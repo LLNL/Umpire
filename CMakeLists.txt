@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.2)
 
 project(Umpire LANGUAGES CXX)
 
-set(ENABLE_CUDA On)
+set(ENABLE_CUDA Off)
 set(ENABLE_COPY_HEADERS On)
+set(ENABLE_TESTS On)
+set(ENABLE_BENCHMARKS On)
 
 ################################
 # BLT
@@ -20,3 +22,6 @@ include(blt/SetupBLT.cmake)
 
 add_subdirectory(src)
 add_subdirectory(docs)
+if (ENABLE_EXAMPLES)
+  add_subdirectory(examples)
+endif()

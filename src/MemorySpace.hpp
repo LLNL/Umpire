@@ -1,44 +1,38 @@
-/**
- * Project Untitled
- */
+#ifndef UMPIRE_MemorySpace_HPP
+#define UMPIRE_MemorySpace_HPP
 
+#include "umpire/MemoryAllocator.hpp"
+#include "umpire/AllocationRecord.hpp"
 
-#ifndef _MEMORY SPACE_H
-#define _MEMORY SPACE_H
+#include <vector>
+#include <map>
+#include <string>
 
-class Memory Space {
-public: 
-    string m_descriptor;
-    map m_allocations;
-    vector m_allocators;
-    MemoryAllocator m_default_allocator;
+namespace umpire {
+
+class MemorySpace {
+  public: 
+    virtual void* allocate(size_t bytes) = 0;
+    virtual void free(void* ptr) = 0;
+
+    virtual void getTotalSize() = 0;
     
-    void getTotalSize();
+    virtual void getProperties() = 0;
+    virtual void getRemainingSize() = 0;
+    //virtual std::string getDescriptor();
     
-    void getProperties();
+    virtual void setDefaultAllocator(MemoryAllocator& allocator) = 0;
+    virtual MemoryAllocator& getDefaultAllocator() = 0;
     
-    void getRemainingSize();
-    
-    /**
-     * @param bytes
-     */
-    void* alloc(size_t bytes);
-    
-    /**
-     * @param ptr
-     */
-    void free(void* ptr);
-    
-    void getDescriptor();
-    
-    /**
-     * @param allocator
-     */
-    void setDefaultAllocator(MemoryAllocator allocator);
-    
-    MemoryAllocator getDefaultAllocator();
-    
-    vector getAllocators();
+    virtual std::vector<MemoryAllocator*> getAllocators() = 0;
+
+  protected: 
+    std::string m_descriptor;
+    std::map<void*, AllocationRecord> m_allocations;
+    std::vector<MemoryAllocator*> m_allocators;
+    MemoryAllocator* m_default_allocator;
 };
 
-#endif //_MEMORY SPACE_H
+} // end of namespace umpire
+
+#endif // UMPIRE_MemorySpace_HPP

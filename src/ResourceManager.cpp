@@ -1,70 +1,65 @@
-/**
- * Project Untitled
- */
+#include "ResourceManager.hpp"
+#include "HostSpace.hpp"
 
+namespace umpire {
 
-#include "ResourceManager.h"
+ResourceManager* ResourceManager::s_resource_manager_instance = nullptr;
 
-/**
- * ResourceManager implementation
- */
+ResourceManager&
+ResourceManager::getInstance()
+{
+  if (!s_resource_manager_instance) {
+    s_resource_manager_instance = new ResourceManager();
+  }
 
-
-/**
- * @return ResourceManager
- */
-ResourceManager ResourceManager::getResourceManager() {
-    return null;
+  return *s_resource_manager_instance;
 }
 
-void ResourceManager::getAvailableSpaces() {
+ResourceManager::ResourceManager() :
+  m_spaces(),
+  m_allocation_spaces()
+{
 
+  MemorySpace* space = new HostSpace();
+  m_spaces.push_back(new HostSpace());
+  m_default_space = space;
 }
 
-/**
- * @param bytes
- * @return void*
- */
+std::vector<MemorySpace*>
+ResourceManager::getAvailableSpaces()
+{
+  return m_spaces;
+}
+
 void* ResourceManager::allocate(size_t bytes) {
-    return null;
+  return allocate(bytes, m_default_space);
 }
 
-/**
- * @param bytes
- * @param space
- * @return void*
- */
-void* ResourceManager::allocate(size_t bytes, string space) {
-    return null;
+void* ResourceManager::allocate(size_t bytes, MemorySpace* space)
+{
+  void* ptr = space->allocate(bytes);
+  m_allocation_spaces[ptr] = space;
+  return ptr;
 }
 
-/**
- * @param bytes
- * @param space
- * @return void*
- */
-void* ResourceManager::allocate(size_t bytes, MemorySpace space) {
-    return null;
+void ResourceManager::free(void* pointer)
+{
+  m_allocation_spaces[pointer]->free(pointer);
 }
 
-/**
- * @param space
- */
-void ResourceManager::setDefaultSpace(MemorySpace space) {
-
+void 
+  ResourceManager::setDefaultSpace(MemorySpace* space)
+{
+  m_default_space = space;
 }
 
-/**
- * @return MemorySpace
- */
-MemorySpace ResourceManager::getDefaultSpace() {
-    return null;
+MemorySpace& ResourceManager::getDefaultSpace()
+{
+  return *m_default_space;
 }
 
-/**
- * @param pointer
- * @param destination
- */
-void ResourceManager::move(void* pointer, MemorySpace destination) {
-
+void ResourceManager::move(void* pointer, MemorySpace& destination)
+{
 }
+
+} // end of namespace umpire
