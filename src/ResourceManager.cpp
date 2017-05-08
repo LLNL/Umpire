@@ -1,5 +1,5 @@
 #include "ResourceManager.hpp"
-#include "HostSpace.hpp"
+#include "space/HostSpace.hpp"
 
 namespace umpire {
 

@@ -1,6 +1,8 @@
-#include "umpire/Umpire.hpp"
+#include <climits>
 
+#include "umpire/Umpire.hpp"
 #include "umpire/MallocAllocator.hpp"
+#include "umpire/CudaAllocator.hpp"
 
 #include "benchmark/benchmark_api.h"
 
@@ -20,7 +22,7 @@ static void benchmark_malloc_ui(benchmark::State& state) {
   }
 }
 
-BENCHMARK(benchmark_malloc)->Range(8, 8<<24);
-BENCHMARK(benchmark_malloc_ui)->Range(8, 8<<24);
+BENCHMARK(benchmark_malloc)->Range(1, INT_MAX);
+BENCHMARK(benchmark_malloc_ui)->Range(1, INT_MAX);
 
 BENCHMARK_MAIN();

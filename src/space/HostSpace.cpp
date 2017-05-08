@@ -1,6 +1,6 @@
 #include "umpire/HostSpace.hpp"
 
-#include "MallocAllocator.hpp"
+#include "../alloc/MallocAllocator.hpp"
 
 namespace umpire {
 
@@ -22,16 +22,16 @@ void HostSpace::free(void* ptr)
 void HostSpace::getTotalSize()
 {}
 
-  void HostSpace::getProperties(){}
+void HostSpace::getProperties(){}
 
-  void HostSpace::getRemainingSize(){}
+void HostSpace::getRemainingSize(){}
 
-  std::string HostSpace::getDescriptor(){}
+std::string HostSpace::getDescriptor(){}
 
-  void HostSpace::setDefaultAllocator(MemoryAllocator& allocator){}
+void HostSpace::setDefaultAllocator(MemoryAllocator& allocator){}
 
-  MemoryAllocator& HostSpace::getDefaultAllocator(){}
+MemoryAllocator& HostSpace::getDefaultAllocator(){}
 
-  std::vector<MemoryAllocator*> HostSpace::getAllocators(){}
+std::vector<MemoryAllocator*> HostSpace::getAllocators(){}
 
 } // end of namespace umpire

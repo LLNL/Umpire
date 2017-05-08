@@ -10,6 +10,8 @@ class ResourceManager {
     static ResourceManager& getInstance();
     
     std::vector<MemorySpace*> getAvailableSpaces();
+
+    MemorySpace* findSpace();
     
     void* allocate(size_t bytes);
     void* allocate(size_t bytes, MemorySpace* space);

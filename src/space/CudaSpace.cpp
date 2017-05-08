@@ -1,6 +1,6 @@
 #include "umpire/GpuSpace.hpp"
 
-#include "CudaMallocAllocator.hpp"
+#include "../alloc/CudaMallocAllocator.hpp"
 
 namespace umpire {
 

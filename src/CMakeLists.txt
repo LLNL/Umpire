@@ -1,23 +1,23 @@
 set (umpire_headers
   AllocationRecord.hpp
-  HostSpace.hpp
-  MallocAllocator.hpp
-  MallocAllocator.inl
-  MemoryAllocator.hpp
-  MemorySpace.hpp
+  space/HostSpace.hpp
+  alloc/MallocAllocator.hpp
+  alloc/MallocAllocator.inl
+  alloc/MemoryAllocator.hpp
+  space/MemorySpace.hpp
   ResourceManager.hpp
   Umpire.hpp)
 
 set (umpire_sources
-  HostSpace.cpp
+  space/HostSpace.cpp
   ResourceManager.cpp)
 
 if (ENABLE_CUDA)
   set(umpire_headers
     ${umpire_headers}
-    CudaMallocAllocator.hpp
-    CudaMallocAllocator.inl
-    GpuSpace.hpp)
+    alloc/CudaMallocAllocator.hpp
+    alloc/CudaMallocAllocator.inl
+    space/GpuSpace.hpp)
   
   set(umpire_sources
     ${umpire_sources}
