@@ -1,14 +1,14 @@
-#ifndef UMPIRE_HostSpaceFactory_HPP
-#define UMPIRE_HostSpaceFactory_HPP
+#ifndef UMPIRE_DeviceSpaceFactory_HPP
+#define UMPIRE_DeviceSpaceFactory_HPP
 
 #include "umpire/space/MemorySpaceFactory.hpp"
 
 namespace umpire {
 namespace space {
 
-class HostSpaceFactory : public MemorySpaceFactory {
+class DeviceSpaceFactory : public MemorySpaceFactory {
   public:
-    HostSpaceFactory();
+    DeviceSpaceFactory();
     void registerFactory(MemorySpaceRegistry& registry);
     std::shared_ptr<MemorySpace> create();
 };
@@ -16,4 +16,4 @@ class HostSpaceFactory : public MemorySpaceFactory {
 } // end of namespace space
 } // end of namespace umpire
 
-#endif // UMPIRE_HostSpaceFactory_HPP
+#endif // UMPIRE_DeviceSpaceFactory_HPP

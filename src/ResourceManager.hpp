@@ -4,6 +4,10 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/space/MemorySpace.hpp"
 
+#include <vector>
+#include <string>
+#include <memory>
+
 namespace umpire {
 
 class ResourceManager : public Allocator {
@@ -12,18 +16,18 @@ class ResourceManager : public Allocator {
     
     std::vector<std::string> getAvailableSpaces();
 
-    space::MemorySpace* findSpace();
+    std::shared_ptr<space::MemorySpace> findSpace();
     
-    /*
-     */
     virtual void* allocate(size_t bytes);
     virtual void free(void* pointer);
 
-    void* allocate(size_t bytes, space::MemorySpace* space);
+    void* allocate(size_t bytes, std::shared_ptr<space::MemorySpace> space);
+
+    void registerAllocation(void* ptr, std::shared_ptr<space::MemorySpace> space);
 
     
-    void setDefaultSpace(space::MemorySpace* space);
-    space::MemorySpace& getDefaultSpace();
+    void setDefaultSpace(std::shared_ptr<space::MemorySpace> space);
+    std::shared_ptr<space::MemorySpace> getDefaultSpace();
     
     /**
      * @brief
@@ -39,9 +43,9 @@ class ResourceManager : public Allocator {
   private:
     static ResourceManager* s_resource_manager_instance;
 
-    std::map<std::string, space::MemorySpace*> m_spaces;
-    std::map<void*, space::MemorySpace*> m_allocation_spaces;
-    space::MemorySpace* m_default_space;
+    std::map<std::string, std::shared_ptr<space::MemorySpace>> m_spaces;
+    std::map<void*, std::shared_ptr<space::MemorySpace>> m_allocation_spaces;
+    std::shared_ptr<space::MemorySpace> m_default_space;
 
     long m_allocated;
 };

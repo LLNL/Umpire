@@ -28,14 +28,14 @@ MemorySpaceRegistry::MemorySpaceRegistry() :
 
 void MemorySpaceRegistry::buildRegistry()
 {
-  HostSpaceFactory f;
-  f.registerFactory(*this);
+  std::shared_ptr<HostSpaceFactory> f = std::make_shared<HostSpaceFactory>();
+  f->registerFactory(*this);
 }
 
 void
 MemorySpaceRegistry::registerMemorySpaceFactory(
     const std::string& name, 
-    MemorySpaceFactory* factory)
+    std::shared_ptr<MemorySpaceFactory> factory)
 {
   if (m_space_factories.find(name) != m_space_factories.end()) {
     UMPIRE_ERROR("Duplicate MemorySpaceFactories registered with MemorySpaceRegistry");
@@ -51,7 +51,7 @@ MemorySpaceRegistry::getMemorySpaceFactoryNames()
   return m_space_factory_names;
 }
 
-MemorySpaceFactory*
+std::shared_ptr<MemorySpaceFactory>
 MemorySpaceRegistry::getMemorySpaceFactory(const std::string& name)
 {
   if (m_space_factories.find(name) != m_space_factories.end()) {

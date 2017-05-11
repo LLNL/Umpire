@@ -8,15 +8,20 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <memory>
 
 namespace umpire {
+
+class ResourceManager;
+
 namespace space {
 
-class MemorySpace : public Allocator {
+class MemorySpace : 
+  public Allocator, 
+  public std::enable_shared_from_this<MemorySpace> 
+{
   public: 
-    MemorySpace();
-
-    MemorySpace(alloc::MemoryAllocator* allocator);
+    MemorySpace(const std::string& name, alloc::MemoryAllocator* allocator);
 
     virtual void* allocate(size_t bytes);
     virtual void free(void* ptr);
@@ -29,18 +34,19 @@ class MemorySpace : public Allocator {
     virtual void getRemainingSize();
     virtual std::string getDescriptor();
 
-    //virtual void addAllocator(alloc::MemoryAllocator* allocator);
-    
     virtual void setDefaultAllocator(alloc::MemoryAllocator* allocator);
     virtual alloc::MemoryAllocator& getDefaultAllocator();
-    
-    virtual std::vector<alloc::MemoryAllocator*> getAllocators();
 
   protected: 
+
     std::string m_descriptor;
-    std::map<void*, AllocationRecord> m_allocations;
-    std::vector<alloc::MemoryAllocator*> m_allocators;
+
+    std::map<void*, alloc::MemoryAllocator*> m_allocations;
+
     alloc::MemoryAllocator* m_default_allocator;
+    // ResourceManager& m_resource_manager;
+  private:
+    MemorySpace();
 };
 
 } // end of namespace space

@@ -17,14 +17,12 @@ HostSpaceFactory::HostSpaceFactory() {
 void 
 HostSpaceFactory::registerFactory(MemorySpaceRegistry& registry) {
   UMPIRE_LOG("Registering HostSpaceFactory");
-  registry.registerMemorySpaceFactory("HOST", new HostSpaceFactory());
+  registry.registerMemorySpaceFactory("HOST", std::make_shared<HostSpaceFactory>());
 }
 
-MemorySpace* HostSpaceFactory::create() {
+std::shared_ptr<MemorySpace> HostSpaceFactory::create() {
   UMPIRE_LOG("Creating MemorySpace");
-  MemorySpace* space = new MemorySpace(new alloc::MallocAllocator());
-
-  return space;
+  return std::make_shared<MemorySpace>("HOST", new alloc::MallocAllocator());
 }
 
 } // end of namespace space

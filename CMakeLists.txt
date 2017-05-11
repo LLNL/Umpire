@@ -7,6 +7,7 @@ set(ENABLE_CUDA Off CACHE Bool "")
 set(ENABLE_COPY_HEADERS On CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
+option(ENABLE_EXAMPLES "Build Umpire examples" On)
 
 ################################
 # BLT
@@ -29,8 +30,8 @@ endif ()
 if (ENABLE_BENCHMARKS)
   add_subdirectory(benchmarks)
 endif ()
-#if (ENABLE_EXAMPLES)
+if (ENABLE_EXAMPLES)
 add_subdirectory(examples)
-  #endif()
+endif ()
 
 add_subdirectory(docs)

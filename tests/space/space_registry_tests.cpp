@@ -10,7 +10,8 @@ TEST(MemorySpaceRegistry, FindHostSpace)
   umpire::space::MemorySpaceRegistry& registry =
     umpire::space::MemorySpaceRegistry::getInstance();
 
-  std::shared_ptr<umpire::space::MemorySpaceFactory> space = registry.getMemorySpaceFactory("HOST");
+  std::shared_ptr<umpire::space::MemorySpaceFactory> space = 
+    registry.getMemorySpaceFactory("HOST");
 
   ASSERT_NE(nullptr, dynamic_cast<umpire::space::HostSpaceFactory*>(space.get()));
 }

@@ -3,6 +3,8 @@
 
 #include "umpire/space/MemorySpace.hpp"
 
+#include <memory>
+
 namespace umpire {
 namespace space {
 
@@ -10,7 +12,7 @@ class MemorySpaceRegistry;
 
 class MemorySpaceFactory {
   public:
-    virtual MemorySpace* create() = 0;
+    virtual std::shared_ptr<MemorySpace> create() = 0;
     virtual void registerFactory(MemorySpaceRegistry& registry) = 0; 
 };
 

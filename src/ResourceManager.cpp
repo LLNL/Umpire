@@ -43,11 +43,9 @@ void* ResourceManager::allocate(size_t bytes) {
   return allocate(bytes, m_default_space);
 }
 
-void* ResourceManager::allocate(size_t bytes, space::MemorySpace* space)
+void* ResourceManager::allocate(size_t bytes, std::shared_ptr<space::MemorySpace> space)
 {
-  void* ptr = space->allocate(bytes);
-  m_allocation_spaces[ptr] = space;
-  return ptr;
+  return space->allocate(bytes);
 }
 
 void ResourceManager::free(void* pointer)
@@ -56,14 +54,19 @@ void ResourceManager::free(void* pointer)
 }
 
 void 
-  ResourceManager::setDefaultSpace(space::MemorySpace* space)
+  ResourceManager::setDefaultSpace(std::shared_ptr<space::MemorySpace> space)
 {
   m_default_space = space;
 }
 
-space::MemorySpace& ResourceManager::getDefaultSpace()
+std::shared_ptr<space::MemorySpace> ResourceManager::getDefaultSpace()
 {
-  return *m_default_space;
+  return m_default_space;
+}
+
+void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<space::MemorySpace> space)
+{
+  m_allocation_spaces[ptr] = space;
 }
 
 void ResourceManager::move(void* pointer, space::MemorySpace& destination)

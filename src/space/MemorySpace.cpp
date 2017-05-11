@@ -1,21 +1,28 @@
 #include "umpire/space/MemorySpace.hpp"
 
+#include "umpire/ResourceManager.hpp"
+
 namespace umpire {
 
 namespace space {
 
-MemorySpace::MemorySpace()
-{
-}
-
-MemorySpace::MemorySpace(alloc::MemoryAllocator* allocator) :
+MemorySpace::MemorySpace(
+    const std::string& name,
+    alloc::MemoryAllocator* allocator) :
+  m_descriptor(name),
+  m_allocations(),
   m_default_allocator(allocator)
 {
 }
 
 void* MemorySpace::allocate(size_t bytes)
 {
-  return m_default_allocator->allocate(bytes);
+  void* ptr = m_default_allocator->allocate(bytes);
+
+  m_allocations[ptr] = m_default_allocator;
+  ResourceManager::getInstance().registerAllocation(ptr, shared_from_this());
+
+  return ptr;
 }
 
 void MemorySpace::free(void* ptr)
@@ -24,7 +31,8 @@ void MemorySpace::free(void* ptr)
 }
 
 void MemorySpace::getTotalSize()
-{}
+{
+}
 
 void MemorySpace::getProperties(){}
 
@@ -35,8 +43,6 @@ std::string MemorySpace::getDescriptor(){}
 void MemorySpace::setDefaultAllocator(alloc::MemoryAllocator* allocator){}
 
 alloc::MemoryAllocator& MemorySpace::getDefaultAllocator(){}
-
-std::vector<alloc::MemoryAllocator*> MemorySpace::getAllocators(){}
 
 } // end of namespace space
 } // end of namespace umpire
