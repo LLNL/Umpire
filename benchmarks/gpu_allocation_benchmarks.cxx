@@ -1,6 +1,6 @@
-#include "umpire/CudaMallocAllocator.hpp"
-
 #include "benchmark/benchmark_api.h"
+
+#include "umpire/CudaMallocAllocator.hpp"
 
 static void benchmark_malloc_free(benchmark::State& state) {
   auto allocator = umpire::CudaMallocAllocator();

@@ -1,10 +1,10 @@
 #ifndef UMPIRE_MallocAllocator_HPP
 #define UMPIRE_MallocAllocator_HPP
 
-#include "umpire/MemoryAllocator.hpp"
-#include "umpire/MemorySpace.hpp"
+#include "umpire/alloc/MemoryAllocator.hpp"
 
 namespace umpire {
+namespace alloc {
 
 class MallocAllocator :
   public MemoryAllocator
@@ -17,9 +17,9 @@ class MallocAllocator :
   void free(void* ptr);
 };
 
+} // end of namespace alloc
 } // end of namespace umpire
 
-#include "umpire/MallocAllocator.inl"
+#include "umpire/alloc/MallocAllocator.inl"
 
 #endif // UMPIRE_MallocAllocator_HPP
-

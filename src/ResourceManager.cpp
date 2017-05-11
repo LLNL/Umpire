@@ -1,5 +1,6 @@
-#include "ResourceManager.hpp"
-#include "space/HostSpace.hpp"
+#include "umpire/ResourceManager.hpp"
+
+#include "umpire/space/MemorySpaceRegistry.hpp"
 
 namespace umpire {
 
@@ -19,23 +20,30 @@ ResourceManager::ResourceManager() :
   m_spaces(),
   m_allocation_spaces()
 {
+  umpire::space::MemorySpaceRegistry& registry =
+    umpire::space::MemorySpaceRegistry::getInstance();
 
-  MemorySpace* space = new HostSpace();
-  m_spaces.push_back(new HostSpace());
-  m_default_space = space;
+  for (std::string factory_name : registry.getMemorySpaceFactoryNames()) {
+    m_spaces[factory_name] = registry.getMemorySpaceFactory(factory_name)->create();
+  }
+
+  m_default_space = m_spaces["HOST"];
 }
 
-std::vector<MemorySpace*>
+std::vector<std::string>
 ResourceManager::getAvailableSpaces()
 {
-  return m_spaces;
+  umpire::space::MemorySpaceRegistry& registry =
+    umpire::space::MemorySpaceRegistry::getInstance();
+
+  return registry.getMemorySpaceFactoryNames();
 }
 
 void* ResourceManager::allocate(size_t bytes) {
   return allocate(bytes, m_default_space);
 }
 
-void* ResourceManager::allocate(size_t bytes, MemorySpace* space)
+void* ResourceManager::allocate(size_t bytes, space::MemorySpace* space)
 {
   void* ptr = space->allocate(bytes);
   m_allocation_spaces[ptr] = space;
@@ -48,17 +56,17 @@ void ResourceManager::free(void* pointer)
 }
 
 void 
-  ResourceManager::setDefaultSpace(MemorySpace* space)
+  ResourceManager::setDefaultSpace(space::MemorySpace* space)
 {
   m_default_space = space;
 }
 
-MemorySpace& ResourceManager::getDefaultSpace()
+space::MemorySpace& ResourceManager::getDefaultSpace()
 {
   return *m_default_space;
 }
 
-void ResourceManager::move(void* pointer, MemorySpace& destination)
+void ResourceManager::move(void* pointer, space::MemorySpace& destination)
 {
 }
 

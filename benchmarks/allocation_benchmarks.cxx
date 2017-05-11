@@ -1,13 +1,12 @@
 #include <climits>
 
 #include "umpire/Umpire.hpp"
-#include "umpire/MallocAllocator.hpp"
-#include "umpire/CudaAllocator.hpp"
+#include "umpire/alloc/MallocAllocator.hpp"
 
 #include "benchmark/benchmark_api.h"
 
 static void benchmark_malloc(benchmark::State& state) {
-  auto allocator = umpire::MallocAllocator();
+  auto allocator = umpire::alloc::MallocAllocator();
 
   while (state.KeepRunning()) {
     void* ptr = allocator.allocate(state.range_x());

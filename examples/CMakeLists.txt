@@ -13,3 +13,5 @@ if (ENABLE_CUDA)
       umpire
       cuda)
 endif ()
+
+add_subdirectory(lulesh)

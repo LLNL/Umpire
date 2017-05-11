@@ -1,6 +1,8 @@
 #ifndef UMPIRE_AllocationRecord_HPP
 #define UMPIRE_AllocationRecord_HPP
 
+#include "umpire/alloc/MemoryAllocator.hpp"
+
 namespace umpire {
 
 struct AllocationRecord
@@ -8,7 +10,7 @@ struct AllocationRecord
   void* m_ptr;
   size_t m_size;
 
-  MemoryAllocator* m_allocator;
+  alloc::MemoryAllocator* m_allocator;
 };
 
 } // end of namespace umpire
