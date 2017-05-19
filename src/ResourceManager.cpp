@@ -1,6 +1,7 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/space/MemorySpaceRegistry.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 
@@ -37,6 +38,16 @@ ResourceManager::getAvailableSpaces()
     umpire::space::MemorySpaceRegistry::getInstance();
 
   return registry.getMemorySpaceFactoryNames();
+}
+
+std::shared_ptr<space::MemorySpace>
+ResourceManager::getSpace(const std::string& space)
+{
+  if (m_spaces.find(space) != m_spaces.end()) {
+    return m_spaces[space];
+  } else {
+    UMPIRE_ERROR("ResourceManager: cannot find space with name = " << space);
+  }
 }
 
 void* ResourceManager::allocate(size_t bytes) {

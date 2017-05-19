@@ -2,7 +2,6 @@
 #define UMPIRE_Pool_INL
 
 #include "umpire/alloc/Pool.hpp"
-
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -16,7 +15,7 @@ Pool<alloc>::Pool() :
 }
 
 template <typename alloc>
-Pool<alloc>::Pool(shared_ptr<space::MemorySpace> space) :
+Pool<alloc>::Pool(std::shared_ptr<space::MemorySpace> space) :
   m_allocator(alloc{}),
   m_space(space)
 {
@@ -46,7 +45,7 @@ Pool<alloc>::allocate(size_t bytes)
   }
 
   if (m_space) {
-    m_space->registerAllocation(ptr, this);
+    //m_space->registerAllocation(ptr, this);
   }
 
   return ptr;
@@ -59,7 +58,7 @@ Pool<alloc>::free(void* ptr)
   for (int i = 0; i < 32; ++i) {
     if (m_pointers[i] == ptr) {
       if (m_space) {
-        m_space->unregisterAllocation(ptr);
+        //m_space->un/registerAllocation(ptr);
       }
       m_lengths[i] = -m_lengths[i];
       ptr = nullptr;

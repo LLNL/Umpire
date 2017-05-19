@@ -72,8 +72,9 @@
 #include <iostream>
 
 #include "umpire/Umpire.hpp"
+#include "umpire/alloc/Pool.hpp"
 
-#define LULESH_SHOW_PROGRESS 1
+#undef LULESH_SHOW_PROGRESS //1
 
 enum { VolumeError = -1, QStopError = -2 } ;
 
@@ -102,6 +103,7 @@ inline real4  FABS(real4  arg) { return fabsf(arg) ; }
 inline real8  FABS(real8  arg) { return fabs(arg) ; }
 inline real10 FABS(real10 arg) { return fabsl(arg) ; }
 
+
   template <typename T>
 T *Allocate(size_t size)
 {
@@ -126,6 +128,42 @@ void Release(T **ptr)
     *ptr = NULL ;
   }
 }
+
+#define USE_POOL
+
+umpire::alloc::Pool<> pool;
+
+#ifdef USE_POOL
+
+template <typename T>
+T* PoolAllocate(size_t size) {
+  return static_cast<T*>(pool.allocate(sizeof(T) * size));
+}
+
+template <typename T>
+void PoolRelease(T** ptr)
+{
+  if (*ptr != NULL) {
+    pool.free(*ptr);
+  }
+}
+
+#else
+template <typename T>
+T* PoolAllocate(size_t size) {
+  return static_cast<T *>(umpire::malloc(sizeof(T)*size)) ;
+}
+
+template <typename T>
+void PoolRelease(T** ptr)
+{
+  if (*ptr != NULL) {
+    umpire::free(*ptr);
+    *ptr = NULL;
+  }
+}
+#endif
+
 
 /************************************************************/
 /* Allow for flexible data layout experiments by separating */
@@ -863,9 +901,9 @@ void IntegrateStressForElems( Index_t numElem,
     Real_t *determ)
 {
   Index_t numElem8 = numElem * 8 ;
-  Real_t *fx_elem = Allocate<Real_t>(numElem8) ;
-  Real_t *fy_elem = Allocate<Real_t>(numElem8) ;
-  Real_t *fz_elem = Allocate<Real_t>(numElem8) ;
+  Real_t *fx_elem = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *fy_elem = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *fz_elem = PoolAllocate<Real_t>(numElem8) ;
 
   // loop over all elements
 #pragma omp parallel for firstprivate(numElem)
@@ -932,9 +970,9 @@ void IntegrateStressForElems( Index_t numElem,
     }
   }
 
-  Release(&fz_elem) ;
-  Release(&fy_elem) ;
-  Release(&fx_elem) ;
+  PoolRelease(&fz_elem) ;
+  PoolRelease(&fy_elem) ;
+  PoolRelease(&fx_elem) ;
 }
 
 
@@ -1252,9 +1290,9 @@ void CalcFBHourglassForceForElems(Real_t *determ,
 
   Index_t numElem = domain.numElem() ;
   Index_t numElem8 = numElem * 8 ;
-  Real_t *fx_elem = Allocate<Real_t>(numElem8) ;
-  Real_t *fy_elem = Allocate<Real_t>(numElem8) ;
-  Real_t *fz_elem = Allocate<Real_t>(numElem8) ;
+  Real_t *fx_elem = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *fy_elem = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *fz_elem = PoolAllocate<Real_t>(numElem8) ;
 
   Real_t  gamma[4][8];
 
@@ -1502,9 +1540,9 @@ void CalcFBHourglassForceForElems(Real_t *determ,
     }
   }
 
-  Release(&fz_elem) ;
-  Release(&fy_elem) ;
-  Release(&fx_elem) ;
+  PoolRelease(&fz_elem) ;
+  PoolRelease(&fy_elem) ;
+  PoolRelease(&fx_elem) ;
 }
 
   static inline
@@ -1512,12 +1550,12 @@ void CalcHourglassControlForElems(Real_t determ[], Real_t hgcoef)
 {
   Index_t numElem = domain.numElem() ;
   Index_t numElem8 = numElem * 8 ;
-  Real_t *dvdx = Allocate<Real_t>(numElem8) ;
-  Real_t *dvdy = Allocate<Real_t>(numElem8) ;
-  Real_t *dvdz = Allocate<Real_t>(numElem8) ;
-  Real_t *x8n  = Allocate<Real_t>(numElem8) ;
-  Real_t *y8n  = Allocate<Real_t>(numElem8) ;
-  Real_t *z8n  = Allocate<Real_t>(numElem8) ;
+  Real_t *dvdx = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *dvdy = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *dvdz = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *x8n  = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *y8n  = PoolAllocate<Real_t>(numElem8) ;
+  Real_t *z8n  = PoolAllocate<Real_t>(numElem8) ;
 
   /* start loop over elements */
 #pragma omp parallel for firstprivate(numElem)
@@ -1554,12 +1592,12 @@ void CalcHourglassControlForElems(Real_t determ[], Real_t hgcoef)
     CalcFBHourglassForceForElems(determ,x8n,y8n,z8n,dvdx,dvdy,dvdz,hgcoef) ;
   }
 
-  Release(&z8n) ;
-  Release(&y8n) ;
-  Release(&x8n) ;
-  Release(&dvdz) ;
-  Release(&dvdy) ;
-  Release(&dvdx) ;
+  PoolRelease(&z8n) ;
+  PoolRelease(&y8n) ;
+  PoolRelease(&x8n) ;
+  PoolRelease(&dvdz) ;
+  PoolRelease(&dvdy) ;
+  PoolRelease(&dvdx) ;
 
   return ;
 }
@@ -1570,10 +1608,10 @@ void CalcVolumeForceForElems()
   Index_t numElem = domain.numElem() ;
   if (numElem != 0) {
     Real_t  hgcoef = domain.hgcoef() ;
-    Real_t *sigxx  = Allocate<Real_t>(numElem) ;
-    Real_t *sigyy  = Allocate<Real_t>(numElem) ;
-    Real_t *sigzz  = Allocate<Real_t>(numElem) ;
-    Real_t *determ = Allocate<Real_t>(numElem) ;
+    Real_t *sigxx  = PoolAllocate<Real_t>(numElem) ;
+    Real_t *sigyy  = PoolAllocate<Real_t>(numElem) ;
+    Real_t *sigzz  = PoolAllocate<Real_t>(numElem) ;
+    Real_t *determ = PoolAllocate<Real_t>(numElem) ;
 
     /* Sum contributions to total stress tensor */
     InitStressTermsForElems(numElem, sigxx, sigyy, sigzz);
@@ -1592,10 +1630,10 @@ void CalcVolumeForceForElems()
 
     CalcHourglassControlForElems(determ, hgcoef) ;
 
-    Release(&determ) ;
-    Release(&sigzz) ;
-    Release(&sigyy) ;
-    Release(&sigxx) ;
+    PoolRelease(&determ) ;
+    PoolRelease(&sigzz) ;
+    PoolRelease(&sigyy) ;
+    PoolRelease(&sigxx) ;
   }
 }
 
@@ -2431,7 +2469,7 @@ void CalcEnergyForElems(Real_t* p_new, Real_t* e_new, Real_t* q_new,
     Real_t eosvmax,
     Index_t length)
 {
-  Real_t *pHalfStep = Allocate<Real_t>(length) ;
+  Real_t *pHalfStep = PoolAllocate<Real_t>(length) ;
 
 #pragma omp parallel for firstprivate(length, emin)
   for (Index_t i = 0 ; i < length ; ++i) {
@@ -2542,7 +2580,7 @@ void CalcEnergyForElems(Real_t* p_new, Real_t* e_new, Real_t* q_new,
     }
   }
 
-  Release(&pHalfStep) ;
+  PoolRelease(&pHalfStep) ;
 
   return ;
 }
@@ -2581,20 +2619,20 @@ void EvalEOSForElems(Real_t *vnewc, Index_t length)
   Real_t emin    = domain.emin() ;
   Real_t rho0    = domain.refdens() ;
 
-  Real_t *e_old = Allocate<Real_t>(length) ;
-  Real_t *delvc = Allocate<Real_t>(length) ;
-  Real_t *p_old = Allocate<Real_t>(length) ;
-  Real_t *q_old = Allocate<Real_t>(length) ;
-  Real_t *compression = Allocate<Real_t>(length) ;
-  Real_t *compHalfStep = Allocate<Real_t>(length) ;
-  Real_t *qq = Allocate<Real_t>(length) ;
-  Real_t *ql = Allocate<Real_t>(length) ;
-  Real_t *work = Allocate<Real_t>(length) ;
-  Real_t *p_new = Allocate<Real_t>(length) ;
-  Real_t *e_new = Allocate<Real_t>(length) ;
-  Real_t *q_new = Allocate<Real_t>(length) ;
-  Real_t *bvc = Allocate<Real_t>(length) ;
-  Real_t *pbvc = Allocate<Real_t>(length) ;
+  Real_t *e_old = PoolAllocate<Real_t>(length) ;
+  Real_t *delvc = PoolAllocate<Real_t>(length) ;
+  Real_t *p_old = PoolAllocate<Real_t>(length) ;
+  Real_t *q_old = PoolAllocate<Real_t>(length) ;
+  Real_t *compression = PoolAllocate<Real_t>(length) ;
+  Real_t *compHalfStep = PoolAllocate<Real_t>(length) ;
+  Real_t *qq = PoolAllocate<Real_t>(length) ;
+  Real_t *ql = PoolAllocate<Real_t>(length) ;
+  Real_t *work = PoolAllocate<Real_t>(length) ;
+  Real_t *p_new = PoolAllocate<Real_t>(length) ;
+  Real_t *e_new = PoolAllocate<Real_t>(length) ;
+  Real_t *q_new = PoolAllocate<Real_t>(length) ;
+  Real_t *bvc = PoolAllocate<Real_t>(length) ;
+  Real_t *pbvc = PoolAllocate<Real_t>(length) ;
 
   /* compress data, minimal set */
 #pragma omp parallel
@@ -2691,20 +2729,20 @@ void EvalEOSForElems(Real_t *vnewc, Index_t length)
   CalcSoundSpeedForElems(vnewc, rho0, e_new, p_new,
       pbvc, bvc, ss4o3, length) ;
 
-  Release(&pbvc) ;
-  Release(&bvc) ;
-  Release(&q_new) ;
-  Release(&e_new) ;
-  Release(&p_new) ;
-  Release(&work) ;
-  Release(&ql) ;
-  Release(&qq) ;
-  Release(&compHalfStep) ;
-  Release(&compression) ;
-  Release(&q_old) ;
-  Release(&p_old) ;
-  Release(&delvc) ;
-  Release(&e_old) ;
+  PoolRelease(&pbvc) ;
+  PoolRelease(&bvc) ;
+  PoolRelease(&q_new) ;
+  PoolRelease(&e_new) ;
+  PoolRelease(&p_new) ;
+  PoolRelease(&work) ;
+  PoolRelease(&ql) ;
+  PoolRelease(&qq) ;
+  PoolRelease(&compHalfStep) ;
+  PoolRelease(&compression) ;
+  PoolRelease(&q_old) ;
+  PoolRelease(&p_old) ;
+  PoolRelease(&delvc) ;
+  PoolRelease(&e_old) ;
 }
 
   static inline
@@ -2716,7 +2754,7 @@ void ApplyMaterialPropertiesForElems()
     /* Expose all of the variables needed for material evaluation */
     Real_t eosvmin = domain.eosvmin() ;
     Real_t eosvmax = domain.eosvmax() ;
-    Real_t *vnewc = Allocate<Real_t>(length) ;
+    Real_t *vnewc = PoolAllocate<Real_t>(length) ;
 
 #pragma omp parallel
     {
@@ -2762,7 +2800,7 @@ void ApplyMaterialPropertiesForElems()
 
     EvalEOSForElems(vnewc, length);
 
-    Release(&vnewc) ;
+    PoolRelease(&vnewc) ;
 
   }
 }
@@ -2981,6 +3019,11 @@ int main(int argc, char *argv[])
     std::cout << space << " ";
   }
   std::cout << std::endl;
+
+  std::cout << "Creating Pool in space HOST..." << std::endl;
+
+  auto host_space = rm.getSpace("HOST");
+  pool = umpire::alloc::Pool<>(host_space);
 
   /* get run options to measure various metrics */
 

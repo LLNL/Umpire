@@ -2,10 +2,10 @@ set(umpire_alloc_headers
     MallocAllocator.hpp
     MallocAllocator.inl
     MemoryAllocator.hpp
-    Pool.hpp)
+    Pool.hpp
+    Pool.inl)
 
 set (umpire_alloc_sources
-  Pool.cpp
   )
 
 blt_add_library(

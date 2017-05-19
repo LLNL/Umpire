@@ -16,7 +16,7 @@ class ResourceManager : public Allocator {
     
     std::vector<std::string> getAvailableSpaces();
 
-    std::shared_ptr<space::MemorySpace> findSpace();
+    std::shared_ptr<space::MemorySpace> getSpace(const std::string& space);
     
     virtual void* allocate(size_t bytes);
     virtual void free(void* pointer);

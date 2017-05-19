@@ -2,8 +2,8 @@
 #define UMPIRE_Macros_HPP
 
 #include "umpire/util/Exception.hpp"
-
 #include <sstream>
+#include <iostream>
 
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
