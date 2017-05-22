@@ -24,6 +24,7 @@ class ResourceManager : public Allocator {
     void* allocate(size_t bytes, std::shared_ptr<space::MemorySpace> space);
 
     void registerAllocation(void* ptr, std::shared_ptr<space::MemorySpace> space);
+    void deregisterAllocation(void* ptr);
 
     
     void setDefaultSpace(std::shared_ptr<space::MemorySpace> space);

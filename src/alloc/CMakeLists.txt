@@ -1,9 +1,11 @@
 set(umpire_alloc_headers
-    MallocAllocator.hpp
-    MallocAllocator.inl
-    MemoryAllocator.hpp
-    Pool.hpp
-    Pool.inl)
+  CudaMallocAllocator.hpp
+  CudaMallocAllocator.inl
+  MallocAllocator.hpp
+  MallocAllocator.inl
+  MemoryAllocator.hpp
+  Pool.hpp
+  Pool.inl)
 
 set (umpire_alloc_sources
   )

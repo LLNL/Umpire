@@ -1,8 +1,7 @@
 #ifndef UMPIRE_CudaMallocAllocator_HPP
 #define UMPIRE_CudaMallocAllocator_HPP
 
-#include "umpire/MemoryAllocator.hpp"
-#include "umpire/MemorySpace.hpp"
+#include "umpire/alloc/MemoryAllocator.hpp"
 
 namespace umpire {
 
@@ -19,7 +18,7 @@ class CudaMallocAllocator :
 
 } // end of namespace umpire
 
-#include "umpire/CudaMallocAllocator.inl"
+#include "umpire/alloc/CudaMallocAllocator.inl"
 
 #endif // UMPIRE_CudaMallocAllocator_HPP
 

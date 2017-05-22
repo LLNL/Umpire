@@ -26,8 +26,6 @@ class MemorySpace :
     virtual void* allocate(size_t bytes);
     virtual void free(void* ptr);
 
-    //virtual void* allocate(size_t bytes, Allocator* allocator);
-
     virtual void getTotalSize();
     
     virtual void getProperties();
@@ -38,13 +36,11 @@ class MemorySpace :
     virtual alloc::MemoryAllocator& getDefaultAllocator();
 
   protected: 
-
     std::string m_descriptor;
 
     std::map<void*, alloc::MemoryAllocator*> m_allocations;
 
     alloc::MemoryAllocator* m_default_allocator;
-    // ResourceManager& m_resource_manager;
   private:
     MemorySpace();
 };

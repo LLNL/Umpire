@@ -1,7 +1,7 @@
 #ifndef UMPIRE_CudaMallocAllocator_INL
 #define UMPIRE_CudaMallocAllocator_INL
 
-#include "umpire/CudaMallocAllocator.hpp"
+#include "umpire/alloc/CudaMallocAllocator.hpp"
 
 #include <cuda.h>
 

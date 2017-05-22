@@ -1,5 +1,6 @@
 #include "umpire/space/MemorySpaceRegistry.hpp"
 #include "umpire/space/HostSpaceFactory.hpp"
+#include "umpire/space/DeviceSpaceFactory.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -28,8 +29,15 @@ MemorySpaceRegistry::MemorySpaceRegistry() :
 
 void MemorySpaceRegistry::buildRegistry()
 {
-  std::shared_ptr<HostSpaceFactory> f = std::make_shared<HostSpaceFactory>();
-  f->registerFactory(*this);
+  {
+    std::shared_ptr<HostSpaceFactory> f = std::make_shared<HostSpaceFactory>();
+    f->registerFactory(*this);
+  }
+
+  {
+    std::shared_ptr<HostSpaceFactory> f = std::make_shared<DeviceSpaceFactory>();
+    f->registerFactory(*this);
+  }
 }
 
 void

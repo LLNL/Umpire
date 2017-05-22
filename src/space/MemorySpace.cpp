@@ -18,7 +18,6 @@ MemorySpace::MemorySpace(
 void* MemorySpace::allocate(size_t bytes)
 {
   void* ptr = m_default_allocator->allocate(bytes);
-
   m_allocations[ptr] = m_default_allocator;
   ResourceManager::getInstance().registerAllocation(ptr, shared_from_this());
 
@@ -28,6 +27,7 @@ void* MemorySpace::allocate(size_t bytes)
 void MemorySpace::free(void* ptr)
 {
   m_default_allocator->free(ptr);
+  ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
 void MemorySpace::getTotalSize()

@@ -1,4 +1,5 @@
 set (umpire_space_headers
+      DeviceSpaceFactory.hpp
       HostSpaceFactory.hpp
       MemorySpace.hpp
       MemorySpaceDescriptors.hpp
@@ -7,6 +8,7 @@ set (umpire_space_headers
 )
 
 set (umpire_space_sources
+      DeviceSpaceFactory.cpp
       HostSpaceFactory.cpp
       MemorySpace.cpp
       MemorySpaceRegistry.cpp
@@ -17,5 +19,5 @@ blt_add_library(
   HEADERS ${umpire_space_headers}
   SOURCES ${umpire_space_sources}
   HEADERS_OUTPUT_SUBDIR umpire/space
-  DEPENDS_ON umpire_alloc umpire_util)
+  DEPENDS_ON umpire_alloc umpire_util cuda_rt)
 

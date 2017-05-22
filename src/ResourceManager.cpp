@@ -80,6 +80,11 @@ void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<space::Memor
   m_allocation_spaces[ptr] = space;
 }
 
+void ResourceManager::deregisterAllocation(void* ptr)
+{
+  m_allocation_spaces.erase(ptr);
+}
+
 void ResourceManager::move(void* pointer, space::MemorySpace& destination)
 {
 }
