@@ -34,10 +34,15 @@ void MemorySpaceRegistry::buildRegistry()
     f->registerFactory(*this);
   }
 
+#if defined(HAVE_CUDA)
   {
     std::shared_ptr<HostSpaceFactory> f = std::make_shared<DeviceSpaceFactory>();
     f->registerFactory(*this);
   }
+#endif
+
+#if defined(HAVE_KNL)
+#endif
 }
 
 void

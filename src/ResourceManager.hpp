@@ -36,7 +36,7 @@ class ResourceManager : public Allocator {
      * @param pointer
      * @param destination
      */
-    void move(void* pointer, space::MemorySpace& destination);
+    void* copy(void* pointer, space::MemorySpace& destination);
 
   protected:
     ResourceManager();

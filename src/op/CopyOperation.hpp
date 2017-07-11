@@ -10,7 +10,6 @@ class CopyOperation : public MemoryOperation {
   CopyOperation();
 
   void operator()(void *ptr,
-                  const MemorySpace &source,
                   const MemorySpace &dest);
 };
 

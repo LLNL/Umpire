@@ -7,7 +7,7 @@ namespace umpire {
 
 /*!
  * \brief Allocator provides a unified interface to all Umpire classes that can
- * allocate data.
+ * be used to allocate and free data.
  */
 class Allocator {
   public:
