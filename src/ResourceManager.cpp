@@ -85,8 +85,8 @@ void ResourceManager::deregisterAllocation(void* ptr)
   m_allocation_spaces.erase(ptr);
 }
 
-void ResourceManager::move(void* pointer, space::MemorySpace& destination)
-{
-}
+// void ResourceManager::move(void* pointer, space::MemorySpace& destination)
+// {
+// }
 
 } // end of namespace umpire

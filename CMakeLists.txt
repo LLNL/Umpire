@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 project(Umpire LANGUAGES CXX)
 
 set(ENABLE_OPENMP On CACHE Bool "")
-set(ENABLE_CUDA Off CACHE Bool "")
+set(ENABLE_CUDA On CACHE Bool "")
 set(ENABLE_COPY_HEADERS On CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
@@ -21,6 +21,10 @@ if (NOT EXISTS ${PROJECT_SOURCE_DIR}/blt/SetupBLT.cmake)
 endif()
 
 include(blt/SetupBLT.cmake)
+
+if (ENABLE_CUDA)
+  set(CUDA_NVCC_FLAGS -std=c++11)
+endif ()
 
 add_subdirectory(src)
 

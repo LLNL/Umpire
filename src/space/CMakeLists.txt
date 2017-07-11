@@ -19,5 +19,5 @@ blt_add_library(
   HEADERS ${umpire_space_headers}
   SOURCES ${umpire_space_sources}
   HEADERS_OUTPUT_SUBDIR umpire/space
-  DEPENDS_ON umpire_alloc umpire_util cuda_rt)
+  DEPENDS_ON umpire umpire_alloc umpire_util cuda_runtime)
 

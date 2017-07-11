@@ -2,6 +2,7 @@
 #define UMPIRE_DeviceSpaceFactory_HPP
 
 #include "umpire/space/MemorySpaceFactory.hpp"
+#include "umpire/space/MemorySpaceRegistry.hpp"
 
 namespace umpire {
 namespace space {

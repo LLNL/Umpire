@@ -4,18 +4,20 @@
 #include "umpire/alloc/MemoryAllocator.hpp"
 
 namespace umpire {
+namespace alloc {
 
 class CudaMallocAllocator :
-  public MemoryAllocator
+  public alloc::MemoryAllocator
 {
  public:
   CudaMallocAllocator();
 
-  void* alloc(size_t bytes);
+  void* allocate(size_t bytes);
 
   void free(void* ptr);
 };
 
+} // end of namespace alloc
 } // end of namespace umpire
 
 #include "umpire/alloc/CudaMallocAllocator.inl"

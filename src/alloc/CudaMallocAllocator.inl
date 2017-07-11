@@ -3,9 +3,10 @@
 
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 
-#include <cuda.h>
+#include <cuda_runtime.h>
 
 namespace umpire {
+namespace alloc {
 
 inline
 CudaMallocAllocator::CudaMallocAllocator()
@@ -30,6 +31,7 @@ CudaMallocAllocator::free(void* ptr)
   cudaFree(ptr);
 }
 
+} // end of namespace alloc
 } // end of namespace umpire
 
-#endif
+#endif // UMPIRE_CudaMallocAllocator_INL

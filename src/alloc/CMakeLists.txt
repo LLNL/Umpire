@@ -7,8 +7,7 @@ set(umpire_alloc_headers
   Pool.hpp
   Pool.inl)
 
-set (umpire_alloc_sources
-  )
+set (umpire_alloc_sources)
 
 blt_add_library(
   NAME umpire_alloc
