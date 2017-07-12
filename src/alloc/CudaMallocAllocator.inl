@@ -3,7 +3,7 @@
 
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 
-#include <cuda_runtime.h>
+#include <cuda_runtime_api.h>
 
 namespace umpire {
 namespace alloc {
@@ -19,7 +19,7 @@ void*
 CudaMallocAllocator::allocate(size_t bytes)
 {
   void* ptr;
-  cudaMalloc(&ptr, bytes);
+  ::cudaMalloc(&ptr, bytes);
   return ptr;
 }
 
@@ -28,7 +28,7 @@ inline
 void
 CudaMallocAllocator::free(void* ptr)
 {
-  cudaFree(ptr);
+  ::cudaFree(ptr);
 }
 
 } // end of namespace alloc

@@ -5,7 +5,9 @@ set(umpire_alloc_headers
   MallocAllocator.inl
   MemoryAllocator.hpp
   Pool.hpp
-  Pool.inl)
+  Pool.inl
+  PosixMemalignAllocator.hpp
+  PosixMemalignAllocator.inl)
 
 set (umpire_alloc_sources)
 

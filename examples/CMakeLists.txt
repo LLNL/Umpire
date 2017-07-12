@@ -5,13 +5,4 @@ blt_add_executable(
     umpire
     )
 
-if (ENABLE_CUDA)
-  blt_add_executable(
-    NAME malloc_gpu
-    SOURCES malloc_gpu.cxx
-    DEPENDS_ON
-      umpire
-      cuda)
-endif ()
-
 add_subdirectory(lulesh)

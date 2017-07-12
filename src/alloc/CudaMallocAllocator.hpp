@@ -9,7 +9,7 @@ namespace alloc {
 class CudaMallocAllocator :
   public alloc::MemoryAllocator
 {
- public:
+  public:
   CudaMallocAllocator();
 
   void* allocate(size_t bytes);
@@ -23,4 +23,3 @@ class CudaMallocAllocator :
 #include "umpire/alloc/CudaMallocAllocator.inl"
 
 #endif // UMPIRE_CudaMallocAllocator_HPP
-

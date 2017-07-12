@@ -36,7 +36,7 @@ void MemorySpaceRegistry::buildRegistry()
 
 #if defined(HAVE_CUDA)
   {
-    std::shared_ptr<HostSpaceFactory> f = std::make_shared<DeviceSpaceFactory>();
+    std::shared_ptr<DeviceSpaceFactory> f = std::make_shared<DeviceSpaceFactory>();
     f->registerFactory(*this);
   }
 #endif

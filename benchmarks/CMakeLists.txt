@@ -20,7 +20,7 @@ if (ENABLE_CUDA)
   blt_add_executable(
     NAME gpu_allocation_benchmarks
     SOURCES gpu_allocation_benchmarks.cxx
-    DEPENDS_ON gbenchmark umpire cuda_runtime)
+    DEPENDS_ON gbenchmark umpire_alloc cuda_runtime)
 
   blt_add_benchmark(
     NAME gpu_allocation_benchmarks

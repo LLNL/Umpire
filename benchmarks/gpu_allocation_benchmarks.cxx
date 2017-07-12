@@ -12,5 +12,4 @@ static void benchmark_malloc_free(benchmark::State& state) {
 }
 
 BENCHMARK(benchmark_malloc_free)->Range(8, 8<<24);
-
 BENCHMARK_MAIN();

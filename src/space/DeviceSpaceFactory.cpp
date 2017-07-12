@@ -1,4 +1,6 @@
 #include "umpire/space/DeviceSpaceFactory.hpp"
+
+#include "umpire/space/MemorySpaceRegistry.hpp"
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 
 #include "umpire/util/Macros.hpp"
