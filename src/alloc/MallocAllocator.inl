@@ -16,9 +16,23 @@ MallocAllocator::MallocAllocator()
 
 inline
 void*
-MallocAllocator::allocate(size_t bytes)
+MallocAllocator::malloc(size_t bytes)
 {
   return ::malloc(bytes);
+}
+
+inline
+void*
+MallocAllocator::calloc(size_t bytes)
+{
+  return ::calloc(bytes, 1);
+}
+
+inline
+void*
+MallocAllocator::realloc(void* ptr, size_t new_size)
+{
+  return ::realloc(ptr, new_size);
 }
 
 inline

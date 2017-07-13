@@ -38,7 +38,7 @@ Pool<alloc>::allocate(size_t bytes)
         break ;
      } else if (m_lengths[i] == 0) {
         m_lengths[i] = -static_cast<int>(bytes) ;
-        m_pointers[i] = m_allocator.allocate(bytes);
+        m_pointers[i] = m_allocator.malloc(bytes);
         ptr = m_pointers[i] ;
         break ;
      }

@@ -12,8 +12,9 @@ class MallocAllocator :
  public:
   MallocAllocator();
 
-  void* allocate(size_t bytes);
-
+  void* malloc(size_t bytes);
+  void* calloc(size_t bytes);
+  void* realloc(void* ptr, size_t new_size);
   void free(void* ptr);
 };
 

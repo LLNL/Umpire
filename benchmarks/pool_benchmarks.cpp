@@ -10,7 +10,7 @@ static void benchmark_malloc(benchmark::State& state) {
   auto allocator = umpire::alloc::MallocAllocator();
 
   while (state.KeepRunning()) {
-    void* ptr = allocator.allocate(state.range_x());
+    void* ptr = allocator.malloc(state.range_x());
     allocator.free(ptr);
   }
 }

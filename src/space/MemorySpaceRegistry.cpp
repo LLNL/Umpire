@@ -1,9 +1,7 @@
 #include "umpire/space/MemorySpaceRegistry.hpp"
 #include "umpire/space/HostSpaceFactory.hpp"
 #include "umpire/space/DeviceSpaceFactory.hpp"
-
 #include "umpire/util/Macros.hpp"
-
 
 namespace umpire {
 namespace space {
@@ -34,15 +32,10 @@ void MemorySpaceRegistry::buildRegistry()
     f->registerFactory(*this);
   }
 
-#if defined(HAVE_CUDA)
   {
     std::shared_ptr<DeviceSpaceFactory> f = std::make_shared<DeviceSpaceFactory>();
     f->registerFactory(*this);
   }
-#endif
-
-#if defined(HAVE_KNL)
-#endif
 }
 
 void

@@ -15,11 +15,30 @@ PosixMemalignAllocator::PosixMemalignAllocator()
 
 inline 
 void*
-PosixMemalignAllocator::allocate(size_t bytes)
+PosixMemalignAllocator::malloc(size_t bytes)
 {
   void* ptr = nullptr;
   ::posix_memalign(&ptr, 64, bytes);
   return ptr;
+}
+
+inline 
+void*
+PosixMemalignAllocator::calloc(size_t bytes)
+{
+  void* ptr = nullptr;
+  ::posix_memalign(&ptr, 64, bytes);
+  ::memset(ptr, 0, bytes);
+  return ptr;
+}
+
+inline 
+void*
+PosixMemalignAllocator::realloc(void* ptr, size_t new_size)
+{
+  /* TODO: check alignment of this new allocation */
+  void* new_ptr = ::realloc(ptr, new_size);
+  return new_ptr;
 }
 
 inline

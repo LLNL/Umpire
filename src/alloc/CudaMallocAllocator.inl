@@ -16,13 +16,34 @@ CudaMallocAllocator::CudaMallocAllocator()
 
 inline
 void*
-CudaMallocAllocator::allocate(size_t bytes)
+CudaMallocAllocator::malloc(size_t bytes)
 {
   void* ptr;
   ::cudaMalloc(&ptr, bytes);
   return ptr;
 }
 
+inline
+void*
+CudaMallocAllocator::calloc(size_t bytes)
+{
+  void* ptr;
+  ::cudaMalloc(&ptr, bytes);
+  ::cudaMemset(ptr, 0, bytes);
+  return ptr;
+}
+
+inline
+void*
+CudaMallocAllocator::realloc(void* ptr, size_t new_size)
+{
+  void* new_ptr;
+  ::cudaMalloc(&ptr, new_size);
+  /* TODO: this should be the actual size of the old allocation */
+  ::cudaMemcpy(new_ptr, ptr, new_size, cudaMemcpyDeviceToDevice);
+  ::cudaFree(ptr);
+  return new_ptr;
+}
 
 inline
 void

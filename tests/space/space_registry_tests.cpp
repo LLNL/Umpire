@@ -2,6 +2,7 @@
 
 #include "umpire/space/MemorySpaceRegistry.hpp"
 #include "umpire/space/HostSpaceFactory.hpp"
+#include "umpire/space/DeviceSpaceFactory.hpp"
 
 #include "umpire/util/Exception.hpp"
 
@@ -24,7 +25,7 @@ TEST(MemorySpaceRegistry, FindDeviceSpace)
   std::shared_ptr<umpire::space::MemorySpaceFactory> space = 
     registry.getMemorySpaceFactory("DEVICE");
 
-  ASSERT_NE(nullptr, dynamic_cast<umpire::space::HostSpaceFactory*>(space.get()));
+  ASSERT_NE(nullptr, dynamic_cast<umpire::space::DeviceSpaceFactory*>(space.get()));
 }
 
 TEST(MemorySpaceRegistry, FindMissingSpace)
