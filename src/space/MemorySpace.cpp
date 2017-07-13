@@ -17,7 +17,7 @@ MemorySpace::MemorySpace(
 
 void* MemorySpace::allocate(size_t bytes)
 {
-  void* ptr = m_default_allocator->allocate(bytes);
+  void* ptr = m_default_allocator->malloc(bytes);
   m_allocations[ptr] = m_default_allocator;
   ResourceManager::getInstance().registerAllocation(ptr, shared_from_this());
 
