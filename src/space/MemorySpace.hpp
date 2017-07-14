@@ -36,13 +36,13 @@ class MemorySpace :
     virtual alloc::MemoryAllocator& getDefaultAllocator();
 
   protected: 
+    MemorySpace();
+
     std::string m_descriptor;
 
     std::map<void*, alloc::MemoryAllocator*> m_allocations;
 
     alloc::MemoryAllocator* m_default_allocator;
-  private:
-    MemorySpace();
 };
 
 } // end of namespace space
