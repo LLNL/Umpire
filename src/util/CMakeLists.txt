@@ -11,3 +11,9 @@ blt_add_library(
   SOURCES ${umpire_util_sources}
   HEADERS_OUTPUT_SUBDIR umpire/util
 )
+
+install(TARGETS
+  umpire_util
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
