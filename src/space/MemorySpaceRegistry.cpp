@@ -1,6 +1,7 @@
 #include "umpire/space/MemorySpaceRegistry.hpp"
 #include "umpire/space/HostSpaceFactory.hpp"
 #include "umpire/space/DeviceSpaceFactory.hpp"
+#include "umpire/space/CnmemPoolFactory.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -34,6 +35,11 @@ void MemorySpaceRegistry::buildRegistry()
 
   {
     std::shared_ptr<DeviceSpaceFactory> f = std::make_shared<DeviceSpaceFactory>();
+    f->registerFactory(*this);
+  }
+
+  {
+    std::shared_ptr<CnmemPoolFactory> f = std::make_shared<CnmemPoolFactory>();
     f->registerFactory(*this);
   }
 }
