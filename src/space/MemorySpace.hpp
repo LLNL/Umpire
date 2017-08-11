@@ -3,7 +3,6 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/AllocationRecord.hpp"
-#include "umpire/alloc/MemoryAllocator.hpp"
 
 #include <vector>
 #include <map>
@@ -16,15 +15,17 @@ class ResourceManager;
 
 namespace space {
 
+template <typename _allocator>
 class MemorySpace : 
   public Allocator, 
-  public std::enable_shared_from_this<MemorySpace> 
+  public std::enable_shared_from_this<MemorySpace<_allocator> >
 {
+
   public: 
-    MemorySpace(const std::string& name, alloc::MemoryAllocator* allocator);
+    MemorySpace(const std::string& name);
 
     virtual void* allocate(size_t bytes);
-    virtual void free(void* ptr);
+    virtual void deallocate(void* ptr);
 
     virtual void getTotalSize();
     
@@ -32,17 +33,12 @@ class MemorySpace :
     virtual void getRemainingSize();
     virtual std::string getDescriptor();
 
-    virtual void setDefaultAllocator(alloc::MemoryAllocator* allocator);
-    virtual alloc::MemoryAllocator& getDefaultAllocator();
-
   protected: 
     MemorySpace();
 
     std::string m_descriptor;
 
-    std::map<void*, alloc::MemoryAllocator*> m_allocations;
-
-    alloc::MemoryAllocator* m_default_allocator;
+    _allocator m_allocator;
 };
 
 } // end of namespace space

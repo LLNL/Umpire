@@ -25,7 +25,7 @@ class Allocator {
      *
      * \param ptr Pointer to free.
      */
-    virtual void free(void* ptr) = 0;
+    virtual void deallocate(void* ptr) = 0;
 };
 
 } // end of namespace umpire

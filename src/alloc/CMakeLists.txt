@@ -1,9 +1,6 @@
 set(umpire_alloc_headers
   CudaMallocAllocator.hpp
-  CudaMallocAllocator.inl
   MallocAllocator.hpp
-  MallocAllocator.inl
-  MemoryAllocator.hpp
   Pool.hpp
   Pool.inl
   PosixMemalignAllocator.hpp

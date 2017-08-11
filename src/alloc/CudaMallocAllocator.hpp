@@ -1,26 +1,27 @@
 #ifndef UMPIRE_CudaMallocAllocator_HPP
 #define UMPIRE_CudaMallocAllocator_HPP
 
-#include "umpire/alloc/MemoryAllocator.hpp"
+#include <cuda_runtime_api.h>
 
 namespace umpire {
 namespace alloc {
 
-class CudaMallocAllocator :
-  public alloc::MemoryAllocator
+struct CudaMallocAllocator :
 {
-  public:
-  CudaMallocAllocator();
+  void* allocate(size_t bytes)
+  {
+    void* ptr;
+    ::cudaMalloc(&ptr, bytes);
+    return ptr;
+  }
 
-  void* malloc(size_t bytes);
-  void* calloc(size_t bytes);
-  void* realloc(void* ptr, size_t new_size);
-  void free(void* ptr);
+  void deallocate(void* ptr)
+  {
+    ::cudaFree(ptr);
+  }
 };
 
 } // end of namespace alloc
 } // end of namespace umpire
-
-#include "umpire/alloc/CudaMallocAllocator.inl"
 
 #endif // UMPIRE_CudaMallocAllocator_HPP

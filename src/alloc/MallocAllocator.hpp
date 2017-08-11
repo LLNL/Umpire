@@ -1,26 +1,25 @@
 #ifndef UMPIRE_MallocAllocator_HPP
 #define UMPIRE_MallocAllocator_HPP
 
-#include "umpire/alloc/MemoryAllocator.hpp"
+#include <cstdlib>
 
 namespace umpire {
 namespace alloc {
 
-class MallocAllocator :
-  public MemoryAllocator
+struct MallocAllocator :
 {
- public:
-  MallocAllocator();
+  void* allocate(size_t bytes) 
+  {
+    return std::malloc(bytes);
+  }
 
-  void* malloc(size_t bytes);
-  void* calloc(size_t bytes);
-  void* realloc(void* ptr, size_t new_size);
-  void free(void* ptr);
+  void* deallocate(void* ptr)
+  {
+    std::free(ptr);
+  }
 };
 
 } // end of namespace alloc
 } // end of namespace umpire
-
-#include "umpire/alloc/MallocAllocator.inl"
 
 #endif // UMPIRE_MallocAllocator_HPP

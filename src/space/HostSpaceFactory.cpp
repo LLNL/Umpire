@@ -22,7 +22,7 @@ HostSpaceFactory::registerFactory(MemorySpaceRegistry& registry) {
 
 std::shared_ptr<MemorySpace> HostSpaceFactory::create() {
   UMPIRE_LOG("Creating MemorySpace");
-  return std::make_shared<MemorySpace>("HOST", new alloc::MallocAllocator());
+  return std::make_shared<MemorySpace<alloc::MallocAllocator>("HOST");
 }
 
 } // end of namespace space

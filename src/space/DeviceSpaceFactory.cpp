@@ -33,9 +33,8 @@ DeviceSpaceFactory::registerFactory(MemorySpaceRegistry& registry) {
 
 std::shared_ptr<MemorySpace> DeviceSpaceFactory::create() {
   UMPIRE_LOG("Creating MemorySpace");
-  return std::make_shared<MemorySpace>(
-      "DEVICE",
-      new alloc::CudaMallocAllocator());
+  return std::make_shared<MemorySpace<umpire::alloc::CudaMallocAllocator> >(
+      "DEVICE");
 }
 
 } // end of namespace space

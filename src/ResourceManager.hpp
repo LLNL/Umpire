@@ -17,27 +17,14 @@ class ResourceManager : public Allocator {
     std::vector<std::string> getAvailableSpaces();
 
     std::shared_ptr<space::MemorySpace> getSpace(const std::string& space);
-    
-    virtual void* allocate(size_t bytes);
-    virtual void free(void* pointer);
 
-    void* allocate(size_t bytes, std::shared_ptr<space::MemorySpace> space);
-
-    void registerAllocation(void* ptr, std::shared_ptr<space::MemorySpace> space);
-    void deregisterAllocation(void* ptr);
-
-    
     void setDefaultSpace(std::shared_ptr<space::MemorySpace> space);
     std::shared_ptr<space::MemorySpace> getDefaultSpace();
     
-    /**
-     * @brief
-     *
-     * @param pointer
-     * @param destination
-     */
-    void* copy(void* pointer, space::MemorySpace& destination);
-
+    void registerAllocation(void* ptr, std::shared_ptr<space::MemorySpace> space);
+    void deregisterAllocation(void* ptr);
+    
+    
   protected:
     ResourceManager();
 

@@ -1,6 +1,4 @@
 set (umpire_space_headers
-      CnmemPool.hpp
-      CnmemPoolFactory.hpp
       DeviceSpaceFactory.hpp
       HostSpaceFactory.hpp
       MemorySpace.hpp
@@ -10,13 +8,23 @@ set (umpire_space_headers
 )
 
 set (umpire_space_sources
-      CnmemPool.cpp
-      CnmemPoolFactory.cpp
       DeviceSpaceFactory.cpp
       HostSpaceFactory.cpp
       MemorySpace.cpp
       MemorySpaceRegistry.cpp
 )
+
+if (ENABLE_CUDA)
+  set (umpire_space_headers
+    ${umpire_space_headers}
+    CnmemPool.hpp
+    CnmemPoolFactory.hpp)
+
+  set (umpire_space_sources
+    ${umpire_space_sources}
+    CnmemPool.cpp
+    CnmemPoolFactory.cpp)
+endif ()
 
 blt_add_library(
   NAME umpire_space

@@ -6,43 +6,47 @@ namespace umpire {
 
 namespace space {
 
-MemorySpace::MemorySpace(
-    const std::string& name,
-    alloc::MemoryAllocator* allocator) :
+template<typename _allocator>
+MemorySpace<_allocator>::MemorySpace(
+    const std::string& name) :
   m_descriptor(name),
-  m_allocations(),
-  m_default_allocator(allocator)
+  m_allocator()
 {
 }
 
-void* MemorySpace::allocate(size_t bytes)
+template<typename _allocator>
+void* MemorySpace<_allocator>::allocate(size_t bytes)
 {
-  void* ptr = m_default_allocator->malloc(bytes);
-  m_allocations[ptr] = m_default_allocator;
+  void* ptr = m_allocator.allocate(bytes);
+  //m_allocations[ptr] = m_allocator;
   ResourceManager::getInstance().registerAllocation(ptr, shared_from_this());
 
   return ptr;
 }
 
-void MemorySpace::free(void* ptr)
+template<typename _allocator>
+void MemorySpace<_allocator>::free(void* ptr)
 {
-  m_default_allocator->free(ptr);
+  m_allocator.deallocate(ptr);
   ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
-void MemorySpace::getTotalSize()
+template<typename _allocator>
+void MemorySpace<_allocator>::getTotalSize()
 {
 }
 
-void MemorySpace::getProperties(){}
+template<typename _allocator>
+void MemorySpace<_allocator>::getProperties(){}
 
-void MemorySpace::getRemainingSize(){}
+template<typename _allocator>
+void MemorySpace<_allocator>::getRemainingSize(){}
 
-std::string MemorySpace::getDescriptor(){}
+template<typename _allocator>
+std::string MemorySpace<_allocator>::getDescriptor(){}
 
-void MemorySpace::setDefaultAllocator(alloc::MemoryAllocator* allocator){}
-
-alloc::MemoryAllocator& MemorySpace::getDefaultAllocator(){}
+template<typename _allocator>
+void MemorySpace<_allocator>::setDefaultAllocator(alloc::MemoryAllocator* allocator){}
 
 } // end of namespace space
 } // end of namespace umpire

@@ -6,8 +6,8 @@
 namespace umpire {
 namespace space {
 
-class CnmemPool :
-  public MemorySpace
+class CnmemPool 
+  //: public MemorySpace
 {
   public: 
     CnmemPool(const std::string& name);

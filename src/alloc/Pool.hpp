@@ -4,8 +4,6 @@
 #include "umpire/Allocator.hpp"
 
 #include "umpire/space/MemorySpace.hpp"
-#include "umpire/alloc/MemoryAllocator.hpp"
-
 #include "umpire/alloc/MallocAllocator.hpp"
 
 #include <memory>
