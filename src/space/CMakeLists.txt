@@ -1,29 +1,28 @@
 set (umpire_space_headers
-      DeviceSpaceFactory.hpp
-      HostSpaceFactory.hpp
       MemorySpace.hpp
-      MemorySpaceDescriptors.hpp
-      MemorySpaceFactory.hpp
-      MemorySpaceRegistry.hpp
+      HostSpaceFactory.hpp
 )
 
 set (umpire_space_sources
-      DeviceSpaceFactory.cpp
-      HostSpaceFactory.cpp
       MemorySpace.cpp
-      MemorySpaceRegistry.cpp
+      HostSpaceFactory.cpp
 )
+
+set (umpire_space_depends
+  umpire umpire_alloc umpire_util)
 
 if (ENABLE_CUDA)
   set (umpire_space_headers
     ${umpire_space_headers}
-    CnmemPool.hpp
-    CnmemPoolFactory.hpp)
+    DeviceSpaceFactory.hpp)
 
   set (umpire_space_sources
     ${umpire_space_sources}
-    CnmemPool.cpp
-    CnmemPoolFactory.cpp)
+    DeviceSpaceFactory.cpp)
+
+  set(umpire_space_depends
+    ${umpire_space_depends}
+    umpire_tpl_cnmem cuda_runtime)
 endif ()
 
 blt_add_library(
@@ -31,7 +30,7 @@ blt_add_library(
   HEADERS ${umpire_space_headers}
   SOURCES ${umpire_space_sources}
   HEADERS_OUTPUT_SUBDIR umpire/space
-  DEPENDS_ON umpire umpire_alloc umpire_util umpire_tpl_cnmem cuda_runtime)
+  DEPENDS_ON ${umpire_space_depends})
 
 install(TARGETS
   umpire_space

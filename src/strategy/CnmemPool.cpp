@@ -1,14 +1,12 @@
-#include "umpire/space/CnmemPool.hpp"
+#include "umpire/strategy/CnmemPool.hpp"
 
 #include "umpire/tpl/cnmem/cnmem.h"
 
-#include <cstring>
-
 namespace umpire {
-namespace space {
+namespace strategy {
 
-CnmemPool::CnmemPool(const std::string& name)
-  : MemorySpace(name, nullptr)
+CnmemPool::CnmemPool(std::shared_ptr<umpire::Allocator>& alloc)
+  : AllocationStrategy(alloc)
 {
   cudaDeviceProp props;
   cudaGetDeviceProperties(&props, 0);
@@ -25,7 +23,7 @@ void* CnmemPool::allocate(size_t bytes)
   return ret;
 }
 
-void CnmemPool::free(void* ptr)
+void CnmemPool::deallocate(void* ptr)
 {
   cnmemFree(ptr, NULL);
 }

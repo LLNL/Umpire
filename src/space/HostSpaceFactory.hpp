@@ -1,16 +1,17 @@
 #ifndef UMPIRE_HostSpaceFactory_HPP
 #define UMPIRE_HostSpaceFactory_HPP
 
-#include "umpire/space/MemorySpaceFactory.hpp"
+#include "umpire/AllocatorFactory.hpp"
 
 namespace umpire {
 namespace space {
 
-class HostSpaceFactory : public MemorySpaceFactory {
-  public:
-    HostSpaceFactory();
-    void registerFactory(MemorySpaceRegistry& registry);
-    std::shared_ptr<MemorySpace> create();
+
+class HostSpaceFactory :
+  public AllocatorFactory
+{
+  bool isValidAllocatorFor(const std::string& name);
+  std::shared_ptr<Allocator> create();
 };
 
 } // end of namespace space

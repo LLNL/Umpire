@@ -1,10 +1,13 @@
 set (umpire_headers
   Allocator.hpp
+  AllocatorFactory.hpp
+  AllocatorRegistry.hpp
   AllocationRecord.hpp
   ResourceManager.hpp
   Umpire.hpp)
 
 set (umpire_sources
+  AllocatorRegistry.cpp
   ResourceManager.cpp)
 
 blt_add_library(

@@ -42,16 +42,16 @@ int main(int argc, char* argv[]) {
   }
 
   umpire::ResourceManager* rm = umpire::ResourceManager::getInstance();
-  umpire::MemorySpace* space;
+  umpire::Allocator* space;
 
   if (use_gpu) {
-    space = rm->findSpace(umpire::GPU);
+    space = rm->getAllocator(umpire::GPU);
   } else {
-    space = rm->findSpace(umpire::CPU)
+    space = rm->getAllocator(umpire::CPU);
   }
 
-  double* u0 = umpire::malloc(sizeof(double) * nx, space);
-  double* u1 = umpire::malloc(sizeof(double) * nx, space);
+  double* u0 = space->allocate(sizeof(double) * nx);
+  double* u1 = space->allocate(sizeof(double) * nx);
 
   const BLOCK_SIZE = 128;
 

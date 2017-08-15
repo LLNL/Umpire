@@ -1,1 +1,3 @@
-add_subdirectory(cnmem)
+if (ENABLE_CUDA)
+  add_subdirectory(cnmem)
+endif ()

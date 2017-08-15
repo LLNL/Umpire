@@ -1,23 +1,11 @@
-#ifndef UMPIRE_Pool_INL
-#define UMPIRE_Pool_INL
-
 #include "umpire/alloc/Pool.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
-namespace alloc {
+namespace strategy {
 
-template <typename alloc>
-Pool<alloc>::Pool() :
-  m_allocator(alloc{}),
-  m_space(nullptr)
-{
-}
-
-template <typename alloc>
-Pool<alloc>::Pool(std::shared_ptr<space::MemorySpace> space) :
-  m_allocator(alloc{}),
-  m_space(space)
+Pool::Pool(std::shared_ptr<umpire::Allocator>& allocator) :
+  AllocationStrategy(allocator)
 {
   UMPIRE_LOG("Creating pool");
   for (int i = 0; i < 32; ++i) {
@@ -26,9 +14,8 @@ Pool<alloc>::Pool(std::shared_ptr<space::MemorySpace> space) :
   }
 }
 
-template <typename alloc>
 void*
-Pool<alloc>::allocate(size_t bytes)
+Pool::allocate(size_t bytes)
 {
   void* ptr = nullptr;
   for (int i = 0; i < 32; ++i) {
@@ -38,7 +25,7 @@ Pool<alloc>::allocate(size_t bytes)
         break ;
      } else if (m_lengths[i] == 0) {
         m_lengths[i] = -static_cast<int>(bytes) ;
-        m_pointers[i] = m_allocator.malloc(bytes);
+        m_pointers[i] = m_allocator.allocate(bytes);
         ptr = m_pointers[i] ;
         break ;
      }
@@ -51,9 +38,8 @@ Pool<alloc>::allocate(size_t bytes)
   return ptr;
 }
 
-template <typename alloc>
 void
-Pool<alloc>::free(void* ptr)
+Pool<alloc>::deallocate(void* ptr)
 {
   for (int i = 0; i < 32; ++i) {
     if (m_pointers[i] == ptr) {
@@ -69,5 +55,3 @@ Pool<alloc>::free(void* ptr)
 
 } // end of namespace alloc
 } // end of namespace pool
-
-#endif // UMPIRE_Pool_INL

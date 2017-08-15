@@ -1,6 +1,7 @@
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/space/MemorySpaceRegistry.hpp"
+#include "umpire/AllocatorRegistry.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -18,71 +19,38 @@ ResourceManager::getInstance()
 }
 
 ResourceManager::ResourceManager() :
-  m_spaces(),
-  m_allocation_spaces()
+  m_allocators(),
+  m_allocation_to_allocator()
 {
-  umpire::space::MemorySpaceRegistry& registry =
-    umpire::space::MemorySpaceRegistry::getInstance();
-
-  for (std::string factory_name : registry.getMemorySpaceFactoryNames()) {
-    m_spaces[factory_name] = registry.getMemorySpaceFactory(factory_name)->create();
-  }
-
-  m_default_space = m_spaces["HOST"];
+  AllocatorRegistry& registry =
+    AllocatorRegistry::getInstance();
 }
 
-std::vector<std::string>
-ResourceManager::getAvailableSpaces()
+std::shared_ptr<Allocator>
+ResourceManager::getAllocator(const std::string& name)
 {
-  umpire::space::MemorySpaceRegistry& registry =
-    umpire::space::MemorySpaceRegistry::getInstance();
-
-  return registry.getMemorySpaceFactoryNames();
-}
-
-std::shared_ptr<space::MemorySpace>
-ResourceManager::getSpace(const std::string& space)
-{
-  if (m_spaces.find(space) != m_spaces.end()) {
-    return m_spaces[space];
-  } else {
-    UMPIRE_ERROR("ResourceManager: cannot find space with name = " << space);
-  }
-}
-
-void* ResourceManager::allocate(size_t bytes) {
-  return allocate(bytes, m_default_space);
-}
-
-void* ResourceManager::allocate(size_t bytes, std::shared_ptr<space::MemorySpace> space)
-{
-  return space->allocate(bytes);
-}
-
-void ResourceManager::free(void* pointer)
-{
-  m_allocation_spaces[pointer]->free(pointer);
+  return nullptr;
 }
 
 void 
-  ResourceManager::setDefaultSpace(std::shared_ptr<space::MemorySpace> space)
+ResourceManager::setDefaultAllocator(std::shared_ptr<Allocator> space)
 {
   m_default_space = space;
 }
 
-std::shared_ptr<space::MemorySpace> ResourceManager::getDefaultSpace()
+std::shared_ptr<Allocator> ResourceManager::getDefaultAllocator()
 {
   return m_default_space;
 }
 
-void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<space::MemorySpace> space)
+void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<Allocator> space)
 {
-  m_allocation_spaces[ptr] = space;
+  m_allocation_to_allocator[ptr] = space;
 }
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
-  m_allocation_spaces.erase(ptr);
+  m_allocation_to_allocator.erase(ptr);
 }
 
 } // end of namespace umpire

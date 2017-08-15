@@ -16,5 +16,11 @@ blt_add_test(
   NAME stdlib_alloc_test
   COMMAND stdlib_alloc_tests)
 
+blt_add_executable(
+  NAME allocator_registry_tests
+  SOURCES allocator_registry_tests.cpp
+  DEPENDS_ON umpire gtest gmock
+  )
+
 add_subdirectory(alloc)
 add_subdirectory(space)

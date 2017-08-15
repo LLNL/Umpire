@@ -7,6 +7,7 @@ set(ENABLE_CUDA On CACHE Bool "")
 set(ENABLE_COPY_HEADERS On CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
+set(ENABLE_GMOCK On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 
 ################################

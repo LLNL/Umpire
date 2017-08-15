@@ -6,7 +6,7 @@
 namespace umpire {
 namespace alloc {
 
-struct MallocAllocator :
+struct MallocAllocator
 {
   void* allocate(size_t bytes) 
   {

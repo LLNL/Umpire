@@ -1,19 +1,19 @@
 #ifndef UMPIRE_CnmemPool_HPP_
 #define UMPIRE_CnmemPool_HPP_
 
-#include "umpire/space/MemorySpace.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
-namespace space {
+namespace strategy {
 
 class CnmemPool 
-  //: public MemorySpace
+  : public AllocationStrategy
 {
   public: 
-    CnmemPool(const std::string& name);
+    CnmemPool(std::shared_ptr<umpire::Allocator>& alloc);
 
     virtual void* allocate(size_t bytes);
-    virtual void free(void* ptr);
+    virtual void deallocate(void* ptr);
 };
 
 } // end of namespace space
