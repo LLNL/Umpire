@@ -3,14 +3,16 @@
 
 #include "umpire/tpl/cnmem/cnmem.h"
 
+#include <cstring>
+
 namespace umpire {
 namespace alloc {
 
-struct CnmemAllocator :
+struct CnmemAllocator
 {
   void* allocate(size_t bytes)
   {
-    static bool init = false;
+    static bool initialized = false;
 
     if (!initialized) {
       cudaDeviceProp props;
@@ -25,14 +27,16 @@ struct CnmemAllocator :
 
     void* ptr;
     ::cnmemMalloc(&ptr, bytes, NULL);
-    return ret;
+    return ptr;
   }
 
-  void* deallocate(void* ptr)
+  void deallocate(void* ptr)
   {
     ::cnmemFree(ptr, NULL);
   }
-}
+};
 
 } // end of namespace alloc
 } // end of namespace umpire
+
+#endif // UMPIRE_CnmemAllocator_HPP

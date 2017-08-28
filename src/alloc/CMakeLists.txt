@@ -15,8 +15,8 @@ if (ENABLE_CUDA)
     CnmemAllocator.hpp)
 
   set (umpire_alloc_depends
-    ${umpire_alloc_depends}
-    umpire_tpl_cnmem)
+    ${umpire_alloc_depends})
+    #umpire_tpl_cnmem)
 endif ()
 
 blt_add_library(

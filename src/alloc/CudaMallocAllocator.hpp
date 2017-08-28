@@ -6,7 +6,7 @@
 namespace umpire {
 namespace alloc {
 
-struct CudaMallocAllocator :
+struct CudaMallocAllocator
 {
   void* allocate(size_t bytes)
   {

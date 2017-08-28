@@ -18,6 +18,10 @@ blt_add_library(
   HEADERS_OUTPUT_SUBDIR umpire 
   DEPENDS_ON umpire_space)
 
+configure_file(
+  ${PROJECT_SOURCE_DIR}/src/config.hpp.in
+  ${PROJECT_BINARY_DIR}/include/umpire/config.hpp)
+
 install(TARGETS
   umpire
   RUNTIME DESTINATION lib
