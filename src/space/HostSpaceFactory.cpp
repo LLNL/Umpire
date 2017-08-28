@@ -1,10 +1,12 @@
 #include "umpire/space/HostSpaceFactory.hpp"
 
+#include "umpire/space/MemorySpace.hpp"
 #include "umpire/alloc/MallocAllocator.hpp"
 
 namespace umpire {
 namespace space {
 
+bool
 HostSpaceFactory::isValidAllocatorFor(const std::string& name)
 {
   if (name.compare("HOST") == 0) {
@@ -14,10 +16,10 @@ HostSpaceFactory::isValidAllocatorFor(const std::string& name)
   }
 }
 
-std::shared_ptr<Allocator>
+std::shared_ptr<AllocatorInterface>
 HostSpaceFactory::create()
 {
-  return std::make_shared<umpire::MemorySpace<alloc::MallocAllocator> >();
+  return std::make_shared<MemorySpace<alloc::MallocAllocator> >();
 }
 
 } // end of namespace space

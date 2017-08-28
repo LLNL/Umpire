@@ -22,12 +22,12 @@ AllocatorRegistry::AllocatorRegistry() :
 }
 
 void
-AllocatorRegistry::registerAllocator(std::shared_ptr<AllocatorFactory> factory)
+AllocatorRegistry::registerAllocator(std::shared_ptr<AllocatorFactory>&& factory)
 {
   m_allocator_factories.push_back(factory);
 }
 
-std::shared_ptr<umpire::Allocator>
+std::shared_ptr<umpire::AllocatorInterface>
 AllocatorRegistry::makeAllocator(const std::string& name)
 {
   for (auto allocator_factory : m_allocator_factories) {

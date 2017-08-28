@@ -1,16 +1,16 @@
 #ifndef UMPIRE_AllocationStrategy_HPP
 #define UMPIRE_AllocationStrategy_HPP
 
-#include "umpire/Allocator.hpp"
+#include "umpire/AllocatorInterface.hpp"
 
 namespace umpire {
 namespace strategy {
 
 class AllocationStrategy :
-  public umpire::Allocator
+  public umpire::AllocatorInterface
 {
   public:
-    AllocationStrategy(std::shared_ptr<umpire::Allocator>& alloc);
+    AllocationStrategy(std::shared_ptr<umpire::AllocatorInterface>& alloc);
 
     virtual void* allocate(size_t bytes) = 0;;
     virtual void deallocate(void* ptr) = 0;;

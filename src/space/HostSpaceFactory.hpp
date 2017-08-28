@@ -11,7 +11,7 @@ class HostSpaceFactory :
   public AllocatorFactory
 {
   bool isValidAllocatorFor(const std::string& name);
-  std::shared_ptr<Allocator> create();
+  std::shared_ptr<AllocatorInterface> create();
 };
 
 } // end of namespace space

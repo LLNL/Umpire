@@ -30,6 +30,7 @@ endif ()
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
+  set (UMPIRE_TEST_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)

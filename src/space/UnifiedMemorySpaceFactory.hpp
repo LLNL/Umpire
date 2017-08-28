@@ -1,5 +1,5 @@
-#ifndef UMPIRE_DeviceSpaceFactory_HPP
-#define UMPIRE_DeviceSpaceFactory_HPP
+#ifndef UMPIRE_UnifiedMemorySpaceFactory_HPP
+#define UMPIRE_UnifiedMemorySpaceFactory_HPP
 
 #include "umpire/AllocatorFactory.hpp"
 
@@ -7,7 +7,7 @@ namespace umpire {
 namespace space {
 
 
-class DeviceSpaceFactory :
+class UnifiedMemorySpaceFactory :
   public AllocatorFactory
 {
   bool isValidAllocatorFor(const std::string& name);
@@ -17,4 +17,4 @@ class DeviceSpaceFactory :
 } // end of namespace space
 } // end of namespace umpire
 
-#endif // UMPIRE_DeviceSpaceFactory_HPP
+#endif // UMPIRE_UnifiedMemorySpaceFactory_HPP

@@ -1,22 +1,19 @@
-#ifndef UMPIRE_Allocator_HPP
-#define UMPIRE_Allocator_HPP
-
-#include "umpire/AllocatorInterface.hpp"
+#ifndef UMPIRE_AllocatorInterface_HPP
+#define UMPIRE_AllocatorInterface_HPP
 
 #include <memory>
+
 #include <cstddef>
 
 namespace umpire {
-
-class ResourceManager;
 
 /*!
  * \brief Allocator provides a unified interface to all Umpire classes that can
  * be used to allocate and free data.
  */
-class Allocator {
-  friend class ResourceManager;
-
+class AllocatorInterface :
+  public std::enable_shared_from_this<AllocatorInterface>
+{
   public:
     /*!
      * \brief Allocate bytes of memory.
@@ -25,20 +22,19 @@ class Allocator {
      *
      * \return Pointer to start of allocation.
      */
-    void* allocate(size_t bytes);
+    virtual void* allocate(size_t bytes) = 0;
 
     /*!
      * \brief Free the memory at ptr.
      *
      * \param ptr Pointer to free.
      */
-    void deallocate(void* ptr);
+    virtual void deallocate(void* ptr) = 0;
 
-  private:
-    Allocator(std::shared_ptr<umpire::AllocatorInterface>& allocator);
-    std::shared_ptr<umpire::AllocatorInterface> m_allocator;
+    virtual long getCurrentSize() = 0;
+    virtual long getHighWatermark() = 0;
 };
 
 } // end of namespace umpire
 
-#endif // UMPIRE_Allocator_HPP
+#endif // UMPIRE_AllocatorInterface_HPP

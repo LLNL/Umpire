@@ -1,4 +1,5 @@
 set (umpire_util_headers
+  AllocationRecord.hpp
   Exception.hpp
   Macros.hpp)
 

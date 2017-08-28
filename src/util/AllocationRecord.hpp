@@ -2,6 +2,7 @@
 #define UMPIRE_AllocationRecord_HPP
 
 namespace umpire {
+namespace util {
 
 struct AllocationRecord
 {
@@ -9,6 +10,7 @@ struct AllocationRecord
   size_t m_size;
 };
 
+} // end of namespace util
 } // end of namespace umpire
 
 #endif // UMPIRE_AllocationRecord_HPP

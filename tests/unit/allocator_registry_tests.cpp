@@ -10,7 +10,7 @@ class MockAllocatorFactory : public umpire::AllocatorFactory
 {
   public:
   MOCK_METHOD1(isValidAllocatorFor, bool(const std::string& name));
-  MOCK_METHOD0(create, std::shared_ptr<umpire::Allocator>());
+  MOCK_METHOD0(create, std::shared_ptr<umpire::AllocatorInterface>());
 };
 
 TEST(AllocatorRegistry, Constructor) {
@@ -36,5 +36,5 @@ TEST(AllocatorRegistry, Create) {
   reg.registerAllocator(mock_allocator_factory);
 
   auto alloc = reg.makeAllocator("test");
-  ASSERT_EQ(std::dynamic_pointer_cast<umpire::Allocator>(mock_allocator_factory), alloc);
+  ASSERT_EQ(std::dynamic_pointer_cast<umpire::AllocatorInterface>(mock_allocator_factory), alloc);
 }

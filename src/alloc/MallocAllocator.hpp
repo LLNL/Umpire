@@ -10,12 +10,12 @@ struct MallocAllocator
 {
   void* allocate(size_t bytes) 
   {
-    return std::malloc(bytes);
+    return ::malloc(bytes);
   }
 
-  void* deallocate(void* ptr)
+  void deallocate(void* ptr)
   {
-    std::free(ptr);
+    ::free(ptr);
   }
 };
 

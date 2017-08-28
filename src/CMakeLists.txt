@@ -1,12 +1,13 @@
 set (umpire_headers
   Allocator.hpp
+  AllocatorInterface.hpp
   AllocatorFactory.hpp
   AllocatorRegistry.hpp
-  AllocationRecord.hpp
   ResourceManager.hpp
   Umpire.hpp)
 
 set (umpire_sources
+  Allocator.cpp
   AllocatorRegistry.cpp
   ResourceManager.cpp)
 

@@ -13,9 +13,10 @@ class AllocatorRegistry {
   public:
     static AllocatorRegistry& getInstance();
 
-    std::shared_ptr<umpire::Allocator> makeAllocator(const std::string& name);
+    std::shared_ptr<umpire::AllocatorInterface> makeAllocator(
+        const std::string& name);
 
-    void registerAllocator(std::shared_ptr<AllocatorFactory> factory);
+    void registerAllocator(std::shared_ptr<AllocatorFactory>&& factory);
 
   protected:
     AllocatorRegistry();

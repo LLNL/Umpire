@@ -12,7 +12,7 @@ class Pool :
   public AllocationStrategy
 {
   public:
-    Pool(std::shared_ptr<umpire::Allocator>& allocator);
+    Pool(std::shared_ptr<umpire::AllocatorInterface>& allocator);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
