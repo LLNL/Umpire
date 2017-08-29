@@ -1,7 +1,7 @@
 blt_add_library(
   NAME umpire_tpl_cnmem
-  SOURCES cnmem.cpp
   HEADERS cnmem.h
+  SOURCES cnmem.cpp
   HEADERS_OUTPUT_SUBDIR umpire/tpl/cnmem
   DEPENDS_ON cuda_runtime)
 

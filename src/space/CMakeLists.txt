@@ -24,7 +24,8 @@ if (ENABLE_CUDA)
 
   set(umpire_space_depends
     ${umpire_space_depends}
-    cuda_runtime)
+    cuda_runtime
+    umpire_tpl_cnmem)
 endif ()
 
 blt_add_library(

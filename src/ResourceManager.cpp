@@ -1,3 +1,5 @@
+#include "umpire/config.hpp"
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/AllocatorRegistry.hpp"
 
@@ -34,7 +36,7 @@ ResourceManager::ResourceManager() :
   registry.registerAllocator(
       std::make_shared<space::HostSpaceFactory>());
 
-#if ENABLE_CUDA
+#if defined(ENABLE_CUDA)
   registry.registerAllocator(
       std::make_shared<space::DeviceSpaceFactory>());
 
