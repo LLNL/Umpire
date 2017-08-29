@@ -1,7 +1,7 @@
 blt_add_executable(
   NAME memory_allocator_tests
   SOURCES memory_allocator_tests.cpp
-  DEPENDS_ON umpire_alloc gtest umpire_tpl_cnmem cuda_runtime
+  DEPENDS_ON umpire_alloc gtest cuda_runtime
   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
 target_include_directories(

@@ -15,16 +15,21 @@ if (ENABLE_CUDA)
     CnmemAllocator.hpp)
 
   set (umpire_alloc_depends
-    ${umpire_alloc_depends})
-    #umpire_tpl_cnmem)
+    ${umpire_alloc_depends}
+    umpire_tpl_cnmem)
 endif ()
 
 blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers}
   SOURCES ${umpire_alloc_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/alloc
-  DEPENDS_ON ${umpire_alloc_depends})
+  HEADERS_OUTPUT_SUBDIR umpire/alloc)
+#DEPENDS_ON ${umpire_alloc_depends})
+
+target_link_libraries(
+  umpire_alloc
+  INTERFACE
+  ${umpire_alloc_depends})
 
 install(TARGETS
   umpire_alloc
