@@ -6,3 +6,9 @@ blt_add_library(
   DEPENDS_ON cuda_runtime)
 
 target_compile_definitions(umpire_tpl_cnmem PUBLIC -DCNMEM_DLLEXPORT)
+
+install(TARGETS
+  umpire_tpl_cnmem
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
