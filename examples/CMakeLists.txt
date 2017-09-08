@@ -8,3 +8,5 @@ blt_add_executable(
     )
 
 add_subdirectory(lulesh)
+
+add_subdirectory(diffusion)

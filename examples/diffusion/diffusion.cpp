@@ -1,6 +1,24 @@
-// GPU kernel
+#include <iostream>
+
+#include "umpire/ResourceManager.hpp"
+#include "umpire/Allocator.hpp"
+
 __global__
-void diffuse(int n, double* u0, double *u1, rx)
+void init(int n, double* u0, int hotspot)
+{
+  int i = blockIdx.x*blockDim.x + threadIdx.x;
+
+  if (i > 0 && i < n-1) {
+    u0[i] = 0.0;
+  }
+
+  if (i == hotspot) {
+    u0[i] = 1.0;
+  }
+}
+
+__global__
+void diffuse(int n, double* u0, double *u1, double rx)
 {
   int i = blockIdx.x*blockDim.x + threadIdx.x;
 
@@ -10,7 +28,7 @@ void diffuse(int n, double* u0, double *u1, rx)
 }
 
 __global__
-void reset(int n, double* u0, double *u1, rx)
+void reset(int n, double* u0, double *u1)
 {
   int i = blockIdx.x*blockDim.x + threadIdx.x;
 
@@ -25,7 +43,10 @@ int main(int argc, char* argv[]) {
   bool use_gpu = false;
 
   if (atoi(argv[1]) == 1) {
+    std::cout << "Running on GPU" << std::endl;
     use_gpu = true;
+  } else {
+    std::cout << "Running on GPU" << std::endl;
   }
 
   // location of point heat source
@@ -41,26 +62,38 @@ int main(int argc, char* argv[]) {
     std::cerr << "Error, k/h^2 > 0.5!" << std::endl;
   }
 
-  umpire::ResourceManager* rm = umpire::ResourceManager::getInstance();
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator* space;
 
   if (use_gpu) {
-    space = rm->getAllocator(umpire::GPU);
+    space = new umpire::Allocator(rm.getAllocator("DEVICE"));
   } else {
-    space = rm->getAllocator(umpire::CPU);
+    space = new umpire::Allocator(rm.getAllocator("HOST"));
   }
 
-  double* u0 = space->allocate(sizeof(double) * nx);
-  double* u1 = space->allocate(sizeof(double) * nx);
+  double* u0 = (double*)space->allocate(sizeof(double) * nx);
+  double* u1 = (double*)space->allocate(sizeof(double) * nx);
 
-  const BLOCK_SIZE = 128;
+  const int BLOCK_SIZE = 128;
 
-  u[x0] = 1.0;
+
+  if (!use_gpu) {
+    for (int i = 0; i < nx; i++) {
+      u0[i] = 0.0;
+    }
+    u0[hotspot] = 1.0;
+
+    std::cout << "Value at u0[ " << hotspot << "] = " << u0[hotspot] << std::endl;
+  } else {
+    init<<<(nx+BLOCK_SIZE-1)/BLOCK_SIZE, BLOCK_SIZE>>>(nx, u0, hotspot);
+  }
+
   for (double t = 0; t < end_time; t += dt) {
+    std::cout << "Starting step " << t/dt << "....";
 
-    if (use_cpu) {
+    if (!use_gpu) {
       for (int i = 1; i < nx-1; i++) {
-        u1[i] = (1.0-2.0*rx)*u0[i]+ rx*u0[i] + rx*u0[i];
+        u1[i] = (1.0-2.0*rx)*u0[i]+ rx*u0[i-1] + rx*u0[i+1];
       }
 
       for (int i = 0; i < nx; i++) {
@@ -70,7 +103,17 @@ int main(int argc, char* argv[]) {
       diffuse<<<(nx+BLOCK_SIZE-1)/BLOCK_SIZE, BLOCK_SIZE>>>(nx-1, u0, u1, rx);
       reset<<<(nx+BLOCK_SIZE-1)/BLOCK_SIZE, BLOCK_SIZE>>>(nx, u0, u1);
     }
+
+    std::cout << "done." << std::endl;
   }
+
+
+  if (!use_gpu) {
+    std::cout << "Value at u0[ " << hotspot << "] = " << u0[hotspot] << std::endl;
+  }
+
+  space->deallocate(u0);
+  space->deallocate(u1);
 
   return 0;
 }
