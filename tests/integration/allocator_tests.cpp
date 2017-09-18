@@ -13,6 +13,22 @@ TEST(Allocator, HostAllocator)
   ASSERT_NE(nullptr, test_alloc);
 }
 
+TEST(AllocatorRef, HostAllocator)
+{
+  auto rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator *p;
+
+  p = new umpire::Allocator(rm.getAllocator("HOST"));
+
+  double* test_alloc = static_cast<double*>(p->allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+
+  p->deallocate(test_alloc);
+
+  delete p;
+}
+
 #if defined(ENABLE_CUDA)
 TEST(Allocator, DeviceAllocator)
 {
@@ -32,5 +48,37 @@ TEST(Allocator, UmAllocator)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+}
+
+TEST(AllocatorRef, DeviceAllocator)
+{
+  auto rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator *p;
+
+  p = new umpire::Allocator(rm.getAllocator("DEVICE"));
+
+  double* test_alloc = static_cast<double*>(p->allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+
+  p->deallocate(test_alloc);
+
+  delete p;
+}
+
+TEST(AllocatorRef, UmAllocator)
+{
+  auto rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator *p;
+
+  p = new umpire::Allocator(rm.getAllocator("UM"));
+
+  double* test_alloc = static_cast<double*>(p->allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+
+  p->deallocate(test_alloc);
+
+  delete p;
 }
 #endif
