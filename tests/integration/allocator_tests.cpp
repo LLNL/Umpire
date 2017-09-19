@@ -13,7 +13,7 @@ TEST(Allocator, HostAllocator)
   ASSERT_NE(nullptr, test_alloc);
 }
 
-TEST(AllocatorRef, HostAllocator)
+TEST(Allocator, HostAllocatorReference)
 {
   auto rm = umpire::ResourceManager::getInstance();
   umpire::Allocator *p;
@@ -40,17 +40,7 @@ TEST(Allocator, DeviceAllocator)
   ASSERT_NE(nullptr, test_alloc);
 }
 
-TEST(Allocator, UmAllocator)
-{
-  auto rm = umpire::ResourceManager::getInstance();
-
-  umpire::Allocator allocator = rm.getAllocator("UM");
-  double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
-
-  ASSERT_NE(nullptr, test_alloc);
-}
-
-TEST(AllocatorRef, DeviceAllocator)
+TEST(Allocator, DeviceAllocatorReference)
 {
   auto rm = umpire::ResourceManager::getInstance();
   umpire::Allocator *p;
@@ -66,7 +56,17 @@ TEST(AllocatorRef, DeviceAllocator)
   delete p;
 }
 
-TEST(AllocatorRef, UmAllocator)
+TEST(Allocator, UmAllocator)
+{
+  auto rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("UM");
+  double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+}
+
+TEST(Allocator, UmAllocatorReference)
 {
   auto rm = umpire::ResourceManager::getInstance();
   umpire::Allocator *p;
