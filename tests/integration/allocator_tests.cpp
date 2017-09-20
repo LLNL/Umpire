@@ -40,17 +40,7 @@ TEST(Allocator, HostAllocatorSize)
 
   allocator.deallocate(test_alloc);
 
-  bool expected_invalid_allocation_ptr_exception;
-
-  try {
-    allocator.size(test_alloc);
-    expected_invalid_allocation_ptr_exception = false;
-  }
-  catch (...) {
-    expected_invalid_allocation_ptr_exception = true;
-  }
-
-  ASSERT_EQ(true, expected_invalid_allocation_ptr_exception);
+  ASSERT_ANY_THROW(allocator.size(test_alloc));
 }
 
 #if defined(ENABLE_CUDA)
@@ -91,17 +81,7 @@ TEST(Allocator, DeviceAllocatorSize)
 
   allocator.deallocate(test_alloc);
 
-  bool expected_invalid_allocation_ptr_exception;
-
-  try {
-    allocator.size(test_alloc);
-    expected_invalid_allocation_ptr_exception = false;
-  }
-  catch (...) {
-    expected_invalid_allocation_ptr_exception = true;
-  }
-
-  ASSERT_EQ(true, expected_invalid_allocation_ptr_exception);
+  ASSERT_ANY_THROW(allocator.size(test_alloc));
 }
 
 TEST(Allocator, UmAllocator)
@@ -141,17 +121,7 @@ TEST(Allocator, UmAllocatorSize)
 
   allocator.deallocate(test_alloc);
 
-  bool expected_invalid_allocation_ptr_exception;
-
-  try {
-    allocator.size(test_alloc);
-    expected_invalid_allocation_ptr_exception = false;
-  }
-  catch (...) {
-    expected_invalid_allocation_ptr_exception = true;
-  }
-
-  ASSERT_EQ(true, expected_invalid_allocation_ptr_exception);
+  ASSERT_ANY_THROW(allocator.size(test_alloc));
 }
 
 #endif

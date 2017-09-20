@@ -39,7 +39,7 @@ class Allocator {
      *
      * \param ptr Pointer to allocation in question
      *
-     * \return Number of bytes allocated
+     * \return number of bytes allocated for ptr
      */
     size_t size(void* ptr);
 
