@@ -31,6 +31,15 @@ class AllocatorInterface :
      */
     virtual void deallocate(void* ptr) = 0;
 
+    /*!
+     * \brief Return number of bytes allocated for allocation
+     *
+     * \param ptr Pointer to allocation in question
+     *
+     * \return number of bytes allocated for ptr
+     */
+    virtual size_t size(void* ptr) = 0;
+
     virtual long getCurrentSize() = 0;
     virtual long getHighWatermark() = 0;
 };

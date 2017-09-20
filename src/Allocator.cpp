@@ -19,4 +19,10 @@ Allocator::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
+size_t
+Allocator::size(void* ptr)
+{
+  return m_allocator->size(ptr);
+}
+
 } // end of namespace umpire

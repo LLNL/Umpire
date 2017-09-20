@@ -21,6 +21,7 @@ class MemorySpace :
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
+    size_t size(void* ptr);
 
     long getCurrentSize();
     long getHighWatermark();

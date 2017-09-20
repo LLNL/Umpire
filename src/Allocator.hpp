@@ -34,6 +34,15 @@ class Allocator {
      */
     void deallocate(void* ptr);
 
+    /*!
+     * \brief Return number of bytes allocated for allocation
+     *
+     * \param ptr Pointer to allocation in question
+     *
+     * \return number of bytes allocated for ptr
+     */
+    size_t size(void* ptr);
+
   private:
     Allocator(std::shared_ptr<umpire::AllocatorInterface>& allocator);
     std::shared_ptr<umpire::AllocatorInterface> m_allocator;

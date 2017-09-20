@@ -3,8 +3,10 @@
 
 #include "umpire/space/MemorySpace.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/util/Macros.hpp"
 
 #include <memory>
+#include <sstream>
 
 namespace umpire {
 namespace space {
@@ -40,8 +42,24 @@ void MemorySpace<_allocator>::deallocate(void* ptr)
   ResourceManager::getInstance().deregisterAllocation(ptr);
 
   auto allocation = m_allocations.find(ptr);
-  if (allocation != m_allocations.end())
+  if (allocation != m_allocations.end()) {
     m_current_size -= allocation->second.m_size;
+    m_allocations.erase(allocation);
+  }
+}
+
+template<typename _allocator>
+size_t MemorySpace<_allocator>::size(void* ptr)
+{
+  auto allocation = m_allocations.find(ptr);
+  if (allocation == m_allocations.end()) {
+    std::stringstream e;
+    e << "size for " << ptr << " not found" << std::endl;
+    UMPIRE_ERROR(e.str());
+    return(0);
+  }
+
+  return allocation->second.m_size;
 }
 
 template<typename _allocator>
