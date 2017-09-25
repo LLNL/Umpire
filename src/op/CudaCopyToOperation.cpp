@@ -3,7 +3,6 @@
 #include <cuda_runtime_api.h>
 
 namespace umpire {
-
 namespace op {
 
 void CudaCopyToOperation::operator()(

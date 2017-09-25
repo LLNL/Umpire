@@ -9,6 +9,8 @@
 #include "umpire/space/UnifiedMemorySpaceFactory.hpp"
 #endif
 
+#include "umpire/op/MemoryOperationRegistry.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -82,14 +84,16 @@ void ResourceManager::deregisterAllocation(void* ptr)
 
 void ResourceManager::copy(void* src_ptr, void* dst_ptr)
 {
-  auto op_registry = op::OperationRegistry::getInstance();
+  auto op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc = m_allocation_to_allocator[src_ptr];
   auto dst_alloc = m_allocation_to_allocator[dst_ptr];
 
+  std::size_t size = src_alloc->size(src_ptr);
+
   auto op = op_registry.find("COPY", src_alloc, dst_alloc);
 
-  op(src, dst, size);
+  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
 }
 
 } // end of namespace umpire

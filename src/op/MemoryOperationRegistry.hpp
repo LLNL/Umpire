@@ -1,8 +1,28 @@
 #ifndef UMPIRE_OperationRegistry_HPP
 #define UMPIRE_OperationRegistry_HPP
 
+#include "umpire/op/MemoryOperation.hpp"
+
+#include "umpire/AllocatorInterface.hpp"
+#include "umpire/util/Platform.hpp"
+
+#include <memory>
+#include <unordered_map>
+#include <functional>
+
 namespace umpire {
 namespace op {
+
+struct pair_hash {
+  std::size_t operator () (const std::pair<Platform, Platform> &p) const {
+      auto h1 = std::hash<int>{}(static_cast<int>(p.first));
+      auto h2 = std::hash<int>{}(static_cast<int>(p.second));
+
+      // Mainly for demonstration purposes, i.e. works but is overly simple
+      // In the real world, use sth. like boost.hash_combine
+      return h1 ^ h2;
+  }
+};
 
 class MemoryOperationRegistry {
   public:
@@ -14,6 +34,11 @@ class MemoryOperationRegistry {
         std::shared_ptr<AllocatorInterface>& source_allocator,
         std::shared_ptr<AllocatorInterface>& dst_allocator);
 
+    void registerOperation(
+      const std::string& name,
+      std::pair<Platform, Platform> platforms,
+      std::shared_ptr<MemoryOperation>&& operation);
+
   protected:
     MemoryOperationRegistry();
 
@@ -23,7 +48,8 @@ class MemoryOperationRegistry {
     std::unordered_map<
       std::string,
       std::unordered_map< std::pair<Platform, Platform>, 
-                          std::shared_ptr<MemoryOperation> > > m_operators;
+                          std::shared_ptr<MemoryOperation>, 
+                          pair_hash > > m_operators;
 
 };
 

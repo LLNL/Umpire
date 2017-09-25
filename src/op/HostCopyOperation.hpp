@@ -4,16 +4,17 @@
 #include "MemoryOperation.hpp"
 
 namespace umpire {
+namespace op {
 
 class HostCopyOperation : public MemoryOperation {
  public:
-  HostCopyOperation();
-
-  void operator()(void *src_ptr,
+  void operator()(
+      const void *src_ptr,
       void* dst_ptr,
       size_t length);
 };
 
+} // end of naemspace op
 } //end of namespace umpire
 
 #endif // UMPIRE_HostCopyOperation_HPP

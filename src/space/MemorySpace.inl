@@ -12,7 +12,7 @@ namespace umpire {
 namespace space {
 
 template<typename _allocator>
-MemorySpace<_allocator>::MemorySpace(Platform platform = Platform::cpu) :
+MemorySpace<_allocator>::MemorySpace(Platform platform) :
   m_allocator(),
   m_allocations(),
   m_current_size(0l),
@@ -76,7 +76,7 @@ long MemorySpace<_allocator>::getHighWatermark()
 }
 
 template<typename _allocator>
-Platform getPlatform()
+Platform MemorySpace<_allocator>::getPlatform()
 {
   return m_platform;
 }

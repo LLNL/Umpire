@@ -18,7 +18,7 @@ class MemorySpace :
 {
 
   public: 
-    MemorySpace(Platform platform);
+    MemorySpace(Platform platform = Platform::cpu);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

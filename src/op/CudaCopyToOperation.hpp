@@ -4,16 +4,17 @@
 #include "MemoryOperation.hpp"
 
 namespace umpire {
+namespace op {
 
 class CudaCopyToOperation : public MemoryOperation {
  public:
-  CudaCopyToOperation();
-
-  void operator()(void *dst_ptr,
-      void* src_ptr,
+  void operator()(
+      const void *src_ptr,
+      void* dst_ptr,
       size_t length);
 };
 
-} //end of namespace umpire
+} // end of namespace op
+} // end of namespace umpire
 
 #endif // UMPIRE_CudaCopyToOperation_HPP

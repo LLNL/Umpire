@@ -11,12 +11,21 @@ set (umpire_op_sources
   HostCopyOperation.cpp
   MemoryOperationRegistry.cpp)
 
+set (umpire_op_depends
+  umpire_util)
+
+if (ENABLE_CUDA)
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    cuda_runtime)
+endif ()
+
 blt_add_library(
   NAME umpire_op
   HEADERS ${umpire_op_headers}
-  SOURCES ${umpire_op_sources{
+  SOURCES ${umpire_op_sources}
   HEADERS_OUTPUT_SUBDIR umpire/op
-  DEPENDS_ON umpire_util
+  DEPENDS_ON ${umpire_op_depends}
 )
 
 install(TARGETS

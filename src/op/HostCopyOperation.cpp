@@ -1,15 +1,16 @@
 #include "HostCopyOperation.hpp"
 
-namespace umpire {
+#include <cstring>
 
+namespace umpire {
 namespace op {
 
 void HostCopyOperation::operator()(
-    void *src_ptr,
+    const void *src_ptr,
     void* dest_ptr,
     size_t length)
 {
-  std::memcpy(src_ptr, dest_ptr, length);
+  std::memcpy(dest_ptr, src_ptr, length);
 }
 
 } // end of namespace op

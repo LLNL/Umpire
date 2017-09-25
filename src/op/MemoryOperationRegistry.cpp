@@ -4,6 +4,9 @@
 #include "umpire/op/CudaCopyToOperation.hpp"
 #include "umpire/op/HostCopyOperation.hpp"
 
+#include "umpire/util/Macros.hpp"
+
+
 namespace umpire {
 namespace op {
 
@@ -35,9 +38,10 @@ MemoryOperationRegistry::MemoryOperationRegistry()
   registerOperation(
       "COPY",
       std::make_pair(Platform::cuda, Platform::cpu),
-      std::make_shared<CudaCopyToOperation>());
+      std::make_shared<CudaCopyFromOperation>());
 }
 
+void
 MemoryOperationRegistry::registerOperation(
     const std::string& name,
     std::pair<Platform, Platform> platforms,
@@ -49,34 +53,35 @@ MemoryOperationRegistry::registerOperation(
     operations = m_operators.insert(
         std::make_pair(name,
           std::unordered_map<std::pair<Platform, Platform>,
-          std::shared_ptr<MemoryOperation>>())).first;
+          std::shared_ptr<MemoryOperation>, pair_hash >())).first;
   }
 
-  operations->second.insert(std::make_pair(platforms, operation))
+  operations->second.insert(std::make_pair(platforms, operation));
 }
 
-std::shared_ptr<umpire::op::MemoryOperation> find(
+std::shared_ptr<umpire::op::MemoryOperation>
+MemoryOperationRegistry::find(
     const std::string& name,
-    std::shared_ptr<AllocatorInterface>& source_allocator,
+    std::shared_ptr<AllocatorInterface>& src_allocator,
     std::shared_ptr<AllocatorInterface>& dst_allocator)
 {
   auto platforms = std::make_pair(
-      source_allocator->getPlatform(),
-      dest_allocator->getPlatform());
+      src_allocator->getPlatform(),
+      dst_allocator->getPlatform());
 
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
-    UMPIRE_ERROR("Cannot find operator " << name) << ", " << platforms.second());
+    UMPIRE_ERROR("Cannot find operator " << name); 
   }
 
-  auto op = operations.find(platforms);
+  auto op = operations->second.find(platforms);
 
-  if (op == operations.end()) {
-    UMPIRE_ERROR("Cannot find operator" << name << " for platforms " << platforms.first() << ", " << platforms.second());
+  if (op == operations->second.end()) {
+    UMPIRE_ERROR("Cannot find operator" << name << " for platforms " << static_cast<int>(platforms.first) << ", " << static_cast<int>(platforms.second));
   }
 
-  return op;
+  return op->second;
 }
 
 

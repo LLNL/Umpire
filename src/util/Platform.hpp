@@ -8,4 +8,6 @@ enum class Platform {
   cuda
 };
 
+} // end of namespace umpire
+
 #endif
