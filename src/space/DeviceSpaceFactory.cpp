@@ -19,7 +19,7 @@ DeviceSpaceFactory::isValidAllocatorFor(const std::string& name)
 std::shared_ptr<AllocatorInterface>
 DeviceSpaceFactory::create()
 {
-  return std::make_shared<space::MemorySpace<alloc::CnmemAllocator> >();
+  return std::make_shared<space::MemorySpace<alloc::CnmemAllocator> >(Platform::cuda);
 }
 
 } // end of namespace space

@@ -80,4 +80,16 @@ void ResourceManager::deregisterAllocation(void* ptr)
   m_allocation_to_allocator.erase(ptr);
 }
 
+void ResourceManager::copy(void* src_ptr, void* dst_ptr)
+{
+  auto op_registry = op::OperationRegistry::getInstance();
+
+  auto src_alloc = m_allocation_to_allocator[src_ptr];
+  auto dst_alloc = m_allocation_to_allocator[dst_ptr];
+
+  auto op = op_registry.find("COPY", src_alloc, dst_alloc);
+
+  op(src, dst, size);
+}
+
 } // end of namespace umpire

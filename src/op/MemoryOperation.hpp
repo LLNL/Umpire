@@ -4,9 +4,9 @@
 namespace umpire {
 
 class MemoryOperation {
-  virtual void operator()(void *ptr,
-                          const MemorySpace &src,
-                          const MemorySpace &dest) = 0;
+  virtual void operator()(void *src_ptr,
+      void* dst_ptr,
+      size_t length) = 0;
 };
 
 } // end of namespace umpire

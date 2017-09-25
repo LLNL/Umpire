@@ -26,6 +26,8 @@ class ResourceManager
     
     void registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space);
     void deregisterAllocation(void* ptr);
+
+    void copy(void* src_ptr, void* dst_ptr);
     
   protected:
     ResourceManager();
