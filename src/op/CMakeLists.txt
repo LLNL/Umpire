@@ -6,6 +6,7 @@ set (umpire_op_headers
 if (ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
+    CudaCopyOperation.hpp
     CudaCopyFromOperation.hpp
     CudaCopyToOperation.hpp)
 endif ()
@@ -17,6 +18,7 @@ set (umpire_op_sources
 if (ENABLE_CUDA)
   set (umpire_op_sources
     ${umpire_op_sources}
+    CudaCopyOperation.cpp
     CudaCopyFromOperation.cpp
     CudaCopyToOperation.cpp)
 endif ()

@@ -32,8 +32,6 @@ ResourceManager::ResourceManager() :
   m_allocators(),
   m_allocation_to_allocator()
 {
-  UMPIRE_LOG("Building ResourceManager @ " << this);
-  
   AllocatorRegistry& registry =
     AllocatorRegistry::getInstance();
 
@@ -78,10 +76,6 @@ void ResourceManager::deregisterAllocation(void* ptr)
 
 void ResourceManager::copy(void* src_ptr, void* dst_ptr)
 {
-  for (auto alloc : m_allocation_to_allocator) {
-    std::cout << "Found pointer " << alloc.first << " -> " << alloc.second << std::endl;
-  }
-
   UMPIRE_LOG("Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
 
   auto op_registry = op::MemoryOperationRegistry::getInstance();

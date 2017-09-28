@@ -2,9 +2,14 @@
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
+#include "umpire/op/HostCopyOperation.hpp"
+
+#if defined(ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
 #include "umpire/op/CudaCopyToOperation.hpp"
-#include "umpire/op/HostCopyOperation.hpp"
+#include "umpire/op/CudaCopyOperation.hpp"
+#endif
+
 
 #include "umpire/util/Macros.hpp"
 
@@ -42,6 +47,11 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "COPY",
       std::make_pair(Platform::cuda, Platform::cpu),
       std::make_shared<CudaCopyFromOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaCopyOperation>());
 #endif
 }
 
