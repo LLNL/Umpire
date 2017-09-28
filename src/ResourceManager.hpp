@@ -29,10 +29,11 @@ class ResourceManager
 
     void copy(void* src_ptr, void* dst_ptr);
     
-  protected:
-    ResourceManager();
-
   private:
+    ResourceManager();
+    ResourceManager (const ResourceManager&) = delete;
+    ResourceManager& operator= (const ResourceManager&) = delete;
+
     static ResourceManager* s_resource_manager_instance;
 
     std::list<std::string> m_allocator_names;

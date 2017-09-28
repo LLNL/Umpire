@@ -5,7 +5,7 @@
 
 TEST(Operation, HostToHostCopy)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator host_allocator = rm.getAllocator("HOST");
 

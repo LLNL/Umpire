@@ -32,6 +32,8 @@ ResourceManager::ResourceManager() :
   m_allocators(),
   m_allocation_to_allocator()
 {
+  UMPIRE_LOG("Building ResourceManager @ " << this);
+  
   AllocatorRegistry& registry =
     AllocatorRegistry::getInstance();
 
@@ -61,37 +63,38 @@ ResourceManager::getAllocator(const std::string& name)
   return Allocator(m_allocators[name]);
 }
 
-// void 
-// ResourceManager::setDefaultAllocator(std::shared_ptr<Allocator>& allocator)
-// {
-//   m_default_allocator = allocator;
-// }
-// 
-// std::shared_ptr<Allocator> ResourceManager::getDefaultAllocator()
-// {
-//   return m_default_allocator;
-// }
-
 void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space)
 {
+  UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
   m_allocation_to_allocator[ptr] = space;
+
 }
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
+  UMPIRE_LOG("Deregistering " << ptr);
   m_allocation_to_allocator.erase(ptr);
 }
 
 void ResourceManager::copy(void* src_ptr, void* dst_ptr)
 {
+  for (auto alloc : m_allocation_to_allocator) {
+    std::cout << "Found pointer " << alloc.first << " -> " << alloc.second << std::endl;
+  }
+
+  UMPIRE_LOG("Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
+
   auto op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto src_alloc = m_allocation_to_allocator[src_ptr];
-  auto dst_alloc = m_allocation_to_allocator[dst_ptr];
+  auto src_alloc = m_allocation_to_allocator.find(src_ptr);
+  auto dst_alloc = m_allocation_to_allocator.find(dst_ptr);
 
-  std::size_t size = src_alloc->size(src_ptr);
+  UMPIRE_LOG("Source allocator:  " << src_alloc->second);
+  UMPIRE_LOG("Dest allocator:  " << dst_alloc->second);
 
-  auto op = op_registry.find("COPY", src_alloc, dst_alloc);
+  std::size_t size = src_alloc->second->size(src_ptr);
+
+  auto op = op_registry.find("COPY", src_alloc->second, dst_alloc->second);
 
   op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
 }

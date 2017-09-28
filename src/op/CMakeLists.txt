@@ -1,15 +1,25 @@
 set (umpire_op_headers
-  CudaCopyFromOperation.hpp
-  CudaCopyToOperation.hpp
   HostCopyOperation.hpp
   MemoryOperation.hpp
   MemoryOperationRegistry.hpp)
 
+if (ENABLE_CUDA)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    CudaCopyFromOperation.hpp
+    CudaCopyToOperation.hpp)
+endif ()
+
 set (umpire_op_sources
-  CudaCopyFromOperation.cpp
-  CudaCopyToOperation.cpp
   HostCopyOperation.cpp
   MemoryOperationRegistry.cpp)
+
+if (ENABLE_CUDA)
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    CudaCopyFromOperation.cpp
+    CudaCopyToOperation.cpp)
+endif ()
 
 set (umpire_op_depends
   umpire_util)

@@ -1,3 +1,5 @@
+#include "umpire/config.hpp"
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/op/CudaCopyFromOperation.hpp"
@@ -30,6 +32,7 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostCopyOperation>());
 
+#if defined(ENABLE_CUDA)
   registerOperation(
       "COPY",
       std::make_pair(Platform::cpu, Platform::cuda),
@@ -39,6 +42,7 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "COPY",
       std::make_pair(Platform::cuda, Platform::cpu),
       std::make_shared<CudaCopyFromOperation>());
+#endif
 }
 
 void

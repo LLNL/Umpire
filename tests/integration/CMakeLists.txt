@@ -16,7 +16,7 @@ blt_add_test(
 blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
-  DEPENDS_ON umpire gtest cuda_runtime
+  DEPENDS_ON umpire gtest
   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
 target_include_directories(
