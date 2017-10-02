@@ -11,11 +11,30 @@ set (umpire_sources
   AllocatorRegistry.cpp
   ResourceManager.cpp)
 
+if (ENABLE_FORTRAN)
+  set (umpire_headers
+    ${umpire_headers}
+    interface/umpire.h
+    shroudrt.hpp
+    wrapAllocator.h
+    wrapResourceManager.h
+    )
+
+  set (umpire_sources
+    ${umpire_sources}
+    shroudrt.cpp
+    wrapAllocator.cpp
+    wrapResourceManager.cpp
+    wrapfumpire.f
+    )
+endif ()
+
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}
   SOURCES ${umpire_sources}
-  HEADERS_OUTPUT_SUBDIR umpire 
+  HEADERS_OUTPUT_SUBDIR umpire
   DEPENDS_ON umpire_space umpire_alloc)
 
 configure_file(
@@ -37,3 +56,6 @@ add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(util)
 add_subdirectory(tpl)
+if (SHROUD_FOUND)
+  add_subdirectory(interface)
+endif ()

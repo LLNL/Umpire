@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(Umpire LANGUAGES CXX)
+project(Umpire LANGUAGES CXX C Fortran)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
@@ -22,6 +22,8 @@ if (NOT EXISTS ${PROJECT_SOURCE_DIR}/blt/SetupBLT.cmake)
 endif()
 
 include(blt/SetupBLT.cmake)
+
+include(cmake/SetupUmpireThirdParty.cmake)
 
 if (ENABLE_CUDA)
   set(CUDA_NVCC_FLAGS -std=c++11)
