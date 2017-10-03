@@ -6,7 +6,7 @@ types:
   ResourceManager:
     base: wrapped
     cpp_type: ResourceManager
-    c_type: umpire_resourcemanager
+    c_type: UMPIRE_resourcemanager
     f_derived_type: UmpireResourceManager
     f_to_c: "{f_var}%get_instance()"
     f_module:
@@ -16,7 +16,7 @@ types:
   Allocator:
     base: wrapped
     cpp_type: Allocator
-    c_type: umpire_allocator
+    c_type: UMPIRE_allocator
     f_derived_type: UmpireAllocator
     f_to_c: "{f_var}%get_instance()"
     f_module:

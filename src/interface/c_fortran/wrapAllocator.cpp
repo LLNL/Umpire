@@ -14,16 +14,16 @@ extern "C" {
 // splicer begin class.Allocator.C_definitions
 // splicer end class.Allocator.C_definitions
 
-void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes)
+int * UMPIRE_allocator_allocate_int(UMPIRE_allocator * self, size_t bytes)
 {
-// splicer begin class.Allocator.method.allocate
+// splicer begin class.Allocator.method.allocate_int
     Allocator *SH_this = static_cast<Allocator *>(static_cast<void *>(self));
-    void * SH_rv = SH_this->allocate(bytes);
+    int * SH_rv = static_cast<int*>(SH_this->allocate(bytes*sizeof(int)));
     return SH_rv;
-// splicer end class.Allocator.method.allocate
+// splicer end class.Allocator.method.allocate_int
 }
 
-void umpire_allocator_deallocate(umpire_allocator * self, void * ptr)
+void UMPIRE_allocator_deallocate(UMPIRE_allocator * self, void * ptr)
 {
 // splicer begin class.Allocator.method.deallocate
     Allocator *SH_this = static_cast<Allocator *>(static_cast<void *>(self));

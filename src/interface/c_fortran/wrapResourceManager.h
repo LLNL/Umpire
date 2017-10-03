@@ -17,21 +17,19 @@ extern "C" {
 #endif
 
 // declaration of wrapped types
-struct s_umpire_allocator;
-typedef struct s_umpire_allocator umpire_allocator;
-struct s_umpire_resourcemanager;
-typedef struct s_umpire_resourcemanager umpire_resourcemanager;
+struct s_UMPIRE_allocator;
+typedef struct s_UMPIRE_allocator UMPIRE_allocator;
+struct s_UMPIRE_resourcemanager;
+typedef struct s_UMPIRE_resourcemanager UMPIRE_resourcemanager;
 
 // splicer begin class.ResourceManager.C_declarations
 // splicer end class.ResourceManager.C_declarations
 
-umpire_resourcemanager * umpire_resourcemanager_new();
+UMPIRE_resourcemanager * UMPIRE_resourcemanager_get();
 
-void umpire_resourcemanager_delete(umpire_resourcemanager * self);
+UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator(UMPIRE_resourcemanager * self, const char * space);
 
-umpire_allocator umpire_resourcemanager_get_allocator(umpire_resourcemanager * self, const char * space);
-
-umpire_allocator umpire_resourcemanager_get_allocator_bufferify(umpire_resourcemanager * self, const char * space, int Lspace);
+UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator_bufferify(UMPIRE_resourcemanager * self, const char * space, int Lspace);
 
 #ifdef __cplusplus
 }

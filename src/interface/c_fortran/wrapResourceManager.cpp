@@ -15,41 +15,31 @@ extern "C" {
 // splicer begin class.ResourceManager.C_definitions
 // splicer end class.ResourceManager.C_definitions
 
-umpire_resourcemanager * umpire_resourcemanager_new()
+UMPIRE_resourcemanager * UMPIRE_resourcemanager_get()
 {
-// splicer begin class.ResourceManager.method.new
-    ResourceManager * SH_rv = new ResourceManager();
-    return static_cast<umpire_resourcemanager *>(static_cast<void *>(SH_rv));
-// splicer end class.ResourceManager.method.new
+// splicer begin class.ResourceManager.method.get
+    auto& SH_rv = ResourceManager::getInstance(); return static_cast<UMPIRE_resourcemanager *>(static_cast<void *>(&SH_rv));
+// splicer end class.ResourceManager.method.get
 }
 
-void umpire_resourcemanager_delete(umpire_resourcemanager * self)
-{
-// splicer begin class.ResourceManager.method.delete
-    ResourceManager *SH_this = static_cast<ResourceManager *>(static_cast<void *>(self));
-    delete SH_this;
-    return;
-// splicer end class.ResourceManager.method.delete
-}
-
-umpire_allocator umpire_resourcemanager_get_allocator(umpire_resourcemanager * self, const char * space)
+UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator(UMPIRE_resourcemanager * self, const char * space)
 {
 // splicer begin class.ResourceManager.method.get_allocator
     ResourceManager *SH_this = static_cast<ResourceManager *>(static_cast<void *>(self));
     const std::string SH_space(space);
-    Allocator SH_rv = SH_this->getAllocator(SH_space);
-    umpire_allocator XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv));
+    Allocator * SH_rv = new Allocator(SH_this->getAllocator(SH_space));
+    UMPIRE_allocator * XSH_rv = static_cast<UMPIRE_allocator *>(static_cast<void *>(SH_rv));
     return XSH_rv;
 // splicer end class.ResourceManager.method.get_allocator
 }
 
-umpire_allocator umpire_resourcemanager_get_allocator_bufferify(umpire_resourcemanager * self, const char * space, int Lspace)
+UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator_bufferify(UMPIRE_resourcemanager * self, const char * space, int Lspace)
 {
 // splicer begin class.ResourceManager.method.get_allocator_bufferify
     ResourceManager *SH_this = static_cast<ResourceManager *>(static_cast<void *>(self));
     const std::string SH_space(space, Lspace);
-    Allocator SH_rv = SH_this->getAllocator(SH_space);
-    umpire_allocator XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv));
+    Allocator * SH_rv = new Allocator(SH_this->getAllocator(SH_space));
+    UMPIRE_allocator * XSH_rv = static_cast<UMPIRE_allocator *>(static_cast<void *>(SH_rv));
     return XSH_rv;
 // splicer end class.ResourceManager.method.get_allocator_bufferify
 }

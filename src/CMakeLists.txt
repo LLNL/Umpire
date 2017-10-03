@@ -15,17 +15,17 @@ if (ENABLE_FORTRAN)
   set (umpire_headers
     ${umpire_headers}
     interface/umpire.h
-    shroudrt.hpp
-    wrapAllocator.h
-    wrapResourceManager.h
+    interface/c_fortran/shroudrt.hpp
+    interface/c_fortran/wrapAllocator.h
+    interface/c_fortran/wrapResourceManager.h
     )
 
   set (umpire_sources
     ${umpire_sources}
-    shroudrt.cpp
-    wrapAllocator.cpp
-    wrapResourceManager.cpp
-    wrapfumpire.f
+    interface/c_fortran/shroudrt.cpp
+    interface/c_fortran/wrapAllocator.cpp
+    interface/c_fortran/wrapResourceManager.cpp
+    interface/c_fortran/wrapfumpire.f
     )
 endif ()
 
