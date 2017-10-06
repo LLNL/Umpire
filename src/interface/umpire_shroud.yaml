@@ -1,0 +1,26 @@
+library: Umpire
+namespace: umpire
+
+options:
+  C_prefix: UMPIRE_
+  F_module_per_class: False
+
+classes:
+  - name: ResourceManager
+    cpp_header: umpire/ResourceManager.hpp
+    F_derived_name: UmpireResourceManager
+
+    methods:
+      - decl: ResourceManager& get() +constructor
+        C_code: auto& SH_rv = ResourceManager::getInstance();
+                return static_cast<UMPIRE_resourcemanager *>(static_cast<void *>(&SH_rv));
+
+      - decl: Allocator* getAllocator(const std::string& space)
+
+  - name: Allocator
+    cpp_header: umpire/Allocator.hpp
+    F_derived_name: UmpireAllocator
+
+    methods:
+      - decl: void* allocate(size_t bytes)
+      - decl: void deallocate (void* ptr)
