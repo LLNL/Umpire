@@ -19,9 +19,5 @@ int main(int argc, char* argv[]) {
 
   printf("allocation = %x\n", allocation);
 
-  allocation[0] = 1.0;
-
-
-
   return 0;
 }

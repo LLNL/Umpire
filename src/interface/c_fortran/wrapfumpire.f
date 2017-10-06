@@ -43,7 +43,7 @@ module umpire_mod
         ! splicer begin class.Allocator.component_part
         ! splicer end class.Allocator.component_part
     contains
-        procedure :: allocate_int => allocator_allocate_int
+        procedure :: allocate => allocator_allocate
         procedure :: deallocate => allocator_deallocate
         procedure :: get_instance => allocator_get_instance
         procedure :: set_instance => allocator_set_instance
@@ -97,15 +97,15 @@ module umpire_mod
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
 
-        function c_allocator_allocate_int(self, bytes) &
+        function c_allocator_allocate(self, bytes) &
                 result(SH_rv) &
-                bind(C, name="UMPIRE_allocator_allocate_int")
-            use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
+                bind(C, name="UMPIRE_allocator_allocate")
+            use iso_c_binding, only : C_PTR, C_SIZE_T
             implicit none
             type(C_PTR), value, intent(IN) :: self
             integer(C_SIZE_T), value, intent(IN) :: bytes
-            integer(C_INT) :: SH_rv
-        end function c_allocator_allocate_int
+            type(C_PTR) :: SH_rv
+        end function c_allocator_allocate
 
         subroutine c_allocator_deallocate(self, ptr) &
                 bind(C, name="UMPIRE_allocator_deallocate")
@@ -168,17 +168,17 @@ contains
     ! splicer begin class.ResourceManager.additional_functions
     ! splicer end class.ResourceManager.additional_functions
 
-    function allocator_allocate_int(obj, bytes) result(SH_rv)
-        use iso_c_binding, only : C_INT, C_SIZE_T
+    function allocator_allocate(obj, bytes) result(SH_rv)
+        use iso_c_binding, only : C_PTR, C_SIZE_T
         class(UmpireAllocator) :: obj
         integer(C_SIZE_T), value, intent(IN) :: bytes
-        integer(C_INT) :: SH_rv
-        ! splicer begin class.Allocator.method.allocate_int
-        SH_rv = c_allocator_allocate_int(  &
+        type(C_PTR) :: SH_rv
+        ! splicer begin class.Allocator.method.allocate
+        SH_rv = c_allocator_allocate(  &
             obj%voidptr,  &
             bytes)
-        ! splicer end class.Allocator.method.allocate_int
-    end function allocator_allocate_int
+        ! splicer end class.Allocator.method.allocate
+    end function allocator_allocate
 
     subroutine allocator_deallocate(obj, ptr)
         use iso_c_binding, only : C_PTR

@@ -25,7 +25,7 @@ typedef struct s_UMPIRE_allocator UMPIRE_allocator;
 // splicer begin class.Allocator.C_declarations
 // splicer end class.Allocator.C_declarations
 
-int * UMPIRE_allocator_allocate_int(UMPIRE_allocator * self, size_t bytes);
+void * UMPIRE_allocator_allocate(UMPIRE_allocator * self, size_t bytes);
 
 void UMPIRE_allocator_deallocate(UMPIRE_allocator * self, void * ptr);
 

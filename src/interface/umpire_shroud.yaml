@@ -22,6 +22,5 @@ classes:
     F_derived_name: UmpireAllocator
 
     methods:
-      - decl: int* allocate(size_t bytes)
-        function_suffix: _int
+      - decl: void* allocate(size_t bytes)
       - decl: void deallocate (void* ptr)

@@ -14,13 +14,6 @@ blt_add_executable(
     umpire
 )
 
-blt_add_executable(
-  NAME allocator_f
-  SOURCES allocator.F
-  DEPENDS_ON
-    umpire
-)
-
 add_subdirectory(lulesh)
 
 add_subdirectory(diffusion)
