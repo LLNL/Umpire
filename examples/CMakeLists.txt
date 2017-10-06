@@ -7,6 +7,13 @@ blt_add_executable(
     umpire_alloc
     )
 
+blt_add_executable(
+  NAME allocator_c
+  SOURCES allocator.c
+  DEPENDS_ON
+    umpire
+)
+
 add_subdirectory(lulesh)
 
 add_subdirectory(diffusion)

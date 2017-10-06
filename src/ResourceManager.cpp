@@ -93,4 +93,15 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr)
   op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
 }
 
+void ResourceManager::deallocate(void* ptr)
+{
+  auto allocator = m_allocation_to_allocator.find(ptr);
+
+  if (allocator != m_allocation_to_allocator.end()) {
+    allocator->second->deallocate(ptr);
+  } else {
+    UMPIRE_ERROR("Cannot find allocator for " << ptr);
+  }
+}
+
 } // end of namespace umpire

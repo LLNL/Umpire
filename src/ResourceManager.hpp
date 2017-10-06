@@ -28,6 +28,13 @@ class ResourceManager
     void deregisterAllocation(void* ptr);
 
     void copy(void* src_ptr, void* dst_ptr);
+
+    /*
+     * \brief Deallocate any pointer allocated by an Umpire-managed resource.
+     *
+     * \param ptr Pointer to deallocate
+     */
+    void deallocate(void* ptr);
     
   private:
     ResourceManager();

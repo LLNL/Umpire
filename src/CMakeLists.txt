@@ -11,6 +11,25 @@ set (umpire_sources
   AllocatorRegistry.cpp
   ResourceManager.cpp)
 
+if (ENABLE_FORTRAN)
+  set (umpire_headers
+    ${umpire_headers}
+    interface/umpire.h
+    interface/c_fortran/shroudrt.hpp
+    interface/c_fortran/wrapAllocator.h
+    interface/c_fortran/wrapResourceManager.h
+    )
+
+  set (umpire_sources
+    ${umpire_sources}
+    interface/c_fortran/shroudrt.cpp
+    interface/c_fortran/wrapAllocator.cpp
+    interface/c_fortran/wrapResourceManager.cpp
+    interface/c_fortran/wrapfumpire.f
+    )
+endif ()
+
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}
@@ -37,3 +56,6 @@ add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(util)
 add_subdirectory(tpl)
+if (SHROUD_FOUND)
+  add_subdirectory(interface)
+endif ()
