@@ -26,6 +26,13 @@ class ResourceManager
     
     void registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space);
     void deregisterAllocation(void* ptr);
+
+    /*
+     * \brief Deallocate any pointer allocated by an Umpire-managed resource.
+     *
+     * \param ptr Pointer to deallocate
+     */
+    void deallocate(void* ptr);
     
   protected:
     ResourceManager();

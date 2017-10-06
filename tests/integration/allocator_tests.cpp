@@ -125,3 +125,23 @@ TEST(Allocator, UmAllocatorSize)
 }
 
 #endif
+
+TEST(Allocator, Deallocate)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("HOST");
+  double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
+
+  rm.deallocate(test_alloc);
+
+  SUCCEED();
+}
+
+TEST(Allocator, DeallocateThrow)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  double* ptr = new double[20];
+  ASSERT_ANY_THROW(rm.deallocate(ptr));
+}

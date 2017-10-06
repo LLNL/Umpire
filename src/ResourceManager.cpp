@@ -80,4 +80,15 @@ void ResourceManager::deregisterAllocation(void* ptr)
   m_allocation_to_allocator.erase(ptr);
 }
 
+void ResourceManager::deallocate(void* ptr)
+{
+  auto allocator = m_allocation_to_allocator.find(ptr);
+
+  if (allocator != m_allocation_to_allocator.end()) {
+    allocator->second->deallocate(ptr);
+  } else {
+    UMPIRE_ERROR("Cannot find allocator for " << ptr);
+  }
+}
+
 } // end of namespace umpire
