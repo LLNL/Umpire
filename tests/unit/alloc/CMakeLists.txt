@@ -1,7 +1,16 @@
+set (memory_allocator_test_depends
+  umpire_alloc gtest)
+
+if (ENABLE_CUDA)
+  set (memory_allocator_test_depends
+    ${memory_allocator_test_depends}
+    cuda_runtime)
+endif ()
+
 blt_add_executable(
   NAME memory_allocator_tests
   SOURCES memory_allocator_tests.cpp
-  DEPENDS_ON umpire_alloc gtest cuda_runtime
+  DEPENDS_ON ${memory_allocator_test_depends}
   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
 target_include_directories(
