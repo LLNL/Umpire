@@ -10,6 +10,15 @@ namespace alloc {
 
 struct CnmemAllocator
 {
+  const char* cnmemGetErrorString(cnmemStatus_t error) {
+    switch (error) {
+      case CNMEM_STATUS_SUCCESS: return "SUCCESS";
+      case CNMEM_STATUS_NOT_INITIALIZED: return "NOT INITIALIZED";
+      case CNMEM_STATUS_INVALID_ARGUMENT: return "INVALID_ARGUMENT";
+      case CNMEM_STATUS_OUT_OF_MEMORY: return "OUT_OF_MEMORY";
+      case CNMEM_STATUS_CUDA_ERROR: return cudaGetErrorString(cudaPeekAtLastError());
+  }
+
   void* allocate(size_t bytes)
   {
     static bool initialized = false;
@@ -26,8 +35,12 @@ struct CnmemAllocator
     }
 
     void* ptr;
-    ::cnmemMalloc(&ptr, bytes, NULL);
-    return ptr;
+    cnmemStatus_t error = ::cnmemMalloc(&ptr, bytes, NULL);
+    if (error != CNMEM_STATUS_SUCCESS) {
+      UMPIRE_ERROR("cnmemMalloc failed allocating " << bytes << " bytes, with: " << cnmemGetErrorString(error));
+    } else {
+      return ptr;
+    }
   }
 
   void deallocate(void* ptr)
