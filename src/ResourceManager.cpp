@@ -86,8 +86,8 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr)
   std::size_t src_size = src_alloc->size(src_ptr);
   std::size_t dst_size = dst_alloc->size(dst_ptr);
 
-  if (src_size != dst_size) {
-    UMPIRE_ERROR("Source and destination size don't match in copy: " << src_size << " -> " << dst_size);
+  if (src_size > dst_size) {
+    UMPIRE_ERROR("Not enough space in destination for copy: " << src_size << " -> " << dst_size);
   }
 
   auto op = op_registry.find("COPY", src_alloc, dst_alloc);
