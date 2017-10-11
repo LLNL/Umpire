@@ -41,6 +41,8 @@ class ResourceManager
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
 
+    std::shared_ptr<AllocatorInterface> findAllocatorForPointer(void* ptr);
+
     static ResourceManager* s_resource_manager_instance;
 
     std::list<std::string> m_allocator_names;

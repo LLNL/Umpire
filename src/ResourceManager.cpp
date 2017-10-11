@@ -80,28 +80,37 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr)
 
   auto op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto src_alloc = m_allocation_to_allocator.find(src_ptr);
-  auto dst_alloc = m_allocation_to_allocator.find(dst_ptr);
+  auto src_alloc = findAllocatorForPointer(src_ptr);
+  auto dst_alloc = findAllocatorForPointer(dst_ptr);
 
-  UMPIRE_LOG("Source allocator:  " << src_alloc->second);
-  UMPIRE_LOG("Dest allocator:  " << dst_alloc->second);
+  std::size_t src_size = src_alloc->size(src_ptr);
+  std::size_t dst_size = dst_alloc->size(dst_ptr);
 
-  std::size_t size = src_alloc->second->size(src_ptr);
+  if (src_size != dst_size) {
+    UMPIRE_ERROR("Source and destination size don't match in copy: " << src_size << " -> " << dst_size);
+  }
 
-  auto op = op_registry.find("COPY", src_alloc->second, dst_alloc->second);
+  auto op = op_registry.find("COPY", src_alloc, dst_alloc);
 
-  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
+  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, src_size);
 }
 
 void ResourceManager::deallocate(void* ptr)
 {
+  auto allocator = findAllocatorForPointer(ptr);;
+
+  allocator->deallocate(ptr);
+}
+
+std::shared_ptr<AllocatorInterface> ResourceManager::findAllocatorForPointer(void* ptr)
+{
   auto allocator = m_allocation_to_allocator.find(ptr);
 
-  if (allocator != m_allocation_to_allocator.end()) {
-    allocator->second->deallocate(ptr);
-  } else {
-    UMPIRE_ERROR("Cannot find allocator for " << ptr);
+  if (allocator == m_allocation_to_allocator.end()) {
+    UMPIRE_ERROR("Cannot find allocator " << ptr);
   }
+
+  return allocator->second;
 }
 
 } // end of namespace umpire

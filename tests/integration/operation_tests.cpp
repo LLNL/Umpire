@@ -4,6 +4,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/util/Exception.hpp"
 
 TEST(Operation, HostToHostCopy)
 {
@@ -135,5 +136,17 @@ TEST(Operation, UmToDeviceToUmCopy)
     ASSERT_DOUBLE_EQ(array_one[i], array_three[i]);
   }
 }
-
 #endif
+
+TEST(Operation, SizeError)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+
+  double* array_one = static_cast<double*>(host_allocator.allocate(100*sizeof(double)));
+  double* array_two = static_cast<double*>(host_allocator.allocate(70*sizeof(double)));
+
+  ASSERT_THROW(rm.copy(array_one, array_two), umpire::util::Exception);
+}
+
