@@ -44,6 +44,24 @@ UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator_bufferify(UMPIRE_resourc
 // splicer end class.ResourceManager.method.get_allocator_bufferify
 }
 
+void UMPIRE_resourcemanager_copy(UMPIRE_resourcemanager * self, void * src_ptr, void * dst_ptr)
+{
+// splicer begin class.ResourceManager.method.copy
+    ResourceManager *SH_this = static_cast<ResourceManager *>(static_cast<void *>(self));
+    SH_this->copy(src_ptr, dst_ptr);
+    return;
+// splicer end class.ResourceManager.method.copy
+}
+
+void UMPIRE_resourcemanager_deallocate(UMPIRE_resourcemanager * self, void * ptr)
+{
+// splicer begin class.ResourceManager.method.deallocate
+    ResourceManager *SH_this = static_cast<ResourceManager *>(static_cast<void *>(self));
+    SH_this->deallocate(ptr);
+    return;
+// splicer end class.ResourceManager.method.deallocate
+}
+
 }  // extern "C"
 
 }  // namespace umpire

@@ -19,7 +19,7 @@ UnifiedMemorySpaceFactory::isValidAllocatorFor(const std::string& name)
 std::shared_ptr<AllocatorInterface>
 UnifiedMemorySpaceFactory::create()
 {
-  return std::make_shared<space::MemorySpace<alloc::CudaMallocManagedAllocator> >();
+  return std::make_shared<space::MemorySpace<alloc::CudaMallocManagedAllocator> >(Platform::cuda);
 }
 
 } // end of namespace space

@@ -5,7 +5,7 @@
 
 TEST(Allocator, HostAllocator)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
@@ -15,7 +15,7 @@ TEST(Allocator, HostAllocator)
 
 TEST(Allocator, HostAllocatorReference)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
   umpire::Allocator *p;
 
   p = new umpire::Allocator(rm.getAllocator("HOST"));
@@ -31,7 +31,7 @@ TEST(Allocator, HostAllocatorReference)
 
 TEST(Allocator, HostAllocatorSize)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
@@ -46,7 +46,7 @@ TEST(Allocator, HostAllocatorSize)
 #if defined(ENABLE_CUDA)
 TEST(Allocator, DeviceAllocator)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("DEVICE");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
@@ -56,7 +56,7 @@ TEST(Allocator, DeviceAllocator)
 
 TEST(Allocator, DeviceAllocatorReference)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
   umpire::Allocator *p;
 
   p = new umpire::Allocator(rm.getAllocator("DEVICE"));
@@ -72,7 +72,7 @@ TEST(Allocator, DeviceAllocatorReference)
 
 TEST(Allocator, DeviceAllocatorSize)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("DEVICE");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
@@ -86,7 +86,7 @@ TEST(Allocator, DeviceAllocatorSize)
 
 TEST(Allocator, UmAllocator)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("UM");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
@@ -96,7 +96,7 @@ TEST(Allocator, UmAllocator)
 
 TEST(Allocator, UmAllocatorReference)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
   umpire::Allocator *p;
 
   p = new umpire::Allocator(rm.getAllocator("UM"));
@@ -112,7 +112,7 @@ TEST(Allocator, UmAllocatorReference)
 
 TEST(Allocator, UmAllocatorSize)
 {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("UM");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));

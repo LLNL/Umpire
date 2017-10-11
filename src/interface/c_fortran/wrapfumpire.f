@@ -28,6 +28,8 @@ module umpire_mod
         ! splicer end class.ResourceManager.component_part
     contains
         procedure :: get_allocator => resourcemanager_get_allocator
+        procedure :: copy => resourcemanager_copy
+        procedure :: deallocate => resourcemanager_deallocate
         procedure :: get_instance => resourcemanager_get_instance
         procedure :: set_instance => resourcemanager_set_instance
         procedure :: associated => resourcemanager_associated
@@ -94,6 +96,23 @@ module umpire_mod
             type(C_PTR) :: SH_rv
         end function c_resourcemanager_get_allocator_bufferify
 
+        subroutine c_resourcemanager_copy(self, src_ptr, dst_ptr) &
+                bind(C, name="UMPIRE_resourcemanager_copy")
+            use iso_c_binding, only : C_PTR
+            implicit none
+            type(C_PTR), value, intent(IN) :: self
+            type(C_PTR), value, intent(IN) :: src_ptr
+            type(C_PTR), value, intent(IN) :: dst_ptr
+        end subroutine c_resourcemanager_copy
+
+        subroutine c_resourcemanager_deallocate(self, ptr) &
+                bind(C, name="UMPIRE_resourcemanager_deallocate")
+            use iso_c_binding, only : C_PTR
+            implicit none
+            type(C_PTR), value, intent(IN) :: self
+            type(C_PTR), value, intent(IN) :: ptr
+        end subroutine c_resourcemanager_deallocate
+
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
 
@@ -140,6 +159,30 @@ contains
             len_trim(space, kind=C_INT))
         ! splicer end class.ResourceManager.method.get_allocator
     end function resourcemanager_get_allocator
+
+    subroutine resourcemanager_copy(obj, src_ptr, dst_ptr)
+        use iso_c_binding, only : C_PTR
+        class(UmpireResourceManager) :: obj
+        type(C_PTR), value, intent(IN) :: src_ptr
+        type(C_PTR), value, intent(IN) :: dst_ptr
+        ! splicer begin class.ResourceManager.method.copy
+        call c_resourcemanager_copy(  &
+            obj%voidptr,  &
+            src_ptr,  &
+            dst_ptr)
+        ! splicer end class.ResourceManager.method.copy
+    end subroutine resourcemanager_copy
+
+    subroutine resourcemanager_deallocate(obj, ptr)
+        use iso_c_binding, only : C_PTR
+        class(UmpireResourceManager) :: obj
+        type(C_PTR), value, intent(IN) :: ptr
+        ! splicer begin class.ResourceManager.method.deallocate
+        call c_resourcemanager_deallocate(  &
+            obj%voidptr,  &
+            ptr)
+        ! splicer end class.ResourceManager.method.deallocate
+    end subroutine resourcemanager_deallocate
 
     function resourcemanager_get_instance(obj) result (voidptr)
         use iso_c_binding, only: C_PTR

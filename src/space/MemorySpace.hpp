@@ -4,6 +4,7 @@
 #include "umpire/AllocatorInterface.hpp"
 
 #include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/Platform.hpp"
 
 #include <memory>
 #include <unordered_map>
@@ -17,7 +18,7 @@ class MemorySpace :
 {
 
   public: 
-    MemorySpace();
+    MemorySpace(Platform platform = Platform::cpu);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -26,6 +27,8 @@ class MemorySpace :
     long getCurrentSize();
     long getHighWatermark();
 
+    Platform getPlatform();
+
   protected: 
     _allocator m_allocator;
 
@@ -33,6 +36,8 @@ class MemorySpace :
 
     long m_current_size;
     long m_highwatermark;
+
+    Platform m_platform;
 };
 
 } // end of namespace space
