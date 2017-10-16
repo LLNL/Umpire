@@ -61,6 +61,12 @@ ResourceManager::getAllocator(const std::string& name)
   return Allocator(m_allocators[name]);
 }
 
+Allocator
+ResourceManager::getAllocator(void* ptr)
+{
+  return Allocator(findAllocatorForPointer(ptr));
+}
+
 void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space)
 {
   UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
@@ -83,8 +89,8 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr)
   auto src_alloc = findAllocatorForPointer(src_ptr);
   auto dst_alloc = findAllocatorForPointer(dst_ptr);
 
-  std::size_t src_size = src_alloc->size(src_ptr);
-  std::size_t dst_size = dst_alloc->size(dst_ptr);
+  std::size_t src_size = src_alloc->getSize(src_ptr);
+  std::size_t dst_size = dst_alloc->getSize(dst_ptr);
 
   if (src_size > dst_size) {
     UMPIRE_ERROR("Not enough space in destination for copy: " << src_size << " -> " << dst_size);
@@ -102,7 +108,7 @@ void ResourceManager::deallocate(void* ptr)
   allocator->deallocate(ptr);
 }
 
-std::shared_ptr<AllocatorInterface> ResourceManager::findAllocatorForPointer(void* ptr)
+std::shared_ptr<AllocatorInterface>& ResourceManager::findAllocatorForPointer(void* ptr)
 {
   auto allocator = m_allocation_to_allocator.find(ptr);
 

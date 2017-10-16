@@ -50,7 +50,7 @@ void MemorySpace<_allocator>::deallocate(void* ptr)
 }
 
 template<typename _allocator>
-size_t MemorySpace<_allocator>::size(void* ptr)
+size_t MemorySpace<_allocator>::getSize(void* ptr)
 {
   auto allocation = m_allocations.find(ptr);
   if (allocation == m_allocations.end()) {

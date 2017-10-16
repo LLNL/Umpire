@@ -20,6 +20,7 @@ class ResourceManager
     std::vector<std::string> getAvailableAllocators();
 
     Allocator getAllocator(const std::string& space);
+    Allocator getAllocator(void* ptr);
 
     void setDefaultAllocator(Allocator allocator);
     Allocator getDefaultAllocator();
@@ -41,7 +42,7 @@ class ResourceManager
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
 
-    std::shared_ptr<AllocatorInterface> findAllocatorForPointer(void* ptr);
+    std::shared_ptr<AllocatorInterface>& findAllocatorForPointer(void* ptr);
 
     static ResourceManager* s_resource_manager_instance;
 

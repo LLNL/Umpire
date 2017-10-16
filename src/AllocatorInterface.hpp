@@ -40,7 +40,7 @@ class AllocatorInterface :
      *
      * \return number of bytes allocated for ptr
      */
-    virtual size_t size(void* ptr) = 0;
+    virtual size_t getSize(void* ptr) = 0;
 
     virtual long getCurrentSize() = 0;
     virtual long getHighWatermark() = 0;
