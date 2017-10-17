@@ -20,9 +20,21 @@ Allocator::deallocate(void* ptr)
 }
 
 size_t
-Allocator::size(void* ptr)
+Allocator::getSize(void* ptr)
 {
-  return m_allocator->size(ptr);
+  return m_allocator->getSize(ptr);
+}
+
+size_t
+Allocator::getHighWatermark()
+{
+  return m_allocator->getHighWatermark();
+}
+
+size_t
+Allocator::getCurrentSize()
+{
+  return m_allocator->getCurrentSize();
 }
 
 } // end of namespace umpire
