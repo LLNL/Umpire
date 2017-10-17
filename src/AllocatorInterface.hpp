@@ -1,9 +1,11 @@
 #ifndef UMPIRE_AllocatorInterface_HPP
 #define UMPIRE_AllocatorInterface_HPP
 
-#include <memory>
+#include "umpire/util/Platform.hpp"
 
+#include <memory>
 #include <cstddef>
+
 
 namespace umpire {
 
@@ -42,6 +44,8 @@ class AllocatorInterface :
 
     virtual long getCurrentSize() = 0;
     virtual long getHighWatermark() = 0;
+
+    virtual Platform getPlatform()  = 0;
 };
 
 } // end of namespace umpire

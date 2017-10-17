@@ -4,7 +4,7 @@
 #include <iostream>
 
 int main() {
-  auto rm = umpire::ResourceManager::getInstance();
+  auto &rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
   const int size = 100;

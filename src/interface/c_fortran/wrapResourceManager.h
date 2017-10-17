@@ -31,6 +31,10 @@ UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator(UMPIRE_resourcemanager *
 
 UMPIRE_allocator * UMPIRE_resourcemanager_get_allocator_bufferify(UMPIRE_resourcemanager * self, const char * space, int Lspace);
 
+void UMPIRE_resourcemanager_copy(UMPIRE_resourcemanager * self, void * src_ptr, void * dst_ptr);
+
+void UMPIRE_resourcemanager_deallocate(UMPIRE_resourcemanager * self, void * ptr);
+
 #ifdef __cplusplus
 }
 #endif

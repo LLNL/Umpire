@@ -1,14 +1,20 @@
 #ifndef UMPIRE_MemoryOperation_HPP
 #define UMPIRE_MemoryOperation_HPP
 
+#include <cstddef>
+
 namespace umpire {
+namespace op {
 
 class MemoryOperation {
-  virtual void operator()(void *ptr,
-                          const MemorySpace &src,
-                          const MemorySpace &dest) = 0;
+  public:
+  virtual void operator()(
+      const void *src_ptr,
+      void* dst_ptr,
+      size_t length) = 0;
 };
 
+} // end of namespace op
 } // end of namespace umpire
 
 #endif // UMPIRE_MemoryOperation_HPP
