@@ -12,7 +12,7 @@ struct MallocAllocator
   {
     void* ret = ::malloc(bytes);
     if  (ret == nullptr) {
-      UMPIRE_ERROR("malloc returned NULL, allocating " << bytes << " bytes."):
+      UMPIRE_ERROR("malloc returned NULL, allocating " << bytes << " bytes.");
     } else {
       return ret;
     }
