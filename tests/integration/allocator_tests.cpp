@@ -36,11 +36,11 @@ TEST(Allocator, HostAllocatorSize)
   umpire::Allocator allocator = rm.getAllocator("HOST");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
-  ASSERT_EQ((100*sizeof(double)), allocator.size(test_alloc));
+  ASSERT_EQ((100*sizeof(double)), allocator.getSize(test_alloc));
 
   allocator.deallocate(test_alloc);
 
-  ASSERT_ANY_THROW(allocator.size(test_alloc));
+  ASSERT_ANY_THROW(allocator.getSize(test_alloc));
 }
 
 #if defined(ENABLE_CUDA)
@@ -77,11 +77,11 @@ TEST(Allocator, DeviceAllocatorSize)
   umpire::Allocator allocator = rm.getAllocator("DEVICE");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
-  ASSERT_EQ((100*sizeof(double)), allocator.size(test_alloc));
+  ASSERT_EQ((100*sizeof(double)), allocator.getSize(test_alloc));
 
   allocator.deallocate(test_alloc);
 
-  ASSERT_ANY_THROW(allocator.size(test_alloc));
+  ASSERT_ANY_THROW(allocator.getSize(test_alloc));
 }
 
 TEST(Allocator, UmAllocator)
@@ -117,11 +117,11 @@ TEST(Allocator, UmAllocatorSize)
   umpire::Allocator allocator = rm.getAllocator("UM");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
-  ASSERT_EQ((100*sizeof(double)), allocator.size(test_alloc));
+  ASSERT_EQ((100*sizeof(double)), allocator.getSize(test_alloc));
 
   allocator.deallocate(test_alloc);
 
-  ASSERT_ANY_THROW(allocator.size(test_alloc));
+  ASSERT_ANY_THROW(allocator.getSize(test_alloc));
 }
 
 #endif

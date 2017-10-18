@@ -3,6 +3,8 @@
 
 #include <cstdlib>
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace alloc {
 

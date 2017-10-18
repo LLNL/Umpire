@@ -17,6 +17,11 @@ struct CnmemAllocator
       case CNMEM_STATUS_INVALID_ARGUMENT: return "INVALID_ARGUMENT";
       case CNMEM_STATUS_OUT_OF_MEMORY: return "OUT_OF_MEMORY";
       case CNMEM_STATUS_CUDA_ERROR: return cudaGetErrorString(cudaPeekAtLastError());
+      case CNMEM_STATUS_UNKNOWN_ERROR: return "UNKNOWN";
+      default: return "UNKNOWN";
+    }
+
+    return "UNKNOWN";
   }
 
   void* allocate(size_t bytes)
