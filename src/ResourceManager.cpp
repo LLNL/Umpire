@@ -11,6 +11,8 @@
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
+#include "umpire/strategy/Pool.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -45,6 +47,9 @@ ResourceManager::ResourceManager() :
   registry.registerAllocator(
       std::make_shared<space::UnifiedMemorySpaceFactory>());
 #endif
+
+  getAllocator("HOST");
+  m_allocators["POOL"] = std::make_shared<umpire::strategy::Pool>(m_allocators["HOST"]);
 }
 
 Allocator

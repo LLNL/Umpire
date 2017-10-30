@@ -17,11 +17,17 @@ class Pool :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
+    long getCurrentSize();
+    long getHighWatermark();
+
   private:
     void init();
 
     void* m_pointers[32];
     int m_lengths[32];
+
+    long m_current_size;
+    long m_highwatermark;
 
 };
 

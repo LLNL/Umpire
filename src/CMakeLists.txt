@@ -35,7 +35,7 @@ blt_add_library(
   HEADERS ${umpire_headers}
   SOURCES ${umpire_sources}
   HEADERS_OUTPUT_SUBDIR umpire 
-  DEPENDS_ON umpire_space umpire_alloc umpire_op)
+  DEPENDS_ON umpire_space umpire_alloc umpire_op umpire_strategy)
 
 configure_file(
   ${PROJECT_SOURCE_DIR}/src/config.hpp.in
@@ -56,6 +56,7 @@ add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(util)
 add_subdirectory(tpl)
+add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
 endif ()

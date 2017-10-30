@@ -7,6 +7,12 @@ blt_add_executable(
     umpire_alloc
     )
 
+blt_add_executable(
+  NAME strategy_example
+  SOURCES strategy_example.cpp
+  DEPENDS_ON
+    umpire)
+
 if (ENABLE_FORTRAN)
   blt_add_executable(
     NAME allocator_c
