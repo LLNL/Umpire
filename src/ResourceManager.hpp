@@ -36,6 +36,10 @@ class ResourceManager
      * \param ptr Pointer to deallocate
      */
     void deallocate(void* ptr);
+
+    template <typename Strategy>
+    void
+    registerAllocator(const std::string& name, const std::string& parent);
     
   private:
     ResourceManager();
@@ -43,6 +47,7 @@ class ResourceManager
     ResourceManager& operator= (const ResourceManager&) = delete;
 
     std::shared_ptr<AllocatorInterface>& findAllocatorForPointer(void* ptr);
+    std::shared_ptr<AllocatorInterface>& getAllocatorInterface(const std::string& name);
 
     static ResourceManager* s_resource_manager_instance;
 
@@ -54,6 +59,14 @@ class ResourceManager
 
     long m_allocated;
 };
+
+template <typename Strategy>
+void
+ResourceManager::registerAllocator(const std::string& name, const std::string& parent)
+{
+  m_allocators[name] = std::make_shared<Strategy>(getAllocatorInterface(parent));
+}
+
 
 } // end of namespace umpire
 

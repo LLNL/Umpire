@@ -47,13 +47,10 @@ ResourceManager::ResourceManager() :
   registry.registerAllocator(
       std::make_shared<space::UnifiedMemorySpaceFactory>());
 #endif
-
-  getAllocator("HOST");
-  m_allocators["POOL"] = std::make_shared<umpire::strategy::Pool>(m_allocators["HOST"]);
 }
 
-Allocator
-ResourceManager::getAllocator(const std::string& name)
+std::shared_ptr<AllocatorInterface>&
+ResourceManager::getAllocatorInterface(const std::string& name)
 {
   AllocatorRegistry& registry =
     AllocatorRegistry::getInstance();
@@ -63,7 +60,13 @@ ResourceManager::getAllocator(const std::string& name)
     m_allocators[name] = registry.makeAllocator(name);
   }
 
-  return Allocator(m_allocators[name]);
+  return m_allocators[name];
+}
+
+Allocator
+ResourceManager::getAllocator(const std::string& name)
+{
+  return Allocator(getAllocatorInterface(name));
 }
 
 Allocator
