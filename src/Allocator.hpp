@@ -34,6 +34,33 @@ class Allocator {
      */
     void deallocate(void* ptr);
 
+    /*!
+     * \brief Return number of bytes allocated for allocation
+     *
+     * \param ptr Pointer to allocation in question
+     *
+     * \return number of bytes allocated for ptr
+     */
+    size_t getSize(void* ptr);
+
+    /*!
+     * \brief Return the memory high watermark for this Allocator.
+     *
+     * This is the largest seen value of getCurrentSize.
+     *
+     * \return memory high watermark.
+     */
+    size_t getHighWatermark();
+
+    /*!
+     * \brief Return the current size of this Allocator.
+     *
+     * This is sum of the sizes of all the tracked allocations.
+     *
+     * \return current size of Allocator.
+     */
+    size_t getCurrentSize();
+
   private:
     Allocator(std::shared_ptr<umpire::AllocatorInterface>& allocator);
     std::shared_ptr<umpire::AllocatorInterface> m_allocator;

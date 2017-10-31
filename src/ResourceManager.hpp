@@ -20,17 +20,30 @@ class ResourceManager
     std::vector<std::string> getAvailableAllocators();
 
     Allocator getAllocator(const std::string& space);
+    Allocator getAllocator(void* ptr);
 
     void setDefaultAllocator(Allocator allocator);
     Allocator getDefaultAllocator();
     
     void registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space);
     void deregisterAllocation(void* ptr);
-    
-  protected:
-    ResourceManager();
 
+    void copy(void* src_ptr, void* dst_ptr);
+
+    /*
+     * \brief Deallocate any pointer allocated by an Umpire-managed resource.
+     *
+     * \param ptr Pointer to deallocate
+     */
+    void deallocate(void* ptr);
+    
   private:
+    ResourceManager();
+    ResourceManager (const ResourceManager&) = delete;
+    ResourceManager& operator= (const ResourceManager&) = delete;
+
+    std::shared_ptr<AllocatorInterface>& findAllocatorForPointer(void* ptr);
+
     static ResourceManager* s_resource_manager_instance;
 
     std::list<std::string> m_allocator_names;

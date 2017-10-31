@@ -18,25 +18,25 @@ struct TestAllocator
 
 TEST(MemorySpace, Constructor)
 {
-  std::shared_ptr<umpire::space::MemorySpace<TestAllocator> > alloc;
+  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
 
   SUCCEED();
 }
 
 TEST(MemorySpace, AllocateDeallocate)
 {
-  std::shared_ptr<umpire::space::MemorySpace<TestAllocator> > alloc;
-  void* pointer = alloc->allocate(10);
+  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  double* pointer = (double*)alloc->allocate(10*sizeof(double));
   ASSERT_NE(pointer, nullptr);
 }
 
 TEST(MemorySpace, GetSize)
 {
-  std::shared_ptr<umpire::space::MemorySpace<TestAllocator> > alloc;
-  void* pointer = alloc->allocate(10);
+  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  double* pointer = (double*) alloc->allocate(10);
   ASSERT_EQ(alloc->getCurrentSize(), 10);
 
-  void* pointer_two = alloc->allocate(10);
+  double* pointer_two = (double*)alloc->allocate(10);
   ASSERT_EQ(alloc->getCurrentSize(), 20);
 
   alloc->deallocate(pointer);
@@ -48,9 +48,12 @@ TEST(MemorySpace, GetSize)
 
 TEST(MemorySpace, GetHighWatermark)
 {
-  std::shared_ptr<umpire::space::MemorySpace<TestAllocator> > alloc;
-  void* pointer = alloc->allocate(10);
-  void* pointer_two = alloc->allocate(30);
+  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  ASSERT_EQ(alloc->getHighWatermark(), 0);
+
+  double* pointer = (double*)alloc->allocate(10);
+  double* pointer_two = (double*)alloc->allocate(30);
+
   alloc->deallocate(pointer);
 
   ASSERT_EQ(alloc->getHighWatermark(), 40);

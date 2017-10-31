@@ -10,9 +10,13 @@ struct CudaMallocManagedAllocator
 {
   void* allocate(size_t bytes)
   {
-    void* ptr;
-    ::cudaMallocManaged(&ptr, bytes);
-    return ptr;
+    void* ptr = nullptr;
+    cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
+    if (error != cudaSuccess) {
+      UMPIRE_ERROR("cudaMallocManaged failed allocating " << bytes << "bytes, with: " << cudaGetErrorString(error));
+    } else {
+      return ptr;
+    }
   }
 
   void deallocate(void* ptr)

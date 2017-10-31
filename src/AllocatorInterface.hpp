@@ -1,9 +1,11 @@
 #ifndef UMPIRE_AllocatorInterface_HPP
 #define UMPIRE_AllocatorInterface_HPP
 
-#include <memory>
+#include "umpire/util/Platform.hpp"
 
+#include <memory>
 #include <cstddef>
+
 
 namespace umpire {
 
@@ -31,8 +33,19 @@ class AllocatorInterface :
      */
     virtual void deallocate(void* ptr) = 0;
 
+    /*!
+     * \brief Return number of bytes allocated for allocation
+     *
+     * \param ptr Pointer to allocation in question
+     *
+     * \return number of bytes allocated for ptr
+     */
+    virtual size_t getSize(void* ptr) = 0;
+
     virtual long getCurrentSize() = 0;
     virtual long getHighWatermark() = 0;
+
+    virtual Platform getPlatform()  = 0;
 };
 
 } // end of namespace umpire

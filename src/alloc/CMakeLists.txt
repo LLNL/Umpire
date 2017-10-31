@@ -1,13 +1,11 @@
 set(umpire_alloc_headers
   CudaMallocAllocator.hpp
   CudaMallocManagedAllocator.hpp
-  MallocAllocator.hpp
-  PosixMemalignAllocator.hpp
-  PosixMemalignAllocator.inl)
+  MallocAllocator.hpp)
 
 set (umpire_alloc_sources)
 
-set (umpire_alloc_depends)
+set (umpire_alloc_depends umpire_util)
 
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
@@ -24,7 +22,6 @@ blt_add_library(
   HEADERS ${umpire_alloc_headers}
   SOURCES ${umpire_alloc_sources}
   HEADERS_OUTPUT_SUBDIR umpire/alloc)
-#DEPENDS_ON ${umpire_alloc_depends})
 
 target_link_libraries(
   umpire_alloc

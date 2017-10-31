@@ -1,7 +1,8 @@
 set (umpire_util_headers
   AllocationRecord.hpp
   Exception.hpp
-  Macros.hpp)
+  Macros.hpp
+  Platform.hpp)
 
 set (umpire_util_sources
   Exception.cpp)

@@ -9,6 +9,8 @@
 #include "umpire/space/UnifiedMemorySpaceFactory.hpp"
 #endif
 
+#include "umpire/op/MemoryOperationRegistry.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -59,25 +61,62 @@ ResourceManager::getAllocator(const std::string& name)
   return Allocator(m_allocators[name]);
 }
 
-// void 
-// ResourceManager::setDefaultAllocator(std::shared_ptr<Allocator>& allocator)
-// {
-//   m_default_allocator = allocator;
-// }
-// 
-// std::shared_ptr<Allocator> ResourceManager::getDefaultAllocator()
-// {
-//   return m_default_allocator;
-// }
+Allocator
+ResourceManager::getAllocator(void* ptr)
+{
+  return Allocator(findAllocatorForPointer(ptr));
+}
 
 void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space)
 {
+  UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
   m_allocation_to_allocator[ptr] = space;
+
 }
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
+  UMPIRE_LOG("Deregistering " << ptr);
   m_allocation_to_allocator.erase(ptr);
+}
+
+void ResourceManager::copy(void* src_ptr, void* dst_ptr)
+{
+  UMPIRE_LOG("Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
+
+  auto op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto src_alloc = findAllocatorForPointer(src_ptr);
+  auto dst_alloc = findAllocatorForPointer(dst_ptr);
+
+  std::size_t src_size = src_alloc->getSize(src_ptr);
+  std::size_t dst_size = dst_alloc->getSize(dst_ptr);
+
+  if (src_size > dst_size) {
+    UMPIRE_ERROR("Not enough space in destination for copy: " << src_size << " -> " << dst_size);
+  }
+
+  auto op = op_registry.find("COPY", src_alloc, dst_alloc);
+
+  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, src_size);
+}
+
+void ResourceManager::deallocate(void* ptr)
+{
+  auto allocator = findAllocatorForPointer(ptr);;
+
+  allocator->deallocate(ptr);
+}
+
+std::shared_ptr<AllocatorInterface>& ResourceManager::findAllocatorForPointer(void* ptr)
+{
+  auto allocator = m_allocation_to_allocator.find(ptr);
+
+  if (allocator == m_allocation_to_allocator.end()) {
+    UMPIRE_ERROR("Cannot find allocator " << ptr);
+  }
+
+  return allocator->second;
 }
 
 } // end of namespace umpire
