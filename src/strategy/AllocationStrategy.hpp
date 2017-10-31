@@ -3,6 +3,8 @@
 
 #include "umpire/AllocatorInterface.hpp"
 
+#include "umpire/util/AllocatorTraits.hpp"
+
 namespace umpire {
 namespace strategy {
 
@@ -10,7 +12,7 @@ class AllocationStrategy :
   public umpire::AllocatorInterface
 {
   public:
-    AllocationStrategy(std::shared_ptr<umpire::AllocatorInterface>& alloc);
+    AllocationStrategy(std::shared_ptr<umpire::AllocatorInterface>& alloc, AllocatorTraits traits);
 
     virtual void* allocate(size_t bytes) = 0;;
     virtual void deallocate(void* ptr) = 0;;

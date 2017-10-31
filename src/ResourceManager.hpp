@@ -1,14 +1,15 @@
 #ifndef UMPIRE_ResourceManager_HPP
 #define UMPIRE_ResourceManager_HPP
 
-#include "umpire/Allocator.hpp"
-#include "umpire/AllocatorInterface.hpp"
-
 #include <vector>
 #include <string>
 #include <memory>
 #include <list>
 #include <unordered_map>
+
+#include "umpire/Allocator.hpp"
+#include "umpire/AllocatorInterface.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
 namespace umpire {
 
@@ -39,7 +40,7 @@ class ResourceManager
 
     template <typename Strategy>
     void
-    registerAllocator(const std::string& name, const std::string& parent);
+    registerAllocator(const std::string& name, const std::string& parent, AllocatorTraits traits);
     
   private:
     ResourceManager();
@@ -62,9 +63,9 @@ class ResourceManager
 
 template <typename Strategy>
 void
-ResourceManager::registerAllocator(const std::string& name, const std::string& parent)
+ResourceManager::registerAllocator(const std::string& name, const std::string& parent, AllocatorTraits traits)
 {
-  m_allocators[name] = std::make_shared<Strategy>(getAllocatorInterface(parent));
+  m_allocators[name] = std::make_shared<Strategy>(getAllocatorInterface(parent), traits);
 }
 
 

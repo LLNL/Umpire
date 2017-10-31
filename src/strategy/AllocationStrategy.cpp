@@ -3,7 +3,7 @@
 namespace umpire {
 namespace strategy {
   
-AllocationStrategy::AllocationStrategy(std::shared_ptr<umpire::AllocatorInterface>& alloc):
+AllocationStrategy::AllocationStrategy(std::shared_ptr<umpire::AllocatorInterface>& alloc, AllocatorTraits traits):
   m_allocator(alloc)
 {
 }

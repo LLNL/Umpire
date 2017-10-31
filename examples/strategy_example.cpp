@@ -5,8 +5,8 @@ int main(int argc, char* argv[])
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  rm.registerAllocator<umpire::strategy::Pool>("POOL_ONE", "HOST");
-  rm.registerAllocator<umpire::strategy::Pool>("POOL_TWO", "HOST");
+  registry.registerAllocator(
+      std::make_shared<space::AllocationStrategyFactor<umpire::strategy::Pool> >());
 
   auto pool = rm.getAllocator("POOL_ONE");
   void* test = pool.allocate(100);
