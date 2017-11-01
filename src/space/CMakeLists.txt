@@ -9,7 +9,7 @@ set (umpire_space_sources
 )
 
 set (umpire_space_depends
-  umpire_alloc umpire_util)
+  umpire_alloc umpire_strategy umpire_util)
 
 if (ENABLE_CUDA)
   set (umpire_space_headers

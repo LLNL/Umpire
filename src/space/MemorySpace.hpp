@@ -1,7 +1,7 @@
 #ifndef UMPIRE_MemorySpace_HPP
 #define UMPIRE_MemorySpace_HPP
 
-#include "umpire/AllocatorInterface.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
@@ -14,7 +14,7 @@ namespace space {
 
 template <typename _allocator>
 class MemorySpace : 
-  public AllocatorInterface
+  public strategy::AllocationStrategy
 {
 
   public: 

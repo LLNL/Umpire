@@ -7,7 +7,7 @@ namespace umpire {
 namespace space {
 
 bool
-DeviceSpaceFactory::isValidAllocatorFor(const std::string& name)
+DeviceSpaceFactory::isValidAllocationStrategyFor(const std::string& name)
 {
   if (name.compare("DEVICE") == 0) {
     return true;
@@ -16,7 +16,7 @@ DeviceSpaceFactory::isValidAllocatorFor(const std::string& name)
   }
 }
 
-std::shared_ptr<AllocatorInterface>
+std::shared_ptr<strategy::AllocationStrategy>
 DeviceSpaceFactory::create()
 {
   return std::make_shared<space::MemorySpace<alloc::CnmemAllocator> >(Platform::cuda);

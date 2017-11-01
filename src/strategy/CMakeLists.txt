@@ -1,13 +1,17 @@
 set (umpire_strategy_headers
   AllocationStrategy.hpp
+  AllocationStrategyFactory.hpp
+  AllocationStrategyRegistry.hpp
+  DefaultAllocationStrategy.hpp
   Pool.hpp)
 
 set (umpire_stategy_sources
-  AllocationStrategy.cpp
+  AllocationStrategyRegistry.cpp
+  DefaultAllocationStrategy.cpp
   Pool.cpp)
 
 set (umpire_strategy_depends
-  umpire)
+  umpire_util)
 
 blt_add_library(
   NAME umpire_strategy

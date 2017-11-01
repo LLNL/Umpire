@@ -2,7 +2,7 @@
 
 namespace umpire {
 
-Allocator::Allocator(std::shared_ptr<umpire::AllocatorInterface>& allocator):
+Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator):
   m_allocator(allocator)
 {
 }
@@ -35,6 +35,12 @@ size_t
 Allocator::getCurrentSize()
 {
   return m_allocator->getCurrentSize();
+}
+
+std::shared_ptr<strategy::AllocationStrategy>
+Allocator::getAllocationStrategy()
+{
+  return m_allocator;
 }
 
 } // end of namespace umpire

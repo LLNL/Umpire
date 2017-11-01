@@ -12,7 +12,7 @@ class Pool :
   public AllocationStrategy
 {
   public:
-    Pool(std::shared_ptr<umpire::AllocatorInterface>& allocator, AllocatorTraits traits);
+    Pool(std::shared_ptr<umpire::strategy::AllocationStrategy> allocator);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -31,6 +31,7 @@ class Pool :
 
     size_t m_slots;
 
+    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
 
 } // end of namespace strategy

@@ -7,7 +7,7 @@ namespace umpire {
 namespace space {
 
 bool
-UnifiedMemorySpaceFactory::isValidAllocatorFor(const std::string& name)
+UnifiedMemorySpaceFactory::isValidAllocationStrategyFor(const std::string& name)
 {
   if (name.compare("UM") == 0) {
     return true;
@@ -16,7 +16,7 @@ UnifiedMemorySpaceFactory::isValidAllocatorFor(const std::string& name)
   }
 }
 
-std::shared_ptr<AllocatorInterface>
+std::shared_ptr<strategy::AllocationStrategy>
 UnifiedMemorySpaceFactory::create()
 {
   return std::make_shared<space::MemorySpace<alloc::CudaMallocManagedAllocator> >(Platform::cuda);

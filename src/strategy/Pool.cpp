@@ -4,12 +4,12 @@
 namespace umpire {
 namespace strategy {
 
-Pool::Pool(std::shared_ptr<umpire::AllocatorInterface>& allocator, AllocatorTraits traits) :
-  AllocationStrategy(allocator, traits),
+Pool::Pool(std::shared_ptr<umpire::strategy::AllocationStrategy> allocator) :
+  m_allocator(allocator),
   m_current_size(0),
   m_highwatermark(0)
 {
-  m_slots = traits.m_slots;
+  m_slots = 64;
 
   UMPIRE_LOG("Creating " << m_slots << "-slot pool.");
 

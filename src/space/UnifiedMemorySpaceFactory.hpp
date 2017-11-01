@@ -1,17 +1,17 @@
 #ifndef UMPIRE_UnifiedMemorySpaceFactory_HPP
 #define UMPIRE_UnifiedMemorySpaceFactory_HPP
 
-#include "umpire/AllocatorFactory.hpp"
+#include "umpire/strategy/AllocationStrategyFactory.hpp"
 
 namespace umpire {
 namespace space {
 
 
 class UnifiedMemorySpaceFactory :
-  public AllocatorFactory
+  public strategy::AllocationStrategyFactory
 {
-  bool isValidAllocatorFor(const std::string& name);
-  std::shared_ptr<AllocatorInterface> create();
+  bool isValidAllocationStrategyFor(const std::string& name);
+  std::shared_ptr<strategy::AllocationStrategy> create();
 };
 
 } // end of namespace space

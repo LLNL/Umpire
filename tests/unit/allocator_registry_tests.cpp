@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "umpire/AllocatorRegistry.hpp"
+#include "umpire/strategy/AllocatorRegistry.hpp"
 #include "umpire/Allocator.hpp"
 
 using namespace testing;
@@ -9,17 +9,17 @@ using namespace testing;
 class MockAllocatorFactory : public umpire::AllocatorFactory
 {
   public:
-  MOCK_METHOD1(isValidAllocatorFor, bool(const std::string& name));
-  MOCK_METHOD0(create, std::shared_ptr<umpire::AllocatorInterface>());
+  MOCK_METHOD1(isValidAllocationStrategyFor, bool(const std::string& name));
+  MOCK_METHOD0(create, std::shared_ptr<umpire::strategy::AllocationStrategy>());
 };
 
 TEST(AllocatorRegistry, Constructor) {
-  umpire::AllocatorRegistry reg = umpire::AllocatorRegistry::getInstance();
+  auto& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
   SUCCEED();
 }
 
 TEST(AllocatorRegistry, Register) {
-  umpire::AllocatorRegistry reg = umpire::AllocatorRegistry::getInstance();
+  auto& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
 
   reg.registerAllocator(std::make_shared<MockAllocatorFactory>());
 }

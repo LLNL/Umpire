@@ -3,7 +3,7 @@
 
 #include "umpire/op/MemoryOperation.hpp"
 
-#include "umpire/AllocatorInterface.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Platform.hpp"
 
 #include <memory>
@@ -31,8 +31,8 @@ class MemoryOperationRegistry {
 
     std::shared_ptr<umpire::op::MemoryOperation> find(
         const std::string& name,
-        std::shared_ptr<AllocatorInterface>& source_allocator,
-        std::shared_ptr<AllocatorInterface>& dst_allocator);
+        std::shared_ptr<strategy::AllocationStrategy>& source_allocator,
+        std::shared_ptr<strategy::AllocationStrategy>& dst_allocator);
 
     void registerOperation(
       const std::string& name,

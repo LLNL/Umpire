@@ -7,7 +7,7 @@ namespace umpire {
 namespace space {
 
 bool
-HostSpaceFactory::isValidAllocatorFor(const std::string& name)
+HostSpaceFactory::isValidAllocationStrategyFor(const std::string& name)
 {
   if (name.compare("HOST") == 0) {
     return true;
@@ -16,7 +16,7 @@ HostSpaceFactory::isValidAllocatorFor(const std::string& name)
   }
 }
 
-std::shared_ptr<AllocatorInterface>
+std::shared_ptr<strategy::AllocationStrategy>
 HostSpaceFactory::create()
 {
   return std::make_shared<MemorySpace<alloc::MallocAllocator> >();

@@ -1,18 +1,21 @@
 #ifndef UMPIRE_AllocationStrategyFactory_HPP
 #define UMPIRE_AllocationStrategyFactory_HPP
 
-#include "umpire/AllocatorFactory.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
+
+#include <memory>
+#include <string>
 
 namespace umpire {
+namespace strategy {
 
-template <typename Strategy>
-class AllocationStrategyFactory :
-  public AllocatorFactory {
+class AllocationStrategyFactory {
   public:
-    virtual bool isValidAllocatorFor(const std::string& name) = 0;
-    virtual std::shared_ptr<AllocatorInterface> create() = 0;
+    virtual bool isValidAllocationStrategyFor(const std::string& name) = 0;
+    virtual std::shared_ptr<AllocationStrategy> create() = 0;
 };
 
+} // end of namespace strategy
 } // end of namespace umpire
 
 #endif // UMPIRE_AllocationStrategyFactory_HPP

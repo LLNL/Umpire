@@ -1,0 +1,48 @@
+#include "umpire/strategy/DefaultAllocationStrategy.hpp"
+
+namespace umpire {
+namespace strategy {
+
+DefaultAllocationStrategy::DefaultAllocationStrategy(std::shared_ptr<AllocationStrategy> allocator) :
+  m_allocator(allocator)
+{
+}
+
+void* 
+DefaultAllocationStrategy::allocate(size_t bytes)
+{
+  return m_allocator->allocate(bytes);
+}
+
+void 
+DefaultAllocationStrategy::deallocate(void* ptr)
+{
+  return m_allocator->deallocate(ptr);
+}
+
+size_t 
+DefaultAllocationStrategy::getSize(void* ptr)
+{
+  return m_allocator->getSize(ptr);
+}
+
+long 
+DefaultAllocationStrategy::getCurrentSize()
+{
+  return m_allocator->getCurrentSize();
+}
+
+long 
+DefaultAllocationStrategy::getHighWatermark()
+{
+  return m_allocator->getHighWatermark();
+}
+
+Platform 
+DefaultAllocationStrategy::getPlatform()
+{
+  return m_allocator->getPlatform();
+}
+
+} // end of namespace strategy
+} // end of namespace umpire

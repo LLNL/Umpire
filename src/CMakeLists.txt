@@ -1,14 +1,10 @@
 set (umpire_headers
   Allocator.hpp
-  AllocatorInterface.hpp
-  AllocatorFactory.hpp
-  AllocatorRegistry.hpp
   ResourceManager.hpp
   Umpire.hpp)
 
 set (umpire_sources
   Allocator.cpp
-  AllocatorRegistry.cpp
   ResourceManager.cpp)
 
 if (ENABLE_FORTRAN)

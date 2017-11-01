@@ -1,7 +1,7 @@
 #include "umpire/config.hpp"
 
 #include "umpire/ResourceManager.hpp"
-#include "umpire/AllocatorRegistry.hpp"
+#include "umpire/strategy/AllocationStrategyRegistry.hpp"
 
 #include "umpire/space/HostSpaceFactory.hpp"
 #if defined(ENABLE_CUDA)
@@ -10,8 +10,6 @@
 #endif
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
-
-#include "umpire/strategy/Pool.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -34,30 +32,30 @@ ResourceManager::ResourceManager() :
   m_allocators(),
   m_allocation_to_allocator()
 {
-  AllocatorRegistry& registry =
-    AllocatorRegistry::getInstance();
+  strategy::AllocationStrategyRegistry& registry =
+    strategy::AllocationStrategyRegistry::getInstance();
 
-  registry.registerAllocator(
+  registry.registerAllocationStrategy(
       std::make_shared<space::HostSpaceFactory>());
 
 #if defined(ENABLE_CUDA)
-  registry.registerAllocator(
+  registry.registerAllocationStrategy(
       std::make_shared<space::DeviceSpaceFactory>());
 
-  registry.registerAllocator(
+  registry.registerAllocationStrategy(
       std::make_shared<space::UnifiedMemorySpaceFactory>());
 #endif
 }
 
-std::shared_ptr<AllocatorInterface>&
-ResourceManager::getAllocatorInterface(const std::string& name)
+std::shared_ptr<strategy::AllocationStrategy>&
+ResourceManager::getAllocationStrategy(const std::string& name)
 {
-  AllocatorRegistry& registry =
-    AllocatorRegistry::getInstance();
+  strategy::AllocationStrategyRegistry& registry =
+    strategy::AllocationStrategyRegistry::getInstance();
 
   auto allocator = m_allocators.find(name);
   if (allocator == m_allocators.end()) {
-    m_allocators[name] = registry.makeAllocator(name);
+    m_allocators[name] = registry.makeAllocationStrategy(name);
   }
 
   return m_allocators[name];
@@ -66,7 +64,7 @@ ResourceManager::getAllocatorInterface(const std::string& name)
 Allocator
 ResourceManager::getAllocator(const std::string& name)
 {
-  return Allocator(getAllocatorInterface(name));
+  return Allocator(getAllocationStrategy(name));
 }
 
 Allocator
@@ -75,7 +73,7 @@ ResourceManager::getAllocator(void* ptr)
   return Allocator(findAllocatorForPointer(ptr));
 }
 
-void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<AllocatorInterface> space)
+void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<strategy::AllocationStrategy> space)
 {
   UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
   m_allocation_to_allocator[ptr] = space;
@@ -116,7 +114,7 @@ void ResourceManager::deallocate(void* ptr)
   allocator->deallocate(ptr);
 }
 
-std::shared_ptr<AllocatorInterface>& ResourceManager::findAllocatorForPointer(void* ptr)
+std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)
 {
   auto allocator = m_allocation_to_allocator.find(ptr);
 
