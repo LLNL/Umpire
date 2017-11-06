@@ -1,5 +1,6 @@
 set (umpire_headers
   Allocator.hpp
+  AllocatorTraits.hpp
   ResourceManager.hpp
   Umpire.hpp)
 
@@ -47,7 +48,7 @@ install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-add_subdirectory(space)
+add_subdirectory(resource)
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(util)

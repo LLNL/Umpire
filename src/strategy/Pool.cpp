@@ -1,15 +1,21 @@
 #include "umpire/strategy/Pool.hpp"
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/AllocatorTraits.hpp"
+
 namespace umpire {
 namespace strategy {
 
-Pool::Pool(std::shared_ptr<umpire::strategy::AllocationStrategy> allocator) :
-  m_allocator(allocator),
+Pool::Pool(
+    AllocatorTraits traits,
+    std::vector<std::shared_ptr<AllocationStrategy> > providers) :
   m_current_size(0),
   m_highwatermark(0)
 {
-  m_slots = 64;
+  m_slots = traits.m_number_allocations;
+
+  m_allocator = providers[0];
+
 
   UMPIRE_LOG("Creating " << m_slots << "-slot pool.");
 
@@ -65,6 +71,18 @@ long
 Pool::getHighWatermark()
 {
   return m_highwatermark;
+}
+
+size_t
+Pool::getSize(void* ptr)
+{
+  return m_allocator->getSize(ptr);
+}
+
+Platform
+Pool::getPlatform()
+{
+  return m_allocator->getPlatform();
 }
 
 

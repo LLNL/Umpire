@@ -1,11 +1,15 @@
 set (umpire_space_headers
-      MemorySpace.hpp
-      MemorySpace.inl
-      HostSpaceFactory.hpp
+  MemoryResourceFactory.hpp
+  MemoryResourceRegistry.hpp
+  DefaultMemoryResource.hpp
+  DefaultMemoryResource.inl
+  MemoryResource.hpp
+  HostResourceFactory.hpp
 )
 
 set (umpire_space_sources
-      HostSpaceFactory.cpp
+  HostResourceFactory.cpp
+  MemoryResourceRegistry.cpp
 )
 
 set (umpire_space_depends
@@ -14,13 +18,13 @@ set (umpire_space_depends
 if (ENABLE_CUDA)
   set (umpire_space_headers
     ${umpire_space_headers}
-    DeviceSpaceFactory.hpp
-    UnifiedMemorySpaceFactory.hpp)
+    DeviceResourceFactory.hpp
+    UnifiedMemoryResourceFactory.hpp)
 
   set (umpire_space_sources
     ${umpire_space_sources}
-    DeviceSpaceFactory.cpp
-    UnifiedMemorySpaceFactory.cpp)
+    DeviceResourceFactory.cpp
+    UnifiedMemoryResourceFactory.cpp)
 
   set(umpire_space_depends
     ${umpire_space_depends}
@@ -31,7 +35,7 @@ blt_add_library(
   NAME umpire_space
   HEADERS ${umpire_space_headers}
   SOURCES ${umpire_space_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/space
+  HEADERS_OUTPUT_SUBDIR umpire/resource
   DEPENDS_ON ${umpire_space_depends})
 
 install(TARGETS

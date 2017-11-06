@@ -9,7 +9,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocatorTraits.hpp"
+#include "umpire/AllocatorTraits.hpp"
 
 namespace umpire {
 
@@ -17,10 +17,23 @@ class ResourceManager
 {
   public: 
     static ResourceManager& getInstance();
+
+    /*!
+     * \brief Initialize available memory systems.
+     */
+    void initialize();
+
+    void finalize();
     
     std::vector<std::string> getAvailableAllocators();
 
     Allocator getAllocator(const std::string& space);
+
+    Allocator makeAllocator(const std::string& name, 
+        const std::string& strategy, 
+        AllocatorTraits traits,
+        std::vector<Allocator> providers);
+
     Allocator getAllocator(void* ptr);
 
     void setDefaultAllocator(Allocator allocator);
@@ -51,8 +64,12 @@ class ResourceManager
     std::list<std::string> m_allocator_names;
 
     std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators;
+
     std::unordered_map<void*, std::shared_ptr<strategy::AllocationStrategy> > m_allocation_to_allocator;
+
     std::shared_ptr<strategy::AllocationStrategy> m_default_allocator;
+
+    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_memory_resources;
 
     long m_allocated;
 };

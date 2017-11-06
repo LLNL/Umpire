@@ -15,7 +15,7 @@ classes:
         C_code: auto& SH_rv = ResourceManager::getInstance();
                 return static_cast<UMPIRE_resourcemanager *>(static_cast<void *>(&SH_rv));
 
-      - decl: Allocator* getAllocator(const std::string& space)
+      - decl: Allocator* getAllocator(const std::string& resource)
       - decl: void copy(void* src_ptr, void* dst_ptr)
       - decl: void deallocate(void* ptr)
 

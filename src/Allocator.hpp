@@ -61,10 +61,10 @@ class Allocator {
      */
     size_t getCurrentSize();
 
+    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
+
   private:
     Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator);
-
-    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };

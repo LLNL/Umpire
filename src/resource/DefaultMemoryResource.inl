@@ -1,7 +1,7 @@
-#ifndef UMPIRE_MemorySpace_INL
-#define UMPIRE_MemorySpace_INL
+#ifndef UMPIRE_DefaultMemoryResource_INL
+#define UMPIRE_DefaultMemoryResource_INL
 
-#include "umpire/space/MemorySpace.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
@@ -9,10 +9,10 @@
 #include <sstream>
 
 namespace umpire {
-namespace space {
+namespace resource {
 
 template<typename _allocator>
-MemorySpace<_allocator>::MemorySpace(Platform platform) :
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform) :
   m_allocator(),
   m_allocations(),
   m_current_size(0l),
@@ -22,7 +22,7 @@ MemorySpace<_allocator>::MemorySpace(Platform platform) :
 }
 
 template<typename _allocator>
-void* MemorySpace<_allocator>::allocate(size_t bytes)
+void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
   ResourceManager::getInstance().registerAllocation(ptr, this->shared_from_this());
@@ -37,7 +37,7 @@ void* MemorySpace<_allocator>::allocate(size_t bytes)
 }
 
 template<typename _allocator>
-void MemorySpace<_allocator>::deallocate(void* ptr)
+void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 {
   m_allocator.deallocate(ptr);
   ResourceManager::getInstance().deregisterAllocation(ptr);
@@ -50,7 +50,7 @@ void MemorySpace<_allocator>::deallocate(void* ptr)
 }
 
 template<typename _allocator>
-size_t MemorySpace<_allocator>::getSize(void* ptr)
+size_t DefaultMemoryResource<_allocator>::getSize(void* ptr)
 {
   auto allocation = m_allocations.find(ptr);
   if (allocation == m_allocations.end()) {
@@ -64,23 +64,23 @@ size_t MemorySpace<_allocator>::getSize(void* ptr)
 }
 
 template<typename _allocator>
-long MemorySpace<_allocator>::getCurrentSize()
+long DefaultMemoryResource<_allocator>::getCurrentSize()
 {
   return m_current_size;
 }
 
 template<typename _allocator>
-long MemorySpace<_allocator>::getHighWatermark()
+long DefaultMemoryResource<_allocator>::getHighWatermark()
 {
   return m_highwatermark;
 }
 
 template<typename _allocator>
-Platform MemorySpace<_allocator>::getPlatform()
+Platform DefaultMemoryResource<_allocator>::getPlatform()
 {
   return m_platform;
 }
 
-} // end of namespace space
+} // end of namespace resource
 } // end of namespace umpire
-#endif // UMPIRE_MemorySpace_INL
+#endif // UMPIRE_DefaultMemoryResource_INL

@@ -892,7 +892,7 @@ cnmemStatus_t Manager::stealBlockUnsafe(void *&data, std::size_t &dataSize, ::si
         }
     }
         
-    // If no memory space found, simply return NULL. We have failed to allocate. Quit miserably.
+    // If no memory resource found, simply return NULL. We have failed to allocate. Quit miserably.
     if( !data ) {
         return CNMEM_STATUS_OUT_OF_MEMORY;
     }
@@ -925,7 +925,7 @@ cnmemStatus_t Manager::stealBlockUnsafe(void *&data, std::size_t &dataSize, ::si
     // The resulting block.
     Block *result = curr;
     
-    // If we have no space between curr->getData and block->getData.
+    // If we have no resource between curr->getData and block->getData.
     if( sizeBefore == 0 ) {
         curr->setSize(dataSize);
     }
@@ -942,7 +942,7 @@ cnmemStatus_t Manager::stealBlockUnsafe(void *&data, std::size_t &dataSize, ::si
         result = block;
     }
     
-    // We have space at the end so we may need to add a new node.
+    // We have resource at the end so we may need to add a new node.
     if( sizeAfter > 0 ) {
         Block *block = new Block(curr->getData() + curr->getSize(), sizeAfter, next, false);
         if( !block ) {

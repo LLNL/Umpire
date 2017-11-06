@@ -13,12 +13,12 @@ Design
 The current Umpire design is made up of three main components:
 
 -----------
-MemorySpace
+MemoryResource
 -----------
 
 An interface defining how we can interact with a specific physical memory (e.g.
 DRAM, GPU memory), it handles the details of a specific memory space, including
-its properties and allocation/free.  Each MemorySpace maintains a map of
+its properties and allocation/free.  Each MemoryResource maintains a map of
 AllocationRecords, so that based on a given pointer we know how big it is.
 
 ----------------
@@ -27,7 +27,7 @@ Resource Manager
 
 This handles the discovery and management of available MemorySpaces. It also
 provides general methods for allocation and deletion of data, which can be
-controlled with either a string or a specific MemorySpace. It also keeps track
+controlled with either a string or a specific MemoryResource. It also keeps track
 of which space an allocation was made in. 
 
 
@@ -36,7 +36,7 @@ MemoryAllocator
 ---------------
 
 MemoryAllocator is an interface that decouples memory allocation from the
-specific MemorySpace. This allows us to provide different types of allocators
+specific MemoryResource. This allows us to provide different types of allocators
 for a single physical memory space, for example, a memory pool.
 
 ---------------

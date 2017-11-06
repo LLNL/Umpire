@@ -3,11 +3,15 @@ set (umpire_strategy_headers
   AllocationStrategyFactory.hpp
   AllocationStrategyRegistry.hpp
   DefaultAllocationStrategy.hpp
+  GenericAllocationStrategyFactory.hpp
+  GenericAllocationStrategyFactory.inl
+  MonotonicAllocationStrategy.hpp
   Pool.hpp)
 
 set (umpire_stategy_sources
   AllocationStrategyRegistry.cpp
   DefaultAllocationStrategy.cpp
+  MonotonicAllocationStrategy.cpp
   Pool.cpp)
 
 set (umpire_strategy_depends

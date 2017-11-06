@@ -4,21 +4,29 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 #include <memory>
+#include <vector>
 
 namespace umpire {
+
+  class AllocatorTraits;
+
 namespace strategy {
 
 class Pool :
   public AllocationStrategy
 {
   public:
-    Pool(std::shared_ptr<umpire::strategy::AllocationStrategy> allocator);
+    Pool(AllocatorTraits traits,
+      std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
     long getCurrentSize();
     long getHighWatermark();
+
+    size_t getSize(void* ptr);
+    Platform getPlatform();
 
   private:
     void init();

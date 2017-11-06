@@ -4,10 +4,9 @@
 namespace umpire {
 
 struct AllocatorTraits {
-  bool m_pool;
   size_t m_initial_size;
   size_t m_maximum_size;
-  size_t m_slots;
+  size_t m_number_allocations;
 };
 
 } // end of namespace umpire
