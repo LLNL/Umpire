@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 project(Umpire LANGUAGES CXX C Fortran)
 
 set(ENABLE_OPENMP On CACHE Bool "")
-set(ENABLE_CUDA Off CACHE Bool "")
+set(ENABLE_CUDA On CACHE Bool "")
 set(ENABLE_COPY_HEADERS On CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")

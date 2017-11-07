@@ -14,7 +14,7 @@ blt_add_executable(
   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}
 )
 
-blt_make_test(
+blt_add_test(
   NAME allocator_registry_tests
   COMMAND allocator_registry_tests)
 
