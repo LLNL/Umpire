@@ -11,7 +11,7 @@ cd ${BUILD_DIR}
 
 echo "Configuring..."
 
-cmake -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake ${BUILD_OPTIONS} ../
+cmake -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../
 
 echo "Building..."
 make VERBOSE=1 -j
