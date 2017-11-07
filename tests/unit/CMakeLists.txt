@@ -8,19 +8,16 @@ blt_add_test(
   COMMAND resource_manager_tests)
 
 blt_add_executable(
-  NAME stdlib_alloc_tests
-  SOURCES stdlib_alloc_tests.cpp
-  DEPENDS_ON umpire gtest)
-
-blt_add_test(
-  NAME stdlib_alloc_test
-  COMMAND stdlib_alloc_tests)
-
-blt_add_executable(
   NAME allocator_registry_tests
   SOURCES allocator_registry_tests.cpp
   DEPENDS_ON umpire gtest gmock
-  )
+  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}
+)
+
+blt_make_test(
+  NAME allocator_registry_tests
+  COMMAND allocator_registry_tests)
 
 add_subdirectory(alloc)
 add_subdirectory(space)
+add_subdirectory(util)

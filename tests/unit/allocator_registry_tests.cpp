@@ -3,6 +3,8 @@
 
 #include "umpire/AllocatorRegistry.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/util/Exception.hpp"
+#include "umpire/util/Macros.hpp"
 
 using namespace testing;
 
@@ -14,14 +16,15 @@ class MockAllocatorFactory : public umpire::AllocatorFactory
 };
 
 TEST(AllocatorRegistry, Constructor) {
-  umpire::AllocatorRegistry reg = umpire::AllocatorRegistry::getInstance();
+  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
   SUCCEED();
 }
 
 TEST(AllocatorRegistry, Register) {
-  umpire::AllocatorRegistry reg = umpire::AllocatorRegistry::getInstance();
-
+  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
   reg.registerAllocator(std::make_shared<MockAllocatorFactory>());
+
+  SUCCEED();
 }
 
 TEST(AllocatorRegistry, Create) {
@@ -37,4 +40,10 @@ TEST(AllocatorRegistry, Create) {
 
   auto alloc = reg.makeAllocator("test");
   ASSERT_EQ(std::dynamic_pointer_cast<umpire::AllocatorInterface>(mock_allocator_factory), alloc);
+}
+
+TEST(AllocatorRegistry, CreateUnknown) {
+  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
+
+  ASSERT_THROW(reg.makeAllocator("unknown"), umpire::util::Exception);
 }
