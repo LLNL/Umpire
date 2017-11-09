@@ -6,4 +6,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_FLAGS} -O3 -march=native -ansi-alias" CACH
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${COMMON_FLAGS} -O3 -g -march=native -ansi-alias" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_FLAGS} -O0 -g" CACHE STRING "")
 
-include(cudatoolkit_9_0.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cudatoolkit_8_0.cmake)
