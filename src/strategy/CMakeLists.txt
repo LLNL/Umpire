@@ -1,4 +1,5 @@
 set (umpire_strategy_headers
+  AllocatorTraits.hpp
   AllocationStrategy.hpp
   AllocationStrategyFactory.hpp
   AllocationStrategyRegistry.hpp

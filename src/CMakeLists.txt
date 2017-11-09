@@ -1,6 +1,5 @@
 set (umpire_headers
   Allocator.hpp
-  AllocatorTraits.hpp
   ResourceManager.hpp
   Umpire.hpp)
 
