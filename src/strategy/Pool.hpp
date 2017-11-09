@@ -1,14 +1,13 @@
 #ifndef UMPIRE_Pool_HPP
 #define UMPIRE_Pool_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include <memory>
 #include <vector>
 
-namespace umpire {
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
-  class AllocatorTraits;
+namespace umpire {
 
 namespace strategy {
 
@@ -16,7 +15,7 @@ class Pool :
   public AllocationStrategy
 {
   public:
-    Pool(AllocatorTraits traits,
+    Pool(util::AllocatorTraits traits,
       std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
     void* allocate(size_t bytes);

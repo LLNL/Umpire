@@ -1,15 +1,15 @@
 #ifndef UMPIRE_AllocationStrategyFactory_HPP
 #define UMPIRE_AllocationStrategyFactory_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include <memory>
 #include <string>
 #include <vector>
 
-namespace umpire {
+#include "umpire/strategy/AllocationStrategy.hpp"
 
-struct AllocatorTraits;
+#include "umpire/util/AllocatorTraits.hpp"
+
+namespace umpire {
 
 namespace strategy {
 
@@ -18,7 +18,7 @@ class AllocationStrategyFactory {
     virtual bool isValidAllocationStrategyFor(const std::string& name) = 0;
     virtual std::shared_ptr<AllocationStrategy> create() = 0;
     virtual std::shared_ptr<AllocationStrategy> createWithTraits(
-        AllocatorTraits traits,
+        util::AllocatorTraits traits,
         std::vector<std::shared_ptr<AllocationStrategy> > providers) = 0;
 };
 

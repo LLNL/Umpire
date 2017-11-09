@@ -5,8 +5,6 @@
 
 namespace umpire {
 
-  class AllocatorTraits;
-
 namespace strategy {
 
 template <typename ALLOC_STRATEGY>
@@ -17,7 +15,7 @@ class GenericAllocationStrategyFactory
     bool isValidAllocationStrategyFor(const std::string& name);
     std::shared_ptr<AllocationStrategy> create();
     std::shared_ptr<AllocationStrategy> createWithTraits(
-        AllocatorTraits traits,
+        util::AllocatorTraits traits,
         std::vector<std::shared_ptr<AllocationStrategy> > providers);
   private:
     std::string m_name;

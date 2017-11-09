@@ -1,6 +1,6 @@
 #include "umpire/strategy/AllocationStrategyRegistry.hpp"
 
-#include "umpire/AllocatorTraits.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -31,7 +31,7 @@ AllocationStrategyRegistry::registerAllocationStrategy(std::shared_ptr<Allocatio
 }
 
 std::shared_ptr<umpire::strategy::AllocationStrategy>
-AllocationStrategyRegistry::makeAllocationStrategy(const std::string& name, AllocatorTraits traits, std::vector<std::shared_ptr<AllocationStrategy> > providers)
+AllocationStrategyRegistry::makeAllocationStrategy(const std::string& name, util::AllocatorTraits traits, std::vector<std::shared_ptr<AllocationStrategy> > providers)
 {
   for (auto allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidAllocationStrategyFor(name)) {

@@ -1,13 +1,13 @@
 #include "umpire/strategy/Pool.hpp"
 #include "umpire/util/Macros.hpp"
 
-#include "umpire/AllocatorTraits.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
 namespace umpire {
 namespace strategy {
 
 Pool::Pool(
-    AllocatorTraits traits,
+    util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
   m_current_size(0),
   m_highwatermark(0)

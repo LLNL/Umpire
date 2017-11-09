@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 
-#include "umpire/space/MemorySpace.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
 
 struct TestAllocator
 {
@@ -16,23 +16,23 @@ struct TestAllocator
   }
 };
 
-TEST(MemorySpace, Constructor)
+TEST(DefaultMemoryResource, Constructor)
 {
-  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
 
   SUCCEED();
 }
 
-TEST(MemorySpace, AllocateDeallocate)
+TEST(DefaultMemoryResource, AllocateDeallocate)
 {
-  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
   ASSERT_NE(pointer, nullptr);
 }
 
-TEST(MemorySpace, GetSize)
+TEST(DefaultMemoryResource, GetSize)
 {
-  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
   double* pointer = (double*) alloc->allocate(10);
   ASSERT_EQ(alloc->getCurrentSize(), 10);
 
@@ -46,9 +46,9 @@ TEST(MemorySpace, GetSize)
   ASSERT_EQ(alloc->getCurrentSize(), 0);
 }
 
-TEST(MemorySpace, GetHighWatermark)
+TEST(DefaultMemoryResource, GetHighWatermark)
 {
-  auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
   ASSERT_EQ(alloc->getHighWatermark(), 0);
 
   double* pointer = (double*)alloc->allocate(10);

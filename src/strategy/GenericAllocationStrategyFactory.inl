@@ -31,7 +31,7 @@ GenericAllocationStrategyFactory<ALLOC_STRATEGY>::create()
 template <typename ALLOC_STRATEGY>
 std::shared_ptr<AllocationStrategy> 
 GenericAllocationStrategyFactory<ALLOC_STRATEGY>::createWithTraits(
-    AllocatorTraits traits,
+    util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers)
 {
   return std::make_shared<ALLOC_STRATEGY>(traits, providers);

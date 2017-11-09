@@ -23,4 +23,4 @@ blt_add_executable(
   )
 
 add_subdirectory(alloc)
-add_subdirectory(space)
+add_subdirectory(resource)

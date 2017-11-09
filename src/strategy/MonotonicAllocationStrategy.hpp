@@ -5,10 +5,9 @@
 #include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
 namespace umpire {
-
-  class AllocatorTraits;
 
 namespace strategy {
 
@@ -16,7 +15,7 @@ class MonotonicAllocationStrategy :
   public AllocationStrategy
 {
   public:
-    MonotonicAllocationStrategy(umpire::AllocatorTraits traits, std::vector<std::shared_ptr<AllocationStrategy> > providers);
+    MonotonicAllocationStrategy(util::AllocatorTraits traits, std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

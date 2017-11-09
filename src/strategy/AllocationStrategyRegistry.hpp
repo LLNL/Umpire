@@ -1,16 +1,13 @@
 #ifndef UMPIRE_AllocationStrategyRegistry_HPP
 #define UMPIRE_AllocationStrategyRegistry_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
-#include "umpire/strategy/AllocationStrategyFactory.hpp"
-
 #include <memory>
 #include <list>
 
-namespace umpire {
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/AllocationStrategyFactory.hpp"
 
-class AllocatorTraits;
+namespace umpire {
 
 namespace strategy {
 
@@ -20,7 +17,7 @@ class AllocationStrategyRegistry {
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> makeAllocationStrategy(
       const std::string& name, 
-      AllocatorTraits traits,
+      util::AllocatorTraits traits,
       std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
     void registerAllocationStrategy(std::shared_ptr<AllocationStrategyFactory> factory);

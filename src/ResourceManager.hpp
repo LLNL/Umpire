@@ -9,7 +9,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/AllocatorTraits.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
 namespace umpire {
 
@@ -31,7 +31,7 @@ class ResourceManager
 
     Allocator makeAllocator(const std::string& name, 
         const std::string& strategy, 
-        AllocatorTraits traits,
+        util::AllocatorTraits traits,
         std::vector<Allocator> providers);
 
     Allocator getAllocator(void* ptr);
@@ -53,6 +53,7 @@ class ResourceManager
 
   private:
     ResourceManager();
+
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
 

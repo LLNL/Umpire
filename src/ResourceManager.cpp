@@ -98,14 +98,16 @@ Allocator
 ResourceManager::makeAllocator(
     const std::string& name, 
     const std::string& strategy, 
-    AllocatorTraits traits,
+    util::AllocatorTraits traits,
     std::vector<Allocator> providers)
 {
   strategy::AllocationStrategyRegistry& registry =
     strategy::AllocationStrategyRegistry::getInstance();
 
+  /* 
+   * Turn the vector of Allocators into a vector of AllocationStrategies.
+   */
   std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
-
   for (auto provider : providers) {
     provider_strategies.push_back(provider.getAllocationStrategy());
   }

@@ -2,14 +2,14 @@
 
 #include "umpire/util/Macros.hpp"
 
-#include "umpire/AllocatorTraits.hpp"
+#include "umpire/util/AllocatorTraits.hpp"
 
 namespace umpire {
 
 namespace strategy {
 
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
-    AllocatorTraits traits,
+    util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
   m_size(0),
   m_sizes()
