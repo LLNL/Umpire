@@ -1,7 +1,7 @@
 #ifndef UMPIRE_UnifiedMemoryResourceFactory_HPP
 #define UMPIRE_UnifiedMemoryResourceFactory_HPP
 
-#include "umpire/strategy/MemoryResourceFactory.hpp"
+#include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
 namespace resource {
