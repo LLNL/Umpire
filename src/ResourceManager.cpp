@@ -72,8 +72,8 @@ ResourceManager::initialize()
      */
   m_allocators["HOST"] = m_memory_resources["HOST"];
 #if defined(ENABLE_CUDA)
-  m_allocators["HOST"] = m_memory_resources["HOST"];
-  m_allocators["HOST"] = m_memory_resources["HOST"];
+  m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
+  m_allocators["UM"] = m_memory_resources["UM"];
 #endif
 }
 
