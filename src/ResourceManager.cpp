@@ -48,7 +48,7 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::DeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::DeviceResourceFactory>());
+    std::make_shared<resource::UnifiedMemoryResourceFactory>());
 #endif
 
   initialize();
