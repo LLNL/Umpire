@@ -10,7 +10,7 @@ namespace resource {
 bool
 UnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 {
-  if (name.compare("UM") == 1) {
+  if (name.compare("UM") == 0) {
     return true;
   } else {
     return false;
