@@ -1,6 +1,6 @@
 set (memory_allocator_tests_depends
   umpire_alloc gtest)
-  
+
 if (ENABLE_CUDA)
   set (memory_allocator_tests_depends
     ${memory_allocator_tests_depends}

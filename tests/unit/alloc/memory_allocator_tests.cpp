@@ -21,7 +21,6 @@ TYPED_TEST_CASE_P(MemoryAllocatorTest);
 TYPED_TEST_P(MemoryAllocatorTest, Allocate) {
   TypeParam allocator;
   void* allocation = allocator.allocate(1000);
-
   ASSERT_NE(nullptr, allocation);
 
   allocator.deallocate(allocation);
