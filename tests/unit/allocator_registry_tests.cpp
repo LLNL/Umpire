@@ -3,6 +3,8 @@
 
 #include "umpire/strategy/AllocationStrategyRegistry.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/util/Exception.hpp"
+#include "umpire/util/Macros.hpp"
 
 using namespace testing;
 
@@ -14,15 +16,16 @@ class MockAllocatorFactory : public umpire::strategy::AllocationStrategyFactory
   MOCK_METHOD2(createWithTraits, std::shared_ptr<umpire::strategy::AllocationStrategy>(umpire::util::AllocatorTraits, std::vector<std::shared_ptr<umpire::strategy::AllocationStrategy> >));
 };
 
-TEST(AllocationStrategyRegistry, Constructor) {
-  auto& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
+TEST(AllocatorRegistry, Constructor) {
+  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
   SUCCEED();
 }
 
-TEST(AllocationStrategyRegistry, Register) {
-  auto& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
+TEST(AllocatorRegistry, Register) {
+  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
+  reg.registerAllocator(std::make_shared<MockAllocatorFactory>());
 
-  reg.registerAllocationStrategy(std::make_shared<MockAllocatorFactory>());
+  SUCCEED();
 }
 
 TEST(AllocationStrategyRegistry, Create) {
@@ -39,4 +42,10 @@ TEST(AllocationStrategyRegistry, Create) {
 
   auto alloc = reg.makeAllocationStrategy("test", {}, {});
   ASSERT_EQ(std::dynamic_pointer_cast<umpire::strategy::AllocationStrategy>(mock_allocator_factory), alloc);
+}
+
+TEST(AllocatorRegistry, CreateUnknown) {
+  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
+
+  ASSERT_THROW(reg.makeAllocator("unknown"), umpire::util::Exception);
 }
