@@ -33,12 +33,12 @@ TEST(MemorySpace, AllocateDeallocate)
 TEST(MemorySpace, getCurrentSize)
 {
   auto alloc = std::make_shared<umpire::space::MemorySpace<TestAllocator> >();
-  ASSERT_EQ(alloc->getCurrentSize(), 0);
+  ASSERT_EQ(alloc->getCurrentSize(), 0l);
 
 
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
-  ASSERT_EQ(alloc->getCurrentSize(), 10*sizeof(double));
+  ASSERT_EQ(alloc->getCurrentSize(), static_cast<long>(10*sizeof(double)));
 
   alloc->deallocate(pointer);
-  ASSERT_EQ(alloc->getCurrentSize(), 0);
+  ASSERT_EQ(alloc->getCurrentSize(), 0l);
 }

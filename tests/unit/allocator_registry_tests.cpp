@@ -17,6 +17,9 @@ class MockAllocatorFactory : public umpire::AllocatorFactory
 
 TEST(AllocatorRegistry, Constructor) {
   umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
+
+  (void) reg;
+
   SUCCEED();
 }
 
