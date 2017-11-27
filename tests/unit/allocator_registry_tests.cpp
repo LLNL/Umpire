@@ -2,6 +2,7 @@
 #include "gmock/gmock.h"
 
 #include "umpire/strategy/AllocationStrategyRegistry.hpp"
+
 #include "umpire/Allocator.hpp"
 #include "umpire/util/Exception.hpp"
 #include "umpire/util/Macros.hpp"
@@ -17,13 +18,16 @@ class MockAllocatorFactory : public umpire::strategy::AllocationStrategyFactory
 };
 
 TEST(AllocatorRegistry, Constructor) {
-  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
+  umpire::strategy::AllocationStrategyRegistry& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
+
+  (void) reg;
+
   SUCCEED();
 }
 
-TEST(AllocatorRegistry, Register) {
-  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
-  reg.registerAllocator(std::make_shared<MockAllocatorFactory>());
+TEST(AllocationStrategyRegistry, Register) {
+  umpire::strategy::AllocationStrategyRegistry& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
+  reg.registerAllocationStrategy(std::make_shared<MockAllocatorFactory>());
 
   SUCCEED();
 }
@@ -40,12 +44,24 @@ TEST(AllocationStrategyRegistry, Create) {
   umpire::strategy::AllocationStrategyRegistry reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
   reg.registerAllocationStrategy(mock_allocator_factory);
 
-  auto alloc = reg.makeAllocationStrategy("test", {}, {});
+  umpire::util::AllocatorTraits traits;
+
+  traits.m_initial_size = 0;
+  traits.m_maximum_size = 0;
+  traits.m_number_allocations = 0;
+
+  auto alloc = reg.makeAllocationStrategy("test", traits, {});
   ASSERT_EQ(std::dynamic_pointer_cast<umpire::strategy::AllocationStrategy>(mock_allocator_factory), alloc);
 }
 
-TEST(AllocatorRegistry, CreateUnknown) {
-  umpire::AllocatorRegistry& reg = umpire::AllocatorRegistry::getInstance();
+TEST(AllocationStrategyRegistry, CreateUnknown) {
+  umpire::strategy::AllocationStrategyRegistry& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
 
-  ASSERT_THROW(reg.makeAllocator("unknown"), umpire::util::Exception);
+  umpire::util::AllocatorTraits traits;
+
+  traits.m_initial_size = 0;
+  traits.m_maximum_size = 0;
+  traits.m_number_allocations = 0;
+
+  ASSERT_THROW(reg.makeAllocationStrategy("unknown", traits, {}), umpire::util::Exception);
 }
