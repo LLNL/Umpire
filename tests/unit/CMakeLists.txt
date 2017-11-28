@@ -19,5 +19,5 @@ blt_add_test(
   COMMAND allocator_registry_tests)
 
 add_subdirectory(alloc)
-add_subdirectory(space)
+add_subdirectory(resource)
 add_subdirectory(util)

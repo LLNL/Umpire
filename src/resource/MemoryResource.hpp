@@ -1,20 +1,17 @@
-#ifndef UMPIRE_AllocatorInterface_HPP
-#define UMPIRE_AllocatorInterface_HPP
+#ifndef UMPIRE_MemoryResource_HPP
+#define UMPIRE_MemoryResource_HPP
 
-#include "umpire/util/Platform.hpp"
-
-#include <memory>
-#include <cstddef>
-
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
+namespace resource {
 
 /*!
  * \brief Allocator provides a unified interface to all Umpire classes that can
  * be used to allocate and free data.
  */
-class AllocatorInterface :
-  public std::enable_shared_from_this<AllocatorInterface>
+class MemoryResource :
+  public strategy::AllocationStrategy
 {
   public:
     /*!
@@ -48,6 +45,7 @@ class AllocatorInterface :
     virtual Platform getPlatform()  = 0;
 };
 
+} // end of namespace strategy
 } // end of namespace umpire
 
-#endif // UMPIRE_AllocatorInterface_HPP
+#endif // UMPIRE_MemoryResource_HPP

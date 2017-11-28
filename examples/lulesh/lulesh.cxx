@@ -3020,7 +3020,7 @@ int main(int argc, char *argv[])
   }
   std::cout << std::endl;
 
-  std::cout << "Creating Pool in space HOST..." << std::endl;
+  std::cout << "Creating Pool in resource HOST..." << std::endl;
 
   auto host_space = rm.getSpace("HOST");
   pool = umpire::alloc::Pool<>(host_space);

@@ -2,10 +2,13 @@ blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
   DEPENDS_ON 
-    umpire
-    umpire_space
-    umpire_alloc
-    )
+    umpire)
+
+blt_add_executable(
+  NAME strategy_example
+  SOURCES strategy_example.cpp
+  DEPENDS_ON
+    umpire)
 
 if (ENABLE_FORTRAN)
   blt_add_executable(

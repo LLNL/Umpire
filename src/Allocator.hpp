@@ -1,7 +1,7 @@
 #ifndef UMPIRE_Allocator_HPP
 #define UMPIRE_Allocator_HPP
 
-#include "umpire/AllocatorInterface.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 #include <memory>
 #include <cstddef>
@@ -61,9 +61,12 @@ class Allocator {
      */
     size_t getCurrentSize();
 
+    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
+
   private:
-    Allocator(std::shared_ptr<umpire::AllocatorInterface>& allocator);
-    std::shared_ptr<umpire::AllocatorInterface> m_allocator;
+    Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator);
+
+    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
 
 } // end of namespace umpire

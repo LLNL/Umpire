@@ -1,24 +1,23 @@
-#ifndef UMPIRE_MemorySpace_HPP
-#define UMPIRE_MemorySpace_HPP
+#ifndef UMPIRE_DefaultMemoryResource_HPP
+#define UMPIRE_DefaultMemoryResource_HPP
 
-#include "umpire/AllocatorInterface.hpp"
-
-#include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Platform.hpp"
+#include "umpire/resource/MemoryResource.hpp"
 
 #include <memory>
 #include <unordered_map>
 
+#include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/Platform.hpp"
+
 namespace umpire {
-namespace space {
+namespace resource {
 
 template <typename _allocator>
-class MemorySpace : 
-  public AllocatorInterface
+class DefaultMemoryResource :
+  public MemoryResource
 {
-
   public: 
-    MemorySpace(Platform platform = Platform::cpu);
+    DefaultMemoryResource(Platform platform = Platform::cpu);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -40,9 +39,9 @@ class MemorySpace :
     Platform m_platform;
 };
 
-} // end of namespace space
+} // end of namespace resource
 } // end of namespace umpire
 
-#include "umpire/space/MemorySpace.inl"
+#include "umpire/resource/DefaultMemoryResource.inl"
 
-#endif // UMPIRE_MemorySpace_HPP
+#endif // UMPIRE_DefaultMemoryResource_HPP
