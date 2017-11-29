@@ -25,23 +25,18 @@ TEST(AllocatorRegistry, Constructor) {
   SUCCEED();
 }
 
-TEST(AllocationStrategyRegistry, Register) {
-  umpire::strategy::AllocationStrategyRegistry& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
-  reg.registerAllocationStrategy(std::make_shared<MockAllocatorFactory>());
-
-  SUCCEED();
-}
-
-TEST(AllocationStrategyRegistry, Create) {
+TEST(AllocationStrategyRegistry, RegisterAndCreate) {
   auto mock_allocator_factory = std::make_shared<MockAllocatorFactory>();
 
   EXPECT_CALL(*mock_allocator_factory, isValidAllocationStrategyFor("test"))
     .Times(1)
     .WillOnce(Return(true));
-  EXPECT_CALL(*mock_allocator_factory, create())
+  EXPECT_CALL(*mock_allocator_factory, isValidAllocationStrategyFor("unknown"))
+    .WillRepeatedly(Return(false));
+  EXPECT_CALL(*mock_allocator_factory, createWithTraits(_, _))
     .Times(1);
 
-  umpire::strategy::AllocationStrategyRegistry reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
+  umpire::strategy::AllocationStrategyRegistry& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();
   reg.registerAllocationStrategy(mock_allocator_factory);
 
   umpire::util::AllocatorTraits traits;
@@ -50,8 +45,11 @@ TEST(AllocationStrategyRegistry, Create) {
   traits.m_maximum_size = 0;
   traits.m_number_allocations = 0;
 
+
   auto alloc = reg.makeAllocationStrategy("test", traits, {});
   ASSERT_EQ(std::dynamic_pointer_cast<umpire::strategy::AllocationStrategy>(mock_allocator_factory), alloc);
+
+  ::testing::Mock::AllowLeak(&(*mock_allocator_factory));
 }
 
 TEST(AllocationStrategyRegistry, CreateUnknown) {

@@ -22,10 +22,13 @@ class AllocationStrategyRegistry {
 
     void registerAllocationStrategy(std::shared_ptr<AllocationStrategyFactory> factory);
 
-  protected:
+  private:
     AllocationStrategyRegistry();
 
-  private:
+    AllocationStrategyRegistry(const AllocationStrategyRegistry&) = delete;
+
+    AllocationStrategyRegistry& operator= (const AllocationStrategyRegistry&) = delete;
+
     static AllocationStrategyRegistry* s_allocator_registry_instance;
 
     std::list<std::shared_ptr<AllocationStrategyFactory> > m_allocator_factories;
