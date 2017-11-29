@@ -1,29 +1,31 @@
-# blt_add_executable(
-#   NAME allocation_benchmarks
-#   SOURCES allocation_benchmarks.cxx
-#   DEPENDS_ON gbenchmark umpire)
-# 
-# blt_add_benchmark(
-#   NAME allocation_benchmarks
-#   COMMAND allocation_benchmarks)
-#   
-# blt_add_executable(
-#   NAME pool_benchmarks
-#   SOURCES pool_benchmarks.cpp
-#   DEPENDS_ON gbenchmark umpire)
-# 
-# blt_add_benchmark(
-#   NAME pool_benchmarks
-#   COMMAND pool_benchmarks)
-# 
-# if (ENABLE_CUDA)
-#   blt_add_executable(
-#     NAME gpu_allocation_benchmarks
-#     SOURCES gpu_allocation_benchmarks.cxx
-#     DEPENDS_ON gbenchmark umpire_alloc cuda_runtime)
-# 
-#   blt_add_benchmark(
-#     NAME gpu_allocation_benchmarks
-#     COMMAND gpu_allocation_benchmarks)
-# 
-# endif()
+blt_add_executable(
+  NAME allocator_stress_test
+  SOURCES allocator_stress_test.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+
+blt_add_executable(
+  NAME copy_stress_test
+  SOURCES copy_stress_test.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+
+blt_add_executable(
+  NAME allocator_benchmarks
+  SOURCES allocator_benchmarks.cpp
+  DEPENDS_ON gbenchmark umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+
+blt_add_benchmark(
+  NAME allocator_benchmarks
+  COMMAND allocator_benchmarks)
+
+blt_add_executable(
+  NAME copy_benchmarks
+  SOURCES copy_benchmarks.cpp
+  DEPENDS_ON gbenchmark umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+
+blt_add_benchmark(
+  NAME copy_benchmarks
+  COMMAND copy_benchmarks)

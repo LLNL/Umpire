@@ -1,5 +1,7 @@
 #!/bin/bash
 
+SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+
 UMPIRE_DIR=$(git rev-parse --show-toplevel)
 BUILD_DIR=build-${SYS_TYPE}
 
@@ -22,3 +24,10 @@ if [[ $HOSTNAME == *manta* ]]; then
 else
   srun -ppdebug -t 5 -N 1 ctest -T Test
 fi
+
+echo "Benchmarking..."
+COMMIT=`git rev-parse --short HEAD`
+DATE=`date +%Y-%m-%d`
+BENCHMARK_OUTPUT_NAME="${COMMIT}_${COMPILER}_${DATE}"
+
+${SCRIPTPATH}/benchmark.sh $BENCHMARK_OUTPUT_NAME
