@@ -22,7 +22,7 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
 void* 
 MonotonicAllocationStrategy::allocate(size_t bytes)
 {
-  void* ret = m_block + bytes;
+  void* ret = static_cast<char*>(m_block) + bytes;
   m_size += bytes;
   m_sizes[ret] = bytes;
 
@@ -34,7 +34,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 }
 
 void 
-MonotonicAllocationStrategy::deallocate(void* ptr)
+MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {
   UMPIRE_LOG("MonoticAllocationStrategy: deallocate doesn't do anything");
   // no op
