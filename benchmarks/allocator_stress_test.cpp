@@ -8,12 +8,11 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
-#define ALLOCATIONS 1000
+#define ALLOCATIONS 100000
 
 void benchmark_allocator(std::string name) {
   std::mt19937 gen(12345678);
   std::uniform_int_distribution<size_t> dist(64, 4096);
-
 
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator(name);
@@ -24,8 +23,6 @@ void benchmark_allocator(std::string name) {
 
   for (int i = 0; i < ALLOCATIONS; i++) {
     std::size_t size = dist(gen);
-
-    //allocations[i] = alloc.allocate(64);
     allocations[i] = alloc.allocate(size);
   }
 
@@ -44,6 +41,9 @@ void benchmark_allocator(std::string name) {
 
 int main(int, char**) {
   benchmark_allocator("HOST");
+
+#if defined(ENABLE_CUDA)
   benchmark_allocator("DEVICE");
   benchmark_allocator("UM");
+#endif
 }

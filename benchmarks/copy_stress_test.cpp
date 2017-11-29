@@ -4,7 +4,7 @@
 #include <iostream>
 #include <chrono>
 
-#define ALLOCATIONS 10000000
+#define ALLOCATIONS 100000
 
 int do_copy(std::string src, std::string dst, std::size_t size = 4096) {
   auto& rm = umpire::ResourceManager::getInstance();
