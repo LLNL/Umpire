@@ -23,4 +23,6 @@
   std::cout << msg << std::endl;                                   \
 }
 
+#define UMPIRE_UNUSED_ARG(x)
+
 #endif // UMPIRE_Macros_HPP

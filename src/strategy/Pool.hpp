@@ -31,7 +31,7 @@ class Pool :
     void init();
 
     void** m_pointers;
-    int* m_lengths;
+    size_t* m_lengths;
 
     long m_current_size;
     long m_highwatermark;
