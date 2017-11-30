@@ -10,9 +10,8 @@ This page provides information on how to quickly get up and running with Umpire.
 Installation
 ------------
 
-Umpire is hosted on Bitbucket `here
-<https://rzlc.llnl.gov/bitbucket/projects/UM/repos/umpire/browse>`_.  To clone
-the repo into your local working space, type:
+Umpire is hosted on Bitbucket `here <https://rzlc.llnl.gov/bitbucket/projects/UM/repos/umpire/browse>`_.
+To clone the repo into your local working space, type:
 
 .. code-block:: bash
 
@@ -24,9 +23,9 @@ also checked out. `BLT <https://github.com/LLNL/BLT>`_ is the build system we
 use for Umpire.
 
 
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 Building Umpire
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^
 
 Umpire uses CMake and BLT to handle builds. Make sure that you have a modern
 compiler loaded and the configuration is as simple as:
@@ -61,7 +60,7 @@ Umpire install files to the ``lib``, ``include`` and ``bin`` directories of the
 file that can help you use Umpire in other projects. By setting `umpire_DIR` to
 point to the root of your Umpire installation, you can call
 ``find_package(umpire)`` inside your CMake project and Umpire will be
-automatically detected and available for use in your own project.
+automatically detected and available for use.
 
 -----------
 Basic Usage
