@@ -5,7 +5,7 @@ set(umpire_alloc_headers
 
 set (umpire_alloc_sources)
 
-set (umpire_alloc_depends umpire_util)
+set (umpire_alloc_depends umpire_util umpire_tpl_simpool)
 
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
