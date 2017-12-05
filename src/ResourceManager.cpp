@@ -12,6 +12,7 @@
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #endif
+#include "umpire/strategy/SimPoolAllocationStrategy.hpp"
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
@@ -67,13 +68,38 @@ ResourceManager::initialize()
   m_memory_resources["UM"] = registry.makeMemoryResource("UM");
 #endif
 
-    /*
-     * Construct default allocators for each resource
-     */
-  m_allocators["HOST"] = m_memory_resources["HOST"];
+  /*
+   * Construct default allocators for each resource
+   */
+  {
+    // m_allocators["HOST"] = m_memory_resources["HOST"];
+    std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
+    util::AllocatorTraits t; 
+
+    provider_strategies.push_back(m_memory_resources["HOST"]);
+
+    m_allocators["HOST"] = (std::shared_ptr<umpire::strategy::AllocationStrategy>)new umpire::strategy::SimPoolAllocationStrategy{t, provider_strategies};
+  }
+
 #if defined(ENABLE_CUDA)
-  m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
-  m_allocators["UM"] = m_memory_resources["UM"];
+  {
+    // m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
+    std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
+    util::AllocatorTraits t; 
+
+    provider_strategies.push_back(m_memory_resources["DEVICE"]);
+    m_allocators["DEVICE"] = (std::shared_ptr<umpire::strategy::AllocationStrategy>)new umpire::strategy::SimPoolAllocationStrategy{t, provider_strategies};
+  }
+
+  {
+    // m_allocators["UM"] = m_memory_resources["UM"];
+    std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
+    util::AllocatorTraits t; 
+
+    provider_strategies.push_back(m_memory_resources["UM"]);
+    m_allocators["UM"] = (std::shared_ptr<umpire::strategy::AllocationStrategy>)new umpire::strategy::SimPoolAllocationStrategy{t, provider_strategies};
+  }
+
 #endif
 }
 
