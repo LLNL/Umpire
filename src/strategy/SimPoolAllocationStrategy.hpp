@@ -3,9 +3,11 @@
 
 #include <memory>
 #include <vector>
+#include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocatorTraits.hpp"
+#include "umpire/util/AllocationRecord.hpp"
 #include "umpire/tpl/simpool/DynamicPoolAllocator.hpp"
 
 namespace umpire {
@@ -41,13 +43,18 @@ class SimPoolAllocationStrategy : public AllocationStrategy
       dpa = new DynamicPoolAllocator<simPoolAllocator>((1 << 8), m_allocator);
     }
 
-    void* allocate(size_t bytes) { return dpa->allocate(bytes); }
-    void deallocate(void* ptr)   { dpa->deallocate(ptr); }
+    inline void* allocate(size_t bytes) { 
+      return dpa->allocate(bytes);
+    }
 
-    long getCurrentSize()        { return m_allocator->getCurrentSize(); }
-    long getHighWatermark()      { return m_allocator->getHighWatermark(); }
-    size_t getSize(void* ptr)    { return m_allocator->getSize(ptr); }
-    Platform getPlatform()       { return m_allocator->getPlatform(); }
+    inline void deallocate(void* ptr) {
+      dpa->deallocate(ptr);
+    }
+
+    inline long getCurrentSize()        { return m_allocator->getCurrentSize(); }
+    inline long getHighWatermark()      { return m_allocator->getHighWatermark(); }
+    inline size_t getSize(void* ptr)    { return m_allocator->getSize(ptr); }
+    inline Platform getPlatform()       { return m_allocator->getPlatform(); }
 
   private:
     DynamicPoolAllocator<simPoolAllocator>* dpa;
