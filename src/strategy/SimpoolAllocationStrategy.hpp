@@ -1,5 +1,5 @@
-#ifndef UMPIRE_SimPool_HPP
-#define UMPIRE_SimPool_HPP
+#ifndef UMPIRE_SimpoolAllocationStrategy_HPP
+#define UMPIRE_SimpoolAllocationStrategy_HPP
 
 #include <memory>
 #include <vector>
@@ -44,4 +44,4 @@ class SimpoolAllocationStrategy : public AllocationStrategy
 } // end of namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_SimPool_HPP
+#endif // UMPIRE_SimpoolAllocationStrategy_HPP
