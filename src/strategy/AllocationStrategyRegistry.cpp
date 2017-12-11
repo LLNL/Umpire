@@ -1,6 +1,8 @@
 #include "umpire/strategy/AllocationStrategyRegistry.hpp"
 
 #include "umpire/strategy/SimpoolAllocationStrategy.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+
 #include "umpire/strategy/GenericAllocationStrategyFactory.hpp"
 
 #include "umpire/util/AllocatorTraits.hpp"
@@ -26,6 +28,9 @@ AllocationStrategyRegistry::AllocationStrategyRegistry() :
 {
   registerAllocationStrategy(
       std::make_shared<GenericAllocationStrategyFactory<SimpoolAllocationStrategy> >("POOL"));
+
+  registerAllocationStrategy(
+      std::make_shared<GenericAllocationStrategyFactory<MonotonicAllocationStrategy> >("MONOTONIC"));
 }
 
 void

@@ -17,6 +17,7 @@ set (umpire_stategy_sources
   SimpoolAllocationStrategy.cpp)
 
 set (umpire_strategy_depends
+  umpire
   umpire_util
   umpire_tpl_simpool)
 

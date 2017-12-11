@@ -13,10 +13,10 @@
 namespace umpire {
 namespace strategy {
 
-class SimPoolAllocationStrategy : public AllocationStrategy
+class SimpoolAllocationStrategy : public AllocationStrategy
 {
   public:
-    SimPoolAllocationStrategy(
+    SimpoolAllocationStrategy(
       util::AllocatorTraits,
       std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
@@ -34,15 +34,11 @@ class SimPoolAllocationStrategy : public AllocationStrategy
   private:
     DynamicPoolAllocator<>* dpa;
 
-    void** m_pointers;
-    size_t* m_lengths;
-
     long m_current_size;
     long m_highwatermark;
 
-    size_t m_slots;
-
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    std::unordered_map<void*, util::AllocationRecord> m_allocations;
 };
 
 } // end of namespace strategy

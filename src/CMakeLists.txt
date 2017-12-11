@@ -31,7 +31,7 @@ blt_add_library(
   HEADERS ${umpire_headers}
   SOURCES ${umpire_sources}
   HEADERS_OUTPUT_SUBDIR umpire 
-  DEPENDS_ON umpire_resource umpire_alloc umpire_op umpire_strategy)
+  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
 configure_file(
   ${PROJECT_SOURCE_DIR}/src/config.hpp.in
