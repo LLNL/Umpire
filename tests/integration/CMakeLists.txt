@@ -1,5 +1,5 @@
 set (allocator_tests_depends
-  umpire umpire_alloc gtest)
+  umpire gtest)
 
 if (ENABLE_CUDA)
   set (allocator_tests_depends

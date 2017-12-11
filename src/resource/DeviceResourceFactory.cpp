@@ -1,7 +1,7 @@
 #include "umpire/resource/DeviceResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/CnmemAllocator.hpp"
+#include "umpire/alloc/CudaMallocAllocator.hpp"
 
 namespace umpire {
 namespace resource {
@@ -19,7 +19,7 @@ DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 std::shared_ptr<MemoryResource>
 DeviceResourceFactory::create()
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CnmemAllocator> >(Platform::cuda);
+  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda);
 }
 
 } // end of namespace resource

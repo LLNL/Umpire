@@ -6,16 +6,20 @@ set (umpire_strategy_headers
   GenericAllocationStrategyFactory.hpp
   GenericAllocationStrategyFactory.inl
   MonotonicAllocationStrategy.hpp
-  Pool.hpp)
+  Pool.hpp
+  SimpoolAllocationStrategy.hpp)
 
 set (umpire_stategy_sources
   AllocationStrategyRegistry.cpp
   DefaultAllocationStrategy.cpp
   MonotonicAllocationStrategy.cpp
-  Pool.cpp)
+  Pool.cpp
+  SimpoolAllocationStrategy.cpp)
 
 set (umpire_strategy_depends
-  umpire_util)
+  umpire
+  umpire_util
+  umpire_tpl_simpool)
 
 blt_add_library(
   NAME umpire_strategy

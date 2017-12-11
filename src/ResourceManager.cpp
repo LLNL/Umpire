@@ -12,7 +12,6 @@
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #endif
-
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -67,12 +66,21 @@ ResourceManager::initialize()
   m_memory_resources["UM"] = registry.makeMemoryResource("UM");
 #endif
 
-    /*
-     * Construct default allocators for each resource
-     */
+  /*
+   * Construct default allocators for each resource
+   */
   m_allocators["HOST"] = m_memory_resources["HOST"];
+
 #if defined(ENABLE_CUDA)
+  /*
+   *  strategy::AllocationStrategyRegistry& strategy_registry =
+   *    strategy::AllocationStrategyRegistry::getInstance();
+   *
+   *  m_allocators["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
+   */
+
   m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
+
   m_allocators["UM"] = m_memory_resources["UM"];
 #endif
 }
@@ -125,14 +133,14 @@ ResourceManager::getAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<strategy::AllocationStrategy> space)
 {
-  UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
+  //UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
   m_allocation_to_allocator[ptr] = space;
 
 }
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
-  UMPIRE_LOG("Deregistering " << ptr);
+  //UMPIRE_LOG("Deregistering " << ptr);
   m_allocation_to_allocator.erase(ptr);
 }
 
