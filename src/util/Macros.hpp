@@ -15,6 +15,12 @@
                                  __LINE__);                        \
 }
 
+#if defined(NDEBUG)
+
+#define UMPIRE_LOG( msg )
+
+#else
+
 #define UMPIRE_LOG( msg )                                          \
 {                                                                  \
   std::ostringstream umpire_oss_log;                               \
@@ -22,6 +28,8 @@
   std::cout << "[" << __FILE__  << ":" << __LINE__ << "]:";        \
   std::cout << msg << std::endl;                                   \
 }
+
+#endif // defined(NDEBUG)
 
 #define UMPIRE_UNUSED_ARG(x)
 
