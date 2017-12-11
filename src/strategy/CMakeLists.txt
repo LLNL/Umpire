@@ -7,13 +7,14 @@ set (umpire_strategy_headers
   GenericAllocationStrategyFactory.inl
   MonotonicAllocationStrategy.hpp
   Pool.hpp
-  SimPoolAllocationStrategy.hpp)
+  SimpoolAllocationStrategy.hpp)
 
 set (umpire_stategy_sources
   AllocationStrategyRegistry.cpp
   DefaultAllocationStrategy.cpp
   MonotonicAllocationStrategy.cpp
-  Pool.cpp)
+  Pool.cpp
+  SimpoolAllocationStrategy.cpp)
 
 set (umpire_strategy_depends
   umpire_util

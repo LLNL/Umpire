@@ -12,8 +12,6 @@
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #endif
-#include "umpire/strategy/SimPoolAllocationStrategy.hpp"
-
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -74,12 +72,10 @@ ResourceManager::initialize()
   m_allocators["HOST"] = m_memory_resources["HOST"];
 
 #if defined(ENABLE_CUDA)
-  //m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
-  std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
-  util::AllocatorTraits t; 
+  strategy::AllocationStrategyRegistry& strategy_registry =
+    strategy::AllocationStrategyRegistry::getInstance();
 
-  provider_strategies.push_back(m_memory_resources["DEVICE"]);
-  m_allocators["DEVICE"] = (std::shared_ptr<umpire::strategy::AllocationStrategy>)new umpire::strategy::SimPoolAllocationStrategy{t, provider_strategies};
+  m_allocators["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
 
   m_allocators["UM"] = m_memory_resources["UM"];
 #endif

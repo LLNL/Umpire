@@ -1,7 +1,9 @@
 #include "umpire/strategy/AllocationStrategyRegistry.hpp"
 
-#include "umpire/util/AllocatorTraits.hpp"
+#include "umpire/strategy/SimpoolAllocationStrategy.hpp"
+#include "umpire/strategy/GenericAllocationStrategyFactory.hpp"
 
+#include "umpire/util/AllocatorTraits.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -22,6 +24,8 @@ AllocationStrategyRegistry::getInstance()
 AllocationStrategyRegistry::AllocationStrategyRegistry() :
   m_allocator_factories()
 {
+  registerAllocationStrategy(
+      std::make_shared<GenericAllocationStrategyFactory<SimpoolAllocationStrategy> >("POOL"));
 }
 
 void
