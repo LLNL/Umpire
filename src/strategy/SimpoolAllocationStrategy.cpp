@@ -23,7 +23,7 @@ SimpoolAllocationStrategy::SimpoolAllocationStrategy(
 void*
 SimpoolAllocationStrategy::allocate(size_t bytes) { 
   void* ptr = dpa->allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, this->shared_from_this());
+  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
 
   m_allocations[ptr] = {ptr, bytes};
 

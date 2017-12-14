@@ -33,7 +33,7 @@ ResourceManager::getInstance()
 ResourceManager::ResourceManager() :
   m_allocator_names(),
   m_allocators(),
-  m_allocation_to_allocator(),
+  m_allocations(),
   m_memory_resources()
 {
   resource::MemoryResourceRegistry& registry =
@@ -131,38 +131,45 @@ ResourceManager::getAllocator(void* ptr)
   return Allocator(findAllocatorForPointer(ptr));
 }
 
-void ResourceManager::registerAllocation(void* ptr, std::shared_ptr<strategy::AllocationStrategy> space)
+void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
 {
   //UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
-  m_allocation_to_allocator[ptr] = space;
+  m_allocations.insert(ptr, record);
+
+  //m_allocation_to_allocator[ptr] = space;
 
 }
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
   //UMPIRE_LOG("Deregistering " << ptr);
-  m_allocation_to_allocator.erase(ptr);
+  m_allocations.remove(ptr);
 }
 
-void ResourceManager::copy(void* src_ptr, void* dst_ptr)
+void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
 {
   UMPIRE_LOG("Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
 
   auto op_registry = op::MemoryOperationRegistry::getInstance();
 
-  auto src_alloc = findAllocatorForPointer(src_ptr);
-  auto dst_alloc = findAllocatorForPointer(dst_ptr);
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  auto dst_alloc_record = m_allocations.find(src_ptr);
 
-  std::size_t src_size = src_alloc->getSize(src_ptr);
-  std::size_t dst_size = dst_alloc->getSize(dst_ptr);
+  std::size_t src_size = src_alloc_record->m_size;
+  std::size_t dst_size = dst_alloc_record->m_size;
 
-  if (src_size > dst_size) {
-    UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
+  if (size == 0) {
+    size = src_size;
+    if (src_size > dst_size) {
+      UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
+    }
   }
 
-  auto op = op_registry.find("COPY", src_alloc, dst_alloc);
+  auto op = op_registry.find("COPY", 
+      src_alloc_record->m_strategy, 
+      dst_alloc_record->m_strategy);
 
-  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, src_size);
+  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
 }
 
 void ResourceManager::deallocate(void* ptr)
@@ -174,13 +181,13 @@ void ResourceManager::deallocate(void* ptr)
 
 std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)
 {
-  auto allocator = m_allocation_to_allocator.find(ptr);
+  auto allocation_record = m_allocations.find(ptr);
 
-  if (allocator == m_allocation_to_allocator.end()) {
+  if (! allocation_record->m_strategy) {
     UMPIRE_ERROR("Cannot find allocator " << ptr);
   }
 
-  return allocator->second;
+  return allocation_record->m_strategy;
 }
 
 std::vector<std::string>

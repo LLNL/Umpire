@@ -150,3 +150,17 @@ TEST(Operation, SizeError)
   ASSERT_THROW(rm.copy(array_one, array_two), umpire::util::Exception);
 }
 
+TEST(Operation, CopyOffset)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+
+  double* array_one = static_cast<double*>(host_allocator.allocate(100*sizeof(double)));
+  double* array_two = static_cast<double*>(host_allocator.allocate(70*sizeof(double)));
+
+  array_one[10] = 3.14;
+  array_two[11] = 0.0;
+
+  rm.copy(&array_one[10], &array_two[11], sizeof(double));
+}
+
