@@ -11,8 +11,7 @@ namespace strategy {
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
     util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
-  m_size(0),
-  m_sizes()
+  m_size(0)
 {
   m_capacity = std::max(traits.m_maximum_size, traits.m_initial_size);
   m_allocator = providers[0];
@@ -24,7 +23,6 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 {
   void* ret = static_cast<char*>(m_block) + bytes;
   m_size += bytes;
-  m_sizes[ret] = bytes;
 
   if (m_size > m_capacity) {
     UMPIRE_ERROR("MonoticAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
@@ -38,18 +36,6 @@ MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {
   UMPIRE_LOG("MonoticAllocationStrategy: deallocate doesn't do anything");
   // no op
-}
-
-size_t 
-MonotonicAllocationStrategy::getSize(void* ptr)
-{
-  auto it = m_sizes.find(ptr);
-  
-  if (it != m_sizes.end()) {
-    return it->second;
-  } else {
-    return m_allocator->getSize(ptr);
-  }
 }
 
 long 

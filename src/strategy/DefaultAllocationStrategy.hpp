@@ -21,15 +21,6 @@ class DefaultAllocationStrategy :
      */
     void deallocate(void* ptr);
 
-    /*!
-     * \brief Return number of bytes allocated for allocation
-     *
-     * \param ptr Pointer to allocation in question
-     *
-     * \return number of bytes allocated for ptr
-     */
-    size_t getSize(void* ptr);
-
     long getCurrentSize();
     long getHighWatermark();
 

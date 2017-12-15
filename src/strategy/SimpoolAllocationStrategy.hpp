@@ -3,7 +3,6 @@
 
 #include <memory>
 #include <vector>
-#include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocatorTraits.hpp"
@@ -24,8 +23,6 @@ class SimpoolAllocationStrategy : public AllocationStrategy
 
     void deallocate(void* ptr);
 
-    size_t getSize(void* ptr);
-
     long getCurrentSize();
     long getHighWatermark();
 
@@ -38,7 +35,6 @@ class SimpoolAllocationStrategy : public AllocationStrategy
     long m_highwatermark;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
-    std::unordered_map<void*, util::AllocationRecord> m_allocations;
 };
 
 } // end of namespace strategy

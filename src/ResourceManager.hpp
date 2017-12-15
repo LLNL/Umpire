@@ -52,6 +52,8 @@ class ResourceManager
      */
     void deallocate(void* ptr);
 
+    size_t getSize(void* ptr);
+
   private:
     ResourceManager();
 

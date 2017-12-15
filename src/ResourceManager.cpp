@@ -159,10 +159,11 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
   std::size_t dst_size = dst_alloc_record->m_size;
 
   if (size == 0) {
-    size = src_size;
     if (src_size > dst_size) {
       UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
     }
+
+    size = src_size;
   }
 
   auto op = op_registry.find("COPY", 
@@ -177,6 +178,13 @@ void ResourceManager::deallocate(void* ptr)
   auto allocator = findAllocatorForPointer(ptr);;
 
   allocator->deallocate(ptr);
+}
+
+size_t
+ResourceManager::getSize(void* ptr)
+{
+  auto record = m_allocations.find(ptr);
+  return record->m_size;
 }
 
 std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)
