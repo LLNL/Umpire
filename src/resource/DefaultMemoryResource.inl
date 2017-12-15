@@ -14,7 +14,6 @@ namespace resource {
 template<typename _allocator>
 DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform) :
   m_allocator(),
-  m_allocations(),
   m_current_size(0l),
   m_highwatermark(0l),
   m_platform(platform)

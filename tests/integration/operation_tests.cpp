@@ -162,5 +162,7 @@ TEST(Operation, CopyOffset)
   array_two[11] = 0.0;
 
   rm.copy(&array_one[10], &array_two[11], sizeof(double));
+
+  ASSERT_EQ(array_one[10], array_two[11]);
 }
 
