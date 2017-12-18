@@ -153,12 +153,13 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
   auto op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
-  auto dst_alloc_record = m_allocations.find(src_ptr);
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
 
   std::size_t src_size = src_alloc_record->m_size;
   std::size_t dst_size = dst_alloc_record->m_size;
 
   if (size == 0) {
+
     if (src_size > dst_size) {
       UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
     }
