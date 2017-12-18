@@ -12,7 +12,7 @@ TEST(AllocationMap, AddFindRemove)
 
   int* pointer = new int[10];
 
-  umpire::util::AllocationRecord* record = new umpire::util::AllocationRecord{pointer, 10};
+  umpire::util::AllocationRecord* record = new umpire::util::AllocationRecord{pointer, 10, nullptr};
 
   map.insert((void*)pointer, record);
 
