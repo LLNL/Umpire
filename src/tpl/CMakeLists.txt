@@ -3,3 +3,4 @@ if (ENABLE_CUDA)
 endif ()
 
 add_subdirectory(simpool)
+add_subdirectory(judy)

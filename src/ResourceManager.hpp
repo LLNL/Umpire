@@ -10,6 +10,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocatorTraits.hpp"
+#include "umpire/util/AllocationMap.hpp"
 
 namespace umpire {
 
@@ -39,10 +40,10 @@ class ResourceManager
     void setDefaultAllocator(Allocator allocator);
     Allocator getDefaultAllocator();
     
-    void registerAllocation(void* ptr, std::shared_ptr<strategy::AllocationStrategy> space);
+    void registerAllocation(void* ptr, util::AllocationRecord* record);
     void deregisterAllocation(void* ptr);
 
-    void copy(void* src_ptr, void* dst_ptr);
+    void copy(void* src_ptr, void* dst_ptr, size_t size=0);
 
     /*
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
@@ -50,6 +51,8 @@ class ResourceManager
      * \param ptr Pointer to deallocate
      */
     void deallocate(void* ptr);
+
+    size_t getSize(void* ptr);
 
   private:
     ResourceManager();
@@ -66,7 +69,7 @@ class ResourceManager
 
     std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators;
 
-    std::unordered_map<void*, std::shared_ptr<strategy::AllocationStrategy> > m_allocation_to_allocator;
+    util::AllocationMap m_allocations;
 
     std::shared_ptr<strategy::AllocationStrategy> m_default_allocator;
 

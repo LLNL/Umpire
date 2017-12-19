@@ -8,7 +8,7 @@
 #include "umpire/strategy/GenericAllocationStrategyFactory.hpp"
 #include "umpire/strategy/AllocationStrategyRegistry.hpp"
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 

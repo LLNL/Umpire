@@ -73,12 +73,6 @@ Pool::getHighWatermark()
   return m_highwatermark;
 }
 
-size_t
-Pool::getSize(void* ptr)
-{
-  return m_allocator->getSize(ptr);
-}
-
 Platform
 Pool::getPlatform()
 {

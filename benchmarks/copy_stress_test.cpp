@@ -37,7 +37,7 @@ int do_copy(std::string src, std::string dst, std::size_t size = 4096) {
   return 0;
 }
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
   do_copy("HOST", "HOST");
 
 #if defined(ENABLE_CUDA)

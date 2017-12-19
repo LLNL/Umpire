@@ -24,7 +24,6 @@ class Pool :
     long getCurrentSize();
     long getHighWatermark();
 
-    size_t getSize(void* ptr);
     Platform getPlatform();
 
   private:

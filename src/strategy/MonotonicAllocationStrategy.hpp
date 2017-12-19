@@ -2,7 +2,6 @@
 #define UMPIRE_MonotonicAllocationStrategy_HPP
 
 #include <vector>
-#include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocatorTraits.hpp"
@@ -32,8 +31,6 @@ class MonotonicAllocationStrategy :
 
     size_t m_size;
     size_t m_capacity;
-
-    std::unordered_map<void*, size_t> m_sizes;
 
     std::shared_ptr<AllocationStrategy> m_allocator;
 };

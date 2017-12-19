@@ -13,8 +13,7 @@ SimpoolAllocationStrategy::SimpoolAllocationStrategy(
   dpa(nullptr),
   m_current_size(0),
   m_highwatermark(0),
-  m_allocator(),
-  m_allocations()
+  m_allocator()
 {
   m_allocator = providers[0];
   dpa = new DynamicPoolAllocator<>(m_allocator);
@@ -23,9 +22,7 @@ SimpoolAllocationStrategy::SimpoolAllocationStrategy(
 void*
 SimpoolAllocationStrategy::allocate(size_t bytes) { 
   void* ptr = dpa->allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, this->shared_from_this());
-
-  m_allocations[ptr] = {ptr, bytes};
+  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
@@ -37,13 +34,9 @@ SimpoolAllocationStrategy::allocate(size_t bytes) {
 void 
 SimpoolAllocationStrategy::deallocate(void* ptr) {
   dpa->deallocate(ptr);
-  ResourceManager::getInstance().deregisterAllocation(ptr);
+  m_current_size -= ResourceManager::getInstance().getSize(ptr);
 
-  auto allocation = m_allocations.find(ptr);
-  if (allocation != m_allocations.end()) {
-    m_current_size -= allocation->second.m_size;
-    m_allocations.erase(allocation);
-  }
+  ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
 long 
@@ -56,17 +49,6 @@ long
 SimpoolAllocationStrategy::getHighWatermark()
 { 
   return m_highwatermark;
-}
-
-size_t 
-SimpoolAllocationStrategy::getSize(void* ptr)
-{ 
-  auto allocation = m_allocations.find(ptr);
-  if (allocation == m_allocations.end()) {
-    UMPIRE_ERROR("size for " << ptr << " not found");
-  }
-
-  return allocation->second.m_size;
 }
 
 Platform 

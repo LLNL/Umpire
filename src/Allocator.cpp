@@ -1,5 +1,7 @@
 #include "umpire/Allocator.hpp"
 
+#include "umpire/ResourceManager.hpp"
+
 namespace umpire {
 
 Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator):
@@ -22,7 +24,7 @@ Allocator::deallocate(void* ptr)
 size_t
 Allocator::getSize(void* ptr)
 {
-  return m_allocator->getSize(ptr);
+  return ResourceManager::getInstance().getSize(ptr);
 }
 
 size_t

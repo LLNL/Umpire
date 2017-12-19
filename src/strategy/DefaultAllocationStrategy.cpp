@@ -20,12 +20,6 @@ DefaultAllocationStrategy::deallocate(void* ptr)
   return m_allocator->deallocate(ptr);
 }
 
-size_t 
-DefaultAllocationStrategy::getSize(void* ptr)
-{
-  return m_allocator->getSize(ptr);
-}
-
 long 
 DefaultAllocationStrategy::getCurrentSize()
 {

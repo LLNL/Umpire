@@ -3,9 +3,6 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 
-#include <memory>
-#include <unordered_map>
-
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -22,7 +19,6 @@ class DefaultMemoryResource :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    size_t getSize(void* ptr);
     long getCurrentSize();
     long getHighWatermark();
 
@@ -30,8 +26,6 @@ class DefaultMemoryResource :
 
   protected: 
     _allocator m_allocator;
-
-    std::unordered_map<void*, util::AllocationRecord> m_allocations;
 
     long m_current_size;
     long m_highwatermark;
