@@ -1,11 +1,15 @@
 #include "umpire/util/Logger.hpp"
 
-#include <iostream> // for std::cout, std::cerr
+#include <iostream>   // for std::cout, std::cerr
+#include <stdlib.h>   // for getenv()
+#include <strings.h>  // for strcasecmp()
 
 namespace umpire {
 namespace util {
 
+static const char* env_name = "UMPIRE_LOG_LEVEL";
 static message::Level defaultLevel = message::Info;
+Logger* Logger::s_Logger = nullptr;
 
 static const std::string MessageLevelName[ message::Num_Levels ] = {
   "ERROR",
@@ -13,8 +17,6 @@ static const std::string MessageLevelName[ message::Num_Levels ] = {
   "INFO",
   "DEBUG"
 };
-
-Logger* Logger::s_Logger = nullptr;
 
 Logger::Logger()
 {
@@ -50,10 +52,23 @@ void Logger::logMessage( message::Level level,
 
 void Logger::initialize()
 {
-  if ( s_Logger == nullptr ) {
-    s_Logger = new Logger();
-    s_Logger->setLoggingMsgLevel(defaultLevel);
+  if ( s_Logger != nullptr )
+    return;
+
+  message::Level level = defaultLevel;
+  char* enval = getenv(env_name);
+
+  if ( enval != NULL ) {
+    for ( int i = 0; i < message::Num_Levels; ++i ) {
+      if ( strcasecmp( enval, MessageLevelName[ i ].c_str() ) == 0 ) {
+        level = (message::Level)i;
+        break;
+      }
+    }
   }
+
+  s_Logger = new Logger();
+  s_Logger->setLoggingMsgLevel(level);
 }
 
 void Logger::finalize()
