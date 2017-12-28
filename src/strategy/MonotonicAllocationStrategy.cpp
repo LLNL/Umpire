@@ -34,7 +34,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 void 
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {
-  UMPIRE_LOG("MonoticAllocationStrategy: deallocate doesn't do anything");
+  UMPIRE_LOG(Info, "MonoticAllocationStrategy: deallocate doesn't do anything");
   // no op
 }
 
