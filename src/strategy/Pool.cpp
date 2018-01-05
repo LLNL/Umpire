@@ -46,12 +46,14 @@ Pool::allocate(size_t bytes)
      }
   }
 
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
   return ptr;
 }
 
 void
 Pool::deallocate(void* ptr)
 {
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   for (size_t i = 0; i < m_slots; ++i) {
     if (m_pointers[i] == ptr) {
       m_lengths[i] = -m_lengths[i];
@@ -64,12 +66,14 @@ Pool::deallocate(void* ptr)
 long 
 Pool::getCurrentSize()
 {
+  UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 long 
 Pool::getHighWatermark()
 {
+  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 

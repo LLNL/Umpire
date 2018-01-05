@@ -27,6 +27,7 @@ ResourceManager::getInstance()
     s_resource_manager_instance = new ResourceManager();
   }
 
+  UMPIRE_LOG(Debug, "() returning " << s_resource_manager_instance);
   return *s_resource_manager_instance;
 }
 
@@ -36,6 +37,7 @@ ResourceManager::ResourceManager() :
   m_allocations(),
   m_memory_resources()
 {
+  UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
@@ -51,11 +53,13 @@ ResourceManager::ResourceManager() :
 #endif
 
   initialize();
+  UMPIRE_LOG(Debug, "() leaving");
 }
 
 void
 ResourceManager::initialize()
 {
+  UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
@@ -83,11 +87,13 @@ ResourceManager::initialize()
 
   m_allocators["UM"] = m_memory_resources["UM"];
 #endif
+  UMPIRE_LOG(Debug, "() leaving");
 }
 
 std::shared_ptr<strategy::AllocationStrategy>&
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
+  UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators.find(name);
   if (allocator == m_allocators.end()) {
     UMPIRE_ERROR("Allocator \"" << name << "\" not found.");
@@ -99,6 +105,7 @@ ResourceManager::getAllocationStrategy(const std::string& name)
 Allocator
 ResourceManager::getAllocator(const std::string& name)
 {
+  UMPIRE_LOG(Debug, "(\"" << name << "\")");
   return Allocator(getAllocationStrategy(name));
 }
 
@@ -109,6 +116,7 @@ ResourceManager::makeAllocator(
     util::AllocatorTraits traits,
     std::vector<Allocator> providers)
 {
+  UMPIRE_LOG(Debug, "(name=\"" << name << "\", strategy=\"" << strategy << "\")");
   strategy::AllocationStrategyRegistry& registry =
     strategy::AllocationStrategyRegistry::getInstance();
 
@@ -128,27 +136,26 @@ ResourceManager::makeAllocator(
 Allocator
 ResourceManager::getAllocator(void* ptr)
 {
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return Allocator(findAllocatorForPointer(ptr));
 }
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
 {
-  //UMPIRE_LOG(Debug, "Registering " << ptr << " to " << space << " with rm " << this);
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", record=" << record << ") with " << this );
+
   m_allocations.insert(ptr, record);
-
-  //m_allocation_to_allocator[ptr] = space;
-
 }
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
-  //UMPIRE_LOG(Debug, "Deregistering " << ptr);
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   m_allocations.remove(ptr);
 }
 
 void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
 {
-  UMPIRE_LOG(Debug, "Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
   auto op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -176,6 +183,7 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
 
 void ResourceManager::deallocate(void* ptr)
 {
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto allocator = findAllocatorForPointer(ptr);;
 
   allocator->deallocate(ptr);
@@ -185,6 +193,7 @@ size_t
 ResourceManager::getSize(void* ptr)
 {
   auto record = m_allocations.find(ptr);
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);
   return record->m_size;
 }
 
@@ -196,6 +205,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
     UMPIRE_ERROR("Cannot find allocator " << ptr);
   }
 
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->m_strategy);
   return allocation_record->m_strategy;
 }
 
@@ -207,6 +217,7 @@ ResourceManager::getAvailableAllocators()
     names.push_back(it->first);
   }
 
+  UMPIRE_LOG(Debug, "() returning " << names.size() << " allocators");
   return names;
 }
 

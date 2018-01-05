@@ -1,5 +1,4 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-
 #include "umpire/util/Macros.hpp"
 
 #include "umpire/util/AllocatorTraits.hpp"
@@ -28,25 +27,28 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
     UMPIRE_ERROR("MonoticAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
   return ret;
 }
 
 void 
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {
-  UMPIRE_LOG(Info, "MonoticAllocationStrategy: deallocate doesn't do anything");
+  UMPIRE_LOG(Info, "() doesn't do anything");
   // no op
 }
 
 long 
 MonotonicAllocationStrategy::getCurrentSize()
 {
+  UMPIRE_LOG(Debug, "() returning " << m_size);
   return m_size;
 }
 
 long 
 MonotonicAllocationStrategy::getHighWatermark()
 {
+  UMPIRE_LOG(Debug, "() returning " << m_capacity);
   return m_capacity;
 }
 

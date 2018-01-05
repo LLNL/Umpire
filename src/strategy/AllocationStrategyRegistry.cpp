@@ -20,17 +20,20 @@ AllocationStrategyRegistry::getInstance()
     s_allocator_registry_instance = new AllocationStrategyRegistry();
   }
 
+  UMPIRE_LOG(Debug, "() returning " << s_allocator_registry_instance);
   return *s_allocator_registry_instance;
 }
 
 AllocationStrategyRegistry::AllocationStrategyRegistry() :
   m_allocator_factories()
 {
+  UMPIRE_LOG(Debug, "() entered");
   registerAllocationStrategy(
       std::make_shared<GenericAllocationStrategyFactory<SimpoolAllocationStrategy> >("POOL"));
 
   registerAllocationStrategy(
       std::make_shared<GenericAllocationStrategyFactory<MonotonicAllocationStrategy> >("MONOTONIC"));
+  UMPIRE_LOG(Debug, "() leaving");
 }
 
 void

@@ -25,6 +25,7 @@ MemoryOperationRegistry::getInstance()
 {
   if (!s_memory_operation_registry_instance) {
     s_memory_operation_registry_instance = new MemoryOperationRegistry();
+    UMPIRE_LOG(Info, "() Created MemoryOperationRegistry at " << s_memory_operation_registry_instance);
   }
 
   return *s_memory_operation_registry_instance;

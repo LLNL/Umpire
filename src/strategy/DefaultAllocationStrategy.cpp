@@ -1,4 +1,5 @@
 #include "umpire/strategy/DefaultAllocationStrategy.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -11,12 +12,14 @@ DefaultAllocationStrategy::DefaultAllocationStrategy(std::shared_ptr<AllocationS
 void* 
 DefaultAllocationStrategy::allocate(size_t bytes)
 {
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   return m_allocator->allocate(bytes);
 }
 
 void 
 DefaultAllocationStrategy::deallocate(void* ptr)
 {
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return m_allocator->deallocate(ptr);
 }
 
