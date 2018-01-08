@@ -3,12 +3,14 @@ set (umpire_util_headers
   AllocationRecord.hpp
   AllocatorTraits.hpp
   Exception.hpp
+  Logger.hpp
   Macros.hpp
   Platform.hpp)
 
 set (umpire_util_sources
   AllocationMap.cpp
-  Exception.cpp)
+  Exception.cpp
+  Logger.cpp)
 
 blt_add_library(
   NAME umpire_util
@@ -23,3 +25,4 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+

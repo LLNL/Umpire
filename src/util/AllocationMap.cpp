@@ -16,7 +16,7 @@ AllocationMap::~AllocationMap()
 void
 AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
 {
-  UMPIRE_LOG("Inserting " << ptr);
+  UMPIRE_LOG(Debug, "Inserting " << ptr);
 
   m_records.insert(
       reinterpret_cast<uintptr_t>(ptr),
@@ -26,7 +26,7 @@ AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
 void
 AllocationMap::remove(void* ptr)
 {
-  UMPIRE_LOG("Removing " << ptr);
+  UMPIRE_LOG(Debug, "Removing " << ptr);
 
   m_records.remove(reinterpret_cast<uintptr_t>(ptr));
 }
@@ -34,7 +34,7 @@ AllocationMap::remove(void* ptr)
 AllocationRecord*
 AllocationMap::find(void* ptr)
 {
-  UMPIRE_LOG("Searching for " << ptr);
+  UMPIRE_LOG(Debug, "Searching for " << ptr);
   AddressPair record = 
     m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
 
@@ -42,7 +42,7 @@ AllocationMap::find(void* ptr)
   AllocationRecord* alloc_record = reinterpret_cast<AllocationRecord*>(record.value);
 
   if (alloc_record && ((static_cast<char*>(parent_ptr) + alloc_record->m_size) > static_cast<char*>(ptr))) {
-    UMPIRE_LOG("Found " << ptr << " at " << parent_ptr << " with size " << alloc_record->m_size);
+    UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr << " with size " << alloc_record->m_size);
     return alloc_record;
   } else {
     UMPIRE_ERROR("Allocation not mapped: " << ptr);

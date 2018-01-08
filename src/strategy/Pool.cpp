@@ -17,7 +17,7 @@ Pool::Pool(
   m_allocator = providers[0];
 
 
-  UMPIRE_LOG("Creating " << m_slots << "-slot pool.");
+  UMPIRE_LOG(Debug, "Creating " << m_slots << "-slot pool.");
 
   m_lengths = new size_t[m_slots];
   m_pointers = new void*[m_slots];

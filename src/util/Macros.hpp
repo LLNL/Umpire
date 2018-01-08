@@ -17,16 +17,21 @@
 
 #if defined(NDEBUG)
 
-#define UMPIRE_LOG( msg )
+#define UMPIRE_LOG( lvl, msg )
 
 #else
 
-#define UMPIRE_LOG( msg )                                          \
+#include "umpire/util/Logger.hpp"
+
+#define UMPIRE_LOG( lvl, msg )                                     \
 {                                                                  \
-  std::ostringstream umpire_oss_log;                               \
-  umpire_oss_log << msg;                                           \
-  std::cout << "[" << __FILE__  << ":" << __LINE__ << "]:";        \
-  std::cout << msg << std::endl;                                   \
+  std::ostringstream local_msg;                                    \
+  local_msg << msg;                                                \
+  umpire::util::Logger::getActiveLogger()->logMessage(             \
+      umpire::util::message::lvl,                                  \
+      local_msg.str(),                                             \
+      std::string(__FILE__),                                       \
+      __LINE__);                                                   \
 }
 
 #endif // defined(NDEBUG)

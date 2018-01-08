@@ -133,7 +133,7 @@ ResourceManager::getAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
 {
-  //UMPIRE_LOG("Registering " << ptr << " to " << space << " with rm " << this);
+  //UMPIRE_LOG(Debug, "Registering " << ptr << " to " << space << " with rm " << this);
   m_allocations.insert(ptr, record);
 
   //m_allocation_to_allocator[ptr] = space;
@@ -142,13 +142,13 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* reco
 
 void ResourceManager::deregisterAllocation(void* ptr)
 {
-  //UMPIRE_LOG("Deregistering " << ptr);
+  //UMPIRE_LOG(Debug, "Deregistering " << ptr);
   m_allocations.remove(ptr);
 }
 
 void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
 {
-  UMPIRE_LOG("Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
+  UMPIRE_LOG(Debug, "Copying " << src_ptr << " to " << dst_ptr << " with rm @" << this);
 
   auto op_registry = op::MemoryOperationRegistry::getInstance();
 
