@@ -7,7 +7,6 @@
 
 #include <memory>
 #include <sstream>
-#include <cxxabi.h>
 
 namespace umpire {
 namespace resource {
