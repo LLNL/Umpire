@@ -26,7 +26,7 @@
 #define UMPIRE_LOG( lvl, msg )                                     \
 {                                                                  \
   std::ostringstream local_msg;                                    \
-  local_msg << msg;                                                \
+  local_msg  << " " << __func__ << " " << msg,                     \
   umpire::util::Logger::getActiveLogger()->logMessage(             \
       umpire::util::message::lvl,                                  \
       local_msg.str(),                                             \

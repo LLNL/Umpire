@@ -12,6 +12,7 @@ struct CudaMallocManagedAllocator
   {
     void* ptr = nullptr;
     cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
+    UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
       UMPIRE_ERROR("cudaMallocManaged failed allocating " << bytes << "bytes, with: " << cudaGetErrorString(error));
     } else {
@@ -21,6 +22,7 @@ struct CudaMallocManagedAllocator
 
   void deallocate(void* ptr)
   {
+    UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::cudaFree(ptr);
   }
 };

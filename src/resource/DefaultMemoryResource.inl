@@ -30,12 +30,16 @@ void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
   if (m_current_size > m_highwatermark)
     m_highwatermark = m_current_size;
 
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
+
   return ptr;
 }
 
 template<typename _allocator>
 void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 {
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+
   m_allocator.deallocate(ptr);
   m_current_size -= ResourceManager::getInstance().getSize(ptr);
   ResourceManager::getInstance().deregisterAllocation(ptr);
@@ -45,12 +49,14 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 template<typename _allocator>
 long DefaultMemoryResource<_allocator>::getCurrentSize()
 {
+  UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 template<typename _allocator>
 long DefaultMemoryResource<_allocator>::getHighWatermark()
 {
+  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 

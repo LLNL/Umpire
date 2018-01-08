@@ -20,7 +20,9 @@ SimpoolAllocationStrategy::SimpoolAllocationStrategy(
 }
 
 void*
-SimpoolAllocationStrategy::allocate(size_t bytes) { 
+SimpoolAllocationStrategy::allocate(size_t bytes)
+{
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   void* ptr = dpa->allocate(bytes);
   ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
 
@@ -32,7 +34,9 @@ SimpoolAllocationStrategy::allocate(size_t bytes) {
 }
 
 void 
-SimpoolAllocationStrategy::deallocate(void* ptr) {
+SimpoolAllocationStrategy::deallocate(void* ptr)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
   m_current_size -= ResourceManager::getInstance().getSize(ptr);
 
@@ -48,6 +52,7 @@ SimpoolAllocationStrategy::getCurrentSize()
 long 
 SimpoolAllocationStrategy::getHighWatermark()
 { 
+  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
