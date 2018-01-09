@@ -20,7 +20,7 @@ UnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 std::shared_ptr<MemoryResource>
 UnifiedMemoryResourceFactory::create()
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator> >(Platform::cuda);
+  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator> >(Platform::cuda, "UM");
 }
 
 } // end of namespace resource

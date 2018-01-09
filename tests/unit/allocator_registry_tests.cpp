@@ -14,7 +14,7 @@ class MockAllocatorFactory : public umpire::strategy::AllocationStrategyFactory
   public:
   MOCK_METHOD1(isValidAllocationStrategyFor, bool(const std::string& name));
   MOCK_METHOD0(create, std::shared_ptr<umpire::strategy::AllocationStrategy>());
-  MOCK_METHOD2(createWithTraits, std::shared_ptr<umpire::strategy::AllocationStrategy>(umpire::util::AllocatorTraits, std::vector<std::shared_ptr<umpire::strategy::AllocationStrategy> >));
+  MOCK_METHOD3(createWithTraits, std::shared_ptr<umpire::strategy::AllocationStrategy>(const std::string& name, umpire::util::AllocatorTraits, std::vector<std::shared_ptr<umpire::strategy::AllocationStrategy> >));
 };
 
 TEST(AllocatorRegistry, Constructor) {
@@ -33,7 +33,7 @@ TEST(AllocationStrategyRegistry, RegisterAndCreate) {
     .WillOnce(Return(true));
   EXPECT_CALL(*mock_allocator_factory, isValidAllocationStrategyFor("unknown"))
     .WillRepeatedly(Return(false));
-  EXPECT_CALL(*mock_allocator_factory, createWithTraits(_, _))
+  EXPECT_CALL(*mock_allocator_factory, createWithTraits(_, _, _))
     .Times(1);
 
   umpire::strategy::AllocationStrategyRegistry& reg = umpire::strategy::AllocationStrategyRegistry::getInstance();

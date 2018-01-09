@@ -8,8 +8,10 @@ namespace umpire {
 namespace strategy {
 
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
+    const std::string& name,
     util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+  AllocationStrategy(name),
   m_size(0)
 {
   m_capacity = std::max(traits.m_maximum_size, traits.m_initial_size);

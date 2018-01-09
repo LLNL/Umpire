@@ -15,6 +15,7 @@ class GenericAllocationStrategyFactory
     bool isValidAllocationStrategyFor(const std::string& name);
     std::shared_ptr<AllocationStrategy> create();
     std::shared_ptr<AllocationStrategy> createWithTraits(
+        const std::string& name,
         util::AllocatorTraits traits,
         std::vector<std::shared_ptr<AllocationStrategy> > providers);
   private:

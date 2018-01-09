@@ -8,8 +8,10 @@ namespace umpire {
 namespace strategy {
 
 SimpoolAllocationStrategy::SimpoolAllocationStrategy(
+    const std::string& name,
     util::AllocatorTraits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+  AllocationStrategy(name),
   dpa(nullptr),
   m_current_size(0),
   m_highwatermark(0),

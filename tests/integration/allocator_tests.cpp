@@ -145,3 +145,12 @@ TEST(Allocator, DeallocateThrow)
   double* ptr = new double[20];
   ASSERT_ANY_THROW(rm.deallocate(ptr));
 }
+
+TEST(Allocator, Name)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator alloc = rm.getAllocator("HOST");
+
+  ASSERT_EQ(alloc.getName(), "HOST");
+}

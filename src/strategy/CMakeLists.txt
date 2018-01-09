@@ -10,6 +10,7 @@ set (umpire_strategy_headers
   SimpoolAllocationStrategy.hpp)
 
 set (umpire_stategy_sources
+  AllocationStrategy.cpp
   AllocationStrategyRegistry.cpp
   DefaultAllocationStrategy.cpp
   MonotonicAllocationStrategy.cpp

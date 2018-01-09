@@ -9,6 +9,7 @@ set (umpire_resource_headers
 
 set (umpire_resource_sources
   HostResourceFactory.cpp
+  MemoryResource.cpp
   MemoryResourceRegistry.cpp
 )
 

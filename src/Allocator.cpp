@@ -43,6 +43,12 @@ Allocator::getCurrentSize()
   return m_allocator->getCurrentSize();
 }
 
+std::string
+Allocator::getName()
+{
+  return m_allocator->getName();
+}
+
 std::shared_ptr<strategy::AllocationStrategy>
 Allocator::getAllocationStrategy()
 {

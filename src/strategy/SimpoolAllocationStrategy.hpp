@@ -16,6 +16,7 @@ class SimpoolAllocationStrategy : public AllocationStrategy
 {
   public:
     SimpoolAllocationStrategy(
+        const std::string& name,
       util::AllocatorTraits,
       std::vector<std::shared_ptr<AllocationStrategy> > providers);
 

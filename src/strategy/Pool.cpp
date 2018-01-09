@@ -7,8 +7,10 @@ namespace umpire {
 namespace strategy {
 
 Pool::Pool(
+    const std::string& name,
     util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+  AllocationStrategy(name),
   m_current_size(0),
   m_highwatermark(0)
 {

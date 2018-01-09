@@ -47,7 +47,7 @@ AllocationStrategyRegistry::makeAllocationStrategy(const std::string& name, util
 {
   for (auto allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidAllocationStrategyFor(name)) {
-        return allocator_factory->createWithTraits(traits, providers);
+        return allocator_factory->createWithTraits(name, traits, providers);
     }
   }
 
