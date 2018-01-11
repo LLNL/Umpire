@@ -23,18 +23,13 @@ GenericAllocationStrategyFactory<ALLOC_STRATEGY>::isValidAllocationStrategyFor(c
 
 template <typename ALLOC_STRATEGY>
 std::shared_ptr<AllocationStrategy> 
-GenericAllocationStrategyFactory<ALLOC_STRATEGY>::create()
-{
-  UMPIRE_ERROR("GenericAllocationStrategyFactory empty create()");
-}
-
-template <typename ALLOC_STRATEGY>
-std::shared_ptr<AllocationStrategy> 
-GenericAllocationStrategyFactory<ALLOC_STRATEGY>::createWithTraits(
+GenericAllocationStrategyFactory<ALLOC_STRATEGY>::create(
+    const std::string& name,
+    int id,
     util::AllocatorTraits traits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers)
 {
-  return std::make_shared<ALLOC_STRATEGY>(traits, providers);
+  return std::make_shared<ALLOC_STRATEGY>(name, id, traits, providers);
 }
 
 }

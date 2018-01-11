@@ -14,6 +14,8 @@ class MemoryResource :
   public strategy::AllocationStrategy
 {
   public:
+    MemoryResource(const std::string& name, int id);
+
     /*!
      * \brief Allocate bytes of memory.
      *
