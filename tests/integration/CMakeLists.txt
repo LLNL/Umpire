@@ -24,21 +24,6 @@ blt_add_test(
   COMMAND allocator_tests)
 
 blt_add_executable(
-  NAME strategy_tests
-  SOURCES strategy_tests.cpp
-  DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
-
-target_include_directories(
-  strategy_tests
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
-
-blt_add_test(
-  NAME strategy_tests
-  COMMAND strategy_tests)
-
-blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
   DEPENDS_ON umpire gtest
