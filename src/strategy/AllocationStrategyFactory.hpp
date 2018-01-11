@@ -17,10 +17,9 @@ class AllocationStrategyFactory {
   public:
     virtual bool isValidAllocationStrategyFor(const std::string& name) = 0;
 
-    virtual std::shared_ptr<AllocationStrategy> create() = 0;
-
-    virtual std::shared_ptr<AllocationStrategy> createWithTraits(
+    virtual std::shared_ptr<AllocationStrategy> create(
         const std::string& name,
+        int id,
         util::AllocatorTraits traits,
         std::vector<std::shared_ptr<AllocationStrategy> > providers) = 0;
 };

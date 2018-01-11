@@ -34,8 +34,10 @@ ResourceManager::getInstance()
 ResourceManager::ResourceManager() :
   m_allocator_names(),
   m_allocators(),
+  m_allocators_by_id(),
   m_allocations(),
-  m_memory_resources()
+  m_memory_resources(),
+  m_next_id(0)
 {
   UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
@@ -63,17 +65,19 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources["HOST"] = registry.makeMemoryResource("HOST");
+  m_memory_resources["HOST"] = registry.makeMemoryResource("HOST", m_next_id++);
 
 #if defined(ENABLE_CUDA)
-  m_memory_resources["DEVICE"] = registry.makeMemoryResource("DEVICE");
-  m_memory_resources["UM"] = registry.makeMemoryResource("UM");
+  m_memory_resources["DEVICE"] = registry.makeMemoryResource("DEVICE", m_next_id++);
+  m_memory_resources["UM"] = registry.makeMemoryResource("UM", m_next_id++);
 #endif
 
   /*
    * Construct default allocators for each resource
    */
-  m_allocators["HOST"] = m_memory_resources["HOST"];
+  auto host_allocator = m_memory_resources["HOST"];
+  m_allocators["HOST"] = host_allocator;
+  m_allocators_by_id[host_allocator->getId()] = host_allocator;
 
 #if defined(ENABLE_CUDA)
   /*
@@ -83,9 +87,13 @@ ResourceManager::initialize()
    *  m_allocators["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
    */
 
-  m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
+  auto device_allocator = m_memory_resources["DEVICE"];
+  m_allocators["DEVICE"] = device_allocator;
+  m_allocators_by_id[device_allocator->getId()] = device_allocator;
 
-  m_allocators["UM"] = m_memory_resources["UM"];
+  auto um_allocator = m_memory_resources["UM"];
+  m_allocators["UM"] = um_allocator;
+  m_allocators_by_id[um_allocator->getId()] = um_allocator;
 #endif
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -128,7 +136,9 @@ ResourceManager::makeAllocator(
     provider_strategies.push_back(provider.getAllocationStrategy());
   }
 
-  m_allocators[name] = registry.makeAllocationStrategy(strategy, traits, provider_strategies);
+  auto allocator = registry.makeAllocationStrategy(name, m_next_id++, strategy, traits, provider_strategies);
+  m_allocators[name] = allocator;
+  m_allocators_by_id[allocator->getId()] = allocator;
 
   return Allocator(m_allocators[name]);
 }

@@ -68,6 +68,8 @@ class Allocator {
      */
     std::string getName();
 
+    int getId();
+
     std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
   private:

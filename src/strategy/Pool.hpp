@@ -15,9 +15,11 @@ class Pool :
   public AllocationStrategy
 {
   public:
-    Pool(const std::string& name, 
-         util::AllocatorTraits traits,
-         std::vector<std::shared_ptr<AllocationStrategy> > providers);
+    Pool(
+        const std::string& name,
+        int id,
+       util::AllocatorTraits traits,
+       std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

@@ -14,7 +14,7 @@ class DefaultMemoryResource :
   public MemoryResource
 {
   public: 
-    DefaultMemoryResource(Platform platform, const std::string& name);
+    DefaultMemoryResource(Platform platform, const std::string& name, int id);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

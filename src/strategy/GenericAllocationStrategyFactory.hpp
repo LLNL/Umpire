@@ -12,10 +12,12 @@ class GenericAllocationStrategyFactory
   : public AllocationStrategyFactory {
   public:
     GenericAllocationStrategyFactory(const std::string& name);
+
     bool isValidAllocationStrategyFor(const std::string& name);
-    std::shared_ptr<AllocationStrategy> create();
-    std::shared_ptr<AllocationStrategy> createWithTraits(
+
+    std::shared_ptr<AllocationStrategy> create(
         const std::string& name,
+        int id,
         util::AllocatorTraits traits,
         std::vector<std::shared_ptr<AllocationStrategy> > providers);
   private:

@@ -43,11 +43,16 @@ AllocationStrategyRegistry::registerAllocationStrategy(std::shared_ptr<Allocatio
 }
 
 std::shared_ptr<umpire::strategy::AllocationStrategy>
-AllocationStrategyRegistry::makeAllocationStrategy(const std::string& name, util::AllocatorTraits traits, std::vector<std::shared_ptr<AllocationStrategy> > providers)
+AllocationStrategyRegistry::makeAllocationStrategy(
+    const std::string& name, 
+    int id,
+    const std::string& strategy,
+    util::AllocatorTraits traits, 
+    std::vector<std::shared_ptr<AllocationStrategy> > providers)
 {
   for (auto allocator_factory : m_allocator_factories) {
-    if (allocator_factory->isValidAllocationStrategyFor(name)) {
-        return allocator_factory->createWithTraits(name, traits, providers);
+    if (allocator_factory->isValidAllocationStrategyFor(strategy)) {
+        return allocator_factory->create(name, id, traits, providers);
     }
   }
 

@@ -17,9 +17,9 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-HostResourceFactory::create()
+HostResourceFactory::create(const std::string& name, int id)
 {
-  return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST");
+  return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST", id);
 }
 
 } // end of namespace resource

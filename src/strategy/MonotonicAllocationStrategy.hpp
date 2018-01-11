@@ -16,6 +16,7 @@ class MonotonicAllocationStrategy :
   public:
     MonotonicAllocationStrategy(
         const std::string& name,
+        int id,
         util::AllocatorTraits traits, 
         std::vector<std::shared_ptr<AllocationStrategy> > providers);
 

@@ -9,9 +9,10 @@ namespace strategy {
 
 SimpoolAllocationStrategy::SimpoolAllocationStrategy(
     const std::string& name,
+    int id,
     util::AllocatorTraits,
     std::vector<std::shared_ptr<AllocationStrategy> > providers) :
-  AllocationStrategy(name),
+  AllocationStrategy(name, id),
   dpa(nullptr),
   m_current_size(0),
   m_highwatermark(0),

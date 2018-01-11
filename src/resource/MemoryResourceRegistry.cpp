@@ -29,11 +29,11 @@ MemoryResourceRegistry::registerMemoryResource(std::shared_ptr<MemoryResourceFac
 }
 
 std::shared_ptr<umpire::resource::MemoryResource>
-MemoryResourceRegistry::makeMemoryResource(const std::string& name)
+MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
   for (auto allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
-        return allocator_factory->create();
+        return allocator_factory->create(name, id);
     }
   }
 
