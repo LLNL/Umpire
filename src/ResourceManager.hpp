@@ -67,7 +67,7 @@ class ResourceManager
 
     std::list<std::string> m_allocator_names;
 
-    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators;
+    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_name;
     std::unordered_map<int, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_id;
 
     util::AllocationMap m_allocations;

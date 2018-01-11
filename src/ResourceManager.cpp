@@ -33,8 +33,8 @@ ResourceManager::getInstance()
 
 ResourceManager::ResourceManager() :
   m_allocator_names(),
-  m_allocators(),
-  m_allocators_by_id(),
+  m_allocators_by_name(),
+  m_allocators_by_name_by_id(),
   m_allocations(),
   m_memory_resources(),
   m_next_id(0)
@@ -76,24 +76,24 @@ ResourceManager::initialize()
    * Construct default allocators for each resource
    */
   auto host_allocator = m_memory_resources["HOST"];
-  m_allocators["HOST"] = host_allocator;
-  m_allocators_by_id[host_allocator->getId()] = host_allocator;
+  m_allocators_by_name["HOST"] = host_allocator;
+  m_allocators_by_name_by_id[host_allocator->getId()] = host_allocator;
 
 #if defined(ENABLE_CUDA)
   /*
    *  strategy::AllocationStrategyRegistry& strategy_registry =
    *    strategy::AllocationStrategyRegistry::getInstance();
    *
-   *  m_allocators["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
+   *  m_allocators_by_name["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
    */
 
   auto device_allocator = m_memory_resources["DEVICE"];
-  m_allocators["DEVICE"] = device_allocator;
-  m_allocators_by_id[device_allocator->getId()] = device_allocator;
+  m_allocators_by_name["DEVICE"] = device_allocator;
+  m_allocators_by_name_by_id[device_allocator->getId()] = device_allocator;
 
   auto um_allocator = m_memory_resources["UM"];
-  m_allocators["UM"] = um_allocator;
-  m_allocators_by_id[um_allocator->getId()] = um_allocator;
+  m_allocators_by_name["UM"] = um_allocator;
+  m_allocators_by_name_by_id[um_allocator->getId()] = um_allocator;
 #endif
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -102,12 +102,12 @@ std::shared_ptr<strategy::AllocationStrategy>&
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
-  auto allocator = m_allocators.find(name);
-  if (allocator == m_allocators.end()) {
+  auto allocator = m_allocators_by_name.find(name);
+  if (allocator == m_allocators_by_name.end()) {
     UMPIRE_ERROR("Allocator \"" << name << "\" not found.");
   }
 
-  return m_allocators[name];
+  return m_allocators_by_name[name];
 }
 
 Allocator
@@ -137,10 +137,10 @@ ResourceManager::makeAllocator(
   }
 
   auto allocator = registry.makeAllocationStrategy(name, m_next_id++, strategy, traits, provider_strategies);
-  m_allocators[name] = allocator;
-  m_allocators_by_id[allocator->getId()] = allocator;
+  m_allocators_by_name[name] = allocator;
+  m_allocators_by_name_by_id[allocator->getId()] = allocator;
 
-  return Allocator(m_allocators[name]);
+  return Allocator(m_allocators_by_name[name]);
 }
 
 Allocator
@@ -223,7 +223,7 @@ std::vector<std::string>
 ResourceManager::getAvailableAllocators()
 {
   std::vector<std::string> names;
-  for(auto it = m_allocators.begin(); it != m_allocators.end(); ++it) {
+  for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
     names.push_back(it->first);
   }
 
