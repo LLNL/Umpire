@@ -62,7 +62,7 @@ TEST(MonotonicStrategy, Host)
   ASSERT_GE(allocator.getCurrentSize(), 100);
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
-  ASSERT_EQ(allocator.getName(), "host_monontonic_pool");
+  ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
 }
 
 #if defined(ENABLE_CUDA)
