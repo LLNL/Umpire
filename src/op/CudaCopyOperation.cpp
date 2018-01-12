@@ -1,16 +1,18 @@
 #include "CudaCopyOperation.hpp"
+#include "../util/AllocationRecord.hpp"
 
 #include <cuda_runtime_api.h>
+#include <umpire/util/AllocationRecord.hpp>
 
 namespace umpire {
 namespace op {
 
 void CudaCopyOperation::transform(
-    void** src_ptr,
-    void** dest_ptr,
+    umpire::util::AllocationRecord *src_allocation,
+    umpire::util::AllocationRecord *dest_ptr,
     size_t length)
 {
-  ::cudaMemcpy(*dest_ptr, *src_ptr, length, cudaMemcpyDeviceToDevice);
+  ::cudaMemcpy(*dest_ptr, *src_allocation, length, cudaMemcpyDeviceToDevice);
 }
 
 } // end of namespace op

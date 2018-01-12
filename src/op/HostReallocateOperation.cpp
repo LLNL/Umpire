@@ -1,16 +1,18 @@
 #include "HostReallocateOperation.hpp"
+#include "../util/AllocationRecord.hpp"
 
 #include <cstdlib>
+#include <umpire/util/AllocationRecord.hpp>
 
 namespace umpire {
 namespace op {
 
 void HostReallocateOperation::transform(
-    void** src_ptr,
-    void** dest_ptr,
+    util::AllocationRecord *src_allocation,
+    util::AllocationRecord *dest_ptr,
     size_t length)
 {
-  *dest_ptr = ::realloc(*src_ptr, length);
+  *dest_ptr = ::realloc(*src_allocation, length);
 }
 
 } // end of namespace op

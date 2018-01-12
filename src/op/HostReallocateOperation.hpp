@@ -1,7 +1,9 @@
 #ifndef UMPIRE_HostReallocateOperation_HPP
 #define UMPIRE_HostReallocateOperation_HPP
 
+#include <umpire/util/AllocationRecord.hpp>
 #include "MemoryOperation.hpp"
+#include "../util/AllocationRecord.hpp"
 
 namespace umpire {
 namespace op {
@@ -10,8 +12,8 @@ class HostReallocateOperation :
   public MemoryOperation {
  public:
   void transform(
-      void** src_ptr,
-      void** dst_ptr,
+      util::AllocationRecord *src_allocation,
+      util::AllocationRecord *dst_allocation,
       size_t length);
 };
 
