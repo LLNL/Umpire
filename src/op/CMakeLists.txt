@@ -1,6 +1,7 @@
 set (umpire_op_headers
   HostCopyOperation.hpp
   HostMemsetOperation.hpp
+  HostReallocateOperation.hpp
   MemoryOperation.hpp
   MemoryOperationRegistry.hpp)
 
@@ -16,6 +17,7 @@ endif ()
 set (umpire_op_sources
   HostCopyOperation.cpp
   HostMemsetOperation.cpp
+  HostReallocateOperation.cpp
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 

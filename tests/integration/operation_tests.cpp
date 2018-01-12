@@ -215,3 +215,27 @@ TEST(Operation, UmMemset)
   }
 }
 #endif
+
+TEST(Operation, HostReallocate)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+
+  double* array = static_cast<double*>(host_allocator.allocate(100*sizeof(double)));
+
+  for (int i = 0; i < 100; i++) {
+    array[i] = static_cast<double>(i);
+  }
+
+  double* new_array = static_cast<double*>(rm.reallocate((void**)&array, 50*sizeof(double)));
+
+  ASSERT_EQ(host_allocator.getSize(new_array), 50*sizeof(double));
+
+  ASSERT_THROW(
+      host_allocator.getSize(array),
+      umpire::util::Exception);
+
+  for (int i = 0; i < 50; i++) {
+    ASSERT_DOUBLE_EQ(new_array[i], static_cast<double>(i));
+  }
+}

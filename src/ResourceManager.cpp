@@ -157,7 +157,7 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
-  auto op_registry = op::MemoryOperationRegistry::getInstance();
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
   auto dst_alloc_record = m_allocations.find(dst_ptr);
@@ -185,7 +185,7 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
 
-  auto op_registry = op::MemoryOperationRegistry::getInstance();
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto alloc_record = m_allocations.find(ptr);
 
@@ -200,6 +200,34 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
       alloc_record->m_strategy);
 
   op->apply(&ptr, length, value);
+}
+
+void*
+ResourceManager::reallocate(void** src_ptr, size_t size)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  void* dst_ptr;
+
+  auto alloc_record = m_allocations.find(*src_ptr);
+  std::size_t src_size = alloc_record->m_size;
+
+  deregisterAllocation(*src_ptr);
+
+  auto op = op_registry.find("REALLOCATE", 
+      alloc_record->m_strategy, 
+      alloc_record->m_strategy);
+
+  op->transform(src_ptr, &dst_ptr, size);
+
+  alloc_record->m_size = size;
+  alloc_record->m_ptr = dst_ptr;
+
+  registerAllocation(dst_ptr, alloc_record);
+
+  return dst_ptr;
 }
 
 void ResourceManager::deallocate(void* ptr)

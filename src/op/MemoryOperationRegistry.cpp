@@ -4,6 +4,7 @@
 
 #include "umpire/op/HostCopyOperation.hpp"
 #include "umpire/op/HostMemsetOperation.hpp"
+#include "umpire/op/HostReallocateOperation.hpp"
 
 #if defined(ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
@@ -46,6 +47,10 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostMemsetOperation>());
 
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostReallocateOperation>());
 
 #if defined(ENABLE_CUDA)
   registerOperation(

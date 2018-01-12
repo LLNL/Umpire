@@ -47,6 +47,8 @@ class ResourceManager
 
     void memset(void* ptr, int val, size_t length=0);
 
+    void* reallocate(void** src_ptr, size_t size);
+
     /*
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
