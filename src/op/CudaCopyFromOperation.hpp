@@ -9,9 +9,9 @@ namespace op {
 class CudaCopyFromOperation :
   public MemoryOperation {
  public:
-  void operator()(
-      const void *src_ptr,
-      void* dst_ptr,
+  void transform(
+      void** src_ptr,
+      void** dst_ptr,
       size_t length);
 };
 

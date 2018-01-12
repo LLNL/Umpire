@@ -8,10 +8,15 @@ namespace op {
 
 class MemoryOperation {
   public:
-  virtual void operator()(
-      const void *src_ptr,
-      void* dst_ptr,
-      size_t length) = 0;
+    virtual void transform(
+        void** src_ptr,
+        void** dst_ptr,
+        size_t length);
+
+    virtual void apply(
+        void** src_ptr,
+        size_t length,
+        int val);
 };
 
 } // end of namespace op

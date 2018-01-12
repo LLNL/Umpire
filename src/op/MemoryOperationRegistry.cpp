@@ -3,11 +3,14 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/op/HostCopyOperation.hpp"
+#include "umpire/op/HostMemsetOperation.hpp"
 
 #if defined(ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
 #include "umpire/op/CudaCopyToOperation.hpp"
 #include "umpire/op/CudaCopyOperation.hpp"
+
+#include "umpire/op/CudaMemsetOperation.hpp"
 #endif
 
 
@@ -38,6 +41,12 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostCopyOperation>());
 
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostMemsetOperation>());
+
+
 #if defined(ENABLE_CUDA)
   registerOperation(
       "COPY",
@@ -53,6 +62,11 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "COPY",
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaMemsetOperation>());
 #endif
 }
 

@@ -178,7 +178,28 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
       src_alloc_record->m_strategy, 
       dst_alloc_record->m_strategy);
 
-  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
+  op->transform(&src_ptr, &dst_ptr, size);
+}
+
+void ResourceManager::memset(void* ptr, int value, size_t length)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  auto op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  std::size_t src_size = alloc_record->m_size;
+
+  if (length == 0) {
+    length = src_size;
+  }
+
+  auto op = op_registry.find("MEMSET", 
+      alloc_record->m_strategy, 
+      alloc_record->m_strategy);
+
+  op->apply(&ptr, length, value);
 }
 
 void ResourceManager::deallocate(void* ptr)

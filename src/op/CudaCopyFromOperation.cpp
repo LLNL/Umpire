@@ -5,12 +5,12 @@
 namespace umpire {
 namespace op {
 
-void CudaCopyFromOperation::operator()(
-    const void *src_ptr,
-    void* dest_ptr,
+void CudaCopyFromOperation::transform(
+    void** src_ptr,
+    void** dest_ptr,
     size_t length)
 {
-  ::cudaMemcpy(dest_ptr, src_ptr, length, cudaMemcpyDeviceToHost);
+  ::cudaMemcpy(*dest_ptr, *src_ptr, length, cudaMemcpyDeviceToHost);
 }
 
 } // end of namespace op
