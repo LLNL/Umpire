@@ -1,4 +1,5 @@
 set (umpire_op_headers
+  GenericReallocateOperation.hpp
   HostCopyOperation.hpp
   HostMemsetOperation.hpp
   HostReallocateOperation.hpp
@@ -15,6 +16,7 @@ if (ENABLE_CUDA)
 endif ()
 
 set (umpire_op_sources
+  GenericReallocateOperation.cpp
   HostCopyOperation.cpp
   HostMemsetOperation.cpp
   HostReallocateOperation.cpp

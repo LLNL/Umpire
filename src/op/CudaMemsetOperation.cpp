@@ -7,11 +7,12 @@ namespace op {
 
 void
 CudaMemsetOperation::apply(
-    void** ptr,
-    size_t length,
-    int value)
+    void* src_ptr,
+    util::AllocationRecord* allocation,
+    int value,
+    size_t length)
 {
-  ::cudaMemset(*ptr, value, length);
+  ::cudaMemset(src_ptr, value, length);
 }
 
 } // end of namespace op

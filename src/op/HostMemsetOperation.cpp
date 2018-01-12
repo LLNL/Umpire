@@ -7,11 +7,12 @@ namespace op {
 
 void
 HostMemsetOperation::apply(
-    void** ptr,
-    size_t length,
-    int value)
+    void* src_ptr,
+    util::AllocationRecord* allocation,
+    int value,
+    size_t length)
 {
-  std::memset(*ptr, value, length);
+  std::memset(src_ptr, value, length);
 }
 
 } // end of namespace op

@@ -1,14 +1,14 @@
-#ifndef UMPIRE_HostReallocateOperation_HPP
-#define UMPIRE_HostReallocateOperation_HPP
+#ifndef UMPIRE_GenericReallocateOperation_HPP
+#define UMPIRE_GenericReallocateOperation_HPP
 
-#include <umpire/util/AllocationRecord.hpp>
+#include "umpire/util/AllocationRecord.hpp"
+
 #include "MemoryOperation.hpp"
-#include "../util/AllocationRecord.hpp"
 
 namespace umpire {
 namespace op {
 
-class HostReallocateOperation : 
+class GenericReallocateOperation : 
   public MemoryOperation {
  public:
   void transform(
@@ -22,5 +22,5 @@ class HostReallocateOperation :
 } // end of naemspace op
 } // end of namespace umpire
 
-#endif // UMPIRE_HostReallocateOperation_HPP
+#endif // UMPIRE_GenericReallocateOperation_HPP
 

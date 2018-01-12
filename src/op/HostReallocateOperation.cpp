@@ -8,11 +8,13 @@ namespace umpire {
 namespace op {
 
 void HostReallocateOperation::transform(
+    void* src_ptr,
+    void* dst_ptr,
     util::AllocationRecord *src_allocation,
-    util::AllocationRecord *dest_ptr,
+    util::AllocationRecord *dst_allocation,
     size_t length)
 {
-  *dest_ptr = ::realloc(*src_allocation, length);
+  dst_allocation->m_ptr = ::realloc(src_ptr, length);
 }
 
 } // end of namespace op

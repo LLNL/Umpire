@@ -8,11 +8,17 @@ namespace umpire {
 namespace op {
 
 void CudaCopyOperation::transform(
+    void* src_ptr,
+    void* dst_ptr,
     umpire::util::AllocationRecord *src_allocation,
-    umpire::util::AllocationRecord *dest_ptr,
+    umpire::util::AllocationRecord *dst_allocation,
     size_t length)
 {
-  ::cudaMemcpy(*dest_ptr, *src_allocation, length, cudaMemcpyDeviceToDevice);
+  ::cudaMemcpy(
+      dst_ptr,
+      src_ptr,
+      length, 
+      cudaMemcpyDeviceToDevice);
 }
 
 } // end of namespace op

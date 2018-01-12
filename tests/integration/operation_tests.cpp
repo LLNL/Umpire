@@ -227,15 +227,37 @@ TEST(Operation, HostReallocate)
     array[i] = static_cast<double>(i);
   }
 
-  double* new_array = static_cast<double*>(rm.reallocate((void**)&array, 50*sizeof(double)));
+  double* new_array = static_cast<double*>(rm.reallocate(array, 50*sizeof(double)));
 
   ASSERT_EQ(host_allocator.getSize(new_array), 50*sizeof(double));
 
-  ASSERT_THROW(
-      host_allocator.getSize(array),
-      umpire::util::Exception);
 
   for (int i = 0; i < 50; i++) {
     ASSERT_DOUBLE_EQ(new_array[i], static_cast<double>(i));
   }
 }
+
+#if defined(ENABLE_CUDA)
+TEST(Operation, GenericReallocateDevice)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator device_allocator = rm.getAllocator("DEVICE");
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+
+  double* d_array = static_cast<double*>(device_allocator.allocate(100*sizeof(double)));
+
+  rm.memset(d_array, 0);
+
+  double* d_new_array = static_cast<double*>(rm.reallocate(d_array, 50*sizeof(double)));
+  double* h_array = static_cast<double*>(host_allocator.allocate(50*sizeof(double)));
+
+  ASSERT_EQ(device_allocator.getSize(d_new_array), 50*sizeof(double));
+
+  rm.copy(d_new_array, h_array);
+
+  for (int i = 0; i < 50; i++) {
+    ASSERT_DOUBLE_EQ(h_array[i], 0);
+  }
+}
+#endif
