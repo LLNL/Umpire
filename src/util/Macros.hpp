@@ -2,6 +2,7 @@
 #define UMPIRE_Macros_HPP
 
 #include "umpire/util/Exception.hpp"
+#include "umpire/config.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -23,7 +24,7 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#if defined(USE_SLIC_FOR_UMPIRE_LOG)
+#ifdef UMPIRE_ENABLE_SLIC
 #include "slic/Logger.hpp"
 #define UMPIRE_LOG( lvl, msg )                                                                \
 {                                                                                             \
@@ -33,7 +34,7 @@
     plog = axom::slic::Logger::getActiveLogger();                                             \
     axom::slic::message::Level level;                                                         \
     level = axom::slic::message::Level::Error;                                                \
-    char* enval = getenv("UMPIRE_LOG_LEVEL");                                               \
+    char* enval = getenv("UMPIRE_LOG_LEVEL");                                                 \
     if ( enval != NULL ) {                                                                    \
       for ( int i = 0; i < axom::slic::message::Level::Num_Levels; ++i ) {                    \
         if ( strcasecmp( enval, axom::slic::message::MessageLevelName[ i ].c_str() ) == 0 ) { \
@@ -45,23 +46,22 @@
     plog->setLoggingMsgLevel(level);                                                          \
   }                                                                                           \
   std::ostringstream local_msg;                                                               \
-  local_msg  << " " << __func__ << " " << msg;                                                \
+  local_msg  << " SLIC " << __func__ << " SLIC " << msg;                                                \
   plog->logMessage( axom::slic::message::lvl, local_msg.str(),                                \
                     std::string(__FILE__), __LINE__);                                         \
 }
 
 #else
-
 #include "umpire/util/Logger.hpp"
 #define UMPIRE_LOG( lvl, msg )                                                                \
 {                                                                                             \
   std::ostringstream local_msg;                                                               \
-  local_msg  << " " << __func__ << " " << msg,                                                \
+  local_msg  << " UMPIRE " << __func__ << " UMPIRE " << msg,                                                \
   umpire::util::Logger::getActiveLogger()->logMessage(                                        \
       umpire::util::message::lvl, local_msg.str(),                                            \
       std::string(__FILE__), __LINE__);                                                       \
 }
-#endif // defined(USE_SLIC_FOR_UMPIRE_LOG)
+#endif // UMPIRE_ENABLE_SLIC
 
 #endif // defined(NDEBUG)
 

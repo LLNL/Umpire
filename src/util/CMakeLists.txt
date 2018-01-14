@@ -12,8 +12,12 @@ set (umpire_util_sources
   Exception.cpp
   Logger.cpp)
 
+set (umpire_util_depends umpire_tpl_judy)
+
 if (ENABLE_SLIC)
-  set(slicDepend umpire_tpl_slic)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    slic)
 endif()
 
 blt_add_library(
@@ -21,7 +25,7 @@ blt_add_library(
   HEADERS ${umpire_util_headers}
   SOURCES ${umpire_util_sources}
   HEADERS_OUTPUT_SUBDIR umpire/util
-  DEPENDS_ON umpire_tpl_judy ${slicDepend}
+  DEPENDS_ON ${umpire_util_depends}
 )
 
 install(TARGETS

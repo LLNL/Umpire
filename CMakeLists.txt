@@ -24,19 +24,6 @@ endif()
 
 include(blt/SetupBLT.cmake)
 
-if (ENABLE_SLIC)
-  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-  find_package(SLIC REQUIRED)
-  blt_register_library( NAME umpire_tpl_slic
-                        INCLUDES ${SLIC_INCLUDE_DIR}
-                        LIBRARIES ${SLIC_LIBRARY}
-                      )
-
-  # set(CMAKE_CXX_FLAGS ${SLIC_DEFINITIONS})
-  # set(CMAKE_EXE_LINKER_FLAGS ${SLIC_LIBRARY})
-  # include_directories(${SLIC_INCLUDE_DIR})
-endif ()
-
 include(cmake/SetupUmpireThirdParty.cmake)
 
 if (ENABLE_CUDA)
