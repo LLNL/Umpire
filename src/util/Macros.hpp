@@ -46,7 +46,7 @@
     plog->setLoggingMsgLevel(level);                                                          \
   }                                                                                           \
   std::ostringstream local_msg;                                                               \
-  local_msg  << " SLIC " << __func__ << " SLIC " << msg;                                                \
+  local_msg  << " " << __func__ << " " << msg;                                                \
   plog->logMessage( axom::slic::message::lvl, local_msg.str(),                                \
                     std::string(__FILE__), __LINE__);                                         \
 }
@@ -56,7 +56,7 @@
 #define UMPIRE_LOG( lvl, msg )                                                                \
 {                                                                                             \
   std::ostringstream local_msg;                                                               \
-  local_msg  << " UMPIRE " << __func__ << " UMPIRE " << msg,                                                \
+  local_msg  << " " << __func__ << " " << msg,                                                \
   umpire::util::Logger::getActiveLogger()->logMessage(                                        \
       umpire::util::message::lvl, local_msg.str(),                                            \
       std::string(__FILE__), __LINE__);                                                       \
