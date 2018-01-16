@@ -10,7 +10,7 @@ if (EXISTS ${SHROUD_EXECUTABLE})
 endif ()
 
 if (ENABLE_SLIC)
-  set(UMPIRE_ENABLE_SLIC On CACHE Bool "")
+  set(UMPIRE_ENABLE_SLIC On)
 
   find_library( SLIC_LIBRARY
     libslic.a
