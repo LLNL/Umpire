@@ -14,7 +14,11 @@ class MonotonicAllocationStrategy :
   public AllocationStrategy
 {
   public:
-    MonotonicAllocationStrategy(util::AllocatorTraits traits, std::vector<std::shared_ptr<AllocationStrategy> > providers);
+    MonotonicAllocationStrategy(
+        const std::string& name,
+        int id,
+        util::AllocatorTraits traits, 
+        std::vector<std::shared_ptr<AllocationStrategy> > providers);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

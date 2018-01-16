@@ -40,7 +40,7 @@ int do_copy(std::string src, std::string dst, std::size_t size = 4096) {
 int main(int, char**) {
   do_copy("HOST", "HOST");
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   do_copy("HOST", "DEVICE");
   do_copy("DEVICE", "HOST");
   do_copy("DEVICE", "DEVICE");

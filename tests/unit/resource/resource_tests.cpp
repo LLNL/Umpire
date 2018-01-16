@@ -18,21 +18,21 @@ struct TestAllocator
 
 TEST(DefaultMemoryResource, Constructor)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0);
 
   SUCCEED();
 }
 
 TEST(DefaultMemoryResource, AllocateDeallocate)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0);
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
   ASSERT_NE(pointer, nullptr);
 }
 
 TEST(DefaultMemoryResource, GetSize)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0);
   double* pointer = (double*) alloc->allocate(10);
   ASSERT_EQ(alloc->getCurrentSize(), 10);
 
@@ -48,7 +48,7 @@ TEST(DefaultMemoryResource, GetSize)
 
 TEST(DefaultMemoryResource, GetHighWatermark)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >();
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0);
   ASSERT_EQ(alloc->getHighWatermark(), 0);
 
   double* pointer = (double*)alloc->allocate(10);

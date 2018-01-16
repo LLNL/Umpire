@@ -17,6 +17,8 @@ class AllocationStrategy :
   public std::enable_shared_from_this<AllocationStrategy>
 {
   public:
+    AllocationStrategy(const std::string& name, int id);
+
     /*!
      * \brief Allocate bytes of memory.
      *
@@ -37,6 +39,15 @@ class AllocationStrategy :
     virtual long getHighWatermark() = 0;
 
     virtual Platform getPlatform()  = 0;
+
+    std::string getName();
+
+    int getId();
+
+  protected:
+    std::string m_name;
+
+    int m_id;
 };
 
 } // end of namespace strategy

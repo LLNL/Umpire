@@ -8,7 +8,7 @@
 #include "umpire/strategy/AllocationStrategyFactory.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #endif
@@ -33,9 +33,11 @@ ResourceManager::getInstance()
 
 ResourceManager::ResourceManager() :
   m_allocator_names(),
-  m_allocators(),
+  m_allocators_by_name(),
+  m_allocators_by_id(),
   m_allocations(),
-  m_memory_resources()
+  m_memory_resources(),
+  m_next_id(0)
 {
   UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
@@ -44,7 +46,7 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
       std::make_shared<resource::HostResourceFactory>());
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
     std::make_shared<resource::DeviceResourceFactory>());
 
@@ -63,29 +65,35 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources["HOST"] = registry.makeMemoryResource("HOST");
+  m_memory_resources["HOST"] = registry.makeMemoryResource("HOST", m_next_id++);
 
-#if defined(ENABLE_CUDA)
-  m_memory_resources["DEVICE"] = registry.makeMemoryResource("DEVICE");
-  m_memory_resources["UM"] = registry.makeMemoryResource("UM");
+#if defined(UMPIRE_ENABLE_CUDA)
+  m_memory_resources["DEVICE"] = registry.makeMemoryResource("DEVICE", m_next_id++);
+  m_memory_resources["UM"] = registry.makeMemoryResource("UM", m_next_id++);
 #endif
 
   /*
    * Construct default allocators for each resource
    */
-  m_allocators["HOST"] = m_memory_resources["HOST"];
+  auto host_allocator = m_memory_resources["HOST"];
+  m_allocators_by_name["HOST"] = host_allocator;
+  m_allocators_by_id[host_allocator->getId()] = host_allocator;
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   /*
    *  strategy::AllocationStrategyRegistry& strategy_registry =
    *    strategy::AllocationStrategyRegistry::getInstance();
    *
-   *  m_allocators["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
+   *  m_allocators_by_name["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
    */
 
-  m_allocators["DEVICE"] = m_memory_resources["DEVICE"];
+  auto device_allocator = m_memory_resources["DEVICE"];
+  m_allocators_by_name["DEVICE"] = device_allocator;
+  m_allocators_by_id[device_allocator->getId()] = device_allocator;
 
-  m_allocators["UM"] = m_memory_resources["UM"];
+  auto um_allocator = m_memory_resources["UM"];
+  m_allocators_by_name["UM"] = um_allocator;
+  m_allocators_by_id[um_allocator->getId()] = um_allocator;
 #endif
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -94,12 +102,12 @@ std::shared_ptr<strategy::AllocationStrategy>&
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
-  auto allocator = m_allocators.find(name);
-  if (allocator == m_allocators.end()) {
+  auto allocator = m_allocators_by_name.find(name);
+  if (allocator == m_allocators_by_name.end()) {
     UMPIRE_ERROR("Allocator \"" << name << "\" not found.");
   }
 
-  return m_allocators[name];
+  return m_allocators_by_name[name];
 }
 
 Allocator
@@ -128,9 +136,11 @@ ResourceManager::makeAllocator(
     provider_strategies.push_back(provider.getAllocationStrategy());
   }
 
-  m_allocators[name] = registry.makeAllocationStrategy(strategy, traits, provider_strategies);
+  auto allocator = registry.makeAllocationStrategy(name, m_next_id++, strategy, traits, provider_strategies);
+  m_allocators_by_name[name] = allocator;
+  m_allocators_by_id[allocator->getId()] = allocator;
 
-  return Allocator(m_allocators[name]);
+  return Allocator(m_allocators_by_name[name]);
 }
 
 Allocator
@@ -234,7 +244,7 @@ std::vector<std::string>
 ResourceManager::getAvailableAllocators()
 {
   std::vector<std::string> names;
-  for(auto it = m_allocators.begin(); it != m_allocators.end(); ++it) {
+  for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
     names.push_back(it->first);
   }
 

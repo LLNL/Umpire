@@ -5,6 +5,7 @@ namespace umpire {
 namespace strategy {
 
 DefaultAllocationStrategy::DefaultAllocationStrategy(std::shared_ptr<AllocationStrategy> allocator) :
+  AllocationStrategy("DEFAULT"),
   m_allocator(allocator)
 {
 }
