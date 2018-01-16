@@ -17,6 +17,8 @@ class AllocationStrategyRegistry {
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> makeAllocationStrategy(
       const std::string& name, 
+      int id,
+      const std::string& strategy,
       util::AllocatorTraits traits,
       std::vector<std::shared_ptr<AllocationStrategy> > providers);
 

@@ -40,7 +40,7 @@ BENCHMARK_CAPTURE(benchmark_allocate, host, std::string("HOST"))->Range(4, 4096)
 
 BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(4, 4096);
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_CAPTURE(benchmark_allocate, um, std::string("UM"))->Range(4, 4096);
 BENCHMARK_CAPTURE(benchmark_deallocate, um, std::string("UM"))->Range(4, 4096);
 

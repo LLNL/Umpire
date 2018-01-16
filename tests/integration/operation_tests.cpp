@@ -26,7 +26,7 @@ TEST(Operation, HostToHostCopy)
   }
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(Operation, HostToDeviceToHostCopy)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();

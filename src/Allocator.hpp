@@ -61,6 +61,15 @@ class Allocator {
      */
     size_t getCurrentSize();
 
+    /*!
+     * \brief Get the name of this Allocator.
+     *
+     * \return name of Allocator.
+     */
+    std::string getName();
+
+    int getId();
+
     std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
   private:

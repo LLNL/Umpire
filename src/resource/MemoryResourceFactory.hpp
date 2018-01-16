@@ -12,7 +12,7 @@ namespace resource {
 class MemoryResourceFactory {
   public:
     virtual bool isValidMemoryResourceFor(const std::string& name) = 0;
-    virtual std::shared_ptr<MemoryResource> create() = 0;
+    virtual std::shared_ptr<MemoryResource> create(const std::string& name, int id) = 0;
 };
 
 } // end of namespace strategy
