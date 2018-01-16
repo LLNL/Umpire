@@ -3,12 +3,12 @@
 
 #include "umpire/config.hpp"
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 #endif
 
 struct sequential {};
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 struct cuda {};
 #endif
 
@@ -25,14 +25,14 @@ void forall_kernel_cpu(int begin, int end, LOOP_BODY body)
  */
 template <typename LOOP_BODY>
 void forall(sequential, int begin, int end, LOOP_BODY body) {
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaDeviceSynchronize();
 #endif
 
   forall_kernel_cpu(begin, end, body);
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 template <typename LOOP_BODY>
 __global__ void forall_kernel_gpu(int start, int length, LOOP_BODY body) {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;

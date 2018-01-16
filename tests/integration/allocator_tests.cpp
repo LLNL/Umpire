@@ -43,7 +43,7 @@ TEST(Allocator, HostAllocatorSize)
   ASSERT_ANY_THROW(allocator.getSize(test_alloc));
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(Allocator, DeviceAllocator)
 {
   auto &rm = umpire::ResourceManager::getInstance();
@@ -164,7 +164,7 @@ TEST(Allocator, Id)
   ASSERT_GE(id, 0);
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(Allocator, IdUnique)
 {
   auto& rm = umpire::ResourceManager::getInstance();

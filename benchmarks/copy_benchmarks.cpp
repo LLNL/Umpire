@@ -29,7 +29,7 @@ static void benchmark_copy(benchmark::State& state, std::string src, std::string
 
 BENCHMARK_CAPTURE(benchmark_copy, host_host, std::string("HOST"), std::string("HOST"))->Range(4, 4096);
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("DEVICE"))->Range(4, 4096);
 BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::string("HOST"))->Range(4, 4096);
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
