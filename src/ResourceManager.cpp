@@ -8,7 +8,7 @@
 #include "umpire/strategy/AllocationStrategyFactory.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #endif
@@ -46,7 +46,7 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
       std::make_shared<resource::HostResourceFactory>());
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
     std::make_shared<resource::DeviceResourceFactory>());
 
@@ -67,7 +67,7 @@ ResourceManager::initialize()
 
   m_memory_resources["HOST"] = registry.makeMemoryResource("HOST", m_next_id++);
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   m_memory_resources["DEVICE"] = registry.makeMemoryResource("DEVICE", m_next_id++);
   m_memory_resources["UM"] = registry.makeMemoryResource("UM", m_next_id++);
 #endif
@@ -79,7 +79,7 @@ ResourceManager::initialize()
   m_allocators_by_name["HOST"] = host_allocator;
   m_allocators_by_id[host_allocator->getId()] = host_allocator;
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
   /*
    *  strategy::AllocationStrategyRegistry& strategy_registry =
    *    strategy::AllocationStrategyRegistry::getInstance();
