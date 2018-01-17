@@ -9,7 +9,7 @@ if (EXISTS ${SHROUD_EXECUTABLE})
   include(${CMAKE_CURRENT_BINARY_DIR}/SetupShroud.cmake)
 endif ()
 
-if (ENABLE_SLIC)
+if (ENABLE_SLIC AND ENABLE_LOGGING)
   find_library( SLIC_LIBRARY
     libslic.a
     PATHS ${SLIC_LIBRARY_PATH} 
