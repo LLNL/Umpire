@@ -23,13 +23,16 @@ void GenericReallocateOperation::transform(
 
   dst_ptr = allocator->allocate(length);
 
+  size_t old_size = src_allocation->m_size;
+  size_t copy_size = ( old_size > length ) ? length : old_size;
+
   // Copy
-  ResourceManager::getInstance().copy(src_ptr, dst_ptr, length);
+  ResourceManager::getInstance().copy(src_ptr, dst_ptr, copy_size);
   
   // Free
   allocator->deallocate(src_ptr);
 
-  src_allocation->m_ptr = dst_ptr;
+  dst_allocation->m_ptr = dst_ptr;
 }
 
 } // end of namespace op

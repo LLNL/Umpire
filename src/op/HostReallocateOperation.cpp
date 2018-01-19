@@ -1,8 +1,10 @@
 #include "HostReallocateOperation.hpp"
-#include "../util/AllocationRecord.hpp"
+
 
 #include <cstdlib>
-#include <umpire/util/AllocationRecord.hpp>
+
+#include "umpire/util/AllocationRecord.hpp"
+#include "umpire/ResourceManager.hpp"
 
 namespace umpire {
 namespace op {
@@ -14,7 +16,13 @@ void HostReallocateOperation::transform(
     util::AllocationRecord *dst_allocation,
     size_t length)
 {
+
+  ResourceManager::getInstance().deregisterAllocation(src_ptr);
+
   dst_allocation->m_ptr = ::realloc(src_ptr, length);
+
+  dst_allocation->m_size = length;
+  ResourceManager::getInstance().registerAllocation(dst_allocation->m_ptr, dst_allocation);
 }
 
 } // end of namespace op
