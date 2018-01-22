@@ -16,9 +16,7 @@
 #include "umpire/op/CudaMemsetOperation.hpp"
 #endif
 
-
 #include "umpire/util/Macros.hpp"
-
 
 namespace umpire {
 namespace op {

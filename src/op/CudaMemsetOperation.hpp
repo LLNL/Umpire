@@ -1,7 +1,7 @@
 #ifndef UMPIRE_CudaMemsetOperation_HPP
 #define UMPIRE_CudaMemsetOperation_HPP
 
-#include "MemoryOperation.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {

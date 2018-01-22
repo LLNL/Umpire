@@ -1,18 +1,17 @@
-#include "HostReallocateOperation.hpp"
-
+#include "umpire/op/HostReallocateOperation.hpp"
 
 #include <cstdlib>
 
-#include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace op {
 
 void HostReallocateOperation::transform(
     void* src_ptr,
-    void* dst_ptr,
-    util::AllocationRecord *src_allocation,
+    void* UMPIRE_UNUSED_ARG(dst_ptr),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord *dst_allocation,
     size_t length)
 {

@@ -2,13 +2,15 @@
 
 #include <cuda_runtime_api.h>
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace op {
 
 void
 CudaMemsetOperation::apply(
     void* src_ptr,
-    util::AllocationRecord* allocation,
+    util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
     int value,
     size_t length)
 {

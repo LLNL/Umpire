@@ -1,9 +1,7 @@
 #ifndef UMPIRE_GenericReallocateOperation_HPP
 #define UMPIRE_GenericReallocateOperation_HPP
 
-#include "umpire/util/AllocationRecord.hpp"
-
-#include "MemoryOperation.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {

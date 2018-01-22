@@ -1,10 +1,9 @@
-#include "GenericReallocateOperation.hpp"
+#include "umpire/op/GenericReallocateOperation.hpp"
 
 #include <cstdlib>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/ResourceManager.hpp"
-
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
 namespace umpire {

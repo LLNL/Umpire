@@ -1,9 +1,7 @@
 #ifndef UMPIRE_CudaCopyFromOperation_HPP
 #define UMPIRE_CudaCopyFromOperation_HPP
 
-#include <umpire/util/AllocationRecord.hpp>
-#include "MemoryOperation.hpp"
-#include "../util/AllocationRecord.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {

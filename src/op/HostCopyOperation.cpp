@@ -1,9 +1,8 @@
-#include "HostCopyOperation.hpp"
-#include "../util/AllocationRecord.hpp"
+#include "umpire/op/HostCopyOperation.hpp"
 
 #include <cstring>
 
-#include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace op {
@@ -11,8 +10,8 @@ namespace op {
 void HostCopyOperation::transform(
     void* src_ptr,
     void* dst_ptr,
-    util::AllocationRecord *src_allocation,
-    util::AllocationRecord *dst_allocation,
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     size_t length)
 {
   std::memcpy(
