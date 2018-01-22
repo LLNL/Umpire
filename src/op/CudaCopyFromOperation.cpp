@@ -14,11 +14,16 @@ void CudaCopyFromOperation::transform(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     size_t length)
 {
-  ::cudaMemcpy(
-      dst_ptr,
-      src_ptr,
-      length, 
-      cudaMemcpyDeviceToHost);
+  cudaError_t error = 
+    ::cudaMemcpy(dest_ptr, src_ptr, length, cudaMemcpyDeviceToHost);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << dest_ptr
+      << ", src_ptr = " << src_ptr
+      << ", length = " << length
+      << ", cudaMemcpyDeviceToHost ) failed with error: "
+      << cudaGetErrorString(error));
+  }
 }
 
 } // end of namespace op

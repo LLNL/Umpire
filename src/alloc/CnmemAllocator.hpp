@@ -43,7 +43,7 @@ struct CnmemAllocator
     cnmemStatus_t error = ::cnmemMalloc(&ptr, bytes, NULL);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != CNMEM_STATUS_SUCCESS) {
-      UMPIRE_ERROR("cnmemMalloc failed allocating " << bytes << " bytes, with: " << cnmemGetErrorString(error));
+      UMPIRE_ERROR("cnmemMalloc( bytes = " << bytes << " ) failed with error: " << cnmemGetErrorString(error));
     } else {
       return ptr;
     }
@@ -52,7 +52,10 @@ struct CnmemAllocator
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-    ::cnmemFree(ptr, NULL);
+    cnmemStatus_t error = ::cnmemFree(ptr, NULL);
+    if ( error != CNMEM_STATUS_SUCCESS ) {
+      UMPIRE_ERROR("cnmemFree( ptr = " << ptr << " ) failed with error: " << cnmemGetErrorString(error));
+    }
   }
 };
 
