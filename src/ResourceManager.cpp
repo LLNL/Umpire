@@ -220,7 +220,6 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto alloc_record = m_allocations.find(src_ptr);
-  std::size_t src_size = alloc_record->m_size;
 
   if (src_ptr != alloc_record->m_ptr) {
     UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
