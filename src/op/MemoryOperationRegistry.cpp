@@ -4,6 +4,9 @@
 
 #include "umpire/op/HostCopyOperation.hpp"
 #include "umpire/op/HostMemsetOperation.hpp"
+#include "umpire/op/HostReallocateOperation.hpp"
+
+#include "umpire/op/GenericReallocateOperation.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
@@ -13,9 +16,7 @@
 #include "umpire/op/CudaMemsetOperation.hpp"
 #endif
 
-
 #include "umpire/util/Macros.hpp"
-
 
 namespace umpire {
 namespace op {
@@ -46,6 +47,11 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostMemsetOperation>());
 
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostReallocateOperation>());
+
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(
       "COPY",
@@ -66,6 +72,11 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "MEMSET",
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<GenericReallocateOperation>());
 #endif
 }
 

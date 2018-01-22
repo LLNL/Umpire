@@ -508,7 +508,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
                 table = ( JudySlot * )( next & JUDY_mask ); // outer radix
 
                 if( judy->depth ) {
-                    slot = ( src[depth] >> ( ( JUDY_key_size - ++off & JUDY_key_mask ) * 8 ) ) & 0xff;
+                    slot = ( src[depth] >> ( ( ( JUDY_key_size - ++off ) & JUDY_key_mask ) * 8 ) ) & 0xff;
                 } else if( off < max ) {
                     slot = buff[off++];
                 } else {
@@ -1081,7 +1081,8 @@ JudySlot * judy_prv( Judy * judy ) {
 //        returning previous entry.
 
 JudySlot * judy_del( Judy * judy ) {
-    int slot, off, size, type, high;
+    // int slot, off, size, type, high;
+    int slot, off, size, type;
     JudySlot * table, *inner;
     JudySlot next, *node;
     int keysize, cnt;
@@ -1134,7 +1135,7 @@ JudySlot * judy_del( Judy * judy ) {
                 table = ( JudySlot * )( next & JUDY_mask );
                 inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
                 inner[slot & 0x0F] = 0;
-                high = slot & 0xF0;
+                // high = slot & 0xF0;
 
                 for( cnt = 16; cnt--; )
                     if( inner[cnt] ) {
@@ -1380,7 +1381,7 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                 table = ( JudySlot * )( *next & JUDY_mask ); // outer radix
 
                 if( judy->depth ) {
-                    slot = ( src[depth] >> ( ( JUDY_key_size - ++off & JUDY_key_mask ) * 8 ) ) & 0xff;
+                    slot = ( src[depth] >> ( ( ( JUDY_key_size - ++off ) & JUDY_key_mask ) * 8 ) ) & 0xff;
                 } else if( off < max ) {
                     slot = buff[off++];
                 } else {

@@ -7,20 +7,7 @@
 #include <sstream>
 #include <iostream>
 
-#define UMPIRE_ERROR( msg )                                        \
-{                                                                  \
-  std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << msg;                                         \
-  throw umpire::util::Exception( umpire_oss_error.str(),           \
-                                 std::string(__FILE__),            \
-                                 __LINE__);                        \
-}
-
-#if defined(NDEBUG)
-
-#define UMPIRE_LOG( lvl, msg )
-
-#else
+#ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
@@ -61,19 +48,34 @@
 }
 
 #else
+
 #include "umpire/util/Logger.hpp"
 #define UMPIRE_LOG( lvl, msg )                                                                \
 {                                                                                             \
   std::ostringstream local_msg;                                                               \
-  local_msg  << " " << __func__ << " " << msg,                                                \
+  local_msg  << " " << __func__ << " " << msg;                                                \
   umpire::util::Logger::getActiveLogger()->logMessage(                                        \
       umpire::util::message::lvl, local_msg.str(),                                            \
       std::string(__FILE__), __LINE__);                                                       \
 }
 #endif // UMPIRE_ENABLE_SLIC
 
-#endif // defined(NDEBUG)
+#else
+
+#define UMPIRE_LOG( lvl, msg )
+
+#endif // UMPIRE_ENABLE_LOGGING
 
 #define UMPIRE_UNUSED_ARG(x)
+
+#define UMPIRE_ERROR( msg )                                        \
+{                                                                  \
+  UMPIRE_LOG(Error, msg);                                          \
+  std::ostringstream umpire_oss_error;                             \
+  umpire_oss_error << " " << __func__ << msg;                      \
+  throw umpire::util::Exception( umpire_oss_error.str(),           \
+                                 std::string(__FILE__),            \
+                                 __LINE__);                        \
+}
 
 #endif // UMPIRE_Macros_HPP

@@ -56,7 +56,7 @@ AllocationStrategyRegistry::makeAllocationStrategy(
     }
   }
 
-  UMPIRE_ERROR("AllocationStrategy " << name << " not found");
+  UMPIRE_ERROR("Unable to find valid allocation strategy for: " << strategy );
 }
 
 } // end of namespace strategy

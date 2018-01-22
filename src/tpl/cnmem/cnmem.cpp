@@ -899,12 +899,13 @@ cnmemStatus_t Manager::stealBlockUnsafe(void *&data, std::size_t &dataSize, ::si
 
     // We have got a node from a children. We need to update our "used" list before we can do 
     // anything with it.
-    Block *curr = mUsedBlocks, *prev = NULL;
+    // Block *curr = mUsedBlocks, *prev = NULL;
+    Block *curr = mUsedBlocks;
     for( ; curr ; curr = curr->getNext() ) { 
         if( curr->getData() <= data && data < curr->getData()+curr->getSize() ) {
             break;
         }
-        prev = curr;
+        // prev = curr;
     }
     
     // Curr points to the node which contains that memory region.
@@ -923,7 +924,7 @@ cnmemStatus_t Manager::stealBlockUnsafe(void *&data, std::size_t &dataSize, ::si
     std::size_t sizeAfter = (curr->getSize() - sizeBefore - dataSize);
 
     // The resulting block.
-    Block *result = curr;
+    //Block *result = curr;
     
     // If we have no resource between curr->getData and block->getData.
     if( sizeBefore == 0 ) {
@@ -939,7 +940,7 @@ cnmemStatus_t Manager::stealBlockUnsafe(void *&data, std::size_t &dataSize, ::si
         curr = block;
         data = (char*) data + dataSize;
         dataSize = sizeAfter; 
-        result = block;
+        //result = block;
     }
     
     // We have resource at the end so we may need to add a new node.
@@ -1208,7 +1209,8 @@ cnmemStatus_t cnmemMalloc(void **ptr, std::size_t size, cudaStream_t stream) {
         // One lock failed, quit. Reduce the damage as much as possible, though.
         if( numLocked != numChildren ) {
             for( std::size_t i = 0 ; i < numLocked ; ++i ) {
-                cnmemStatus_t lockStatus = mutexes[i]->unlock();
+                //cnmemStatus_t lockStatus = mutexes[i]->unlock();
+                mutexes[i]->unlock();
             }
             return CNMEM_STATUS_UNKNOWN_ERROR;
         }

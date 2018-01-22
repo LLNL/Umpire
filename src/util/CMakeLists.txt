@@ -14,7 +14,7 @@ set (umpire_util_sources
 
 set (umpire_util_depends umpire_tpl_judy)
 
-if (ENABLE_SLIC)
+if (ENABLE_SLIC AND ENABLE_LOGGING)
   set (umpire_util_depends
     ${umpire_util_depends}
     slic)
