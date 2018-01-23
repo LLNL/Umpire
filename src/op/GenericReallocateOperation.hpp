@@ -1,12 +1,12 @@
-#ifndef UMPIRE_CudaCopyFromOperation_HPP
-#define UMPIRE_CudaCopyFromOperation_HPP
+#ifndef UMPIRE_GenericReallocateOperation_HPP
+#define UMPIRE_GenericReallocateOperation_HPP
 
 #include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
-class CudaCopyFromOperation :
+class GenericReallocateOperation : 
   public MemoryOperation {
  public:
   void transform(
@@ -17,7 +17,8 @@ class CudaCopyFromOperation :
       size_t length);
 };
 
-} // end of namespace op
-} //end of namespace umpire
+} // end of naemspace op
+} // end of namespace umpire
 
-#endif // UMPIRE_CudaCopyFromOperation_HPP
+#endif // UMPIRE_GenericReallocateOperation_HPP
+

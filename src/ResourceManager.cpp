@@ -167,7 +167,7 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
-  auto op_registry = op::MemoryOperationRegistry::getInstance();
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
   auto dst_alloc_record = m_allocations.find(dst_ptr);
@@ -188,7 +188,53 @@ void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
       src_alloc_record->m_strategy, 
       dst_alloc_record->m_strategy);
 
-  op->operator()(const_cast<const void*>(src_ptr), dst_ptr, size);
+  op->transform(src_ptr, dst_ptr, src_alloc_record, dst_alloc_record, size);
+}
+
+void ResourceManager::memset(void* ptr, int value, size_t length)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  std::size_t src_size = alloc_record->m_size;
+
+  if (length == 0) {
+    length = src_size;
+  }
+
+  auto op = op_registry.find("MEMSET", 
+      alloc_record->m_strategy, 
+      alloc_record->m_strategy);
+
+  op->apply(ptr, alloc_record, value, length);
+}
+
+void*
+ResourceManager::reallocate(void* src_ptr, size_t size)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto alloc_record = m_allocations.find(src_ptr);
+
+  if (src_ptr != alloc_record->m_ptr) {
+    UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
+  }
+
+
+  auto op = op_registry.find("REALLOCATE", 
+      alloc_record->m_strategy, 
+      alloc_record->m_strategy);
+
+  void* dst_ptr = nullptr;
+
+  op->transform(src_ptr, dst_ptr, alloc_record, alloc_record, size);
+
+  return alloc_record->m_ptr;
 }
 
 void ResourceManager::deallocate(void* ptr)

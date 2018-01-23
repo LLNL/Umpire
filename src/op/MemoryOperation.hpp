@@ -3,15 +3,25 @@
 
 #include <cstddef>
 
+#include "umpire/util/AllocationRecord.hpp"
+
 namespace umpire {
 namespace op {
 
 class MemoryOperation {
   public:
-  virtual void operator()(
-      const void *src_ptr,
-      void* dst_ptr,
-      size_t length) = 0;
+    virtual void transform(
+        void* src_ptr,
+        void* dst_ptr,
+        util::AllocationRecord *src_allocation,
+        util::AllocationRecord *dst_allocation,
+        size_t length);
+
+    virtual void apply(
+        void* src_ptr,
+        util::AllocationRecord *src_allocation,
+        int val,
+        size_t length);
 };
 
 } // end of namespace op
