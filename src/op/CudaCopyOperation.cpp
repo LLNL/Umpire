@@ -15,10 +15,10 @@ void CudaCopyOperation::transform(
     size_t length)
 {
   cudaError_t error = 
-    ::cudaMemcpy(dest_ptr, src_ptr, length, cudaMemcpyDeviceToDevice);
+    ::cudaMemcpy(dst_ptr, src_ptr, length, cudaMemcpyDeviceToDevice);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << dest_ptr
+    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << dst_ptr
       << ", src_ptr = " << src_ptr
       << ", length = " << length
       << ", cudaMemcpyDeviceToDevice ) failed with error: " 
