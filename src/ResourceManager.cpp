@@ -65,17 +65,17 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources["HOST"] = registry.makeMemoryResource("HOST", m_next_id++);
+  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", m_next_id++);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources["DEVICE"] = registry.makeMemoryResource("DEVICE", m_next_id++);
-  m_memory_resources["UM"] = registry.makeMemoryResource("UM", m_next_id++);
+  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", m_next_id++);
+  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", m_next_id++);
 #endif
 
   /*
    * Construct default allocators for each resource
    */
-  auto host_allocator = m_memory_resources["HOST"];
+  auto host_allocator = m_memory_resources[resource::Host];
   m_allocators_by_name["HOST"] = host_allocator;
   m_allocators_by_id[host_allocator->getId()] = host_allocator;
 
@@ -87,11 +87,11 @@ ResourceManager::initialize()
    *  m_allocators_by_name["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
    */
 
-  auto device_allocator = m_memory_resources["DEVICE"];
+  auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
 
-  auto um_allocator = m_memory_resources["UM"];
+  auto um_allocator = m_memory_resources[resource::UnifiedMemory];
   m_allocators_by_name["UM"] = um_allocator;
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
 #endif
@@ -115,6 +115,19 @@ ResourceManager::getAllocator(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   return Allocator(getAllocationStrategy(name));
+}
+
+Allocator
+ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
+{
+  UMPIRE_LOG(Debug, "(\"" << static_cast<size_t>(resource_type) << "\")");
+
+  auto allocator = m_memory_resources.find(resource_type);
+  if (allocator == m_memory_resources.end()) {
+    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type) << "\" not found.");
+  }
+
+  return Allocator(m_memory_resources[resource_type]);
 }
 
 Allocator

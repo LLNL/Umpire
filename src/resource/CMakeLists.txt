@@ -1,10 +1,11 @@
 set (umpire_resource_headers
-  MemoryResourceFactory.hpp
-  MemoryResourceRegistry.hpp
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
-  MemoryResource.hpp
   HostResourceFactory.hpp
+  MemoryResource.hpp
+  MemoryResourceFactory.hpp
+  MemoryResourceRegistry.hpp
+  MemoryResourceTypes.hpp
 )
 
 set (umpire_resource_sources

@@ -12,6 +12,8 @@
 #include "umpire/util/AllocatorTraits.hpp"
 #include "umpire/util/AllocationMap.hpp"
 
+#include "umpire/resource/MemoryResourceTypes.hpp"
+
 namespace umpire {
 
 class ResourceManager
@@ -29,6 +31,8 @@ class ResourceManager
     std::vector<std::string> getAvailableAllocators();
 
     Allocator getAllocator(const std::string& space);
+
+    Allocator getAllocator(resource::MemoryResourceType resource_type);
 
     Allocator makeAllocator(const std::string& name, 
         const std::string& strategy, 
@@ -78,7 +82,7 @@ class ResourceManager
 
     std::shared_ptr<strategy::AllocationStrategy> m_default_allocator;
 
-    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_memory_resources;
+    std::unordered_map<resource::MemoryResourceType, std::shared_ptr<strategy::AllocationStrategy>, resource::MemoryResourceTypeHash > m_memory_resources;
 
     long m_allocated;
 
