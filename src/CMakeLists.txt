@@ -33,6 +33,10 @@ blt_add_library(
   HEADERS_OUTPUT_SUBDIR umpire 
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
+set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
+set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
+set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
+
 configure_file(
   ${PROJECT_SOURCE_DIR}/src/config.hpp.in
   ${PROJECT_BINARY_DIR}/include/umpire/config.hpp)

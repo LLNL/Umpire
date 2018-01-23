@@ -11,7 +11,7 @@ class HostResourceFactory :
   public MemoryResourceFactory
 {
   bool isValidMemoryResourceFor(const std::string& name);
-  std::shared_ptr<MemoryResource> create();
+  std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };
 
 } // end of namespace resource

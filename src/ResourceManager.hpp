@@ -45,6 +45,10 @@ class ResourceManager
 
     void copy(void* src_ptr, void* dst_ptr, size_t size=0);
 
+    void memset(void* ptr, int val, size_t length=0);
+
+    void* reallocate(void* src_ptr, size_t size);
+
     /*
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
@@ -67,7 +71,8 @@ class ResourceManager
 
     std::list<std::string> m_allocator_names;
 
-    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators;
+    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_name;
+    std::unordered_map<int, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_id;
 
     util::AllocationMap m_allocations;
 
@@ -76,6 +81,8 @@ class ResourceManager
     std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_memory_resources;
 
     long m_allocated;
+
+    int m_next_id;
 };
 
 } // end of namespace umpire

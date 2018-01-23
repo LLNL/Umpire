@@ -43,7 +43,7 @@ TEST(Allocator, HostAllocatorSize)
   ASSERT_ANY_THROW(allocator.getSize(test_alloc));
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(Allocator, DeviceAllocator)
 {
   auto &rm = umpire::ResourceManager::getInstance();
@@ -145,3 +145,36 @@ TEST(Allocator, DeallocateThrow)
   double* ptr = new double[20];
   ASSERT_ANY_THROW(rm.deallocate(ptr));
 }
+
+TEST(Allocator, Name)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator alloc = rm.getAllocator("HOST");
+
+  ASSERT_EQ(alloc.getName(), "HOST");
+}
+
+TEST(Allocator, Id)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator alloc = rm.getAllocator("HOST");
+  int id = alloc.getId();
+  ASSERT_GE(id, 0);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Allocator, IdUnique)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator host_alloc = rm.getAllocator("HOST");
+  umpire::Allocator device_alloc = rm.getAllocator("DEVICE");
+
+  int host_id = host_alloc.getId();
+  int device_id = device_alloc.getId();
+
+  ASSERT_NE(host_id, device_id);
+}
+#endif

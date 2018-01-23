@@ -15,6 +15,13 @@ enum Level {
 
   Num_Levels
 };
+
+static const std::string MessageLevelName[ Level::Num_Levels ] = {
+  "ERROR",
+  "WARNING",
+  "INFO",
+  "DEBUG"
+};
 } /* namespace messge */
 
 class Logger {

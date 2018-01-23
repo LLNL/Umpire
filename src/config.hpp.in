@@ -1,6 +1,8 @@
 #ifndef UMPIRE_config_HPP
 #define UMPIRE_config_HPP
 
-#cmakedefine ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_SLIC
+#cmakedefine UMPIRE_ENABLE_LOGGING
 
 #endif

@@ -4,7 +4,7 @@
 
 using namespace umpire::alloc;
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include "umpire/alloc/CnmemAllocator.hpp"
@@ -30,7 +30,7 @@ REGISTER_TYPED_TEST_CASE_P(
     MemoryAllocatorTest,
     Allocate);
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 using test_types = ::testing::Types<MallocAllocator, CudaMallocAllocator, CudaMallocManagedAllocator, CnmemAllocator>;
 #else
 using test_types = ::testing::Types<MallocAllocator>;
