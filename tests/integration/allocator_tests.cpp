@@ -19,7 +19,7 @@ TEST(Allocator, HostAllocatorType)
 {
   auto &rm = umpire::ResourceManager::getInstance();
 
-  umpire::Allocator allocator = rm.getAllocator(umpire::resource::MemoryResourceType::Host);
+  umpire::Allocator allocator = rm.getAllocator(umpire::resource::Host);
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);

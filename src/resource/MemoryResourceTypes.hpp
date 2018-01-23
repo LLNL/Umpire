@@ -14,7 +14,7 @@ struct MemoryResourceTypeHash
 };
 
 
-enum class MemoryResourceType {
+enum MemoryResourceType {
   Host,
   Device,
   UnifiedMemory
