@@ -3,11 +3,23 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/resource/MemoryResourceTypes.hpp"
+
 TEST(Allocator, HostAllocator)
 {
   auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
+  double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+}
+
+TEST(Allocator, HostAllocatorType)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator(umpire::resource::MemoryResourceType::Host);
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
