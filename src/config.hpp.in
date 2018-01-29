@@ -4,5 +4,6 @@
 #cmakedefine UMPIRE_ENABLE_CUDA
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
+#cmakedefine UMPIRE_ENABLE_ASSERTS
 
 #endif
