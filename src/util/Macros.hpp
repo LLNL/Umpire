@@ -69,7 +69,7 @@
 
 #else
 
-#define UMPIRE_LOG( lvl, msg )
+#define UMPIRE_LOG( lvl, msg ) ((void)0)
 
 #endif // UMPIRE_ENABLE_LOGGING
 
