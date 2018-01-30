@@ -43,6 +43,7 @@ configure_file(
 
 install(TARGETS
   umpire
+  EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
