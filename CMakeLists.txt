@@ -31,6 +31,16 @@ if (ENABLE_CUDA)
   set(CUDA_NVCC_FLAGS -std=c++11)
 endif ()
 
+configure_file(
+  umpire-config.cmake.in
+  "${PROJECT_BINARY_DIR}/umpire-config.cmake" @ONLY)
+
+install(FILES
+  "${PROJECT_BINARY_DIR}/umpire-config.cmake"
+  DESTINATION share/umpire/cmake)
+
+install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
+
 add_subdirectory(src)
 
 if (ENABLE_TESTS)

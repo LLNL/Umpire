@@ -30,6 +30,7 @@ blt_add_library(
 
 install(TARGETS
   umpire_util
+  EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)

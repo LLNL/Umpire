@@ -30,6 +30,7 @@ target_link_libraries(
 
 install(TARGETS
   umpire_alloc
+  EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)

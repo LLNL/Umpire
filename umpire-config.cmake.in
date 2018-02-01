@@ -1,0 +1,4 @@
+get_filename_component(UMPIRE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(UMPIRE_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
+
+include("${UMPIRE_CMAKE_DIR}/umpire-targets.cmake")
