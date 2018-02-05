@@ -22,7 +22,8 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
       ``ENABLE_SLIC``              Off      Enable SLIC logging
-      ``ENABLE_ASSERTS``           On       Enable assert() within Umpire
+      ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
+      ``ENABLE_ASSERT_TESTS``      On       Enable gtest of UMPIRE_ASSERT()
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
@@ -46,3 +47,7 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_ASSERTS``
   Enable assert() within Umpire
+
+* ``ENABLE_ASSERT_TESTS``
+  Requires that ENABLE_ASSERTS set to On.  Enables gtest of
+  UMPIRE_ASSERT() in the Umpire implementation.
