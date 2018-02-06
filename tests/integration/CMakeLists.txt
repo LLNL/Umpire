@@ -53,7 +53,7 @@ blt_add_test(
   NAME operation_tests
   COMMAND operation_tests)
 
-if (ENABLE_ASSERTS AND ENABLE_ASSERT_TESTS)
+if (ENABLE_ASSERTS)
   blt_add_executable(
     NAME assert_tests
     SOURCES assert_tests.cpp
