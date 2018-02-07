@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(Umpire LANGUAGES CXX C Fortran)
+cmake_policy(SET CMP0048 NEW)
+
+project(Umpire 
+  LANGUAGES CXX C Fortran 
+  VERSION 0.1.0)
+
+message(STATUS ${Umpire_VERSION_MAJOR})
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
