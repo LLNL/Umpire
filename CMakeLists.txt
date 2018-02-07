@@ -17,6 +17,8 @@ set(ENABLE_GMOCK On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
+option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
+set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 
 ################################
 # BLT

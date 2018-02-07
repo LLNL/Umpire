@@ -7,6 +7,13 @@
 #include <sstream>
 #include <iostream>
 
+#ifdef UMPIRE_ENABLE_ASSERTS
+#include <cassert>
+#define UMPIRE_ASSERT(condition) assert(condition)
+#else
+#define UMPIRE_ASSERT(condition) ((void)0)
+#endif // UMPIRE_ENABLE_ASSERTS
+
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
 #include <stdlib.h>   // for getenv()
@@ -62,7 +69,7 @@
 
 #else
 
-#define UMPIRE_LOG( lvl, msg )
+#define UMPIRE_LOG( lvl, msg ) ((void)0)
 
 #endif // UMPIRE_ENABLE_LOGGING
 
