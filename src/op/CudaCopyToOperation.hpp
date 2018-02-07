@@ -1,16 +1,18 @@
 #ifndef UMPIRE_CudaCopyToOperation_HPP
 #define UMPIRE_CudaCopyToOperation_HPP
 
-#include "MemoryOperation.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
 class CudaCopyToOperation : public MemoryOperation {
  public:
-  void operator()(
-      const void *src_ptr,
+  void transform(
+      void* src_ptr,
       void* dst_ptr,
+      umpire::util::AllocationRecord *src_allocation,
+      umpire::util::AllocationRecord *dst_allocation,
       size_t length);
 };
 

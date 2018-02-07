@@ -5,7 +5,7 @@ set(umpire_alloc_headers
 
 set (umpire_alloc_sources)
 
-set (umpire_alloc_depends umpire_util)
+set (umpire_alloc_depends umpire_util umpire_tpl_simpool)
 
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
@@ -30,6 +30,7 @@ target_link_libraries(
 
 install(TARGETS
   umpire_alloc
+  EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)

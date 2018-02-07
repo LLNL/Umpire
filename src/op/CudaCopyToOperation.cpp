@@ -1,16 +1,29 @@
-#include "CudaCopyToOperation.hpp"
+#include "umpire/op/CudaCopyToOperation.hpp"
 
 #include <cuda_runtime_api.h>
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace op {
 
-void CudaCopyToOperation::operator()(
-    const void *src_ptr,
-    void* dest_ptr,
+void CudaCopyToOperation::transform(
+    void* src_ptr,
+    void* dst_ptr,
+    umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     size_t length)
 {
-  ::cudaMemcpy(dest_ptr, src_ptr, length, cudaMemcpyHostToDevice);
+  cudaError_t error = 
+    ::cudaMemcpy(dst_ptr, src_ptr, length, cudaMemcpyHostToDevice);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << dst_ptr
+      << ", src_ptr = " << src_ptr
+      << ", length = " << length
+      << ", cudaMemcpyHostToDevice ) failed with error: " 
+      << cudaGetErrorString(error));
+  }
 }
 
 } // end of namespace op

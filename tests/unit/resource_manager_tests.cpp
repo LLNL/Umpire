@@ -4,5 +4,7 @@
 
 TEST(ResourceManager, Constructor) {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  (void) rm;
   SUCCEED();
 }

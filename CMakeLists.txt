@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(Umpire LANGUAGES CXX C Fortran)
+cmake_policy(SET CMP0048 NEW)
+
+project(Umpire 
+  LANGUAGES CXX C Fortran 
+  VERSION 0.1.0)
+
+message(STATUS ${Umpire_VERSION_MAJOR})
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
@@ -9,6 +15,8 @@ set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
+option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
+option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 
 ################################
 # BLT
@@ -29,6 +37,16 @@ if (ENABLE_CUDA)
   set(CUDA_NVCC_FLAGS -std=c++11)
 endif ()
 
+configure_file(
+  umpire-config.cmake.in
+  "${PROJECT_BINARY_DIR}/umpire-config.cmake" @ONLY)
+
+install(FILES
+  "${PROJECT_BINARY_DIR}/umpire-config.cmake"
+  DESTINATION share/umpire/cmake)
+
+install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
+
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
@@ -36,6 +54,7 @@ if (ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
+  set (UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmark)
   add_subdirectory(benchmarks)
 endif ()
 if (ENABLE_EXAMPLES)

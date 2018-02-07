@@ -2,10 +2,23 @@
 
 namespace umpire {
 namespace strategy {
-  
-AllocationStrategy::AllocationStrategy(std::shared_ptr<umpire::Allocator>& alloc)
-  m_allocator(alloc)
+
+AllocationStrategy::AllocationStrategy(const std::string& name, int id) :
+  m_name(name),
+  m_id(id)
 {
+}
+
+std::string
+AllocationStrategy::getName()
+{
+  return m_name;
+}
+
+int
+AllocationStrategy::getId()
+{
+  return m_id;
 }
 
 } // end of namespace strategy

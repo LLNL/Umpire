@@ -1,6 +1,12 @@
 #ifndef UMPIRE_config_HPP
 #define UMPIRE_config_HPP
 
-#cmakedefine ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_SLIC
+#cmakedefine UMPIRE_ENABLE_LOGGING
+
+constexpr int UMPIRE_VERSION_MAJOR = @Umpire_VERSION_MAJOR@;
+constexpr int UMPIRE_VERSION_MINOR = @Umpire_VERSION_MINOR@;
+constexpr int UMPIRE_VERSION_PATCH = @Umpire_VERSION_PATCH@;
 
 #endif

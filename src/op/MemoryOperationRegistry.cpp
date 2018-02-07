@@ -3,16 +3,20 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/op/HostCopyOperation.hpp"
+#include "umpire/op/HostMemsetOperation.hpp"
+#include "umpire/op/HostReallocateOperation.hpp"
 
-#if defined(ENABLE_CUDA)
+#include "umpire/op/GenericReallocateOperation.hpp"
+
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
 #include "umpire/op/CudaCopyToOperation.hpp"
 #include "umpire/op/CudaCopyOperation.hpp"
+
+#include "umpire/op/CudaMemsetOperation.hpp"
 #endif
 
-
 #include "umpire/util/Macros.hpp"
-
 
 namespace umpire {
 namespace op {
@@ -25,6 +29,7 @@ MemoryOperationRegistry::getInstance()
 {
   if (!s_memory_operation_registry_instance) {
     s_memory_operation_registry_instance = new MemoryOperationRegistry();
+    UMPIRE_LOG(Info, "() Created MemoryOperationRegistry at " << s_memory_operation_registry_instance);
   }
 
   return *s_memory_operation_registry_instance;
@@ -37,7 +42,17 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostCopyOperation>());
 
-#if defined(ENABLE_CUDA)
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostReallocateOperation>());
+
+#if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(
       "COPY",
       std::make_pair(Platform::cpu, Platform::cuda),
@@ -52,6 +67,16 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "COPY",
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<GenericReallocateOperation>());
 #endif
 }
 
@@ -76,8 +101,8 @@ MemoryOperationRegistry::registerOperation(
 std::shared_ptr<umpire::op::MemoryOperation>
 MemoryOperationRegistry::find(
     const std::string& name,
-    std::shared_ptr<AllocatorInterface>& src_allocator,
-    std::shared_ptr<AllocatorInterface>& dst_allocator)
+    std::shared_ptr<strategy::AllocationStrategy>& src_allocator,
+    std::shared_ptr<strategy::AllocationStrategy>& dst_allocator)
 {
   auto platforms = std::make_pair(
       src_allocator->getPlatform(),

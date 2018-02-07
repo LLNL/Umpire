@@ -1,7 +1,7 @@
 #ifndef UMPIRE_CudaCopyFromOperation_HPP
 #define UMPIRE_CudaCopyFromOperation_HPP
 
-#include "MemoryOperation.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
@@ -9,9 +9,11 @@ namespace op {
 class CudaCopyFromOperation :
   public MemoryOperation {
  public:
-  void operator()(
-      const void *src_ptr,
+  void transform(
+      void* src_ptr,
       void* dst_ptr,
+      util::AllocationRecord *src_allocation,
+      util::AllocationRecord *dst_allocation,
       size_t length);
 };
 

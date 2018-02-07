@@ -13,8 +13,10 @@ struct MallocAllocator
   void* allocate(size_t bytes) 
   {
     void* ret = ::malloc(bytes);
+    UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
+
     if  (ret == nullptr) {
-      UMPIRE_ERROR("malloc returned NULL, allocating " << bytes << " bytes.");
+      UMPIRE_ERROR("malloc( bytes = " << bytes << " ) failed");
     } else {
       return ret;
     }
@@ -22,6 +24,7 @@ struct MallocAllocator
 
   void deallocate(void* ptr)
   {
+    UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::free(ptr);
   }
 };
