@@ -11,8 +11,11 @@ TEST(Allocator, HostAllocator)
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
-
   ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
+
+  test_alloc = static_cast<double*>(allocator.allocate(0*sizeof(double)));
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, HostAllocatorType)
