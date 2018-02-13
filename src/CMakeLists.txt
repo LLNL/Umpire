@@ -21,7 +21,7 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/shroudrt.cpp
     interface/c_fortran/wrapAllocator.cpp
     interface/c_fortran/wrapResourceManager.cpp
-    interface/c_fortran/wrapfumpire.f
+    interface/c_fortran/wrapfumpire.f90
     )
 endif ()
 
