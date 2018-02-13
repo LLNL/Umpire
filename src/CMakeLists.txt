@@ -21,7 +21,7 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/shroudrt.cpp
     interface/c_fortran/wrapAllocator.cpp
     interface/c_fortran/wrapResourceManager.cpp
-    interface/c_fortran/wrapfumpire.f
+    interface/c_fortran/wrapfumpire.f90
     )
 endif ()
 
@@ -36,6 +36,7 @@ blt_add_library(
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
+set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 
 configure_file(
   ${PROJECT_SOURCE_DIR}/src/config.hpp.in

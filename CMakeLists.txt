@@ -4,9 +4,7 @@ cmake_policy(SET CMP0048 NEW)
 
 project(Umpire 
   LANGUAGES CXX C Fortran 
-  VERSION 0.1.0)
-
-message(STATUS ${Umpire_VERSION_MAJOR})
+  VERSION 0.1.1)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
@@ -17,6 +15,8 @@ set(ENABLE_GMOCK On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
+option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
+set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 
 ################################
 # BLT
