@@ -5,6 +5,10 @@
 
 TEST(AllocatorAssert, DeallocateDeath)
 {
+#if !defined(NDEBUG)
   ASSERT_DEATH(umpire::ResourceManager::getInstance().getAllocator("HOST").deallocate( nullptr ), "");
+#else
+  SUCCEED();
+#endif
 }
 
