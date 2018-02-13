@@ -6,8 +6,6 @@ project(Umpire
   LANGUAGES CXX C Fortran 
   VERSION 0.1.0)
 
-message(STATUS ${Umpire_VERSION_MAJOR})
-
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
 set(ENABLE_COPY_HEADERS On CACHE Bool "")
