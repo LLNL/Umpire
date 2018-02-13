@@ -18,6 +18,8 @@ option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 
+message(STATUS "Death tests are ${ENABLE_GTEST_DEATH_TESTS}")
+
 ################################
 # BLT
 ################################
