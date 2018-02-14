@@ -1,6 +1,8 @@
+#include <stdio.h>
+
 #include "umpire/umpire.h"
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
 
   UMPIRE_resourcemanager* rm = UMPIRE_resourcemanager_get();
   UMPIRE_allocator* allocator = UMPIRE_resourcemanager_get_allocator(rm, "HOST");
