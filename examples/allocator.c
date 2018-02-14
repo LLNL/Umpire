@@ -2,7 +2,10 @@
 
 #include "umpire/umpire.h"
 
-int main(int, char**) {
+int main(int argc, char* argv[]) {
+
+  (void)(argc);
+  (void)(argv);
 
   UMPIRE_resourcemanager* rm = UMPIRE_resourcemanager_get();
   UMPIRE_allocator* allocator = UMPIRE_resourcemanager_get_allocator(rm, "HOST");
