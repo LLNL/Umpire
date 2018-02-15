@@ -19,10 +19,12 @@ TEST(AllocationMap, AddFindRemove)
   auto found_record = map.find(pointer);
 
   ASSERT_EQ(record, found_record);
+  ASSERT_TRUE(map.contains(pointer));
 
   map.remove(pointer);
 
   ASSERT_THROW(
       map.find(pointer),
       umpire::util::Exception);
+  ASSERT_FALSE(map.contains(pointer));
 }

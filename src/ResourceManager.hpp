@@ -41,6 +41,13 @@ class ResourceManager
 
     Allocator getAllocator(void* ptr);
 
+    /*!
+     * \brief Does the given pointer have an associated Allocator.
+     *
+     * \return True if the pointer has an associated Allocator.
+     */
+    bool hasAllocator(void* ptr);
+
     void setDefaultAllocator(Allocator allocator);
     Allocator getDefaultAllocator();
     
@@ -61,6 +68,7 @@ class ResourceManager
     void deallocate(void* ptr);
 
     size_t getSize(void* ptr);
+
 
   private:
     ResourceManager();

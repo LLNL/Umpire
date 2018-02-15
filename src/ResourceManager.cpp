@@ -163,6 +163,14 @@ ResourceManager::getAllocator(void* ptr)
   return Allocator(findAllocatorForPointer(ptr));
 }
 
+bool
+ResourceManager::hasAllocator(void* ptr)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr <<")");
+
+  return m_allocations.contains(ptr);
+}
+
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", record=" << record << ") with " << this );
