@@ -9,6 +9,7 @@ target_compile_definitions(umpire_tpl_cnmem PUBLIC -DCNMEM_DLLEXPORT)
 
 install(TARGETS
   umpire_tpl_cnmem
+  EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)

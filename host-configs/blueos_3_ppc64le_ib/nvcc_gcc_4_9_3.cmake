@@ -15,6 +15,8 @@
 set(RAJA_COMPILER "RAJA_COMPILER_GNU" CACHE STRING "")
 
 set(CMAKE_CXX_COMPILER "/usr/tcetmp/bin/g++" CACHE PATH "")
+set(CMAKE_C_COMPILER "/usr/tcetmp/bin/gcc" CACHE PATH "")
+set(CMAKE_Fortran_COMPILER "/usr/tcetmp/bin/gfortran" CACHE PATH "")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -finline-functions" CACHE STRING "")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-Ofast -g -finline-functions" CACHE STRING "")

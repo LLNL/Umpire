@@ -20,6 +20,7 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
+  UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
   UMPIRE_LOG(Debug, "(" << ptr << ")");
   m_allocator->deallocate(ptr);
 }
