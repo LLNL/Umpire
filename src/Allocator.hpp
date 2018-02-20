@@ -78,36 +78,6 @@ class Allocator {
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
 
-template<typename T>
-class AllocatorAdapter {
-  public:
-  typedef T value_type;
-
-  AllocatorAdapter(Allocator allocator) :
-    m_allocator(allocator)
-  {
-  }
-
-  T* allocate(size_t size) 
-  {
-    return static_cast<T*>(m_allocator.allocate(sizeof(T)*size));
-  }
-
-  void deallocate(T* ptr, size_t size) 
-  {
-    m_allocator.deallocate(ptr);
-  }
-
-  private:
-    umpire::Allocator m_allocator;
-};
-
 } // end of namespace umpire
-
-bool 
-operator==(const umpire::Allocator&, const umpire::Allocator&);
-
-bool 
-operator!=(const umpire::Allocator&, const umpire::Allocator&);
 
 #endif // UMPIRE_Allocator_HPP

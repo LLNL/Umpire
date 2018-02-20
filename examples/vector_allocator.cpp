@@ -1,13 +1,15 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
+#include "umpire/TypedAllocator.hpp"
+
 int main(int argc, char* argv[]) {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
 
-  umpire::AllocatorAdapter<double> vector_allocator(alloc);
+  umpire::TypedAllocator<double> vector_allocator(alloc);
 
-  std::vector< double, umpire::AllocatorAdapter<double> > my_vector(vector_allocator);
+  std::vector< double, umpire::TypedAllocator<double> > my_vector(vector_allocator);
 
   my_vector.resize(100);
 
