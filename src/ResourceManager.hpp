@@ -47,7 +47,7 @@ class ResourceManager
     void registerAllocation(void* ptr, util::AllocationRecord* record);
     void deregisterAllocation(void* ptr);
 
-    void copy(void* src_ptr, void* dst_ptr, size_t size=0);
+    void copy(void* dst_ptr, void* src_ptr, size_t size=0);
 
     void memset(void* ptr, int val, size_t length=0);
 
