@@ -176,7 +176,7 @@ void ResourceManager::deregisterAllocation(void* ptr)
   m_allocations.remove(ptr);
 }
 
-void ResourceManager::copy(void* src_ptr, void* dst_ptr, size_t size)
+void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 

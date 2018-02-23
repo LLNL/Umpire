@@ -47,7 +47,18 @@ class ResourceManager
     void registerAllocation(void* ptr, util::AllocationRecord* record);
     void deregisterAllocation(void* ptr);
 
-    void copy(void* src_ptr, void* dst_ptr, size_t size=0);
+    /*!
+     * \brief Copy size bytes of data from src_ptr to dst_ptr.
+     *
+     * Both the src_ptr and dst_ptr addresses must be allocated by Umpire. They
+     * can be offset from any Umpire-managed base address.  The dst_ptr must be
+     * large enough to accommodate size bytes of data.
+     *
+     * \param dst_ptr Destination pointer.
+     * \param src_ptr Source pointer.
+     * \param size Size in bytes.
+     */
+    void copy(void* dst_ptr, void* src_ptr, size_t size=0);
 
     void memset(void* ptr, int val, size_t length=0);
 
