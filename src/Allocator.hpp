@@ -68,12 +68,30 @@ class Allocator {
      */
     std::string getName();
 
+    /*!
+     * \brief Get the integer ID of this Allocator.
+     *
+     * \return integer id of Allocator.
+     */
     int getId();
 
+    /*!
+     * \brief Get the AllocationStrategy object used by this Allocator.
+     *
+     * \return Pointer to the AllocationStrategy.
+     */
     std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
   private:
+    /*!
+     * \brief Construct an Allocator with the given AllocationStrategy.
+     *
+     * This method is private to ensure that only the ResourceManager can
+     * construct Allocators.
+     */
     Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator);
+
+    Allocator() = delete;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };

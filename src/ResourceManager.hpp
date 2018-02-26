@@ -22,7 +22,9 @@ class ResourceManager
     static ResourceManager& getInstance();
 
     /*!
-     * \brief Initialize available memory systems.
+     * \brief Initialize the ResourceManager.
+     *
+     * This will create all registered MemoryResource objects
      */
     void initialize();
 
@@ -60,8 +62,18 @@ class ResourceManager
      */
     void copy(void* dst_ptr, void* src_ptr, size_t size=0);
 
+    /*!
+     * \brief Set the first length bytes of ptr to the value val.
+     *
+     * \param ptr
+     * \param val
+     * \param length
+     */
     void memset(void* ptr, int val, size_t length=0);
 
+    /*!
+     *
+     */
     void* reallocate(void* src_ptr, size_t size);
 
     /*
