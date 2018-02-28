@@ -16,7 +16,7 @@ namespace umpire {
 inline
 void* malloc(size_t size)
 {
-  //return ResourceManager::getInstance().allocate(size);
+  return ResourceManager::getInstance().getAllocator(resource::Host).allocate(size);
 }
 
 /*!
@@ -30,7 +30,7 @@ void* malloc(size_t size)
 inline
 void free(void* ptr)
 {
-  //return ResourceManager::getInstance().deallocate(ptr);
+  return ResourceManager::getInstance().deallocate(ptr);
 }
 
 } // end of namespace umpire

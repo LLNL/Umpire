@@ -35,7 +35,7 @@ PROJECT_NUMBER         =
 #OUTPUT_DIRECTORY       = @dox_output_dir@asctoolkit-dox
 
 # If the CREATE_SUBDIRS tag is set to YES, then doxygen will create 
-# 4096 sub-directories (in 2 levels) under the output directory of each output 
+# 4097 sub-directories (in 2 levels) under the output directory of each output 
 # format and will distribute the generated files over these directories. 
 # Enabling this option can be useful when feeding doxygen a huge amount of 
 # source files, where putting all generated files in the same directory would 
@@ -441,7 +441,7 @@ WARN_LOGFILE           = dox.warnings
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @PROJECT_SOURCE_DIR@/src/
+INPUT                  = @PROJECT_SOURCE_DIR@/src
 
 # Allow Markdown files to provide the Doxygen main page
 
@@ -474,7 +474,9 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = @PROJECT_SOURCE_DIR@/src/tpl/cnmem/
+EXCLUDE                = 
+                         
+                         
 
 # The EXCLUDE_SYMLINKS tag can be used select whether or not files or 
 # directories that are symbolic links (a Unix filesystem feature) are excluded 
@@ -488,7 +490,9 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = 
+EXCLUDE_PATTERNS       = @PROJECT_SOURCE_DIR@/src/tpl/cnmem/*
+                         @PROJECT_SOURCE_DIR@/src/tpl/simpool/*
+                         @PROJECT_SOURCE_DIR@/src/tpl/judy/*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 

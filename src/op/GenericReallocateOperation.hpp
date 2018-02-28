@@ -6,9 +6,21 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * Generic reallocate operation to work on any src_ptr location.
+ */
 class GenericReallocateOperation : 
   public MemoryOperation {
  public:
+   /*!
+    * \copybrief MemoryOperation::transform
+    *
+    * This operation relies on ResourceManager::copy,
+    * AllocationStrategy::allocate and AllocationStrategy::deallocate to
+    * implement a reallocate operation that can work for any src_ptr location.
+    *
+    * \copydetails MemoryOperation::transform
+    */
   void transform(
       void* src_ptr,
       void* dst_ptr,

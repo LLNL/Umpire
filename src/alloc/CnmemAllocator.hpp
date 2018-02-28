@@ -8,8 +8,17 @@
 namespace umpire {
 namespace alloc {
 
+/*!
+ * \brief CnmemAllocator uses cnmem to allocate and free memory on NVIDIA GPUs 
+ */
 struct CnmemAllocator
 {
+  /*!
+   * \brief Get a descriptive string from a cnmemStatus_t code.
+   *
+   * \param error Status code of error.
+   * \return String describing the error.
+   */
   const char* cnmemGetErrorString(cnmemStatus_t error) {
     switch (error) {
       case CNMEM_STATUS_SUCCESS: return "SUCCESS";
@@ -24,6 +33,16 @@ struct CnmemAllocator
     return "UNKNOWN";
   }
 
+  /*!
+   * \brief Allocate bytes of memory using cnmem.
+   *
+   * This method initializes cnmem using default properties.
+   *
+   * \param bytes Number of bytes to allocate.
+   * \return Pointer to start of allocation.
+   *
+   * \throws umpire::Exception if memory cannot be allocated.
+   */
   void* allocate(size_t bytes)
   {
     static bool initialized = false;
@@ -49,6 +68,13 @@ struct CnmemAllocator
     }
   }
 
+  /*!
+   * \brief Deallocate memory from cnmem.
+   *
+   * \param ptr Address of allocate to deallocate.
+   *
+   * \throws umpire::util::Exception if deallocation fails.
+   */
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

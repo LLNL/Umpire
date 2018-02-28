@@ -16,9 +16,14 @@
 
 namespace umpire {
 
+/*!
+ * \brief 
+ */
 class ResourceManager
-{
   public: 
+    /*!
+     * \brief 
+     */
     static ResourceManager& getInstance();
 
     /*!
@@ -30,22 +35,51 @@ class ResourceManager
 
     void finalize();
     
+    /*!
+     * \brief Get the names of all available Allocator objects.
+     */
     std::vector<std::string> getAvailableAllocators();
 
-    Allocator getAllocator(const std::string& space);
+    /*!
+     * \brief Get the Allocator with the given name.
+     */
+    Allocator getAllocator(const std::string& name);
 
+    /*!
+     * \brief Get the default Allocator for the given resource_type.
+     */
     Allocator getAllocator(resource::MemoryResourceType resource_type);
 
+    /*!
+     * \brief Construct a new Allocator.
+     *
+     * The Allocator will be constructed using the given strategy, options
+     * passed in traits, and will use the providers vector of base Allocators
+     * to allocate memory.
+     *
+     * \code
+     *
+     * auto makeAllocator("my_allocator", "pool"
+     *
+     *
+     */
     Allocator makeAllocator(const std::string& name, 
         const std::string& strategy, 
         util::AllocatorTraits traits,
         std::vector<Allocator> providers);
 
+    /*!
+     * \brief Get the Allocator used to allocate ptr.
+     *
+     *
+     *
+     * \param ptr Pointer to find the Allocator for.
+     * \return Allocator for the given ptr.
+     */
     Allocator getAllocator(void* ptr);
 
-    void setDefaultAllocator(Allocator allocator);
-    Allocator getDefaultAllocator();
-    
+    /*!
+     * \brief Register a new 
     void registerAllocation(void* ptr, util::AllocationRecord* record);
     void deregisterAllocation(void* ptr);
 
