@@ -17,7 +17,8 @@ struct MemoryResourceTypeHash
 enum MemoryResourceType {
   Host,
   Device,
-  UnifiedMemory
+  UnifiedMemory,
+  PinnedMemory
 };
 
 } // end of namespace resource
