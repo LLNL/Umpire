@@ -1,10 +1,10 @@
-# Umpire v0.1.1
+# Umpire v0.1.2
 
 Umpire is a resource management libray that allows the discovery, provision,
 and management of memory on next-generation architectures.
 
 Umpire uses CMake and BLT to handle builds. Since BLT is included as a
-submoduel, first make sure you run:
+submodule, first make sure you run:
 
     $ git submodule init && git submodule update
 

@@ -18,7 +18,3 @@ if (ENABLE_FORTRAN)
       umpire
   )
 endif ()
-
-add_subdirectory(lulesh)
-
-add_subdirectory(diffusion)
