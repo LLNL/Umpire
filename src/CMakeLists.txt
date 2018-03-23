@@ -23,6 +23,11 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/wrapResourceManager.cpp
     interface/c_fortran/wrapfumpire.f90
     )
+
+  set_source_files_properties(
+    interface/c_fortran/wrapfumpire.f90
+    PROPERTIES
+    Fortran_FORMAT FREE)
 endif ()
 
 
