@@ -27,6 +27,6 @@ files_no_license=$(grep -L 'This file is part of Umpire.' \
 
 echo `pwd`
 
-echo $files_no_license | xargs $LIC_CMD -f scripts/umpire-license.txt -v 
+echo $files_no_license | xargs $LIC_CMD -f scripts/umpire-license.txt 
 
 echo "${GREEN} [Ok] License text applied. ${NOCOLOR}"
