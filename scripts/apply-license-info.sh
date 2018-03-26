@@ -25,8 +25,6 @@ files_no_license=$(grep -L 'This file is part of Umpire.' \
   tests/**/*(^/) \
   CMakeLists.txt umpire-config.cmake.in)
 
-echo `pwd`
-
 echo $files_no_license | xargs $LIC_CMD -f scripts/umpire-license.txt 
 
 echo "${GREEN} [Ok] License text applied. ${NOCOLOR}"
