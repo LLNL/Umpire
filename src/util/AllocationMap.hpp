@@ -3,6 +3,8 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
+#include <cstdint>
+
 #include "umpire/tpl/judy/judyLArray.h"
 
 namespace umpire {

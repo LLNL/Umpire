@@ -24,7 +24,3 @@ blt_add_executable(
   SOURCES vector_allocator.cpp
   DEPENDS_ON 
     umpire)
-
-add_subdirectory(lulesh)
-
-add_subdirectory(diffusion)
