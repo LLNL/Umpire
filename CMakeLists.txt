@@ -4,7 +4,7 @@ cmake_policy(SET CMP0048 NEW)
 
 project(Umpire 
   LANGUAGES CXX C Fortran 
-  VERSION 0.1.1)
+  VERSION 0.1.2)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")

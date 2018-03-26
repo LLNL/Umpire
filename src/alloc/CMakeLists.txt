@@ -9,7 +9,8 @@ if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     CudaMallocAllocator.hpp
-    CudaMallocManagedAllocator.hpp)
+    CudaMallocManagedAllocator.hpp
+    CudaPinnedAllocator.hpp)
 
   set(umpire_alloc_depends
     ${umpire_alloc_depends}
