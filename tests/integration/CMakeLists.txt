@@ -4,7 +4,6 @@ set (allocator_tests_depends
 if (ENABLE_CUDA)
   set (allocator_tests_depends
     ${allocator_tests_depends}
-    umpire_tpl_cnmem 
     cuda_runtime)
 endif ()
 
