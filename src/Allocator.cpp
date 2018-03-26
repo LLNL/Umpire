@@ -64,15 +64,3 @@ Allocator::getAllocationStrategy()
 }
 
 } // end of namespace umpire
-
-bool 
-operator==(const umpire::Allocator&, const umpire::Allocator&) 
-{ 
-  return true;
-}
-
-bool 
-operator!=(const umpire::Allocator&, const umpire::Allocator&)
-{
-  return false;
-}
