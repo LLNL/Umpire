@@ -12,9 +12,6 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-if (ENABLE_CUDA)
-  add_subdirectory(cnmem)
-endif ()
 
 add_subdirectory(simpool)
 add_subdirectory(judy)

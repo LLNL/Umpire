@@ -17,6 +17,7 @@
 
 #include "umpire/util/Platform.hpp"
 
+#include <string>
 #include <memory>
 #include <cstddef>
 
