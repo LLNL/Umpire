@@ -11,6 +11,7 @@
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/PinnedMemoryResourceFactory.hpp"
 #endif
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
@@ -52,6 +53,9 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     std::make_shared<resource::UnifiedMemoryResourceFactory>());
+
+  registry.registerMemoryResource(
+    std::make_shared<resource::PinnedMemoryResourceFactory>());
 #endif
 
   initialize();
@@ -70,6 +74,7 @@ ResourceManager::initialize()
 #if defined(UMPIRE_ENABLE_CUDA)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", m_next_id++);
   m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", m_next_id++);
+  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", m_next_id++);
 #endif
 
   /*
@@ -94,6 +99,10 @@ ResourceManager::initialize()
   auto um_allocator = m_memory_resources[resource::UnifiedMemory];
   m_allocators_by_name["UM"] = um_allocator;
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
+
+  auto pinned_allocator = m_memory_resources[resource::PinnedMemory];
+  m_allocators_by_name["PINNED"] = pinned_allocator;
+  m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
 #endif
   UMPIRE_LOG(Debug, "() leaving");
 }

@@ -1,16 +1,17 @@
 set(umpire_alloc_headers
-  CudaMallocAllocator.hpp
-  CudaMallocManagedAllocator.hpp
   MallocAllocator.hpp)
 
 set (umpire_alloc_sources)
 
-set (umpire_alloc_depends umpire_util umpire_tpl_simpool)
+set (umpire_alloc_depends umpire_util)
 
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
-    CnmemAllocator.hpp)
+    CnmemAllocator.hpp
+    CudaMallocAllocator.hpp
+    CudaMallocManagedAllocator.hpp
+    CudaPinnedAllocator.hpp)
 
   set (umpire_alloc_depends
     ${umpire_alloc_depends}
