@@ -78,9 +78,8 @@ class ResourceManager {
      */
     Allocator getAllocator(void* ptr);
 
-    /*!
-     * \brief Register a new 
     void registerAllocation(void* ptr, util::AllocationRecord* record);
+
     void deregisterAllocation(void* ptr);
 
     /*!
