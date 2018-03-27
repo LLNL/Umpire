@@ -20,8 +20,19 @@
 namespace umpire {
 namespace alloc {
 
+/*!
+ * \brief Uses cudaMalloc and cudaFree to allocate and deallocate memory on
+ *        NVIDIA GPUs.
+ */
 struct CudaMallocAllocator
-{
+  /*!
+   * \brief Allocate bytes of memory using cudaMalloc
+   *
+   * \param bytes Number of bytes to allocate.
+   * \return Pointer to start of the allocation.
+   *
+   * \throws umpire::util::Exception if memory cannot be allocated.
+   */
   void* allocate(size_t bytes)
   {
     void* ptr = nullptr;
@@ -34,6 +45,13 @@ struct CudaMallocAllocator
     }
   }
 
+  /*!
+   * \brief Deallocate memory using cudaFree.
+   *
+   * \param ptr Address to deallocate.
+   *
+   * \throws umpire::util::Exception if memory cannot be free'd.
+   */
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

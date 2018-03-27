@@ -21,17 +21,30 @@ namespace umpire {
 namespace resource {
 
 /*!
- * \brief Allocator provides a unified interface to all Umpire classes that can
- * be used to allocate and free data.
+ * \brief Base class to represent the available hardware resources for memory
+ * allocation in the system.
+ *
+ * Objects of this inherit from strategy::AllocationStrategy, allowing them to
+ * be used directly.
  */
 class MemoryResource :
   public strategy::AllocationStrategy
 {
   public:
+    /*!
+     * \brief Construct a MemoryResource with the given name and id.
+     *
+     * \param name Name of the MemoryResource.
+     * \param id ID of the MemoryResource (must be unique).
+     *
+     */
     MemoryResource(const std::string& name, int id);
 
     /*!
      * \brief Allocate bytes of memory.
+     *
+     * This function is pure virtual and must be implemented by the inheriting
+     * class.
      *
      * \param bytes Number of bytes to allocate.
      *
@@ -42,13 +55,43 @@ class MemoryResource :
     /*!
      * \brief Free the memory at ptr.
      *
+     * This function is pure virtual and must be implemented by the inheriting
+     * class.
+     *
      * \param ptr Pointer to free.
      */
     virtual void deallocate(void* ptr) = 0;
 
+    /*!
+     * \brief Return the current size of this MemoryResource.
+     *
+     * This is sum of the sizes of all the tracked allocations. Note that this
+     * doesn't ever have to be equal to getHighWatermark.
+     *
+     * \return current total size of active allocations in this MemoryResource.
+     */
     virtual long getCurrentSize() = 0;
+
+    /*!
+     * \brief Return the memory high watermark for this MemoryResource.
+     *
+     * This is the largest amount of memory allocated by this Allocator. Note
+     * that this may be larger than the largest value returned by
+     * getCurrentSize.
+     *
+     * \return Memory high watermark.
+     */
     virtual long getHighWatermark() = 0;
 
+
+    /*!
+     * \brief Get the Platform assocatiated with this MemoryResource.
+     *
+     * This function is pure virtual and must be implemented by the inheriting
+     * class.
+     *
+     * \return Platform associated with this MemoryResource.
+     */
     virtual Platform getPlatform()  = 0;
 };
 

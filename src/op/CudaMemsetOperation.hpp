@@ -20,8 +20,18 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * \brief Memset on NVIDIA device memory.
+ */
 class CudaMemsetOperation : public MemoryOperation {
  public:
+   /*!
+    * @copybrief MemoryOperation::apply
+    *
+    * Uses cudaMemset to set first length bytes of src_ptr to value.
+    *
+    * @copydetails MemoryOperation::apply
+    */
   void apply(
       void* src_ptr,
       util::AllocationRecord* ptr,

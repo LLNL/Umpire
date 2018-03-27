@@ -21,10 +21,15 @@ namespace umpire {
 namespace resource {
 
 
+/*!
+ * \brief Factory class for constructing MemoryResource objects that use GPU
+ * memory.
+ */
 class DeviceResourceFactory :
   public MemoryResourceFactory
 {
   bool isValidMemoryResourceFor(const std::string& name);
+
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };
 

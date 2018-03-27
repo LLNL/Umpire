@@ -23,6 +23,11 @@
 namespace umpire {
 namespace resource {
 
+
+  /*!
+   * \brief Concrete MemoryResource object that uses the template _allocator to
+   * allocate and deallocate memory.
+   */
 template <typename _allocator>
 class DefaultMemoryResource :
   public MemoryResource
