@@ -6,9 +6,20 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * \brief Copy operation to move data from a NVIDA GPU to CPU memory.
+ */
 class CudaCopyFromOperation :
   public MemoryOperation {
  public:
+   /*!
+    * @copybrief MemoryOperation::transform
+    *
+    * Uses cudaMemcpy to move data when src_ptr is on a NVIDIA GPU and dst_ptr
+    * is on the CPU.
+    *
+    * @copydetails MemoryOperation::transform
+    */
   void transform(
       void* src_ptr,
       void* dst_ptr,

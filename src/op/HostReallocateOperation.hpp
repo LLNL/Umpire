@@ -6,9 +6,19 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * \brief Reallocate data in CPU memory.
+ */
 class HostReallocateOperation : 
   public MemoryOperation {
  public:
+  /*!
+   * \copybrief MemoryOperation::transform
+   *
+   * Uses POSIX realloc to reallocate memory in the CPU memory.
+   *
+   * \copydetails MemoryOperation::transform
+   */
   void transform(
       void* src_ptr,
       void* dst_ptr,

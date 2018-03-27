@@ -6,8 +6,19 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * \brief Copy operation to move data between two GPU addresses.
+ */
 class CudaCopyOperation : public MemoryOperation {
  public:
+   /*!
+    * @copybrief MemoryOperation::transform
+    *
+    * Uses cudaMemcpy to move data when both src_ptr  and dst_ptr are on NVIDIA
+    * GPUs.
+    *
+    * @copydetails MemoryOperation::transform
+    */
   void transform(
       void* src_ptr,
       void* dst_ptr,

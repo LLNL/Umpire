@@ -6,8 +6,18 @@
 namespace umpire {
 namespace op {
 
+/*!
+ * \brief Copy memory between two allocations in CPU memory.
+ */
 class HostCopyOperation : public MemoryOperation {
  public:
+   /*
+    * \copybrief MemoryOperation::transform
+    *
+    * Perform a memcpy to move length bytes of data from src_ptr to dst_ptr
+    *
+    * \copydetails MemoryOperation::transform
+    */
   void transform(
       void* src_ptr,
       void* dst_ptr,

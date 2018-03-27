@@ -6,6 +6,10 @@
 namespace umpire {
 namespace resource {
 
+/*!
+ * \brief Factory class to construct a MemoryResource that uses NVIDIA
+ * "unified" memory, accesible from both the CPU and NVIDIA GPUs.
+ */
 class UnifiedMemoryResourceFactory :
   public MemoryResourceFactory
 {

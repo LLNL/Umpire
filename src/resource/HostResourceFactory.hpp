@@ -7,6 +7,9 @@ namespace umpire {
 namespace resource {
 
 
+/*!
+ * \brief Factory class to construct a MemoryResource that uses CPU memory.
+ */
 class HostResourceFactory :
   public MemoryResourceFactory
 {
