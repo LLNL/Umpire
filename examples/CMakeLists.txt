@@ -18,3 +18,9 @@ if (ENABLE_FORTRAN)
       umpire
   )
 endif ()
+
+blt_add_executable(
+  NAME vector_allocator
+  SOURCES vector_allocator.cpp
+  DEPENDS_ON 
+    umpire)
