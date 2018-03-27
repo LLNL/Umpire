@@ -87,8 +87,9 @@ class ResourceManager
      * \brief Copy size bytes of data from src_ptr to dst_ptr.
      *
      * Both the src_ptr and dst_ptr addresses must be allocated by Umpire. They
-     * can be offset from any Umpire-managed base address.  The dst_ptr must be
-     * large enough to accommodate size bytes of data.
+     * can be offset from any Umpire-managed base address.  
+     *
+     * The dst_ptr must be large enough to accommodate size bytes of data.
      *
      * \param dst_ptr Destination pointer.
      * \param src_ptr Source pointer.
@@ -99,13 +100,19 @@ class ResourceManager
     /*!
      * \brief Set the first length bytes of ptr to the value val.
      *
-     * \param ptr
-     * \param val
-     * \param length
+     * \param ptr Pointer to data.
+     * \param val Value to set.
+     * \param length Number of bytes to set to val.
      */
     void memset(void* ptr, int val, size_t length=0);
 
     /*!
+     * \brief Reallocate src_ptr to size.
+     *
+     * \param src_ptr Source pointer to reallocate.
+     * \param size New size of pointer.
+     *
+     * \return Reallocated pointer.
      *
      */
     void* reallocate(void* src_ptr, size_t size);
@@ -113,7 +120,7 @@ class ResourceManager
     /*
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
-     * \param ptr Pointer to deallocate
+     * \param ptr Pointer to deallocate.
      */
     void deallocate(void* ptr);
 
