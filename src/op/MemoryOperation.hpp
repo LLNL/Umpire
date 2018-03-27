@@ -12,7 +12,8 @@ namespace op {
  * \brief Base class of an operation on memory.
  *
  * Neither the transfrom or apply methods are pure virtual, so inheriting
- * classes only need overload the appropriate method.
+ * classes only need overload the appropriate method. However, both methods
+ * will throw an error if called.
  */
 class MemoryOperation {
   public:
@@ -24,6 +25,8 @@ class MemoryOperation {
      * \param src_allocation AllocationRecord of source.
      * \param dst_allocation AllocationRecord of destination.
      * \param length Number of bytes to transform.
+     *
+     * \throws util::Exception
      */
     virtual void transform(
         void* src_ptr,
@@ -39,6 +42,8 @@ class MemoryOperation {
      * \param src_allocation AllocationRecord of source.
      * \param val Value to apply.
      * \param length Number of bytes to modify.
+     *
+     * \throws util::Exception
      */
     virtual void apply(
         void* src_ptr,
