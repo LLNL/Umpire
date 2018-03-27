@@ -1,7 +1,7 @@
 # Contributing to Umpire
 
 This document is intented for developers who want to add new features or
-bugfixes to Umpire. It assumes you have some familiarity with git and Bitbucket.
+bugfixes to Umpire. It assumes you have some familiarity with git and GitHub.
 It will discuss what a good pull request (PR) looks like, and the tests that
 your PR must pass before it can be merged into Umpire.
 
@@ -56,7 +56,7 @@ Once you are finished, you can push your branch to GitHub, then create a PR.
 ## Creating a Pull Request
 
 You can create a new PR
-[here](https://lc.llnl.gov/bitbucket/projects/UM/repos/umpire/pull-requests?create).
+[here](https://github.com/LLNL/Umpire/compare).
 Ensure that your PR base is the `develop` branch of Umpire.
 
 Add a descriptive title explaining the bug you fixed or the feature you have

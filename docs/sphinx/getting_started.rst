@@ -10,12 +10,12 @@ This page provides information on how to quickly get up and running with Umpire.
 Installation
 ------------
 
-Umpire is hosted on Bitbucket `here <https://rzlc.llnl.gov/bitbucket/projects/UM/repos/umpire/browse>`_.
+Umpire is hosted on GitHub `here <https://github.com/LLNL/Umpire>`_.
 To clone the repo into your local working space, type:
 
 .. code-block:: bash
 
-  $ git clone --recursive ssh://git@rz-bitbucket.llnl.gov:7999/um/umpire.git
+  $ git clone --recursive https://github.com/LLNL/Umpire.git
 
 
 The ``--recursive`` argument is required to ensure that the *BLT* submodule is

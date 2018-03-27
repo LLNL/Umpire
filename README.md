@@ -1,6 +1,6 @@
 # Umpire v0.1.2
 
-Umpire is a resource management libray that allows the discovery, provision,
+Umpire is a resource management library that allows the discovery, provision,
 and management of memory on next-generation architectures.
 
 Umpire uses CMake and BLT to handle builds. Since BLT is included as a
