@@ -15,6 +15,8 @@
 set (umpire_headers
   Allocator.hpp
   ResourceManager.hpp
+  TypedAllocator.hpp
+  TypedAllocator.inl
   Umpire.hpp)
 
 set (umpire_sources
