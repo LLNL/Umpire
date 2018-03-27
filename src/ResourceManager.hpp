@@ -117,13 +117,20 @@ class ResourceManager
      */
     void* reallocate(void* src_ptr, size_t size);
 
-    /*
+    /*!
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
      * \param ptr Pointer to deallocate.
      */
     void deallocate(void* ptr);
 
+    /*!
+     * \brief Get the size in bytes of the allocation for the given pointer.
+     *
+     * \param ptr Pointer to find size of.
+     *
+     * \return Size of allocation in bytes.
+     */
     size_t getSize(void* ptr);
 
   private:
