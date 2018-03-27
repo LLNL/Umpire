@@ -19,6 +19,8 @@ if (ENABLE_FORTRAN)
   )
 endif ()
 
-add_subdirectory(lulesh)
-
-add_subdirectory(diffusion)
+blt_add_executable(
+  NAME vector_allocator
+  SOURCES vector_allocator.cpp
+  DEPENDS_ON 
+    umpire)
