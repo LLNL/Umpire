@@ -24,7 +24,7 @@ namespace alloc {
  * \brief Uses cudaMalloc and cudaFree to allocate and deallocate memory on
  *        NVIDIA GPUs.
  */
-struct CudaMallocAllocator
+struct CudaMallocAllocator {
   /*!
    * \brief Allocate bytes of memory using cudaMalloc
    *
@@ -33,13 +33,13 @@ struct CudaMallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(size_t bytes)
+  void* allocate(size_t size)
   {
     void* ptr = nullptr;
-    cudaError_t error = ::cudaMalloc(&ptr, bytes);
-    UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
+    cudaError_t error = ::cudaMalloc(&ptr, size);
+    UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMalloc( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
     } else {
       return ptr;
     }

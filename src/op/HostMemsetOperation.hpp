@@ -31,6 +31,7 @@ class HostMemsetOperation : public MemoryOperation {
     * Uses std::memset to set the first length bytes of src_ptr to value.
     *
     * \copydetails MemoryOperation::apply
+    */
   void apply(
       void* src_ptr,
       util::AllocationRecord* allocation,
@@ -38,7 +39,7 @@ class HostMemsetOperation : public MemoryOperation {
       size_t length);
 };
 
-} // end of naemspace op
-} //end of namespace umpire
+} // end of namespace op
+} // end of namespace umpire
 
 #endif // UMPIRE_HostMemsetOperation_HPP

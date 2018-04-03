@@ -1,4 +1,4 @@
-# Umpire v0.1.2
+# Umpire v0.1.3
 
 Umpire is a resource management library that allows the discovery, provision,
 and management of memory on next-generation architectures.
