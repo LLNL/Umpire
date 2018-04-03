@@ -3,7 +3,7 @@
 
 #include "umpire/TypedAllocator.hpp"
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
 
