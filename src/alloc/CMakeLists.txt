@@ -1,20 +1,30 @@
+##############################################################################
+# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory
+#
+# Created by David Beckingsale, david@llnl.gov
+# LLNL-CODE-747640
+#
+# All rights reserved.
+#
+# This file is part of Umpire.
+#
+# For details, see https://github.com/LLNL/Umpire
+# Please also see the LICENSE file for MIT license.
+##############################################################################
 set(umpire_alloc_headers
-  CudaMallocAllocator.hpp
-  CudaMallocManagedAllocator.hpp
   MallocAllocator.hpp)
 
 set (umpire_alloc_sources)
 
-set (umpire_alloc_depends umpire_util umpire_tpl_simpool)
+set (umpire_alloc_depends umpire_util)
 
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
-    CnmemAllocator.hpp)
-
-  set (umpire_alloc_depends
-    ${umpire_alloc_depends}
-    umpire_tpl_cnmem)
+    CudaMallocAllocator.hpp
+    CudaMallocManagedAllocator.hpp
+    CudaPinnedAllocator.hpp)
 endif ()
 
 blt_add_library(

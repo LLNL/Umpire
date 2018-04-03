@@ -1,3 +1,17 @@
+##############################################################################
+# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory
+#
+# Created by David Beckingsale, david@llnl.gov
+# LLNL-CODE-747640
+#
+# All rights reserved.
+#
+# This file is part of Umpire.
+#
+# For details, see https://github.com/LLNL/Umpire
+# Please also see the LICENSE file for MIT license.
+##############################################################################
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
@@ -21,11 +35,13 @@ if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     DeviceResourceFactory.hpp
+    PinnedMemoryResourceFactory.hpp
     UnifiedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
     DeviceResourceFactory.cpp
+    PinnedMemoryResourceFactory.cpp
     UnifiedMemoryResourceFactory.cpp)
 
   set(umpire_resource_depends
