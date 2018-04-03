@@ -3,5 +3,5 @@
 	url = https://github.com/LLNL/blt.git
 [submodule "src/tpl/simpool"]
 	path = src/tpl/simpool
-	url = ssh://git@rz-bitbucket.llnl.gov:7999/um/simpool.git
+	url = https://github.com/LLNL/simpool.git
 	branch = feature/umpire-strategy

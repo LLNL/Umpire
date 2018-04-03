@@ -1,6 +1,6 @@
 # Umpire v0.1.3
 
-Umpire is a resource management libray that allows the discovery, provision,
+Umpire is a resource management library that allows the discovery, provision,
 and management of memory on next-generation architectures.
 
 Umpire uses CMake and BLT to handle builds. Since BLT is included as a
@@ -20,3 +20,22 @@ completed, Umpire can be built with Make:
     $ make
 
 For more advanced configuration you can use standard CMake variables.
+
+# Documentation
+
+Both user and code documentation is available.
+
+# Authors
+
+Thanks to all of Umpire's
+[contributors](https://github.com/LLNL/Umpire/graphs/contributors).
+
+Umpire was created by David Beckingsale (david@llnl.gov).
+
+# Release
+
+Umpire is released under an MIT license. For more details, please see the
+[LICENSE](./LICENSE) and [RELEASE](./RELEASE) files.
+
+`LLNL-CODE-747640`
+`OCEC-18-031`
