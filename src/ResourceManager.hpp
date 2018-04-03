@@ -33,7 +33,7 @@ namespace umpire {
 /*!
  * \brief 
  */
-class ResourceManager
+class ResourceManager {
   public: 
     /*!
      * \brief 
