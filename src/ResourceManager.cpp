@@ -273,6 +273,27 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
   return alloc_record->m_ptr;
 }
 
+void*
+ResourceManager::move(void* ptr, Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  if (ptr != alloc_record->m_ptr) {
+    UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);
+  }
+
+  size_t size = alloc_record->m_size;
+  void* dst_ptr = allocator.allocate(size);
+
+  copy(dst_ptr, ptr);
+
+  deallocate(ptr);
+
+  return dst_ptr;
+}
+
 void ResourceManager::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

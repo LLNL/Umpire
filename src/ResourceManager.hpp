@@ -131,6 +131,16 @@ class ResourceManager {
     void* reallocate(void* src_ptr, size_t size);
 
     /*!
+     * \brief Move src_ptr to memory from allocator
+     *
+     * \param src_ptr Pointer to move.
+     * \param allocator Allocator to use to allocate new memory for moved data.
+     *
+     * \return Pointer to new location of data.
+     */
+    void* move(void* src_ptr, Allocator allocator);
+
+    /*!
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
      * \param ptr Pointer to deallocate.

@@ -194,7 +194,7 @@ TEST(Operation, HostMemset)
   }
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(Operation, DeviceMemset)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
@@ -270,7 +270,7 @@ TEST(Operation, HostReallocateLarger)
   }
 }
 
-#if defined(ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(Operation, GenericReallocateDevice)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
@@ -279,15 +279,15 @@ TEST(Operation, GenericReallocateDevice)
   umpire::Allocator host_allocator = rm.getAllocator("HOST");
 
   double* d_array = static_cast<double*>(device_allocator.allocate(100*sizeof(double)));
-
   rm.memset(d_array, 0);
 
   double* d_new_array = static_cast<double*>(rm.reallocate(d_array, 50*sizeof(double)));
+
   double* h_array = static_cast<double*>(host_allocator.allocate(50*sizeof(double)));
 
   ASSERT_EQ(device_allocator.getSize(d_new_array), 50*sizeof(double));
 
-  rm.copy(d_array, d_new_array);
+  rm.copy(h_array, d_new_array);
 
   for (int i = 0; i < 50; i++) {
     ASSERT_DOUBLE_EQ(h_array[i], 0);
@@ -306,6 +306,7 @@ TEST(Operation, GenericReallocateLarger)
   rm.memset(d_array, 0);
 
   double* d_new_array = static_cast<double*>(rm.reallocate(d_array, 150*sizeof(double)));
+
   double* h_array = static_cast<double*>(host_allocator.allocate(150*sizeof(double)));
 
   ASSERT_EQ(device_allocator.getSize(d_new_array), 150*sizeof(double));
@@ -314,6 +315,68 @@ TEST(Operation, GenericReallocateLarger)
 
   for (int i = 0; i < 100; i++) {
     ASSERT_DOUBLE_EQ(h_array[i], 0);
+  }
+}
+#endif
+
+TEST(Operation, MoveHostToHost)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+  double* host_array = static_cast<double*>(host_allocator.allocate(100*sizeof(double)));
+
+  for (int i = 0; i < 100; i++) {
+    host_array[i] = i;
+  }
+
+  double* moved_array = static_cast<double*>(rm.move(host_array, host_allocator));
+
+  for (int i = 0; i < 100; i++) {
+    ASSERT_DOUBLE_EQ(moved_array[i], i);
+  }
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Operation, MoveHostToDeviceToHost)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+  umpire::Allocator device_allocator = rm.getAllocator("DEVICE");
+
+  double* h_array = static_cast<double*>(host_allocator.allocate(100*sizeof(double)));
+
+  for (int i = 0; i < 100; i++) {
+    h_array[i] = i;
+  }
+
+  double* moved_array_d = static_cast<double*>(rm.move(h_array, device_allocator));
+
+  double* moved_array = static_cast<double*>(rm.move(moved_array_d, host_allocator));
+
+  for (int i = 0; i < 100; i++) {
+    ASSERT_DOUBLE_EQ(moved_array[i], i);
+  }
+}
+
+TEST(Operation, MoveHostToUM)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator host_allocator = rm.getAllocator("HOST");
+  umpire::Allocator um_allocator = rm.getAllocator("UM");
+
+  double* h_array = static_cast<double*>(host_allocator.allocate(100*sizeof(double)));
+
+  for (int i = 0; i < 100; i++) {
+    h_array[i] = i;
+  }
+
+  double* moved_array = static_cast<double*>(rm.move(h_array, um_allocator));
+
+  for (int i = 0; i < 100; i++) {
+    ASSERT_DOUBLE_EQ(moved_array[i], i);
   }
 }
 #endif
