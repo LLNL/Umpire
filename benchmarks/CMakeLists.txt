@@ -30,6 +30,12 @@ blt_add_executable(
   DEPENDS_ON gbenchmark umpire
   OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
 
+blt_add_executable(
+  NAME debuglog_benchmarks
+  SOURCES debuglog_benchmarks.cpp
+  DEPENDS_ON gbenchmark umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+
 blt_add_benchmark(
   NAME allocator_benchmarks
   COMMAND allocator_benchmarks)

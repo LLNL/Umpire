@@ -54,7 +54,7 @@ void Logger::logMessage( message::Level level,
                          const std::string& fileName,
                          int line )
 {
-  if ( level < 0 || level >= message::Num_Levels || m_isEnabled[ level ] == false  )
+  if ( !logLevelEnabled( level ) )
     return;   /* short-circuit */
 
   std::cout 
