@@ -14,12 +14,12 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
-#include "benchmark/benchmark.h"
+#include "benchmark/benchmark_api.h"
 
 #include "umpire/util/Macros.hpp"
 
 static void benchmark_DebugLogger(benchmark::State& state) {
-  for (auto _ : state) {
+  while (state.KeepRunning()) {
     UMPIRE_LOG(Debug, "(" << 22 << ")");
   }
 }
