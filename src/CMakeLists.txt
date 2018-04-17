@@ -23,7 +23,7 @@ set (umpire_sources
   Allocator.cpp
   ResourceManager.cpp)
 
-if (ENABLE_FORTRAN)
+if ( ENABLE_FORTRAN OR ENABLE_C )
   set (umpire_headers
     ${umpire_headers}
     interface/umpire.h
@@ -32,11 +32,18 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/wrapResourceManager.h
     )
 
+if ( ENABLE_C )
   set (umpire_sources
     ${umpire_sources}
     interface/c_fortran/shroudrt.cpp
     interface/c_fortran/wrapAllocator.cpp
     interface/c_fortran/wrapResourceManager.cpp
+    )
+endif()
+
+if ( ENABLE_FORTRAN )
+  set (umpire_sources
+    ${umpire_sources}
     interface/c_fortran/wrapfumpire.f90
     )
 
@@ -44,8 +51,8 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/wrapfumpire.f90
     PROPERTIES
     Fortran_FORMAT FREE)
+endif()
 endif ()
-
 
 blt_add_library(
   NAME umpire

@@ -24,7 +24,7 @@ blt_add_executable(
   DEPENDS_ON
     umpire)
 
-if (ENABLE_FORTRAN)
+if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c
