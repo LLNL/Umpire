@@ -21,11 +21,11 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-  blt_add_executable(
-    NAME allocator_tests
-    SOURCES allocator_tests.cpp
-    DEPENDS_ON ${allocator_tests_depends}
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+blt_add_executable(
+  NAME allocator_tests
+  SOURCES allocator_tests.cpp
+  DEPENDS_ON ${allocator_tests_depends}
+  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
 target_include_directories(
   allocator_tests
