@@ -15,7 +15,6 @@
 #include "gtest/gtest.h"
 
 #include "umpire/umpire.h"
-#include "umpire/config.hpp"
 
 TEST(Allocator, HostAllocator)
 {

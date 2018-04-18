@@ -38,19 +38,19 @@ blt_add_test(
 
 if (ENABLE_C)
   blt_add_executable(
-    NAME allocator_tests_c
-    SOURCES allocator_tests_c.c
+    NAME allocator_c_tests
+    SOURCES allocator_c_tests.cpp
     DEPENDS_ON ${allocator_tests_depends}
     OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
   target_include_directories(
-    allocator_tests_c
+    allocator_c_tests
     PRIVATE
     ${PROJECT_BINARY_DIR}/include)
 
   blt_add_test(
-    NAME allocator_tests_c
-    COMMAND allocator_tests_c)
+    NAME allocator_c_tests
+    COMMAND allocator_c_tests)
 
 endif()
 
