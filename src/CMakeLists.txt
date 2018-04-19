@@ -23,7 +23,7 @@ set (umpire_sources
   Allocator.cpp
   ResourceManager.cpp)
 
-if ( ENABLE_FORTRAN OR ENABLE_C )
+if ( ENABLE_FORTRAN_API OR ENABLE_C_API )
   set (umpire_headers
     ${umpire_headers}
     interface/umpire.h
@@ -32,7 +32,7 @@ if ( ENABLE_FORTRAN OR ENABLE_C )
     interface/c_fortran/wrapResourceManager.h
     )
 
-if ( ENABLE_C )
+if ( ENABLE_C_API )
   set (umpire_sources
     ${umpire_sources}
     interface/c_fortran/shroudrt.cpp
@@ -41,7 +41,7 @@ if ( ENABLE_C )
     )
 endif()
 
-if ( ENABLE_FORTRAN )
+if ( ENABLE_FORTRAN_API )
   set (umpire_sources
     ${umpire_sources}
     interface/c_fortran/wrapfumpire.f90

@@ -36,7 +36,7 @@ blt_add_test(
   NAME allocator_tests
   COMMAND allocator_tests)
 
-if (ENABLE_C)
+if (ENABLE_C_API)
   blt_add_executable(
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp

@@ -26,12 +26,18 @@ set(ENABLE_COPY_HEADERS On CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
-option(ENABLE_C "Build C API Shroud" On)
+option(ENABLE_FORTRAN_API "Build FORTRAN API" Off)
+option(ENABLE_C_API "Build C API" On)
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
+
+if (ENABLE_FORTRAN_API)
+  set(ENABLE_FORTRAN On)
+  set(ENABLE_C_API On)
+endif()
 
 ################################
 # BLT

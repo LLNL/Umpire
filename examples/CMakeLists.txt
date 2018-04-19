@@ -24,7 +24,7 @@ blt_add_executable(
   DEPENDS_ON
     umpire)
 
-if (ENABLE_C)
+if (ENABLE_C_API)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c
