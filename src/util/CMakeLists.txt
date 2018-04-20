@@ -19,12 +19,16 @@ set (umpire_util_headers
   Exception.hpp
   Logger.hpp
   Macros.hpp
-  Platform.hpp)
+  Platform.hpp
+  Statistic.hpp
+  StatisticsDatabase.hpp)
 
 set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
-  Logger.cpp)
+  Logger.cpp
+  Statistic.cpp
+  StatisticsDatabase.cpp)
 
 set (umpire_util_depends umpire_tpl_judy)
 
