@@ -33,7 +33,6 @@ class Statistic {
       void* ptr;
       size_t size;
       std::string event;
-      std::chrono::time_point<std::chrono::system_clock> timestamp;
     }; 
 
     struct OperationStatistic {
@@ -41,20 +40,28 @@ class Statistic {
       void* dst_ptr;
       size_t size;
       std::string event;
-      std::chrono::time_point<std::chrono::system_clock> timestamp;
     };
 
+    enum StatisticType { ALLOC_STAT, OP_STAT };
+
     void recordAllocationStatistic(AllocationStatistic stat);
-    void recordOperationStatistic(OperationStatistic&& stat);
+    void recordOperationStatistic(OperationStatistic stat);
 
     void printData(std::ostream& stream);
 
+    StatisticType getType();
   protected:
-    Statistic(const std::string& name);
+    Statistic(const std::string& name, StatisticType type);
 
   private:
     std::string m_name;
+
+    StatisticType m_type;
+
+    std::vector<std::chrono::time_point<std::chrono::system_clock> > m_statistic_times;
+
     std::vector<AllocationStatistic> m_allocation_statistics;
+
     std::vector<OperationStatistic> m_operation_statistics;
 };
 

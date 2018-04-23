@@ -15,6 +15,8 @@
 
 #include "umpire/util/StatisticsDatabase.hpp"
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace util {
 
@@ -29,15 +31,23 @@ StatisticsDatabase* StatisticsDatabase::getDatabase()
 }
 
 std::shared_ptr<Statistic> 
-StatisticsDatabase::getStatistic(const std::string& name)
+StatisticsDatabase::getStatistic(const std::string& name, Statistic::StatisticType type)
 {
   auto statistic = m_statistics.find(name);
+  std::shared_ptr<Statistic> stat;
 
   if (statistic == m_statistics.end()) {
-    m_statistics[name] = std::shared_ptr<Statistic>(new Statistic(name));
+    stat = std::shared_ptr<Statistic>(new Statistic(name, type));
+    m_statistics[name] = stat;
+  } else {
+    stat = statistic->second;
   }
 
-  return m_statistics[name];
+  if (stat->getType() != type) {
+    UMPIRE_ERROR("Statistic " << name << " already created with type " << type);
+  }
+
+  return stat;
 }
 
 StatisticsDatabase::StatisticsDatabase() :
@@ -48,7 +58,7 @@ StatisticsDatabase::StatisticsDatabase() :
 void
 StatisticsDatabase::printStatistics(std::ostream& stream)
 {
-  stream << "Umpire StatisticsDatabase" << std::endl;
+  stream << "umpire::util::StatisticsDatabase contains " << m_statistics.size() << " statistics" << std::endl;
   for (auto& stat : m_statistics) {
     stat.second->printData(stream);
   }

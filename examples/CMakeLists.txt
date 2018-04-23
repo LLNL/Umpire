@@ -38,3 +38,8 @@ blt_add_executable(
   SOURCES vector_allocator.cpp
   DEPENDS_ON 
     umpire)
+
+blt_add_executable(
+  NAME statistics_example
+  SOURCES statistics.cpp
+  DEPENDS_ON umpire)

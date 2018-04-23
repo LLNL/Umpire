@@ -17,6 +17,9 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/util/StatisticsDatabase.hpp"
+#include "umpire/util/Statistic.hpp"
+
 namespace umpire {
 
 Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator):
@@ -28,7 +31,12 @@ void*
 Allocator::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-  return m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate(bytes);
+
+  util::Statistic::AllocationStatistic stat = {ret, bytes, "allocate"};
+  util::StatisticsDatabase::getDatabase()->getStatistic(getName(), util::Statistic::ALLOC_STAT)->recordAllocationStatistic(stat);
+
+  return ret;
 }
 
 void
@@ -36,6 +44,10 @@ Allocator::deallocate(void* ptr)
 {
   UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
   UMPIRE_LOG(Debug, "(" << ptr << ")");
+
+  util::Statistic::AllocationStatistic stat = {ptr, 0x0, "deallocate"};
+  util::StatisticsDatabase::getDatabase()->getStatistic(getName(), util::Statistic::ALLOC_STAT)->recordAllocationStatistic(stat);
+
   m_allocator->deallocate(ptr);
 }
 

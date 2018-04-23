@@ -28,7 +28,9 @@ class StatisticsDatabase {
   public:
     static StatisticsDatabase* getDatabase();
 
-    std::shared_ptr<Statistic> getStatistic(const std::string& name);
+    std::shared_ptr<Statistic> getStatistic(
+        const std::string& name,
+        Statistic::StatisticType type);
 
     void printStatistics(std::ostream& stream);
   private:

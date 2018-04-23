@@ -18,6 +18,9 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/util/StatisticsDatabase.hpp"
+#include "umpire/util/Statistic.hpp"
+
 namespace umpire {
 namespace op {
 
@@ -28,6 +31,9 @@ void HostCopyOperation::transform(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     size_t length)
 {
+  util::Statistic::OperationStatistic stat = {src_ptr, dst_ptr, length, "transform"};
+  util::StatisticsDatabase::getDatabase()->getStatistic("HostCopyOperation", util::Statistic::OP_STAT)->recordOperationStatistic(stat);
+
   std::memcpy(
       dst_ptr,
       src_ptr,
