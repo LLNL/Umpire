@@ -31,8 +31,10 @@ void HostCopyOperation::transform(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     size_t length)
 {
+#if defined(UMPIRE_ENABLE_STATISTICS)
   util::Statistic::OperationStatistic stat = {src_ptr, dst_ptr, length, "transform"};
   util::StatisticsDatabase::getDatabase()->getStatistic("HostCopyOperation", util::Statistic::OP_STAT)->recordOperationStatistic(stat);
+#endif
 
   std::memcpy(
       dst_ptr,

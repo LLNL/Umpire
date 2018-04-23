@@ -31,6 +31,7 @@ option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
+option(ENABLE_STATISTICS "Keep statistics" On)
 
 ################################
 # BLT
