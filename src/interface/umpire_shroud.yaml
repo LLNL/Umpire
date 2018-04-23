@@ -12,31 +12,39 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+
 library: Umpire
-namespace: umpire
 
 options:
-  C_prefix: UMPIRE_
   F_module_per_class: False
 
-classes:
-  - name: ResourceManager
-    cpp_header: umpire/ResourceManager.hpp
-    F_derived_name: UmpireResourceManager
+format:
+  C_prefix: umpire_
 
-    methods:
-      - decl: ResourceManager& get() +constructor
-        C_code: auto& SH_rv = ResourceManager::getInstance();
-                return static_cast<UMPIRE_resourcemanager *>(static_cast<void *>(&SH_rv));
+declarations:
+- decl: namespace umpire
+  declarations:
 
-      - decl: Allocator* getAllocator(const std::string& resource)
-      - decl: void copy(void* src_ptr, void* dst_ptr)
-      - decl: void deallocate(void* ptr)
+    - decl: class Allocator
+      cxx_header: umpire/Allocator.hpp
+      format:
+        F_derived_name: UmpireAllocator
 
-  - name: Allocator
-    cpp_header: umpire/Allocator.hpp
-    F_derived_name: UmpireAllocator
+      declarations:
+        - decl: void* allocate(size_t bytes)
+        - decl: void deallocate (void* ptr)
 
-    methods:
-      - decl: void* allocate(size_t bytes)
-      - decl: void deallocate (void* ptr)
+    - decl: class ResourceManager
+      cxx_header: umpire/ResourceManager.hpp
+      format:
+        F_derived_name: UmpireResourceManager
+
+      declarations:
+        - decl: ResourceManager& get() +constructor
+          format:
+            C_code: auto& SH_rv = ResourceManager::getInstance();
+                    return static_cast<UMPIRE_resourcemanager *>(static_cast<void *>(&SH_rv));
+
+        - decl: Allocator * getAllocator(const std::string& resource)
+        - decl: void copy(void* src_ptr, void* dst_ptr)
+        - decl: void deallocate(void* ptr)

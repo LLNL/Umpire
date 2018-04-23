@@ -73,11 +73,13 @@
 #include "umpire/util/Logger.hpp"
 #define UMPIRE_LOG( lvl, msg )                                                                \
 {                                                                                             \
-  std::ostringstream local_msg;                                                               \
-  local_msg  << " " << __func__ << " " << msg;                                                \
-  umpire::util::Logger::getActiveLogger()->logMessage(                                        \
-      umpire::util::message::lvl, local_msg.str(),                                            \
-      std::string(__FILE__), __LINE__);                                                       \
+  if (umpire::util::Logger::getActiveLogger()->logLevelEnabled(umpire::util::message::lvl)) { \
+    std::ostringstream local_msg;                                                             \
+    local_msg  << " " << __func__ << " " << msg;                                              \
+    umpire::util::Logger::getActiveLogger()->logMessage(                                      \
+        umpire::util::message::lvl, local_msg.str(),                                          \
+        std::string(__FILE__), __LINE__);                                                     \
+  }                                                                                           \
 }
 #endif // UMPIRE_ENABLE_SLIC
 
