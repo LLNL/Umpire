@@ -18,11 +18,12 @@
 
 TEST(Allocator, HostAllocator)
 {
-  UMPIRE_resourcemanager* rm = UMPIRE_resourcemanager_get();
-  UMPIRE_allocator* allocator = UMPIRE_resourcemanager_get_allocator(rm, "HOST");
+  umpire_resourcemanager* rm = umpire_resourcemanager_get_instance();
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "HOST");
 
-  double* test_alloc = (double*) UMPIRE_allocator_allocate(allocator, 100*sizeof(double));
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
 
   ASSERT_NE(nullptr, test_alloc);
-  UMPIRE_allocator_deallocate(allocator, test_alloc);
+  umpire_allocator_deallocate(allocator, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
 }

@@ -1,17 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
-//
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
-//////////////////////////////////////////////////////////////////////////////
 // wrapAllocator.h
 // This is generated code, do not edit
 /**
@@ -23,7 +9,7 @@
 #ifndef WRAPALLOCATOR_H
 #define WRAPALLOCATOR_H
 
-#include "stdlib.h"
+#include <stddef.h>
 
 // splicer begin class.Allocator.CXX_declarations
 // splicer end class.Allocator.CXX_declarations
@@ -32,16 +18,16 @@
 extern "C" {
 #endif
 
-// declaration of wrapped types
-struct s_UMPIRE_allocator;
-typedef struct s_UMPIRE_allocator UMPIRE_allocator;
+// declaration of shadow types
+struct s_umpire_allocator;
+typedef struct s_umpire_allocator umpire_allocator;
 
 // splicer begin class.Allocator.C_declarations
 // splicer end class.Allocator.C_declarations
 
-void * UMPIRE_allocator_allocate(UMPIRE_allocator * self, size_t bytes);
+void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 
-void UMPIRE_allocator_deallocate(UMPIRE_allocator * self, void * ptr);
+void umpire_allocator_deallocate(umpire_allocator * self, void * ptr);
 
 #ifdef __cplusplus
 }
