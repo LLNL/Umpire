@@ -48,6 +48,14 @@ declarations:
         F_derived_name: UmpireResourceManager
 
       declarations:
+        #
+        # NOTE: Ideally, this would simply be "- decl: static ResourceManager& getInstance()"
+        # But there seems to be a bug with the internal names produced by shroud for
+        # constructors.  Namely, the internal name used is get_instance which conflicts
+        # with what getInstance() gets translated to.  So, for the moment, we have to
+        # specify a different name for the method and then specify the code to be run
+        # that will call our internal C++ implementation of getInsance().
+        #
         - decl: static ResourceManager& getinstance()
           format:
             C_code: |
@@ -59,10 +67,11 @@ declarations:
 
         #
         # - decl: void finalize()
-        #
- 
+        # NOTE: Does not compile since implementation of finalize() is missing.
         #
         # - decl: std::vector<std::string> getAvailableAllocators()
+        # NOTE: If needed, we will need to determine mechanism to return a vector
+        #       object from a C interface.
         #
 
         - decl: Allocator* getAllocator(const std::string& name)
@@ -72,7 +81,11 @@ declarations:
               umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
               umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
               return XSH_rv;
-        
+ 
+        #
+        # NOTE: This function is needed for Shroud only since object lifetime
+        #       for C/FORTRAN callers needs to be explicit.
+        #
         - decl: static void deleteAllocator(Allocator* alloc_obj)
           format:
             C_code: |
@@ -80,22 +93,14 @@ declarations:
               delete SHCXX_alloc_obj;
 
         #
-        # - decl: Allocator getAllocator(resource::MemoryResourceType resource_type)
-        #
-
-        #
         # - decl: Allocator makeAllocator(const std::string& name, const std::string& strategy, util::AllocatorTraits traits, std::vector<Allocator> providers)
-        #
-
-        #
+        # - decl: Allocator getAllocator(resource::MemoryResourceType resource_type)
         # - decl: Allocator getAllocator(void* ptr)
         #
-
-        #
         # - decl: void registerAllocation(void* ptr, util::AllocationRecord* record)
+        # - decl: void deregisterAllocation(void* ptr)
         #
 
-        - decl: void deregisterAllocation(void* ptr)
         - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
         - decl: void memset(void* ptr, int val, size_t length=0)
         - decl: void* reallocate(void* src_ptr, size_t size)

@@ -16,6 +16,21 @@
 
 #include "umpire/umpire.h"
 
+TEST(Allocator, HostAllocatorExplicitInit)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+
+  umpire_resourcemanager_initialize(rm);
+
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "HOST");
+
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
+
+  ASSERT_NE(nullptr, test_alloc);
+  umpire_allocator_deallocate(allocator, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
+}
+
 TEST(Allocator, HostAllocator)
 {
   umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
@@ -27,3 +42,60 @@ TEST(Allocator, HostAllocator)
   umpire_allocator_deallocate(allocator, test_alloc);
   umpire_resourcemanager_delete_allocator(allocator);
 }
+
+TEST(Allocator, HostAllocatorSize)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "HOST");
+
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
+  ASSERT_EQ((100*sizeof(double)), umpire_resourcemanager_get_size(rm, test_alloc));
+  ASSERT_EQ((100*sizeof(double)), umpire_allocator_get_size(allocator, test_alloc));
+
+  ASSERT_NE(nullptr, test_alloc);
+  umpire_allocator_deallocate(allocator, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Allocator, DeviceAllocatorExplicitInit)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+
+  umpire_resourcemanager_initialize(rm);
+
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "DEVICE");
+
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
+
+  ASSERT_NE(nullptr, test_alloc);
+  umpire_allocator_deallocate(allocator, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
+}
+
+TEST(Allocator, DeviceAllocator)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "DEVICE");
+
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
+
+  ASSERT_NE(nullptr, test_alloc);
+  umpire_allocator_deallocate(allocator, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
+}
+
+TEST(Allocator, DeviceAllocatorSize)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "DEVICE");
+
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
+  ASSERT_EQ((100*sizeof(double)), umpire_resourcemanager_get_size(rm, test_alloc));
+  ASSERT_EQ((100*sizeof(double)), umpire_allocator_get_size(allocator, test_alloc));
+
+  ASSERT_NE(nullptr, test_alloc);
+  umpire_allocator_deallocate(allocator, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
+}
+#endif
