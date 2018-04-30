@@ -32,13 +32,39 @@ declarations:
       declarations:
         - decl: void* allocate(size_t bytes)
         - decl: void deallocate (void* ptr)
+        - decl: size_t getSize(void* ptr)
+        - decl: size_t getHighWatermark()
+        - decl: size_t getCurrentSize()
+        # - decl: std::string getName()
+        - decl: size_t getId()
+
+        #
+        # - decl: std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy()
+        #
 
     - decl: class ResourceManager
       cxx_header: umpire/ResourceManager.hpp
       format:
         F_derived_name: UmpireResourceManager
+
       declarations:
-        - decl: static ResourceManager& getInstance()
+        - decl: static ResourceManager& getinstance()
+          format:
+            C_code: |
+              umpire::ResourceManager & SHCXX_rv = umpire::ResourceManager::getInstance();
+              umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
+              return SHC_rv;
+
+        - decl: void initialize()
+
+        #
+        # - decl: void finalize()
+        #
+ 
+        #
+        # - decl: std::vector<std::string> getAvailableAllocators()
+        #
+
         - decl: Allocator* getAllocator(const std::string& name)
           format:
             C_code: |
@@ -46,10 +72,32 @@ declarations:
               umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
               umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
               return XSH_rv;
+        
         - decl: static void deleteAllocator(Allocator* alloc_obj)
           format:
             C_code: |
               {C_pre_call}
               delete SHCXX_alloc_obj;
-        - decl: void copy(void* src_ptr, void* dst_ptr)
+
+        #
+        # - decl: Allocator getAllocator(resource::MemoryResourceType resource_type)
+        #
+
+        #
+        # - decl: Allocator makeAllocator(const std::string& name, const std::string& strategy, util::AllocatorTraits traits, std::vector<Allocator> providers)
+        #
+
+        #
+        # - decl: Allocator getAllocator(void* ptr)
+        #
+
+        #
+        # - decl: void registerAllocation(void* ptr, util::AllocationRecord* record)
+        #
+
+        - decl: void deregisterAllocation(void* ptr)
+        - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
+        - decl: void memset(void* ptr, int val, size_t length=0)
+        - decl: void* reallocate(void* src_ptr, size_t size)
         - decl: void deallocate(void* ptr)
+        - decl: size_t getSize(void* ptr)

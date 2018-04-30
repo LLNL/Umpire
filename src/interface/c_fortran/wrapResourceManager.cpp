@@ -12,16 +12,24 @@ extern "C" {
 // splicer begin class.ResourceManager.C_definitions
 // splicer end class.ResourceManager.C_definitions
 
-umpire_resourcemanager * umpire_resourcemanager_get_instance()
+umpire_resourcemanager * umpire_resourcemanager_getinstance()
 {
-// splicer begin class.ResourceManager.method.get_instance
-    umpire::ResourceManager & SHCXX_rv = umpire::
-        ResourceManager::getInstance();
-    umpire_resourcemanager * SHC_rv = 
-        static_cast<umpire_resourcemanager *>(static_cast<void *>(
-        &SHCXX_rv));
+// splicer begin class.ResourceManager.method.getinstance
+    umpire::ResourceManager & SHCXX_rv = umpire::ResourceManager::getInstance();
+    umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
     return SHC_rv;
-// splicer end class.ResourceManager.method.get_instance
+
+// splicer end class.ResourceManager.method.getinstance
+}
+
+void umpire_resourcemanager_initialize(umpire_resourcemanager * self)
+{
+// splicer begin class.ResourceManager.method.initialize
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    SH_this->initialize();
+    return;
+// splicer end class.ResourceManager.method.initialize
 }
 
 umpire_allocator * umpire_resourcemanager_get_allocator(
@@ -63,15 +71,70 @@ void umpire_resourcemanager_delete_allocator(
 // splicer end class.ResourceManager.method.delete_allocator
 }
 
-void umpire_resourcemanager_copy(umpire_resourcemanager * self,
+void umpire_resourcemanager_deregister_allocation(
+    umpire_resourcemanager * self, void * ptr)
+{
+// splicer begin class.ResourceManager.method.deregister_allocation
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    SH_this->deregisterAllocation(ptr);
+    return;
+// splicer end class.ResourceManager.method.deregister_allocation
+}
+
+void umpire_resourcemanager_copy_0(umpire_resourcemanager * self,
     void * src_ptr, void * dst_ptr)
 {
-// splicer begin class.ResourceManager.method.copy
+// splicer begin class.ResourceManager.method.copy_0
     umpire::ResourceManager *SH_this = static_cast<umpire::
         ResourceManager *>(static_cast<void *>(self));
     SH_this->copy(src_ptr, dst_ptr);
     return;
-// splicer end class.ResourceManager.method.copy
+// splicer end class.ResourceManager.method.copy_0
+}
+
+void umpire_resourcemanager_copy_1(umpire_resourcemanager * self,
+    void * src_ptr, void * dst_ptr, size_t size)
+{
+// splicer begin class.ResourceManager.method.copy_1
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    SH_this->copy(src_ptr, dst_ptr, size);
+    return;
+// splicer end class.ResourceManager.method.copy_1
+}
+
+void umpire_resourcemanager_memset_0(umpire_resourcemanager * self,
+    void * ptr, int val)
+{
+// splicer begin class.ResourceManager.method.memset_0
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    SH_this->memset(ptr, val);
+    return;
+// splicer end class.ResourceManager.method.memset_0
+}
+
+void umpire_resourcemanager_memset_1(umpire_resourcemanager * self,
+    void * ptr, int val, size_t length)
+{
+// splicer begin class.ResourceManager.method.memset_1
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    SH_this->memset(ptr, val, length);
+    return;
+// splicer end class.ResourceManager.method.memset_1
+}
+
+void * umpire_resourcemanager_reallocate(umpire_resourcemanager * self,
+    void * src_ptr, size_t size)
+{
+// splicer begin class.ResourceManager.method.reallocate
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    void * SHC_rv = SH_this->reallocate(src_ptr, size);
+    return SHC_rv;
+// splicer end class.ResourceManager.method.reallocate
 }
 
 void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
@@ -83,6 +146,17 @@ void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
     SH_this->deallocate(ptr);
     return;
 // splicer end class.ResourceManager.method.deallocate
+}
+
+size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
+    void * ptr)
+{
+// splicer begin class.ResourceManager.method.get_size
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    size_t SHC_rv = SH_this->getSize(ptr);
+    return SHC_rv;
+// splicer end class.ResourceManager.method.get_size
 }
 
 }  // extern "C"

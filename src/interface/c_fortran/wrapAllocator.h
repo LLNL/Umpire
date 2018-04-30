@@ -29,6 +29,14 @@ void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 
 void umpire_allocator_deallocate(umpire_allocator * self, void * ptr);
 
+size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr);
+
+size_t umpire_allocator_get_high_watermark(umpire_allocator * self);
+
+size_t umpire_allocator_get_current_size(umpire_allocator * self);
+
+size_t umpire_allocator_get_id(umpire_allocator * self);
+
 #ifdef __cplusplus
 }
 #endif

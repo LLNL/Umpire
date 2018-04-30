@@ -44,11 +44,11 @@ endif()
 if ( ENABLE_FORTRAN_API )
   set (umpire_sources
     ${umpire_sources}
-    interface/c_fortran/wrapfumpire.f90
+    interface/c_fortran/wrapfumpire.f
     )
 
   set_source_files_properties(
-    interface/c_fortran/wrapfumpire.f90
+    interface/c_fortran/wrapfumpire.f
     PROPERTIES
     Fortran_FORMAT FREE)
 endif()

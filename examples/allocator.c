@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
   (void)(argc);
   (void)(argv);
 
-  umpire_resourcemanager* rm = umpire_resourcemanager_get_instance();
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
   umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "HOST");
 
   double* alloc_one;
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
     alloc_one[i] = 1.0*i;
   }
 
-  umpire_resourcemanager_copy(rm, alloc_one, alloc_two);
+  umpire_resourcemanager_copy_0(rm, alloc_one, alloc_two);
 
   for (i = 0; i < ELEMS; i++) {
     if (alloc_one[i] == alloc_two[i]) {

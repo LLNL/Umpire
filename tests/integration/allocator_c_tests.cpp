@@ -18,7 +18,7 @@
 
 TEST(Allocator, HostAllocator)
 {
-  umpire_resourcemanager* rm = umpire_resourcemanager_get_instance();
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
   umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "HOST");
 
   double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
