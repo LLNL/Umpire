@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
   (void)(argv);
 
   umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
-  umpire_allocator* allocator = umpire_resourcemanager_get_allocator(rm, "HOST");
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator_0(rm, "HOST");
 
   double* alloc_one;
   double* alloc_two;

@@ -46,9 +46,9 @@ module umpire_mod
     contains
         procedure, nopass :: getinstance => resourcemanager_getinstance
         procedure :: initialize => resourcemanager_initialize
-        procedure :: get_allocator => resourcemanager_get_allocator
+        procedure :: get_allocator_0 => resourcemanager_get_allocator_0
+        procedure :: get_allocator_1 => resourcemanager_get_allocator_1
         procedure, nopass :: delete_allocator => resourcemanager_delete_allocator
-        procedure :: deregister_allocation => resourcemanager_deregister_allocation
         procedure :: copy_0 => resourcemanager_copy_0
         procedure :: copy_1 => resourcemanager_copy_1
         procedure :: memset_0 => resourcemanager_memset_0
@@ -60,6 +60,7 @@ module umpire_mod
         procedure :: set_instance => resourcemanager_set_instance
         procedure :: associated => resourcemanager_associated
         generic :: copy => copy_0, copy_1
+        generic :: get_allocator => get_allocator_0, get_allocator_1
         generic :: memset => memset_0, memset_1
         ! splicer begin class.ResourceManager.type_bound_procedure_part
         ! splicer end class.ResourceManager.type_bound_procedure_part
@@ -150,27 +151,37 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: self
         end subroutine c_resourcemanager_initialize
 
-        function c_resourcemanager_get_allocator(self, name) &
+        function c_resourcemanager_get_allocator_0(self, name) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_get_allocator")
+                bind(C, name="umpire_resourcemanager_get_allocator_0")
             use iso_c_binding, only : C_CHAR, C_PTR
             implicit none
             type(C_PTR), value, intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             type(C_PTR) :: SHT_rv
-        end function c_resourcemanager_get_allocator
+        end function c_resourcemanager_get_allocator_0
 
-        function c_resourcemanager_get_allocator_bufferify(self, name, &
+        function c_resourcemanager_get_allocator_0_bufferify(self, name, &
                 Lname) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_get_allocator_bufferify")
+                bind(C, name="umpire_resourcemanager_get_allocator_0_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             implicit none
             type(C_PTR), value, intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
             type(C_PTR) :: SHT_rv
-        end function c_resourcemanager_get_allocator_bufferify
+        end function c_resourcemanager_get_allocator_0_bufferify
+
+        function c_resourcemanager_get_allocator_1(self, id) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_get_allocator_1")
+            use iso_c_binding, only : C_INT, C_PTR
+            implicit none
+            type(C_PTR), value, intent(IN) :: self
+            integer(C_INT), value, intent(IN) :: id
+            type(C_PTR) :: SHT_rv
+        end function c_resourcemanager_get_allocator_1
 
         subroutine c_resourcemanager_delete_allocator(alloc_obj) &
                 bind(C, name="umpire_resourcemanager_delete_allocator")
@@ -178,14 +189,6 @@ module umpire_mod
             implicit none
             type(C_PTR), value, intent(IN) :: alloc_obj
         end subroutine c_resourcemanager_delete_allocator
-
-        subroutine c_resourcemanager_deregister_allocation(self, ptr) &
-                bind(C, name="umpire_resourcemanager_deregister_allocation")
-            use iso_c_binding, only : C_PTR
-            implicit none
-            type(C_PTR), value, intent(IN) :: self
-            type(C_PTR), value, intent(IN) :: ptr
-        end subroutine c_resourcemanager_deregister_allocation
 
         subroutine c_resourcemanager_copy_0(self, src_ptr, dst_ptr) &
                 bind(C, name="umpire_resourcemanager_copy_0")
@@ -361,17 +364,29 @@ contains
         ! splicer end class.ResourceManager.method.initialize
     end subroutine resourcemanager_initialize
 
-    function resourcemanager_get_allocator(obj, name) &
+    function resourcemanager_get_allocator_0(obj, name) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT
         class(UmpireResourceManager) :: obj
         character(*), intent(IN) :: name
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.get_allocator
-        SHT_rv%voidptr = c_resourcemanager_get_allocator_bufferify(obj%voidptr, &
+        ! splicer begin class.ResourceManager.method.get_allocator_0
+        SHT_rv%voidptr = c_resourcemanager_get_allocator_0_bufferify(obj%voidptr, &
             name, len_trim(name, kind=C_INT))
-        ! splicer end class.ResourceManager.method.get_allocator
-    end function resourcemanager_get_allocator
+        ! splicer end class.ResourceManager.method.get_allocator_0
+    end function resourcemanager_get_allocator_0
+
+    function resourcemanager_get_allocator_1(obj, id) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT
+        class(UmpireResourceManager) :: obj
+        integer(C_INT), value, intent(IN) :: id
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.get_allocator_1
+        SHT_rv%voidptr = c_resourcemanager_get_allocator_1(obj%voidptr, &
+            id)
+        ! splicer end class.ResourceManager.method.get_allocator_1
+    end function resourcemanager_get_allocator_1
 
     subroutine resourcemanager_delete_allocator(alloc_obj)
         type(UmpireAllocator), value, intent(IN) :: alloc_obj
@@ -379,15 +394,6 @@ contains
         call c_resourcemanager_delete_allocator(alloc_obj%get_instance())
         ! splicer end class.ResourceManager.method.delete_allocator
     end subroutine resourcemanager_delete_allocator
-
-    subroutine resourcemanager_deregister_allocation(obj, ptr)
-        use iso_c_binding, only : C_PTR
-        class(UmpireResourceManager) :: obj
-        type(C_PTR), value, intent(IN) :: ptr
-        ! splicer begin class.ResourceManager.method.deregister_allocation
-        call c_resourcemanager_deregister_allocation(obj%voidptr, ptr)
-        ! splicer end class.ResourceManager.method.deregister_allocation
-    end subroutine resourcemanager_deregister_allocation
 
     subroutine resourcemanager_copy_0(obj, src_ptr, dst_ptr)
         use iso_c_binding, only : C_PTR

@@ -36,6 +36,7 @@ declarations:
         - decl: size_t getHighWatermark()
         - decl: size_t getCurrentSize()
         # - decl: std::string getName()
+
         - decl: size_t getId()
 
         #
@@ -79,6 +80,14 @@ declarations:
             C_code: |
               {C_pre_call}
               umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
+              umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
+              return XSH_rv;
+ 
+        - decl: Allocator* getAllocator(const int id)
+          format:
+            C_code: |
+              {C_pre_call}
+              umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(id)); 
               umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
               return XSH_rv;
  

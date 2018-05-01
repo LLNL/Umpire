@@ -60,6 +60,11 @@ class ResourceManager {
     Allocator getAllocator(const std::string& name);
 
     /*!
+     * \brief Get the Allocator with the given ID.
+     */
+    Allocator getAllocator(const int id);
+
+    /*!
      * \brief Get the default Allocator for the given resource_type.
      */
     Allocator getAllocator(resource::MemoryResourceType resource_type);
@@ -153,6 +158,7 @@ class ResourceManager {
     ResourceManager& operator= (const ResourceManager&) = delete;
 
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
+    std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForId(int id);
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
     static ResourceManager* s_resource_manager_instance;

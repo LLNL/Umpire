@@ -31,17 +31,17 @@ umpire_resourcemanager * umpire_resourcemanager_getinstance();
 
 void umpire_resourcemanager_initialize(umpire_resourcemanager * self);
 
-umpire_allocator * umpire_resourcemanager_get_allocator(
+umpire_allocator * umpire_resourcemanager_get_allocator_0(
     umpire_resourcemanager * self, const char * name);
 
-umpire_allocator * umpire_resourcemanager_get_allocator_bufferify(
+umpire_allocator * umpire_resourcemanager_get_allocator_0_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname);
+
+umpire_allocator * umpire_resourcemanager_get_allocator_1(
+    umpire_resourcemanager * self, const int id);
 
 void umpire_resourcemanager_delete_allocator(
     umpire_allocator * alloc_obj);
-
-void umpire_resourcemanager_deregister_allocation(
-    umpire_resourcemanager * self, void * ptr);
 
 void umpire_resourcemanager_copy_0(umpire_resourcemanager * self,
     void * src_ptr, void * dst_ptr);

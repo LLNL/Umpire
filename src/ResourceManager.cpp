@@ -186,6 +186,13 @@ ResourceManager::getAllocator(void* ptr)
   return Allocator(findAllocatorForPointer(ptr));
 }
 
+Allocator
+ResourceManager::getAllocator(int id)
+{
+  UMPIRE_LOG(Debug, "(id=" << id << ")");
+  return Allocator(findAllocatorForId(id));
+}
+
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", record=" << record << ") with " << this );
@@ -287,6 +294,18 @@ ResourceManager::getSize(void* ptr)
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);
   return record->m_size;
+}
+
+std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForId(int id)
+{
+  auto allocator_i = m_allocators_by_id.find(id);
+
+  if ( allocator_i == m_allocators_by_id.end() ) {
+    UMPIRE_ERROR("Cannot find allocator for ID " << id);
+  }
+
+  UMPIRE_LOG(Debug, "(id=" << id << ") returning " << allocator_i->second );
+  return allocator_i->second;
 }
 
 std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)

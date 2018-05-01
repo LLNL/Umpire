@@ -40,6 +40,22 @@ TEST(Allocator, HostAllocatorType)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
+}
+
+TEST(Allocator, HostAllocatorId)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("HOST");
+  int alloc_id = allocator.getId();
+  umpire::Allocator allocator2 = rm.getAllocator(alloc_id);
+
+  ASSERT_EQ(alloc_id, allocator2.getId());
+
+  double* test_alloc = static_cast<double*>(allocator2.allocate(100*sizeof(double)));
+  ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, HostAllocatorReference)
@@ -81,6 +97,22 @@ TEST(Allocator, DeviceAllocator)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
+}
+
+TEST(Allocator, DeviceAllocatorId)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("DEVICE");
+  int alloc_id = allocator.getId();
+  umpire::Allocator allocator2 = rm.getAllocator(alloc_id);
+
+  ASSERT_EQ(alloc_id, allocator2.getId());
+
+  double* test_alloc = static_cast<double*>(allocator2.allocate(100*sizeof(double)));
+  ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, DeviceAllocatorReference)
@@ -121,6 +153,22 @@ TEST(Allocator, UmAllocator)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
+}
+
+TEST(Allocator, UmAllocatorId)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("UM");
+  int alloc_id = allocator.getId();
+  umpire::Allocator allocator2 = rm.getAllocator(alloc_id);
+
+  ASSERT_EQ(alloc_id, allocator2.getId());
+
+  double* test_alloc = static_cast<double*>(allocator2.allocate(100*sizeof(double)));
+  ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, UmAllocatorReference)
@@ -161,6 +209,22 @@ TEST(Allocator, PinnedAllocator)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
+}
+
+TEST(Allocator, PinnedAllocatorId)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("PINNED");
+  int alloc_id = allocator.getId();
+  umpire::Allocator allocator2 = rm.getAllocator(alloc_id);
+
+  ASSERT_EQ(alloc_id, allocator2.getId());
+
+  double* test_alloc = static_cast<double*>(allocator2.allocate(100*sizeof(double)));
+  ASSERT_NE(nullptr, test_alloc);
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, PinnedAllocatorReference)

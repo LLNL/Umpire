@@ -32,10 +32,10 @@ void umpire_resourcemanager_initialize(umpire_resourcemanager * self)
 // splicer end class.ResourceManager.method.initialize
 }
 
-umpire_allocator * umpire_resourcemanager_get_allocator(
+umpire_allocator * umpire_resourcemanager_get_allocator_0(
     umpire_resourcemanager * self, const char * name)
 {
-// splicer begin class.ResourceManager.method.get_allocator
+// splicer begin class.ResourceManager.method.get_allocator_0
     umpire::ResourceManager *SH_this = static_cast<umpire::
         ResourceManager *>(static_cast<void *>(self));
     const std::string SH_name(name);
@@ -43,13 +43,13 @@ umpire_allocator * umpire_resourcemanager_get_allocator(
     umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
     return XSH_rv;
 
-// splicer end class.ResourceManager.method.get_allocator
+// splicer end class.ResourceManager.method.get_allocator_0
 }
 
-umpire_allocator * umpire_resourcemanager_get_allocator_bufferify(
+umpire_allocator * umpire_resourcemanager_get_allocator_0_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname)
 {
-// splicer begin class.ResourceManager.method.get_allocator_bufferify
+// splicer begin class.ResourceManager.method.get_allocator_0_bufferify
     umpire::ResourceManager *SH_this = static_cast<umpire::
         ResourceManager *>(static_cast<void *>(self));
     const std::string SH_name(name, Lname);
@@ -57,7 +57,20 @@ umpire_allocator * umpire_resourcemanager_get_allocator_bufferify(
     umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
     return XSH_rv;
 
-// splicer end class.ResourceManager.method.get_allocator_bufferify
+// splicer end class.ResourceManager.method.get_allocator_0_bufferify
+}
+
+umpire_allocator * umpire_resourcemanager_get_allocator_1(
+    umpire_resourcemanager * self, const int id)
+{
+// splicer begin class.ResourceManager.method.get_allocator_1
+    umpire::ResourceManager *SH_this = static_cast<umpire::
+        ResourceManager *>(static_cast<void *>(self));
+    umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(id)); 
+    umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
+    return XSH_rv;
+
+// splicer end class.ResourceManager.method.get_allocator_1
 }
 
 void umpire_resourcemanager_delete_allocator(
@@ -69,17 +82,6 @@ void umpire_resourcemanager_delete_allocator(
     delete SHCXX_alloc_obj;
 
 // splicer end class.ResourceManager.method.delete_allocator
-}
-
-void umpire_resourcemanager_deregister_allocation(
-    umpire_resourcemanager * self, void * ptr)
-{
-// splicer begin class.ResourceManager.method.deregister_allocation
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
-    SH_this->deregisterAllocation(ptr);
-    return;
-// splicer end class.ResourceManager.method.deregister_allocation
 }
 
 void umpire_resourcemanager_copy_0(umpire_resourcemanager * self,
