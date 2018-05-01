@@ -189,3 +189,23 @@ TEST(Allocator, DeviceAllocator_CurrentSize_and_HiWatermark)
   umpire_resourcemanager_delete_allocator(allocator);
 }
 #endif
+
+TEST(Allocator, Deallocate)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+  umpire_allocator* allocator = umpire_resourcemanager_get_allocator_0(rm, "HOST");
+  double* test_alloc = (double*) umpire_allocator_allocate(allocator, 100*sizeof(double));
+  umpire_resourcemanager_deallocate(rm, test_alloc);
+  umpire_resourcemanager_delete_allocator(allocator);
+  SUCCEED();
+}
+
+TEST(Allocator, DeallocateThrow)
+{
+  umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
+  double* ptr = new double[20];
+  ASSERT_ANY_THROW( umpire_resourcemanager_deallocate(rm, ptr) );
+
+  delete[] ptr;
+}
+

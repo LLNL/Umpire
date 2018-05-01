@@ -35,7 +35,22 @@ declarations:
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
         - decl: size_t getCurrentSize()
-        # - decl: std::string getName()
+
+        #
+        # NOTE: Can we change getName() to be a const std::string& instead of std::string??
+        #
+        # - decl: const std::string& getName()
+        # format:
+        # C_code: |
+        # {C_pre_call}
+        # std::string SHCXX_rv = new std::string(SH_this->getName());
+        # 
+        # umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
+        # return XSH_rv;
+        # 
+        # umpire::ResourceManager & SHCXX_rv = umpire::ResourceManager::getInstance();
+        # umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
+        # return SHC_rv;
 
         - decl: size_t getId()
 
@@ -64,8 +79,10 @@ declarations:
               umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
               return SHC_rv;
 
-        - decl: void initialize()
-
+        #
+        # - decl: void initialize()
+        # NOTE: This one is trivial to add, but I need to understand the use case for it first.
+        # Especially sinze finalize() implementation is missing.
         #
         # - decl: void finalize()
         # NOTE: Does not compile since implementation of finalize() is missing.
@@ -77,6 +94,7 @@ declarations:
 
         - decl: Allocator* getAllocator(const std::string& name)
           format:
+            # C_name: umpire_resourcemanager_get_allocator_by_name
             C_code: |
               {C_pre_call}
               umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
@@ -85,6 +103,7 @@ declarations:
  
         - decl: Allocator* getAllocator(const int id)
           format:
+            # C_name: umpire_resourcemanager_get_allocator_by_id
             C_code: |
               {C_pre_call}
               umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(id)); 

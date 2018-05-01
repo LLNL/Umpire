@@ -45,7 +45,6 @@ module umpire_mod
         ! splicer end class.ResourceManager.component_part
     contains
         procedure, nopass :: getinstance => resourcemanager_getinstance
-        procedure :: initialize => resourcemanager_initialize
         procedure :: get_allocator_0 => resourcemanager_get_allocator_0
         procedure :: get_allocator_1 => resourcemanager_get_allocator_1
         procedure, nopass :: delete_allocator => resourcemanager_delete_allocator
@@ -143,13 +142,6 @@ module umpire_mod
             implicit none
             type(C_PTR) :: SHT_rv
         end function c_resourcemanager_getinstance
-
-        subroutine c_resourcemanager_initialize(self) &
-                bind(C, name="umpire_resourcemanager_initialize")
-            use iso_c_binding, only : C_PTR
-            implicit none
-            type(C_PTR), value, intent(IN) :: self
-        end subroutine c_resourcemanager_initialize
 
         function c_resourcemanager_get_allocator_0(self, name) &
                 result(SHT_rv) &
@@ -356,13 +348,6 @@ contains
         SHT_rv%voidptr = c_resourcemanager_getinstance()
         ! splicer end class.ResourceManager.method.getinstance
     end function resourcemanager_getinstance
-
-    subroutine resourcemanager_initialize(obj)
-        class(UmpireResourceManager) :: obj
-        ! splicer begin class.ResourceManager.method.initialize
-        call c_resourcemanager_initialize(obj%voidptr)
-        ! splicer end class.ResourceManager.method.initialize
-    end subroutine resourcemanager_initialize
 
     function resourcemanager_get_allocator_0(obj, name) &
             result(SHT_rv)

@@ -277,6 +277,7 @@ TEST(Allocator, DeallocateThrow)
 
   double* ptr = new double[20];
   ASSERT_ANY_THROW(rm.deallocate(ptr));
+  delete[] ptr;
 }
 
 TEST(Allocator, Name)

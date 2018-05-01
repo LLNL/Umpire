@@ -29,8 +29,6 @@ typedef struct s_umpire_resourcemanager umpire_resourcemanager;
 
 umpire_resourcemanager * umpire_resourcemanager_getinstance();
 
-void umpire_resourcemanager_initialize(umpire_resourcemanager * self);
-
 umpire_allocator * umpire_resourcemanager_get_allocator_0(
     umpire_resourcemanager * self, const char * name);
 

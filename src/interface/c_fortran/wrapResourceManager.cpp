@@ -22,16 +22,6 @@ umpire_resourcemanager * umpire_resourcemanager_getinstance()
 // splicer end class.ResourceManager.method.getinstance
 }
 
-void umpire_resourcemanager_initialize(umpire_resourcemanager * self)
-{
-// splicer begin class.ResourceManager.method.initialize
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
-    SH_this->initialize();
-    return;
-// splicer end class.ResourceManager.method.initialize
-}
-
 umpire_allocator * umpire_resourcemanager_get_allocator_0(
     umpire_resourcemanager * self, const char * name)
 {
