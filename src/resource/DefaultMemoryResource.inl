@@ -56,7 +56,7 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
-  m_current_size -= ResourceManager::getInstance().getSize(ptr);
+  //m_current_size -= ResourceManager::getInstance().getSize(ptr);
   ResourceManager::getInstance().deregisterAllocation(ptr);
 
 }
