@@ -32,6 +32,11 @@ static void benchmark_allocate(benchmark::State& state, std::string name) {
   while (state.KeepRunning()) {
     allocations[i++] = allocator.allocate(size);
   }
+
+  for (size_t j = 0; j < i; j++)
+    allocator.deallocate(allocations[j]);
+
+  delete[] allocations;
 }
 
 static void benchmark_deallocate(benchmark::State& state, std::string name) {
@@ -48,11 +53,83 @@ static void benchmark_deallocate(benchmark::State& state, std::string name) {
   while (state.KeepRunning()) {
     allocator.deallocate(allocations[i++]);
   }
+
+  for (size_t j = i; j < state.max_iterations; j++)
+    allocator.deallocate(allocations[j]);
+  delete[] allocations;
 }
 
-BENCHMARK_CAPTURE(benchmark_allocate, host, std::string("HOST"))->Range(4, 4096);
+static void benchmark_mallocate(benchmark::State& state, std::string name) {
+  auto allocator = umpire::ResourceManager::getInstance().getAllocator(name);
+  void** allocations = new void*[state.max_iterations];
 
-BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(4, 4096);
+  auto size = state.range(0);
+
+  size_t i = 0;
+  while (state.KeepRunning()) {
+    allocations[i++] = malloc(size);
+  }
+
+  for (size_t j = 0; j < i; j++)
+    free(allocations[j]);
+
+  delete[] allocations;
+}
+
+static void benchmark_free(benchmark::State& state, std::string name) {
+  auto allocator = umpire::ResourceManager::getInstance().getAllocator(name);
+
+  void** allocations = new void*[state.max_iterations];
+  auto size = state.range(0);
+
+  for (size_t i = 0; i < state.max_iterations; i++) {
+    allocations[i] = malloc(size);
+  }
+
+  size_t i = 0;
+  while (state.KeepRunning()) {
+    free(allocations[i++]);
+  }
+
+  for (size_t j = i; j < state.max_iterations; j++)
+    free(allocations[j]);
+  delete[] allocations;
+}
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(4, 4);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(4, 4);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(4, 4);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(4, 4);
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(8, 8);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(8, 8);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(8, 8);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(8, 8);
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(16, 16);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(16, 16);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(16, 16);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(16, 16);
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(32, 32);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(32, 32);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(32, 32);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(32, 32);
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(64, 64);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(64, 64);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(64, 64);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(64, 64);
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(512, 512);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(512, 512);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(512, 512);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(512, 512);
+
+BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(4096, 4096);
+BENCHMARK_CAPTURE(benchmark_mallocate,  host, std::string("HOST"))->Range(4096, 4096);
+BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(4096, 4096);
+BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(4096, 4096);
 
 #if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_CAPTURE(benchmark_allocate, um, std::string("UM"))->Range(4, 4096);
