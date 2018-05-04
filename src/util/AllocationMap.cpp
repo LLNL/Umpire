@@ -37,12 +37,14 @@ AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
       reinterpret_cast<uintptr_t>(alloc_record));
 }
 
-void
+AllocationRecord*
 AllocationMap::remove(void* ptr)
 {
   UMPIRE_LOG(Debug, "Removing " << ptr);
 
-  m_records.remove(reinterpret_cast<uintptr_t>(ptr));
+  uintptr_t record = m_records.remove(reinterpret_cast<uintptr_t>(ptr));
+  return reinterpret_cast<AllocationRecord*>(record);
+  //return nullptr;
 }
 
 AllocationRecord*

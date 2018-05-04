@@ -94,7 +94,7 @@ class ResourceManager {
 
     void registerAllocation(void* ptr, util::AllocationRecord* record);
 
-    void deregisterAllocation(void* ptr);
+    util::AllocationRecord* deregisterAllocation(void* ptr);
 
     /*!
      * \brief Copy size bytes of data from src_ptr to dst_ptr.

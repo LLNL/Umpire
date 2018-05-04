@@ -35,7 +35,7 @@ class AllocationMap
   void
   insert(void* ptr, AllocationRecord* record);
 
-  void
+  AllocationRecord*
   remove(void* ptr);
 
   AllocationRecord*
