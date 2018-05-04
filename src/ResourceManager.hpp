@@ -23,7 +23,6 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocatorTraits.hpp"
 #include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
@@ -67,20 +66,12 @@ class ResourceManager {
     /*!
      * \brief Construct a new Allocator.
      *
-     * The Allocator will be constructed using the given strategy, options
-     * passed in traits, and will use the providers vector of base Allocators
-     * to allocate memory.
-     *
-     * \code
-     *
-     * auto makeAllocator("my_allocator", "pool"
-     *
-     *
      */
-    Allocator makeAllocator(const std::string& name, 
-        const std::string& strategy, 
-        util::AllocatorTraits traits,
-        std::vector<Allocator> providers);
+    template <typename Strategy,
+             typename... Args>
+    Allocator makeAllocator(
+        const std::string& name, 
+        Args&&... args);
 
     /*!
      * \brief Get the Allocator used to allocate ptr.
@@ -174,5 +165,7 @@ class ResourceManager {
 };
 
 } // end of namespace umpire
+
+#include "umpire/ResourceManager.inl"
 
 #endif // UMPIRE_ResourceManager_HPP

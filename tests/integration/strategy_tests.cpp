@@ -17,12 +17,17 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/Pool.hpp"
+#include "umpire/strategy/SimpoolAllocationStrategy.hpp"
+
 TEST(SimpoolStrategy, Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator(
-      "host_simpool", "POOL", {0,0,0}, {rm.getAllocator("HOST")});
+  auto allocator = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+      "host_simpool", rm.getAllocator("HOST"));
 
   void* alloc = allocator.allocate(100);
 
@@ -37,8 +42,8 @@ TEST(SimpoolStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator(
-      "device_simpool", "POOL", {0,0,0}, {rm.getAllocator("DEVICE")});
+  auto allocator = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+      "device_simpool", rm.getAllocator("DEVICE"));
 
   void* alloc = allocator.allocate(100);
 
@@ -52,8 +57,8 @@ TEST(SimpoolStrategy, UM)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator(
-      "um_simpool", "POOL", {0,0,0}, {rm.getAllocator("UM")});
+  auto allocator = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+      "um_simpool", rm.getAllocator("UM"));
 
   void* alloc = allocator.allocate(100);
 
@@ -68,8 +73,8 @@ TEST(MonotonicStrategy, Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator(
-      "host_monotonic_pool", "MONOTONIC", {0, 65536, 0}, {rm.getAllocator("HOST")});
+  auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
+      "host_monotonic_pool", 65536, rm.getAllocator("HOST"));
 
   void* alloc = allocator.allocate(100);
 
@@ -84,8 +89,8 @@ TEST(MonotonicStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator(
-      "device_monotonic_pool", "MONOTONIC", {0, 65536, 0}, {rm.getAllocator("DEVICE")});
+  auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
+      "device_monotonic_pool", 65536, rm.getAllocator("DEVICE"));
 
   void* alloc = allocator.allocate(100);
 
@@ -99,8 +104,8 @@ TEST(MonotonicStrategy, UM)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator(
-      "um_monotonic_pool", "MONOTONIC", {0, 65536, 0}, {rm.getAllocator("UM")});
+  auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
+      "um_monotonic_pool", 65536, rm.getAllocator("UM"));
 
   void* alloc = allocator.allocate(100);
 

@@ -19,7 +19,8 @@
 #include <vector>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocatorTraits.hpp"
+
+#include "umpire/Allocator.hpp"
 
 namespace umpire {
 
@@ -32,8 +33,8 @@ class Pool :
     Pool(
         const std::string& name,
         int id,
-       util::AllocatorTraits traits,
-       std::vector<std::shared_ptr<AllocationStrategy> > providers);
+        size_t slots,
+        Allocator allocator);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

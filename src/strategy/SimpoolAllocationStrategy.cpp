@@ -24,15 +24,13 @@ namespace strategy {
 SimpoolAllocationStrategy::SimpoolAllocationStrategy(
     const std::string& name,
     int id,
-    util::AllocatorTraits,
-    std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+    Allocator allocator) :
   AllocationStrategy(name, id),
   dpa(nullptr),
   m_current_size(0),
   m_highwatermark(0),
-  m_allocator()
+  m_allocator(allocator.getAllocationStrategy())
 {
-  m_allocator = providers[0];
   dpa = new DynamicPoolAllocator<>(m_allocator);
 }
 

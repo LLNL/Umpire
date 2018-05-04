@@ -19,8 +19,9 @@
 #include <vector>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocatorTraits.hpp"
-#include "umpire/util/AllocationRecord.hpp"
+
+#include "umpire/Allocator.hpp"
+
 #include "umpire/tpl/simpool/DynamicPoolAllocator.hpp"
 
 namespace umpire {
@@ -32,8 +33,7 @@ class SimpoolAllocationStrategy : public AllocationStrategy
     SimpoolAllocationStrategy(
         const std::string& name,
         int id,
-      util::AllocatorTraits,
-      std::vector<std::shared_ptr<AllocationStrategy> > providers);
+        Allocator allocator);
 
     void* allocate(size_t bytes);
 

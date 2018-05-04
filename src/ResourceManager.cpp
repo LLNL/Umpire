@@ -154,32 +154,6 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 }
 
 Allocator
-ResourceManager::makeAllocator(
-    const std::string& name, 
-    const std::string& strategy, 
-    util::AllocatorTraits traits,
-    std::vector<Allocator> providers)
-{
-  UMPIRE_LOG(Debug, "(name=\"" << name << "\", strategy=\"" << strategy << "\")");
-  strategy::AllocationStrategyRegistry& registry =
-    strategy::AllocationStrategyRegistry::getInstance();
-
-  /* 
-   * Turn the vector of Allocators into a vector of AllocationStrategies.
-   */
-  std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
-  for (auto provider : providers) {
-    provider_strategies.push_back(provider.getAllocationStrategy());
-  }
-
-  auto allocator = registry.makeAllocationStrategy(name, m_next_id++, strategy, traits, provider_strategies);
-  m_allocators_by_name[name] = allocator;
-  m_allocators_by_id[allocator->getId()] = allocator;
-
-  return Allocator(m_allocators_by_name[name]);
-}
-
-Allocator
 ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

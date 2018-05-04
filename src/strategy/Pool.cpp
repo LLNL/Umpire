@@ -15,25 +15,20 @@
 #include "umpire/strategy/Pool.hpp"
 #include "umpire/util/Macros.hpp"
 
-#include "umpire/util/AllocatorTraits.hpp"
-
 namespace umpire {
 namespace strategy {
 
 Pool::Pool(
     const std::string& name,
     int id,
-    util::AllocatorTraits traits,
-    std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+    size_t slots,
+    Allocator allocator) :
   AllocationStrategy(name, id),
   m_current_size(0),
-  m_highwatermark(0)
+  m_highwatermark(0),
+  m_slots(slots),
+  m_allocator(allocator.getAllocationStrategy())
 {
-  m_slots = traits.m_number_allocations;
-
-  m_allocator = providers[0];
-
-
   UMPIRE_LOG(Debug, "Creating " << m_slots << "-slot pool.");
 
   m_lengths = new size_t[m_slots];
