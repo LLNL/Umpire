@@ -193,10 +193,10 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* reco
   m_allocations.insert(ptr, record);
 }
 
-void ResourceManager::deregisterAllocation(void* ptr)
+util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  m_allocations.remove(ptr);
+  return m_allocations.remove(ptr);
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
