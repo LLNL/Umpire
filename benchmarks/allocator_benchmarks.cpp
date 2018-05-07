@@ -118,13 +118,10 @@ static void benchmark_free(benchmark::State& state, std::string name) {
   delete[] allocations;
 }
 
-#define RUNALL
-#ifdef RUNALL
 BENCHMARK_CAPTURE(benchmark_allocate,   host, std::string("HOST"))->Range(4, 1024);
 BENCHMARK_CAPTURE(benchmark_malloc,  host, std::string("HOST"))->Range(4, 1024);
 BENCHMARK_CAPTURE(benchmark_deallocate, host, std::string("HOST"))->Range(4, 1024);
 BENCHMARK_CAPTURE(benchmark_free,       host, std::string("HOST"))->Range(4, 1024);
-#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_CAPTURE(benchmark_allocate, um, std::string("UM"))->Range(4, 1024);
