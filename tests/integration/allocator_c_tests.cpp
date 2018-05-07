@@ -20,7 +20,7 @@ TEST(Allocator, HostAllocatorExplicitInit)
 {
   umpire_resourcemanager* rm = umpire_resourcemanager_getinstance();
 
-  umpire_resourcemanager_initialize(rm);
+  // umpire_resourcemanager_initialize(rm);
 
   umpire_allocator* allocator = umpire_resourcemanager_get_allocator_0(rm, "HOST");
 
