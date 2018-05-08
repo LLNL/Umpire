@@ -15,14 +15,14 @@
 set (umpire_strategy_headers
   AllocationStrategy.hpp
   MonotonicAllocationStrategy.hpp
-  Pool.hpp
-  SimpoolAllocationStrategy.hpp)
+  SlotPool.hpp
+  DynamicPool.hpp)
 
 set (umpire_stategy_sources
   AllocationStrategy.cpp
   MonotonicAllocationStrategy.cpp
-  Pool.cpp
-  SimpoolAllocationStrategy.cpp)
+  SlotPool.cpp
+  DynamicPool.cpp)
 
 set (umpire_strategy_depends
   umpire

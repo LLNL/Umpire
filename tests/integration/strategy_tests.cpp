@@ -19,14 +19,14 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/Pool.hpp"
-#include "umpire/strategy/SimpoolAllocationStrategy.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 TEST(SimpoolStrategy, Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_simpool", rm.getAllocator("HOST"));
 
   void* alloc = allocator.allocate(100);
@@ -42,7 +42,7 @@ TEST(SimpoolStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "device_simpool", rm.getAllocator("DEVICE"));
 
   void* alloc = allocator.allocate(100);
@@ -57,7 +57,7 @@ TEST(SimpoolStrategy, UM)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "um_simpool", rm.getAllocator("UM"));
 
   void* alloc = allocator.allocate(100);

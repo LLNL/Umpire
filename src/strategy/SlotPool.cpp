@@ -12,13 +12,15 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/Pool.hpp"
+
+#include "umpire/strategy/SlotPool.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
 
-Pool::Pool(
+SlotPool::SlotPool(
     const std::string& name,
     int id,
     size_t slots,
@@ -41,7 +43,7 @@ Pool::Pool(
 }
 
 void*
-Pool::allocate(size_t bytes)
+SlotPool::allocate(size_t bytes)
 {
   void* ptr = nullptr;
 
@@ -63,7 +65,7 @@ Pool::allocate(size_t bytes)
 }
 
 void
-Pool::deallocate(void* ptr)
+SlotPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   for (size_t i = 0; i < m_slots; ++i) {
@@ -76,25 +78,25 @@ Pool::deallocate(void* ptr)
 }
 
 long 
-Pool::getCurrentSize()
+SlotPool::getCurrentSize()
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 long 
-Pool::getHighWatermark()
+SlotPool::getHighWatermark()
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
 Platform
-Pool::getPlatform()
+SlotPool::getPlatform()
 {
   return m_allocator->getPlatform();
 }
 
 
-} // end of namespace alloc
-} // end of namespace pool
+} // end of namespace strategy
+} // end of namespace umpire

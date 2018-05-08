@@ -16,10 +16,9 @@
 
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/strategy/Pool.hpp"
-
+#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/SimpoolAllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 int main(int, char**)
 {
@@ -43,7 +42,7 @@ int main(int, char**)
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
    */
-  auto alloc = rm.makeAllocator<umpire::strategy::SimpoolAllocationStrategy>(
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_simpool", rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
@@ -51,6 +50,9 @@ int main(int, char**)
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 4096", 4096, rm.getAllocator("HOST"));
+
+  auto slot_alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
+      "host_slot_pool", 64, rm.getAllocator("HOST"));
 
   /*
    * Get the previously created POOL allocator.

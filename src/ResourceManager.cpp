@@ -17,9 +17,6 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/resource/MemoryResourceRegistry.hpp"
-#include "umpire/strategy/AllocationStrategyRegistry.hpp"
-
-#include "umpire/strategy/AllocationStrategyFactory.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
 #if defined(UMPIRE_ENABLE_CUDA)
