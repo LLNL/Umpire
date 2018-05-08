@@ -1124,7 +1124,8 @@ JudySlot * judy_del( Judy * judy ) {
 
                 if( node[-cnt] ) {    // does node have any slots left?
                     judy->stack[judy->level].slot++;
-                    return judy_prv( judy );
+                    //return judy_prv( judy );
+                    return NULL;
                 }
 
                 judy_free( judy, base, type );
@@ -1139,7 +1140,8 @@ JudySlot * judy_del( Judy * judy ) {
 
                 for( cnt = 16; cnt--; )
                     if( inner[cnt] ) {
-                        return judy_prv( judy );
+                        // return judy_prv( judy );
+                        return NULL;
                     }
 
                 judy_free( judy, inner, JUDY_radix );
@@ -1147,7 +1149,8 @@ JudySlot * judy_del( Judy * judy ) {
 
                 for( cnt = 16; cnt--; )
                     if( table[cnt] ) {
-                        return judy_prv( judy );
+                        // return judy_prv( judy );
+                        return NULL;
                     }
 
                 judy_free( judy, table, JUDY_radix );
