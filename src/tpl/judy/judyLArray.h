@@ -113,12 +113,14 @@ class judyLArray {
             return _success;
         }
 
-        bool remove( JudyKey key ) {
-            if( judy_slot( _judyarray, (const unsigned char*) &key, _depth * JUDY_key_size ) ) {
+        JudyValue remove( JudyKey key ) {
+          JudyValue* entry = ( JudyValue * ) judy_slot( _judyarray, (const unsigned char*) &key, _depth * JUDY_key_size );
+          JudyValue cached_entry(*entry);
+            if( entry  ) {
                 _lastSlot = ( JudyValue * ) judy_del( _judyarray );
-                return true;
+                return cached_entry;
             } else {
-                return false;
+                return 0;
             }
         }
 
