@@ -94,7 +94,13 @@ class ResourceManager {
 
     void registerAllocation(void* ptr, util::AllocationRecord* record);
 
-    void deregisterAllocation(void* ptr);
+    util::AllocationRecord* deregisterAllocation(void* ptr);
+
+    /*!
+     * \brief Check whether the named Allocator exists.
+     *
+     */
+    bool isAllocatorRegistered(const std::string& name);
 
     /*!
      * \brief Copy size bytes of data from src_ptr to dst_ptr.

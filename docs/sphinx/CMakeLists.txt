@@ -13,5 +13,3 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 blt_add_sphinx_target(umpire_docs)
-
-
