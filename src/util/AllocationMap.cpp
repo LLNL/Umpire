@@ -44,7 +44,6 @@ AllocationMap::remove(void* ptr)
 
   uintptr_t record = m_records.remove(reinterpret_cast<uintptr_t>(ptr));
   return reinterpret_cast<AllocationRecord*>(record);
-  //return nullptr;
 }
 
 AllocationRecord*
