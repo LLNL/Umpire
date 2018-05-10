@@ -372,7 +372,7 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
                     }
 #else
                 for( off = 0; off < keysize && len < max; off++ )
-                    if( buff[len] = base[slot * keysize + off] ) {
+                    if( (buff[len] = base[slot * keysize + off]) ) {
                         len++;
                     } else {
                         break;
@@ -768,7 +768,7 @@ JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned in
                     return &node[-slot - 1];
                 }
 #else
-                if( !judy->depth && !base[slot * keysize + keysize - 1] || judy->depth && ++depth == judy->depth ) {
+                if( (!judy->depth && !base[slot * keysize + keysize - 1]) || (judy->depth && ++depth == judy->depth) ) {
                     return &node[-slot - 1];
                 }
 #endif
@@ -948,7 +948,7 @@ JudySlot * judy_nxt( Judy * judy ) {
 #if BYTE_ORDER != BIG_ENDIAN
                     if( ( !judy->depth && !base[slot * keysize] ) || ( judy->depth && ++depth == judy->depth ) )
 #else
-                    if( ( !judy->depth && !base[slot * keysize + keysize - 1] ) || judy->depth && ++depth == judy->depth ) )
+                    if( ( ( !judy->depth && !base[slot * keysize + keysize - 1] ) || (judy->depth && ++depth == judy->depth) ) )
 #endif
                     {
                         judy->stack[judy->level].slot = slot;
@@ -1038,7 +1038,7 @@ JudySlot * judy_prv( Judy * judy ) {
 #if BYTE_ORDER != BIG_ENDIAN
                 if( ( !judy->depth && !base[( slot - 1 ) * keysize] ) || ( judy->depth && ++depth == judy->depth ) )
 #else
-                if( ( !judy->depth && !base[( slot - 1 ) * keysize + keysize - 1] ) || judy->depth && ++depth == judy->depth ) )
+                if( (!judy->depth && !base[( slot - 1 ) * keysize + keysize - 1]) || (judy->depth && ++depth == judy->depth) )
 #endif
                     return &node[-slot];
                 return judy_last( judy, node[-slot], ( off | JUDY_key_mask ) + 1, depth );
@@ -1124,7 +1124,8 @@ JudySlot * judy_del( Judy * judy ) {
 
                 if( node[-cnt] ) {    // does node have any slots left?
                     judy->stack[judy->level].slot++;
-                    return judy_prv( judy );
+                    //return judy_prv( judy );
+                    return NULL;
                 }
 
                 judy_free( judy, base, type );
@@ -1139,7 +1140,8 @@ JudySlot * judy_del( Judy * judy ) {
 
                 for( cnt = 16; cnt--; )
                     if( inner[cnt] ) {
-                        return judy_prv( judy );
+                        // return judy_prv( judy );
+                        return NULL;
                     }
 
                 judy_free( judy, inner, JUDY_radix );
@@ -1147,7 +1149,8 @@ JudySlot * judy_del( Judy * judy ) {
 
                 for( cnt = 16; cnt--; )
                     if( table[cnt] ) {
-                        return judy_prv( judy );
+                        // return judy_prv( judy );
+                        return NULL;
                     }
 
                 judy_free( judy, table, JUDY_radix );

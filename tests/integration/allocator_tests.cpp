@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Produced at the Lawrence Livermore National Laboratory
+//
+// Created by David Beckingsale, david@llnl.gov
+// LLNL-CODE-747640
+//
+// All rights reserved.
+//
+// This file is part of Umpire.
+//
+// For details, see https://github.com/LLNL/Umpire
+// Please also see the LICENSE file for MIT license.
+//////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 
 #include "umpire/config.hpp"
@@ -130,6 +144,46 @@ TEST(Allocator, UmAllocatorSize)
   auto &rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("UM");
+  double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
+
+  ASSERT_EQ((100*sizeof(double)), allocator.getSize(test_alloc));
+
+  allocator.deallocate(test_alloc);
+
+  ASSERT_ANY_THROW(allocator.getSize(test_alloc));
+}
+
+TEST(Allocator, PinnedAllocator)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("PINNED");
+  double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+}
+
+TEST(Allocator, PinnedAllocatorReference)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator *p;
+
+  p = new umpire::Allocator(rm.getAllocator("PINNED"));
+
+  double* test_alloc = static_cast<double*>(p->allocate(100*sizeof(double)));
+
+  ASSERT_NE(nullptr, test_alloc);
+
+  p->deallocate(test_alloc);
+
+  delete p;
+}
+
+TEST(Allocator, PinnedAllocatorSize)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
+
+  umpire::Allocator allocator = rm.getAllocator("PINNED");
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_EQ((100*sizeof(double)), allocator.getSize(test_alloc));

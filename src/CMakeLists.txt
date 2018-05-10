@@ -1,6 +1,22 @@
+##############################################################################
+# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory
+#
+# Created by David Beckingsale, david@llnl.gov
+# LLNL-CODE-747640
+#
+# All rights reserved.
+#
+# This file is part of Umpire.
+#
+# For details, see https://github.com/LLNL/Umpire
+# Please also see the LICENSE file for MIT license.
+##############################################################################
 set (umpire_headers
   Allocator.hpp
   ResourceManager.hpp
+  TypedAllocator.hpp
+  TypedAllocator.inl
   Umpire.hpp)
 
 set (umpire_sources
@@ -23,6 +39,11 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/wrapResourceManager.cpp
     interface/c_fortran/wrapfumpire.f90
     )
+
+  set_source_files_properties(
+    interface/c_fortran/wrapfumpire.f90
+    PROPERTIES
+    Fortran_FORMAT FREE)
 endif ()
 
 

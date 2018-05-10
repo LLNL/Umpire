@@ -1,3 +1,17 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Produced at the Lawrence Livermore National Laboratory
+//
+// Created by David Beckingsale, david@llnl.gov
+// LLNL-CODE-747640
+//
+// All rights reserved.
+//
+// This file is part of Umpire.
+//
+// For details, see https://github.com/LLNL/Umpire
+// Please also see the LICENSE file for MIT license.
+//////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_CudaMallocAllocator_HPP
 #define UMPIRE_CudaMallocAllocator_HPP
 
@@ -6,20 +20,38 @@
 namespace umpire {
 namespace alloc {
 
-struct CudaMallocAllocator
-{
-  void* allocate(size_t bytes)
+/*!
+ * \brief Uses cudaMalloc and cudaFree to allocate and deallocate memory on
+ *        NVIDIA GPUs.
+ */
+struct CudaMallocAllocator {
+  /*!
+   * \brief Allocate bytes of memory using cudaMalloc
+   *
+   * \param bytes Number of bytes to allocate.
+   * \return Pointer to start of the allocation.
+   *
+   * \throws umpire::util::Exception if memory cannot be allocated.
+   */
+  void* allocate(size_t size)
   {
     void* ptr = nullptr;
-    cudaError_t error = ::cudaMalloc(&ptr, bytes);
-    UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
+    cudaError_t error = ::cudaMalloc(&ptr, size);
+    UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMalloc( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
     } else {
       return ptr;
     }
   }
 
+  /*!
+   * \brief Deallocate memory using cudaFree.
+   *
+   * \param ptr Address to deallocate.
+   *
+   * \throws umpire::util::Exception if memory cannot be free'd.
+   */
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
