@@ -332,6 +332,8 @@ TEST(Operation, MoveHostToHost)
 
   double* moved_array = static_cast<double*>(rm.move(host_array, host_allocator));
 
+  ASSERT_EQ(moved_array, host_array);
+
   for (int i = 0; i < 100; i++) {
     ASSERT_DOUBLE_EQ(moved_array[i], i);
   }
