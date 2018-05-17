@@ -207,6 +207,12 @@ util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
   return m_allocations.remove(ptr);
 }
 
+bool
+ResourceManager::isAllocatorRegistered(const std::string& name)
+{
+  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
+}
+
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
