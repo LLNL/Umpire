@@ -35,6 +35,8 @@ TEST(AllocationMap, AddFindRemove)
   ASSERT_EQ(record, found_record);
   ASSERT_TRUE(map.contains(pointer));
 
+  ASSERT_FALSE(map.contains(pointer-1));
+
   map.remove(pointer);
 
   ASSERT_THROW(
