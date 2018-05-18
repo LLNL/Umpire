@@ -146,6 +146,8 @@ class ResourceManager {
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
+    int getNextId();
+
     static ResourceManager* s_resource_manager_instance;
 
     std::list<std::string> m_allocator_names;
@@ -161,7 +163,7 @@ class ResourceManager {
 
     long m_allocated;
 
-    int m_next_id;
+    int m_id;
 };
 
 } // end of namespace umpire

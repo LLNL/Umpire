@@ -49,7 +49,7 @@ ResourceManager::ResourceManager() :
   m_allocators_by_id(),
   m_allocations(),
   m_memory_resources(),
-  m_next_id(0)
+  m_id(0)
 {
   UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
@@ -80,12 +80,12 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", m_next_id++);
+  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", m_next_id++);
-  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", m_next_id++);
-  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", m_next_id++);
+  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
+  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
 #endif
 
   /*
@@ -282,6 +282,12 @@ ResourceManager::getAvailableAllocators()
 
   UMPIRE_LOG(Debug, "() returning " << names.size() << " allocators");
   return names;
+}
+
+int
+ResourceManager::getNextId()
+{
+  return m_id++;
 }
 
 } // end of namespace umpire

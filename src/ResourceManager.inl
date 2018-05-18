@@ -30,7 +30,7 @@ Allocator ResourceManager::makeAllocator(
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
   std::shared_ptr<strategy::AllocationStrategy> allocator = 
-    std::make_shared<Strategy>(name, m_next_id++, std::forward<Args>(args)...);
+    std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
 
   m_allocators_by_name[name] = allocator;
   m_allocators_by_id[allocator->getId()] = allocator;
