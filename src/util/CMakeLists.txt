@@ -16,6 +16,7 @@ set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
   AllocatorTraits.hpp
+  detail/statistic_helper.hpp
   Exception.hpp
   Logger.hpp
   Macros.hpp
@@ -30,7 +31,7 @@ set (umpire_util_sources
   Statistic.cpp
   StatisticsDatabase.cpp)
 
-set (umpire_util_depends umpire_tpl_judy)
+set (umpire_util_depends umpire_tpl_judy conduit)
 
 if (ENABLE_SLIC AND ENABLE_LOGGING)
   set (umpire_util_depends

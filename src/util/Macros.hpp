@@ -18,6 +18,8 @@
 #include "umpire/util/Exception.hpp"
 #include "umpire/config.hpp"
 
+#include "umpire/util/statistic_helper.hpp"
+
 #include <sstream>
 #include <iostream>
 
@@ -100,5 +102,12 @@
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
 }
+
+#if defined(UMPIRE_ENABLE_STATISTICS)
+
+#define UMPIRE_RECORD_STATISTIC(name, ...) \
+  umpire::util::detail::record_statistic(name, __VA_ARGS__);
+
+#endif
 
 #endif // UMPIRE_Macros_HPP

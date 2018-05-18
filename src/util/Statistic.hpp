@@ -19,6 +19,8 @@
 #include <vector>
 #include <string>
 
+#include "conduit.hpp"
+
 namespace umpire {
 namespace util {
 
@@ -29,40 +31,18 @@ class Statistic {
   public:
     ~Statistic();
 
-    struct AllocationStatistic {
-      void* ptr;
-      size_t size;
-      std::string event;
-    }; 
-
-    struct OperationStatistic {
-      void* src_ptr;
-      void* dst_ptr;
-      size_t size;
-      std::string event;
-    };
-
-    enum StatisticType { ALLOC_STAT, OP_STAT };
-
-    void recordAllocationStatistic(AllocationStatistic stat);
-    void recordOperationStatistic(OperationStatistic stat);
+    void recordStatistic(conduit::Node&& n);
 
     void printData(std::ostream& stream);
 
-    StatisticType getType();
   protected:
-    Statistic(const std::string& name, StatisticType type);
+    Statistic(const std::string& name);
 
   private:
     std::string m_name;
+    size_t m_counter;
 
-    StatisticType m_type;
-
-    std::vector<std::chrono::time_point<std::chrono::system_clock> > m_statistic_times;
-
-    std::vector<AllocationStatistic> m_allocation_statistics;
-
-    std::vector<OperationStatistic> m_operation_statistics;
+    conduit::Node m_data;
 };
 
 } // end of namespace util

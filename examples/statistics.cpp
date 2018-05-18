@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/StatisticsDatabase.hpp"
+#include "umpire/util/Macros.hpp"
 
 #include <iostream>
 

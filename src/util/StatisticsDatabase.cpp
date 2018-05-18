@@ -31,20 +31,16 @@ StatisticsDatabase* StatisticsDatabase::getDatabase()
 }
 
 std::shared_ptr<Statistic> 
-StatisticsDatabase::getStatistic(const std::string& name, Statistic::StatisticType type)
+StatisticsDatabase::getStatistic(const std::string& name)
 {
   auto statistic = m_statistics.find(name);
   std::shared_ptr<Statistic> stat;
 
   if (statistic == m_statistics.end()) {
-    stat = std::shared_ptr<Statistic>(new Statistic(name, type));
+    stat = std::shared_ptr<Statistic>(new Statistic(name));
     m_statistics[name] = stat;
   } else {
     stat = statistic->second;
-  }
-
-  if (stat->getType() != type) {
-    UMPIRE_ERROR("Statistic " << name << " already created with type " << type);
   }
 
   return stat;

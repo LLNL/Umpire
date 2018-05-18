@@ -32,6 +32,7 @@ void GenericReallocateOperation::transform(
 {
   // Allocate
 
+
   auto allocator = dst_allocation->m_strategy;
 
   dst_ptr = allocator->allocate(length);

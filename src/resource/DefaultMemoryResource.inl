@@ -47,6 +47,8 @@ void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
 
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");
+
   return ptr;
 }
 
@@ -54,6 +56,8 @@ template<typename _allocator>
 void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
   m_allocator.deallocate(ptr);
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);

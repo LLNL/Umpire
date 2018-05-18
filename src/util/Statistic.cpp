@@ -19,16 +19,17 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "conduit.hpp"
+
 namespace umpire {
 namespace util {
 
-Statistic::Statistic(const std::string& name, Statistic::StatisticType type) :
+Statistic::Statistic(const std::string& name) :
   m_name(name),
-  m_type(type),
-  m_statistic_times(),
-  m_allocation_statistics(),
-  m_operation_statistics()
+  m_counter(),
+  m_data()
 {
+  m_data["name"] = name;
 }
 
 Statistic::~Statistic()
@@ -36,53 +37,19 @@ Statistic::~Statistic()
 }
 
 void
-Statistic::recordAllocationStatistic(AllocationStatistic stat)
+Statistic::recordStatistic(conduit::Node&& stat)
 {
-  if (m_type == ALLOC_STAT) {
-    m_statistic_times.push_back(std::chrono::system_clock::now());
-    m_allocation_statistics.push_back(stat);
-  } else {
-    UMPIRE_ERROR("Cannot record AllocationStatistic in Statistic with type OP_STAT");
-  }
-}
+  auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch();
+  stat["timestamp"] = static_cast<long>(time.count());
 
-void
-Statistic::recordOperationStatistic(OperationStatistic stat)
-{
-  if (m_type == OP_STAT) {
-    m_statistic_times.push_back(std::chrono::system_clock::now());
-    m_operation_statistics.push_back(stat);
-  } else {
-    UMPIRE_ERROR("Cannot record OperationStatistic in Statistic with type ALLOC_STAT");
-  }
+  m_data["statistics"].append().set(stat);
 }
 
 void
 Statistic::printData(std::ostream& stream)
 {
-  if (m_type == ALLOC_STAT) {
-    std::cout << "Allocation statistic: " << m_name << std::endl;
-    for (int i = 0; i < m_allocation_statistics.size(); i++) {
-      std::cout << m_statistic_times[i].time_since_epoch().count() << ", ";
-      auto record = m_allocation_statistics[i];
-      std::cout << "{ " << record.ptr << ", " << record.size << ", " << record.event << "}" << std::endl;
-    }
-  } else if (m_type == OP_STAT) {
-    std::cout << "Operation statistic: " << m_name << std::endl;
-    for (int i = 0; i < m_operation_statistics.size(); i++) {
-      std::cout << m_statistic_times[i].time_since_epoch().count() << ", ";
-      auto record = m_operation_statistics[i];
-      std::cout << "{ " << record.src_ptr << ", " << record.dst_ptr << ", " << record.size << ", " << record.event << "}" << std::endl;
-    }
-  }
+  m_data.print();
 }
-
-Statistic::StatisticType
-Statistic::getType()
-{
-  return m_type;
-}
-
 
 } // end of namespace util
 } // end of namespace umpire
