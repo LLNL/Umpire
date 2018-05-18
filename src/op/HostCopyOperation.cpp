@@ -37,7 +37,8 @@ void HostCopyOperation::transform(
       "HostCopyOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
       "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
-      "size", length);
+      "size", length,
+      "event", "copy");
 }
 
 } // end of namespace op

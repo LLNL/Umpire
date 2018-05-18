@@ -29,6 +29,13 @@ CudaMemsetOperation::apply(
     size_t length)
 {
   ::cudaMemset(src_ptr, value, length);
+
+  UMPIRE_RECORD_STATISTIC(
+      "CudaMemsetOperation",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "value", value,
+      "size", length,
+      "event", "memset");
 }
 
 } // end of namespace op

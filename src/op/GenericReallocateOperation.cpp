@@ -20,6 +20,8 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace op {
 
@@ -42,6 +44,13 @@ void GenericReallocateOperation::transform(
 
   // Copy
   ResourceManager::getInstance().copy(src_ptr, dst_ptr, copy_size);
+
+  UMPIRE_RECORD_STATISTIC(
+      "GenericReallocate",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "size", length,
+      "event", "reallocate");
   
   // Free
   allocator->deallocate(src_ptr);

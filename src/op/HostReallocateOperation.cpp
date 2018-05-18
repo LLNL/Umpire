@@ -34,6 +34,13 @@ void HostReallocateOperation::transform(
 
   dst_allocation->m_ptr = ::realloc(src_ptr, length);
 
+  UMPIRE_RECORD_STATISTIC(
+      "HostReallocate",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(dst_allocation->m_ptr),
+      "size", length,
+      "event", "reallocate");
+
   dst_allocation->m_size = length;
   ResourceManager::getInstance().registerAllocation(dst_allocation->m_ptr, dst_allocation);
 }

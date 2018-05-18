@@ -29,6 +29,13 @@ HostMemsetOperation::apply(
     size_t length)
 {
   std::memset(src_ptr, value, length);
+
+  UMPIRE_RECORD_STATISTIC(
+      "HostMemsetOperation",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "value", value,
+      "size", length,
+      "event", "memset");
 }
 
 } // end of namespace op
