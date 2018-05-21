@@ -108,6 +108,10 @@
 #define UMPIRE_RECORD_STATISTIC(name, ...) \
   umpire::util::detail::record_statistic(name, __VA_ARGS__);
 
-#endif
+#else
+
+#define UMPIRE_RECORD_STATISTIC(name, ...) ((void) 0)
+
+#endif // defined(UMPIRE_ENABLE_STATISTICS)
 
 #endif // UMPIRE_Macros_HPP
