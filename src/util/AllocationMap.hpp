@@ -41,11 +41,17 @@ class AllocationMap
   AllocationRecord*
   find(void* ptr);
 
+  bool
+  contains(void* ptr);
+
   void
     reset();
 
   private:
+    AllocationRecord* findRecord(void* ptr);
+
     judyLArray<uintptr_t, uintptr_t> m_records;
+
 };
 
 } // end of namespace util

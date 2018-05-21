@@ -92,6 +92,13 @@ class ResourceManager {
      */
     Allocator getAllocator(void* ptr);
 
+    /*!
+     * \brief Does the given pointer have an associated Allocator.
+     *
+     * \return True if the pointer has an associated Allocator.
+     */
+    bool hasAllocator(void* ptr);
+    
     void registerAllocation(void* ptr, util::AllocationRecord* record);
 
     util::AllocationRecord* deregisterAllocation(void* ptr);
@@ -161,6 +168,7 @@ class ResourceManager {
      * \return Size of allocation in bytes.
      */
     size_t getSize(void* ptr);
+
 
   private:
     ResourceManager();
