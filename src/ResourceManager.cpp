@@ -157,6 +157,14 @@ ResourceManager::getAllocator(void* ptr)
   return Allocator(findAllocatorForPointer(ptr));
 }
 
+bool
+ResourceManager::hasAllocator(void* ptr)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr <<")");
+
+  return m_allocations.contains(ptr);
+}
+
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", record=" << record << ") with " << this );
@@ -168,6 +176,12 @@ util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return m_allocations.remove(ptr);
+}
+
+bool
+ResourceManager::isAllocatorRegistered(const std::string& name)
+{
+  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)

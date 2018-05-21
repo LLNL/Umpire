@@ -247,3 +247,11 @@ TEST(Allocator, IdUnique)
   ASSERT_NE(host_id, device_id);
 }
 #endif
+
+TEST(Allocator, isRegistered)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  ASSERT_TRUE(rm.isAllocatorRegistered("HOST"));
+  ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
+}
