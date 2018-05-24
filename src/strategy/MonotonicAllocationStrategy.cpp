@@ -15,7 +15,6 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
 
-#include "umpire/util/AllocatorTraits.hpp"
 #include "umpire/ResourceManager.hpp"
 
 namespace umpire {
@@ -25,13 +24,13 @@ namespace strategy {
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
     const std::string& name,
     int id,
-    util::AllocatorTraits traits,
-    std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+    size_t capacity,
+    Allocator allocator) :
   AllocationStrategy(name, id),
-  m_size(0)
+  m_size(0),
+  m_capacity(capacity),
+  m_allocator(allocator.getAllocationStrategy())
 {
-  m_capacity = std::max(traits.m_maximum_size, traits.m_initial_size);
-  m_allocator = providers[0];
   m_block = m_allocator->allocate(m_capacity);
 }
 

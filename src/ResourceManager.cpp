@@ -17,9 +17,6 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/resource/MemoryResourceRegistry.hpp"
-#include "umpire/strategy/AllocationStrategyRegistry.hpp"
-
-#include "umpire/strategy/AllocationStrategyFactory.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -52,7 +49,7 @@ ResourceManager::ResourceManager() :
   m_allocators_by_id(),
   m_allocations(),
   m_memory_resources(),
-  m_next_id(0)
+  m_id(0)
 {
   UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
@@ -83,12 +80,12 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", m_next_id++);
+  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", m_next_id++);
-  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", m_next_id++);
-  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", m_next_id++);
+  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
+  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
 #endif
 
   /*
@@ -151,32 +148,6 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
   }
 
   return Allocator(m_memory_resources[resource_type]);
-}
-
-Allocator
-ResourceManager::makeAllocator(
-    const std::string& name, 
-    const std::string& strategy, 
-    util::AllocatorTraits traits,
-    std::vector<Allocator> providers)
-{
-  UMPIRE_LOG(Debug, "(name=\"" << name << "\", strategy=\"" << strategy << "\")");
-  strategy::AllocationStrategyRegistry& registry =
-    strategy::AllocationStrategyRegistry::getInstance();
-
-  /* 
-   * Turn the vector of Allocators into a vector of AllocationStrategies.
-   */
-  std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
-  for (auto provider : providers) {
-    provider_strategies.push_back(provider.getAllocationStrategy());
-  }
-
-  auto allocator = registry.makeAllocationStrategy(name, m_next_id++, strategy, traits, provider_strategies);
-  m_allocators_by_name[name] = allocator;
-  m_allocators_by_id[allocator->getId()] = allocator;
-
-  return Allocator(m_allocators_by_name[name]);
 }
 
 Allocator
@@ -325,6 +296,12 @@ ResourceManager::getAvailableAllocators()
 
   UMPIRE_LOG(Debug, "() returning " << names.size() << " allocators");
   return names;
+}
+
+int
+ResourceManager::getNextId()
+{
+  return m_id++;
 }
 
 } // end of namespace umpire
