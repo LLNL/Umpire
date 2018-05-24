@@ -16,11 +16,9 @@
 
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/strategy/Pool.hpp"
-
+#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/GenericAllocationStrategyFactory.hpp"
-#include "umpire/strategy/AllocationStrategyRegistry.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 int main(int, char**)
 {
@@ -31,24 +29,6 @@ int main(int, char**)
     std::cout << s << "  ";
   }
   std::cout << std::endl;
-
-  /*
-   * Register AllocationStrategies.
-   *
-   * For Umpire-provided AllocationStrategies this step will be hidden. For
-   * user-defined strategies, a Factory must be registered. A Generic factory
-   * is provided for simple strategies.
-   *
-   */
-  auto& alloc_registry = umpire::strategy::AllocationStrategyRegistry::getInstance();
-
-  alloc_registry.registerAllocationStrategy(
-      std::make_shared<umpire::strategy::GenericAllocationStrategyFactory<umpire::strategy::Pool> >("POOL"));
-
-  alloc_registry.registerAllocationStrategy(
-      std::make_shared<
-        umpire::strategy::GenericAllocationStrategyFactory<
-          umpire::strategy::MonotonicAllocationStrategy> >("MONOTONIC"));
 
   /*
    * Build some new Allocators from the named AllocationStrategies.
@@ -62,11 +42,17 @@ int main(int, char**)
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
    */
-  auto alloc = rm.makeAllocator("POOL", "POOL", {0,0,64}, {rm.getAllocator("HOST")});
-  alloc = rm.makeAllocator("MONOTONIC 1024", "MONOTONIC", {1024,0,0}, {rm.getAllocator("HOST")});
-  alloc = rm.makeAllocator("MONOTONIC 4096", "MONOTONIC", {4096,0,0}, {rm.getAllocator("HOST")});
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_simpool", rm.getAllocator("HOST"));
 
+  alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
+      "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
 
+  alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
+      "MONOTONIC 4096", 4096, rm.getAllocator("HOST"));
+
+  auto slot_alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
+      "host_slot_pool", 64, rm.getAllocator("HOST"));
 
   /*
    * Get the previously created POOL allocator.

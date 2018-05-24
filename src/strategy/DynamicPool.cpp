@@ -12,7 +12,7 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/SimpoolAllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 #include "umpire/ResourceManager.hpp"
 
@@ -21,23 +21,22 @@
 namespace umpire {
 namespace strategy {
 
-SimpoolAllocationStrategy::SimpoolAllocationStrategy(
+DynamicPool::DynamicPool(
     const std::string& name,
     int id,
-    util::AllocatorTraits,
-    std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+    Allocator allocator,
+    size_t min_alloc_size) :
   AllocationStrategy(name, id),
   dpa(nullptr),
   m_current_size(0),
   m_highwatermark(0),
-  m_allocator()
+  m_allocator(allocator.getAllocationStrategy())
 {
-  m_allocator = providers[0];
-  dpa = new DynamicPoolAllocator<>(m_allocator);
+  dpa = new DynamicPoolAllocator<>(m_allocator, min_alloc_size);
 }
 
 void*
-SimpoolAllocationStrategy::allocate(size_t bytes)
+DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   void* ptr = dpa->allocate(bytes);
@@ -51,7 +50,7 @@ SimpoolAllocationStrategy::allocate(size_t bytes)
 }
 
 void 
-SimpoolAllocationStrategy::deallocate(void* ptr)
+DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
@@ -61,20 +60,20 @@ SimpoolAllocationStrategy::deallocate(void* ptr)
 }
 
 long 
-SimpoolAllocationStrategy::getCurrentSize()
+DynamicPool::getCurrentSize()
 { 
   return dpa->totalSize(); 
 }
 
 long 
-SimpoolAllocationStrategy::getHighWatermark()
+DynamicPool::getHighWatermark()
 { 
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
 Platform 
-SimpoolAllocationStrategy::getPlatform()
+DynamicPool::getPlatform()
 { 
   return m_allocator->getPlatform();
 }

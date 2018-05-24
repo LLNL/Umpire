@@ -12,33 +12,50 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_AllocationStrategyFactory_HPP
-#define UMPIRE_AllocationStrategyFactory_HPP
+#ifndef UMPIRE_SlotPool_HPP
+#define UMPIRE_SlotPool_HPP
 
 #include <memory>
-#include <string>
 #include <vector>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-
-#include "umpire/util/AllocatorTraits.hpp"
+#include "umpire/Allocator.hpp"
 
 namespace umpire {
-
 namespace strategy {
 
-class AllocationStrategyFactory {
+class SlotPool :
+  public AllocationStrategy
+{
   public:
-    virtual bool isValidAllocationStrategyFor(const std::string& name) = 0;
-
-    virtual std::shared_ptr<AllocationStrategy> create(
+      SlotPool(
         const std::string& name,
         int id,
-        util::AllocatorTraits traits,
-        std::vector<std::shared_ptr<AllocationStrategy> > providers) = 0;
+        size_t slots,
+        Allocator allocator);
+
+    void* allocate(size_t bytes);
+    void deallocate(void* ptr);
+
+    long getCurrentSize();
+    long getHighWatermark();
+
+    Platform getPlatform();
+  private:
+    void init();
+
+    void** m_pointers;
+    size_t* m_lengths;
+
+    long m_current_size;
+    long m_highwatermark;
+
+    size_t m_slots;
+
+    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
 
 } // end of namespace strategy
-} // end of namespace umpire
+} // end namespace umpire
 
-#endif // UMPIRE_AllocationStrategyFactory_HPP
+#endif // UMPIRE_SlotPool_HPP
