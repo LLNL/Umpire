@@ -35,7 +35,7 @@ class HostReallocateOperation :
    */
   void transform(
       void* src_ptr,
-      void* dst_ptr,
+      void** dst_ptr,
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
       size_t length);

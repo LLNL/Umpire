@@ -23,16 +23,16 @@ namespace op {
 
 void CudaCopyToOperation::transform(
     void* src_ptr,
-    void* dst_ptr,
+    void** dst_ptr,
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     size_t length)
 {
   cudaError_t error = 
-    ::cudaMemcpy(dst_ptr, src_ptr, length, cudaMemcpyHostToDevice);
+    ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyHostToDevice);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << dst_ptr
+    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << *dst_ptr
       << ", src_ptr = " << src_ptr
       << ", length = " << length
       << ", cudaMemcpyHostToDevice ) failed with error: " 

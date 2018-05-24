@@ -197,7 +197,6 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   std::size_t dst_size = dst_alloc_record->m_size;
 
   if (size == 0) {
-
     if (src_size > dst_size) {
       UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
     }
@@ -209,7 +208,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
       src_alloc_record->m_strategy, 
       dst_alloc_record->m_strategy);
 
-  op->transform(src_ptr, dst_ptr, src_alloc_record, dst_alloc_record, size);
+  op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
 void ResourceManager::memset(void* ptr, int value, size_t length)
@@ -246,16 +245,41 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
     UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
   }
 
-
   auto op = op_registry.find("REALLOCATE", 
       alloc_record->m_strategy, 
       alloc_record->m_strategy);
 
   void* dst_ptr = nullptr;
 
-  op->transform(src_ptr, dst_ptr, alloc_record, alloc_record, size);
+  op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
 
-  return alloc_record->m_ptr;
+  return dst_ptr;
+}
+
+void*
+ResourceManager::move(void* ptr, Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  // short-circuit if ptr was allocated by 'allocator'
+  if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
+    return ptr;
+  }
+
+  if (ptr != alloc_record->m_ptr) {
+    UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);
+  }
+
+  size_t size = alloc_record->m_size;
+  void* dst_ptr = allocator.allocate(size);
+
+  copy(dst_ptr, ptr);
+
+  deallocate(ptr);
+
+  return dst_ptr;
 }
 
 void ResourceManager::deallocate(void* ptr)
