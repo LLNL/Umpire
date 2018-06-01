@@ -15,7 +15,6 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
-  AllocatorTraits.hpp
   Exception.hpp
   Logger.hpp
   Macros.hpp

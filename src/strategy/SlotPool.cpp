@@ -12,28 +12,25 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/Pool.hpp"
-#include "umpire/util/Macros.hpp"
 
-#include "umpire/util/AllocatorTraits.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
 
-Pool::Pool(
+SlotPool::SlotPool(
     const std::string& name,
     int id,
-    util::AllocatorTraits traits,
-    std::vector<std::shared_ptr<AllocationStrategy> > providers) :
+    size_t slots,
+    Allocator allocator) :
   AllocationStrategy(name, id),
   m_current_size(0),
-  m_highwatermark(0)
+  m_highwatermark(0),
+  m_slots(slots),
+  m_allocator(allocator.getAllocationStrategy())
 {
-  m_slots = traits.m_number_allocations;
-
-  m_allocator = providers[0];
-
-
   UMPIRE_LOG(Debug, "Creating " << m_slots << "-slot pool.");
 
   m_lengths = new size_t[m_slots];
@@ -46,7 +43,7 @@ Pool::Pool(
 }
 
 void*
-Pool::allocate(size_t bytes)
+SlotPool::allocate(size_t bytes)
 {
   void* ptr = nullptr;
 
@@ -68,7 +65,7 @@ Pool::allocate(size_t bytes)
 }
 
 void
-Pool::deallocate(void* ptr)
+SlotPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   for (size_t i = 0; i < m_slots; ++i) {
@@ -81,25 +78,25 @@ Pool::deallocate(void* ptr)
 }
 
 long 
-Pool::getCurrentSize()
+SlotPool::getCurrentSize()
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 long 
-Pool::getHighWatermark()
+SlotPool::getHighWatermark()
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
 Platform
-Pool::getPlatform()
+SlotPool::getPlatform()
 {
   return m_allocator->getPlatform();
 }
 
 
-} // end of namespace alloc
-} // end of namespace pool
+} // end of namespace strategy
+} // end of namespace umpire

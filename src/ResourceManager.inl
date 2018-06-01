@@ -12,33 +12,32 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/HostReallocateOperation.hpp"
-
-#include <cstdlib>
+#ifndef UMPIRE_ResourceManager_INL
+#define UMPIRE_ResourceManager_INL
 
 #include "umpire/ResourceManager.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
-namespace op {
 
-void HostReallocateOperation::transform(
-    void* src_ptr,
-    void** dst_ptr,
-    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-    util::AllocationRecord *dst_allocation,
-    size_t length)
+template <typename Strategy,
+         typename... Args>
+Allocator ResourceManager::makeAllocator(
+    const std::string& name, 
+    Args&&... args)
 {
-  auto allocator = dst_allocation->m_strategy;
+  UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-  ResourceManager::getInstance().deregisterAllocation(src_ptr);
+  std::shared_ptr<strategy::AllocationStrategy> allocator = 
+    std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
 
-  *dst_ptr = ::realloc(src_ptr, length);
+  m_allocators_by_name[name] = allocator;
+  m_allocators_by_id[allocator->getId()] = allocator;
 
-  ResourceManager::getInstance().registerAllocation(
-      *dst_ptr,
-      new util::AllocationRecord{*dst_ptr, length, allocator});
+  return Allocator(allocator);
 }
 
-} // end of namespace op
 } // end of namespace umpire
+
+#endif // UMPIRE_ResourceManager_INL

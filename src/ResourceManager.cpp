@@ -17,9 +17,6 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/resource/MemoryResourceRegistry.hpp"
-#include "umpire/strategy/AllocationStrategyRegistry.hpp"
-
-#include "umpire/strategy/AllocationStrategyFactory.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -52,7 +49,7 @@ ResourceManager::ResourceManager() :
   m_allocators_by_id(),
   m_allocations(),
   m_memory_resources(),
-  m_next_id(0)
+  m_id(0)
 {
   UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =
@@ -83,12 +80,12 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", m_next_id++);
+  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", m_next_id++);
-  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", m_next_id++);
-  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", m_next_id++);
+  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
+  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
 #endif
 
   /*
@@ -154,36 +151,18 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 }
 
 Allocator
-ResourceManager::makeAllocator(
-    const std::string& name, 
-    const std::string& strategy, 
-    util::AllocatorTraits traits,
-    std::vector<Allocator> providers)
-{
-  UMPIRE_LOG(Debug, "(name=\"" << name << "\", strategy=\"" << strategy << "\")");
-  strategy::AllocationStrategyRegistry& registry =
-    strategy::AllocationStrategyRegistry::getInstance();
-
-  /* 
-   * Turn the vector of Allocators into a vector of AllocationStrategies.
-   */
-  std::vector<std::shared_ptr<strategy::AllocationStrategy> > provider_strategies;
-  for (auto provider : providers) {
-    provider_strategies.push_back(provider.getAllocationStrategy());
-  }
-
-  auto allocator = registry.makeAllocationStrategy(name, m_next_id++, strategy, traits, provider_strategies);
-  m_allocators_by_name[name] = allocator;
-  m_allocators_by_id[allocator->getId()] = allocator;
-
-  return Allocator(m_allocators_by_name[name]);
-}
-
-Allocator
 ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return Allocator(findAllocatorForPointer(ptr));
+}
+
+bool
+ResourceManager::hasAllocator(void* ptr)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr <<")");
+
+  return m_allocations.contains(ptr);
 }
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
@@ -193,10 +172,16 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* reco
   m_allocations.insert(ptr, record);
 }
 
-void ResourceManager::deregisterAllocation(void* ptr)
+util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  m_allocations.remove(ptr);
+  return m_allocations.remove(ptr);
+}
+
+bool
+ResourceManager::isAllocatorRegistered(const std::string& name)
+{
+  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
@@ -212,7 +197,6 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   std::size_t dst_size = dst_alloc_record->m_size;
 
   if (size == 0) {
-
     if (src_size > dst_size) {
       UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
     }
@@ -224,7 +208,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
       src_alloc_record->m_strategy, 
       dst_alloc_record->m_strategy);
 
-  op->transform(src_ptr, dst_ptr, src_alloc_record, dst_alloc_record, size);
+  op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
 void ResourceManager::memset(void* ptr, int value, size_t length)
@@ -261,16 +245,41 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
     UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
   }
 
-
   auto op = op_registry.find("REALLOCATE", 
       alloc_record->m_strategy, 
       alloc_record->m_strategy);
 
   void* dst_ptr = nullptr;
 
-  op->transform(src_ptr, dst_ptr, alloc_record, alloc_record, size);
+  op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
 
-  return alloc_record->m_ptr;
+  return dst_ptr;
+}
+
+void*
+ResourceManager::move(void* ptr, Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  // short-circuit if ptr was allocated by 'allocator'
+  if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
+    return ptr;
+  }
+
+  if (ptr != alloc_record->m_ptr) {
+    UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);
+  }
+
+  size_t size = alloc_record->m_size;
+  void* dst_ptr = allocator.allocate(size);
+
+  copy(dst_ptr, ptr);
+
+  deallocate(ptr);
+
+  return dst_ptr;
 }
 
 void ResourceManager::deallocate(void* ptr)
@@ -311,6 +320,12 @@ ResourceManager::getAvailableAllocators()
 
   UMPIRE_LOG(Debug, "() returning " << names.size() << " allocators");
   return names;
+}
+
+int
+ResourceManager::getNextId()
+{
+  return m_id++;
 }
 
 } // end of namespace umpire
