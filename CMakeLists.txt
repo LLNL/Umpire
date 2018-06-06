@@ -18,7 +18,7 @@ cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 
 project(Umpire 
-  LANGUAGES CXX C Fortran 
+  LANGUAGES CXX C
   VERSION 0.2.0)
 
 set(ENABLE_OPENMP On CACHE Bool "")
