@@ -114,6 +114,8 @@ class ResourceManager {
      */
     void copy(void* dst_ptr, void* src_ptr, size_t size=0);
 
+    void transfer(void* dst_ptr, void* src_ptr, size_t size, std::shared_ptr<umpire::strategy::AllocationStrategy>& dst_alloc_strategy, std::shared_ptr<umpire::strategy::AllocationStrategy>& src_alloc_strategy);
+
     /*!
      * \brief Set the first length bytes of ptr to the value val.
      *

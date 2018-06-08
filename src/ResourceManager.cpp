@@ -211,6 +211,16 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
+void ResourceManager::transfer(void* dst_ptr, void* src_ptr, size_t size, std::shared_ptr<umpire::strategy::AllocationStrategy>& dst_alloc_strategy, std::shared_ptr<umpire::strategy::AllocationStrategy>& src_alloc_strategy)
+{
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  auto op = op_registry.find("COPY", 
+      src_alloc_strategy, 
+      dst_alloc_strategy);
+
+  op->transform(src_ptr, &dst_ptr, nullptr, nullptr, size);
+}
+
 void ResourceManager::memset(void* ptr, int value, size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
