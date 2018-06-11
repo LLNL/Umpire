@@ -158,6 +158,12 @@ ResourceManager::getAllocator(void* ptr)
 }
 
 bool
+ResourceManager::isAllocator(const std::string& name)
+{
+  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
+}
+
+bool
 ResourceManager::hasAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr <<")");
