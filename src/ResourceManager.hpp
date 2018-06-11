@@ -23,7 +23,6 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocatorTraits.hpp"
 #include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
@@ -67,20 +66,12 @@ class ResourceManager {
     /*!
      * \brief Construct a new Allocator.
      *
-     * The Allocator will be constructed using the given strategy, options
-     * passed in traits, and will use the providers vector of base Allocators
-     * to allocate memory.
-     *
-     * \code
-     *
-     * auto makeAllocator("my_allocator", "pool"
-     *
-     *
      */
-    Allocator makeAllocator(const std::string& name, 
-        const std::string& strategy, 
-        util::AllocatorTraits traits,
-        std::vector<Allocator> providers);
+    template <typename Strategy,
+             typename... Args>
+    Allocator makeAllocator(
+        const std::string& name, 
+        Args&&... args);
 
     /*!
      * \brief Get the Allocator used to allocate ptr.
@@ -144,6 +135,16 @@ class ResourceManager {
     void* reallocate(void* src_ptr, size_t size);
 
     /*!
+     * \brief Move src_ptr to memory from allocator
+     *
+     * \param src_ptr Pointer to move.
+     * \param allocator Allocator to use to allocate new memory for moved data.
+     *
+     * \return Pointer to new location of data.
+     */
+    void* move(void* src_ptr, Allocator allocator);
+
+    /*!
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
      * \param ptr Pointer to deallocate.
@@ -169,6 +170,8 @@ class ResourceManager {
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
+    int getNextId();
+
     static ResourceManager* s_resource_manager_instance;
 
     std::list<std::string> m_allocator_names;
@@ -184,9 +187,11 @@ class ResourceManager {
 
     long m_allocated;
 
-    int m_next_id;
+    int m_id;
 };
 
 } // end of namespace umpire
+
+#include "umpire/ResourceManager.inl"
 
 #endif // UMPIRE_ResourceManager_HPP

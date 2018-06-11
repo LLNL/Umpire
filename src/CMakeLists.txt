@@ -15,6 +15,7 @@
 set (umpire_headers
   Allocator.hpp
   ResourceManager.hpp
+  ResourceManager.inl
   TypedAllocator.hpp
   TypedAllocator.inl
   Umpire.hpp)
@@ -61,8 +62,13 @@ set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 
 configure_file(
-  ${PROJECT_SOURCE_DIR}/src/config.hpp.in
-  ${PROJECT_BINARY_DIR}/include/umpire/config.hpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
+  ${CMAKE_BINARY_DIR}/include/umpire/config.hpp)
+
+target_include_directories(
+  umpire
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
 
 install(TARGETS
   umpire

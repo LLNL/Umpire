@@ -24,25 +24,27 @@ namespace op {
 
 void HostReallocateOperation::transform(
     void* src_ptr,
-    void* UMPIRE_UNUSED_ARG(dst_ptr),
+    void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord *dst_allocation,
     size_t length)
 {
+  auto allocator = dst_allocation->m_strategy;
 
   ResourceManager::getInstance().deregisterAllocation(src_ptr);
 
-  dst_allocation->m_ptr = ::realloc(src_ptr, length);
+  *dst_ptr = ::realloc(src_ptr, length);
 
   UMPIRE_RECORD_STATISTIC(
       "HostReallocate",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(dst_allocation->m_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "reallocate");
 
-  dst_allocation->m_size = length;
-  ResourceManager::getInstance().registerAllocation(dst_allocation->m_ptr, dst_allocation);
+  ResourceManager::getInstance().registerAllocation(
+      *dst_ptr,
+      new util::AllocationRecord{*dst_ptr, length, allocator});
 }
 
 } // end of namespace op

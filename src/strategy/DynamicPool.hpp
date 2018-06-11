@@ -12,28 +12,29 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_SimpoolAllocationStrategy_HPP
-#define UMPIRE_SimpoolAllocationStrategy_HPP
+#ifndef UMPIRE_DynamicPool_HPP
+#define UMPIRE_DynamicPool_HPP
 
 #include <memory>
 #include <vector>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocatorTraits.hpp"
-#include "umpire/util/AllocationRecord.hpp"
+
+#include "umpire/Allocator.hpp"
+
 #include "umpire/tpl/simpool/DynamicPoolAllocator.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class SimpoolAllocationStrategy : public AllocationStrategy
+class DynamicPool : public AllocationStrategy
 {
   public:
-    SimpoolAllocationStrategy(
+    DynamicPool(
         const std::string& name,
         int id,
-      util::AllocatorTraits,
-      std::vector<std::shared_ptr<AllocationStrategy> > providers);
+        Allocator allocator,
+        size_t min_alloc_size = 1 << 8);
 
     void* allocate(size_t bytes);
 
@@ -56,4 +57,4 @@ class SimpoolAllocationStrategy : public AllocationStrategy
 } // end of namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_SimpoolAllocationStrategy_HPP
+#endif // UMPIRE_DynamicPool_HPP

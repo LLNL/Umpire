@@ -35,7 +35,7 @@ class CudaCopyToOperation : public MemoryOperation {
     */
   void transform(
       void* src_ptr,
-      void* dst_ptr,
+      void** dst_ptr,
       umpire::util::AllocationRecord *src_allocation,
       umpire::util::AllocationRecord *dst_allocation,
       size_t length);

@@ -102,6 +102,8 @@ class MemoryOperationRegistry {
 
   protected:
     MemoryOperationRegistry();
+    MemoryOperationRegistry (const MemoryOperationRegistry&) = delete;
+    MemoryOperationRegistry& operator= (const MemoryOperationRegistry&) = delete;
 
   private:
     static MemoryOperationRegistry* s_memory_operation_registry_instance;

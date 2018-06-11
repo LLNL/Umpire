@@ -12,13 +12,14 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9)
 
 cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0057 NEW)
 
 project(Umpire 
-  LANGUAGES CXX C Fortran 
-  VERSION 0.1.4)
+  LANGUAGES CXX C
+  VERSION 0.2.0)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
@@ -47,10 +48,6 @@ endif()
 include(blt/SetupBLT.cmake)
 
 include(cmake/SetupUmpireThirdParty.cmake)
-
-if (ENABLE_CUDA)
-  set(CUDA_NVCC_FLAGS -std=c++11)
-endif ()
 
 configure_file(
   umpire-config.cmake.in
