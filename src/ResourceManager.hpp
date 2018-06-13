@@ -83,6 +83,8 @@ class ResourceManager {
      */
     Allocator getAllocator(void* ptr);
 
+    bool isAllocator(const std::string& name);
+
     /*!
      * \brief Does the given pointer have an associated Allocator.
      *
