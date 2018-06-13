@@ -13,5 +13,13 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
+set(OLD_COPY_HEADERS ${ENABLE_COPY_HEADERS})
+set(OLD_ENABLE_TESTS ${ENABLE_TESTS})
+set(ENABLE_COPY_HEADERS Off)
+set(ENABLE_TESTS Off)
+add_subdirectory(conduit/src)
+set(ENABLE_COPY_HEADERS ${OLD_COPY_HEADERS})
+set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
+
 add_subdirectory(simpool)
 add_subdirectory(judy)

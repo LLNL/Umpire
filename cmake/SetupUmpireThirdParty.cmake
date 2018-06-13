@@ -57,13 +57,13 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
                       )
 endif ()
 
-if (CONDUIT_DIR)
-  include(${CONDUIT_DIR}/lib/cmake/conduit.cmake)
-  set(CONDUIT_INCLUDE_DIRS ${CONDUIT_DIR}/include/conduit)
-
-  blt_register_library(NAME conduit 
-    INCLUDES ${CONDUIT_INCLUDE_DIRS} 
-    LIBRARIES  conduit)
-else ()
-  message (FATAL_ERROR "Could not find conduit, make sure CONDUIT_DIR is set properly")
-endif ()
+# if (CONDUIT_DIR)
+#   include(${CONDUIT_DIR}/lib/cmake/conduit.cmake)
+#   set(CONDUIT_INCLUDE_DIRS ${CONDUIT_DIR}/include/conduit)
+# 
+#   blt_register_library(NAME conduit 
+#     INCLUDES ${CONDUIT_INCLUDE_DIRS} 
+#     LIBRARIES  conduit)
+# else ()
+#   message (FATAL_ERROR "Could not find conduit, make sure CONDUIT_DIR is set properly")
+# endif ()
