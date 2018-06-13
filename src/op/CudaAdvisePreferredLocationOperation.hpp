@@ -12,15 +12,15 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaAdvisePreferredLocation_HPP
-#define UMPIRE_CudaAdvisePreferredLocation_HPP
+#ifndef UMPIRE_CudaAdvisePreferredLocationOperation_HPP
+#define UMPIRE_CudaAdvisePreferredLocationOperation_HPP
 
 #include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
-class CudaAdvisePreferredLocation :
+class CudaAdvisePreferredLocationOperation :
   public MemoryOperation {
 public:
   /*!
@@ -40,4 +40,4 @@ public:
 } // end of namespace op
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaAdvisePreferredLocation_HPP
+#endif // UMPIRE_CudaAdvisePreferredLocationOperation_HPP

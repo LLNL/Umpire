@@ -12,25 +12,25 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/CudaAdvisePreferredLocation.hpp"
+#include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
 
 #include <cuda_runtime_api.h>
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace op {
 
 void
-CudaAdvisePreferredLocation::apply(
+CudaAdvisePreferredLocationOperation::apply(
     void* src_ptr,
-    util::AllocationRecord *src_allocation,
-    int val,
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    int UMPIRE_UNUSED_ARG(val),
     size_t length)
 {
   // TODO: get correct device for allocation
-  cudaMemAdvise(src_ptr, cudaMemAdviseSetPreferredLocation, 0);
+  cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, 0);
 }
 
 } // end of namespace op
 } // end of namespace umpire
-
-#endif // UMPIRE_CudaAdvisePreferredLocation_HPP

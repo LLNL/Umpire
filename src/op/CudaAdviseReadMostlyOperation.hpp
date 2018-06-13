@@ -12,15 +12,15 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaAdviseReadMostly_HPP
-#define UMPIRE_CudaAdviseReadMostly_HPP
+#ifndef UMPIRE_CudaAdviseReadMostlyOperation_HPP
+#define UMPIRE_CudaAdviseReadMostlyOperation_HPP
 
 #include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
-class CudaAdviseReadMostly :
+class CudaAdviseReadMostlyOperation :
   public MemoryOperation {
 public:
   /*!
@@ -40,4 +40,4 @@ public:
 } // end of namespace op
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaAdviseReadMostly_HPP
+#endif // UMPIRE_CudaAdviseReadMostlyOperation_HPP
