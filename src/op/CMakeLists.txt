@@ -23,6 +23,9 @@ set (umpire_op_headers
 if (ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
+    CudaAdviseAccessedByOperation.hpp
+    CudaAdvisePreferredLocationOperation.hpp
+    CudaAdviseReadMostlyOperation.hpp
     CudaCopyOperation.hpp
     CudaCopyFromOperation.hpp
     CudaCopyToOperation.hpp
@@ -40,6 +43,9 @@ set (umpire_op_sources
 if (ENABLE_CUDA)
   set (umpire_op_sources
     ${umpire_op_sources}
+    CudaAdviseAccessedByOperation.cpp
+    CudaAdvisePreferredLocationOperation.cpp
+    CudaAdviseReadMostlyOperation.cpp
     CudaCopyOperation.cpp
     CudaCopyFromOperation.cpp
     CudaCopyToOperation.cpp
