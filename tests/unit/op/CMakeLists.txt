@@ -13,15 +13,10 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 blt_add_executable(
-  NAME resource_manager_tests
-  SOURCES resource_manager_tests.cpp
-  DEPENDS_ON umpire gtest)
+  NAME cuda_mem_advise_op_tests
+  SOURCES cuda_mem_advise_op_tests.cpp
+  DEPENDS_ON umpire_op umpire cuda_runtime gtest gmock)
 
 blt_add_test(
-  NAME resource_manager_tests
-  COMMAND resource_manager_tests)
-
-add_subdirectory(alloc)
-add_subdirectory(op)
-add_subdirectory(resource)
-add_subdirectory(util)
+  NAME cuda_mem_advise_op_tests
+  COMMAND cuda_mem_advise_op_tests)
