@@ -255,3 +255,16 @@ TEST(Allocator, isRegistered)
   ASSERT_TRUE(rm.isAllocatorRegistered("HOST"));
   ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
 }
+
+TEST(Allocator, registerAllocator)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  rm.registerAllocator("my_host_allocator_copy", rm.getAllocator("HOST"));
+
+  ASSERT_EQ(rm.getAllocator("HOST").getAllocationStrategy(), 
+      rm.getAllocator("my_host_allocator_copy").getAllocationStrategy());
+
+  ASSERT_ANY_THROW(
+      rm.registerAllocator("HOST", rm.getAllocator("my_host_allocator_copy")));
+}

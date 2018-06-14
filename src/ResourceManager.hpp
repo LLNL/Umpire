@@ -73,6 +73,8 @@ class ResourceManager {
         const std::string& name, 
         Args&&... args);
 
+    void registerAllocator(const std::string& name, Allocator allocator);
+
     /*!
      * \brief Get the Allocator used to allocate ptr.
      *
