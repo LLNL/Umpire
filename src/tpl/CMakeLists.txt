@@ -21,5 +21,27 @@ add_subdirectory(conduit/src)
 set(ENABLE_COPY_HEADERS ${OLD_COPY_HEADERS})
 set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 
+# set (CONDUIT_INCLUDE_DIRS 
+#   ${PROJECT_SOURCE_DIR}/src/tpl/conduit/src/libs/conduit 
+#   $<INSTALL_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+# 
+# blt_register_library(
+#   NAME conduit
+#   INCLUDES ${CONDUIT_INCLUDE_DIRS}
+#   LIBRARIES conduit)
+
+set (conduit_includes 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit> 
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/c>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/python>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs/conduit>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs/conduit/python>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
+
+blt_register_library(
+  NAME conduit
+  INCLUDES ${conduit_includes}
+  LIBRARIES conduit)
+
 add_subdirectory(simpool)
 add_subdirectory(judy)

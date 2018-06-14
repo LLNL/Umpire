@@ -81,11 +81,12 @@ install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
+add_subdirectory(tpl)
+
 add_subdirectory(resource)
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(util)
-add_subdirectory(tpl)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
