@@ -115,3 +115,14 @@ TEST(MonotonicStrategy, UM)
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
 }
 #endif
+
+TEST(Allocator, Duplicate)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  ASSERT_TRUE(rm.isAllocator("HOST"));
+
+  ASSERT_ANY_THROW(
+      rm.makeAllocator<umpire::strategy::DynamicPool>(
+        "host_simpool", rm.getAllocator("HOST")));
+}
