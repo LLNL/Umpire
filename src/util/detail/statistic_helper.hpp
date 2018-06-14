@@ -25,7 +25,7 @@ namespace detail {
 
 inline
 conduit::Node
-add_entry(conduit::Node n)
+add_entry(conduit::Node& n)
 {
   return n;
 }
@@ -33,7 +33,7 @@ add_entry(conduit::Node n)
 template <typename T, typename U>
 inline
 conduit::Node
-add_entry(conduit::Node n, T k, U v)
+add_entry(conduit::Node& n, T k, U v)
 {
   n[k] = v; 
   return n;
@@ -42,7 +42,7 @@ add_entry(conduit::Node n, T k, U v)
 template <typename T, typename U, typename... Args>
 inline
 conduit::Node
-add_entry(conduit::Node n, T k, U v, Args... args)
+add_entry(conduit::Node& n, T k, U v, Args... args)
 {
   n[k] = v; 
   return add_entry(n, args...);
@@ -61,7 +61,8 @@ template<typename... Args>
 inline
 void
 record_statistic(const std::string& name, Args&&... args) {
-  util::StatisticsDatabase::getDatabase()->getStatistic(name)->recordStatistic(add_entry(conduit::Node{}, args...));
+  auto node = conduit::Node{};
+  util::StatisticsDatabase::getDatabase()->getStatistic(name)->recordStatistic(add_entry(node, args...));
 }
 
 } // end of namespace detail

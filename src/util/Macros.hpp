@@ -18,7 +18,9 @@
 #include "umpire/util/Exception.hpp"
 #include "umpire/config.hpp"
 
+#if defined(UMPIRE_ENABLE_STATISTICS)
 #include "umpire/util/statistic_helper.hpp"
+#endif
 
 #include <sstream>
 #include <iostream>
