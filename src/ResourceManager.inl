@@ -29,6 +29,10 @@ Allocator ResourceManager::makeAllocator(
 {
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
+  if (isAllocator(name)) {
+    UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+  }
+
   std::shared_ptr<strategy::AllocationStrategy> allocator = 
     std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
 
