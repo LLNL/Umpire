@@ -21,6 +21,7 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/AllocationAdvisor.hpp"
 
 TEST(SimpoolStrategy, Host)
 {
@@ -113,6 +114,21 @@ TEST(MonotonicStrategy, UM)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
+}
+
+TEST(AllocationAdvisor, Create)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  ASSERT_NO_THROW(
+    auto read_only_alloc = 
+    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
+
+  ASSERT_ANY_THROW(
+      auto failed_alloc = 
+    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "read_only_um", rm.getAllocator("UM"), "FOOBAR"));
 }
 #endif
 

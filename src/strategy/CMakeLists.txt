@@ -13,12 +13,14 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 set (umpire_strategy_headers
+  AllocationAdvisor.hpp
   AllocationStrategy.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   DynamicPool.hpp)
 
 set (umpire_stategy_sources
+  AllocationAdvisor.cpp
   AllocationStrategy.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
