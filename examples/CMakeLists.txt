@@ -39,7 +39,9 @@ blt_add_executable(
   DEPENDS_ON 
     umpire)
 
-blt_add_executable(
-  NAME statistics_example
-  SOURCES statistics.cpp
-  DEPENDS_ON umpire)
+if (ENABLE_STATISTICS)
+  blt_add_executable(
+    NAME statistics_example
+    SOURCES statistics.cpp
+    DEPENDS_ON umpire)
+endif()
