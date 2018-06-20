@@ -33,6 +33,7 @@ if (ENABLE_STATISTICS)
   blt_register_library(
     NAME conduit
     INCLUDES ${conduit_includes}
+    TREAT_INCLUDES_AS_SYSTEM On
     LIBRARIES conduit)
 endif()
 
