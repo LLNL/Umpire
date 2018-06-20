@@ -73,6 +73,17 @@ class ResourceManager {
         const std::string& name, 
         Args&&... args);
 
+    /*!
+     * \brief Register an Allocator with the ResourceManager.
+     *
+     * After registration, the Allocator can be retrieved by calling
+     * getAllocator(name).
+     *
+     * The same Allocator can be registered under multiple names.
+     *
+     * \param name Name to register Allocator with. 
+     * \param allocator Allocator to register.
+     */
     void registerAllocator(const std::string& name, Allocator allocator);
 
     /*!
