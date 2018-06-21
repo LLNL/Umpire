@@ -115,8 +115,8 @@ class judyLArray {
 
         JudyValue remove( JudyKey key ) {
           JudyValue* entry = ( JudyValue * ) judy_slot( _judyarray, (const unsigned char*) &key, _depth * JUDY_key_size );
-          JudyValue cached_entry(*entry);
             if( entry  ) {
+                JudyValue cached_entry(*entry);
                 _lastSlot = ( JudyValue * ) judy_del( _judyarray );
                 return cached_entry;
             } else {
