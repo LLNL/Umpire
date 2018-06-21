@@ -24,7 +24,7 @@ class AllocationMapTest : public ::testing::Test {
   protected:
     virtual void SetUp() {
       double* data = new double[15];
-      size = 15;
+      size = 15*sizeof(double);
       record = new umpire::util::AllocationRecord{data, size, nullptr};
     }
 
@@ -59,6 +59,17 @@ TEST_F(AllocationMapTest, Find)
   );
 
   auto actual_record = map.find(data);
+
+  ASSERT_EQ(record, actual_record);
+}
+
+TEST_F(AllocationMapTest, FindOffset)
+{
+  EXPECT_NO_THROW(
+    map.insert(data,record)
+  );
+
+  auto actual_record = map.find(&data[4]);
 
   ASSERT_EQ(record, actual_record);
 }
