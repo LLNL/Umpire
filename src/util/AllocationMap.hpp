@@ -28,6 +28,8 @@ class AllocationMap
 {
   public:
     using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
+    using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
+    using Entry = AllocationRecord*;
 
   AllocationMap();
   ~AllocationMap();

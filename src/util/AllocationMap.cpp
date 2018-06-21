@@ -42,20 +42,21 @@ AllocationMap::remove(void* ptr)
 {
   UMPIRE_LOG(Debug, "Removing " << ptr);
 
-  auto record_vector = 
-    const_cast<std::vector<uintptr_t>*>(m_records.find(reinterpret_cast<uintptr_t>(ptr)));
+  EntryVector* record_vector =
+    const_cast<EntryVector*>(
+        m_records.find(reinterpret_cast<uintptr_t>(ptr)));
 
-  AllocationRecord* ret = nullptr;
+  Entry ret = nullptr;
 
   if (record_vector) {
     if (record_vector->size() > 0) {
-      ret = reinterpret_cast<AllocationRecord*>(record_vector->back());
+
+      ret = reinterpret_cast<Entry>(record_vector->back());
       record_vector->pop_back();
+
       if (record_vector->empty()) {
         m_records.removeEntry(reinterpret_cast<uintptr_t>(ptr));
       }
-    } else {
-      UMPIRE_ERROR("Cannot remove " << ptr );
     }
   } else {
     UMPIRE_ERROR("Cannot remove " << ptr );
@@ -67,15 +68,20 @@ AllocationMap::remove(void* ptr)
 AllocationRecord*
 AllocationMap::findRecord(void* ptr)
 {
-  AddressPair record = 
-    m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+  auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
 
   if (record.value) {
     void* parent_ptr = reinterpret_cast<void*>(record.key);
-    AllocationRecord* alloc_record = reinterpret_cast<AllocationRecord*>(record.value->back());
+    auto alloc_record =
+      reinterpret_cast<Entry>(record.value->back());
 
-    if (alloc_record && ((static_cast<char*>(parent_ptr) + alloc_record->m_size) >= static_cast<char*>(ptr))) {
-      UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr << " with size " << alloc_record->m_size);
+    if (alloc_record &&
+        ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
+           > static_cast<char*>(ptr))) {
+
+      UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
+          << " with size " << alloc_record->m_size);
+
       return alloc_record;
     }
   }
@@ -88,7 +94,7 @@ AllocationMap::find(void* ptr)
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
-  AllocationRecord* alloc_record = findRecord(ptr);
+  auto alloc_record = findRecord(ptr);
 
   if (alloc_record) {
     return alloc_record;
@@ -102,9 +108,7 @@ AllocationMap::contains(void* ptr)
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
-  AllocationRecord* alloc_record = findRecord(ptr);
-
-  return (alloc_record != nullptr);
+  return (findRecord(ptr) != nullptr);
 }
 
 } // end of namespace util
