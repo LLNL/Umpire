@@ -20,12 +20,33 @@ set (umpire_util_headers
   Macros.hpp
   Platform.hpp)
 
+if (ENABLE_STATISTICS)
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    detail/statistic_helper.hpp
+    Statistic.hpp
+    StatisticsDatabase.hpp)
+endif()
+
 set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
   Logger.cpp)
 
+if (ENABLE_STATISTICS)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    Statistic.cpp
+    StatisticsDatabase.cpp)
+endif()
+
 set (umpire_util_depends umpire_tpl_judy)
+
+if (ENABLE_STATISTICS)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    conduit)
+endif ()
 
 if (ENABLE_SLIC AND ENABLE_LOGGING)
   set (umpire_util_depends

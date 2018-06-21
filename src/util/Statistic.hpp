@@ -12,31 +12,40 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/CudaMemsetOperation.hpp"
+#ifndef UMPIRE_Statistic_HPP
+#define UMPIRE_Statistic_HPP
 
-#include <cuda_runtime_api.h>
+#include <chrono>
+#include <vector>
+#include <string>
 
-#include "umpire/util/Macros.hpp"
+#include "conduit.hpp"
 
 namespace umpire {
-namespace op {
+namespace util {
 
-void
-CudaMemsetOperation::apply(
-    void* src_ptr,
-    util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
-    int value,
-    size_t length)
-{
-  ::cudaMemset(src_ptr, value, length);
+class StatisticsDatabase;
 
-  UMPIRE_RECORD_STATISTIC(
-      "CudaMemsetOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "value", value,
-      "size", length,
-      "event", "memset");
-}
+class Statistic {
+  friend class StatisticsDatabase;
+  public:
+    ~Statistic();
 
-} // end of namespace op
+    void recordStatistic(conduit::Node&& n);
+
+    void printData(std::ostream& stream);
+
+  protected:
+    Statistic(const std::string& name);
+
+  private:
+    std::string m_name;
+    size_t m_counter;
+
+    conduit::Node m_data;
+};
+
+} // end of namespace util
 } // end of namespace umpire
+
+#endif // UMPIRE_Statistic_HPP

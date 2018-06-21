@@ -38,6 +38,13 @@ void CudaCopyOperation::transform(
       << ", cudaMemcpyDeviceToDevice ) failed with error: " 
       << cudaGetErrorString(error));
   }
+
+  UMPIRE_RECORD_STATISTIC(
+      "CudaCopyOperation",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "size", length,
+      "event", "copy");
 }
 
 } // end of namespace op

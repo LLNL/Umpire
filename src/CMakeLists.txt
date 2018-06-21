@@ -59,6 +59,7 @@ set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
+set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
@@ -80,11 +81,12 @@ install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
+add_subdirectory(tpl)
+
 add_subdirectory(resource)
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(util)
-add_subdirectory(tpl)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
