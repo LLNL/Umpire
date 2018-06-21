@@ -115,10 +115,10 @@ TEST_F(AllocationMapTest, FindMultiple)
   umpire::util::AllocationRecord* next_record = 
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
-  EXPECT_NO_THROW(
+  EXPECT_NO_THROW({
     map.insert(data, record);
     map.insert(data, next_record);
-  );
+  });
 
   auto actual_record = map.find(data);
 
@@ -130,5 +130,5 @@ TEST_F(AllocationMapTest, FindMultiple)
     actual_record = map.find(data);
   );
 
-  ASSERT_EQ(next_record, record);
+  ASSERT_EQ(actual_record, record);
 }
