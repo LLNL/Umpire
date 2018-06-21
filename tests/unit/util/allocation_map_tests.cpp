@@ -99,6 +99,18 @@ TEST_F(AllocationMapTest, RemoveNotFound)
   );
 }
 
+TEST_F(AllocationMapTest, RemoveAndUse)
+{
+  EXPECT_NO_THROW(
+    map.insert(data, record)
+  );
+
+  auto found_record = map.remove(data);
+
+  ASSERT_EQ(record, found_record);
+
+}
+
 TEST_F(AllocationMapTest, RegisterMultiple)
 {
   umpire::util::AllocationRecord* next_record = 
