@@ -62,12 +62,8 @@ set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
-  ${CMAKE_BINARY_DIR}/include/umpire/config.hpp)
+  ${PROJECT_BINARY_DIR}/include/umpire/config.hpp)
 
-target_include_directories(
-  umpire
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
 
 install(TARGETS
   umpire

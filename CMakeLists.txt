@@ -23,7 +23,6 @@ project(Umpire
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
-set(ENABLE_COPY_HEADERS On CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
@@ -36,15 +35,19 @@ set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 ################################
 # BLT
 ################################
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/blt/SetupBLT.cmake)
-  message(FATAL_ERROR "\
-  The BLT submodule is not present. \
-  If in git repository run the following two commands:\n \
-  git submodule init\n \
-  git submodule update")
-endif()
+if (NOT BLT_LOADED)
 
-include(blt/SetupBLT.cmake)
+  if (NOT EXISTS ${PROJECT_SOURCE_DIR}/blt/SetupBLT.cmake)
+  	message(FATAL_ERROR "\
+  	The BLT submodule is not present. \
+  	If in git repository run the following two commands:\n \
+  	git submodule init\n \
+  	git submodule update")
+  endif()
+  
+  include(blt/SetupBLT.cmake)
+  
+endif()
 
 include(cmake/SetupUmpireThirdParty.cmake)
 
@@ -58,18 +61,24 @@ install(FILES
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
+message(INFO "UMPIRE BINARY DIR: ${PROJECT_BINARY_DIR}")
+include_directories(${PROJECT_BINARY_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
   set (UMPIRE_TEST_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test)
   add_subdirectory(tests)
 endif ()
+
 if (ENABLE_BENCHMARKS)
   set (UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmark)
   add_subdirectory(benchmarks)
 endif ()
+
 if (ENABLE_EXAMPLES)
-add_subdirectory(examples)
+  add_subdirectory(examples)
 endif ()
 
 add_subdirectory(docs)

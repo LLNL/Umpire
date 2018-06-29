@@ -2,6 +2,6 @@
 	path = blt
 	url = https://github.com/LLNL/blt.git
 [submodule "src/tpl/simpool"]
-	path = src/tpl/simpool
+	path = src/umpire/tpl/simpool
 	url = https://github.com/LLNL/simpool.git
 	branch = feature/umpire-strategy
