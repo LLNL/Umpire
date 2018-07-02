@@ -20,6 +20,10 @@
 #include <memory>
 #include <cstddef>
 
+#include "umpire/util/Platform.hpp"
+
+class AllocatorTest;
+
 namespace umpire {
 
 class ResourceManager;
@@ -39,6 +43,7 @@ class ResourceManager;
  */
 class Allocator {
   friend class ResourceManager;
+  friend class ::AllocatorTest;
 
   public:
     /*!
@@ -132,6 +137,13 @@ class Allocator {
      */
     std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
+    /*!
+     * \brief Get the Platform object appropriate for this Allocator.
+     *
+     * \return Platform for this Allocator.
+     */
+    Platform getPlatform();
+
   private:
     /*!
      * \brief Construct an Allocator with the given AllocationStrategy.
@@ -142,7 +154,7 @@ class Allocator {
      * \param allocator Pointer to the AllocationStrategy object to use for
      * Allocations.
      */
-    Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator);
+    Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator);
 
     Allocator() = delete;
 

@@ -24,7 +24,7 @@
 
 namespace umpire {
 
-Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator):
+Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
   m_allocator(allocator)
 {
 }
@@ -87,6 +87,12 @@ Allocator::getAllocationStrategy()
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
   return m_allocator;
+}
+
+Platform
+Allocator::getPlatform()
+{
+  return m_allocator->getPlatform();
 }
 
 } // end of namespace umpire
