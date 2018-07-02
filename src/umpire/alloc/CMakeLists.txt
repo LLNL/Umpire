@@ -31,12 +31,17 @@ blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers}
   SOURCES ${umpire_alloc_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/alloc)
+  HEADERS_OUTPUT_SUBDIR umpire/alloc
+  DEPENDS ${umpire_alloc_depends})
+  
+
 
 target_link_libraries(
   umpire_alloc
   INTERFACE
   ${umpire_alloc_depends})
+  
+
 
 install(TARGETS
   umpire_alloc
