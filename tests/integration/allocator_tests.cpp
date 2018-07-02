@@ -40,6 +40,8 @@ TEST(Allocator, HostAllocatorType)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, HostAllocatorReference)
@@ -231,6 +233,10 @@ TEST(Allocator, Id)
   umpire::Allocator alloc = rm.getAllocator("HOST");
   int id = alloc.getId();
   ASSERT_GE(id, 0);
+
+  auto allocator_by_id = rm.getAllocator(id);
+
+  ASSERT_EQ(alloc.getAllocationStrategy(), allocator_by_id.getAllocationStrategy());
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
