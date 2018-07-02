@@ -64,6 +64,11 @@ class ResourceManager {
     Allocator getAllocator(resource::MemoryResourceType resource_type);
 
     /*!
+     * \brief Get the default Allocator with the given ID.
+     */
+    Allocator getAllocator(int id);
+
+    /*!
      * \brief Construct a new Allocator.
      *
      */

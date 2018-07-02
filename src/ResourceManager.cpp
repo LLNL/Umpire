@@ -150,6 +150,19 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
   return Allocator(m_memory_resources[resource_type]);
 }
 
+Allocator
+ResourceManager::getAllocator(int id)
+{
+  UMPIRE_LOG(Debug, "(\"" << id << "\")");
+
+  auto allocator = m_allocators_by_id.find(id);
+  if (allocator == m_allocators_by_id.end()) {
+    UMPIRE_ERROR("Allocator \"" << id << "\" not found.");
+  }
+
+  return Allocator(m_allocators_by_id[id]);
+}
+
 void
 ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
 {
