@@ -22,6 +22,8 @@
 
 #include "umpire/util/Platform.hpp"
 
+class AllocatorTest;
+
 namespace umpire {
 
 class ResourceManager;
@@ -41,6 +43,7 @@ class ResourceManager;
  */
 class Allocator {
   friend class ResourceManager;
+  friend class ::AllocatorTest;
 
   public:
     /*!
@@ -151,7 +154,7 @@ class Allocator {
      * \param allocator Pointer to the AllocationStrategy object to use for
      * Allocations.
      */
-    Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator);
+    Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator);
 
     Allocator() = delete;
 
