@@ -237,6 +237,10 @@ TEST(Allocator, Id)
   auto allocator_by_id = rm.getAllocator(id);
 
   ASSERT_EQ(alloc.getAllocationStrategy(), allocator_by_id.getAllocationStrategy());
+
+  ASSERT_THROW(
+      rm.getAllocator(-25),
+      umpire::util::Exception);
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
