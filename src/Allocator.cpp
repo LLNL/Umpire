@@ -89,4 +89,10 @@ Allocator::getAllocationStrategy()
   return m_allocator;
 }
 
+Platform
+Allocator::getPlatform()
+{
+  return m_allocator->getPlatform();
+}
+
 } // end of namespace umpire

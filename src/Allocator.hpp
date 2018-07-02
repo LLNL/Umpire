@@ -20,6 +20,8 @@
 #include <memory>
 #include <cstddef>
 
+#include "umpire/util/Platform.hpp"
+
 namespace umpire {
 
 class ResourceManager;
@@ -131,6 +133,13 @@ class Allocator {
      * \return Pointer to the AllocationStrategy.
      */
     std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
+
+    /*!
+     * \brief Get the Platform object appropriate for this Allocator.
+     *
+     * \return Platform for this Allocator.
+     */
+    Platform getPlatform();
 
   private:
     /*!
