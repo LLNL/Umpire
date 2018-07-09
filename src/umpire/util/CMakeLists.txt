@@ -23,7 +23,7 @@ set (umpire_util_headers
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
     ${umpire_util_headers}
-    detail/statistic_helper.hpp
+    statistic_helper.hpp
     Statistic.hpp
     StatisticsDatabase.hpp)
 endif()
@@ -68,6 +68,10 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+
+install(FILES
+  ${umpire_util_headers}
+  DESTINATION include/umpire/util)
 
 install(TARGETS
   umpire_util

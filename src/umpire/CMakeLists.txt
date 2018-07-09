@@ -79,6 +79,10 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
+install(FILES
+  ${umpire_headers}
+  DESTINATION include/umpire)
+
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ${CMAKE_INSTALL_PREFIX})

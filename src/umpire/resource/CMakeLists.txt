@@ -69,3 +69,7 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+install(FILES
+  ${umpire_resource_headers}
+  DESTINATION include/umpire/resource)

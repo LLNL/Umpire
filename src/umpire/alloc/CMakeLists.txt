@@ -45,6 +45,10 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+install(FILES
+  ${umpire_alloc_headers}
+  DESTINATION include/umpire/alloc)
+
 install(TARGETS
   umpire_alloc
   EXPORT umpire-targets

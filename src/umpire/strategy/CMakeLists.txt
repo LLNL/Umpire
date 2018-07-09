@@ -51,3 +51,7 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+install(FILES
+  ${umpire_strategy_headers}
+  DESTINATION include/umpire/strategy)

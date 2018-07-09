@@ -76,6 +76,10 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+install(FILES
+  ${umpire_op_headers}
+  DESTINATION include/umpire/op)
+
 install(TARGETS
   umpire_op
   EXPORT umpire-targets
