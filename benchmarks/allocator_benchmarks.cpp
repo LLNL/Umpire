@@ -24,7 +24,10 @@
 #include "umpire/strategy/DynamicPool.hpp"
 
 class allocatorBenchmark : public ::benchmark::Fixture {
-  public:
+public:
+  using ::benchmark::Fixture::SetUp;
+  using ::benchmark::Fixture::TearDown;
+
   allocatorBenchmark() : max_allocations(100000) { 
     allocations = new void*[max_allocations];
   }
@@ -79,7 +82,9 @@ BENCHMARK_DEFINE_F(Malloc, malloc)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(Malloc, free)(benchmark::State &st)   { deallocation(st); }
 
 class allocator : public ::allocatorBenchmark {
-  public:
+public:
+  using allocatorBenchmark::SetUp;
+  using allocatorBenchmark::TearDown;
   void SetUp(const ::benchmark::State&) {
     auto& rm = umpire::ResourceManager::getInstance();
     allocator = new umpire::Allocator(rm.getAllocator(getName()));
@@ -126,7 +131,9 @@ BENCHMARK_DEFINE_F(UM, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 static int namecnt = 0;   // Used to generate unique name per iteration
 class Pool : public ::allocatorBenchmark {
-  public:
+public:
+  using allocatorBenchmark::SetUp;
+  using allocatorBenchmark::TearDown;
   void SetUp(const ::benchmark::State&) {
     std::stringstream ss;
     ss << "host_pool" << namecnt++;
