@@ -33,7 +33,7 @@ class allocatorBenchmark : public ::benchmark::Fixture {
   }
   virtual void* allocate( size_t nbytes ) = 0;
   virtual void deallocate( void* ptr ) = 0;
-  void BM_allocation(benchmark::State &st) {
+  void allocation(benchmark::State &st) {
     auto size = st.range(0);
     size_t i = 0;
     while (st.KeepRunning()) {
@@ -49,7 +49,7 @@ class allocatorBenchmark : public ::benchmark::Fixture {
     for (size_t j = 0; j < i; j++)
       deallocate(allocations[j]);
   }
-  void BM_deallocation(benchmark::State &st) {
+  void deallocation(benchmark::State &st) {
     auto size = st.range(0);
     size_t i = 0;
     while (st.KeepRunning()) {
@@ -70,15 +70,15 @@ class allocatorBenchmark : public ::benchmark::Fixture {
   void** allocations;
 };
 
-class BM_malloc : public ::allocatorBenchmark {
+class Malloc : public ::allocatorBenchmark {
   public:
   virtual void* allocate( size_t nbytes ) { return malloc(nbytes); }
   virtual void deallocate( void* ptr ) { free(ptr); }
 };
-BENCHMARK_DEFINE_F(BM_malloc, malloc)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_malloc, free)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(Malloc, malloc)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(Malloc, free)(benchmark::State &st)   { deallocation(st); }
 
-class BM_allocAlloc : public ::allocatorBenchmark {
+class allocator : public ::allocatorBenchmark {
   public:
   void SetUp(const ::benchmark::State&) {
     auto& rm = umpire::ResourceManager::getInstance();
@@ -94,38 +94,38 @@ class BM_allocAlloc : public ::allocatorBenchmark {
   umpire::Allocator* allocator;
 };
 
-class BM_allocateHost : public ::BM_allocAlloc {
+class Host : public ::allocator {
   public:
-    BM_allocateHost(): name("HOST") { }
+    Host(): name("HOST") { }
     const std::string& getName( void ) { return name; }
   private:
     const std::string name;
 };
-BENCHMARK_DEFINE_F(BM_allocateHost, allocate)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_allocateHost, deallocate)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(Host, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(Host, deallocate)(benchmark::State &st)   { deallocation(st); }
 
-class BM_allocateDevice : public ::BM_allocAlloc {
+class Device : public ::allocator {
   public:
-    BM_allocateDevice(): name("DEVICE") { }
+    Device(): name("DEVICE") { }
     const std::string& getName( void ) { return name; }
   private:
     const std::string name;
 };
-BENCHMARK_DEFINE_F(BM_allocateDevice, allocate)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_allocateDevice, deallocate)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(Device, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(Device, deallocate)(benchmark::State &st)   { deallocation(st); }
 
-class BM_allocateUM : public ::BM_allocAlloc {
+class UM : public ::allocator {
   public:
-    BM_allocateUM(): name("UM") { }
+    UM(): name("UM") { }
     const std::string& getName( void ) { return name; }
   private:
     const std::string name;
 };
-BENCHMARK_DEFINE_F(BM_allocateUM, allocate)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_allocateUM, deallocate)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(UM, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(UM, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 static int namecnt = 0;   // Used to generate unique name per iteration
-class BM_allocatePool : public ::allocatorBenchmark {
+class Pool : public ::allocatorBenchmark {
   public:
   void SetUp(const ::benchmark::State&) {
     std::stringstream ss;
@@ -149,55 +149,55 @@ class BM_allocatePool : public ::allocatorBenchmark {
   umpire::Allocator* allocator;
 };
 
-class BM_allocatePoolHost : public ::BM_allocatePool {
+class PoolHost : public ::Pool {
   public:
-    BM_allocatePoolHost(): name("HOST") { }
+    PoolHost(): name("HOST") { }
     const std::string& getName( void ) { return name; }
   private:
     const std::string name;
 };
-BENCHMARK_DEFINE_F(BM_allocatePoolHost, allocate)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_allocatePoolHost, deallocate)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(PoolHost, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(PoolHost, deallocate)(benchmark::State &st)   { deallocation(st); }
 
-class BM_allocatePoolDevice : public ::BM_allocatePool {
+class PoolDevice : public ::Pool {
   public:
-    BM_allocatePoolDevice(): name("DEVICE") { }
+    PoolDevice(): name("DEVICE") { }
     const std::string& getName( void ) { return name; }
   private:
     const std::string name;
 };
-BENCHMARK_DEFINE_F(BM_allocatePoolDevice, allocate)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_allocatePoolDevice, deallocate)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(PoolDevice, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(PoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
 
-class BM_allocatePoolUM : public ::BM_allocatePool {
+class PoolUM : public ::Pool {
   public:
-    BM_allocatePoolUM(): name("UM") { }
+    PoolUM(): name("UM") { }
     const std::string& getName( void ) { return name; }
   private:
     const std::string name;
 };
-BENCHMARK_DEFINE_F(BM_allocatePoolUM, allocate)(benchmark::State &st) { BM_allocation(st); }
-BENCHMARK_DEFINE_F(BM_allocatePoolUM, deallocate)(benchmark::State &st)   { BM_deallocation(st); }
+BENCHMARK_DEFINE_F(PoolUM, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(PoolUM, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
-BENCHMARK_REGISTER_F(BM_malloc, malloc)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_malloc, free)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocateHost, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocateHost, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocatePoolHost, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocatePoolHost, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-BENCHMARK_REGISTER_F(BM_allocateDevice, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocateDevice, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocatePoolDevice, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocatePoolDevice, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocateUM, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocateUM, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocatePoolUM, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(BM_allocatePoolUM, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Device, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Device, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(PoolDevice, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(PoolDevice, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(UM, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(UM, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
 #endif
 
 BENCHMARK_MAIN()
