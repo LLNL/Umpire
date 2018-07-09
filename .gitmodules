@@ -5,3 +5,6 @@
 	path = src/tpl/simpool
 	url = https://github.com/LLNL/simpool.git
 	branch = feature/umpire-strategy
+[submodule "src/tpl/conduit"]
+	path = src/tpl/conduit
+	url = https://github.com/LLNL/conduit.git

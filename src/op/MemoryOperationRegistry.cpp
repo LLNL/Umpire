@@ -28,6 +28,10 @@
 #include "umpire/op/CudaCopyOperation.hpp"
 
 #include "umpire/op/CudaMemsetOperation.hpp"
+
+#include "umpire/op/CudaAdviseAccessedByOperation.hpp"
+#include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
+#include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
 #endif
 
 #include "umpire/util/Macros.hpp"
@@ -43,7 +47,7 @@ MemoryOperationRegistry::getInstance()
 {
   if (!s_memory_operation_registry_instance) {
     s_memory_operation_registry_instance = new MemoryOperationRegistry();
-    UMPIRE_LOG(Info, "() Created MemoryOperationRegistry at " << s_memory_operation_registry_instance);
+    UMPIRE_LOG(Debug, "() Created MemoryOperationRegistry at " << s_memory_operation_registry_instance);
   }
 
   return *s_memory_operation_registry_instance;
@@ -91,6 +95,21 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "REALLOCATE",
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<GenericReallocateOperation>());
+
+  registerOperation(
+      "ACCESSED_BY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseAccessedByOperation>());
+
+  registerOperation(
+      "PREFERRED_LOCATION",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdvisePreferredLocationOperation>());
+
+  registerOperation(
+      "READ_MOSTLY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseReadMostlyOperation>());
 #endif
 }
 

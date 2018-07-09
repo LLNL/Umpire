@@ -40,6 +40,8 @@ TEST(Allocator, HostAllocatorType)
   double* test_alloc = static_cast<double*>(allocator.allocate(100*sizeof(double)));
 
   ASSERT_NE(nullptr, test_alloc);
+
+  allocator.deallocate(test_alloc);
 }
 
 TEST(Allocator, HostAllocatorReference)
@@ -231,6 +233,14 @@ TEST(Allocator, Id)
   umpire::Allocator alloc = rm.getAllocator("HOST");
   int id = alloc.getId();
   ASSERT_GE(id, 0);
+
+  auto allocator_by_id = rm.getAllocator(id);
+
+  ASSERT_EQ(alloc.getAllocationStrategy(), allocator_by_id.getAllocationStrategy());
+
+  ASSERT_THROW(
+      rm.getAllocator(-25),
+      umpire::util::Exception);
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -254,4 +264,17 @@ TEST(Allocator, isRegistered)
 
   ASSERT_TRUE(rm.isAllocatorRegistered("HOST"));
   ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
+}
+
+TEST(Allocator, registerAllocator)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  rm.registerAllocator("my_host_allocator_copy", rm.getAllocator("HOST"));
+
+  ASSERT_EQ(rm.getAllocator("HOST").getAllocationStrategy(), 
+      rm.getAllocator("my_host_allocator_copy").getAllocationStrategy());
+
+  ASSERT_ANY_THROW(
+      rm.registerAllocator("HOST", rm.getAllocator("my_host_allocator_copy")));
 }

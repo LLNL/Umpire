@@ -32,6 +32,13 @@ void HostCopyOperation::transform(
       *dst_ptr,
       src_ptr,
       length);
+
+  UMPIRE_RECORD_STATISTIC(
+      "HostCopyOperation",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "size", length,
+      "event", "copy");
 }
 
 } // end of namespace op

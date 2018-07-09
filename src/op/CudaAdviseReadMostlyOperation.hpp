@@ -12,31 +12,32 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/CudaMemsetOperation.hpp"
+#ifndef UMPIRE_CudaAdviseReadMostlyOperation_HPP
+#define UMPIRE_CudaAdviseReadMostlyOperation_HPP
 
-#include <cuda_runtime_api.h>
-
-#include "umpire/util/Macros.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
-void
-CudaMemsetOperation::apply(
-    void* src_ptr,
-    util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
-    int value,
-    size_t length)
-{
-  ::cudaMemset(src_ptr, value, length);
-
-  UMPIRE_RECORD_STATISTIC(
-      "CudaMemsetOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "value", value,
-      "size", length,
-      "event", "memset");
-}
+class CudaAdviseReadMostlyOperation :
+  public MemoryOperation {
+public:
+  /*!
+   * @copybrief MemoryOperation::apply
+   *
+   * Uses cudaMemAdvise to set data as "read mostly" on the appropriate device.
+   *
+   * @copydetails MemoryOperation::apply
+   */
+    void apply(
+        void* src_ptr,
+        util::AllocationRecord *src_allocation,
+        int val,
+        size_t length);
+};
 
 } // end of namespace op
 } // end of namespace umpire
+
+#endif // UMPIRE_CudaAdviseReadMostlyOperation_HPP

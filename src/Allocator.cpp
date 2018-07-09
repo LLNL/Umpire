@@ -17,9 +17,14 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
+#if defined(UMPIRE_ENABLE_STATISTICS)
+#include "umpire/util/StatisticsDatabase.hpp"
+#include "umpire/util/Statistic.hpp"
+#endif
+
 namespace umpire {
 
-Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy>& allocator):
+Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
   m_allocator(allocator)
 {
 }
@@ -28,7 +33,11 @@ void*
 Allocator::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-  return m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate(bytes);
+
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
+
+  return ret;
 }
 
 void
@@ -36,6 +45,9 @@ Allocator::deallocate(void* ptr)
 {
   UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
   UMPIRE_LOG(Debug, "(" << ptr << ")");
+
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
+
   m_allocator->deallocate(ptr);
 }
 
@@ -75,6 +87,12 @@ Allocator::getAllocationStrategy()
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
   return m_allocator;
+}
+
+Platform
+Allocator::getPlatform()
+{
+  return m_allocator->getPlatform();
 }
 
 } // end of namespace umpire

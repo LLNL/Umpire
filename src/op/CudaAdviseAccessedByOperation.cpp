@@ -12,39 +12,24 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/HostReallocateOperation.hpp"
+#include "umpire/op/CudaAdviseAccessedByOperation.hpp"
 
-#include <cstdlib>
+#include <cuda_runtime_api.h>
 
-#include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace op {
 
-void HostReallocateOperation::transform(
+void
+CudaAdviseAccessedByOperation::apply(
     void* src_ptr,
-    void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-    util::AllocationRecord *dst_allocation,
+    int UMPIRE_UNUSED_ARG(val),
     size_t length)
 {
-  auto allocator = dst_allocation->m_strategy;
-
-  ResourceManager::getInstance().deregisterAllocation(src_ptr);
-
-  *dst_ptr = ::realloc(src_ptr, length);
-
-  UMPIRE_RECORD_STATISTIC(
-      "HostReallocate",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
-      "size", length,
-      "event", "reallocate");
-
-  ResourceManager::getInstance().registerAllocation(
-      *dst_ptr,
-      new util::AllocationRecord{*dst_ptr, length, allocator});
+  // TODO: get correct device for allocation
+  cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, 0);
 }
 
 } // end of namespace op

@@ -151,10 +151,39 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 }
 
 Allocator
+ResourceManager::getAllocator(int id)
+{
+  UMPIRE_LOG(Debug, "(\"" << id << "\")");
+
+  auto allocator = m_allocators_by_id.find(id);
+  if (allocator == m_allocators_by_id.end()) {
+    UMPIRE_ERROR("Allocator \"" << id << "\" not found.");
+  }
+
+  return Allocator(m_allocators_by_id[id]);
+}
+
+void
+ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
+{
+  if (isAllocator(name)) {
+    UMPIRE_ERROR("Allocator " << name << " is already registered.");
+  }
+
+  m_allocators_by_name[name] = allocator.getAllocationStrategy();
+}
+
+Allocator
 ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return Allocator(findAllocatorForPointer(ptr));
+}
+
+bool
+ResourceManager::isAllocator(const std::string& name)
+{
+  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
 
 bool

@@ -64,6 +64,11 @@ class ResourceManager {
     Allocator getAllocator(resource::MemoryResourceType resource_type);
 
     /*!
+     * \brief Get the default Allocator with the given ID.
+     */
+    Allocator getAllocator(int id);
+
+    /*!
      * \brief Construct a new Allocator.
      *
      */
@@ -74,6 +79,19 @@ class ResourceManager {
         Args&&... args);
 
     /*!
+     * \brief Register an Allocator with the ResourceManager.
+     *
+     * After registration, the Allocator can be retrieved by calling
+     * getAllocator(name).
+     *
+     * The same Allocator can be registered under multiple names.
+     *
+     * \param name Name to register Allocator with. 
+     * \param allocator Allocator to register.
+     */
+    void registerAllocator(const std::string& name, Allocator allocator);
+
+    /*!
      * \brief Get the Allocator used to allocate ptr.
      *
      *
@@ -82,6 +100,8 @@ class ResourceManager {
      * \return Allocator for the given ptr.
      */
     Allocator getAllocator(void* ptr);
+
+    bool isAllocator(const std::string& name);
 
     /*!
      * \brief Does the given pointer have an associated Allocator.
