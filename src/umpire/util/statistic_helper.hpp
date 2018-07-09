@@ -17,7 +17,7 @@
 
 #include "umpire/util/StatisticsDatabase.hpp"
 
-#include "conduit.hpp"
+#include "conduit/conduit.hpp"
 
 namespace umpire {
 namespace util {
