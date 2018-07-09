@@ -15,10 +15,10 @@
 #ifndef UMPIRE_H_
 #define UMPIRE_H_
 
-#include "umpire/shroudrt.hpp"
+#include "umpire/interface/c_fortran/shroudrt.hpp"
 
-#include "umpire/wrapAllocator.h"
+#include "umpire/interface/c_fortran/wrapAllocator.h"
 
-#include "umpire/wrapResourceManager.h"
+#include "umpire/interface/c_fortran/wrapResourceManager.h"
 
 #endif // UMPIRE_H_
