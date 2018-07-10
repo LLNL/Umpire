@@ -20,27 +20,138 @@
 
 #include "gtest/gtest.h"
 
-TEST(AllocationMap, AddFindRemove)
+class AllocationMapTest : public ::testing::Test {
+  protected:
+    virtual void SetUp() {
+      double* data = new double[15];
+      size = 15*sizeof(double);
+      record = new umpire::util::AllocationRecord{data, size, nullptr};
+    }
+
+    virtual void TearDown() {
+    }
+
+    umpire::util::AllocationMap map;
+
+    double* data;
+    size_t size;
+    umpire::util::AllocationRecord* record;
+};
+
+TEST_F(AllocationMapTest, Add)
 {
-  umpire::util::AllocationMap map;
+  EXPECT_NO_THROW(
+    map.insert(data, record)
+  );
+}
 
-  int* pointer = new int[10];
+TEST_F(AllocationMapTest, FindNotFound)
+{
+  ASSERT_THROW(
+    map.find(data),
+    umpire::util::Exception);
+}
 
-  umpire::util::AllocationRecord* record = new umpire::util::AllocationRecord{pointer, 10, nullptr};
+TEST_F(AllocationMapTest, Find)
+{
+  EXPECT_NO_THROW(
+    map.insert(data,record)
+  );
 
-  map.insert((void*)pointer, record);
+  auto actual_record = map.find(data);
 
-  auto found_record = map.find(pointer);
+  ASSERT_EQ(record, actual_record);
+}
 
-  ASSERT_EQ(record, found_record);
-  ASSERT_TRUE(map.contains(pointer));
+TEST_F(AllocationMapTest, FindOffset)
+{
+  EXPECT_NO_THROW(
+    map.insert(data,record)
+  );
 
-  ASSERT_FALSE(map.contains(pointer-1));
+  auto actual_record = map.find(&data[4]);
 
-  map.remove(pointer);
+  ASSERT_EQ(record, actual_record);
+}
+
+TEST_F(AllocationMapTest, Contains)
+{
+  EXPECT_NO_THROW(
+    map.insert(data,record)
+  );
+
+  ASSERT_TRUE(map.contains(data));
+}
+
+TEST_F(AllocationMapTest, NotContains)
+{
+  ASSERT_FALSE(map.contains(data));
+}
+
+TEST_F(AllocationMapTest, Remove)
+{
+  EXPECT_NO_THROW({
+    map.insert(data,record);
+    map.remove(data);
+  });
 
   ASSERT_THROW(
-      map.find(pointer),
+      map.find(data),
       umpire::util::Exception);
-  ASSERT_FALSE(map.contains(pointer));
+
+  ASSERT_FALSE(map.contains(data));
+}
+
+TEST_F(AllocationMapTest, RemoveNotFound)
+{
+  ASSERT_THROW(
+    map.remove(data),
+    umpire::util::Exception
+  );
+}
+
+TEST_F(AllocationMapTest, RemoveAndUse)
+{
+  EXPECT_NO_THROW(
+    map.insert(data, record)
+  );
+
+  auto found_record = map.remove(data);
+
+  ASSERT_EQ(record, found_record);
+
+}
+
+TEST_F(AllocationMapTest, RegisterMultiple)
+{
+  umpire::util::AllocationRecord* next_record = 
+    new umpire::util::AllocationRecord{data, 1, nullptr};
+
+  ASSERT_NO_THROW(
+    map.insert(data, record);
+    map.insert(data, next_record);
+  );
+}
+
+TEST_F(AllocationMapTest, FindMultiple)
+{
+  umpire::util::AllocationRecord* next_record = 
+    new umpire::util::AllocationRecord{data, 1, nullptr};
+
+  EXPECT_NO_THROW({
+    map.insert(data, record);
+    map.insert(data, next_record);
+  });
+
+  auto actual_record = map.find(data);
+
+  ASSERT_EQ(next_record, actual_record);
+
+  map.remove(data);
+
+  EXPECT_NO_THROW(
+    actual_record = map.find(data);
+  );
+
+  ASSERT_EQ(actual_record, record);
 }

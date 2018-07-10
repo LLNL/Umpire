@@ -15,7 +15,7 @@
 blt_add_library(
   NAME umpire_tpl_judy
   SOURCES judy.c
-  HEADERS judy.h judyLArray.h
+  HEADERS judy.h judyLArray.h judyL2Array.h
   HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
 
 install(TARGETS
