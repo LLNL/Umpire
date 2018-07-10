@@ -19,7 +19,7 @@
 #include <vector>
 #include <string>
 
-#include "conduit.hpp"
+#include "conduit/conduit.hpp"
 
 namespace umpire {
 namespace util {

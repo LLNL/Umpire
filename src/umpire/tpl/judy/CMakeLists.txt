@@ -24,3 +24,7 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+install(FILES
+  judy.h judyLArray.h
+  DESTINATION include/umpire/tpl/judy)

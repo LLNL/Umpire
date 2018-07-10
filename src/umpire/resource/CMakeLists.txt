@@ -56,9 +56,20 @@ blt_add_library(
   HEADERS_OUTPUT_SUBDIR umpire/resource
   DEPENDS_ON ${umpire_resource_depends})
 
+target_include_directories(
+  umpire_resource
+  PUBLIC
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 install(TARGETS
   umpire_resource
   EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+install(FILES
+  ${umpire_resource_headers}
+  DESTINATION include/umpire/resource)

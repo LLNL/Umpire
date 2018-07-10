@@ -38,6 +38,17 @@ target_link_libraries(
   INTERFACE
   ${umpire_alloc_depends})
 
+target_include_directories(
+  umpire_alloc
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+install(FILES
+  ${umpire_alloc_headers}
+  DESTINATION include/umpire/alloc)
+
 install(TARGETS
   umpire_alloc
   EXPORT umpire-targets
