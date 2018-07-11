@@ -238,6 +238,8 @@ class FixedPoolUM : public ::FixedPool {
   private:
     const std::string name;
 };
+BENCHMARK_DEFINE_F(FixedPoolUM, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolUM, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 class FixedPoolDevice : public ::FixedPool {
   public:
@@ -246,6 +248,8 @@ class FixedPoolDevice : public ::FixedPool {
   private:
     const std::string name;
 };
+BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
@@ -274,7 +278,6 @@ BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, deallocate)->Arg(RangeLow);
-
 #endif
 
 
