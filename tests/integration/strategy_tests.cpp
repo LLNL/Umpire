@@ -21,6 +21,7 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 
 TEST(SimpoolStrategy, Host)
@@ -181,4 +182,21 @@ TEST(Allocator, Duplicate)
   ASSERT_ANY_THROW(
       rm.makeAllocator<umpire::strategy::DynamicPool>(
         "host_simpool", rm.getAllocator("HOST")));
+}
+
+TEST(FixedPool, Host)
+{
+  struct data { int _[100]; };
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool<data>>(
+      "host_fixed_pool", rm.getAllocator("HOST"));
+
+  void* alloc = allocator.allocate(100);
+
+  ASSERT_GE(allocator.getCurrentSize(), sizeof(data)*64);
+  ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
+  ASSERT_GE(allocator.getHighWatermark(), sizeof(data)*64);
+  ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 }
