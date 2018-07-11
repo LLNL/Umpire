@@ -22,7 +22,7 @@
 
 #include "umpire/Allocator.hpp"
 
-#include "umpire/tpl/simpool/DynamicPoolAllocator.hpp"
+#include "umpire/tpl/simpool/DynamicSizePool.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -46,7 +46,7 @@ class DynamicPool : public AllocationStrategy
     Platform getPlatform();
 
   private:
-    DynamicPoolAllocator<>* dpa;
+    DynamicSizePool<>* dpa;
 
     long m_current_size;
     long m_highwatermark;
