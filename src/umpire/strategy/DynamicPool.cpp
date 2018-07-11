@@ -40,7 +40,7 @@ DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   void* ptr = dpa->allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
+  ResourceManager::getInstance().registerAllocation(ptr, util::makeAllocationRecord(ptr, bytes, this->shared_from_this()));
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)

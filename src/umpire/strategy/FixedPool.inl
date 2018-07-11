@@ -107,7 +107,7 @@ FixedPool<T, NP, IA>::allocate(size_t bytes) {
     m_num_blocks++;
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, sizeof(T), this->shared_from_this()});
+  ResourceManager::getInstance().registerAllocation(ptr, util::makeAllocationRecord(ptr, sizeof(T), this->shared_from_this()));
 
   return ptr;
 }

@@ -19,6 +19,9 @@
 
 #include <memory>
 
+#include "umpire/tpl/simpool/FixedSizePool.hpp"
+#include "umpire/tpl/simpool/StdAllocator.hpp"
+
 namespace umpire {
 
 namespace strategy {
@@ -33,6 +36,27 @@ struct AllocationRecord
   size_t m_size;
   std::shared_ptr<strategy::AllocationStrategy> m_strategy;
 };
+
+namespace {
+  static FixedSizePool<AllocationRecord, StdAllocator> pool;
+}
+
+template<typename... Args>
+inline
+AllocationRecord*
+makeAllocationRecord(Args... args)
+{
+  auto record = pool.allocate();
+
+  return new (record) AllocationRecord{args...};
+}
+
+inline
+void
+deleteAllocationRecord(AllocationRecord* ptr)
+{
+  pool.deallocate(ptr);
+}
 
 } // end of namespace util
 } // end of namespace umpire

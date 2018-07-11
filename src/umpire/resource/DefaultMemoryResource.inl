@@ -39,7 +39,8 @@ template<typename _allocator>
 void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
+  ResourceManager::getInstance().registerAllocation(ptr, 
+      util::makeAllocationRecord(ptr, bytes, this->shared_from_this()));
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
@@ -62,7 +63,7 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
   m_allocator.deallocate(ptr);
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
-  delete record;
+  util::deleteAllocationRecord(record);
 }
 
 template<typename _allocator>

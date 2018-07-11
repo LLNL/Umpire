@@ -46,7 +46,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
-  ResourceManager::getInstance().registerAllocation(ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
+  ResourceManager::getInstance().registerAllocation(ret, util::makeAllocationRecord(ret, bytes, this->shared_from_this()));
 
   return ret;
 }
