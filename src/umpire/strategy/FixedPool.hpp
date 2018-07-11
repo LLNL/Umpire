@@ -58,17 +58,19 @@ class FixedPool
       struct Pool* next;
     };
 
-    struct Pool *pool;
-    size_t numPerPool;
-    size_t totalPoolSize;
-
-    size_t numBlocks;
-
     void newPool(struct Pool **pnew);
 
     T* allocInPool(struct Pool *p);
 
     size_t numPools() const;
+
+
+    struct Pool *m_pool;
+    size_t m_num_per_pool;
+    size_t m_total_pool_size;
+
+    size_t m_num_blocks;
+
 
     long m_highwatermark;
     long m_current_size;
