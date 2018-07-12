@@ -25,14 +25,14 @@
 class AllocationMapPerformanceTest : public ::testing::Test {
   protected:
     virtual void SetUp() {
-      num_entries = 1000000;
+      num_entries = 10000;
 
       size = 8;
 
       data = new double*[num_entries];
       records = new umpire::util::AllocationRecord*[num_entries];
 
-      for (int i = 0; i < num_entries; i++) {
+      for (size_t i = 0; i < num_entries; i++) {
         data[i] = new double[size];
         records[i] = new umpire::util::AllocationRecord{data[i], size, nullptr};
       }
@@ -40,7 +40,7 @@ class AllocationMapPerformanceTest : public ::testing::Test {
     }
 
     virtual void TearDown() {
-      for (int i = 0; i < num_entries; i++) {
+      for (size_t i = 0; i < num_entries; i++) {
         delete[] data[i];
         delete records[i];
       }
@@ -61,7 +61,7 @@ TEST_F(AllocationMapPerformanceTest, Insert)
 {
   auto start = std::chrono::high_resolution_clock::now();
 
-  for (int i = 0; i < num_entries; ++i) {
+  for (size_t i = 0; i < num_entries; ++i) {
     map.insert(data[i], records[i]);
   }
 
