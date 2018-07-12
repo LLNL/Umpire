@@ -12,17 +12,18 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9)
 
 cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0057 NEW)
 
 project(Umpire 
-  LANGUAGES CXX C Fortran 
-  VERSION 0.2.0)
+  LANGUAGES CXX C
+  VERSION 0.2.1)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
-set(ENABLE_COPY_HEADERS On CACHE Bool "")
+set(ENABLE_COPY_HEADERS Off CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
@@ -31,25 +32,32 @@ option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
+option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 
 ################################
 # BLT
 ################################
-if (NOT EXISTS ${PROJECT_SOURCE_DIR}/blt/SetupBLT.cmake)
-  message(FATAL_ERROR "\
-  The BLT submodule is not present. \
-  If in git repository run the following two commands:\n \
-  git submodule init\n \
-  git submodule update")
+if (NOT BLT_LOADED)
+  if (DEFINED BLT_SOURCE_DIR)
+    if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
+        message(FATAL_ERROR "Given BLT_SOURCE_DIR does not contain SetupBLT.cmake")
+    endif()
+  else ()
+    set (BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/blt CACHE PATH "")
+
+    if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
+      message(FATAL_ERROR "\
+      The BLT submodule is not present. \
+      If in git repository run the following two commands:\n \
+      git submodule init\n \
+      git submodule update")
+    endif ()
+  endif ()
 endif()
 
-include(blt/SetupBLT.cmake)
+include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 
 include(cmake/SetupUmpireThirdParty.cmake)
-
-if (ENABLE_CUDA)
-  set(CUDA_NVCC_FLAGS -std=c++11)
-endif ()
 
 configure_file(
   umpire-config.cmake.in
