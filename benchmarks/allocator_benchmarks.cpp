@@ -22,6 +22,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 
 class allocatorBenchmark : public ::benchmark::Fixture {
 public:
@@ -34,11 +35,14 @@ public:
   virtual ~allocatorBenchmark() {
     delete[] allocations;
   }
+
   virtual void* allocate( size_t nbytes ) = 0;
   virtual void deallocate( void* ptr ) = 0;
+
   void allocation(benchmark::State &st) {
     auto size = st.range(0);
     size_t i = 0;
+
     while (st.KeepRunning()) {
       if ( i == max_allocations ) {
         st.PauseTiming();
@@ -52,6 +56,7 @@ public:
     for (size_t j = 0; j < i; j++)
       deallocate(allocations[j]);
   }
+
   void deallocation(benchmark::State &st) {
     auto size = st.range(0);
     size_t i = 0;
@@ -186,6 +191,66 @@ class PoolUM : public ::Pool {
 BENCHMARK_DEFINE_F(PoolUM, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(PoolUM, deallocate)(benchmark::State &st)   { deallocation(st); }
 
+class FixedPool : public ::allocatorBenchmark {
+public:
+  using allocatorBenchmark::SetUp;
+  using allocatorBenchmark::TearDown;
+
+  void SetUp(const ::benchmark::State&) {
+    struct data { char _[8388608]; };
+
+    std::stringstream ss;
+    ss << "fixedpool" << namecnt++;
+    auto& rm = umpire::ResourceManager::getInstance();
+    rm.makeAllocator<umpire::strategy::FixedPool<data>>(ss.str(), rm.getAllocator(getName()));
+    allocator = new umpire::Allocator(rm.getAllocator(ss.str()));
+
+    void* ptr;
+    ptr = allocate(1);
+    deallocate(ptr);
+  }
+
+  void TearDown(const ::benchmark::State&) {
+    delete allocator;
+  }
+
+  virtual void* allocate( size_t nbytes ) { return allocator->allocate(nbytes); }
+  virtual void deallocate( void* ptr ) { allocator->deallocate(ptr); }
+  virtual const std::string& getName( void ) = 0;
+
+  umpire::Allocator* allocator;
+};
+
+class FixedPoolHost : public ::FixedPool {
+  public:
+    FixedPoolHost(): name("HOST") { }
+    const std::string& getName( void ) { return name; }
+  private:
+    const std::string name;
+};
+BENCHMARK_DEFINE_F(FixedPoolHost, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolHost, deallocate)(benchmark::State &st)   { deallocation(st); }
+
+class FixedPoolUM : public ::FixedPool {
+  public:
+    FixedPoolUM(): name("UM") { }
+    const std::string& getName( void ) { return name; }
+  private:
+    const std::string name;
+};
+BENCHMARK_DEFINE_F(FixedPoolUM, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolUM, deallocate)(benchmark::State &st)   { deallocation(st); }
+
+class FixedPoolDevice : public ::FixedPool {
+  public:
+    FixedPoolDevice(): name("DEVICE") { }
+    const std::string& getName( void ) { return name; }
+  private:
+    const std::string name;
+};
+BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
+
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
@@ -195,6 +260,9 @@ BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
+// NOTE: always allocates 8mb, ignores size argument
+BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(RangeLow);
 
 #if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_REGISTER_F(Device, allocate)->Range(RangeLow, RangeHi);
@@ -205,6 +273,12 @@ BENCHMARK_REGISTER_F(UM, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(UM, deallocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
+// NOTE: always allocates 8mb, ignores size argument
+BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedPoolUM, allocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedPoolUM, deallocate)->Arg(RangeLow);
 #endif
+
 
 BENCHMARK_MAIN()

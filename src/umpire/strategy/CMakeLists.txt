@@ -17,7 +17,9 @@ set (umpire_strategy_headers
   AllocationStrategy.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
-  DynamicPool.hpp)
+  DynamicPool.hpp
+  FixedPool.hpp
+  FixedPool.inl)
 
 set (umpire_stategy_sources
   AllocationAdvisor.cpp

@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DynamicPool_HPP
-#define UMPIRE_DynamicPool_HPP
+#ifndef UMPIRE_FixedPool_HPP
+#define UMPIRE_FixedPool_HPP
 
 #include <memory>
 #include <vector>
@@ -22,19 +22,23 @@
 
 #include "umpire/Allocator.hpp"
 
-#include "umpire/tpl/simpool/DynamicSizePool.hpp"
+#include "umpire/tpl/simpool/StdAllocator.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class DynamicPool : public AllocationStrategy
+template <typename T, int NP=64, typename IA=StdAllocator>
+class FixedPool 
+  : public AllocationStrategy
 {
+
   public:
-    DynamicPool(
+    FixedPool(
         const std::string& name,
         int id,
-        Allocator allocator,
-        size_t min_alloc_size = 1 << 8);
+        Allocator allocator);
+
+    ~FixedPool();
 
     void* allocate(size_t bytes);
 
@@ -46,10 +50,30 @@ class DynamicPool : public AllocationStrategy
     Platform getPlatform();
 
   private:
-    DynamicSizePool<>* dpa;
+    struct Pool
+    {
+      unsigned char *data;
+      unsigned int *avail;
+      unsigned int numAvail;
+      struct Pool* next;
+    };
 
-    long m_current_size;
+    void newPool(struct Pool **pnew);
+
+    T* allocInPool(struct Pool *p);
+
+    size_t numPools() const;
+
+
+    struct Pool *m_pool;
+    size_t m_num_per_pool;
+    size_t m_total_pool_size;
+
+    size_t m_num_blocks;
+
+
     long m_highwatermark;
+    long m_current_size;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
@@ -57,4 +81,6 @@ class DynamicPool : public AllocationStrategy
 } // end of namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_DynamicPool_HPP
+#include "umpire/strategy/FixedPool.inl"
+
+#endif // UMPIRE_FixedPool_HPP

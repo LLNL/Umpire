@@ -32,7 +32,7 @@ DynamicPool::DynamicPool(
   m_highwatermark(0),
   m_allocator(allocator.getAllocationStrategy())
 {
-  dpa = new DynamicPoolAllocator<>(m_allocator, min_alloc_size);
+  dpa = new DynamicSizePool<>(m_allocator, min_alloc_size);
 }
 
 void*
