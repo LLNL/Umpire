@@ -44,32 +44,33 @@ TEST(SimpoolStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto allocator = rm.getAllocator("DEVICE");
+  void* alloc;
+
+  // Determine how much memory we can allocate from device
+  std::size_t max_mem = 0;
+  const std::size_t OneGiB = 1 * 1024 * 1024 * 1024;
+  try {
+    while ( true ) {  // Will "catch" out when allocation fails
+      alloc = allocator.allocate(max_mem + OneGiB);
+      ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
+      max_mem += OneGiB;
+    }
+  }
+  catch (...) {
+    ASSERT_GT(max_mem, OneGiB);
+  }
+
+  allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "device_simpool", rm.getAllocator("DEVICE"));
 
   ASSERT_EQ(allocator.getName(), "device_simpool");
-
-  void* alloc;
 
   ASSERT_NO_THROW( { alloc = allocator.allocate(100); } );
   ASSERT_GE(allocator.getCurrentSize(), 100);
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
-
-  // Determine how much memory we can allocate from device
-  std::size_t max_mem = 0;
-  const std::size_t OneGiB = 1 * 1024 * 1024 * 1024;
-  try {
-    for ( std::size_t factor = 14; ; ++factor ) {
-      alloc = allocator.allocate(factor * OneGiB);
-      ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
-      max_mem += (factor * OneGiB);
-    }
-  }
-  catch (...) {
-    ASSERT_GT(max_mem, OneGiB);
-  }
 
   std::size_t alloc_size = max_mem / 4;
   void* alloc1;
