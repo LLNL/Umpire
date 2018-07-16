@@ -23,6 +23,7 @@
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/PinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/DeviceConstResourceFactory.hpp"
 #endif
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
@@ -67,6 +68,10 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     std::make_shared<resource::PinnedMemoryResourceFactory>());
+
+  // constant memory
+  registry.registerMemoryResource(
+    std::make_shared<resource::DeviceConstResourceFactory>());
 #endif
 
   initialize();
@@ -86,6 +91,8 @@ ResourceManager::initialize()
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
   m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
   m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
+  // constant memory
+  m_memory_resources[resource::Device_Const] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
   /*
@@ -114,6 +121,11 @@ ResourceManager::initialize()
   auto pinned_allocator = m_memory_resources[resource::PinnedMemory];
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
+
+  // constant memory
+  auto device_const_allocator = m_memory_resources[resource::Device_Const];
+  m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
+  m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -151,39 +163,10 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 }
 
 Allocator
-ResourceManager::getAllocator(int id)
-{
-  UMPIRE_LOG(Debug, "(\"" << id << "\")");
-
-  auto allocator = m_allocators_by_id.find(id);
-  if (allocator == m_allocators_by_id.end()) {
-    UMPIRE_ERROR("Allocator \"" << id << "\" not found.");
-  }
-
-  return Allocator(m_allocators_by_id[id]);
-}
-
-void
-ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
-{
-  if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator " << name << " is already registered.");
-  }
-
-  m_allocators_by_name[name] = allocator.getAllocationStrategy();
-}
-
-Allocator
 ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return Allocator(findAllocatorForPointer(ptr));
-}
-
-bool
-ResourceManager::isAllocator(const std::string& name)
-{
-  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
 
 bool

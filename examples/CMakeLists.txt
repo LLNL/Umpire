@@ -39,6 +39,12 @@ blt_add_executable(
   DEPENDS_ON 
     umpire)
 
+blt_add_executable(
+  NAME device_const_test_case
+  SOURCES device_const_mem_real_case.cu
+  DEPENDS_ON 
+    umpire)
+
 if (ENABLE_STATISTICS)
   blt_add_executable(
     NAME statistics_example
