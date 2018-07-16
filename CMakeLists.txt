@@ -53,9 +53,10 @@ if (NOT BLT_LOADED)
       git submodule update")
     endif ()
   endif ()
+
+  include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
 
-include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 
 include(cmake/SetupUmpireThirdParty.cmake)
 
