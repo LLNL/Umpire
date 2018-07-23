@@ -20,6 +20,70 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/util/Exception.hpp"
 
+class OperationTest : 
+  public ::testing::Test,
+  public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
+{
+  public:
+    virtual void SetUp() {
+      auto& rm = umpire::ResourceManager::getInstance();
+      source_allocator = rm.getAllocator(::testing::get<0>(GetParam()));
+      dest_allocator = rm.getAllocator(::testing::get<1>(GetParam()));
+
+      source_array = static_cast<char*>(source_allocator.allocate(m_size*sizeof(char)));
+      dest_array = static_cast<char*>(dest_allocator.allocate(m_size*sizeof(char)));
+
+      check_array = static_cast<char*>(
+          rm.getAllocator("HOST").allocate(m_size*sizeof(char)));
+    }
+
+    virtual void TearDown() {
+      source_allocator.deallocate(source_array);
+      dest_allocator.deallocate(dest_array);
+      rm.getAllocator("HOST").deallocate(check_array);
+    }
+
+    char* source_array;
+    char* dest_array;
+    char* check_array;
+
+    const size_t m_size = 1024;
+
+    umpire::Allocator source_allocator;
+    umpire::Allocator dest_allocator;
+};
+
+class CopyTest :
+  public OperationTest
+{
+  void doTest() {
+    for (size_t i = 0; i < m_size; i++) {
+      array_one[i] = i;
+    }
+
+    rm.copy(dest_array, source_array);
+    rm.copy(check_array, dest_array);
+
+    for (size_t i = 0; i < m_size; i++) {
+      ASSERT_DOUBLE_EQ(source_array[i], check_array[i]);
+    }
+  }
+}
+
+TEST_P(CopyTest, Copy) {
+  doTest();
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+INSTANTIATE_TEST_CASE_P(
+    Copies,
+    CopyTest,
+    ::testing::Combine(
+      ::testing::Values("HOST", "UM"),
+      ::testing::Values("HOST", "DEVICE", "UM")
+      ));
+#endif
+
 TEST(Operation, HostToHostCopy)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
