@@ -21,54 +21,60 @@
 #include "umpire/util/Exception.hpp"
 
 class OperationTest : 
-  public ::testing::Test,
   public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
 {
   public:
     virtual void SetUp() {
       auto& rm = umpire::ResourceManager::getInstance();
-      source_allocator = rm.getAllocator(::testing::get<0>(GetParam()));
-      dest_allocator = rm.getAllocator(::testing::get<1>(GetParam()));
+      source_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<0>(GetParam())));
+      dest_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<1>(GetParam())));
 
-      source_array = static_cast<char*>(source_allocator.allocate(m_size*sizeof(char)));
-      dest_array = static_cast<char*>(dest_allocator.allocate(m_size*sizeof(char)));
+      source_array = static_cast<float*>(source_allocator->allocate(m_size*sizeof(float)));
+      dest_array = static_cast<float*>(dest_allocator->allocate(m_size*sizeof(float)));
 
-      check_array = static_cast<char*>(
-          rm.getAllocator("HOST").allocate(m_size*sizeof(char)));
+      check_array = static_cast<float*>(
+          rm.getAllocator("HOST").allocate(m_size*sizeof(float)));
     }
 
     virtual void TearDown() {
-      source_allocator.deallocate(source_array);
-      dest_allocator.deallocate(dest_array);
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      source_allocator->deallocate(source_array);
+      dest_allocator->deallocate(dest_array);
+
       rm.getAllocator("HOST").deallocate(check_array);
     }
 
-    char* source_array;
-    char* dest_array;
-    char* check_array;
+    float* source_array;
+    float* dest_array;
+    float* check_array;
 
     const size_t m_size = 1024;
 
-    umpire::Allocator source_allocator;
-    umpire::Allocator dest_allocator;
+    umpire::Allocator* source_allocator;
+    umpire::Allocator* dest_allocator;
 };
 
 class CopyTest :
   public OperationTest
 {
+  public:
   void doTest() {
+    auto& rm = umpire::ResourceManager::getInstance();
+
     for (size_t i = 0; i < m_size; i++) {
-      array_one[i] = i;
+      source_array[i] = i;
     }
 
     rm.copy(dest_array, source_array);
+
     rm.copy(check_array, dest_array);
 
     for (size_t i = 0; i < m_size; i++) {
-      ASSERT_DOUBLE_EQ(source_array[i], check_array[i]);
+      ASSERT_FLOAT_EQ(source_array[i], check_array[i]);
     }
   }
-}
+};
 
 TEST_P(CopyTest, Copy) {
   doTest();
@@ -81,6 +87,38 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::Values("HOST", "UM"),
       ::testing::Values("HOST", "DEVICE", "UM")
+      ));
+#endif
+
+class MemsetTest :
+  public OperationTest
+{
+  public:
+  void doTest() {
+    auto& rm = umpire::ResourceManager::getInstance();
+
+    rm.memset(source_array, 0);
+
+    rm.copy(check_array, source_array);
+
+    for (size_t i = 0; i < m_size; i++) {
+      ASSERT_EQ(0, check_array[i]);
+    }
+  }
+};
+
+TEST_P(MemsetTest, Memset) {
+  doTest();
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+INSTANTIATE_TEST_CASE_P(
+    Set,
+    MemsetTest,
+    ::testing::Combine(
+      ::testing::Values("HOST", "UM", "DEVICE"),
+      // dest allocator unecessary
+      ::testing::Values("HOST")
       ));
 #endif
 
