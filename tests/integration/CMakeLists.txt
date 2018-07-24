@@ -82,3 +82,18 @@ if (ENABLE_ASSERTS)
     NAME assert_tests
     COMMAND assert_tests)
 endif ()
+
+blt_add_executable(
+  NAME free_functions_integration_tests
+  SOURCES free_functions_integration_tests.cpp
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+
+target_include_directories(
+  free_functions_integration_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME free_functions_integration_tests
+  COMMAND free_functions_integration_tests)
