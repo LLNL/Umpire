@@ -255,6 +255,28 @@ TEST_P(ReallocateTest, ReallocateLarger)
   check_array = nullptr;
 }
 
+TEST_P(ReallocateTest, RealocateNull)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  rm.setDefaultAllocator(*source_allocator);
+
+  const size_t reallocated_size = (m_size+50);
+
+  void* null_array = nullptr;
+
+  float* reallocated_array = 
+    static_cast<float*>(
+        rm.reallocate(null_array, reallocated_size*sizeof(float)));
+
+  ASSERT_EQ(
+      source_allocator->getSize(reallocated_array), 
+      reallocated_size*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+  rm.setDefaultAllocator(rm.getAllocator("HOST"));
+}
+
 const std::string reallocate_sources[] = {
   "HOST"
 #if defined(UMPIRE_ENABLE_CUDA)
