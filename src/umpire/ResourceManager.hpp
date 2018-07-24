@@ -166,6 +166,9 @@ class ResourceManager {
     /*!
      * \brief Reallocate src_ptr to size.
      *
+     * If src_ptr is null, then the default allocator will be used to allocate
+     * data.
+     *
      * \param src_ptr Source pointer to reallocate.
      * \param size New size of pointer.
      *
@@ -173,6 +176,20 @@ class ResourceManager {
      *
      */
     void* reallocate(void* src_ptr, size_t size);
+
+    /*!
+     * \brief Reallocate src_ptr to size.
+     *
+     * If src_ptr is null, then allocator will be used to allocate the data.
+     *
+     * \param src_ptr Source pointer to reallocate.
+     * \param size New size of pointer.
+     * \param allocator Allocator to use if src_ptr is null.
+     *
+     * \return Reallocated pointer.
+     *
+     */
+    void* reallocate(void* src_ptr, size_t size, Allocator allocator);
 
     /*!
      * \brief Move src_ptr to memory from allocator
