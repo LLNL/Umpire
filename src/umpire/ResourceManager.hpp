@@ -64,9 +64,29 @@ class ResourceManager {
     Allocator getAllocator(resource::MemoryResourceType resource_type);
 
     /*!
-     * \brief Get the default Allocator with the given ID.
+     * \brief Get the Allocator with the given ID.
      */
     Allocator getAllocator(int id);
+
+    /*!
+     * \brief Get the default Allocator.
+     *
+     * The default Allocator is used whenever an Allocator is required and one
+     * is not provided, or cannot be inferred.
+     *
+     * \return The default Allocator.
+     */
+    Allocator getDefaultAllocator();
+
+    /*!
+     * \brief Set the default Allocator.
+     *
+     * The default Allocator is used whenever an Allocator is required and one
+     * is not provided, or cannot be inferred.
+     *
+     * \param allocator The Allocator to use as the default.
+     */
+    void setDefaultAllocator(Allocator allocator);
 
     /*!
      * \brief Construct a new Allocator.

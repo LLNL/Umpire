@@ -278,3 +278,16 @@ TEST(Allocator, registerAllocator)
   ASSERT_ANY_THROW(
       rm.registerAllocator("HOST", rm.getAllocator("my_host_allocator_copy")));
 }
+
+TEST(DefaultAllocator, GetSet)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  ASSERT_NO_THROW(
+    auto alloc = rm.getDefaultAllocator();
+  );
+
+  ASSERT_NO_THROW(
+    rm.setDefaultAllocator(rm.getDefaultAllocator());
+  );
+}
