@@ -48,6 +48,7 @@ ResourceManager::ResourceManager() :
   m_allocators_by_name(),
   m_allocators_by_id(),
   m_allocations(),
+  m_default_allocator(),
   m_memory_resources(),
   m_id(0)
 {
@@ -94,6 +95,8 @@ ResourceManager::initialize()
   auto host_allocator = m_memory_resources[resource::Host];
   m_allocators_by_name["HOST"] = host_allocator;
   m_allocators_by_id[host_allocator->getId()] = host_allocator;
+
+  m_default_allocator = host_allocator;
 
 #if defined(UMPIRE_ENABLE_CUDA)
   /*
@@ -161,6 +164,26 @@ ResourceManager::getAllocator(int id)
   }
 
   return Allocator(m_allocators_by_id[id]);
+}
+
+Allocator
+ResourceManager::getDefaultAllocator()
+{
+  UMPIRE_LOG(Debug, "");
+
+  if (!m_default_allocator) {
+    UMPIRE_ERROR("The default Allocator is not defined");
+  }
+
+  return Allocator(m_default_allocator);
+}
+
+void
+ResourceManager::setDefaultAllocator(Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");
+
+  m_default_allocator = allocator.getAllocationStrategy();
 }
 
 void
