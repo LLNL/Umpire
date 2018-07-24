@@ -249,11 +249,11 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   std::size_t dst_size = dst_alloc_record->m_size;
 
   if (size == 0) {
-    if (src_size > dst_size) {
-      UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
-    }
-
     size = src_size;
+  }
+
+  if (size > dst_size) {
+    UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
   }
 
   auto op = op_registry.find("COPY", 
@@ -275,6 +275,10 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
 
   if (length == 0) {
     length = src_size;
+  }
+
+  if (length > src_size) {
+    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << src_size);
   }
 
   auto op = op_registry.find("MEMSET", 
