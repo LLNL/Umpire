@@ -29,7 +29,15 @@ CudaAdviseAccessedByOperation::apply(
     size_t length)
 {
   // TODO: get correct device for allocation
-  cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, 0);
+  cudaError_t error =
+    ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, 0);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
+      << ", length = " << length
+      << ", cudaMemAdviseSetAccessedBy, 0) failed with error: "
+      << cudaGetErrorString(error));
+  }
 }
 
 } // end of namespace op
