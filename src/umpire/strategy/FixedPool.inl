@@ -152,6 +152,12 @@ FixedPool<T, NP, IA>::getCurrentSize() {
 
 template <typename T, int NP, typename IA>
 long 
+FixedPool<T, NP, IA>::getActualSize() {
+    return m_total_pool_size;
+}
+
+template <typename T, int NP, typename IA>
+long 
 FixedPool<T, NP, IA>::getHighWatermark() {
   return m_highwatermark;
 }

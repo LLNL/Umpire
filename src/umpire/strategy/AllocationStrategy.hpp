@@ -52,6 +52,7 @@ class AllocationStrategy :
 
     virtual long getCurrentSize() = 0;
     virtual long getHighWatermark() = 0;
+    virtual long getActualSize();
 
     virtual Platform getPlatform()  = 0;
 

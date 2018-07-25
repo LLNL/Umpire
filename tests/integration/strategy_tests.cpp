@@ -24,6 +24,32 @@
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 
+TEST(SimpoolStrategy, HostDynamicPool)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_dynamicpool", rm.getAllocator("HOST"), 512);
+
+  void* alloc = allocator.allocate(100);
+  ASSERT_GE(allocator.getCurrentSize(), 100);
+  ASSERT_EQ(allocator.getHighWatermark(), 100);
+  ASSERT_GE(allocator.getActualSize(), 512);
+  ASSERT_EQ(allocator.getSize(alloc), 100);
+
+  void* alloc2 = allocator.allocate(200);
+  allocator.deallocate(alloc);
+
+  ASSERT_GE(allocator.getCurrentSize(), 100);
+  ASSERT_EQ(allocator.getHighWatermark(), 300);
+  ASSERT_GE(allocator.getActualSize(), 512);
+  ASSERT_EQ(allocator.getSize(alloc2), 200);
+
+  allocator.deallocate(alloc2);
+
+  ASSERT_EQ(allocator.getName(), "host_dynamicpool");
+}
+
 TEST(SimpoolStrategy, Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
