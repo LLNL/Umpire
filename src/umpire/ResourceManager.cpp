@@ -48,6 +48,7 @@ ResourceManager::ResourceManager() :
   m_allocators_by_name(),
   m_allocators_by_id(),
   m_allocations(),
+  m_default_allocator(),
   m_memory_resources(),
   m_id(0)
 {
@@ -94,6 +95,8 @@ ResourceManager::initialize()
   auto host_allocator = m_memory_resources[resource::Host];
   m_allocators_by_name["HOST"] = host_allocator;
   m_allocators_by_id[host_allocator->getId()] = host_allocator;
+
+  m_default_allocator = host_allocator;
 
 #if defined(UMPIRE_ENABLE_CUDA)
   /*
@@ -163,6 +166,26 @@ ResourceManager::getAllocator(int id)
   return Allocator(m_allocators_by_id[id]);
 }
 
+Allocator
+ResourceManager::getDefaultAllocator()
+{
+  UMPIRE_LOG(Debug, "");
+
+  if (!m_default_allocator) {
+    UMPIRE_ERROR("The default Allocator is not defined");
+  }
+
+  return Allocator(m_default_allocator);
+}
+
+void
+ResourceManager::setDefaultAllocator(Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");
+
+  m_default_allocator = allocator.getAllocationStrategy();
+}
+
 void
 ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
 {
@@ -226,11 +249,11 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   std::size_t dst_size = dst_alloc_record->m_size;
 
   if (size == 0) {
-    if (src_size > dst_size) {
-      UMPIRE_ERROR("Not enough resource in destination for copy: " << src_size << " -> " << dst_size);
-    }
-
     size = src_size;
+  }
+
+  if (size > dst_size) {
+    UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
   }
 
   auto op = op_registry.find("COPY", 
@@ -254,6 +277,10 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
     length = src_size;
   }
 
+  if (length > src_size) {
+    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << src_size);
+  }
+
   auto op = op_registry.find("MEMSET", 
       alloc_record->m_strategy, 
       alloc_record->m_strategy);
@@ -266,21 +293,48 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  void* dst_ptr = nullptr;
 
-  auto alloc_record = m_allocations.find(src_ptr);
+  if (!src_ptr) {
+    dst_ptr = m_default_allocator->allocate(size);
+  } else {
+    auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  if (src_ptr != alloc_record->m_ptr) {
-    UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
+    auto alloc_record = m_allocations.find(src_ptr);
+
+    if (src_ptr != alloc_record->m_ptr) {
+      UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
+    }
+
+    auto op = op_registry.find("REALLOCATE", 
+        alloc_record->m_strategy, 
+        alloc_record->m_strategy);
+
+
+    op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
   }
 
-  auto op = op_registry.find("REALLOCATE", 
-      alloc_record->m_strategy, 
-      alloc_record->m_strategy);
+  return dst_ptr;
+}
+
+void*
+ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
   void* dst_ptr = nullptr;
 
-  op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
+  if (!src_ptr) {
+    dst_ptr = allocator.allocate(size);
+  } else {
+    auto alloc_record = m_allocations.find(src_ptr);
+
+    if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
+      dst_ptr = reallocate(src_ptr, size);
+    } else {
+      UMPIRE_ERROR("Cannot reallocate " << src_ptr << " with Allocator " << allocator.getName());
+    }
+  }
 
   return dst_ptr;
 }

@@ -34,7 +34,8 @@ class DynamicPool : public AllocationStrategy
         const std::string& name,
         int id,
         Allocator allocator,
-        size_t min_alloc_size = 1 << 8);
+        const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
+        const std::size_t min_alloc_size = (1 * 1024 *1024));
 
     void* allocate(size_t bytes);
 
@@ -42,6 +43,7 @@ class DynamicPool : public AllocationStrategy
 
     long getCurrentSize();
     long getHighWatermark();
+    long getActualSize();
 
     Platform getPlatform();
 

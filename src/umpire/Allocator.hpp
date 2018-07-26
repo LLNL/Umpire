@@ -104,6 +104,18 @@ class Allocator {
     size_t getCurrentSize();
 
     /*!
+     * \brief Return the actual size of this Allocator.
+     *
+     * For non-pool allocators, this will be the same as getCurrentSize().
+     *
+     * For pools, this is the total amount of memory allocated for blocks
+     * managed by the pool.
+     *
+     * \return actual size of Allocator.
+     */
+    size_t getActualSize();
+
+    /*!
      * \brief Get the name of this Allocator.
      *
      * Allocators are uniquely named, and the name of the Allocator can be used

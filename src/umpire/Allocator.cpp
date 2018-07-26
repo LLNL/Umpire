@@ -70,6 +70,12 @@ Allocator::getCurrentSize()
   return m_allocator->getCurrentSize();
 }
 
+size_t
+Allocator::getActualSize()
+{
+  return m_allocator->getActualSize();
+}
+
 std::string
 Allocator::getName()
 {

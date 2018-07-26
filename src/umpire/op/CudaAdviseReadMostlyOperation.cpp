@@ -29,7 +29,15 @@ CudaAdviseReadMostlyOperation::apply(
     size_t length)
 {
   // TODO: get correct device for allocation
-  cudaMemAdvise(src_ptr, length, cudaMemAdviseSetReadMostly, 0);
+  cudaError_t error =
+    ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetReadMostly, 0);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
+      << ", length = " << length
+      << ", cudaMemAdviseSetReadMostly, 0) failed with error: "
+      << cudaGetErrorString(error));
+  }
 }
 
 } // end of namespace op

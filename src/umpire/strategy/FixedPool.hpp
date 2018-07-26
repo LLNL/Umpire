@@ -46,6 +46,7 @@ class FixedPool
 
     long getCurrentSize();
     long getHighWatermark();
+    long getActualSize();
 
     Platform getPlatform();
 

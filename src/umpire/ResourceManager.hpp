@@ -64,9 +64,29 @@ class ResourceManager {
     Allocator getAllocator(resource::MemoryResourceType resource_type);
 
     /*!
-     * \brief Get the default Allocator with the given ID.
+     * \brief Get the Allocator with the given ID.
      */
     Allocator getAllocator(int id);
+
+    /*!
+     * \brief Get the default Allocator.
+     *
+     * The default Allocator is used whenever an Allocator is required and one
+     * is not provided, or cannot be inferred.
+     *
+     * \return The default Allocator.
+     */
+    Allocator getDefaultAllocator();
+
+    /*!
+     * \brief Set the default Allocator.
+     *
+     * The default Allocator is used whenever an Allocator is required and one
+     * is not provided, or cannot be inferred.
+     *
+     * \param allocator The Allocator to use as the default.
+     */
+    void setDefaultAllocator(Allocator allocator);
 
     /*!
      * \brief Construct a new Allocator.
@@ -146,6 +166,9 @@ class ResourceManager {
     /*!
      * \brief Reallocate src_ptr to size.
      *
+     * If src_ptr is null, then the default allocator will be used to allocate
+     * data.
+     *
      * \param src_ptr Source pointer to reallocate.
      * \param size New size of pointer.
      *
@@ -153,6 +176,20 @@ class ResourceManager {
      *
      */
     void* reallocate(void* src_ptr, size_t size);
+
+    /*!
+     * \brief Reallocate src_ptr to size.
+     *
+     * If src_ptr is null, then allocator will be used to allocate the data.
+     *
+     * \param src_ptr Source pointer to reallocate.
+     * \param size New size of pointer.
+     * \param allocator Allocator to use if src_ptr is null.
+     *
+     * \return Reallocated pointer.
+     *
+     */
+    void* reallocate(void* src_ptr, size_t size, Allocator allocator);
 
     /*!
      * \brief Move src_ptr to memory from allocator

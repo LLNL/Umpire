@@ -28,7 +28,15 @@ CudaMemsetOperation::apply(
     int value,
     size_t length)
 {
-  ::cudaMemset(src_ptr, value, length);
+  cudaError_t error = ::cudaMemset(src_ptr, value, length);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaMemset( src_ptr = " << src_ptr
+      << ", value = " << value
+      << ", length = " << length
+      << ") failed with error: "
+      << cudaGetErrorString(error));
+  }
 
   UMPIRE_RECORD_STATISTIC(
       "CudaMemsetOperation",
