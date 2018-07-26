@@ -108,7 +108,7 @@ TEST(SimpoolStrategy, Device)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator("DEVICE");
-  void* alloc;
+  void* alloc = nullptr;
 
   // Determine how much memory we can allocate from device
   std::size_t max_mem = 0;
@@ -136,9 +136,9 @@ TEST(SimpoolStrategy, Device)
   ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
 
   std::size_t alloc_size = max_mem / 4;
-  void* alloc1;
-  void* alloc2;
-  void* alloc3;
+  void* alloc1 = nullptr;
+  void* alloc2 = nullptr;
+  void* alloc3 = nullptr;
 
   // Hold a little of the first block we allocate
   ASSERT_NO_THROW( { alloc1 = allocator.allocate(1024); } );
