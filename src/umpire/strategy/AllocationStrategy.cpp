@@ -35,5 +35,11 @@ AllocationStrategy::getId()
   return m_id;
 }
 
+long
+AllocationStrategy::getActualSize()
+{
+  return getCurrentSize();
+}
+
 } // end of namespace strategy
 } // end of namespace umpire
