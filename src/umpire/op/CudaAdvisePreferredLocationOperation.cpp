@@ -24,13 +24,19 @@ namespace op {
 void
 CudaAdvisePreferredLocationOperation::apply(
     void* src_ptr,
-    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    util::AllocationRecord* src_allocation,
     int UMPIRE_UNUSED_ARG(val),
     size_t length)
 {
   // TODO: get correct device for allocation
+  int device = 0;
+
+  if (src_allocation->m_strategy->getPlatform() == cpu) {
+    device = cudaCpuDeviceId;
+  }
+
   cudaError_t error =
-    ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, 0);
+    ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr

@@ -95,6 +95,33 @@ TEST(CudaAdvisePreferredLocation, Apply)
       1024*sizeof(float)));
 }
 
+TEST(CudaAdvisePreferredLocation, ApplyHost)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
+  auto strategy = allocator.getAllocationStrategy();
+
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+
+  auto advice_operation = op_registry.find(
+      "PREFERRED_LOCATION",
+      strategy,
+      strategy);
+
+  float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
+  auto record = new util::AllocationRecord{data, 1024*sizeof(float), strategy};
+
+  ASSERT_NO_THROW(
+    advice_operation->apply(
+      data,
+      record,
+      0, // val is unused
+      1024*sizeof(float)));
+
+  allocator->deallocate(data);
+  delete record;
+}
+
 TEST(CudaAdviseReadMostly, Find)
 {
   auto& rm = umpire::ResourceManager::getInstance();
