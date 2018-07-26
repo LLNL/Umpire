@@ -68,7 +68,7 @@ TEST_P(StrategyTest, Allocate) {
 }
 
 TEST_P(StrategyTest, Sizes) {
-  void* alloc = nullptr;
+  void* alloc;
   ASSERT_NO_THROW({ alloc = allocator->allocate(100); });
   ASSERT_EQ(allocator->getSize(alloc), 100);
   ASSERT_GE(allocator->getCurrentSize(), 100);
