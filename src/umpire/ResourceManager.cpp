@@ -162,16 +162,6 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
   return Allocator(m_memory_resources[resource_type]);
 }
 
-void
-ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
-{
-  if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator " << name << " is already registered.");
-  }
-
-  m_allocators_by_name[name] = allocator.getAllocationStrategy();
-}
-
 Allocator
 ResourceManager::getAllocator(int id)
 {
@@ -184,6 +174,17 @@ ResourceManager::getAllocator(int id)
 
   return Allocator(m_allocators_by_id[id]);
 }
+
+void
+ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
+{
+  if (isAllocator(name)) {
+    UMPIRE_ERROR("Allocator " << name << " is already registered.");
+  }
+
+  m_allocators_by_name[name] = allocator.getAllocationStrategy();
+}
+
 
 Allocator
 ResourceManager::getAllocator(void* ptr)
