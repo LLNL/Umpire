@@ -255,6 +255,78 @@ TEST_P(ReallocateTest, ReallocateLarger)
   check_array = nullptr;
 }
 
+TEST_P(ReallocateTest, RealocateNull)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  rm.setDefaultAllocator(*source_allocator);
+
+  const size_t reallocated_size = (m_size+50);
+
+  void* null_array = nullptr;
+
+  float* reallocated_array = 
+    static_cast<float*>(
+        rm.reallocate(null_array, reallocated_size*sizeof(float)));
+
+  ASSERT_EQ(
+      source_allocator->getSize(reallocated_array), 
+      reallocated_size*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+  rm.setDefaultAllocator(rm.getAllocator("HOST"));
+}
+
+TEST_P(ReallocateTest, ReallocateNullWithAllocator)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  const size_t reallocated_size = (m_size+50);
+
+  void* null_array = nullptr;
+
+  float* reallocated_array = 
+    static_cast<float*>(
+        rm.reallocate(null_array, reallocated_size*sizeof(float), *source_allocator));
+
+  ASSERT_EQ(
+      source_allocator->getSize(reallocated_array), 
+      reallocated_size*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+}
+
+TEST_P(ReallocateTest, ReallocateWithAllocator)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  const size_t reallocated_size = (m_size+50);
+
+  float* reallocated_array = 
+    static_cast<float*>(
+        rm.reallocate(source_array, reallocated_size*sizeof(float), *source_allocator));
+
+  ASSERT_EQ(
+      source_allocator->getSize(reallocated_array), 
+      reallocated_size*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+  source_array = nullptr;
+}
+
+TEST_P(ReallocateTest, ReallocateWithAllocatorFail)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  if (source_allocator->getId() == dest_allocator->getId()) {
+    SUCCEED();
+  } else {
+    ASSERT_THROW(
+        rm.reallocate(source_array, m_size, *dest_allocator),
+        umpire::util::Exception);
+  }
+}
+
 const std::string reallocate_sources[] = {
   "HOST"
 #if defined(UMPIRE_ENABLE_CUDA)

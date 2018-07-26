@@ -293,21 +293,48 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
-  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  void* dst_ptr = nullptr;
 
-  auto alloc_record = m_allocations.find(src_ptr);
+  if (!src_ptr) {
+    dst_ptr = m_default_allocator->allocate(size);
+  } else {
+    auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  if (src_ptr != alloc_record->m_ptr) {
-    UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
+    auto alloc_record = m_allocations.find(src_ptr);
+
+    if (src_ptr != alloc_record->m_ptr) {
+      UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
+    }
+
+    auto op = op_registry.find("REALLOCATE", 
+        alloc_record->m_strategy, 
+        alloc_record->m_strategy);
+
+
+    op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
   }
 
-  auto op = op_registry.find("REALLOCATE", 
-      alloc_record->m_strategy, 
-      alloc_record->m_strategy);
+  return dst_ptr;
+}
+
+void*
+ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
   void* dst_ptr = nullptr;
 
-  op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
+  if (!src_ptr) {
+    dst_ptr = allocator.allocate(size);
+  } else {
+    auto alloc_record = m_allocations.find(src_ptr);
+
+    if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
+      dst_ptr = reallocate(src_ptr, size);
+    } else {
+      UMPIRE_ERROR("Cannot reallocate " << src_ptr << " with Allocator " << allocator.getName());
+    }
+  }
 
   return dst_ptr;
 }
