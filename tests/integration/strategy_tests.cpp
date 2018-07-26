@@ -13,6 +13,8 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
+#include <string>
+#include <sstream>
 
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -24,46 +26,81 @@
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 
-TEST(SimpoolStrategy, HostDynamicPool)
+static int unique_pool_name = 0;
+static int initial_min_size = 1024;
+static int subsequent_min_size = 512;
+
+const char* AllocationDevices[] = {
+  "HOST"
+#if defined(UMPIRE_ENABLE_CUDA)
+    , "DEVICE"
+    , "UM"
+    , "PINNED"
+#endif
+};
+
+class StrategyTest :
+  public ::testing::TestWithParam<const char*>
+{
+  public:
+    virtual void SetUp() {
+      auto& rm = umpire::ResourceManager::getInstance();
+      allocatorName = GetParam();
+      poolName << allocatorName << "_pool_" << unique_pool_name++;
+
+     rm.makeAllocator<umpire::strategy::DynamicPool>
+                    (  poolName.str()
+                     , rm.getAllocator(allocatorName)
+                     , initial_min_size
+                     , subsequent_min_size);
+     allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
+    }
+
+    umpire::Allocator* allocator;
+    std::string allocatorName;
+    std::stringstream poolName;
+};
+
+TEST_P(StrategyTest, Allocate) {
+  void* alloc;
+  alloc = allocator->allocate(100);
+  allocator->deallocate(alloc);
+}
+
+TEST_P(StrategyTest, Sizes) {
+  void* alloc = nullptr;
+  ASSERT_NO_THROW({ alloc = allocator->allocate(100); });
+  ASSERT_EQ(allocator->getSize(alloc), 100);
+  ASSERT_GE(allocator->getCurrentSize(), 100);
+  ASSERT_EQ(allocator->getHighWatermark(), 100);
+  ASSERT_GE(allocator->getActualSize(), initial_min_size);
+
+  void* alloc2 = nullptr;
+  ASSERT_NO_THROW({ alloc2 = allocator->allocate(initial_min_size); });
+  ASSERT_NO_THROW({ allocator->deallocate(alloc); });
+
+  ASSERT_GE(allocator->getCurrentSize(), initial_min_size);
+  ASSERT_EQ(allocator->getHighWatermark(), initial_min_size+100);
+  ASSERT_GE(allocator->getActualSize(), initial_min_size+subsequent_min_size);
+  ASSERT_EQ(allocator->getSize(alloc2), initial_min_size);
+
+  ASSERT_NO_THROW({ allocator->deallocate(alloc2); });
+}
+
+TEST_P(StrategyTest, Duplicate)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_dynamicpool", rm.getAllocator("HOST"), 512);
+  ASSERT_TRUE(rm.isAllocator(allocatorName));
+ 
+  ASSERT_EQ(allocator->getName(), poolName.str());
 
-  void* alloc = allocator.allocate(100);
-  ASSERT_GE(allocator.getCurrentSize(), 100);
-  ASSERT_EQ(allocator.getHighWatermark(), 100);
-  ASSERT_GE(allocator.getActualSize(), 512);
-  ASSERT_EQ(allocator.getSize(alloc), 100);
-
-  void* alloc2 = allocator.allocate(200);
-  allocator.deallocate(alloc);
-
-  ASSERT_GE(allocator.getCurrentSize(), 100);
-  ASSERT_EQ(allocator.getHighWatermark(), 300);
-  ASSERT_GE(allocator.getActualSize(), 512);
-  ASSERT_EQ(allocator.getSize(alloc2), 200);
-
-  allocator.deallocate(alloc2);
-
-  ASSERT_EQ(allocator.getName(), "host_dynamicpool");
+  ASSERT_ANY_THROW(
+      rm.makeAllocator<umpire::strategy::DynamicPool>(
+        poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-TEST(SimpoolStrategy, Host)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_simpool", rm.getAllocator("HOST"));
-
-  void* alloc = allocator.allocate(100);
-
-  ASSERT_GE(allocator.getCurrentSize(), 100);
-  ASSERT_EQ(allocator.getSize(alloc), 100);
-  ASSERT_GE(allocator.getHighWatermark(), 100);
-  ASSERT_EQ(allocator.getName(), "host_simpool");
-}
+INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices));
 
 #if defined(UMPIRE_ENABLE_CUDA)
 TEST(SimpoolStrategy, Device)
@@ -117,24 +154,6 @@ TEST(SimpoolStrategy, Device)
   }
 
   ASSERT_NO_THROW( { allocator.deallocate(alloc3); } );
-}
-
-TEST(SimpoolStrategy, UM)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "um_simpool", rm.getAllocator("UM"));
-
-  ASSERT_EQ(allocator.getName(), "um_simpool");
-
-  void* alloc;
-
-  ASSERT_NO_THROW( { alloc = allocator.allocate(100); } );
-  ASSERT_GE(allocator.getCurrentSize(), 100);
-  ASSERT_EQ(allocator.getSize(alloc), 100);
-  ASSERT_GE(allocator.getHighWatermark(), 100);
-  ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
 }
 #endif
 
@@ -199,17 +218,6 @@ TEST(AllocationAdvisor, Create)
       "read_only_um", rm.getAllocator("UM"), "FOOBAR"));
 }
 #endif
-
-TEST(Allocator, Duplicate)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  ASSERT_TRUE(rm.isAllocator("HOST"));
-
-  ASSERT_ANY_THROW(
-      rm.makeAllocator<umpire::strategy::DynamicPool>(
-        "host_simpool", rm.getAllocator("HOST")));
-}
 
 TEST(FixedPool, Host)
 {
