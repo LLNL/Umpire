@@ -18,6 +18,7 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/util/Platform.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
@@ -33,7 +34,7 @@ CudaAdvisePreferredLocationOperation::apply(
   // TODO: get correct device for allocation
   int device = 0;
 
-  if (src_allocation->m_strategy->getPlatform() == cpu) {
+  if (src_allocation->m_strategy->getPlatform() == Platform::cpu) {
     device = cudaCpuDeviceId;
   }
 
