@@ -18,6 +18,8 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/strategy/AllocationStrategy.hpp"
+
 namespace umpire {
 namespace op {
 
