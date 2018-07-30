@@ -18,6 +18,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
+#include "umpire/util/AllocationRecord.hpp"
 
 TEST(CudaAdviseAccessedBy, Find)
 {
@@ -86,11 +87,12 @@ TEST(CudaAdvisePreferredLocation, Apply)
       strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
+  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
 
   ASSERT_NO_THROW(
     advice_operation->apply(
       data,
-      nullptr, // AllocationRecord* is unused
+      record,
       0, // val is unused
       1024*sizeof(float)));
 }
@@ -109,7 +111,7 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
       strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
-  auto record = new util::AllocationRecord{data, 1024*sizeof(float), strategy};
+  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
 
   ASSERT_NO_THROW(
     advice_operation->apply(
