@@ -24,6 +24,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <mutex>
 
 #ifdef UMPIRE_ENABLE_ASSERTS
 #include <cassert>
@@ -115,5 +116,8 @@
 #define UMPIRE_RECORD_STATISTIC(name, ...) ((void) 0)
 
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
+
+#define UMPIRE_LOCK \
+  std::lock_guard<std::mutex> guard(*m_mutex);
 
 #endif // UMPIRE_Macros_HPP

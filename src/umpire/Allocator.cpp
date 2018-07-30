@@ -25,13 +25,16 @@
 namespace umpire {
 
 Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
-  m_allocator(allocator)
+  m_allocator(allocator),
+  m_mutex(new std::mutex())
 {
 }
 
 void*
 Allocator::allocate(size_t bytes)
 {
+  UMPIRE_LOCK
+
   UMPIRE_LOG(Debug, "(" << bytes << ")");
   void* ret = m_allocator->allocate(bytes);
 
@@ -43,6 +46,8 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
+  UMPIRE_LOCK
+
   UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 

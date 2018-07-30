@@ -27,6 +27,8 @@ Allocator ResourceManager::makeAllocator(
     const std::string& name, 
     Args&&... args)
 {
+  UMPIRE_LOCK;
+
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
   if (isAllocator(name)) {
