@@ -258,8 +258,8 @@ BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
 // NOTE: always allocates 8mb, ignores size argument
 BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(RangeLow);
@@ -267,17 +267,19 @@ BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(RangeLow);
 #if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_REGISTER_F(Device, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Device, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolDevice, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolDevice, deallocate)->Range(RangeLow, RangeHi);
+//BENCHMARK_REGISTER_F(PoolDevice, allocate)->Range(RangeLow, RangeHi);
+//BENCHMARK_REGISTER_F(PoolDevice, deallocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(UM, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(UM, deallocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
 // NOTE: always allocates 8mb, ignores size argument
+#if DOESNT_WORK_YET
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, deallocate)->Arg(RangeLow);
+#endif
 #endif
 
 

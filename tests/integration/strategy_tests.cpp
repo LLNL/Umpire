@@ -62,7 +62,7 @@ class StrategyTest :
 };
 
 TEST_P(StrategyTest, Allocate) {
-  void* alloc;
+  void* alloc = nullptr;
   alloc = allocator->allocate(100);
   allocator->deallocate(alloc);
 }
