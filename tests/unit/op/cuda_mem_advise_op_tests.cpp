@@ -95,6 +95,8 @@ TEST(CudaAdvisePreferredLocation, Apply)
       record,
       0, // val is unused
       1024*sizeof(float)));
+
+  allocator.deallocate(data);
 }
 
 TEST(CudaAdvisePreferredLocation, ApplyHost)
@@ -120,7 +122,7 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
       0, // val is unused
       1024*sizeof(float)));
 
-  allocator->deallocate(data);
+  allocator.deallocate(data);
   delete record;
 }
 
