@@ -102,7 +102,7 @@ TEST(CudaAdvisePreferredLocation, Apply)
 TEST(CudaAdvisePreferredLocation, ApplyHost)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto allocator = rm.getAllocator("HOST");
+  auto allocator = rm.getAllocator("UM");
   auto strategy = allocator.getAllocationStrategy();
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
