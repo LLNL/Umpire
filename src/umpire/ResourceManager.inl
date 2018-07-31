@@ -40,6 +40,7 @@ Allocator ResourceManager::makeAllocator(
 
   m_allocators_by_name[name] = allocator;
   m_allocators_by_id[allocator->getId()] = allocator;
+  UMPIRE_UNLOCK;
 
   return Allocator(allocator);
 }
