@@ -33,19 +33,32 @@ CudaAdvisePreferredLocationOperation::apply(
 {
   // TODO: get correct device for allocation
   int device = 0;
+  cudaError_t error;
 
-  if (src_allocation->m_strategy->getPlatform() == Platform::cpu) {
-    device = cudaCpuDeviceId;
-  }
-
-  cudaError_t error =
-    ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
+  cudaDeviceProp properties;
+  error = ::cudaGetDeviceProperties(&properties, device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
-      << ", length = " << length
-      << ", cudaMemAdviseSetPreferredLocation, 0) failed with error: "
-      << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+        << " failed with error: " 
+        << cudaGetErrorString(error));
+  }
+
+  if (properties.managedMemory == 1 
+      && properties.concurrentManagedAccess == 1) {
+    if (src_allocation->m_strategy->getPlatform() == Platform::cpu) {
+      device = cudaCpuDeviceId;
+    }
+
+    error =
+      ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
+
+    if (error != cudaSuccess) {
+      UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
+        << ", length = " << length
+        << ", cudaMemAdviseSetPreferredLocation, 0) failed with error: "
+        << cudaGetErrorString(error));
+    }
   }
 }
 
