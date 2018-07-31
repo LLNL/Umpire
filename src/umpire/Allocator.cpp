@@ -33,29 +33,40 @@ Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
 void*
 Allocator::allocate(size_t bytes)
 {
-  UMPIRE_LOCK;
+  void* ret = nullptr;
+  try {
+    UMPIRE_LOCK;
 
-  UMPIRE_LOG(Debug, "(" << bytes << ")");
-  void* ret = m_allocator->allocate(bytes);
+    UMPIRE_LOG(Debug, "(" << bytes << ")");
+    ret = m_allocator->allocate(bytes);
 
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
+    UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
 
-  UMPIRE_UNLOCK;
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
+  }
   return ret;
 }
 
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_LOCK;
+  try {
+    UMPIRE_LOCK;
 
-  UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
-  UMPIRE_LOG(Debug, "(" << ptr << ")");
+    UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
+    UMPIRE_LOG(Debug, "(" << ptr << ")");
 
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
+    UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  m_allocator->deallocate(ptr);
-  UMPIRE_UNLOCK;
+    m_allocator->deallocate(ptr);
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
+  }
 }
 
 size_t
