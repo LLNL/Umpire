@@ -45,3 +45,21 @@ if (ENABLE_STATISTICS)
     SOURCES statistics.cpp
     DEPENDS_ON umpire)
 endif()
+
+blt_add_executable(
+  NAME tut_allocator
+  SOURCES tut_allocator.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME tut_resources
+  SOURCES tut_resources.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME tut_dynamic_pool
+  SOURCES tut_dynamic_pool.cpp
+  DEPENDS_ON 
+    umpire)
