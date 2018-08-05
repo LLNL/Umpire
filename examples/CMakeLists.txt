@@ -63,3 +63,9 @@ blt_add_executable(
   SOURCES tut_dynamic_pool.cpp
   DEPENDS_ON 
     umpire)
+
+blt_add_executable(
+  NAME tut_operations
+  SOURCES tut_operations.cpp
+  DEPENDS_ON 
+    umpire)
