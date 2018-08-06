@@ -20,6 +20,12 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/util/Exception.hpp"
 
+#include "umpire/op/MemoryOperationRegistry.hpp"
+
+#if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+#endif
+
 class OperationTest : 
   public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
 {
@@ -403,3 +409,103 @@ INSTANTIATE_TEST_CASE_P(
       ::testing::ValuesIn(move_sources),
       ::testing::ValuesIn(move_dests)
 ));
+
+#if defined(UMPIRE_ENABLE_CUDA)
+class AdviceTest :
+  public OperationTest
+{
+};
+
+TEST_P(AdviceTest, ReadMostly)
+{
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+  auto strategy = source_allocator->getAllocationStrategy();
+
+  int device = 0;
+
+  auto m_advice_operation = op_registry.find(
+      "READ_MOSTLY",
+      strategy,
+      strategy);
+
+  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+    device = cudaCpuDeviceId;
+  }
+
+  ASSERT_NO_THROW({
+      m_advice_operation->apply(
+          source_array,
+          nullptr,
+          device,
+          m_size);
+  });
+}
+
+TEST_P(AdviceTest, PreferredLocation)
+{
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+  auto strategy = source_allocator->getAllocationStrategy();
+
+  int device = 0;
+
+  auto m_advice_operation = op_registry.find(
+      "PREFERRED_LOCATION",
+      strategy,
+      strategy);
+
+  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+    device = cudaCpuDeviceId;
+  }
+
+  ASSERT_NO_THROW({
+      m_advice_operation->apply(
+          source_array,
+          nullptr,
+          device,
+          m_size);
+  });
+}
+
+TEST_P(AdviceTest, AccessedBy)
+{
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+  auto strategy = source_allocator->getAllocationStrategy();
+
+  int device = 0;
+
+  auto m_advice_operation = op_registry.find(
+      "ACCESSED_BY",
+      strategy,
+      strategy);
+
+  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+    device = cudaCpuDeviceId;
+  }
+
+  ASSERT_NO_THROW({
+      m_advice_operation->apply(
+          source_array,
+          nullptr,
+          device,
+          m_size);
+  });
+}
+
+const std::string advice_sources[] = {
+  "UM"
+};
+
+const std::string advice_dests[] = {
+  "HOST"
+  , "DEVICE"
+};
+
+INSTANTIATE_TEST_CASE_P(
+    Advice,
+    AdviceTest,
+    ::testing::Combine(
+      ::testing::ValuesIn(advice_sources),
+      ::testing::ValuesIn(advice_dests)
+));
+
+#endif
