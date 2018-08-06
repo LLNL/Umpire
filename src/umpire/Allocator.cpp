@@ -25,7 +25,7 @@
 namespace umpire {
 
 Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
-  m_allocator(allocator),
+  m_allocator(allocator)
 {
 }
 
