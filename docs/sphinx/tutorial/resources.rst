@@ -24,20 +24,20 @@ GPU ("UM") and host memory that can be accessed by the GPU ("PINNED");
 Umpire will create an ``Allocator`` for each of these resources, and you can
 get them using the same ``getAllocator`` call you saw in the previous example:
 
-.. literalinclude:: ../../../examples/tut_resources.cpp 
-                    :lines 22-24
+.. literalinclude:: ../../../examples/tut_resources.cpp
+                    :lines: 22-24
 
 Note that every ``Allocator`` supports the same calls, no matter which resource
 it is for, this means we can parametertize the ``getAllocator`` call, and run
 the same code for all the resources available in the system:
 
 .. literalinclude:: ../../../examples/tut_resources.cpp 
-                    :lines 18-35
+                    :lines: 18-35
 
 As you can see, we can call this function with any valid resource name:
 
 .. literalinclude:: ../../../examples/tut_resources.cpp 
-                    :lines 38-44
+                    :lines: 38-44
 
 In the next example, we will learn how to move data between resources using
 operations.
