@@ -12,10 +12,9 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-// #ifndef UMPIRE_DefaultMemoryResource_INL
-// #define UMPIRE_DefaultMemoryResource_INL
 
 #include "umpire/resource/ConstantMemoryResource.hpp"
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
@@ -25,21 +24,16 @@
 namespace umpire {
 namespace resource {
 
-// template<typename _allocator>
 ConstantMemoryResource::ConstantMemoryResource(Platform platform, const std::string& name, int id) :
   MemoryResource(name, id),
-  // m_allocator(),
   m_current_size(0l),
   m_highwatermark(0l),
   m_platform(platform)
 {
 }
 
-// template<typename _allocator>
 void* ConstantMemoryResource::allocate(size_t bytes)
 {
-  // void* ptr = m_allocator.allocate(bytes);
-
   void* ptr = nullptr;
   cudaError_t error = ::cudaGetSymbolAddress((void**)&ptr, umpire_internal_device_constant_memory);
 
@@ -54,32 +48,27 @@ void* ConstantMemoryResource::allocate(size_t bytes)
   return ptr;
 }
 
-// template<typename _allocator>
 void ConstantMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  // m_allocator.deallocate(ptr);
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
   delete record;
 }
 
-// template<typename _allocator>
 long ConstantMemoryResource::getCurrentSize()
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-// template<typename _allocator>
 long ConstantMemoryResource::getHighWatermark()
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
-// template<typename _allocator>
 Platform ConstantMemoryResource::getPlatform()
 {
   return m_platform;
@@ -87,4 +76,3 @@ Platform ConstantMemoryResource::getPlatform()
 
 } // end of namespace resource
 } // end of namespace umpire
-// #endif // UMPIRE_DefaultMemoryResource_INL

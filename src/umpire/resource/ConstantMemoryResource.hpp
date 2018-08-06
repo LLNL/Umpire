@@ -28,10 +28,6 @@ namespace umpire {
 namespace resource {
 
 
-  /*!
-   * \brief Concrete MemoryResource object that uses the template _allocator to
-   * allocate and deallocate memory.
-   */
 class ConstantMemoryResource :
   public MemoryResource
 {
@@ -47,8 +43,6 @@ class ConstantMemoryResource :
     Platform getPlatform();
 
   protected: 
-    // _allocator m_allocator;
-
     long m_current_size;
     long m_highwatermark;
 
@@ -58,6 +52,4 @@ class ConstantMemoryResource :
 } // end of namespace resource
 } // end of namespace umpire
 
-// #include "umpire/resource/ConstantMemoryResource.inl"
-
-#endif // UMPIRE_DefaultMemoryResource_HPP
+#endif // UMPIRE_ConstantMemoryResource_HPP

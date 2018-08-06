@@ -20,7 +20,6 @@
 namespace umpire {
 namespace resource {
 
-
 /*!
  * \brief Factory class for constructing MemoryResource objects that use GPU
  * memory.
@@ -36,4 +35,4 @@ class DeviceConstResourceFactory :
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_DeviceResourceFactory_HPP
+#endif // UMPIRE_DeviceConstResourceFactory_HPP
