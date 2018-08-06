@@ -456,7 +456,7 @@ WARN_LOGFILE           = dox.warnings
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = @PROJECT_SOURCE_DIR@/src
+INPUT                  = ../../src
 
 # Allow Markdown files to provide the Doxygen main page
 
@@ -505,7 +505,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = @PROJECT_SOURCE_DIR@/src/tpl/simpool/* @PROJECT_SOURCE_DIR@/src/tpl/judy/*
+EXCLUDE_PATTERNS       = ../../src/umpire/tpl/simpool/* ../../src/umpire/tpl/judy/*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
