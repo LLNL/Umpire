@@ -39,7 +39,6 @@ import os, subprocess
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 if read_the_docs_build:
     subprocess.call('cd ../doxygen; doxygen', shell=True)
-    html_extra_path = ['../doxygen/html']
 
 # -- General configuration ------------------------------------------------
 
@@ -53,7 +52,7 @@ if read_the_docs_build:
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.mathjax'
+    'sphinx.ext.mathjax',
     'breathe'
 ]
 
