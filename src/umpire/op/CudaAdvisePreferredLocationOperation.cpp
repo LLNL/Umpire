@@ -27,12 +27,11 @@ namespace op {
 void
 CudaAdvisePreferredLocationOperation::apply(
     void* src_ptr,
-    util::AllocationRecord* src_allocation,
-    int UMPIRE_UNUSED_ARG(val),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    int val,
     size_t length)
 {
-  // TODO: get correct device for allocation
-  int device = 0;
+  int device = val;
   cudaError_t error;
 
   cudaDeviceProp properties;
@@ -46,18 +45,15 @@ CudaAdvisePreferredLocationOperation::apply(
 
   if (properties.managedMemory == 1 
       && properties.concurrentManagedAccess == 1) {
-    if (src_allocation->m_strategy->getPlatform() == Platform::cpu) {
-      device = cudaCpuDeviceId;
-    }
 
-    error =
-      ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
+    error = ::cudaMemAdvise(
+        src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
         << ", length = " << length
-        << ", cudaMemAdviseSetPreferredLocation, 0) failed with error: "
-        << cudaGetErrorString(error));
+        << ", cudaMemAdviseSetPreferredLocation, " << device << ") "
+        << "failed with error: " << cudaGetErrorString(error));
     }
   }
 }
