@@ -17,6 +17,7 @@ set (umpire_strategy_headers
   AllocationStrategy.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
+  ThreadSafeAllocator.hpp
   DynamicPool.hpp
   FixedPool.hpp
   FixedPool.inl)
@@ -26,6 +27,7 @@ set (umpire_stategy_sources
   AllocationStrategy.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
+  ThreadSafeAllocator.cpp
   DynamicPool.cpp)
 
 set (umpire_strategy_depends
