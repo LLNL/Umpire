@@ -19,7 +19,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <mutex>
 
 #include "umpire/util/Platform.hpp"
 
@@ -175,8 +174,6 @@ class Allocator {
      * \brief Pointer to the AllocationStrategy used by this Allocator.
      */
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
-
-    std::mutex* m_mutex;
 };
 
 } // end of namespace umpire
