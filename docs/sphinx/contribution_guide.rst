@@ -77,7 +77,7 @@ Once you are finished, you can push your branch to GitHub, then create a PR.
 Creating a Pull Request
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-You can create a new PR `here<https://github.com/LLNL/Umpire/compare>`_.
+You can create a new PR `here <https://github.com/LLNL/Umpire/compare>`_.
 Ensure that your PR base is the ``develop`` branch of Umpire.
 
 Add a descriptive title explaining the bug you fixed or the feature you have

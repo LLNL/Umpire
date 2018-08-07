@@ -28,3 +28,4 @@ around, and check where it is, as you will see in the following sections.
    tutorial/allocators.rst
    tutorial/resources.rst
    tutorial/dynamic_pool.rst
+   tutorial/introspection.rst

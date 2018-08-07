@@ -23,7 +23,7 @@ and management of memory on next-generation hardware architectures.
   :caption: Reference
 
   advanced_configuration
-  concepts
+  features
   code_documentation
 
 .. toctree::

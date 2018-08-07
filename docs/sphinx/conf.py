@@ -52,15 +52,18 @@ if read_the_docs_build:
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.mathjax',
-    'breathe'
+    'sphinx.ext.mathjax'
+#    'breathe'
 ]
 
-breathe_projects = { 'umpire': "../doxygen/xml/" }
-breathe_default_project = "umpire"
+#breathe_projects = { 'umpire': "../../build/docs/doxygen/xml/" }
+#breathe_default_project = "umpire"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+
+html_extra_path = ['../doxygen/html/']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
