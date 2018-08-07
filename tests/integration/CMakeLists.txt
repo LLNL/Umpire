@@ -36,10 +36,19 @@ blt_add_test(
   NAME allocator_integration_tests
   COMMAND allocator_integration_tests)
 
+set (strategy_test_depends 
+  umpire gtest)
+
+if (ENABLE_OPENMP)
+  set (strategy_test_depends
+    ${strategy_test_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
-  DEPENDS_ON umpire gtest
+  DEPENDS_ON ${strategy_test_depends}
   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
 target_include_directories(

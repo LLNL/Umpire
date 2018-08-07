@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <mutex>
 #include <list>
 #include <unordered_map>
 
@@ -245,6 +246,8 @@ class ResourceManager {
     long m_allocated;
 
     int m_id;
+
+    std::mutex* m_mutex;
 };
 
 } // end of namespace umpire
