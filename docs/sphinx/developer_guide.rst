@@ -3,6 +3,3 @@
 ===============
 Developer Guide
 ===============
-
-.. doxygenindex:: 
-   :project: umpire

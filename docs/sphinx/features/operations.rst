@@ -1,0 +1,6 @@
+==========
+Operations
+==========
+
+.. doxygennamespace:: umpire::op
+

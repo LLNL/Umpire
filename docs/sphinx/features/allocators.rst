@@ -1,0 +1,5 @@
+==========
+Allocators
+==========
+
+.. doxygenclass:: umpire::Allocator
