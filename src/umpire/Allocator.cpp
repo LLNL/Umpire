@@ -32,11 +32,11 @@ Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
 void*
 Allocator::allocate(size_t bytes)
 {
+  void* ret = nullptr;
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-  void* ret = m_allocator->allocate(bytes);
+  ret = m_allocator->allocate(bytes);
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
-
   return ret;
 }
 

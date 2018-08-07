@@ -17,8 +17,8 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
-#include <memory>
 #include <cstddef>
+#include <memory>
 
 #include "umpire/util/Platform.hpp"
 
