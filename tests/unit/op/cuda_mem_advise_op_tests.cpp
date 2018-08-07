@@ -18,6 +18,21 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
+#include "umpire/util/AllocationRecord.hpp"
+
+class CudaAdviseOpTest : public ::testing::Test {
+  protected:
+    virtual void SetUp() {
+      auto& rm = umpire::ResourceManager::getInstance();
+      auto allocator = rm.getAllocator("UM");
+      auto strategy = allocator.getAllocationStrategy();
+    }
+
+    virtual void TearDown() {
+    }
+
+    umpire::util::AllocationRecord* record;
+};
 
 TEST(CudaAdviseAccessedBy, Find)
 {
@@ -86,13 +101,43 @@ TEST(CudaAdvisePreferredLocation, Apply)
       strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
+  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
 
   ASSERT_NO_THROW(
     advice_operation->apply(
       data,
-      nullptr, // AllocationRecord* is unused
+      record,
       0, // val is unused
       1024*sizeof(float)));
+
+  allocator.deallocate(data);
+}
+
+TEST(CudaAdvisePreferredLocation, ApplyHost)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("UM");
+  auto strategy = allocator.getAllocationStrategy();
+
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+
+  auto advice_operation = op_registry.find(
+      "PREFERRED_LOCATION",
+      strategy,
+      strategy);
+
+  float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
+  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
+
+  ASSERT_NO_THROW(
+    advice_operation->apply(
+      data,
+      record,
+      0, // val is unused
+      1024*sizeof(float)));
+
+  allocator.deallocate(data);
+  delete record;
 }
 
 TEST(CudaAdviseReadMostly, Find)
@@ -112,11 +157,11 @@ TEST(CudaAdviseReadMostly, Find)
 
 TEST(CudaAdviseReadMostly, Apply)
 {
+  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
+
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
   auto strategy = allocator.getAllocationStrategy();
-
-  auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
   auto advice_operation = op_registry.find(
       "READ_MOSTLY",

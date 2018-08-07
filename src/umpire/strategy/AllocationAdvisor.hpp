@@ -34,6 +34,13 @@ class AllocationAdvisor :
         Allocator allocator,
         const std::string& advice_operation);
 
+      AllocationAdvisor(
+        const std::string& name,
+        int id,
+        Allocator allocator,
+        const std::string& advice_operation,
+        Allocator accessing_allocator);
+
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
@@ -48,6 +55,8 @@ class AllocationAdvisor :
     long m_highwatermark;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+
+    int m_device;
 };
 
 } // end of namespace strategy
