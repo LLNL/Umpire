@@ -25,6 +25,7 @@ and management of memory on next-generation hardware architectures.
   advanced_configuration
   features
   code_documentation
+  api/api
 
 .. toctree::
   :maxdepth: 2
