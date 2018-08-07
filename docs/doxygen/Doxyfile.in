@@ -1,4 +1,4 @@
-#############################################################################
+##############################################################################
 # Copyright (c) 2018, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
@@ -456,7 +456,7 @@ WARN_LOGFILE           = dox.warnings
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../../src
+INPUT                  = @PROJECT_SOURCE_DIR@/src
 
 # Allow Markdown files to provide the Doxygen main page
 
@@ -507,7 +507,7 @@ EXCLUDE_SYMLINKS       = NO
 
 EXCLUDE_PATTERNS       = */tpl/simpool/* \
                          */tpl/judy/* \
-                         */tpl/conduit/*
+                         */tpl/conduit/* 
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
