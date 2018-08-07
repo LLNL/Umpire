@@ -95,6 +95,8 @@
 
 #define UMPIRE_UNUSED_ARG(x)
 
+#define UMPIRE_USE_VAR(x) static_cast<void>(x)
+
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
   UMPIRE_LOG(Error, msg);                                          \
