@@ -12,6 +12,12 @@ matrix:
     - COMPILER=g++
     - IMG=gcc-5
     - CMAKE_EXTRA_FLAGS="-DENABLE_WARNINGS=On -DENABLE_CUDA=Off"
+  - compiler: nvcc
+    env:
+    - COMPILER=g++
+    - IMG=nvcc-9
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=On"
+    - DO_TEST=no
 
 script: 
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
