@@ -43,12 +43,16 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_ASSERT("Deallocate called with nullptr" && ptr);
   UMPIRE_LOG(Debug, "(" << ptr << ")");
+
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  m_allocator->deallocate(ptr);
+  if (!ptr) {
+    return;
+  } else {
+    m_allocator->deallocate(ptr);
+  }
 }
 
 size_t
