@@ -65,7 +65,7 @@ TEST_P(AllocatorTest, AllocateDeallocateSmall)
 TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
-  if (m_allocator.getPlatform() == umpire::Platform::cuda) {
+  if (m_allocator->getPlatform() == umpire::Platform::cuda) {
     SUCCEED();
   } else {
     double* data = static_cast<double*>(
