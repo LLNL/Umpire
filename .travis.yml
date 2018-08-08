@@ -7,11 +7,16 @@ env:
   - DO_TEST=yes
 matrix:
   include:
-  - compiler: gcc5
+  - compiler: gcc-5
     env:
     - COMPILER=g++
     - IMG=gcc-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_WARNINGS=On -DENABLE_CUDA=Off"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
+  - compiler: clang-4
+    env:
+      - COMPILER=clang++
+      - IMG=clang-4
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
   - compiler: nvcc
     env:
     - COMPILER=g++
