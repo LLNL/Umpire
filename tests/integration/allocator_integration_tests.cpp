@@ -64,12 +64,17 @@ TEST_P(AllocatorTest, AllocateDeallocateSmall)
 
 TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
-  double* data = static_cast<double*>(
-    m_allocator->allocate(m_nothing*sizeof(double)));
+  // CUDA doesn't support allocating 0 bytes
+  if (m_allocator.getPlatform() == umpire::Platform::cuda) {
+    SUCCEED();
+  } else {
+    double* data = static_cast<double*>(
+      m_allocator->allocate(m_nothing*sizeof(double)));
 
-  ASSERT_NE(nullptr, data);
+    ASSERT_NE(nullptr, data);
 
-  m_allocator->deallocate(data);
+    m_allocator->deallocate(data);
+  }
 }
 
 TEST_P(AllocatorTest, DeallocateNullptr)
