@@ -48,7 +48,7 @@ trycmd "make VERBOSE=1 -j"
 #
 echo "Testing..."
 if [[ $HOSTNAME == *manta* ]]; then
-  bsub -x -n 1 -G guests -Ip ctest -V -T Test
+  bsub -x -n 1 -G guests -Ip ctest --output-on-failure -T Test
 else
-  srun -ppdebug -t 5 -N 1 ctest -V -T Test
+  srun -ppdebug -t 5 -N 1 ctest --output-on-failure -T Test
 fi
