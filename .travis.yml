@@ -7,40 +7,40 @@ env:
   - DO_TEST=yes
 matrix:
   include:
-  - compiler: gcc-5
+  - compiler: gcc5
     env:
     - COMPILER=g++
     - IMG=gcc-5
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - compiler: gcc-6
+  - compiler: gcc6
     env:
     - COMPILER=g++
     - IMG=gcc-6
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - compiler: gcc-7
+  - compiler: gcc7
     env:
     - COMPILER=g++
     - IMG=gcc-7
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - compiler: gcc-8
+  - compiler: gcc8
     env:
     - COMPILER=g++
     - IMG=gcc-8
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - compiler: clang-4
+  - compiler: clang4
     env:
-      - COMPILER=clang++
-      - IMG=clang-4
+    - COMPILER=clang++
+    - IMG=clang-4
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - compiler: clang-5
+  - compiler: clang5
     env:
-      - COMPILER=clang++
-      - IMG=clang-5
+    - COMPILER=clang++
+    - IMG=clang-5
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - compiler: clang-6
+  - compiler: clang6
     env:
-      - COMPILER=clang++
-      - IMG=clang-6
+    - COMPILER=clang++
+    - IMG=clang-6
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
   - compiler: nvcc
     env:
