@@ -204,7 +204,7 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 #if defined(UMPIRE_ENABLE_CUDA)
   , umpire::resource::Device
   , umpire::resource::UnifiedMemory
-  , umpire::resource::Pinned
+  , umpire::resource::PinnedMemory
 #endif
 };
 
