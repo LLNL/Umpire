@@ -49,6 +49,7 @@ Allocator::deallocate(void* ptr)
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
   if (!ptr) {
+    UMPIRE_LOG(Info, "Deallocating a null pointer");
     return;
   } else {
     m_allocator->deallocate(ptr);
