@@ -12,39 +12,6 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-blt_add_executable(
-  NAME malloc
-  SOURCES malloc.cxx
-  DEPENDS_ON 
-    umpire)
-
-blt_add_executable(
-  NAME strategy_example
-  SOURCES strategy_example.cpp
-  DEPENDS_ON
-    umpire)
-
-if (ENABLE_FORTRAN)
-  blt_add_executable(
-    NAME allocator_c
-    SOURCES allocator.c
-    DEPENDS_ON
-      umpire
-  )
-endif ()
-
-blt_add_executable(
-  NAME vector_allocator
-  SOURCES vector_allocator.cpp
-  DEPENDS_ON 
-    umpire)
-
-if (ENABLE_STATISTICS)
-  blt_add_executable(
-    NAME statistics_example
-    SOURCES statistics.cpp
-    DEPENDS_ON umpire)
-endif()
 
 blt_add_executable(
   NAME tut_allocator
@@ -69,5 +36,3 @@ blt_add_executable(
   SOURCES tut_operations.cpp
   DEPENDS_ON 
     umpire)
-
-add_subdirectory(tutorial)
