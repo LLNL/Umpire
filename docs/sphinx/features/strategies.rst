@@ -14,12 +14,12 @@ and reusable implementations of different components.
 
 .. doxygennamespace:: umpire::strategy
 
-.. doxygenclass:: umpire::AllocationAdvisor
+.. doxygenclass:: umpire::strategy::AllocationAdvisor
 
-.. doxygenclass:: umpire::DynamicPool
+.. doxygenclass:: umpire::strategy::DynamicPool
 
-.. doxygenclass:: umpire::FixedPool
+.. doxygenclass:: umpire::strategy::FixedPool
 
-.. doxygenclass:: umpire::MonotonicAllocationStrategy
+.. doxygenclass:: umpire::strategy::MonotonicAllocationStrategy
 
-.. doxygenclass:: umpire::SlotPool
+.. doxygenclass:: umpire::strategy::SlotPool

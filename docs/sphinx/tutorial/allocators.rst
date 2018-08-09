@@ -9,8 +9,8 @@ The fundamental concept for accessing memory through Umpire is the
 and deallocate memory, as well as query a pointer to get some extra information
 about it.
 
-All ``Allocator`` s are created and managed by Umpire's ``ResourceManager``. To
-get an Allocator, you need to ask for one: 
+All ``Allocator`` s are created and managed by Umpire's
+:class:`umpire::ResourceManager`. To get an Allocator, you need to ask for one: 
 
 .. literalinclude:: ../../../examples/tutorial/tut_allocator.cpp
                     :lines: 22-24
