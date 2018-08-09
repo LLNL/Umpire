@@ -33,6 +33,7 @@ ConstantMemoryResource::ConstantMemoryResource(Platform platform, const std::str
   m_highwatermark(0l),
   m_platform(platform)
 {
+  offset = 0;
 }
 
 // template<typename _allocator>
@@ -42,6 +43,14 @@ void* ConstantMemoryResource::allocate(size_t bytes)
 
   void* ptr = nullptr;
   cudaError_t error = ::cudaGetSymbolAddress((void**)&ptr, umpire_internal_device_constant_memory);
+
+  ptr += offset;
+  offset += bytes;
+
+  if (offset > 1024 * 64)
+  {
+    UMPIRE_LOG(Debug, "ask bytes more than max constant memory size (64KB), current size is " << offset - bytes << "bytes");
+  }
 
   ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
 
