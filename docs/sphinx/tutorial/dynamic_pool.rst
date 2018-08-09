@@ -37,3 +37,5 @@ to help mitigate the cost of allocating memory on these devices.
 There are lots of different strategies that you can use, and we will look at
 many of them in the rest of this tutorial. A complete list of strategies can be
 found here.
+
+.. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool.cpp

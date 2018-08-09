@@ -22,3 +22,5 @@ Once you have an ``Allocator`` you can use it to allocate and deallocate memory:
 
 In the next section, we will see how to allocate memory using different
 resources.
+
+.. literalinclude:: ../../../examples/tutorial/tut_allocator.cpp

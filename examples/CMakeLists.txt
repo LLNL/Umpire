@@ -46,28 +46,4 @@ if (ENABLE_STATISTICS)
     DEPENDS_ON umpire)
 endif()
 
-blt_add_executable(
-  NAME tut_allocator
-  SOURCES tut_allocator.cpp
-  DEPENDS_ON 
-    umpire)
-
-blt_add_executable(
-  NAME tut_resources
-  SOURCES tut_resources.cpp
-  DEPENDS_ON 
-    umpire)
-
-blt_add_executable(
-  NAME tut_dynamic_pool
-  SOURCES tut_dynamic_pool.cpp
-  DEPENDS_ON 
-    umpire)
-
-blt_add_executable(
-  NAME tut_operations
-  SOURCES tut_operations.cpp
-  DEPENDS_ON 
-    umpire)
-
 add_subdirectory(tutorial)

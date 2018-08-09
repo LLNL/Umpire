@@ -31,7 +31,7 @@ void copy_data(double* source_data, size_t size, const std::string& destination)
   dest_allocator.deallocate(dest_data);
 }
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
   constexpr size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
   double* data = static_cast<double*>(
       allocator.allocate(SIZE*sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the"
+  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
     << allocator.getName() << " allocator." << std::endl;
 
   std::cout << "Filling with 0.0...";

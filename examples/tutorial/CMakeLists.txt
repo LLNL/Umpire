@@ -32,7 +32,13 @@ blt_add_executable(
     umpire)
 
 blt_add_executable(
-  NAME tut_operations
-  SOURCES tut_operations.cpp
+  NAME tut_copy
+  SOURCES tut_copy.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME tut_move
+  SOURCES tut_move.cpp
   DEPENDS_ON 
     umpire)

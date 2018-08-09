@@ -15,6 +15,8 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/DynamicPool.hpp"
+
 void allocate_and_deallocate_pool(const std::string& resource)
 {
   constexpr size_t SIZE = 1024;
@@ -30,15 +32,15 @@ void allocate_and_deallocate_pool(const std::string& resource)
   double* data = static_cast<double*>(
       pooled_allocator.allocate(SIZE*sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the"
+  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
     << pooled_allocator.getName() << " allocator...";
 
   pooled_allocator.deallocate(data);
 
-  std::cout << " dealocated."
+  std::cout << " deallocated." << std::endl;
 }
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
   allocate_and_deallocate_pool("HOST");
 
 #if defined(UMPIRE_ENABLE_CUDA)

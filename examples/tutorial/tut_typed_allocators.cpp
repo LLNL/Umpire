@@ -12,26 +12,27 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Allocator.hpp"
+
+#include "umpire/TypedAllocator.hpp"
 
 int main(int, char**) {
-
-  constexpr size_t SIZE = 1024;
-
   auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.getAllocator("HOST");
 
-  umpire::Allocator allocator = rm.getAllocator("HOST");
+  // Create a TypedAllocator for doubles
+  umpire::TypedAllocator<double> double_alloc(alloc);
 
-  double* data = static_cast<double*>(
-      allocator.allocate(SIZE*sizeof(double)));
+  double* my_doubles = double_alloc.allocate(1024);
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << allocator.getName() << " allocator...";
+  double_alloc.deallocate(my_doubles);
 
-  allocator.deallocate(data);
 
-  std::cout << " deallocated." << std::endl;
+  std::vector< double, umpire::TypedAllocator<double> > 
+    my_vector(double_allocator);
+
+  my_vector.resize(100);
 
   return 0;
 }

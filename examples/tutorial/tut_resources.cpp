@@ -26,12 +26,12 @@ void allocate_and_deallocate(const std::string& resource)
   double* data = static_cast<double*>(
       allocator.allocate(SIZE*sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the"
+  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
     << allocator.getName() << " allocator...";
 
   allocator.deallocate(data);
 
-  std::cout << " dealocated."
+  std::cout << " deallocated." << std::endl;
 }
 
 int main(int argc, char* argv[]) {

@@ -41,3 +41,5 @@ As you can see, we can call this function with any valid resource name:
 
 In the next example, we will learn how to move data between resources using
 operations.
+
+.. literalinclude:: ../../../examples/tut_resources.cpp 

@@ -23,6 +23,8 @@ selects the correct implementation to copy the data:
 
 This example allocates the destination data using any valid Allocator. 
 
+.. literalinclude:: ../../../examples/tutorial/tut_copy.cpp
+
 ----
 Move
 ----
@@ -32,3 +34,21 @@ provides a `move` operation.
 
 .. literalinclude:: ../../../examples/tutorial/tut_move.cpp
                     :lines: 23-26
+
+.. literalinclude:: ../../../examples/tutorial/tut_move.cpp
+
+------
+Memset
+------
+
+
+
+----------
+Reallocate
+----------
+
+
+
+-------------
+Memory Advice
+-------------
