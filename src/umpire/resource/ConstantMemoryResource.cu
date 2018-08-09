@@ -44,7 +44,7 @@ void* ConstantMemoryResource::allocate(size_t bytes)
   void* ptr = nullptr;
   cudaError_t error = ::cudaGetSymbolAddress((void**)&ptr, umpire_internal_device_constant_memory);
 
-  ptr += offset;
+  (char*)ptr += offset;
   offset += bytes;
 
   if (offset > 1024 * 64)
@@ -60,7 +60,7 @@ void* ConstantMemoryResource::allocate(size_t bytes)
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
 
-  return ptr;
+  return (void*)ptr;
 }
 
 // template<typename _allocator>
