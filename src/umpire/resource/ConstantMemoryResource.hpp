@@ -53,6 +53,8 @@ class ConstantMemoryResource :
     long m_highwatermark;
 
     Platform m_platform;
+  private:
+    size_t offset;
 };
 
 } // end of namespace resource
