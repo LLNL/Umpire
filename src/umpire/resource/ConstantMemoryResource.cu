@@ -21,7 +21,6 @@
 
 #include <memory>
 #include <sstream>
-#include <iostream>
 
 namespace umpire {
 namespace resource {
