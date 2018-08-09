@@ -34,7 +34,6 @@ ConstantMemoryResource::ConstantMemoryResource(Platform platform, const std::str
   m_platform(platform)
 {
   offset = 0;
-  std::cout << "new ConstantMemoryResource" << std::endl;
 }
 
 // template<typename _allocator>
