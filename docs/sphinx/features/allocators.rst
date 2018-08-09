@@ -2,4 +2,6 @@
 Allocators
 ==========
 
-.. doxygenclass:: Allocator
+.. doxygenclass:: umpire::Allocator
+
+.. doxygenclass:: umpire::TypedAllocator
