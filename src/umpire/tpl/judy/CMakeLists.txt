@@ -12,10 +12,19 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (judy_sources
+  judy.c)
+
+set (judy_headers
+  judy.h
+  judyLArray.h
+  judyL2Array.h)
+
+
 blt_add_library(
   NAME umpire_tpl_judy
-  SOURCES judy.c
-  HEADERS judy.h judyLArray.h judyL2Array.h
+  SOURCES ${judy_sources}
+  HEADERS ${judy_headers}
   HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
 
 install(TARGETS
@@ -26,5 +35,5 @@ install(TARGETS
   ARCHIVE DESTINATION lib)
 
 install(FILES
-  judy.h judyLArray.h
+  ${judy_headers}
   DESTINATION include/umpire/tpl/judy)
