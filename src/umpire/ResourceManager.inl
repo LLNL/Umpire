@@ -17,17 +17,22 @@
 
 #include "umpire/ResourceManager.hpp"
 
+#include <sstream>
+
 #include "umpire/util/Macros.hpp"
+#include "umpire/strategy/AllocationTracker.hpp"
 
 namespace umpire {
 
 template <typename Strategy,
+         bool introspection,
          typename... Args>
 Allocator ResourceManager::makeAllocator(
     const std::string& name, 
     Args&&... args)
 {
   std::shared_ptr<strategy::AllocationStrategy> allocator;
+
   try {
     UMPIRE_LOCK;
 
@@ -37,10 +42,25 @@ Allocator ResourceManager::makeAllocator(
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
     }
 
-    allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+    if (!introspection) {
+      allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
 
-    m_allocators_by_name[name] = allocator;
-    m_allocators_by_id[allocator->getId()] = allocator;
+      m_allocators_by_name[name] = allocator;
+      m_allocators_by_id[allocator->getId()] = allocator;
+    } else {
+      std::stringstream base_name;
+      base_name << name << "_base";
+
+
+      auto base_allocator = std::make_shared<Strategy>(base_name.str(), getNextId(), std::forward<Args>(args)...);
+
+      allocator = std::make_shared<umpire::strategy::AllocationTracker>(name, getNextId(), Allocator(base_allocator));
+
+      m_allocators_by_name[name] = allocator;
+      m_allocators_by_id[allocator->getId()] = allocator;
+
+    }
+
     UMPIRE_UNLOCK;
   } catch (...) {
     UMPIRE_UNLOCK;

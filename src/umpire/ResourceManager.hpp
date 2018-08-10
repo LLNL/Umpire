@@ -94,7 +94,7 @@ class ResourceManager {
      *
      */
     template <typename Strategy,
-    //         bool introspection=false,
+             bool introspection=true,
              typename... Args>
     Allocator makeAllocator(const std::string& name, Args&&... args);
 

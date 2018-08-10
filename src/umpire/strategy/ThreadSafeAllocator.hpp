@@ -41,9 +41,6 @@ class ThreadSafeAllocator :
     Platform getPlatform();
 
   protected:
-    long m_current_size;
-    long m_highwatermark;
-
     std::shared_ptr<AllocationStrategy> m_allocator;
 
     std::mutex* m_mutex;

@@ -25,8 +25,6 @@ ThreadSafeAllocator::ThreadSafeAllocator(
     int id,
     Allocator allocator) :
   AllocationStrategy(name, id),
-  m_current_size(0),
-  m_highwatermark(0),
   m_allocator(allocator.getAllocationStrategy()),
   m_mutex(new std::mutex())
 {
@@ -42,19 +40,11 @@ ThreadSafeAllocator::allocate(size_t bytes)
 
     ret = m_allocator->allocate(bytes);
 
-    m_current_size += bytes;
-    if (m_current_size > m_highwatermark)
-      m_highwatermark = m_current_size;
-
-
     UMPIRE_UNLOCK;
   } catch (...) {
     UMPIRE_UNLOCK;
     throw;
   }
-
-  ResourceManager::getInstance().registerAllocation(ret, 
-      new util::AllocationRecord{ret, bytes, this->shared_from_this()});
 
   return ret;
 }
@@ -72,31 +62,18 @@ ThreadSafeAllocator::deallocate(void* ptr)
     UMPIRE_UNLOCK;
     throw;
   }
-
-  util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record->m_size;
-
-  delete record;
 }
 
 long
 ThreadSafeAllocator::getCurrentSize()
 {
-  long size;
-  
-  size = m_current_size;
-
-  return size;
+  return 0;
 }
 
 long
 ThreadSafeAllocator::getHighWatermark()
 {
-  long size;
-  
-  size = m_highwatermark;
-
-  return size;
+  return 0;
 }
 
 
