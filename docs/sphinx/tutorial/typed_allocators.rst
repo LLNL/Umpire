@@ -5,19 +5,19 @@ Typed Allocators
 ----------------
 
 Sometimes, you might want to construct an allocator that allocates objects of a
-specific type. Umpire provides a ``TypedAllocator`` for this purpose. It can
-also be used with STL objects like ``std::vector``.
+specific type. Umpire provides a :class:`umpire::TypedAllocator` for this
+purpose. It can also be used with STL objects like ``std::vector``.
 
-A ``TypedAllocator`` is constructed from any existing Allocator, and provides
-the same interface as the normal ``Allocator``. However, when you call
-allocate, this argument is the number of objects you want to allocate, no the
-total number of bytes:
+A :class:`umpire::TypedAllocator` is constructed from any existing Allocator,
+and provides the same interface as the normal ``Allocator``. However, when you
+call allocate, this argument is the number of objects you want to allocate, no
+the total number of bytes:
 
 .. literalinclude:: ../../../examples/tutorial/tut_typed_allocator.cpp
                     :lines: 25-29
 
-To use this TypedAllocator with an STL object std::vector, you need to pass the
-type as a template parameter for the vector, and also pass the allocatro to the
+To use this allocator with an STL object like a vector, you need to pass the
+type as a template parameter for the vector, and also pass the allocator to the
 vector when you construct it:
 
 .. literalinclude:: ../../../examples/tutorial/tut_typed_allocator.cpp

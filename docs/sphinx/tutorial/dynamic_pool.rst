@@ -15,7 +15,7 @@ allocations of any size. To create a new ``Allocator`` using the
 :class:`umpire::strategy::DynamicPool` strategy:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool.cpp
-                    :lines: 26-28
+                    :lines: 26-30
 
 We have to provide a new name for the Allocator, as well as the underlying
 Allocator we wish to use to grab memory.
@@ -36,8 +36,8 @@ Most Umpire users will make alloctations that use the GPU via the
 :class:`umpire::strategy::DynamicPool`, to help mitigate the cost of allocating
 memory on these devices.
 
-There are lots of different strategies that you can use, and we will look at
-many of them in the rest of this tutorial. A complete list of strategies can be
-found here.
+There are lots of different strategies that you can use, we will look at some
+of them in this tutorial. A complete list of strategies can be found `here
+<../features/operations.html>`_.
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool.cpp
