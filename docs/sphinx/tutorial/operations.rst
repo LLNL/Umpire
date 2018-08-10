@@ -8,8 +8,8 @@ Moving and modifying data in a heterogenous memory system can be annoying. You
 have to keep track of the source and destination, and often use vendor-specific
 APIs to perform the modifications. In Umpire, all data modification and
 movement is wrapped up in a concept we call `operations`. Full documentation
-for all of these is available here: :namespace:`umpire::op`. The full code
-listing for each example is include at the bottom of the page.
+for all of these is available `here <../features/operations.html>`_. The full
+code listing for each example is include at the bottom of the page.
 
 ----
 Copy
@@ -31,7 +31,7 @@ Move
 ----
 
 If you want to move data to a new Allocator and deallocate the old copy, Umpire
-provides a `move` operation.
+provides a :func:`umpire::ResourceManager::move` operation.
 
 .. literalinclude:: ../../../examples/tutorial/tut_move.cpp
                     :lines: 25-26
@@ -46,8 +46,9 @@ Memset
 ------
 
 Setting a whole block of memory to a value (like 0) is a common operation, that
-most people know as a memset. Umpire provides a memset implementation that can
-be applied to any allocation, regardless of where it came from:
+most people know as a memset. Umpire provides a
+:func:`umpire::ResourceManager::memset` implementation that can be applied to
+any allocation, regardless of where it came from:
 
 .. literalinclude:: ../../../examples/tutorial/tut_memset.cpp
                     :lines: 22
@@ -56,17 +57,33 @@ be applied to any allocation, regardless of where it came from:
 Reallocate
 ----------
 
+Reallocating CPU memory is easy, there is a function designed specifically to
+do it: ``realloc``. When the original allocation was made in a different memory
+however, you can be out of luck. Umpire provides a
+:func:`umpire::ResourceManager::reallocate` operation:
 
--------------
-Memory Advice
--------------
+.. literalinclude:: ../../../examples/tutorial/tut_reallocate.cpp
+                    :lines: 44
 
-
+This method returns a pointer to the reallocated data. Like all operations,
+this can be used regardless of the Allocator used for the source data.
 
 --------
 Listings
 --------
 
+Copy Example Listing
+
 .. literalinclude:: ../../../examples/tutorial/tut_copy.cpp
 
+Move Example Listing
+
 .. literalinclude:: ../../../examples/tutorial/tut_move.cpp
+
+Memset Example Listing
+
+.. literalinclude:: ../../../examples/tutorial/tut_memset.cpp
+
+Reallocate Example Listing
+
+.. literalinclude:: ../../../examples/tutorial/tut_reallocate.cpp

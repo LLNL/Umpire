@@ -5,7 +5,7 @@ Operations
 ==========
 
 Operations provide an abstract interface to modifying and moving data between
-Umpire Allocators.
+Umpire :class:`umpire::Allocator`s. 
 
 .. doxygennamespace:: umpire::op
 

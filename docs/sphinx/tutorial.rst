@@ -30,3 +30,4 @@ around, and check where it is, as you will see in the following sections.
    tutorial/operations.rst
    tutorial/dynamic_pool.rst
    tutorial/introspection.rst
+   tutorial/typed_allocators.rst
