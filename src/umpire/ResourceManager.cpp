@@ -19,6 +19,9 @@
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
+#if defined(UMPIRE_ENABLE_IPC)
+#include "umpire/resource/IpcResourceFactory.hpp"
+#endif
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
@@ -71,6 +74,11 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::PinnedMemoryResourceFactory>());
 #endif
 
+#if defined(UMPIRE_ENABLE_IPC)
+  registry.registerMemoryResource(
+    std::make_shared<resource::IpcResourceFactory>());
+#endif
+
   initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -88,6 +96,10 @@ ResourceManager::initialize()
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
   m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
   m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_IPC)
+  m_memory_resources[resource::IpcMemory] = registry.makeMemoryResource("IPC", getNextId());
 #endif
 
   /*
@@ -119,6 +131,13 @@ ResourceManager::initialize()
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
 #endif
+
+#if defined(UMPIRE_ENABLE_IPC) && defined(UMPIRE_ENABLE_IPC_MPI3)
+  auto ipc_allocator = m_memory_resources[resource::IpcMemory];
+  m_allocators_by_name["IPC"] = ipc_allocator;
+  m_allocators_by_id[ipc_allocator->getId()] = ipc_allocator;
+#endif
+
   UMPIRE_LOG(Debug, "() leaving");
 }
 

@@ -49,6 +49,16 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
+if (ENABLE_IPC)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    IpcResourceFactory.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    IpcResourceFactory.cpp)
+endif ()
+
 blt_add_library(
   NAME umpire_resource
   HEADERS ${umpire_resource_headers}

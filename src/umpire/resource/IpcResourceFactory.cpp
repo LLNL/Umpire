@@ -12,31 +12,29 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_MemoryResourceTypes_HPP
-#define UMPIRE_MemoryResourceTypes_HPP
+#include "umpire/resource/IpcResourceFactory.hpp"
+
+#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/alloc/Mpi3Allocator.hpp"
 
 namespace umpire {
 namespace resource {
 
-struct MemoryResourceTypeHash
+bool
+IpcResourceFactory::isValidMemoryResourceFor(const std::string& name)
 {
-    template <typename T>
-    std::size_t operator()(T t) const
-    {
-        return static_cast<std::size_t>(t);
-    }
-};
+  if (name.compare("IPC") == 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
-
-enum MemoryResourceType {
-  Host,
-  Device,
-  UnifiedMemory,
-  PinnedMemory,
-  IpcMemory
-};
+std::shared_ptr<MemoryResource>
+IpcResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+{
+  return std::make_shared<DefaultMemoryResource<alloc::Mpi3Allocator> >(Platform::cpu, "IPC", id);
+}
 
 } // end of namespace resource
 } // end of namespace umpire
-
-#endif

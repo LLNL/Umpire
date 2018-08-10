@@ -33,6 +33,8 @@ option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
+option(ENABLE_IPC "Build Umpire with IPC shared memory enabled" Off)
+option(ENABLE_IPC_MPI3 "Build Umpire with MPI3 SHM enabled" Off)
 
 ################################
 # BLT

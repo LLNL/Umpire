@@ -20,6 +20,8 @@
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_ASSERTS
 #cmakedefine UMPIRE_ENABLE_STATISTICS
+#cmakedefine UMPIRE_ENABLE_IPC
+#cmakedefine UMPIRE_ENABLE_IPC_MPI3
 
 constexpr int UMPIRE_VERSION_MAJOR = @Umpire_VERSION_MAJOR@;
 constexpr int UMPIRE_VERSION_MINOR = @Umpire_VERSION_MINOR@;

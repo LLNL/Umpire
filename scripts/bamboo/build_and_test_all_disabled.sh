@@ -14,7 +14,7 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
-export BUILD_OPTIONS="-DENABLE_CUDA=Off -DENABLE_FORTRAN=Off ${BUILD_OPTIONS}"
+export BUILD_OPTIONS="-DENABLE_CUDA=Off -DENABLE_FORTRAN=Off -DENABLE_IPC=Off -DENABLE_IPC_MPI3=Off ${BUILD_OPTIONS}"
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 

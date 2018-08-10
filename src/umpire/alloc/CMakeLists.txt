@@ -27,6 +27,12 @@ if (ENABLE_CUDA)
     CudaPinnedAllocator.hpp)
 endif ()
 
+if (ENABLE_MPI3)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    Mpi3Allocator.hpp)
+endif ()
+
 blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers}
