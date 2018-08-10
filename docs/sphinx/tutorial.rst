@@ -7,11 +7,11 @@ Umpire Tutorial
 This section is a tutorial introduction to Umpire. We start with the most basic
 memory allocation, and move through topics like allocating on different
 resources, using allocation strategies to change how memory is allocated, using
-operations to move and modify data, and even how to write your own allocation
-strategies!
+operations to move and modify data, and how to use Umpire introspection
+capability to find out information about Allocators and allocations.
 
 These examples are all built as part of Umpire, and you can find the files in
-the ``exmamples`` directory at the root of the Umpire repository.  Feel free to
+the ``examples`` directory at the root of the Umpire repository.  Feel free to
 play around and modify these examples to experiment with all of Umpire's
 functionality.
 

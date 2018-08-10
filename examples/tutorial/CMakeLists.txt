@@ -42,3 +42,27 @@ blt_add_executable(
   SOURCES tut_move.cpp
   DEPENDS_ON 
     umpire)
+
+blt_add_executable(
+  NAME tut_memset
+  SOURCES tut_memset.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME tut_reallocate
+  SOURCES tut_reallocate.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME tut_typed_allocator
+  SOURCES tut_realtyped_allocator.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME tut_introspection
+  SOURCES tut_introspection.cpp
+  DEPENDS_ON 
+    umpire)
