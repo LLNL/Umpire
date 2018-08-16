@@ -50,7 +50,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 }
 
 void 
-MonotonicAllocationStrategy::deallocate(void* ptr)
+MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {
   UMPIRE_LOG(Info, "() doesn't do anything");
 }
