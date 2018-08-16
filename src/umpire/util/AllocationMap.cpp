@@ -19,7 +19,8 @@
 namespace umpire {
 namespace util {
 
-AllocationMap::AllocationMap()
+AllocationMap::AllocationMap() :
+  m_mutex(new std::mutex())
 {
 }
 
@@ -30,36 +31,54 @@ AllocationMap::~AllocationMap()
 void
 AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
 {
-  UMPIRE_LOG(Debug, "Inserting " << ptr);
+  try {
+    UMPIRE_LOCK;
 
-  m_records.insert(
-      reinterpret_cast<uintptr_t>(ptr),
-      reinterpret_cast<uintptr_t>(alloc_record));
+    UMPIRE_LOG(Debug, "Inserting " << ptr);
+
+    m_records.insert(
+        reinterpret_cast<uintptr_t>(ptr),
+        reinterpret_cast<uintptr_t>(alloc_record));
+
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
+  }
 }
 
 AllocationRecord*
 AllocationMap::remove(void* ptr)
 {
-  UMPIRE_LOG(Debug, "Removing " << ptr);
-
-  EntryVector* record_vector =
-    const_cast<EntryVector*>(
-        m_records.find(reinterpret_cast<uintptr_t>(ptr)));
-
   Entry ret = nullptr;
 
-  if (record_vector) {
-    if (record_vector->size() > 0) {
+  try {
+    UMPIRE_LOCK;
 
-      ret = reinterpret_cast<Entry>(record_vector->back());
-      record_vector->pop_back();
+    UMPIRE_LOG(Debug, "Removing " << ptr);
 
-      if (record_vector->empty()) {
-        m_records.removeEntry(reinterpret_cast<uintptr_t>(ptr));
+    EntryVector* record_vector =
+      const_cast<EntryVector*>(
+          m_records.find(reinterpret_cast<uintptr_t>(ptr)));
+
+    if (record_vector) {
+      if (record_vector->size() > 0) {
+
+        ret = reinterpret_cast<Entry>(record_vector->back());
+        record_vector->pop_back();
+
+        if (record_vector->empty()) {
+          m_records.removeEntry(reinterpret_cast<uintptr_t>(ptr));
+        }
       }
+    } else {
+      UMPIRE_ERROR("Cannot remove " << ptr );
     }
-  } else {
-    UMPIRE_ERROR("Cannot remove " << ptr );
+    
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
   }
 
   return ret;

@@ -23,8 +23,13 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+
+#if defined(_OPENMP)
+#include <omp.h>
+#endif
 
 static int unique_pool_name = 0;
 static int initial_min_size = 1024;
@@ -217,6 +222,24 @@ TEST(AllocationAdvisor, Create)
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "read_only_um", rm.getAllocator("UM"), "FOOBAR"));
 }
+
+TEST(AllocationAdvisor, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto um_allocator = rm.getAllocator("UM");
+  auto host_allocator = rm.getAllocator("HOST");
+
+  auto read_only_alloc = 
+    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "preferred_location_host", um_allocator, "PREFERRED_LOCATION", host_allocator);
+
+  ASSERT_NO_THROW({
+      double* data = static_cast<double*>(
+          read_only_alloc.allocate(1024*sizeof(double)));
+      read_only_alloc.deallocate(data);
+  });
+
+}
 #endif
 
 TEST(FixedPool, Host)
@@ -235,3 +258,26 @@ TEST(FixedPool, Host)
   ASSERT_GE(allocator.getHighWatermark(), sizeof(data)*64);
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 }
+
+#if defined(_OPENMP)
+TEST(ThreadSafeAllocator, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator", rm.getAllocator("HOST"));
+
+#pragma omp parallel
+  {
+    const size_t size = 1024*omp_get_thread_num();
+
+    double* thread_data = static_cast<double*>(
+     allocator.allocate(size*sizeof(double)));
+
+    allocator.deallocate(thread_data);
+  }
+
+  SUCCEED();
+}
+
+#endif

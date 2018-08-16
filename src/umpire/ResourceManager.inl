@@ -27,17 +27,25 @@ Allocator ResourceManager::makeAllocator(
     const std::string& name, 
     Args&&... args)
 {
-  UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
+  std::shared_ptr<strategy::AllocationStrategy> allocator;
+  try {
+    UMPIRE_LOCK;
 
-  if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+    UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
+
+    if (isAllocator(name)) {
+      UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+    }
+
+    allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+
+    m_allocators_by_name[name] = allocator;
+    m_allocators_by_id[allocator->getId()] = allocator;
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
   }
-
-  std::shared_ptr<strategy::AllocationStrategy> allocator = 
-    std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
-
-  m_allocators_by_name[name] = allocator;
-  m_allocators_by_id[allocator->getId()] = allocator;
 
   return Allocator(allocator);
 }
