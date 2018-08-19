@@ -87,7 +87,18 @@ AllocationMap::remove(void* ptr)
 AllocationRecord*
 AllocationMap::findRecord(void* ptr)
 {
-  auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+
+  AddressPair record;
+
+  try {
+    UMPIRE_LOCK;
+    record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+    UMPIRE_UNLOCK;
+  }
+  catch (...){
+    UMPIRE_UNLOCK;
+    throw;
+  }
 
   if (record.value) {
     void* parent_ptr = reinterpret_cast<void*>(record.key);
