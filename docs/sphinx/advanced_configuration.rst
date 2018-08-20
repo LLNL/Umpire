@@ -40,14 +40,13 @@ These arguments are explained in more detail below:
   This option controls whether or not test executables will be built.
 
 * ``ENABLE_BENCHMARKS``
-  This option will build the benchmark programs used to test ``ManagedArray``
-  performance.
+  This option will build the benchmark programs used to test performance.
 
 * ``ENABLE_LOGGING``
   This option enables usage of Logging services for Umpire
 
 * ``ENABLE_SLIC``
-  This option enables usage of Logging services provided by SLIC.
+  This option enables usage of logging services provided by SLIC.
 
 * ``ENABLE_ASSERTS``
   Enable assert() within Umpire
