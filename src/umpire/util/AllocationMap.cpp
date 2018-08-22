@@ -88,11 +88,25 @@ AllocationRecord*
 AllocationMap::findRecord(void* ptr)
 {
 
-  AddressPair record;
+  AllocationRecord* alloc_record;
 
   try {
     UMPIRE_LOCK;
-    record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+    auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+    if (record.value) {
+      void* parent_ptr = reinterpret_cast<void*>(record.key);
+      alloc_record =
+        reinterpret_cast<Entry>(record.value->back());
+
+      if (alloc_record &&
+          ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
+             > static_cast<char*>(ptr))) {
+
+         UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
+            << " with size " << alloc_record->m_size);
+
+      }
+    }
     UMPIRE_UNLOCK;
   }
   catch (...){
@@ -100,23 +114,7 @@ AllocationMap::findRecord(void* ptr)
     throw;
   }
 
-  if (record.value) {
-    void* parent_ptr = reinterpret_cast<void*>(record.key);
-    auto alloc_record =
-      reinterpret_cast<Entry>(record.value->back());
-
-    if (alloc_record &&
-        ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
-           > static_cast<char*>(ptr))) {
-
-      UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
-          << " with size " << alloc_record->m_size);
-
-      return alloc_record;
-    }
-  }
-
-  return nullptr;
+  return alloc_record;
 }
 
 AllocationRecord*
