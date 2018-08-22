@@ -88,7 +88,7 @@ AllocationRecord*
 AllocationMap::findRecord(void* ptr)
 {
 
-  AllocationRecord* alloc_record;
+  Entry alloc_record = nullptr;
 
   try {
     UMPIRE_LOCK;
