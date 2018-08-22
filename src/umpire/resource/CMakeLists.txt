@@ -20,6 +20,7 @@ set (umpire_resource_headers
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
+  MemoryResourceTraits.hpp
 )
 
 set (umpire_resource_sources

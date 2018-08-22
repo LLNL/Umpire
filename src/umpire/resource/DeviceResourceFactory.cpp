@@ -17,6 +17,8 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 
+#include <cuda_runtime_api.h>
+
 namespace umpire {
 namespace resource {
 
@@ -33,7 +35,19 @@ DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 std::shared_ptr<MemoryResource>
 DeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id);
+  MemoryResourceTraits traits;
+
+  cudaDeviceProp properties;
+  error = ::cudaGetDeviceProperties(&properties, 0);
+
+  traits.unified = false;
+  traits.size = properties.totalGlobalMem;
+
+  traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
+  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::any;
+
+  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

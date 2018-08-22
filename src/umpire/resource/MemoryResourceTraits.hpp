@@ -12,30 +12,46 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_MemoryResourceTypes_HPP
-#define UMPIRE_MemoryResourceTypes_HPP
+#ifndef UMPIRE_MemoryResourceTraits_HPP
+#define UMPIRE_MemoryResourceTraits_HPP
+
+#include <cstddef>
 
 namespace umpire {
 namespace resource {
 
-struct MemoryResourceTypeHash
-{
-    template <typename T>
-    std::size_t operator()(T t) const
-    {
-        return static_cast<std::size_t>(t);
-    }
-};
+struct MemoryResourceTraits {
 
+  enum class optimized_for {
+    any,
+    latency,
+    bandwidth,
+    access
+  };
 
-enum MemoryResourceType {
-  Host,
-  Device,
-  Unified,
-  Pinned
+  enum class vendor_type {
+    AMD,
+    IBM,
+    INTEL,
+    NVIDIA
+  };
+
+  enum class memory_type {
+    DDR,
+    GDDR,
+    HBM,
+    NVME
+  };
+
+  bool unified;
+  size_t size;
+
+  vendor_type vendor;
+  memory_type kind;
+  optimized_for used_for;
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif
+#endif // UMPIRE_MemoryResourceTraits_HPP

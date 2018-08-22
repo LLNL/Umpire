@@ -33,7 +33,7 @@ class DefaultMemoryResource :
   public MemoryResource
 {
   public: 
-    DefaultMemoryResource(Platform platform, const std::string& name, int id);
+    DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

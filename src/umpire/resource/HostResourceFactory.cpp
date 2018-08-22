@@ -33,7 +33,24 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name)
 std::shared_ptr<MemoryResource>
 HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST", id);
+  MemoryResourceTraits traits;
+
+  // int mib[2];
+  // mib[0] = CTL_HW;
+  // mib[1] = HW_MEMSIZE;
+
+  // size_t mem_size;
+  // size_t returnSize = sizeof(mem_size);
+  // sysctl(mib, 2, &physicalMem, &returnSize, NULL, 0);
+
+  traits.unified = false;
+  traits.size = 0;
+
+  traits.vendor = MemoryResourceTraits::vendor_type::IBM;
+  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::any;
+
+  return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST", id, traits);
 }
 
 } // end of namespace resource

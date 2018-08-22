@@ -86,8 +86,8 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_CUDA)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
-  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
-  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
+  m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
+  m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
 #endif
 
   /*
@@ -100,22 +100,15 @@ ResourceManager::initialize()
   m_default_allocator = host_allocator;
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  /*
-   *  strategy::AllocationStrategyRegistry& strategy_registry =
-   *    strategy::AllocationStrategyRegistry::getInstance();
-   *
-   *  m_allocators_by_name["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
-   */
-
   auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
 
-  auto um_allocator = m_memory_resources[resource::UnifiedMemory];
+  auto um_allocator = m_memory_resources[resource::Unified];
   m_allocators_by_name["UM"] = um_allocator;
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
 
-  auto pinned_allocator = m_memory_resources[resource::PinnedMemory];
+  auto pinned_allocator = m_memory_resources[resource::Pinned];
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
 #endif
