@@ -1,7 +1,10 @@
 [submodule "blt"]
 	path = blt
 	url = https://github.com/LLNL/blt.git
-[submodule "src/tpl/simpool"]
-	path = src/tpl/simpool
+[submodule "src/umpire/tpl/simpool"]
+	path = src/umpire/tpl/simpool
 	url = https://github.com/LLNL/simpool.git
 	branch = feature/umpire-strategy
+[submodule "src/umpire/tpl/conduit"]
+	path = src/umpire/tpl/conduit
+	url = https://github.com/LLNL/conduit.git

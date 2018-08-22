@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
-#include "umpire/umpire.h"
+#include "umpire/interface/umpire.h"
 
 int main(int argc, char* argv[]) {
 
