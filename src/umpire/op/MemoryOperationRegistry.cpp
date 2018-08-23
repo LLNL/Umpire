@@ -107,9 +107,15 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_shared<CudaAdvisePreferredLocationOperation>());
 
   registerOperation(
+      "PREFERRED_LOCATION",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<CudaAdvisePreferredLocationOperation>());
+
+  registerOperation(
       "READ_MOSTLY",
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseReadMostlyOperation>());
+
 #endif
 }
 

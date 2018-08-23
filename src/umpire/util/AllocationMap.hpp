@@ -18,6 +18,7 @@
 #include "umpire/util/AllocationRecord.hpp"
 
 #include <cstdint>
+#include <mutex>
 
 #include "umpire/tpl/judy/judyL2Array.h"
 
@@ -54,6 +55,7 @@ class AllocationMap
 
     judyL2Array<uintptr_t, uintptr_t> m_records;
 
+    std::mutex* m_mutex;
 };
 
 } // end of namespace util
