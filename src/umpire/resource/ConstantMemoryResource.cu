@@ -23,11 +23,11 @@
 namespace umpire {
 namespace resource {
 
-ConstantMemoryResource::ConstantMemoryResource(Platform platform, const std::string& name, int id) :
+ConstantMemoryResource::ConstantMemoryResource(const std::string& name, int id) :
   MemoryResource(name, id),
   m_current_size(0l),
   m_highwatermark(0l),
-  m_platform(platform),
+  m_platform(Platform::cuda),
   m_offset(0)
 {
 }
@@ -37,12 +37,12 @@ void* ConstantMemoryResource::allocate(size_t bytes)
   void* ptr = nullptr;
   cudaError_t error = ::cudaGetSymbolAddress((void**)&ptr, umpire_internal_device_constant_memory);
 
-  char* new_ptr = (char*)ptr + offset;
-  offset += bytes;
+  char* new_ptr = (char*)ptr + m_offset;
+  m_offset += bytes;
 
-  if (offset > 1024 * 64)
+  if (m_offset > 1024 * 64)
   {
-    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << offset - bytes << "bytes");
+    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
   ResourceManager::getInstance().registerAllocation((void*)new_ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});

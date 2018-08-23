@@ -31,7 +31,7 @@ class ConstantMemoryResource :
   public MemoryResource
 {
   public: 
-    ConstantMemoryResource(Platform platform, const std::string& name, int id);
+    ConstantMemoryResource(const std::string& name, int id);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
