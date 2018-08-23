@@ -60,11 +60,6 @@ class ResourceManager {
     Allocator getAllocator(const std::string& name);
 
     /*!
-     * \brief Get the Allocator with the given ID.
-     */
-    Allocator getAllocator(const int id);
-
-    /*!
      * \brief Get the default Allocator for the given resource_type.
      */
     Allocator getAllocator(resource::MemoryResourceType resource_type);

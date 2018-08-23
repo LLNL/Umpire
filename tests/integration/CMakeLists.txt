@@ -107,3 +107,14 @@ target_include_directories(
 blt_add_test(
   NAME free_functions_integration_tests
   COMMAND free_functions_integration_tests)
+
+blt_add_executable(
+  NAME fortran_interface_tests
+  SOURCES umpire_fortran_interface.f
+  DEPENDS_ON fruit umpire
+)
+
+#set_source_files_properties(
+#  umpire_fortran_interface.f
+#  PROPERTIES
+#  Fortran_FORMAT FREE)
