@@ -48,6 +48,7 @@ class ConstantMemoryResource :
     Platform m_platform;
 
     size_t m_offset;
+    void* m_ptr;
 };
 
 } // end of namespace resource

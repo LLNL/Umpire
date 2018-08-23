@@ -28,32 +28,34 @@ ConstantMemoryResource::ConstantMemoryResource(const std::string& name, int id) 
   m_current_size(0l),
   m_highwatermark(0l),
   m_platform(Platform::cuda),
-  m_offset(0)
+  m_offset(0),
+  m_ptr(nullptr)
 {
+  cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, umpire_internal_device_constant_memory);
 }
 
 void* ConstantMemoryResource::allocate(size_t bytes)
 {
-  void* ptr = nullptr;
-  cudaError_t error = ::cudaGetSymbolAddress((void**)&ptr, umpire_internal_device_constant_memory);
-
-  char* new_ptr = (char*)ptr + m_offset;
+  char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;
+
+  void* ret = static_cast<void*>(ptr);
 
   if (m_offset > 1024 * 64)
   {
     UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
-  ResourceManager::getInstance().registerAllocation((void*)new_ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
+  ResourceManager::getInstance().registerAllocation(
+      ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
     m_highwatermark = m_current_size;
 
-  UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
-  return (void*)new_ptr;
+  return ret;
 }
 
 void ConstantMemoryResource::deallocate(void* ptr)
@@ -62,6 +64,14 @@ void ConstantMemoryResource::deallocate(void* ptr)
 
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
+
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size)) 
+      == static_cast<char*>(ptr)) {
+    m_offset -= record->m_size;
+  } else {
+    UMPIRE_ERROR("ConstantMemory deallocations must be in reverse order");
+  }
+
   delete record;
 }
 

@@ -93,8 +93,7 @@ ResourceManager::initialize()
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
   m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
   m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
-  // constant memory
-  m_memory_resources[resource::Device_Const] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
+  m_memory_resources[resource::DeviceConst] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
   /*
@@ -127,7 +126,7 @@ ResourceManager::initialize()
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
 
   // constant memory
-  auto device_const_allocator = m_memory_resources[resource::Device_Const];
+  auto device_const_allocator = m_memory_resources[resource::DeviceConst];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
