@@ -2,7 +2,6 @@
 // Copyright (c) 2018, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
-// Created by Zifan Nan, nan1@llnl.gov
 // LLNL-CODE-747640
 //
 // All rights reserved.
@@ -42,13 +41,13 @@ class ConstantMemoryResource :
 
     Platform getPlatform();
 
-  protected: 
+  private: 
     long m_current_size;
     long m_highwatermark;
 
     Platform m_platform;
-  private:
-    size_t offset;
+
+    size_t m_offset;
 };
 
 } // end of namespace resource

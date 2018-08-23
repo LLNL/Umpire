@@ -2,7 +2,6 @@
 // Copyright (c) 2018, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
-// Created by Zifan Nan, nan1@llnl.gov
 // LLNL-CODE-747640
 //
 // All rights reserved.
@@ -28,9 +27,9 @@ ConstantMemoryResource::ConstantMemoryResource(Platform platform, const std::str
   MemoryResource(name, id),
   m_current_size(0l),
   m_highwatermark(0l),
-  m_platform(platform)
+  m_platform(platform),
+  m_offset(0)
 {
-  offset = 0;
 }
 
 void* ConstantMemoryResource::allocate(size_t bytes)
@@ -43,7 +42,7 @@ void* ConstantMemoryResource::allocate(size_t bytes)
 
   if (offset > 1024 * 64)
   {
-    UMPIRE_LOG(Debug, "ask bytes more than max constant memory size (64KB), current size is " << offset - bytes << "bytes");
+    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << offset - bytes << "bytes");
   }
 
   ResourceManager::getInstance().registerAllocation((void*)new_ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
