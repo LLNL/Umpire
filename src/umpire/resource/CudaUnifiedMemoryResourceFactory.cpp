@@ -12,7 +12,7 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
 
@@ -24,7 +24,7 @@ namespace umpire {
 namespace resource {
 
 bool
-UnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 {
   if (name.compare("UM") == 0) {
     return true;
@@ -34,7 +34,7 @@ UnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-UnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
 

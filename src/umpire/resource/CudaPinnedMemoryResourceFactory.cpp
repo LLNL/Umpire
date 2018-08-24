@@ -12,20 +12,19 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/DeviceResourceFactory.hpp"
+#include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/CudaMallocAllocator.hpp"
 
-#include <cuda_runtime_api.h>
+#include "umpire/alloc/CudaCudaPinnedAllocator.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool
-DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 {
-  if (name.compare("DEVICE") == 0) {
+  if (name.compare("PINNED") == 0) {
     return true;
   } else {
     return false;
@@ -33,21 +32,16 @@ DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-DeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  MemoryResourceTraits traits;
-
-  cudaDeviceProp properties;
-  error = ::cudaGetDeviceProperties(&properties, 0);
-
   traits.unified = false;
-  traits.size = properties.totalGlobalMem;
+  traits.size = 0; // size of system memory?
 
   traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
-  traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.kind = MemoryResourceTraits::memory_type:DDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id, traits);
+  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaCudaPinnedAllocator> >(Platform::cuda, "PINNED", id, traits);
 }
 
 } // end of namespace resource

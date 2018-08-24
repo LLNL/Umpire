@@ -20,9 +20,9 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 #if defined(UMPIRE_ENABLE_CUDA)
-#include "umpire/resource/DeviceResourceFactory.hpp"
-#include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
-#include "umpire/resource/PinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/CudaDeviceResourceFactory.hpp"
+#include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
 #endif
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
@@ -62,13 +62,13 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
-    std::make_shared<resource::DeviceResourceFactory>());
+    std::make_shared<resource::CudaDeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::UnifiedMemoryResourceFactory>());
+    std::make_shared<resource::CudaUnifiedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::PinnedMemoryResourceFactory>());
+    std::make_shared<resource::CudaPinnedMemoryResourceFactory>());
 #endif
 
   initialize();
