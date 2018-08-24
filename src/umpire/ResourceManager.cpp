@@ -161,6 +161,11 @@ ResourceManager::getAllocator(int id)
 }
 
 Allocator
+ResourceManager::getAllocator(resource::MemoryResourceTraits traits)
+{
+}
+
+Allocator
 ResourceManager::getDefaultAllocator()
 {
   UMPIRE_LOG(Debug, "");

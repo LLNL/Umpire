@@ -27,6 +27,7 @@
 #include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
+#include "umpire/resource/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
@@ -68,6 +69,11 @@ class ResourceManager {
      * \brief Get the Allocator with the given ID.
      */
     Allocator getAllocator(int id);
+
+    /*!
+     * \brief Get the Allocator that best matches traits.
+     */
+    Allocator getAllocator(resource::MemoryResourceTraits traits);
 
     /*!
      * \brief Get the default Allocator.
