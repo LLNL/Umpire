@@ -21,15 +21,17 @@ blt_add_test(
   NAME resource_manager_tests
   COMMAND resource_manager_tests)
 
-blt_add_executable(
-  NAME allocator_tests
-  SOURCES allocator_tests.cpp
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}
-  DEPENDS_ON umpire gtest gmock)
+if (ENABLE_GMOCK)
+  blt_add_executable(
+    NAME allocator_tests
+    SOURCES allocator_tests.cpp
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}
+    DEPENDS_ON umpire gtest gmock)
 
-blt_add_test(
-  NAME allocator_tests
-  COMMAND allocator_tests)
+  blt_add_test(
+    NAME allocator_tests
+    COMMAND allocator_tests)
+endif ()
 
 add_subdirectory(alloc)
 add_subdirectory(op)

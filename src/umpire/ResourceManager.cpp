@@ -19,11 +19,17 @@
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
 #endif
+
+#if defined(UMPIRE_ENABLE_ROCM)
+#include "umpire/resource/RocmDeviceResourceFactory.hpp"
+#endif
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -71,6 +77,11 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::CudaPinnedMemoryResourceFactory>());
 #endif
 
+#if defined(UMPIRE_ENABLE_ROCM)
+  registry.registerMemoryResource(
+    std::make_shared<resource::RocmDeviceResourceFactory>());
+#endif
+
   initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -84,8 +95,11 @@ ResourceManager::initialize()
 
   m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_ROCM)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
   m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
   m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
 #endif
@@ -99,11 +113,13 @@ ResourceManager::initialize()
 
   m_default_allocator = host_allocator;
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_ROCM)
   auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
+#endif
 
+#if defined(UMPIRE_ENABLE_CUDA)
   auto um_allocator = m_memory_resources[resource::Unified];
   m_allocators_by_name["UM"] = um_allocator;
   m_allocators_by_id[um_allocator->getId()] = um_allocator;

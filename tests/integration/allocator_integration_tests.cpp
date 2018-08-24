@@ -65,7 +65,8 @@ TEST_P(AllocatorTest, AllocateDeallocateSmall)
 TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
-  if (m_allocator->getPlatform() == umpire::Platform::cuda) {
+  if (m_allocator->getPlatform() == umpire::Platform::cuda || 
+      m_allocator->getPlatform() == umpire::Platform::rocm) {
     SUCCEED();
   } else {
     double* data = static_cast<double*>(
@@ -125,8 +126,10 @@ TEST_P(AllocatorTest, GetById)
 
 const std::string allocator_strings[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_ROCM)
   , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_CUDA)
   , "UM"
   , "PINNED"
 #endif
