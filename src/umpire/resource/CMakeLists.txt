@@ -53,11 +53,13 @@ endif ()
 if (ENABLE_ROCM)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    RocmDeviceResourceFactory.hpp)
+    RocmDeviceResourceFactory.hpp
+    RocmPinnedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    RocmDeviceResourceFactory.cpp)
+    RocmDeviceResourceFactory.cpp
+    RocmPinnedMemoryResourceFactory.cpp)
 
   set (umpire_resource_depends
     ${umpire_resource_depends}
