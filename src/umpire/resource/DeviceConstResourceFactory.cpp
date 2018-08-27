@@ -16,6 +16,8 @@
 
 #include "umpire/resource/ConstantMemoryResource.hpp"
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -30,7 +32,7 @@ DeviceConstResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-DeviceConstResourceFactory::create(const std::string& name, int id)
+DeviceConstResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   return std::make_shared<resource::ConstantMemoryResource >("DEVICE_CONST", id);
 }
