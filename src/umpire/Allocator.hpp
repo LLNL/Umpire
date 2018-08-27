@@ -51,7 +51,7 @@ class Allocator {
      *
      * The memory will be allocated as determined by the AllocationStrategy
      * used by this Allocator. Note that this method does not guarantee new
-     * memory pages being requested from thet underlying memory system, as the
+     * memory pages being requested from the underlying memory system, as the
      * associated AllocationStrategy could have already allocated sufficient
      * memory, or re-use existing allocations that were not returned to the
      * system.
