@@ -251,11 +251,12 @@ TEST(FixedPool, Host)
   auto allocator = rm.makeAllocator<umpire::strategy::FixedPool<data>>(
       "host_fixed_pool", rm.getAllocator("HOST"));
 
-  void* alloc = allocator.allocate(100);
+  void* alloc = allocator.allocate(sizeof(data));
 
-  ASSERT_GE(allocator.getCurrentSize(), sizeof(data)*64);
+  ASSERT_GE(allocator.getCurrentSize(), sizeof(data));
+  ASSERT_GE(allocator.getActualSize(), sizeof(data)*64);
   ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
-  ASSERT_GE(allocator.getHighWatermark(), sizeof(data)*64);
+  ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 }
 

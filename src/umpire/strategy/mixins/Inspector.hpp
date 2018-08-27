@@ -12,41 +12,37 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_ThreadSafeAllocator_HPP
-#define UMPIRE_ThreadSafeAllocator_HPP
+#ifndef UMPIRE_Inspector_HPP
+#define UMPIRE_Inspector_HPP
 
-#include <mutex>
-
-#include "umpire/Allocator.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include <memory>
 
 namespace umpire {
 namespace strategy {
 
-class ThreadSafeAllocator :
-  public AllocationStrategy
+class AllocationStrategy;
+
+namespace mixins {
+
+class Inspector
 {
   public:
-    ThreadSafeAllocator(
-        const std::string& name, 
-        int id,
-        Allocator allocator);
+    Inspector();
 
-    void* allocate(size_t bytes);
-    void deallocate(void* ptr);
+    void registerAllocation(
+        void* ptr,
+        size_t size,
+        std::shared_ptr<umpire::strategy::AllocationStrategy> strategy);
 
-    long getCurrentSize();
-    long getHighWatermark();
-
-    Platform getPlatform();
+    void deregisterAllocation(void* ptr);
 
   protected:
-    std::shared_ptr<AllocationStrategy> m_allocator;
-
-    std::mutex* m_mutex;
+    long m_current_size;
+    long m_high_watermark;
 };
 
+} // end of namespace mixins
 } // end of namespace strategy
 } // end of namespace umpire
 
-#endif // UMPIRE_ThreadSafeAllocator_HPP
+#endif // UMPIRE_Inspector_HPP

@@ -15,20 +15,24 @@
 set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationStrategy.hpp
+  AllocationTracker.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   ThreadSafeAllocator.hpp
   DynamicPool.hpp
   FixedPool.hpp
-  FixedPool.inl)
+  FixedPool.inl
+  mixins/Inspector.hpp)
 
 set (umpire_stategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
+  AllocationTracker.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp
-  DynamicPool.cpp)
+  DynamicPool.cpp
+  mixins/Inspector.cpp)
 
 set (umpire_strategy_depends
   umpire
