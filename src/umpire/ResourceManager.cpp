@@ -105,13 +105,6 @@ ResourceManager::initialize()
   m_default_allocator = host_allocator;
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  /*
-   *  strategy::AllocationStrategyRegistry& strategy_registry =
-   *    strategy::AllocationStrategyRegistry::getInstance();
-   *
-   *  m_allocators_by_name["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
-   */
-
   auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
@@ -124,7 +117,6 @@ ResourceManager::initialize()
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
 
-  // constant memory
   auto device_const_allocator = m_memory_resources[resource::DeviceConst];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
@@ -206,7 +198,6 @@ ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
 
   m_allocators_by_name[name] = allocator.getAllocationStrategy();
 }
-
 
 Allocator
 ResourceManager::getAllocator(void* ptr)
