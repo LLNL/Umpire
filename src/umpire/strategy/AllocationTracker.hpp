@@ -40,6 +40,7 @@ class AllocationTracker :
 
     long getCurrentSize();
     long getHighWatermark();
+    long getActualSize();
 
     Platform getPlatform();
 

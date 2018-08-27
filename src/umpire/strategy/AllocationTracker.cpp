@@ -56,6 +56,12 @@ AllocationTracker::getHighWatermark()
   return m_high_watermark;
 }
 
+long
+AllocationTracker::getActualSize()
+{
+  return m_allocator->getActualSize();
+}
+
 Platform 
 AllocationTracker::getPlatform()
 {
