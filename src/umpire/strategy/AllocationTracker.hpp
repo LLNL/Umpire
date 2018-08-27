@@ -12,48 +12,44 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DefaultMemoryResource_HPP
-#define UMPIRE_DefaultMemoryResource_HPP
+#ifndef UMPIRE_AllocationTracker_HPP
+#define UMPIRE_AllocationTracker_HPP
 
-#include "umpire/resource/MemoryResource.hpp"
+#include <memory>
 
-#include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Platform.hpp"
-
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/Allocator.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 
 namespace umpire {
-namespace resource {
+namespace strategy {
 
-  /*!
-   * \brief Concrete MemoryResource object that uses the template _allocator to
-   * allocate and deallocate memory.
-   */
-template <typename _allocator>
-class DefaultMemoryResource :
-  public MemoryResource,
-  private umpire::strategy::mixins::Inspector
+class AllocationTracker : 
+  public AllocationStrategy,
+  private mixins::Inspector
 {
-  public: 
-    DefaultMemoryResource(Platform platform, const std::string& name, int id);
+  public:
+    AllocationTracker(
+        const std::string& name,
+        int id,
+        Allocator allocator);
 
     void* allocate(size_t bytes);
+
     void deallocate(void* ptr);
 
     long getCurrentSize();
     long getHighWatermark();
+    long getActualSize();
 
     Platform getPlatform();
 
-  protected: 
-    _allocator m_allocator;
+  private:
+    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 
-    Platform m_platform;
 };
 
-} // end of namespace resource
 } // end of namespace umpire
+} // end of namespace strategy
 
-#include "umpire/resource/DefaultMemoryResource.inl"
-
-#endif // UMPIRE_DefaultMemoryResource_HPP
+#endif // UMPIRE_AllocationTracker_HPP

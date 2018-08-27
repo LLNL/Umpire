@@ -65,9 +65,6 @@ class AllocationAdvisor :
   private:
     std::shared_ptr<op::MemoryOperation> m_advice_operation;
 
-    long m_current_size;
-    long m_highwatermark;
-
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 
     int m_device;

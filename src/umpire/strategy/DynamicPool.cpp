@@ -29,8 +29,6 @@ DynamicPool::DynamicPool(
     const std::size_t min_alloc_size) :
   AllocationStrategy(name, id),
   dpa(nullptr),
-  m_current_size(0),
-  m_highwatermark(0),
   m_allocator(allocator.getAllocationStrategy())
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
@@ -41,12 +39,6 @@ DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   void* ptr = dpa->allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
-
-  m_current_size += bytes;
-  if (m_current_size > m_highwatermark)
-    m_highwatermark = m_current_size;
-
   return ptr;
 }
 
@@ -55,23 +47,20 @@ DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
-  m_current_size -= ResourceManager::getInstance().getSize(ptr);
-
-  ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
 long 
 DynamicPool::getCurrentSize()
 { 
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
-  return m_current_size;
+  return 0;
 }
 
 long 
 DynamicPool::getHighWatermark()
 { 
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
+  return 0;
 }
 
 long 
