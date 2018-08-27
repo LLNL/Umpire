@@ -71,7 +71,6 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     std::make_shared<resource::PinnedMemoryResourceFactory>());
 
-  // constant memory
   registry.registerMemoryResource(
     std::make_shared<resource::DeviceConstResourceFactory>());
 #endif
