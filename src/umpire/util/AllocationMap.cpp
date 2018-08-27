@@ -87,25 +87,34 @@ AllocationMap::remove(void* ptr)
 AllocationRecord*
 AllocationMap::findRecord(void* ptr)
 {
-  auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
 
-  if (record.value) {
-    void* parent_ptr = reinterpret_cast<void*>(record.key);
-    auto alloc_record =
-      reinterpret_cast<Entry>(record.value->back());
+  Entry alloc_record = nullptr;
 
-    if (alloc_record &&
-        ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
-           > static_cast<char*>(ptr))) {
+  try {
+    UMPIRE_LOCK;
+    auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+    if (record.value) {
+      void* parent_ptr = reinterpret_cast<void*>(record.key);
+      alloc_record =
+        reinterpret_cast<Entry>(record.value->back());
 
-      UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
-          << " with size " << alloc_record->m_size);
+      if (alloc_record &&
+          ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
+             > static_cast<char*>(ptr))) {
 
-      return alloc_record;
+         UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
+            << " with size " << alloc_record->m_size);
+
+      }
     }
+    UMPIRE_UNLOCK;
+  }
+  catch (...){
+    UMPIRE_UNLOCK;
+    throw;
   }
 
-  return nullptr;
+  return alloc_record;
 }
 
 AllocationRecord*
