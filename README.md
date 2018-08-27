@@ -1,6 +1,7 @@
 # Umpire v0.2.3
 
 [![Build Status](https://travis-ci.com/LLNL/Umpire.svg?branch=develop)](https://travis-ci.com/LLNL/Umpire)
+[![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
 
 Umpire is a resource management library that allows the discovery, provision,
 and management of memory on next-generation architectures.
