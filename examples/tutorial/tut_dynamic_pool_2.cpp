@@ -31,8 +31,8 @@ void allocate_and_deallocate_pool(
   auto pooled_allocator = 
     rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
                                                     allocator,
-                                                    initial_size,
-                                                    min_block_size);
+                                                    initial_size, /* default = 512Mb*/
+                                                    min_block_size /* default = 1Mb */);
 
   double* data = static_cast<double*>(
       pooled_allocator.allocate(SIZE*sizeof(double)));
