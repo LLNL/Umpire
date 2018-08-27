@@ -1027,11 +1027,12 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-PREDEFINED             = HAVE_SILO \
-                         HAVE_SUNDIALS \
-                         HAVE_HYPRE \
-                         HAVE_PETSC \
-                         HAVE_HDF5
+PREDEFINED             = UMPIRE_ENABLE_CUDA \
+                         UMPIRE_ENABLE_SLIC \
+                         UMPIRE_ENABLE_LOGGING \
+                         UMPIRE_ENABLE_ASSERTS \
+                         UMPIRE_ENABLE_STATISTICS \
+                         DOXYGEN_SKIP_THIS
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

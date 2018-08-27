@@ -63,7 +63,7 @@ blt_add_executable(
 
 blt_add_executable(
   NAME tut_typed_allocator
-  SOURCES tut_realtyped_allocator.cpp
+  SOURCES tut_typed_allocator.cpp
   DEPENDS_ON 
     umpire)
 

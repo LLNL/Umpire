@@ -29,17 +29,14 @@ namespace umpire {
 class ResourceManager;
 
 /*!
- * \brief Allocator provides a unified interface to all Umpire classes that can
- * be used to allocate and free data.
+ * \brief Provides a unified interface to allocate and free data.
  *
  * An Allocator encapsulates all the details of how and where allocations will
  * be made, and can also be used to introspect the memory resource. Allocator
  * objects do not return typed allocations, so the pointer returned from the
  * allocate method must be cast to the relevant type.
  *
- * \code
- *
- * float* my_floats = static_cast<float*>(allocator.allocate(100*sizeof(float));
+ * \see TypedAllocator
  */
 class Allocator {
   friend class ResourceManager;

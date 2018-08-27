@@ -15,15 +15,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-void set_to_zero(double* source_data)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  rm.memset(dest_data, 0);
-
-  std::cout << "Set data from " << destination << " (" << dest_data << ") to 0." << std::endl;
-}
-
 int main(int, char**) {
   constexpr size_t SIZE = 1024;
 
@@ -32,7 +23,7 @@ int main(int, char**) {
   const std::string destinations[] = {
     "HOST"
 #if defined(UMPIRE_ENABLE_CUDA)
-      , "DEVCIE"
+      , "DEVICE"
       , "UM"
       , "PINNED"
 #endif
@@ -46,7 +37,9 @@ int main(int, char**) {
     std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
       << allocator.getName() << " allocator." << std::endl;
 
-    set_to_zero(data);
+    rm.memset(data, 0);
+
+    std::cout << "Set data from " << destination << " (" << data << ") to 0." << std::endl;
 
     allocator.deallocate(data);
   }

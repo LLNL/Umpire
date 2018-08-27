@@ -24,7 +24,7 @@ int main(int, char**) {
   const std::string destinations[] = {
     "HOST"
 #if defined(UMPIRE_ENABLE_CUDA)
-      , "DEVCIE"
+      , "DEVICE"
       , "UM"
       , "PINNED"
 #endif
@@ -41,9 +41,9 @@ int main(int, char**) {
     std::cout << "Reallocating data (" << data << ") to size " 
       << REALLOCATED_SIZE << "...";
 
-    data = rm.reallocate(data, REALLOCATED_SIZE);
+    data = static_cast<double*>(rm.reallocate(data, REALLOCATED_SIZE));
 
-    std::cout << "done.  Reallocated data (" << << ")" << std::endl;
+    std::cout << "done.  Reallocated data (" << data << ")" << std::endl;
 
     allocator.deallocate(data);
   }

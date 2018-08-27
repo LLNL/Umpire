@@ -42,7 +42,7 @@ int main(int, char**) {
     std::cout << "According to the ResourceManager, the Allocator used is " 
       << found_allocator.getName() 
       << ", which has the Platform " 
-      << found_allocator.getPlatform() << std::endl;
+      << static_cast<int>(found_allocator.getPlatform()) << std::endl;
 
     std::cout << "The size of the allocation is << " 
       << found_allocator.getSize(data) << std::endl;
