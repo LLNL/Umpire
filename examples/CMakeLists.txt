@@ -45,3 +45,5 @@ if (ENABLE_STATISTICS)
     SOURCES statistics.cpp
     DEPENDS_ON umpire)
 endif()
+
+add_subdirectory(tutorial)

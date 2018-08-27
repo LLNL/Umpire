@@ -24,6 +24,20 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ *
+ * \brief Applies the given MemoryOperation to every allocation.
+ *
+ * This AllocationStrategy is designed to be used with the following
+ * operations:
+ *
+ * - op::CudaAdviseAccessedByOperation
+ * - op::CudaAdvisePreferredLocationOperation
+ * - op::CudaAdviseReadMostlyOperation
+ *
+ * Using this AllocationStrategy when combined with a pool like DynamicPool is
+ * a good way to mitigate the overhead of applying the memory advice.
+ */
 class AllocationAdvisor :
   public AllocationStrategy
 {
