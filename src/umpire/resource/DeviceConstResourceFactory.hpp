@@ -12,31 +12,27 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_MemoryResourceTypes_HPP
-#define UMPIRE_MemoryResourceTypes_HPP
+#ifndef UMPIRE_DeviceConstResourceFactory_HPP
+#define UMPIRE_DeviceConstResourceFactory_HPP
+
+#include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
 namespace resource {
 
-struct MemoryResourceTypeHash
+/*!
+ * \brief Factory class for constructing MemoryResource objects that use GPU
+ * memory.
+ */
+class DeviceConstResourceFactory :
+  public MemoryResourceFactory
 {
-    template <typename T>
-    std::size_t operator()(T t) const
-    {
-        return static_cast<std::size_t>(t);
-    }
-};
+  bool isValidMemoryResourceFor(const std::string& name);
 
-
-enum MemoryResourceType {
-  Host,
-  Device,
-  UnifiedMemory,
-  PinnedMemory,
-  DeviceConst
+  std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif
+#endif // UMPIRE_DeviceConstResourceFactory_HPP

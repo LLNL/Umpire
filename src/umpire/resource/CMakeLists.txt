@@ -34,12 +34,16 @@ set (umpire_resource_depends
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
+    DeviceConstResourceFactory.hpp
+    ConstantMemoryResource.hpp
     DeviceResourceFactory.hpp
     PinnedMemoryResourceFactory.hpp
     UnifiedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
+    DeviceConstResourceFactory.cpp
+    ConstantMemoryResource.cu
     DeviceResourceFactory.cpp
     PinnedMemoryResourceFactory.cpp
     UnifiedMemoryResourceFactory.cpp)
