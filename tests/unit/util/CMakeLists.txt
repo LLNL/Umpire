@@ -32,12 +32,15 @@ blt_add_test(
   NAME allocation_map_tests
   COMMAND allocation_map_tests)
 
-blt_add_executable(
-  NAME allocation_map_performance_tests
-  SOURCES allocation_map_performance_tests.cpp
-  DEPENDS_ON umpire_util gtest
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+# This test can fail when coverage is enabled
+if (NOT ENABLE_COVERAGE)
+  blt_add_executable(
+    NAME allocation_map_performance_tests
+    SOURCES allocation_map_performance_tests.cpp
+    DEPENDS_ON umpire_util gtest
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
-blt_add_test(
-  NAME allocation_map_performance_tests
-  COMMAND allocation_map_performance_tests)
+  blt_add_test(
+    NAME allocation_map_performance_tests
+    COMMAND allocation_map_performance_tests)
+endif ()
