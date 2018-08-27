@@ -70,36 +70,6 @@ Allocator ResourceManager::makeAllocator(
   return Allocator(allocator);
 }
 
-// template <typename Strategy,
-//          typename... Args>
-// Allocator ResourceManager::makeAllocator<true>(
-//     const std::string& name, 
-//     Args&&... args)
-// {
-//   std::shared_ptr<strategy::AllocationStrategy> allocator;
-// 
-//   try {
-//     UMPIRE_LOCK;
-// 
-//     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
-// 
-//     if (isAllocator(name)) {
-//       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
-//     }
-// 
-//     allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
-// 
-//     m_allocators_by_name[name] = allocator;
-//     m_allocators_by_id[allocator->getId()] = allocator;
-//     UMPIRE_UNLOCK;
-//   } catch (...) {
-//     UMPIRE_UNLOCK;
-//     throw;
-//   }
-// 
-//   return Allocator(allocator);
-// }
-
 } // end of namespace umpire
 
 #endif // UMPIRE_ResourceManager_INL
