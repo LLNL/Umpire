@@ -30,7 +30,7 @@ double* move_data(double* source_data, const std::string& destination)
   return dest_data;
 }
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
   constexpr size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();

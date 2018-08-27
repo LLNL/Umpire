@@ -34,7 +34,7 @@ void allocate_and_deallocate(const std::string& resource)
   std::cout << " deallocated." << std::endl;
 }
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
   allocate_and_deallocate("HOST");
 
 #if defined(UMPIRE_ENABLE_CUDA)
