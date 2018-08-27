@@ -1,6 +1,0 @@
-.. _introspection:
-
-=============
-Introspection
-=============
-

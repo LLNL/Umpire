@@ -25,12 +25,12 @@ before, without needing to worry about the underlying algorithm used for the
 allocations:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
-                    :lines: 30-36
+                    :lines: 32-38
 
 Don't forget, these strategies can be created on top of any valid Allocator:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
-                    :lines: 42-48
+                    :lines: 46-50
 
 Most Umpire users will make alloctations that use the GPU via the
 :class:`umpire::strategy::DynamicPool`, to help mitigate the cost of allocating

@@ -10,4 +10,3 @@ Features
   features/allocators
   features/strategies
   features/operations
-  features/introspection

@@ -51,7 +51,7 @@ most people know as a memset. Umpire provides a
 any allocation, regardless of where it came from:
 
 .. literalinclude:: ../../../examples/tutorial/tut_memset.cpp
-                    :lines: 22
+                    :lines: 40
 
 ----------
 Reallocate
