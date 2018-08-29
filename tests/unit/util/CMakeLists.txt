@@ -32,8 +32,8 @@ blt_add_test(
   NAME allocation_map_tests
   COMMAND allocation_map_tests)
 
-# This test can fail when coverage is enabled
-if (NOT ENABLE_COVERAGE)
+# TODO: Make this test a relative performance test
+if (False)
   blt_add_executable(
     NAME allocation_map_performance_tests
     SOURCES allocation_map_performance_tests.cpp
