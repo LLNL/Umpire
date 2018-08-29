@@ -1,3 +1,4 @@
 ignore:
-  - "src/umpire/tpl"
+  - "src/umpire/tpl/conduit"
+  - "src/umpire/tpl/judy"
   - "test"
