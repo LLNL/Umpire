@@ -27,7 +27,7 @@ For more advanced configuration you can use standard CMake variables.
 
 # Documentation
 
-Both user and code documentation is available.
+Both user and code documentation is available [here](http://umpire.readthedocs.io/).
 
 # Authors
 
