@@ -33,6 +33,7 @@ enum MemoryResourceType {
   Device,
   UnifiedMemory,
   PinnedMemory,
+  DeviceConst,
   IpcMemory
 };
 

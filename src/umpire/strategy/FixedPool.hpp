@@ -27,6 +27,13 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ * \brief Pool for fixed size allocations
+ *
+ * This AllocationStrategy provides an efficient pool for fixed size
+ * allocations of size T. Pools of NP objects of type T are constructed, and
+ * used to quickly allocate and deallocate objects.
+ */
 template <typename T, int NP=64, typename IA=StdAllocator>
 class FixedPool 
   : public AllocationStrategy

@@ -37,7 +37,7 @@ class AllocatorTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 16000;
+  const size_t m_big = 64;
   const size_t m_small = 8;
   const size_t m_nothing = 0;
 };
@@ -129,6 +129,7 @@ const std::string allocator_strings[] = {
   , "DEVICE"
   , "UM"
   , "PINNED"
+  , "DEVICE_CONST"
 #endif
 };
 
@@ -189,7 +190,7 @@ class AllocatorByResourceTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 16000;
+  const size_t m_big = 64;
   const size_t m_small = 8;
   const size_t m_nothing = 0;
 };
@@ -210,6 +211,7 @@ const umpire::resource::MemoryResourceType resource_types[] = {
   , umpire::resource::Device
   , umpire::resource::UnifiedMemory
   , umpire::resource::PinnedMemory
+  , umpire::resource::DeviceConst
 #endif
 };
 

@@ -47,7 +47,6 @@ if (ENABLE_FORTRAN)
     Fortran_FORMAT FREE)
 endif ()
 
-
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}

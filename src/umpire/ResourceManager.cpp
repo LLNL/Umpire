@@ -26,6 +26,7 @@
 #include "umpire/resource/DeviceResourceFactory.hpp"
 #include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/PinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/DeviceConstResourceFactory.hpp"
 #endif
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
@@ -72,6 +73,9 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     std::make_shared<resource::PinnedMemoryResourceFactory>());
+
+  registry.registerMemoryResource(
+    std::make_shared<resource::DeviceConstResourceFactory>());
 #endif
 
 #if defined(UMPIRE_ENABLE_IPC)
@@ -96,6 +100,7 @@ ResourceManager::initialize()
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
   m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
   m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
+  m_memory_resources[resource::DeviceConst] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
 #if defined(UMPIRE_ENABLE_IPC)
@@ -112,13 +117,6 @@ ResourceManager::initialize()
   m_default_allocator = host_allocator;
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  /*
-   *  strategy::AllocationStrategyRegistry& strategy_registry =
-   *    strategy::AllocationStrategyRegistry::getInstance();
-   *
-   *  m_allocators_by_name["DEVICE"] = strategy_registry.makeAllocationStrategy("POOL", {}, {m_memory_resources["DEVICE"]});
-   */
-
   auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
@@ -130,6 +128,10 @@ ResourceManager::initialize()
   auto pinned_allocator = m_memory_resources[resource::PinnedMemory];
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
+
+  auto device_const_allocator = m_memory_resources[resource::DeviceConst];
+  m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
+  m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
 
 #if defined(UMPIRE_ENABLE_IPC) && defined(UMPIRE_ENABLE_IPC_MPI3)
