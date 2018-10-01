@@ -20,9 +20,10 @@
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
 
+#include "umpire/strategy/mixins/Inspector.hpp"
+
 namespace umpire {
 namespace resource {
-
 
   /*!
    * \brief Concrete MemoryResource object that uses the template _allocator to
@@ -30,7 +31,8 @@ namespace resource {
    */
 template <typename _allocator>
 class DefaultMemoryResource :
-  public MemoryResource
+  public MemoryResource,
+  private umpire::strategy::mixins::Inspector
 {
   public: 
     DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
@@ -45,9 +47,6 @@ class DefaultMemoryResource :
 
   protected: 
     _allocator m_allocator;
-
-    long m_current_size;
-    long m_highwatermark;
 
     Platform m_platform;
 };

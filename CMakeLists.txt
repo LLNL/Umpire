@@ -32,6 +32,7 @@ option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
+option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
@@ -65,6 +66,7 @@ if (NOT BLT_LOADED)
 endif()
 
 
+include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
 configure_file(

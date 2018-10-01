@@ -60,7 +60,7 @@ int main(int, char**)
    * Allocator getAllocator(const std::string& name); // name of allocator
    *
    */
-  alloc = rm.getAllocator("POOL");
+  alloc = rm.getAllocator("host_slot_pool");
   void* test = alloc.allocate(100);
   alloc.deallocate(test);
 

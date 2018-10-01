@@ -107,8 +107,6 @@ FixedPool<T, NP, IA>::allocate(size_t bytes) {
     m_num_blocks++;
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, sizeof(T), this->shared_from_this()});
-
   return ptr;
 }
 
@@ -134,7 +132,6 @@ FixedPool<T,NP, IA>::deallocate(void* ptr) {
       curr->avail[indexI] ^= 1 << indexB;
       curr->numAvail++;
       m_num_blocks--;
-      ResourceManager::getInstance().deregisterAllocation(ptr);
 
       return;
     }

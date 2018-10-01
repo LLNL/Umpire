@@ -15,20 +15,26 @@
 set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationStrategy.hpp
+  AllocationTracker.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   ThreadSafeAllocator.hpp
   DynamicPool.hpp
   FixedPool.hpp
   FixedPool.inl)
+  
+set (umpire_strategy_mixin_headers
+  mixins/Inspector.hpp)
 
 set (umpire_stategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
+  AllocationTracker.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp
-  DynamicPool.cpp)
+  DynamicPool.cpp
+  mixins/Inspector.cpp)
 
 set (umpire_strategy_depends
   umpire
@@ -36,8 +42,8 @@ set (umpire_strategy_depends
   umpire_tpl_simpool)
 
 blt_add_library(
-  NAME umpire_strategy
-  HEADERS ${umpire_strategy_headers}
+  NAME umpire_strategy 
+  HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
   SOURCES ${umpire_stategy_sources}
   HEADERS_OUTPUT_SUBDIR umpire/strategy
   DEPENDS_ON ${umpire_strategy_depends})
@@ -59,3 +65,7 @@ install(TARGETS
 install(FILES
   ${umpire_strategy_headers}
   DESTINATION include/umpire/strategy)
+
+install(FILES
+  ${umpire_strategy_mixin_headers}
+  DESTINATION include/umpire/strategy/mixins)

@@ -11,7 +11,7 @@ matrix:
     env:
     - COMPILER=g++
     - IMG=gcc-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_COVERAGE=On"
   - compiler: gcc6
     env:
     - COMPILER=g++
