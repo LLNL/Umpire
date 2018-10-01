@@ -24,7 +24,7 @@
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
-#include "umpire/resource/DeviceConstResourceFactory.hpp"
+#include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_ROCM)
@@ -79,7 +79,7 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::CudaPinnedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::DeviceConstResourceFactory>());
+    std::make_shared<resource::CudaConstantMemoryResourceFactory>());
 #endif
 
 #if defined(UMPIRE_ENABLE_ROCM)
@@ -110,7 +110,7 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_CUDA)
   m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
-  m_memory_resources[resource::DeviceConst] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
+  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
   /*
@@ -137,7 +137,7 @@ ResourceManager::initialize()
   m_allocators_by_name["UM"] = um_allocator;
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
 
-  auto device_const_allocator = m_memory_resources[resource::DeviceConst];
+  auto device_const_allocator = m_memory_resources[resource::Constant];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
