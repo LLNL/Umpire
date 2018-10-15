@@ -126,13 +126,17 @@ TEST_P(AllocatorTest, GetById)
 
 const std::string allocator_strings[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_DEVICE)
   , "DEVICE"
 #endif
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
   , "UM"
-  , "PINNED"
+#endif
+#if defined(UMPIRE_ENABLE_CUDA)
   , "DEVICE_CONST"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+  , "PINNED"
 #endif
 };
 

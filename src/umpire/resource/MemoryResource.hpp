@@ -99,7 +99,6 @@ class MemoryResource :
     MemoryResourceTraits getTraits();
   protected:
     MemoryResourceTraits m_traits;
-
 };
 
 } // end of namespace strategy

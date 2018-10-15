@@ -103,13 +103,19 @@ ResourceManager::initialize()
 
   m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
 
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_DEVICE)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_PINNED)
   m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
   m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
   m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
@@ -122,21 +128,25 @@ ResourceManager::initialize()
 
   m_default_allocator = host_allocator;
 
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_DEVICE)
   auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
+#endif
 
+#if defined(UMPIRE_ENABLE_PINNED)
   auto pinned_allocator = m_memory_resources[resource::Pinned];
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
   auto um_allocator = m_memory_resources[resource::Unified];
   m_allocators_by_name["UM"] = um_allocator;
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
+#endif
 
+#if defined(UMPIRE_ENABLE_CUDA)
   auto device_const_allocator = m_memory_resources[resource::Constant];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
@@ -188,11 +198,6 @@ ResourceManager::getAllocator(int id)
   }
 
   return Allocator(m_allocators_by_id[id]);
-}
-
-Allocator
-ResourceManager::getAllocator(resource::MemoryResourceTraits traits)
-{
 }
 
 Allocator

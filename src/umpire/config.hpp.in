@@ -22,6 +22,10 @@
 #cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_ROCM
 
+#cmakedefine UMPIRE_ENABLE_DEVICE
+#cmakedefine UMPIRE_ENABLE_PINNED
+#cmakedefine UMPIRE_ENABLE_UM
+
 constexpr int UMPIRE_VERSION_MAJOR = @Umpire_VERSION_MAJOR@;
 constexpr int UMPIRE_VERSION_MINOR = @Umpire_VERSION_MINOR@;
 constexpr int UMPIRE_VERSION_PATCH = @Umpire_VERSION_PATCH@;

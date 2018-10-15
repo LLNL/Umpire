@@ -37,9 +37,13 @@ static int subsequent_min_size = 512;
 
 const char* AllocationDevices[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
     , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
     , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
     , "PINNED"
 #endif
 };
@@ -107,7 +111,7 @@ TEST_P(StrategyTest, Duplicate)
 
 INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices));
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
 TEST(SimpoolStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -177,7 +181,7 @@ TEST(MonotonicStrategy, Host)
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
 TEST(MonotonicStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();

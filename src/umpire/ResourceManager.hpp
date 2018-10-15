@@ -71,11 +71,6 @@ class ResourceManager {
     Allocator getAllocator(int id);
 
     /*!
-     * \brief Get the Allocator that best matches traits.
-     */
-    Allocator getAllocator(resource::MemoryResourceTraits traits);
-
-    /*!
      * \brief Get the default Allocator.
      *
      * The default Allocator is used whenever an Allocator is required and one

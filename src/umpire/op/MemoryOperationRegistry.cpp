@@ -36,6 +36,7 @@
 
 #if defined(UMPIRE_ENABLE_ROCM)
 #include "umpire/op/RocmCopyOperation.hpp"
+#include "umpire/op/RocmMemsetOperation.hpp"
 #endif
 
 #include "umpire/util/Macros.hpp"
@@ -137,6 +138,16 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       "COPY",
       std::make_pair(Platform::rocm, Platform::rocm),
       std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<RocmMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<GenericReallocateOperation>());
 #endif
 }
 
