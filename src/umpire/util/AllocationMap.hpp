@@ -50,6 +50,10 @@ class AllocationMap
   void
     reset();
 
+
+  void
+    printAll();
+
   private:
     AllocationRecord* findRecord(void* ptr);
 

@@ -127,6 +127,7 @@ AllocationMap::find(void* ptr)
   if (alloc_record) {
     return alloc_record;
   } else {
+    printAll();
     UMPIRE_ERROR("Allocation not mapped: " << ptr);
   }
 }
@@ -137,6 +138,28 @@ AllocationMap::contains(void* ptr)
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
   return (findRecord(ptr) != nullptr);
+}
+
+void
+AllocationMap::printAll()
+{
+  std::cout << "🔍 Printing allocation map contents..." << std::endl;
+
+  for (auto record = m_records.begin(); m_records.success(); record=m_records.next()){
+    auto addr = record.key;
+    auto vec = *record.value;
+
+    std::cout << reinterpret_cast<void*>(addr) << " : {" << std::endl;
+    for (auto const& records : vec) {
+      AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
+      std::cout << "  " << tmp->m_size << 
+        " [ " << reinterpret_cast<void*>(addr) <<
+        " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
+        " ] " << std::endl;
+    }
+    std::cout << "}" << std::endl;
+  } 
+  std::cout << "done." << std::endl;
 }
 
 } // end of namespace util
