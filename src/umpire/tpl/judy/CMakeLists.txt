@@ -27,6 +27,11 @@ blt_add_library(
   HEADERS ${judy_headers}
   HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
 
+target_compile_options(
+  umpire_tpl_judy
+  PRIVATE
+  -O0)
+
 install(TARGETS
   umpire_tpl_judy
   EXPORT umpire-targets
