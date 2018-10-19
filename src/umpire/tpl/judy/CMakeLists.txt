@@ -27,10 +27,12 @@ blt_add_library(
   HEADERS ${judy_headers}
   HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
 
-target_compile_options(
-  umpire_tpl_judy
-  PRIVATE
-  -Os)
+if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  target_compile_options(
+    umpire_tpl_judy
+    PRIVATE
+    -Os)
+endif()
 
 install(TARGETS
   umpire_tpl_judy
