@@ -16,10 +16,20 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/tpl/judy/judyL2Array.h"
+
+namespace {
+  using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
+  using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
+  using Entry = umpire::util::AllocationRecord*;
+}
+
 namespace umpire {
 namespace util {
 
+
 AllocationMap::AllocationMap() :
+  m_records(new judyL2Array<uintptr_t, uintptr_t>()),
   m_mutex(new std::mutex())
 {
 }
@@ -36,7 +46,7 @@ AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
 
     UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-    m_records.insert(
+    m_records->insert(
         reinterpret_cast<uintptr_t>(ptr),
         reinterpret_cast<uintptr_t>(alloc_record));
 
@@ -59,7 +69,7 @@ AllocationMap::remove(void* ptr)
 
     EntryVector* record_vector =
       const_cast<EntryVector*>(
-          m_records.find(reinterpret_cast<uintptr_t>(ptr)));
+          m_records->find(reinterpret_cast<uintptr_t>(ptr)));
 
     if (record_vector) {
       if (record_vector->size() > 0) {
@@ -68,7 +78,7 @@ AllocationMap::remove(void* ptr)
         record_vector->pop_back();
 
         if (record_vector->empty()) {
-          m_records.removeEntry(reinterpret_cast<uintptr_t>(ptr));
+          m_records->removeEntry(reinterpret_cast<uintptr_t>(ptr));
         }
       }
     } else {
@@ -92,7 +102,7 @@ AllocationMap::findRecord(void* ptr)
 
   try {
     UMPIRE_LOCK;
-    auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+    auto record = m_records->atOrBefore(reinterpret_cast<uintptr_t>(ptr));
     if (record.value) {
       void* parent_ptr = reinterpret_cast<void*>(record.key);
       alloc_record =
@@ -145,7 +155,7 @@ AllocationMap::printAll()
 {
   std::cout << "🔍 Printing allocation map contents..." << std::endl;
 
-  for (auto record = m_records.begin(); m_records.success(); record=m_records.next()){
+  for (auto record = m_records->begin(); m_records->success(); record=m_records->next()){
     auto addr = record.key;
     auto vec = *record.value;
 

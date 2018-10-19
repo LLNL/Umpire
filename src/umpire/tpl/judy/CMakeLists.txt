@@ -30,7 +30,7 @@ blt_add_library(
 target_compile_options(
   umpire_tpl_judy
   PRIVATE
-  -O0)
+  -Os)
 
 install(TARGETS
   umpire_tpl_judy

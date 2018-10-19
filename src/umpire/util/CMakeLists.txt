@@ -62,6 +62,11 @@ blt_add_library(
   DEPENDS_ON ${umpire_util_depends}
 )
 
+target_compile_options(
+  umpire_util
+  PRIVATE
+  -Os)
+
 target_include_directories(
   umpire_util
   PUBLIC
