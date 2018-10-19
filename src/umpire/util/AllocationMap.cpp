@@ -84,7 +84,7 @@ AllocationMap::remove(void* ptr)
     } else {
       UMPIRE_ERROR("Cannot remove " << ptr );
     }
-    
+
     UMPIRE_UNLOCK;
   } catch (...) {
     UMPIRE_UNLOCK;
@@ -137,7 +137,10 @@ AllocationMap::find(void* ptr)
   if (alloc_record) {
     return alloc_record;
   } else {
+#if !defined(NDEBUG)
+    // use this from a debugger to dump the contents of the AllocationMap
     printAll();
+#endif
     UMPIRE_ERROR("Allocation not mapped: " << ptr);
   }
 }
@@ -162,13 +165,13 @@ AllocationMap::printAll()
     std::cout << reinterpret_cast<void*>(addr) << " : {" << std::endl;
     for (auto const& records : vec) {
       AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
-      std::cout << "  " << tmp->m_size << 
+      std::cout << "  " << tmp->m_size <<
         " [ " << reinterpret_cast<void*>(addr) <<
         " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
         " ] " << std::endl;
     }
     std::cout << "}" << std::endl;
-  } 
+  }
   std::cout << "done." << std::endl;
 }
 
