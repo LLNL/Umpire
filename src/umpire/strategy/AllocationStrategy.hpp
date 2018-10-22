@@ -43,6 +43,8 @@ class AllocationStrategy :
      */
     AllocationStrategy(const std::string& name, int id);
 
+    virtual ~AllocationStrategy() = default;
+
     /*!
      * \brief Allocate bytes of memory.
      *
@@ -74,7 +76,7 @@ class AllocationStrategy :
      *
      * This is equivalent to the highest observed value of getCurrentSize.
      * \return High watermark allocation size.
-     */ 
+     */
     virtual long getHighWatermark() = 0;
 
     /*!

@@ -42,6 +42,8 @@ class MemoryResource :
      */
     MemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
+    virtual ~MemoryResource() = default;
+
     /*!
      * \brief Allocate bytes of memory.
      *
