@@ -20,7 +20,8 @@
 #include <cstdint>
 #include <mutex>
 
-#include "umpire/tpl/judy/judyL2Array.h"
+template< typename JudyKey, typename JudyValue >
+class judyL2Array;
 
 namespace umpire {
 namespace util {
@@ -28,9 +29,6 @@ namespace util {
 class AllocationMap
 {
   public:
-    using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
-    using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
-    using Entry = AllocationRecord*;
 
   AllocationMap();
   ~AllocationMap();
@@ -50,10 +48,13 @@ class AllocationMap
   void
     reset();
 
+  void
+    printAll();
+
   private:
     AllocationRecord* findRecord(void* ptr);
 
-    judyL2Array<uintptr_t, uintptr_t> m_records;
+    judyL2Array<uintptr_t, uintptr_t>* m_records;
 
     std::mutex* m_mutex;
 };
