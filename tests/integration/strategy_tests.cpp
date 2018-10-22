@@ -101,7 +101,7 @@ TEST_P(StrategyTest, Duplicate)
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_TRUE(rm.isAllocator(allocatorName));
- 
+
   ASSERT_EQ(allocator->getName(), poolName.str());
 
   ASSERT_ANY_THROW(
@@ -212,17 +212,18 @@ TEST(MonotonicStrategy, UM)
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
 }
 
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(AllocationAdvisor, Create)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_NO_THROW(
-    auto read_only_alloc = 
+    auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc = 
+      auto failed_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "read_only_um", rm.getAllocator("UM"), "FOOBAR"));
 }
@@ -233,7 +234,7 @@ TEST(AllocationAdvisor, Host)
   auto um_allocator = rm.getAllocator("UM");
   auto host_allocator = rm.getAllocator("HOST");
 
-  auto read_only_alloc = 
+  auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "preferred_location_host", um_allocator, "PREFERRED_LOCATION", host_allocator);
 
@@ -244,6 +245,7 @@ TEST(AllocationAdvisor, Host)
   });
 
 }
+#endif // defined(UMPIRE_ENABLE_CUDA)
 #endif
 
 TEST(FixedPool, Host)
