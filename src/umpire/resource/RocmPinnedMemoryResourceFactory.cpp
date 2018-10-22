@@ -23,7 +23,7 @@ namespace resource {
 bool
 RocmPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 {
-  if (name.compare("DEVICE") == 0) {
+  if (name.compare("PINNED") == 0) {
     return true;
   } else {
     return false;
