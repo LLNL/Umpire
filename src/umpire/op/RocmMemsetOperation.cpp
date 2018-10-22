@@ -29,22 +29,21 @@ RocmMemsetOperation::apply(
     int value,
     size_t length)
 {
-  unsigned char * cptr = static_cast<unsigned char *>(ptr);
-  uint32_t * wptr = static_cast<uint32_t *> ptr;
+  unsigned char * cptr = static_cast<unsigned char *>(src_ptr);
+  uint32_t * wptr = static_cast<uint32_t *>(src_ptr);
 
   char c = static_cast<char>(value);
 
-  uint32_t fill = 
-    static_cast<uint32_t>value
+  uint32_t fill =
+    static_cast<uint32_t>(value
     + (static_cast<uint32_t>(value)<<8)
     + (static_cast<uint32_t>(value)<<16)
-    + (static_cast<uint32_t>(value)<<24);
+    + (static_cast<uint32_t>(value)<<24));
 
   int n = length/4;
   int r = length - n*4;
 
   if(n+r) {
-
     hc::extent<1> e(n + (r ? r : 0));
 
     hc::parallel_for_each(e,  [=] (hc::index<1> idx) [[hc]] {
