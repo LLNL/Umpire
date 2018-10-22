@@ -31,7 +31,7 @@ void RocmCopyOperation::transform(
   hc::accelerator acc;
   hc::accelerator_view av = acc.get_default_view();
 
-  av.copy(src_ptr, *dest_ptr, length);
+  av.copy(src_ptr, *dst_ptr, length);
 
   UMPIRE_RECORD_STATISTIC(
       "RocmCopyOperation",
