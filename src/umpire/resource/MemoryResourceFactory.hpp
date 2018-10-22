@@ -33,6 +33,8 @@ namespace resource {
  */
 class MemoryResourceFactory {
   public:
+    virtual ~MemoryResourceFactory() = default;
+    
     /*
      * \brief Check whether the MemoryResource constructed by this factory is
      * valid for the given name
