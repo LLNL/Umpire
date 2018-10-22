@@ -15,7 +15,7 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/AmAllocAllocator.hpp"
+#include "umpire/alloc/AmPinnedAllocator.hpp"
 
 namespace umpire {
 namespace resource {
