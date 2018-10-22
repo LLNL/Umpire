@@ -31,6 +31,8 @@ namespace op {
  */
 class MemoryOperation {
   public:
+    virtual ~MemoryOperation() = default;
+
     /*!
      * \brief Transfrom length bytes of memory from src_ptr to dst_ptr.
      *
