@@ -196,7 +196,9 @@ TEST(MonotonicStrategy, Device)
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "device_monotonic_pool");
 }
+#endif // defined(UMPIRE_ENABLE_DEVICE)
 
+#if defined(UMPIRE_ENABLE_UM)
 TEST(MonotonicStrategy, UM)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -211,6 +213,7 @@ TEST(MonotonicStrategy, UM)
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
 }
+#endif // defined(UMPIRE_ENABLE_UM)
 
 #if defined(UMPIRE_ENABLE_CUDA)
 TEST(AllocationAdvisor, Create)
@@ -246,7 +249,6 @@ TEST(AllocationAdvisor, Host)
 
 }
 #endif // defined(UMPIRE_ENABLE_CUDA)
-#endif
 
 TEST(FixedPool, Host)
 {
