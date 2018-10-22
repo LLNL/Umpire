@@ -37,7 +37,7 @@ struct AmPinnedAllocator {
   {
     /* Default accelerator */
     hc::accelerator acc;
-    void* ret = hc::am_alloc(bytes, acc, hc::amHostPinned);
+    void* ret = hc::am_alloc(bytes, acc, amHostPinned);
 
     UMPIRE_LOG(Debug, "(size=" << bytes << ") returning " << ret);
 
