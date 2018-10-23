@@ -50,7 +50,7 @@ class DeviceAllocator {
     umpire::Allocator m_allocator;
 
     void* m_ptr;
-    void* m_counter;
+    unsigned int* m_counter;
 
     size_t m_size;
 };

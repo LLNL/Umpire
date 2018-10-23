@@ -20,6 +20,7 @@
 
 namespace umpire {
 
+  __host__
 DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size) :
   m_allocator(allocator),
   m_ptr(m_allocator.allocate(size)),
@@ -28,10 +29,12 @@ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size) :
   auto& rm = umpire::ResourceManager::getInstance();
   auto device_alloc = rm.getAllocator(umpire::resource::Device);
 
-  m_counter = device_alloc.allocate(sizeof(size_t));
+  m_counter = static_cast<unsigned int*>(
+    device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
 }
 
+__host__
 DeviceAllocator::~DeviceAllocator()
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -40,6 +43,7 @@ DeviceAllocator::~DeviceAllocator()
   m_allocator.deallocate(m_ptr);
 }
 
+__device__
 void*
 DeviceAllocator::allocate(size_t size)
 {
