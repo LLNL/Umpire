@@ -14,6 +14,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
 
+#include "umpire/ResourceManager.hpp"
+#include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
