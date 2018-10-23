@@ -12,8 +12,7 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DeviceAllocator_INL
-#define UMPIRE_DeviceAllocator_INL
+#include "umpire/DeviceAllocator.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -46,5 +45,3 @@ DeviceAllocator::allocate(size_t size)
 }
 
 } // end of namespace umpire
-
-#endif // UMPIRE_DeviceAllocator_INL
