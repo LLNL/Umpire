@@ -31,7 +31,10 @@ class DeviceAllocator {
    *
    * \param allocator Allocator to use for allocating memory.
    */
+   __host__
   DeviceAllocator(Allocator allocator, size_t size);
+
+  ~DeviceAllocator();
 
   /*
    * \brief Allocate size objects of type T.

@@ -19,7 +19,6 @@
 
 namespace umpire {
 
-__host__
 DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size) :
   m_allocator(allocator),
   m_ptr(m_allocator.allocate(size)),
@@ -32,7 +31,6 @@ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size) :
   rm.memset(m_counter, 0);
 }
 
-__host__
 DeviceAllocator::~DeviceAllocator()
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -41,7 +39,6 @@ DeviceAllocator::~DeviceAllocator()
   m_allocator.deallocate(m_ptr);
 }
 
-__device__
 void*
 DeviceAllocator::allocate(size_t size)
 {
