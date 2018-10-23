@@ -47,11 +47,25 @@ if (ENABLE_FORTRAN)
     Fortran_FORMAT FREE)
 endif ()
 
+if (ENABLE_CUDA)
+  set(umpire_headers
+    ${umpire_headers}
+    DeviceAllocator.hpp)
+
+  set(umpire_sources
+    ${umpire_sources}
+    DeviceAllocator.cpp)
+
+  set_source_files_properties(DeviceAllocator.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
+endif ()
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}
   SOURCES ${umpire_sources}
-  HEADERS_OUTPUT_SUBDIR umpire 
+  HEADERS_OUTPUT_SUBDIR umpire
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
