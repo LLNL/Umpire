@@ -57,6 +57,4 @@ class DeviceAllocator {
 
 } // end of namespace umpire
 
-#include "umpire/DeviceAllocator.inl"
-
 #endif // UMPIRE_DeviceAllocator_HPP
