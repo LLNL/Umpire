@@ -15,7 +15,7 @@
 blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
-  DEPENDS_ON 
+  DEPENDS_ON
     umpire)
 
 blt_add_executable(
@@ -36,7 +36,7 @@ endif ()
 blt_add_executable(
   NAME vector_allocator
   SOURCES vector_allocator.cpp
-  DEPENDS_ON 
+  DEPENDS_ON
     umpire)
 
 if (ENABLE_STATISTICS)
@@ -45,5 +45,11 @@ if (ENABLE_STATISTICS)
     SOURCES statistics.cpp
     DEPENDS_ON umpire)
 endif()
+
+blt_add_executable(
+  NAME device_allocator_example
+  SOURCES device-allocator.cpp
+  DEPENDS_ON cuda umpire
+)
 
 add_subdirectory(tutorial)
