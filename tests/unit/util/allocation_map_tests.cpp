@@ -155,3 +155,19 @@ TEST_F(AllocationMapTest, FindMultiple)
 
   ASSERT_EQ(actual_record, record);
 }
+
+TEST_F(AllocationMapTest, PrintAll)
+{
+  umpire::util::AllocationRecord* next_record = 
+    new umpire::util::AllocationRecord{data, 1, nullptr};
+
+  auto extra_data = new double[10];
+  umpire::util::AllocationRecord* extra_record =
+    new umpire::util::AllocationRecord{extra_data, 10, nullptr};
+
+  map.insert(data, record);
+  map.insert(data, next_record);
+  map.insert(extra_data, extra_record);
+
+  map.printAll();
+}

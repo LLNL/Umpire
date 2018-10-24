@@ -12,17 +12,25 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "gtest/gtest.h"
-
 #include "umpire/ResourceManager.hpp"
-#include "umpire/resource/MemoryResourceTypes.hpp"
+#include "umpire/Allocator.hpp"
 
-TEST(AllocatorAssert, DeallocateDeath)
-{
-#if !defined(NDEBUG)
-  ASSERT_DEATH(umpire::ResourceManager::getInstance().getAllocator("HOST").deallocate( nullptr ), "");
-#else
-  SUCCEED();
-#endif
+#include "umpire/TypedAllocator.hpp"
+
+int main(int, char**) {
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.getAllocator("HOST");
+
+  umpire::TypedAllocator<double> double_allocator(alloc);
+
+  double* my_doubles = double_allocator.allocate(1024);
+
+  double_allocator.deallocate(my_doubles, 1024);
+
+  std::vector< double, umpire::TypedAllocator<double> > 
+    my_vector(double_allocator);
+
+  my_vector.resize(100);
+
+  return 0;
 }
-

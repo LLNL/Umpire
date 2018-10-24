@@ -16,6 +16,7 @@
 #define UMPIRE_DefaultMemoryResource_INL
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
@@ -28,9 +29,8 @@ namespace resource {
 template<typename _allocator>
 DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id) :
   MemoryResource(name, id),
+  umpire::strategy::mixins::Inspector(),
   m_allocator(),
-  m_current_size(0l),
-  m_highwatermark(0l),
   m_platform(platform)
 {
 }
@@ -39,14 +39,10 @@ template<typename _allocator>
 void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
 
-  m_current_size += bytes;
-  if (m_current_size > m_highwatermark)
-    m_highwatermark = m_current_size;
+  registerAllocation(ptr, bytes, this->shared_from_this());
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
-
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");
 
   return ptr;
@@ -60,9 +56,7 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
   m_allocator.deallocate(ptr);
-  util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record->m_size;
-  delete record;
+  deregisterAllocation(ptr);
 }
 
 template<typename _allocator>
@@ -75,8 +69,8 @@ long DefaultMemoryResource<_allocator>::getCurrentSize()
 template<typename _allocator>
 long DefaultMemoryResource<_allocator>::getHighWatermark()
 {
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
+  UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
+  return m_high_watermark;
 }
 
 template<typename _allocator>

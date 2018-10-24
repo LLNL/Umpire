@@ -12,14 +12,13 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-cmake_minimum_required(VERSION 3.9)
 
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 
 project(Umpire 
   LANGUAGES CXX C
-  VERSION 0.2.3)
+  VERSION 0.2.4)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
@@ -33,6 +32,15 @@ option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
+option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
+
+if (ENABLE_CUDA)
+  cmake_minimum_required(VERSION 3.9)
+else ()
+  cmake_minimum_required(VERSION 3.8.2)
+endif ()
+
+message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
 ################################
 # BLT
@@ -58,6 +66,7 @@ if (NOT BLT_LOADED)
 endif()
 
 
+include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
 configure_file(
