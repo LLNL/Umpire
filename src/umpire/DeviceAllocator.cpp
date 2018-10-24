@@ -23,7 +23,7 @@ namespace umpire {
   __host__
 DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size) :
   m_allocator(allocator),
-  m_ptr(m_allocator.allocate(size)),
+  m_ptr(static_cast<char*>(m_allocator.allocate(size))),
   m_size(size)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -47,7 +47,8 @@ __device__
 void*
 DeviceAllocator::allocate(size_t size)
 {
-  return m_ptr + atomicAdd(m_counter, size);
+  return static_cast<void*>(
+    m_ptr + atomicAdd(m_counter, size));
 }
 
 } // end of namespace umpire
