@@ -33,6 +33,8 @@ void RocmCopyOperation::transform(
 
   av.copy(src_ptr, *dst_ptr, length);
 
+  av.wait();
+
   UMPIRE_RECORD_STATISTIC(
       "RocmCopyOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
