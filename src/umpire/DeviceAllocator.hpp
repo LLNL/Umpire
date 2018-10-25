@@ -34,7 +34,11 @@ class DeviceAllocator {
    __host__
   DeviceAllocator(Allocator allocator, size_t size);
 
+   __host__
   ~DeviceAllocator();
+
+   __host__ __device__
+   DeviceAllocator(const DeviceAllocator& other);
 
   /*
    * \brief Allocate size objects of type T.
@@ -53,7 +57,10 @@ class DeviceAllocator {
     unsigned int* m_counter;
 
     size_t m_size;
+
+    bool m_child;
 };
+
 
 } // end of namespace umpire
 

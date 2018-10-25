@@ -49,7 +49,15 @@ endif()
 blt_add_executable(
   NAME device_allocator_example
   SOURCES device-allocator.cpp
-  DEPENDS_ON cuda umpire
+  DEPENDS_ON umpire cuda
 )
+
+set_source_files_properties(
+  device-allocator.cpp
+  PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+set_target_properties(
+  device_allocator_example
+  PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
 add_subdirectory(tutorial)

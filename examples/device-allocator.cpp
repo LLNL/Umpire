@@ -20,6 +20,7 @@ int main(int argc, char const *argv[]) {
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   my_kernel<<<1, 16>>>(device_allocator, ptr_to_data);
+  cudaDeviceSynchronize();
 
   std::cout << (*ptr_to_data)[7] << std::endl;
 }

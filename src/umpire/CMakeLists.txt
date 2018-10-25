@@ -68,6 +68,9 @@ blt_add_library(
   HEADERS_OUTPUT_SUBDIR umpire
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
+set_target_properties(umpire PROPERTIES
+  CUDA_SEPARABLE_COMPILATION On)
+
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})

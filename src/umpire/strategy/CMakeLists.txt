@@ -37,9 +37,14 @@ set (umpire_stategy_sources
   mixins/Inspector.cpp)
 
 set (umpire_strategy_depends
-  umpire
   umpire_util
   umpire_tpl_simpool)
+
+if (ENABLE_CUDA)
+  set (umpire_strategy_depends
+    ${umpire_strategy_depends}
+    cuda_runtime)
+endif ()
 
 blt_add_library(
   NAME umpire_strategy 
