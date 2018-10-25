@@ -1,4 +1,4 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v0.2.3
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v0.2.4
 
 [![Build Status](https://travis-ci.com/LLNL/Umpire.svg?branch=develop)](https://travis-ci.com/LLNL/Umpire)
 [![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
@@ -28,6 +28,28 @@ For more advanced configuration you can use standard CMake variables.
 # Documentation
 
 Both user and code documentation is available [here](http://umpire.readthedocs.io/).
+
+The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/tutorial.html) provides a step by step introduction to Umpire features.
+
+If you have build problems, we have comprehensive [build sytem documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
+
+# Getting Involved
+
+Umpire is an open-source project, and we welcome contributions from the community.
+
+## Mailing List
+
+The Umpire mailing list is hosted on Google Groups, and is a great place to ask questions:
+- [Umpire Users Google Group](https://groups.google.com/forum/#!forum/umpire-users)
+
+## Contributions
+
+We welcome all kinds of contributions: new features, bug fixes, documentation edits; it's all great!
+
+To contribute, make a [pull request](https://github.com/LLNL/Umpire/compare), with `develop` as the destination branch.
+We use Travis to run CI tests, and your branch must pass these tests before being merged.
+
+For more information, see the [contributing guide](https://github.com/LLNL/Umpire/blob/develop/CONTRIBUTING.md).
 
 # Authors
 
