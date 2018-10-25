@@ -20,14 +20,14 @@ namespace strategy {
 AllocationTracker::AllocationTracker(
   const std::string& name,
   int id,
-  Allocator allocator) :
+  Allocator allocator) noexcept :
 AllocationStrategy(name, id),
 mixins::Inspector(),
 m_allocator(allocator.getAllocationStrategy())
 {
 }
 
-void* 
+void*
 AllocationTracker::allocate(size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
@@ -37,33 +37,33 @@ AllocationTracker::allocate(size_t bytes)
   return ptr;
 }
 
-void 
+void
 AllocationTracker::deallocate(void* ptr)
 {
   deregisterAllocation(ptr);
   m_allocator->deallocate(ptr);
 }
 
-long 
-AllocationTracker::getCurrentSize()
+long
+AllocationTracker::getCurrentSize() noexcept
 {
   return m_current_size;
 }
 
-long 
-AllocationTracker::getHighWatermark()
+long
+AllocationTracker::getHighWatermark() noexcept
 {
   return m_high_watermark;
 }
 
 long
-AllocationTracker::getActualSize()
+AllocationTracker::getActualSize() noexcept
 {
   return m_allocator->getActualSize();
 }
 
-Platform 
-AllocationTracker::getPlatform()
+Platform
+AllocationTracker::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

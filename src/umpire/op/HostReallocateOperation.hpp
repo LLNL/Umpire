@@ -23,7 +23,7 @@ namespace op {
 /*!
  * \brief Reallocate data in CPU memory.
  */
-class HostReallocateOperation : 
+class HostReallocateOperation :
   public MemoryOperation {
  public:
   /*!
@@ -45,4 +45,3 @@ class HostReallocateOperation :
 } // end of namespace umpire
 
 #endif // UMPIRE_HostReallocateOperation_HPP
-

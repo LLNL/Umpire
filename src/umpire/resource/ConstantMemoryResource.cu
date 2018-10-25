@@ -66,7 +66,7 @@ void ConstantMemoryResource::deallocate(void* ptr)
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size)) 
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
       == static_cast<char*>(ptr)) {
     m_offset -= record->m_size;
   } else {
@@ -76,19 +76,19 @@ void ConstantMemoryResource::deallocate(void* ptr)
   delete record;
 }
 
-long ConstantMemoryResource::getCurrentSize()
+long ConstantMemoryResource::getCurrentSize() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long ConstantMemoryResource::getHighWatermark()
+long ConstantMemoryResource::getHighWatermark() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
-Platform ConstantMemoryResource::getPlatform()
+Platform ConstantMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

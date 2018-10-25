@@ -38,12 +38,10 @@ class MonotonicAllocationStrategy :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    size_t getSize(void* ptr);
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
 
-    long getCurrentSize();
-    long getHighWatermark();
-
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     void* m_block;
@@ -58,4 +56,3 @@ class MonotonicAllocationStrategy :
 } // end of namespace umpire
 
 #endif // UMPIRE_MonotonicAllocationStrategy_HPP
-
