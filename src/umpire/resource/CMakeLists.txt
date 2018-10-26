@@ -39,16 +39,16 @@ if (ENABLE_CUDA)
     CudaPinnedMemoryResourceFactory.hpp
     CudaUnifiedMemoryResourceFactory.hpp
 
-    DeviceConstResourceFactory.hpp
-    ConstantMemoryResource.hpp
+    CudaConstantMemoryResourceFactory.hpp
+    CudaConstantMemoryResource.hpp
     )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
 
 
-    DeviceConstResourceFactory.cpp
-    ConstantMemoryResource.cu
+    CudaConstantMemoryResourceFactory.cpp
+    CudaConstantMemoryResource.cu
 
     CudaDeviceResourceFactory.cpp
     CudaPinnedMemoryResourceFactory.cpp
