@@ -38,7 +38,7 @@ CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   MemoryResourceTraits traits;
 
   cudaDeviceProp properties;
-  error = ::cudaGetDeviceProperties(&properties, 0);
+  auto error = ::cudaGetDeviceProperties(&properties, 0);
 
   traits.unified = false;
   traits.size = properties.totalGlobalMem;
