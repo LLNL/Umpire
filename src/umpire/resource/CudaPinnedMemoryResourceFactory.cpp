@@ -34,6 +34,8 @@ CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
 std::shared_ptr<MemoryResource>
 CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
+  MemoryResourceTraits traits;
+
   traits.unified = false;
   traits.size = 0; // size of system memory?
 
