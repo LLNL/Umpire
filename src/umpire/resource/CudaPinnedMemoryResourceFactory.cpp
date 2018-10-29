@@ -38,10 +38,10 @@ CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.size = 0; // size of system memory?
 
   traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
-  traits.kind = MemoryResourceTraits::memory_type:DDR;
+  traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaCudaPinnedAllocator> >(Platform::cuda, "PINNED", id, traits);
+  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator> >(Platform::cuda, "PINNED", id, traits);
 }
 
 } // end of namespace resource
