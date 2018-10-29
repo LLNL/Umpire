@@ -16,7 +16,7 @@
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
 
-#include "umpire/alloc/CudaCudaPinnedAllocator.hpp"
+#include "umpire/alloc/CudaPinnedAllocator.hpp"
 
 namespace umpire {
 namespace resource {
