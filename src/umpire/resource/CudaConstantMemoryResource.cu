@@ -24,8 +24,8 @@
 namespace umpire {
 namespace resource {
 
-CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, int id) :
-  MemoryResource(name, id),
+CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
+  MemoryResource(name, id, traits),
   m_current_size(0l),
   m_highwatermark(0l),
   m_platform(Platform::cuda),
@@ -66,7 +66,7 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size)) 
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
       == static_cast<char*>(ptr)) {
     m_offset -= record->m_size;
   } else {

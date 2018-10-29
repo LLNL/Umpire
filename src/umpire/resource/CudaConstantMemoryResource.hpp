@@ -31,8 +31,8 @@ namespace resource {
 class CudaConstantMemoryResource :
   public MemoryResource
 {
-  public: 
-    CudaConstantMemoryResource(const std::string& name, int id);
+  public:
+    CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -42,7 +42,7 @@ class CudaConstantMemoryResource :
 
     Platform getPlatform();
 
-  private: 
+  private:
     long m_current_size;
     long m_highwatermark;
 

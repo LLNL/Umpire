@@ -34,7 +34,17 @@ CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& n
 std::shared_ptr<MemoryResource>
 CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<resource::CudaConstantMemoryResource >("DEVICE_CONST", id);
+  MemoryResourceTraits traits;
+
+  traits.unified = false;
+  traits.size = 64*1024;
+
+  traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
+  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+
+  traits.used_for = MemoryResourceTraits::optimized_for::any;
+
+  return std::make_shared<resource::CudaConstantMemoryResource >("DEVICE_CONST", id, traits);
 }
 
 } // end of namespace resource
