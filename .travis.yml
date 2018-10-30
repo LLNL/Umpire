@@ -52,7 +52,7 @@ matrix:
     env:
       - COMPILER=hcc
       - IMG=rocm
-      - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=`which hcc` -DENABLE_ROCM=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off"
+      - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hcc -DENABLE_ROCM=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off"
       - DO_TEST=no
 
 script:
