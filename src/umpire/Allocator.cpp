@@ -32,19 +32,23 @@ Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
 void*
 Allocator::allocate(size_t bytes)
 {
+  UMPIRE_REPLAY( getName() << " " << bytes );
   void* ret = nullptr;
   UMPIRE_LOG(Debug, "(" << bytes << ")");
   ret = m_allocator->allocate(bytes);
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
+
+  UMPIRE_REPLAY( getName() << " " << bytes << " " << ret );
   return ret;
 }
 
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_LOG(Debug, "(" << ptr << ")");
+  UMPIRE_REPLAY( getName() << " " << ResourceManager::getInstance().getSize(ptr) << " " << ptr );
 
+  UMPIRE_LOG(Debug, "(" << ptr << ")");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
