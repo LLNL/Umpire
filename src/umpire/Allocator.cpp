@@ -46,7 +46,7 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY( getName() << " " << ResourceManager::getInstance().getSize(ptr) << " " << ptr );
+  UMPIRE_REPLAY( getName() << " " << ptr );
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
