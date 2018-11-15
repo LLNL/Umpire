@@ -31,18 +31,18 @@ namespace resource {
 class ConstantMemoryResource :
   public MemoryResource
 {
-  public: 
+  public:
     ConstantMemoryResource(const std::string& name, int id);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
-  private: 
+  private:
     long m_current_size;
     long m_highwatermark;
 

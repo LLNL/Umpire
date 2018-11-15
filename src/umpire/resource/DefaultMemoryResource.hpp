@@ -34,18 +34,18 @@ class DefaultMemoryResource :
   public MemoryResource,
   private umpire::strategy::mixins::Inspector
 {
-  public: 
+  public:
     DefaultMemoryResource(Platform platform, const std::string& name, int id);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
-  protected: 
+  protected:
     _allocator m_allocator;
 
     Platform m_platform;

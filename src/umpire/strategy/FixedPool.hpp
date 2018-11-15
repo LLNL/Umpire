@@ -35,7 +35,7 @@ namespace strategy {
  * used to quickly allocate and deallocate objects.
  */
 template <typename T, int NP=64, typename IA=StdAllocator>
-class FixedPool 
+class FixedPool
   : public AllocationStrategy
 {
 
@@ -51,11 +51,11 @@ class FixedPool
 
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
-    long getActualSize();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
+    long getActualSize() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     struct Pool
@@ -70,7 +70,7 @@ class FixedPool
 
     T* allocInPool(struct Pool *p);
 
-    size_t numPools() const;
+    size_t numPools() const noexcept;
 
 
     struct Pool *m_pool;

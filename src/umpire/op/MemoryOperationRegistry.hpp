@@ -28,7 +28,7 @@ namespace umpire {
 namespace op {
 
 struct pair_hash {
-  std::size_t operator () (const std::pair<Platform, Platform> &p) const {
+  std::size_t operator () (const std::pair<Platform, Platform> &p) const noexcept {
       auto h1 = std::hash<int>{}(static_cast<int>(p.first));
       auto h2 = std::hash<int>{}(static_cast<int>(p.second));
 
@@ -64,7 +64,7 @@ class MemoryOperationRegistry {
     /*!
      * \brief Get the MemoryOperationRegistry singleton instance.
      */
-    static MemoryOperationRegistry& getInstance();
+    static MemoryOperationRegistry& getInstance() noexcept;
 
     /*!
      * \brief Function to find a MemoryOperation object
@@ -98,10 +98,10 @@ class MemoryOperationRegistry {
     void registerOperation(
       const std::string& name,
       std::pair<Platform, Platform> platforms,
-      std::shared_ptr<MemoryOperation>&& operation);
+      std::shared_ptr<MemoryOperation>&& operation) noexcept;
 
   protected:
-    MemoryOperationRegistry();
+    MemoryOperationRegistry() noexcept;
     MemoryOperationRegistry (const MemoryOperationRegistry&) = delete;
     MemoryOperationRegistry& operator= (const MemoryOperationRegistry&) = delete;
 
@@ -114,8 +114,8 @@ class MemoryOperationRegistry {
      */
     std::unordered_map<
       std::string,
-      std::unordered_map< std::pair<Platform, Platform>, 
-                          std::shared_ptr<MemoryOperation>, 
+      std::unordered_map< std::pair<Platform, Platform>,
+                          std::shared_ptr<MemoryOperation>,
                           pair_hash > > m_operators;
 
 };
