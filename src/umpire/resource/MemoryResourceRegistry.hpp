@@ -26,14 +26,14 @@ namespace resource {
 
 class MemoryResourceRegistry {
   public:
-    static MemoryResourceRegistry& getInstance();
+    static MemoryResourceRegistry& getInstance() noexcept;
 
     std::shared_ptr<umpire::resource::MemoryResource> makeMemoryResource(const std::string& name, int id);
 
     void registerMemoryResource(std::shared_ptr<MemoryResourceFactory>&& factory);
 
   protected:
-    MemoryResourceRegistry();
+    MemoryResourceRegistry() noexcept;
 
   private:
     static MemoryResourceRegistry* s_allocator_registry_instance;

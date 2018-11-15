@@ -22,7 +22,7 @@ namespace resource {
 MemoryResourceRegistry* MemoryResourceRegistry::s_allocator_registry_instance = nullptr;
 
 MemoryResourceRegistry&
-MemoryResourceRegistry::getInstance()
+MemoryResourceRegistry::getInstance() noexcept
 {
   if (!s_allocator_registry_instance) {
     s_allocator_registry_instance = new MemoryResourceRegistry();
@@ -31,7 +31,7 @@ MemoryResourceRegistry::getInstance()
   return *s_allocator_registry_instance;
 }
 
-MemoryResourceRegistry::MemoryResourceRegistry() :
+MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
   m_allocator_factories()
 {
 }

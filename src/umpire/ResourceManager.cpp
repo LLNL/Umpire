@@ -213,7 +213,7 @@ ResourceManager::getDefaultAllocator()
 }
 
 void
-ResourceManager::setDefaultAllocator(Allocator allocator)
+ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 {
   UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");
 
@@ -238,7 +238,7 @@ ResourceManager::getAllocator(void* ptr)
 }
 
 bool
-ResourceManager::isAllocator(const std::string& name)
+ResourceManager::isAllocator(const std::string& name) noexcept
 {
   return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
@@ -290,8 +290,8 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
     UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
   }
 
-  auto op = op_registry.find("COPY", 
-      src_alloc_record->m_strategy, 
+  auto op = op_registry.find("COPY",
+      src_alloc_record->m_strategy,
       dst_alloc_record->m_strategy);
 
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
@@ -315,8 +315,8 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
     UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << src_size);
   }
 
-  auto op = op_registry.find("MEMSET", 
-      alloc_record->m_strategy, 
+  auto op = op_registry.find("MEMSET",
+      alloc_record->m_strategy,
       alloc_record->m_strategy);
 
   op->apply(ptr, alloc_record, value, length);
@@ -340,8 +340,8 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
       UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
     }
 
-    auto op = op_registry.find("REALLOCATE", 
-        alloc_record->m_strategy, 
+    auto op = op_registry.find("REALLOCATE",
+        alloc_record->m_strategy,
         alloc_record->m_strategy);
 
 
@@ -428,7 +428,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
 }
 
 std::vector<std::string>
-ResourceManager::getAvailableAllocators()
+ResourceManager::getAvailableAllocators() noexcept
 {
   std::vector<std::string> names;
   for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
@@ -440,7 +440,7 @@ ResourceManager::getAvailableAllocators()
 }
 
 int
-ResourceManager::getNextId()
+ResourceManager::getNextId() noexcept
 {
   return m_id++;
 }

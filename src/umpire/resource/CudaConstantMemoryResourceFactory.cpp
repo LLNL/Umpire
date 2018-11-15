@@ -23,6 +23,7 @@ namespace resource {
 
 bool
 CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("DEVICE_CONST") == 0) {
     return true;

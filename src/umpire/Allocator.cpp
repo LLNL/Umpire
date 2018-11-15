@@ -24,7 +24,7 @@
 
 namespace umpire {
 
-Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
+Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept:
   m_allocator(allocator)
 {
 }
@@ -64,44 +64,44 @@ Allocator::getSize(void* ptr)
 }
 
 size_t
-Allocator::getHighWatermark()
+Allocator::getHighWatermark() noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
 size_t
-Allocator::getCurrentSize()
+Allocator::getCurrentSize() noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
 size_t
-Allocator::getActualSize()
+Allocator::getActualSize() noexcept
 {
   return m_allocator->getActualSize();
 }
 
 std::string
-Allocator::getName()
+Allocator::getName() noexcept
 {
   return m_allocator->getName();
 }
 
 int
-Allocator::getId()
+Allocator::getId() noexcept
 {
   return m_allocator->getId();
 }
 
 std::shared_ptr<strategy::AllocationStrategy>
-Allocator::getAllocationStrategy()
+Allocator::getAllocationStrategy() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
   return m_allocator;
 }
 
 Platform
-Allocator::getPlatform()
+Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

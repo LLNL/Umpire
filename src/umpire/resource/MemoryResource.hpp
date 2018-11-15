@@ -74,7 +74,7 @@ class MemoryResource :
      *
      * \return current total size of active allocations in this MemoryResource.
      */
-    virtual long getCurrentSize() = 0;
+    virtual long getCurrentSize() noexcept = 0;
 
     /*!
      * \brief Return the memory high watermark for this MemoryResource.
@@ -85,7 +85,7 @@ class MemoryResource :
      *
      * \return Memory high watermark.
      */
-    virtual long getHighWatermark() = 0;
+    virtual long getHighWatermark() noexcept = 0;
 
 
     /*!
@@ -96,7 +96,7 @@ class MemoryResource :
      *
      * \return Platform associated with this MemoryResource.
      */
-    virtual Platform getPlatform()  = 0;
+    virtual Platform getPlatform() noexcept = 0;
 
     MemoryResourceTraits getTraits();
   protected:

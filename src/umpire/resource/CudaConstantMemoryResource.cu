@@ -76,19 +76,19 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
   delete record;
 }
 
-long CudaConstantMemoryResource::getCurrentSize()
+long CudaConstantMemoryResource::getCurrentSize() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long CudaConstantMemoryResource::getHighWatermark()
+long CudaConstantMemoryResource::getHighWatermark() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
-Platform CudaConstantMemoryResource::getPlatform()
+Platform CudaConstantMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }
