@@ -26,7 +26,7 @@ DynamicPool::DynamicPool(
     int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size) :
+    const std::size_t min_alloc_size) noexcept :
   AllocationStrategy(name, id),
   dpa(nullptr),
   m_allocator(allocator.getAllocationStrategy())
@@ -42,38 +42,38 @@ DynamicPool::allocate(size_t bytes)
   return ptr;
 }
 
-void 
+void
 DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
 }
 
-long 
-DynamicPool::getCurrentSize()
-{ 
+long
+DynamicPool::getCurrentSize() noexcept
+{
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return 0;
 }
 
-long 
-DynamicPool::getHighWatermark()
-{ 
+long
+DynamicPool::getHighWatermark() noexcept
+{
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return 0;
 }
 
-long 
-DynamicPool::getActualSize()
-{ 
+long
+DynamicPool::getActualSize() noexcept
+{
   long totalSize = dpa->totalSize();
   UMPIRE_LOG(Debug, "() returning " << totalSize);
   return totalSize;
 }
 
-Platform 
-DynamicPool::getPlatform()
-{ 
+Platform
+DynamicPool::getPlatform() noexcept
+{
   return m_allocator->getPlatform();
 }
 

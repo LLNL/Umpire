@@ -21,7 +21,7 @@ namespace umpire {
 namespace resource {
 
 bool
-DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.compare("DEVICE") == 0) {
     return true;
