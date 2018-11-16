@@ -124,7 +124,16 @@
 {                                                                        \
   if (umpire::util::Replay::getReplayLogger()->replayLoggingEnabled()) { \
     std::ostringstream local_msg;                                        \
-    local_msg  << " " << __func__ << " " << msg;                         \
+    local_msg  << "REPLAY " << __func__ << " " << msg;                   \
+    umpire::util::Replay::getReplayLogger()->logMessage(local_msg.str());\
+  }                                                                      \
+}
+
+#define UMPIRE_REPLAY_CONT( msg )                                        \
+{                                                                        \
+  if (umpire::util::Replay::getReplayLogger()->replayLoggingEnabled()) { \
+    std::ostringstream local_msg;                                        \
+    local_msg  << " " << msg;                                            \
     umpire::util::Replay::getReplayLogger()->logMessage(local_msg.str());\
   }                                                                      \
 }

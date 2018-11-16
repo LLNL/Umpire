@@ -37,7 +37,7 @@ void Replay::logMessage( const std::string& message )
   if ( !replayEnabled )
     return;   /* short-circuit */
 
-  std::cout << "REPLAY " << message << std::endl;
+  std::cout << message;
 }
 
 bool Replay::replayLoggingEnabled()
