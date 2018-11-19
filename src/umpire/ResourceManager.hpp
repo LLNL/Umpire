@@ -247,6 +247,26 @@ class ResourceManager {
     int m_id;
 
     std::mutex* m_mutex;
+
+    std::string printReplayAllocator( );
+
+    template <typename... Args>
+    std::string printReplayAllocator(
+      umpire::Allocator&& firstArg,
+      Args&&... args
+    );
+
+    template <typename... Args>
+    std::string printReplayAllocator(
+      int&& firstArg,
+      Args&&... args
+    );
+
+    template <typename T, typename... Args>
+    std::string printReplayAllocator(
+      T&& firstArg,
+      Args&&... args
+    );
 };
 
 } // end of namespace umpire

@@ -21,8 +21,53 @@
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
+#ifndef _MSC_VER
+#include <cxxabi.h>
+#endif
 
 namespace umpire {
+
+template <typename T, typename... Args>
+std::string ResourceManager::printReplayAllocator(
+    T&& firstArg,
+    Args&&... args
+)
+{
+  std::stringstream ss;
+
+  ss << ", ???" << abi::__cxa_demangle(typeid(firstArg).name(), nullptr, nullptr, nullptr) << "???";
+
+  ss << printReplayAllocator(std::forward<Args>(args)...);
+  return ss.str();
+}
+
+template <typename... Args>
+std::string ResourceManager::printReplayAllocator(
+    int&& firstArg,
+    Args&&... args
+)
+{
+  std::stringstream ss;
+
+  ss << ", " << firstArg;
+
+  ss << printReplayAllocator(std::forward<Args>(args)...);
+  return ss.str();
+}
+
+template <typename... Args>
+std::string ResourceManager::printReplayAllocator(
+    umpire::Allocator&& firstArg,
+    Args&&... args
+)
+{
+  std::stringstream ss;
+
+  ss << ", rm.getAllocator(\"" << firstArg.getName() << "\")";
+
+  ss << printReplayAllocator(std::forward<Args>(args)...);
+  return ss.str();
+}
 
 template <typename Strategy,
          bool introspection,
@@ -35,6 +80,14 @@ Allocator ResourceManager::makeAllocator(
 
   try {
     UMPIRE_LOCK;
+
+    UMPIRE_REPLAY("<" << 
+        abi::__cxa_demangle(typeid(Strategy).name(), nullptr, nullptr, nullptr)
+        << ", " << (introspection ? "true" : "false")  << ">("
+        << "\"" << name << "\""
+        << printReplayAllocator(std::forward<Args>(args)...)
+        <<");\n"
+    );
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
