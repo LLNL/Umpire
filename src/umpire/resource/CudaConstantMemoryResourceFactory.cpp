@@ -12,9 +12,9 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/DeviceConstResourceFactory.hpp"
+#include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
 
-#include "umpire/resource/ConstantMemoryResource.hpp"
+#include "umpire/resource/CudaConstantMemoryResource.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -22,7 +22,8 @@ namespace umpire {
 namespace resource {
 
 bool
-DeviceConstResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
+CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("DEVICE_CONST") == 0) {
     return true;
@@ -32,9 +33,19 @@ DeviceConstResourceFactory::isValidMemoryResourceFor(const std::string& name) no
 }
 
 std::shared_ptr<MemoryResource>
-DeviceConstResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<resource::ConstantMemoryResource >("DEVICE_CONST", id);
+  MemoryResourceTraits traits;
+
+  traits.unified = false;
+  traits.size = 64*1024;
+
+  traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
+  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+
+  traits.used_for = MemoryResourceTraits::optimized_for::any;
+
+  return std::make_shared<resource::CudaConstantMemoryResource >("DEVICE_CONST", id, traits);
 }
 
 } // end of namespace resource
