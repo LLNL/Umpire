@@ -27,7 +27,7 @@ namespace resource {
 class UnifiedMemoryResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name);
+  bool isValidMemoryResourceFor(const std::string& name) noexcept;
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };
 

@@ -67,9 +67,9 @@ void* AllocationAdvisor::allocate(size_t bytes)
   auto alloc_record = new util::AllocationRecord{ptr, bytes, this->shared_from_this()};
 
   m_advice_operation->apply(
-      ptr, 
+      ptr,
       alloc_record,
-      m_device, 
+      m_device,
       bytes);
 
   return ptr;
@@ -81,17 +81,17 @@ void AllocationAdvisor::deallocate(void* ptr)
 
 }
 
-long AllocationAdvisor::getCurrentSize()
+long AllocationAdvisor::getCurrentSize() noexcept
 {
   return 0;
 }
 
-long AllocationAdvisor::getHighWatermark()
+long AllocationAdvisor::getHighWatermark() noexcept
 {
   return 0;
 }
 
-Platform AllocationAdvisor::getPlatform()
+Platform AllocationAdvisor::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

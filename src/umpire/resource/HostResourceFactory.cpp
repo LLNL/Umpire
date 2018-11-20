@@ -21,7 +21,7 @@ namespace umpire {
 namespace resource {
 
 bool
-HostResourceFactory::isValidMemoryResourceFor(const std::string& name)
+HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.compare("HOST") == 0) {
     return true;

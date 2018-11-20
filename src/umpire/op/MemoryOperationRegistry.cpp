@@ -43,7 +43,7 @@ MemoryOperationRegistry*
 MemoryOperationRegistry::s_memory_operation_registry_instance = nullptr;
 
 MemoryOperationRegistry&
-MemoryOperationRegistry::getInstance()
+MemoryOperationRegistry::getInstance() noexcept
 {
   if (!s_memory_operation_registry_instance) {
     s_memory_operation_registry_instance = new MemoryOperationRegistry();
@@ -53,7 +53,7 @@ MemoryOperationRegistry::getInstance()
   return *s_memory_operation_registry_instance;
 }
 
-MemoryOperationRegistry::MemoryOperationRegistry()
+MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
   registerOperation(
       "COPY",
@@ -123,7 +123,7 @@ void
 MemoryOperationRegistry::registerOperation(
     const std::string& name,
     std::pair<Platform, Platform> platforms,
-    std::shared_ptr<MemoryOperation>&& operation)
+    std::shared_ptr<MemoryOperation>&& operation) noexcept
 {
   auto operations = m_operators.find(name);
 
@@ -150,7 +150,7 @@ MemoryOperationRegistry::find(
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
-    UMPIRE_ERROR("Cannot find operator " << name); 
+    UMPIRE_ERROR("Cannot find operator " << name);
   }
 
   auto op = operations->second.find(platforms);

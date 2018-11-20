@@ -29,14 +29,14 @@ class StatisticsDatabase;
 class Statistic {
   friend class StatisticsDatabase;
   public:
-    ~Statistic();
+    ~Statistic() noexcept;
 
     void recordStatistic(conduit::Node&& n);
 
-    void printData(std::ostream& stream);
+    void printData(std::ostream& stream) noexcept;
 
   protected:
-    Statistic(const std::string& name);
+    Statistic(const std::string& name) noexcept;
 
   private:
     std::string m_name;

@@ -56,17 +56,17 @@ class DynamicPool :
         int id,
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024));
+        const std::size_t min_alloc_size = (1 * 1024 *1024)) noexcept;
 
     void* allocate(size_t bytes);
 
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
-    long getActualSize();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
+    long getActualSize() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     DynamicSizePool<>* dpa;

@@ -88,7 +88,7 @@ class Allocator {
      *
      * \return Memory high watermark.
      */
-    size_t getHighWatermark();
+    size_t getHighWatermark() noexcept;
 
     /*!
      * \brief Return the current size of this Allocator.
@@ -98,7 +98,7 @@ class Allocator {
      *
      * \return current size of Allocator.
      */
-    size_t getCurrentSize();
+    size_t getCurrentSize() noexcept;
 
     /*!
      * \brief Return the actual size of this Allocator.
@@ -110,7 +110,7 @@ class Allocator {
      *
      * \return actual size of Allocator.
      */
-    size_t getActualSize();
+    size_t getActualSize() noexcept;
 
     /*!
      * \brief Get the name of this Allocator.
@@ -122,7 +122,7 @@ class Allocator {
      *
      * \return name of Allocator.
      */
-    std::string getName();
+    std::string getName() noexcept;
 
     /*!
      * \brief Get the integer ID of this Allocator.
@@ -135,7 +135,7 @@ class Allocator {
      *
      * \return integer id of Allocator.
      */
-    int getId();
+    int getId() noexcept;
 
     /*!
      * \brief Get the AllocationStrategy object used by this Allocator.
@@ -144,14 +144,14 @@ class Allocator {
      *
      * \return Pointer to the AllocationStrategy.
      */
-    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
+    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy() noexcept;
 
     /*!
      * \brief Get the Platform object appropriate for this Allocator.
      *
      * \return Platform for this Allocator.
      */
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     /*!
@@ -163,7 +163,7 @@ class Allocator {
      * \param allocator Pointer to the AllocationStrategy object to use for
      * Allocations.
      */
-    Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator);
+    Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept;
 
     Allocator() = delete;
 
