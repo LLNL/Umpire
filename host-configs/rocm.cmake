@@ -35,7 +35,7 @@ set(ROCM_ARCH_FLAG "-amdgpu-target=${ROCM_ARCH}" CACHE STRING "")
 execute_process(COMMAND ${ROCM_ROOT_DIR}/hcc/bin/hcc-config --cxxflags OUTPUT_VARIABLE ROCM_CXX_COMPILE_FLAGS)
 execute_process(COMMAND ${ROCM_ROOT_DIR}/hcc/bin/hcc-config --ldflags OUTPUT_VARIABLE ROCM_CXX_LINK_FLAGS)
 
-set(ROCM_CXX_COMPILE_FLAGS "${ROCM_CXX_COMPILE_FLAGS} -Wno-unused-command-line-argument -DHCC_ENABLE_ACCELERATOR_PRINTF" CACHE STRING "")
+#set(ROCM_CXX_COMPILE_FLAGS "${ROCM_CXX_COMPILE_FLAGS} -Wno-unused-command-line-argument -DHCC_ENABLE_ACCELERATOR_PRINTF" CACHE STRING "")
 set(ROCM_CXX_LINK_FLAGS "${ROCM_CXX_LINK_FLAGS} ${ROCM_ARCH_FLAG} ${ROCM_CXX_LIBRARIES}" CACHE STRING "")
 
 ###########################################################
