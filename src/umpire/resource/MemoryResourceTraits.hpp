@@ -30,6 +30,7 @@ struct MemoryResourceTraits {
   };
 
   enum class vendor_type {
+    UNKNOWN,
     AMD,
     IBM,
     INTEL,
@@ -37,18 +38,19 @@ struct MemoryResourceTraits {
   };
 
   enum class memory_type {
+    UNKNOWN,
     DDR,
     GDDR,
     HBM,
     NVME
   };
 
-  bool unified;
-  size_t size;
+  bool unified = false;
+  size_t size = 0;
 
-  vendor_type vendor;
-  memory_type kind;
-  optimized_for used_for;
+  vendor_type vendor = vendor_type::UNKNOWN;
+  memory_type kind = memory_type::UNKNOWN;
+  optimized_for used_for = optimized_for::any;
 };
 
 } // end of namespace resource
