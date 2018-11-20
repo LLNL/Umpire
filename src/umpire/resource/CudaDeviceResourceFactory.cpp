@@ -24,6 +24,7 @@ namespace resource {
 
 bool
 CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("DEVICE") == 0) {
     return true;

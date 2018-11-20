@@ -21,7 +21,8 @@ namespace umpire {
 namespace resource {
 
 bool
-RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
+RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("DEVICE") == 0) {
     return true;

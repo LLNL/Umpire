@@ -25,6 +25,7 @@ namespace resource {
 
 bool
 CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("UM") == 0) {
     return true;
