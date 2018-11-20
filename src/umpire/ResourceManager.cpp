@@ -414,8 +414,4 @@ ResourceManager::getNextId() noexcept
   return m_id++;
 }
 
-std::string ResourceManager::printReplayAllocator( ) {
-  return std::string("");
-}
-
 } // end of namespace umpire
