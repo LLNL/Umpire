@@ -34,8 +34,8 @@ class DefaultMemoryResource :
   public MemoryResource,
   private umpire::strategy::mixins::Inspector
 {
-  public:
-    DefaultMemoryResource(Platform platform, const std::string& name, int id);
+  public: 
+    DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

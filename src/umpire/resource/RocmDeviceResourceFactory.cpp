@@ -12,18 +12,19 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/HostResourceFactory.hpp"
+#include "umpire/resource/RocmDeviceResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/MallocAllocator.hpp"
+#include "umpire/alloc/AmAllocAllocator.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool
-HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
+RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
-  if (name.compare("HOST") == 0) {
+  if (name.compare("DEVICE") == 0) {
     return true;
   } else {
     return false;
@@ -31,26 +32,16 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 }
 
 std::shared_ptr<MemoryResource>
-HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
 
-  // int mib[2];
-  // mib[0] = CTL_HW;
-  // mib[1] = HW_MEMSIZE;
-
-  // size_t mem_size;
-  // size_t returnSize = sizeof(mem_size);
-  // sysctl(mib, 2, &physicalMem, &returnSize, NULL, 0);
-
   traits.unified = false;
-  traits.size = 0;
-
-  traits.vendor = MemoryResourceTraits::vendor_type::IBM;
+  traits.vendor = MemoryResourceTraits::vendor_type::AMD;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST", id, traits);
+  return std::make_shared<resource::DefaultMemoryResource<alloc::AmAllocAllocator> >(Platform::rocm, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

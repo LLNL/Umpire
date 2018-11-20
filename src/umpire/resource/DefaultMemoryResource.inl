@@ -27,8 +27,8 @@ namespace umpire {
 namespace resource {
 
 template<typename _allocator>
-DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id) :
-  MemoryResource(name, id),
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits) :
+  MemoryResource(name, id, traits),
   umpire::strategy::mixins::Inspector(),
   m_allocator(),
   m_platform(platform)

@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_ConstantMemoryResource_HPP
-#define UMPIRE_ConstantMemoryResource_HPP
+#ifndef UMPIRE_CudaConstantMemoryResource_HPP
+#define UMPIRE_CudaConstantMemoryResource_HPP
 
 #include "umpire/resource/MemoryResource.hpp"
 
@@ -28,11 +28,11 @@ namespace umpire {
 namespace resource {
 
 
-class ConstantMemoryResource :
+class CudaConstantMemoryResource :
   public MemoryResource
 {
   public:
-    ConstantMemoryResource(const std::string& name, int id);
+    CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -55,4 +55,4 @@ class ConstantMemoryResource :
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_ConstantMemoryResource_HPP
+#endif // UMPIRE_CudaConstantMemoryResource_HPP
