@@ -26,6 +26,7 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/SizeLimiter.hpp"
 
 #if defined(_OPENMP)
 #include <omp.h>
@@ -290,3 +291,21 @@ TEST(ThreadSafeAllocator, Host)
 }
 
 #endif
+
+TEST(SizeLimiter, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+      "size_limited_alloc", rm.getAllocator("HOST"), 64);
+
+  void* data;
+  EXPECT_NO_THROW(data = alloc.allocate(64));
+
+  EXPECT_THROW(
+    void* tmp_data = alloc.allocate(1024),
+    umpire::util::Exception);
+
+  EXPECT_NO_THROW(
+    alloc.deallocate(data));
+}
