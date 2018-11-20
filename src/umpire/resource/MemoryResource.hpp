@@ -15,6 +15,8 @@
 #ifndef UMPIRE_MemoryResource_HPP
 #define UMPIRE_MemoryResource_HPP
 
+#include "umpire/resource/MemoryResourceTraits.hpp"
+
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
@@ -38,7 +40,7 @@ class MemoryResource :
      * \param id ID of the MemoryResource (must be unique).
      *
      */
-    MemoryResource(const std::string& name, int id);
+    MemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
     virtual ~MemoryResource() = default;
 
@@ -95,6 +97,10 @@ class MemoryResource :
      * \return Platform associated with this MemoryResource.
      */
     virtual Platform getPlatform() noexcept = 0;
+
+    MemoryResourceTraits getTraits();
+  protected:
+    MemoryResourceTraits m_traits;
 };
 
 } // end of namespace strategy

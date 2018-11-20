@@ -34,6 +34,11 @@
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_ROCM)
+#include "umpire/op/RocmCopyOperation.hpp"
+#include "umpire/op/RocmMemsetOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -116,6 +121,33 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
+#endif
+
+#if defined(UMPIRE_ENABLE_ROCM)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::rocm, Platform::cpu),
+      std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cpu, Platform::rocm),
+      std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<RocmMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<GenericReallocateOperation>());
 #endif
 }
 
