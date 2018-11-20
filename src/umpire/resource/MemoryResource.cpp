@@ -17,9 +17,16 @@
 namespace umpire {
 namespace resource {
 
-MemoryResource::MemoryResource(const std::string& name, int id) :
-  strategy::AllocationStrategy(name, id)
+MemoryResource::MemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
+  strategy::AllocationStrategy(name, id),
+  m_traits(traits)
 {
+}
+
+MemoryResourceTraits
+MemoryResource::getTraits()
+{
+  return m_traits;
 }
 
 } // end of namespace resource

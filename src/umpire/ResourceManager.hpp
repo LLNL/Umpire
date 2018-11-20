@@ -27,6 +27,7 @@
 #include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
+#include "umpire/resource/MemoryResourceTraits.hpp"
 
 namespace umpire {
 

@@ -12,20 +12,19 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DeviceResourceFactory_HPP
-#define UMPIRE_DeviceResourceFactory_HPP
+#ifndef UMPIRE_CudaConstantMemoryResourceFactory_HPP
+#define UMPIRE_CudaConstantMemoryResourceFactory_HPP
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
 namespace resource {
 
-
 /*!
  * \brief Factory class for constructing MemoryResource objects that use GPU
  * memory.
  */
-class DeviceResourceFactory :
+class CudaConstantMemoryResourceFactory :
   public MemoryResourceFactory
 {
   bool isValidMemoryResourceFor(const std::string& name) noexcept;
@@ -36,4 +35,4 @@ class DeviceResourceFactory :
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_DeviceResourceFactory_HPP
+#endif // UMPIRE_CudaConstantMemoryResourceFactory_HPP
