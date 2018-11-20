@@ -33,6 +33,10 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
   m_ptr(nullptr)
 {
   cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, umpire_internal_device_constant_memory);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaGetSymbolAddress failed with error: " << cudaGetErrorString(error));
+  }
 }
 
 void* CudaConstantMemoryResource::allocate(size_t bytes)
