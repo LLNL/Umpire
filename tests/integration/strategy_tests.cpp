@@ -299,12 +299,14 @@ TEST(SizeLimiter, Host)
   auto alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>(
       "size_limited_alloc", rm.getAllocator("HOST"), 64);
 
-  void* data;
+  void* data = nullptr;
+
   EXPECT_NO_THROW(data = alloc.allocate(64));
 
-  EXPECT_THROW(
-    void* tmp_data = alloc.allocate(1024),
-    umpire::util::Exception);
+  EXPECT_THROW({
+    void* tmp_data = alloc.allocate(1024);
+    UMPIRE_USE_VAR(tmp_data);
+  }, umpire::util::Exception);
 
   EXPECT_NO_THROW(
     alloc.deallocate(data));

@@ -15,8 +15,11 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
+
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+
+#include "umpire/util/Macros.hpp"
 
 int main(int, char**)
 {
@@ -29,6 +32,7 @@ int main(int, char**)
 
   // This will throw an exception because the pool is limited to 1024 bytes.
   void* data = pool.allocate(2048);
+  UMPIRE_USE_VAR(data);
 
   return 0;
 }
