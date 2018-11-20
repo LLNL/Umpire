@@ -16,7 +16,7 @@ set(ROCM_ROOT_DIR "/opt/rocm/" CACHE PATH "ROCm ROOT directory path")
 set(ROCM_INCLUDE_PATH "${ROCM_ROOT_DIR}/hcc/include"  CACHE PATH "")
 set(ROCM_CXX_LIBRARIES "-L${ROCM_ROOT_DIR}/hcc/lib -lhc_am" CACHE STRING "")
 
-set(ROCM_ARCH gfx900)
+set(ROCM_ARCH "gfx900" CACHE STRING "")
 
 ###########################################################
 # specify the target architecture
@@ -42,6 +42,6 @@ set(ROCM_CXX_LINK_FLAGS "${ROCM_CXX_LINK_FLAGS} ${ROCM_ARCH_FLAG} ${ROCM_CXX_LIB
 # set CMake cache variables
 ###########################################################
 set(CMAKE_CXX_COMPILER "${ROCM_ROOT_DIR}/bin/hcc" CACHE FILEPATH "ROCm HCC compiler")
-set(BLT_CXX_FLAGS "${ROCM_CXX_COMPILE_FLAGS}" CACHE STRING "HCC compiler flags")
+#set(BLT_CXX_FLAGS "${ROCM_CXX_COMPILE_FLAGS}" CACHE STRING "HCC compiler flags")
 
 set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_CXX_COMPILER} ${ROCM_CXX_LINK_FLAGS} <OBJECTS> <LINK_LIBRARIES> -o <TARGET>" CACHE STRING "HCC linker command line")
