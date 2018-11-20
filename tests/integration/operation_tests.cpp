@@ -118,17 +118,23 @@ TEST_P(CopyTest, InvalidSize)
 
 const std::string copy_sources[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
   , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   , "PINNED"
 #endif
 };
 
 const std::string copy_dests[] = {
     "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
     , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
     , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
     , "PINNED"
 #endif
 };
@@ -179,9 +185,13 @@ TEST_P(MemsetTest, InvalidPointer)
 
 const std::string memset_sources[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
   , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
   , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   , "PINNED"
 #endif
 };
@@ -335,9 +345,13 @@ TEST_P(ReallocateTest, ReallocateWithAllocatorFail)
 
 const std::string reallocate_sources[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
   , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_DEVICE)
   , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   , "PINNED"
 #endif
 };
@@ -387,17 +401,23 @@ TEST_P(MoveTest, Move)
 
 const std::string move_sources[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
   , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   , "PINNED"
 #endif
 };
 
 const std::string move_dests[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
   , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
   , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   , "PINNED"
 #endif
 };
