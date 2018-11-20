@@ -42,6 +42,10 @@ CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(na
   cudaDeviceProp properties;
   auto error = ::cudaGetDeviceProperties(&properties, 0);
 
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
+  }
+
   traits.unified = true;
   traits.size = properties.totalGlobalMem; // plus system size?
 

@@ -1233,7 +1233,8 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
     judyvalue * src = ( judyvalue * )buff;
     int size, idx, slot, cnt, tst;
     JudySlot * next = judy->root;
-    judyvalue test, value;
+    judyvalue test = 0;
+    judyvalue value = 0;
     unsigned int off = 0, start;
     JudySlot * table;
     JudySlot * node;

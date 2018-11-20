@@ -39,6 +39,12 @@ blt_add_executable(
   DEPENDS_ON 
     umpire)
 
+blt_add_executable(
+  NAME size_limiter
+  SOURCES size_limiter.cpp
+  DEPENDS_ON 
+    umpire)
+
 if (ENABLE_STATISTICS)
   blt_add_executable(
     NAME statistics_example
