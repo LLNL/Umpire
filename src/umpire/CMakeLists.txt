@@ -55,7 +55,6 @@ if (ENABLE_FORTRAN_API OR ENABLE_C_API)
   endif ()
 endif ()
 
-
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}
@@ -68,6 +67,21 @@ set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
+set(UMPIRE_ENABLE_ROCM ${ENABLE_ROCM})
+
+if (ENABLE_CUDA OR ENABLE_ROCM) 
+  set(UMPIRE_ENABLE_DEVICE On)
+  set(UMPIRE_ENABLE_PINNED On)
+else ()
+  set(UMPIRE_ENABLE_DEVICE Off)
+  set(UMPIRE_ENABLE_PINNED Off)
+endif()
+
+if (ENABLE_CUDA)
+  set(UMPIRE_ENABLE_UM On)
+else ()
+  set(UMPIRE_ENABLE_UM Off)
+endif()
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in

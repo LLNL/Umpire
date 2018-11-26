@@ -26,11 +26,9 @@ DynamicPool::DynamicPool(
     int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size) :
+    const std::size_t min_alloc_size) noexcept :
   AllocationStrategy(name, id),
   dpa(nullptr),
-  m_current_size(0),
-  m_highwatermark(0),
   m_allocator(allocator.getAllocationStrategy())
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
@@ -41,50 +39,41 @@ DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   void* ptr = dpa->allocate(bytes);
-  ResourceManager::getInstance().registerAllocation(ptr, new util::AllocationRecord{ptr, bytes, this->shared_from_this()});
-
-  m_current_size += bytes;
-  if (m_current_size > m_highwatermark)
-    m_highwatermark = m_current_size;
-
   return ptr;
 }
 
-void 
+void
 DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
-  m_current_size -= ResourceManager::getInstance().getSize(ptr);
-
-  ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
-long 
-DynamicPool::getCurrentSize()
-{ 
+long
+DynamicPool::getCurrentSize() noexcept
+{
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
-  return m_current_size;
+  return 0;
 }
 
-long 
-DynamicPool::getHighWatermark()
-{ 
+long
+DynamicPool::getHighWatermark() noexcept
+{
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
+  return 0;
 }
 
-long 
-DynamicPool::getActualSize()
-{ 
+long
+DynamicPool::getActualSize() noexcept
+{
   long totalSize = dpa->totalSize();
   UMPIRE_LOG(Debug, "() returning " << totalSize);
   return totalSize;
 }
 
-Platform 
-DynamicPool::getPlatform()
-{ 
+Platform
+DynamicPool::getPlatform() noexcept
+{
   return m_allocator->getPlatform();
 }
 

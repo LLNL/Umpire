@@ -24,6 +24,20 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ *
+ * \brief Applies the given MemoryOperation to every allocation.
+ *
+ * This AllocationStrategy is designed to be used with the following
+ * operations:
+ *
+ * - op::CudaAdviseAccessedByOperation
+ * - op::CudaAdvisePreferredLocationOperation
+ * - op::CudaAdviseReadMostlyOperation
+ *
+ * Using this AllocationStrategy when combined with a pool like DynamicPool is
+ * a good way to mitigate the overhead of applying the memory advice.
+ */
 class AllocationAdvisor :
   public AllocationStrategy
 {
@@ -44,15 +58,12 @@ class AllocationAdvisor :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
   private:
     std::shared_ptr<op::MemoryOperation> m_advice_operation;
-
-    long m_current_size;
-    long m_highwatermark;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 

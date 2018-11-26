@@ -42,8 +42,6 @@ AllocationAdvisor::AllocationAdvisor(
     const std::string& advice_operation,
     Allocator accessing_allocator) :
   AllocationStrategy(name, id),
-  m_current_size(0),
-  m_highwatermark(0),
   m_allocator(allocator.getAllocationStrategy()),
   m_device(0)
 {
@@ -69,16 +67,10 @@ void* AllocationAdvisor::allocate(size_t bytes)
   auto alloc_record = new util::AllocationRecord{ptr, bytes, this->shared_from_this()};
 
   m_advice_operation->apply(
-      ptr, 
+      ptr,
       alloc_record,
-      m_device, 
+      m_device,
       bytes);
-
-  ResourceManager::getInstance().registerAllocation(ptr, alloc_record);
-
-  m_current_size += bytes;
-  if (m_current_size > m_highwatermark)
-    m_highwatermark = m_current_size;
 
   return ptr;
 }
@@ -86,22 +78,20 @@ void* AllocationAdvisor::allocate(size_t bytes)
 void AllocationAdvisor::deallocate(void* ptr)
 {
   m_allocator->deallocate(ptr);
-  m_current_size -= ResourceManager::getInstance().getSize(ptr);
 
-  ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
-long AllocationAdvisor::getCurrentSize()
+long AllocationAdvisor::getCurrentSize() noexcept
 {
-  return m_current_size;
+  return 0;
 }
 
-long AllocationAdvisor::getHighWatermark()
+long AllocationAdvisor::getHighWatermark() noexcept
 {
-  return m_highwatermark;
+  return 0;
 }
 
-Platform AllocationAdvisor::getPlatform()
+Platform AllocationAdvisor::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

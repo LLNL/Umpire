@@ -118,3 +118,17 @@ blt_add_executable(
 #  umpire_fortran_interface.f
 #  PROPERTIES
 #  Fortran_FORMAT FREE)
+# blt_add_executable(
+#   NAME memory_resource_traits_tests
+#   SOURCES memory_resource_traits_tests.cpp
+#   DEPENDS_ON umpire gtest
+#   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+# 
+# target_include_directories(
+#   memory_resource_traits_tests
+#   PRIVATE
+#   ${PROJECT_BINARY_DIR}/include)
+# 
+# blt_add_test(
+#   NAME memory_resource_traits_tests
+#   COMMAND memory_resource_traits_tests)

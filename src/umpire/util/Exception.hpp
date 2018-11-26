@@ -27,6 +27,8 @@ class Exception : public std::exception {
         const std::string &file,
         int line);
 
+    virtual ~Exception() = default;
+
     std::string message() const;
     virtual const char* what() const throw();
 

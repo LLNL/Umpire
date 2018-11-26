@@ -28,22 +28,19 @@ class ThreadSafeAllocator :
 {
   public:
     ThreadSafeAllocator(
-        const std::string& name, 
+        const std::string& name,
         int id,
         Allocator allocator);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   protected:
-    long m_current_size;
-    long m_highwatermark;
-
     std::shared_ptr<AllocationStrategy> m_allocator;
 
     std::mutex* m_mutex;

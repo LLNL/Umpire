@@ -17,26 +17,26 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) :
+AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept :
   m_name(name),
   m_id(id)
 {
 }
 
 std::string
-AllocationStrategy::getName()
+AllocationStrategy::getName() noexcept
 {
   return m_name;
 }
 
 int
-AllocationStrategy::getId()
+AllocationStrategy::getId() noexcept
 {
   return m_id;
 }
 
 long
-AllocationStrategy::getActualSize()
+AllocationStrategy::getActualSize() noexcept
 {
   return getCurrentSize();
 }

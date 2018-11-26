@@ -20,6 +20,7 @@ set (umpire_resource_headers
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
+  MemoryResourceTraits.hpp
 )
 
 set (umpire_resource_sources
@@ -34,19 +35,45 @@ set (umpire_resource_depends
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    DeviceResourceFactory.hpp
-    PinnedMemoryResourceFactory.hpp
-    UnifiedMemoryResourceFactory.hpp)
+    CudaDeviceResourceFactory.hpp
+    CudaPinnedMemoryResourceFactory.hpp
+    CudaUnifiedMemoryResourceFactory.hpp
+
+    CudaConstantMemoryResourceFactory.hpp
+    CudaConstantMemoryResource.hpp
+    )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    DeviceResourceFactory.cpp
-    PinnedMemoryResourceFactory.cpp
-    UnifiedMemoryResourceFactory.cpp)
+
+
+    CudaConstantMemoryResourceFactory.cpp
+    CudaConstantMemoryResource.cu
+
+    CudaDeviceResourceFactory.cpp
+    CudaPinnedMemoryResourceFactory.cpp
+    CudaUnifiedMemoryResourceFactory.cpp)
+
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
     cuda_runtime)
+endif ()
+
+if (ENABLE_ROCM)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    RocmDeviceResourceFactory.hpp
+    RocmPinnedMemoryResourceFactory.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    RocmDeviceResourceFactory.cpp
+    RocmPinnedMemoryResourceFactory.cpp)
+
+  set (umpire_resource_depends
+    ${umpire_resource_depends}
+    rocm)
 endif ()
 
 blt_add_library(

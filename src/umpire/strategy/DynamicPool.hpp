@@ -27,25 +27,46 @@
 namespace umpire {
 namespace strategy {
 
-class DynamicPool : public AllocationStrategy
+/*!
+ * \brief Simple dynamic pool for allocations
+ *
+ * This AllocationStrategy uses Simpool to provide pooling for allocations of
+ * any size. The behavior of the pool can be controlled by two parameters: the
+ * initial allocation size, and the minimum allocation size.
+ *
+ * The initial size controls how large the first piece of memory allocated is,
+ * and the minimum size controls the lower bound on all future chunk
+ * allocations.
+ */
+class DynamicPool :
+  public AllocationStrategy
 {
   public:
+    /*!
+     * \brief Construct a new DynamicPool.
+     *
+     * \param name Name of this instance of the DynamicPool.
+     * \param id Id of this instance of the DynamicPool.
+     * \param min_initial_alloc_size The minimum size of the first allocation
+     *                               the pool will make.
+     * \param min_alloc_size The minimum size of all future allocations.
+     */
     DynamicPool(
         const std::string& name,
         int id,
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024));
+        const std::size_t min_alloc_size = (1 * 1024 *1024)) noexcept;
 
     void* allocate(size_t bytes);
 
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
-    long getActualSize();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
+    long getActualSize() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     DynamicSizePool<>* dpa;

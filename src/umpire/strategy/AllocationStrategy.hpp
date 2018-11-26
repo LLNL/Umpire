@@ -25,21 +25,32 @@ namespace umpire {
 namespace strategy {
 
 /*!
- * \brief Allocator provides a unified interface to all Umpire classes that can
- * be used to allocate and free data.
+ * \brief AllocationStrategy provides a unified interface to all classes that
+ * can be used to allocate and free data.
  */
 class AllocationStrategy :
   public std::enable_shared_from_this<AllocationStrategy>
 {
   public:
-    AllocationStrategy(const std::string& name, int id);
+    /*!
+     * \brief Construct a new AllocationStrategy object.
+     *
+     * All AllocationStrategy objects must will have a unique name and id. This
+     * uniqueness is enforced by the ResourceManager.
+     *
+     * \param name The name of this AllocationStrategy object.
+     * \param id The id of this AllocationStrategy object.
+     */
+    AllocationStrategy(const std::string& name, int id) noexcept;
+
+    virtual ~AllocationStrategy() = default;
 
     /*!
      * \brief Allocate bytes of memory.
      *
      * \param bytes Number of bytes to allocate.
      *
-     * \return Pointer to start of allocation.
+     * \return Pointer to start of allocated bytes.
      */
     virtual void* allocate(size_t bytes) = 0;
 
@@ -50,15 +61,58 @@ class AllocationStrategy :
      */
     virtual void deallocate(void* ptr) = 0;
 
-    virtual long getCurrentSize() = 0;
-    virtual long getHighWatermark() = 0;
-    virtual long getActualSize();
+    /*!
+     * \brief Get current (total) size of the allocated memory.
+     *
+     * This is the total size of all allocation currently 'live' that have been
+     * made by this AllocationStrategy object.
+     *
+     * \return Current total size of allocations.
+     */
+    virtual long getCurrentSize() noexcept = 0;
 
-    virtual Platform getPlatform()  = 0;
+    /*!
+     * \brief Get the high watermark of the total allocated size.
+     *
+     * This is equivalent to the highest observed value of getCurrentSize.
+     * \return High watermark allocation size.
+     */
+    virtual long getHighWatermark() noexcept = 0;
 
-    std::string getName();
+    /*!
+     * \brief Get the current amount of memory allocated by this allocator.
+     *
+     * Note that this can be larger than getCurrentSize(), particularly if the
+     * AllocationStrategy implements some kind of pooling.
+     *
+     * \return The total size of all the memory this object has allocated.
+     */
+    virtual long getActualSize() noexcept;
 
-    int getId();
+    /*!
+     * \brief Get the platform associated with this AllocationStrategy.
+     *
+     * The Platform distinguishes the appropriate place to execute operations
+     * on memory allocated by this AllocationStrategy.
+     *
+     * \return The platform associated with this AllocationStrategy.
+     */
+    virtual Platform getPlatform() noexcept = 0;
+
+    /*!
+     * \brief Get the name of this AllocationStrategy.
+     *
+     * \return The name of this AllocationStrategy.
+     */
+    std::string getName() noexcept;
+
+
+    /*!
+     * \brief Get the id of this AllocationStrategy.
+     *
+     * \return The id of this AllocationStrategy.
+     */
+    int getId() noexcept;
 
   protected:
     std::string m_name;
