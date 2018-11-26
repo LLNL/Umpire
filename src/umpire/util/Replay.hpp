@@ -17,6 +17,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 #include "umpire/Allocator.hpp"
 #include <cxxabi.h>
 
@@ -46,10 +47,9 @@ class Replay {
   ) {
     std::stringstream ss;
 
-    ss << ", ???" << 
+    ss << ",???" << 
       abi::__cxa_demangle(typeid(firstArg).name(), 
-          nullptr, nullptr, nullptr) << "???";
-
+          nullptr,nullptr,nullptr) << ",???";
     ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
   }
@@ -62,8 +62,7 @@ class Replay {
   {
     std::stringstream ss;
 
-    ss << ", " << firstArg;
-
+    ss << "," << firstArg;
     ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
   }
@@ -76,8 +75,7 @@ class Replay {
   {
     std::stringstream ss;
 
-    ss << ", rm.getAllocator(\"" << firstArg.getName() << "\")";
-
+    ss << "," << firstArg.getName();
     ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
   }

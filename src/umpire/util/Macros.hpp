@@ -124,7 +124,7 @@
 {                                                                        \
   if (umpire::util::Replay::getReplayLogger()->replayLoggingEnabled()) { \
     std::ostringstream local_msg;                                        \
-    local_msg  << "REPLAY " << __func__ << " " << msg;                   \
+    local_msg  << "REPLAY," << msg;                                      \
     umpire::util::Replay::getReplayLogger()->logMessage(local_msg.str());\
   }                                                                      \
 }
@@ -133,7 +133,7 @@
 {                                                                        \
   if (umpire::util::Replay::getReplayLogger()->replayLoggingEnabled()) { \
     std::ostringstream local_msg;                                        \
-    local_msg  << " " << msg;                                            \
+    local_msg  << "," << msg;                                            \
     umpire::util::Replay::getReplayLogger()->logMessage(local_msg.str());\
   }                                                                      \
 }
