@@ -23,10 +23,12 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 
 class replayTest {
 public:
-  replayTest() : testAllocations(10), allocationSize(16)
+  replayTest() : testAllocations(3), allocationSize(16)
   {
     auto& rm = umpire::ResourceManager::getInstance();
 
@@ -50,6 +52,24 @@ public:
       "preferred_location_host", rm.getAllocator("UM"),
       "PREFERRED_LOCATION", rm.getAllocator("HOST"));
     allocatorNames.push_back("preferred_location_host");
+
+    rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
+      "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
+    allocatorNames.push_back("MONOTONIC 1024");
+
+    rm.makeAllocator<umpire::strategy::SlotPool>(
+      "host_slot_pool", 64, rm.getAllocator("HOST"));
+    allocatorNames.push_back("host_slot_pool");
+
+    rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator", rm.getAllocator("HOST"));
+    allocatorNames.push_back("thread_safe_allocator");
+
+    struct data { char _[1024*1024]; };
+
+    rm.makeAllocator<umpire::strategy::FixedPool<data>>(
+        "fixed_pool_allocator", rm.getAllocator("HOST"));
+    allocatorNames.push_back("fixed_pool_allocator");
   }
 
   ~replayTest( void )
