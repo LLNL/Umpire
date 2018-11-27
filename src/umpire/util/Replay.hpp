@@ -23,17 +23,14 @@
 
 namespace umpire {
 namespace util {
+std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc);
 class Replay {
-  public:
-
-  void logMessage( const std::string& message );
-
+public:
   static void initialize();
-
   static void finalize();
 
+  void logMessage( const std::string& message );
   static Replay* getReplayLogger();
-
   bool replayLoggingEnabled();
 
   static std::string printReplayAllocator( void ) {
@@ -41,45 +38,11 @@ class Replay {
   }
 
   template <typename T, typename... Args>
-  static std::string printReplayAllocator(
-    T&& firstArg,
-    Args&&... args
-  ) {
+  static std::string printReplayAllocator(T&& firstArg, Args&&... args) {
     std::stringstream ss;
-
-    ss << ",???" << 
-      abi::__cxa_demangle(typeid(firstArg).name(), 
-          nullptr,nullptr,nullptr) << ",???";
-    ss << printReplayAllocator(std::forward<Args>(args)...);
+    ss << firstArg << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
   }
-
-  template <typename... Args>
-  static std::string printReplayAllocator(
-      int&& firstArg,
-      Args&&... args
-  )
-  {
-    std::stringstream ss;
-
-    ss << "," << firstArg;
-    ss << printReplayAllocator(std::forward<Args>(args)...);
-    return ss.str();
-  }
-
-  template <typename... Args>
-  static std::string printReplayAllocator(
-      umpire::Allocator&& firstArg,
-      Args&&... args
-  )
-  {
-    std::stringstream ss;
-
-    ss << "," << firstArg.getName();
-    ss << printReplayAllocator(std::forward<Args>(args)...);
-    return ss.str();
-  }
-
 private:
   Replay(bool enable_replay);
   ~Replay();

@@ -17,6 +17,7 @@
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
+#include "umpire/Allocator.hpp"
 
 namespace umpire {
 namespace util {
@@ -68,6 +69,11 @@ Replay* Replay::getReplayLogger()
     Replay::initialize();
 
   return s_Replay;
+}
+
+std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
+  out << "," << alloc.getName();
+  return out;
 }
 
 } /* namespace util */
