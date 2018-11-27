@@ -34,9 +34,22 @@ public:
         "host_simpool_defaults", rm.getAllocator("HOST"));
     allocatorNames.push_back("host_simpool_defaults");
 
+    rm.makeAllocator<umpire::strategy::DynamicPool>(
+        "host_simpool_spec1", rm.getAllocator("HOST"), 9876, 1234);
+    allocatorNames.push_back("host_simpool_spec1");
+
+    rm.makeAllocator<umpire::strategy::DynamicPool, false>(
+        "host_simpool_spec2", rm.getAllocator("HOST"), 9876, 1234);
+    allocatorNames.push_back("host_simpool_spec2");
+
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
     allocatorNames.push_back("read_only_um");
+
+    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "preferred_location_host", rm.getAllocator("UM"),
+      "PREFERRED_LOCATION", rm.getAllocator("HOST"));
+    allocatorNames.push_back("preferred_location_host");
   }
 
   ~replayTest( void )

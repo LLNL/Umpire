@@ -72,7 +72,7 @@ Replay* Replay::getReplayLogger()
 }
 
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
-  out << "," << alloc.getName();
+  out << alloc.getName();
   return out;
 }
 

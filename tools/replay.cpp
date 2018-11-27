@@ -120,23 +120,19 @@ class Replay {
       get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
 
       if ( m_row[2] == "umpire::strategy::AllocationAdvisor" ) {
-#if 0
         const std::string& name = m_row[4];
-        int id; get_from_string(m_row[5], id);
-        const std::string& allocName = m_row[6];
-        const std::string& adviceOperation = m_row[7];
-
+        const std::string& allocName = m_row[5];
+        const std::string& adviceOperation = m_row[6];
         // Now grab the optional fields
-        if (m_row.size() > 9) {
-          const std::string& accessingAllocatorName = m_row[8];
-          if ( introspection )  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>( name, id, m_rm.getAllocator(allocName), adviceOperation, m_rm.getAllocator(accessingAllocatorName));
-          else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(name, id, m_rm.getAllocator(allocName), adviceOperation, m_rm.getAllocator(accessingAllocatorName));
+        if (m_row.size() > 8) {
+          const std::string& accessingAllocatorName = m_row[7];
+          if ( introspection )  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>( name, m_rm.getAllocator(allocName), adviceOperation, m_rm.getAllocator(accessingAllocatorName));
+          else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(name, m_rm.getAllocator(allocName), adviceOperation, m_rm.getAllocator(accessingAllocatorName));
         }
         else {
-          if ( introspection )  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>( name, id, m_rm.getAllocator(allocName), adviceOperation);
-          else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(name, id, m_rm.getAllocator(allocName), adviceOperation);
+          if ( introspection )  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>( name, m_rm.getAllocator(allocName), adviceOperation);
+          else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(name, m_rm.getAllocator(allocName), adviceOperation);
         }
-#endif
       }
       else if ( m_row[2] == "umpire::strategy::DynamicPool" ) {
         const std::string& name = m_row[4];
