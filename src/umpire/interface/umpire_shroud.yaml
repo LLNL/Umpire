@@ -19,7 +19,7 @@ options:
   F_module_per_class: False
 
 format:
-  C_prefix: umpire_
+  C_prefix: um_
 
 declarations:
 - decl: namespace umpire
@@ -35,102 +35,44 @@ declarations:
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
         - decl: size_t getCurrentSize()
-
-        #
-        # NOTE: Can we change getName() to be a const std::string& instead of std::string??
-        #
-        # - decl: const std::string& getName()
-        # format:
-        # C_code: |
-        # {C_pre_call}
-        # std::string SHCXX_rv = new std::string(SH_this->getName());
-        # 
-        # umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
-        # return XSH_rv;
-        # 
-        # umpire::ResourceManager & SHCXX_rv = umpire::ResourceManager::getInstance();
-        # umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
-        # return SHC_rv;
-
+        - decl: std::string getName()
         - decl: size_t getId()
-
-        #
-        # - decl: std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy()
-        #
 
     - decl: class ResourceManager
       cxx_header: umpire/ResourceManager.hpp
       format:
         F_derived_name: UmpireResourceManager
+        F_name_instance_set:
+        F_name_instance_get:
 
       declarations:
-        #
-        # NOTE: Ideally, this would simply be "- decl: static ResourceManager& getInstance()"
-        # But there seems to be a bug with the internal names produced by shroud for
-        # constructors.  Namely, the internal name used is get_instance which conflicts
-        # with what getInstance() gets translated to.  So, for the moment, we have to
-        # specify a different name for the method and then specify the code to be run
-        # that will call our internal C++ implementation of getInsance().
-        #
-        - decl: static ResourceManager& getinstance()
-          format:
-            C_code: |
-              umpire::ResourceManager & SHCXX_rv = umpire::ResourceManager::getInstance();
-              umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
-              return SHC_rv;
+        - decl: static ResourceManager& getInstance()
 
-        #
-        # - decl: void initialize()
-        # NOTE: This one is trivial to add, but I need to understand the use case for it first.
-        # Especially sinze finalize() implementation is missing.
-        #
-        # - decl: void finalize()
-        # NOTE: Does not compile since implementation of finalize() is missing.
-        #
-        # - decl: std::vector<std::string> getAvailableAllocators()
-        # NOTE: If needed, we will need to determine mechanism to return a vector
-        #       object from a C interface.
-        #
-
-        - decl: Allocator* getAllocator(const std::string& name)
+        - decl: Allocator getAllocator(const std::string& name)
           format:
-            # C_name: umpire_resourcemanager_get_allocator_by_name
-            C_code: |
-              {C_pre_call}
-              umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
-              umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
-              return XSH_rv;
+            function_suffix: _by_name
  
-        - decl: Allocator* getAllocator(const int id)
+        - decl: Allocator getAllocator(const int id)
           format:
-            # C_name: umpire_resourcemanager_get_allocator_by_id
-            C_code: |
-              {C_pre_call}
-              umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(id)); 
-              umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
-              return XSH_rv;
- 
-        #
-        # NOTE: This function is needed for Shroud only since object lifetime
-        #       for C/FORTRAN callers needs to be explicit.
-        #
-        - decl: static void deleteAllocator(Allocator* alloc_obj)
-          format:
-            C_code: |
-              {C_pre_call}
-              delete SHCXX_alloc_obj;
+            function_suffix: _by_id
 
-        #
-        # - decl: Allocator makeAllocator(const std::string& name, const std::string& strategy, util::AllocatorTraits traits, std::vector<Allocator> providers)
-        # - decl: Allocator getAllocator(resource::MemoryResourceType resource_type)
-        # - decl: Allocator getAllocator(void* ptr)
-        #
-        # - decl: void registerAllocation(void* ptr, util::AllocationRecord* record)
-        # - decl: void deregisterAllocation(void* ptr)
-        #
+        - decl: Allocator getAllocator(void* ptr)
+          format:
+            function_suffix: for_ptr
 
         - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
+          default_arg_suffix:
+            - _all
+            - _with_size
+
         - decl: void memset(void* ptr, int val, size_t length=0)
         - decl: void* reallocate(void* src_ptr, size_t size)
         - decl: void deallocate(void* ptr)
         - decl: size_t getSize(void* ptr)
+
+splicer_code:
+  c:
+    class:
+      Allocator:
+        CXX_declarations:
+        - "#include <cstring>"

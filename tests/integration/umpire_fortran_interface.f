@@ -14,9 +14,9 @@ contains
     type(UmpireAllocator) allocator
     type(UmpireResourceManager) rm
 
-    rm = rm%getinstance()
+    rm = rm%get_instance()
 
-    allocator = rm%get_allocator_1(0)
+    allocator = rm%get_allocator_by_id(0)
 
     data_ptr = allocator%allocate(c_sizeof(i)*10);
     call c_f_pointer(data_ptr, array, [ 10 ])

@@ -1,7 +1,9 @@
 // wrapResourceManager.cpp
 // This is generated code, do not edit
 #include "wrapResourceManager.h"
+#include <stdlib.h>
 #include <string>
+#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
 // splicer begin class.ResourceManager.CXX_definitions
@@ -12,140 +14,149 @@ extern "C" {
 // splicer begin class.ResourceManager.C_definitions
 // splicer end class.ResourceManager.C_definitions
 
-umpire_resourcemanager * umpire_resourcemanager_getinstance()
+um_resourcemanager * um_resourcemanager_get_instance(
+    um_resourcemanager * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.getinstance
-    umpire::ResourceManager & SHCXX_rv = umpire::ResourceManager::getInstance();
-    umpire_resourcemanager * SHC_rv = static_cast<umpire_resourcemanager *>(static_cast<void *>(&SHCXX_rv));
+// splicer begin class.ResourceManager.method.get_instance
+    umpire::ResourceManager & SHCXX_rv =
+        umpire::ResourceManager::getInstance();
+    SHC_rv->addr = static_cast<void *>(&SHCXX_rv);
+    SHC_rv->idtor = 0;
     return SHC_rv;
-
-// splicer end class.ResourceManager.method.getinstance
+// splicer end class.ResourceManager.method.get_instance
 }
 
-umpire_allocator * umpire_resourcemanager_get_allocator_0(
-    umpire_resourcemanager * self, const char * name)
+um_allocator * um_resourcemanager_get_allocator_by_name(
+    um_resourcemanager * self, const char * name, um_allocator * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.get_allocator_0
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+// splicer begin class.ResourceManager.method.get_allocator_by_name
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
     const std::string SH_name(name);
-    umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
-    umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
-    return XSH_rv;
-
-// splicer end class.ResourceManager.method.get_allocator_0
+    *SHCXX_rv = SH_this->getAllocator(SH_name);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.get_allocator_by_name
 }
 
-umpire_allocator * umpire_resourcemanager_get_allocator_0_bufferify(
-    umpire_resourcemanager * self, const char * name, int Lname)
+um_allocator * um_resourcemanager_get_allocator_by_name_bufferify(
+    um_resourcemanager * self, const char * name, int Lname,
+    um_allocator * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.get_allocator_0_bufferify
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+// splicer begin class.ResourceManager.method.get_allocator_by_name_bufferify
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
     const std::string SH_name(name, Lname);
-    umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(SH_name)); 
-    umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
-    return XSH_rv;
-
-// splicer end class.ResourceManager.method.get_allocator_0_bufferify
+    *SHCXX_rv = SH_this->getAllocator(SH_name);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.get_allocator_by_name_bufferify
 }
 
-umpire_allocator * umpire_resourcemanager_get_allocator_1(
-    umpire_resourcemanager * self, const int id)
+um_allocator * um_resourcemanager_get_allocator_by_id(
+    um_resourcemanager * self, const int id, um_allocator * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.get_allocator_1
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
-    umpire::Allocator * SH_rv = new umpire::Allocator(SH_this->getAllocator(id)); 
-    umpire_allocator * XSH_rv = static_cast<umpire_allocator *>(static_cast<void *>(SH_rv)); 
-    return XSH_rv;
-
-// splicer end class.ResourceManager.method.get_allocator_1
+// splicer begin class.ResourceManager.method.get_allocator_by_id
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->getAllocator(id);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.get_allocator_by_id
 }
 
-void umpire_resourcemanager_delete_allocator(
-    umpire_allocator * alloc_obj)
+um_allocator * um_resourcemanager_get_allocatorfor_ptr(
+    um_resourcemanager * self, void * ptr, um_allocator * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.delete_allocator
-    umpire::Allocator * SHCXX_alloc_obj = static_cast<umpire::
-        Allocator *>(static_cast<void *>(alloc_obj));
-    delete SHCXX_alloc_obj;
-
-// splicer end class.ResourceManager.method.delete_allocator
+// splicer begin class.ResourceManager.method.get_allocatorfor_ptr
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    *SHCXX_rv = SH_this->getAllocator(ptr);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.get_allocatorfor_ptr
 }
 
-void umpire_resourcemanager_copy_0(umpire_resourcemanager * self,
+void um_resourcemanager_copy_all(um_resourcemanager * self,
     void * src_ptr, void * dst_ptr)
 {
-// splicer begin class.ResourceManager.method.copy_0
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+// splicer begin class.ResourceManager.method.copy_all
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->copy(src_ptr, dst_ptr);
     return;
-// splicer end class.ResourceManager.method.copy_0
+// splicer end class.ResourceManager.method.copy_all
 }
 
-void umpire_resourcemanager_copy_1(umpire_resourcemanager * self,
+void um_resourcemanager_copy_with_size(um_resourcemanager * self,
     void * src_ptr, void * dst_ptr, size_t size)
 {
-// splicer begin class.ResourceManager.method.copy_1
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+// splicer begin class.ResourceManager.method.copy_with_size
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->copy(src_ptr, dst_ptr, size);
     return;
-// splicer end class.ResourceManager.method.copy_1
+// splicer end class.ResourceManager.method.copy_with_size
 }
 
-void umpire_resourcemanager_memset_0(umpire_resourcemanager * self,
-    void * ptr, int val)
+void um_resourcemanager_memset_0(um_resourcemanager * self, void * ptr,
+    int val)
 {
 // splicer begin class.ResourceManager.method.memset_0
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->memset(ptr, val);
     return;
 // splicer end class.ResourceManager.method.memset_0
 }
 
-void umpire_resourcemanager_memset_1(umpire_resourcemanager * self,
-    void * ptr, int val, size_t length)
+void um_resourcemanager_memset_1(um_resourcemanager * self, void * ptr,
+    int val, size_t length)
 {
 // splicer begin class.ResourceManager.method.memset_1
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->memset(ptr, val, length);
     return;
 // splicer end class.ResourceManager.method.memset_1
 }
 
-void * umpire_resourcemanager_reallocate(umpire_resourcemanager * self,
+void * um_resourcemanager_reallocate(um_resourcemanager * self,
     void * src_ptr, size_t size)
 {
 // splicer begin class.ResourceManager.method.reallocate
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     void * SHC_rv = SH_this->reallocate(src_ptr, size);
     return SHC_rv;
 // splicer end class.ResourceManager.method.reallocate
 }
 
-void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
+void um_resourcemanager_deallocate(um_resourcemanager * self,
     void * ptr)
 {
 // splicer begin class.ResourceManager.method.deallocate
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->deallocate(ptr);
     return;
 // splicer end class.ResourceManager.method.deallocate
 }
 
-size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
+size_t um_resourcemanager_get_size(um_resourcemanager * self,
     void * ptr)
 {
 // splicer begin class.ResourceManager.method.get_size
-    umpire::ResourceManager *SH_this = static_cast<umpire::
-        ResourceManager *>(static_cast<void *>(self));
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
     size_t SHC_rv = SH_this->getSize(ptr);
     return SHC_rv;
 // splicer end class.ResourceManager.method.get_size

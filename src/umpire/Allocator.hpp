@@ -153,6 +153,8 @@ class Allocator {
      */
     Platform getPlatform() noexcept;
 
+    Allocator() = default;
+
   private:
     /*!
      * \brief Construct an Allocator with the given AllocationStrategy.
@@ -165,7 +167,6 @@ class Allocator {
      */
     Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept;
 
-    Allocator() = delete;
 
     /*!
      * \brief Pointer to the AllocationStrategy used by this Allocator.

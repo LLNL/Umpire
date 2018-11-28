@@ -39,19 +39,20 @@ if (ENABLE_FORTRAN_API OR ENABLE_C_API)
       interface/c_fortran/shroudrt.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
+      interface/c_fortran/wrapUmpire.cpp
       )
-  endif ()
 
-  if (ENABLE_FORTRAN_API)
-    set (umpire_sources
-      ${umpire_sources}
-      interface/c_fortran/wrapfumpire.f
-    )
+    if (ENABLE_FORTRAN_API)
+      set (umpire_sources
+        ${umpire_sources}
+        interface/c_fortran/wrapfumpire.f
+      )
 
-    set_source_files_properties(
-      interface/c_fortran/wrapfumpire.f
-      PROPERTIES
-      Fortran_FORMAT FREE)
+      set_source_files_properties(
+        interface/c_fortran/wrapfumpire.f
+        PROPERTIES
+        Fortran_FORMAT FREE)
+    endif ()
   endif ()
 endif ()
 

@@ -49,7 +49,7 @@ if (ENABLE_C_API)
   blt_add_executable(
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp
-    DEPENDS_ON ${allocator_tests_depends}
+    DEPENDS_ON umpire gtest
     OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
 
   target_include_directories(
@@ -114,10 +114,11 @@ blt_add_executable(
   DEPENDS_ON fruit umpire
 )
 
-#set_source_files_properties(
-#  umpire_fortran_interface.f
-#  PROPERTIES
-#  Fortran_FORMAT FREE)
+set_source_files_properties(
+  umpire_fortran_interface.f
+  PROPERTIES
+  Fortran_FORMAT FREE)
+
 # blt_add_executable(
 #   NAME memory_resource_traits_tests
 #   SOURCES memory_resource_traits_tests.cpp

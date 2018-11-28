@@ -13,8 +13,4 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
-if (SHROUD_FOUND)
-  add_subdirectory(interface)
-endif ()
-
 add_subdirectory(umpire)
