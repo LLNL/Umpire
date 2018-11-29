@@ -1,5 +1,17 @@
 ! wrapfumpire.f
 ! This is generated code, do not edit
+! Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+! Produced at the Lawrence Livermore National Laboratory
+!
+! Created by David Beckingsale, david@llnl.gov
+! LLNL-CODE-747640
+!
+! All rights reserved.
+!
+! This file is part of Umpire.
+!
+! For details, see https://github.com/LLNL/Umpire
+! Please also see the LICENSE file for MIT license.
 !>
 !! \file wrapfumpire.f
 !! \brief Shroud generated wrapper for Umpire library
@@ -78,6 +90,7 @@ module umpire_mod
         procedure :: reallocate => resourcemanager_reallocate
         procedure :: deallocate => resourcemanager_deallocate
         procedure :: get_size => resourcemanager_get_size
+        procedure :: make_allocator_int => resourcemanager_make_allocator_int
         procedure :: associated => resourcemanager_associated
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
@@ -308,6 +321,33 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_SIZE_T) :: SHT_rv
         end function c_resourcemanager_get_size
+
+        function c_resourcemanager_make_allocator_int(self, name, &
+                SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="um_resourcemanager_make_allocator_int")
+            use iso_c_binding, only : C_CHAR, C_PTR
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
+            implicit none
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_int
+
+        function c_resourcemanager_make_allocator_int_bufferify(self, &
+                name, Lname, SHT_crv) &
+                result(SHT_rv) &
+                bind(C, name="um_resourcemanager_make_allocator_int_bufferify")
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
+            implicit none
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(C_PTR) SHT_rv
+        end function c_resourcemanager_make_allocator_int_bufferify
 
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
@@ -551,6 +591,19 @@ contains
         SHT_rv = c_resourcemanager_get_size(obj%cxxmem, ptr)
         ! splicer end class.ResourceManager.method.get_size
     end function resourcemanager_get_size
+
+    function resourcemanager_make_allocator_int(obj, name) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_INT, C_PTR
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(C_PTR) :: SHT_prv
+        type(UmpireAllocator) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.make_allocator_int
+        SHT_prv = c_resourcemanager_make_allocator_int_bufferify(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), SHT_rv%cxxmem)
+        ! splicer end class.ResourceManager.method.make_allocator_int
+    end function resourcemanager_make_allocator_int
 
     function resourcemanager_associated(obj) result (rv)
         use iso_c_binding, only: c_associated

@@ -13,6 +13,21 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
+copyright:
+  - Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+  - Produced at the Lawrence Livermore National Laboratory
+  - 
+  - Created by David Beckingsale, david@llnl.gov
+  - LLNL-CODE-747640
+  - 
+  - All rights reserved.
+  - 
+  - This file is part of Umpire. 
+  - 
+  - For details, see https://github.com/LLNL/Umpire
+  - Please also see the LICENSE file for MIT license.
+
+
 library: Umpire
 
 options:
@@ -24,6 +39,10 @@ format:
 declarations:
 - decl: namespace umpire
   declarations:
+    - decl: namespace strategy
+      declarations:
+        - decl: class DynamicPool
+
     - decl: class Allocator
       cxx_header: umpire/Allocator.hpp
       format:
@@ -69,6 +88,10 @@ declarations:
         - decl: void* reallocate(void* src_ptr, size_t size)
         - decl: void deallocate(void* ptr)
         - decl: size_t getSize(void* ptr)
+
+        - decl: template <typename T> Allocator makeAllocator(const std::string& name);
+          cxx_template:
+            - instantiation: <DynamicPool>
 
 splicer_code:
   c:

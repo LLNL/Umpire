@@ -1,5 +1,17 @@
 // wrapResourceManager.cpp
 // This is generated code, do not edit
+// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Produced at the Lawrence Livermore National Laboratory
+//
+// Created by David Beckingsale, david@llnl.gov
+// LLNL-CODE-747640
+//
+// All rights reserved.
+//
+// This file is part of Umpire.
+//
+// For details, see https://github.com/LLNL/Umpire
+// Please also see the LICENSE file for MIT license.
 #include "wrapResourceManager.h"
 #include <stdlib.h>
 #include <string>
@@ -160,6 +172,37 @@ size_t um_resourcemanager_get_size(um_resourcemanager * self,
     size_t SHC_rv = SH_this->getSize(ptr);
     return SHC_rv;
 // splicer end class.ResourceManager.method.get_size
+}
+
+um_allocator * um_resourcemanager_make_allocator_int(
+    um_resourcemanager * self, const char * name, um_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_int
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name);
+    *SHCXX_rv = SH_this->makeAllocator<int>(SH_name);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_int
+}
+
+um_allocator * um_resourcemanager_make_allocator_int_bufferify(
+    um_resourcemanager * self, const char * name, int Lname,
+    um_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_int_bufferify
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name, Lname);
+    *SHCXX_rv = SH_this->makeAllocator<int>(SH_name);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_int_bufferify
 }
 
 }  // extern "C"
