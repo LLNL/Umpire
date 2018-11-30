@@ -226,6 +226,7 @@ class ResourceManager {
     ResourceManager& operator= (const ResourceManager&) = delete;
 
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
+    std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForId(int id);
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
     int getNextId() noexcept;

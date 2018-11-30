@@ -90,8 +90,6 @@ blt_add_test(
   NAME free_functions_integration_tests
   COMMAND free_functions_integration_tests)
 
-add_subdirectory(replay)
-
 # blt_add_executable(
 #   NAME memory_resource_traits_tests
 #   SOURCES memory_resource_traits_tests.cpp
@@ -106,3 +104,9 @@ add_subdirectory(replay)
 # blt_add_test(
 #   NAME memory_resource_traits_tests
 #   COMMAND memory_resource_traits_tests)
+
+add_subdirectory(replay)
+
+if (ENABLE_C_API OR ENABLE_FORTRAN_API)
+  add_subdirectory(interface)
+endif()
