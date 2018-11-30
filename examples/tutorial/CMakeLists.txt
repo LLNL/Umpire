@@ -72,3 +72,7 @@ blt_add_executable(
   SOURCES tut_introspection.cpp
   DEPENDS_ON 
     umpire)
+
+if (ENABLE_C_API)
+  add_subdirectory(c)
+endif ()

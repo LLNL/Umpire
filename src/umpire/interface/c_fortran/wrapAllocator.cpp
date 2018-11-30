@@ -87,22 +87,33 @@ size_t umpire_allocator_get_current_size(umpire_allocator * self)
 // splicer end class.Allocator.method.get_current_size
 }
 
+const char * umpire_allocator_get_name(umpire_allocator * self)
+{
+// splicer begin class.Allocator.method.get_name
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    const std::string & SHCXX_rv = SH_this->getName();
+    const char * SHC_rv = SHCXX_rv.c_str();
+    return SHC_rv;
+// splicer end class.Allocator.method.get_name
+}
+
 void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv)
 {
 // splicer begin class.Allocator.method.get_name_bufferify
     umpire::Allocator *SH_this =
         static_cast<umpire::Allocator *>(self->addr);
-    std::string * SHCXX_rv = new std::string;
-    *SHCXX_rv = SH_this->getName();
-    DSHF_rv->cxx.addr = static_cast<void *>(SHCXX_rv);
-    DSHF_rv->cxx.idtor = 1;
-    if (SHCXX_rv->empty()) {
+    const std::string & SHCXX_rv = SH_this->getName();
+    DSHF_rv->cxx.addr = static_cast<void *>(const_cast<std::string *>
+        (&SHCXX_rv));
+    DSHF_rv->cxx.idtor = 0;
+    if (SHCXX_rv.empty()) {
         DSHF_rv->addr.ccharp = NULL;
         DSHF_rv->len = 0;
     } else {
-        DSHF_rv->addr.ccharp = SHCXX_rv->data();
-        DSHF_rv->len = SHCXX_rv->size();
+        DSHF_rv->addr.ccharp = SHCXX_rv.data();
+        DSHF_rv->len = SHCXX_rv.size();
     }
     DSHF_rv->size = 1;
     return;

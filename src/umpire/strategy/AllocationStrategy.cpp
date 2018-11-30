@@ -23,7 +23,7 @@ AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
 {
 }
 
-std::string
+const std::string&
 AllocationStrategy::getName() noexcept
 {
   return m_name;

@@ -47,6 +47,8 @@ size_t umpire_allocator_get_high_watermark(umpire_allocator * self);
 
 size_t umpire_allocator_get_current_size(umpire_allocator * self);
 
+const char * umpire_allocator_get_name(umpire_allocator * self);
+
 void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv);
 

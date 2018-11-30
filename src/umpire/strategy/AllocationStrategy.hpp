@@ -104,7 +104,7 @@ class AllocationStrategy :
      *
      * \return The name of this AllocationStrategy.
      */
-    std::string getName() noexcept;
+    const std::string& getName() noexcept;
 
 
     /*!

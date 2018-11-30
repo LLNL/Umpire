@@ -54,7 +54,7 @@ declarations:
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
         - decl: size_t getCurrentSize()
-        - decl: std::string getName()
+        - decl: const std::string& getName() +pure
         - decl: size_t getId()
 
     - decl: class ResourceManager

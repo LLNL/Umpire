@@ -187,6 +187,16 @@ module umpire_mod
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_current_size
 
+        pure function c_allocator_get_name(self) &
+                result(SHT_rv) &
+                bind(C, name="umpire_allocator_get_name")
+            use iso_c_binding, only : C_PTR
+            import :: SHROUD_allocator_capsule
+            implicit none
+            type(SHROUD_allocator_capsule), intent(IN) :: self
+            type(C_PTR) SHT_rv
+        end function c_allocator_get_name
+
         subroutine c_allocator_get_name_bufferify(self, DSHF_rv) &
                 bind(C, name="umpire_allocator_get_name_bufferify")
             import :: SHROUD_allocator_capsule, SHROUD_array
