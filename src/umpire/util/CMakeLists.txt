@@ -18,8 +18,8 @@ set (umpire_util_headers
   Exception.hpp
   Logger.hpp
   Macros.hpp
-  Replay.hpp
-  Platform.hpp)
+  Platform.hpp
+  Replay.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
