@@ -21,7 +21,7 @@ declarations:
         base: shadow
         cxx_header: umpire/Allocator.hpp
         cxx_type: umpire::Allocator
-        c_type: um_allocator
+        c_type: umpire_allocator
         f_module_name: umpire_mod
         f_derived_type: UmpireAllocator
         f_capsule_data_type: SHROUD_allocator_capsule
@@ -31,7 +31,7 @@ declarations:
         base: shadow
         cxx_header: umpire/ResourceManager.hpp
         cxx_type: umpire::ResourceManager
-        c_type: um_resourcemanager
+        c_type: umpire_resourcemanager
         f_module_name: umpire_mod
         f_derived_type: UmpireResourceManager
         f_capsule_data_type: SHROUD_resourcemanager_capsule
@@ -42,7 +42,7 @@ declarations:
         fields:
           base: shadow
           cxx_type: umpire::strategy::DynamicPool
-          c_type: um_dynamicpool
+          c_type: umpire_dynamicpool
           f_module_name: umpire_mod
           f_derived_type: dynamicpool
           f_capsule_data_type: SHROUD_dynamicpool_capsule

@@ -138,7 +138,7 @@ module umpire_mod
 
         function c_allocator_allocate(self, bytes) &
                 result(SHT_rv) &
-                bind(C, name="um_allocator_allocate")
+                bind(C, name="umpire_allocator_allocate")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_allocator_capsule
             implicit none
@@ -148,7 +148,7 @@ module umpire_mod
         end function c_allocator_allocate
 
         subroutine c_allocator_deallocate(self, ptr) &
-                bind(C, name="um_allocator_deallocate")
+                bind(C, name="umpire_allocator_deallocate")
             use iso_c_binding, only : C_PTR
             import :: SHROUD_allocator_capsule
             implicit none
@@ -158,7 +158,7 @@ module umpire_mod
 
         function c_allocator_get_size(self, ptr) &
                 result(SHT_rv) &
-                bind(C, name="um_allocator_get_size")
+                bind(C, name="umpire_allocator_get_size")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_allocator_capsule
             implicit none
@@ -169,7 +169,7 @@ module umpire_mod
 
         function c_allocator_get_high_watermark(self) &
                 result(SHT_rv) &
-                bind(C, name="um_allocator_get_high_watermark")
+                bind(C, name="umpire_allocator_get_high_watermark")
             use iso_c_binding, only : C_SIZE_T
             import :: SHROUD_allocator_capsule
             implicit none
@@ -179,7 +179,7 @@ module umpire_mod
 
         function c_allocator_get_current_size(self) &
                 result(SHT_rv) &
-                bind(C, name="um_allocator_get_current_size")
+                bind(C, name="umpire_allocator_get_current_size")
             use iso_c_binding, only : C_SIZE_T
             import :: SHROUD_allocator_capsule
             implicit none
@@ -188,7 +188,7 @@ module umpire_mod
         end function c_allocator_get_current_size
 
         subroutine c_allocator_get_name_bufferify(self, DSHF_rv) &
-                bind(C, name="um_allocator_get_name_bufferify")
+                bind(C, name="umpire_allocator_get_name_bufferify")
             import :: SHROUD_allocator_capsule, SHROUD_array
             implicit none
             type(SHROUD_allocator_capsule), intent(IN) :: self
@@ -197,7 +197,7 @@ module umpire_mod
 
         function c_allocator_get_id(self) &
                 result(SHT_rv) &
-                bind(C, name="um_allocator_get_id")
+                bind(C, name="umpire_allocator_get_id")
             use iso_c_binding, only : C_SIZE_T
             import :: SHROUD_allocator_capsule
             implicit none
@@ -210,7 +210,7 @@ module umpire_mod
 
         function c_resourcemanager_get_instance(SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_get_instance")
+                bind(C, name="umpire_resourcemanager_get_instance")
             use iso_c_binding, only : C_PTR
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -221,7 +221,7 @@ module umpire_mod
         function c_resourcemanager_get_allocator_by_name(self, name, &
                 SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_get_allocator_by_name")
+                bind(C, name="umpire_resourcemanager_get_allocator_by_name")
             use iso_c_binding, only : C_CHAR, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -234,7 +234,7 @@ module umpire_mod
         function c_resourcemanager_get_allocator_by_name_bufferify(self, &
                 name, Lname, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_get_allocator_by_name_bufferify")
+                bind(C, name="umpire_resourcemanager_get_allocator_by_name_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -248,7 +248,7 @@ module umpire_mod
         function c_resourcemanager_get_allocator_by_id(self, id, &
                 SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_get_allocator_by_id")
+                bind(C, name="umpire_resourcemanager_get_allocator_by_id")
             use iso_c_binding, only : C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -261,7 +261,7 @@ module umpire_mod
         function c_resourcemanager_get_allocatorfor_ptr(self, ptr, &
                 SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_get_allocatorfor_ptr")
+                bind(C, name="umpire_resourcemanager_get_allocatorfor_ptr")
             use iso_c_binding, only : C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -272,7 +272,7 @@ module umpire_mod
         end function c_resourcemanager_get_allocatorfor_ptr
 
         subroutine c_resourcemanager_copy_all(self, src_ptr, dst_ptr) &
-                bind(C, name="um_resourcemanager_copy_all")
+                bind(C, name="umpire_resourcemanager_copy_all")
             use iso_c_binding, only : C_PTR
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -283,7 +283,7 @@ module umpire_mod
 
         subroutine c_resourcemanager_copy_with_size(self, src_ptr, &
                 dst_ptr, size) &
-                bind(C, name="um_resourcemanager_copy_with_size")
+                bind(C, name="umpire_resourcemanager_copy_with_size")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -294,7 +294,7 @@ module umpire_mod
         end subroutine c_resourcemanager_copy_with_size
 
         subroutine c_resourcemanager_memset_0(self, ptr, val) &
-                bind(C, name="um_resourcemanager_memset_0")
+                bind(C, name="umpire_resourcemanager_memset_0")
             use iso_c_binding, only : C_INT, C_PTR
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -304,7 +304,7 @@ module umpire_mod
         end subroutine c_resourcemanager_memset_0
 
         subroutine c_resourcemanager_memset_1(self, ptr, val, length) &
-                bind(C, name="um_resourcemanager_memset_1")
+                bind(C, name="umpire_resourcemanager_memset_1")
             use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -316,7 +316,7 @@ module umpire_mod
 
         function c_resourcemanager_reallocate(self, src_ptr, size) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_reallocate")
+                bind(C, name="umpire_resourcemanager_reallocate")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -327,7 +327,7 @@ module umpire_mod
         end function c_resourcemanager_reallocate
 
         subroutine c_resourcemanager_deallocate(self, ptr) &
-                bind(C, name="um_resourcemanager_deallocate")
+                bind(C, name="umpire_resourcemanager_deallocate")
             use iso_c_binding, only : C_PTR
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -337,7 +337,7 @@ module umpire_mod
 
         function c_resourcemanager_get_size(self, ptr) &
                 result(SHT_rv) &
-                bind(C, name="um_resourcemanager_get_size")
+                bind(C, name="umpire_resourcemanager_get_size")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -354,7 +354,7 @@ module umpire_mod
         ! helper function
         ! Copy the char* or std::string in context into c_var.
         subroutine SHROUD_copy_string_and_free(context, c_var, c_var_size) &
-             bind(c,name="um_ShroudCopyStringAndFree")
+             bind(c,name="umpire_ShroudCopyStringAndFree")
             use, intrinsic :: iso_c_binding, only : C_CHAR, C_SIZE_T
             import SHROUD_array
             type(SHROUD_array), intent(IN) :: context

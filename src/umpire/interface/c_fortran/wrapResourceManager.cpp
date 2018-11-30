@@ -26,8 +26,8 @@ extern "C" {
 // splicer begin class.ResourceManager.C_definitions
 // splicer end class.ResourceManager.C_definitions
 
-um_resourcemanager * um_resourcemanager_get_instance(
-    um_resourcemanager * SHC_rv)
+umpire_resourcemanager * umpire_resourcemanager_get_instance(
+    umpire_resourcemanager * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.get_instance
     umpire::ResourceManager & SHCXX_rv =
@@ -38,8 +38,9 @@ um_resourcemanager * um_resourcemanager_get_instance(
 // splicer end class.ResourceManager.method.get_instance
 }
 
-um_allocator * um_resourcemanager_get_allocator_by_name(
-    um_resourcemanager * self, const char * name, um_allocator * SHC_rv)
+umpire_allocator * umpire_resourcemanager_get_allocator_by_name(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.get_allocator_by_name
     umpire::ResourceManager *SH_this =
@@ -53,9 +54,9 @@ um_allocator * um_resourcemanager_get_allocator_by_name(
 // splicer end class.ResourceManager.method.get_allocator_by_name
 }
 
-um_allocator * um_resourcemanager_get_allocator_by_name_bufferify(
-    um_resourcemanager * self, const char * name, int Lname,
-    um_allocator * SHC_rv)
+umpire_allocator * umpire_resourcemanager_get_allocator_by_name_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.get_allocator_by_name_bufferify
     umpire::ResourceManager *SH_this =
@@ -69,8 +70,9 @@ um_allocator * um_resourcemanager_get_allocator_by_name_bufferify(
 // splicer end class.ResourceManager.method.get_allocator_by_name_bufferify
 }
 
-um_allocator * um_resourcemanager_get_allocator_by_id(
-    um_resourcemanager * self, const int id, um_allocator * SHC_rv)
+umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
+    umpire_resourcemanager * self, const int id,
+    umpire_allocator * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.get_allocator_by_id
     umpire::ResourceManager *SH_this =
@@ -83,8 +85,9 @@ um_allocator * um_resourcemanager_get_allocator_by_id(
 // splicer end class.ResourceManager.method.get_allocator_by_id
 }
 
-um_allocator * um_resourcemanager_get_allocatorfor_ptr(
-    um_resourcemanager * self, void * ptr, um_allocator * SHC_rv)
+umpire_allocator * umpire_resourcemanager_get_allocatorfor_ptr(
+    umpire_resourcemanager * self, void * ptr,
+    umpire_allocator * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.get_allocatorfor_ptr
     umpire::ResourceManager *SH_this =
@@ -97,7 +100,7 @@ um_allocator * um_resourcemanager_get_allocatorfor_ptr(
 // splicer end class.ResourceManager.method.get_allocatorfor_ptr
 }
 
-void um_resourcemanager_copy_all(um_resourcemanager * self,
+void umpire_resourcemanager_copy_all(umpire_resourcemanager * self,
     void * src_ptr, void * dst_ptr)
 {
 // splicer begin class.ResourceManager.method.copy_all
@@ -108,8 +111,9 @@ void um_resourcemanager_copy_all(um_resourcemanager * self,
 // splicer end class.ResourceManager.method.copy_all
 }
 
-void um_resourcemanager_copy_with_size(um_resourcemanager * self,
-    void * src_ptr, void * dst_ptr, size_t size)
+void umpire_resourcemanager_copy_with_size(
+    umpire_resourcemanager * self, void * src_ptr, void * dst_ptr,
+    size_t size)
 {
 // splicer begin class.ResourceManager.method.copy_with_size
     umpire::ResourceManager *SH_this =
@@ -119,8 +123,8 @@ void um_resourcemanager_copy_with_size(um_resourcemanager * self,
 // splicer end class.ResourceManager.method.copy_with_size
 }
 
-void um_resourcemanager_memset_0(um_resourcemanager * self, void * ptr,
-    int val)
+void umpire_resourcemanager_memset_0(umpire_resourcemanager * self,
+    void * ptr, int val)
 {
 // splicer begin class.ResourceManager.method.memset_0
     umpire::ResourceManager *SH_this =
@@ -130,8 +134,8 @@ void um_resourcemanager_memset_0(um_resourcemanager * self, void * ptr,
 // splicer end class.ResourceManager.method.memset_0
 }
 
-void um_resourcemanager_memset_1(um_resourcemanager * self, void * ptr,
-    int val, size_t length)
+void umpire_resourcemanager_memset_1(umpire_resourcemanager * self,
+    void * ptr, int val, size_t length)
 {
 // splicer begin class.ResourceManager.method.memset_1
     umpire::ResourceManager *SH_this =
@@ -141,7 +145,7 @@ void um_resourcemanager_memset_1(um_resourcemanager * self, void * ptr,
 // splicer end class.ResourceManager.method.memset_1
 }
 
-void * um_resourcemanager_reallocate(um_resourcemanager * self,
+void * umpire_resourcemanager_reallocate(umpire_resourcemanager * self,
     void * src_ptr, size_t size)
 {
 // splicer begin class.ResourceManager.method.reallocate
@@ -152,7 +156,7 @@ void * um_resourcemanager_reallocate(um_resourcemanager * self,
 // splicer end class.ResourceManager.method.reallocate
 }
 
-void um_resourcemanager_deallocate(um_resourcemanager * self,
+void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
     void * ptr)
 {
 // splicer begin class.ResourceManager.method.deallocate
@@ -163,7 +167,7 @@ void um_resourcemanager_deallocate(um_resourcemanager * self,
 // splicer end class.ResourceManager.method.deallocate
 }
 
-size_t um_resourcemanager_get_size(um_resourcemanager * self,
+size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
     void * ptr)
 {
 // splicer begin class.ResourceManager.method.get_size

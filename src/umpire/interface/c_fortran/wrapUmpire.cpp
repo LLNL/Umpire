@@ -25,7 +25,7 @@ extern "C" {
 // splicer end C_definitions
 
 // Release C++ allocated memory.
-void um_SHROUD_memory_destructor(UMP_SHROUD_capsule_data *cap)
+void umpire_SHROUD_memory_destructor(UMP_SHROUD_capsule_data *cap)
 {
     void *ptr = cap->addr;
     switch (cap->idtor) {

@@ -25,7 +25,9 @@
 #include "typesUmpire.h"
 
 // splicer begin class.Allocator.CXX_declarations
+#ifdef __cplusplus
 #include <cstring>
+#endif
 // splicer end class.Allocator.CXX_declarations
 
 #ifdef __cplusplus
@@ -35,20 +37,20 @@ extern "C" {
 // splicer begin class.Allocator.C_declarations
 // splicer end class.Allocator.C_declarations
 
-void * um_allocator_allocate(um_allocator * self, size_t bytes);
+void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 
-void um_allocator_deallocate(um_allocator * self, void * ptr);
+void umpire_allocator_deallocate(umpire_allocator * self, void * ptr);
 
-size_t um_allocator_get_size(um_allocator * self, void * ptr);
+size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr);
 
-size_t um_allocator_get_high_watermark(um_allocator * self);
+size_t umpire_allocator_get_high_watermark(umpire_allocator * self);
 
-size_t um_allocator_get_current_size(um_allocator * self);
+size_t umpire_allocator_get_current_size(umpire_allocator * self);
 
-void um_allocator_get_name_bufferify(um_allocator * self,
+void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv);
 
-size_t um_allocator_get_id(um_allocator * self);
+size_t umpire_allocator_get_id(umpire_allocator * self);
 
 #ifdef __cplusplus
 }

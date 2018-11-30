@@ -26,18 +26,18 @@ extern "C" {
 // helper function
 // Copy the char* or std::string in context into c_var.
 // Called by Fortran to deal with allocatable character.
-void um_ShroudCopyStringAndFree(UMP_SHROUD_array *data, char *c_var, size_t c_var_len) {
+void umpire_ShroudCopyStringAndFree(UMP_SHROUD_array *data, char *c_var, size_t c_var_len) {
     const char *cxx_var = data->addr.ccharp;
     size_t n = c_var_len;
     if (data->len < n) n = data->len;
     strncpy(c_var, cxx_var, n);
-    um_SHROUD_memory_destructor(&data->cxx); // delete data->cxx.addr
+    umpire_SHROUD_memory_destructor(&data->cxx); // delete data->cxx.addr
 }
 
 // splicer begin class.Allocator.C_definitions
 // splicer end class.Allocator.C_definitions
 
-void * um_allocator_allocate(um_allocator * self, size_t bytes)
+void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes)
 {
 // splicer begin class.Allocator.method.allocate
     umpire::Allocator *SH_this =
@@ -47,7 +47,7 @@ void * um_allocator_allocate(um_allocator * self, size_t bytes)
 // splicer end class.Allocator.method.allocate
 }
 
-void um_allocator_deallocate(um_allocator * self, void * ptr)
+void umpire_allocator_deallocate(umpire_allocator * self, void * ptr)
 {
 // splicer begin class.Allocator.method.deallocate
     umpire::Allocator *SH_this =
@@ -57,7 +57,7 @@ void um_allocator_deallocate(um_allocator * self, void * ptr)
 // splicer end class.Allocator.method.deallocate
 }
 
-size_t um_allocator_get_size(um_allocator * self, void * ptr)
+size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr)
 {
 // splicer begin class.Allocator.method.get_size
     umpire::Allocator *SH_this =
@@ -67,7 +67,7 @@ size_t um_allocator_get_size(um_allocator * self, void * ptr)
 // splicer end class.Allocator.method.get_size
 }
 
-size_t um_allocator_get_high_watermark(um_allocator * self)
+size_t umpire_allocator_get_high_watermark(umpire_allocator * self)
 {
 // splicer begin class.Allocator.method.get_high_watermark
     umpire::Allocator *SH_this =
@@ -77,7 +77,7 @@ size_t um_allocator_get_high_watermark(um_allocator * self)
 // splicer end class.Allocator.method.get_high_watermark
 }
 
-size_t um_allocator_get_current_size(um_allocator * self)
+size_t umpire_allocator_get_current_size(umpire_allocator * self)
 {
 // splicer begin class.Allocator.method.get_current_size
     umpire::Allocator *SH_this =
@@ -87,7 +87,7 @@ size_t um_allocator_get_current_size(um_allocator * self)
 // splicer end class.Allocator.method.get_current_size
 }
 
-void um_allocator_get_name_bufferify(um_allocator * self,
+void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv)
 {
 // splicer begin class.Allocator.method.get_name_bufferify
@@ -109,7 +109,7 @@ void um_allocator_get_name_bufferify(um_allocator * self,
 // splicer end class.Allocator.method.get_name_bufferify
 }
 
-size_t um_allocator_get_id(um_allocator * self)
+size_t umpire_allocator_get_id(umpire_allocator * self)
 {
 // splicer begin class.Allocator.method.get_id
     umpire::Allocator *SH_this =

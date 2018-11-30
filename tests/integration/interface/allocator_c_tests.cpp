@@ -22,16 +22,16 @@ class AllocatorCTest :
   public:
   virtual void SetUp()
   {
-    um_resourcemanager rm;
-    um_resourcemanager_get_instance(&rm);
-    um_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);;
+    umpire_resourcemanager rm;
+    umpire_resourcemanager_get_instance(&rm);
+    umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);;
   }
 
   virtual void TearDown()
   {
   }
 
-  um_allocator m_allocator;
+  umpire_allocator m_allocator;
 
   const size_t m_big = 64;
   const size_t m_small = 8;
@@ -40,10 +40,77 @@ class AllocatorCTest :
 
 TEST_P(AllocatorCTest, AllocateDeallocateBig)
 {
-  double* data = (double*) um_allocator_allocate(&m_allocator, m_big*sizeof(double));
+  double* data = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
   ASSERT_NE(nullptr, data);
 
-  um_allocator_deallocate(&m_allocator, data);
+  umpire_allocator_deallocate(&m_allocator, data);
+}
+
+TEST_P(AllocatorCTest, AllocateDeallocateSmall)
+{
+  double* data = (double*) umpire_allocator_allocate(&m_allocator, m_small*sizeof(double));
+  ASSERT_NE(nullptr, data);
+
+  umpire_allocator_deallocate(&m_allocator, data);
+}
+
+TEST_P(AllocatorCTest, AllocateDeallocateNothing)
+{
+  double* data = (double*) umpire_allocator_allocate(&m_allocator, m_nothing*sizeof(double));
+  ASSERT_NE(nullptr, data);
+
+  umpire_allocator_deallocate(&m_allocator, data);
+}
+
+TEST_P(AllocatorCTest, GetSize)
+{
+  const size_t size = m_big * sizeof(double);
+
+  double* data = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
+
+  ASSERT_EQ(size, umpire_allocator_get_size(&m_allocator, data));
+
+  umpire_allocator_deallocate(&m_allocator, data);
+}
+
+TEST_P(AllocatorCTest, GetAllocatorById)
+{
+  umpire_resourcemanager rm;
+  umpire_resourcemanager_get_instance(&rm);
+  int alloc_id = umpire_allocator_get_id(&m_allocator);
+
+  umpire_allocator alloc_two;
+  umpire_resourcemanager_get_allocator_by_id(&rm, alloc_id, &alloc_two);
+  ASSERT_EQ(alloc_id, umpire_allocator_get_id(&alloc_two));
+}
+
+TEST_P(AllocatorCTest, SizeAndHighWatermark)
+{
+  double* data_one = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
+  ASSERT_NE(nullptr, data_one);
+
+  double* data_two = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
+  ASSERT_NE(nullptr, data_two);
+
+  double* data_three = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
+  ASSERT_NE(nullptr, data_three);
+
+  size_t total_size = 3*m_big*sizeof(double);
+
+  ASSERT_EQ(total_size, umpire_allocator_get_current_size(&m_allocator));
+  ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+
+  umpire_allocator_deallocate(&m_allocator, data_one);
+  ASSERT_EQ((2*m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
+  ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+
+  umpire_allocator_deallocate(&m_allocator, data_two);
+  ASSERT_EQ((m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
+  ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+ 
+  umpire_allocator_deallocate(&m_allocator, data_three);
+  ASSERT_EQ(0, umpire_allocator_get_current_size(&m_allocator));
+  ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
 }
 
 const char* allocator_names[] = {
@@ -67,169 +134,26 @@ INSTANTIATE_TEST_CASE_P(
     AllocatorCTest,
     ::testing::ValuesIn(allocator_names));
 
-// 
-// TEST(Allocator, HostAllocatorId)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "HOST");
-//   int alloc_id = um_allocator_get_id(allocator);
-// 
-//   um_allocator* allocator2 = um_resourcemanager_get_allocator_1(rm, alloc_id);
-// 
-//   ASSERT_EQ(alloc_id, um_allocator_get_id(allocator2));
-// 
-//   double* test_alloc = (double*) um_allocator_allocate(allocator2, 100*sizeof(double));
-//   ASSERT_NE(nullptr, test_alloc);
-// 
-//   um_allocator_deallocate(allocator2, test_alloc);
-//   um_resourcemanager_delete_allocator(allocator);
-//   um_resourcemanager_delete_allocator(allocator2);
-// }
-// 
-// TEST(Allocator, HostAllocatorSize)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "HOST");
-// 
-//   double* test_alloc = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   ASSERT_EQ((100*sizeof(double)), um_resourcemanager_get_size(rm, test_alloc));
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_size(allocator, test_alloc));
-// 
-//   ASSERT_NE(nullptr, test_alloc);
-//   um_allocator_deallocate(allocator, test_alloc);
-//   um_resourcemanager_delete_allocator(allocator);
-// }
-// 
-// TEST(Allocator, HostAllocator_CurrentSize_and_HiWatermark)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "HOST");
-// 
-//   double* test_alloc1 = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   double* test_alloc2 = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   double* test_alloc3 = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-// 
-//   ASSERT_EQ((100*sizeof(double)), um_resourcemanager_get_size(rm, test_alloc1));
-//   ASSERT_NE(nullptr, test_alloc1);
-// 
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_size(allocator, test_alloc2));
-//   ASSERT_NE(nullptr, test_alloc2);
-// 
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_size(allocator, test_alloc3));
-//   ASSERT_NE(nullptr, test_alloc3);
-// 
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_allocator_deallocate(allocator, test_alloc1);
-//   ASSERT_EQ((2*100*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_allocator_deallocate(allocator, test_alloc2);
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_allocator_deallocate(allocator, test_alloc3);
-//   ASSERT_EQ((0*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_resourcemanager_delete_allocator(allocator);
-// }
-// 
-// #if defined(um_ENABLE_CUDA)
-// TEST(Allocator, DeviceAllocatorExplicitInit)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-// 
-//   um_resourcemanager_initialize(rm);
-// 
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "DEVICE");
-// 
-//   double* test_alloc = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-// 
-//   ASSERT_NE(nullptr, test_alloc);
-//   um_allocator_deallocate(allocator, test_alloc);
-//   um_resourcemanager_delete_allocator(allocator);
-// }
-// 
-// TEST(Allocator, DeviceAllocator)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "DEVICE");
-// 
-//   double* test_alloc = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-// 
-//   ASSERT_NE(nullptr, test_alloc);
-//   um_allocator_deallocate(allocator, test_alloc);
-//   um_resourcemanager_delete_allocator(allocator);
-// }
-// 
-// TEST(Allocator, DeviceAllocatorSize)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "DEVICE");
-// 
-//   double* test_alloc = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   ASSERT_EQ((100*sizeof(double)), um_resourcemanager_get_size(rm, test_alloc));
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_size(allocator, test_alloc));
-// 
-//   ASSERT_NE(nullptr, test_alloc);
-//   um_allocator_deallocate(allocator, test_alloc);
-//   um_resourcemanager_delete_allocator(allocator);
-// }
-// 
-// TEST(Allocator, DeviceAllocator_CurrentSize_and_HiWatermark)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "DEVICE");
-// 
-//   double* test_alloc1 = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   double* test_alloc2 = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   double* test_alloc3 = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-// 
-//   ASSERT_EQ((100*sizeof(double)), um_resourcemanager_get_size(rm, test_alloc1));
-//   ASSERT_NE(nullptr, test_alloc1);
-// 
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_size(allocator, test_alloc2));
-//   ASSERT_NE(nullptr, test_alloc2);
-// 
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_size(allocator, test_alloc3));
-//   ASSERT_NE(nullptr, test_alloc3);
-// 
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_allocator_deallocate(allocator, test_alloc1);
-//   ASSERT_EQ((2*100*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_allocator_deallocate(allocator, test_alloc2);
-//   ASSERT_EQ((100*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_allocator_deallocate(allocator, test_alloc3);
-//   ASSERT_EQ((0*sizeof(double)), um_allocator_get_current_size(allocator));
-//   ASSERT_EQ((3*100*sizeof(double)), um_allocator_get_high_watermark(allocator));
-// 
-//   um_resourcemanager_delete_allocator(allocator);
-// }
-// #endif
-// 
-// TEST(Allocator, Deallocate)
-// {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
-//   um_allocator* allocator = um_resourcemanager_get_allocator_0(rm, "HOST");
-//   double* test_alloc = (double*) um_allocator_allocate(allocator, 100*sizeof(double));
-//   um_resourcemanager_deallocate(rm, test_alloc);
-//   um_resourcemanager_delete_allocator(allocator);
-//   SUCCEED();
-// }
-// 
+//TEST(AllocatorC, RegisterAllocator)
+//{
+//  umpire_resourcemanager rm;
+//  umpire_resourcemanager_get_instance(&rm);
+//
+//  umpire_allocator alloc;
+//  umpire_resourcemanager_get_allocator_by_name(&rm, "HOST", &alloc);
+//
+//  umpire_resourcemanager_register_allocator(
+//      "my_host_allocator_copy",
+//      &alloc);
+//
+//  SUCCEED();
+//}
+
 // TEST(Allocator, DeallocateThrow)
 // {
-//   um_resourcemanager* rm = um_resourcemanager_get_instance();
+//   umpire_resourcemanager* rm = umpire_resourcemanager_get_instance();
 //   double* ptr = new double[20];
-//   ASSERT_ANY_THROW( um_resourcemanager_deallocate(rm, ptr) );
+//   ASSERT_ANY_THROW( umpire_resourcemanager_deallocate(rm, ptr) );
 // 
 //   delete[] ptr;
 // }

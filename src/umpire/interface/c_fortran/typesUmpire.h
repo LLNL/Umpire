@@ -30,23 +30,23 @@ struct s_UMP_SHROUD_capsule_data {
 };
 typedef struct s_UMP_SHROUD_capsule_data UMP_SHROUD_capsule_data;
 
-struct s_um_allocator {
+struct s_umpire_allocator {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
 };
-typedef struct s_um_allocator um_allocator;
+typedef struct s_umpire_allocator umpire_allocator;
 
-struct s_um_dynamicpool {
+struct s_umpire_dynamicpool {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
 };
-typedef struct s_um_dynamicpool um_dynamicpool;
+typedef struct s_umpire_dynamicpool umpire_dynamicpool;
 
-struct s_um_resourcemanager {
+struct s_umpire_resourcemanager {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
 };
-typedef struct s_um_resourcemanager um_resourcemanager;
+typedef struct s_umpire_resourcemanager umpire_resourcemanager;
 
 struct s_UMP_SHROUD_array {
     UMP_SHROUD_capsule_data cxx;      /* address of C++ memory */
@@ -59,7 +59,7 @@ struct s_UMP_SHROUD_array {
 };
 typedef struct s_UMP_SHROUD_array UMP_SHROUD_array;
 
-void um_SHROUD_memory_destructor(UMP_SHROUD_capsule_data *cap);
+void umpire_SHROUD_memory_destructor(UMP_SHROUD_capsule_data *cap);
 
 #ifdef __cplusplus
 }
