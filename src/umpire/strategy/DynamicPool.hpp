@@ -71,9 +71,6 @@ class DynamicPool :
   private:
     DynamicSizePool<>* dpa;
 
-    long m_current_size;
-    long m_highwatermark;
-
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
 

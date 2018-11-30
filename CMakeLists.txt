@@ -37,6 +37,7 @@ option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
+option(ENABLE_TOOLS "Enable Umpire Development Tools" On)
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
@@ -100,6 +101,10 @@ if (ENABLE_BENCHMARKS)
 endif ()
 if (ENABLE_EXAMPLES)
 add_subdirectory(examples)
+endif ()
+
+if (ENABLE_TOOLS)
+add_subdirectory(tools)
 endif ()
 
 add_subdirectory(docs)
