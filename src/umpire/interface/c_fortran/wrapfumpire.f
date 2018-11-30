@@ -105,8 +105,8 @@ module umpire_mod
         procedure :: get_allocatorfor_ptr => resourcemanager_get_allocatorfor_ptr
         procedure :: copy_all => resourcemanager_copy_all
         procedure :: copy_with_size => resourcemanager_copy_with_size
-        procedure :: memset_0 => resourcemanager_memset_0
-        procedure :: memset_1 => resourcemanager_memset_1
+        procedure :: memset_all => resourcemanager_memset_all
+        procedure :: memset_with_size => resourcemanager_memset_with_size
         procedure :: reallocate => resourcemanager_reallocate
         procedure :: deallocate => resourcemanager_deallocate
         procedure :: get_size => resourcemanager_get_size
@@ -114,7 +114,7 @@ module umpire_mod
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
             get_allocator_by_id, get_allocatorfor_ptr
-        generic :: memset => memset_0, memset_1
+        generic :: memset => memset_all, memset_with_size
         ! splicer begin class.ResourceManager.type_bound_procedure_part
         ! splicer end class.ResourceManager.type_bound_procedure_part
     end type UmpireResourceManager
@@ -293,18 +293,19 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: size
         end subroutine c_resourcemanager_copy_with_size
 
-        subroutine c_resourcemanager_memset_0(self, ptr, val) &
-                bind(C, name="umpire_resourcemanager_memset_0")
+        subroutine c_resourcemanager_memset_all(self, ptr, val) &
+                bind(C, name="umpire_resourcemanager_memset_all")
             use iso_c_binding, only : C_INT, C_PTR
             import :: SHROUD_resourcemanager_capsule
             implicit none
             type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_INT), value, intent(IN) :: val
-        end subroutine c_resourcemanager_memset_0
+        end subroutine c_resourcemanager_memset_all
 
-        subroutine c_resourcemanager_memset_1(self, ptr, val, length) &
-                bind(C, name="umpire_resourcemanager_memset_1")
+        subroutine c_resourcemanager_memset_with_size(self, ptr, val, &
+                length) &
+                bind(C, name="umpire_resourcemanager_memset_with_size")
             use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -312,7 +313,7 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_INT), value, intent(IN) :: val
             integer(C_SIZE_T), value, intent(IN) :: length
-        end subroutine c_resourcemanager_memset_1
+        end subroutine c_resourcemanager_memset_with_size
 
         function c_resourcemanager_reallocate(self, src_ptr, size) &
                 result(SHT_rv) &
@@ -562,26 +563,27 @@ contains
         ! splicer end class.ResourceManager.method.copy_with_size
     end subroutine resourcemanager_copy_with_size
 
-    subroutine resourcemanager_memset_0(obj, ptr, val)
+    subroutine resourcemanager_memset_all(obj, ptr, val)
         use iso_c_binding, only : C_INT, C_PTR
         class(UmpireResourceManager) :: obj
         type(C_PTR), value, intent(IN) :: ptr
         integer(C_INT), value, intent(IN) :: val
-        ! splicer begin class.ResourceManager.method.memset_0
-        call c_resourcemanager_memset_0(obj%cxxmem, ptr, val)
-        ! splicer end class.ResourceManager.method.memset_0
-    end subroutine resourcemanager_memset_0
+        ! splicer begin class.ResourceManager.method.memset_all
+        call c_resourcemanager_memset_all(obj%cxxmem, ptr, val)
+        ! splicer end class.ResourceManager.method.memset_all
+    end subroutine resourcemanager_memset_all
 
-    subroutine resourcemanager_memset_1(obj, ptr, val, length)
+    subroutine resourcemanager_memset_with_size(obj, ptr, val, length)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
         type(C_PTR), value, intent(IN) :: ptr
         integer(C_INT), value, intent(IN) :: val
         integer(C_SIZE_T), value, intent(IN) :: length
-        ! splicer begin class.ResourceManager.method.memset_1
-        call c_resourcemanager_memset_1(obj%cxxmem, ptr, val, length)
-        ! splicer end class.ResourceManager.method.memset_1
-    end subroutine resourcemanager_memset_1
+        ! splicer begin class.ResourceManager.method.memset_with_size
+        call c_resourcemanager_memset_with_size(obj%cxxmem, ptr, val, &
+            length)
+        ! splicer end class.ResourceManager.method.memset_with_size
+    end subroutine resourcemanager_memset_with_size
 
     function resourcemanager_reallocate(obj, src_ptr, size) &
             result(SHT_rv)

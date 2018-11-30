@@ -29,6 +29,21 @@ if (ENABLE_C_API)
     NAME allocator_c_tests
     COMMAND allocator_c_tests)
 
+  blt_add_executable(
+    NAME operation_c_tests
+    SOURCES operation_c_tests.cpp
+    DEPENDS_ON umpire gtest
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+
+  target_include_directories(
+    operation_c_tests
+    PRIVATE
+    ${PROJECT_BINARY_DIR}/include)
+
+  blt_add_test(
+    NAME operation_c_tests
+    COMMAND operation_c_tests)
+
   if (ENABLE_FORTRAN_API)
     blt_add_executable(
       NAME fortran_interface_tests

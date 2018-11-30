@@ -87,8 +87,18 @@ declarations:
             - _with_size
 
         - decl: void memset(void* ptr, int val, size_t length=0)
+          default_arg_suffix:
+            - _all
+            - _with_size
+
         - decl: void* reallocate(void* src_ptr, size_t size)
+
+          #- decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
+          #  format:
+          #    function_suffix: _with_allocator
+
         - decl: void deallocate(void* ptr)
+
         - decl: size_t getSize(void* ptr)
 
           #        - decl: template <typename T> Allocator makeAllocator(const std::string& name);

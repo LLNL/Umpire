@@ -123,26 +123,26 @@ void umpire_resourcemanager_copy_with_size(
 // splicer end class.ResourceManager.method.copy_with_size
 }
 
-void umpire_resourcemanager_memset_0(umpire_resourcemanager * self,
+void umpire_resourcemanager_memset_all(umpire_resourcemanager * self,
     void * ptr, int val)
 {
-// splicer begin class.ResourceManager.method.memset_0
+// splicer begin class.ResourceManager.method.memset_all
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->memset(ptr, val);
     return;
-// splicer end class.ResourceManager.method.memset_0
+// splicer end class.ResourceManager.method.memset_all
 }
 
-void umpire_resourcemanager_memset_1(umpire_resourcemanager * self,
-    void * ptr, int val, size_t length)
+void umpire_resourcemanager_memset_with_size(
+    umpire_resourcemanager * self, void * ptr, int val, size_t length)
 {
-// splicer begin class.ResourceManager.method.memset_1
+// splicer begin class.ResourceManager.method.memset_with_size
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
     SH_this->memset(ptr, val, length);
     return;
-// splicer end class.ResourceManager.method.memset_1
+// splicer end class.ResourceManager.method.memset_with_size
 }
 
 void * umpire_resourcemanager_reallocate(umpire_resourcemanager * self,

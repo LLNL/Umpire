@@ -60,11 +60,11 @@ void umpire_resourcemanager_copy_with_size(
     umpire_resourcemanager * self, void * src_ptr, void * dst_ptr,
     size_t size);
 
-void umpire_resourcemanager_memset_0(umpire_resourcemanager * self,
+void umpire_resourcemanager_memset_all(umpire_resourcemanager * self,
     void * ptr, int val);
 
-void umpire_resourcemanager_memset_1(umpire_resourcemanager * self,
-    void * ptr, int val, size_t length);
+void umpire_resourcemanager_memset_with_size(
+    umpire_resourcemanager * self, void * ptr, int val, size_t length);
 
 void * umpire_resourcemanager_reallocate(umpire_resourcemanager * self,
     void * src_ptr, size_t size);
