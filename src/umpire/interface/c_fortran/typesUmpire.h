@@ -36,6 +36,12 @@ struct s_um_allocator {
 };
 typedef struct s_um_allocator um_allocator;
 
+struct s_um_dynamicpool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_um_dynamicpool um_dynamicpool;
+
 struct s_um_resourcemanager {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */

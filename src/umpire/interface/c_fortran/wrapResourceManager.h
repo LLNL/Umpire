@@ -72,14 +72,6 @@ void um_resourcemanager_deallocate(um_resourcemanager * self,
 size_t um_resourcemanager_get_size(um_resourcemanager * self,
     void * ptr);
 
-um_allocator * um_resourcemanager_make_allocator_int(
-    um_resourcemanager * self, const char * name,
-    um_allocator * SHC_rv);
-
-um_allocator * um_resourcemanager_make_allocator_int_bufferify(
-    um_resourcemanager * self, const char * name, int Lname,
-    um_allocator * SHC_rv);
-
 #ifdef __cplusplus
 }
 #endif

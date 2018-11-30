@@ -89,9 +89,9 @@ declarations:
         - decl: void deallocate(void* ptr)
         - decl: size_t getSize(void* ptr)
 
-        - decl: template <typename T> Allocator makeAllocator(const std::string& name);
-          cxx_template:
-            - instantiation: <DynamicPool>
+          #        - decl: template <typename T> Allocator makeAllocator(const std::string& name);
+          #          cxx_template:
+          #            - instantiation: <DynamicPool>
 
 splicer_code:
   c:

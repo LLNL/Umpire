@@ -45,24 +45,6 @@ if (ENABLE_OPENMP)
     openmp)
 endif ()
 
-if (ENABLE_C_API)
-  blt_add_executable(
-    NAME allocator_c_tests
-    SOURCES allocator_c_tests.cpp
-    DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
-
-  target_include_directories(
-    allocator_c_tests
-    PRIVATE
-    ${PROJECT_BINARY_DIR}/include)
-
-  blt_add_test(
-    NAME allocator_c_tests
-    COMMAND allocator_c_tests)
-
-endif()
-
 blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
@@ -108,28 +90,7 @@ blt_add_test(
   NAME free_functions_integration_tests
   COMMAND free_functions_integration_tests)
 
-blt_add_executable(
-  NAME fortran_interface_tests
-  SOURCES umpire_fortran_interface.f
-  DEPENDS_ON fruit umpire
-)
+if (ENABLE_C_API OR ENABLE_FORTRAN_API)
+  add_subdirectory(interface)
+endif()
 
-set_source_files_properties(
-  umpire_fortran_interface.f
-  PROPERTIES
-  Fortran_FORMAT FREE)
-
-# blt_add_executable(
-#   NAME memory_resource_traits_tests
-#   SOURCES memory_resource_traits_tests.cpp
-#   DEPENDS_ON umpire gtest
-#   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
-# 
-# target_include_directories(
-#   memory_resource_traits_tests
-#   PRIVATE
-#   ${PROJECT_BINARY_DIR}/include)
-# 
-# blt_add_test(
-#   NAME memory_resource_traits_tests
-#   COMMAND memory_resource_traits_tests)

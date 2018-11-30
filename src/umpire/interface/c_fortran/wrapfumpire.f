@@ -39,6 +39,26 @@ module umpire_mod
         integer(C_SIZE_T) :: size = 0_C_SIZE_T ! size of data in cxx
     end type SHROUD_array
 
+    ! splicer begin class.DynamicPool.module_top
+    ! splicer end class.DynamicPool.module_top
+
+    type, bind(C) :: SHROUD_dynamicpool_capsule
+        type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
+        integer(C_INT) :: idtor = 0       ! index of destructor
+    end type SHROUD_dynamicpool_capsule
+
+    type dynamicpool
+        type(SHROUD_dynamicpool_capsule) :: cxxmem
+        ! splicer begin class.DynamicPool.component_part
+        ! splicer end class.DynamicPool.component_part
+    contains
+        procedure :: get_instance => dynamicpool_get_instance
+        procedure :: set_instance => dynamicpool_set_instance
+        procedure :: associated => dynamicpool_associated
+        ! splicer begin class.DynamicPool.type_bound_procedure_part
+        ! splicer end class.DynamicPool.type_bound_procedure_part
+    end type dynamicpool
+
     ! splicer begin class.Allocator.module_top
     ! splicer end class.Allocator.module_top
 
@@ -90,7 +110,6 @@ module umpire_mod
         procedure :: reallocate => resourcemanager_reallocate
         procedure :: deallocate => resourcemanager_deallocate
         procedure :: get_size => resourcemanager_get_size
-        procedure :: make_allocator_int => resourcemanager_make_allocator_int
         procedure :: associated => resourcemanager_associated
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
@@ -101,16 +120,21 @@ module umpire_mod
     end type UmpireResourceManager
 
     interface operator (.eq.)
+        module procedure dynamicpool_eq
         module procedure allocator_eq
         module procedure resourcemanager_eq
     end interface
 
     interface operator (.ne.)
+        module procedure dynamicpool_ne
         module procedure allocator_ne
         module procedure resourcemanager_ne
     end interface
 
     interface
+
+        ! splicer begin class.DynamicPool.additional_interfaces
+        ! splicer end class.DynamicPool.additional_interfaces
 
         function c_allocator_allocate(self, bytes) &
                 result(SHT_rv) &
@@ -322,33 +346,6 @@ module umpire_mod
             integer(C_SIZE_T) :: SHT_rv
         end function c_resourcemanager_get_size
 
-        function c_resourcemanager_make_allocator_int(self, name, &
-                SHT_crv) &
-                result(SHT_rv) &
-                bind(C, name="um_resourcemanager_make_allocator_int")
-            use iso_c_binding, only : C_CHAR, C_PTR
-            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
-            implicit none
-            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
-            character(kind=C_CHAR), intent(IN) :: name(*)
-            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
-            type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_int
-
-        function c_resourcemanager_make_allocator_int_bufferify(self, &
-                name, Lname, SHT_crv) &
-                result(SHT_rv) &
-                bind(C, name="um_resourcemanager_make_allocator_int_bufferify")
-            use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
-            implicit none
-            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
-            character(kind=C_CHAR), intent(IN) :: name(*)
-            integer(C_INT), value, intent(IN) :: Lname
-            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
-            type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_int_bufferify
-
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
     end interface
@@ -367,6 +364,32 @@ module umpire_mod
     end interface
 
 contains
+
+    ! Return pointer to C++ memory.
+    function dynamicpool_get_instance(obj) result (cxxptr)
+        use iso_c_binding, only: C_PTR
+        class(dynamicpool), intent(IN) :: obj
+        type(C_PTR) :: cxxptr
+        cxxptr = obj%cxxmem%addr
+    end function dynamicpool_get_instance
+
+    subroutine dynamicpool_set_instance(obj, cxxmem)
+        use iso_c_binding, only: C_PTR
+        class(dynamicpool), intent(INOUT) :: obj
+        type(C_PTR), intent(IN) :: cxxmem
+        obj%cxxmem%addr = cxxmem
+        obj%cxxmem%idtor = 0
+    end subroutine dynamicpool_set_instance
+
+    function dynamicpool_associated(obj) result (rv)
+        use iso_c_binding, only: c_associated
+        class(dynamicpool), intent(IN) :: obj
+        logical rv
+        rv = c_associated(obj%cxxmem%addr)
+    end function dynamicpool_associated
+
+    ! splicer begin class.DynamicPool.additional_functions
+    ! splicer end class.DynamicPool.additional_functions
 
     function allocator_allocate(obj, bytes) &
             result(SHT_rv)
@@ -592,19 +615,6 @@ contains
         ! splicer end class.ResourceManager.method.get_size
     end function resourcemanager_get_size
 
-    function resourcemanager_make_allocator_int(obj, name) &
-            result(SHT_rv)
-        use iso_c_binding, only : C_INT, C_PTR
-        class(UmpireResourceManager) :: obj
-        character(len=*), intent(IN) :: name
-        type(C_PTR) :: SHT_prv
-        type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_int
-        SHT_prv = c_resourcemanager_make_allocator_int_bufferify(obj%cxxmem, &
-            name, len_trim(name, kind=C_INT), SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_int
-    end function resourcemanager_make_allocator_int
-
     function resourcemanager_associated(obj) result (rv)
         use iso_c_binding, only: c_associated
         class(UmpireResourceManager), intent(IN) :: obj
@@ -614,6 +624,28 @@ contains
 
     ! splicer begin class.ResourceManager.additional_functions
     ! splicer end class.ResourceManager.additional_functions
+
+    function dynamicpool_eq(a,b) result (rv)
+        use iso_c_binding, only: c_associated
+        type(dynamicpool), intent(IN) ::a,b
+        logical :: rv
+        if (c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
+            rv = .true.
+        else
+            rv = .false.
+        endif
+    end function dynamicpool_eq
+
+    function dynamicpool_ne(a,b) result (rv)
+        use iso_c_binding, only: c_associated
+        type(dynamicpool), intent(IN) ::a,b
+        logical :: rv
+        if (.not. c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
+            rv = .true.
+        else
+            rv = .false.
+        endif
+    end function dynamicpool_ne
 
     function allocator_eq(a,b) result (rv)
         use iso_c_binding, only: c_associated
