@@ -27,6 +27,8 @@ set(ENABLE_COPY_HEADERS Off CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
+option(ENABLE_FORTRAN_API "Build FORTRAN API" Off)
+option(ENABLE_C_API "Build C API" Off)
 set(ENABLE_WARNINGS_AS_ERRORS On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
@@ -43,6 +45,11 @@ else ()
 endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
+
+if (ENABLE_FORTRAN_API)
+  set(ENABLE_FORTRAN On)
+  set(ENABLE_C_API On)
+endif()
 
 ################################
 # BLT
