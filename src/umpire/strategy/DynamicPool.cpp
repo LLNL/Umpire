@@ -52,14 +52,12 @@ DynamicPool::deallocate(void* ptr)
 long
 DynamicPool::getCurrentSize() noexcept
 {
-  UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return 0;
 }
 
 long
 DynamicPool::getHighWatermark() noexcept
 {
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return 0;
 }
 

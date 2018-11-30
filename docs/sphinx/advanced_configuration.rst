@@ -25,6 +25,7 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
       ``ENABLE_SLIC``              Off      Enable SLIC logging
       ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
+      ``ENABLE_TOOLS``             On       Enable tools like replay
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
@@ -56,3 +57,6 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_ASSERTS``
   Enable assert() within Umpire
+
+* ``ENABLE_TOOLS``
+  Enable development tools for Umpire (replay, etc.)
