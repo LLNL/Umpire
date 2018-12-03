@@ -47,3 +47,4 @@ classes that Umpire provides.
   :caption: C API Tutorial
 
   tutorial/c/allocators.rst
+  tutorial/c/resources.rst
