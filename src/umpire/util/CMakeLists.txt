@@ -18,7 +18,8 @@ set (umpire_util_headers
   Exception.hpp
   Logger.hpp
   Macros.hpp
-  Platform.hpp)
+  Platform.hpp
+  Replay.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -31,7 +32,8 @@ endif()
 set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
-  Logger.cpp)
+  Logger.cpp
+  Replay.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources
