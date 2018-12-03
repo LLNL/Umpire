@@ -26,6 +26,7 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_SLIC``              Off      Enable SLIC logging
       ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
       ``ENABLE_TOOLS``             On       Enable tools like replay
+      ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
@@ -60,3 +61,6 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_TOOLS``
   Enable development tools for Umpire (replay, etc.)
+
+* ``ENABLE_DOCS``
+  Build user documentation (with Sphinx) and code documentation (with Doxygen)
