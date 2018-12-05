@@ -122,7 +122,7 @@ class Allocator {
      *
      * \return name of Allocator.
      */
-    std::string getName() noexcept;
+    std::string getName() const noexcept;
 
     /*!
      * \brief Get the integer ID of this Allocator.
@@ -135,7 +135,7 @@ class Allocator {
      *
      * \return integer id of Allocator.
      */
-    int getId() noexcept;
+    int getId() const noexcept;
 
     /*!
      * \brief Get the AllocationStrategy object used by this Allocator.
