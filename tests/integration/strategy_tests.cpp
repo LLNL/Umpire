@@ -337,3 +337,19 @@ TEST(CoalesceTest, Unsupported)
   rm.coalesce(rm.getAllocator("HOST")),
   umpire::util::Exception);
 }
+
+TEST(ReleaseTest, Works)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_simpool_for_release", rm.getAllocator("HOST"), 64, 64);
+
+  void* ptr_one = alloc.allocate(62);
+  void* ptr_two = alloc.allocate(1024);
+  alloc.deallocate(ptr_two);
+
+  EXPECT_NO_THROW(alloc.release());
+
+  alloc.deallocate(ptr_one);
+}

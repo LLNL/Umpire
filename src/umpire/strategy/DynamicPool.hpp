@@ -62,6 +62,8 @@ class DynamicPool :
 
     void deallocate(void* ptr);
 
+    void release();
+
     long getCurrentSize() noexcept;
     long getHighWatermark() noexcept;
     long getActualSize() noexcept;

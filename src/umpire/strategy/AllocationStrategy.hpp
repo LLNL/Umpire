@@ -62,6 +62,11 @@ class AllocationStrategy :
     virtual void deallocate(void* ptr) = 0;
 
     /*!
+     * \brief Release any and all unused memory held by this AllocationStrategy
+     */
+    virtual void release();
+
+    /*!
      * \brief Get current (total) size of the allocated memory.
      *
      * This is the total size of all allocation currently 'live' that have been
