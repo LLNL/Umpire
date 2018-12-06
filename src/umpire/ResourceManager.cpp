@@ -34,6 +34,9 @@
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/AllocationTracker.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -413,6 +416,27 @@ ResourceManager::getSize(void* ptr)
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);
   return record->m_size;
+}
+
+void
+ResourceManager::coalesce(Allocator allocator)
+{
+  auto strategy = allocator.getAllocationStrategy();
+
+  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+  if (tracker) {
+    strategy = tracker->getAllocationStrategy();
+
+  }
+
+  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
+  if (dynamic_pool) {
+    dynamic_pool->coalesce();
+  } else {
+    UMPIRE_ERROR(allocator.getName() << " is not a DynamicPool, cannot coalesce!");
+  }
 }
 
 std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForId(int id)

@@ -68,6 +68,8 @@ class DynamicPool :
 
     Platform getPlatform() noexcept;
 
+    void coalesce() noexcept;
+
   private:
     DynamicSizePool<>* dpa;
 

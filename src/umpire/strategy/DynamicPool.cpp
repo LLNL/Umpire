@@ -75,5 +75,11 @@ DynamicPool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+void
+DynamicPool::coalesce() noexcept
+{
+  dpa->coalesce();
+}
+
 } // end of namespace strategy
 } // end of namespace umpire
