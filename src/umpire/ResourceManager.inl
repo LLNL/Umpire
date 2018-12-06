@@ -40,7 +40,7 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_REPLAY("makeAllocator,"
 #if defined(UMPIRE_ENABLE_ROCM)
-        << typeid(Strategy).name();
+        << typeid(Strategy).name()
 #else
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
 #endif
