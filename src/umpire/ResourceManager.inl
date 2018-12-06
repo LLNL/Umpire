@@ -39,7 +39,11 @@ Allocator ResourceManager::makeAllocator(
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
     UMPIRE_REPLAY("makeAllocator,"
+#if defined(UMPIRE_ENABLE_ROCM)
+        << typeid(Strategy).name();
+#else
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+#endif
         << "," << (introspection ? "true" : "false")
         << "," << name
         << umpire::util::Replay::printReplayAllocator(std::forward<Args>(args)...)

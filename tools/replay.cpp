@@ -277,9 +277,11 @@ int main(int ac, char** av)
   if ( ac != 2 )
     Replay::usage_and_exit( "Incorrect number of program arguments" );
 
+#if !defined(UMPIRE_ENABLE_ROCM)
   Replay replay(av[1]);
 
   replay.run();
+#endif
 
   return 0;
 }
