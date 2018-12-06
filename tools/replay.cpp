@@ -22,6 +22,7 @@
 
 #include <cstdlib>
 
+#include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
