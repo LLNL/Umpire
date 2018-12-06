@@ -68,5 +68,11 @@ AllocationTracker::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+std::shared_ptr<umpire::strategy::AllocationStrategy> 
+AllocationTracker::getAllocationStrategy()
+{
+  return m_allocator;
+}
+
 } // end of namespace umpire
 } // end of namespace strategy

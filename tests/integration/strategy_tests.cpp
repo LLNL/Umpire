@@ -311,3 +311,29 @@ TEST(SizeLimiter, Host)
   EXPECT_NO_THROW(
     alloc.deallocate(data));
 }
+
+
+TEST(CoalesceTest, CanCoalesce)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_simpool", rm.getAllocator("HOST"), 64, 64);
+
+  void* ptr_one = alloc.allocate(62);
+  void* ptr_two = alloc.allocate(1024);
+  alloc.deallocate(ptr_two);
+
+  EXPECT_NO_THROW(rm.coalesce(alloc));
+
+  alloc.deallocate(ptr_one);
+}
+
+TEST(CoalesceTest, Unsupported)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  EXPECT_THROW(
+  rm.coalesce(rm.getAllocator("HOST")),
+  umpire::util::Exception);
+}
