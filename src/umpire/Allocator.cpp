@@ -87,13 +87,13 @@ Allocator::getActualSize() noexcept
 }
 
 std::string
-Allocator::getName() noexcept
+Allocator::getName() const noexcept
 {
   return m_allocator->getName();
 }
 
 int
-Allocator::getId() noexcept
+Allocator::getId() const noexcept
 {
   return m_allocator->getId();
 }
