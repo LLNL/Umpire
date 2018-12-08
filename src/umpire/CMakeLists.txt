@@ -14,6 +14,7 @@
 ##############################################################################
 set (umpire_headers
   Allocator.hpp
+  Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
   TypedAllocator.hpp
@@ -22,6 +23,7 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
+  Replay.cpp
   ResourceManager.cpp)
 
 if (ENABLE_FORTRAN_API OR ENABLE_C_API)

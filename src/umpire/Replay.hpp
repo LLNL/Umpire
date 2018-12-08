@@ -19,10 +19,27 @@
 #include <sstream>
 #include <iostream>
 #include "umpire/Allocator.hpp"
-#include <cxxabi.h>
+
+#define UMPIRE_REPLAY( msg )                                             \
+{                                                                        \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
+    std::ostringstream local_msg;                                        \
+    local_msg  << "REPLAY," << msg;                                      \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
+  }                                                                      \
+}
+
+#define UMPIRE_REPLAY_CONT( msg )                                        \
+{                                                                        \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
+    std::ostringstream local_msg;                                        \
+    local_msg  << "," << msg;                                            \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
+  }                                                                      \
+}
 
 namespace umpire {
-namespace util {
+namespace replay {
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc);
 class Replay {
 public:
@@ -51,7 +68,7 @@ private:
   static Replay* s_Replay;
 };
 
-} /* namespace util */
+} /* namespace replay */
 } /* namespace umpire */
 
 #endif /* UMPIRE_Replay_HPP */

@@ -12,15 +12,15 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/Replay.hpp"
 
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
 #include "umpire/Allocator.hpp"
+#include "umpire/Replay.hpp"
 
 namespace umpire {
-namespace util {
+namespace replay {
 
 static const char* env_name = "UMPIRE_REPLAY";
 Replay* Replay::s_Replay = nullptr;
@@ -76,5 +76,5 @@ std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
   return out;
 }
 
-} /* namespace util */
+} /* namespace replay */
 } /* namespace umpire */
