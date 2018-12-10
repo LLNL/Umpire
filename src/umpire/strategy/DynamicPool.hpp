@@ -58,17 +58,17 @@ class DynamicPool :
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024)) noexcept;
 
-    void* allocate(size_t bytes);
+    void* allocate(size_t bytes) override;
 
-    void deallocate(void* ptr);
+    void deallocate(void* ptr) override;
 
     void release() override;
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
-    long getActualSize() noexcept;
+    long getCurrentSize() override noexcept;
+    long getHighWatermark() override noexcept;
+    long getActualSize() override noexcept;
 
-    Platform getPlatform() noexcept;
+    Platform getPlatform() override noexcept;
 
     void coalesce() noexcept;
 
