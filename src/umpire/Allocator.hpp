@@ -71,6 +71,11 @@ class Allocator {
     void deallocate(void* ptr);
 
     /*!
+     * \brief Release any and all unused memory held by this Allocator.
+     */
+    void release();
+
+    /*!
      * \brief Return number of bytes allocated for allocation
      *
      * \param ptr Pointer to allocation in question

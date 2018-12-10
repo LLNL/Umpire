@@ -49,6 +49,12 @@ DynamicPool::deallocate(void* ptr)
   dpa->deallocate(ptr);
 }
 
+void
+DynamicPool::release()
+{
+  dpa->release();
+}
+
 long
 DynamicPool::getCurrentSize() noexcept
 {

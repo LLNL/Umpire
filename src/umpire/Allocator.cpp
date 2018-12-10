@@ -62,6 +62,16 @@ Allocator::deallocate(void* ptr)
   }
 }
 
+void
+Allocator::release()
+{
+  UMPIRE_REPLAY("release," <<  m_allocator << "\n");
+
+  UMPIRE_LOG(Debug, "");
+
+  m_allocator->release();
+}
+
 size_t
 Allocator::getSize(void* ptr)
 {
