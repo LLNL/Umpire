@@ -1,4 +1,4 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v0.2.4
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v0.3.0
 
 [![Build Status](https://travis-ci.com/LLNL/Umpire.svg?branch=develop)](https://travis-ci.com/LLNL/Umpire)
 [![Documentation Status](https://readthedocs.org/projects/umpire/badge/?version=develop)](https://umpire.readthedocs.io/en/develop/?badge=develop)
