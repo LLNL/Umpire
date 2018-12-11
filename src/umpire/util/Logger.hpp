@@ -41,12 +41,12 @@ static const std::string MessageLevelName[ Level::Num_Levels ] = {
 class Logger {
   public:
 
-  void setLoggingMsgLevel( message::Level level );
+  void setLoggingMsgLevel( message::Level level ) noexcept;
 
   void logMessage( message::Level level,
                    const std::string& message,
                    const std::string& fileName,
-                   int line );
+                   int line ) noexcept;
 
   static void initialize();
 
@@ -65,8 +65,8 @@ class Logger {
   };
 
 private:
-  Logger();
-  ~Logger();
+  Logger() noexcept;
+  ~Logger() noexcept;
 
   bool m_isEnabled[ message::Num_Levels ];
   static Logger* s_Logger;

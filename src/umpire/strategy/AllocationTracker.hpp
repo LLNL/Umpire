@@ -24,7 +24,7 @@
 namespace umpire {
 namespace strategy {
 
-class AllocationTracker : 
+class AllocationTracker :
   public AllocationStrategy,
   private mixins::Inspector
 {
@@ -32,17 +32,19 @@ class AllocationTracker :
     AllocationTracker(
         const std::string& name,
         int id,
-        Allocator allocator);
+        Allocator allocator) noexcept;
 
     void* allocate(size_t bytes);
 
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
-    long getActualSize();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
+    long getActualSize() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
+
+    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
   private:
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;

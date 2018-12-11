@@ -18,7 +18,6 @@
 #include "umpire/interface/c_fortran/shroudrt.hpp"
 
 #include "umpire/interface/c_fortran/wrapAllocator.h"
-
 #include "umpire/interface/c_fortran/wrapResourceManager.h"
 
 #endif // UMPIRE_H_

@@ -12,30 +12,28 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/PinnedMemoryResourceFactory.hpp"
+#ifndef UMPIRE_RocmDeviceResourceFactory_HPP
+#define UMPIRE_RocmDeviceResourceFactory_HPP
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
-
-#include "umpire/alloc/CudaPinnedAllocator.hpp"
+#include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool
-PinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
-{
-  if (name.compare("PINNED") == 0) {
-    return true;
-  } else {
-    return false;
-  }
-}
 
-std::shared_ptr<MemoryResource>
-PinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+/*!
+ * \brief Factory class for constructing MemoryResource objects that use GPU
+ * memory.
+ */
+class RocmDeviceResourceFactory :
+  public MemoryResourceFactory
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator> >(Platform::cuda, "PINNED", id);
-}
+  bool isValidMemoryResourceFor(const std::string& name) noexcept;
+
+  std::shared_ptr<MemoryResource> create(const std::string& name, int id);
+};
 
 } // end of namespace resource
 } // end of namespace umpire
+
+#endif // UMPIRE_RocmDeviceResourceFactory_HPP

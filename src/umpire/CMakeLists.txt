@@ -14,6 +14,7 @@
 ##############################################################################
 set (umpire_headers
   Allocator.hpp
+  Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
   TypedAllocator.hpp
@@ -22,9 +23,10 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
+  Replay.cpp
   ResourceManager.cpp)
 
-if (ENABLE_FORTRAN)
+if (ENABLE_FORTRAN_API OR ENABLE_C_API)
   set (umpire_headers
     ${umpire_headers}
     interface/umpire.h
@@ -33,18 +35,27 @@ if (ENABLE_FORTRAN)
     interface/c_fortran/wrapResourceManager.h
     )
 
-  set (umpire_sources
-    ${umpire_sources}
-    interface/c_fortran/shroudrt.cpp
-    interface/c_fortran/wrapAllocator.cpp
-    interface/c_fortran/wrapResourceManager.cpp
-    interface/c_fortran/wrapfumpire.f90
-    )
+  if (ENABLE_C_API)
+    set (umpire_sources
+      ${umpire_sources}
+      interface/c_fortran/shroudrt.cpp
+      interface/c_fortran/wrapAllocator.cpp
+      interface/c_fortran/wrapResourceManager.cpp
+      interface/c_fortran/wrapUmpire.cpp
+      )
 
-  set_source_files_properties(
-    interface/c_fortran/wrapfumpire.f90
-    PROPERTIES
-    Fortran_FORMAT FREE)
+    if (ENABLE_FORTRAN_API)
+      set (umpire_sources
+        ${umpire_sources}
+        interface/c_fortran/wrapfumpire.f
+      )
+
+      set_source_files_properties(
+        interface/c_fortran/wrapfumpire.f
+        PROPERTIES
+        Fortran_FORMAT FREE)
+    endif ()
+  endif ()
 endif ()
 
 blt_add_library(
@@ -59,6 +70,21 @@ set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
+set(UMPIRE_ENABLE_ROCM ${ENABLE_ROCM})
+
+if (ENABLE_CUDA OR ENABLE_ROCM) 
+  set(UMPIRE_ENABLE_DEVICE On)
+  set(UMPIRE_ENABLE_PINNED On)
+else ()
+  set(UMPIRE_ENABLE_DEVICE Off)
+  set(UMPIRE_ENABLE_PINNED Off)
+endif()
+
+if (ENABLE_CUDA)
+  set(UMPIRE_ENABLE_UM On)
+else ()
+  set(UMPIRE_ENABLE_UM Off)
+endif()
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in

@@ -24,7 +24,7 @@ blt_add_executable(
   DEPENDS_ON
     umpire)
 
-if (ENABLE_FORTRAN)
+if (ENABLE_C_API)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c
@@ -36,6 +36,12 @@ endif ()
 blt_add_executable(
   NAME vector_allocator
   SOURCES vector_allocator.cpp
+  DEPENDS_ON 
+    umpire)
+
+blt_add_executable(
+  NAME size_limiter
+  SOURCES size_limiter.cpp
   DEPENDS_ON 
     umpire)
 

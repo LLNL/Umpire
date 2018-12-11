@@ -16,6 +16,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 #include "umpire/util/StatisticsDatabase.hpp"
@@ -24,7 +25,7 @@
 
 namespace umpire {
 
-Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator):
+Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept:
   m_allocator(allocator)
 {
 }
@@ -33,8 +34,12 @@ void*
 Allocator::allocate(size_t bytes)
 {
   void* ret = nullptr;
+
   UMPIRE_LOG(Debug, "(" << bytes << ")");
+
+  UMPIRE_REPLAY( "allocate," << bytes << "," << m_allocator);
   ret = m_allocator->allocate(bytes);
+  UMPIRE_REPLAY_CONT( ret << "\n");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
   return ret;
@@ -43,8 +48,9 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_LOG(Debug, "(" << ptr << ")");
+  UMPIRE_REPLAY( "deallocate," << ptr << "," << m_allocator << "\n");
 
+  UMPIRE_LOG(Debug, "(" << ptr << ")");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
@@ -56,6 +62,16 @@ Allocator::deallocate(void* ptr)
   }
 }
 
+void
+Allocator::release()
+{
+  UMPIRE_REPLAY("release," <<  m_allocator << "\n");
+
+  UMPIRE_LOG(Debug, "");
+
+  m_allocator->release();
+}
+
 size_t
 Allocator::getSize(void* ptr)
 {
@@ -64,44 +80,44 @@ Allocator::getSize(void* ptr)
 }
 
 size_t
-Allocator::getHighWatermark()
+Allocator::getHighWatermark() noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
 size_t
-Allocator::getCurrentSize()
+Allocator::getCurrentSize() noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
 size_t
-Allocator::getActualSize()
+Allocator::getActualSize() noexcept
 {
   return m_allocator->getActualSize();
 }
 
 std::string
-Allocator::getName()
+Allocator::getName() const noexcept
 {
   return m_allocator->getName();
 }
 
 int
-Allocator::getId()
+Allocator::getId() const noexcept
 {
   return m_allocator->getId();
 }
 
 std::shared_ptr<strategy::AllocationStrategy>
-Allocator::getAllocationStrategy()
+Allocator::getAllocationStrategy() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
   return m_allocator;
 }
 
 Platform
-Allocator::getPlatform()
+Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

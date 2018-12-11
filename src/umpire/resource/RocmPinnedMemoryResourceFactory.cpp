@@ -12,19 +12,19 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-
-#include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#include "umpire/alloc/AmPinnedAllocator.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool
-UnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+RocmPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
-  if (name.compare("UM") == 0) {
+  if (name.compare("PINNED") == 0) {
     return true;
   } else {
     return false;
@@ -32,9 +32,16 @@ UnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-UnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+RocmPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator> >(Platform::cuda, "UM", id);
+  MemoryResourceTraits traits;
+
+  traits.unified = true;
+  traits.vendor = MemoryResourceTraits::vendor_type::AMD;
+  traits.kind = MemoryResourceTraits::memory_type::DDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::access;
+
+  return std::make_shared<resource::DefaultMemoryResource<alloc::AmPinnedAllocator> >(Platform::rocm, "PINNED", id, traits);
 }
 
 } // end of namespace resource

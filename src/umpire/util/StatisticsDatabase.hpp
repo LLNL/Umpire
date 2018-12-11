@@ -31,9 +31,9 @@ class StatisticsDatabase {
     std::shared_ptr<Statistic> getStatistic(
         const std::string& name);
 
-    void printStatistics(std::ostream& stream);
+    void printStatistics(std::ostream& stream) noexcept;
   private:
-    StatisticsDatabase();
+    StatisticsDatabase() noexcept;
 
     StatisticsDatabase (const StatisticsDatabase&) = delete;
     StatisticsDatabase& operator= (const StatisticsDatabase&) = delete;

@@ -18,6 +18,7 @@ set (umpire_strategy_headers
   AllocationTracker.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
+  SizeLimiter.hpp
   ThreadSafeAllocator.hpp
   DynamicPool.hpp
   FixedPool.hpp
@@ -32,6 +33,7 @@ set (umpire_stategy_sources
   AllocationTracker.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
+  SizeLimiter.cpp
   ThreadSafeAllocator.cpp
   DynamicPool.cpp
   mixins/Inspector.cpp)

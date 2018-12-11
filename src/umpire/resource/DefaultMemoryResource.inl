@@ -27,8 +27,8 @@ namespace umpire {
 namespace resource {
 
 template<typename _allocator>
-DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id) :
-  MemoryResource(name, id),
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits) :
+  MemoryResource(name, id, traits),
   umpire::strategy::mixins::Inspector(),
   m_allocator(),
   m_platform(platform)
@@ -60,21 +60,21 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 }
 
 template<typename _allocator>
-long DefaultMemoryResource<_allocator>::getCurrentSize()
+long DefaultMemoryResource<_allocator>::getCurrentSize() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 template<typename _allocator>
-long DefaultMemoryResource<_allocator>::getHighWatermark()
+long DefaultMemoryResource<_allocator>::getHighWatermark() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
   return m_high_watermark;
 }
 
 template<typename _allocator>
-Platform DefaultMemoryResource<_allocator>::getPlatform()
+Platform DefaultMemoryResource<_allocator>::getPlatform() noexcept
 {
   return m_platform;
 }

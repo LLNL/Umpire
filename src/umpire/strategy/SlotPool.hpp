@@ -37,10 +37,10 @@ class SlotPool :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() noexcept;
+    long getHighWatermark() noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
   private:
     void init();
 
