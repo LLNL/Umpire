@@ -26,10 +26,12 @@ DynamicPool::DynamicPool(
     int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size) noexcept :
+    const std::size_t min_alloc_size,
+    std::function<bool(umpire::strategy::DynamicPool*)> heuristic_fun) noexcept :
   AllocationStrategy(name, id),
   dpa(nullptr),
-  m_allocator(allocator.getAllocationStrategy())
+  m_allocator(allocator.getAllocationStrategy()),
+  free_heuristic{heuristic_fun}
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
 }
@@ -47,6 +49,9 @@ DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
+  if ( free_heuristic(this) ) {
+    dpa->coalesce();
+  }
 }
 
 void
