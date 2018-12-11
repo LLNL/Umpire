@@ -16,6 +16,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 #include "umpire/util/StatisticsDatabase.hpp"
