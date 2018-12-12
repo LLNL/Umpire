@@ -28,8 +28,7 @@
 namespace umpire {
 namespace strategy {
 
-class DynamicPool;
-static bool default_heuristic( umpire::strategy::DynamicPool* ) { return false; }
+static inline bool default_heuristic( int /* id */ ) { return false; }
 
 /*!
  * \brief Simple dynamic pool for allocations
@@ -45,6 +44,8 @@ static bool default_heuristic( umpire::strategy::DynamicPool* ) { return false; 
 class DynamicPool :
   public AllocationStrategy
 {
+  using Coalesce_Heuristic  = std::function<bool(int)>;
+
   public:
     /*!
      * \brief Construct a new DynamicPool.
@@ -57,11 +58,11 @@ class DynamicPool :
      */
     DynamicPool(
         const std::string& name,
-        int id,
+        int _id,
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        std::function<bool( umpire::strategy::DynamicPool* )> heuristic_fun = default_heuristic) noexcept;
+        Coalesce_Heuristic h_fun = default_heuristic) noexcept;
 
     void* allocate(size_t bytes) override;
 
@@ -81,7 +82,8 @@ class DynamicPool :
     DynamicSizePool<>* dpa;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
-    std::function<bool( umpire::strategy::DynamicPool* )> free_heuristic;
+    int id;
+    Coalesce_Heuristic do_coalesce;
 };
 
 } // end of namespace strategy
