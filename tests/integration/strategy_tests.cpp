@@ -26,6 +26,7 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/SizeLimiter.hpp"
 
 #if defined(_OPENMP)
 #include <omp.h>
@@ -37,9 +38,13 @@ static int subsequent_min_size = 512;
 
 const char* AllocationDevices[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
     , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
     , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
     , "PINNED"
 #endif
 };
@@ -97,7 +102,7 @@ TEST_P(StrategyTest, Duplicate)
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_TRUE(rm.isAllocator(allocatorName));
- 
+
   ASSERT_EQ(allocator->getName(), poolName.str());
 
   ASSERT_ANY_THROW(
@@ -107,7 +112,7 @@ TEST_P(StrategyTest, Duplicate)
 
 INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices));
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
 TEST(SimpoolStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -177,7 +182,7 @@ TEST(MonotonicStrategy, Host)
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
 TEST(MonotonicStrategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -192,7 +197,9 @@ TEST(MonotonicStrategy, Device)
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "device_monotonic_pool");
 }
+#endif // defined(UMPIRE_ENABLE_DEVICE)
 
+#if defined(UMPIRE_ENABLE_UM)
 TEST(MonotonicStrategy, UM)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -207,18 +214,20 @@ TEST(MonotonicStrategy, UM)
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
 }
+#endif // defined(UMPIRE_ENABLE_UM)
 
+#if defined(UMPIRE_ENABLE_CUDA)
 TEST(AllocationAdvisor, Create)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_NO_THROW(
-    auto read_only_alloc = 
+    auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc = 
+      auto failed_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "read_only_um", rm.getAllocator("UM"), "FOOBAR"));
 }
@@ -229,7 +238,7 @@ TEST(AllocationAdvisor, Host)
   auto um_allocator = rm.getAllocator("UM");
   auto host_allocator = rm.getAllocator("HOST");
 
-  auto read_only_alloc = 
+  auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "preferred_location_host", um_allocator, "PREFERRED_LOCATION", host_allocator);
 
@@ -240,7 +249,7 @@ TEST(AllocationAdvisor, Host)
   });
 
 }
-#endif
+#endif // defined(UMPIRE_ENABLE_CUDA)
 
 TEST(FixedPool, Host)
 {
@@ -282,3 +291,65 @@ TEST(ThreadSafeAllocator, Host)
 }
 
 #endif
+
+TEST(SizeLimiter, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+      "size_limited_alloc", rm.getAllocator("HOST"), 64);
+
+  void* data = nullptr;
+
+  EXPECT_NO_THROW(data = alloc.allocate(64));
+
+  EXPECT_THROW({
+    void* tmp_data = alloc.allocate(1024);
+    UMPIRE_USE_VAR(tmp_data);
+  }, umpire::util::Exception);
+
+  EXPECT_NO_THROW(
+    alloc.deallocate(data));
+}
+
+
+TEST(CoalesceTest, CanCoalesce)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_simpool", rm.getAllocator("HOST"), 64, 64);
+
+  void* ptr_one = alloc.allocate(62);
+  void* ptr_two = alloc.allocate(1024);
+  alloc.deallocate(ptr_two);
+
+  EXPECT_NO_THROW(rm.coalesce(alloc));
+
+  alloc.deallocate(ptr_one);
+}
+
+TEST(CoalesceTest, Unsupported)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  EXPECT_THROW(
+  rm.coalesce(rm.getAllocator("HOST")),
+  umpire::util::Exception);
+}
+
+TEST(ReleaseTest, Works)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_simpool_for_release", rm.getAllocator("HOST"), 64, 64);
+
+  void* ptr_one = alloc.allocate(62);
+  void* ptr_two = alloc.allocate(1024);
+  alloc.deallocate(ptr_two);
+
+  EXPECT_NO_THROW(alloc.release());
+
+  alloc.deallocate(ptr_one);
+}

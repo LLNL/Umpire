@@ -27,16 +27,17 @@
 #include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
+#include "umpire/resource/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
 /*!
- * \brief 
+ * \brief
  */
 class ResourceManager {
-  public: 
+  public:
     /*!
-     * \brief 
+     * \brief
      */
     static ResourceManager& getInstance();
 
@@ -48,11 +49,11 @@ class ResourceManager {
     void initialize();
 
     void finalize();
-    
+
     /*!
      * \brief Get the names of all available Allocator objects.
      */
-    std::vector<std::string> getAvailableAllocators();
+    std::vector<std::string> getAvailableAllocators() noexcept;
 
     /*!
      * \brief Get the Allocator with the given name.
@@ -87,7 +88,7 @@ class ResourceManager {
      *
      * \param allocator The Allocator to use as the default.
      */
-    void setDefaultAllocator(Allocator allocator);
+    void setDefaultAllocator(Allocator allocator) noexcept;
 
     /*!
      * \brief Construct a new Allocator.
@@ -106,7 +107,7 @@ class ResourceManager {
      *
      * The same Allocator can be registered under multiple names.
      *
-     * \param name Name to register Allocator with. 
+     * \param name Name to register Allocator with.
      * \param allocator Allocator to register.
      */
     void registerAllocator(const std::string& name, Allocator allocator);
@@ -121,7 +122,7 @@ class ResourceManager {
      */
     Allocator getAllocator(void* ptr);
 
-    bool isAllocator(const std::string& name);
+    bool isAllocator(const std::string& name) noexcept;
 
     /*!
      * \brief Does the given pointer have an associated Allocator.
@@ -129,7 +130,7 @@ class ResourceManager {
      * \return True if the pointer has an associated Allocator.
      */
     bool hasAllocator(void* ptr);
-    
+
     void registerAllocation(void* ptr, util::AllocationRecord* record);
 
     util::AllocationRecord* deregisterAllocation(void* ptr);
@@ -144,7 +145,7 @@ class ResourceManager {
      * \brief Copy size bytes of data from src_ptr to dst_ptr.
      *
      * Both the src_ptr and dst_ptr addresses must be allocated by Umpire. They
-     * can be offset from any Umpire-managed base address.  
+     * can be offset from any Umpire-managed base address.
      *
      * The dst_ptr must be large enough to accommodate size bytes of data.
      *
@@ -217,6 +218,16 @@ class ResourceManager {
      */
     size_t getSize(void* ptr);
 
+    /*!
+     * \brief If allocator is some kind of memory pool, try and coalesce
+     * memory.
+     *
+     * \param allocator Allocator to coalesce memory.
+     *
+     * \throws umpire::util::Exception if allocator doesn't support coalescing.
+     */
+    void coalesce(Allocator allocator);
+
 
   private:
     ResourceManager();
@@ -225,9 +236,10 @@ class ResourceManager {
     ResourceManager& operator= (const ResourceManager&) = delete;
 
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
+    std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForId(int id);
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
-    int getNextId();
+    int getNextId() noexcept;
 
     static ResourceManager* s_resource_manager_instance;
 

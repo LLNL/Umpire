@@ -13,12 +13,13 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
+cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 
 project(Umpire 
   LANGUAGES CXX C
-  VERSION 0.2.3)
+  VERSION 0.3.0)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
@@ -26,6 +27,10 @@ set(ENABLE_COPY_HEADERS Off CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
+set(ENABLE_DOCS Off CACHE Bool "")
+option(ENABLE_FORTRAN_API "Build FORTRAN API" Off)
+option(ENABLE_C_API "Build C API" Off)
+set(ENABLE_WARNINGS_AS_ERRORS On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
@@ -33,6 +38,7 @@ option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
 set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
+option(ENABLE_TOOLS "Enable Umpire Development Tools" On)
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
@@ -41,6 +47,11 @@ else ()
 endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
+
+if (ENABLE_FORTRAN_API)
+  set(ENABLE_FORTRAN On)
+  set(ENABLE_C_API On)
+endif()
 
 ################################
 # BLT
@@ -93,4 +104,10 @@ if (ENABLE_EXAMPLES)
 add_subdirectory(examples)
 endif ()
 
-add_subdirectory(docs)
+if (ENABLE_TOOLS)
+add_subdirectory(tools)
+endif ()
+
+if (ENABLE_DOCS)
+  add_subdirectory(docs)
+endif ()

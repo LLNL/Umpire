@@ -77,22 +77,22 @@ SlotPool::deallocate(void* ptr)
   }
 }
 
-long 
-SlotPool::getCurrentSize()
+long
+SlotPool::getCurrentSize() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long 
-SlotPool::getHighWatermark()
+long
+SlotPool::getHighWatermark() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
 Platform
-SlotPool::getPlatform()
+SlotPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

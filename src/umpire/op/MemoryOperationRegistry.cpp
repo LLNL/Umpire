@@ -34,6 +34,11 @@
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_ROCM)
+#include "umpire/op/RocmCopyOperation.hpp"
+#include "umpire/op/RocmMemsetOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -43,7 +48,7 @@ MemoryOperationRegistry*
 MemoryOperationRegistry::s_memory_operation_registry_instance = nullptr;
 
 MemoryOperationRegistry&
-MemoryOperationRegistry::getInstance()
+MemoryOperationRegistry::getInstance() noexcept
 {
   if (!s_memory_operation_registry_instance) {
     s_memory_operation_registry_instance = new MemoryOperationRegistry();
@@ -53,7 +58,7 @@ MemoryOperationRegistry::getInstance()
   return *s_memory_operation_registry_instance;
 }
 
-MemoryOperationRegistry::MemoryOperationRegistry()
+MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
   registerOperation(
       "COPY",
@@ -117,13 +122,40 @@ MemoryOperationRegistry::MemoryOperationRegistry()
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
 #endif
+
+#if defined(UMPIRE_ENABLE_ROCM)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::rocm, Platform::cpu),
+      std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cpu, Platform::rocm),
+      std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<RocmCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<RocmMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::rocm, Platform::rocm),
+      std::make_shared<GenericReallocateOperation>());
+#endif
 }
 
 void
 MemoryOperationRegistry::registerOperation(
     const std::string& name,
     std::pair<Platform, Platform> platforms,
-    std::shared_ptr<MemoryOperation>&& operation)
+    std::shared_ptr<MemoryOperation>&& operation) noexcept
 {
   auto operations = m_operators.find(name);
 
@@ -150,7 +182,7 @@ MemoryOperationRegistry::find(
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
-    UMPIRE_ERROR("Cannot find operator " << name); 
+    UMPIRE_ERROR("Cannot find operator " << name);
   }
 
   auto op = operations->second.find(platforms);

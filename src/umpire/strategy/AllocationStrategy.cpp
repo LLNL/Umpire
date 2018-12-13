@@ -14,29 +14,37 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/AllocationStrategy.hpp"
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) :
+AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept :
   m_name(name),
   m_id(id)
 {
 }
 
+void
+AllocationStrategy::release()
+{
+  UMPIRE_LOG(Info, "AllocationStrategy::release in a no-op");
+}
+
 std::string
-AllocationStrategy::getName()
+AllocationStrategy::getName() noexcept
 {
   return m_name;
 }
 
 int
-AllocationStrategy::getId()
+AllocationStrategy::getId() noexcept
 {
   return m_id;
 }
 
 long
-AllocationStrategy::getActualSize()
+AllocationStrategy::getActualSize() noexcept
 {
   return getCurrentSize();
 }

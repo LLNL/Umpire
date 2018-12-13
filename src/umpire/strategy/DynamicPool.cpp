@@ -26,7 +26,7 @@ DynamicPool::DynamicPool(
     int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size) :
+    const std::size_t min_alloc_size) noexcept :
   AllocationStrategy(name, id),
   dpa(nullptr),
   m_allocator(allocator.getAllocationStrategy())
@@ -42,39 +42,49 @@ DynamicPool::allocate(size_t bytes)
   return ptr;
 }
 
-void 
+void
 DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
 }
 
-long 
-DynamicPool::getCurrentSize()
-{ 
-  UMPIRE_LOG(Debug, "() returning " << m_current_size);
+void
+DynamicPool::release()
+{
+  dpa->release();
+}
+
+long
+DynamicPool::getCurrentSize() noexcept
+{
   return 0;
 }
 
-long 
-DynamicPool::getHighWatermark()
-{ 
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
+long
+DynamicPool::getHighWatermark() noexcept
+{
   return 0;
 }
 
-long 
-DynamicPool::getActualSize()
-{ 
+long
+DynamicPool::getActualSize() noexcept
+{
   long totalSize = dpa->totalSize();
   UMPIRE_LOG(Debug, "() returning " << totalSize);
   return totalSize;
 }
 
-Platform 
-DynamicPool::getPlatform()
-{ 
+Platform
+DynamicPool::getPlatform() noexcept
+{
   return m_allocator->getPlatform();
+}
+
+void
+DynamicPool::coalesce() noexcept
+{
+  dpa->coalesce();
 }
 
 } // end of namespace strategy

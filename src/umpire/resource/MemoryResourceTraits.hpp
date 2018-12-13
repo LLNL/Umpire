@@ -12,22 +12,48 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_PinnedMemoryResourceFactory_HPP
-#define UMPIRE_PinnedMemoryResourceFactory_HPP
+#ifndef UMPIRE_MemoryResourceTraits_HPP
+#define UMPIRE_MemoryResourceTraits_HPP
 
-#include "umpire/resource/MemoryResourceFactory.hpp"
+#include <cstddef>
 
 namespace umpire {
 namespace resource {
 
-class PinnedMemoryResourceFactory :
-  public MemoryResourceFactory
-{
-  bool isValidMemoryResourceFor(const std::string& name);
-  std::shared_ptr<MemoryResource> create(const std::string& name, int id);
+struct MemoryResourceTraits {
+
+  enum class optimized_for {
+    any,
+    latency,
+    bandwidth,
+    access
+  };
+
+  enum class vendor_type {
+    UNKNOWN,
+    AMD,
+    IBM,
+    INTEL,
+    NVIDIA
+  };
+
+  enum class memory_type {
+    UNKNOWN,
+    DDR,
+    GDDR,
+    HBM,
+    NVME
+  };
+
+  bool unified = false;
+  size_t size = 0;
+
+  vendor_type vendor = vendor_type::UNKNOWN;
+  memory_type kind = memory_type::UNKNOWN;
+  optimized_for used_for = optimized_for::any;
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_PinnedMemoryResourceFactory_HPP
+#endif // UMPIRE_MemoryResourceTraits_HPP

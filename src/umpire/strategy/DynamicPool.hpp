@@ -56,23 +56,24 @@ class DynamicPool :
         int id,
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024));
+        const std::size_t min_alloc_size = (1 * 1024 *1024)) noexcept;
 
-    void* allocate(size_t bytes);
+    void* allocate(size_t bytes) override;
 
-    void deallocate(void* ptr);
+    void deallocate(void* ptr) override;
 
-    long getCurrentSize();
-    long getHighWatermark();
-    long getActualSize();
+    void release() override;
 
-    Platform getPlatform();
+    long getCurrentSize() noexcept override;
+    long getHighWatermark() noexcept override;
+    long getActualSize() noexcept override;
+
+    Platform getPlatform() noexcept override;
+
+    void coalesce() noexcept;
 
   private:
     DynamicSizePool<>* dpa;
-
-    long m_current_size;
-    long m_highwatermark;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
