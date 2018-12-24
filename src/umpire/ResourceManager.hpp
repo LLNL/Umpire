@@ -100,6 +100,12 @@ class ResourceManager {
     Allocator makeAllocator(const std::string& name, Args&&... args);
 
     /*!
+     * \brief Make an allocator using the fluent interface.
+     */
+    template <typename Strategy>
+    AllocatorBuilder makeAllocator(const std::string& name) noexcept;
+
+    /*!
      * \brief Register an Allocator with the ResourceManager.
      *
      * After registration, the Allocator can be retrieved by calling

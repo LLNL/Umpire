@@ -16,6 +16,7 @@
 #define UMPIRE_Allocator_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/resource/MemoryResourceTypes.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -39,6 +40,7 @@ class ResourceManager;
  * \see TypedAllocator
  */
 class Allocator {
+  friend class AllocatorBuilder;
   friend class ResourceManager;
   friend class ::AllocatorTest;
 
@@ -177,6 +179,22 @@ class Allocator {
      * \brief Pointer to the AllocationStrategy used by this Allocator.
      */
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+};
+
+class AllocatorBuilder {
+public:
+  AllocatorBuilder(ResourceManager &rm);
+
+  AllocatorBuilder& onMemoryResource(resource::MemoryResourceType rt);
+
+  AllocatorBuilder& withMaximumSize(const int size_limit);
+
+  operator Allocator();
+
+private:
+  // TODO: This seems like it should be const, but rm::getAllocator(resource::MemoryResourceType) is not const
+  ResourceManager& m_rm;
+  std::shared_ptr<strategy::AllocationStrategy> m_strategy;
 };
 
 } // end of namespace umpire
