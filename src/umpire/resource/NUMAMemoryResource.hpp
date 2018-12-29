@@ -12,49 +12,36 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_MemoryResourceTraits_HPP
-#define UMPIRE_MemoryResourceTraits_HPP
+#ifndef UMPIRE_NUMAMemoryResource_HPP
+#define UMPIRE_NUMAMemoryResource_HPP
 
-#include <cstddef>
+#include "umpire/resource/MemoryResource.hpp"
+
+#include "umpire/strategy/mixins/Inspector.hpp"
 
 namespace umpire {
 namespace resource {
 
-struct MemoryResourceTraits {
+class NUMAMemoryResource :
+    public MemoryResource,
+    private umpire::strategy::mixins::Inspector
+{
+public:
+  NUMAMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
-  enum class optimized_for {
-    any,
-    latency,
-    bandwidth,
-    access
-  };
+  void* allocate(size_t bytes);
+  void deallocate(void* ptr);
 
-  enum class vendor_type {
-    UNKNOWN,
-    AMD,
-    IBM,
-    INTEL,
-    NVIDIA
-  };
+  long getCurrentSize() noexcept;
+  long getHighWatermark() noexcept;
 
-  enum class memory_type {
-    UNKNOWN,
-    DDR,
-    GDDR,
-    HBM,
-    NVME
-  };
+  Platform getPlatform() noexcept;
 
-  bool unified = false;
-  size_t size = 0;
-  int numa_node = -1;
-
-  vendor_type vendor = vendor_type::UNKNOWN;
-  memory_type kind = memory_type::UNKNOWN;
-  optimized_for used_for = optimized_for::any;
+protected:
+  Platform m_platform;
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_MemoryResourceTraits_HPP
+#endif // UMPIRE_NUMAMemoryResource_HPP
