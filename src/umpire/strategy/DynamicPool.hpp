@@ -28,7 +28,8 @@
 namespace umpire {
 namespace strategy {
 
-static inline bool default_heuristic( int /* id */ ) { return false; }
+class DynamicPool;
+static inline bool default_heuristic( const strategy::DynamicPool* /* strat */ ) { return false; }
 
 /*!
  * \brief Simple dynamic pool for allocations
@@ -44,7 +45,16 @@ static inline bool default_heuristic( int /* id */ ) { return false; }
 class DynamicPool :
   public AllocationStrategy
 {
-  using Coalesce_Heuristic  = std::function<bool(int)>;
+  /*!
+   * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
+   *
+   * The registered heuristic callback function will be called in the following
+   * two places:
+   *
+   * 1. Immediately after a deallocation() has completed.
+   * 2. Immediately before an allocation() occurrs.
+   */
+  using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool* )>;
 
   public:
     /*!
@@ -55,6 +65,7 @@ class DynamicPool :
      * \param min_initial_alloc_size The minimum size of the first allocation
      *                               the pool will make.
      * \param min_alloc_size The minimum size of all future allocations.
+     * \param h_fun Heuristic callback function.
      */
     DynamicPool(
         const std::string& name,
