@@ -32,7 +32,6 @@ DynamicPool::DynamicPool(
   AllocationStrategy(name, _id),
   dpa(nullptr),
   m_allocator(allocator.getAllocationStrategy()),
-  id(_id),
   do_coalesce{h_fun}
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);

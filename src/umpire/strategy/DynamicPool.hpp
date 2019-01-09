@@ -93,7 +93,6 @@ class DynamicPool :
     DynamicSizePool<>* dpa;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
-    int id;
     Coalesce_Heuristic do_coalesce;
 };
 
