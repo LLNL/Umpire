@@ -1,0 +1,8 @@
+testCompile
+testSingleton
+testFixedPool
+testDynamicPool
+testSTL
+testNew
+
+*.dSYM/
