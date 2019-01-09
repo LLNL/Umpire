@@ -29,7 +29,7 @@ namespace umpire {
 namespace strategy {
 
 class DynamicPool;
-static inline bool default_heuristic( const strategy::DynamicPool* /* strat */ ) { return false; }
+static inline bool default_heuristic( const strategy::DynamicPool& /* strat */ ) { return false; }
 
 /*!
  * \brief Simple dynamic pool for allocations
@@ -54,7 +54,7 @@ class DynamicPool :
    * 1. Immediately after a deallocation() has completed.
    * 2. Immediately before an allocation() occurrs.
    */
-  using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool* )>;
+  using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool& )>;
 
   public:
     /*!
