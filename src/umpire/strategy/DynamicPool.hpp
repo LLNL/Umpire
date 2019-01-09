@@ -69,7 +69,7 @@ class DynamicPool :
      */
     DynamicPool(
         const std::string& name,
-        int _id,
+        int id,
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
