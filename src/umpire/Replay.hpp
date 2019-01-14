@@ -18,29 +18,16 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+
 #include "umpire/Allocator.hpp"
-
-#define UMPIRE_REPLAY( msg )                                             \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "REPLAY," << msg;                                      \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
-
-#define UMPIRE_REPLAY_CONT( msg )                                        \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "," << msg;                                            \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 namespace umpire {
 namespace replay {
-std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc);
+std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
+std::ostream& operator<< (std::ostream& out, 
+    umpire::strategy::DynamicPool::Coalesce_Heuristic );
 class Replay {
 public:
   static void initialize();
@@ -70,5 +57,23 @@ private:
 
 } /* namespace replay */
 } /* namespace umpire */
+
+#define UMPIRE_REPLAY( msg )                                             \
+{                                                                        \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
+    std::ostringstream local_msg;                                        \
+    local_msg  << "REPLAY," << msg;                                      \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
+  }                                                                      \
+}
+
+#define UMPIRE_REPLAY_CONT( msg )                                        \
+{                                                                        \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
+    std::ostringstream local_msg;                                        \
+    local_msg  << "," << msg;                                            \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
+  }                                                                      \
+}
 
 #endif /* UMPIRE_Replay_HPP */

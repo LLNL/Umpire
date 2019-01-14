@@ -42,9 +42,6 @@ DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
-  if ( do_coalesce(*this) )
-    dpa->coalesce();
-
   void* ptr = dpa->allocate(bytes);
   return ptr;
 }
@@ -55,8 +52,11 @@ DynamicPool::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
 
-  if ( do_coalesce(*this) )
+  if ( do_coalesce(*this) ) {
+    UMPIRE_LOG(Debug, "Heuristic returned true, "
+        "performing coalesce operation for " << this << "\n");
     dpa->coalesce();
+  }
 }
 
 void

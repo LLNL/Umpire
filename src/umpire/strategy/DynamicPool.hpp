@@ -45,18 +45,15 @@ static inline bool default_heuristic( const strategy::DynamicPool& /* strat */ )
 class DynamicPool :
   public AllocationStrategy
 {
-  /*!
-   * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
-   *
-   * The registered heuristic callback function will be called in the following
-   * two places:
-   *
-   * 1. Immediately after a deallocation() has completed.
-   * 2. Immediately before an allocation() occurrs.
-   */
-  using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool& )>;
-
   public:
+    /*!
+     * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
+     *
+     * The registered heuristic callback function will be called immediately
+     * after a deallocation() has completed from the pool.
+     */
+    using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool& )>;
+
     /*!
      * \brief Construct a new DynamicPool.
      *
