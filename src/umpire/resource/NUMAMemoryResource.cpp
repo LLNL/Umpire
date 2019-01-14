@@ -56,7 +56,7 @@ void* NUMAMemoryResource::allocate(size_t bytes)
     ptr = ++s;
   }
   else {
-    UMPIRE_ERROR("numa_alloc_onnode( bytes = " << sizeof(*s) + size << ", " << m_traits.numa_node << " ) failed");
+    UMPIRE_ERROR("numa_alloc_onnode( bytes = " << sizeof(*s) + bytes << ", " << m_traits.numa_node << " ) failed");
   }
 #else
   void* s = ::malloc(bytes);
