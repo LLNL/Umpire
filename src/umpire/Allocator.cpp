@@ -23,8 +23,6 @@
 #include "umpire/util/Statistic.hpp"
 #endif
 
-#include "umpire/strategy/SizeLimiter.hpp"
-
 namespace umpire {
 
 Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept:
@@ -123,31 +121,5 @@ Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }
-
-AllocatorBuilder::AllocatorBuilder(ResourceManager &rm) :
-  m_rm(rm), m_strategy(m_rm.getDefaultAllocator().getAllocationStrategy())
-{
-}
-
-AllocatorBuilder& AllocatorBuilder::onMemoryResource(resource::MemoryResourceType rt)
-{
-  m_strategy = m_rm.getAllocator(rt).getAllocationStrategy();
-  return *this;
-}
-
-AllocatorBuilder& AllocatorBuilder::withMaximumSize(const int size_limit)
-{
-  m_strategy = std::make_shared<strategy::SizeLimiter>(m_strategy->getName(),
-                                                       m_strategy->getId(),
-                                                       Allocator(m_strategy),
-                                                       size_limit);
-  return *this;
-}
-
-AllocatorBuilder::operator Allocator()
-{
-  return Allocator(m_strategy);
-}
-
 
 } // end of namespace umpire

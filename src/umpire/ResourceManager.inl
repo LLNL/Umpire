@@ -30,7 +30,7 @@ template <typename Strategy,
          bool introspection,
          typename... Args>
 Allocator ResourceManager::makeAllocator(
-    const std::string& name,
+    const std::string& name, 
     Args&&... args)
 {
   std::shared_ptr<strategy::AllocationStrategy> allocator;
@@ -79,17 +79,6 @@ Allocator ResourceManager::makeAllocator(
 
   return Allocator(allocator);
 }
-
-template <typename Strategy>
-AllocatorBuilder ResourceManager::makeAllocator(
-  const std::string& UMPIRE_UNUSED_ARG(name)) noexcept
-{
-  // const int id = getNextId();
-  // m_allocators_by_id[id] = // ...
-  // m_allocators_by_name[name] = // ...
-  return AllocatorBuilder{*this};
-}
-
 
 } // end of namespace umpire
 

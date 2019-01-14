@@ -42,10 +42,8 @@ int main(int, char**)
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
    */
-  // auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-  //     "host_simpool", rm.getAllocator("HOST"));
-
-  umpire::Allocator alloc = rm.makeAllocator<umpire::strategy::DynamicPool>("host_simpool").withMaximumSize(1024);
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_simpool", rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
