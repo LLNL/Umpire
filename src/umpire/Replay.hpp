@@ -44,7 +44,8 @@ public:
   template <typename T, typename... Args>
   static std::string printReplayAllocator(T&& firstArg, Args&&... args) {
     std::stringstream ss;
-    ss << "," << firstArg << printReplayAllocator(std::forward<Args>(args)...);
+    ss << ",";
+    ss << firstArg << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
   }
 private:
