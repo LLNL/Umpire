@@ -26,6 +26,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
 
+#include "umpire/resource/MemoryResource.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/resource/MemoryResourceTraits.hpp"
 
@@ -69,6 +70,11 @@ class ResourceManager {
      * \brief Get the Allocator with the given ID.
      */
     Allocator getAllocator(int id);
+
+    /*!
+     * \brief Get a reasonable Allocator for the given traits.
+     */
+    Allocator getAllocatorFor(const resource::MemoryResourceTraits traits);
 
     /*!
      * \brief Get the default Allocator.
@@ -251,6 +257,8 @@ class ResourceManager {
     util::AllocationMap m_allocations;
 
     std::shared_ptr<strategy::AllocationStrategy> m_default_allocator;
+
+    std::list<std::shared_ptr<resource::MemoryResource> > m_resource_list;
 
     std::unordered_map<resource::MemoryResourceType, std::shared_ptr<strategy::AllocationStrategy>, resource::MemoryResourceTypeHash > m_memory_resources;
 

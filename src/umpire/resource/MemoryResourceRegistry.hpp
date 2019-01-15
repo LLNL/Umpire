@@ -28,7 +28,8 @@ class MemoryResourceRegistry {
   public:
     static MemoryResourceRegistry& getInstance() noexcept;
 
-    std::shared_ptr<umpire::resource::MemoryResource> makeMemoryResource(const std::string& name, int id);
+    std::shared_ptr<umpire::resource::MemoryResource> makeMemoryResource(const std::string& name, int id,
+                                                                         const MemoryResourceTraits traits = MemoryResourceTraits{});
 
     void registerMemoryResource(std::shared_ptr<MemoryResourceFactory>&& factory);
 

@@ -32,6 +32,10 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/resource/NUMAMemoryResourceFactory.hpp"
+#endif
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/strategy/DynamicPool.hpp"
@@ -93,6 +97,13 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
+#if defined(UMPIRE_ENABLE_NUMA)
+  for (std::size_t numa_node = 0; numa_node < resource::NUMAMemoryResourceFactory::getNodeCount(); numa_node++) {
+    registry.registerMemoryResource(
+      std::make_shared<resource::NUMAMemoryResourceFactory>(numa_node));
+  }
+#endif
+
   initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -104,22 +115,27 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
+  m_resource_list.push_back(registry.makeMemoryResource("HOST", getNextId()));
+  m_memory_resources[resource::Host] = m_resource_list.back();
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+  m_resource_list.push_back(registry.makeMemoryResource("DEVICE", getNextId()));
+  m_memory_resources[resource::Device] = m_resource_list.back();
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)
-  m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
+  m_resource_list.push_back(registry.makeMemoryResource("PINNED", getNextId()));
+  m_memory_resources[resource::Pinned] = m_resource_list.back();
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-  m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
+  m_resource_list.push_back(registry.makeMemoryResource("UM", getNextId()));
+  m_memory_resources[resource::Unified] = m_resource_list.back();
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
+  m_resource_list.push_back(registry.makeMemoryResource("DEVICE_CONST", getNextId()));
+  m_memory_resources[resource::Constant] = m_resource_list.back();
 #endif
 
   /*
@@ -153,6 +169,14 @@ ResourceManager::initialize()
   auto device_const_allocator = m_memory_resources[resource::Constant];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
+#endif
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  for (std::size_t numa_node = 0; numa_node < resource::NUMAMemoryResourceFactory::getNodeCount(); numa_node++) {
+    resource::MemoryResourceTraits traits{};
+    traits.numa_node = numa_node;
+    m_resource_list.push_back(registry.makeMemoryResource("HOST_NUMA", getNextId(), traits));
+  }
 #endif
 
   UMPIRE_LOG(Debug, "() leaving");
@@ -201,6 +225,21 @@ ResourceManager::getAllocator(int id)
   }
 
   return Allocator(m_allocators_by_id[id]);
+}
+
+Allocator
+ResourceManager::getAllocatorFor(const resource::MemoryResourceTraits traits)
+{
+  UMPIRE_LOG(Debug, "(Looking up allocator by traits)");
+
+  for (auto r : m_resource_list) {
+    const resource::MemoryResourceTraits r_traits = r->getTraits();
+    if (traits.unified == r_traits.unified &&
+        traits.kind == r_traits.kind &&
+        traits.numa_node == r_traits.numa_node) return Allocator(r);
+  }
+
+  UMPIRE_ERROR("Allocator for traits not found.");
 }
 
 Allocator

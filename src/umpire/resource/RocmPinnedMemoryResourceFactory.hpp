@@ -28,7 +28,8 @@ namespace resource {
 class RocmPinnedMemoryResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name) noexcept;
+  bool isValidMemoryResourceFor(const std::string& name,
+                                const MemoryResourceTraits traits = MemoryResourceTraits{}) noexcept;
 
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };

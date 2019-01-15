@@ -39,15 +39,16 @@ MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
 void
 MemoryResourceRegistry::registerMemoryResource(std::shared_ptr<MemoryResourceFactory>&& factory)
 {
-  m_allocator_factories.push_front(factory);
+  m_allocator_factories.push_back(factory);
 }
 
 std::shared_ptr<umpire::resource::MemoryResource>
-MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
+MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
+                                           const MemoryResourceTraits traits)
 {
   for (auto allocator_factory : m_allocator_factories) {
-    if (allocator_factory->isValidMemoryResourceFor(name)) {
-        return allocator_factory->create(name, id);
+    if (allocator_factory->isValidMemoryResourceFor(name, traits)) {
+      return allocator_factory->create(name, id);
     }
   }
 

@@ -24,7 +24,8 @@ namespace umpire {
 namespace resource {
 
 bool
-CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name,
+                                                           const MemoryResourceTraits UMPIRE_UNUSED_ARG(traits))
   noexcept
 {
   if (name.compare("UM") == 0) {

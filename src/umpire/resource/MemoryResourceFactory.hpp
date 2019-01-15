@@ -16,6 +16,7 @@
 #define UMPIRE_MemoryResourceFactory_HPP
 
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/resource/MemoryResourceTraits.hpp"
 
 #include <memory>
 #include <string>
@@ -37,11 +38,15 @@ class MemoryResourceFactory {
 
     /*
      * \brief Check whether the MemoryResource constructed by this factory is
-     * valid for the given name
+     * valid for the given name.
+     *
+     * \param name Short string description of the memory resource
+     * \param traits Full description of the memory resource
      *
      * \return true if the MemoryResource matches name.
      */
-    virtual bool isValidMemoryResourceFor(const std::string& name) noexcept = 0;
+    virtual bool isValidMemoryResourceFor(const std::string& name,
+                                          const MemoryResourceTraits traits) noexcept = 0;
 
     /*!
      * \brief Construct a MemoryResource with the given name and id.

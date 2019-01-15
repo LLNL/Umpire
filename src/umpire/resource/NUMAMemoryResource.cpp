@@ -31,15 +31,15 @@ union alloc_or_size_t {
 namespace umpire {
 namespace resource {
 
-NUMAMemoryResource::NUMAMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
-  MemoryResource(name, id, traits),
+NUMAMemoryResource::NUMAMemoryResource(int id, MemoryResourceTraits traits) :
+  MemoryResource("HOST_NUMA", id, traits),
   umpire::strategy::mixins::Inspector(),
   m_platform(Platform::cpu)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
-  if (numa_available() < 0) UMPIRE_ERROR("libnuma is not usable.");
+    if (numa_available() < 0) UMPIRE_ERROR("libnuma is not usable.");
 #else
-  UMPIRE_LOG(Warning, "NUMA is not available. Falling back to ::malloc()");
+    UMPIRE_LOG(Warning, "NUMA is not available. Falling back to ::malloc()");
 #endif
 }
 

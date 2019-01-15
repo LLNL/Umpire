@@ -12,28 +12,38 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaUnifiedMemoryResourceFactory_HPP
-#define UMPIRE_CudaUnifiedMemoryResourceFactory_HPP
+#ifndef UMPIRE_NUMAMemoryResourceFactory_HPP
+#define UMPIRE_NUMAMemoryResourceFactory_HPP
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
+
+#include <cstddef>
 
 namespace umpire {
 namespace resource {
 
 /*!
- * \brief Factory class to construct a MemoryResource that uses NVIDIA
- * "unified" memory, accesible from both the CPU and NVIDIA GPUs.
+ * \brief Factory class for constructing MemoryResource objects that allocate
+ * memory on specific NUMA nodes.
  */
-class CudaUnifiedMemoryResourceFactory :
+class NUMAMemoryResourceFactory :
   public MemoryResourceFactory
 {
+public:
+  NUMAMemoryResourceFactory(const int numa_node_);
+
+  static std::size_t getNodeCount();
+
   bool isValidMemoryResourceFor(const std::string& name,
                                 const MemoryResourceTraits traits = MemoryResourceTraits{}) noexcept;
 
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
+
+private:
+  const int numa_node;
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaUnifiedMemoryResourceFactory_HPP
+#endif // UMPIRE_NUMAMemoryResourceFactory_HPP

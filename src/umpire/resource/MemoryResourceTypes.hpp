@@ -33,7 +33,8 @@ enum MemoryResourceType {
   Device,
   Unified,
   Pinned,
-  Constant
+  Constant,
+  Numa
 };
 
 } // end of namespace resource

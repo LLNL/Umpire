@@ -15,7 +15,6 @@
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
-  NUMAMemoryResource.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
@@ -28,7 +27,6 @@ set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
-  NUMAMemoryResource.cpp
 )
 
 set (umpire_resource_depends
@@ -47,7 +45,6 @@ if (ENABLE_CUDA)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-
 
     CudaConstantMemoryResourceFactory.cpp
     CudaConstantMemoryResource.cu
@@ -77,6 +74,23 @@ if (ENABLE_ROCM)
     ${umpire_resource_depends}
     rocm)
 endif ()
+
+if (UMPIRE_ENABLE_NUMA)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    NUMAMemoryResourceFactory.hpp
+    NUMAMemoryResource.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    NUMAMemoryResourceFactory.cpp
+    NUMAMemoryResource.cpp)
+
+  set (umpire_resource_depends
+    ${umpire_resource_depends}
+    numa)
+endif ()
+
 
 blt_add_library(
   NAME umpire_resource

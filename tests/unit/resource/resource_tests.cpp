@@ -17,9 +17,15 @@
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
 
+#include "umpire/resource/MemoryResourceTraits.hpp"
+
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/resource/NUMAMemoryResource.hpp"
+#endif
+
 struct TestAllocator
 {
-  void* allocate(size_t bytes) 
+  void* allocate(size_t bytes)
   {
     return ::malloc(bytes);
   }
@@ -74,3 +80,16 @@ TEST(DefaultMemoryResource, GetHighWatermark)
 
   alloc->deallocate(pointer_two);
 }
+
+#if defined(UMPIRE_ENABLE_NUMA)
+TEST(NUMAMemoryResource, Allocate)
+{
+  umpire::resource::MemoryResourceTraits traits;
+  traits.numa_node = 0;
+  auto alloc = std::make_shared<umpire::resource::NUMAMemoryResource>(0, traits);
+
+  double* pointer = (double*)alloc->allocate(10*sizeof(double));
+  alloc->deallocate(pointer);
+  ASSERT_NE(pointer, nullptr);
+}
+#endif

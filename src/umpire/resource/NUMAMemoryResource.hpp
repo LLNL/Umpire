@@ -19,6 +19,8 @@
 
 #include "umpire/strategy/mixins/Inspector.hpp"
 
+#include <cstddef>
+
 namespace umpire {
 namespace resource {
 
@@ -27,7 +29,7 @@ class NUMAMemoryResource :
     private umpire::strategy::mixins::Inspector
 {
 public:
-  NUMAMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
+  NUMAMemoryResource(int id, MemoryResourceTraits traits);
 
   void* allocate(size_t bytes);
   void deallocate(void* ptr);
