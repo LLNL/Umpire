@@ -27,7 +27,7 @@ namespace umpire {
 namespace replay {
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
 std::ostream& operator<< (std::ostream& out, 
-    umpire::strategy::DynamicPool::Coalesce_Heuristic );
+    umpire::strategy::DynamicPool::Coalesce_Heuristic& );
 class Replay {
 public:
   static void initialize();
@@ -44,8 +44,11 @@ public:
   template <typename T, typename... Args>
   static std::string printReplayAllocator(T&& firstArg, Args&&... args) {
     std::stringstream ss;
-    ss << ",";
-    ss << firstArg << printReplayAllocator(std::forward<Args>(args)...);
+
+    if (typeid(firstArg) != typeid(umpire::strategy::DynamicPool::Coalesce_Heuristic))
+      ss << "," << firstArg;
+
+    ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
   }
 private:

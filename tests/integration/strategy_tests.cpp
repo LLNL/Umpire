@@ -361,10 +361,12 @@ static bool heuristic_fun( const umpire::strategy::DynamicPool& /* strat */)
 
 TEST(HeuristicTest, Works)
 {
+  umpire::strategy::DynamicPool::Coalesce_Heuristic h_fun = heuristic_fun;
+
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_dyn_pool_h", rm.getAllocator("HOST"), 256, 64, &heuristic_fun);
+      "host_dyn_pool_h", rm.getAllocator("HOST"), 256, 64, h_fun);
 
   void* ptr_one = alloc.allocate(62);
   void* ptr_two = alloc.allocate(1024);
