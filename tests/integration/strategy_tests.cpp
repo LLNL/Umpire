@@ -364,7 +364,7 @@ TEST(HeuristicTest, Works)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_dyn_pool_h", rm.getAllocator("HOST"), 256, 64, heuristic_fun);
+      "host_dyn_pool_h", rm.getAllocator("HOST"), 256, 64, &heuristic_fun);
 
   void* ptr_one = alloc.allocate(62);
   void* ptr_two = alloc.allocate(1024);
