@@ -119,7 +119,7 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
+//  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
   /*
@@ -150,9 +150,9 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  auto device_const_allocator = m_memory_resources[resource::Constant];
-  m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
-  m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
+//  auto device_const_allocator = m_memory_resources[resource::Constant];
+//  m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
+//  m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
 
   UMPIRE_LOG(Debug, "() leaving");
