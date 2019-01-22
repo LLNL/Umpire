@@ -85,6 +85,21 @@ class AllocationStrategy :
     virtual long getHighWatermark() noexcept = 0;
 
     /*!
+     * \brief Get the number of bytes that may be released back to resource
+     *
+     * A memory pool has a set of blocks that have no allocations
+     * against them.  If the size of the set is greater than one, then
+     * the pool will have a number of bytes that may be released back to
+     * the resource or coalesced into a larger block.
+     *
+     * Note: This method will always return 0 for strategies that are not
+     *       memory pools.
+     *
+     * \return The total number of bytes that are releaseable
+     */
+    virtual long getReleaseableSize() noexcept;
+
+    /*!
      * \brief Get the current amount of memory allocated by this allocator.
      *
      * Note that this can be larger than getCurrentSize(), particularly if the

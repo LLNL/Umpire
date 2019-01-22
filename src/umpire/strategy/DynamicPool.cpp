@@ -68,21 +68,33 @@ DynamicPool::release()
 long
 DynamicPool::getCurrentSize() noexcept
 {
-  return 0;
-}
-
-long
-DynamicPool::getHighWatermark() noexcept
-{
-  return 0;
+  long CurrentSize = dpa->getCurrentSize();
+  UMPIRE_LOG(Debug, "() returning " << CurrentSize);
+  return CurrentSize;
 }
 
 long
 DynamicPool::getActualSize() noexcept
 {
-  long totalSize = dpa->totalSize();
-  UMPIRE_LOG(Debug, "() returning " << totalSize);
-  return totalSize;
+  long ActualSize = dpa->getActualSize();
+  UMPIRE_LOG(Debug, "() returning " << ActualSize);
+  return ActualSize;
+}
+
+long
+DynamicPool::getHighWatermark() noexcept
+{
+  long HighWatermark = dpa->getHighWatermark();
+  UMPIRE_LOG(Debug, "() returning " << HighWatermark);
+  return HighWatermark;
+}
+
+long
+DynamicPool::getReleaseableSize() noexcept
+{
+  long SparseBlockSize = dpa->getReleaseableSize();
+  UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);
+  return SparseBlockSize;
 }
 
 Platform

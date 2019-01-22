@@ -79,8 +79,9 @@ class DynamicPool :
     void release() override;
 
     long getCurrentSize() noexcept override;
-    long getHighWatermark() noexcept override;
     long getActualSize() noexcept override;
+    long getHighWatermark() noexcept override;
+    long getReleaseableSize() noexcept override;
 
     Platform getPlatform() noexcept override;
 

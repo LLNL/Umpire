@@ -49,5 +49,11 @@ AllocationStrategy::getActualSize() noexcept
   return getCurrentSize();
 }
 
+long
+AllocationStrategy::getReleaseableSize() noexcept
+{
+  return 0;
+}
+
 } // end of namespace strategy
 } // end of namespace umpire

@@ -125,10 +125,10 @@ public:
   }
 
   /// Return allocated size to user.
-  std::size_t allocatedSize() const { return numBlocks * sizeof(T); }
+  std::size_t getCurrentSize() const { return numBlocks * sizeof(T); }
 
   /// Return total size with internal overhead.
-  std::size_t totalSize() const {
+  std::size_t getActualSize() const {
     return numPools() * totalPoolSize;
   }
 
