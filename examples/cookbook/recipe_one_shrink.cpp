@@ -25,34 +25,37 @@ int main(int, char**) {
   auto allocator = rm.getAllocator("DEVICE");
 
   /* 
-   * Create a 4 Gb pool and reserve one byte.
+   * Create a 4 Gb pool and reserve one word (to maintain aligment)
    */
-  auto pooled_allocator = 
-    rm.makeAllocator<umpire::strategy::DynamicPool>("GPU_POOL",
-                                                    allocator,
-                                                    4ul * 1024ul * 1024ul * 1024ul + 1); 
-  void* hold = pooled_allocator.allocate(1);
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+                            "GPU_POOL",
+                            allocator,
+                            4ul * 1024ul * 1024ul * 1024ul + 1); 
+  void* hold = pooled_allocator.allocate(64);
 
 
-  std::cout << "Pool has allocated " << pooled_allocator.getActualSize() << " bytes of memory. " << pooled_allocator.getCurrentSize() << " bytes are used" << std::endl;
+  std::cout << "Pool has allocated " << pooled_allocator.getActualSize()
+            << " bytes of memory. " << pooled_allocator.getCurrentSize()
+            << " bytes are used" << std::endl;
 
 
   /*
-   * Grow pool to ~16Gb by grabbing a 12Gb chunk.
+   * Grow pool to ~12 by grabbing a 8Gb chunk
    */
   void* grow = pooled_allocator.allocate( 8ul * 1024ul * 1024ul * 1024ul );
   pooled_allocator.deallocate(grow);
 
-  std::cout << "Pool has allocated " << pooled_allocator.getActualSize() << " bytes of memory. " << pooled_allocator.getCurrentSize() << " bytes are used" << std::endl;
-
-
+  std::cout << "Pool has allocated " << pooled_allocator.getActualSize()
+            << " bytes of memory. " << pooled_allocator.getCurrentSize()
+            << " bytes are used" << std::endl;
 
   /*
-   * Shrink pool back to ~4Gb.
+   * Shrink pool back to ~4Gb
    */
   pooled_allocator.release();
-  std::cout << "Pool has allocated " << pooled_allocator.getActualSize() << " bytes of memory. "
-            << pooled_allocator.getCurrentSize() << " bytes are used" << std::endl;
+  std::cout << "Pool has allocated " << pooled_allocator.getActualSize() 
+            << " bytes of memory. " << pooled_allocator.getCurrentSize()
+            << " bytes are used" << std::endl;
 
   return 0;
 }
