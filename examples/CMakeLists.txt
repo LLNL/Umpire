@@ -53,3 +53,5 @@ if (ENABLE_STATISTICS)
 endif()
 
 add_subdirectory(tutorial)
+
+add_subdirectory(cookbook)
