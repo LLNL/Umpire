@@ -31,8 +31,8 @@ class MockAllocationStrategy : public umpire::strategy::AllocationStrategy
 
     MOCK_METHOD1(allocate, void*(size_t bytes));
     MOCK_METHOD1(deallocate, void(void* ptr));
-    MOCK_METHOD0(getCurrentSize, long() noexcept);
-    MOCK_METHOD0(getHighWatermark, long() noexcept);
+    MOCK_METHOD0(getCurrentSize, long() const noexcept);
+    MOCK_METHOD0(getHighWatermark, long() const noexcept);
     MOCK_METHOD0(getPlatform, umpire::Platform() noexcept);
 };
 

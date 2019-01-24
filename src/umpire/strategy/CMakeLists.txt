@@ -21,6 +21,7 @@ set (umpire_strategy_headers
   SizeLimiter.hpp
   ThreadSafeAllocator.hpp
   DynamicPool.hpp
+  DynamicPoolHeuristic.hpp
   FixedPool.hpp
   FixedPool.inl)
   
@@ -36,6 +37,7 @@ set (umpire_stategy_sources
   SizeLimiter.cpp
   ThreadSafeAllocator.cpp
   DynamicPool.cpp
+  DynamicPoolHeuristic.cpp
   mixins/Inspector.cpp)
 
 set (umpire_strategy_depends

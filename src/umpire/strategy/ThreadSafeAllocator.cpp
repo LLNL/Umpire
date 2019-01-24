@@ -65,13 +65,13 @@ ThreadSafeAllocator::deallocate(void* ptr)
 }
 
 long
-ThreadSafeAllocator::getCurrentSize() noexcept
+ThreadSafeAllocator::getCurrentSize() const noexcept
 {
   return 0;
 }
 
 long
-ThreadSafeAllocator::getHighWatermark() noexcept
+ThreadSafeAllocator::getHighWatermark() const noexcept
 {
   return 0;
 }

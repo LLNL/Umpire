@@ -12,41 +12,19 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
+
+#include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept :
-  m_name(name),
-  m_id(id)
+bool heuristic_all_allocations_are_releaseable( const strategy::DynamicPool& dynamic_pool )
 {
-}
-
-void
-AllocationStrategy::release()
-{
-  UMPIRE_LOG(Info, "AllocationStrategy::release in a no-op");
-}
-
-std::string
-AllocationStrategy::getName() noexcept
-{
-  return m_name;
-}
-
-int
-AllocationStrategy::getId() noexcept
-{
-  return m_id;
-}
-
-long
-AllocationStrategy::getActualSize() const noexcept
-{
-  return getCurrentSize();
+  return (dynamic_pool.getCurrentSize() == 0 && dynamic_pool.getReleaseableSize() > 0);
 }
 
 } // end of namespace strategy
