@@ -66,7 +66,7 @@ DynamicPool::release()
 }
 
 long
-DynamicPool::getCurrentSize() noexcept
+DynamicPool::getCurrentSize() const noexcept
 {
   long CurrentSize = dpa->getCurrentSize();
   UMPIRE_LOG(Debug, "() returning " << CurrentSize);
@@ -74,7 +74,7 @@ DynamicPool::getCurrentSize() noexcept
 }
 
 long
-DynamicPool::getActualSize() noexcept
+DynamicPool::getActualSize() const noexcept
 {
   long ActualSize = dpa->getActualSize();
   UMPIRE_LOG(Debug, "() returning " << ActualSize);
@@ -82,7 +82,7 @@ DynamicPool::getActualSize() noexcept
 }
 
 long
-DynamicPool::getHighWatermark() noexcept
+DynamicPool::getHighWatermark() const noexcept
 {
   long HighWatermark = dpa->getHighWatermark();
   UMPIRE_LOG(Debug, "() returning " << HighWatermark);
@@ -90,7 +90,7 @@ DynamicPool::getHighWatermark() noexcept
 }
 
 long
-DynamicPool::getReleaseableSize() noexcept
+DynamicPool::getReleaseableSize() const noexcept
 {
   long SparseBlockSize = dpa->getReleaseableSize();
   UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);

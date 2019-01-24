@@ -52,12 +52,12 @@ void SizeLimiter::deallocate(void* ptr)
 
 }
 
-long SizeLimiter::getCurrentSize() noexcept
+long SizeLimiter::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long SizeLimiter::getHighWatermark() noexcept
+long SizeLimiter::getHighWatermark() const noexcept
 {
   return 0;
 }

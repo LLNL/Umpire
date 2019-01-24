@@ -76,10 +76,10 @@ class DynamicPool :
 
     void release() override;
 
-    long getCurrentSize() noexcept override;
-    long getActualSize() noexcept override;
-    long getHighWatermark() noexcept override;
-    long getReleaseableSize() noexcept override;
+    long getCurrentSize() const noexcept override;
+    long getActualSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+    long getReleaseableSize() const noexcept override;
 
     Platform getPlatform() noexcept override;
 

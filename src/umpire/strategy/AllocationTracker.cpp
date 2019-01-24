@@ -45,19 +45,19 @@ AllocationTracker::deallocate(void* ptr)
 }
 
 long
-AllocationTracker::getCurrentSize() noexcept
+AllocationTracker::getCurrentSize() const noexcept
 {
   return m_current_size;
 }
 
 long
-AllocationTracker::getHighWatermark() noexcept
+AllocationTracker::getHighWatermark() const noexcept
 {
   return m_high_watermark;
 }
 
 long
-AllocationTracker::getActualSize() noexcept
+AllocationTracker::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();
 }

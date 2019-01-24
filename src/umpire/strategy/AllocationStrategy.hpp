@@ -74,7 +74,7 @@ class AllocationStrategy :
      *
      * \return Current total size of allocations.
      */
-    virtual long getCurrentSize() noexcept = 0;
+    virtual long getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Get the high watermark of the total allocated size.
@@ -82,7 +82,7 @@ class AllocationStrategy :
      * This is equivalent to the highest observed value of getCurrentSize.
      * \return High watermark allocation size.
      */
-    virtual long getHighWatermark() noexcept = 0;
+    virtual long getHighWatermark() const noexcept = 0;
 
     /*!
      * \brief Get the number of bytes that may be released back to resource
@@ -97,7 +97,7 @@ class AllocationStrategy :
      *
      * \return The total number of bytes that are releaseable
      */
-    virtual long getReleaseableSize() noexcept;
+    virtual long getReleaseableSize() const noexcept;
 
     /*!
      * \brief Get the current amount of memory allocated by this allocator.
@@ -107,7 +107,7 @@ class AllocationStrategy :
      *
      * \return The total size of all the memory this object has allocated.
      */
-    virtual long getActualSize() noexcept;
+    virtual long getActualSize() const noexcept;
 
     /*!
      * \brief Get the platform associated with this AllocationStrategy.

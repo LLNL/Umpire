@@ -44,13 +44,13 @@ AllocationStrategy::getId() noexcept
 }
 
 long
-AllocationStrategy::getActualSize() noexcept
+AllocationStrategy::getActualSize() const noexcept
 {
   return getCurrentSize();
 }
 
 long
-AllocationStrategy::getReleaseableSize() noexcept
+AllocationStrategy::getReleaseableSize() const noexcept
 {
   return 0;
 }

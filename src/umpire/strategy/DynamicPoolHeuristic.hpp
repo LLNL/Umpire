@@ -23,9 +23,7 @@ class DynamicPool;
 
   static inline bool heuristicNoop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
   
-#if 0
   bool heuristicAllAllocationsAreReleaseable( const strategy::DynamicPool& dynamic_pool );
-#endif
 
 } // end of namespace strategy
 } // end namespace umpire
