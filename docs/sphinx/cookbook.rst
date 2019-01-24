@@ -10,9 +10,11 @@ different parts of Umpire to achieve a particular use case.
 
 Examples include being able to grow and shrink a pool, constructing Allocators
 that have introspection disabled for improved performance, and applying CUDA
-"memeory advise" to all the allocations in a particular pool.
+"memory advise" to all the allocations in a particular pool.
 
 .. toctree::
    :maxdepth: 1
 
    cookbook/shrinking_pools.rst
+   cookbook/no_introspection.rst
+   cookbook/pool_advice.rst
