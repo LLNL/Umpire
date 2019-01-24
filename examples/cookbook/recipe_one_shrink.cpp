@@ -17,6 +17,8 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/util/Macros.hpp"
+
 #include <iostream>
 
 int main(int, char**) {
@@ -32,6 +34,7 @@ int main(int, char**) {
                             allocator,
                             4ul * 1024ul * 1024ul * 1024ul + 1); 
   void* hold = pooled_allocator.allocate(64);
+  UMPIRE_USE_VAR(hold);
 
 
   std::cout << "Pool has allocated " << pooled_allocator.getActualSize()
