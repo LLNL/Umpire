@@ -102,7 +102,7 @@
 {                                                                  \
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << msg;                      \
+  umpire_oss_error << " " << __func__ << " " << msg;               \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \

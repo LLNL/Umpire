@@ -113,7 +113,7 @@ ResourceManager::initialize()
   auto error = ::cudaGetDeviceCount(&count);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("Umpire compiled with CDUA support but no GPUs detected!");
+    UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
   }
 #endif
 
