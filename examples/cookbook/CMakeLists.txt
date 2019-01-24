@@ -5,3 +5,9 @@ if (ENABLE_CUDA)
     DEPENDS_ON 
       umpire)
 endif ()
+
+blt_add_executable(
+  NAME recipe_two_no_introspection
+  SOURCES recipe_two_no_introspection.cpp
+  DEPENDS_ON umpire)
+
