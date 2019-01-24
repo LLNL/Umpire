@@ -13,7 +13,7 @@ blt_add_executable(
 
 if (ENABLE_CUDA)
   blt_add_executable(
-    NAME recipe_three_advise_pool
-    SOURCES recipe_three_advise_pool.cpp
+    NAME recipe_three_pool_advice
+    SOURCES recipe_three_pool_advice.cpp
     DEPENDS_ON umpire)
 endif()
