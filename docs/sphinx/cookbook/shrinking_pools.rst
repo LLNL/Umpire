@@ -24,7 +24,8 @@ allocations:
                     :lines: 48-49
 
 Assuming that there are no allocations left in the larger "chunk" of the pool,
-you can shrink the pool back down to the initial size by calling ``release``:
+you can shrink the pool back down to the initial size by calling
+:func:`umpire::Allocator::release`:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_one_shrink.cpp
                     :lines: 58

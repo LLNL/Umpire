@@ -11,8 +11,8 @@ location", and you can specificy where you want the preferred location of the
 memory to be. This can be useful for ensuring that the memory is kept on the
 GPU.
 
-By creating a pool on top of an :class:`AllocationAdvisor', you can amortize
-the cost of applying memory advice:
+By creating a pool on top of an :class:`umpire::strategy::AllocationAdvisor`,
+you can amortize the cost of applying memory advice:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_three_pool_advice.cpp
                     :lines: 34-44
