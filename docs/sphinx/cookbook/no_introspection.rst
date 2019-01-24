@@ -12,10 +12,9 @@ introspection and avoid the overhead of tracking the associated metadata.
     Disabling introspection means that allocations from this Allocator cannot
     be used for operations, or size and location queries.
 
-
- In this recipe, we look at disabling introspection for a pool. To turn off
- introspection, you pass a boolean as the second template parameter to the
- makeAllocator method:
+In this recipe, we look at disabling introspection for a pool. To turn off
+introspection, you pass a boolean as the second template parameter to the
+makeAllocator method:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_two_no_introspection.cpp
                     :lines: 32-34
