@@ -26,10 +26,13 @@ DynamicPool::DynamicPool(
     int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size) noexcept :
+    const std::size_t min_alloc_size,
+    Coalesce_Heuristic coalesce_heuristic) noexcept
+  :
   AllocationStrategy(name, id),
   dpa(nullptr),
-  m_allocator(allocator.getAllocationStrategy())
+  m_allocator(allocator.getAllocationStrategy()),
+  do_coalesce{coalesce_heuristic}
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
 }
@@ -38,6 +41,7 @@ void*
 DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
+
   void* ptr = dpa->allocate(bytes);
   return ptr;
 }
@@ -47,6 +51,12 @@ DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
+
+  if ( do_coalesce(*this) ) {
+    UMPIRE_LOG(Debug, "Heuristic returned true, "
+        "performing coalesce operation for " << this << "\n");
+    dpa->coalesce();
+  }
 }
 
 void
@@ -56,23 +66,35 @@ DynamicPool::release()
 }
 
 long
-DynamicPool::getCurrentSize() noexcept
+DynamicPool::getCurrentSize() const noexcept
 {
-  return 0;
+  long CurrentSize = dpa->getCurrentSize();
+  UMPIRE_LOG(Debug, "() returning " << CurrentSize);
+  return CurrentSize;
 }
 
 long
-DynamicPool::getHighWatermark() noexcept
+DynamicPool::getActualSize() const noexcept
 {
-  return 0;
+  long ActualSize = dpa->getActualSize();
+  UMPIRE_LOG(Debug, "() returning " << ActualSize);
+  return ActualSize;
 }
 
 long
-DynamicPool::getActualSize() noexcept
+DynamicPool::getHighWatermark() const noexcept
 {
-  long totalSize = dpa->totalSize();
-  UMPIRE_LOG(Debug, "() returning " << totalSize);
-  return totalSize;
+  long HighWatermark = dpa->getHighWatermark();
+  UMPIRE_LOG(Debug, "() returning " << HighWatermark);
+  return HighWatermark;
+}
+
+long
+DynamicPool::getReleaseableSize() const noexcept
+{
+  long SparseBlockSize = dpa->getReleaseableSize();
+  UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);
+  return SparseBlockSize;
 }
 
 Platform

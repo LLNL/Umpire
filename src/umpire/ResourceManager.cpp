@@ -422,7 +422,7 @@ void ResourceManager::deallocate(void* ptr)
 }
 
 size_t
-ResourceManager::getSize(void* ptr)
+ResourceManager::getSize(void* ptr) const
 {
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);

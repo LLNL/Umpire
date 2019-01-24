@@ -80,13 +80,13 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
   delete record;
 }
 
-long CudaConstantMemoryResource::getCurrentSize() noexcept
+long CudaConstantMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long CudaConstantMemoryResource::getHighWatermark() noexcept
+long CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;

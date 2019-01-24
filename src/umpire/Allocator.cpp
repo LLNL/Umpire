@@ -73,26 +73,26 @@ Allocator::release()
 }
 
 size_t
-Allocator::getSize(void* ptr)
+Allocator::getSize(void* ptr) const
 {
   UMPIRE_LOG(Debug, "(" << ptr << ")");
   return ResourceManager::getInstance().getSize(ptr);
 }
 
 size_t
-Allocator::getHighWatermark() noexcept
+Allocator::getHighWatermark() const noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
 size_t
-Allocator::getCurrentSize() noexcept
+Allocator::getCurrentSize() const noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
 size_t
-Allocator::getActualSize() noexcept
+Allocator::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();
 }

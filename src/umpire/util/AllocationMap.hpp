@@ -40,7 +40,7 @@ class AllocationMap
   remove(void* ptr);
 
   AllocationRecord*
-  find(void* ptr);
+  find(void* ptr) const;
 
   bool
   contains(void* ptr);
@@ -49,10 +49,10 @@ class AllocationMap
     reset();
 
   void
-    printAll();
+    printAll() const;
 
   private:
-    AllocationRecord* findRecord(void* ptr);
+    AllocationRecord* findRecord(void* ptr) const;
 
     judyL2Array<uintptr_t, uintptr_t>* m_records;
 

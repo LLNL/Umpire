@@ -39,13 +39,13 @@ DefaultAllocationStrategy::deallocate(void* ptr)
 }
 
 long 
-DefaultAllocationStrategy::getCurrentSize()
+DefaultAllocationStrategy::getCurrentSize() const
 {
   return m_allocator->getCurrentSize();
 }
 
 long 
-DefaultAllocationStrategy::getHighWatermark()
+DefaultAllocationStrategy::getHighWatermark() const
 {
   return m_allocator->getHighWatermark();
 }

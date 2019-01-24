@@ -40,9 +40,9 @@ class AllocationTracker :
 
     void release();
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
-    long getActualSize() noexcept;
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
+    long getActualSize() const noexcept;
 
     Platform getPlatform() noexcept;
 

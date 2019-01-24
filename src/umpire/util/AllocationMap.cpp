@@ -95,7 +95,7 @@ AllocationMap::remove(void* ptr)
 }
 
 AllocationRecord*
-AllocationMap::findRecord(void* ptr)
+AllocationMap::findRecord(void* ptr) const
 {
 
   Entry alloc_record = nullptr;
@@ -128,7 +128,7 @@ AllocationMap::findRecord(void* ptr)
 }
 
 AllocationRecord*
-AllocationMap::find(void* ptr)
+AllocationMap::find(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
@@ -154,7 +154,7 @@ AllocationMap::contains(void* ptr)
 }
 
 void
-AllocationMap::printAll()
+AllocationMap::printAll() const
 {
   std::cout << "🔍 Printing allocation map contents..." << std::endl;
 
