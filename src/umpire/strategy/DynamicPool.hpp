@@ -20,6 +20,7 @@
 #include <functional>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 
 #include "umpire/Allocator.hpp"
 
@@ -27,9 +28,6 @@
 
 namespace umpire {
 namespace strategy {
-
-class DynamicPool;
-static inline bool default_heuristic( const strategy::DynamicPool& /* strat */ ) { return false; }
 
 /*!
  * \brief Simple dynamic pool for allocations
@@ -70,7 +68,7 @@ class DynamicPool :
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        Coalesce_Heuristic h_fun = default_heuristic) noexcept;
+        Coalesce_Heuristic h_fun = heuristicNoop) noexcept;
 
     void* allocate(size_t bytes) override;
 

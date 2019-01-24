@@ -314,15 +314,12 @@ public:
 
     // Release it
     releaseBlock(curr, prev);
-
-    if ( allocBytes == 0 && getFreeBlocks() > 1 )
-      coalesceFreeBlocks(highWatermark);
   }
 
   std::size_t getCurrentSize() const { return allocBytes; }
 
   std::size_t getActualSize() const {
-    return totalBytes + blockPool.getActualSize();
+    return totalBytes;
   }
 
   std::size_t getHighWatermark() const {
@@ -332,11 +329,18 @@ public:
   std::size_t getReleaseableSize() const {
     std::size_t nblocks = 0;
     std::size_t nbytes = 0;
-    for (struct Block *temp = freeBlocks; temp; temp = temp->next)
+    for (struct Block *temp = freeBlocks; temp; temp = temp->next) {
+      std::cout << temp << " " << temp->size << " " << temp->blockSize << std::endl;
       if ( temp->size == temp->blockSize ) {
         nbytes += temp->blockSize;
         nblocks++;
       }
+    }
+    std::cout 
+      << "nblocks=" << nblocks
+      << ", nbytes=" << nbytes
+      << ", returning " << (nblocks > 1 ? nbytes : 0)
+      << std::endl;
     return nblocks > 1 ? nbytes : 0;
   }
 

@@ -23,6 +23,7 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
@@ -62,7 +63,8 @@ class StrategyTest :
                     (  poolName.str()
                      , rm.getAllocator(allocatorName)
                      , initial_min_size
-                     , subsequent_min_size);
+                     , subsequent_min_size
+                     , &umpire::strategy::heuristicNoop);
      allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
     }
 
@@ -79,6 +81,11 @@ TEST_P(StrategyTest, Allocate) {
 
 TEST_P(StrategyTest, ReleaseableSizes) {
   auto strategy = allocator->getAllocationStrategy();
+  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+  if (tracker) {
+    strategy = tracker->getAllocationStrategy();
+  }
 
   auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
 
@@ -108,14 +115,15 @@ TEST_P(StrategyTest, ReleaseableSizes) {
   ASSERT_EQ(dynamic_pool->getReleaseableSize(), 2*initial_min_size);
 
   ASSERT_NO_THROW({ allocator->deallocate(alloc); });
-  ASSERT_EQ(dynamic_pool->getReleaseableSize(), 3*initial_min_size);
+  ASSERT_EQ(dynamic_pool->getReleaseableSize(),
+                    initial_min_size + 2*initial_min_size);
 
   auto& rm = umpire::ResourceManager::getInstance();
 
   EXPECT_NO_THROW(rm.coalesce(*allocator));
   ASSERT_EQ(dynamic_pool->getReleaseableSize(), 0);
 
-  ASSERT_GE(allocator->getActualSize(), 3*initial_min_size);
+  ASSERT_GE(allocator->getActualSize(), initial_min_size + 2*initial_min_size);
 }
 
 TEST_P(StrategyTest, Sizes) {
