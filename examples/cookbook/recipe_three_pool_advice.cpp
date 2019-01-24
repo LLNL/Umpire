@@ -31,7 +31,7 @@ int main(int, char**) {
    * Create an allocator that applied "PREFFERED_LOCATION" advice to set the
    * GPU as the preferred location.
    */
-  auto preffered_location_allocator =
+  auto preferred_location_allocator =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
       "preferred_location_host", allocator, "PREFERRED_LOCATION");
 
