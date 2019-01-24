@@ -21,6 +21,8 @@
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
@@ -105,6 +107,15 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance();
 
   m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  int count;
+  auto error = ::cudaGetDeviceCount(&count);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("Umpire compiled with CDUA support but no GPUs detected!");
+  }
+#endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
