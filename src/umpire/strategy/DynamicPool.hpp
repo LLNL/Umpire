@@ -79,9 +79,23 @@ class DynamicPool :
     long getCurrentSize() const noexcept override;
     long getActualSize() const noexcept override;
     long getHighWatermark() const noexcept override;
-    long getReleaseableSize() const noexcept override;
 
     Platform getPlatform() noexcept override;
+
+    /*!
+     * \brief Get the number of bytes that may be released back to resource
+     *
+     * A memory pool has a set of blocks that have no allocations
+     * against them.  If the size of the set is greater than one, then
+     * the pool will have a number of bytes that may be released back to
+     * the resource or coalesced into a larger block.
+     *
+     * Note: This method will always return 0 for strategies that are not
+     *       memory pools.
+     *
+     * \return The total number of bytes that are releaseable
+     */
+    long getReleaseableSize() const noexcept;
 
     void coalesce() noexcept;
 
