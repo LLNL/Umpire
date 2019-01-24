@@ -23,16 +23,16 @@ namespace strategy {
 
 DynamicPool::DynamicPool(
     const std::string& name,
-    int _id,
+    int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
     const std::size_t min_alloc_size,
-    Coalesce_Heuristic h_fun) noexcept
+    Coalesce_Heuristic coalesce_heuristic) noexcept
   :
-  AllocationStrategy(name, _id),
+  AllocationStrategy(name, id),
   dpa(nullptr),
   m_allocator(allocator.getAllocationStrategy()),
-  do_coalesce{h_fun}
+  do_coalesce{coalesce_heuristic}
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
 }

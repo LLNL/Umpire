@@ -37,7 +37,7 @@ class AllocationTracker :
     void* allocate(size_t bytes);
 
     void deallocate(void* ptr);
-    
+
     void release();
 
     long getCurrentSize() const noexcept;

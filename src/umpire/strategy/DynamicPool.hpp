@@ -60,7 +60,7 @@ class DynamicPool :
      * \param min_initial_alloc_size The minimum size of the first allocation
      *                               the pool will make.
      * \param min_alloc_size The minimum size of all future allocations.
-     * \param h_fun Heuristic callback function.
+     * \param coalesce_heuristic Heuristic callback function.
      */
     DynamicPool(
         const std::string& name,
@@ -68,7 +68,7 @@ class DynamicPool :
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        Coalesce_Heuristic h_fun = heuristic_noop) noexcept;
+        Coalesce_Heuristic coalesce_heuristic = heuristic_noop) noexcept;
 
     void* allocate(size_t bytes) override;
 
@@ -89,9 +89,6 @@ class DynamicPool :
      * against them.  If the size of the set is greater than one, then
      * the pool will have a number of bytes that may be released back to
      * the resource or coalesced into a larger block.
-     *
-     * Note: This method will always return 0 for strategies that are not
-     *       memory pools.
      *
      * \return The total number of bytes that are releaseable
      */
