@@ -21,10 +21,27 @@ namespace umpire {
 namespace strategy {
 class DynamicPool;
 
-  static inline bool heuristicNoop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
-  
+  /*!
+   * \brief Return true if everything in pool is releaseable
+   *
+   * When everything has been deallocated back to the pool, this heuristic
+   * will return true.
+   *
+   * \param dynamic_pool The dynamic pool object in question.
+   *
+   * \return True if all memory in pool is releaseable.
+   */
   bool heuristicAllAllocationsAreReleaseable( const strategy::DynamicPool& dynamic_pool );
 
+  /*!
+   * \brief Default action
+   *
+   * This is the default heuristic for the dynamic pool.
+   *
+   * \return false always
+   */
+  static inline bool heuristicNoop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
+  
 } // end of namespace strategy
 } // end namespace umpire
 

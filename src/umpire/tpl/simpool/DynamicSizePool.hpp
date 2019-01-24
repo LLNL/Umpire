@@ -330,17 +330,11 @@ public:
     std::size_t nblocks = 0;
     std::size_t nbytes = 0;
     for (struct Block *temp = freeBlocks; temp; temp = temp->next) {
-      std::cout << temp << " " << temp->size << " " << temp->blockSize << std::endl;
       if ( temp->size == temp->blockSize ) {
         nbytes += temp->blockSize;
         nblocks++;
       }
     }
-    std::cout 
-      << "nblocks=" << nblocks
-      << ", nbytes=" << nbytes
-      << ", returning " << (nblocks > 1 ? nbytes : 0)
-      << std::endl;
     return nblocks > 1 ? nbytes : 0;
   }
 
