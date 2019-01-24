@@ -31,7 +31,7 @@ class DynamicPool;
    *
    * \return True if all memory in pool is releaseable.
    */
-  bool heuristicAllAllocationsAreReleaseable( const strategy::DynamicPool& dynamic_pool );
+  bool heuristic_all_allocations_are_releaseable( const strategy::DynamicPool& dynamic_pool );
 
   /*!
    * \brief Default action
@@ -40,7 +40,7 @@ class DynamicPool;
    *
    * \return false always
    */
-  static inline bool heuristicNoop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
+  static inline bool heuristic_noop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
   
 } // end of namespace strategy
 } // end namespace umpire

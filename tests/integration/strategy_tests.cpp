@@ -63,8 +63,7 @@ class StrategyTest :
                     (  poolName.str()
                      , rm.getAllocator(allocatorName)
                      , initial_min_size
-                     , subsequent_min_size
-                     , &umpire::strategy::heuristicNoop);
+                     , subsequent_min_size);
      allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
     }
 
@@ -403,7 +402,7 @@ TEST(ReleaseTest, Works)
 TEST(HeuristicTest, AllReleaseableHeuristic)
 {
   umpire::strategy::DynamicPool::Coalesce_Heuristic h_fun =
-              umpire::strategy::heuristicAllAllocationsAreReleaseable;
+              umpire::strategy::heuristic_all_allocations_are_releaseable;
 
   auto& rm = umpire::ResourceManager::getInstance();
 

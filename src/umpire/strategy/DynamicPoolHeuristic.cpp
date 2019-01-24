@@ -22,7 +22,7 @@
 namespace umpire {
 namespace strategy {
 
-bool heuristicAllAllocationsAreReleaseable( const strategy::DynamicPool& dynamic_pool )
+bool heuristic_all_allocations_are_releaseable( const strategy::DynamicPool& dynamic_pool )
 {
   return (dynamic_pool.getCurrentSize() == 0 && dynamic_pool.getReleaseableSize() > 0);
 }
