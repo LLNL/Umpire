@@ -13,7 +13,7 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/resource/NUMAMemoryResource.hpp"
+#include "umpire/resource/NumaMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -31,7 +31,7 @@ union alloc_or_size_t {
 namespace umpire {
 namespace resource {
 
-NUMAMemoryResource::NUMAMemoryResource(int id, MemoryResourceTraits traits) :
+NumaMemoryResource::NumaMemoryResource(int id, MemoryResourceTraits traits) :
   MemoryResource("HOST_NUMA", id, traits),
   umpire::strategy::mixins::Inspector(),
   m_platform(Platform::cpu)
@@ -43,7 +43,7 @@ NUMAMemoryResource::NUMAMemoryResource(int id, MemoryResourceTraits traits) :
 #endif
 }
 
-void* NUMAMemoryResource::allocate(size_t bytes)
+void* NumaMemoryResource::allocate(size_t bytes)
 {
   void *ptr = nullptr;
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -76,7 +76,7 @@ void* NUMAMemoryResource::allocate(size_t bytes)
   return ptr;
 }
 
-void NUMAMemoryResource::deallocate(void* ptr)
+void NumaMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
@@ -95,19 +95,19 @@ void NUMAMemoryResource::deallocate(void* ptr)
   deregisterAllocation(ptr);
 }
 
-long NUMAMemoryResource::getCurrentSize() noexcept
+long NumaMemoryResource::getCurrentSize() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long NUMAMemoryResource::getHighWatermark() noexcept
+long NumaMemoryResource::getHighWatermark() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
   return m_high_watermark;
 }
 
-Platform NUMAMemoryResource::getPlatform() noexcept
+Platform NumaMemoryResource::getPlatform() noexcept
 {
   return Platform::cpu;
 }

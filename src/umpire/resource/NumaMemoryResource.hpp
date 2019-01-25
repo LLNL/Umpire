@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_NUMAMemoryResource_HPP
-#define UMPIRE_NUMAMemoryResource_HPP
+#ifndef UMPIRE_NumaMemoryResource_HPP
+#define UMPIRE_NumaMemoryResource_HPP
 
 #include "umpire/resource/MemoryResource.hpp"
 
@@ -24,12 +24,12 @@
 namespace umpire {
 namespace resource {
 
-class NUMAMemoryResource :
+class NumaMemoryResource :
     public MemoryResource,
     private umpire::strategy::mixins::Inspector
 {
 public:
-  NUMAMemoryResource(int id, MemoryResourceTraits traits);
+  NumaMemoryResource(int id, MemoryResourceTraits traits);
 
   void* allocate(size_t bytes);
   void deallocate(void* ptr);
@@ -46,4 +46,4 @@ protected:
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_NUMAMemoryResource_HPP
+#endif // UMPIRE_NumaMemoryResource_HPP

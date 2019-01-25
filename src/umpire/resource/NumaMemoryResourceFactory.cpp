@@ -12,9 +12,9 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/NUMAMemoryResourceFactory.hpp"
+#include "umpire/resource/NumaMemoryResourceFactory.hpp"
 
-#include "umpire/resource/NUMAMemoryResource.hpp"
+#include "umpire/resource/NumaMemoryResource.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -25,11 +25,11 @@
 namespace umpire {
 namespace resource {
 
-NUMAMemoryResourceFactory::NUMAMemoryResourceFactory(const int numa_node_)
+NumaMemoryResourceFactory::NumaMemoryResourceFactory(const int numa_node_)
   : numa_node(numa_node_) {}
 
 std::size_t
-NUMAMemoryResourceFactory::getNodeCount() {
+NumaMemoryResourceFactory::getNodeCount() {
 #if defined(UMPIRE_ENABLE_NUMA)
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
   return numa_max_possible_node() + 1;
@@ -39,7 +39,7 @@ NUMAMemoryResourceFactory::getNodeCount() {
 }
 
 bool
-NUMAMemoryResourceFactory::isValidMemoryResourceFor(const std::string& UMPIRE_UNUSED_ARG(name),
+NumaMemoryResourceFactory::isValidMemoryResourceFor(const std::string& UMPIRE_UNUSED_ARG(name),
                                                     const MemoryResourceTraits traits)
   noexcept
 {
@@ -47,7 +47,7 @@ NUMAMemoryResourceFactory::isValidMemoryResourceFor(const std::string& UMPIRE_UN
 }
 
 std::shared_ptr<MemoryResource>
-NUMAMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+NumaMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
 
@@ -59,7 +59,7 @@ NUMAMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<resource::NUMAMemoryResource >(id, traits);
+  return std::make_shared<resource::NumaMemoryResource >(id, traits);
 }
 
 } // end of namespace resource

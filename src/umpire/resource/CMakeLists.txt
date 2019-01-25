@@ -78,13 +78,13 @@ endif ()
 if (UMPIRE_ENABLE_NUMA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    NUMAMemoryResourceFactory.hpp
-    NUMAMemoryResource.hpp)
+    NumaMemoryResourceFactory.hpp
+    NumaMemoryResource.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    NUMAMemoryResourceFactory.cpp
-    NUMAMemoryResource.cpp)
+    NumaMemoryResourceFactory.cpp
+    NumaMemoryResource.cpp)
 
   set (umpire_resource_depends
     ${umpire_resource_depends}
