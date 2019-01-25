@@ -52,12 +52,12 @@ message(STATUS "Using CMake version ${CMAKE_VERSION}")
 if (ENABLE_FORTRAN_API)
   set(ENABLE_FORTRAN On)
   set(ENABLE_C_API On)
-endif()
+endif ()
 
 # Disable NUMA allocators if on MacOS or a non-UNIX platform
 if (ENABLE_NUMA AND (APPLE OR NOT UNIX))
   message(FATAL_ERROR "NUMA is unavailable on this platform. Re-run CMake using ENABLE_NUMA=OFF (default)")
-endif()
+endif ()
 
 ################################
 # BLT
@@ -66,9 +66,9 @@ if (NOT BLT_LOADED)
   if (DEFINED BLT_SOURCE_DIR)
     if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
         message(FATAL_ERROR "Given BLT_SOURCE_DIR does not contain SetupBLT.cmake")
-    endif()
+    endif ()
   else ()
-    set (BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/blt CACHE PATH "")
+    set(BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/blt CACHE PATH "")
 
     if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
       message(FATAL_ERROR "\
@@ -80,7 +80,7 @@ if (NOT BLT_LOADED)
   endif ()
 
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
-endif()
+endif ()
 
 
 include(cmake/SetupCompilerFlags.cmake)
@@ -99,11 +99,11 @@ install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
-  set (UMPIRE_TEST_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test)
+  set(UMPIRE_TEST_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
-  set (UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmark)
+  set(UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmark)
   add_subdirectory(benchmarks)
 endif ()
 if (ENABLE_EXAMPLES)
