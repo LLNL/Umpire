@@ -54,6 +54,11 @@ if (ENABLE_FORTRAN_API)
   set(ENABLE_C_API On)
 endif()
 
+# Disable NUMA allocators if on MacOS or a non-UNIX platform
+if (ENABLE_NUMA AND (APPLE OR NOT UNIX))
+  message(FATAL_ERROR "NUMA is unavailable on this platform. Re-run CMake using ENABLE_NUMA=OFF (default)")
+endif()
+
 ################################
 # BLT
 ################################

@@ -87,12 +87,6 @@ else ()
   set(UMPIRE_ENABLE_UM Off)
 endif()
 
-# Disable NUMA if on Mac OS or a non-UNIX platform
-if (ENABLE_NUMA AND (APPLE OR NOT UNIX))
-  message(WARNING "NUMA is not available. Setting UMPIRE_ENABLE_NUMA=Off.")
-  set(UMPIRE_ENABLE_NUMA Off)
-endif()
-
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
   ${CMAKE_BINARY_DIR}/include/umpire/config.hpp)
