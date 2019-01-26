@@ -46,14 +46,16 @@ class AllocationAdvisor :
         const std::string& name,
         int id,
         Allocator allocator,
-        const std::string& advice_operation);
+        const std::string& advice_operation,
+        int device_id);
 
       AllocationAdvisor(
         const std::string& name,
         int id,
         Allocator allocator,
         const std::string& advice_operation,
-        Allocator accessing_allocator);
+        Allocator accessing_allocator,
+        int device_id);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);

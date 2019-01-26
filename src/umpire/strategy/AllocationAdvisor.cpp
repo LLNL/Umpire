@@ -40,10 +40,22 @@ AllocationAdvisor::AllocationAdvisor(
     int id,
     Allocator allocator,
     const std::string& advice_operation,
-    Allocator accessing_allocator) :
+    int device_id) :
+  AllocationAdvisor(
+      name, id, allocator, advice_operation, allocator, device_id)
+{
+}
+
+AllocationAdvisor::AllocationAdvisor(
+    const std::string& name,
+    int id,
+    Allocator allocator,
+    const std::string& advice_operation,
+    Allocator accessing_allocator,
+    int device_id) :
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
-  m_device(0)
+  m_device(device_id)
 {
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
