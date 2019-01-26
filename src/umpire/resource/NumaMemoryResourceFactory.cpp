@@ -29,7 +29,7 @@ NumaMemoryResourceFactory::NumaMemoryResourceFactory(const int numa_node_)
   : numa_node(numa_node_) {}
 
 std::size_t
-NumaMemoryResourceFactory::getNodeCount() {
+NumaMemoryResourceFactory::getNumberOfNumaNodes() {
 #if defined(UMPIRE_ENABLE_NUMA)
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
   return numa_max_possible_node() + 1;
