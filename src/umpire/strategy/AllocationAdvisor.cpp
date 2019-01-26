@@ -29,16 +29,6 @@ AllocationAdvisor::AllocationAdvisor(
     const std::string& name,
     int id,
     Allocator allocator,
-    const std::string& advice_operation) :
-  AllocationAdvisor(
-      name, id, allocator, advice_operation, allocator)
-{
-}
-
-AllocationAdvisor::AllocationAdvisor(
-    const std::string& name,
-    int id,
-    Allocator allocator,
     const std::string& advice_operation,
     int device_id) :
   AllocationAdvisor(

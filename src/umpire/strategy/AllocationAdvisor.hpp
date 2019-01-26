@@ -42,18 +42,12 @@ class AllocationAdvisor :
   public AllocationStrategy
 {
   public:
-    AllocationAdvisor(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        const std::string& advice_operation);
-
       AllocationAdvisor(
         const std::string& name,
         int id,
         Allocator allocator,
         const std::string& advice_operation,
-        int device_id);
+        int device_id = 0);
 
       AllocationAdvisor(
         const std::string& name,
