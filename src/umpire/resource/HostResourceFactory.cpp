@@ -17,6 +17,8 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/MallocAllocator.hpp"
 
+#include "umpire/VendorTest.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -48,8 +50,8 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.unified = false;
   traits.size = 0;
 
-  traits.vendor = MemoryResourceTraits::vendor_type::IBM;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.vendor = CpuVendorType();
+  traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST", id, traits);
