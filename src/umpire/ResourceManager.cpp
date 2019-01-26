@@ -232,11 +232,18 @@ ResourceManager::getAllocatorFor(const resource::MemoryResourceTraits traits)
 {
   UMPIRE_LOG(Debug, "(Looking up allocator by traits)");
 
+  const resource::MemoryResourceTraits d_traits;
   for (auto r : m_resource_list) {
     const resource::MemoryResourceTraits r_traits = r->getTraits();
-    if (traits.unified == r_traits.unified &&
-        traits.kind == r_traits.kind &&
-        traits.numa_node == r_traits.numa_node) return Allocator(r);
+    // For each trait different from the default value, do not match
+    // if resource's trait differs from that passed
+    if ( (traits.unified != d_traits.unified) && (traits.unified != r_traits.unified) ) continue;
+    if ( (traits.size != d_traits.size) && (traits.size != r_traits.size) ) continue;
+    if ( (traits.numa_node != d_traits.numa_node) && (traits.numa_node != r_traits.numa_node) ) continue;
+    if ( (traits.vendor != d_traits.vendor) && (traits.vendor != r_traits.vendor) ) continue;
+    if ( (traits.kind != d_traits.kind) && (traits.kind != r_traits.kind) ) continue;
+    if ( (traits.used_for != d_traits.used_for) && (traits.used_for != r_traits.used_for) ) continue;
+    return Allocator(r);
   }
 
   UMPIRE_ERROR("Allocator for traits not found.");
