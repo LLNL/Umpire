@@ -55,7 +55,7 @@ class AllocationAdvisor :
         Allocator allocator,
         const std::string& advice_operation,
         Allocator accessing_allocator,
-        int device_id);
+        int device_id = 0);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
