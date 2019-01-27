@@ -21,13 +21,13 @@ set (umpire_resource_headers
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
   MemoryResourceTraits.hpp
-)
+  DetectVendor.hpp)
 
 set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
-)
+  DetectVendor.cpp)
 
 set (umpire_resource_depends
   umpire_alloc umpire_strategy umpire_util)

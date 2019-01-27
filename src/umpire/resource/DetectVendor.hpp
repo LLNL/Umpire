@@ -12,19 +12,15 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
+#ifndef UMPIRE_DetectVendor_HPP
+#define UMPIRE_DetectVendor_HPP
 
-#include "umpire/VendorTest.hpp"
+#include "umpire/resource/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
-resource::MemoryResourceTraits::vendor_type CpuVendorType() noexcept {
-#if defined(__x86_64__)
-  return resource::MemoryResourceTraits::vendor_type::INTEL;
-#elif defined(__powerpc__)
-  return resource::MemoryResourceTraits::vendor_type::IBM;
-#else
-  return resource::MemoryResourceTraits::vendor_type::UNKNOWN;
-#endif
-}
+resource::MemoryResourceTraits::vendor_type CpuVendorType() noexcept;
 
 }
+
+#endif // UMPIRE_DetectVendor_HPP

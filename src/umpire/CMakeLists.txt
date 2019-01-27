@@ -19,14 +19,12 @@ set (umpire_headers
   ResourceManager.inl
   TypedAllocator.hpp
   TypedAllocator.inl
-  Umpire.hpp
-  VendorTest.hpp)
+  Umpire.hpp)
 
 set (umpire_sources
   Allocator.cpp
   Replay.cpp
-  ResourceManager.cpp
-  VendorTest.cpp)
+  ResourceManager.cpp)
 
 if (ENABLE_FORTRAN_API OR ENABLE_C_API)
   set (umpire_headers

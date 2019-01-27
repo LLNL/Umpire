@@ -17,7 +17,7 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/MallocAllocator.hpp"
 
-#include "umpire/VendorTest.hpp"
+#include "umpire/resource/DetectVendor.hpp"
 
 namespace umpire {
 namespace resource {
