@@ -16,8 +16,6 @@
 #include "umpire/resource/NumaMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 
-#if defined(UMPIRE_ENABLE_NUMA)
-
 #include <cstddef>
 #include <numa.h>
 
@@ -25,8 +23,6 @@ union alloc_or_size_t {
   std::size_t bytes;
   std::max_align_t a;
 };
-
-#endif
 
 namespace umpire {
 namespace resource {
@@ -36,17 +32,13 @@ NumaMemoryResource::NumaMemoryResource(int id, MemoryResourceTraits traits) :
   umpire::strategy::mixins::Inspector(),
   m_platform(Platform::cpu)
 {
-#if defined(UMPIRE_ENABLE_NUMA)
     if (numa_available() < 0) UMPIRE_ERROR("libnuma is not usable.");
-#else
-    UMPIRE_LOG(Warning, "NUMA is not available. Falling back to ::malloc()");
-#endif
 }
 
 void* NumaMemoryResource::allocate(size_t bytes)
 {
   void *ptr = nullptr;
-#if defined(UMPIRE_ENABLE_NUMA)
+
   // Need to keep track of allocation sizes, so do this before the
   // allocation, but make sure to keep alignment of the actual alignment
   union alloc_or_size_t* s = static_cast<union alloc_or_size_t*>(
@@ -58,15 +50,6 @@ void* NumaMemoryResource::allocate(size_t bytes)
   else {
     UMPIRE_ERROR("numa_alloc_onnode( bytes = " << sizeof(*s) + bytes << ", " << m_traits.numa_node << " ) failed");
   }
-#else
-  void* s = ::malloc(bytes);
-  if (s) {
-    ptr = s;
-  }
-  else {
-    UMPIRE_ERROR("malloc( bytes = " << bytes << " ) failed");
-  }
-#endif
 
   registerAllocation(ptr, bytes, this->shared_from_this());
 
@@ -83,13 +66,9 @@ void NumaMemoryResource::deallocate(void* ptr)
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
   if (ptr) {
-#if defined(UMPIRE_ENABLE_NUMA)
     union alloc_or_size_t* s = static_cast<union alloc_or_size_t*>(ptr);
     s--;
     numa_free(s, sizeof(*s) + s->bytes);
-#else
-    ::free(ptr);
-#endif
   }
 
   deregisterAllocation(ptr);

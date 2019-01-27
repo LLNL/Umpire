@@ -18,9 +18,19 @@
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
 #include <cstddef>
+#include <vector>
 
 namespace umpire {
 namespace resource {
+
+/*!
+ * \brief Interface for calls to libnuma.
+ */
+namespace numa {
+std::size_t nodeCount();
+std::vector<std::size_t> getHostNodes();
+std::vector<std::size_t> getDeviceNodes();
+};
 
 /*!
  * \brief Factory class for constructing MemoryResource objects that allocate
@@ -31,8 +41,6 @@ class NumaMemoryResourceFactory :
 {
 public:
   NumaMemoryResourceFactory(const int numa_node_);
-
-  static std::size_t getNumberOfNumaNodes();
 
   bool isValidMemoryResourceFor(const std::string& name,
                                 const MemoryResourceTraits traits = MemoryResourceTraits{}) noexcept;

@@ -20,7 +20,7 @@
 #include "umpire/resource/MemoryResourceTraits.hpp"
 
 #if defined(UMPIRE_ENABLE_NUMA)
-#include "umpire/resource/NUMAMemoryResource.hpp"
+#include "umpire/resource/NumaMemoryResource.hpp"
 #endif
 
 struct TestAllocator
@@ -82,11 +82,11 @@ TEST(DefaultMemoryResource, GetHighWatermark)
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
-TEST(NUMAMemoryResource, Allocate)
+TEST(NumaMemoryResource, Allocate)
 {
   umpire::resource::MemoryResourceTraits traits;
   traits.numa_node = 0;
-  auto alloc = std::make_shared<umpire::resource::NUMAMemoryResource>(0, traits);
+  auto alloc = std::make_shared<umpire::resource::NumaMemoryResource>(0, traits);
 
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
   alloc->deallocate(pointer);

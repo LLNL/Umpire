@@ -98,10 +98,20 @@ ResourceManager::ResourceManager() :
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
-  for (std::size_t numa_node = 0; numa_node < resource::NumaMemoryResourceFactory::getNumberOfNumaNodes(); numa_node++) {
-    registry.registerMemoryResource(
-      std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
+#if defined(UMPIRE_ENABLE_CUDA)
+  {
+    auto host_nodes = resource::numa::getHostNodes();
+    for (std::size_t numa_node : host_nodes) {
+      registry.registerMemoryResource(
+        std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
+    }
   }
+#else
+  for (std::size_t numa_node = 0; numa_node < resource::numa::nodeCount(); numa_node++) {
+      registry.registerMemoryResource(
+        std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
+  }
+#endif
 #endif
 
   initialize();
@@ -172,11 +182,22 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
-  for (std::size_t numa_node = 0; numa_node < resource::NumaMemoryResourceFactory::getNumberOfNumaNodes(); numa_node++) {
+#if defined(UMPIRE_ENABLE_CUDA)
+  {
+    auto host_nodes = resource::numa::getHostNodes();
+    for (std::size_t numa_node : host_nodes) {
+      resource::MemoryResourceTraits traits{};
+      traits.numa_node = numa_node;
+      m_resource_list.push_back(registry.makeMemoryResource("HOST_NUMA", getNextId(), traits));
+    }
+  }
+#else
+  for (std::size_t numa_node = 0; numa_node < resource::numa::nodeCount(); numa_node++) {
     resource::MemoryResourceTraits traits{};
     traits.numa_node = numa_node;
     m_resource_list.push_back(registry.makeMemoryResource("HOST_NUMA", getNextId(), traits));
   }
+#endif
 #endif
 
   UMPIRE_LOG(Debug, "() leaving");
