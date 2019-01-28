@@ -17,7 +17,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/util/Macros.hpp"
+#include "umpire/util/Exception.hpp"
 
 #include <iostream>
 
@@ -42,9 +42,11 @@ int main(int, char**) {
     void* data = preferred_location_allocator.allocate(1024);
 
     preferred_location_allocator.deallocate(data);
-  } catch (umpire::Exception e) {
+  } catch (umpire::util::Exception e) {
     std::cout << "Couldn't create Allocator with device_id = " << device_id
               << std::endl;
+
+    std::cout << e.message() << std::endl;
   }
 
   return 0;
