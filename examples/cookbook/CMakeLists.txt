@@ -4,6 +4,12 @@ if (ENABLE_CUDA)
     SOURCES recipe_one_shrink.cpp
     DEPENDS_ON 
       umpire)
+
+  blt_add_executable(
+    NAME recipe_four_advice_device_id
+    SOURCES recipe_four_advice_device_id.cpp
+    DEPENDS_ON 
+      umpire)
 endif ()
 
 blt_add_executable(
