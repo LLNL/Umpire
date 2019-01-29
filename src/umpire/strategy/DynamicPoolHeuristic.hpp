@@ -31,7 +31,19 @@ class DynamicPool;
    *
    * \return True if all memory in pool is releaseable.
    */
-  bool heuristic_all_allocations_are_releaseable( const strategy::DynamicPool& dynamic_pool );
+  bool heuristic_100_percent_releaseable( const strategy::DynamicPool& dynamic_pool );
+
+  /*!
+   * \brief Return true if 90% of pool is releaseable
+   *
+   * When 90% has been deallocated back to the pool, this heuristic
+   * will return true.
+   *
+   * \param dynamic_pool The dynamic pool object in question.
+   *
+   * \return True if 90% memory in pool is releaseable.
+   */
+  bool heuristic_90_percent_releaseable( const strategy::DynamicPool& dynamic_pool );
 
   /*!
    * \brief Default action

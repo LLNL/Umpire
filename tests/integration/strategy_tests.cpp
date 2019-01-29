@@ -402,7 +402,7 @@ TEST(ReleaseTest, Works)
 TEST(HeuristicTest, AllReleaseableHeuristic)
 {
   umpire::strategy::DynamicPool::Coalesce_Heuristic h_fun =
-              umpire::strategy::heuristic_all_allocations_are_releaseable;
+              umpire::strategy::heuristic_100_percent_releaseable;
 
   auto& rm = umpire::ResourceManager::getInstance();
 
