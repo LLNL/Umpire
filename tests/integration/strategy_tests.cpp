@@ -274,7 +274,25 @@ TEST(AllocationAdvisor, Create)
   ASSERT_ANY_THROW(
       auto failed_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "FOOBAR"));
+      "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR"));
+}
+
+TEST(AllocationAdvisor, CreateWithId)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  const int device_id = 2;
+
+  ASSERT_NO_THROW(
+    auto read_only_alloc =
+    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id));
+
+  ASSERT_ANY_THROW(
+      auto failed_alloc =
+    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "read_only_um_nonsense_operator_device_id",
+      rm.getAllocator("UM"), "FOOBAR", device_id));
 }
 
 TEST(AllocationAdvisor, Host)
