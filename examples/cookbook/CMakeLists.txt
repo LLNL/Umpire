@@ -6,8 +6,8 @@ if (ENABLE_CUDA)
       umpire)
 
   blt_add_executable(
-    NAME recipe_four_advice_device_id
-    SOURCES recipe_four_advice_device_id.cpp
+    NAME recipe_advice_device_id
+    SOURCES recipe_advice_device_id.cpp
     DEPENDS_ON 
       umpire)
 endif ()

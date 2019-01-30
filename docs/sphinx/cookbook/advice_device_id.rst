@@ -16,9 +16,9 @@ By passing a specific device id when constructing an
 :class:`umpire::strategy::AllocationAdvisor`, you can ensure that the advice
 will be applied with respect to that device
 
-.. literalinclude:: ../../../examples/cookbook/recipe_four_advice_device_id.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_advice_device_id.cpp
                     :lines: 38-40
 
 The complete example is included below:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_four_advice_device_id.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_advice_device_id.cpp
