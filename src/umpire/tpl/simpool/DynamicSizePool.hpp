@@ -46,7 +46,7 @@ protected:
   std::size_t minBytes;
 
   // High water mark of allocations
-  std::size_t highWaterMark;
+  std::size_t highWatermark;
 
   // Pointer to our allocator's allocation strategy
   std::shared_ptr<umpire::strategy::AllocationStrategy> allocator;
@@ -90,17 +90,17 @@ protected:
       UMPIRE_LOG(Error, 
           "\n\tMemory exhausted at allocation resource. "
           "Attempting to give blocks back.\n\t"
-          << allocatedSize() << " Allocated to pool, "
-          << numFreeBlocks() << " Free Blocks, "
-          << numUsedBlocks() << " Used Blocks\n"
+          << getCurrentSize() << " Allocated to pool, "
+          << getFreeBlocks() << " Free Blocks, "
+          << getInUseBlocks() << " Used Blocks\n"
       );
       freeReleasedBlocks();
       UMPIRE_LOG(Error, 
           "\n\tMemory exhausted at allocation resource.  "
           "\n\tRetrying allocation operation: "
-          << allocatedSize() << " Bytes still allocated to pool, "
-          << numFreeBlocks() << " Partially Free Blocks, "
-          << numUsedBlocks() << " Used Blocks\n"
+          << getCurrentSize() << " Bytes still allocated to pool, "
+          << getFreeBlocks() << " Free Blocks, "
+          << getInUseBlocks() << " Used Blocks\n"
       );
       try {
         data = allocator->allocate(sizeToAlloc);
@@ -112,9 +112,9 @@ protected:
         UMPIRE_LOG(Error, 
           "\n\tUnable to allocate from resource even after giving back free blocks.\n"
           "\tThrowing to let application know we have no more memory: "
-          << allocatedSize() << " Bytes still allocated to pool\n"
-          << numFreeBlocks() << " Partially Free Blocks, "
-          << numUsedBlocks() << " Used Blocks\n"
+          << getCurrentSize() << " Bytes still allocated to pool\n"
+          << getFreeBlocks() << " Partially Free Blocks, "
+          << getInUseBlocks() << " Used Blocks\n"
         );
         throw;
       }
@@ -239,7 +239,7 @@ protected:
     UMPIRE_LOG(Debug, "Allocator " << this
                         << " coalescing to "
                         << size << " bytes from "
-                        << numFreeBlocks() << " free blocks\n");
+                        << getFreeBlocks() << " free blocks\n");
     freeReleasedBlocks();
     void* ptr = allocate(size);
     deallocate(ptr);
@@ -268,7 +268,7 @@ public:
       allocBytes(0),
       minInitialBytes(_minInitialBytes),
       minBytes(_minBytes),
-      highWaterMark(0),
+      highWatermark(0),
       allocator(strat) { }
 
   ~DynamicSizePool() { freeAllBlocks(); }
@@ -292,8 +292,8 @@ public:
     // Increment the allocated size
     allocBytes += size;
 
-    if ( allocBytes > highWaterMark )
-      highWaterMark = allocBytes;
+    if ( allocBytes > highWatermark )
+      highWatermark = allocBytes;
 
     // Return the new pointer
     return usedBlocks->data;
@@ -314,31 +314,46 @@ public:
 
     // Release it
     releaseBlock(curr, prev);
-
-    if ( allocBytes == 0 && numFreeBlocks() > 1 )
-      coalesceFreeBlocks(highWaterMark);
   }
 
-  std::size_t allocatedSize() const { return allocBytes; }
+  std::size_t getCurrentSize() const { return allocBytes; }
 
-  std::size_t totalSize() const {
-    return totalBytes + blockPool.totalSize();
+  std::size_t getActualSize() const {
+    return totalBytes;
   }
 
-  std::size_t numFreeBlocks() const {
+  std::size_t getHighWatermark() const {
+    return highWatermark;
+  }
+
+  std::size_t getReleaseableSize() const {
+    std::size_t nblocks = 0;
+    std::size_t nbytes = 0;
+    for (struct Block *temp = freeBlocks; temp; temp = temp->next) {
+      if ( temp->size == temp->blockSize ) {
+        nbytes += temp->blockSize;
+        nblocks++;
+      }
+    }
+    return nblocks > 1 ? nbytes : 0;
+  }
+
+  std::size_t getFreeBlocks() const {
     std::size_t nb = 0;
-    for (struct Block *temp = freeBlocks; temp; temp = temp->next) nb++;
+    for (struct Block *temp = freeBlocks; temp; temp = temp->next)
+      if ( temp->size == temp->blockSize )
+        nb++;
     return nb;
   }
 
-  std::size_t numUsedBlocks() const {
+  std::size_t getInUseBlocks() const {
     std::size_t nb = 0;
     for (struct Block *temp = usedBlocks; temp; temp = temp->next) nb++;
     return nb;
   }
 
   void coalesce() {
-    if ( numFreeBlocks() > 1 ) {
+    if ( getFreeBlocks() > 1 ) {
       std::size_t size_to_coalesce = freeReleasedBlocks();
 
       UMPIRE_LOG(Debug, "Attempting to coalesce "

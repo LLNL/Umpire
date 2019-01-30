@@ -16,7 +16,11 @@
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
+
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+
 #include "umpire/Replay.hpp"
 
 namespace umpire {
@@ -73,6 +77,12 @@ Replay* Replay::getReplayLogger()
 
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
   out << alloc.getName();
+  return out;
+}
+
+std::ostream& operator<< (
+    std::ostream& out, 
+    umpire::strategy::DynamicPool::Coalesce_Heuristic& ) {
   return out;
 }
 

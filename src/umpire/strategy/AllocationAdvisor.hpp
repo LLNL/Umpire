@@ -58,8 +58,8 @@ class AllocationAdvisor :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
   private:

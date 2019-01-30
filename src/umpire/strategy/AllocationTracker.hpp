@@ -38,9 +38,11 @@ class AllocationTracker :
 
     void deallocate(void* ptr);
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
-    long getActualSize() noexcept;
+    void release();
+
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
+    long getActualSize() const noexcept;
 
     Platform getPlatform() noexcept;
 

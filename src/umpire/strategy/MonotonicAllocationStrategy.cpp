@@ -56,14 +56,14 @@ MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 }
 
 long
-MonotonicAllocationStrategy::getCurrentSize() noexcept
+MonotonicAllocationStrategy::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_size);
   return m_size;
 }
 
 long
-MonotonicAllocationStrategy::getHighWatermark() noexcept
+MonotonicAllocationStrategy::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_capacity);
   return m_capacity;

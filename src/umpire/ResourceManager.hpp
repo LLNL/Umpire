@@ -222,7 +222,7 @@ class ResourceManager {
      *
      * \return Size of allocation in bytes.
      */
-    size_t getSize(void* ptr);
+    size_t getSize(void* ptr) const;
 
     /*!
      * \brief If allocator is some kind of memory pool, try and coalesce

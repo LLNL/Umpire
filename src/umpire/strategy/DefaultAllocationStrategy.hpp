@@ -35,8 +35,8 @@ class DefaultAllocationStrategy :
      */
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() const;
+    long getHighWatermark() const;
 
     Platform getPlatform();
 

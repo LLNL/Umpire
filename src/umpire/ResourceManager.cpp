@@ -21,6 +21,8 @@
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
@@ -127,6 +129,15 @@ ResourceManager::initialize()
 
   m_resource_list.push_back(registry.makeMemoryResource("HOST", getNextId()));
   m_memory_resources[resource::Host] = m_resource_list.back();
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  int count;
+  auto error = ::cudaGetDeviceCount(&count);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
+  }
+#endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   m_resource_list.push_back(registry.makeMemoryResource("DEVICE", getNextId()));
@@ -478,7 +489,7 @@ void ResourceManager::deallocate(void* ptr)
 }
 
 size_t
-ResourceManager::getSize(void* ptr)
+ResourceManager::getSize(void* ptr) const
 {
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);
