@@ -14,10 +14,20 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/mixins/Inspector.hpp"
 
+#include "umpire/util/AllocationRecord.hpp"
+
 #include "umpire/ResourceManager.hpp"
+
+#include "umpire/tpl/simpool/FixedSizePool.hpp"
+#include "umpire/tpl/simpool/StdAllocator.hpp"
+
+namespace {
+  static FixedSizePool<umpire::util::AllocationRecord, StdAllocator> pool;
+}
 
 namespace umpire {
 namespace strategy {
+
 namespace mixins {
 
 Inspector::Inspector() :
@@ -39,7 +49,8 @@ Inspector::registerAllocation(
     m_high_watermark = m_current_size;
   }
 
-  auto record = new umpire::util::AllocationRecord{
+  auto record_ptr = pool.allocate();
+  auto record = new (record_ptr) umpire::util::AllocationRecord{
     ptr,
     size,
     strategy};
@@ -53,7 +64,9 @@ Inspector::deregisterAllocation(void* ptr)
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
   m_current_size -= record->m_size;
-  delete record;
+
+  pool.deallocate(record);
+  //delete record;
 }
 
 } // end of namespace mixins
