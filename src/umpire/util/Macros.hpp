@@ -24,6 +24,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <mutex>
 
 #ifdef UMPIRE_ENABLE_ASSERTS
 #include <cassert>
@@ -95,11 +96,13 @@
 
 #define UMPIRE_UNUSED_ARG(x)
 
+#define UMPIRE_USE_VAR(x) static_cast<void>(x)
+
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << msg;                      \
+  umpire_oss_error << " " << __func__ << " " << msg;               \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
@@ -115,5 +118,12 @@
 #define UMPIRE_RECORD_STATISTIC(name, ...) ((void) 0)
 
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
+
+#define UMPIRE_LOCK \
+  if ( !m_mutex->try_lock() ) \
+    m_mutex->lock();
+
+#define UMPIRE_UNLOCK \
+  m_mutex->unlock();
 
 #endif // UMPIRE_Macros_HPP

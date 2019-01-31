@@ -23,7 +23,7 @@ namespace umpire {
 namespace strategy {
 
 template <typename T, int NP, typename IA>
-void 
+void
 FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
   struct Pool *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
   p->numAvail = m_num_per_pool;
@@ -31,7 +31,7 @@ FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
 
   p->data  = reinterpret_cast<unsigned char*>(m_allocator->allocate(m_num_per_pool * sizeof(T)));
   p->avail = reinterpret_cast<unsigned int *>(p + 1);
-  for (int i = 0; i < NP; i++) p->avail[i] = -1;
+  for (int i = 0; i < NP; i++) p->avail[i] = (~0);
 
   *pnew = p;
 
@@ -42,7 +42,7 @@ FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
 }
 
 template <typename T, int NP, typename IA>
-T* 
+T*
 FixedPool<T, NP, IA>::allocInPool(struct Pool *p) {
     if (!p->numAvail) return NULL;
 
@@ -63,7 +63,7 @@ template <typename T, int NP, typename IA>
 FixedPool<T, NP, IA>::FixedPool(
     const std::string& name,
     int id,
-    Allocator allocator) : 
+    Allocator allocator) :
   AllocationStrategy(name, id),
   m_num_per_pool(NP * sizeof(unsigned int) * 8),
   m_total_pool_size(sizeof(struct Pool) + m_num_per_pool * sizeof(T) + NP * sizeof(unsigned int)),
@@ -71,8 +71,8 @@ FixedPool<T, NP, IA>::FixedPool(
   m_highwatermark(0),
   m_current_size(0),
   m_allocator(allocator.getAllocationStrategy())
-{ 
-  newPool(&m_pool); 
+{
+  newPool(&m_pool);
 }
 
 template <typename T, int NP, typename IA>
@@ -86,7 +86,7 @@ FixedPool<T, NP, IA>::~FixedPool() {
   }
 
 template <typename T, int NP, typename IA>
-void* 
+void*
 FixedPool<T, NP, IA>::allocate(size_t bytes) {
   T* ptr = NULL;
 
@@ -107,13 +107,11 @@ FixedPool<T, NP, IA>::allocate(size_t bytes) {
     m_num_blocks++;
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, util::makeAllocationRecord(ptr, sizeof(T), this->shared_from_this()));
-
   return ptr;
 }
 
 template <typename T, int NP, typename IA>
-void 
+void
 FixedPool<T,NP, IA>::deallocate(void* ptr) {
   T* t_ptr = static_cast<T*>(ptr);
 
@@ -134,7 +132,6 @@ FixedPool<T,NP, IA>::deallocate(void* ptr) {
       curr->avail[indexI] ^= 1 << indexB;
       curr->numAvail++;
       m_num_blocks--;
-      ResourceManager::getInstance().deregisterAllocation(ptr);
 
       return;
     }
@@ -145,29 +142,35 @@ FixedPool<T,NP, IA>::deallocate(void* ptr) {
 }
 
 template <typename T, int NP, typename IA>
-long 
-FixedPool<T, NP, IA>::getCurrentSize() {
+long
+FixedPool<T, NP, IA>::getCurrentSize() const noexcept {
     return m_current_size;
 }
 
 template <typename T, int NP, typename IA>
-long 
-FixedPool<T, NP, IA>::getHighWatermark() {
+long
+FixedPool<T, NP, IA>::getActualSize() const noexcept {
+    return m_total_pool_size;
+}
+
+template <typename T, int NP, typename IA>
+long
+FixedPool<T, NP, IA>::getHighWatermark() const noexcept {
   return m_highwatermark;
 }
 
 template <typename T, int NP, typename IA>
 size_t
-FixedPool<T, NP, IA>::numPools() const {
+FixedPool<T, NP, IA>::numPools() const noexcept {
   std::size_t np = 0;
   for (struct Pool *curr = m_pool; curr; curr = curr->next) np++;
   return np;
 }
 
 template <typename T, int NP, typename IA>
-Platform 
-FixedPool<T, NP, IA>::getPlatform()
-{ 
+Platform
+FixedPool<T, NP, IA>::getPlatform() noexcept
+{
   return m_allocator->getPlatform();
 }
 

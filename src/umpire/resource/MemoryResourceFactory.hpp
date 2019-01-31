@@ -33,13 +33,15 @@ namespace resource {
  */
 class MemoryResourceFactory {
   public:
+    virtual ~MemoryResourceFactory() = default;
+
     /*
      * \brief Check whether the MemoryResource constructed by this factory is
      * valid for the given name
      *
      * \return true if the MemoryResource matches name.
      */
-    virtual bool isValidMemoryResourceFor(const std::string& name) = 0;
+    virtual bool isValidMemoryResourceFor(const std::string& name) noexcept = 0;
 
     /*!
      * \brief Construct a MemoryResource with the given name and id.

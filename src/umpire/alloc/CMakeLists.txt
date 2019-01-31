@@ -27,6 +27,12 @@ if (ENABLE_CUDA)
     CudaPinnedAllocator.hpp)
 endif ()
 
+if (ENABLE_ROCM)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    AmAllocAllocator.hpp)
+endif ()
+
 blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers}
@@ -42,7 +48,7 @@ target_include_directories(
   umpire_alloc
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(FILES

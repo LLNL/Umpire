@@ -27,8 +27,15 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ * \brief Pool for fixed size allocations
+ *
+ * This AllocationStrategy provides an efficient pool for fixed size
+ * allocations of size T. Pools of NP objects of type T are constructed, and
+ * used to quickly allocate and deallocate objects.
+ */
 template <typename T, int NP=64, typename IA=StdAllocator>
-class FixedPool 
+class FixedPool
   : public AllocationStrategy
 {
 
@@ -44,10 +51,11 @@ class FixedPool
 
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
+    long getActualSize() const noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     struct Pool
@@ -62,7 +70,7 @@ class FixedPool
 
     T* allocInPool(struct Pool *p);
 
-    size_t numPools() const;
+    size_t numPools() const noexcept;
 
 
     struct Pool *m_pool;

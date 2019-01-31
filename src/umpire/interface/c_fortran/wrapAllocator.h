@@ -1,4 +1,5 @@
-//////////////////////////////////////////////////////////////////////////////
+// wrapAllocator.h
+// This is generated code, do not edit
 // Copyright (c) 2018, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
@@ -11,9 +12,6 @@
 //
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
-//////////////////////////////////////////////////////////////////////////////
-// wrapAllocator.h
-// This is generated code, do not edit
 /**
  * \file wrapAllocator.h
  * \brief Shroud generated wrapper for Allocator class
@@ -23,25 +21,36 @@
 #ifndef WRAPALLOCATOR_H
 #define WRAPALLOCATOR_H
 
-#include "stdlib.h"
+#include <stddef.h>
+#include "typesUmpire.h"
 
 // splicer begin class.Allocator.CXX_declarations
+#ifdef __cplusplus
+#include <cstring>
+#endif
 // splicer end class.Allocator.CXX_declarations
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// declaration of wrapped types
-struct s_UMPIRE_allocator;
-typedef struct s_UMPIRE_allocator UMPIRE_allocator;
-
 // splicer begin class.Allocator.C_declarations
 // splicer end class.Allocator.C_declarations
 
-void * UMPIRE_allocator_allocate(UMPIRE_allocator * self, size_t bytes);
+void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 
-void UMPIRE_allocator_deallocate(UMPIRE_allocator * self, void * ptr);
+void umpire_allocator_deallocate(umpire_allocator * self, void * ptr);
+
+size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr);
+
+size_t umpire_allocator_get_high_watermark(umpire_allocator * self);
+
+size_t umpire_allocator_get_current_size(umpire_allocator * self);
+
+void umpire_allocator_get_name_bufferify(umpire_allocator * self,
+    UMP_SHROUD_array *DSHF_rv);
+
+size_t umpire_allocator_get_id(umpire_allocator * self);
 
 #ifdef __cplusplus
 }

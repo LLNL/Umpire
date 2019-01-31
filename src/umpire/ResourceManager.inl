@@ -17,27 +17,65 @@
 
 #include "umpire/ResourceManager.hpp"
 
+#include <sstream>
+#include <cxxabi.h>
+
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
+#include "umpire/strategy/AllocationTracker.hpp"
 
 namespace umpire {
 
 template <typename Strategy,
+         bool introspection,
          typename... Args>
 Allocator ResourceManager::makeAllocator(
     const std::string& name, 
     Args&&... args)
 {
-  UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
+  std::shared_ptr<strategy::AllocationStrategy> allocator;
 
-  if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+  try {
+    UMPIRE_LOCK;
+
+    UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
+
+    UMPIRE_REPLAY("makeAllocator,"
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+    );
+
+    if (isAllocator(name)) {
+      UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+    }
+
+    if (!introspection) {
+      allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+
+      m_allocators_by_name[name] = allocator;
+      m_allocators_by_id[allocator->getId()] = allocator;
+    } else {
+      std::stringstream base_name;
+      base_name << name << "_base";
+
+      auto base_allocator = std::make_shared<Strategy>(base_name.str(), getNextId(), std::forward<Args>(args)...);
+
+      allocator = std::make_shared<umpire::strategy::AllocationTracker>(name, getNextId(), Allocator(base_allocator));
+
+      m_allocators_by_name[name] = allocator;
+      m_allocators_by_id[allocator->getId()] = allocator;
+
+    }
+
+    UMPIRE_REPLAY_CONT("" << allocator << "\n");
+
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
   }
-
-  std::shared_ptr<strategy::AllocationStrategy> allocator = 
-    std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
-
-  m_allocators_by_name[name] = allocator;
-  m_allocators_by_id[allocator->getId()] = allocator;
 
   return Allocator(allocator);
 }

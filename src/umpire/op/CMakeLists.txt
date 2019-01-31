@@ -20,6 +20,17 @@ set (umpire_op_headers
   MemoryOperation.hpp
   MemoryOperationRegistry.hpp)
 
+set (umpire_op_sources
+  GenericReallocateOperation.cpp
+  HostCopyOperation.cpp
+  HostMemsetOperation.cpp
+  HostReallocateOperation.cpp
+  MemoryOperation.cpp
+  MemoryOperationRegistry.cpp)
+
+set (umpire_op_depends
+  umpire_util)
+
 if (ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
@@ -30,17 +41,7 @@ if (ENABLE_CUDA)
     CudaCopyFromOperation.hpp
     CudaCopyToOperation.hpp
     CudaMemsetOperation.hpp)
-endif ()
 
-set (umpire_op_sources
-  GenericReallocateOperation.cpp
-  HostCopyOperation.cpp
-  HostMemsetOperation.cpp
-  HostReallocateOperation.cpp
-  MemoryOperation.cpp
-  MemoryOperationRegistry.cpp)
-
-if (ENABLE_CUDA)
   set (umpire_op_sources
     ${umpire_op_sources}
     CudaAdviseAccessedByOperation.cpp
@@ -50,16 +51,28 @@ if (ENABLE_CUDA)
     CudaCopyFromOperation.cpp
     CudaCopyToOperation.cpp
     CudaMemsetOperation.cpp)
-endif ()
 
-set (umpire_op_depends
-  umpire_util)
-
-if (ENABLE_CUDA)
   set (umpire_op_depends
     ${umpire_op_depends}
     cuda_runtime)
 endif ()
+
+if (ENABLE_ROCM)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    RocmCopyOperation.hpp
+    RocmMemsetOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    RocmCopyOperation.cpp
+    RocmMemsetOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    rocm)
+endif ()
+
 
 blt_add_library(
   NAME umpire_op
@@ -73,7 +86,7 @@ target_include_directories(
   umpire_op
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(FILES

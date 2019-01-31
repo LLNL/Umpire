@@ -13,6 +13,21 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
+copyright:
+  - Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+  - Produced at the Lawrence Livermore National Laboratory
+  - 
+  - Created by David Beckingsale, david@llnl.gov
+  - LLNL-CODE-747640
+  - 
+  - All rights reserved.
+  - 
+  - This file is part of Umpire. 
+  - 
+  - For details, see https://github.com/LLNL/Umpire
+  - Please also see the LICENSE file for MIT license.
+
+
 library: Umpire
 
 options:
@@ -24,6 +39,9 @@ format:
 declarations:
 - decl: namespace umpire
   declarations:
+    - decl: namespace strategy
+      declarations:
+        - decl: class DynamicPool
 
     - decl: class Allocator
       cxx_header: umpire/Allocator.hpp
@@ -33,18 +51,65 @@ declarations:
       declarations:
         - decl: void* allocate(size_t bytes)
         - decl: void deallocate (void* ptr)
+        - decl: size_t getSize(void* ptr)
+        - decl: size_t getHighWatermark()
+        - decl: size_t getCurrentSize()
+        - decl: std::string getName()
+        - decl: size_t getId()
 
     - decl: class ResourceManager
       cxx_header: umpire/ResourceManager.hpp
       format:
         F_derived_name: UmpireResourceManager
+        F_name_instance_set:
+        F_name_instance_get:
 
       declarations:
-        - decl: ResourceManager& get() +constructor
-          format:
-            C_code: auto& SH_rv = ResourceManager::getInstance();
-                    return static_cast<UMPIRE_resourcemanager *>(static_cast<void *>(&SH_rv));
+        - decl: static ResourceManager& getInstance()
 
-        - decl: Allocator * getAllocator(const std::string& resource)
-        - decl: void copy(void* src_ptr, void* dst_ptr)
+        - decl: Allocator getAllocator(const std::string& name)
+          format:
+            function_suffix: _by_name
+ 
+        - decl: Allocator getAllocator(const int id)
+          format:
+            function_suffix: _by_id
+
+        - decl: Allocator getAllocator(void* ptr)
+          format:
+            function_suffix: for_ptr
+
+            #        - decl: void registerAllocator(const std::string& name, Allocator allocator)
+
+        - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
+          default_arg_suffix:
+            - _all
+            - _with_size
+
+        - decl: void memset(void* ptr, int val, size_t length=0)
+          default_arg_suffix:
+            - _all
+            - _with_size
+
+        - decl: void* reallocate(void* src_ptr, size_t size)
+
+          #- decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
+          #  format:
+          #    function_suffix: _with_allocator
+
         - decl: void deallocate(void* ptr)
+
+        - decl: size_t getSize(void* ptr)
+
+          #        - decl: template <typename T> Allocator makeAllocator(const std::string& name);
+          #          cxx_template:
+          #            - instantiation: <DynamicPool>
+
+splicer_code:
+  c:
+    class:
+      Allocator:
+        CXX_declarations:
+        - "#ifdef __cplusplus"
+        - "#include <cstring>"
+        - "#endif"

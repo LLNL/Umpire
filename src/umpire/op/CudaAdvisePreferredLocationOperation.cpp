@@ -25,11 +25,34 @@ void
 CudaAdvisePreferredLocationOperation::apply(
     void* src_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-    int UMPIRE_UNUSED_ARG(val),
+    int val,
     size_t length)
 {
-  // TODO: get correct device for allocation
-  cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, 0);
+  int device = val;
+  cudaError_t error;
+
+  cudaDeviceProp properties;
+  error = ::cudaGetDeviceProperties(&properties, 0);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+        << " failed with error: " 
+        << cudaGetErrorString(error));
+  }
+
+  if (properties.managedMemory == 1 
+      && properties.concurrentManagedAccess == 1) {
+
+    error = ::cudaMemAdvise(
+        src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
+
+    if (error != cudaSuccess) {
+      UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
+        << ", length = " << length
+        << ", cudaMemAdviseSetPreferredLocation, " << device << ") "
+        << "failed with error: " << cudaGetErrorString(error));
+    }
+  }
 }
 
 } // end of namespace op
