@@ -63,8 +63,8 @@ class StrategyTest :
                     (  poolName.str()
                      , rm.getAllocator(allocatorName)
                      , initial_min_size
-                     , subsequent_min_size,
-                       umpire::strategy::heuristic_noop);
+                     , subsequent_min_size
+                     , &umpire::strategy::heuristic_noop);
 
      allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
     }
@@ -403,15 +403,12 @@ TEST(ReleaseTest, Works)
 
 TEST(HeuristicTest, AllReleaseableHeuristic)
 {
-  umpire::strategy::DynamicPool::Coalesce_Heuristic h_fun =
-              umpire::strategy::heuristic_all_allocations_are_releaseable;
-
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h", rm.getAllocator("HOST"),
       initial_min_size, subsequent_min_size, 
-      umpire::strategy::heuristic_all_allocations_are_releaseable);
+      &umpire::strategy::heuristic_all_allocations_are_releaseable);
 
   auto strategy = alloc.getAllocationStrategy();
   auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
