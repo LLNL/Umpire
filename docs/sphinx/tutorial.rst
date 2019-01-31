@@ -32,3 +32,4 @@ sections.
    tutorial/dynamic_pool.rst
    tutorial/introspection.rst
    tutorial/typed_allocators.rst
+   tutorial/replay.rst
