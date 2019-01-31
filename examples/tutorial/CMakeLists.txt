@@ -72,3 +72,8 @@ blt_add_executable(
   SOURCES tut_introspection.cpp
   DEPENDS_ON 
     umpire)
+
+blt_add_executable(
+  NAME tut_replay
+  SOURCES tut_replay.cpp
+  DEPENDS_ON umpire)
