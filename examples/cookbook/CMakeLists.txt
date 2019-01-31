@@ -1,7 +1,7 @@
 if (ENABLE_CUDA)
   blt_add_executable(
-    NAME recipe_one_shrink
-    SOURCES recipe_one_shrink.cpp
+    NAME recipe_shrink
+    SOURCES recipe_shrink.cpp
     DEPENDS_ON 
       umpire)
 
@@ -13,13 +13,13 @@ if (ENABLE_CUDA)
 endif ()
 
 blt_add_executable(
-  NAME recipe_two_no_introspection
-  SOURCES recipe_two_no_introspection.cpp
+  NAME recipe_no_introspection
+  SOURCES recipe_no_introspection.cpp
   DEPENDS_ON umpire)
 
 if (ENABLE_CUDA)
   blt_add_executable(
-    NAME recipe_three_pool_advice
-    SOURCES recipe_three_pool_advice.cpp
+    NAME recipe_pool_advice
+    SOURCES recipe_pool_advice.cpp
     DEPENDS_ON umpire)
 endif()
