@@ -19,7 +19,7 @@
 #include <cstddef>
 #include <numa.h>
 
-union alloc_or_size_t {
+union aligned_size {
   std::size_t bytes;
   std::max_align_t a;
 };
@@ -41,14 +41,14 @@ void* NumaMemoryResource::allocate(size_t bytes)
 
   // Need to keep track of allocation sizes, so do this before the
   // allocation, but make sure to keep alignment of the actual alignment
-  union alloc_or_size_t* s = static_cast<union alloc_or_size_t*>(
+  aligned_size* s = static_cast<aligned_size*>(
     numa_alloc_onnode(sizeof(*s) + bytes, m_traits.numa_node));
   if (s) {
     s->bytes = bytes;
     ptr = ++s;
   }
   else {
-    UMPIRE_ERROR("numa_alloc_onnode( bytes = " << sizeof(*s) + bytes << ", " << m_traits.numa_node << " ) failed");
+    UMPIRE_ERROR("numa_alloc_onnode( bytes = " << sizeof(*s) + bytes << ", numa_node = " << m_traits.numa_node << " ) failed");
   }
 
   registerAllocation(ptr, bytes, this->shared_from_this());
@@ -66,7 +66,7 @@ void NumaMemoryResource::deallocate(void* ptr)
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
   if (ptr) {
-    union alloc_or_size_t* s = static_cast<union alloc_or_size_t*>(ptr);
+    aligned_size* s = static_cast<aligned_size*>(ptr);
     s--;
     numa_free(s, sizeof(*s) + s->bytes);
   }
