@@ -61,12 +61,11 @@ ResourceManager::getInstance()
 }
 
 ResourceManager::ResourceManager() :
-  m_allocator_names(),
+  m_memory_resources(),
   m_allocators_by_name(),
   m_allocators_by_id(),
   m_allocations(),
   m_default_allocator(),
-  m_memory_resources(),
   m_id(0),
   m_mutex(new std::mutex())
 {
@@ -74,8 +73,18 @@ ResourceManager::ResourceManager() :
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
+#if not defined(UMPIRE_ENABLE_NUMA_HOST)
   registry.registerMemoryResource(
       std::make_shared<resource::HostResourceFactory>());
+#else
+  {
+    auto host_nodes = resource::numa::get_host_nodes();
+    for (std::size_t n : host_nodes) {
+      registry.registerMemoryResource(
+        std::make_shared<resource::NumaMemoryResourceFactory>(n));
+    }
+  }
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
@@ -99,21 +108,12 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
-#if defined(UMPIRE_ENABLE_NUMA_HOST)
-  {
-    auto host_nodes = resource::numa::get_host_nodes();
-    for (std::size_t numa_node : host_nodes) {
-      registry.registerMemoryResource(
-        std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
-    }
-  }
-#endif
-#if defined(UMPIRE_ENABLE_NUMA)
+#if defined(UMPIRE_ENABLE_DEVICE) and defined(UMPIRE_ENABLE_NUMA)
   {
     auto device_nodes = resource::numa::get_device_nodes();
-    for (std::size_t numa_node : device_nodes) {
+    for (std::size_t n : device_nodes) {
       registry.registerMemoryResource(
-        std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
+        std::make_shared<resource::NumaMemoryResourceFactory>(n));
     }
   }
 #endif
@@ -129,8 +129,10 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_resource_list.push_back(registry.makeMemoryResource("HOST", getNextId()));
-  m_memory_resources[resource::Host] = m_resource_list.back();
+  {
+    const std::string name = resource::type_to_string(resource::Host);
+    m_memory_resources[name] = registry.makeMemoryResource(name, getNextId());
+  }
 
 #if defined(UMPIRE_ENABLE_CUDA)
   int count;
@@ -142,75 +144,103 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  m_resource_list.push_back(registry.makeMemoryResource("DEVICE", getNextId()));
-  m_memory_resources[resource::Device] = m_resource_list.back();
+  {
+    const std::string name = resource::type_to_string(resource::Device);
+    m_memory_resources[name] = registry.makeMemoryResource(name, getNextId());
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)
-  m_resource_list.push_back(registry.makeMemoryResource("PINNED", getNextId()));
-  m_memory_resources[resource::Pinned] = m_resource_list.back();
+  {
+    const std::string name = resource::type_to_string(resource::Pinned);
+    m_memory_resources[name] = registry.makeMemoryResource(name, getNextId());
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-  m_resource_list.push_back(registry.makeMemoryResource("UM", getNextId()));
-  m_memory_resources[resource::Unified] = m_resource_list.back();
+  {
+    const std::string name = resource::type_to_string(resource::Unified);
+    m_memory_resources[name] = registry.makeMemoryResource(name, getNextId());
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_resource_list.push_back(registry.makeMemoryResource("DEVICE_CONST", getNextId()));
-  m_memory_resources[resource::Constant] = m_resource_list.back();
+  {
+    const std::string name = resource::type_to_string(resource::Constant);
+    m_memory_resources[name] = registry.makeMemoryResource(name, getNextId());
+  }
 #endif
 
   /*
    * Construct default allocators for each resource
    */
-  auto host_allocator = m_memory_resources[resource::Host];
-  m_allocators_by_name["HOST"] = host_allocator;
-  m_allocators_by_id[host_allocator->getId()] = host_allocator;
+  {
+    const std::string name = resource::type_to_string(resource::Host);
+    auto host_allocator = m_memory_resources[name];
+    m_allocators_by_name[name] = host_allocator;
+    m_allocators_by_id[host_allocator->getId()] = host_allocator;
 
-  m_default_allocator = host_allocator;
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-  auto device_allocator = m_memory_resources[resource::Device];
-  m_allocators_by_name["DEVICE"] = device_allocator;
-  m_allocators_by_id[device_allocator->getId()] = device_allocator;
-#endif
-
-#if defined(UMPIRE_ENABLE_PINNED)
-  auto pinned_allocator = m_memory_resources[resource::Pinned];
-  m_allocators_by_name["PINNED"] = pinned_allocator;
-  m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
-#endif
-
-#if defined(UMPIRE_ENABLE_UM)
-  auto um_allocator = m_memory_resources[resource::Unified];
-  m_allocators_by_name["UM"] = um_allocator;
-  m_allocators_by_id[um_allocator->getId()] = um_allocator;
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA)
-  auto device_const_allocator = m_memory_resources[resource::Constant];
-  m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
-  m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
-#endif
+    m_default_allocator = host_allocator;
+  }
 
 #if defined(UMPIRE_ENABLE_NUMA_HOST)
   {
+    const std::string base_name = "NUMA_NODE_";
     auto host_nodes = resource::numa::get_host_nodes();
-    for (std::size_t numa_node : host_nodes) {
-      resource::MemoryResourceTraits traits{};
-      traits.numa_node = numa_node;
-      m_resource_list.push_back(registry.makeMemoryResource("HOST_NUMA", getNextId(), traits));
+    for (std::size_t n : host_nodes) {
+      resource::MemoryResourceTraits traits;
+      traits.numa_node = n;
+      const std::string name = base_name + std::to_string(n);
+      m_memory_resources[name] = registry.makeMemoryResource(name, getNextId(), traits);
     }
   }
 #endif
-#if defined(UMPIRE_ENABLE_NUMA)
+
+#if defined(UMPIRE_ENABLE_DEVICE)
   {
+    const std::string name = resource::type_to_string(resource::Device);
+    auto device_allocator = m_memory_resources[name];
+    m_allocators_by_name[name] = device_allocator;
+    m_allocators_by_id[device_allocator->getId()] = device_allocator;
+  }
+#endif
+
+#if defined(UMPIRE_ENABLE_PINNED)
+  {
+    const std::string name = resource::type_to_string(resource::Pinned);
+    auto pinned_allocator = m_memory_resources[name];
+    m_allocators_by_name[name] = pinned_allocator;
+    m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
+  }
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+  {
+    const std::string name = resource::type_to_string(resource::Unified);
+    auto um_allocator = m_memory_resources[name];
+    m_allocators_by_name[name] = um_allocator;
+    m_allocators_by_id[um_allocator->getId()] = um_allocator;
+  }
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  {
+    const std::string name = resource::type_to_string(resource::Constant);
+    auto device_const_allocator = m_memory_resources[name];
+    m_allocators_by_name[name] = device_const_allocator;
+    m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
+  }
+#endif
+
+#if defined(UMPIRE_ENABLE_DEVICE) and defined(UMPIRE_ENABLE_NUMA)
+  {
+    const std::string base_name = "NUMA_NODE_";
     auto device_nodes = resource::numa::get_device_nodes();
-    for (std::size_t numa_node : device_nodes) {
-      resource::MemoryResourceTraits traits{};
-      traits.numa_node = numa_node;
-      m_resource_list.push_back(registry.makeMemoryResource("DEVICE_NUMA", getNextId(), traits));
+    for (std::size_t n : device_nodes) {
+      resource::MemoryResourceTraits traits;
+      traits.numa_node = n;
+      const std::string name = base_name + std::to_string(n);
+      m_memory_resources[name] = registry.makeMemoryResource(name, getNextId(), traits);
     }
   }
 #endif
@@ -242,12 +272,12 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 {
   UMPIRE_LOG(Debug, "(\"" << static_cast<size_t>(resource_type) << "\")");
 
-  auto allocator = m_memory_resources.find(resource_type);
+  auto allocator = m_memory_resources.find(resource::type_to_string(resource_type));
   if (allocator == m_memory_resources.end()) {
     UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type) << "\" not found.");
   }
 
-  return Allocator(m_memory_resources[resource_type]);
+  return Allocator(std::static_pointer_cast<strategy::AllocationStrategy>(allocator->second));
 }
 
 Allocator
@@ -269,17 +299,16 @@ ResourceManager::getAllocatorFor(const resource::MemoryResourceTraits traits)
   UMPIRE_LOG(Debug, "(Looking up allocator by traits)");
 
   const resource::MemoryResourceTraits d_traits;
-  for (auto r : m_resource_list) {
-    const resource::MemoryResourceTraits r_traits = r->getTraits();
-    // For each trait different from the default value, do not match
-    // if resource's trait differs from that passed
+  for (auto r : m_memory_resources) {
+    const resource::MemoryResourceTraits r_traits = r.second->getTraits();
+    // For each trait different from the default value, skip if resource's trait differs from that passed
     if ( (traits.unified != d_traits.unified) && (traits.unified != r_traits.unified) ) continue;
     if ( (traits.size != d_traits.size) && (traits.size != r_traits.size) ) continue;
     if ( (traits.numa_node != d_traits.numa_node) && (traits.numa_node != r_traits.numa_node) ) continue;
     if ( (traits.vendor != d_traits.vendor) && (traits.vendor != r_traits.vendor) ) continue;
     if ( (traits.kind != d_traits.kind) && (traits.kind != r_traits.kind) ) continue;
     if ( (traits.used_for != d_traits.used_for) && (traits.used_for != r_traits.used_for) ) continue;
-    return Allocator(r);
+    return Allocator(std::static_pointer_cast<strategy::AllocationStrategy>(r.second));
   }
 
   UMPIRE_ERROR("Allocator for traits not found.");

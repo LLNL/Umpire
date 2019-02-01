@@ -30,6 +30,9 @@ namespace numa {
 std::size_t node_count();
 std::vector<std::size_t> get_host_nodes();
 std::vector<std::size_t> get_device_nodes();
+std::size_t preferred_node();
+enum class ResourceType : int { Host, Device };
+ResourceType node_type(const std::size_t node);
 };
 
 /*!
@@ -48,7 +51,9 @@ public:
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 
 private:
-  const int numa_node;
+  const int m_numa_node;
+  const int m_preferred_node;
+  const numa::ResourceType m_node_type;
 };
 
 } // end of namespace resource

@@ -27,8 +27,8 @@ union aligned_size {
 namespace umpire {
 namespace resource {
 
-NumaMemoryResource::NumaMemoryResource(int id, MemoryResourceTraits traits) :
-  MemoryResource("HOST_NUMA", id, traits),
+NumaMemoryResource::NumaMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
+  MemoryResource(name, id, traits),
   umpire::strategy::mixins::Inspector(),
   m_platform(Platform::cpu)
 {

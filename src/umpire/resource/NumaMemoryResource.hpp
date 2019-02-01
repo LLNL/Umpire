@@ -29,7 +29,7 @@ class NumaMemoryResource :
     private umpire::strategy::mixins::Inspector
 {
 public:
-  NumaMemoryResource(int id, MemoryResourceTraits traits);
+  NumaMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
   void* allocate(size_t bytes);
   void deallocate(void* ptr);

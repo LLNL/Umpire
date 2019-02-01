@@ -249,7 +249,7 @@ class ResourceManager {
 
     static ResourceManager* s_resource_manager_instance;
 
-    std::list<std::string> m_allocator_names;
+    std::unordered_map<std::string, std::shared_ptr<resource::MemoryResource> > m_memory_resources;
 
     std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_name;
     std::unordered_map<int, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_id;
@@ -257,10 +257,6 @@ class ResourceManager {
     util::AllocationMap m_allocations;
 
     std::shared_ptr<strategy::AllocationStrategy> m_default_allocator;
-
-    std::list<std::shared_ptr<resource::MemoryResource> > m_resource_list;
-
-    std::unordered_map<resource::MemoryResourceType, std::shared_ptr<strategy::AllocationStrategy>, resource::MemoryResourceTypeHash > m_memory_resources;
 
     long m_allocated;
 

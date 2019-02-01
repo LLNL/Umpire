@@ -15,19 +15,20 @@
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
+  DetectVendor.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
-  MemoryResourceTraits.hpp
-  DetectVendor.hpp)
+  MemoryResourceTraits.hpp)
 
 set (umpire_resource_sources
+  DetectVendor.cpp
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
-  DetectVendor.cpp)
+  MemoryResourceTypes.cpp)
 
 set (umpire_resource_depends
   umpire_alloc umpire_strategy umpire_util)
