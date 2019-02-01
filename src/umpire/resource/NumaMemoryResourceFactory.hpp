@@ -27,9 +27,9 @@ namespace resource {
  * \brief Interface for calls to libnuma.
  */
 namespace numa {
-std::size_t nodeCount();
-std::vector<std::size_t> getHostNodes();
-std::vector<std::size_t> getDeviceNodes();
+std::size_t node_count();
+std::vector<std::size_t> get_host_nodes();
+std::vector<std::size_t> get_device_nodes();
 };
 
 /*!

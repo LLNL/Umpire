@@ -25,12 +25,12 @@ namespace resource {
 
 namespace numa {
 
-std::size_t nodeCount() {
+std::size_t node_count() {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
   return numa_max_possible_node() + 1;
 }
 
-std::vector<std::size_t> getHostNodes() {
+std::vector<std::size_t> get_host_nodes() {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
 
   std::vector<std::size_t> host_nodes;
@@ -58,7 +58,7 @@ std::vector<std::size_t> getHostNodes() {
   return host_nodes;
 }
 
-std::vector<std::size_t> getDeviceNodes() {
+std::vector<std::size_t> get_device_nodes() {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
 
   std::vector<std::size_t> device_nodes;
@@ -110,7 +110,7 @@ NumaMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.size = 0;
   traits.numa_node = numa_node;
 
-  traits.vendor = CpuVendorType();
+  traits.vendor = cpu_vendor_type();
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 

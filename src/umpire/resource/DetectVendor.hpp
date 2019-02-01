@@ -19,7 +19,7 @@
 
 namespace umpire {
 
-resource::MemoryResourceTraits::vendor_type CpuVendorType() noexcept;
+resource::MemoryResourceTraits::vendor_type cpu_vendor_type() noexcept;
 
 }
 

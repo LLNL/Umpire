@@ -101,7 +101,7 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_NUMA_HOST)
   {
-    auto host_nodes = resource::numa::getHostNodes();
+    auto host_nodes = resource::numa::get_host_nodes();
     for (std::size_t numa_node : host_nodes) {
       registry.registerMemoryResource(
         std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
@@ -110,7 +110,7 @@ ResourceManager::ResourceManager() :
 #endif
 #if defined(UMPIRE_ENABLE_NUMA)
   {
-    auto device_nodes = resource::numa::getDeviceNodes();
+    auto device_nodes = resource::numa::get_device_nodes();
     for (std::size_t numa_node : device_nodes) {
       registry.registerMemoryResource(
         std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
@@ -196,7 +196,7 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_NUMA_HOST)
   {
-    auto host_nodes = resource::numa::getHostNodes();
+    auto host_nodes = resource::numa::get_host_nodes();
     for (std::size_t numa_node : host_nodes) {
       resource::MemoryResourceTraits traits{};
       traits.numa_node = numa_node;
@@ -206,7 +206,7 @@ ResourceManager::initialize()
 #endif
 #if defined(UMPIRE_ENABLE_NUMA)
   {
-    auto device_nodes = resource::numa::getDeviceNodes();
+    auto device_nodes = resource::numa::get_device_nodes();
     for (std::size_t numa_node : device_nodes) {
       resource::MemoryResourceTraits traits{};
       traits.numa_node = numa_node;

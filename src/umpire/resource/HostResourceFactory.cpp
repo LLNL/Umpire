@@ -50,7 +50,7 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.unified = false;
   traits.size = 0;
 
-  traits.vendor = CpuVendorType();
+  traits.vendor = cpu_vendor_type();
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
