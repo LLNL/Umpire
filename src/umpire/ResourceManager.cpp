@@ -34,7 +34,7 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_NUMA)
+#if defined(UMPIRE_ENABLE_NUMA_HOST)
 #include "umpire/resource/NumaMemoryResourceFactory.hpp"
 #endif
 
@@ -99,8 +99,7 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
-#if defined(UMPIRE_ENABLE_NUMA)
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_NUMA_HOST)
   {
     auto host_nodes = resource::numa::getHostNodes();
     for (std::size_t numa_node : host_nodes) {
@@ -108,12 +107,15 @@ ResourceManager::ResourceManager() :
         std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
     }
   }
-#else
-  for (std::size_t numa_node = 0; numa_node < resource::numa::nodeCount(); numa_node++) {
+#endif
+#if defined(UMPIRE_ENABLE_NUMA)
+  {
+    auto device_nodes = resource::numa::getDeviceNodes();
+    for (std::size_t numa_node : device_nodes) {
       registry.registerMemoryResource(
         std::make_shared<resource::NumaMemoryResourceFactory>(numa_node));
+    }
   }
-#endif
 #endif
 
   initialize();
@@ -192,8 +194,7 @@ ResourceManager::initialize()
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
 
-#if defined(UMPIRE_ENABLE_NUMA)
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_NUMA_HOST)
   {
     auto host_nodes = resource::numa::getHostNodes();
     for (std::size_t numa_node : host_nodes) {
@@ -202,13 +203,16 @@ ResourceManager::initialize()
       m_resource_list.push_back(registry.makeMemoryResource("HOST_NUMA", getNextId(), traits));
     }
   }
-#else
-  for (std::size_t numa_node = 0; numa_node < resource::numa::nodeCount(); numa_node++) {
-    resource::MemoryResourceTraits traits{};
-    traits.numa_node = numa_node;
-    m_resource_list.push_back(registry.makeMemoryResource("HOST_NUMA", getNextId(), traits));
-  }
 #endif
+#if defined(UMPIRE_ENABLE_NUMA)
+  {
+    auto device_nodes = resource::numa::getDeviceNodes();
+    for (std::size_t numa_node : device_nodes) {
+      resource::MemoryResourceTraits traits{};
+      traits.numa_node = numa_node;
+      m_resource_list.push_back(registry.makeMemoryResource("DEVICE_NUMA", getNextId(), traits));
+    }
+  }
 #endif
 
   UMPIRE_LOG(Debug, "() leaving");

@@ -74,13 +74,13 @@ void NumaMemoryResource::deallocate(void* ptr)
   deregisterAllocation(ptr);
 }
 
-long NumaMemoryResource::getCurrentSize() noexcept
+long NumaMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long NumaMemoryResource::getHighWatermark() noexcept
+long NumaMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
   return m_high_watermark;

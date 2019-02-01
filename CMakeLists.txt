@@ -23,7 +23,8 @@ project(Umpire
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
-set(ENABLE_NUMA Off CACHE Bool "")
+option(ENABLE_NUMA_HOST "Add allocators for host NUMA nodes" Off)
+option(ENABLE_NUMA "Add allocators for all NUMA nodes (including GPUs)" Off)
 set(ENABLE_COPY_HEADERS Off CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
@@ -55,9 +56,14 @@ if (ENABLE_FORTRAN_API)
 endif ()
 
 # Disable NUMA allocators if on MacOS or a non-UNIX platform
-if (ENABLE_NUMA AND (APPLE OR NOT UNIX))
+if ((ENABLE_NUMA_HOST OR ENABLE_NUMA) AND (APPLE OR NOT UNIX))
   message(FATAL_ERROR "NUMA is unavailable on this platform. \
-                       Please re-run CMake using ENABLE_NUMA=OFF (default)")
+                       Please re-run CMake using ENABLE_NUMA_HOST=OFF and ENABLE_NUMA=OFF")
+endif ()
+
+# Use ENABLE_NUMA_HOST if ENABLE_NUMA
+if (ENABLE_NUMA)
+  set(ENABLE_NUMA_HOST On)
 endif ()
 
 ################################

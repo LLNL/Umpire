@@ -75,7 +75,7 @@ if (ENABLE_ROCM)
     rocm)
 endif ()
 
-if (UMPIRE_ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA_HOST)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     NumaMemoryResourceFactory.hpp

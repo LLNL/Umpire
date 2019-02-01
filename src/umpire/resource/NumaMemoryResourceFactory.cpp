@@ -18,9 +18,7 @@
 
 #include "umpire/util/Macros.hpp"
 
-extern "C" {
 #include <numa.h>
-}
 
 namespace umpire {
 namespace resource {
