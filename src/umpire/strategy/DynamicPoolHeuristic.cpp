@@ -22,11 +22,13 @@
 namespace umpire {
 namespace strategy {
 
-std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releaseable( float percentage )
+std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( int percentage )
 {
+  float f = (float)((float)percentage / (float)100.0);
+
   return [=] (const strategy::DynamicPool& pool) {
-      const long threshold = percentage * pool.getActualSize();
-      return (pool.getReleaseableSize() >= threshold);
+      const long threshold = f * pool.getActualSize();
+      return (pool.getReleasableSize() >= threshold);
   };
 }
 

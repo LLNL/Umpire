@@ -90,9 +90,9 @@ class DynamicPool :
      * the pool will have a number of bytes that may be released back to
      * the resource or coalesced into a larger block.
      *
-     * \return The total number of bytes that are releaseable
+     * \return The total number of bytes that are releasable
      */
-    long getReleaseableSize() const noexcept;
+    long getReleasableSize() const noexcept;
 
     void coalesce() noexcept;
 

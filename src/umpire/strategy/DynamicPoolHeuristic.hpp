@@ -23,17 +23,17 @@ namespace strategy {
 class DynamicPool;
 
   /*!
-   * \brief Return true if specified percentage of pool is releaseable
+   * \brief Return true if specified percentage of pool is releasable
    *
    * When the specified percentage of the pool has been deallocated back to the
    * pool, this heuristic will return true.
    *
-   * \param percentage The percentage of available memory to actual memory used
-   * by the pool.
+   * \param percentage The integer percentage of releasable memory to actual
+   * memory used by the pool.
    *
-   * \return True if specified percentage of memory in pool is releaseable.
+   * \return True if specified percentage of memory in pool is releasable.
    */
-  std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releaseable( float percentage );
+  std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( int percentage );
 
   /*!
    * \brief Default action

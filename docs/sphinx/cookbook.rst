@@ -18,3 +18,4 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/shrinking_pools.rst
    cookbook/no_introspection.rst
    cookbook/pool_advice.rst
+   cookbook/dynamic_pool_heuristics.rst

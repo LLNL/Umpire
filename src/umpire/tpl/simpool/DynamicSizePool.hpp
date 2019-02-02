@@ -326,7 +326,7 @@ public:
     return highWatermark;
   }
 
-  std::size_t getReleaseableSize() const {
+  std::size_t getReleasableSize() const {
     std::size_t nblocks = 0;
     std::size_t nbytes = 0;
     for (struct Block *temp = freeBlocks; temp; temp = temp->next) {
