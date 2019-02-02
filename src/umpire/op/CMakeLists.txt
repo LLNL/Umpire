@@ -31,6 +31,16 @@ set (umpire_op_sources
 set (umpire_op_depends
   umpire_util)
 
+if (ENABLE_NUMA_HOST)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    NumaReallocateOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    NumaReallocateOperation.cpp)
+endif ()
+
 if (ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}

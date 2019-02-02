@@ -26,19 +26,25 @@ if (ENABLE_STATISTICS)
     statistic_helper.hpp
     Statistic.hpp
     StatisticsDatabase.hpp)
-endif()
+endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
   Logger.cpp)
 
+if (ENABLE_NUMA_HOST)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    Numa.cpp)
+endif ()
+
 if (ENABLE_STATISTICS)
   set (umpire_util_sources
     ${umpire_util_sources}
     Statistic.cpp
     StatisticsDatabase.cpp)
-endif()
+endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
 
@@ -86,4 +92,3 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-

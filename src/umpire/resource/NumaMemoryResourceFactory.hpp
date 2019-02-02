@@ -16,24 +16,10 @@
 #define UMPIRE_NumaMemoryResourceFactory_HPP
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
-
-#include <cstddef>
-#include <vector>
+#include "umpire/util/Numa.hpp"
 
 namespace umpire {
 namespace resource {
-
-/*!
- * \brief Interface for calls to libnuma.
- */
-namespace numa {
-std::size_t node_count();
-std::vector<std::size_t> get_host_nodes();
-std::vector<std::size_t> get_device_nodes();
-std::size_t preferred_node();
-enum class ResourceType : int { Host, Device };
-ResourceType node_type(const std::size_t node);
-};
 
 /*!
  * \brief Factory class for constructing MemoryResource objects that allocate
@@ -53,7 +39,7 @@ public:
 private:
   const int m_numa_node;
   const int m_preferred_node;
-  const numa::ResourceType m_node_type;
+  const numa::NodeType m_node_type;
 };
 
 } // end of namespace resource

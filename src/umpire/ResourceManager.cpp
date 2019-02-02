@@ -35,6 +35,7 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA_HOST)
+#include "umpire/util/Numa.hpp"
 #include "umpire/resource/NumaMemoryResourceFactory.hpp"
 #endif
 
@@ -78,7 +79,7 @@ ResourceManager::ResourceManager() :
       std::make_shared<resource::HostResourceFactory>());
 #else
   {
-    auto host_nodes = resource::numa::get_host_nodes();
+    auto host_nodes = numa::get_host_nodes();
     for (std::size_t n : host_nodes) {
       registry.registerMemoryResource(
         std::make_shared<resource::NumaMemoryResourceFactory>(n));
@@ -186,7 +187,7 @@ ResourceManager::initialize()
 #if defined(UMPIRE_ENABLE_NUMA_HOST)
   {
     const std::string base_name = "NUMA_NODE_";
-    auto host_nodes = resource::numa::get_host_nodes();
+    auto host_nodes = numa::get_host_nodes();
     for (std::size_t n : host_nodes) {
       resource::MemoryResourceTraits traits;
       traits.numa_node = n;

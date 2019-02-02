@@ -14,15 +14,11 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/resource/NumaMemoryResource.hpp"
+#include "umpire/util/Numa.hpp"
 #include "umpire/util/Macros.hpp"
 
 #include <cstddef>
 #include <numa.h>
-
-union aligned_size {
-  std::size_t bytes;
-  std::max_align_t a;
-};
 
 namespace umpire {
 namespace resource {
@@ -30,9 +26,8 @@ namespace resource {
 NumaMemoryResource::NumaMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
   umpire::strategy::mixins::Inspector(),
-  m_platform(Platform::cpu)
+  m_platform(Platform::numa)
 {
-    if (numa_available() < 0) UMPIRE_ERROR("libnuma is not usable.");
 }
 
 void* NumaMemoryResource::allocate(size_t bytes)
@@ -41,15 +36,7 @@ void* NumaMemoryResource::allocate(size_t bytes)
 
   // Need to keep track of allocation sizes, so do this before the
   // allocation, but make sure to keep alignment of the actual alignment
-  aligned_size* s = static_cast<aligned_size*>(
-    numa_alloc_onnode(sizeof(*s) + bytes, m_traits.numa_node));
-  if (s) {
-    s->bytes = bytes;
-    ptr = ++s;
-  }
-  else {
-    UMPIRE_ERROR("numa_alloc_onnode( bytes = " << sizeof(*s) + bytes << ", numa_node = " << m_traits.numa_node << " ) failed");
-  }
+  ptr = numa::allocate_on_node(bytes, m_traits.numa_node);
 
   registerAllocation(ptr, bytes, this->shared_from_this());
 
@@ -65,11 +52,7 @@ void NumaMemoryResource::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  if (ptr) {
-    aligned_size* s = static_cast<aligned_size*>(ptr);
-    s--;
-    numa_free(s, sizeof(*s) + s->bytes);
-  }
+  numa::deallocate(ptr);
 
   deregisterAllocation(ptr);
 }
@@ -88,7 +71,7 @@ long NumaMemoryResource::getHighWatermark() const noexcept
 
 Platform NumaMemoryResource::getPlatform() noexcept
 {
-  return Platform::cpu;
+  return Platform::numa;
 }
 
 } // end of namespace resource

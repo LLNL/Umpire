@@ -19,8 +19,6 @@
 
 #include "umpire/strategy/mixins/Inspector.hpp"
 
-#include <cstddef>
-
 namespace umpire {
 namespace resource {
 

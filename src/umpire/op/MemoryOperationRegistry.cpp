@@ -22,6 +22,10 @@
 
 #include "umpire/op/GenericReallocateOperation.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA_HOST)
+#include "umpire/op/NumaReallocateOperation.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
 #include "umpire/op/CudaCopyToOperation.hpp"
@@ -75,6 +79,23 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
 
+#if defined(UMPIRE_ENABLE_NUMA_HOST)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::numa, Platform::numa),
+      std::make_shared<HostCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::numa, Platform::numa),
+      std::make_shared<HostMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::numa, Platform::numa),
+      std::make_shared<NumaReallocateOperation>());
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(
       "COPY",
@@ -121,6 +142,17 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
+#if defined(UMPIRE_ENABLE_NUMA_HOST)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::numa, Platform::cuda),
+      std::make_shared<CudaCopyToOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cuda, Platform::numa),
+      std::make_shared<CudaCopyFromOperation>());
+#endif
 #endif
 
 #if defined(UMPIRE_ENABLE_ROCM)

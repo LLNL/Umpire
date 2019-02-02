@@ -19,6 +19,7 @@ namespace umpire {
 
 enum class Platform {
   cpu,
+  numa,
   cuda,
   rocm
 };
