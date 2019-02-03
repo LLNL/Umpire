@@ -33,6 +33,18 @@ set (umpire_resource_sources
 set (umpire_resource_depends
   umpire_alloc umpire_strategy umpire_util)
 
+if (ENABLE_NUMA_HOST)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    NumaMemoryResourceFactory.hpp
+    NumaMemoryResource.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    NumaMemoryResourceFactory.cpp
+    NumaMemoryResource.cpp)
+endif ()
+
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
@@ -74,22 +86,6 @@ if (ENABLE_ROCM)
   set (umpire_resource_depends
     ${umpire_resource_depends}
     rocm)
-endif ()
-
-if (UMPIRE_ENABLE_NUMA_HOST)
-  set (umpire_resource_headers
-    ${umpire_resource_headers}
-    NumaMemoryResourceFactory.hpp
-    NumaMemoryResource.hpp)
-
-  set (umpire_resource_sources
-    ${umpire_resource_sources}
-    NumaMemoryResourceFactory.cpp
-    NumaMemoryResource.cpp)
-
-  set (umpire_resource_depends
-    ${umpire_resource_depends}
-    numa)
 endif ()
 
 

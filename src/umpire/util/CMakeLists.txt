@@ -37,6 +37,10 @@ if (ENABLE_NUMA_HOST)
   set (umpire_util_sources
     ${umpire_util_sources}
     Numa.cpp)
+
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    Numa.hpp)
 endif ()
 
 if (ENABLE_STATISTICS)
@@ -47,6 +51,12 @@ if (ENABLE_STATISTICS)
 endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
+
+if (ENABLE_NUMA_HOST)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    numa)
+endif ()
 
 if (ENABLE_STATISTICS)
   set (umpire_util_depends

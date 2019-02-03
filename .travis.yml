@@ -37,18 +37,11 @@ matrix:
     - COMPILER=clang++
     - IMG=clang-5
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - name: "clang6 default"
-    compiler: clang6
+  - compiler: clang6
     env:
     - COMPILER=clang++
     - IMG=clang-6
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
-  - name: "clang6 with NUMA"
-    compiler: clang6
-    env:
-    - COMPILER=clang++
-    - IMG=clang-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_NUMA_HOST=On"
   - compiler: nvcc
     env:
     - COMPILER=g++
