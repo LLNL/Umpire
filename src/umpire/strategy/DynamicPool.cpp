@@ -97,6 +97,14 @@ DynamicPool::getReleasableSize() const noexcept
   return SparseBlockSize;
 }
 
+long
+DynamicPool::getBlocksInPool() const noexcept
+{
+  long BlocksInPool = dpa->getBlocksInPool();
+  UMPIRE_LOG(Debug, "() returning " << BlocksInPool);
+  return BlocksInPool;
+}
+
 Platform
 DynamicPool::getPlatform() noexcept
 {

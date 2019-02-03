@@ -94,6 +94,13 @@ class DynamicPool :
      */
     long getReleasableSize() const noexcept;
 
+    /*!
+     * \brief Get the number of memory blocks that the pools has
+     *
+     * \return The total number of blocks that are allocated by the pool
+     */
+    long getBlocksInPool() const noexcept;
+
     void coalesce() noexcept;
 
   private:

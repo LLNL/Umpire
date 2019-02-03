@@ -45,6 +45,15 @@ int main(int, char**) {
                             , 1024ul, 1024ul
                             , heuristic_function); 
 
+  auto strategy = pooled_allocator.getAllocationStrategy();
+  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+  if (tracker) {
+    strategy = tracker->getAllocationStrategy();
+  }
+
+  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
   void* a1 = pooled_allocator.allocate(1024);
   void* a2 = pooled_allocator.allocate(1024);
   void* a3 = pooled_allocator.allocate(1024);
@@ -52,7 +61,8 @@ int main(int, char**) {
 
   std::cout << "Pool has allocated " << pooled_allocator.getActualSize()
             << " bytes of memory. " << pooled_allocator.getCurrentSize()
-            << " bytes are used." << pooled_allocator.getReleasableSize()
+            << " bytes are used." << dynamic_pool->getBlocksInPool()
+            << " blocks are in pool." << dynamic_pool->getReleasableSize()
             << " bytes are releaseable." << std::endl;
 
   //
@@ -62,7 +72,8 @@ int main(int, char**) {
                           
   std::cout << "Pool has allocated " << pooled_allocator.getActualSize()
             << " bytes of memory. " << pooled_allocator.getCurrentSize()
-            << " bytes are used." << pooled_allocator.getReleasableSize()
+            << " bytes are used." << dynamic_pool->getBlocksInPool()
+            << " blocks are in pool." << dynamic_pool->getReleasableSize()
             << " bytes are releaseable." << std::endl;
 
 
