@@ -59,6 +59,7 @@ if (ENABLE_CUDA)
   set (umpire_resource_sources
     ${umpire_resource_sources}
 
+
     CudaConstantMemoryResourceFactory.cpp
     CudaConstantMemoryResource.cu
 
@@ -87,7 +88,6 @@ if (ENABLE_ROCM)
     ${umpire_resource_depends}
     rocm)
 endif ()
-
 
 blt_add_library(
   NAME umpire_resource

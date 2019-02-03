@@ -72,7 +72,7 @@ private:
   static Logger* s_Logger;
 };
 
-} /* namespace util */
-} /* namespace umpire */
+} // end of namespace util
+} // end of namespace umpire
 
-#endif /* UMPIRE_Logger_HPP */
+#endif // UMPIRE_Logger_HPP

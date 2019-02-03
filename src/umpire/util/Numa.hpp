@@ -40,7 +40,7 @@ std::size_t preferred_node();
 
 NodeType node_type(const std::size_t node);
 
-} // namespace numa
-} // namespace umpire
+} // end of namespace numa
+} // end of namespace umpire
 
 #endif // UMPIRE_Numa_HPP

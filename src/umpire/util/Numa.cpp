@@ -71,7 +71,7 @@ std::vector<std::size_t> get_host_nodes() {
   std::vector<std::size_t> host_nodes;
   struct bitmask *cpus = numa_allocate_cpumask();
 
-  const std::size_t num_nodes = numa_max_possible_node();
+  const std::size_t num_nodes = node_count();
   for (std::size_t i = 0; i < num_nodes; i++) {
     if (numa_bitmask_isbitset(numa_all_nodes_ptr, i)) {
 
@@ -98,7 +98,7 @@ std::vector<std::size_t> get_device_nodes() {
   std::vector<std::size_t> device_nodes;
   struct bitmask *cpus = numa_allocate_cpumask();
 
-  const std::size_t num_nodes = numa_max_possible_node();
+  const std::size_t num_nodes = node_count();
   for (std::size_t i = 0; i < num_nodes; i++) {
     if (numa_bitmask_isbitset(numa_all_nodes_ptr, i)) {
 
