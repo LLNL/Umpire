@@ -35,15 +35,6 @@ class DynamicPool;
    */
   std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( int percentage );
 
-  /*!
-   * \brief Default action
-   *
-   * This is the default heuristic for the dynamic pool.
-   *
-   * \return false always
-   */
-  static inline bool heuristic_noop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
-  
 } // end of namespace strategy
 } // end namespace umpire
 
