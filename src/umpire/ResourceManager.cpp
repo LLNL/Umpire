@@ -109,7 +109,7 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
-#if defined(UMPIRE_ENABLE_DEVICE) and defined(UMPIRE_ENABLE_NUMA)
+#if defined(UMPIRE_ENABLE_DEVICE) && defined(UMPIRE_ENABLE_NUMA)
   {
     auto device_nodes = resource::numa::get_device_nodes();
     for (std::size_t n : device_nodes) {
@@ -233,7 +233,7 @@ ResourceManager::initialize()
   }
 #endif
 
-#if defined(UMPIRE_ENABLE_DEVICE) and defined(UMPIRE_ENABLE_NUMA)
+#if defined(UMPIRE_ENABLE_DEVICE) && defined(UMPIRE_ENABLE_NUMA)
   {
     const std::string base_name = "NUMA_NODE_";
     auto device_nodes = resource::numa::get_device_nodes();
