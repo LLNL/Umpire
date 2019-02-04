@@ -17,17 +17,17 @@ In this recipe, we look at disabling introspection for a pool. To turn off
 introspection, you pass a boolean as the second template parameter to the
 :func:`umpire::ResourceManager::makeAllocator` method:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_two_no_introspection.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_no_introspection.cpp
                     :lines: 32-34
 
 Remember that disabling introspection will stop tracking the size of
 allocations made from the pool, so the
 :func:`umpire::Allocator::getCurrentSize` method will return 0:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_two_no_introspection.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_no_introspection.cpp
                     :lines: 39
 
 
 The complete example is included below:
 
-.. literalinclude:: ../../../examples/cookbook/recipe_two_no_introspection.cpp
+.. literalinclude:: ../../../examples/cookbook/recipe_no_introspection.cpp
