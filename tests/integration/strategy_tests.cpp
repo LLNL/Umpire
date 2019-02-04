@@ -79,58 +79,6 @@ TEST_P(StrategyTest, Allocate) {
   allocator->deallocate(alloc);
 }
 
-TEST_P(StrategyTest, ReleasableSizes) {
-  auto strategy = allocator->getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
-
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
-
-  ASSERT_NE(dynamic_pool, nullptr);
-
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 0);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  void* alloc = nullptr;
-  ASSERT_NO_THROW({ alloc = allocator->allocate(16); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  void* alloc2 = nullptr;
-  ASSERT_NO_THROW({ alloc2 = allocator->allocate(initial_min_size); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  void* alloc3 = nullptr;
-  ASSERT_NO_THROW({ alloc3 = allocator->allocate(initial_min_size); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  ASSERT_NO_THROW({ allocator->deallocate(alloc2); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  ASSERT_NO_THROW({ allocator->deallocate(alloc3); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_min_size);
-
-  ASSERT_NO_THROW({ allocator->deallocate(alloc); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(),
-                    initial_min_size + 2*initial_min_size);
-
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  EXPECT_NO_THROW(rm.coalesce(*allocator));
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  ASSERT_GE(allocator->getActualSize(), initial_min_size + 2*initial_min_size);
-}
-
 TEST_P(StrategyTest, Sizes) {
   void* alloc = nullptr;
   ASSERT_NO_THROW({ alloc = allocator->allocate(100); });
@@ -439,6 +387,50 @@ TEST(HeuristicTest, OutOfBounds)
   }, umpire::util::Exception);
 }
 
+TEST(HeuristicTest, EdgeCases_75)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto h_fun = umpire::strategy::heuristic_percent_releasable(75);
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_dyn_pool_h_75", rm.getAllocator("HOST"),
+      1024ul, 1024ul, h_fun);
+
+  auto strategy = alloc.getAllocationStrategy();
+  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+  if (tracker) {
+    strategy = tracker->getAllocationStrategy();
+  }
+
+  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 0);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+
+  void* a[4];
+  for ( int i = 0; i < 4; ++i ) {
+    ASSERT_NO_THROW({ a[i] = alloc.allocate(1024); });
+    ASSERT_EQ(alloc.getActualSize(), (1024*(i+1)));
+    ASSERT_EQ(dynamic_pool->getBlocksInPool(), (i+1));
+    ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  }
+
+  for ( int i = 0; i < 2; ++i ) {
+    ASSERT_NO_THROW({ alloc.deallocate(a[i]); });
+    ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  }
+
+  ASSERT_NO_THROW({ alloc.deallocate(a[2]); });
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+
+  ASSERT_NO_THROW({ alloc.deallocate(a[3]); });
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+}
+
 TEST(HeuristicTest, EdgeCases_100)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -561,4 +553,3 @@ TEST(HeuristicTest, EdgeCases_0)
   ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 3*initial_min_size);
 }
-
