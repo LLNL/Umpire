@@ -80,16 +80,3 @@ TEST(DefaultMemoryResource, GetHighWatermark)
 
   alloc->deallocate(pointer_two);
 }
-
-#if defined(UMPIRE_ENABLE_NUMA)
-TEST(NumaMemoryResource, Allocate)
-{
-  umpire::resource::MemoryResourceTraits traits;
-  traits.numa_node = 0;
-  auto alloc = std::make_shared<umpire::resource::NumaMemoryResource>(0, traits);
-
-  double* pointer = (double*)alloc->allocate(10*sizeof(double));
-  alloc->deallocate(pointer);
-  ASSERT_NE(pointer, nullptr);
-}
-#endif

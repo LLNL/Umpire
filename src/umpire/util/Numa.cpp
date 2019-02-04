@@ -103,8 +103,9 @@ std::vector<std::size_t> get_device_nodes() {
     if (numa_bitmask_isbitset(numa_all_nodes_ptr, i)) {
 
       // Check if this has CPUs
-      if (numa_node_to_cpus(i, cpus) != 0)
+      if (numa_node_to_cpus(i, cpus) != 0) {
         UMPIRE_ERROR("Error getting CPU list for NUMA node.");
+      }
 
       const std::size_t ncpus = numa_bitmask_weight(cpus);
       if (ncpus == 0) {
@@ -122,6 +123,14 @@ std::size_t preferred_node() {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
 
   return numa_preferred();
+}
+
+void run_on_node(const int node) {
+  if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
+
+  if (numa_run_on_node(node) != 0) {
+    UMPIRE_ERROR("Error calling numa_run_on_node( node = " << node << ")");
+  }
 }
 
 NodeType node_type(const std::size_t node) {

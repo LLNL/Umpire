@@ -24,6 +24,10 @@ namespace numa {
 // The node type - host nodes have associated cpus.
 enum class NodeType : int { Host, Device };
 
+void run_on_node(const int node);
+
+std::size_t preferred_node();
+
 void* allocate_on_node(const std::size_t bytes, const std::size_t node);
 
 void deallocate(void* ptr);
@@ -35,8 +39,6 @@ std::size_t node_count();
 std::vector<std::size_t> get_host_nodes();
 
 std::vector<std::size_t> get_device_nodes();
-
-std::size_t preferred_node();
 
 NodeType node_type(const std::size_t node);
 
