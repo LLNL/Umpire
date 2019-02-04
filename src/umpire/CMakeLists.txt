@@ -35,6 +35,7 @@ if (ENABLE_FORTRAN_API OR ENABLE_C_API)
     interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
+    interface/c_fortran/typesUmpire.h
   )
 
   if (ENABLE_C_API)
