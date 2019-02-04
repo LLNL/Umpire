@@ -30,7 +30,7 @@ void burn(std::string name) {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator(name);
 
-  while (true) {
+  for (int i = 0; i < 50000000; i++) {
     void* data = alloc.allocate(random_size());
     alloc.deallocate(data);
   }
