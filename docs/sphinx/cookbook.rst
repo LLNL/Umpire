@@ -20,4 +20,5 @@ allocations in a particular pool.
    cookbook/no_introspection.rst
    cookbook/pool_advice.rst
    cookbook/advice_device_id.rst
+   cookbook/move_to_managed.rst
    cookbook/numa_allocator.rst
