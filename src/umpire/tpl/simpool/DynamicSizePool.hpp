@@ -33,6 +33,9 @@ protected:
   struct Block *usedBlocks;
   struct Block *freeBlocks;
 
+  // Total blocks in the pool
+  std::size_t totalBlocks;
+
   // Total size allocated (bytes)
   std::size_t totalBytes;
 
@@ -120,6 +123,7 @@ protected:
       }
     }
 
+    totalBlocks += 1;
     totalBytes += sizeToAlloc;
 
     // Allocate the block
@@ -217,6 +221,7 @@ protected:
       // Make sure to only free blocks that are completely released.
       //
       if ( curr->size == curr->blockSize ) {
+        totalBlocks -= 1;
         totalBytes -= curr->blockSize;
         freed += curr->blockSize;
         allocator->deallocate(curr->data);
@@ -264,6 +269,7 @@ public:
     : blockPool(),
       usedBlocks(NULL),
       freeBlocks(NULL),
+      totalBlocks(0),
       totalBytes(0),
       allocBytes(0),
       minInitialBytes(_minInitialBytes),
@@ -326,7 +332,11 @@ public:
     return highWatermark;
   }
 
-  std::size_t getReleaseableSize() const {
+  std::size_t getBlocksInPool() const {
+    return totalBlocks;
+  }
+
+  std::size_t getReleasableSize() const {
     std::size_t nblocks = 0;
     std::size_t nbytes = 0;
     for (struct Block *temp = freeBlocks; temp; temp = temp->next) {

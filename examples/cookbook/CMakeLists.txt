@@ -26,3 +26,8 @@ if (ENABLE_CUDA)
     SOURCES recipe_move_to_managed.cpp
     DEPENDS_ON umpire)
 endif ()
+
+blt_add_executable(
+  NAME recipe_dynamic_pool_heuristic
+  SOURCES recipe_dynamic_pool_heuristic.cpp
+  DEPENDS_ON umpire)
