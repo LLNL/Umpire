@@ -1,7 +1,7 @@
 .. _dynamic_pool_heuristics:
 
 =======================================
-Creating a Coalesce Heurisitic Function
+Improving DynamicPool Performance with a Coalesce Heuristic
 =======================================
 
 By default, a DynamicPool object will not coalesce blocks that it allocates
