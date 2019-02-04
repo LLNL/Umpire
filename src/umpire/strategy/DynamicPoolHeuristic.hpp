@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -15,6 +15,7 @@
 #ifndef UMPIRE_DynamicPoolHeuristic_HPP
 #define UMPIRE_DynamicPoolHeuristic_HPP
 
+#include <functional>
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -22,26 +23,18 @@ namespace strategy {
 class DynamicPool;
 
   /*!
-   * \brief Return true if everything in pool is releaseable
+   * \brief Return true if specified percentage of pool is releasable
    *
-   * When everything has been deallocated back to the pool, this heuristic
-   * will return true.
+   * When the specified percentage of the pool has been deallocated back to the
+   * pool, this heuristic will return true.
    *
-   * \param dynamic_pool The dynamic pool object in question.
+   * \param percentage The integer percentage of releasable memory to actual
+   * memory used by the pool.
    *
-   * \return True if all memory in pool is releaseable.
+   * \return True if specified percentage of memory in pool is releasable.
    */
-  bool heuristic_all_allocations_are_releaseable( const strategy::DynamicPool& dynamic_pool );
+  std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( int percentage );
 
-  /*!
-   * \brief Default action
-   *
-   * This is the default heuristic for the dynamic pool.
-   *
-   * \return false always
-   */
-  static inline bool heuristic_noop( const strategy::DynamicPool& UMPIRE_UNUSED_ARG(dynamic_pool) ) { return false; }
-  
 } // end of namespace strategy
 } // end namespace umpire
 
