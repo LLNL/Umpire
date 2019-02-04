@@ -49,3 +49,15 @@ blt_add_executable(
 blt_add_benchmark(
   NAME copy_benchmarks
   COMMAND copy_benchmarks)
+
+blt_add_executable(
+  NAME inspector_benchmarks
+  SOURCES inspector_benchmarks.cpp
+  DEPENDS_ON gbenchmark umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+
+blt_add_executable(
+  NAME allocator_burn_test
+  SOURCES allocator_burn_test.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
