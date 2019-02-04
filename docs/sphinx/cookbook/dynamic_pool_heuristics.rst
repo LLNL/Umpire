@@ -17,7 +17,7 @@ To help address this, applications may offer a heuristic function to the
 DynamicPool object during instantiation that will return true whenever a pool
 reaches a specific threshold of releasable bytes (represented by completely
 free blocks) to the total size of the pool.  The DynamicPool will call this
-heuristic function just before it returns from its deallocate() method and when
+heuristic function just before it returns from its :func:`umpire::strategy::DynamicPool::deallocate` method and when
 the function returns true, the DynamicPool will coalesce all of its releasable
 blocks into a single larger block of the combined size.
 
