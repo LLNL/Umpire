@@ -41,7 +41,7 @@ void
 Inspector::registerAllocation(
     void* ptr, 
     size_t size, 
-    std::shared_ptr<AllocationStrategy> strategy)
+    const std::shared_ptr<AllocationStrategy>& strategy)
 {
   m_current_size += size;
 
