@@ -16,6 +16,9 @@
 #include <iterator>
 #include <vector>
 
+#include "umpire/tpl/simpool/FixedSizePool.hpp"
+#include "umpire/tpl/simpool/StdAllocator.hpp"
+
 template< typename JudyKey, typename vec >
 struct judyl2KVpair {
     JudyKey key;
@@ -44,6 +47,7 @@ class judyL2Array {
         JudyKey _buff[1];
         bool _success;
         cpair kv;
+        FixedSizePool<vector, StdAllocator> pool;
     public:
         judyL2Array(): _maxLevels( sizeof( JudyKey ) ), _depth( 1 ), _lastSlot( 0 ), _success( true ) {
             assert( sizeof( JudyKey ) == JUDY_key_size && "JudyKey *must* be the same size as a pointer!" );
@@ -69,6 +73,7 @@ class judyL2Array {
             JudyKey key = 0;
             while( 0 != ( _lastSlot = ( vector ** ) judy_strt( _judyarray, ( const unsigned char * ) &key, 0 ) ) ) {
                 //( * _lastSlot )->~vector(); //TODO: placement new
+                pool.deallocate(*_lastSlot);
                 delete( * _lastSlot );
                 judy_del( _judyarray );
             }
@@ -102,7 +107,10 @@ class judyL2Array {
             _lastSlot = ( vector ** ) judy_cell( _judyarray, ( const unsigned char * ) &key, _depth * JUDY_key_size );
             if( _lastSlot ) {
                 if( !( * _lastSlot ) ) {
-                    * _lastSlot = new vector;
+                    vector* vec = pool.allocate(); // new vector;
+                    new(vec) vector;
+                    * _lastSlot = vec; // new vector;
+                    
                     /* TODO store vectors inside judy with placement new
                     * vector * n = judy_data( _judyarray, sizeof( std::vector < JudyValue > ) );
                     * new(n) vector;
@@ -127,7 +135,10 @@ class judyL2Array {
             _lastSlot = ( vector ** ) judy_cell( _judyarray, ( const unsigned char * ) &key, _depth * JUDY_key_size );
             if( _lastSlot ) {
                 if( !( * _lastSlot ) ) {
-                    * _lastSlot = new vector;
+                    vector* vec = pool.allocate(); // new vector;
+                    new(vec) vector;
+                    * _lastSlot = vec; // new vector;
+                    // * _lastSlot = pool.allocate(); // new vector;
                     /* TODO store vectors inside judy with placement new
                      * (see other insert(), above)
                      */
@@ -221,6 +232,7 @@ class judyL2Array {
             if( 0 != ( _lastSlot = ( vector ** ) judy_slot( _judyarray, ( const unsigned char * ) &key, _depth * JUDY_key_size ) ) ) {
                 // _lastSlot->~vector(); //for use with placement new
                 // delete _lastSlot;
+                pool.deallocate(*_lastSlot);
                 _lastSlot = ( vector ** ) judy_del( _judyarray );
                 return true;
             } else {
