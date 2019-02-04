@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -60,14 +60,14 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 }
 
 template<typename _allocator>
-long DefaultMemoryResource<_allocator>::getCurrentSize() noexcept
+long DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 template<typename _allocator>
-long DefaultMemoryResource<_allocator>::getHighWatermark() noexcept
+long DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
   return m_high_watermark;

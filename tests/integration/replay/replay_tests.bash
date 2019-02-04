@@ -7,7 +7,7 @@ replayprogram=$1/replay
 # may be replayed.
 #
 UMPIRE_REPLAY="On" $testprogram >& replay_test1.csv
-if [ $? -nq 0 ]; then
+if [ $? -ne 0 ]; then
     echo FAIL
     exit 1
 fi
@@ -16,7 +16,7 @@ fi
 # Now replay from the activity captured in the replay_test1.csv file
 #
 UMPIRE_REPLAY="On" $replayprogram replay_test1.csv >& replay_test2.csv
-if [ $? -nq 0 ]; then
+if [ $? -ne 0 ]; then
     echo FAIL
     exit 1
 fi

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -143,19 +143,19 @@ FixedPool<T,NP, IA>::deallocate(void* ptr) {
 
 template <typename T, int NP, typename IA>
 long
-FixedPool<T, NP, IA>::getCurrentSize() noexcept {
+FixedPool<T, NP, IA>::getCurrentSize() const noexcept {
     return m_current_size;
 }
 
 template <typename T, int NP, typename IA>
 long
-FixedPool<T, NP, IA>::getActualSize() noexcept {
+FixedPool<T, NP, IA>::getActualSize() const noexcept {
     return m_total_pool_size;
 }
 
 template <typename T, int NP, typename IA>
 long
-FixedPool<T, NP, IA>::getHighWatermark() noexcept {
+FixedPool<T, NP, IA>::getHighWatermark() const noexcept {
   return m_highwatermark;
 }
 

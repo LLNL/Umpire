@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -65,13 +65,13 @@ ThreadSafeAllocator::deallocate(void* ptr)
 }
 
 long
-ThreadSafeAllocator::getCurrentSize() noexcept
+ThreadSafeAllocator::getCurrentSize() const noexcept
 {
   return 0;
 }
 
 long
-ThreadSafeAllocator::getHighWatermark() noexcept
+ThreadSafeAllocator::getHighWatermark() const noexcept
 {
   return 0;
 }
