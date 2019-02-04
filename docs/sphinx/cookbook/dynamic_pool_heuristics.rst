@@ -5,7 +5,7 @@ Improving DynamicPool Performance with a Coalesce Heuristic
 =======================================
 
 By default, a DynamicPool object will not coalesce blocks that it allocates
-for the pool.  As needed, the DynamicPool will continue to allocate blocks to
+for the pool.  As needed, the :class:`umpire::strategy::DynamicPool` will continue to allocate blocks to
 satisfy allocation requests that cannot be satisfied by blocks currently in the
 pool.  Under certain application specific memory allocation patterns, this can
 lead to fragmentation within the pool which could cause the pool to grow too
