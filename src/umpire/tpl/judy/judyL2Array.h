@@ -22,6 +22,39 @@ struct judyl2KVpair {
     vec value;
 };
 
+template< typename T>
+struct stack_vector {
+  void push_back(T item) {
+    //std::cout << "Push back " << item << " to stack[" << count << "]" << std::endl;
+    stack[count++] = item;
+
+    if (count > 5) {
+      throw;
+    }
+  }
+
+  size_t size() const {
+    return count;
+  }
+
+  T back() const {
+    //std::cout << "back() = " << stack[count-1] << std::endl;
+    return stack[count-1];
+  }
+
+  T pop_back() {
+    //std::cout << "pop_back() = " << stack[count-1] << std::endl;
+    return stack[--count];
+  }
+
+  bool empty() const {
+    return (count == 0);
+  }
+
+  T stack[5];
+  std::size_t count = 0;
+};
+
 //TODO: use vectors only when >( sizeof(vector)/sizeof(value) ) values, and store data/vector within judy.
 
 /** A judyL2 array maps JudyKey's to multiple JudyValue's, similar to std::multimap.
@@ -33,7 +66,7 @@ struct judyl2KVpair {
 template< typename JudyKey, typename JudyValue >
 class judyL2Array {
     public:
-        typedef std::vector< JudyValue > vector;
+        typedef stack_vector< JudyValue > vector;
         typedef const vector cvector;
         typedef judyl2KVpair< JudyKey, vector * > pair;
         typedef judyl2KVpair< JudyKey, cvector * > cpair;
