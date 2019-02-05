@@ -32,7 +32,7 @@ class Inspector
     void registerAllocation(
         void* ptr,
         size_t size,
-        const std::shared_ptr<umpire::strategy::AllocationStrategy>& strategy);
+        std::shared_ptr<umpire::strategy::AllocationStrategy> strategy);
 
     void deregisterAllocation(void* ptr);
 

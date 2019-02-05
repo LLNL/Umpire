@@ -82,8 +82,8 @@ class MemoryOperationRegistry {
      */
     std::shared_ptr<umpire::op::MemoryOperation> find(
         const std::string& name,
-        const std::shared_ptr<strategy::AllocationStrategy>& source_allocator,
-        const std::shared_ptr<strategy::AllocationStrategy>& dst_allocator);
+        std::shared_ptr<strategy::AllocationStrategy>& source_allocator,
+        std::shared_ptr<strategy::AllocationStrategy>& dst_allocator);
 
     /*!
      * \brief Add a new MemoryOperation to the registry

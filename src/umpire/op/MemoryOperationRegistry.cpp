@@ -172,8 +172,8 @@ MemoryOperationRegistry::registerOperation(
 std::shared_ptr<umpire::op::MemoryOperation>
 MemoryOperationRegistry::find(
     const std::string& name,
-    const std::shared_ptr<strategy::AllocationStrategy>& src_allocator,
-    const std::shared_ptr<strategy::AllocationStrategy>& dst_allocator)
+    std::shared_ptr<strategy::AllocationStrategy>& src_allocator,
+    std::shared_ptr<strategy::AllocationStrategy>& dst_allocator)
 {
   auto platforms = std::make_pair(
       src_allocator->getPlatform(),
