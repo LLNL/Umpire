@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -68,7 +68,7 @@ class DynamicPool :
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        Coalesce_Heuristic coalesce_heuristic = &heuristic_all_allocations_are_releaseable) noexcept;
+        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     void* allocate(size_t bytes) override;
 
@@ -90,9 +90,16 @@ class DynamicPool :
      * the pool will have a number of bytes that may be released back to
      * the resource or coalesced into a larger block.
      *
-     * \return The total number of bytes that are releaseable
+     * \return The total number of bytes that are releasable
      */
-    long getReleaseableSize() const noexcept;
+    long getReleasableSize() const noexcept;
+
+    /*!
+     * \brief Get the number of memory blocks that the pools has
+     *
+     * \return The total number of blocks that are allocated by the pool
+     */
+    long getBlocksInPool() const noexcept;
 
     void coalesce() noexcept;
 

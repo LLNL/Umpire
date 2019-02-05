@@ -13,16 +13,30 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
+  constexpr size_t SIZE = 1024;
+
   auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.getAllocator("HOST");
+  auto allocator = rm.getAllocator("HOST");
 
-  std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
-    std::cout << s << "  ";
-  }
-  std::cout << std::endl;
+  /*
+   * Allocate host data
+   */
+  double* host_data = static_cast<double*>(
+      allocator.allocate(SIZE*sizeof(double)));
+
+  /*
+   * Move data to unified memory
+   */
+  auto um_allocator = rm.getAllocator("UM");
+  double* um_data = static_cast<double*>(rm.move(host_data, um_allocator));
+
+  /*
+   * Deallocate um_data, host_data is already deallocated by move operation.
+   */
+  rm.deallocate(um_data);
 
   return 0;
 }
