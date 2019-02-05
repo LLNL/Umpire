@@ -23,7 +23,8 @@ set (umpire_strategy_headers
   DynamicPool.hpp
   DynamicPoolHeuristic.hpp
   FixedPool.hpp
-  FixedPool.inl)
+  FixedPool.inl
+  MixedPool.hpp)
   
 set (umpire_strategy_mixin_headers
   mixins/Inspector.hpp)
@@ -38,6 +39,7 @@ set (umpire_stategy_sources
   ThreadSafeAllocator.cpp
   DynamicPool.cpp
   DynamicPoolHeuristic.cpp
+  MixedPool.cpp
   mixins/Inspector.cpp)
 
 set (umpire_strategy_depends
