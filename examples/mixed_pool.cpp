@@ -22,7 +22,7 @@
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto pool = rm.makeAllocator<umpire::strategy::MixedPool>(
+  auto pool = rm.makeAllocator<umpire::strategy::MixedPool<> >(
       "host_mixed_pool", rm.getAllocator("HOST"));
 
   pool.allocate(62);
