@@ -25,7 +25,7 @@ using PoolVector = std::vector< std::shared_ptr<umpire::strategy::AllocationStra
 
 template<int FirstFixed, int Current, int LastFixed, int Increment>
 struct make_fixed_pool_array {
-  static void eval(PoolVector& fixed_pool, Allocator& allocator) {
+  static void eval(PoolVector& fixed_pool, Allocator allocator) {
     const int index = Current - FirstFixed;
     const std::size_t size = 1 << Current;
     std::stringstream ss{"internal_fixed_"};
@@ -37,7 +37,7 @@ struct make_fixed_pool_array {
 
 template<int FirstFixed, int LastFixed, int Increment>
 struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
-  static void eval(PoolVector& fixed_pool, Allocator& allocator) {
+  static void eval(PoolVector& fixed_pool, Allocator allocator) {
     const int index = LastFixed - FirstFixed;
     const std::size_t size = 1 << LastFixed;
     std::stringstream ss{"internal_fixed_"};
@@ -69,22 +69,29 @@ MixedPool<FirstFixed,Increment,LastFixed>::MixedPool(
 template<int FirstFixed, int Increment, int LastFixed>
 void* MixedPool<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
 {
-  size_t nearest_index = 0;
+  size_t nearest = 1;
 
   size_t original_bytes = bytes;
 
-  if (bytes > 1) {
-    nearest_index = 1;
+  if (bytes <= 1) {
+    nearest = 1;
+  } else {
+    nearest = 2;
     bytes--;
-    while (bytes >>= 1) nearest_index++;
+    while (bytes >>= 1) nearest <<= 1;
   }
+
+  size_t original_nearest = nearest;
+  size_t nearest_index = 0;
+  while (nearest >>= 1) nearest_index++;
+  nearest_index -= FirstFixed;
 
   (void) original_bytes;
 
   //std::cout << nearest << std::endl;
 
   if (nearest_index < m_fixed_pool.size()) {
-    return m_fixed_pool[0]->allocate(1 << nearest_index);
+    return m_fixed_pool[nearest_index]->allocate(original_nearest);
   }
   else {
     return m_dynamic_pool->allocate(original_bytes);
