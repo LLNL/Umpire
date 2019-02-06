@@ -29,6 +29,7 @@
 namespace umpire {
 namespace strategy {
 
+template<int FirstFixed = 8, int Increment = 1, int LastFixed = 22>
 class MixedPool :
   public AllocationStrategy
 {
@@ -50,7 +51,7 @@ class MixedPool :
 
     Platform getPlatform() noexcept override;
   private:
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_fixed_pool[16];
+    std::vector< std::shared_ptr<umpire::strategy::AllocationStrategy> > m_fixed_pool;
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_dynamic_pool;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
@@ -58,5 +59,7 @@ class MixedPool :
 
 } // end of namespace strategy
 } // end namespace umpire
+
+#include "umpire/strategy/MixedPool.inl"
 
 #endif // UMPIRE_MixedPool_HPP
