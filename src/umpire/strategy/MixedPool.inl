@@ -48,7 +48,7 @@ struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-MixedPool<FirstFixed,Increment,LastFixed>::MixedPool(
+MixedPoolImpl<FirstFixed,Increment,LastFixed>::MixedPoolImpl(
     const std::string& name,
     int id,
     Allocator allocator) noexcept
@@ -67,7 +67,7 @@ MixedPool<FirstFixed,Increment,LastFixed>::MixedPool(
 
 
 template<int FirstFixed, int Increment, int LastFixed>
-void* MixedPool<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
+void* MixedPoolImpl<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
 {
   size_t nearest = 1;
 
@@ -101,35 +101,35 @@ void* MixedPool<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-void MixedPool<FirstFixed,Increment,LastFixed>::deallocate(void*)
+void MixedPoolImpl<FirstFixed,Increment,LastFixed>::deallocate(void*)
 {
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-void MixedPool<FirstFixed,Increment,LastFixed>::release()
+void MixedPoolImpl<FirstFixed,Increment,LastFixed>::release()
 {
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-long MixedPool<FirstFixed,Increment,LastFixed>::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-template<int FirstFixed, int Increment, int LastFixed>
-long MixedPool<FirstFixed,Increment,LastFixed>::getActualSize() const noexcept
+long MixedPoolImpl<FirstFixed,Increment,LastFixed>::getCurrentSize() const noexcept
 {
   return 0;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-long MixedPool<FirstFixed,Increment,LastFixed>::getHighWatermark() const noexcept
+long MixedPoolImpl<FirstFixed,Increment,LastFixed>::getActualSize() const noexcept
 {
   return 0;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-Platform MixedPool<FirstFixed,Increment,LastFixed>::getPlatform() noexcept
+long MixedPoolImpl<FirstFixed,Increment,LastFixed>::getHighWatermark() const noexcept
+{
+  return 0;
+}
+
+template<int FirstFixed, int Increment, int LastFixed>
+Platform MixedPoolImpl<FirstFixed,Increment,LastFixed>::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

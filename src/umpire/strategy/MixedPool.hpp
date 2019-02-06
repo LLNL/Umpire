@@ -30,11 +30,11 @@ namespace umpire {
 namespace strategy {
 
 template<int FirstFixed = 8, int Increment = 1, int LastFixed = 22>
-class MixedPool :
+class MixedPoolImpl :
   public AllocationStrategy
 {
   public:
-    MixedPool(
+    MixedPoolImpl(
         const std::string& name,
         int id,
         Allocator allocator) noexcept;
@@ -56,6 +56,8 @@ class MixedPool :
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 };
+
+using MixedPool = MixedPoolImpl<>;
 
 } // end of namespace strategy
 } // end namespace umpire
