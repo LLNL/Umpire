@@ -22,17 +22,18 @@
 
 #include <cstdlib>
 
-#include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/strategy/SizeLimiter.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 
 class CSVRow {
 public:
@@ -255,6 +256,10 @@ class Replay {
         // dynamically parse/creat the data type parameter
         //
         return;
+      } else if (m_row[2] == "umpire::strategy::MixedPool" ) {
+        const std::string& allocName = m_row[5];
+        if ( introspection ) m_rm.makeAllocator<umpire::strategy::MixedPool, true>(name, m_rm.getAllocator(allocName));
+        else                 m_rm.makeAllocator<umpire::strategy::MixedPool, false>(name, m_rm.getAllocator(allocName));
 #if 0
         const std::string& allocName = m_row[5];
         std::size_t PoolSize = hmm...

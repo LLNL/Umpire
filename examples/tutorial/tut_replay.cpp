@@ -21,7 +21,7 @@
 int main(int, char**) {
   constexpr int NUM_ALLOCATIONS = 64;
   std::default_random_engine generator;
-  std::uniform_int_distribution<int> distribution(0, 1024);
+  std::uniform_int_distribution<int> distribution(1, 1024);
 
   auto random_number = std::bind(distribution, generator);
 
