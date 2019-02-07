@@ -75,6 +75,14 @@ void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
 size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
     void * ptr);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_umpire_strategy_DynamicPool(
+    umpire_resourcemanager * self, const char * name, int initial_size,
+    int block, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_umpire_strategy_DynamicPool_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    int initial_size, int block, umpire_allocator * SHC_rv);
+
 #ifdef __cplusplus
 }
 #endif

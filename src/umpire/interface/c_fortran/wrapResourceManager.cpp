@@ -178,4 +178,38 @@ size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
 // splicer end class.ResourceManager.method.get_size
 }
 
+umpire_allocator * umpire_resourcemanager_make_allocator_umpire_strategy_DynamicPool(
+    umpire_resourcemanager * self, const char * name, int initial_size,
+    int block, umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_umpire_strategy_DynamicPool
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPool>(
+        SH_name, initial_size, block);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_umpire_strategy_DynamicPool
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_umpire_strategy_DynamicPool_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    int initial_size, int block, umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_umpire_strategy_DynamicPool_bufferify
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name, Lname);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPool>(
+        SH_name, initial_size, block);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 0;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_umpire_strategy_DynamicPool_bufferify
+}
+
 }  // extern "C"
