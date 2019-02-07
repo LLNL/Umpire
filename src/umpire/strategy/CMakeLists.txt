@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -21,6 +21,7 @@ set (umpire_strategy_headers
   SizeLimiter.hpp
   ThreadSafeAllocator.hpp
   DynamicPool.hpp
+  DynamicPoolHeuristic.hpp
   FixedPool.hpp
   FixedPool.inl)
   
@@ -36,6 +37,7 @@ set (umpire_stategy_sources
   SizeLimiter.cpp
   ThreadSafeAllocator.cpp
   DynamicPool.cpp
+  DynamicPoolHeuristic.cpp
   mixins/Inspector.cpp)
 
 set (umpire_strategy_depends

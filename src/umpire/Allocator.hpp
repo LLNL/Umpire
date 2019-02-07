@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -71,13 +71,18 @@ class Allocator {
     void deallocate(void* ptr);
 
     /*!
+     * \brief Release any and all unused memory held by this Allocator.
+     */
+    void release();
+
+    /*!
      * \brief Return number of bytes allocated for allocation
      *
      * \param ptr Pointer to allocation in question
      *
      * \return number of bytes allocated for ptr
      */
-    size_t getSize(void* ptr);
+    size_t getSize(void* ptr) const;
 
     /*!
      * \brief Return the memory high watermark for this Allocator.
@@ -88,7 +93,7 @@ class Allocator {
      *
      * \return Memory high watermark.
      */
-    size_t getHighWatermark() noexcept;
+    size_t getHighWatermark() const noexcept;
 
     /*!
      * \brief Return the current size of this Allocator.
@@ -98,7 +103,7 @@ class Allocator {
      *
      * \return current size of Allocator.
      */
-    size_t getCurrentSize() noexcept;
+    size_t getCurrentSize() const noexcept;
 
     /*!
      * \brief Return the actual size of this Allocator.
@@ -110,7 +115,7 @@ class Allocator {
      *
      * \return actual size of Allocator.
      */
-    size_t getActualSize() noexcept;
+    size_t getActualSize() const noexcept;
 
     /*!
      * \brief Get the name of this Allocator.
@@ -122,7 +127,7 @@ class Allocator {
      *
      * \return name of Allocator.
      */
-    const std::string& getName() noexcept;
+    const std::string& getName() const noexcept;
 
     /*!
      * \brief Get the integer ID of this Allocator.
@@ -135,7 +140,7 @@ class Allocator {
      *
      * \return integer id of Allocator.
      */
-    int getId() noexcept;
+    int getId() const noexcept;
 
     /*!
      * \brief Get the AllocationStrategy object used by this Allocator.

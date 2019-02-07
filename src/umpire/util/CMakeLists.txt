@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -18,8 +18,7 @@ set (umpire_util_headers
   Exception.hpp
   Logger.hpp
   Macros.hpp
-  Platform.hpp
-  Replay.hpp)
+  Platform.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -32,8 +31,7 @@ endif()
 set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
-  Logger.cpp
-  Replay.cpp)
+  Logger.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources

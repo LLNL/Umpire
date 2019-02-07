@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -13,6 +13,8 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/AllocationStrategy.hpp"
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -29,6 +31,12 @@ AllocationStrategy::getName() noexcept
   return m_name;
 }
 
+void
+AllocationStrategy::release()
+{
+  UMPIRE_LOG(Info, "AllocationStrategy::release in a no-op");
+}
+
 int
 AllocationStrategy::getId() noexcept
 {
@@ -36,7 +44,7 @@ AllocationStrategy::getId() noexcept
 }
 
 long
-AllocationStrategy::getActualSize() noexcept
+AllocationStrategy::getActualSize() const noexcept
 {
   return getCurrentSize();
 }

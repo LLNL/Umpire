@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -80,13 +80,13 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
   delete record;
 }
 
-long CudaConstantMemoryResource::getCurrentSize() noexcept
+long CudaConstantMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long CudaConstantMemoryResource::getHighWatermark() noexcept
+long CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;

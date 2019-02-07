@@ -1,6 +1,6 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -34,7 +34,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
       or_die make -j 3 VERBOSE=1
     fi
     if [[ "${DO_TEST}" == "yes" ]] ; then
-      or_die ctest -V
+      or_die ctest --output-on-failure -V
     fi
 fi
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -12,15 +12,19 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/Replay.hpp"
 
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
+
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+
+#include "umpire/Replay.hpp"
 
 namespace umpire {
-namespace util {
+namespace replay {
 
 static const char* env_name = "UMPIRE_REPLAY";
 Replay* Replay::s_Replay = nullptr;
@@ -76,5 +80,11 @@ std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
   return out;
 }
 
-} /* namespace util */
+std::ostream& operator<< (
+    std::ostream& out, 
+    umpire::strategy::DynamicPool::Coalesce_Heuristic& ) {
+  return out;
+}
+
+} /* namespace replay */
 } /* namespace umpire */

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -216,7 +216,17 @@ class ResourceManager {
      *
      * \return Size of allocation in bytes.
      */
-    size_t getSize(void* ptr);
+    size_t getSize(void* ptr) const;
+
+    /*!
+     * \brief If allocator is some kind of memory pool, try and coalesce
+     * memory.
+     *
+     * \param allocator Allocator to coalesce memory.
+     *
+     * \throws umpire::util::Exception if allocator doesn't support coalescing.
+     */
+    void coalesce(Allocator allocator);
 
 
   private:

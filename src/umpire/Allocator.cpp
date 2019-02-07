@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -16,6 +16,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 #include "umpire/util/StatisticsDatabase.hpp"
@@ -61,39 +62,49 @@ Allocator::deallocate(void* ptr)
   }
 }
 
+void
+Allocator::release()
+{
+  UMPIRE_REPLAY("release," <<  m_allocator << "\n");
+
+  UMPIRE_LOG(Debug, "");
+
+  m_allocator->release();
+}
+
 size_t
-Allocator::getSize(void* ptr)
+Allocator::getSize(void* ptr) const
 {
   UMPIRE_LOG(Debug, "(" << ptr << ")");
   return ResourceManager::getInstance().getSize(ptr);
 }
 
 size_t
-Allocator::getHighWatermark() noexcept
+Allocator::getHighWatermark() const noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
 size_t
-Allocator::getCurrentSize() noexcept
+Allocator::getCurrentSize() const noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
 size_t
-Allocator::getActualSize() noexcept
+Allocator::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();
 }
 
 const std::string&
-Allocator::getName() noexcept
+Allocator::getName() const noexcept
 {
   return m_allocator->getName();
 }
 
 int
-Allocator::getId() noexcept
+Allocator::getId() const noexcept
 {
   return m_allocator->getId();
 }

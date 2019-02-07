@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -102,7 +102,7 @@
 {                                                                  \
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << msg;                      \
+  umpire_oss_error << " " << __func__ << " " << msg;               \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
@@ -118,25 +118,6 @@
 #define UMPIRE_RECORD_STATISTIC(name, ...) ((void) 0)
 
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
-
-#include "umpire/util/Replay.hpp"
-#define UMPIRE_REPLAY( msg )                                             \
-{                                                                        \
-  if (umpire::util::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "REPLAY," << msg;                                      \
-    umpire::util::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
-
-#define UMPIRE_REPLAY_CONT( msg )                                        \
-{                                                                        \
-  if (umpire::util::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "," << msg;                                            \
-    umpire::util::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
 
 #define UMPIRE_LOCK \
   if ( !m_mutex->try_lock() ) \

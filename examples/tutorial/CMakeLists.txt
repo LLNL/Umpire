@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -72,6 +72,11 @@ blt_add_executable(
   SOURCES tut_introspection.cpp
   DEPENDS_ON 
     umpire)
+
+blt_add_executable(
+  NAME tut_replay
+  SOURCES tut_replay.cpp
+  DEPENDS_ON umpire)
 
 if (ENABLE_C_API)
   add_subdirectory(c)

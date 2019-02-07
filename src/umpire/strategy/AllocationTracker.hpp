@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -38,11 +38,15 @@ class AllocationTracker :
 
     void deallocate(void* ptr);
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
-    long getActualSize() noexcept;
+    void release();
+
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
+    long getActualSize() const noexcept;
 
     Platform getPlatform() noexcept;
+
+    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
 
   private:
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
