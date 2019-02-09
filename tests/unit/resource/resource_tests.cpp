@@ -17,15 +17,9 @@
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
 
-#include "umpire/resource/MemoryResourceTraits.hpp"
-
-#if defined(UMPIRE_ENABLE_NUMA)
-#include "umpire/resource/NumaMemoryResource.hpp"
-#endif
-
 struct TestAllocator
 {
-  void* allocate(size_t bytes)
+  void* allocate(size_t bytes) 
   {
     return ::malloc(bytes);
   }
