@@ -58,7 +58,7 @@ endif ()
 # Disable NUMA allocators if on MacOS or a non-UNIX platform
 if ((ENABLE_NUMA OR ENABLE_NUMA_DEVICES) AND (APPLE OR NOT UNIX))
   message(FATAL_ERROR "NUMA is unavailable on this platform. \
-                       Please re-run CMake using ENABLE_NUMA_HOST=OFF and ENABLE_NUMA=OFF")
+                       Please re-run CMake using ENABLE_NUMA=OFF and ENABLE_NUMA_DEVICES=OFF")
 endif ()
 
 # Set ENABLE_NUMA if ENABLE_NUMA_DEVICES
