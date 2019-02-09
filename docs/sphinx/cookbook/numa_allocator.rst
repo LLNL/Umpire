@@ -15,15 +15,11 @@ and a fine-grained interface with `libnuma`.
 
 The NUMA node ID is one component of
 :class:`umpire::resource::MemoryResourceTraits`. An allocator for a
-specific node can be created by creating a traits object and passing
-it to :meth:`umpire::ResourceManager::getAllocatorFor`. This will
-allocate memory through libnuma on the specific node.
-
-Umpire's NUMA API wrapper can get a list of host (or attached device)
-nodes and relocate the process to this node, as in:
-
-.. literalinclude:: ../../../examples/cookbook/recipe_numa_allocator.cpp
-                    :lines: 31-33
+specific node can be created by making a traits object and passing it
+to :meth:`umpire::ResourceManager::getAllocatorFor`. This will
+allocate memory through libnuma on the specific node. Note that Umpire
+NUMA calls are done through wrapper in the `op` library under the
+`numa::` namespace.
 
 The complete example is included below:
 

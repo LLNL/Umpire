@@ -119,7 +119,7 @@ std::vector<std::size_t> get_device_nodes() {
   return device_nodes;
 }
 
-std::size_t preferred_node() {
+int preferred_node() {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
 
   return numa_preferred();

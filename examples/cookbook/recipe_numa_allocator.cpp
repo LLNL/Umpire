@@ -27,19 +27,16 @@ int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
 
   /*
-   * Get the first NUMA node on the system and set this as the
-   * location for the process.
+   * Get the preferred NUMA node for allocation.
    */
-  auto host_nodes = umpire::numa::get_host_nodes();
-  const int node = host_nodes[0];
-  umpire::numa::run_on_node(node);
+  const int node = numa::preferred_node();
 
   /*
    * Create a traits object with the numa node id and pass to
    * getAllocatorFor.
    */
   umpire::resource::MemoryResourceTraits traits;
-  traits.numa_node = host_nodes[0];
+  traits.numa_node = node;
 
   auto allocator = rm.getAllocatorFor(traits);
 

@@ -26,7 +26,7 @@ enum class NodeType : int { Host, Device };
 
 void run_on_node(const int node);
 
-std::size_t preferred_node();
+int preferred_node();
 
 void* allocate_on_node(const std::size_t bytes, const std::size_t node);
 
