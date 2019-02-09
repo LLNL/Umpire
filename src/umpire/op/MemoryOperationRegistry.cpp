@@ -22,7 +22,7 @@
 
 #include "umpire/op/GenericReallocateOperation.hpp"
 
-#if defined(UMPIRE_ENABLE_NUMA_HOST)
+#if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/op/NumaReallocateOperation.hpp"
 #endif
 
@@ -79,7 +79,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
 
-#if defined(UMPIRE_ENABLE_NUMA_HOST)
+#if defined(UMPIRE_ENABLE_NUMA)
   registerOperation(
       "COPY",
       std::make_pair(Platform::numa, Platform::numa),
@@ -142,7 +142,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
-#if defined(UMPIRE_ENABLE_NUMA_HOST)
+#if defined(UMPIRE_ENABLE_NUMA_DEVICES)
   registerOperation(
       "COPY",
       std::make_pair(Platform::numa, Platform::cuda),

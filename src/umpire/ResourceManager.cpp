@@ -34,7 +34,7 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_NUMA_HOST)
+#if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/util/Numa.hpp"
 #include "umpire/resource/NumaMemoryResourceFactory.hpp"
 #endif
@@ -74,7 +74,7 @@ ResourceManager::ResourceManager() :
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-#if not defined(UMPIRE_ENABLE_NUMA_HOST)
+#if not defined(UMPIRE_ENABLE_NUMA)
   registry.registerMemoryResource(
       std::make_shared<resource::HostResourceFactory>());
 #else
@@ -109,7 +109,7 @@ ResourceManager::ResourceManager() :
     std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
-#if defined(UMPIRE_ENABLE_DEVICE) && defined(UMPIRE_ENABLE_NUMA)
+#if defined(UMPIRE_ENABLE_NUMA_DEVICES)
   {
     auto device_nodes = resource::numa::get_device_nodes();
     for (std::size_t n : device_nodes) {
@@ -184,7 +184,7 @@ ResourceManager::initialize()
     m_default_allocator = host_allocator;
   }
 
-#if defined(UMPIRE_ENABLE_NUMA_HOST)
+#if defined(UMPIRE_ENABLE_NUMA)
   {
     const std::string base_name = "NUMA_NODE_";
     auto host_nodes = numa::get_host_nodes();
@@ -233,7 +233,7 @@ ResourceManager::initialize()
   }
 #endif
 
-#if defined(UMPIRE_ENABLE_DEVICE) && defined(UMPIRE_ENABLE_NUMA)
+#if defined(UMPIRE_ENABLE_NUMA_DEVICES)
   {
     const std::string base_name = "NUMA_NODE_";
     auto device_nodes = resource::numa::get_device_nodes();

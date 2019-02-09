@@ -31,7 +31,7 @@ set (umpire_op_sources
 set (umpire_op_depends
   umpire_util)
 
-if (ENABLE_NUMA_HOST)
+if (ENABLE_NUMA)
   set (umpire_op_headers
     ${umpire_op_headers}
     NumaReallocateOperation.hpp)

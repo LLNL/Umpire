@@ -33,7 +33,7 @@ set (umpire_util_sources
   Exception.cpp
   Logger.cpp)
 
-if (ENABLE_NUMA_HOST)
+if (ENABLE_NUMA)
   set (umpire_util_sources
     ${umpire_util_sources}
     Numa.cpp)
@@ -52,7 +52,7 @@ endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
 
-if (ENABLE_NUMA_HOST)
+if (ENABLE_NUMA)
   set (umpire_util_depends
     ${umpire_util_depends}
     numa)

@@ -25,8 +25,8 @@
 #cmakedefine UMPIRE_ENABLE_DEVICE
 #cmakedefine UMPIRE_ENABLE_PINNED
 #cmakedefine UMPIRE_ENABLE_UM
-#cmakedefine UMPIRE_ENABLE_NUMA_HOST
 #cmakedefine UMPIRE_ENABLE_NUMA
+#cmakedefine UMPIRE_ENABLE_NUMA_DEVICES
 
 constexpr int UMPIRE_VERSION_MAJOR = @Umpire_VERSION_MAJOR@;
 constexpr int UMPIRE_VERSION_MINOR = @Umpire_VERSION_MINOR@;

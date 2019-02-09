@@ -33,7 +33,7 @@ set (umpire_resource_sources
 set (umpire_resource_depends
   umpire_alloc umpire_strategy umpire_util)
 
-if (ENABLE_NUMA_HOST)
+if (ENABLE_NUMA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     NumaMemoryResourceFactory.hpp

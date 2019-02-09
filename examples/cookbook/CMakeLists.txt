@@ -3,7 +3,7 @@ blt_add_executable(
   SOURCES recipe_no_introspection.cpp
   DEPENDS_ON umpire)
 
-if (ENABLE_NUMA_HOST)
+if (ENABLE_NUMA)
   blt_add_executable(
     NAME recipe_numa_allocator
     SOURCES recipe_numa_allocator.cpp
