@@ -27,6 +27,8 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
       ``ENABLE_TOOLS``             On       Enable tools like replay
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
+      ``ENABLE_NUMA``              Off      Enable usage of CPU NUMA-aware allocators
+      ``ENABLE_NUMA_DEVICES``      Off      Enable usage of device NUMA allocators
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
@@ -57,10 +59,16 @@ These arguments are explained in more detail below:
   This option enables usage of logging services provided by SLIC.
 
 * ``ENABLE_ASSERTS``
-  Enable assert() within Umpire
+  Enable assert() within Umpire.
 
 * ``ENABLE_TOOLS``
   Enable development tools for Umpire (replay, etc.)
 
 * ``ENABLE_DOCS``
-  Build user documentation (with Sphinx) and code documentation (with Doxygen)
+  Build user documentation (with Sphinx) and code documentation (with Doxygen).
+
+* ``ENABLE_NUMA``
+  Replaces the ``HOST`` allocator using `malloc()` with a NUMA version calling into libnuma. Other NUMA nodes are accessible by `getAllocatorFor(traits)`.
+
+* ``ENABLE_NUMA_DEVICES``
+  Adds allocators for the device NUMA nodes.
