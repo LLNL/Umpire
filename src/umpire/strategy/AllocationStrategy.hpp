@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -41,7 +41,9 @@ class AllocationStrategy :
      * \param name The name of this AllocationStrategy object.
      * \param id The id of this AllocationStrategy object.
      */
-    AllocationStrategy(const std::string& name, int id);
+    AllocationStrategy(const std::string& name, int id) noexcept;
+
+    virtual ~AllocationStrategy() = default;
 
     /*!
      * \brief Allocate bytes of memory.
@@ -60,6 +62,11 @@ class AllocationStrategy :
     virtual void deallocate(void* ptr) = 0;
 
     /*!
+     * \brief Release any and all unused memory held by this AllocationStrategy
+     */
+    virtual void release();
+
+    /*!
      * \brief Get current (total) size of the allocated memory.
      *
      * This is the total size of all allocation currently 'live' that have been
@@ -67,15 +74,15 @@ class AllocationStrategy :
      *
      * \return Current total size of allocations.
      */
-    virtual long getCurrentSize() = 0;
+    virtual long getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Get the high watermark of the total allocated size.
      *
      * This is equivalent to the highest observed value of getCurrentSize.
      * \return High watermark allocation size.
-     */ 
-    virtual long getHighWatermark() = 0;
+     */
+    virtual long getHighWatermark() const noexcept = 0;
 
     /*!
      * \brief Get the current amount of memory allocated by this allocator.
@@ -85,7 +92,7 @@ class AllocationStrategy :
      *
      * \return The total size of all the memory this object has allocated.
      */
-    virtual long getActualSize();
+    virtual long getActualSize() const noexcept;
 
     /*!
      * \brief Get the platform associated with this AllocationStrategy.
@@ -95,14 +102,14 @@ class AllocationStrategy :
      *
      * \return The platform associated with this AllocationStrategy.
      */
-    virtual Platform getPlatform()  = 0;
+    virtual Platform getPlatform() noexcept = 0;
 
     /*!
      * \brief Get the name of this AllocationStrategy.
      *
      * \return The name of this AllocationStrategy.
      */
-    std::string getName();
+    std::string getName() noexcept;
 
 
     /*!
@@ -110,7 +117,7 @@ class AllocationStrategy :
      *
      * \return The id of this AllocationStrategy.
      */
-    int getId();
+    int getId() noexcept;
 
   protected:
     std::string m_name;

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -32,18 +32,18 @@ static const std::string MessageLevelName[ message::Num_Levels ] = {
   "DEBUG"
 };
 
-Logger::Logger()
+Logger::Logger() noexcept
 {
   // by default, all message streams are disabled
   for ( int i=0 ; i < message::Num_Levels ; ++i )
     m_isEnabled[ i ] = false;
 }
 
-Logger::~Logger()
+Logger::~Logger() noexcept
 {
 }
 
-void Logger::setLoggingMsgLevel( message::Level level )
+void Logger::setLoggingMsgLevel( message::Level level ) noexcept
 {
   for ( int i=0 ; i < message::Num_Levels ; ++i )
     m_isEnabled[ i ] = (i<= level) ? true : false;
@@ -52,15 +52,15 @@ void Logger::setLoggingMsgLevel( message::Level level )
 void Logger::logMessage( message::Level level,
                          const std::string& message,
                          const std::string& fileName,
-                         int line )
+                         int line ) noexcept
 {
   if ( !logLevelEnabled( level ) )
     return;   /* short-circuit */
 
-  std::cout 
+  std::cout
     << "[" << MessageLevelName[ level ] << "]"
-    << "[" << fileName  << ":" << line << "]:" 
-    << message 
+    << "[" << fileName  << ":" << line << "]:"
+    << message
     << std::endl;
 }
 

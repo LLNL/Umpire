@@ -18,6 +18,7 @@ Here is a summary of the configuration options, their default value, and meaning
       Variable                     Default  Meaning
       ===========================  ======== ===============================================================================
       ``ENABLE_CUDA``              On       Enable CUDA support
+      ``ENABLE_ROCM``              Off      Enable ROCm support
       ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
@@ -26,13 +27,20 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
       ``ENABLE_IPC``               Off      Enable IPC shared memory resource within Umpire
       ``ENABLE_IPC_MPI3``          Off      Enable MPI3 SHM as an IPC memory resource within Umpire
+      ``ENABLE_TOOLS``             On       Enable tools like replay
+      ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
 
 * ``ENABLE_CUDA``
-  This option enables support for GPUs. If Umpire is built without CUDA support,
-  then only the ``HOST`` allocator is available for use.
+  This option enables support for NVIDIA GPUs. If Umpire is built without CUDA
+  or ROCM support, then only the ``HOST`` allocator is available for use.
+
+* ``ENABLE_ROCM``
+  This option enables support for AMD GPUs using the ROCm stack and HCC
+  programming model. If Umpire is built without CUDA or ROCM support, then only
+  the ``HOST`` allocator is available for use.
 
 * ``ENABLE_STATISTICS``
   This option enables collection of memory statistics. If Umpire is built with
@@ -58,3 +66,9 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_IPC_MPI3``
   Enable MPI3 SHM as an IPC shared memory resource
+
+* ``ENABLE_TOOLS``
+  Enable development tools for Umpire (replay, etc.)
+
+* ``ENABLE_DOCS``
+  Build user documentation (with Sphinx) and code documentation (with Doxygen)

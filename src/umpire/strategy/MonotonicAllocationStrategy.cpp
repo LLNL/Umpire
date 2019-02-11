@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -34,7 +34,7 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
   m_block = m_allocator->allocate(m_capacity);
 }
 
-void* 
+void*
 MonotonicAllocationStrategy::allocate(size_t bytes)
 {
   void* ret = static_cast<char*>(m_block) + bytes;
@@ -49,28 +49,28 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
   return ret;
 }
 
-void 
+void
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {
   UMPIRE_LOG(Info, "() doesn't do anything");
 }
 
-long 
-MonotonicAllocationStrategy::getCurrentSize()
+long
+MonotonicAllocationStrategy::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_size);
   return m_size;
 }
 
-long 
-MonotonicAllocationStrategy::getHighWatermark()
+long
+MonotonicAllocationStrategy::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_capacity);
   return m_capacity;
 }
 
-Platform 
-MonotonicAllocationStrategy::getPlatform()
+Platform
+MonotonicAllocationStrategy::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

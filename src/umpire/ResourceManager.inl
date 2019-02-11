@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -18,8 +18,10 @@
 #include "umpire/ResourceManager.hpp"
 
 #include <sstream>
+#include <cxxabi.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
 
 namespace umpire {
@@ -38,6 +40,13 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
+    UMPIRE_REPLAY("makeAllocator,"
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+    );
+
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
     }
@@ -51,7 +60,6 @@ Allocator ResourceManager::makeAllocator(
       std::stringstream base_name;
       base_name << name << "_base";
 
-
       auto base_allocator = std::make_shared<Strategy>(base_name.str(), getNextId(), std::forward<Args>(args)...);
 
       allocator = std::make_shared<umpire::strategy::AllocationTracker>(name, getNextId(), Allocator(base_allocator));
@@ -60,6 +68,8 @@ Allocator ResourceManager::makeAllocator(
       m_allocators_by_id[allocator->getId()] = allocator;
 
     }
+
+    UMPIRE_REPLAY_CONT("" << allocator << "\n");
 
     UMPIRE_UNLOCK;
   } catch (...) {

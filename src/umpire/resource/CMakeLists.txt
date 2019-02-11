@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -20,6 +20,7 @@ set (umpire_resource_headers
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
+  MemoryResourceTraits.hpp
 )
 
 set (umpire_resource_sources
@@ -34,19 +35,25 @@ set (umpire_resource_depends
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    DeviceConstResourceFactory.hpp
-    ConstantMemoryResource.hpp
-    DeviceResourceFactory.hpp
-    PinnedMemoryResourceFactory.hpp
-    UnifiedMemoryResourceFactory.hpp)
+    CudaDeviceResourceFactory.hpp
+    CudaPinnedMemoryResourceFactory.hpp
+    CudaUnifiedMemoryResourceFactory.hpp
+
+    CudaConstantMemoryResourceFactory.hpp
+    CudaConstantMemoryResource.hpp
+    )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    DeviceConstResourceFactory.cpp
-    ConstantMemoryResource.cu
-    DeviceResourceFactory.cpp
-    PinnedMemoryResourceFactory.cpp
-    UnifiedMemoryResourceFactory.cpp)
+
+
+    CudaConstantMemoryResourceFactory.cpp
+    CudaConstantMemoryResource.cu
+
+    CudaDeviceResourceFactory.cpp
+    CudaPinnedMemoryResourceFactory.cpp
+    CudaUnifiedMemoryResourceFactory.cpp)
+
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
@@ -61,6 +68,22 @@ if (ENABLE_IPC)
   set (umpire_resource_sources
     ${umpire_resource_sources}
     IpcResourceFactory.cpp)
+endif ()
+
+if (ENABLE_ROCM)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    RocmDeviceResourceFactory.hpp
+    RocmPinnedMemoryResourceFactory.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    RocmDeviceResourceFactory.cpp
+    RocmPinnedMemoryResourceFactory.cpp)
+
+  set (umpire_resource_depends
+    ${umpire_resource_depends}
+    rocm)
 endif ()
 
 blt_add_library(

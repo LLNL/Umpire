@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -26,10 +26,13 @@ DynamicPool::DynamicPool(
     int id,
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size) :
+    const std::size_t min_alloc_size,
+    Coalesce_Heuristic coalesce_heuristic) noexcept
+  :
   AllocationStrategy(name, id),
   dpa(nullptr),
-  m_allocator(allocator.getAllocationStrategy())
+  m_allocator(allocator.getAllocationStrategy()),
+  do_coalesce{coalesce_heuristic}
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
 }
@@ -38,43 +41,80 @@ void*
 DynamicPool::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
+
   void* ptr = dpa->allocate(bytes);
   return ptr;
 }
 
-void 
+void
 DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
+
+  if ( do_coalesce(*this) ) {
+    UMPIRE_LOG(Debug, "Heuristic returned true, "
+        "performing coalesce operation for " << this << "\n");
+    dpa->coalesce();
+  }
 }
 
-long 
-DynamicPool::getCurrentSize()
-{ 
-  UMPIRE_LOG(Debug, "() returning " << m_current_size);
-  return 0;
+void
+DynamicPool::release()
+{
+  dpa->release();
 }
 
-long 
-DynamicPool::getHighWatermark()
-{ 
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return 0;
+long
+DynamicPool::getCurrentSize() const noexcept
+{
+  long CurrentSize = dpa->getCurrentSize();
+  UMPIRE_LOG(Debug, "() returning " << CurrentSize);
+  return CurrentSize;
 }
 
-long 
-DynamicPool::getActualSize()
-{ 
-  long totalSize = dpa->totalSize();
-  UMPIRE_LOG(Debug, "() returning " << totalSize);
-  return totalSize;
+long
+DynamicPool::getActualSize() const noexcept
+{
+  long ActualSize = dpa->getActualSize();
+  UMPIRE_LOG(Debug, "() returning " << ActualSize);
+  return ActualSize;
 }
 
-Platform 
-DynamicPool::getPlatform()
-{ 
+long
+DynamicPool::getHighWatermark() const noexcept
+{
+  long HighWatermark = dpa->getHighWatermark();
+  UMPIRE_LOG(Debug, "() returning " << HighWatermark);
+  return HighWatermark;
+}
+
+long
+DynamicPool::getReleasableSize() const noexcept
+{
+  long SparseBlockSize = dpa->getReleasableSize();
+  UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);
+  return SparseBlockSize;
+}
+
+long
+DynamicPool::getBlocksInPool() const noexcept
+{
+  long BlocksInPool = dpa->getBlocksInPool();
+  UMPIRE_LOG(Debug, "() returning " << BlocksInPool);
+  return BlocksInPool;
+}
+
+Platform
+DynamicPool::getPlatform() noexcept
+{
   return m_allocator->getPlatform();
+}
+
+void
+DynamicPool::coalesce() noexcept
+{
+  dpa->coalesce();
 }
 
 } // end of namespace strategy

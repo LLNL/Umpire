@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -19,16 +19,29 @@
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
 #include "umpire/resource/HostResourceFactory.hpp"
+
 #if defined(UMPIRE_ENABLE_IPC)
 #include "umpire/resource/IpcResourceFactory.hpp"
 #endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
-#include "umpire/resource/DeviceResourceFactory.hpp"
-#include "umpire/resource/UnifiedMemoryResourceFactory.hpp"
-#include "umpire/resource/PinnedMemoryResourceFactory.hpp"
-#include "umpire/resource/DeviceConstResourceFactory.hpp"
+#include <cuda_runtime_api.h>
+
+#include "umpire/resource/CudaDeviceResourceFactory.hpp"
+#include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
 #endif
+
+#if defined(UMPIRE_ENABLE_ROCM)
+#include "umpire/resource/RocmDeviceResourceFactory.hpp"
+#include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
+#endif
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
+
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/AllocationTracker.hpp"
 
 #include "umpire/util/Macros.hpp"
 
@@ -66,16 +79,24 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
-    std::make_shared<resource::DeviceResourceFactory>());
+    std::make_shared<resource::CudaDeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::UnifiedMemoryResourceFactory>());
+    std::make_shared<resource::CudaUnifiedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::PinnedMemoryResourceFactory>());
+    std::make_shared<resource::CudaPinnedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::DeviceConstResourceFactory>());
+    std::make_shared<resource::CudaConstantMemoryResourceFactory>());
+#endif
+
+#if defined(UMPIRE_ENABLE_ROCM)
+  registry.registerMemoryResource(
+    std::make_shared<resource::RocmDeviceResourceFactory>());
+
+  registry.registerMemoryResource(
+    std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
 #if defined(UMPIRE_ENABLE_IPC)
@@ -97,10 +118,28 @@ ResourceManager::initialize()
   m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
 
 #if defined(UMPIRE_ENABLE_CUDA)
+  int count;
+  auto error = ::cudaGetDeviceCount(&count);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
+  }
+#endif
+
+#if defined(UMPIRE_ENABLE_DEVICE)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
-  m_memory_resources[resource::UnifiedMemory] = registry.makeMemoryResource("UM", getNextId());
-  m_memory_resources[resource::PinnedMemory] = registry.makeMemoryResource("PINNED", getNextId());
-  m_memory_resources[resource::DeviceConst] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_PINNED)
+  m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+  m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
 #if defined(UMPIRE_ENABLE_IPC)
@@ -116,20 +155,26 @@ ResourceManager::initialize()
 
   m_default_allocator = host_allocator;
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
   auto device_allocator = m_memory_resources[resource::Device];
   m_allocators_by_name["DEVICE"] = device_allocator;
   m_allocators_by_id[device_allocator->getId()] = device_allocator;
+#endif
 
-  auto um_allocator = m_memory_resources[resource::UnifiedMemory];
-  m_allocators_by_name["UM"] = um_allocator;
-  m_allocators_by_id[um_allocator->getId()] = um_allocator;
-
-  auto pinned_allocator = m_memory_resources[resource::PinnedMemory];
+#if defined(UMPIRE_ENABLE_PINNED)
+  auto pinned_allocator = m_memory_resources[resource::Pinned];
   m_allocators_by_name["PINNED"] = pinned_allocator;
   m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
+#endif
 
-  auto device_const_allocator = m_memory_resources[resource::DeviceConst];
+#if defined(UMPIRE_ENABLE_UM)
+  auto um_allocator = m_memory_resources[resource::Unified];
+  m_allocators_by_name["UM"] = um_allocator;
+  m_allocators_by_id[um_allocator->getId()] = um_allocator;
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  auto device_const_allocator = m_memory_resources[resource::Constant];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
 #endif
@@ -201,7 +246,7 @@ ResourceManager::getDefaultAllocator()
 }
 
 void
-ResourceManager::setDefaultAllocator(Allocator allocator)
+ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 {
   UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");
 
@@ -226,7 +271,7 @@ ResourceManager::getAllocator(void* ptr)
 }
 
 bool
-ResourceManager::isAllocator(const std::string& name)
+ResourceManager::isAllocator(const std::string& name) noexcept
 {
   return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
@@ -278,8 +323,8 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
     UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
   }
 
-  auto op = op_registry.find("COPY", 
-      src_alloc_record->m_strategy, 
+  auto op = op_registry.find("COPY",
+      src_alloc_record->m_strategy,
       dst_alloc_record->m_strategy);
 
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
@@ -303,8 +348,8 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
     UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << src_size);
   }
 
-  auto op = op_registry.find("MEMSET", 
-      alloc_record->m_strategy, 
+  auto op = op_registry.find("MEMSET",
+      alloc_record->m_strategy,
       alloc_record->m_strategy);
 
   op->apply(ptr, alloc_record, value, length);
@@ -328,8 +373,8 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
       UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
     }
 
-    auto op = op_registry.find("REALLOCATE", 
-        alloc_record->m_strategy, 
+    auto op = op_registry.find("REALLOCATE",
+        alloc_record->m_strategy,
         alloc_record->m_strategy);
 
 
@@ -396,11 +441,44 @@ void ResourceManager::deallocate(void* ptr)
 }
 
 size_t
-ResourceManager::getSize(void* ptr)
+ResourceManager::getSize(void* ptr) const
 {
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);
   return record->m_size;
+}
+
+void
+ResourceManager::coalesce(Allocator allocator)
+{
+  auto strategy = allocator.getAllocationStrategy();
+
+  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+  if (tracker) {
+    strategy = tracker->getAllocationStrategy();
+
+  }
+
+  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
+  if (dynamic_pool) {
+    dynamic_pool->coalesce();
+  } else {
+    UMPIRE_ERROR(allocator.getName() << " is not a DynamicPool, cannot coalesce!");
+  }
+}
+
+std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForId(int id)
+{
+  auto allocator_i = m_allocators_by_id.find(id);
+
+  if ( allocator_i == m_allocators_by_id.end() ) {
+    UMPIRE_ERROR("Cannot find allocator for ID " << id);
+  }
+
+  UMPIRE_LOG(Debug, "(id=" << id << ") returning " << allocator_i->second );
+  return allocator_i->second;
 }
 
 std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)
@@ -416,7 +494,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
 }
 
 std::vector<std::string>
-ResourceManager::getAvailableAllocators()
+ResourceManager::getAvailableAllocators() noexcept
 {
   std::vector<std::string> names;
   for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
@@ -428,7 +506,7 @@ ResourceManager::getAvailableAllocators()
 }
 
 int
-ResourceManager::getNextId()
+ResourceManager::getNextId() noexcept
 {
   return m_id++;
 }

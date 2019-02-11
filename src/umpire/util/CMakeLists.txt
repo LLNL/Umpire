@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -61,6 +61,13 @@ blt_add_library(
   HEADERS_OUTPUT_SUBDIR umpire/util
   DEPENDS_ON ${umpire_util_depends}
 )
+
+if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  target_compile_options(
+    umpire_util
+    PRIVATE
+    -Os)
+endif()
 
 target_include_directories(
   umpire_util

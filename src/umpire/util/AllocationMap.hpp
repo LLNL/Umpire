@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -20,7 +20,8 @@
 #include <cstdint>
 #include <mutex>
 
-#include "umpire/tpl/judy/judyL2Array.h"
+template< typename JudyKey, typename JudyValue >
+class judyL2Array;
 
 namespace umpire {
 namespace util {
@@ -28,9 +29,6 @@ namespace util {
 class AllocationMap
 {
   public:
-    using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
-    using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
-    using Entry = AllocationRecord*;
 
   AllocationMap();
   ~AllocationMap();
@@ -42,7 +40,7 @@ class AllocationMap
   remove(void* ptr);
 
   AllocationRecord*
-  find(void* ptr);
+  find(void* ptr) const;
 
   bool
   contains(void* ptr);
@@ -50,10 +48,13 @@ class AllocationMap
   void
     reset();
 
-  private:
-    AllocationRecord* findRecord(void* ptr);
+  void
+    printAll() const;
 
-    judyL2Array<uintptr_t, uintptr_t> m_records;
+  private:
+    AllocationRecord* findRecord(void* ptr) const;
+
+    judyL2Array<uintptr_t, uintptr_t>* m_records;
 
     std::mutex* m_mutex;
 };

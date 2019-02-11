@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -35,7 +35,7 @@ namespace strategy {
  * used to quickly allocate and deallocate objects.
  */
 template <typename T, int NP=64, typename IA=StdAllocator>
-class FixedPool 
+class FixedPool
   : public AllocationStrategy
 {
 
@@ -51,11 +51,11 @@ class FixedPool
 
     void deallocate(void* ptr);
 
-    long getCurrentSize();
-    long getHighWatermark();
-    long getActualSize();
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
+    long getActualSize() const noexcept;
 
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     struct Pool
@@ -70,7 +70,7 @@ class FixedPool
 
     T* allocInPool(struct Pool *p);
 
-    size_t numPools() const;
+    size_t numPools() const noexcept;
 
 
     struct Pool *m_pool;

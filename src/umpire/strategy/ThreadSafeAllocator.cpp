@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -30,8 +30,8 @@ ThreadSafeAllocator::ThreadSafeAllocator(
 {
 }
 
-void* 
-ThreadSafeAllocator::allocate(size_t bytes) 
+void*
+ThreadSafeAllocator::allocate(size_t bytes)
 {
   void* ret = nullptr;
 
@@ -49,7 +49,7 @@ ThreadSafeAllocator::allocate(size_t bytes)
   return ret;
 }
 
-void 
+void
 ThreadSafeAllocator::deallocate(void* ptr)
 {
   try {
@@ -65,20 +65,19 @@ ThreadSafeAllocator::deallocate(void* ptr)
 }
 
 long
-ThreadSafeAllocator::getCurrentSize()
+ThreadSafeAllocator::getCurrentSize() const noexcept
 {
   return 0;
 }
 
 long
-ThreadSafeAllocator::getHighWatermark()
+ThreadSafeAllocator::getHighWatermark() const noexcept
 {
   return 0;
 }
 
-
 Platform
-ThreadSafeAllocator::getPlatform()
+ThreadSafeAllocator::getPlatform() noexcept
 {
 
   return m_allocator->getPlatform();

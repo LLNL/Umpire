@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -27,7 +27,7 @@ namespace resource {
 class HostResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name);
+  bool isValidMemoryResourceFor(const std::string& name) noexcept;
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };
 

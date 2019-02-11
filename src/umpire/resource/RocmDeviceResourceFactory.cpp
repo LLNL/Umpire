@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -12,16 +12,17 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/DeviceResourceFactory.hpp"
+#include "umpire/resource/RocmDeviceResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/CudaMallocAllocator.hpp"
+#include "umpire/alloc/AmAllocAllocator.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool
-DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("DEVICE") == 0) {
     return true;
@@ -31,9 +32,16 @@ DeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-DeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id);
+  MemoryResourceTraits traits;
+
+  traits.unified = false;
+  traits.vendor = MemoryResourceTraits::vendor_type::AMD;
+  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::any;
+
+  return std::make_shared<resource::DefaultMemoryResource<alloc::AmAllocAllocator> >(Platform::rocm, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

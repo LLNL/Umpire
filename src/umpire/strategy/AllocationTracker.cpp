@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -20,14 +20,14 @@ namespace strategy {
 AllocationTracker::AllocationTracker(
   const std::string& name,
   int id,
-  Allocator allocator) :
+  Allocator allocator) noexcept :
 AllocationStrategy(name, id),
 mixins::Inspector(),
 m_allocator(allocator.getAllocationStrategy())
 {
 }
 
-void* 
+void*
 AllocationTracker::allocate(size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
@@ -37,35 +37,47 @@ AllocationTracker::allocate(size_t bytes)
   return ptr;
 }
 
-void 
+void
 AllocationTracker::deallocate(void* ptr)
 {
   deregisterAllocation(ptr);
   m_allocator->deallocate(ptr);
 }
 
-long 
-AllocationTracker::getCurrentSize()
+void
+AllocationTracker::release()
+{
+  m_allocator->release();
+}
+
+long
+AllocationTracker::getCurrentSize() const noexcept
 {
   return m_current_size;
 }
 
-long 
-AllocationTracker::getHighWatermark()
+long
+AllocationTracker::getHighWatermark() const noexcept
 {
   return m_high_watermark;
 }
 
 long
-AllocationTracker::getActualSize()
+AllocationTracker::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();
 }
 
-Platform 
-AllocationTracker::getPlatform()
+Platform
+AllocationTracker::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+std::shared_ptr<umpire::strategy::AllocationStrategy> 
+AllocationTracker::getAllocationStrategy()
+{
+  return m_allocator;
 }
 
 } // end of namespace umpire

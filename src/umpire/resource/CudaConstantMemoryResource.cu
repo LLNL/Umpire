@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -13,7 +13,7 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/resource/ConstantMemoryResource.hpp"
+#include "umpire/resource/CudaConstantMemoryResource.hpp"
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
@@ -24,8 +24,8 @@
 namespace umpire {
 namespace resource {
 
-ConstantMemoryResource::ConstantMemoryResource(const std::string& name, int id) :
-  MemoryResource(name, id),
+CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
+  MemoryResource(name, id, traits),
   m_current_size(0l),
   m_highwatermark(0l),
   m_platform(Platform::cuda),
@@ -33,9 +33,13 @@ ConstantMemoryResource::ConstantMemoryResource(const std::string& name, int id) 
   m_ptr(nullptr)
 {
   cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, umpire_internal_device_constant_memory);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaGetSymbolAddress failed with error: " << cudaGetErrorString(error));
+  }
 }
 
-void* ConstantMemoryResource::allocate(size_t bytes)
+void* CudaConstantMemoryResource::allocate(size_t bytes)
 {
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;
@@ -59,36 +63,36 @@ void* ConstantMemoryResource::allocate(size_t bytes)
   return ret;
 }
 
-void ConstantMemoryResource::deallocate(void* ptr)
+void CudaConstantMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size)) 
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
       == static_cast<char*>(ptr)) {
     m_offset -= record->m_size;
   } else {
-    UMPIRE_ERROR("ConstantMemory deallocations must be in reverse order");
+    UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
   }
 
   delete record;
 }
 
-long ConstantMemoryResource::getCurrentSize()
+long CudaConstantMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long ConstantMemoryResource::getHighWatermark()
+long CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
-Platform ConstantMemoryResource::getPlatform()
+Platform CudaConstantMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

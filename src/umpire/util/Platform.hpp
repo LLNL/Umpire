@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -19,7 +19,8 @@ namespace umpire {
 
 enum class Platform {
   cpu,
-  cuda
+  cuda,
+  rocm
 };
 
 } // end of namespace umpire

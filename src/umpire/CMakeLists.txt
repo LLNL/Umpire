@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -14,6 +14,7 @@
 ##############################################################################
 set (umpire_headers
   Allocator.hpp
+  Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
   TypedAllocator.hpp
@@ -22,35 +23,47 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
+  Replay.cpp
   ResourceManager.cpp)
 
-if (ENABLE_FORTRAN)
-  set (umpire_headers
-    ${umpire_headers}
+if (ENABLE_FORTRAN_API OR ENABLE_C_API)
+  set (umpire_interface_headers
     interface/umpire.h
+  )
+
+  set (umpire_interface_c_fortran_headers
     interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
-    )
+    interface/c_fortran/typesUmpire.h
+  )
 
-  set (umpire_sources
-    ${umpire_sources}
-    interface/c_fortran/shroudrt.cpp
-    interface/c_fortran/wrapAllocator.cpp
-    interface/c_fortran/wrapResourceManager.cpp
-    interface/c_fortran/wrapfumpire.f90
-    )
+  if (ENABLE_C_API)
+    set (umpire_interface_sources
+      interface/c_fortran/shroudrt.cpp
+      interface/c_fortran/wrapAllocator.cpp
+      interface/c_fortran/wrapResourceManager.cpp
+      interface/c_fortran/wrapUmpire.cpp
+      )
 
-  set_source_files_properties(
-    interface/c_fortran/wrapfumpire.f90
-    PROPERTIES
-    Fortran_FORMAT FREE)
+    if (ENABLE_FORTRAN_API)
+      set (umpire_interface_sources
+        ${umpire_interface_sources}
+        interface/c_fortran/wrapfumpire.f
+      )
+
+      set_source_files_properties(
+        interface/c_fortran/wrapfumpire.f
+        PROPERTIES
+        Fortran_FORMAT FREE)
+    endif ()
+  endif ()
 endif ()
 
 blt_add_library(
   NAME umpire
-  HEADERS ${umpire_headers}
-  SOURCES ${umpire_sources}
+  HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
+  SOURCES ${umpire_sources} ${umpire_interface_sources}
   HEADERS_OUTPUT_SUBDIR umpire 
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
@@ -61,6 +74,21 @@ set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_IPC ${ENABLE_IPC})
 set(UMPIRE_ENABLE_IPC_MPI3 ${ENABLE_IPC_MPI3})
+set(UMPIRE_ENABLE_ROCM ${ENABLE_ROCM})
+
+if (ENABLE_CUDA OR ENABLE_ROCM) 
+  set(UMPIRE_ENABLE_DEVICE On)
+  set(UMPIRE_ENABLE_PINNED On)
+else ()
+  set(UMPIRE_ENABLE_DEVICE Off)
+  set(UMPIRE_ENABLE_PINNED Off)
+endif()
+
+if (ENABLE_CUDA)
+  set(UMPIRE_ENABLE_UM On)
+else ()
+  set(UMPIRE_ENABLE_UM Off)
+endif()
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
@@ -83,6 +111,14 @@ install(TARGETS
 install(FILES
   ${umpire_headers}
   DESTINATION include/umpire)
+
+install(FILES
+  ${umpire_interface_headers}
+  DESTINATION include/umpire/interface)
+
+install(FILES
+  ${umpire_interface_c_fortran_headers}
+  DESTINATION include/umpire/interface/c_fortran)
 
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include

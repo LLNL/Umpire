@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -31,9 +31,9 @@ class StatisticsDatabase {
     std::shared_ptr<Statistic> getStatistic(
         const std::string& name);
 
-    void printStatistics(std::ostream& stream);
+    void printStatistics(std::ostream& stream) noexcept;
   private:
-    StatisticsDatabase();
+    StatisticsDatabase() noexcept;
 
     StatisticsDatabase (const StatisticsDatabase&) = delete;
     StatisticsDatabase& operator= (const StatisticsDatabase&) = delete;

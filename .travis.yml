@@ -48,8 +48,14 @@ matrix:
     - IMG=nvcc-9
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=On"
     - DO_TEST=no
+  - compiler: hcc
+    env:
+      - COMPILER=hcc
+      - IMG=rocm
+      - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hcc -DENABLE_ROCM=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off"
+      - DO_TEST=no
 
-script: 
+script:
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
 - docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:$IMG ./scripts/travis/build_and_test.sh
 

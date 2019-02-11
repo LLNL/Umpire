@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -38,12 +38,10 @@ class MonotonicAllocationStrategy :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    size_t getSize(void* ptr);
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
 
-    long getCurrentSize();
-    long getHighWatermark();
-
-    Platform getPlatform();
+    Platform getPlatform() noexcept;
 
   private:
     void* m_block;
@@ -58,4 +56,3 @@ class MonotonicAllocationStrategy :
 } // end of namespace umpire
 
 #endif // UMPIRE_MonotonicAllocationStrategy_HPP
-

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -77,22 +77,22 @@ SlotPool::deallocate(void* ptr)
   }
 }
 
-long 
-SlotPool::getCurrentSize()
+long
+SlotPool::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long 
-SlotPool::getHighWatermark()
+long
+SlotPool::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
 Platform
-SlotPool::getPlatform()
+SlotPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

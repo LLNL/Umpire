@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -21,7 +21,7 @@ namespace resource {
 struct MemoryResourceTypeHash
 {
     template <typename T>
-    std::size_t operator()(T t) const
+    std::size_t operator()(T t) const noexcept
     {
         return static_cast<std::size_t>(t);
     }
@@ -31,9 +31,9 @@ struct MemoryResourceTypeHash
 enum MemoryResourceType {
   Host,
   Device,
-  UnifiedMemory,
-  PinnedMemory,
-  DeviceConst,
+  Unified,
+  Pinned,
+  Constant,
   IpcMemory
 };
 

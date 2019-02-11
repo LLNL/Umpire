@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -24,7 +24,7 @@
 namespace umpire {
 namespace util {
 
-Statistic::Statistic(const std::string& name) :
+Statistic::Statistic(const std::string& name) noexcept:
   m_name(name),
   m_counter(),
   m_data()
@@ -32,7 +32,7 @@ Statistic::Statistic(const std::string& name) :
   m_data["name"] = name;
 }
 
-Statistic::~Statistic()
+Statistic::~Statistic() noexcept
 {
 }
 
@@ -46,7 +46,7 @@ Statistic::recordStatistic(conduit::Node&& stat)
 }
 
 void
-Statistic::printData(std::ostream& stream)
+Statistic::printData(std::ostream& stream) noexcept
 {
   m_data.print();
 }

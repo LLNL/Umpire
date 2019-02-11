@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -24,7 +24,7 @@ blt_add_executable(
   DEPENDS_ON
     umpire)
 
-if (ENABLE_FORTRAN)
+if (ENABLE_C_API)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c
@@ -39,6 +39,12 @@ blt_add_executable(
   DEPENDS_ON 
     umpire)
 
+blt_add_executable(
+  NAME size_limiter
+  SOURCES size_limiter.cpp
+  DEPENDS_ON 
+    umpire)
+
 if (ENABLE_STATISTICS)
   blt_add_executable(
     NAME statistics_example
@@ -47,3 +53,5 @@ if (ENABLE_STATISTICS)
 endif()
 
 add_subdirectory(tutorial)
+
+add_subdirectory(cookbook)

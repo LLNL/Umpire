@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -16,10 +16,20 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/tpl/judy/judyL2Array.h"
+
+namespace {
+  using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
+  using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
+  using Entry = umpire::util::AllocationRecord*;
+}
+
 namespace umpire {
 namespace util {
 
+
 AllocationMap::AllocationMap() :
+  m_records(new judyL2Array<uintptr_t, uintptr_t>()),
   m_mutex(new std::mutex())
 {
 }
@@ -36,7 +46,7 @@ AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
 
     UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-    m_records.insert(
+    m_records->insert(
         reinterpret_cast<uintptr_t>(ptr),
         reinterpret_cast<uintptr_t>(alloc_record));
 
@@ -59,7 +69,7 @@ AllocationMap::remove(void* ptr)
 
     EntryVector* record_vector =
       const_cast<EntryVector*>(
-          m_records.find(reinterpret_cast<uintptr_t>(ptr)));
+          m_records->find(reinterpret_cast<uintptr_t>(ptr)));
 
     if (record_vector) {
       if (record_vector->size() > 0) {
@@ -68,13 +78,13 @@ AllocationMap::remove(void* ptr)
         record_vector->pop_back();
 
         if (record_vector->empty()) {
-          m_records.removeEntry(reinterpret_cast<uintptr_t>(ptr));
+          m_records->removeEntry(reinterpret_cast<uintptr_t>(ptr));
         }
       }
     } else {
       UMPIRE_ERROR("Cannot remove " << ptr );
     }
-    
+
     UMPIRE_UNLOCK;
   } catch (...) {
     UMPIRE_UNLOCK;
@@ -85,14 +95,14 @@ AllocationMap::remove(void* ptr)
 }
 
 AllocationRecord*
-AllocationMap::findRecord(void* ptr)
+AllocationMap::findRecord(void* ptr) const
 {
 
   Entry alloc_record = nullptr;
 
   try {
     UMPIRE_LOCK;
-    auto record = m_records.atOrBefore(reinterpret_cast<uintptr_t>(ptr));
+    auto record = m_records->atOrBefore(reinterpret_cast<uintptr_t>(ptr));
     if (record.value) {
       void* parent_ptr = reinterpret_cast<void*>(record.key);
       alloc_record =
@@ -118,7 +128,7 @@ AllocationMap::findRecord(void* ptr)
 }
 
 AllocationRecord*
-AllocationMap::find(void* ptr)
+AllocationMap::find(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
@@ -127,6 +137,10 @@ AllocationMap::find(void* ptr)
   if (alloc_record) {
     return alloc_record;
   } else {
+#if !defined(NDEBUG)
+    // use this from a debugger to dump the contents of the AllocationMap
+    printAll();
+#endif
     UMPIRE_ERROR("Allocation not mapped: " << ptr);
   }
 }
@@ -137,6 +151,28 @@ AllocationMap::contains(void* ptr)
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
   return (findRecord(ptr) != nullptr);
+}
+
+void
+AllocationMap::printAll() const
+{
+  std::cout << "🔍 Printing allocation map contents..." << std::endl;
+
+  for (auto record = m_records->begin(); m_records->success(); record=m_records->next()){
+    auto addr = record.key;
+    auto vec = *record.value;
+
+    std::cout << reinterpret_cast<void*>(addr) << " : {" << std::endl;
+    for (auto const& records : vec) {
+      AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
+      std::cout << "  " << tmp->m_size <<
+        " [ " << reinterpret_cast<void*>(addr) <<
+        " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
+        " ] " << std::endl;
+    }
+    std::cout << "}" << std::endl;
+  }
+  std::cout << "done." << std::endl;
 }
 
 } // end of namespace util

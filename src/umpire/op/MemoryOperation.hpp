@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -31,6 +31,8 @@ namespace op {
  */
 class MemoryOperation {
   public:
+    virtual ~MemoryOperation() = default;
+
     /*!
      * \brief Transfrom length bytes of memory from src_ptr to dst_ptr.
      *

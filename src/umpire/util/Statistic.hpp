@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -29,14 +29,14 @@ class StatisticsDatabase;
 class Statistic {
   friend class StatisticsDatabase;
   public:
-    ~Statistic();
+    ~Statistic() noexcept;
 
     void recordStatistic(conduit::Node&& n);
 
-    void printData(std::ostream& stream);
+    void printData(std::ostream& stream) noexcept;
 
   protected:
-    Statistic(const std::string& name);
+    Statistic(const std::string& name) noexcept;
 
   private:
     std::string m_name;

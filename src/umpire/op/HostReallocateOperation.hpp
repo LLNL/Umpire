@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -23,7 +23,7 @@ namespace op {
 /*!
  * \brief Reallocate data in CPU memory.
  */
-class HostReallocateOperation : 
+class HostReallocateOperation :
   public MemoryOperation {
  public:
   /*!
@@ -45,4 +45,3 @@ class HostReallocateOperation :
 } // end of namespace umpire
 
 #endif // UMPIRE_HostReallocateOperation_HPP
-

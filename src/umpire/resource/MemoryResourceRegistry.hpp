@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -26,14 +26,14 @@ namespace resource {
 
 class MemoryResourceRegistry {
   public:
-    static MemoryResourceRegistry& getInstance();
+    static MemoryResourceRegistry& getInstance() noexcept;
 
     std::shared_ptr<umpire::resource::MemoryResource> makeMemoryResource(const std::string& name, int id);
 
     void registerMemoryResource(std::shared_ptr<MemoryResourceFactory>&& factory);
 
   protected:
-    MemoryResourceRegistry();
+    MemoryResourceRegistry() noexcept;
 
   private:
     static MemoryResourceRegistry* s_allocator_registry_instance;

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_UnifiedMemoryResourceFactory_HPP
-#define UMPIRE_UnifiedMemoryResourceFactory_HPP
+#ifndef UMPIRE_CudaConstantMemoryResourceFactory_HPP
+#define UMPIRE_CudaConstantMemoryResourceFactory_HPP
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
@@ -21,17 +21,18 @@ namespace umpire {
 namespace resource {
 
 /*!
- * \brief Factory class to construct a MemoryResource that uses NVIDIA
- * "unified" memory, accesible from both the CPU and NVIDIA GPUs.
+ * \brief Factory class for constructing MemoryResource objects that use GPU
+ * memory.
  */
-class UnifiedMemoryResourceFactory :
+class CudaConstantMemoryResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name);
+  bool isValidMemoryResourceFor(const std::string& name) noexcept;
+
   std::shared_ptr<MemoryResource> create(const std::string& name, int id);
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_UnifiedMemoryResourceFactory_HPP
+#endif // UMPIRE_CudaConstantMemoryResourceFactory_HPP

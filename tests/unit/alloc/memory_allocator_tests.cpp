@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -24,6 +24,11 @@ using namespace umpire::alloc;
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_ROCM)
+#include "umpire/alloc/AmAllocAllocator.hpp"
+#include "umpire/alloc/AmPinnedAllocator.hpp"
+#endif
+
 #include "gtest/gtest.h"
 
 template <typename T>
@@ -46,6 +51,8 @@ REGISTER_TYPED_TEST_CASE_P(
 
 #if defined(UMPIRE_ENABLE_CUDA)
 using test_types = ::testing::Types<MallocAllocator, CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator>;
+#elif defined(UMPIRE_ENABLE_ROCM)
+using test_types = ::testing::Types<MallocAllocator, AmAllocAllocator, AmPinnedAllocator>;
 #else
 using test_types = ::testing::Types<MallocAllocator>;
 #endif

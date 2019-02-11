@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -31,6 +31,12 @@ if (ENABLE_MPI3)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     Mpi3Allocator.hpp)
+endif ()
+
+if (ENABLE_ROCM)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    AmAllocAllocator.hpp)
 endif ()
 
 blt_add_library(

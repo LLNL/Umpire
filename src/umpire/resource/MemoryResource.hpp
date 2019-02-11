@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -14,6 +14,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_MemoryResource_HPP
 #define UMPIRE_MemoryResource_HPP
+
+#include "umpire/resource/MemoryResourceTraits.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
@@ -38,7 +40,9 @@ class MemoryResource :
      * \param id ID of the MemoryResource (must be unique).
      *
      */
-    MemoryResource(const std::string& name, int id);
+    MemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
+
+    virtual ~MemoryResource() = default;
 
     /*!
      * \brief Allocate bytes of memory.
@@ -70,7 +74,7 @@ class MemoryResource :
      *
      * \return current total size of active allocations in this MemoryResource.
      */
-    virtual long getCurrentSize() = 0;
+    virtual long getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Return the memory high watermark for this MemoryResource.
@@ -81,7 +85,7 @@ class MemoryResource :
      *
      * \return Memory high watermark.
      */
-    virtual long getHighWatermark() = 0;
+    virtual long getHighWatermark() const noexcept = 0;
 
 
     /*!
@@ -92,7 +96,11 @@ class MemoryResource :
      *
      * \return Platform associated with this MemoryResource.
      */
-    virtual Platform getPlatform()  = 0;
+    virtual Platform getPlatform() noexcept = 0;
+
+    MemoryResourceTraits getTraits();
+  protected:
+    MemoryResourceTraits m_traits;
 };
 
 } // end of namespace strategy

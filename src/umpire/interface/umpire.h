@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -18,7 +18,6 @@
 #include "umpire/interface/c_fortran/shroudrt.hpp"
 
 #include "umpire/interface/c_fortran/wrapAllocator.h"
-
 #include "umpire/interface/c_fortran/wrapResourceManager.h"
 
 #endif // UMPIRE_H_

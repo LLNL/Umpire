@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -22,6 +22,10 @@
 #cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_IPC
 #cmakedefine UMPIRE_ENABLE_IPC_MPI3
+#cmakedefine UMPIRE_ENABLE_ROCM
+#cmakedefine UMPIRE_ENABLE_DEVICE
+#cmakedefine UMPIRE_ENABLE_PINNED
+#cmakedefine UMPIRE_ENABLE_UM
 
 constexpr int UMPIRE_VERSION_MAJOR = @Umpire_VERSION_MAJOR@;
 constexpr int UMPIRE_VERSION_MINOR = @Umpire_VERSION_MINOR@;

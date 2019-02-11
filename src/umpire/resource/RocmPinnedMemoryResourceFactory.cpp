@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -12,17 +12,17 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/PinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-
-#include "umpire/alloc/CudaPinnedAllocator.hpp"
+#include "umpire/alloc/AmPinnedAllocator.hpp"
 
 namespace umpire {
 namespace resource {
 
 bool
-PinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+RocmPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
+  noexcept
 {
   if (name.compare("PINNED") == 0) {
     return true;
@@ -32,9 +32,16 @@ PinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::shared_ptr<MemoryResource>
-PinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+RocmPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator> >(Platform::cuda, "PINNED", id);
+  MemoryResourceTraits traits;
+
+  traits.unified = true;
+  traits.vendor = MemoryResourceTraits::vendor_type::AMD;
+  traits.kind = MemoryResourceTraits::memory_type::DDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::access;
+
+  return std::make_shared<resource::DefaultMemoryResource<alloc::AmPinnedAllocator> >(Platform::rocm, "PINNED", id, traits);
 }
 
 } // end of namespace resource

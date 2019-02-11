@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -26,6 +26,8 @@ class Exception : public std::exception {
     Exception(const std::string& msg,
         const std::string &file,
         int line);
+
+    virtual ~Exception() = default;
 
     std::string message() const;
     virtual const char* what() const throw();

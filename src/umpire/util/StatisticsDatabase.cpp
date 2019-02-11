@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -30,7 +30,7 @@ StatisticsDatabase* StatisticsDatabase::getDatabase()
   return s_statistics_database_instance;
 }
 
-std::shared_ptr<Statistic> 
+std::shared_ptr<Statistic>
 StatisticsDatabase::getStatistic(const std::string& name)
 {
   auto statistic = m_statistics.find(name);
@@ -46,13 +46,13 @@ StatisticsDatabase::getStatistic(const std::string& name)
   return stat;
 }
 
-StatisticsDatabase::StatisticsDatabase() :
+StatisticsDatabase::StatisticsDatabase() noexcept:
   m_statistics()
 {
 }
 
 void
-StatisticsDatabase::printStatistics(std::ostream& stream)
+StatisticsDatabase::printStatistics(std::ostream& stream) noexcept
 {
   stream << "umpire::util::StatisticsDatabase contains " << m_statistics.size() << " statistics" << std::endl;
   for (auto& stat : m_statistics) {
