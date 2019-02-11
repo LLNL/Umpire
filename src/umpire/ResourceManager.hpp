@@ -132,6 +132,7 @@ class ResourceManager {
     bool hasAllocator(void* ptr);
 
     void registerAllocation(void* ptr, util::AllocationRecord* record);
+    util::AllocationRecord* findAllocationRecord(void *ptr) { return m_allocations.findRecord(ptr); }
 
     util::AllocationRecord* deregisterAllocation(void* ptr);
 

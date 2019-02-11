@@ -27,7 +27,7 @@ blt_add_library(
   HEADERS ${judy_headers}
   HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
+if (CMAKE_CXX_COMPILER_ID MATCHES Clang AND NOT CMAKE_BUILD_TYPE MATCHES Debug)
   target_compile_options(
     umpire_tpl_judy
     PRIVATE

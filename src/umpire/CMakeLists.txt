@@ -59,6 +59,8 @@ if (ENABLE_FORTRAN_API OR ENABLE_C_API)
     endif ()
   endif ()
 endif ()
+   
+set(UMPIRE_DEPENDS umpire_resource umpire_strategy umpire_alloc umpire_op)
 
 blt_add_library(
   NAME umpire
