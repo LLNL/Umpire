@@ -40,6 +40,7 @@ declarations:
 - decl: namespace umpire
   declarations:
     - decl: namespace strategy
+      cxx_header: umpire/strategy/DynamicPool.hpp
       declarations:
         - decl: class DynamicPool
 
@@ -51,9 +52,11 @@ declarations:
       declarations:
         - decl: void* allocate(size_t bytes)
         - decl: void deallocate (void* ptr)
+        - decl: void release()
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
         - decl: size_t getCurrentSize()
+        - decl: size_t getActualSize()
         - decl: const std::string& getName() +pure
         - decl: size_t getId()
 
@@ -93,24 +96,26 @@ declarations:
 
         - decl: void* reallocate(void* src_ptr, size_t size)
 
-          #- decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
-          #  format:
-          #    function_suffix: _with_allocator
+        - decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
+          format:
+            function_suffix: _with_allocator
+
+        - decl: void* move(void* src_ptr, Allocator allocator)
 
         - decl: void deallocate(void* ptr)
 
         - decl: size_t getSize(void* ptr)
 
         - decl: template <typename T> Allocator makeAllocator(const std::string& name, int initial_size, int block);
-          format:
-            underscore_name: umpire_resourcemanager_make_dynamicpool_allocator
           cxx_template:
             - instantiation: <umpire::strategy::DynamicPool>
+              format:
+                C_name: umpire_resourcemanager_make_pool_allocator
+                F_C_name: c_resourcemanager_make_pool_allocator
 
 splicer_code:
   c:
     class:
-      Allocator:
         CXX_declarations:
         - "#ifdef __cplusplus"
         - "#include <cstring>"

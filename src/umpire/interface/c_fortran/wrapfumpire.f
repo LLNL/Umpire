@@ -74,9 +74,11 @@ module umpire_mod
     contains
         procedure :: allocate => allocator_allocate
         procedure :: deallocate => allocator_deallocate
+        procedure :: release => allocator_release
         procedure :: get_size => allocator_get_size
         procedure :: get_high_watermark => allocator_get_high_watermark
         procedure :: get_current_size => allocator_get_current_size
+        procedure :: get_actual_size => allocator_get_actual_size
         procedure :: get_name => allocator_get_name
         procedure :: get_id => allocator_get_id
         procedure :: get_instance => allocator_get_instance
@@ -107,7 +109,9 @@ module umpire_mod
         procedure :: copy_with_size => resourcemanager_copy_with_size
         procedure :: memset_all => resourcemanager_memset_all
         procedure :: memset_with_size => resourcemanager_memset_with_size
-        procedure :: reallocate => resourcemanager_reallocate
+        procedure :: reallocate_0 => resourcemanager_reallocate_0
+        procedure :: reallocate_with_allocator => resourcemanager_reallocate_with_allocator
+        procedure :: move => resourcemanager_move
         procedure :: deallocate => resourcemanager_deallocate
         procedure :: get_size => resourcemanager_get_size
         procedure :: make_allocator_umpire_strategy_DynamicPool => resourcemanager_make_allocator_umpire_strategy_DynamicPool
@@ -116,6 +120,7 @@ module umpire_mod
         generic :: get_allocator => get_allocator_by_name,  &
             get_allocator_by_id, get_allocatorfor_ptr
         generic :: memset => memset_all, memset_with_size
+        generic :: reallocate => reallocate_0, reallocate_with_allocator
         ! splicer begin class.ResourceManager.type_bound_procedure_part
         ! splicer end class.ResourceManager.type_bound_procedure_part
     end type UmpireResourceManager
@@ -157,6 +162,13 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: ptr
         end subroutine c_allocator_deallocate
 
+        subroutine c_allocator_release(self) &
+                bind(C, name="umpire_allocator_release")
+            import :: SHROUD_allocator_capsule
+            implicit none
+            type(SHROUD_allocator_capsule), intent(IN) :: self
+        end subroutine c_allocator_release
+
         function c_allocator_get_size(self, ptr) &
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_size")
@@ -187,6 +199,16 @@ module umpire_mod
             type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_current_size
+
+        function c_allocator_get_actual_size(self) &
+                result(SHT_rv) &
+                bind(C, name="umpire_allocator_get_actual_size")
+            use iso_c_binding, only : C_SIZE_T
+            import :: SHROUD_allocator_capsule
+            implicit none
+            type(SHROUD_allocator_capsule), intent(IN) :: self
+            integer(C_SIZE_T) :: SHT_rv
+        end function c_allocator_get_actual_size
 
         pure function c_allocator_get_name(self) &
                 result(SHT_rv) &
@@ -326,9 +348,9 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: length
         end subroutine c_resourcemanager_memset_with_size
 
-        function c_resourcemanager_reallocate(self, src_ptr, size) &
+        function c_resourcemanager_reallocate_0(self, src_ptr, size) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_reallocate")
+                bind(C, name="umpire_resourcemanager_reallocate_0")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -336,7 +358,33 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: src_ptr
             integer(C_SIZE_T), value, intent(IN) :: size
             type(C_PTR) :: SHT_rv
-        end function c_resourcemanager_reallocate
+        end function c_resourcemanager_reallocate_0
+
+        function c_resourcemanager_reallocate_with_allocator(self, &
+                src_ptr, size, allocator) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_reallocate_with_allocator")
+            use iso_c_binding, only : C_PTR, C_SIZE_T
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
+            implicit none
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(C_PTR), value, intent(IN) :: src_ptr
+            integer(C_SIZE_T), value, intent(IN) :: size
+            type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
+            type(C_PTR) :: SHT_rv
+        end function c_resourcemanager_reallocate_with_allocator
+
+        function c_resourcemanager_move(self, src_ptr, allocator) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_move")
+            use iso_c_binding, only : C_PTR
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
+            implicit none
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(C_PTR), value, intent(IN) :: src_ptr
+            type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
+            type(C_PTR) :: SHT_rv
+        end function c_resourcemanager_move
 
         subroutine c_resourcemanager_deallocate(self, ptr) &
                 bind(C, name="umpire_resourcemanager_deallocate")
@@ -454,6 +502,13 @@ contains
         ! splicer end class.Allocator.method.deallocate
     end subroutine allocator_deallocate
 
+    subroutine allocator_release(obj)
+        class(UmpireAllocator) :: obj
+        ! splicer begin class.Allocator.method.release
+        call c_allocator_release(obj%cxxmem)
+        ! splicer end class.Allocator.method.release
+    end subroutine allocator_release
+
     function allocator_get_size(obj, ptr) &
             result(SHT_rv)
         use iso_c_binding, only : C_PTR, C_SIZE_T
@@ -484,6 +539,16 @@ contains
         SHT_rv = c_allocator_get_current_size(obj%cxxmem)
         ! splicer end class.Allocator.method.get_current_size
     end function allocator_get_current_size
+
+    function allocator_get_actual_size(obj) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_SIZE_T
+        class(UmpireAllocator) :: obj
+        integer(C_SIZE_T) :: SHT_rv
+        ! splicer begin class.Allocator.method.get_actual_size
+        SHT_rv = c_allocator_get_actual_size(obj%cxxmem)
+        ! splicer end class.Allocator.method.get_actual_size
+    end function allocator_get_actual_size
 
     function allocator_get_name(obj) &
             result(SHT_rv)
@@ -627,17 +692,46 @@ contains
         ! splicer end class.ResourceManager.method.memset_with_size
     end subroutine resourcemanager_memset_with_size
 
-    function resourcemanager_reallocate(obj, src_ptr, size) &
+    function resourcemanager_reallocate_0(obj, src_ptr, size) &
             result(SHT_rv)
         use iso_c_binding, only : C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
         type(C_PTR), value, intent(IN) :: src_ptr
         integer(C_SIZE_T), value, intent(IN) :: size
         type(C_PTR) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.reallocate
-        SHT_rv = c_resourcemanager_reallocate(obj%cxxmem, src_ptr, size)
-        ! splicer end class.ResourceManager.method.reallocate
-    end function resourcemanager_reallocate
+        ! splicer begin class.ResourceManager.method.reallocate_0
+        SHT_rv = c_resourcemanager_reallocate_0(obj%cxxmem, src_ptr, &
+            size)
+        ! splicer end class.ResourceManager.method.reallocate_0
+    end function resourcemanager_reallocate_0
+
+    function resourcemanager_reallocate_with_allocator(obj, src_ptr, &
+            size, allocator) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        type(C_PTR), value, intent(IN) :: src_ptr
+        integer(C_SIZE_T), value, intent(IN) :: size
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        type(C_PTR) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.reallocate_with_allocator
+        SHT_rv = c_resourcemanager_reallocate_with_allocator(obj%cxxmem, &
+            src_ptr, size, allocator%cxxmem)
+        ! splicer end class.ResourceManager.method.reallocate_with_allocator
+    end function resourcemanager_reallocate_with_allocator
+
+    function resourcemanager_move(obj, src_ptr, allocator) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_PTR
+        class(UmpireResourceManager) :: obj
+        type(C_PTR), value, intent(IN) :: src_ptr
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        type(C_PTR) :: SHT_rv
+        ! splicer begin class.ResourceManager.method.move
+        SHT_rv = c_resourcemanager_move(obj%cxxmem, src_ptr, &
+            allocator%cxxmem)
+        ! splicer end class.ResourceManager.method.move
+    end function resourcemanager_move
 
     subroutine resourcemanager_deallocate(obj, ptr)
         use iso_c_binding, only : C_PTR

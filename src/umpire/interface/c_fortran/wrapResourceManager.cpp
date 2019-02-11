@@ -145,15 +145,42 @@ void umpire_resourcemanager_memset_with_size(
 // splicer end class.ResourceManager.method.memset_with_size
 }
 
-void * umpire_resourcemanager_reallocate(umpire_resourcemanager * self,
-    void * src_ptr, size_t size)
+void * umpire_resourcemanager_reallocate_0(
+    umpire_resourcemanager * self, void * src_ptr, size_t size)
 {
-// splicer begin class.ResourceManager.method.reallocate
+// splicer begin class.ResourceManager.method.reallocate_0
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
     void * SHC_rv = SH_this->reallocate(src_ptr, size);
     return SHC_rv;
-// splicer end class.ResourceManager.method.reallocate
+// splicer end class.ResourceManager.method.reallocate_0
+}
+
+void * umpire_resourcemanager_reallocate_with_allocator(
+    umpire_resourcemanager * self, void * src_ptr, size_t size,
+    umpire_allocator allocator)
+{
+// splicer begin class.ResourceManager.method.reallocate_with_allocator
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    void * SHC_rv = SH_this->reallocate(src_ptr, size, SHCXX_allocator);
+    return SHC_rv;
+// splicer end class.ResourceManager.method.reallocate_with_allocator
+}
+
+void * umpire_resourcemanager_move(umpire_resourcemanager * self,
+    void * src_ptr, umpire_allocator allocator)
+{
+// splicer begin class.ResourceManager.method.move
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    void * SHC_rv = SH_this->move(src_ptr, SHCXX_allocator);
+    return SHC_rv;
+// splicer end class.ResourceManager.method.move
 }
 
 void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,

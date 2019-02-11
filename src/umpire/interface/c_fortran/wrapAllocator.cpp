@@ -57,6 +57,16 @@ void umpire_allocator_deallocate(umpire_allocator * self, void * ptr)
 // splicer end class.Allocator.method.deallocate
 }
 
+void umpire_allocator_release(umpire_allocator * self)
+{
+// splicer begin class.Allocator.method.release
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    SH_this->release();
+    return;
+// splicer end class.Allocator.method.release
+}
+
 size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr)
 {
 // splicer begin class.Allocator.method.get_size
@@ -85,6 +95,16 @@ size_t umpire_allocator_get_current_size(umpire_allocator * self)
     size_t SHC_rv = SH_this->getCurrentSize();
     return SHC_rv;
 // splicer end class.Allocator.method.get_current_size
+}
+
+size_t umpire_allocator_get_actual_size(umpire_allocator * self)
+{
+// splicer begin class.Allocator.method.get_actual_size
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    size_t SHC_rv = SH_this->getActualSize();
+    return SHC_rv;
+// splicer end class.Allocator.method.get_actual_size
 }
 
 const char * umpire_allocator_get_name(umpire_allocator * self)
