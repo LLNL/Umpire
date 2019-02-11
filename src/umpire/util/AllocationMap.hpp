@@ -49,11 +49,12 @@ class AllocationMap
   reset();
 
   void
-    printAll() const;
+  printAll() const;
 
-  AllocationRecord* findRecord(void* ptr) const;
+  AllocationRecord*
+  findRecord(void* ptr) const;
+
   private:
-
     judyL2Array<uintptr_t, uintptr_t>* m_records;
 
     std::mutex* m_mutex;
