@@ -51,7 +51,7 @@ class AllocationMap
   void
     printAll() const;
 
-    AllocationRecord* findRecord(void* ptr);
+    AllocationRecord* findRecord(void* ptr) const;
   private:
 
     judyL2Array<uintptr_t, uintptr_t>* m_records;
