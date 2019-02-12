@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -29,9 +29,10 @@ AllocationAdvisor::AllocationAdvisor(
     const std::string& name,
     int id,
     Allocator allocator,
-    const std::string& advice_operation) :
+    const std::string& advice_operation,
+    int device_id) :
   AllocationAdvisor(
-      name, id, allocator, advice_operation, allocator)
+      name, id, allocator, advice_operation, allocator, device_id)
 {
 }
 
@@ -40,10 +41,11 @@ AllocationAdvisor::AllocationAdvisor(
     int id,
     Allocator allocator,
     const std::string& advice_operation,
-    Allocator accessing_allocator) :
+    Allocator accessing_allocator,
+    int device_id) :
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
-  m_device(0)
+  m_device(device_id)
 {
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -81,12 +83,12 @@ void AllocationAdvisor::deallocate(void* ptr)
 
 }
 
-long AllocationAdvisor::getCurrentSize() noexcept
+long AllocationAdvisor::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long AllocationAdvisor::getHighWatermark() noexcept
+long AllocationAdvisor::getHighWatermark() const noexcept
 {
   return 0;
 }

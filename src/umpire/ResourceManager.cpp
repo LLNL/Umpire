@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -21,6 +21,8 @@
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
@@ -105,6 +107,15 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance();
 
   m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  int count;
+  auto error = ::cudaGetDeviceCount(&count);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
+  }
+#endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
@@ -411,7 +422,7 @@ void ResourceManager::deallocate(void* ptr)
 }
 
 size_t
-ResourceManager::getSize(void* ptr)
+ResourceManager::getSize(void* ptr) const
 {
   auto record = m_allocations.find(ptr);
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);

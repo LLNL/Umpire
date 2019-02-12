@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -40,7 +40,7 @@ class AllocationMap
   remove(void* ptr);
 
   AllocationRecord*
-  find(void* ptr);
+  find(void* ptr) const;
 
   bool
   contains(void* ptr);
@@ -49,10 +49,10 @@ class AllocationMap
   reset();
 
   void
-  printAll();
+    printAll() const;
 
   AllocationRecord* 
-  findRecord(void* ptr);
+    findRecord(void* ptr);
   private:
 
     judyL2Array<uintptr_t, uintptr_t>* m_records;

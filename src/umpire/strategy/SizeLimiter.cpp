@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -52,12 +52,12 @@ void SizeLimiter::deallocate(void* ptr)
 
 }
 
-long SizeLimiter::getCurrentSize() noexcept
+long SizeLimiter::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long SizeLimiter::getHighWatermark() noexcept
+long SizeLimiter::getHighWatermark() const noexcept
 {
   return 0;
 }
