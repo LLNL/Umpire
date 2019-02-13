@@ -19,6 +19,12 @@ set (umpire_alloc_sources)
 
 set (umpire_alloc_depends umpire_util)
 
+if (ENABLE_NUMA)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    PosixMemalignAllocator.hpp)
+endif ()
+
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}

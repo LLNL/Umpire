@@ -42,6 +42,12 @@ endif()
 
 set (umpire_util_depends umpire_tpl_judy)
 
+if (ENABLE_NUMA)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    numa)
+endif ()
+
 if (ENABLE_STATISTICS)
   set (umpire_util_depends
     ${umpire_util_depends}
@@ -86,4 +92,3 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-

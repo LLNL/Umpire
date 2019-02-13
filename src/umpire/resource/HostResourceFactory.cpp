@@ -17,6 +17,10 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/MallocAllocator.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/alloc/PosixMemalignAllocator.hpp"
+#endif
+
 namespace umpire {
 namespace resource {
 
@@ -33,6 +37,12 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 std::shared_ptr<MemoryResource>
 HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
+#if defined(UMPIRE_ENABLE_NUMA)
+  using Allocator = alloc::PosixMemalignAllocator;
+#else
+  using Allocator = alloc::MallocAllocator;
+#endif
+
   MemoryResourceTraits traits;
 
   // int mib[2];
@@ -46,11 +56,11 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.unified = false;
   traits.size = 0;
 
-  traits.vendor = MemoryResourceTraits::vendor_type::IBM;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.vendor = MemoryResourceTraits::vendor_type::UNKNOWN;
+  traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<DefaultMemoryResource<alloc::MallocAllocator> >(Platform::cpu, "HOST", id, traits);
+  return std::make_shared<DefaultMemoryResource<Allocator> >(Platform::cpu, "HOST", id, traits);
 }
 
 } // end of namespace resource
