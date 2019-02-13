@@ -20,6 +20,12 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 
+#include <memory>
+
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 
@@ -398,6 +404,40 @@ ResourceManager::move(void* ptr, Allocator allocator)
   if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
     return ptr;
   }
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  {
+    // short circuit if allocator is a NUMA allocator
+    auto numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(allocator.getAllocationStrategy());
+    if (numa_alloc) {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      auto src_alloc_record = m_allocations.find(ptr);
+
+      const size_t size = src_alloc_record->m_size;
+      util::AllocationRecord dst_alloc_record;
+      dst_alloc_record.m_size = src_alloc_record->m_size;
+      dst_alloc_record.m_strategy = numa_alloc;
+
+      void *ret = nullptr;
+      if (size > 0) {
+        auto op = op_registry.find("RELOCATE",
+                                   src_alloc_record->m_strategy,
+                                   dst_alloc_record.m_strategy);
+
+        op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
+        if (ret != ptr) {
+          UMPIRE_ERROR("Numa relocation error");
+        }
+      }
+      else {
+        ret = ptr;
+      }
+
+      return ret;
+    }
+  }
+#endif
 
   if (ptr != alloc_record->m_ptr) {
     UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);

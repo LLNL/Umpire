@@ -21,9 +21,6 @@
 
 #include "umpire/Allocator.hpp"
 
-// Forward declaration of bitmask for NUMA
-struct bitmask;
-
 namespace umpire {
 
 namespace strategy {
@@ -38,8 +35,6 @@ class NumaPolicy :
         int numa_node,
         Allocator allocator);
 
-    ~NumaPolicy();
-
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
@@ -48,11 +43,10 @@ class NumaPolicy :
 
     Platform getPlatform() noexcept;
 
+    int getNode() const noexcept;
+
   private:
-
     int m_node;
-    struct bitmask *m_mask;
-
     std::shared_ptr<AllocationStrategy> m_allocator;
 };
 

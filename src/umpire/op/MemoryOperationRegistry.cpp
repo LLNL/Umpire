@@ -22,6 +22,10 @@
 
 #include "umpire/op/GenericReallocateOperation.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/op/NumaRelocateOperation.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
 #include "umpire/op/CudaCopyToOperation.hpp"
@@ -74,6 +78,13 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  registerOperation(
+      "RELOCATE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<NumaRelocateOperation>());
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(

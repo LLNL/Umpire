@@ -15,6 +15,8 @@
 #ifndef UMPIRE_Numa_HPP
 #define UMPIRE_Numa_HPP
 
+#include <cstddef>
+
 namespace umpire {
 
 // Used in PosixMemalignAllocator but static is defined here
@@ -24,6 +26,8 @@ namespace numa {
 
 // Return the preferred numa node
 int preferred_node();
+
+void move_to_node(void *ptr, size_t bytes, int node);
 
 } // end namespace numa
 

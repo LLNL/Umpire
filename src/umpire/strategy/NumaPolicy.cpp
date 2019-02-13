@@ -17,8 +17,7 @@
 
 #include "umpire/ResourceManager.hpp"
 
-#include <numa.h>
-#include <numaif.h>
+#include "umpire/util/Numa.hpp"
 
 namespace umpire {
 
@@ -31,19 +30,11 @@ NumaPolicy::NumaPolicy(
     Allocator allocator) :
   AllocationStrategy(name, id),
   m_node(numa_node),
-  m_mask(numa_bitmask_alloc(numa_max_node() + 1)),
   m_allocator(allocator.getAllocationStrategy())
 {
   if (allocator.getPlatform() != Platform::cpu) {
     UMPIRE_ERROR("NumaPolicy error: allocator is not of cpu type");
   }
-  numa_bitmask_clearall(m_mask);
-  numa_bitmask_setbit(m_mask, m_node);
-}
-
-NumaPolicy::~NumaPolicy()
-{
-  numa_bitmask_free(m_mask);
 }
 
 void*
@@ -51,9 +42,7 @@ NumaPolicy::allocate(size_t bytes)
 {
   void *ret = m_allocator->allocate(bytes);
 
-  if (mbind(ret, bytes, MPOL_BIND, m_mask->maskp, m_mask->size + 1, MPOL_MF_STRICT) != 0) {
-    UMPIRE_ERROR("NumaPolicy mbind( ret = " << ret << ", bytes = " << bytes << ", node = " << m_node << " ) failed");
-  }
+  numa::move_to_node(ret, bytes, m_node);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
@@ -82,6 +71,12 @@ Platform
 NumaPolicy::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+int
+NumaPolicy::getNode() const noexcept
+{
+  return m_node;
 }
 
 } // end of namespace strategy
