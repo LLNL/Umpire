@@ -393,6 +393,25 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
   return dst_ptr;
 }
 
+static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
+  std::shared_ptr<strategy::NumaPolicy> numa_alloc;
+
+  numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(
+    allocator.getAllocationStrategy());
+
+  // ... or an AllocationTracker wrapping a NumaPolicy
+  if (!numa_alloc) {
+    auto alloc_tracker = std::dynamic_pointer_cast<strategy::AllocationTracker>(
+      allocator.getAllocationStrategy());
+    if (alloc_tracker) {
+      numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(
+        alloc_tracker->getAllocationStrategy());
+    }
+  }
+
+  return numa_alloc;
+}
+
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
@@ -407,8 +426,10 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
 #if defined(UMPIRE_ENABLE_NUMA)
   {
-    // short circuit if allocator is a NUMA allocator
-    auto numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(allocator.getAllocationStrategy());
+    // short circuit if allocator has a NumaPolicy
+    auto numa_alloc = cast_as_numa_policy(allocator);
+
+    // If found, use op::NumaMoveOperation to move in-place (same address returned)
     if (numa_alloc) {
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -421,13 +442,13 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
       void *ret = nullptr;
       if (size > 0) {
-        auto op = op_registry.find("RELOCATE",
+        auto op = op_registry.find("MOVE",
                                    src_alloc_record->m_strategy,
                                    dst_alloc_record.m_strategy);
 
         op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
         if (ret != ptr) {
-          UMPIRE_ERROR("Numa relocation error");
+          UMPIRE_ERROR("Numa move error");
         }
       }
       else {

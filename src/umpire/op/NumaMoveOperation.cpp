@@ -12,7 +12,7 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/NumaRelocateOperation.hpp"
+#include "umpire/op/NumaMoveOperation.hpp"
 
 #include <cstring>
 #include <memory>
@@ -25,7 +25,7 @@
 namespace umpire {
 namespace op {
 
-void NumaRelocateOperation::transform(
+void NumaMoveOperation::transform(
     void* src_ptr,
     void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
@@ -38,7 +38,7 @@ void NumaRelocateOperation::transform(
   numa::move_to_node(*dst_ptr, length, numa_allocator->getNode());
 
   UMPIRE_RECORD_STATISTIC(
-      "NumaRelocateOperation",
+      "NumaMoveOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
       "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
       "size", length,

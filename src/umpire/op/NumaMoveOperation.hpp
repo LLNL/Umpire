@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_NumaRelocateOperation_HPP
-#define UMPIRE_NumaRelocateOperation_HPP
+#ifndef UMPIRE_NumaMoveOperation_HPP
+#define UMPIRE_NumaMoveOperation_HPP
 
 #include "umpire/op/MemoryOperation.hpp"
 
@@ -23,7 +23,7 @@ namespace op {
 /*!
  * \brief Relocate a pointer to a different NUMA node.
  */
-class NumaRelocateOperation : public MemoryOperation {
+class NumaMoveOperation : public MemoryOperation {
  public:
    /*
     * \copybrief MemoryOperation::transform
@@ -46,4 +46,4 @@ class NumaRelocateOperation : public MemoryOperation {
 } // end of namespace op
 } // end of namespace umpire
 
-#endif // UMPIRE_NumaRelocateOperation_HPP
+#endif // UMPIRE_NumaMoveOperation_HPP

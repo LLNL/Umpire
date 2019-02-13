@@ -34,11 +34,11 @@ set (umpire_op_depends
 if (ENABLE_NUMA)
   set (umpire_op_headers
     ${umpire_op_headers}
-    NumaRelocateOperation.hpp)
+    NumaMoveOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
-    NumaRelocateOperation.cpp)
+    NumaMoveOperation.cpp)
 
   set (umpire_op_depends
     ${umpire_op_depends}
