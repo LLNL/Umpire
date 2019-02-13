@@ -30,7 +30,7 @@ namespace strategy {
  * Using this AllocationStrategy with another can be a good way to limit the
  * total size of allocations made on a particular resource or from a particular
  * context.
- * */
+ */
 class SizeLimiter :
   public AllocationStrategy
 {
