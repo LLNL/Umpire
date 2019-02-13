@@ -39,7 +39,7 @@ struct PosixMemalignAllocator
   void* allocate(size_t bytes)
   {
     void* ret = NULL;
-    ::posix_memalign(&ret, numa::s_cpu_page_size, bytes);
+    ::posix_memalign(&ret, s_cpu_page_size, bytes);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 

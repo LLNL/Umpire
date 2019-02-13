@@ -15,19 +15,18 @@
 #ifndef UMPIRE_Numa_HPP
 #define UMPIRE_Numa_HPP
 
-#include <cstddef>
-#include <vector>
-
 namespace umpire {
-namespace numa {
 
 // Used in PosixMemalignAllocator but static is defined here
 extern long s_cpu_page_size;
+
+namespace numa {
 
 // Return the preferred numa node
 int preferred_node();
 
 } // end namespace numa
+
 } // end namespace umpire
 
 
