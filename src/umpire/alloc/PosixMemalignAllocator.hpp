@@ -16,9 +16,9 @@
 #define UMPIRE_PosixMemalignAllocator_HPP
 
 #include <stdlib.h>
-#include <unistd.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Numa.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -38,15 +38,13 @@ struct PosixMemalignAllocator
    */
   void* allocate(size_t bytes)
   {
-    const long pagesize = sysconf(_SC_PAGESIZE);
-
     void* ret = NULL;
-    ::posix_memalign(&ret, pagesize, bytes);
+    ::posix_memalign(&ret, numa::s_cpu_page_size, bytes);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if  (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << pagesize << " ) failed");
+      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << numa::s_cpu_page_size << " ) failed");
     } else {
       return ret;
     }

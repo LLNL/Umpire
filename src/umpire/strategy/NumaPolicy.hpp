@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_NumaPolicyStrategy_HPP
-#define UMPIRE_NumaPolicyStrategy_HPP
+#ifndef UMPIRE_NumaPolicy_HPP
+#define UMPIRE_NumaPolicy_HPP
 
 #include <vector>
 
@@ -28,17 +28,17 @@ namespace umpire {
 
 namespace strategy {
 
-class NumaPolicyStrategy :
+class NumaPolicy :
   public AllocationStrategy
 {
   public:
-    NumaPolicyStrategy(
+    NumaPolicy(
         const std::string& name,
         int id,
         int numa_node,
         Allocator allocator);
 
-    ~NumaPolicyStrategy();
+    ~NumaPolicy();
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -59,4 +59,4 @@ class NumaPolicyStrategy :
 } // end of namespace strategy
 } // end of namespace umpire
 
-#endif // UMPIRE_NumaPolicyStrategy_HPP
+#endif // UMPIRE_NumaPolicy_HPP

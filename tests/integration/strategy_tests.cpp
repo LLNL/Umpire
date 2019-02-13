@@ -30,8 +30,8 @@
 #include "umpire/strategy/SizeLimiter.hpp"
 
 #if defined(UMPIRE_ENABLE_NUMA)
-#include <numa.h>
-#include "umpire/strategy/NumaPolicyStrategy.hpp"
+#include "umpire/strategy/NumaPolicy.hpp"
+#include "umpire/util/Numa.hpp"
 #endif
 
 #if defined(_OPENMP)
@@ -561,21 +561,15 @@ TEST(HeuristicTest, EdgeCases_0)
 
 #if defined(UMPIRE_ENABLE_NUMA)
 TEST(NumaPolicyTest, Allocate) {
-  const int numa_node = numa_preferred();
+  const int numa_node = umpire::numa::preferred_node();
 
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicyStrategy>(
+  auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
     "numa_alloc", numa_node, rm.getAllocator("HOST"));
 
   const size_t size = 1 << 20;
   void* mem = alloc.allocate(size);
-
-  // ASSERT_GE(alloc.getCurrentSize(), size);
-  // ASSERT_GE(alloc.getActualSize(), size);
-  // ASSERT_EQ(alloc.getSize(alloc), size);
-  // ASSERT_GE(alloc.getHighWatermark(), size);
-  // ASSERT_EQ(alloc.getName(), "numa_alloc");
 
   alloc.deallocate(mem);
 }

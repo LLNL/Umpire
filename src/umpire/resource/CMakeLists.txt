@@ -15,6 +15,7 @@
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
+  DetectVendor.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
@@ -24,6 +25,7 @@ set (umpire_resource_headers
 )
 
 set (umpire_resource_sources
+  DetectVendor.cpp
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp

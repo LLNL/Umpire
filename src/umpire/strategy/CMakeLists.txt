@@ -25,6 +25,12 @@ set (umpire_strategy_headers
   FixedPool.hpp
   FixedPool.inl)
 
+if (ENABLE_NUMA)
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    NumaPolicy.hpp)
+endif ()
+
 set (umpire_strategy_mixin_headers
   mixins/Inspector.hpp)
 
@@ -41,13 +47,9 @@ set (umpire_strategy_sources
   mixins/Inspector.cpp)
 
 if (ENABLE_NUMA)
-  set (umpire_strategy_headers
-    ${umpire_strategy_headers}
-    NumaPolicyStrategy.hpp)
-
   set (umpire_strategy_sources
     ${umpire_strategy_sources}
-    NumaPolicyStrategy.cpp)
+    NumaPolicy.cpp)
 endif ()
 
 set (umpire_strategy_depends

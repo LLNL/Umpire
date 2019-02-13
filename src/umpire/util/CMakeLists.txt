@@ -26,7 +26,13 @@ if (ENABLE_STATISTICS)
     statistic_helper.hpp
     Statistic.hpp
     StatisticsDatabase.hpp)
-endif()
+endif ()
+
+if (ENABLE_NUMA)
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    Numa.hpp)
+endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
@@ -38,7 +44,13 @@ if (ENABLE_STATISTICS)
     ${umpire_util_sources}
     Statistic.cpp
     StatisticsDatabase.cpp)
-endif()
+endif ()
+
+if (ENABLE_NUMA)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    Numa.cpp)
+endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
 
