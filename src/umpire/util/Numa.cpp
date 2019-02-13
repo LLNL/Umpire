@@ -20,11 +20,12 @@
 #include <unistd.h>
 
 namespace umpire {
-namespace numa {
 
 long s_cpu_page_size = sysconf(_SC_PAGESIZE);
 
- int preferred_node() {
+namespace numa {
+
+int preferred_node() {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
   return numa_preferred();
 }

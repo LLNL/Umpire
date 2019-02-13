@@ -44,7 +44,7 @@ struct PosixMemalignAllocator
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if  (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << numa::s_cpu_page_size << " ) failed");
+      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << s_cpu_page_size << " ) failed");
     } else {
       return ret;
     }
