@@ -37,9 +37,9 @@ These arguments are explained in more detail below:
   or ROCM support, then only the ``HOST`` allocator is available for use.
 
 * ``ENABLE_NUMA``
-  This option enables support for NUMA. The `strategy::NumaPolicy` is available
-  when built with this option, which may be used to locate the allocation to a
-  specific node.
+  This option enables support for NUMA. The
+  :class:`umpire::strategy::NumaPolicy` is available when built with this
+  option, which may be used to locate the allocation to a specific node.
 
 * ``ENABLE_ROCM``
   This option enables support for AMD GPUs using the ROCm stack and HCC

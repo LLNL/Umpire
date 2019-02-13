@@ -25,6 +25,13 @@ namespace umpire {
 
 namespace strategy {
 
+/*!
+ * \brief Use NUMA interface to locate memory to a specific NUMA node.
+ *
+ * This AllocationStrategy provides a method of ensuring memory sits
+ * on a specific NUMA node. This can be used either for optimization,
+ * or for moving memory between the host and devices.
+ */
 class NumaPolicy :
   public AllocationStrategy
 {
