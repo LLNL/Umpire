@@ -18,6 +18,7 @@ Here is a summary of the configuration options, their default value, and meaning
       Variable                     Default  Meaning
       ===========================  ======== ===============================================================================
       ``ENABLE_CUDA``              On       Enable CUDA support
+      ``ENABLE_NUMA``              Off      Enable NUMA support
       ``ENABLE_ROCM``              Off      Enable ROCm support
       ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
@@ -34,6 +35,11 @@ These arguments are explained in more detail below:
 * ``ENABLE_CUDA``
   This option enables support for NVIDIA GPUs. If Umpire is built without CUDA
   or ROCM support, then only the ``HOST`` allocator is available for use.
+
+* ``ENABLE_NUMA``
+  This option enables support for NUMA. The `strategy::NumaPolicy` is available
+  when built with this option, which may be used to locate the allocation to a
+  specific node.
 
 * ``ENABLE_ROCM``
   This option enables support for AMD GPUs using the ROCm stack and HCC
