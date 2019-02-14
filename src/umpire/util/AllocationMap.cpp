@@ -116,6 +116,9 @@ AllocationMap::findRecord(void* ptr) const
             << " with size " << alloc_record->m_size);
 
       }
+      else {
+         alloc_record = nullptr;
+      }
     }
     UMPIRE_UNLOCK;
   }

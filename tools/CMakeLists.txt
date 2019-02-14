@@ -17,3 +17,9 @@ blt_add_executable(
   SOURCES replay.cpp
   DEPENDS_ON 
     umpire)
+
+blt_add_executable(
+  NAME replay_allocation_map
+  SOURCES replay_allocation_map.cpp
+  DEPENDS_ON 
+    umpire)
