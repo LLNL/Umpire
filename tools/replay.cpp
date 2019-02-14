@@ -95,6 +95,9 @@ class Replay {
         if ( m_row[1] == "makeAllocator" ) {
           replay_makeAllocator();
         }
+        else if ( m_row[1] == "makeMemoryResource" ) {
+          replay_makeMemoryResource();
+        }
         else if ( m_row[1] == "allocate" ) {
           replay_allocate();
         }
@@ -159,7 +162,7 @@ class Replay {
       auto n_iter = m_allocators.find(alloc_obj_ref);
 
       if ( n_iter == m_allocators.end() ) {
-        std::cout << "Unable to find allocator for: " << alloc_ptr << "deallocation ignored" <<  std::endl;
+        std::cout << "Unable to find allocator for: " << alloc_ptr << " deallocation ignored" <<  std::endl;
         return;           // Just skip unknown allocators
       }
 
@@ -176,6 +179,16 @@ class Replay {
 
       auto alloc = m_rm.getAllocator(allocName);
       alloc.deallocate(replay_alloc_ptr);
+    }
+
+    void replay_makeMemoryResource( void )
+    {
+      void* alloc_obj_ref;
+
+      const std::string& name = m_row[2];
+      get_from_string(m_row[3], alloc_obj_ref);
+
+      m_allocators[alloc_obj_ref] = name;
     }
 
     void replay_makeAllocator( void )
