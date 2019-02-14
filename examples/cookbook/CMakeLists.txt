@@ -3,17 +3,25 @@ blt_add_executable(
   SOURCES recipe_no_introspection.cpp
   DEPENDS_ON umpire)
 
+if (ENABLE_NUMA)
+  blt_add_executable(
+    NAME recipe_move_between_numa
+    SOURCES recipe_move_between_numa.cpp
+    DEPENDS_ON
+      umpire)
+endif ()
+
 if (ENABLE_CUDA)
   blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp
-    DEPENDS_ON 
+    DEPENDS_ON
       umpire)
 
   blt_add_executable(
     NAME recipe_advice_device_id
     SOURCES recipe_advice_device_id.cpp
-    DEPENDS_ON 
+    DEPENDS_ON
       umpire)
 
   blt_add_executable(
