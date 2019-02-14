@@ -588,8 +588,11 @@ TEST(NumaPolicyTest, Location) {
     auto numa_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
       ss.str(), n, rm.getAllocator("HOST"));
 
-    void* numa_ptr = numa_alloc.allocate(1024);
+    void* numa_ptr = numa_alloc.allocate(10 * umpire::s_cpu_page_size);
 
+    // Need to memset before checking the location so the memory is paged in.
+    // TODO we shouldn't need to do this...
+    rm.memset(numa_ptr, 0);
     ASSERT_EQ(umpire::numa::get_location(numa_ptr), n);
 
     numa_alloc.deallocate(numa_ptr);
