@@ -18,7 +18,7 @@
 #include <memory>
 
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/Numa.hpp"
+#include "umpire/util/numa.hpp"
 
 #include "umpire/strategy/NumaPolicy.hpp"
 

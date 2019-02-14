@@ -17,7 +17,7 @@
 
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/util/Numa.hpp"
+#include "umpire/util/numa.hpp"
 
 namespace umpire {
 
@@ -32,6 +32,9 @@ NumaPolicy::NumaPolicy(
   m_node(numa_node),
   m_allocator(allocator.getAllocationStrategy())
 {
+  if (numa_node < 0) {
+    UMPIRE_ERROR("NumaPolicy error: NUMA nodes are always non-negative ints");
+  }
   if (allocator.getPlatform() != Platform::cpu) {
     UMPIRE_ERROR("NumaPolicy error: allocator is not of cpu type");
   }

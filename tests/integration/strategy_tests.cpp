@@ -31,7 +31,7 @@
 
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
-#include "umpire/util/Numa.hpp"
+#include "umpire/util/numa.hpp"
 #endif
 
 #if defined(_OPENMP)
@@ -560,18 +560,40 @@ TEST(HeuristicTest, EdgeCases_0)
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
-TEST(NumaPolicyTest, Allocate) {
-  const int numa_node = umpire::numa::preferred_node();
-
+TEST(NumaPolicyTest, EdgeCases) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-    "numa_alloc", numa_node, rm.getAllocator("HOST"));
+  EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
+                 "numa_alloc", -1, rm.getAllocator("HOST")),
+               umpire::util::Exception);
 
-  const size_t size = 1 << 20;
-  void* mem = alloc.allocate(size);
+  const int numa_node = umpire::numa::preferred_node();
 
-  alloc.deallocate(mem);
+#if defined(UMPIRE_ENABLE_CUDA)
+  // Only works with HOST allocators
+  EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
+                 "numa_alloc", numa_node, rm.getAllocator("DEVICE")),
+               umpire::util::Exception);
+#endif
+}
+
+TEST(NumaPolicyTest, Location) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto nodes = umpire::numa::get_allocatable_nodes();
+  for (auto n : nodes) {
+    std::stringstream ss;
+    ss << "numa_alloc_" << n;
+
+    auto numa_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
+      ss.str(), n, rm.getAllocator("HOST"));
+
+    void* numa_ptr = numa_alloc.allocate(1024);
+
+    ASSERT_EQ(umpire::numa::get_location(numa_ptr), n);
+
+    numa_alloc.deallocate(numa_ptr);
+  }
 }
 
 #endif // defined(UMPIRE_ENABLE_NUMA)

@@ -18,7 +18,7 @@
 #include <stdlib.h>
 
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/Numa.hpp"
+#include "umpire/util/numa.hpp"
 
 namespace umpire {
 namespace alloc {

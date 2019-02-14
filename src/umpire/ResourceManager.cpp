@@ -393,6 +393,7 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
   return dst_ptr;
 }
 
+#if defined(UMPIRE_ENABLE_NUMA)
 static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
   std::shared_ptr<strategy::NumaPolicy> numa_alloc;
 
@@ -411,6 +412,7 @@ static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allo
 
   return numa_alloc;
 }
+#endif
 
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
