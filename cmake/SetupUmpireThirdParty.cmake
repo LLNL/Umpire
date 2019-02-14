@@ -56,4 +56,3 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
                         LIBRARIES ${SLIC_LIBRARY} ${SLIC_UTIL_LIBRARY}
                       )
 endif ()
-

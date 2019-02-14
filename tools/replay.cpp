@@ -135,8 +135,10 @@ class Replay {
 
       auto n_iter = m_allocators.find(alloc_obj_ref);
 
-      if ( n_iter == m_allocators.end() )
+      if ( n_iter == m_allocators.end() ) {
+        std::cerr << "Unknown allocator " << alloc_obj_ref << std::endl;
         return;           // Just skip unknown allocators
+      }
 
       const std::string& allocName = n_iter->second;
 
@@ -156,12 +158,14 @@ class Replay {
 
       auto n_iter = m_allocators.find(alloc_obj_ref);
 
-      if ( n_iter == m_allocators.end() )
+      if ( n_iter == m_allocators.end() ) {
+        std::cout << "Unable to find allocator for: " << alloc_ptr << "deallocation ignored" <<  std::endl;
         return;           // Just skip unknown allocators
+      }
 
       auto p_iter = m_allocated_ptrs.find(alloc_ptr);
       if ( p_iter == m_allocated_ptrs.end() ) {
-        std::cerr << "Unable to find pointer to free\n";
+        std::cout << "Duplicate deallocate for:" << alloc_ptr << " ignored" <<  std::endl;
         return;           // Just skip unknown allocators
       }
 
