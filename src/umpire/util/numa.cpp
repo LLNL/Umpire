@@ -12,7 +12,7 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/Numa.hpp"
+#include "umpire/util/numa.hpp"
 
 #include "umpire/util/Macros.hpp"
 

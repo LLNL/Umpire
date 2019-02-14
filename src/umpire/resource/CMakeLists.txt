@@ -15,24 +15,20 @@
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
-  DetectVendor.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
-  MemoryResourceTypes.hpp
-  MemoryResourceTraits.hpp
-)
+  MemoryResourceTypes.hpp)
 
 set (umpire_resource_sources
-  DetectVendor.cpp
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
 )
 
 set (umpire_resource_depends
-  umpire_alloc umpire_strategy umpire_util)
+  umpire_util umpire_alloc umpire_strategy)
 
 if (ENABLE_CUDA)
   set (umpire_resource_headers
@@ -47,8 +43,6 @@ if (ENABLE_CUDA)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-
-
     CudaConstantMemoryResourceFactory.cpp
     CudaConstantMemoryResource.cu
 

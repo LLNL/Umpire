@@ -15,12 +15,13 @@
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/resource/DetectVendor.hpp"
 
 #include "umpire/alloc/MallocAllocator.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/alloc/PosixMemalignAllocator.hpp"
 #endif
+
+#include "umpire/util/detect_vendor.hpp"
 
 namespace umpire {
 namespace resource {

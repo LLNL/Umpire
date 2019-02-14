@@ -18,7 +18,6 @@
 #include <cstddef>
 
 namespace umpire {
-namespace resource {
 
 struct MemoryResourceTraits {
 
@@ -53,7 +52,6 @@ struct MemoryResourceTraits {
   optimized_for used_for = optimized_for::any;
 };
 
-} // end of namespace resource
 } // end of namespace umpire
 
 #endif // UMPIRE_MemoryResourceTraits_HPP

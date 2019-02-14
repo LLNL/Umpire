@@ -15,9 +15,11 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
+  detect_vendor.hpp
   Exception.hpp
   Logger.hpp
   Macros.hpp
+  MemoryResourceTraits.hpp
   Platform.hpp)
 
 if (ENABLE_STATISTICS)
@@ -31,11 +33,12 @@ endif ()
 if (ENABLE_NUMA)
   set (umpire_util_headers
     ${umpire_util_headers}
-    Numa.hpp)
+    numa.hpp)
 endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
+  detect_vendor.cpp
   Exception.cpp
   Logger.cpp)
 
@@ -49,7 +52,7 @@ endif ()
 if (ENABLE_NUMA)
   set (umpire_util_sources
     ${umpire_util_sources}
-    Numa.cpp)
+    numa.cpp)
 endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
