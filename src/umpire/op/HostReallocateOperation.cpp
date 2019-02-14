@@ -19,6 +19,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/util/AllocationRecord.hpp"
+
 namespace umpire {
 namespace op {
 
@@ -44,7 +46,7 @@ void HostReallocateOperation::transform(
 
   ResourceManager::getInstance().registerAllocation(
       *dst_ptr,
-      new util::AllocationRecord{*dst_ptr, length, allocator});
+      new util::AllocationRecord{*dst_ptr, length, allocator, false});
 }
 
 } // end of namespace op

@@ -31,10 +31,23 @@
 
 namespace umpire {
 
+  namespace op {
+    class HostReallocateOperation;
+  }
+
+  namespace strategy {
+    namespace mixins {
+      class Inspector;
+    }
+  }
+
 /*!
  * \brief
  */
 class ResourceManager {
+  friend class op::HostReallocateOperation;
+  friend class strategy::mixins::Inspector;
+
   public:
     /*!
      * \brief
@@ -131,10 +144,6 @@ class ResourceManager {
      */
     bool hasAllocator(void* ptr);
 
-    void registerAllocation(void* ptr, util::AllocationRecord* record);
-
-    util::AllocationRecord* deregisterAllocation(void* ptr);
-
     /*!
      * \brief Check whether the named Allocator exists.
      *
@@ -228,7 +237,7 @@ class ResourceManager {
      */
     void coalesce(Allocator allocator);
 
-
+    void registerExternalAllocation(void* ptr, size_t size, Platform platform);
   private:
     ResourceManager();
 
@@ -238,6 +247,10 @@ class ResourceManager {
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
     std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForId(int id);
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
+
+
+    void registerAllocation(void* ptr, util::AllocationRecord* record);
+    util::AllocationRecord* deregisterAllocation(void* ptr);
 
     int getNextId() noexcept;
 

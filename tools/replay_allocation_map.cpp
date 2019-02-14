@@ -141,7 +141,7 @@ class Replay {
       get_from_string(m_row[m_row.size() - 1], alloc_ptr);
       get_from_string(m_row[m_row.size() - 3], alloc_size);
 
-      auto amap = new umpire::util::AllocationRecord{alloc_ptr, alloc_size, nullptr};
+      auto amap = new umpire::util::AllocationRecord{alloc_ptr, alloc_size, nullptr, false};
       m_allocation_map.insert(alloc_ptr, amap);
 
       m_mapped_ptrs[alloc_ptr] = amap;

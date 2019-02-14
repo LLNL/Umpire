@@ -32,6 +32,7 @@ struct AllocationRecord
   void* m_ptr;
   size_t m_size;
   std::shared_ptr<strategy::AllocationStrategy> m_strategy;
+  bool m_external;
 };
 
 } // end of namespace util

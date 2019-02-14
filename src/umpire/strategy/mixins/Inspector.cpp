@@ -42,7 +42,8 @@ Inspector::registerAllocation(
   auto record = new umpire::util::AllocationRecord{
     ptr,
     size,
-    strategy};
+    strategy,
+    false};
 
   ResourceManager::getInstance().registerAllocation(ptr, record);
 }

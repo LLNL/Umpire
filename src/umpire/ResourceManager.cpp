@@ -278,6 +278,27 @@ util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
   return m_allocations.remove(ptr);
 }
 
+void ResourceManager::registerExternalAllocation(
+    void* ptr,
+    size_t size,
+    Platform platform)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << size << ") with " << this );
+
+  auto record = m_allocations.find(ptr);
+
+  if (record && !record.m_external) {
+    UMPIRE_ERROR(ptr << " is already registered, and owned by Umpire!"):
+  } else if (record) {
+    UMPIRE_LOG(Debug, "Updating record to new size & platform: " << size);
+    record.m_size = size;
+  } else {
+    m_allocations.insert(
+        ptr,
+        new util::AllocationRecord{ptr, size, getAllocator(platform), true});
+  }
+}
+
 bool
 ResourceManager::isAllocatorRegistered(const std::string& name)
 {

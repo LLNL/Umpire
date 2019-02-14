@@ -25,7 +25,7 @@ class AllocationMapTest : public ::testing::Test {
     virtual void SetUp() {
       double* data = new double[15];
       size = 15*sizeof(double);
-      record = new umpire::util::AllocationRecord{data, size, nullptr};
+      record = new umpire::util::AllocationRecord{data, size, nullptr, false};
     }
 
     virtual void TearDown() {
@@ -125,7 +125,7 @@ TEST_F(AllocationMapTest, RemoveAndUse)
 TEST_F(AllocationMapTest, RegisterMultiple)
 {
   umpire::util::AllocationRecord* next_record = 
-    new umpire::util::AllocationRecord{data, 1, nullptr};
+    new umpire::util::AllocationRecord{data, 1, nullptr, false};
 
   ASSERT_NO_THROW(
     map.insert(data, record);
@@ -136,7 +136,7 @@ TEST_F(AllocationMapTest, RegisterMultiple)
 TEST_F(AllocationMapTest, FindMultiple)
 {
   umpire::util::AllocationRecord* next_record = 
-    new umpire::util::AllocationRecord{data, 1, nullptr};
+    new umpire::util::AllocationRecord{data, 1, nullptr, false};
 
   EXPECT_NO_THROW({
     map.insert(data, record);
@@ -159,11 +159,11 @@ TEST_F(AllocationMapTest, FindMultiple)
 TEST_F(AllocationMapTest, PrintAll)
 {
   umpire::util::AllocationRecord* next_record = 
-    new umpire::util::AllocationRecord{data, 1, nullptr};
+    new umpire::util::AllocationRecord{data, 1, nullptr, false};
 
   auto extra_data = new double[10];
   umpire::util::AllocationRecord* extra_record =
-    new umpire::util::AllocationRecord{extra_data, 10, nullptr};
+    new umpire::util::AllocationRecord{extra_data, 10, nullptr, false};
 
   map.insert(data, record);
   map.insert(data, next_record);
