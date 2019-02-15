@@ -29,15 +29,14 @@ TEST(ResourceManager, findAllocationRecord)
 
   auto alloc = rm.getAllocator("HOST");
 
-  const size_t size = 10 * sizeof(double);
-  const size_t offset = 2 * sizeof(double); // < size
+  const size_t size = 1024 * 1024;
+  const size_t offset = 1024;
 
-  double* ptr = static_cast<double*>(alloc.allocate(size));
+  char* ptr = static_cast<char*>(alloc.allocate(size));
   const umpire::util::AllocationRecord* rec = rm.findAllocationRecord(ptr + offset);
 
-  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::util::Exception);
-
   ASSERT_EQ(ptr, rec->m_ptr);
-
   alloc.deallocate(ptr);
+
+  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::util::Exception);
 }
