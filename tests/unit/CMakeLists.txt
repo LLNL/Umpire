@@ -15,7 +15,8 @@
 blt_add_executable(
   NAME resource_manager_tests
   SOURCES resource_manager_tests.cpp
-  DEPENDS_ON umpire gtest)
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/unit)
 
 blt_add_test(
   NAME resource_manager_tests

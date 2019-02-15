@@ -25,7 +25,7 @@ blt_add_executable(
   NAME memory_allocator_tests
   SOURCES memory_allocator_tests.cpp
   DEPENDS_ON ${memory_allocator_tests_depends}
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/unit/alloc)
 
 target_include_directories(
   memory_allocator_tests

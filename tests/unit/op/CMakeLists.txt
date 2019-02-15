@@ -16,7 +16,8 @@ if (ENABLE_CUDA)
   blt_add_executable(
     NAME cuda_mem_advise_op_tests
     SOURCES cuda_mem_advise_op_tests.cpp
-    DEPENDS_ON umpire_op umpire cuda_runtime gtest gmock)
+    DEPENDS_ON umpire_op umpire cuda_runtime gtest gmock
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/unit/op)
 
   blt_add_test(
     NAME cuda_mem_advise_op_tests

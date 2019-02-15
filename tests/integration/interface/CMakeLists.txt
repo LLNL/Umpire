@@ -18,7 +18,7 @@ if (ENABLE_C_API)
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp
     DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/integration/interface)
 
   target_include_directories(
     allocator_c_tests
@@ -33,7 +33,7 @@ if (ENABLE_C_API)
     NAME operation_c_tests
     SOURCES operation_c_tests.cpp
     DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/integration/interface)
 
   target_include_directories(
     operation_c_tests
@@ -57,4 +57,3 @@ if (ENABLE_C_API)
       Fortran_FORMAT FREE)
   endif()
 endif()
-

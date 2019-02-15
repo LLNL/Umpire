@@ -21,10 +21,11 @@ if (BASH_PROGRAM)
   blt_add_executable(
     NAME replay_tests
     SOURCES replay_tests.cpp
-    DEPENDS_ON ${replay_integration_tests_depends})
+    DEPENDS_ON ${replay_integration_tests_depends}
+    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/integration/replay)
 
   add_test(
-    NAME replay_tests 
+    NAME replay_tests
     COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_BINARY_DIR}/bin
   )
 

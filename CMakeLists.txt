@@ -17,7 +17,7 @@ cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 
-project(Umpire 
+project(Umpire
   LANGUAGES CXX C
   VERSION 0.3.1)
 
@@ -93,11 +93,11 @@ install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
-  set (UMPIRE_TEST_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test)
+  set (UMPIRE_TEST_OUTPUT_DIR ${TEST_OUTPUT_DIRECTORY})
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
-  set (UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmark)
+  set (UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmarks)
   add_subdirectory(benchmarks)
 endif ()
 if (ENABLE_EXAMPLES)
