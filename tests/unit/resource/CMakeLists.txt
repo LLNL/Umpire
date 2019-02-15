@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (resource_dir ${UMPIRE_TEST_OUTPUT_DIR}/unit/resource)
+set (resource_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/resource)
 
 if (ENABLE_GMOCK)
   blt_add_executable(

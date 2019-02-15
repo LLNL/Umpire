@@ -14,7 +14,7 @@
 ##############################################################################
 find_program (BASH_PROGRAM bash)
 
-set (replay_dir ${UMPIRE_TEST_OUTPUT_DIR}/integration/replay)
+set (replay_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration/replay)
 
 set (replay_integration_tests_depends
   umpire)

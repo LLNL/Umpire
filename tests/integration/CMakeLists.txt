@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (integration_dir ${UMPIRE_TEST_OUTPUT_DIR}/integration)
+set (integration_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration)
 
 set (allocator_integration_tests_depends
   umpire gtest)

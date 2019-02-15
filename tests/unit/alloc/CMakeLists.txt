@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (alloc_dir ${UMPIRE_TEST_OUTPUT_DIR}/unit/alloc)
+set (alloc_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/alloc)
 
 set (memory_allocator_tests_depends
   umpire_alloc gtest)

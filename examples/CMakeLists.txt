@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (examples_dir ${CMAKE_BINARY_DIR}/examples)
+set (examples_dir ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 
 blt_add_executable(
   NAME malloc

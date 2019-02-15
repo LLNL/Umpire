@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (unit_dir ${UMPIRE_TEST_OUTPUT_DIR}/unit)
+set (unit_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit)
 
 blt_add_executable(
   NAME resource_manager_tests

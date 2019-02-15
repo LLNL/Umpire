@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (op_dir ${UMPIRE_TEST_OUTPUT_DIR}/unit/op)
+set (op_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/op)
 
 if (ENABLE_CUDA)
   blt_add_executable(

@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (interface_dir ${UMPIRE_TEST_OUTPUT_DIR}/integration/interface)
+set (interface_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration/interface)
 
 if (ENABLE_C_API)
   blt_add_executable(

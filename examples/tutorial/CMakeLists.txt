@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (tutorial_dir ${CMAKE_BINARY_DIR}/examples/tutorial)
+set (tutorial_dir ${UMPIRE_EXAMPLES_OUTPUT_DIR}/tutorial)
 
 blt_add_executable(
   NAME tut_allocator

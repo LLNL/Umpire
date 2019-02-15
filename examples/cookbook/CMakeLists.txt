@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (cookbook_dir ${CMAKE_BINARY_DIR}/examples/cookbook)
+set (cookbook_dir ${UMPIRE_EXAMPLES_OUTPUT_DIR}/cookbook)
 
 blt_add_executable(
   NAME recipe_no_introspection
