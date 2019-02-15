@@ -12,13 +12,14 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (interface_dir ${UMPIRE_TEST_OUTPUT_DIR}/integration/interface)
 
 if (ENABLE_C_API)
   blt_add_executable(
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp
     DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/integration/interface)
+    OUTPUT_DIR ${interface_dir})
 
   target_include_directories(
     allocator_c_tests
@@ -33,7 +34,7 @@ if (ENABLE_C_API)
     NAME operation_c_tests
     SOURCES operation_c_tests.cpp
     DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/integration/interface)
+    OUTPUT_DIR ${interface_dir})
 
   target_include_directories(
     operation_c_tests

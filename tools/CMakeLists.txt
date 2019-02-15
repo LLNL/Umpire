@@ -12,14 +12,16 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (tools_dir ${CMAKE_BINARY_DIR}/tools)
+
 blt_add_executable(
   NAME replay
   SOURCES replay.cpp
-  DEPENDS_ON 
-    umpire)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${tools_dir})
 
 blt_add_executable(
   NAME replay_allocation_map
   SOURCES replay_allocation_map.cpp
-  DEPENDS_ON 
-    umpire)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${tools_dir})

@@ -14,6 +14,8 @@
 ##############################################################################
 find_program (BASH_PROGRAM bash)
 
+set (replay_dir ${UMPIRE_TEST_OUTPUT_DIR}/integration/replay)
+
 set (replay_integration_tests_depends
   umpire)
 
@@ -22,11 +24,10 @@ if (BASH_PROGRAM)
     NAME replay_tests
     SOURCES replay_tests.cpp
     DEPENDS_ON ${replay_integration_tests_depends}
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR}/integration/replay)
+    OUTPUT_DIR ${replay_dir})
 
   add_test(
     NAME replay_tests
-    COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_BINARY_DIR}/bin
-  )
+    COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_BINARY_DIR}/tools)
 
 endif()
