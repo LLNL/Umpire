@@ -28,6 +28,7 @@ if (BASH_PROGRAM)
 
   add_test(
     NAME replay_tests
-    COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_BINARY_DIR}/tools)
+    COMMAND ${BASH_PROGRAM}
+    ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
 
 endif()
