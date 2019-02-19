@@ -60,7 +60,7 @@ int main(int, char**) {
   benchmark_allocator("HOST");
 
   auto& rm = umpire::ResourceManager::getInstance();
-  rm.makeAllocator<umpire::strategy::MixedPool<8,14,22> >(
+  rm.makeAllocator<umpire::strategy::MixedPool>(
       "mixed_pool", rm.getAllocator("HOST"));
 
   benchmark_allocator("mixed_pool");
