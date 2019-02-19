@@ -281,21 +281,21 @@ util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
 void ResourceManager::registerExternalAllocation(
     void* ptr,
     size_t size,
-    Platform platform)
+    resource::MemoryResourceType type)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << size << ") with " << this );
 
   auto record = m_allocations.find(ptr);
 
-  if (record && !record.m_external) {
-    UMPIRE_ERROR(ptr << " is already registered, and owned by Umpire!"):
+  if (record && !record->m_external) {
+    UMPIRE_ERROR(ptr << " is already registered, and owned by Umpire!");
   } else if (record) {
     UMPIRE_LOG(Debug, "Updating record to new size & platform: " << size);
-    record.m_size = size;
+    record->m_size = size;
   } else {
     m_allocations.insert(
         ptr,
-        new util::AllocationRecord{ptr, size, getAllocator(platform), true});
+        new util::AllocationRecord{ptr, size, getAllocator(type).getAllocationStrategy(), true});
   }
 }
 

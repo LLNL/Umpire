@@ -242,7 +242,8 @@ class ResourceManager {
      */
     void coalesce(Allocator allocator);
 
-    void registerExternalAllocation(void* ptr, size_t size, Platform platform);
+    void registerExternalAllocation(void* ptr, size_t size, resource::MemoryResourceType type);
+
   private:
     ResourceManager();
 
