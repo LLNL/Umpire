@@ -128,8 +128,6 @@ class ResourceManager {
     /*!
      * \brief Get the Allocator used to allocate ptr.
      *
-     *
-     *
      * \param ptr Pointer to find the Allocator for.
      * \return Allocator for the given ptr.
      */
@@ -143,6 +141,13 @@ class ResourceManager {
      * \return True if the pointer has an associated Allocator.
      */
     bool hasAllocator(void* ptr);
+
+    /*!
+     * \brief Find the allocation record associated with an address ptr.
+     *
+     * \return the record if found, or throws an exception if not found.
+     */
+    const util::AllocationRecord* findAllocationRecord(void* ptr) const;
 
     /*!
      * \brief Check whether the named Allocator exists.
