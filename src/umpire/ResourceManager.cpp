@@ -284,6 +284,20 @@ util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
   return m_allocations.remove(ptr);
 }
 
+const util::AllocationRecord*
+ResourceManager::findAllocationRecord(void* ptr) const
+{
+  auto alloc_record = m_allocations.find(ptr);
+
+  if (!alloc_record->m_strategy) {
+    UMPIRE_ERROR("Cannot find allocator for " << ptr);
+  }
+
+  UMPIRE_LOG(Debug, "(Returning allocation record for ptr = " << ptr << ")");
+
+  return alloc_record;
+}
+
 bool
 ResourceManager::isAllocatorRegistered(const std::string& name)
 {
