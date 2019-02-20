@@ -51,8 +51,7 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
     UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
-  ResourceManager::getInstance().registerAllocation(
-      ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
+  registerAllocation(ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
@@ -67,17 +66,16 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record->m_size;
+  auto prev_size = m_current_size
+  deregisterAllocation(ptr);
+  auto record_size = size - m_current_size
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record_size))
       == static_cast<char*>(ptr)) {
-    m_offset -= record->m_size;
+    m_offset -= record_size;
   } else {
     UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
   }
-
-  delete record;
 }
 
 long CudaConstantMemoryResource::getCurrentSize() const noexcept
@@ -89,7 +87,7 @@ long CudaConstantMemoryResource::getCurrentSize() const noexcept
 long CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
+  return m_high_watermark;
 }
 
 Platform CudaConstantMemoryResource::getPlatform() noexcept

@@ -20,6 +20,8 @@
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
 
+#include "umpire/strategy/mixins/Inspector.hpp"
+
 #include <cuda_runtime_api.h>
 
 __constant__ char umpire_internal_device_constant_memory[64*1024];
@@ -29,7 +31,8 @@ namespace resource {
 
 
 class CudaConstantMemoryResource :
-  public MemoryResource
+  public MemoryResource,
+  private umpire::strategy::mixins::Inspector
 {
   public:
     CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
@@ -43,9 +46,6 @@ class CudaConstantMemoryResource :
     Platform getPlatform() noexcept;
 
   private:
-    long m_current_size;
-    long m_highwatermark;
-
     Platform m_platform;
 
     size_t m_offset;
