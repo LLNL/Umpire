@@ -45,7 +45,6 @@ int main(int, char**) {
   // Create an allocation on that node
   void* src_ptr = host_src_alloc.allocate(alloc_size);
 
-#if !defined(UMPIRE_ENABLE_CUDA)
   if (host_nodes.size() > 1) {
     // Create an allocator on another host NUMA node.
     auto host_dst_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
@@ -63,11 +62,12 @@ int main(int, char**) {
     rm.memset(dst_ptr, 0);
 
     // Verify NUMA node
-    if (umpire::numa::get_location(dst_ptr) != host_nodes[0]) {
+    if (umpire::numa::get_location(dst_ptr) != host_nodes[1]) {
       UMPIRE_ERROR("Move was unsuccessful");
     }
   }
-#else
+
+#if defined(UMPIRE_ENABLE_DEVICE)
   // Get a list of the device nodes
   auto device_nodes = umpire::numa::get_device_nodes();
 
@@ -86,7 +86,7 @@ int main(int, char**) {
       UMPIRE_ERROR("Pointers should match");
     }
 
-    // Touch it
+    // Touch it -- this currently uses the host memset operation (thus, copying the memory back)
     rm.memset(dst_ptr, 0);
 
     // Verify NUMA node
