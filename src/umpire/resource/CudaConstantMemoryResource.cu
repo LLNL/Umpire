@@ -50,7 +50,7 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
     UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
-  registerAllocation(ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
+  registerAllocation(ret, bytes, this->shared_from_this());
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
@@ -61,7 +61,7 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  auto prev_size = m_current_size
+  auto prev_size = m_current_size;
   deregisterAllocation(ptr);
   auto record_size = prev_size - m_current_size;
 
