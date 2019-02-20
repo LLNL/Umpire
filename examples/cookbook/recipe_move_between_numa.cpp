@@ -12,13 +12,12 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/numa.hpp"
-
-#include "umpire/strategy/NumaPolicy.hpp"
-
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/NumaPolicy.hpp"
+
+#include "umpire/util/numa.hpp"
 #include "umpire/util/Macros.hpp"
 
 #include <iostream>
@@ -30,7 +29,7 @@
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  const std::size_t alloc_size = 1024 * 1024;
+  const std::size_t alloc_size = 5 * umpire::get_page_size();
 
   // Get a list of the host NUMA nodes (e.g. one per socket)
   auto host_nodes = umpire::numa::get_host_nodes();
@@ -60,6 +59,9 @@ int main(int, char**) {
       UMPIRE_ERROR("Pointers should match");
     }
 
+    // Touch it
+    rm.memset(dst_ptr, 0, alloc_size);
+
     if (umpire::numa::get_location(dst_ptr) != host_nodes[0]) {
       UMPIRE_ERROR("Move was unsuccessful");
     }
@@ -83,13 +85,11 @@ int main(int, char**) {
       UMPIRE_ERROR("Pointers should match");
     }
 
+    // Touch it
+    rm.memset(dst_ptr, 0, alloc_size);
+
     if (umpire::numa::get_location(dst_ptr) != device_nodes[0]) {
       UMPIRE_ERROR("Move was unsuccessful");
-    }
-
-    // Can use CUDA API with this pointer
-    if (cudaMemset(dst_ptr, 0, alloc_size) != cudaSuccess) {
-      UMPIRE_ERROR("Cannot use address with CUDA");
     }
   }
 #endif

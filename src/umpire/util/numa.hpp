@@ -20,8 +20,8 @@
 
 namespace umpire {
 
-// Used in PosixMemalignAllocator but extern is defined here
-extern long s_cpu_page_size;
+// Return the page size
+long get_page_size();
 
 namespace numa {
 

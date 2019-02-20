@@ -39,15 +39,16 @@ struct PosixMemalignAllocator
   void* allocate(size_t bytes)
   {
     void* ret = NULL;
-    ::posix_memalign(&ret, s_cpu_page_size, bytes);
+    ::posix_memalign(&ret, get_page_size(), bytes);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if  (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << s_cpu_page_size << " ) failed");
-    } else {
-      return ret;
+      UMPIRE_ERROR("posix_memalign( bytes = " << bytes <<
+                   ", pagesize = " << get_page_size() << " ) failed");
     }
+
+    return ret;
   }
 
   /*!
