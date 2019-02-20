@@ -27,8 +27,6 @@ namespace resource {
 CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
   umpire::strategy::mixins::Inspector(),
-  m_current_size(0l),
-  m_highwatermark(0l),
   m_platform(Platform::cuda),
   m_offset(0),
   m_ptr(nullptr)
@@ -54,10 +52,6 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
 
   registerAllocation(ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
 
-  m_current_size += bytes;
-  if (m_current_size > m_highwatermark)
-    m_highwatermark = m_current_size;
-
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
   return ret;
@@ -69,7 +63,7 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
 
   auto prev_size = m_current_size
   deregisterAllocation(ptr);
-  auto record_size = size - m_current_size
+  auto record_size = prev_size - m_current_size;
 
   if ( (static_cast<char*>(m_ptr) + (m_offset - record_size))
       == static_cast<char*>(ptr)) {
