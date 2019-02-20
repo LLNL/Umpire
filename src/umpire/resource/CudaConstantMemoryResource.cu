@@ -81,7 +81,7 @@ long CudaConstantMemoryResource::getCurrentSize() const noexcept
 
 long CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
+  UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
   return m_high_watermark;
 }
 
