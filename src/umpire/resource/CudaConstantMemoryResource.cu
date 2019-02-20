@@ -26,6 +26,7 @@ namespace resource {
 
 CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
+  umpire::strategy::mixins::Inspector(),
   m_current_size(0l),
   m_highwatermark(0l),
   m_platform(Platform::cuda),
