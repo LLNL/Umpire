@@ -84,6 +84,18 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "MOVE",
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<NumaMoveOperation>());
+
+// NOTE: We don't use CUDA calls in the move operation so no guard is needed
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_shared<NumaMoveOperation>());
+
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_shared<NumaMoveOperation>());
+// NOTE: Add cpu<->rocm pairs here when needed
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)

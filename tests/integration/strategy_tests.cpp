@@ -580,22 +580,21 @@ TEST(NumaPolicyTest, EdgeCases) {
 TEST(NumaPolicyTest, Location) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto nodes = umpire::numa::get_allocatable_nodes();
+  // TODO Switch this to numa::get_allocatable_nodes() when the issue is fixed
+  auto nodes = umpire::numa::get_host_nodes();
   for (auto n : nodes) {
     std::stringstream ss;
     ss << "numa_alloc_" << n;
 
-    auto numa_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
+    auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
       ss.str(), n, rm.getAllocator("HOST"));
 
-    void* numa_ptr = numa_alloc.allocate(10 * umpire::get_page_size());
+    void* ptr = alloc.allocate(10 * umpire::get_page_size());
 
-    // Need to memset before checking the location so the memory is paged in.
-    // TODO we shouldn't need to do this...
-    rm.memset(numa_ptr, 0);
-    ASSERT_EQ(umpire::numa::get_location(numa_ptr), n);
+    rm.memset(ptr, 0);
+    ASSERT_EQ(umpire::numa::get_location(ptr), n);
 
-    numa_alloc.deallocate(numa_ptr);
+    alloc.deallocate(ptr);
   }
 }
 

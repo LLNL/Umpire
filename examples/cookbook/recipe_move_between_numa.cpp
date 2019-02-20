@@ -60,8 +60,9 @@ int main(int, char**) {
     }
 
     // Touch it
-    rm.memset(dst_ptr, 0, alloc_size);
+    rm.memset(dst_ptr, 0);
 
+    // Verify NUMA node
     if (umpire::numa::get_location(dst_ptr) != host_nodes[0]) {
       UMPIRE_ERROR("Move was unsuccessful");
     }
@@ -86,8 +87,9 @@ int main(int, char**) {
     }
 
     // Touch it
-    rm.memset(dst_ptr, 0, alloc_size);
+    rm.memset(dst_ptr, 0);
 
+    // Verify NUMA node
     if (umpire::numa::get_location(dst_ptr) != device_nodes[0]) {
       UMPIRE_ERROR("Move was unsuccessful");
     }

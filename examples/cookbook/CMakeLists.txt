@@ -24,8 +24,8 @@ if (ENABLE_NUMA)
   blt_add_executable(
     NAME recipe_move_between_numa
     SOURCES recipe_move_between_numa.cpp
-    DEPENDS_ON
-      umpire)
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${cookbook_dir})
 endif ()
 
 if (ENABLE_CUDA)

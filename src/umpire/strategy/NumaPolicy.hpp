@@ -53,9 +53,9 @@ class NumaPolicy :
     int getNode() const noexcept;
 
   private:
-    int m_node;
     std::shared_ptr<AllocationStrategy> m_allocator;
-    Platform m_numa_platform;
+    Platform m_platform;
+    int m_node;
 };
 
 } // end of namespace strategy

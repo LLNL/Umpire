@@ -31,9 +31,9 @@ NumaPolicy::NumaPolicy(
     int numa_node,
     Allocator allocator) :
   AllocationStrategy(name, id),
-  m_node(numa_node),
   m_allocator(allocator.getAllocationStrategy()),
-  m_numa_platform(Platform::cpu)
+  m_platform(Platform::cpu),
+  m_node(numa_node)
 {
   if (numa_node < 0) {
     UMPIRE_ERROR("NumaPolicy error: NUMA nodes are always non-negative ints");
@@ -45,14 +45,14 @@ NumaPolicy::NumaPolicy(
 #if defined(UMPIRE_ENABLE_DEVICE)
   auto host_nodes = numa::get_host_nodes();
   if (std::find(host_nodes.begin(), host_nodes.end(),
-                m_numa_node) == host_nodes.end()) {
+                m_node) == host_nodes.end()) {
     // This is a device node
     // TODO: Could both these be enabled? If so, find a way to
     // distinguish these at run-time.
 #if defined(UMPIRE_ENABLE_CUDA)
-    m_numa_platform = Platform::cuda;
+    m_platform = Platform::cuda;
 #elif defined(UPIRE_ENABLE_ROCM)
-    m_numa_platform = Platform::rocm;
+    m_platform = Platform::rocm;
 #else
     UMPIRE_ERROR("Could not determine device platform.");
 #endif
@@ -93,7 +93,7 @@ NumaPolicy::getHighWatermark() const noexcept
 Platform
 NumaPolicy::getPlatform() noexcept
 {
-  return m_numa_policy;
+  return m_platform;
 }
 
 int
