@@ -101,7 +101,7 @@ TEST(CudaAdvisePreferredLocation, Apply)
       strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
-  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
+  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy, false};
 
   ASSERT_NO_THROW(
     advice_operation->apply(
@@ -127,7 +127,7 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
       strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
-  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
+  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy, false};
 
   ASSERT_NO_THROW(
     advice_operation->apply(
