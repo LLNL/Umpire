@@ -21,11 +21,10 @@ namespace strategy {
 
 namespace {
 
-using PoolVector = std::vector< std::shared_ptr<umpire::strategy::AllocationStrategy> >;
-
 template<int FirstFixed, int Current, int LastFixed, int Increment>
 struct make_fixed_pool_array {
-  static void eval(PoolVector& fixed_pool, Allocator allocator) {
+  template<typename Array>
+  static void eval(Array& fixed_pool, Allocator& allocator) {
     const int index = Current - FirstFixed;
     const std::size_t size = 1 << Current;
     std::stringstream ss{"internal_fixed_"};
@@ -37,7 +36,8 @@ struct make_fixed_pool_array {
 
 template<int FirstFixed, int LastFixed, int Increment>
 struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
-  static void eval(PoolVector& fixed_pool, Allocator allocator) {
+  template<typename Array>
+  static void eval(Array& fixed_pool, Allocator& allocator) {
     const int index = LastFixed - FirstFixed;
     const std::size_t size = 1 << LastFixed;
     std::stringstream ss{"internal_fixed_"};
@@ -45,6 +45,19 @@ struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
     fixed_pool[index] = std::make_shared<FixedPool<unsigned char[size]> >(ss.str(), -1, allocator);
   }
 };
+
+} // anonymous namespace
+
+template<int FirstFixed, int Increment, int LastFixed>
+size_t MixedPoolImpl<FirstFixed,Increment,LastFixed>::nextPower2(unsigned int n) {
+  n--;
+  n |= n >> 1;
+  n |= n >> 2;
+  n |= n >> 4;
+  n |= n >> 8;
+  n |= n >> 16;
+  n++;
+  return n;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
@@ -54,55 +67,65 @@ MixedPoolImpl<FirstFixed,Increment,LastFixed>::MixedPoolImpl(
     Allocator allocator) noexcept
 :
   AllocationStrategy(name, id),
-  m_fixed_pool((LastFixed - FirstFixed)/Increment + 1),
   m_allocator(allocator.getAllocationStrategy())
+
 {
   m_dynamic_pool = std::make_shared<DynamicPool>(
       "internal_dynamic_pool",
       -1,
       allocator);
 
-  make_fixed_pool_array<FirstFixed, FirstFixed, LastFixed, Increment>::eval(m_fixed_pool, allocator);
+  make_fixed_pool_array<FirstFixed,FirstFixed,LastFixed,Increment>::eval(m_fixed_pool, allocator);
 }
 
+union AlignedSize {
+  int index;
+  std::max_align_t a;
+};
 
 template<int FirstFixed, int Increment, int LastFixed>
 void* MixedPoolImpl<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
 {
-  size_t nearest = 1;
+  const size_t bytes_with_index = bytes + sizeof(unsigned int);
+  AlignedSize* s = nullptr;
+  if (bytes <= (1 << LastFixed)) {
+    // Find next power of 2
+    const size_t alloc_size = nextPower2(bytes_with_index);
 
-  size_t original_bytes = bytes;
+    // Convert that to bit index
+    size_t bit = 0;
+    {
+      size_t size = alloc_size;
+      while (size) { size >>= 1; ++bit; }
+    }
+    // Find index such that alloc_size is equal to size[index] (or, bytes < size[index] and bytes > size[index-1] if that exists)
+    int index = 0;
+    size_t nearest_bytes = 1 << FirstFixed;
+    while (alloc_size > nearest_bytes) { index++; nearest_bytes <<= 1; }
 
-  if (bytes <= 1) {
-    nearest = 1;
-  } else {
-    nearest = 2;
-    bytes--;
-    while (bytes >>= 1) nearest <<= 1;
-  }
-
-  size_t original_nearest = nearest;
-  size_t nearest_index = 0;
-  while (nearest >>= 1) nearest_index++;
-  nearest_index -= FirstFixed;
-
-  (void) original_bytes;
-
-  //std::cout << nearest << std::endl;
-
-  if (nearest_index < m_fixed_pool.size()) {
-    return m_fixed_pool[nearest_index]->allocate(original_nearest);
+    // Allocate
+    s = static_cast<AlignedSize*>(m_fixed_pool[index]->allocate(alloc_size));
+    s->index = index;
   }
   else {
-    return m_dynamic_pool->allocate(original_bytes);
+    s = static_cast<AlignedSize*>(m_dynamic_pool->allocate(bytes_with_index));
+    s->index = -1;
   }
-
-  return nullptr;
+  return ++s;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
-void MixedPoolImpl<FirstFixed,Increment,LastFixed>::deallocate(void*)
+void MixedPoolImpl<FirstFixed,Increment,LastFixed>::deallocate(void* ptr)
 {
+  AlignedSize* s = static_cast<AlignedSize*>(ptr);
+  s--;
+  const int index = s->index;
+  if (index < 0) {
+    m_dynamic_pool->deallocate((void *) s);
+  }
+  else {
+    m_fixed_pool[index]->deallocate((void *) s);
+  }
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
