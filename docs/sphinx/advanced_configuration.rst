@@ -27,8 +27,8 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
       ``ENABLE_TOOLS``             On       Enable tools like replay
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
-      ``ENABLE_C_API``             Off      Build the C API
-      ``ENABLE_FORTRAN_API``       Off      Build the Fortran API
+      ``ENABLE_C``             Off      Build the C API
+      ``ENABLE_FORTRAN``       Off      Build the Fortran API
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
@@ -67,9 +67,9 @@ These arguments are explained in more detail below:
 * ``ENABLE_DOCS``
   Build user documentation (with Sphinx) and code documentation (with Doxygen)
 
-* ``ENABLE_C_API``
+* ``ENABLE_C``
   Build the C API, this allows accessing Umpire Allocators and the
   ResourceManager through a C interface.
 
-* ``ENABLE_FORTRAN_API``
+* ``ENABLE_FORTRAN``
   Build the Fortran API. 
