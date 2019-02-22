@@ -80,6 +80,6 @@ blt_add_executable(
   DEPENDS_ON umpire
   OUTPUT_DIR ${tutorial_dir})
 
-if (ENABLE_C_API)
+if (ENABLE_C)
   add_subdirectory(c)
 endif ()

@@ -37,7 +37,7 @@ sections.
 
 We also have a tutorial for the C interface to Umpire. Complete example
 listings are available, and will be compiled if you have configured Umpire with
-``-DENABLE_C_API=On``. 
+``-DENABLE_C=On``. 
 
 The C tutorial assumes an understanding of C, and it would be useful to have
 some knowledge of C++ to understand how the C API maps to the native C++
