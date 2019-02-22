@@ -34,7 +34,7 @@ AllocationStrategy::getName() noexcept
 void
 AllocationStrategy::release()
 {
-  UMPIRE_LOG(Info, "AllocationStrategy::release in a no-op");
+  UMPIRE_LOG(Info, "AllocationStrategy::release is a no-op");
 }
 
 int
