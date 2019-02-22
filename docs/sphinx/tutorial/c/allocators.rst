@@ -1,8 +1,8 @@
 .. _allocators:
 
-==========
-Allocators
-==========
+=================
+C API: Allocators
+=================
 
 The fundamental concept for accessing memory through Umpire is an
 :class:`umpire:Allocator`. In C, this means using the type
@@ -14,12 +14,12 @@ As with the native C++ interface, all allocators are accessed via the
 ``umpire_resourcemanager`` type. To get an ``umpire_allocator``:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_allocator.c
-                    :lines: 20-24
+                    :lines: 22-26
 
 Once you have an ``umpire_allocator``, you can use it to allocate and
 deallocate memory:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_allocator.c
-                    :lines: 26-30
+                    :lines: 28-32
 
 In the next section, we will see how to allocate memory in different places.

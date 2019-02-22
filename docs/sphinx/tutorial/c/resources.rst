@@ -1,8 +1,8 @@
 .. _resources:
 
-=========
-Resources
-=========
+================
+C API: Resources
+================
 
 Each computer system will have a number of distinct places in which the system
 will allow you to allocate memory. In Umpire's world, these are `memory
@@ -34,7 +34,7 @@ is for, this means we can run the same code for all the resources available in
 the system:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp 
-                    :lines: 19-36
+                    :lines: 21-35
 
 As you can see, we can call this function with any valid resource name:
 

@@ -1,8 +1,8 @@
-.. _dynamic_pool:
+.. _pools:
 
-=============
-Dynamic Pools
-=============
+============
+C API: Pools
+============
 
 Frequently allocating and deallocating memory can be quite costly, especially
 when you are making large allocations or allocating on different memory
