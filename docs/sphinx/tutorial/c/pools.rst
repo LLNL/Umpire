@@ -16,8 +16,10 @@ algorithm:
 .. literalinclude:: ../../../examples/tutorial/tut_pool.c
                     :lines: 24-28
 
-We have to provide a new name for the allocator, as well as the underlying
-``umpire_allocator`` we wish to use to grab memory.
+The two arguments are the size of teh initial block that is allocated, and the
+minimum size of any future blocks. We have to provide a new name for the
+allocator, as well as the underlying ``umpire_allocator`` we wish to use to
+grab memory.
 
 Once you have the allocator, you can allocate and deallocate memory as
 before, without needing to worry about the underlying algorithm used for the
