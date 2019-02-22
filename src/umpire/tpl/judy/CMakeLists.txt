@@ -27,13 +27,6 @@ blt_add_library(
   HEADERS ${judy_headers}
   OBJECT TRUE)
 
-install(TARGETS
-  umpire_tpl_judy
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
 install(FILES
   ${judy_headers}
   DESTINATION include/umpire/tpl/judy)

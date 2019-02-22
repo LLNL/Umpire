@@ -90,10 +90,3 @@ target_include_directories(
 install(FILES
   ${umpire_op_headers}
   DESTINATION include/umpire/op)
-
-install(TARGETS
-  umpire_op
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)

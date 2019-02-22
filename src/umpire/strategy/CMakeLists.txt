@@ -53,13 +53,6 @@ target_include_directories(
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS
-  umpire_strategy
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
 install(FILES
   ${umpire_strategy_headers}
   DESTINATION include/umpire/strategy)

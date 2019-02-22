@@ -43,10 +43,3 @@ target_include_directories(
 install(FILES
   ${umpire_alloc_headers}
   DESTINATION include/umpire/alloc)
-
-install(TARGETS
-  umpire_alloc
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)

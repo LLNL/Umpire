@@ -89,13 +89,6 @@ target_include_directories(
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS
-  umpire_resource
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
 install(FILES
   ${umpire_resource_headers}
   DESTINATION include/umpire/resource)
