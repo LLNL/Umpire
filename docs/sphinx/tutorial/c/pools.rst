@@ -16,7 +16,7 @@ algorithm:
 .. literalinclude:: ../../../examples/tutorial/tut_pool.c
                     :lines: 24-28
 
-The two arguments are the size of teh initial block that is allocated, and the
+The two arguments are the size of the initial block that is allocated, and the
 minimum size of any future blocks. We have to provide a new name for the
 allocator, as well as the underlying ``umpire_allocator`` we wish to use to
 grab memory.
