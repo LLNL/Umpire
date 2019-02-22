@@ -14,7 +14,7 @@
 ##############################################################################
 set (interface_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration/interface)
 
-if (ENABLE_C_API)
+if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp
@@ -45,7 +45,7 @@ if (ENABLE_C_API)
     NAME operation_c_tests
     COMMAND operation_c_tests)
 
-  if (ENABLE_FORTRAN_API)
+  if (ENABLE_FORTRAN)
     blt_add_executable(
       NAME fortran_interface_tests
       SOURCES umpire_fortran_interface.f
