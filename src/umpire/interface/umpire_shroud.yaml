@@ -121,3 +121,7 @@ splicer_code:
         - "#ifdef __cplusplus"
         - "#include <cstring>"
         - "#endif"
+
+splicer:
+  f:
+  - c_fortran/umpiresplicer.f
