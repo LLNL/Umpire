@@ -18,7 +18,7 @@ actually using an ``umpire_allocator`` created for the memory resource
 corresponding to the CPU memory.
 
 The easiest way to identify resources is by name. The "HOST" resource is always
-available. In a modern NVIDIA GPU system, we also have resources that represent
+available. In a system configured with NVIDIA GPUs, we also have resources that represent
 global GPU memory ("DEVICE"), unified memory that can be accessed by the CPU or
 GPU ("UM") and host memory that can be accessed by the GPU ("PINNED");
 
