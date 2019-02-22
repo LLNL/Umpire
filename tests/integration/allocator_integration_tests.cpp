@@ -212,6 +212,23 @@ TEST_P(AllocatorByResourceTest, AllocateDeallocate)
   m_allocator->deallocate(data);
 }
 
+TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
+{
+  double* data = static_cast<double*>(
+    m_allocator->allocate(m_big*sizeof(double)));
+
+  ASSERT_NE(nullptr, data);
+
+  ASSERT_NO_THROW(
+    m_allocator->deallocate(data)
+  );
+
+  ASSERT_THROW(
+      m_allocator->deallocate(data),
+      umpire::util::Exception
+  );
+}
+
 const umpire::resource::MemoryResourceType resource_types[] = {
   umpire::resource::Host
 #if defined(UMPIRE_ENABLE_DEVICE)

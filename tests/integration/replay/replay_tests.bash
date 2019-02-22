@@ -1,6 +1,8 @@
 #!/bin/bash
-testprogram=$1/replay_tests
-replayprogram=$1/replay
+replay_tests_dir=$1
+tools_dir=$2
+testprogram=$replay_tests_dir/replay_tests
+replayprogram=$tools_dir/replay
 
 #
 # The following program will generate a CSV file of Umpire activity that
@@ -22,7 +24,7 @@ if [ $? -ne 0 ]; then
 fi
 
 #
-# Now, compare the results being careful to allow for different object 
+# Now, compare the results being careful to allow for different object
 # references (everything else should be the same).
 #
 exit 0
