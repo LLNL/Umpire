@@ -15,10 +15,6 @@
 set(umpire_alloc_headers
   MallocAllocator.hpp)
 
-set (umpire_alloc_sources)
-
-set (umpire_alloc_depends umpire_util)
-
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
@@ -35,14 +31,7 @@ endif ()
 
 blt_add_library(
   NAME umpire_alloc
-  HEADERS ${umpire_alloc_headers}
-  SOURCES ${umpire_alloc_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/alloc)
-
-target_link_libraries(
-  umpire_alloc
-  INTERFACE
-  ${umpire_alloc_depends})
+  HEADERS ${umpire_alloc_headers})
 
 target_include_directories(
   umpire_alloc

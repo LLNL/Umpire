@@ -25,7 +25,7 @@ blt_add_library(
   NAME umpire_tpl_judy
   SOURCES ${judy_sources}
   HEADERS ${judy_headers}
-  HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
+  OBJECT TRUE)
 
 install(TARGETS
   umpire_tpl_judy

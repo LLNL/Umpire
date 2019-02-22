@@ -15,7 +15,7 @@
 set (alloc_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/alloc)
 
 set (memory_allocator_tests_depends
-  umpire_alloc gtest)
+  umpire gtest)
 
 if (ENABLE_CUDA)
   set (memory_allocator_tests_depends

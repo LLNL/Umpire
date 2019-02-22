@@ -28,8 +28,7 @@ set (umpire_op_sources
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 
-set (umpire_op_depends
-  umpire_util)
+set (umpire_op_depends)
 
 if (ENABLE_CUDA)
   set (umpire_op_headers
@@ -78,9 +77,8 @@ blt_add_library(
   NAME umpire_op
   HEADERS ${umpire_op_headers}
   SOURCES ${umpire_op_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/op
   DEPENDS_ON ${umpire_op_depends}
-)
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_op

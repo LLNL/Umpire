@@ -5,8 +5,7 @@ set (simpool_headers
 
 blt_add_library(
   NAME umpire_tpl_simpool
-  HEADERS ${simpool_headers}
-  HEADERS_OUTPUT_SUBDIR umpire/tpl/simpool)
+  HEADERS ${simpool_headers})
 
 target_link_libraries(umpire_tpl_simpool INTERFACE)
 
