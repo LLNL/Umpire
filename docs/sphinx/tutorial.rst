@@ -49,3 +49,4 @@ classes that Umpire provides.
 
    tutorial/c/allocators.rst
    tutorial/c/resources.rst
+   tutorial/c/pools.rst

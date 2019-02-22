@@ -104,12 +104,12 @@ module umpire_mod
         procedure, nopass :: get_instance => resourcemanager_get_instance
         procedure :: get_allocator_by_name => resourcemanager_get_allocator_by_name
         procedure :: get_allocator_by_id => resourcemanager_get_allocator_by_id
-        procedure :: get_allocatorfor_ptr => resourcemanager_get_allocatorfor_ptr
+        procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
         procedure :: copy_all => resourcemanager_copy_all
         procedure :: copy_with_size => resourcemanager_copy_with_size
         procedure :: memset_all => resourcemanager_memset_all
         procedure :: memset_with_size => resourcemanager_memset_with_size
-        procedure :: reallocate_0 => resourcemanager_reallocate_0
+        procedure :: reallocate_default => resourcemanager_reallocate_default
         procedure :: reallocate_with_allocator => resourcemanager_reallocate_with_allocator
         procedure :: move => resourcemanager_move
         procedure :: deallocate => resourcemanager_deallocate
@@ -118,9 +118,10 @@ module umpire_mod
         procedure :: associated => resourcemanager_associated
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
-            get_allocator_by_id, get_allocatorfor_ptr
+            get_allocator_by_id, get_allocator_for_ptr
         generic :: memset => memset_all, memset_with_size
-        generic :: reallocate => reallocate_0, reallocate_with_allocator
+        generic :: reallocate => reallocate_default,  &
+            reallocate_with_allocator
         ! splicer begin class.ResourceManager.type_bound_procedure_part
         ! splicer end class.ResourceManager.type_bound_procedure_part
     end type UmpireResourceManager
@@ -220,13 +221,13 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_allocator_get_name
 
-        subroutine c_allocator_get_name_bufferify(self, DSHF_rv) &
-                bind(C, name="umpire_allocator_get_name_bufferify")
+        subroutine c_allocator_get_name_b(self, DSHF_rv) &
+                bind(C, name="umpire_allocator_get_name_b")
             import :: SHROUD_allocator_capsule, SHROUD_array
             implicit none
             type(SHROUD_allocator_capsule), intent(IN) :: self
             type(SHROUD_array), intent(INOUT) :: DSHF_rv
-        end subroutine c_allocator_get_name_bufferify
+        end subroutine c_allocator_get_name_b
 
         function c_allocator_get_id(self) &
                 result(SHT_rv) &
@@ -264,10 +265,10 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_name
 
-        function c_resourcemanager_get_allocator_by_name_bufferify(self, &
-                name, Lname, SHT_crv) &
+        function c_resourcemanager_get_allocator_by_name_b(self, name, &
+                Lname, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_get_allocator_by_name_bufferify")
+                bind(C, name="umpire_resourcemanager_get_allocator_by_name_b")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -276,7 +277,7 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: Lname
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_get_allocator_by_name_bufferify
+        end function c_resourcemanager_get_allocator_by_name_b
 
         function c_resourcemanager_get_allocator_by_id(self, id, &
                 SHT_crv) &
@@ -291,10 +292,10 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_id
 
-        function c_resourcemanager_get_allocatorfor_ptr(self, ptr, &
+        function c_resourcemanager_get_allocator_for_ptr(self, ptr, &
                 SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_get_allocatorfor_ptr")
+                bind(C, name="umpire_resourcemanager_get_allocator_for_ptr")
             use iso_c_binding, only : C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -302,7 +303,7 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: ptr
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_get_allocatorfor_ptr
+        end function c_resourcemanager_get_allocator_for_ptr
 
         subroutine c_resourcemanager_copy_all(self, src_ptr, dst_ptr) &
                 bind(C, name="umpire_resourcemanager_copy_all")
@@ -348,9 +349,10 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: length
         end subroutine c_resourcemanager_memset_with_size
 
-        function c_resourcemanager_reallocate_0(self, src_ptr, size) &
+        function c_resourcemanager_reallocate_default(self, src_ptr, &
+                size) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_reallocate_0")
+                bind(C, name="umpire_resourcemanager_reallocate_default")
             use iso_c_binding, only : C_PTR, C_SIZE_T
             import :: SHROUD_resourcemanager_capsule
             implicit none
@@ -358,7 +360,7 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: src_ptr
             integer(C_SIZE_T), value, intent(IN) :: size
             type(C_PTR) :: SHT_rv
-        end function c_resourcemanager_reallocate_0
+        end function c_resourcemanager_reallocate_default
 
         function c_resourcemanager_reallocate_with_allocator(self, &
                 src_ptr, size, allocator) &
@@ -407,35 +409,38 @@ module umpire_mod
         end function c_resourcemanager_get_size
 
         function c_resourcemanager_make_allocator_umpire_strategy_dynamicpool( &
-                self, name, initial_size, block, SHT_crv) &
+                self, name, allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_umpire_strategy_DynamicPool")
+                bind(C, name="umpire_resourcemanager_make_pool_allocator")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
             type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
+            type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
             integer(C_INT), value, intent(IN) :: initial_size
             integer(C_INT), value, intent(IN) :: block
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_umpire_strategy_dynamicpool
 
-        function c_resourcemanager_make_allocator_umpire_strategy_dynamicpool_bufferify( &
-                self, name, Lname, initial_size, block, SHT_crv) &
+        function c_resourcemanager_make_allocator_umpire_strategy_dynamicpool_b( &
+                self, name, Lname, allocator, initial_size, block, &
+                SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_umpire_strategy_DynamicPool_bufferify")
+                bind(C, name="umpire_resourcemanager_make_pool_allocator")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
             type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
+            type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
             integer(C_INT), value, intent(IN) :: initial_size
             integer(C_INT), value, intent(IN) :: block
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_umpire_strategy_dynamicpool_bufferify
+        end function c_resourcemanager_make_allocator_umpire_strategy_dynamicpool_b
 
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
@@ -556,7 +561,7 @@ contains
         type(SHROUD_array) :: DSHF_rv
         character(len=:), allocatable :: SHT_rv
         ! splicer begin class.Allocator.method.get_name
-        call c_allocator_get_name_bufferify(obj%cxxmem, DSHF_rv)
+        call c_allocator_get_name_b(obj%cxxmem, DSHF_rv)
         ! splicer end class.Allocator.method.get_name
         allocate(character(len=DSHF_rv%len):: SHT_rv)
         call SHROUD_copy_string_and_free(DSHF_rv, SHT_rv, DSHF_rv%len)
@@ -616,7 +621,7 @@ contains
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.get_allocator_by_name
-        SHT_prv = c_resourcemanager_get_allocator_by_name_bufferify(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_get_allocator_by_name_b(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.get_allocator_by_name
     end function resourcemanager_get_allocator_by_name
@@ -634,18 +639,18 @@ contains
         ! splicer end class.ResourceManager.method.get_allocator_by_id
     end function resourcemanager_get_allocator_by_id
 
-    function resourcemanager_get_allocatorfor_ptr(obj, ptr) &
+    function resourcemanager_get_allocator_for_ptr(obj, ptr) &
             result(SHT_rv)
         use iso_c_binding, only : C_PTR
         class(UmpireResourceManager) :: obj
         type(C_PTR), value, intent(IN) :: ptr
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.get_allocatorfor_ptr
-        SHT_prv = c_resourcemanager_get_allocatorfor_ptr(obj%cxxmem, &
+        ! splicer begin class.ResourceManager.method.get_allocator_for_ptr
+        SHT_prv = c_resourcemanager_get_allocator_for_ptr(obj%cxxmem, &
             ptr, SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.get_allocatorfor_ptr
-    end function resourcemanager_get_allocatorfor_ptr
+        ! splicer end class.ResourceManager.method.get_allocator_for_ptr
+    end function resourcemanager_get_allocator_for_ptr
 
     subroutine resourcemanager_copy_all(obj, src_ptr, dst_ptr)
         use iso_c_binding, only : C_PTR
@@ -692,18 +697,18 @@ contains
         ! splicer end class.ResourceManager.method.memset_with_size
     end subroutine resourcemanager_memset_with_size
 
-    function resourcemanager_reallocate_0(obj, src_ptr, size) &
+    function resourcemanager_reallocate_default(obj, src_ptr, size) &
             result(SHT_rv)
         use iso_c_binding, only : C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
         type(C_PTR), value, intent(IN) :: src_ptr
         integer(C_SIZE_T), value, intent(IN) :: size
         type(C_PTR) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.reallocate_0
-        SHT_rv = c_resourcemanager_reallocate_0(obj%cxxmem, src_ptr, &
-            size)
-        ! splicer end class.ResourceManager.method.reallocate_0
-    end function resourcemanager_reallocate_0
+        ! splicer begin class.ResourceManager.method.reallocate_default
+        SHT_rv = c_resourcemanager_reallocate_default(obj%cxxmem, &
+            src_ptr, size)
+        ! splicer end class.ResourceManager.method.reallocate_default
+    end function resourcemanager_reallocate_default
 
     function resourcemanager_reallocate_with_allocator(obj, src_ptr, &
             size, allocator) &
@@ -754,19 +759,20 @@ contains
     end function resourcemanager_get_size
 
     function resourcemanager_make_allocator_umpire_strategy_DynamicPool( &
-            obj, name, initial_size, block) &
+            obj, name, allocator, initial_size, block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR
         class(UmpireResourceManager) :: obj
         character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
         integer(C_INT), value, intent(IN) :: initial_size
         integer(C_INT), value, intent(IN) :: block
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_umpire_strategy_DynamicPool
-        SHT_prv = c_resourcemanager_make_allocator_umpire_strategy_dynamicpool_bufferify(obj%cxxmem, &
-            name, len_trim(name, kind=C_INT), initial_size, block, &
-            SHT_rv%cxxmem)
+        SHT_prv = c_resourcemanager_make_allocator_umpire_strategy_dynamicpool_b(obj%cxxmem, &
+            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
+            initial_size, block, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_umpire_strategy_DynamicPool
     end function resourcemanager_make_allocator_umpire_strategy_DynamicPool
 

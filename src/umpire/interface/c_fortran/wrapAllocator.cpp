@@ -118,10 +118,10 @@ const char * umpire_allocator_get_name(umpire_allocator * self)
 // splicer end class.Allocator.method.get_name
 }
 
-void umpire_allocator_get_name_bufferify(umpire_allocator * self,
+void umpire_allocator_get_name_b(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv)
 {
-// splicer begin class.Allocator.method.get_name_bufferify
+// splicer begin class.Allocator.method.get_name_b
     umpire::Allocator *SH_this =
         static_cast<umpire::Allocator *>(self->addr);
     const std::string & SHCXX_rv = SH_this->getName();
@@ -137,7 +137,7 @@ void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     }
     DSHF_rv->size = 1;
     return;
-// splicer end class.Allocator.method.get_name_bufferify
+// splicer end class.Allocator.method.get_name_b
 }
 
 size_t umpire_allocator_get_id(umpire_allocator * self)

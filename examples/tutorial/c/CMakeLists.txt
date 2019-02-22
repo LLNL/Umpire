@@ -19,3 +19,19 @@ blt_add_executable(
     umpire
   OUTPUT_DIR ${tutorial_dir}
 )
+
+blt_add_executable(
+  NAME tut_resources_c
+  SOURCES tut_resources.c
+  DEPENDS_ON
+    umpire
+  OUTPUT_DIR ${tutorial_dir}
+)
+
+blt_add_executable(
+  NAME tut_pool_c
+  SOURCES tut_pool.c
+  DEPENDS_ON
+    umpire
+  OUTPUT_DIR ${tutorial_dir}
+)

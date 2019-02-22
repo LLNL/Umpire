@@ -35,6 +35,7 @@ options:
 
 format:
   C_prefix: umpire_
+  C_bufferify_suffix: _b
 
 declarations:
 - decl: namespace umpire
@@ -80,9 +81,7 @@ declarations:
 
         - decl: Allocator getAllocator(void* ptr)
           format:
-            function_suffix: for_ptr
-
-            #        - decl: void registerAllocator(const std::string& name, Allocator allocator)
+            function_suffix: _for_ptr
 
         - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
           default_arg_suffix:
@@ -95,6 +94,8 @@ declarations:
             - _with_size
 
         - decl: void* reallocate(void* src_ptr, size_t size)
+          format:
+            function_suffix: _default
 
         - decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
           format:
@@ -106,16 +107,16 @@ declarations:
 
         - decl: size_t getSize(void* ptr)
 
-        - decl: template <typename T> Allocator makeAllocator(const std::string& name, int initial_size, int block);
+        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int initial_size, int block);
+          format:
+            C_name: umpire_resourcemanager_make_pool_allocator
           cxx_template:
             - instantiation: <umpire::strategy::DynamicPool>
-              format:
-                C_name: umpire_resourcemanager_make_pool_allocator
-                F_C_name: c_resourcemanager_make_pool_allocator
 
 splicer_code:
   c:
     class:
+      Allocator:
         CXX_declarations:
         - "#ifdef __cplusplus"
         - "#include <cstring>"
