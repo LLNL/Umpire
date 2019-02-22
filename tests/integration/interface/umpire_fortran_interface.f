@@ -29,6 +29,17 @@ contains
 
   end subroutine allocate_sixty_four
 
+  subroutine allocate_through_generic
+    integer(C_INT), pointer :: array(:)
+    type(UmpireAllocator) allocator
+    type(UmpireResourceManager) rm
+
+    rm = rm%get_instance()
+    allocator = rm%get_allocator_by_id(0)
+    call allocator%allocate_array( [ 10 ] , array)
+
+  end subroutine allocate_through_generic
+
 end module umpire_fortran_test
 
 program fortran_test
