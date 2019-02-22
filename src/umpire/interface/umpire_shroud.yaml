@@ -124,4 +124,4 @@ splicer_code:
 
 splicer:
   f:
-  - c_fortran/umpiresplicer.f
+  - c_fortran/genfumpiresplicer.f
