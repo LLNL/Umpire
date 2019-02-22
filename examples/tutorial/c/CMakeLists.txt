@@ -17,4 +17,5 @@ blt_add_executable(
   SOURCES tut_allocator.c
   DEPENDS_ON
     umpire
+  OUTPUT_DIR ${tutorial_dir}
 )

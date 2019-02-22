@@ -55,8 +55,8 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  m_allocator.deallocate(ptr);
   deregisterAllocation(ptr);
+  m_allocator.deallocate(ptr);
 }
 
 template<typename _allocator>
