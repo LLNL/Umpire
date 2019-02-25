@@ -127,7 +127,7 @@ class Allocator {
      *
      * \return name of Allocator.
      */
-    std::string getName() const noexcept;
+    const std::string& getName() const noexcept;
 
     /*!
      * \brief Get the integer ID of this Allocator.

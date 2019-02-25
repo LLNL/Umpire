@@ -109,6 +109,6 @@ blt_add_test(
 
 add_subdirectory(replay)
 
-if (ENABLE_C_API OR ENABLE_FORTRAN_API)
+if (ENABLE_C OR ENABLE_FORTRAN)
   add_subdirectory(interface)
 endif()
