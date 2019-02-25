@@ -12,31 +12,31 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "gtest/gtest.h"
-
+#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-TEST(ResourceManager, Constructor) {
-  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+int main(int, char**) {
+  constexpr size_t SIZE = 1024;
 
-  (void) rm;
-  SUCCEED();
-}
-
-TEST(ResourceManager, findAllocationRecord)
-{
   auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("HOST");
 
-  auto alloc = rm.getAllocator("HOST");
+  /*
+   * Allocate host data
+   */
+  double* host_data = static_cast<double*>(
+      allocator.allocate(SIZE*sizeof(double)));
 
-  const size_t size = 1024 * 1024;
-  const size_t offset = 1024;
+  /*
+   * Move data to unified memory
+   */
+  auto um_allocator = rm.getAllocator("UM");
+  double* um_data = static_cast<double*>(rm.move(host_data, um_allocator));
 
-  char* ptr = static_cast<char*>(alloc.allocate(size));
-  const umpire::util::AllocationRecord* rec = rm.findAllocationRecord(ptr + offset);
+  /*
+   * Deallocate um_data, host_data is already deallocated by move operation.
+   */
+  rm.deallocate(um_data);
 
-  ASSERT_EQ(ptr, rec->m_ptr);
-  alloc.deallocate(ptr);
-
-  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::util::Exception);
+  return 0;
 }

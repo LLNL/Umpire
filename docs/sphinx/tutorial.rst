@@ -25,6 +25,7 @@ sections.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorial
 
    tutorial/allocators.rst
    tutorial/resources.rst
@@ -33,3 +34,19 @@ sections.
    tutorial/introspection.rst
    tutorial/typed_allocators.rst
    tutorial/replay.rst
+
+We also have a tutorial for the C interface to Umpire. Complete example
+listings are available, and will be compiled if you have configured Umpire with
+``-DENABLE_C=On``. 
+
+The C tutorial assumes an understanding of C, and it would be useful to have
+some knowledge of C++ to understand how the C API maps to the native C++
+classes that Umpire provides.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: C API Tutorial
+
+   tutorial/c/allocators.rst
+   tutorial/c/resources.rst
+   tutorial/c/pools.rst

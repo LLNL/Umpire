@@ -25,16 +25,16 @@ AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
 {
 }
 
-void
-AllocationStrategy::release()
-{
-  UMPIRE_LOG(Info, "AllocationStrategy::release in a no-op");
-}
-
-std::string
+const std::string&
 AllocationStrategy::getName() noexcept
 {
   return m_name;
+}
+
+void
+AllocationStrategy::release()
+{
+  UMPIRE_LOG(Info, "AllocationStrategy::release is a no-op");
 }
 
 int

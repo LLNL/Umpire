@@ -90,11 +90,19 @@ DynamicPool::getHighWatermark() const noexcept
 }
 
 long
-DynamicPool::getReleaseableSize() const noexcept
+DynamicPool::getReleasableSize() const noexcept
 {
-  long SparseBlockSize = dpa->getReleaseableSize();
+  long SparseBlockSize = dpa->getReleasableSize();
   UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);
   return SparseBlockSize;
+}
+
+long
+DynamicPool::getBlocksInPool() const noexcept
+{
+  long BlocksInPool = dpa->getBlocksInPool();
+  UMPIRE_LOG(Debug, "() returning " << BlocksInPool);
+  return BlocksInPool;
 }
 
 Platform

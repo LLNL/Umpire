@@ -12,16 +12,26 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (resource_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/resource)
+blt_add_executable(
+  NAME tut_allocator_c
+  SOURCES tut_allocator.c
+  DEPENDS_ON
+    umpire
+  OUTPUT_DIR ${tutorial_dir}
+)
 
-if (ENABLE_GMOCK)
-  blt_add_executable(
-    NAME resource_tests
-    SOURCES resource_tests.cpp
-    DEPENDS_ON umpire umpire_resource umpire_util umpire gtest gmock
-    OUTPUT_DIR ${resource_dir})
+blt_add_executable(
+  NAME tut_resources_c
+  SOURCES tut_resources.c
+  DEPENDS_ON
+    umpire
+  OUTPUT_DIR ${tutorial_dir}
+)
 
-  blt_add_test(
-    NAME resource_tests
-    COMMAND resource_tests)
-endif ()
+blt_add_executable(
+  NAME tut_pool_c
+  SOURCES tut_pool.c
+  DEPENDS_ON
+    umpire
+  OUTPUT_DIR ${tutorial_dir}
+)

@@ -19,3 +19,5 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/no_introspection.rst
    cookbook/pool_advice.rst
    cookbook/advice_device_id.rst
+   cookbook/move_to_managed.rst
+   cookbook/dynamic_pool_heuristics.rst

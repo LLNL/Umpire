@@ -26,27 +26,29 @@ set (umpire_sources
   Replay.cpp
   ResourceManager.cpp)
 
-if (ENABLE_FORTRAN_API OR ENABLE_C_API)
-  set (umpire_headers
-    ${umpire_headers}
+if (ENABLE_FORTRAN OR ENABLE_C)
+  set (umpire_interface_headers
     interface/umpire.h
+  )
+
+  set (umpire_interface_c_fortran_headers
     interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
-    )
+    interface/c_fortran/typesUmpire.h
+  )
 
-  if (ENABLE_C_API)
-    set (umpire_sources
-      ${umpire_sources}
+  if (ENABLE_C)
+    set (umpire_interface_sources
       interface/c_fortran/shroudrt.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp
       )
 
-    if (ENABLE_FORTRAN_API)
-      set (umpire_sources
-        ${umpire_sources}
+    if (ENABLE_FORTRAN)
+      set (umpire_interface_sources
+        ${umpire_interface_sources}
         interface/c_fortran/wrapfumpire.f
       )
 
@@ -60,8 +62,8 @@ endif ()
 
 blt_add_library(
   NAME umpire
-  HEADERS ${umpire_headers}
-  SOURCES ${umpire_sources}
+  HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
+  SOURCES ${umpire_sources} ${umpire_interface_sources}
   HEADERS_OUTPUT_SUBDIR umpire 
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
@@ -107,6 +109,14 @@ install(TARGETS
 install(FILES
   ${umpire_headers}
   DESTINATION include/umpire)
+
+install(FILES
+  ${umpire_interface_headers}
+  DESTINATION include/umpire/interface)
+
+install(FILES
+  ${umpire_interface_c_fortran_headers}
+  DESTINATION include/umpire/interface/c_fortran)
 
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
