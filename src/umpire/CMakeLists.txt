@@ -64,17 +64,18 @@ blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  HEADERS_OUTPUT_SUBDIR umpire 
+  HEADERS_OUTPUT_SUBDIR umpire
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
 
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
+set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_ROCM ${ENABLE_ROCM})
 
-if (ENABLE_CUDA OR ENABLE_ROCM) 
+if (ENABLE_CUDA OR ENABLE_ROCM)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
 else ()

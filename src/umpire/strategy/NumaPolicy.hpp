@@ -12,34 +12,35 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_SizeLimiter_HPP
-#define UMPIRE_SizeLimiter_HPP
+#ifndef UMPIRE_NumaPolicy_HPP
+#define UMPIRE_NumaPolicy_HPP
 
-#include <memory>
+#include <vector>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+
 #include "umpire/Allocator.hpp"
 
 namespace umpire {
+
 namespace strategy {
 
 /*!
+ * \brief Use NUMA interface to locate memory to a specific NUMA node.
  *
- * \brief An allocator with a limited total size.
- *
- * Using this AllocationStrategy with another can be a good way to limit the
- * total size of allocations made on a particular resource or from a particular
- * context.
+ * This AllocationStrategy provides a method of ensuring memory sits
+ * on a specific NUMA node. This can be used either for optimization,
+ * or for moving memory between the host and devices.
  */
-class SizeLimiter :
+class NumaPolicy :
   public AllocationStrategy
 {
   public:
-      SizeLimiter(
+    NumaPolicy(
         const std::string& name,
         int id,
-        Allocator allocator,
-        size_t size_limit);
+        int numa_node,
+        Allocator allocator);
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
@@ -48,14 +49,16 @@ class SizeLimiter :
     long getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
-  private:
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
 
-    size_t m_size_limit;
-    size_t m_total_size;
+    int getNode() const noexcept;
+
+  private:
+    std::shared_ptr<AllocationStrategy> m_allocator;
+    Platform m_platform;
+    int m_node;
 };
 
 } // end of namespace strategy
-} // end namespace umpire
+} // end of namespace umpire
 
-#endif // UMPIRE_SizeLimiter_HPP
+#endif // UMPIRE_NumaPolicy_HPP

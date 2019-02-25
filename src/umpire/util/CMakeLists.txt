@@ -15,9 +15,11 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
+  detect_vendor.hpp
   Exception.hpp
   Logger.hpp
   Macros.hpp
+  MemoryResourceTraits.hpp
   Platform.hpp)
 
 if (ENABLE_STATISTICS)
@@ -26,10 +28,17 @@ if (ENABLE_STATISTICS)
     statistic_helper.hpp
     Statistic.hpp
     StatisticsDatabase.hpp)
-endif()
+endif ()
+
+if (ENABLE_NUMA)
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    numa.hpp)
+endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
+  detect_vendor.cpp
   Exception.cpp
   Logger.cpp)
 
@@ -38,9 +47,21 @@ if (ENABLE_STATISTICS)
     ${umpire_util_sources}
     Statistic.cpp
     StatisticsDatabase.cpp)
-endif()
+endif ()
+
+if (ENABLE_NUMA)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    numa.cpp)
+endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
+
+if (ENABLE_NUMA)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    numa)
+endif ()
 
 if (ENABLE_STATISTICS)
   set (umpire_util_depends
@@ -79,4 +100,3 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-
