@@ -26,7 +26,7 @@ set (umpire_sources
   Replay.cpp
   ResourceManager.cpp)
 
-if (ENABLE_FORTRAN_API OR ENABLE_C_API)
+if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h
   )
@@ -38,7 +38,7 @@ if (ENABLE_FORTRAN_API OR ENABLE_C_API)
     interface/c_fortran/typesUmpire.h
   )
 
-  if (ENABLE_C_API)
+  if (ENABLE_C)
     set (umpire_interface_sources
       interface/c_fortran/shroudrt.cpp
       interface/c_fortran/wrapAllocator.cpp
@@ -46,7 +46,7 @@ if (ENABLE_FORTRAN_API OR ENABLE_C_API)
       interface/c_fortran/wrapUmpire.cpp
       )
 
-    if (ENABLE_FORTRAN_API)
+    if (ENABLE_FORTRAN)
       set (umpire_interface_sources
         ${umpire_interface_sources}
         interface/c_fortran/wrapfumpire.f

@@ -57,6 +57,16 @@ void umpire_allocator_deallocate(umpire_allocator * self, void * ptr)
 // splicer end class.Allocator.method.deallocate
 }
 
+void umpire_allocator_release(umpire_allocator * self)
+{
+// splicer begin class.Allocator.method.release
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    SH_this->release();
+    return;
+// splicer end class.Allocator.method.release
+}
+
 size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr)
 {
 // splicer begin class.Allocator.method.get_size
@@ -87,26 +97,47 @@ size_t umpire_allocator_get_current_size(umpire_allocator * self)
 // splicer end class.Allocator.method.get_current_size
 }
 
-void umpire_allocator_get_name_bufferify(umpire_allocator * self,
-    UMP_SHROUD_array *DSHF_rv)
+size_t umpire_allocator_get_actual_size(umpire_allocator * self)
 {
-// splicer begin class.Allocator.method.get_name_bufferify
+// splicer begin class.Allocator.method.get_actual_size
     umpire::Allocator *SH_this =
         static_cast<umpire::Allocator *>(self->addr);
-    std::string * SHCXX_rv = new std::string;
-    *SHCXX_rv = SH_this->getName();
-    DSHF_rv->cxx.addr = static_cast<void *>(SHCXX_rv);
-    DSHF_rv->cxx.idtor = 1;
-    if (SHCXX_rv->empty()) {
+    size_t SHC_rv = SH_this->getActualSize();
+    return SHC_rv;
+// splicer end class.Allocator.method.get_actual_size
+}
+
+const char * umpire_allocator_get_name(umpire_allocator * self)
+{
+// splicer begin class.Allocator.method.get_name
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    const std::string & SHCXX_rv = SH_this->getName();
+    const char * SHC_rv = SHCXX_rv.c_str();
+    return SHC_rv;
+// splicer end class.Allocator.method.get_name
+}
+
+void umpire_allocator_get_name_b(umpire_allocator * self,
+    UMP_SHROUD_array *DSHF_rv)
+{
+// splicer begin class.Allocator.method.get_name_b
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    const std::string & SHCXX_rv = SH_this->getName();
+    DSHF_rv->cxx.addr = static_cast<void *>(const_cast<std::string *>
+        (&SHCXX_rv));
+    DSHF_rv->cxx.idtor = 0;
+    if (SHCXX_rv.empty()) {
         DSHF_rv->addr.ccharp = NULL;
         DSHF_rv->len = 0;
     } else {
-        DSHF_rv->addr.ccharp = SHCXX_rv->data();
-        DSHF_rv->len = SHCXX_rv->size();
+        DSHF_rv->addr.ccharp = SHCXX_rv.data();
+        DSHF_rv->len = SHCXX_rv.size();
     }
     DSHF_rv->size = 1;
     return;
-// splicer end class.Allocator.method.get_name_bufferify
+// splicer end class.Allocator.method.get_name_b
 }
 
 size_t umpire_allocator_get_id(umpire_allocator * self)

@@ -79,3 +79,7 @@ blt_add_executable(
   SOURCES tut_replay.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${tutorial_dir})
+
+if (ENABLE_C)
+  add_subdirectory(c)
+endif ()
