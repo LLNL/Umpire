@@ -24,11 +24,17 @@ set (umpire_strategy_headers
   DynamicPoolHeuristic.hpp
   FixedPool.hpp
   FixedPool.inl)
-  
+
+if (ENABLE_NUMA)
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    NumaPolicy.hpp)
+endif ()
+
 set (umpire_strategy_mixin_headers
   mixins/Inspector.hpp)
 
-set (umpire_stategy_sources
+set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
   AllocationTracker.cpp
@@ -40,8 +46,14 @@ set (umpire_stategy_sources
   DynamicPoolHeuristic.cpp
   mixins/Inspector.cpp)
 
+if (ENABLE_NUMA)
+  set (umpire_strategy_sources
+    ${umpire_strategy_sources}
+    NumaPolicy.cpp)
+endif ()
+
 blt_add_library(
-  NAME umpire_strategy 
+  NAME umpire_strategy
   HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
   SOURCES ${umpire_stategy_sources}
   OBJECT TRUE)

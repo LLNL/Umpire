@@ -15,6 +15,12 @@
 set(umpire_alloc_headers
   MallocAllocator.hpp)
 
+if (ENABLE_NUMA)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    PosixMemalignAllocator.hpp)
+endif ()
+
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}

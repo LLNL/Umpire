@@ -19,17 +19,13 @@ set (umpire_resource_headers
   MemoryResource.hpp
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
-  MemoryResourceTypes.hpp
-  MemoryResourceTraits.hpp
-)
+  MemoryResourceTypes.hpp)
 
 set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
 )
-
-set (umpire_resource_depends)
 
 if (ENABLE_CUDA)
   set (umpire_resource_headers
@@ -44,8 +40,6 @@ if (ENABLE_CUDA)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-
-
     CudaConstantMemoryResourceFactory.cpp
     CudaConstantMemoryResource.cu
 

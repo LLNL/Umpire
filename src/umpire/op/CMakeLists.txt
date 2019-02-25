@@ -30,6 +30,20 @@ set (umpire_op_sources
 
 set (umpire_op_depends)
 
+if (ENABLE_NUMA)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    NumaMoveOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    NumaMoveOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    umpire_strategy)
+endif ()
+
 if (ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
