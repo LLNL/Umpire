@@ -55,7 +55,7 @@ endif ()
 blt_add_library(
   NAME umpire_strategy
   HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
-  SOURCES ${umpire_stategy_sources}
+  SOURCES ${umpire_strategy_sources}
   OBJECT TRUE)
 
 target_include_directories(

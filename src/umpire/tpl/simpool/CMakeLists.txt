@@ -12,3 +12,10 @@ target_link_libraries(umpire_tpl_simpool INTERFACE)
 install(FILES
   ${simpool_headers}
   DESTINATION include/umpire/tpl/simpool)
+
+install(TARGETS
+  umpire_tpl_simpool
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
