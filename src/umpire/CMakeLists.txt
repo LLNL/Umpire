@@ -60,12 +60,22 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   endif ()
 endif ()
 
+add_subdirectory(tpl)
+
+add_subdirectory(resource)
+add_subdirectory(alloc)
+add_subdirectory(op)
+add_subdirectory(util)
+add_subdirectory(strategy)
+if (SHROUD_FOUND)
+  add_subdirectory(interface)
+endif ()
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  HEADERS_OUTPUT_SUBDIR umpire
-  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
+  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy umpire_tpl_simpool)
 
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
@@ -123,13 +133,3 @@ install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-add_subdirectory(tpl)
-
-add_subdirectory(resource)
-add_subdirectory(alloc)
-add_subdirectory(op)
-add_subdirectory(util)
-add_subdirectory(strategy)
-if (SHROUD_FOUND)
-  add_subdirectory(interface)
-endif ()

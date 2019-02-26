@@ -55,7 +55,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends umpire_tpl_judy)
+set (umpire_util_depends)
 
 if (ENABLE_NUMA)
   set (umpire_util_depends
@@ -79,9 +79,8 @@ blt_add_library(
   NAME umpire_util
   HEADERS ${umpire_util_headers}
   SOURCES ${umpire_util_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/util
   DEPENDS_ON ${umpire_util_depends}
-)
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_util
@@ -93,10 +92,3 @@ target_include_directories(
 install(FILES
   ${umpire_util_headers}
   DESTINATION include/umpire/util)
-
-install(TARGETS
-  umpire_util
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)

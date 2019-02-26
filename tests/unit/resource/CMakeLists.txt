@@ -18,7 +18,7 @@ if (ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
     SOURCES resource_tests.cpp
-    DEPENDS_ON umpire umpire_resource umpire_util umpire gtest gmock
+    DEPENDS_ON umpire gtest gmock
     OUTPUT_DIR ${resource_dir})
 
   blt_add_test(

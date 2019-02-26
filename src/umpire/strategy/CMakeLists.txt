@@ -52,17 +52,20 @@ if (ENABLE_NUMA)
     NumaPolicy.cpp)
 endif ()
 
-set (umpire_strategy_depends
-  umpire
-  umpire_util
-  umpire_tpl_simpool)
+set(umpire_strategy_depends)
+
+if (ENABLE_CUDA)
+  set(umpire_strategy_depends
+    ${umpire_strategy_depends}
+    cuda_runtime)
+endif ()
 
 blt_add_library(
   NAME umpire_strategy
   HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
   SOURCES ${umpire_strategy_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/strategy
-  DEPENDS_ON ${umpire_strategy_depends})
+  DEPENDS_ON ${umpire_strategy_depends}
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_strategy
@@ -70,13 +73,6 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-
-install(TARGETS
-  umpire_strategy
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
 
 install(FILES
   ${umpire_strategy_headers}

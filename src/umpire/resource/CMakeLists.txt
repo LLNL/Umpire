@@ -27,9 +27,6 @@ set (umpire_resource_sources
   MemoryResourceRegistry.cpp
 )
 
-set (umpire_resource_depends
-  umpire_util umpire_alloc umpire_strategy)
-
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
@@ -76,8 +73,8 @@ blt_add_library(
   NAME umpire_resource
   HEADERS ${umpire_resource_headers}
   SOURCES ${umpire_resource_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/resource
-  DEPENDS_ON ${umpire_resource_depends})
+  DEPENDS_ON ${umpire_resource_depends}
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_resource
@@ -85,13 +82,6 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-
-install(TARGETS
-  umpire_resource
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
 
 install(FILES
   ${umpire_resource_headers}
