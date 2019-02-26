@@ -52,10 +52,19 @@ if (ENABLE_NUMA)
     NumaPolicy.cpp)
 endif ()
 
+set(umpire_strategy_depends)
+
+if (ENABLE_CUDA)
+  set(umpire_strategy_depends
+    ${umpire_strategy_depends}
+    cuda_runtime)
+endif ()
+
 blt_add_library(
   NAME umpire_strategy
   HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
   SOURCES ${umpire_strategy_sources}
+  DEPENDS_ON ${umpire_strategy_depends}
   OBJECT TRUE)
 
 target_include_directories(
