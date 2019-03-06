@@ -19,10 +19,11 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 0.3.1)
+  VERSION 0.3.2)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
+set(ENABLE_NUMA Off CACHE Bool "")
 set(ENABLE_COPY_HEADERS Off CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
@@ -49,6 +50,12 @@ message(STATUS "Using CMake version ${CMAKE_VERSION}")
 if (ENABLE_FORTRAN)
   set(ENABLE_C On)
 endif()
+
+if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+  message(FATAL_ERROR "\
+  NUMA support unavailable. \
+  Please re-configure with ENABLE_NUMA=Off (default value)")
+endif ()
 
 ################################
 # BLT

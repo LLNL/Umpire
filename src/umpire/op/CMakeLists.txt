@@ -28,8 +28,21 @@ set (umpire_op_sources
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 
-set (umpire_op_depends
-  umpire_util)
+set (umpire_op_depends)
+
+if (ENABLE_NUMA)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    NumaMoveOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    NumaMoveOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    umpire_strategy)
+endif ()
 
 if (ENABLE_CUDA)
   set (umpire_op_headers
@@ -78,9 +91,8 @@ blt_add_library(
   NAME umpire_op
   HEADERS ${umpire_op_headers}
   SOURCES ${umpire_op_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/op
   DEPENDS_ON ${umpire_op_depends}
-)
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_op
@@ -92,10 +104,3 @@ target_include_directories(
 install(FILES
   ${umpire_op_headers}
   DESTINATION include/umpire/op)
-
-install(TARGETS
-  umpire_op
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
