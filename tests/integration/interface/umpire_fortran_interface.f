@@ -32,7 +32,7 @@ contains
 
     allocator = rm%get_allocator_by_id(0)
 
-    data_ptr = allocator%allocate(c_sizeof(i)*10);
+    data_ptr = allocator%allocate_pointer(sizeof(i)*10);
     call c_f_pointer(data_ptr, array, [ 10 ])
 
     do i = 1, 10
@@ -50,7 +50,7 @@ contains
 
     rm = rm%get_instance()
     allocator = rm%get_allocator_by_id(0)
-    call allocator%allocate_array( [ 10 ] , array)
+    call allocator%allocate(array, [ 10 ])
 
   end subroutine allocate_through_generic
 

@@ -17,12 +17,12 @@ def gen_bounds():
         for dim in range(maxdims+1):
             print(f'procedure :: allocate_{name}_array_{dim+1}d => allocator_allocate_{name}_array_{dim+1}d')
             print(f'procedure :: deallocate_{name}_array_{dim+1}d => allocator_deallocate_{name}_array_{dim+1}d')
-    print('generic, public :: allocate_array => &')
+    print('generic, public :: allocate => &')
     for (name, _) in types:
         for dim in range(maxdims+1):
             print(f'    allocate_{name}_array_{dim+1}d, &')
     print('')
-    print('generic, public :: deallocate_array => &')
+    print('generic, public :: deallocate => &')
     for (name, _) in types:
         for dim in range(maxdims+1):
             print(f'    deallocate_{name}_array_{dim+1}d, &')
@@ -37,7 +37,7 @@ def gen_methods():
     for (name, c_type) in types:
         for dim in range(maxdims+1):
             print("""
-subroutine allocator_allocate_{name}_array_{dim}d(this, dims, array)
+subroutine allocator_allocate_{name}_array_{dim}d(this, array, dims)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
@@ -49,14 +49,14 @@ subroutine allocator_allocate_{name}_array_{dim}d(this, dims, array)
 
       {c_type} :: size_type
 
-      data_ptr = this%allocate(product(dims) * sizeof(size_type))
+      data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
       call c_f_pointer(data_ptr, array, dims)
 end subroutine allocator_allocate_{name}_array_{dim}d
 
 """.format(dim=dim+1, name=name, c_type=c_type, dim_string= ", ".join([":" for i in range(dim+1)])))
 
             print("""
-subroutine allocator_deallocate_{name}_array_{dim}d(this, dims, array)
+subroutine allocator_deallocate_{name}_array_{dim}d(this, array, dims)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
@@ -68,7 +68,7 @@ subroutine allocator_deallocate_{name}_array_{dim}d(this, dims, array)
 
       data_ptr = c_loc(array)
 
-      call this%deallocate(data_ptr)
+      call this%deallocate_pointer(data_ptr)
       nullify(array)
 end subroutine allocator_deallocate_{name}_array_{dim}d
 

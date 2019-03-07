@@ -72,8 +72,8 @@ module umpire_mod
         ! splicer begin class.Allocator.component_part
         ! splicer end class.Allocator.component_part
     contains
-        procedure :: allocate => allocator_allocate
-        procedure :: deallocate => allocator_deallocate
+        procedure :: allocate_pointer => allocator_allocate
+        procedure :: deallocate_pointer => allocator_deallocate
         procedure :: release => allocator_release
         procedure :: get_size => allocator_get_size
         procedure :: get_high_watermark => allocator_get_high_watermark
@@ -118,7 +118,7 @@ module umpire_mod
         procedure :: deallocate_double_array_3d => allocator_deallocate_double_array_3d
         procedure :: allocate_double_array_4d => allocator_allocate_double_array_4d
         procedure :: deallocate_double_array_4d => allocator_deallocate_double_array_4d
-        generic, public :: allocate_array => &
+        generic, public :: allocate => &
             allocate_int_array_1d, &
             allocate_int_array_2d, &
             allocate_int_array_3d, &
@@ -136,7 +136,7 @@ module umpire_mod
             allocate_double_array_3d, &
             allocate_double_array_4d
 
-        generic, public :: deallocate_array => &
+        generic, public :: deallocate => &
             deallocate_int_array_1d, &
             deallocate_int_array_2d, &
             deallocate_int_array_3d, &
@@ -561,18 +561,18 @@ contains
         class(UmpireAllocator) :: obj
         integer(C_SIZE_T), value, intent(IN) :: bytes
         type(C_PTR) :: SHT_rv
-        ! splicer begin class.Allocator.method.allocate
+        ! splicer begin class.Allocator.method.allocate_pointer
         SHT_rv = c_allocator_allocate(obj%cxxmem, bytes)
-        ! splicer end class.Allocator.method.allocate
+        ! splicer end class.Allocator.method.allocate_pointer
     end function allocator_allocate
 
     subroutine allocator_deallocate(obj, ptr)
         use iso_c_binding, only : C_PTR
         class(UmpireAllocator) :: obj
         type(C_PTR), value, intent(IN) :: ptr
-        ! splicer begin class.Allocator.method.deallocate
+        ! splicer begin class.Allocator.method.deallocate_pointer
         call c_allocator_deallocate(obj%cxxmem, ptr)
-        ! splicer end class.Allocator.method.deallocate
+        ! splicer end class.Allocator.method.deallocate_pointer
     end subroutine allocator_deallocate
 
     subroutine allocator_release(obj)
@@ -671,7 +671,7 @@ contains
     ! splicer begin class.Allocator.additional_functions
 
 
-    subroutine allocator_allocate_int_array_1d(this, dims, array)
+    subroutine allocator_allocate_int_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -683,13 +683,13 @@ contains
 
           integer(C_INT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_1d
 
 
 
-    subroutine allocator_deallocate_int_array_1d(this, dims, array)
+    subroutine allocator_deallocate_int_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -701,13 +701,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_int_array_1d
 
 
 
-    subroutine allocator_allocate_int_array_2d(this, dims, array)
+    subroutine allocator_allocate_int_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -719,13 +719,13 @@ contains
 
           integer(C_INT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_2d
 
 
 
-    subroutine allocator_deallocate_int_array_2d(this, dims, array)
+    subroutine allocator_deallocate_int_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -737,13 +737,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_int_array_2d
 
 
 
-    subroutine allocator_allocate_int_array_3d(this, dims, array)
+    subroutine allocator_allocate_int_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -755,13 +755,13 @@ contains
 
           integer(C_INT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_3d
 
 
 
-    subroutine allocator_deallocate_int_array_3d(this, dims, array)
+    subroutine allocator_deallocate_int_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -773,13 +773,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_int_array_3d
 
 
 
-    subroutine allocator_allocate_int_array_4d(this, dims, array)
+    subroutine allocator_allocate_int_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -791,13 +791,13 @@ contains
 
           integer(C_INT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_4d
 
 
 
-    subroutine allocator_deallocate_int_array_4d(this, dims, array)
+    subroutine allocator_deallocate_int_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -809,13 +809,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_int_array_4d
 
 
 
-    subroutine allocator_allocate_long_array_1d(this, dims, array)
+    subroutine allocator_allocate_long_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -827,13 +827,13 @@ contains
 
           integer(C_LONG) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_1d
 
 
 
-    subroutine allocator_deallocate_long_array_1d(this, dims, array)
+    subroutine allocator_deallocate_long_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -845,13 +845,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_long_array_1d
 
 
 
-    subroutine allocator_allocate_long_array_2d(this, dims, array)
+    subroutine allocator_allocate_long_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -863,13 +863,13 @@ contains
 
           integer(C_LONG) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_2d
 
 
 
-    subroutine allocator_deallocate_long_array_2d(this, dims, array)
+    subroutine allocator_deallocate_long_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -881,13 +881,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_long_array_2d
 
 
 
-    subroutine allocator_allocate_long_array_3d(this, dims, array)
+    subroutine allocator_allocate_long_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -899,13 +899,13 @@ contains
 
           integer(C_LONG) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_3d
 
 
 
-    subroutine allocator_deallocate_long_array_3d(this, dims, array)
+    subroutine allocator_deallocate_long_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -917,13 +917,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_long_array_3d
 
 
 
-    subroutine allocator_allocate_long_array_4d(this, dims, array)
+    subroutine allocator_allocate_long_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -935,13 +935,13 @@ contains
 
           integer(C_LONG) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_4d
 
 
 
-    subroutine allocator_deallocate_long_array_4d(this, dims, array)
+    subroutine allocator_deallocate_long_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -953,13 +953,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_long_array_4d
 
 
 
-    subroutine allocator_allocate_float_array_1d(this, dims, array)
+    subroutine allocator_allocate_float_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -971,13 +971,13 @@ contains
 
           real(C_FLOAT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_1d
 
 
 
-    subroutine allocator_deallocate_float_array_1d(this, dims, array)
+    subroutine allocator_deallocate_float_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -989,13 +989,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_float_array_1d
 
 
 
-    subroutine allocator_allocate_float_array_2d(this, dims, array)
+    subroutine allocator_allocate_float_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1007,13 +1007,13 @@ contains
 
           real(C_FLOAT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_2d
 
 
 
-    subroutine allocator_deallocate_float_array_2d(this, dims, array)
+    subroutine allocator_deallocate_float_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1025,13 +1025,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_float_array_2d
 
 
 
-    subroutine allocator_allocate_float_array_3d(this, dims, array)
+    subroutine allocator_allocate_float_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1043,13 +1043,13 @@ contains
 
           real(C_FLOAT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_3d
 
 
 
-    subroutine allocator_deallocate_float_array_3d(this, dims, array)
+    subroutine allocator_deallocate_float_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1061,13 +1061,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_float_array_3d
 
 
 
-    subroutine allocator_allocate_float_array_4d(this, dims, array)
+    subroutine allocator_allocate_float_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1079,13 +1079,13 @@ contains
 
           real(C_FLOAT) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_4d
 
 
 
-    subroutine allocator_deallocate_float_array_4d(this, dims, array)
+    subroutine allocator_deallocate_float_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1097,13 +1097,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_float_array_4d
 
 
 
-    subroutine allocator_allocate_double_array_1d(this, dims, array)
+    subroutine allocator_allocate_double_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1115,13 +1115,13 @@ contains
 
           real(C_DOUBLE) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_1d
 
 
 
-    subroutine allocator_deallocate_double_array_1d(this, dims, array)
+    subroutine allocator_deallocate_double_array_1d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1133,13 +1133,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_double_array_1d
 
 
 
-    subroutine allocator_allocate_double_array_2d(this, dims, array)
+    subroutine allocator_allocate_double_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1151,13 +1151,13 @@ contains
 
           real(C_DOUBLE) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_2d
 
 
 
-    subroutine allocator_deallocate_double_array_2d(this, dims, array)
+    subroutine allocator_deallocate_double_array_2d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1169,13 +1169,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_double_array_2d
 
 
 
-    subroutine allocator_allocate_double_array_3d(this, dims, array)
+    subroutine allocator_allocate_double_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1187,13 +1187,13 @@ contains
 
           real(C_DOUBLE) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_3d
 
 
 
-    subroutine allocator_deallocate_double_array_3d(this, dims, array)
+    subroutine allocator_deallocate_double_array_3d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1205,13 +1205,13 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_double_array_3d
 
 
 
-    subroutine allocator_allocate_double_array_4d(this, dims, array)
+    subroutine allocator_allocate_double_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1223,13 +1223,13 @@ contains
 
           real(C_DOUBLE) :: size_type
 
-          data_ptr = this%allocate(product(dims) * sizeof(size_type))
+          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_4d
 
 
 
-    subroutine allocator_deallocate_double_array_4d(this, dims, array)
+    subroutine allocator_deallocate_double_array_4d(this, array, dims)
           use iso_c_binding
 
           class(UmpireAllocator) :: this
@@ -1241,7 +1241,7 @@ contains
 
           data_ptr = c_loc(array)
 
-          call this%deallocate(data_ptr)
+          call this%deallocate_pointer(data_ptr)
           nullify(array)
     end subroutine allocator_deallocate_double_array_4d
 

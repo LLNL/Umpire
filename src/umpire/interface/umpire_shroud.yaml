@@ -51,7 +51,11 @@ declarations:
 
       declarations:
         - decl: void* allocate(size_t bytes)
+          format:
+            F_name_function: allocate_pointer
         - decl: void deallocate (void* ptr)
+          format:
+            F_name_function: deallocate_pointer
         - decl: void release()
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
