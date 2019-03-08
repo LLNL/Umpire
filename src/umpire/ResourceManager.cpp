@@ -21,6 +21,7 @@
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #include <memory>
+#include <iostream>
 
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
@@ -568,5 +569,16 @@ ResourceManager::getNextId() noexcept
 {
   return m_id++;
 }
+
+void print_allocation_map(Allocator alloc, std::ostream& os) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto strategy = alloc.getAllocationStrategy().get();
+
+  rm.m_allocations.print([strategy] (const util::AllocationRecord* rec) {
+    return rec->m_strategy.get() == strategy;
+  }, os);
+}
+
 
 } // end of namespace umpire

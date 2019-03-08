@@ -271,7 +271,12 @@ class ResourceManager {
     int m_id;
 
     std::mutex* m_mutex;
+
+  friend void print_allocation_map(Allocator, std::ostream&);
 };
+
+void print_allocation_map(Allocator alloc, std::ostream&);
+
 
 } // end of namespace umpire
 
