@@ -18,6 +18,8 @@
 
 #include "umpire/tpl/judy/judyL2Array.h"
 
+#include <sstream>
+
 namespace {
   using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
   using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
@@ -157,25 +159,39 @@ AllocationMap::contains(void* ptr)
 }
 
 void
-AllocationMap::printAll() const
+AllocationMap::print(const std::function<bool (const AllocationRecord*)>&& pred,
+                     std::ostream& os) const
 {
-  std::cout << "🔍 Printing allocation map contents..." << std::endl;
-
   for (auto record = m_records->begin(); m_records->success(); record=m_records->next()){
     auto addr = record.key;
     auto vec = *record.value;
 
-    std::cout << reinterpret_cast<void*>(addr) << " : {" << std::endl;
+    std::stringstream ss;
+    ss << reinterpret_cast<void*>(addr) << " : {" << std::endl;
+    bool any_match = false;
     for (auto const& records : vec) {
       AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
-      std::cout << "  " << tmp->m_size <<
-        " [ " << reinterpret_cast<void*>(addr) <<
-        " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
-        " ] " << std::endl;
+      if (pred(tmp)) {
+        any_match = true;
+        ss << "  " << tmp->m_size <<
+          " [ " << reinterpret_cast<void*>(addr) <<
+          " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
+          " ] " << std::endl;
+      }
     }
-    std::cout << "}" << std::endl;
+    ss << "}" << std::endl;
+    if (any_match) { os << ss.str(); }
   }
-  std::cout << "done." << std::endl;
+}
+
+void
+AllocationMap::printAll(std::ostream& os) const
+{
+  os << "🔍 Printing allocation map contents..." << std::endl;
+
+  print([] (const AllocationRecord*) { return true; }, os);
+
+  os << "done." << std::endl;
 }
 
 } // end of namespace util
