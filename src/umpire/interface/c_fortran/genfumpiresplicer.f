@@ -94,13 +94,11 @@ end subroutine allocator_allocate_int_array_1d
 
 
 
-subroutine allocator_deallocate_int_array_1d(this, array, dims)
+subroutine allocator_deallocate_int_array_1d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_INT), intent(inout), pointer, dimension(:) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -130,13 +128,11 @@ end subroutine allocator_allocate_int_array_2d
 
 
 
-subroutine allocator_deallocate_int_array_2d(this, array, dims)
+subroutine allocator_deallocate_int_array_2d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_INT), intent(inout), pointer, dimension(:, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -166,13 +162,11 @@ end subroutine allocator_allocate_int_array_3d
 
 
 
-subroutine allocator_deallocate_int_array_3d(this, array, dims)
+subroutine allocator_deallocate_int_array_3d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_INT), intent(inout), pointer, dimension(:, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -202,13 +196,11 @@ end subroutine allocator_allocate_int_array_4d
 
 
 
-subroutine allocator_deallocate_int_array_4d(this, array, dims)
+subroutine allocator_deallocate_int_array_4d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_INT), intent(inout), pointer, dimension(:, :, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -238,13 +230,11 @@ end subroutine allocator_allocate_long_array_1d
 
 
 
-subroutine allocator_deallocate_long_array_1d(this, array, dims)
+subroutine allocator_deallocate_long_array_1d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_LONG), intent(inout), pointer, dimension(:) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -274,13 +264,11 @@ end subroutine allocator_allocate_long_array_2d
 
 
 
-subroutine allocator_deallocate_long_array_2d(this, array, dims)
+subroutine allocator_deallocate_long_array_2d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_LONG), intent(inout), pointer, dimension(:, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -310,13 +298,11 @@ end subroutine allocator_allocate_long_array_3d
 
 
 
-subroutine allocator_deallocate_long_array_3d(this, array, dims)
+subroutine allocator_deallocate_long_array_3d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_LONG), intent(inout), pointer, dimension(:, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -346,13 +332,11 @@ end subroutine allocator_allocate_long_array_4d
 
 
 
-subroutine allocator_deallocate_long_array_4d(this, array, dims)
+subroutine allocator_deallocate_long_array_4d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       integer(C_LONG), intent(inout), pointer, dimension(:, :, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -382,13 +366,11 @@ end subroutine allocator_allocate_float_array_1d
 
 
 
-subroutine allocator_deallocate_float_array_1d(this, array, dims)
+subroutine allocator_deallocate_float_array_1d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_FLOAT), intent(inout), pointer, dimension(:) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -418,13 +400,11 @@ end subroutine allocator_allocate_float_array_2d
 
 
 
-subroutine allocator_deallocate_float_array_2d(this, array, dims)
+subroutine allocator_deallocate_float_array_2d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_FLOAT), intent(inout), pointer, dimension(:, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -454,13 +434,11 @@ end subroutine allocator_allocate_float_array_3d
 
 
 
-subroutine allocator_deallocate_float_array_3d(this, array, dims)
+subroutine allocator_deallocate_float_array_3d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_FLOAT), intent(inout), pointer, dimension(:, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -490,13 +468,11 @@ end subroutine allocator_allocate_float_array_4d
 
 
 
-subroutine allocator_deallocate_float_array_4d(this, array, dims)
+subroutine allocator_deallocate_float_array_4d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_FLOAT), intent(inout), pointer, dimension(:, :, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -526,13 +502,11 @@ end subroutine allocator_allocate_double_array_1d
 
 
 
-subroutine allocator_deallocate_double_array_1d(this, array, dims)
+subroutine allocator_deallocate_double_array_1d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_DOUBLE), intent(inout), pointer, dimension(:) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -562,13 +536,11 @@ end subroutine allocator_allocate_double_array_2d
 
 
 
-subroutine allocator_deallocate_double_array_2d(this, array, dims)
+subroutine allocator_deallocate_double_array_2d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_DOUBLE), intent(inout), pointer, dimension(:, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -598,13 +570,11 @@ end subroutine allocator_allocate_double_array_3d
 
 
 
-subroutine allocator_deallocate_double_array_3d(this, array, dims)
+subroutine allocator_deallocate_double_array_3d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
@@ -634,13 +604,11 @@ end subroutine allocator_allocate_double_array_4d
 
 
 
-subroutine allocator_deallocate_double_array_4d(this, array, dims)
+subroutine allocator_deallocate_double_array_4d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       real(C_DOUBLE), intent(inout), pointer, dimension(:, :, :, :) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 

@@ -56,5 +56,16 @@ if (ENABLE_C)
       umpire_fortran_interface.f
       PROPERTIES
       Fortran_FORMAT FREE)
+
+    blt_add_executable(
+      NAME umpire_fortran_tests
+      SOURCES umpire_fortran_tests.f
+      DEPENDS_ON fruit umpire
+    )
+
+    set_source_files_properties(
+      umpire_fortran_tests.f
+      PROPERTIES
+      Fortran_FORMAT FREE)
   endif()
 endif()

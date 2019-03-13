@@ -56,13 +56,11 @@ end subroutine allocator_allocate_{name}_array_{dim}d
 """.format(dim=dim+1, name=name, c_type=c_type, dim_string= ", ".join([":" for i in range(dim+1)])))
 
             print("""
-subroutine allocator_deallocate_{name}_array_{dim}d(this, array, dims)
+subroutine allocator_deallocate_{name}_array_{dim}d(this, array)
       use iso_c_binding
 
       class(UmpireAllocator) :: this
       {c_type}, intent(inout), pointer, dimension({dim_string}) :: array
-
-      integer, dimension(:) :: dims
 
       type(C_PTR) :: data_ptr
 
