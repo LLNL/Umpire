@@ -83,3 +83,7 @@ blt_add_executable(
 if (ENABLE_C)
   add_subdirectory(c)
 endif ()
+
+if (ENABLE_FORTRAN)
+  add_subdirectory(fortran)
+endif ()
