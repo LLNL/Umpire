@@ -13,389 +13,1063 @@ module umpire_fortran_generated_tests
 
 
 
-  subroutine test_allocate_int_array_1d
-    use iso_c_binding
+      subroutine test_allocate_int_host_array_1d
+        use iso_c_binding
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    integer(C_INT), pointer, dimension(:) :: array
+        integer(C_INT), pointer, dimension(:) :: array
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
 
-    call allocator%allocate(array, [10])
-    call assert_true(associated(array))
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
 
-    array(0) = 1
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+      end subroutine test_allocate_int_host_array_1d
 
-  end subroutine test_allocate_int_array_1d
+    
 
+      subroutine test_allocate_int_host_array_2d
+        use iso_c_binding
 
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-  subroutine test_allocate_int_array_2d
-    use iso_c_binding
+        integer(C_INT), pointer, dimension(:, :) :: array
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    integer(C_INT), pointer, dimension(:, :) :: array
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
 
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    call allocator%allocate(array, [10, 10])
-    call assert_true(associated(array))
+      end subroutine test_allocate_int_host_array_2d
 
-    array(0, 0) = 1
+    
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+      subroutine test_allocate_int_host_array_3d
+        use iso_c_binding
 
-  end subroutine test_allocate_int_array_2d
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
+        integer(C_INT), pointer, dimension(:, :, :) :: array
 
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-  subroutine test_allocate_int_array_3d
-    use iso_c_binding
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
 
-    integer(C_INT), pointer, dimension(:, :, :) :: array
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+      end subroutine test_allocate_int_host_array_3d
 
+    
 
-    call allocator%allocate(array, [10, 10, 10])
-    call assert_true(associated(array))
+      subroutine test_allocate_int_host_array_4d
+        use iso_c_binding
 
-    array(0, 0, 0) = 1
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        integer(C_INT), pointer, dimension(:, :, :, :) :: array
 
-  end subroutine test_allocate_int_array_3d
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
 
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
 
-  subroutine test_allocate_int_array_4d
-    use iso_c_binding
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+      end subroutine test_allocate_int_host_array_4d
 
-    integer(C_INT), pointer, dimension(:, :, :, :) :: array
+    
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+      subroutine test_allocate_long_host_array_1d
+        use iso_c_binding
 
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    call allocator%allocate(array, [10, 10, 10, 10])
-    call assert_true(associated(array))
+        integer(C_LONG), pointer, dimension(:) :: array
 
-    array(0, 0, 0, 0) = 1
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
 
-  end subroutine test_allocate_int_array_4d
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
 
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
+      end subroutine test_allocate_long_host_array_1d
 
-  subroutine test_allocate_long_array_1d
-    use iso_c_binding
+    
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+      subroutine test_allocate_long_host_array_2d
+        use iso_c_binding
 
-    integer(C_LONG), pointer, dimension(:) :: array
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        integer(C_LONG), pointer, dimension(:, :) :: array
 
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    call allocator%allocate(array, [10])
-    call assert_true(associated(array))
 
-    array(0) = 1
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-  end subroutine test_allocate_long_array_1d
+      end subroutine test_allocate_long_host_array_2d
 
+    
 
+      subroutine test_allocate_long_host_array_3d
+        use iso_c_binding
 
-  subroutine test_allocate_long_array_2d
-    use iso_c_binding
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        integer(C_LONG), pointer, dimension(:, :, :) :: array
 
-    integer(C_LONG), pointer, dimension(:, :) :: array
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
 
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
 
-    call allocator%allocate(array, [10, 10])
-    call assert_true(associated(array))
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    array(0, 0) = 1
+      end subroutine test_allocate_long_host_array_3d
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+    
 
-  end subroutine test_allocate_long_array_2d
+      subroutine test_allocate_long_host_array_4d
+        use iso_c_binding
 
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
+        integer(C_LONG), pointer, dimension(:, :, :, :) :: array
 
-  subroutine test_allocate_long_array_3d
-    use iso_c_binding
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
 
-    integer(C_LONG), pointer, dimension(:, :, :) :: array
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
+      end subroutine test_allocate_long_host_array_4d
 
-    call allocator%allocate(array, [10, 10, 10])
-    call assert_true(associated(array))
+    
 
-    array(0, 0, 0) = 1
+      subroutine test_allocate_float_host_array_1d
+        use iso_c_binding
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-  end subroutine test_allocate_long_array_3d
+        real(C_FLOAT), pointer, dimension(:) :: array
 
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
 
-  subroutine test_allocate_long_array_4d
-    use iso_c_binding
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    integer(C_LONG), pointer, dimension(:, :, :, :) :: array
+      end subroutine test_allocate_float_host_array_1d
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+    
 
+      subroutine test_allocate_float_host_array_2d
+        use iso_c_binding
 
-    call allocator%allocate(array, [10, 10, 10, 10])
-    call assert_true(associated(array))
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    array(0, 0, 0, 0) = 1
+        real(C_FLOAT), pointer, dimension(:, :) :: array
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-  end subroutine test_allocate_long_array_4d
 
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
 
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-  subroutine test_allocate_float_array_1d
-    use iso_c_binding
+      end subroutine test_allocate_float_host_array_2d
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+    
 
-    real(C_FLOAT), pointer, dimension(:) :: array
+      subroutine test_allocate_float_host_array_3d
+        use iso_c_binding
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
+        real(C_FLOAT), pointer, dimension(:, :, :) :: array
 
-    call allocator%allocate(array, [10])
-    call assert_true(associated(array))
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    array(0) = 1
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
 
-  end subroutine test_allocate_float_array_1d
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
+      end subroutine test_allocate_float_host_array_3d
 
+    
 
-  subroutine test_allocate_float_array_2d
-    use iso_c_binding
+      subroutine test_allocate_float_host_array_4d
+        use iso_c_binding
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    real(C_FLOAT), pointer, dimension(:, :) :: array
+        real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
 
-    call allocator%allocate(array, [10, 10])
-    call assert_true(associated(array))
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
 
-    array(0, 0) = 1
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+      end subroutine test_allocate_float_host_array_4d
 
-  end subroutine test_allocate_float_array_2d
+    
 
+      subroutine test_allocate_double_host_array_1d
+        use iso_c_binding
 
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-  subroutine test_allocate_float_array_3d
-    use iso_c_binding
+        real(C_DOUBLE), pointer, dimension(:) :: array
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    real(C_FLOAT), pointer, dimension(:, :, :) :: array
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
 
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    call allocator%allocate(array, [10, 10, 10])
-    call assert_true(associated(array))
+      end subroutine test_allocate_double_host_array_1d
 
-    array(0, 0, 0) = 1
+    
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+      subroutine test_allocate_double_host_array_2d
+        use iso_c_binding
 
-  end subroutine test_allocate_float_array_3d
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
+        real(C_DOUBLE), pointer, dimension(:, :) :: array
 
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-  subroutine test_allocate_float_array_4d
-    use iso_c_binding
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
 
-    real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+      end subroutine test_allocate_double_host_array_2d
 
+    
 
-    call allocator%allocate(array, [10, 10, 10, 10])
-    call assert_true(associated(array))
+      subroutine test_allocate_double_host_array_3d
+        use iso_c_binding
 
-    array(0, 0, 0, 0) = 1
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        real(C_DOUBLE), pointer, dimension(:, :, :) :: array
 
-  end subroutine test_allocate_float_array_4d
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
 
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
 
-  subroutine test_allocate_double_array_1d
-    use iso_c_binding
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+      end subroutine test_allocate_double_host_array_3d
 
-    real(C_DOUBLE), pointer, dimension(:) :: array
+    
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+      subroutine test_allocate_double_host_array_4d
+        use iso_c_binding
 
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    call allocator%allocate(array, [10])
-    call assert_true(associated(array))
+        real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
 
-    array(0) = 1
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("HOST")
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
 
-  end subroutine test_allocate_double_array_1d
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
 
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
+      end subroutine test_allocate_double_host_array_4d
 
-  subroutine test_allocate_double_array_2d
-    use iso_c_binding
+    
+#ifdef UMPIRE_ENABLE_CUDA
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+      subroutine test_allocate_int_device_array_1d
+        use iso_c_binding
 
-    real(C_DOUBLE), pointer, dimension(:, :) :: array
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        integer(C_INT), pointer, dimension(:) :: array
 
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
 
-    call allocator%allocate(array, [10, 10])
-    call assert_true(associated(array))
 
-    array(0, 0) = 1
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-  end subroutine test_allocate_double_array_2d
+      end subroutine test_allocate_int_device_array_1d
 
+    
 
+      subroutine test_allocate_int_device_array_2d
+        use iso_c_binding
 
-  subroutine test_allocate_double_array_3d
-    use iso_c_binding
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
+        integer(C_INT), pointer, dimension(:, :) :: array
 
-    real(C_DOUBLE), pointer, dimension(:, :, :) :: array
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
 
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
 
-    call allocator%allocate(array, [10, 10, 10])
-    call assert_true(associated(array))
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
-    array(0, 0, 0) = 1
+      end subroutine test_allocate_int_device_array_2d
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+    
 
-  end subroutine test_allocate_double_array_3d
+      subroutine test_allocate_int_device_array_3d
+        use iso_c_binding
 
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
+        integer(C_INT), pointer, dimension(:, :, :) :: array
 
-  subroutine test_allocate_double_array_4d
-    use iso_c_binding
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
 
-    type(UmpireResourceManager) rm
-    type(UmpireAllocator) allocator
 
-    real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
 
-    rm = rm%get_instance()
-    allocator = rm%get_allocator_by_id(0)
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
 
+      end subroutine test_allocate_int_device_array_3d
 
-    call allocator%allocate(array, [10, 10, 10, 10])
-    call assert_true(associated(array))
+    
 
-    array(0, 0, 0, 0) = 1
+      subroutine test_allocate_int_device_array_4d
+        use iso_c_binding
 
-    call allocator%deallocate(array)
-    call assert_true(.not. associated(array))
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
 
-  end subroutine test_allocate_double_array_4d
+        integer(C_INT), pointer, dimension(:, :, :, :) :: array
 
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
 
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_int_device_array_4d
+
+    
+
+      subroutine test_allocate_long_device_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_device_array_1d
+
+    
+
+      subroutine test_allocate_long_device_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_device_array_2d
+
+    
+
+      subroutine test_allocate_long_device_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_device_array_3d
+
+    
+
+      subroutine test_allocate_long_device_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_device_array_4d
+
+    
+
+      subroutine test_allocate_float_device_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_device_array_1d
+
+    
+
+      subroutine test_allocate_float_device_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_device_array_2d
+
+    
+
+      subroutine test_allocate_float_device_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_device_array_3d
+
+    
+
+      subroutine test_allocate_float_device_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_device_array_4d
+
+    
+
+      subroutine test_allocate_double_device_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_device_array_1d
+
+    
+
+      subroutine test_allocate_double_device_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_device_array_2d
+
+    
+
+      subroutine test_allocate_double_device_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_device_array_3d
+
+    
+
+      subroutine test_allocate_double_device_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("DEVICE")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_device_array_4d
+
+    
+
+      subroutine test_allocate_int_um_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_INT), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_int_um_array_1d
+
+    
+
+      subroutine test_allocate_int_um_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_INT), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_int_um_array_2d
+
+    
+
+      subroutine test_allocate_int_um_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_INT), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_int_um_array_3d
+
+    
+
+      subroutine test_allocate_int_um_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_INT), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_int_um_array_4d
+
+    
+
+      subroutine test_allocate_long_um_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_um_array_1d
+
+    
+
+      subroutine test_allocate_long_um_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_um_array_2d
+
+    
+
+      subroutine test_allocate_long_um_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_um_array_3d
+
+    
+
+      subroutine test_allocate_long_um_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        integer(C_LONG), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_long_um_array_4d
+
+    
+
+      subroutine test_allocate_float_um_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_um_array_1d
+
+    
+
+      subroutine test_allocate_float_um_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_um_array_2d
+
+    
+
+      subroutine test_allocate_float_um_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_um_array_3d
+
+    
+
+      subroutine test_allocate_float_um_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_FLOAT), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_float_um_array_4d
+
+    
+
+      subroutine test_allocate_double_um_array_1d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_um_array_1d
+
+    
+
+      subroutine test_allocate_double_um_array_2d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_um_array_2d
+
+    
+
+      subroutine test_allocate_double_um_array_3d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_um_array_3d
+
+    
+
+      subroutine test_allocate_double_um_array_4d
+        use iso_c_binding
+
+        type(UmpireResourceManager) rm
+        type(UmpireAllocator) allocator
+
+        real(C_DOUBLE), pointer, dimension(:, :, :, :) :: array
+
+        rm = rm%get_instance()
+        allocator = rm%get_allocator_by_name("UM")
+
+
+        call allocator%allocate(array, [10, 10, 10, 10])
+        call assert_true(associated(array))
+
+        call allocator%deallocate(array)
+        call assert_true(.not. associated(array))
+
+      end subroutine test_allocate_double_um_array_4d
+
+    
+#endif
 
 end module umpire_fortran_generated_tests
 
@@ -409,22 +1083,57 @@ program fortran_test
 
   call init_fruit
 
-  call test_allocate_int_array_1d
-  call test_allocate_int_array_2d
-  call test_allocate_int_array_3d
-  call test_allocate_int_array_4d
-  call test_allocate_long_array_1d
-  call test_allocate_long_array_2d
-  call test_allocate_long_array_3d
-  call test_allocate_long_array_4d
-  call test_allocate_float_array_1d
-  call test_allocate_float_array_2d
-  call test_allocate_float_array_3d
-  call test_allocate_float_array_4d
-  call test_allocate_double_array_1d
-  call test_allocate_double_array_2d
-  call test_allocate_double_array_3d
-  call test_allocate_double_array_4d
+  call test_allocate_int_host_array_1d
+  call test_allocate_int_host_array_2d
+  call test_allocate_int_host_array_3d
+  call test_allocate_int_host_array_4d
+  call test_allocate_long_host_array_1d
+  call test_allocate_long_host_array_2d
+  call test_allocate_long_host_array_3d
+  call test_allocate_long_host_array_4d
+  call test_allocate_float_host_array_1d
+  call test_allocate_float_host_array_2d
+  call test_allocate_float_host_array_3d
+  call test_allocate_float_host_array_4d
+  call test_allocate_double_host_array_1d
+  call test_allocate_double_host_array_2d
+  call test_allocate_double_host_array_3d
+  call test_allocate_double_host_array_4d
+
+#ifdef UMPIRE_ENABLE_CUDA
+  call test_allocate_int_device_array_1d
+  call test_allocate_int_device_array_2d
+  call test_allocate_int_device_array_3d
+  call test_allocate_int_device_array_4d
+  call test_allocate_long_device_array_1d
+  call test_allocate_long_device_array_2d
+  call test_allocate_long_device_array_3d
+  call test_allocate_long_device_array_4d
+  call test_allocate_float_device_array_1d
+  call test_allocate_float_device_array_2d
+  call test_allocate_float_device_array_3d
+  call test_allocate_float_device_array_4d
+  call test_allocate_double_device_array_1d
+  call test_allocate_double_device_array_2d
+  call test_allocate_double_device_array_3d
+  call test_allocate_double_device_array_4d
+  call test_allocate_int_um_array_1d
+  call test_allocate_int_um_array_2d
+  call test_allocate_int_um_array_3d
+  call test_allocate_int_um_array_4d
+  call test_allocate_long_um_array_1d
+  call test_allocate_long_um_array_2d
+  call test_allocate_long_um_array_3d
+  call test_allocate_long_um_array_4d
+  call test_allocate_float_um_array_1d
+  call test_allocate_float_um_array_2d
+  call test_allocate_float_um_array_3d
+  call test_allocate_float_um_array_4d
+  call test_allocate_double_um_array_1d
+  call test_allocate_double_um_array_2d
+  call test_allocate_double_um_array_3d
+  call test_allocate_double_um_array_4d
+#endif
 
   call fruit_summary
   call fruit_finalize
