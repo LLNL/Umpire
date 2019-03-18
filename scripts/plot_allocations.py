@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 
 import matplotlib.pyplot as plt
-from matplotlib.collections import PolyCollection
-from re import compile
 
+from re import compile
 a_pat = compile(r'\s*(?P<bytes>\d+)\s+\[\s+(?P<start>\w+)\s+--\s+(?P<end>\w+)\s*\]')
 
 def import_from_file(fname):
@@ -20,9 +19,6 @@ def coalesce_records(slist):
             smaller.append(list(s))
     return smaller
 
-def invert_segments(slist):
-    return [(slist[i][1], slist[i+1][0]) for i in range(len(slist)-1)]
-
 def find_scale(min_byte, max_byte):
     scales = ('Bytes', 'kB', 'MB', 'GB')
 
@@ -37,6 +33,11 @@ def find_scale(min_byte, max_byte):
     return denom, scales[expo]
 
 def plot_ranges(*args):
+    '''Plots memory ranges for each dict in args. Each dict must have the
+    fields ranges, color, and alpha.'''
+
+    from matplotlib.collections import PolyCollection
+
     f = plt.figure(figsize=(12,1), tight_layout=True)
     axes = f.gca()
 
@@ -57,7 +58,45 @@ def plot_ranges(*args):
 
     return f
 
+if __name__ == '__main__':
+    from sys import argv
+
+    usage = 'USAGE: plot_allocations.py [ LOGFILE color alpha ] ...'
+
+    all_records = []
+    index = 1
+    while index < len(argv):
+        allocs = import_from_file(argv[index+0])
+
+        if len(argv) < index+3:
+            raise ValueError(usage)
+
+        start = allocs[0][0]
+        coalesced_allocs = coalesce_records([ (a[0]-start, a[1]-start) for a in allocs ])
+
+        all_records.append({'ranges':coalesced_allocs, 'color':argv[index+1], 'alpha':argv[index+2]})
+
+        index += 3
+
+    if len(all_records) > 0:
+        f1 = plot_ranges(*all_records)
+    else:
+        raise ValueError('No records found. {:s}'.format(usage));
+
+    plt.show()
+
+# These functions are not used
+def invert_segments(slist):
+    return [(slist[i][1], slist[i+1][0]) for i in range(len(slist)-1)]
+
 def plot_histogram(nbins, slist, vmin=None, vmax=None):
+    '''Plot a histogram of fragmentation. This is not currently used, but
+    included for possible future use.
+
+    Example usage:
+    % gaps = invert_segments(allocs)
+    % f2 = plot_histogram(10, gaps, vmin=allocs[0][0], vmax=allocs[-1][1])
+    '''
     def overlap(s1, s2):
         '''Return the overlap of s1 and s2'''
         return max(0, min(s1[1], s2[1]) - max(s1[0], s2[0]))
@@ -100,19 +139,3 @@ def plot_histogram(nbins, slist, vmin=None, vmax=None):
     axes.set_ylabel('Relative fragmentation (%)')
 
     return f
-
-
-if __name__ == '__main__':
-    from sys import argv
-    allocs = import_from_file(argv[1])
-
-    start = allocs[0][0]
-    coalesced_allocs = coalesce_records([ (a[0]-start, a[1]-start) for a in allocs ])
-
-    all_records = ({'ranges':coalesced_allocs, 'color':'gray', 'alpha':1.0},)
-    f1 = plot_ranges(*all_records)
-
-    # gaps = invert_segments(coalesced_allocs)
-    # f2 = plot_histogram(10, gaps, vmin=coalesced_allocs[0][0], vmax=coalesced_allocs[-1][1])
-
-    plt.show()

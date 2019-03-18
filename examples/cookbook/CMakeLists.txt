@@ -59,3 +59,9 @@ blt_add_executable(
   SOURCES recipe_dynamic_pool_heuristic.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${cookbook_dir})
+
+blt_add_executable(
+  NAME recipe_plot_allocations
+  SOURCES recipe_plot_allocations.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${cookbook_dir})
