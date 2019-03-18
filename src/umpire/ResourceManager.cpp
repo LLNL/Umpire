@@ -20,6 +20,12 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 
+#include <memory>
+
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 
@@ -278,6 +284,20 @@ util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
   return m_allocations.remove(ptr);
 }
 
+const util::AllocationRecord*
+ResourceManager::findAllocationRecord(void* ptr) const
+{
+  auto alloc_record = m_allocations.find(ptr);
+
+  if (!alloc_record->m_strategy) {
+    UMPIRE_ERROR("Cannot find allocator for " << ptr);
+  }
+
+  UMPIRE_LOG(Debug, "(Returning allocation record for ptr = " << ptr << ")");
+
+  return alloc_record;
+}
+
 bool
 ResourceManager::isAllocatorRegistered(const std::string& name)
 {
@@ -387,6 +407,27 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
   return dst_ptr;
 }
 
+#if defined(UMPIRE_ENABLE_NUMA)
+static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
+  std::shared_ptr<strategy::NumaPolicy> numa_alloc;
+
+  numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(
+    allocator.getAllocationStrategy());
+
+  // ... or an AllocationTracker wrapping a NumaPolicy
+  if (!numa_alloc) {
+    auto alloc_tracker = std::dynamic_pointer_cast<strategy::AllocationTracker>(
+      allocator.getAllocationStrategy());
+    if (alloc_tracker) {
+      numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(
+        alloc_tracker->getAllocationStrategy());
+    }
+  }
+
+  return numa_alloc;
+}
+#endif
+
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
@@ -398,6 +439,42 @@ ResourceManager::move(void* ptr, Allocator allocator)
   if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
     return ptr;
   }
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  {
+    // short circuit if allocator has a NumaPolicy
+    auto numa_alloc = cast_as_numa_policy(allocator);
+
+    // If found, use op::NumaMoveOperation to move in-place (same address returned)
+    if (numa_alloc) {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      auto src_alloc_record = m_allocations.find(ptr);
+
+      const size_t size = src_alloc_record->m_size;
+      util::AllocationRecord dst_alloc_record;
+      dst_alloc_record.m_size = src_alloc_record->m_size;
+      dst_alloc_record.m_strategy = numa_alloc;
+
+      void *ret = nullptr;
+      if (size > 0) {
+        auto op = op_registry.find("MOVE",
+                                   src_alloc_record->m_strategy,
+                                   dst_alloc_record.m_strategy);
+
+        op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
+        if (ret != ptr) {
+          UMPIRE_ERROR("Numa move error");
+        }
+      }
+      else {
+        ret = ptr;
+      }
+
+      return ret;
+    }
+  }
+#endif
 
   if (ptr != alloc_record->m_ptr) {
     UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);

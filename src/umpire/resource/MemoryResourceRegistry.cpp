@@ -15,6 +15,7 @@
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 
 namespace umpire {
 namespace resource {
@@ -47,7 +48,9 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
   for (auto allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
-        return allocator_factory->create(name, id);
+      auto a = allocator_factory->create(name, id);
+      UMPIRE_REPLAY("makeMemoryResource," << name << "," << a << "\n");
+      return a;
     }
   }
 

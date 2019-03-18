@@ -12,8 +12,10 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (alloc_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/alloc)
+
 set (memory_allocator_tests_depends
-  umpire_alloc gtest)
+  umpire gtest)
 
 if (ENABLE_CUDA)
   set (memory_allocator_tests_depends
@@ -25,7 +27,7 @@ blt_add_executable(
   NAME memory_allocator_tests
   SOURCES memory_allocator_tests.cpp
   DEPENDS_ON ${memory_allocator_tests_depends}
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  OUTPUT_DIR ${alloc_dir})
 
 target_include_directories(
   memory_allocator_tests

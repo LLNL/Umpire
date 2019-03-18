@@ -192,7 +192,7 @@ TEST_P(ReallocateTest, Reallocate)
   umpire_resourcemanager_memset_all(&rm, source_array, 0);
 
   float* reallocated_array = 
-    (float*) umpire_resourcemanager_reallocate(&rm, source_array, reallocated_size*sizeof(float));
+    (float*) umpire_resourcemanager_reallocate_default(&rm, source_array, reallocated_size*sizeof(float));
 
   ASSERT_EQ(
       umpire_allocator_get_size(&source_allocator, reallocated_array),
@@ -217,14 +217,14 @@ TEST_P(ReallocateTest, ReallocateLarger)
   umpire_resourcemanager_memset_all(&rm, source_array, 0);
 
   float* reallocated_array = 
-    (float*) umpire_resourcemanager_reallocate(&rm, source_array, reallocated_size*sizeof(float));
+    (float*) umpire_resourcemanager_reallocate_default(&rm, source_array, reallocated_size*sizeof(float));
 
   ASSERT_EQ(
       umpire_allocator_get_size(&source_allocator, reallocated_array),
       reallocated_size*sizeof(float));
 
   float* reallocated_check_array = 
-    (float*) umpire_resourcemanager_reallocate(&rm, check_array, reallocated_size*sizeof(float));
+    (float*) umpire_resourcemanager_reallocate_default(&rm, check_array, reallocated_size*sizeof(float));
 
   umpire_resourcemanager_copy_with_size(&rm, reallocated_check_array, reallocated_array, reallocated_size*sizeof(float));
 

@@ -12,6 +12,8 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (integration_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration)
+
 set (allocator_integration_tests_depends
   umpire gtest)
 
@@ -25,7 +27,7 @@ blt_add_executable(
   NAME allocator_integration_tests
   SOURCES allocator_integration_tests.cpp
   DEPENDS_ON ${allocator_integration_tests_depends}
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  OUTPUT_DIR ${integration_dir})
 
 target_include_directories(
   allocator_integration_tests
@@ -36,7 +38,7 @@ blt_add_test(
   NAME allocator_integration_tests
   COMMAND allocator_integration_tests)
 
-set (strategy_test_depends 
+set (strategy_test_depends
   umpire gtest)
 
 if (ENABLE_OPENMP)
@@ -49,7 +51,7 @@ blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
   DEPENDS_ON ${strategy_test_depends}
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  OUTPUT_DIR ${integration_dir})
 
 target_include_directories(
   strategy_tests
@@ -64,7 +66,7 @@ blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
   DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  OUTPUT_DIR ${integration_dir})
 
 target_include_directories(
   operation_tests
@@ -79,7 +81,7 @@ blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
   DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  OUTPUT_DIR ${integration_dir})
 
 target_include_directories(
   free_functions_integration_tests
@@ -95,18 +97,18 @@ blt_add_test(
 #   SOURCES memory_resource_traits_tests.cpp
 #   DEPENDS_ON umpire gtest
 #   OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
-# 
+#
 # target_include_directories(
 #   memory_resource_traits_tests
 #   PRIVATE
 #   ${PROJECT_BINARY_DIR}/include)
-# 
+#
 # blt_add_test(
 #   NAME memory_resource_traits_tests
 #   COMMAND memory_resource_traits_tests)
 
 add_subdirectory(replay)
 
-if (ENABLE_C_API OR ENABLE_FORTRAN_API)
+if (ENABLE_C OR ENABLE_FORTRAN)
   add_subdirectory(interface)
 endif()

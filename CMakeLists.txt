@@ -17,19 +17,18 @@ cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 
-project(Umpire 
+project(Umpire
   LANGUAGES CXX C
-  VERSION 0.3.1)
+  VERSION 0.3.2)
 
 set(ENABLE_OPENMP On CACHE Bool "")
 set(ENABLE_CUDA On CACHE Bool "")
+set(ENABLE_NUMA Off CACHE Bool "")
 set(ENABLE_COPY_HEADERS Off CACHE Bool "")
 set(ENABLE_TESTS On CACHE Bool "")
 set(ENABLE_BENCHMARKS On CACHE Bool "")
 set(ENABLE_GMOCK On CACHE Bool "")
 set(ENABLE_DOCS Off CACHE Bool "")
-option(ENABLE_FORTRAN_API "Build FORTRAN API" Off)
-option(ENABLE_C_API "Build C API" Off)
 set(ENABLE_WARNINGS_AS_ERRORS On CACHE Bool "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
@@ -48,10 +47,15 @@ endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
-if (ENABLE_FORTRAN_API)
-  set(ENABLE_FORTRAN On)
-  set(ENABLE_C_API On)
+if (ENABLE_FORTRAN)
+  set(ENABLE_C On)
 endif()
+
+if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+  message(FATAL_ERROR "\
+  NUMA support unavailable. \
+  Please re-configure with ENABLE_NUMA=Off (default value)")
+endif ()
 
 ################################
 # BLT
@@ -93,19 +97,21 @@ install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
-  set (UMPIRE_TEST_OUTPUT_DIR ${CMAKE_BINARY_DIR}/test)
+  set(UMPIRE_TESTS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
-  set (UMPIRE_BENCHMARK_OUTPUT_DIR ${CMAKE_BINARY_DIR}/benchmark)
+  set(UMPIRE_BENCHMARKS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/benchmarks)
   add_subdirectory(benchmarks)
 endif ()
 if (ENABLE_EXAMPLES)
-add_subdirectory(examples)
+  set(UMPIRE_EXAMPLES_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/examples)
+  add_subdirectory(examples)
 endif ()
 
 if (ENABLE_TOOLS)
-add_subdirectory(tools)
+  set(UMPIRE_TOOLS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+  add_subdirectory(tools)
 endif ()
 
 if (ENABLE_DOCS)

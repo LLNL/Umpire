@@ -150,12 +150,9 @@ class judyL2Array {
         }
 
         const cpair atOrBefore( JudyKey key) {
-            atOrAfter(key);
+            cpair k = atOrAfter(key);
 
-            JudyKey found_key;
-            judy_key( _judyarray, (unsigned char *) &found_key, _depth * JUDY_key_size);
-
-            if (!(found_key == key)) {
+            if (!(k.key == key && k.value != 0)) {
               _lastSlot = ( vector ** ) judy_prv( _judyarray); //, ( const unsigned char * ) &key, _depth * JUDY_key_size );
             }
 
