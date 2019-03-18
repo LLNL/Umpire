@@ -29,8 +29,7 @@ void benchmark_allocator(std::string name) {
   std::uniform_int_distribution<size_t> dist(64, 4096);
 
   auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(name+"_POOL", rm.getAllocator(name));
-  // umpire::Allocator alloc = rm.getAllocator(name);
+  umpire::Allocator alloc = rm.getAllocator(name);
 
   void* allocations[ALLOCATIONS];
 
@@ -42,8 +41,6 @@ void benchmark_allocator(std::string name) {
   }
 
   auto end_alloc = std::chrono::system_clock::now();
-
-  umpire::print_allocation_map(alloc, std::cout);
 
   auto begin_dealloc = std::chrono::system_clock::now();
   for (int i = 0; i < ALLOCATIONS; i++) {
