@@ -23,27 +23,60 @@ def coalesce_records(slist):
 def invert_segments(slist):
     return [(slist[i][1], slist[i+1][0]) for i in range(len(slist)-1)]
 
-def plot_ranges(axes, *args):
+def find_scale(min_byte, max_byte):
+    scales = ('Bytes', 'kB', 'MB', 'GB')
+
+    # Loop until x-axis will have numbers < 10000
+    expo = 0
+    while (max_byte - min_byte) / (1024 ** expo) > 1e4:
+        expo += 1
+
+    # Divide by this
+    denom = 1024 ** expo
+
+    return denom, scales[expo]
+
+def plot_ranges(*args):
+    f = plt.figure(figsize=(12,1), tight_layout=True)
+    axes = f.gca()
+
+    # Find the correct scale to use
+    lowest = min((record_set['ranges'][0][0] for record_set in args))
+    highest = max((record_set['ranges'][-1][1] for record_set in args))
+
+    denom, scale = find_scale(lowest, highest)
+
+    # Add the rectangles from each record set in args
     for record_set in args:
-        verts = [ ((a[0], 0), (a[1], 0), (a[1], 1), (a[0], 1)) for a in record_set['ranges'] ]
+        verts = [ ((a[0] / denom, 0), (a[1] / denom, 0), (a[1] / denom, 1), (a[0] / denom, 1)) for a in record_set['ranges'] ]
         rects = PolyCollection(verts, closed=True, color=record_set['color'], alpha=record_set['alpha'])
         axes.add_collection(rects)
-        axes.autoscale_view()
+    axes.autoscale_view()
     axes.set_yticks(ticks=())
-    axes.set_xlabel('Address offset (bytes)')
+    axes.set_xlabel('Offset relative to lowest address ({:s})'.format(scale))
 
-def plot_histogram(axes, nbins, slist, vmin=None, vmax=None):
+    return f
+
+def plot_histogram(nbins, slist, vmin=None, vmax=None):
     def overlap(s1, s2):
         '''Return the overlap of s1 and s2'''
         return max(0, min(s1[1], s2[1]) - max(s1[0], s2[0]))
 
+    f = plt.figure(figsize=(6,3))
+    axes = f.gca()
+
+    # Find the correct scale to use
     if vmin is None: vmin = slist[0][0]
     if vmax is None: vmax = slist[-1][1]
 
+    denom, scale = find_scale(vmin, vmax)
+
+    # Create bins
     overlaps = [0] * nbins
     ds = (vmax - vmin) / (nbins + 1)
     bins = [(vmin + ds * bi, vmin + ds * (bi+1)) for bi in range(nbins)]
 
+    # Determine how much of each address range falls inside each bin
     ri = 0
     for bi in range(nbins):
         curr_bin = bins[bi]
@@ -57,12 +90,16 @@ def plot_histogram(axes, nbins, slist, vmin=None, vmax=None):
             else:
                 break
 
+    # Data to plot
     yaxis = [o/ds * 100 for o in overlaps]
-    xaxis = [b[0] + ds/2 for b in bins]
-    print(yaxis, xaxis)
+    xaxis = [(b[0] + ds/2)/denom for b in bins]
 
-    axes.bar(xaxis, yaxis, ds/1.2)
+    axes.bar(xaxis, yaxis, ds/1.2/denom)
     axes.autoscale_view()
+    axes.set_xlabel('Address bin')
+    axes.set_ylabel('Relative fragmentation (%)')
+
+    return f
 
 
 if __name__ == '__main__':
@@ -72,21 +109,10 @@ if __name__ == '__main__':
     start = allocs[0][0]
     coalesced_allocs = coalesce_records([ (a[0]-start, a[1]-start) for a in allocs ])
 
-    f1 = plt.figure(figsize=(12,1), tight_layout=True)
-    a1 = f1.gca()
-
     all_records = ({'ranges':coalesced_allocs, 'color':'gray', 'alpha':1.0},)
-    plot_ranges(a1, *all_records)
-    # plt.savefig('address_usage.pdf', bbox_inches='tight')
+    f1 = plot_ranges(*all_records)
 
-    # f2 = plt.figure(figsize=(6,3))
-    # a2 = f2.gca()
-
-    # gaps = invert_segments(fewer_allocs)
-    # plot_histogram(a2, 10, gaps, vmin=fewer_allocs[0][0], vmax=fewer_allocs[-1][1])
-
-    # a2.set_xlabel('Address ranges')
-    # a2.set_ylabel('Relative fragmentation (%)')
-    # # f2.savefig('relative_fragmentation.pdf', bbox_inches='tight')
+    # gaps = invert_segments(coalesced_allocs)
+    # f2 = plot_histogram(10, gaps, vmin=coalesced_allocs[0][0], vmax=coalesced_allocs[-1][1])
 
     plt.show()
