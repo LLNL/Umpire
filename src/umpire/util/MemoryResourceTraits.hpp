@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -18,7 +18,6 @@
 #include <cstddef>
 
 namespace umpire {
-namespace resource {
 
 struct MemoryResourceTraits {
 
@@ -53,7 +52,6 @@ struct MemoryResourceTraits {
   optimized_for used_for = optimized_for::any;
 };
 
-} // end of namespace resource
 } // end of namespace umpire
 
 #endif // UMPIRE_MemoryResourceTraits_HPP

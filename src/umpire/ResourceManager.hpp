@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -27,7 +27,6 @@
 #include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
-#include "umpire/resource/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
@@ -115,8 +114,6 @@ class ResourceManager {
     /*!
      * \brief Get the Allocator used to allocate ptr.
      *
-     *
-     *
      * \param ptr Pointer to find the Allocator for.
      * \return Allocator for the given ptr.
      */
@@ -131,9 +128,24 @@ class ResourceManager {
      */
     bool hasAllocator(void* ptr);
 
+    /*!
+     * \brief register an allocation with the manager.
+     */
     void registerAllocation(void* ptr, util::AllocationRecord* record);
 
+    /*!
+     * \brief de-register the address ptr with the manager.
+     *
+     * \return the allocation record removed from the manager.
+     */
     util::AllocationRecord* deregisterAllocation(void* ptr);
+
+    /*!
+     * \brief Find the allocation record associated with an address ptr.
+     *
+     * \return the record if found, or throws an exception if not found.
+     */
+    const util::AllocationRecord* findAllocationRecord(void* ptr) const;
 
     /*!
      * \brief Check whether the named Allocator exists.
@@ -216,7 +228,7 @@ class ResourceManager {
      *
      * \return Size of allocation in bytes.
      */
-    size_t getSize(void* ptr);
+    size_t getSize(void* ptr) const;
 
     /*!
      * \brief If allocator is some kind of memory pool, try and coalesce

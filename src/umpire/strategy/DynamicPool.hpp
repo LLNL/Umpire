@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -17,8 +17,10 @@
 
 #include <memory>
 #include <vector>
+#include <functional>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 
 #include "umpire/Allocator.hpp"
 
@@ -43,6 +45,14 @@ class DynamicPool :
 {
   public:
     /*!
+     * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
+     *
+     * The registered heuristic callback function will be called immediately
+     * after a deallocation() has completed from the pool.
+     */
+    using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool& )>;
+
+    /*!
      * \brief Construct a new DynamicPool.
      *
      * \param name Name of this instance of the DynamicPool.
@@ -50,13 +60,15 @@ class DynamicPool :
      * \param min_initial_alloc_size The minimum size of the first allocation
      *                               the pool will make.
      * \param min_alloc_size The minimum size of all future allocations.
+     * \param coalesce_heuristic Heuristic callback function.
      */
     DynamicPool(
         const std::string& name,
         int id,
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024)) noexcept;
+        const std::size_t min_alloc_size = (1 * 1024 *1024),
+        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     void* allocate(size_t bytes) override;
 
@@ -64,11 +76,30 @@ class DynamicPool :
 
     void release() override;
 
-    long getCurrentSize() noexcept override;
-    long getHighWatermark() noexcept override;
-    long getActualSize() noexcept override;
+    long getCurrentSize() const noexcept override;
+    long getActualSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
 
     Platform getPlatform() noexcept override;
+
+    /*!
+     * \brief Get the number of bytes that may be released back to resource
+     *
+     * A memory pool has a set of blocks that have no allocations
+     * against them.  If the size of the set is greater than one, then
+     * the pool will have a number of bytes that may be released back to
+     * the resource or coalesced into a larger block.
+     *
+     * \return The total number of bytes that are releasable
+     */
+    long getReleasableSize() const noexcept;
+
+    /*!
+     * \brief Get the number of memory blocks that the pools has
+     *
+     * \return The total number of blocks that are allocated by the pool
+     */
+    long getBlocksInPool() const noexcept;
 
     void coalesce() noexcept;
 
@@ -76,6 +107,7 @@ class DynamicPool :
     DynamicSizePool<>* dpa;
 
     std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    Coalesce_Heuristic do_coalesce;
 };
 
 } // end of namespace strategy

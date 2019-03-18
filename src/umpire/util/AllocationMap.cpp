@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -95,7 +95,7 @@ AllocationMap::remove(void* ptr)
 }
 
 AllocationRecord*
-AllocationMap::findRecord(void* ptr)
+AllocationMap::findRecord(void* ptr) const
 {
 
   Entry alloc_record = nullptr;
@@ -116,6 +116,9 @@ AllocationMap::findRecord(void* ptr)
             << " with size " << alloc_record->m_size);
 
       }
+      else {
+         alloc_record = nullptr;
+      }
     }
     UMPIRE_UNLOCK;
   }
@@ -128,7 +131,7 @@ AllocationMap::findRecord(void* ptr)
 }
 
 AllocationRecord*
-AllocationMap::find(void* ptr)
+AllocationMap::find(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
@@ -154,7 +157,7 @@ AllocationMap::contains(void* ptr)
 }
 
 void
-AllocationMap::printAll()
+AllocationMap::printAll() const
 {
   std::cout << "🔍 Printing allocation map contents..." << std::endl;
 

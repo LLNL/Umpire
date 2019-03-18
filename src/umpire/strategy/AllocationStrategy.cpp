@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -25,16 +25,16 @@ AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
 {
 }
 
-void
-AllocationStrategy::release()
-{
-  UMPIRE_LOG(Info, "AllocationStrategy::release in a no-op");
-}
-
-std::string
+const std::string&
 AllocationStrategy::getName() noexcept
 {
   return m_name;
+}
+
+void
+AllocationStrategy::release()
+{
+  UMPIRE_LOG(Info, "AllocationStrategy::release is a no-op");
 }
 
 int
@@ -44,7 +44,7 @@ AllocationStrategy::getId() noexcept
 }
 
 long
-AllocationStrategy::getActualSize() noexcept
+AllocationStrategy::getActualSize() const noexcept
 {
   return getCurrentSize();
 }

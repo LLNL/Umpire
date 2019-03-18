@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -17,7 +17,7 @@
 #include "umpire/config.hpp"
 
 #include "umpire/ResourceManager.hpp"
-#include "umpire/resource/MemoryResourceTraits.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 TEST(Traits, DDR) {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -51,9 +51,9 @@ class FixedPool
 
     void deallocate(void* ptr);
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
-    long getActualSize() noexcept;
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
+    long getActualSize() const noexcept;
 
     Platform getPlatform() noexcept;
 

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -15,55 +15,59 @@
 blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
-  DEPENDS_ON
-    umpire)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 
 blt_add_executable(
   NAME strategy_example
   SOURCES strategy_example.cpp
-  DEPENDS_ON
-    umpire)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 
-if (ENABLE_C_API)
+if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c
-    DEPENDS_ON
-      umpire
-  )
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 endif ()
 
 blt_add_executable(
   NAME vector_allocator
   SOURCES vector_allocator.cpp
-  DEPENDS_ON
-    umpire)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 
 blt_add_executable(
   NAME size_limiter
   SOURCES size_limiter.cpp
-  DEPENDS_ON 
-    umpire)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 
 if (ENABLE_STATISTICS)
   blt_add_executable(
     NAME statistics_example
     SOURCES statistics.cpp
-    DEPENDS_ON umpire)
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 endif()
 
-blt_add_executable(
-  NAME device_allocator_example
-  SOURCES device-allocator.cpp
-  DEPENDS_ON umpire cuda
-)
+if (ENABLE_CUDA)
+  blt_add_executable(
+    NAME device_allocator_example
+    SOURCES device-allocator.cpp
+    DEPENDS_ON umpire cuda
+  )
 
-set_source_files_properties(
-  device-allocator.cpp
-  PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+  set_source_files_properties(
+    device-allocator.cpp
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-set_target_properties(
-  device_allocator_example
-  PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+  set_target_properties(
+    device_allocator_example
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+endif()
 
 add_subdirectory(tutorial)
+
+add_subdirectory(cookbook)

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -30,7 +30,7 @@ namespace strategy {
  * Using this AllocationStrategy with another can be a good way to limit the
  * total size of allocations made on a particular resource or from a particular
  * context.
- * */
+ */
 class SizeLimiter :
   public AllocationStrategy
 {
@@ -44,8 +44,8 @@ class SizeLimiter :
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
+    long getCurrentSize() const noexcept;
+    long getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
   private:

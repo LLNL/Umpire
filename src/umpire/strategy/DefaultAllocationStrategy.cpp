@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -39,13 +39,13 @@ DefaultAllocationStrategy::deallocate(void* ptr)
 }
 
 long 
-DefaultAllocationStrategy::getCurrentSize()
+DefaultAllocationStrategy::getCurrentSize() const
 {
   return m_allocator->getCurrentSize();
 }
 
 long 
-DefaultAllocationStrategy::getHighWatermark()
+DefaultAllocationStrategy::getHighWatermark() const
 {
   return m_allocator->getHighWatermark();
 }

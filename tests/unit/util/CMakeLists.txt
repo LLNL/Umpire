@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -12,11 +12,13 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (util_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/util)
+
 blt_add_executable(
   NAME exception_tests
   SOURCES exception_tests.cpp
-  DEPENDS_ON umpire_util gtest
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${util_dir})
 
 blt_add_test(
   NAME exception_tests
@@ -25,8 +27,8 @@ blt_add_test(
 blt_add_executable(
   NAME allocation_map_tests
   SOURCES allocation_map_tests.cpp
-  DEPENDS_ON umpire_util gtest
-  OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${util_dir})
 
 blt_add_test(
   NAME allocation_map_tests
@@ -37,8 +39,8 @@ if (False)
   blt_add_executable(
     NAME allocation_map_performance_tests
     SOURCES allocation_map_performance_tests.cpp
-    DEPENDS_ON umpire_util gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+    DEPENDS_ON umpire gtest
+    OUTPUT_DIR ${util_dir})
 
   blt_add_test(
     NAME allocation_map_performance_tests

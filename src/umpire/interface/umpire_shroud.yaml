@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -14,7 +14,7 @@
 ##############################################################################
 
 copyright:
-  - Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+  - Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
   - Produced at the Lawrence Livermore National Laboratory
   - 
   - Created by David Beckingsale, david@llnl.gov
@@ -35,11 +35,13 @@ options:
 
 format:
   C_prefix: umpire_
+  C_bufferify_suffix: _b
 
 declarations:
 - decl: namespace umpire
   declarations:
     - decl: namespace strategy
+      cxx_header: umpire/strategy/DynamicPool.hpp
       declarations:
         - decl: class DynamicPool
 
@@ -51,10 +53,12 @@ declarations:
       declarations:
         - decl: void* allocate(size_t bytes)
         - decl: void deallocate (void* ptr)
+        - decl: void release()
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
         - decl: size_t getCurrentSize()
-        - decl: std::string getName()
+        - decl: size_t getActualSize()
+        - decl: const std::string& getName() +pure
         - decl: size_t getId()
 
     - decl: class ResourceManager
@@ -77,9 +81,7 @@ declarations:
 
         - decl: Allocator getAllocator(void* ptr)
           format:
-            function_suffix: for_ptr
-
-            #        - decl: void registerAllocator(const std::string& name, Allocator allocator)
+            function_suffix: _for_ptr
 
         - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
           default_arg_suffix:
@@ -92,18 +94,24 @@ declarations:
             - _with_size
 
         - decl: void* reallocate(void* src_ptr, size_t size)
+          format:
+            function_suffix: _default
 
-          #- decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
-          #  format:
-          #    function_suffix: _with_allocator
+        - decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
+          format:
+            function_suffix: _with_allocator
+
+        - decl: void* move(void* src_ptr, Allocator allocator)
 
         - decl: void deallocate(void* ptr)
 
         - decl: size_t getSize(void* ptr)
 
-          #        - decl: template <typename T> Allocator makeAllocator(const std::string& name);
-          #          cxx_template:
-          #            - instantiation: <DynamicPool>
+        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int initial_size, int block);
+          format:
+            C_name: umpire_resourcemanager_make_pool_allocator
+          cxx_template:
+            - instantiation: <umpire::strategy::DynamicPool>
 
 splicer_code:
   c:

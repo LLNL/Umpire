@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -19,7 +19,7 @@
 
 struct TestAllocator
 {
-  void* allocate(size_t bytes) 
+  void* allocate(size_t bytes)
   {
     return ::malloc(bytes);
   }
@@ -32,21 +32,21 @@ struct TestAllocator
 
 TEST(DefaultMemoryResource, Constructor)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::resource::MemoryResourceTraits{});
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
 
   SUCCEED();
 }
 
 TEST(DefaultMemoryResource, AllocateDeallocate)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::resource::MemoryResourceTraits{});
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
   ASSERT_NE(pointer, nullptr);
 }
 
 TEST(DefaultMemoryResource, GetSize)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::resource::MemoryResourceTraits{});
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
   double* pointer = (double*) alloc->allocate(10);
   ASSERT_EQ(alloc->getCurrentSize(), 10);
 
@@ -62,7 +62,7 @@ TEST(DefaultMemoryResource, GetSize)
 
 TEST(DefaultMemoryResource, GetHighWatermark)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::resource::MemoryResourceTraits{});
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
   ASSERT_EQ(alloc->getHighWatermark(), 0);
 
   double* pointer = (double*)alloc->allocate(10);

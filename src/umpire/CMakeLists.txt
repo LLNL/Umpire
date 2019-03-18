@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -26,27 +26,29 @@ set (umpire_sources
   Replay.cpp
   ResourceManager.cpp)
 
-if (ENABLE_FORTRAN_API OR ENABLE_C_API)
-  set (umpire_headers
-    ${umpire_headers}
+if (ENABLE_FORTRAN OR ENABLE_C)
+  set (umpire_interface_headers
     interface/umpire.h
+  )
+
+  set (umpire_interface_c_fortran_headers
     interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
-    )
+    interface/c_fortran/typesUmpire.h
+  )
 
-  if (ENABLE_C_API)
-    set (umpire_sources
-      ${umpire_sources}
+  if (ENABLE_C)
+    set (umpire_interface_sources
       interface/c_fortran/shroudrt.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp
       )
 
-    if (ENABLE_FORTRAN_API)
-      set (umpire_sources
-        ${umpire_sources}
+    if (ENABLE_FORTRAN)
+      set (umpire_interface_sources
+        ${umpire_interface_sources}
         interface/c_fortran/wrapfumpire.f
       )
 
@@ -70,26 +72,37 @@ if (ENABLE_CUDA)
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+endif()
+
+add_subdirectory(tpl)
+
+add_subdirectory(resource)
+add_subdirectory(alloc)
+add_subdirectory(op)
+add_subdirectory(util)
+add_subdirectory(strategy)
+if (SHROUD_FOUND)
+  add_subdirectory(interface)
 endif ()
 
 blt_add_library(
   NAME umpire
-  HEADERS ${umpire_headers}
-  SOURCES ${umpire_sources}
-  HEADERS_OUTPUT_SUBDIR umpire
-  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op)
+  HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
+  SOURCES ${umpire_sources} ${umpire_interface_sources}
+  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy umpire_tpl_simpool)
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
 
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
+set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_ASSERTS ${ENABLE_ASSERTS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_ROCM ${ENABLE_ROCM})
 
-if (ENABLE_CUDA OR ENABLE_ROCM) 
+if (ENABLE_CUDA OR ENABLE_ROCM)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
 else ()
@@ -125,17 +138,15 @@ install(FILES
   ${umpire_headers}
   DESTINATION include/umpire)
 
+install(FILES
+  ${umpire_interface_headers}
+  DESTINATION include/umpire/interface)
+
+install(FILES
+  ${umpire_interface_c_fortran_headers}
+  DESTINATION include/umpire/interface/c_fortran)
+
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ${CMAKE_INSTALL_PREFIX})
 
-add_subdirectory(tpl)
-
-add_subdirectory(resource)
-add_subdirectory(alloc)
-add_subdirectory(op)
-add_subdirectory(util)
-add_subdirectory(strategy)
-if (SHROUD_FOUND)
-  add_subdirectory(interface)
-endif ()

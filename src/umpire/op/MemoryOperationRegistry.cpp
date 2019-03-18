@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -21,6 +21,10 @@
 #include "umpire/op/HostReallocateOperation.hpp"
 
 #include "umpire/op/GenericReallocateOperation.hpp"
+
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/op/NumaMoveOperation.hpp"
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
@@ -74,6 +78,25 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<NumaMoveOperation>());
+
+// NOTE: We don't use CUDA calls in the move operation so no guard is needed
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_shared<NumaMoveOperation>());
+
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_shared<NumaMoveOperation>());
+// NOTE: Add cpu<->rocm pairs here when needed
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(

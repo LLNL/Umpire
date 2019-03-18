@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -210,6 +210,23 @@ TEST_P(AllocatorByResourceTest, AllocateDeallocate)
   ASSERT_NE(nullptr, data);
 
   m_allocator->deallocate(data);
+}
+
+TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
+{
+  double* data = static_cast<double*>(
+    m_allocator->allocate(m_big*sizeof(double)));
+
+  ASSERT_NE(nullptr, data);
+
+  ASSERT_NO_THROW(
+    m_allocator->deallocate(data)
+  );
+
+  ASSERT_THROW(
+      m_allocator->deallocate(data),
+      umpire::util::Exception
+  );
 }
 
 const umpire::resource::MemoryResourceType resource_types[] = {

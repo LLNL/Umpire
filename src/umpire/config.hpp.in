@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -16,6 +16,7 @@
 #define UMPIRE_config_HPP
 
 #cmakedefine UMPIRE_ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_NUMA
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_ASSERTS

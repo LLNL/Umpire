@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -12,11 +12,14 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
+set (resource_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/resource)
+
 if (ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
     SOURCES resource_tests.cpp
-    DEPENDS_ON umpire umpire_resource umpire_util umpire gtest gmock)
+    DEPENDS_ON umpire gtest gmock
+    OUTPUT_DIR ${resource_dir})
 
   blt_add_test(
     NAME resource_tests
