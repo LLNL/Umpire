@@ -36,14 +36,14 @@ int main(int, char**) {
   // Output the records from the underlying host allocator
   {
     std::ofstream out("allocator.log");
-    umpire::print_allocation_map(allocator, out);
+    umpire::print_allocator_records(allocator, out);
     out.close();
   }
 
   // Output the records from the pooled allocator
   {
     std::ofstream out("pooled_allocator.log");
-    umpire::print_allocation_map(pooled_allocator, out);
+    umpire::print_allocator_records(pooled_allocator, out);
     out.close();
   }
 

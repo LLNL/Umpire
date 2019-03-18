@@ -273,7 +273,7 @@ class ResourceManager {
 
     std::mutex* m_mutex;
 
-    friend void print_allocation_map(Allocator, std::ostream&);
+    friend void print_allocator_records(Allocator, std::ostream&);
 };
 
 /*!
@@ -282,7 +282,7 @@ class ResourceManager {
  * \param allocator source Allocator.
  * \param os output stream
  */
-void print_allocation_map(Allocator allocator, std::ostream& os = std::cout);
+void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
 
 
 } // end of namespace umpire

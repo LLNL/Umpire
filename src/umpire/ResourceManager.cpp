@@ -570,7 +570,7 @@ ResourceManager::getNextId() noexcept
   return m_id++;
 }
 
-void print_allocation_map(Allocator alloc, std::ostream& os) {
+void print_allocator_records(Allocator alloc, std::ostream& os) {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto strategy = alloc.getAllocationStrategy().get();
