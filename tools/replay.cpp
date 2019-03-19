@@ -107,11 +107,9 @@ class Replay {
         else if ( m_row[1] == "coalesce" ) {
           replay_coalesce();
         }
-#if 0
         else if ( m_row[1] == "release" ) {
           replay_release();
         }
-#endif
         else {
           std::cout << m_row[1] << "\n";
         }
@@ -173,6 +171,25 @@ class Replay {
           << "Skipped\n";
         return;
       }
+    }
+
+    void replay_release( void )
+    {
+      void* alloc_obj_ref;
+
+      get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
+
+      auto n_iter = m_allocators.find(alloc_obj_ref);
+
+      if ( n_iter == m_allocators.end() ) {
+        std::cerr << "Unknown allocator " << alloc_obj_ref << std::endl;
+        return;           // Just skip unknown allocators
+      }
+
+      const std::string& allocName = n_iter->second;
+
+      auto alloc = m_rm.getAllocator(allocName);
+      alloc.release();
     }
 
     void replay_allocate( void )
