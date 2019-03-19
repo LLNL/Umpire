@@ -12,27 +12,27 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include <iostream>
+#include <cstdlib>
+#include <exception>
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <iterator>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
-#include <cstdlib>
-
-#include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
-#include "umpire/strategy/FixedPool.hpp"
 
 class CSVRow {
 public:
@@ -104,6 +104,14 @@ class Replay {
         else if ( m_row[1] == "deallocate" ) {
           replay_deallocate();
         }
+        else if ( m_row[1] == "coalesce" ) {
+          replay_coalesce();
+        }
+#if 0
+        else if ( m_row[1] == "release" ) {
+          replay_release();
+        }
+#endif
         else {
           std::cout << m_row[1] << "\n";
         }
@@ -123,6 +131,48 @@ class Replay {
     {
         std::istringstream ss(s);
         ss >> val;
+    }
+
+    void strip_off_base(std::string& s)
+    {
+      const std::string base("_base");
+
+      if (s.length() > base.length()) {
+        if (s.compare(s.length() - base.length(), base.length(), base) == 0) {
+          s.erase(s.length() - base.length(), base.length());
+        }
+      }
+    }
+
+    void replay_coalesce( void )
+    {
+      std::string allocName = m_row[m_row.size() - 1];
+      strip_off_base(allocName);
+
+      try {
+        auto alloc = m_rm.getAllocator(allocName);
+        auto strategy = alloc.getAllocationStrategy();
+        auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+        if (tracker)
+          strategy = tracker->getAllocationStrategy();
+
+        try {
+          strategy->coalesce();
+        }
+        catch (std::exception& e) {
+          std::cerr << "coalesce failed for " << allocName << '\n'
+            << e.what() << '\n'
+            << "Skipped\n";
+          return;
+        }
+      }
+      catch (std::exception& e) {
+        std::cerr << "Unable to find allocator for " << allocName << '\n'
+          << e.what() << '\n'
+          << "Skipped\n";
+        return;
+      }
     }
 
     void replay_allocate( void )

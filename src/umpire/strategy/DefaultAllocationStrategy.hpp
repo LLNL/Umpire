@@ -37,6 +37,7 @@ class DefaultAllocationStrategy :
 
     long getCurrentSize() const;
     long getHighWatermark() const;
+    void coalesce() noexcept;
 
     Platform getPlatform();
 
