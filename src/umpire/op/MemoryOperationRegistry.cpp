@@ -62,6 +62,12 @@ MemoryOperationRegistry::getInstance() noexcept
   return *s_memory_operation_registry_instance;
 }
 
+void
+MemoryOperationRegistry::finalize()
+{
+  delete s_memory_operation_registry_instance;
+}
+
 MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
   registerOperation(

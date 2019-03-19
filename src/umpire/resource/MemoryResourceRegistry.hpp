@@ -27,6 +27,8 @@ namespace resource {
 class MemoryResourceRegistry {
   public:
     static MemoryResourceRegistry& getInstance() noexcept;
+    
+    static void finalize();
 
     resource::MemoryResource* makeMemoryResource(const std::string& name, int id);
 

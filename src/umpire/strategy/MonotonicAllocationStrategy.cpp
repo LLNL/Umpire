@@ -34,6 +34,12 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
   m_block = m_allocator->allocate(m_capacity);
 }
 
+MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
+{
+  m_allocator->deallocate(m_block);
+  m_block = nullptr;
+}
+
 void*
 MonotonicAllocationStrategy::allocate(size_t bytes)
 {
@@ -51,9 +57,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 
 void
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
-{
-  UMPIRE_LOG(Info, "() doesn't do anything");
-}
+{}
 
 long
 MonotonicAllocationStrategy::getCurrentSize() const noexcept

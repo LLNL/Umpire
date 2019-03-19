@@ -35,13 +35,15 @@ class MonotonicAllocationStrategy :
         size_t capacity,
         Allocator allocator);
 
-    void* allocate(size_t bytes);
-    void deallocate(void* ptr);
+    ~MonotonicAllocationStrategy() override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    void* allocate(size_t bytes) override;
+    void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+
+    Platform getPlatform() noexcept override;
 
   private:
     void* m_block;

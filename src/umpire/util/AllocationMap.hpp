@@ -31,7 +31,16 @@ class AllocationMap
   public:
 
   AllocationMap();
+
+  AllocationMap(AllocationMap const &) = delete;
+
+  AllocationMap(AllocationMap &&) = delete;
+
   ~AllocationMap();
+
+  AllocationMap & operator=(AllocationMap const &) = delete;
+
+  AllocationMap & operator=(AllocationMap &&) = delete;
 
   void
   insert(void* ptr, AllocationRecord* record);

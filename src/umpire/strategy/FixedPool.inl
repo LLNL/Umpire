@@ -77,13 +77,14 @@ FixedPool<T, NP, IA>::FixedPool(
 
 template <typename T, int NP, typename IA>
 FixedPool<T, NP, IA>::~FixedPool() {
-    for (struct Pool *curr = m_pool; curr; ) {
-      struct Pool *next = curr->next;
-      m_allocator->deallocate(curr);
-      m_current_size -= sizeof(T)*m_num_per_pool;
-      curr = next;
-    }
+  for (struct Pool *curr = m_pool; curr; ) {
+    struct Pool *next = curr->next;
+    m_allocator->deallocate(curr->data);
+    IA::deallocate(curr);
+    m_current_size -= sizeof(T)*m_num_per_pool;
+    curr = next;
   }
+}
 
 template <typename T, int NP, typename IA>
 void*

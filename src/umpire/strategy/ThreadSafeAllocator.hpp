@@ -32,6 +32,8 @@ class ThreadSafeAllocator :
         int id,
         Allocator allocator);
 
+    ~ThreadSafeAllocator();
+
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 

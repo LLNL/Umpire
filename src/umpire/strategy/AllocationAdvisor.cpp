@@ -66,11 +66,11 @@ AllocationAdvisor::AllocationAdvisor(
 void* AllocationAdvisor::allocate(size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
-  auto alloc_record = new util::AllocationRecord{ptr, bytes, this};
+  util::AllocationRecord alloc_record {ptr, bytes, this};
 
   m_advice_operation->apply(
       ptr,
-      alloc_record,
+      &alloc_record,
       m_device,
       bytes);
 

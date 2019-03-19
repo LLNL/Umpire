@@ -70,6 +70,8 @@ class DynamicPool :
         const std::size_t min_alloc_size = (1 * 1024 *1024),
         Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
+    ~DynamicPool() override;
+
     void* allocate(size_t bytes) override;
 
     void deallocate(void* ptr) override;

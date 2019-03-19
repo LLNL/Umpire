@@ -30,6 +30,12 @@ ThreadSafeAllocator::ThreadSafeAllocator(
 {
 }
 
+ThreadSafeAllocator::~ThreadSafeAllocator()
+{
+  delete m_mutex;
+  m_mutex = nullptr;
+}
+
 void*
 ThreadSafeAllocator::allocate(size_t bytes)
 {

@@ -38,6 +38,12 @@ DynamicPool::DynamicPool(
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
 }
 
+DynamicPool::~DynamicPool()
+{
+  delete dpa;
+  dpa = nullptr;
+}
+
 void*
 DynamicPool::allocate(size_t bytes)
 {

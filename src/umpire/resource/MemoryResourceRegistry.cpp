@@ -32,6 +32,12 @@ MemoryResourceRegistry::getInstance() noexcept
   return *s_allocator_registry_instance;
 }
 
+void
+MemoryResourceRegistry::finalize()
+{
+  delete s_allocator_registry_instance;
+}
+
 MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
   m_allocator_factories()
 {

@@ -250,3 +250,14 @@ INSTANTIATE_TEST_CASE_P(
     Resources,
     AllocatorByResourceTest,
     ::testing::ValuesIn(resource_types));
+
+int main( int argc, char* argv[] )
+{
+  int result = 0;
+  testing::InitGoogleTest( &argc, argv );
+  result = RUN_ALL_TESTS();
+
+  umpire::ResourceManager::getInstance().finalize();
+
+  return result;
+}

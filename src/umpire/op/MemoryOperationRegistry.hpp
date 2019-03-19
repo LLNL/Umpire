@@ -66,6 +66,8 @@ class MemoryOperationRegistry {
      */
     static MemoryOperationRegistry& getInstance() noexcept;
 
+    static void finalize();
+
     /*!
      * \brief Function to find a MemoryOperation object
      *

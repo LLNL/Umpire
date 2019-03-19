@@ -30,7 +30,7 @@ class OperationTest :
   public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
 {
   public:
-    virtual void SetUp() {
+    void SetUp() override {
       auto& rm = umpire::ResourceManager::getInstance();
       source_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<0>(GetParam())));
       dest_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<1>(GetParam())));
@@ -42,7 +42,7 @@ class OperationTest :
           rm.getAllocator("HOST").allocate(m_size*sizeof(float)));
     }
 
-    virtual void TearDown() {
+    void TearDown() override {
       auto& rm = umpire::ResourceManager::getInstance();
 
       if (source_array)
@@ -53,6 +53,9 @@ class OperationTest :
 
       if (check_array)
         rm.getAllocator("HOST").deallocate(check_array);
+
+      delete source_allocator;
+      delete dest_allocator;
     }
 
     float* source_array;
@@ -221,21 +224,19 @@ TEST_P(ReallocateTest, Reallocate)
 
   rm.memset(source_array, 0);
 
-  float* reallocated_array = 
+  source_array = 
     static_cast<float*>(
         rm.reallocate(source_array, reallocated_size*sizeof(float)));
 
   ASSERT_EQ(
-      source_allocator->getSize(reallocated_array), 
+      source_allocator->getSize(source_array), 
       reallocated_size*sizeof(float));
 
-  rm.copy(check_array, reallocated_array, reallocated_size*sizeof(float));
+  rm.copy(check_array, source_array, reallocated_size*sizeof(float));
 
   for (size_t i = 0; i < reallocated_size; i++) {
     ASSERT_FLOAT_EQ(check_array[i], 0);
   }
-
-  source_array = nullptr;
 }
 
 TEST_P(ReallocateTest, ReallocateLarger)
@@ -244,31 +245,34 @@ TEST_P(ReallocateTest, ReallocateLarger)
 
   const size_t reallocated_size = (m_size+50);
 
-  rm.memset(source_array, 0);
+  rm.memset(source_array, 1);
 
-  float* reallocated_array = 
+  source_array = 
     static_cast<float*>(
         rm.reallocate(source_array, reallocated_size*sizeof(float)));
 
   ASSERT_EQ(
-      source_allocator->getSize(reallocated_array), 
+      source_allocator->getSize(source_array), 
       reallocated_size*sizeof(float));
 
-  float* reallocated_check_array = 
+  rm.memset(source_array + m_size, 2);
+
+  check_array = 
     static_cast<float*>(
         rm.reallocate(check_array, reallocated_size*sizeof(float)));
 
-  rm.copy(reallocated_check_array, 
-      reallocated_array, 
+  rm.copy(check_array, 
+      source_array, 
       reallocated_size*sizeof(float));
 
-  for (size_t i = 0; i < m_size; i++) {
-    ASSERT_FLOAT_EQ(reallocated_check_array[i], 0);
+  char * check_interrogator = reinterpret_cast<char*>(check_array);
+  for (size_t i = 0; i < m_size * sizeof(float) / sizeof(char); i++) {
+    ASSERT_EQ(check_interrogator[i], 1);
   }
 
-  rm.deallocate(reallocated_check_array);
-  source_array = nullptr;
-  check_array = nullptr;
+  for (size_t i = m_size * sizeof(float) / sizeof(char); i < reallocated_size * sizeof(float) / sizeof(char); i++) {
+    ASSERT_EQ(check_interrogator[i], 2);
+  }
 }
 
 TEST_P(ReallocateTest, RealocateNull)
@@ -529,3 +533,15 @@ INSTANTIATE_TEST_CASE_P(
 ));
 
 #endif
+
+
+int main( int argc, char* argv[] )
+{
+  int result = 0;
+  testing::InitGoogleTest( &argc, argv );
+  result = RUN_ALL_TESTS();
+
+  umpire::ResourceManager::getInstance().finalize();
+
+  return result;
+}
