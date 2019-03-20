@@ -12,6 +12,7 @@ matrix:
     - COMPILER=g++
     - IMG=gcc-5
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_COVERAGE=On"
+    - DO_MEMCHECK=yes
   - compiler: gcc6
     env:
     - COMPILER=g++
