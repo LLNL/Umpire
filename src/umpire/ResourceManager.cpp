@@ -591,7 +591,7 @@ ResourceManager::getAllocatorInformation() const noexcept
   std::ostringstream info;
 
   for (auto& it : m_allocators_by_name) {
-    info << it.second << " ";
+    info << *it.second << " ";
   }
 
   return info.str();
