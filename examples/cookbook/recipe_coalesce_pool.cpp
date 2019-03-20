@@ -40,7 +40,7 @@ int main(int, char**) {
   if (dynamic_pool) {
     dynamic_pool->coalesce();
   } else {
-    UMPIRE_ERROR(allocator.getName() << " is not a DynamicPool, cannot coalesce!");
+    UMPIRE_ERROR(pool.getName() << " is not a DynamicPool, cannot coalesce!");
   }
 
   return 0;
