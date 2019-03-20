@@ -101,7 +101,7 @@ class DynamicPool :
      */
     long getBlocksInPool() const noexcept;
 
-    void coalesce() noexcept override;
+    void coalesce() noexcept;
 
   private:
     DynamicSizePool<>* dpa;

@@ -67,15 +67,6 @@ class AllocationStrategy :
     virtual void release();
 
     /*!
-     * \brief Coalesce all available blocks in pool
-     *
-     * Note that this is only meaningful for AllocationStrategy that
-     * implement some kind of pooling.
-     *
-     */
-    virtual void coalesce() noexcept;
-
-    /*!
      * \brief Get current (total) size of the allocated memory.
      *
      * This is the total size of all allocation currently 'live' that have been

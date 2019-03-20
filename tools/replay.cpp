@@ -155,13 +155,13 @@ class Replay {
         if (tracker)
           strategy = tracker->getAllocationStrategy();
 
-        try {
-          strategy->coalesce();
+        auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
+        if (dynamic_pool) {
+          dynamic_pool->coalesce();
         }
-        catch (std::exception& e) {
-          std::cerr << "coalesce failed for " << allocName << '\n'
-            << e.what() << '\n'
-            << "Skipped\n";
+        else {
+          std::cerr << allocName << " is not a dynamic pool, skipping\n";
           return;
         }
       }

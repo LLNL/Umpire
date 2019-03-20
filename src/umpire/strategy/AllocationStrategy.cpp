@@ -49,11 +49,5 @@ AllocationStrategy::getActualSize() const noexcept
   return getCurrentSize();
 }
 
-void
-AllocationStrategy::coalesce() noexcept
-{
-  return;
-}
-
 } // end of namespace strategy
 } // end of namespace umpire
