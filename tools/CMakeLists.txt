@@ -24,4 +24,4 @@ blt_add_executable(
   DEPENDS_ON umpire
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
 
-install(FILES plot_allocations.py DESTINATION bin)
+install(FILES plot_allocations DESTINATION bin)
