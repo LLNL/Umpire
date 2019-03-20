@@ -183,16 +183,8 @@ ResourceManager::getAllocationStrategy(const std::string& name)
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    auto available_names = getAllocatorNames();
-
-    const char* const delim = " ";
-
-    std::ostringstream name_list;
-    std::copy(available_names.begin(), available_names.end(),
-               std::ostream_iterator<std::string>(name_list, delim));
-
-    
-    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: " << name_list.str());
+    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: " 
+        << getAllocatorInformation());
   }
 
   return m_allocators_by_name[name];
@@ -212,7 +204,8 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 
   auto allocator = m_memory_resources.find(resource_type);
   if (allocator == m_memory_resources.end()) {
-    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type) << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type)
+        << "\" not found. Available allocators: " << getAllocatorInformation());
   }
 
   return Allocator(m_memory_resources[resource_type]);
@@ -225,14 +218,8 @@ ResourceManager::getAllocator(int id)
 
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
-    auto available_ids = getAllocatorIds();
-
-    const char* const delim = " ";
-
-    std::ostringstream id_list;
-    std::copy(available_ids.begin(), available_ids.end(),
-               std::ostream_iterator<int>(id_list, delim));
-    UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: " << id_list.str());
+    UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: "
+        << getAllocatorInformation());
   }
 
   return Allocator(m_allocators_by_id[id]);
@@ -596,6 +583,18 @@ int
 ResourceManager::getNextId() noexcept
 {
   return m_id++;
+}
+
+std::string
+ResourceManager::getAllocatorInformation() const noexcept
+{
+  std::ostringstream info;
+
+  for (auto& it : m_allocators_by_name) {
+    info << it.second << " ";
+  }
+
+  return info.str();
 }
 
 } // end of namespace umpire

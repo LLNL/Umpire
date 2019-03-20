@@ -49,5 +49,11 @@ AllocationStrategy::getActualSize() const noexcept
   return getCurrentSize();
 }
 
+std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)
+{
+  os << "[" << strategy.m_name << "," << strategy.m_id << "]";
+  return os;
+}
+
 } // end of namespace strategy
 } // end of namespace umpire

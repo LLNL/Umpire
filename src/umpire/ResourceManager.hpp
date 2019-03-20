@@ -245,7 +245,6 @@ class ResourceManager {
      */
     void coalesce(Allocator allocator);
 
-
   private:
     ResourceManager();
 
@@ -257,6 +256,8 @@ class ResourceManager {
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
     int getNextId() noexcept;
+
+    std::string getAllocatorInformation() const noexcept;
 
     static ResourceManager* s_resource_manager_instance;
 
