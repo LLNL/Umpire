@@ -58,7 +58,7 @@ matrix:
 
 script:
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
-- docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:$IMG ./scripts/travis/build_and_test.sh
+- docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_MEMCHECK -e CMAKE_EXTRA_FLAGS axom/compilers:$IMG ./scripts/travis/build_and_test.sh
 
 after_success:
 - if [[ "${CMAKE_EXTRA_FLAGS}" == *"ENABLE_COVERAGE"* ]] ; then bash <(curl -s https://codecov.io/bash) -a "-f" >& /dev/null; fi
