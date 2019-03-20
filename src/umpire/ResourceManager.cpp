@@ -506,27 +506,6 @@ ResourceManager::getSize(void* ptr) const
   return record->m_size;
 }
 
-void
-ResourceManager::coalesce(Allocator allocator)
-{
-  auto strategy = allocator.getAllocationStrategy();
-
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-
-  }
-
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
-
-  if (dynamic_pool) {
-    dynamic_pool->coalesce();
-  } else {
-    UMPIRE_ERROR(allocator.getName() << " is not a DynamicPool, cannot coalesce!");
-  }
-}
-
 std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
