@@ -20,8 +20,6 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 
-#include <memory>
-
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -46,6 +44,10 @@
 #include "umpire/strategy/AllocationTracker.hpp"
 
 #include "umpire/util/Macros.hpp"
+
+#include <iterator>
+#include <memory>
+#include <sstream>
 
 namespace umpire {
 
@@ -181,7 +183,16 @@ ResourceManager::getAllocationStrategy(const std::string& name)
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    UMPIRE_ERROR("Allocator \"" << name << "\" not found.");
+    auto available_names = getAvailableAllocators();
+
+    const char* const delim = " ";
+
+    std::ostringstream name_list;
+    std::copy(available_names.begin(), available_names.end(),
+               std::ostream_iterator<std::string>(name_list, delim));
+
+    
+    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: " << name_list.str());
   }
 
   return m_allocators_by_name[name];
