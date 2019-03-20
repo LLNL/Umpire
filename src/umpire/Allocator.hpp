@@ -149,7 +149,7 @@ class Allocator {
      *
      * \return Pointer to the AllocationStrategy.
      */
-    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy() noexcept;
+    strategy::AllocationStrategy* getAllocationStrategy() noexcept;
 
     /*!
      * \brief Get the Platform object appropriate for this Allocator.
@@ -170,13 +170,13 @@ class Allocator {
      * \param allocator Pointer to the AllocationStrategy object to use for
      * Allocations.
      */
-    Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept;
+    Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
 
     /*!
      * \brief Pointer to the AllocationStrategy used by this Allocator.
      */
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    umpire::strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace umpire

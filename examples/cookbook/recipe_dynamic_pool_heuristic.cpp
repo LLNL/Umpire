@@ -50,12 +50,12 @@ int main(int, char**) {
   // DynamicPool-specific statistics
   //
   auto strategy = pooled_allocator.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker)
     strategy = tracker->getAllocationStrategy();
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   void* a[4];
   for (int i = 0; i < 4; ++i)
