@@ -183,7 +183,7 @@ ResourceManager::getAllocationStrategy(const std::string& name)
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    auto available_names = getAvailableAllocators();
+    auto available_names = getAllocatorNames();
 
     const char* const delim = " ";
 
@@ -225,7 +225,14 @@ ResourceManager::getAllocator(int id)
 
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
-    UMPIRE_ERROR("Allocator \"" << id << "\" not found.");
+    auto available_ids = getAllocatorIds();
+
+    const char* const delim = " ";
+
+    std::ostringstream id_list;
+    std::copy(available_ids.begin(), available_ids.end(),
+               std::ostream_iterator<int>(id_list, delim));
+    UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: " << id_list.str());
   }
 
   return Allocator(m_allocators_by_id[id]);
@@ -563,7 +570,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
 }
 
 std::vector<std::string>
-ResourceManager::getAvailableAllocators() noexcept
+ResourceManager::getAllocatorNames() const noexcept
 {
   std::vector<std::string> names;
   for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
@@ -572,6 +579,17 @@ ResourceManager::getAvailableAllocators() noexcept
 
   UMPIRE_LOG(Debug, "() returning " << names.size() << " allocators");
   return names;
+}
+
+std::vector<int>
+ResourceManager::getAllocatorIds() const noexcept
+{
+  std::vector<int> ids;
+  for (auto& it : m_allocators_by_id) {
+    ids.push_back(it.first);
+  }
+
+  return ids;
 }
 
 int

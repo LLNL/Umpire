@@ -41,7 +41,7 @@ TEST(ResourceManager, findAllocationRecord)
   ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::util::Exception);
 }
 
-TEST(ResourceManager, getAllocator)
+TEST(ResourceManager, getAllocatorByName)
 {
 
   auto& rm = umpire::ResourceManager::getInstance();
@@ -52,5 +52,19 @@ TEST(ResourceManager, getAllocator)
 
   ASSERT_THROW(
       rm.getAllocator("BANANA"),
+      umpire::util::Exception);
+}
+
+TEST(ResourceManager, getAllocatorById)
+{
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  EXPECT_NO_THROW({
+    auto alloc = rm.getAllocator(0);
+  });
+
+  ASSERT_THROW(
+      rm.getAllocator(-4),
       umpire::util::Exception);
 }
