@@ -61,6 +61,12 @@ blt_add_executable(
   OUTPUT_DIR ${cookbook_dir})
 
 blt_add_executable(
+  NAME recipe_coalesce_pool
+  SOURCES recipe_coalesce_pool.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${cookbook_dir})
+
+blt_add_executable(
   NAME recipe_plot_allocations
   SOURCES recipe_plot_allocations.cpp
   DEPENDS_ON umpire
