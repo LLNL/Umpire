@@ -20,6 +20,7 @@
 #include <string>
 #include <memory>
 #include <cstddef>
+#include <ostream>
 
 namespace umpire {
 namespace strategy {
@@ -118,6 +119,8 @@ class AllocationStrategy :
      * \return The id of this AllocationStrategy.
      */
     int getId() noexcept;
+
+    friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
 
   protected:
     std::string m_name;
