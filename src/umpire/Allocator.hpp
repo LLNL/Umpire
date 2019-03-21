@@ -19,6 +19,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <ostream>
 
 #include "umpire/util/Platform.hpp"
 
@@ -159,6 +160,8 @@ class Allocator {
     Platform getPlatform() noexcept;
 
     Allocator() = default;
+    
+    friend std::ostream& operator<<(std::ostream&, const Allocator&);
 
   private:
     /*!
