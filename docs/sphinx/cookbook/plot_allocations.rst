@@ -17,13 +17,11 @@ The cookbook generates two files, `allocator.log` and
 underlying allocator and the pool. These can then be plotted using a
 command similar to the following:
 
-```
-tools/plot_allocations allocator.log gray 0.2 pooled_allocator.log purple 0.8
-```
+``tools/plot_allocations allocator.log gray 0.2 pooled_allocator.log purple 0.8``
 
 That script uses Python and Matplotlib to generate the following image
 
-.. image: plot_allocations_example.png
+.. image:: ./plot_allocations_example.png
 
 The complete example is included below:
 
