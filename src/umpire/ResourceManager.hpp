@@ -21,7 +21,6 @@
 #include <mutex>
 #include <list>
 #include <unordered_map>
-#include <iostream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -275,15 +274,6 @@ class ResourceManager {
 
     friend void print_allocator_records(Allocator, std::ostream&);
 };
-
-/*!
- * \brief Print the allocations from a specific allocator
- *
- * \param allocator source Allocator.
- * \param os output stream
- */
-void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
-
 
 } // end of namespace umpire
 
