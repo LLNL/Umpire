@@ -28,6 +28,7 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
@@ -289,8 +290,8 @@ class Replay {
         if (m_row.size() > 8) {
           get_from_string(m_row[6], min_initial_alloc_size);
           get_from_string(m_row[7], min_alloc_size);
-          if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size);
-          else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size);
+          if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
+          else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
         }
         else if ( m_row.size() > 7 ) {
           get_from_string(m_row[6], min_initial_alloc_size);
