@@ -51,6 +51,12 @@ if (ENABLE_FORTRAN)
   set(ENABLE_C On)
 endif()
 
+if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
+  message(FATAL_ERROR "\
+  Sphinx documentation requires Doxygen, \
+  please re-configure with ENABLE_DOXYGEN=ON")
+endif ()
+
 if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
