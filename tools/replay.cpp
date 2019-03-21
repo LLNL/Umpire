@@ -12,27 +12,28 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include <iostream>
+#include <cstdlib>
+#include <exception>
 #include <fstream>
-#include <string>
+#include <iostream>
 #include <iterator>
 #include <sstream>
-#include <vector>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
-#include <cstdlib>
-
-#include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
+#include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
-#include "umpire/strategy/FixedPool.hpp"
 
 class CSVRow {
 public:
@@ -104,6 +105,12 @@ class Replay {
         else if ( m_row[1] == "deallocate" ) {
           replay_deallocate();
         }
+        else if ( m_row[1] == "coalesce" ) {
+          replay_coalesce();
+        }
+        else if ( m_row[1] == "release" ) {
+          replay_release();
+        }
         else {
           std::cout << m_row[1] << "\n";
         }
@@ -123,6 +130,67 @@ class Replay {
     {
         std::istringstream ss(s);
         ss >> val;
+    }
+
+    void strip_off_base(std::string& s)
+    {
+      const std::string base("_base");
+
+      if (s.length() > base.length()) {
+        if (s.compare(s.length() - base.length(), base.length(), base) == 0) {
+          s.erase(s.length() - base.length(), base.length());
+        }
+      }
+    }
+
+    void replay_coalesce( void )
+    {
+      std::string allocName = m_row[m_row.size() - 1];
+      strip_off_base(allocName);
+
+      try {
+        auto alloc = m_rm.getAllocator(allocName);
+        auto strategy = alloc.getAllocationStrategy();
+        auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+        if (tracker)
+          strategy = tracker->getAllocationStrategy();
+
+        auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
+        if (dynamic_pool) {
+          dynamic_pool->coalesce();
+        }
+        else {
+          std::cerr << allocName << " is not a dynamic pool, skipping\n";
+          return;
+        }
+      }
+      catch (std::exception& e) {
+        std::cerr << "Unable to find allocator for " << allocName << '\n'
+          << e.what() << '\n'
+          << "Skipped\n";
+        return;
+      }
+    }
+
+    void replay_release( void )
+    {
+      void* alloc_obj_ref;
+
+      get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
+
+      auto n_iter = m_allocators.find(alloc_obj_ref);
+
+      if ( n_iter == m_allocators.end() ) {
+        std::cerr << "Unknown allocator " << alloc_obj_ref << std::endl;
+        return;           // Just skip unknown allocators
+      }
+
+      const std::string& allocName = n_iter->second;
+
+      auto alloc = m_rm.getAllocator(allocName);
+      alloc.release();
     }
 
     void replay_allocate( void )
@@ -222,8 +290,8 @@ class Replay {
         if (m_row.size() > 8) {
           get_from_string(m_row[6], min_initial_alloc_size);
           get_from_string(m_row[7], min_alloc_size);
-          if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size);
-          else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size);
+          if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
+          else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
         }
         else if ( m_row.size() > 7 ) {
           get_from_string(m_row[6], min_initial_alloc_size);
