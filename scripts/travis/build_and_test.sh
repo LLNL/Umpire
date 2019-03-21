@@ -36,6 +36,9 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
     if [[ "${DO_TEST}" == "yes" ]] ; then
       or_die ctest --output-on-failure -V
     fi
+    if [[ "${DO_MEMCHECK}" == "yes" ]] ; then
+      or_die ctest -T memcheck
+    fi
 fi
 
 exit 0
