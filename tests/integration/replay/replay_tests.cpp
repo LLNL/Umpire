@@ -85,19 +85,38 @@ public:
 
   void runTest()
   {
+    auto& rm = umpire::ResourceManager::getInstance();
+    auto pooled_allocator = rm.getAllocator("host_simpool_spec1");
+    auto strategy = pooled_allocator.getAllocationStrategy();
+    auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+
+    if (tracker) {
+      strategy = tracker->getAllocationStrategy();
+    }
+
+    auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+
+    if (! dynamic_pool ) {
+      std::cerr << "host_simpool_spec1 is not a dynamic pool!\n";
+      exit(1);
+    }
+
     for ( int i = 0; i < testAllocations; ++i ) {
       for ( auto n : allocatorNames ) {
-        auto& rm = umpire::ResourceManager::getInstance();
         auto alloc = rm.getAllocator(n);
         allocations.push_back( std::make_pair(alloc.allocate( ++allocationSize ), n) );
       }
     }
 
+    dynamic_pool->coalesce();
+
     for ( auto ptr : allocations ) {
-      auto& rm = umpire::ResourceManager::getInstance();
       auto alloc = rm.getAllocator(ptr.second);
       alloc.deallocate( ptr.first );
     }
+
+    dynamic_pool->coalesce();
+    pooled_allocator.release();
   }
 private:
   const int testAllocations;
