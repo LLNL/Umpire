@@ -51,7 +51,7 @@ int main(int, char**) {
   for (int i = 0; i < 4; ++i) pooled_allocator.deallocate(a[i]);
 
   // Visualize this using the python script. Example usage:
-  // scripts/plot_allocations.py allocator.log gray 0.2 pooled_allocator.log purple 0.8
+  // tools/plot_allocations allocator.log gray 0.2 pooled_allocator.log purple 0.8
 
   return 0;
 }
