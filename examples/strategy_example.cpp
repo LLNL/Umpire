@@ -25,7 +25,7 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
+  for (auto s : rm.getAllocatorNames()){
     std::cout << s << "  ";
   }
   std::cout << std::endl;
@@ -82,7 +82,7 @@ int main(int, char**)
   std::cout << "Size: " << alloc.getSize(test) << std::endl;
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
+  for (auto s : rm.getAllocatorNames()){
     std::cout << s << ", ";
   }
   std::cout << std::endl;

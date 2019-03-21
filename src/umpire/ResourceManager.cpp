@@ -20,8 +20,6 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 
-#include <memory>
-
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -46,6 +44,10 @@
 #include "umpire/strategy/AllocationTracker.hpp"
 
 #include "umpire/util/Macros.hpp"
+
+#include <iterator>
+#include <memory>
+#include <sstream>
 
 namespace umpire {
 
@@ -181,7 +183,8 @@ ResourceManager::getAllocationStrategy(const std::string& name)
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    UMPIRE_ERROR("Allocator \"" << name << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: " 
+        << getAllocatorInformation());
   }
 
   return m_allocators_by_name[name];
@@ -201,7 +204,8 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 
   auto allocator = m_memory_resources.find(resource_type);
   if (allocator == m_memory_resources.end()) {
-    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type) << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type)
+        << "\" not found. Available allocators: " << getAllocatorInformation());
   }
 
   return Allocator(m_memory_resources[resource_type]);
@@ -214,7 +218,8 @@ ResourceManager::getAllocator(int id)
 
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
-    UMPIRE_ERROR("Allocator \"" << id << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: "
+        << getAllocatorInformation());
   }
 
   return Allocator(m_allocators_by_id[id]);
@@ -531,7 +536,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
 }
 
 std::vector<std::string>
-ResourceManager::getAvailableAllocators() noexcept
+ResourceManager::getAllocatorNames() const noexcept
 {
   std::vector<std::string> names;
   for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
@@ -542,10 +547,33 @@ ResourceManager::getAvailableAllocators() noexcept
   return names;
 }
 
+std::vector<int>
+ResourceManager::getAllocatorIds() const noexcept
+{
+  std::vector<int> ids;
+  for (auto& it : m_allocators_by_id) {
+    ids.push_back(it.first);
+  }
+
+  return ids;
+}
+
 int
 ResourceManager::getNextId() noexcept
 {
   return m_id++;
+}
+
+std::string
+ResourceManager::getAllocatorInformation() const noexcept
+{
+  std::ostringstream info;
+
+  for (auto& it : m_allocators_by_name) {
+    info << *it.second << " ";
+  }
+
+  return info.str();
 }
 
 } // end of namespace umpire
