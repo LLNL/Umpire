@@ -52,7 +52,12 @@ class ResourceManager {
     /*!
      * \brief Get the names of all available Allocator objects.
      */
-    std::vector<std::string> getAvailableAllocators() noexcept;
+    std::vector<std::string> getAllocatorNames() const noexcept;
+
+    /*!
+     * \brief Get the ids of all available Allocator objects.
+     */
+    std::vector<int> getAllocatorIds() const noexcept;
 
     /*!
      * \brief Get the Allocator with the given name.
@@ -241,6 +246,8 @@ class ResourceManager {
     std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
 
     int getNextId() noexcept;
+
+    std::string getAllocatorInformation() const noexcept;
 
     static ResourceManager* s_resource_manager_instance;
 
