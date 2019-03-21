@@ -23,7 +23,7 @@ if (BASH_PROGRAM)
 
   configure_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/test_output.good"
-    "${CMAKE_CURRENT_BINARY_DIR}/test_output.good"
+    "${replay_dir}/test_output.good"
     COPYONLY
   )
 
