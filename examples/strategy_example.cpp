@@ -51,7 +51,7 @@ int main(int, char**)
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 4096", 4096, rm.getAllocator("HOST"));
 
-  auto slot_alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
+  alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
       "host_slot_pool", 64, rm.getAllocator("HOST"));
 
   /*
