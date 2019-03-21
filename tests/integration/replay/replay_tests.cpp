@@ -72,11 +72,13 @@ public:
       "thread_safe_allocator", rm.getAllocator("HOST"));
     allocatorNames.push_back("thread_safe_allocator");
 
+#if 0
     struct data { char _[1024*1024]; };
 
     rm.makeAllocator<umpire::strategy::FixedPool<data>>(
         "fixed_pool_allocator", rm.getAllocator("HOST"));
     allocatorNames.push_back("fixed_pool_allocator");
+#endif
   }
 
   ~replayTest( void )
