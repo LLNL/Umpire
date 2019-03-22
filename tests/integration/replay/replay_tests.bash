@@ -24,16 +24,16 @@ replayprogram=$tools_dir/replay
 #
 UMPIRE_REPLAY="On" $testprogram >& replay_test1.csv
 if [ $? -ne 0 ]; then
-    echo FAIL
+    echo "Failed: Unable to run $testprogram"
     exit 1
 fi
 
 #
 # Now replay from the activity captured in the replay_test1.csv file
 #
-UMPIRE_REPLAY="On" $replayprogram replay_test1.csv >& replay_test2.csv
+$replayprogram replay_test1.csv replay.out
 if [ $? -ne 0 ]; then
-    echo FAIL
+    echo "Failed: Unable to run $replayprogram"
     exit 1
 fi
 
@@ -41,4 +41,9 @@ fi
 # Now, compare the results being careful to allow for different object
 # references (everything else should be the same).
 #
+diff replay.out $replay_tests_dir/test_output.good
+if [ $? -ne 0 ]; then
+    echo "Diff failed"
+    exit 1
+fi
 exit 0

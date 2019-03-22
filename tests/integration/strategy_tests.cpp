@@ -230,13 +230,15 @@ TEST(AllocationAdvisor, Create)
 
   ASSERT_NO_THROW(
     auto read_only_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR"));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+          "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR");
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, CreateWithId)
@@ -248,13 +250,15 @@ TEST(AllocationAdvisor, CreateWithId)
   ASSERT_NO_THROW(
     auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id));
+      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id);
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator_device_id",
-      rm.getAllocator("UM"), "FOOBAR", device_id));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um_nonsense_operator_device_id",
+      rm.getAllocator("UM"), "FOOBAR", device_id);
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, Host)
