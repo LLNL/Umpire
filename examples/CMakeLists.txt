@@ -52,12 +52,6 @@ if (ENABLE_STATISTICS)
     OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 endif()
 
-#blt_add_executable(
-#  NAME sandbox
-#  SOURCES sandbox.cpp
-#  DEPENDS_ON umpire
-#  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
-
 add_subdirectory(tutorial)
 
 add_subdirectory(cookbook)
