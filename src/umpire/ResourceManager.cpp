@@ -177,7 +177,7 @@ ResourceManager::initialize()
   UMPIRE_LOG(Debug, "() leaving");
 }
 
-strategy::AllocationStrategy*&
+strategy::AllocationStrategy*
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
@@ -511,7 +511,7 @@ ResourceManager::getSize(void* ptr) const
   return record->m_size;
 }
 
-strategy::AllocationStrategy*& ResourceManager::findAllocatorForId(int id)
+strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
 
@@ -523,7 +523,7 @@ strategy::AllocationStrategy*& ResourceManager::findAllocatorForId(int id)
   return allocator_i->second;
 }
 
-strategy::AllocationStrategy*& ResourceManager::findAllocatorForPointer(void* ptr)
+strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
   auto allocation_record = m_allocations.find(ptr);
 

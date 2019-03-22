@@ -241,9 +241,9 @@ class ResourceManager {
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
 
-    strategy::AllocationStrategy*& findAllocatorForPointer(void* ptr);
-    strategy::AllocationStrategy*& findAllocatorForId(int id);
-    strategy::AllocationStrategy*& getAllocationStrategy(const std::string& name);
+    strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
+    strategy::AllocationStrategy* findAllocatorForId(int id);
+    strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
 
     int getNextId() noexcept;
 
