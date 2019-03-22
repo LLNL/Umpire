@@ -88,13 +88,13 @@ public:
     auto& rm = umpire::ResourceManager::getInstance();
     auto pooled_allocator = rm.getAllocator("host_simpool_spec1");
     auto strategy = pooled_allocator.getAllocationStrategy();
-    auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+    auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
     if (tracker) {
       strategy = tracker->getAllocationStrategy();
     }
 
-    auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+    auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
     if (! dynamic_pool ) {
       std::cerr << "host_simpool_spec1 is not a dynamic pool!\n";

@@ -46,10 +46,10 @@ class AllocationTracker :
 
     Platform getPlatform() noexcept;
 
-    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy();
+    strategy::AllocationStrategy* getAllocationStrategy();
 
   private:
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 
 };
 

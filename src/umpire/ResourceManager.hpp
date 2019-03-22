@@ -241,9 +241,9 @@ class ResourceManager {
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
 
-    std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForPointer(void* ptr);
-    std::shared_ptr<strategy::AllocationStrategy>& findAllocatorForId(int id);
-    std::shared_ptr<strategy::AllocationStrategy>& getAllocationStrategy(const std::string& name);
+    strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
+    strategy::AllocationStrategy* findAllocatorForId(int id);
+    strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
 
     int getNextId() noexcept;
 
@@ -253,14 +253,14 @@ class ResourceManager {
 
     std::list<std::string> m_allocator_names;
 
-    std::unordered_map<std::string, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_name;
-    std::unordered_map<int, std::shared_ptr<strategy::AllocationStrategy> > m_allocators_by_id;
+    std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
+    std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
 
     util::AllocationMap m_allocations;
 
-    std::shared_ptr<strategy::AllocationStrategy> m_default_allocator;
+    strategy::AllocationStrategy* m_default_allocator;
 
-    std::unordered_map<resource::MemoryResourceType, std::shared_ptr<strategy::AllocationStrategy>, resource::MemoryResourceTypeHash > m_memory_resources;
+    std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash > m_memory_resources;
 
     long m_allocated;
 

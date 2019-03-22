@@ -173,6 +173,7 @@ TEST(Allocator, GetSetDefault)
 
   ASSERT_NO_THROW(
     auto alloc = rm.getDefaultAllocator();
+    UMPIRE_USE_VAR(alloc);
   );
 
   ASSERT_NO_THROW(

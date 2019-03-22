@@ -377,13 +377,13 @@ TEST(HeuristicTest, EdgeCases_75)
       1024ul, 1024ul, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -421,13 +421,13 @@ TEST(HeuristicTest, EdgeCases_100)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -486,13 +486,13 @@ TEST(HeuristicTest, EdgeCases_0)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 

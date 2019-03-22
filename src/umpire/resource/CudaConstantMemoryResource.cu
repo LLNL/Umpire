@@ -52,7 +52,7 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
   }
 
   ResourceManager::getInstance().registerAllocation(
-      ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
+      ret, new util::AllocationRecord{ret, bytes, this});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)

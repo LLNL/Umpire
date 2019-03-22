@@ -79,28 +79,28 @@ ResourceManager::ResourceManager() :
     resource::MemoryResourceRegistry::getInstance();
 
   registry.registerMemoryResource(
-      std::make_shared<resource::HostResourceFactory>());
+      new resource::HostResourceFactory());
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaDeviceResourceFactory>());
+    new resource::CudaDeviceResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaUnifiedMemoryResourceFactory>());
+    new resource::CudaUnifiedMemoryResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaPinnedMemoryResourceFactory>());
+    new resource::CudaPinnedMemoryResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaConstantMemoryResourceFactory>());
+    new resource::CudaConstantMemoryResourceFactory());
 #endif
 
 #if defined(UMPIRE_ENABLE_ROCM)
   registry.registerMemoryResource(
-    std::make_shared<resource::RocmDeviceResourceFactory>());
+    new resource::RocmDeviceResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
+    new resource::RocmPinnedMemoryResourceFactory());
 #endif
 
   initialize();
@@ -177,7 +177,7 @@ ResourceManager::initialize()
   UMPIRE_LOG(Debug, "() leaving");
 }
 
-std::shared_ptr<strategy::AllocationStrategy>&
+strategy::AllocationStrategy*
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
@@ -416,15 +416,15 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
 static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
   std::shared_ptr<strategy::NumaPolicy> numa_alloc;
 
-  numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(
+  numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
     allocator.getAllocationStrategy());
 
   // ... or an AllocationTracker wrapping a NumaPolicy
   if (!numa_alloc) {
-    auto alloc_tracker = std::dynamic_pointer_cast<strategy::AllocationTracker>(
+    auto alloc_tracker = dynamic_cast<strategy::AllocationTracker*>(
       allocator.getAllocationStrategy());
     if (alloc_tracker) {
-      numa_alloc = std::dynamic_pointer_cast<strategy::NumaPolicy>(
+      numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
         alloc_tracker->getAllocationStrategy());
     }
   }
@@ -511,7 +511,7 @@ ResourceManager::getSize(void* ptr) const
   return record->m_size;
 }
 
-std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForId(int id)
+strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
 
@@ -523,7 +523,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
   return allocator_i->second;
 }
 
-std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)
+strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
   auto allocation_record = m_allocations.find(ptr);
 
