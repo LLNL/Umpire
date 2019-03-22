@@ -16,18 +16,16 @@
 #include <vector>
 #include <string>
 
-#include "umpire/config.hpp"
-#include "umpire/ResourceManager.hpp"
-
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 
 class replayTest {
 public:
@@ -46,19 +44,6 @@ public:
     rm.makeAllocator<umpire::strategy::DynamicPool, false>(
         "host_simpool_spec2", rm.getAllocator("HOST"), 9876, 1234);
     allocatorNames.push_back("host_simpool_spec2");
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
-    allocatorNames.push_back("read_only_um");
-#endif
-
-#if defined(UMPIRE_ENABLE_UM)
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "preferred_location_host", rm.getAllocator("UM"),
-      "PREFERRED_LOCATION", rm.getAllocator("HOST"));
-    allocatorNames.push_back("preferred_location_host");
-#endif
 
     rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));

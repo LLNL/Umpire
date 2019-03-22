@@ -1,64 +1,46 @@
 makeMemoryResource HOST
-makeMemoryResource DEVICE
-makeMemoryResource PINNED
-makeMemoryResource UM
-makeMemoryResource DEVICE_CONST
 makeAllocator <umpire::strategy::DynamicPool>(host_simpool_defaults, getAllocator(HOST))
 makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec1, getAllocator(HOST), 9876, 1234)
 makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec2, getAllocator(HOST), 9876, 1234)
-makeAllocator <umpire::strategy::AllocationAdvisor>(read_only_um, getAllocator(UM), READ_MOSTLY)
-makeAllocator <umpire::strategy::AllocationAdvisor>(preferred_location_host, getAllocator(UM), PREFERRED_LOCATION, getAllocator(HOST))
 makeAllocator <umpire::strategy::MonotonicAllocationStrategy>(MONOTONIC 1024, 1024, getAllocator(HOST))
 makeAllocator <umpire::strategy::SlotPool>(host_slot_pool, 64, getAllocator(HOST))
 makeAllocator <umpire::strategy::ThreadSafeAllocator>(thread_safe_allocator, getAllocator(HOST))
 allocate (17) host_simpool_defaults --> 1
 allocate (18) host_simpool_spec1 --> 2
 allocate (19) host_simpool_spec2 --> 3
-allocate (20) read_only_um --> 4
-allocate (21) preferred_location_host --> 5
-allocate (22) MONOTONIC 1024 --> 6
-allocate (23) host_slot_pool --> 7
-allocate (24) thread_safe_allocator --> 8
-allocate (25) host_simpool_defaults --> 9
-allocate (26) host_simpool_spec1 --> 10
-allocate (27) host_simpool_spec2 --> 11
-allocate (28) read_only_um --> 12
-allocate (29) preferred_location_host --> 13
-allocate (30) MONOTONIC 1024 --> 14
-allocate (31) host_slot_pool --> 15
-allocate (32) thread_safe_allocator --> 16
-allocate (33) host_simpool_defaults --> 17
-allocate (34) host_simpool_spec1 --> 18
-allocate (35) host_simpool_spec2 --> 19
-allocate (36) read_only_um --> 20
-allocate (37) preferred_location_host --> 21
-allocate (38) MONOTONIC 1024 --> 22
-allocate (39) host_slot_pool --> 23
-allocate (40) thread_safe_allocator --> 24
+allocate (20) MONOTONIC 1024 --> 4
+allocate (21) host_slot_pool --> 5
+allocate (22) thread_safe_allocator --> 6
+allocate (23) host_simpool_defaults --> 7
+allocate (24) host_simpool_spec1 --> 8
+allocate (25) host_simpool_spec2 --> 9
+allocate (26) MONOTONIC 1024 --> 10
+allocate (27) host_slot_pool --> 11
+allocate (28) thread_safe_allocator --> 12
+allocate (29) host_simpool_defaults --> 13
+allocate (30) host_simpool_spec1 --> 14
+allocate (31) host_simpool_spec2 --> 15
+allocate (32) MONOTONIC 1024 --> 16
+allocate (33) host_slot_pool --> 17
+allocate (34) thread_safe_allocator --> 18
 coalesce host_simpool_spec1
 deallocate host_simpool_defaults(1)
 deallocate host_simpool_spec1(2)
 deallocate host_simpool_spec2(3)
-deallocate read_only_um(4)
-deallocate preferred_location_host(5)
-deallocate MONOTONIC 1024(6)
-deallocate host_slot_pool(7)
-deallocate thread_safe_allocator(8)
-deallocate host_simpool_defaults(9)
-deallocate host_simpool_spec1(10)
-deallocate host_simpool_spec2(11)
-deallocate read_only_um(12)
-deallocate preferred_location_host(13)
-deallocate MONOTONIC 1024(14)
-deallocate host_slot_pool(15)
-deallocate thread_safe_allocator(16)
-deallocate host_simpool_defaults(17)
-deallocate host_simpool_spec1(18)
-deallocate host_simpool_spec2(19)
-deallocate read_only_um(20)
-deallocate preferred_location_host(21)
-deallocate MONOTONIC 1024(22)
-deallocate host_slot_pool(23)
-deallocate thread_safe_allocator(24)
+deallocate MONOTONIC 1024(4)
+deallocate host_slot_pool(5)
+deallocate thread_safe_allocator(6)
+deallocate host_simpool_defaults(7)
+deallocate host_simpool_spec1(8)
+deallocate host_simpool_spec2(9)
+deallocate MONOTONIC 1024(10)
+deallocate host_slot_pool(11)
+deallocate thread_safe_allocator(12)
+deallocate host_simpool_defaults(13)
+deallocate host_simpool_spec1(14)
+deallocate host_simpool_spec2(15)
+deallocate MONOTONIC 1024(16)
+deallocate host_slot_pool(17)
+deallocate thread_safe_allocator(18)
 coalesce host_simpool_spec1
 release host_simpool_spec1
