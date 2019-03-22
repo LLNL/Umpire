@@ -1,0 +1,44 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a
+Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
+[Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- NUMA strategy (umpire::strategy::NumaPolicy) that allows allocating memory
+an specific NUMA nodes.
+
+- Implemented << for Allocator, so that it can be printed directly.
+
+- Update getAllocator methods to print list of available Allocators if the
+requested Allocator cannot be found.
+
+- Replay now captures coalesce operations from strategy::DynamicPool so that
+these can be replayed.
+
+- The replay tool can produce an output file that can be used to verify the
+replayed events are correct.
+
+
+### Changed
+
+- Umpire now builds as a single library, libumpire.a or libumpire.so, rather
+than having one library per source subdirectory.
+
+- Removed shared_ptr usage entirely. Ownership of objects was never "shared"
+and the smart pointers added unecessary overhead.
+
+### Removed
+
+- The 'coalesce' method was removed from ResourceManager and now must be
+accessed directory. examples/cookbook/recipe_coalesce_pool.cpp shows how to do
+this.
+
+### Fixed
+
+- While replay already was recording release operations, the tool was not actually replaying them.  A fix was implemented so that the replay tool will now also replay any captured release operations.
