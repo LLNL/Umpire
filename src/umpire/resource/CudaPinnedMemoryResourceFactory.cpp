@@ -32,7 +32,7 @@ CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
   }
 }
 
-std::shared_ptr<MemoryResource>
+resource::MemoryResource*
 CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -44,7 +44,7 @@ CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator> >(Platform::cuda, "PINNED", id, traits);
+  return new resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>(Platform::cuda, "PINNED", id, traits);
 }
 
 } // end of namespace resource

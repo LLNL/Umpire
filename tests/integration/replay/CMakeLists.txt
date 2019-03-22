@@ -20,6 +20,13 @@ set (replay_integration_tests_depends
   umpire)
 
 if (BASH_PROGRAM)
+
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/test_output.good"
+    "${replay_dir}/test_output.good"
+    COPYONLY
+  )
+
   blt_add_executable(
     NAME replay_tests
     SOURCES replay_tests.cpp

@@ -230,13 +230,15 @@ TEST(AllocationAdvisor, Create)
 
   ASSERT_NO_THROW(
     auto read_only_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR"));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+          "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR");
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, CreateWithId)
@@ -248,13 +250,15 @@ TEST(AllocationAdvisor, CreateWithId)
   ASSERT_NO_THROW(
     auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id));
+      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id);
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator_device_id",
-      rm.getAllocator("UM"), "FOOBAR", device_id));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um_nonsense_operator_device_id",
+      rm.getAllocator("UM"), "FOOBAR", device_id);
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, Host)
@@ -337,32 +341,6 @@ TEST(SizeLimiter, Host)
     alloc.deallocate(data));
 }
 
-
-TEST(CoalesceTest, CanCoalesce)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_simpool", rm.getAllocator("HOST"), 64, 64);
-
-  void* ptr_one = alloc.allocate(62);
-  void* ptr_two = alloc.allocate(1024);
-  alloc.deallocate(ptr_two);
-
-  EXPECT_NO_THROW(rm.coalesce(alloc));
-
-  alloc.deallocate(ptr_one);
-}
-
-TEST(CoalesceTest, Unsupported)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  EXPECT_THROW(
-  rm.coalesce(rm.getAllocator("HOST")),
-  umpire::util::Exception);
-}
-
 TEST(ReleaseTest, Works)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -403,13 +381,13 @@ TEST(HeuristicTest, EdgeCases_75)
       1024ul, 1024ul, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -447,13 +425,13 @@ TEST(HeuristicTest, EdgeCases_100)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -512,13 +490,13 @@ TEST(HeuristicTest, EdgeCases_0)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
