@@ -1,4 +1,3 @@
-makeMemoryResource HOST
 makeAllocator <umpire::strategy::DynamicPool>(host_simpool_defaults, getAllocator(HOST))
 makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec1, getAllocator(HOST), 9876, 1234)
 makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec2, getAllocator(HOST), 9876, 1234)

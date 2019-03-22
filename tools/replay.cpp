@@ -106,30 +106,40 @@ class Replay {
         if ( m_row[0] != "REPLAY" )
           continue;
 
-        replay_out() << m_row[1] << " ";
         if ( m_row[1] == "makeAllocator" ) {
+          replay_out() << m_row[1] << " ";
           replay_makeAllocator();
+          replay_out() << "\n";
         }
         else if ( m_row[1] == "makeMemoryResource" ) {
           replay_makeMemoryResource();
         }
         else if ( m_row[1] == "allocate" ) {
+          replay_out() << m_row[1] << " ";
           replay_allocate();
+          replay_out() << "\n";
         }
         else if ( m_row[1] == "deallocate" ) {
+          replay_out() << m_row[1] << " ";
           replay_deallocate();
+          replay_out() << "\n";
         }
         else if ( m_row[1] == "coalesce" ) {
+          replay_out() << m_row[1] << " ";
           replay_coalesce();
+          replay_out() << "\n";
         }
         else if ( m_row[1] == "release" ) {
+          replay_out() << m_row[1] << " ";
           replay_release();
+          replay_out() << "\n";
         }
         else {
+          replay_out() << m_row[1] << " ";
           std::cerr << "Unknown Replay (" << m_row[1] << ")\n";
+          replay_out() << "\n";
           exit (1);
         }
-        replay_out() << "\n";
       }
     }
 
@@ -294,7 +304,6 @@ class Replay {
       const std::string& name = m_row[2];
       get_from_string(m_row[3], alloc_obj_ref);
 
-      replay_out() << name;
       m_allocators[alloc_obj_ref] = name;
     }
 
