@@ -83,7 +83,7 @@ class FixedPool
     long m_highwatermark;
     long m_current_size;
 
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

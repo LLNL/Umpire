@@ -29,8 +29,7 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy :
-  public std::enable_shared_from_this<AllocationStrategy>
+class AllocationStrategy 
 {
   public:
     /*!

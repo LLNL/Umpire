@@ -53,7 +53,7 @@ class NumaPolicy :
     int getNode() const noexcept;
 
   private:
-    std::shared_ptr<AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
     Platform m_platform;
     int m_node;
 };

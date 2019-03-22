@@ -43,5 +43,7 @@ int main(int, char**) {
                             "GPU_POOL",
                             preferred_location_allocator);
 
+  UMPIRE_USE_VAR(pooled_allocator);
+
   return 0;
 }

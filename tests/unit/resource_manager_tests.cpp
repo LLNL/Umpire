@@ -48,6 +48,7 @@ TEST(ResourceManager, getAllocatorByName)
 
   EXPECT_NO_THROW({
     auto alloc = rm.getAllocator("HOST");
+    UMPIRE_USE_VAR(alloc);
   });
 
   ASSERT_THROW(
@@ -62,6 +63,7 @@ TEST(ResourceManager, getAllocatorById)
 
   EXPECT_NO_THROW({
     auto alloc = rm.getAllocator(0);
+    UMPIRE_USE_VAR(alloc);
   });
 
   ASSERT_THROW(

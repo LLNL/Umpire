@@ -29,13 +29,13 @@ int main(int, char**) {
       "pool", rm.getAllocator("HOST"));
 
   auto strategy = pool.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   if (dynamic_pool) {
     dynamic_pool->coalesce();
