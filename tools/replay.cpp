@@ -451,6 +451,11 @@ class Replay {
         replay_out() << " (ignored) ";
         return;
 #if 0
+        //
+        // Replay currently cannot support replaying FixedPool allocations.
+        // This is because replay does its work at runtime and the FixedPool
+        // is a template where sizes are generated at compile time.
+        //
         const std::string& allocName = m_row[5];
         std::size_t PoolSize = hmm...
 

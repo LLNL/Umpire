@@ -58,6 +58,11 @@ public:
     allocatorNames.push_back("thread_safe_allocator");
 
 #if 0
+    //
+    // Replay currently cannot support replaying FixedPool allocations.
+    // This is because replay does its work at runtime and the FixedPool
+    // is a template where sizes are generated at compile time.
+    //
     struct data { char _[1024*1024]; };
 
     rm.makeAllocator<umpire::strategy::FixedPool<data>>(
