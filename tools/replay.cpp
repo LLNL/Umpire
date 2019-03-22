@@ -67,19 +67,29 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
   return str;
 }   
 
+class NullBuffer : public std::streambuf {
+  public:
+    int overflow(int c) { return c; }
+};
+static NullBuffer null_buffer;
+static std::ostream null_stream(&null_buffer);
+
 class Replay {
   public:
     Replay( std::string in_file_name, std::string out_file_name ):
         m_sequence_id(0)
       , m_input_file(in_file_name)
-      , m_replayout(out_file_name)
       , m_rm(umpire::ResourceManager::getInstance())
     {
       if ( ! m_input_file.is_open() )
         usage_and_exit( "Unable to open input file " + in_file_name );
 
-      if ( ! m_replayout.is_open() )
-        usage_and_exit( "Unable to open output file " + out_file_name );
+      if (out_file_name != "") {
+        m_replayout.open(out_file_name);
+        if ( ! m_replayout.is_open() )
+          usage_and_exit( "Unable to open output file " + out_file_name );
+        replay_out(m_replayout);
+      }
     }
 
     static void usage_and_exit( const std::string& errorMessage ) {
@@ -96,7 +106,7 @@ class Replay {
         if ( m_row[0] != "REPLAY" )
           continue;
 
-        m_replayout << m_row[1] << " ";
+        replay_out() << m_row[1] << " ";
         if ( m_row[1] == "makeAllocator" ) {
           replay_makeAllocator();
         }
@@ -119,19 +129,25 @@ class Replay {
           std::cerr << "Unknown Replay (" << m_row[1] << ")\n";
           exit (1);
         }
-        m_replayout << "\n";
+        replay_out() << "\n";
       }
     }
 
   private:
     uint64_t m_sequence_id;
     std::ifstream m_input_file;
-    std::ofstream m_replayout;
     umpire::ResourceManager& m_rm;
+    std::ofstream m_replayout;
     std::unordered_map<void*, std::string> m_allocators;  // key(alloc_obj), val(alloc name)
     std::unordered_map<void*, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::unordered_map<void*, uint64_t> m_allocation_seq;    // key(alloc_ptr), val(m_sequence_id)
     CSVRow m_row;
+
+    std::ostream& replay_out(std::ostream& outs = null_stream)
+    {
+      static std::ostream& rpl_out = outs;
+      return rpl_out;
+    }
 
     template <typename T>
     void get_from_string( const std::string& s, T& val )
@@ -156,7 +172,7 @@ class Replay {
       std::string allocName = m_row[m_row.size() - 1];
       strip_off_base(allocName);
 
-      m_replayout << allocName;
+      replay_out() << allocName;
 
       try {
         auto alloc = m_rm.getAllocator(allocName);
@@ -199,7 +215,7 @@ class Replay {
 
       const std::string& allocName = n_iter->second;
 
-      m_replayout << allocName;
+      replay_out() << allocName;
 
       auto alloc = m_rm.getAllocator(allocName);
       alloc.release();
@@ -232,7 +248,7 @@ class Replay {
       m_sequence_id++;
       m_allocation_seq[alloc_ptr] = m_sequence_id;
 
-      m_replayout << "(" << alloc_size << ") " << allocName << " --> " << m_sequence_id;
+      replay_out() << "(" << alloc_size << ") " << allocName << " --> " << m_sequence_id;
     }
 
     void replay_deallocate( void )
@@ -252,7 +268,7 @@ class Replay {
 
       const std::string& allocName = n_iter->second;
 
-      m_replayout << allocName;
+      replay_out() << allocName;
 
       auto p_iter = m_allocated_ptrs.find(alloc_ptr);
       if ( p_iter == m_allocated_ptrs.end() ) {
@@ -261,7 +277,7 @@ class Replay {
       }
 
       auto s_iter = m_allocation_seq.find(alloc_ptr);
-      m_replayout << "(" << s_iter->second << ")";
+      replay_out() << "(" << s_iter->second << ")";
       m_allocation_seq.erase(s_iter);
 
       void* replay_alloc_ptr = p_iter->second;
@@ -278,7 +294,7 @@ class Replay {
       const std::string& name = m_row[2];
       get_from_string(m_row[3], alloc_obj_ref);
 
-      m_replayout << name;
+      replay_out() << name;
       m_allocators[alloc_obj_ref] = name;
     }
 
@@ -290,7 +306,7 @@ class Replay {
 
       get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
 
-      m_replayout << "<" << m_row[2] << ">" ;
+      replay_out() << "<" << m_row[2] << ">" ;
 
       if ( m_row[2] == "umpire::strategy::AllocationAdvisor" ) {
         const std::string& allocName = m_row[5];
@@ -299,7 +315,7 @@ class Replay {
         if (m_row.size() > 8) {
           const std::string& accessingAllocatorName = m_row[7];
 
-          m_replayout 
+          replay_out() 
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << adviceOperation
@@ -311,7 +327,7 @@ class Replay {
         }
         else {
 
-          m_replayout 
+          replay_out() 
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << adviceOperation
@@ -331,7 +347,7 @@ class Replay {
           get_from_string(m_row[6], min_initial_alloc_size);
           get_from_string(m_row[7], min_alloc_size);
 
-          m_replayout 
+          replay_out() 
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << min_initial_alloc_size
@@ -344,7 +360,7 @@ class Replay {
         else if ( m_row.size() > 7 ) {
           get_from_string(m_row[6], min_initial_alloc_size);
 
-          m_replayout 
+          replay_out() 
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << min_initial_alloc_size
@@ -355,7 +371,7 @@ class Replay {
         }
         else {
 
-          m_replayout 
+          replay_out() 
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ")";
@@ -370,7 +386,7 @@ class Replay {
 
         const std::string& allocName = m_row[6];
 
-        m_replayout 
+        replay_out() 
           << "(" << name
           << ", " << capacity
             << ", getAllocator(" << allocName << ")"
@@ -384,7 +400,7 @@ class Replay {
         std::size_t size_limit;
         get_from_string(m_row[6], size_limit);
 
-        m_replayout 
+        replay_out() 
           << "(" << name
           << ", getAllocator(" << allocName << ")"
           << ", " << size_limit
@@ -398,7 +414,7 @@ class Replay {
         std::size_t slots;
         get_from_string(m_row[5], slots);
 
-        m_replayout 
+        replay_out() 
           << "(" << name
           << ", " << slots
           << ", getAllocator(" << allocName << ")"
@@ -410,7 +426,7 @@ class Replay {
       else if ( m_row[2] == "umpire::strategy::ThreadSafeAllocator" ) {
         const std::string& allocName = m_row[5];
 
-        m_replayout 
+        replay_out() 
           << "(" << name
           << ", getAllocator(" << allocName << ")"
           << ")";
@@ -423,7 +439,7 @@ class Replay {
         // Need to skip FixedPool for now since I haven't figured out how to
         // dynamically parse/creat the data type parameter
         //
-        m_replayout << " (ignored) ";
+        replay_out() << " (ignored) ";
         return;
 #if 0
         const std::string& allocName = m_row[5];
@@ -453,7 +469,7 @@ int main(int ac, char** av)
   if (ac == 3)
     outfile = av[2];
   else 
-    outfile = "/dev/null";
+    outfile = "";
 
   Replay replay(infile, outfile);
 
