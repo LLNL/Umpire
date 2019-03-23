@@ -46,6 +46,13 @@ class AllocationStrategy
     virtual ~AllocationStrategy() = default;
 
     /*!
+     * \brief Finalize an AllocationStrategy before destroying it.
+     *
+     *  After calling finalize only calls to deallocate are valid. 
+     */
+    virtual void finalize() = 0;
+
+    /*!
      * \brief Allocate bytes of memory.
      *
      * \param bytes Number of bytes to allocate.

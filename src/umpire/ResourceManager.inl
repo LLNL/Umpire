@@ -62,7 +62,7 @@ Allocator ResourceManager::makeAllocator(
 
       auto base_allocator = new Strategy(base_name.str(), getNextId(), std::forward<Args>(args)...);
 
-      allocator = new umpire::strategy::AllocationTracker(name, getNextId(), Allocator(base_allocator));
+      allocator = new umpire::strategy::AllocationTracker(name, getNextId(), Allocator(base_allocator), true);
 
       m_allocators_by_name[name] = allocator;
       m_allocators_by_id[allocator->getId()] = allocator;

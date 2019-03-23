@@ -47,15 +47,17 @@ class FixedPool
 
     ~FixedPool();
 
-    void* allocate(size_t bytes);
+    void finalize() override;
 
-    void deallocate(void* ptr);
+    void* allocate(size_t bytes) override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+    long getActualSize() const noexcept override;
+
+    Platform getPlatform() noexcept override;
 
   private:
     struct Pool
@@ -72,6 +74,7 @@ class FixedPool
 
     size_t numPools() const noexcept;
 
+    void free();
 
     struct Pool *m_pool;
     size_t m_num_per_pool;
@@ -82,6 +85,8 @@ class FixedPool
 
     long m_highwatermark;
     long m_current_size;
+
+    bool m_finalized;
 
     strategy::AllocationStrategy* m_allocator;
 };

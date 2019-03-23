@@ -20,11 +20,26 @@ namespace strategy {
 AllocationTracker::AllocationTracker(
   const std::string& name,
   int id,
-  Allocator allocator) noexcept :
+  Allocator allocator,
+  bool own) noexcept :
 AllocationStrategy(name, id),
 mixins::Inspector(),
+m_owns_allocator(own),
 m_allocator(allocator.getAllocationStrategy())
 {
+}
+
+AllocationTracker::~AllocationTracker()
+{
+  if (m_owns_allocator)
+  {
+    delete m_allocator;
+  }
+}
+
+void AllocationTracker::finalize()
+{
+  m_allocator->finalize();
 }
 
 void*

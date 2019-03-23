@@ -36,6 +36,12 @@ ThreadSafeAllocator::~ThreadSafeAllocator()
   m_mutex = nullptr;
 }
 
+void
+ThreadSafeAllocator::finalize()
+{
+  m_allocator->finalize();
+}
+
 void*
 ThreadSafeAllocator::allocate(size_t bytes)
 {

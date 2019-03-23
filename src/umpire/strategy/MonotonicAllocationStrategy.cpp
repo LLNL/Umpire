@@ -36,8 +36,23 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
 
 MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
 {
-  m_allocator->deallocate(m_block);
-  m_block = nullptr;
+  free();
+}
+
+void
+MonotonicAllocationStrategy::finalize()
+{
+  free();
+  m_allocator->finalize();
+}
+
+void MonotonicAllocationStrategy::free()
+{
+  if (m_block)
+  {
+    m_allocator->deallocate(m_block);
+    m_block = nullptr;
+  }
 }
 
 void*
@@ -47,7 +62,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
   m_size += bytes;
 
   if (m_size > m_capacity) {
-    UMPIRE_ERROR("MonoticAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
+    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

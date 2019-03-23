@@ -32,23 +32,29 @@ class AllocationTracker :
     AllocationTracker(
         const std::string& name,
         int id,
-        Allocator allocator) noexcept;
+        Allocator allocator,
+        bool own=false) noexcept;
 
-    void* allocate(size_t bytes);
+    ~AllocationTracker() override;
 
-    void deallocate(void* ptr);
+    void finalize() override;
 
-    void release();
+    void* allocate(size_t bytes) override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept;
+    void release() override;
+
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+    long getActualSize() const noexcept override;
+
+    Platform getPlatform() noexcept override;
 
     strategy::AllocationStrategy* getAllocationStrategy();
 
   private:
+    const bool m_owns_allocator;
     strategy::AllocationStrategy* m_allocator;
 
 };

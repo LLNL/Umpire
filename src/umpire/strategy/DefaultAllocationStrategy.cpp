@@ -24,6 +24,12 @@ DefaultAllocationStrategy::DefaultAllocationStrategy(strategy::AllocationStrateg
 {
 }
 
+void
+DefaultAllocationStrategy::finalize() override
+{
+  m_allocator->finalize();
+}
+
 void* 
 DefaultAllocationStrategy::allocate(size_t bytes)
 {

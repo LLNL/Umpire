@@ -32,6 +32,11 @@ SizeLimiter::SizeLimiter(
 {
 }
 
+void SizeLimiter::finalize()
+{
+  m_allocator->finalize();
+}
+
 void* SizeLimiter::allocate(size_t bytes)
 {
   m_total_size += bytes;
@@ -49,7 +54,6 @@ void SizeLimiter::deallocate(void* ptr)
 {
   m_total_size -= ResourceManager::getInstance().getSize(ptr);
   m_allocator->deallocate(ptr);
-
 }
 
 long SizeLimiter::getCurrentSize() const noexcept

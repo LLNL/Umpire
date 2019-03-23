@@ -42,28 +42,30 @@ class AllocationAdvisor :
   public AllocationStrategy
 {
   public:
-      AllocationAdvisor(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        const std::string& advice_operation,
-        int device_id = 0);
+    AllocationAdvisor(
+      const std::string& name,
+      int id,
+      Allocator allocator,
+      const std::string& advice_operation,
+      int device_id = 0);
 
-      AllocationAdvisor(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        const std::string& advice_operation,
-        Allocator accessing_allocator,
-        int device_id = 0);
+    AllocationAdvisor(
+      const std::string& name,
+      int id,
+      Allocator allocator,
+      const std::string& advice_operation,
+      Allocator accessing_allocator,
+      int device_id = 0);
 
-    void* allocate(size_t bytes);
-    void deallocate(void* ptr);
+    void finalize() override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    void* allocate(size_t bytes) override;
+    void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+
+    Platform getPlatform() noexcept override;
   private:
     std::shared_ptr<op::MemoryOperation> m_advice_operation;
 

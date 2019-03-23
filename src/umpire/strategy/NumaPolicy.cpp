@@ -60,6 +60,12 @@ NumaPolicy::NumaPolicy(
 #endif
 }
 
+void
+NumaPolicy::finalize()
+{
+  m_allocator->finalize();
+}
+
 void*
 NumaPolicy::allocate(size_t bytes)
 {

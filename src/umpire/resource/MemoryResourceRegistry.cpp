@@ -35,6 +35,12 @@ MemoryResourceRegistry::getInstance() noexcept
 void
 MemoryResourceRegistry::finalize()
 {
+  for (MemoryResourceFactory *& factory : s_allocator_registry_instance->m_allocator_factories)
+  {
+    delete factory;
+    factory = nullptr;
+  }
+
   delete s_allocator_registry_instance;
 }
 

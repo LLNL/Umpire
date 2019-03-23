@@ -42,6 +42,8 @@ class NumaPolicy :
         int numa_node,
         Allocator allocator);
 
+    void finalize() override;
+
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 

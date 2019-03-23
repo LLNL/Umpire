@@ -72,6 +72,8 @@ class DynamicPool :
 
     ~DynamicPool() override;
 
+    void finalize() override;
+
     void* allocate(size_t bytes) override;
 
     void deallocate(void* ptr) override;
@@ -106,7 +108,10 @@ class DynamicPool :
     void coalesce() noexcept;
 
   private:
+    void free();
+
     DynamicSizePool<>* dpa;
+    bool m_finalized;
 
     strategy::AllocationStrategy* m_allocator;
     Coalesce_Heuristic do_coalesce;

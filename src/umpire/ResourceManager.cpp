@@ -108,8 +108,17 @@ ResourceManager::ResourceManager() :
 
 ResourceManager::~ResourceManager()
 {
-  m_allocators_by_name.clear();
-  m_allocators_by_id.clear();
+  for (auto & kvp : m_allocators_by_id)
+  {
+    kvp.second->finalize();
+  }
+
+  for (auto & kvp : m_allocators_by_id)
+  {
+    delete kvp.second;
+    kvp.second = nullptr;
+  }
+
   delete m_mutex;
 }
 
@@ -190,8 +199,8 @@ ResourceManager::finalize()
   s_resource_manager_instance = nullptr;
   op::MemoryOperationRegistry::finalize();
   resource::MemoryResourceRegistry::finalize();
-  umpire::util::Logger::finalize();
   umpire::replay::Replay::getReplayLogger()->finalize();
+  umpire::util::Logger::finalize();
 }
 
 strategy::AllocationStrategy*

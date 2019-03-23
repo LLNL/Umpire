@@ -44,59 +44,8 @@ class MemoryResource :
 
     virtual ~MemoryResource() = default;
 
-    /*!
-     * \brief Allocate bytes of memory.
-     *
-     * This function is pure virtual and must be implemented by the inheriting
-     * class.
-     *
-     * \param bytes Number of bytes to allocate.
-     *
-     * \return Pointer to start of allocation.
-     */
-    virtual void* allocate(size_t bytes) = 0;
-
-    /*!
-     * \brief Free the memory at ptr.
-     *
-     * This function is pure virtual and must be implemented by the inheriting
-     * class.
-     *
-     * \param ptr Pointer to free.
-     */
-    virtual void deallocate(void* ptr) = 0;
-
-    /*!
-     * \brief Return the current size of this MemoryResource.
-     *
-     * This is sum of the sizes of all the tracked allocations. Note that this
-     * doesn't ever have to be equal to getHighWatermark.
-     *
-     * \return current total size of active allocations in this MemoryResource.
-     */
-    virtual long getCurrentSize() const noexcept = 0;
-
-    /*!
-     * \brief Return the memory high watermark for this MemoryResource.
-     *
-     * This is the largest amount of memory allocated by this Allocator. Note
-     * that this may be larger than the largest value returned by
-     * getCurrentSize.
-     *
-     * \return Memory high watermark.
-     */
-    virtual long getHighWatermark() const noexcept = 0;
-
-
-    /*!
-     * \brief Get the Platform assocatiated with this MemoryResource.
-     *
-     * This function is pure virtual and must be implemented by the inheriting
-     * class.
-     *
-     * \return Platform associated with this MemoryResource.
-     */
-    virtual Platform getPlatform() noexcept = 0;
+    virtual void finalize() override
+    {}
 
     MemoryResourceTraits getTraits();
   protected:

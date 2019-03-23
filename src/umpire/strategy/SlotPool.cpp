@@ -42,6 +42,35 @@ SlotPool::SlotPool(
   }
 }
 
+SlotPool::~SlotPool()
+{
+  free();
+}
+
+void SlotPool::finalize()
+{
+  free();
+  m_allocator->finalize();
+}
+
+void SlotPool::free()
+{
+  for (size_t i = 0; i < m_slots; ++i) {
+    if (m_lengths[i] && m_pointers[i])
+    {
+      m_allocator->deallocate(m_pointers[i]);
+    }
+
+    m_pointers[i] = nullptr;
+    m_lengths[i] = 0;
+  }
+
+  m_current_size = 0;
+  m_slots = 0;
+  delete m_lengths;
+  delete m_pointers;
+}
+
 void*
 SlotPool::allocate(size_t bytes)
 {

@@ -28,21 +28,26 @@ class SlotPool :
   public AllocationStrategy
 {
   public:
-      SlotPool(
-        const std::string& name,
-        int id,
-        size_t slots,
-        Allocator allocator);
+    SlotPool(
+      const std::string& name,
+      int id,
+      size_t slots,
+      Allocator allocator);
 
-    void* allocate(size_t bytes);
-    void deallocate(void* ptr);
+    ~SlotPool() override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    void finalize() override;
 
-    Platform getPlatform() noexcept;
+    void* allocate(size_t bytes) override;
+    void deallocate(void* ptr) override;
+
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+
+    Platform getPlatform() noexcept override;
   private:
     void init();
+    void free();
 
     void** m_pointers;
     size_t* m_lengths;

@@ -32,15 +32,17 @@ class ThreadSafeAllocator :
         int id,
         Allocator allocator);
 
-    ~ThreadSafeAllocator();
+    ~ThreadSafeAllocator() override;
 
-    void* allocate(size_t bytes);
-    void deallocate(void* ptr);
+    void finalize() override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    void* allocate(size_t bytes) override;
+    void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+
+    Platform getPlatform() noexcept override;
 
   protected:
     strategy::AllocationStrategy* m_allocator;

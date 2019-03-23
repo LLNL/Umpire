@@ -63,6 +63,11 @@ AllocationAdvisor::AllocationAdvisor(
 #endif
 }
 
+void AllocationAdvisor::finalize()
+{
+  m_allocator->finalize();
+}
+
 void* AllocationAdvisor::allocate(size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);

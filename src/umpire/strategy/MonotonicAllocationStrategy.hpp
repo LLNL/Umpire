@@ -37,6 +37,8 @@ class MonotonicAllocationStrategy :
 
     ~MonotonicAllocationStrategy() override;
 
+    void finalize() override;
+
     void* allocate(size_t bytes) override;
     void deallocate(void* ptr) override;
 
@@ -46,6 +48,8 @@ class MonotonicAllocationStrategy :
     Platform getPlatform() noexcept override;
 
   private:
+    void free();
+
     void* m_block;
 
     size_t m_size;

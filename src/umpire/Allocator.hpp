@@ -160,6 +160,8 @@ class Allocator {
     Platform getPlatform() noexcept;
 
     Allocator() = default;
+
+    ~Allocator() = default;
     
     friend std::ostream& operator<<(std::ostream&, const Allocator&);
 

@@ -26,6 +26,8 @@ class DefaultAllocationStrategy :
   public:
     DefaultAllocationStrategy(strategy::AllocationStrategy* allocator);
 
+    void finalize() override;
+
     void* allocate(size_t bytes);
 
     /*!
