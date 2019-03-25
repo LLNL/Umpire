@@ -35,7 +35,6 @@ options:
 
 format:
   C_prefix: umpire_
-  C_bufferify_suffix: _b
 
 declarations:
 - decl: namespace umpire
@@ -52,7 +51,11 @@ declarations:
 
       declarations:
         - decl: void* allocate(size_t bytes)
+          format:
+            F_name_function: allocate_pointer
         - decl: void deallocate (void* ptr)
+          format:
+            F_name_function: deallocate_pointer
         - decl: void release()
         - decl: size_t getSize(void* ptr)
         - decl: size_t getHighWatermark()
@@ -108,10 +111,10 @@ declarations:
         - decl: size_t getSize(void* ptr)
 
         - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int initial_size, int block);
-          format:
-            C_name: umpire_resourcemanager_make_pool_allocator
           cxx_template:
-            - instantiation: <umpire::strategy::DynamicPool>
+          - instantiation: <umpire::strategy::DynamicPool>
+            format:
+              template_suffix: _pool
 
 splicer_code:
   c:
@@ -121,3 +124,7 @@ splicer_code:
         - "#ifdef __cplusplus"
         - "#include <cstring>"
         - "#endif"
+
+splicer:
+  f:
+  - c_fortran/genfumpiresplicer.f
