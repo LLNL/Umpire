@@ -52,7 +52,7 @@ classes that Umpire provides.
    tutorial/c/pools.rst
 
 Finally, we have a tutorial for Umpire's FORTRAN API. These examples will be
-compiled whet configuring with ``-DENABLE_FORTRAN=On``. The FORTRAN tutorial
+compiled when configuring with ``-DENABLE_FORTRAN=On``. The FORTRAN tutorial
 assumes an understanding of FORTRAN. Familiarity with the FORTRAN's ISO C
 bindings can be useful for understanding why the interface looks the way it
 does.
