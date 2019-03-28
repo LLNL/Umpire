@@ -89,7 +89,7 @@ TEST_P(CopyTest, Copy) {
     }
 }
 
-TEST_P(CopyTest, CopyOffset)
+TEST_P(CopyTest, Single)
 {
     auto& rm = umpire::ResourceManager::getInstance();
 
@@ -99,6 +99,28 @@ TEST_P(CopyTest, CopyOffset)
     rm.copy(&check_array[0], &dest_array[11], sizeof(float));
 
     ASSERT_EQ(check_array[0], check_array[10]);
+}
+
+TEST_P(CopyTest, Offset) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  for (size_t i = 0; i < m_size; ++i)
+  {
+    source_array[i] = i;
+  }
+
+  rm.copy(dest_array, source_array);
+
+  rm.copy(check_array, dest_array);
+  rm.copy(check_array, dest_array + m_size / 2);
+  
+  for (size_t i = 0; i < m_size / 2; ++i) {
+    ASSERT_EQ(i + m_size / 2, check_array[i]);
+  }
+
+  for (size_t i = m_size / 2; i < m_size; ++i) {
+    ASSERT_EQ(i, check_array[i]);
+  }
 }
 
 TEST_P(CopyTest, InvalidSize)
@@ -157,24 +179,43 @@ class MemsetTest :
 };
 
 TEST_P(MemsetTest, Memset) {
-    auto& rm = umpire::ResourceManager::getInstance();
+  auto& rm = umpire::ResourceManager::getInstance();
 
-    rm.memset(source_array, 0);
+  rm.memset(source_array, 0);
 
-    rm.copy(check_array, source_array);
+  rm.copy(check_array, source_array);
 
-    for (size_t i = 0; i < m_size; i++) {
-      ASSERT_EQ(0, check_array[i]);
-    }
+  for (size_t i = 0; i < m_size; i++) {
+    ASSERT_EQ(0, check_array[i]);
+  }
+}
+
+TEST_P(MemsetTest, Offset) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  rm.memset(source_array, 1);
+  rm.memset(source_array + m_size / 2, 2);
+
+  rm.copy(check_array, source_array);
+
+  char * check_chars = reinterpret_cast<char*>(check_array);
+  
+  for (size_t i = 0; i < m_size / 2 * sizeof(float); ++i) {
+    ASSERT_EQ(1, check_chars[i]);
+  }
+
+  for (size_t i = m_size / 2 * sizeof(float); i < m_size * sizeof(float); ++i) {
+    ASSERT_EQ(2, check_chars[i]);
+  }
 }
 
 TEST_P(MemsetTest, InvalidSize)
 {
-    auto& rm = umpire::ResourceManager::getInstance();
+  auto& rm = umpire::ResourceManager::getInstance();
 
-    ASSERT_THROW(
-        rm.memset(source_array, 0, (m_size+100)*sizeof(float)),
-        umpire::util::Exception);
+  ASSERT_THROW(
+      rm.memset(source_array, 0, (m_size+100)*sizeof(float)),
+      umpire::util::Exception);
 }
 
 TEST_P(MemsetTest, InvalidPointer)
