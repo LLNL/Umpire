@@ -40,5 +40,8 @@ accessed directory. examples/cookbook/recipe_coalesce_pool.cpp shows how to do
 this.
 
 ### Fixed
+- Bug in ResourceManager::copy/memset when given a pointer offset into an allocation.
+
+- Memory leak in judyL2Array.
 
 - While replay already was recording release operations, the tool was not actually replaying them.  A fix was implemented so that the replay tool will now also replay any captured release operations.
