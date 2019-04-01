@@ -25,7 +25,7 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
+  for (auto s : rm.getAllocatorNames()){
     std::cout << s << "  ";
   }
   std::cout << std::endl;
@@ -51,7 +51,7 @@ int main(int, char**)
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 4096", 4096, rm.getAllocator("HOST"));
 
-  auto slot_alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
+  alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
       "host_slot_pool", 64, rm.getAllocator("HOST"));
 
   /*
@@ -82,7 +82,7 @@ int main(int, char**)
   std::cout << "Size: " << alloc.getSize(test) << std::endl;
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
+  for (auto s : rm.getAllocatorNames()){
     std::cout << s << ", ";
   }
   std::cout << std::endl;

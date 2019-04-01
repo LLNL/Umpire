@@ -67,7 +67,7 @@ class AllocationAdvisor :
   private:
     std::shared_ptr<op::MemoryOperation> m_advice_operation;
 
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 
     int m_device;
 };

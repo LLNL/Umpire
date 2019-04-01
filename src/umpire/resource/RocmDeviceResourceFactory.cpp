@@ -31,7 +31,7 @@ RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   }
 }
 
-std::shared_ptr<MemoryResource>
+resource::MemoryResource*
 RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -41,7 +41,7 @@ RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<resource::DefaultMemoryResource<alloc::AmAllocAllocator> >(Platform::rocm, "DEVICE", id, traits);
+  return new resource::DefaultMemoryResource<alloc::AmAllocAllocator>(Platform::rocm, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

@@ -27,7 +27,7 @@ int main()
   umpire_resourcemanager_get_allocator_by_name(&rm, "HOST", &allocator);
 
   umpire_allocator pool;
-  umpire_resourcemanager_make_pool_allocator(&rm, "pool", allocator, 1024*512, 512, &pool);
+  umpire_resourcemanager_make_allocator_pool(&rm, "pool", allocator, 1024*512, 512, &pool);
 
   double* data = (double*) umpire_allocator_allocate(&pool, SIZE*sizeof(double));
 

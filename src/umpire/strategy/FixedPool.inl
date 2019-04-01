@@ -27,7 +27,7 @@ void
 FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
   struct Pool *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
   p->numAvail = m_num_per_pool;
-  p->next = NULL;
+  p->next = nullptr;
 
   p->data  = reinterpret_cast<unsigned char*>(m_allocator->allocate(m_num_per_pool * sizeof(T)));
   p->avail = reinterpret_cast<unsigned int *>(p + 1);
@@ -44,7 +44,7 @@ FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
 template <typename T, int NP, typename IA>
 T*
 FixedPool<T, NP, IA>::allocInPool(struct Pool *p) {
-    if (!p->numAvail) return NULL;
+    if (!p->numAvail) return nullptr;
 
     for (int i = 0; i < NP; i++) {
       const int bit = ffs(p->avail[i]) - 1;
@@ -56,7 +56,7 @@ FixedPool<T, NP, IA>::allocInPool(struct Pool *p) {
       }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 template <typename T, int NP, typename IA>
@@ -65,6 +65,7 @@ FixedPool<T, NP, IA>::FixedPool(
     int id,
     Allocator allocator) :
   AllocationStrategy(name, id),
+  m_pool(nullptr),
   m_num_per_pool(NP * sizeof(unsigned int) * 8),
   m_total_pool_size(sizeof(struct Pool) + m_num_per_pool * sizeof(T) + NP * sizeof(unsigned int)),
   m_num_blocks(0),
@@ -77,20 +78,23 @@ FixedPool<T, NP, IA>::FixedPool(
 
 template <typename T, int NP, typename IA>
 FixedPool<T, NP, IA>::~FixedPool() {
-    for (struct Pool *curr = m_pool; curr; ) {
-      struct Pool *next = curr->next;
-      m_allocator->deallocate(curr);
-      m_current_size -= sizeof(T)*m_num_per_pool;
-      curr = next;
-    }
+  for (struct Pool *curr = m_pool; curr; ) {
+    struct Pool *next = curr->next;
+    m_allocator->deallocate(curr->data);
+    IA::deallocate(curr);
+    m_current_size -= sizeof(T)*m_num_per_pool;
+    curr = next;
   }
+
+  m_pool = nullptr;
+}
 
 template <typename T, int NP, typename IA>
 void*
 FixedPool<T, NP, IA>::allocate(size_t bytes) {
-  T* ptr = NULL;
+  T* ptr = nullptr;
 
-  struct Pool *prev = NULL;
+  struct Pool *prev = nullptr;
   struct Pool *curr = m_pool;
   while (!ptr && curr) {
     ptr = allocInPool(curr);

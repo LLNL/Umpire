@@ -58,24 +58,29 @@ const char* AllocationDevices[] = {
 class StrategyTest :
   public ::testing::TestWithParam<const char*>
 {
-  public:
-    virtual void SetUp() {
-      auto& rm = umpire::ResourceManager::getInstance();
-      allocatorName = GetParam();
-      poolName << allocatorName << "_pool_" << unique_pool_name++;
+public:
+  void SetUp() override {
+    auto& rm = umpire::ResourceManager::getInstance();
+    allocatorName = GetParam();
+    poolName << allocatorName << "_pool_" << unique_pool_name++;
 
-     rm.makeAllocator<umpire::strategy::DynamicPool>
-                    (  poolName.str()
-                     , rm.getAllocator(allocatorName)
-                     , initial_min_size
-                     , subsequent_min_size);
+    rm.makeAllocator<umpire::strategy::DynamicPool>
+                  (  poolName.str()
+                   , rm.getAllocator(allocatorName)
+                   , initial_min_size
+                   , subsequent_min_size);
 
-     allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
-    }
+    allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
+  }
 
-    umpire::Allocator* allocator;
-    std::string allocatorName;
-    std::stringstream poolName;
+  void TearDown() override {
+    delete allocator;
+    allocator = nullptr;
+  }
+
+  umpire::Allocator* allocator;
+  std::string allocatorName;
+  std::stringstream poolName;
 };
 
 TEST_P(StrategyTest, Allocate) {
@@ -187,6 +192,8 @@ TEST(MonotonicStrategy, Host)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -203,6 +210,8 @@ TEST(MonotonicStrategy, Device)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "device_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 #endif // defined(UMPIRE_ENABLE_DEVICE)
 
@@ -220,6 +229,8 @@ TEST(MonotonicStrategy, UM)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 #endif // defined(UMPIRE_ENABLE_UM)
 
@@ -230,13 +241,15 @@ TEST(AllocationAdvisor, Create)
 
   ASSERT_NO_THROW(
     auto read_only_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR"));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+          "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR");
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, CreateWithId)
@@ -248,13 +261,15 @@ TEST(AllocationAdvisor, CreateWithId)
   ASSERT_NO_THROW(
     auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id));
+      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id);
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator_device_id",
-      rm.getAllocator("UM"), "FOOBAR", device_id));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um_nonsense_operator_device_id",
+      rm.getAllocator("UM"), "FOOBAR", device_id);
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, Host)
@@ -292,6 +307,8 @@ TEST(FixedPool, Host)
   ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
   ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
+
+  allocator.deallocate(alloc);
 }
 
 #if defined(_OPENMP)
@@ -377,13 +394,13 @@ TEST(HeuristicTest, EdgeCases_75)
       1024ul, 1024ul, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -421,13 +438,13 @@ TEST(HeuristicTest, EdgeCases_100)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -486,13 +503,13 @@ TEST(HeuristicTest, EdgeCases_0)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 

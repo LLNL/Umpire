@@ -53,7 +53,7 @@ size_t umpire_allocator_get_actual_size(umpire_allocator * self);
 
 const char * umpire_allocator_get_name(umpire_allocator * self);
 
-void umpire_allocator_get_name_b(umpire_allocator * self,
+void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv);
 
 size_t umpire_allocator_get_id(umpire_allocator * self);
