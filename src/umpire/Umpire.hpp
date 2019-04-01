@@ -15,6 +15,8 @@
 #ifndef UMPIRE_Umpire_HPP
 #define UMPIRE_Umpire_HPP
 
+#include "umpire/config.hpp"
+
 #include "umpire/ResourceManager.hpp"
 
 namespace umpire {
@@ -45,6 +47,24 @@ inline
 void free(void* ptr)
 {
   return ResourceManager::getInstance().deallocate(ptr);
+}
+
+inline
+int get_major_version()
+{
+  return UMPIRE_VERSION_MAJOR;
+}
+
+inline
+int get_minor_version()
+{
+  return UMPIRE_VERSION_MINOR;
+}
+
+inline
+int get_patch_version()
+{
+  return UMPIRE_VERSION_PATCH;
 }
 
 } // end of namespace umpire
