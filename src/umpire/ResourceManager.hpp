@@ -47,8 +47,6 @@ class ResourceManager {
      */
     void initialize();
 
-    void finalize();
-
     /*!
      * \brief Get the names of all available Allocator objects.
      */
@@ -96,7 +94,6 @@ class ResourceManager {
 
     /*!
      * \brief Construct a new Allocator.
-     *
      */
     template <typename Strategy,
              bool introspection=true,
@@ -238,6 +235,8 @@ class ResourceManager {
   private:
     ResourceManager();
 
+    ~ResourceManager() = default;
+
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
 
@@ -251,8 +250,6 @@ class ResourceManager {
 
     static ResourceManager* s_resource_manager_instance;
 
-    std::list<std::string> m_allocator_names;
-
     std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
     std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
 
@@ -261,8 +258,6 @@ class ResourceManager {
     strategy::AllocationStrategy* m_default_allocator;
 
     std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash > m_memory_resources;
-
-    long m_allocated;
 
     int m_id;
 

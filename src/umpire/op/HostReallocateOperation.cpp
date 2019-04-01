@@ -31,7 +31,7 @@ void HostReallocateOperation::transform(
 {
   auto allocator = dst_allocation->m_strategy;
 
-  ResourceManager::getInstance().deregisterAllocation(src_ptr);
+  delete ResourceManager::getInstance().deregisterAllocation(src_ptr);
 
   *dst_ptr = ::realloc(src_ptr, length);
 
