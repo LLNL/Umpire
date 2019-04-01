@@ -1,20 +1,31 @@
 trigger:
 - develop
 
+strategy:
+  matrix: 
+    linux: 
+      imageName: 'ubuntu-16.04'
+    windows:
+      imageName: 'vs2017-win2016'
+
 pool:
-  vmImage: 'Ubuntu-16.04'
+  vmImage: $(imageName)
 
 variables:
-  imageName: 'your-container-image-name:$(build.buildId)'
   DO_BUILD: 'yes'
   DO_TEST: 'yes'
   COMPILER: 'g++'
   CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
 
 steps:
+- task: CMake@1
+  inputs:
+    workingDir: 'build'
+  condition: eq( variables['Agent.OS'], 'Windows_NT')
 - script:  |
    git submodule init && git submodule update --recursive
    docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
    docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
+  condition: eq( variables['Agent.OS'], 'Linux')
 
-  displayName: 'docker build'
+  displayName: 'build'
