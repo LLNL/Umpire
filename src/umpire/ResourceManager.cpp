@@ -65,7 +65,6 @@ ResourceManager::getInstance()
 }
 
 ResourceManager::ResourceManager() :
-  m_allocator_names(),
   m_allocators_by_name(),
   m_allocators_by_id(),
   m_allocations(),
@@ -316,10 +315,12 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->m_ptr);
+  std::size_t src_size = src_alloc_record->m_size - src_offset;
+  
   auto dst_alloc_record = m_allocations.find(dst_ptr);
-
-  std::size_t src_size = src_alloc_record->m_size;
-  std::size_t dst_size = dst_alloc_record->m_size;
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->m_ptr);
+  std::size_t dst_size = dst_alloc_record->m_size - dst_offset;
 
   if (size == 0) {
     size = src_size;
@@ -344,14 +345,15 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
 
   auto alloc_record = m_allocations.find(ptr);
 
-  std::size_t src_size = alloc_record->m_size;
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->m_ptr);
+  std::size_t size = alloc_record->m_size - offset;
 
   if (length == 0) {
-    length = src_size;
+    length = size;
   }
 
-  if (length > src_size) {
-    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << src_size);
+  if (length > size) {
+    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
   }
 
   auto op = op_registry.find("MEMSET",
