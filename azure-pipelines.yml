@@ -31,7 +31,8 @@ steps:
     cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
   condition: or( eq( variables['Agent.OS'], 'Windows_NT'), eq( variables['Agent.OS'], 'Darwin'))
 - task: VSBuild@1
-  solution: 'build/*.sln'
+  inputs:
+    solution: 'build/*.sln'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
 - task: Xcode@5
   condition: eq( variables['Agent.OS'], 'Darwin')
