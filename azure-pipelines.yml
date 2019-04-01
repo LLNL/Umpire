@@ -18,9 +18,13 @@ variables:
   CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
 
 steps:
+- checkout: self
+  clean: boolean
+  submodules: recursive
 - task: CMake@1
   inputs:
     workingDir: 'build'
+    cmakeArgs: '../'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
 - script:  |
    git submodule init && git submodule update --recursive
