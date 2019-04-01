@@ -134,6 +134,8 @@ class Replay {
           replay_release();
           replay_out() << "\n";
         }
+        else if ( m_row[1] == "Umpire v0.3.2") {
+        }
         else {
           replay_out() << m_row[1] << " ";
           std::cerr << "Unknown Replay (" << m_row[1] << ")\n";
