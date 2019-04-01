@@ -58,24 +58,29 @@ const char* AllocationDevices[] = {
 class StrategyTest :
   public ::testing::TestWithParam<const char*>
 {
-  public:
-    virtual void SetUp() {
-      auto& rm = umpire::ResourceManager::getInstance();
-      allocatorName = GetParam();
-      poolName << allocatorName << "_pool_" << unique_pool_name++;
+public:
+  void SetUp() override {
+    auto& rm = umpire::ResourceManager::getInstance();
+    allocatorName = GetParam();
+    poolName << allocatorName << "_pool_" << unique_pool_name++;
 
-     rm.makeAllocator<umpire::strategy::DynamicPool>
-                    (  poolName.str()
-                     , rm.getAllocator(allocatorName)
-                     , initial_min_size
-                     , subsequent_min_size);
+    rm.makeAllocator<umpire::strategy::DynamicPool>
+                  (  poolName.str()
+                   , rm.getAllocator(allocatorName)
+                   , initial_min_size
+                   , subsequent_min_size);
 
-     allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
-    }
+    allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
+  }
 
-    umpire::Allocator* allocator;
-    std::string allocatorName;
-    std::stringstream poolName;
+  void TearDown() override {
+    delete allocator;
+    allocator = nullptr;
+  }
+
+  umpire::Allocator* allocator;
+  std::string allocatorName;
+  std::stringstream poolName;
 };
 
 TEST_P(StrategyTest, Allocate) {
@@ -187,6 +192,8 @@ TEST(MonotonicStrategy, Host)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -203,6 +210,8 @@ TEST(MonotonicStrategy, Device)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "device_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 #endif // defined(UMPIRE_ENABLE_DEVICE)
 
@@ -220,6 +229,8 @@ TEST(MonotonicStrategy, UM)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 #endif // defined(UMPIRE_ENABLE_UM)
 
@@ -296,6 +307,8 @@ TEST(FixedPool, Host)
   ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
   ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
+
+  allocator.deallocate(alloc);
 }
 
 #if defined(_OPENMP)
