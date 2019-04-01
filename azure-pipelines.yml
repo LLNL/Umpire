@@ -34,7 +34,9 @@ steps:
   inputs:
     solution: 'build/*.sln'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
-- task: Xcode@5
+- script: |
+    cd build
+    make
   condition: eq( variables['Agent.OS'], 'Darwin')
 - script:  |
    docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
