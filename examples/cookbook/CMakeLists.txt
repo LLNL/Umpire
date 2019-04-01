@@ -52,6 +52,12 @@ if (ENABLE_CUDA)
     SOURCES recipe_move_to_managed.cpp
     DEPENDS_ON umpire
     OUTPUT_DIR ${cookbook_dir})
+
+  blt_add_executable(
+    NAME recipe_pinned_pool
+    SOURCES recipe_pinned_pool.F
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${cookbook_dir})
 endif ()
 
 blt_add_executable(
