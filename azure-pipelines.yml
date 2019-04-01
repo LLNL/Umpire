@@ -5,10 +5,13 @@ strategy:
   matrix: 
     linux: 
       imageName: 'ubuntu-16.04'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
     windows:
       imageName: 'vs2017-win2016'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
     mac:
       imageName: 'macos-10.13'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_OPENMP=Off'
 
 pool:
   vmImage: $(imageName)
@@ -17,7 +20,6 @@ variables:
   DO_BUILD: 'yes'
   DO_TEST: 'yes'
   COMPILER: 'g++'
-  CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
 
 steps:
 - checkout: self
