@@ -16,18 +16,16 @@
 #include <vector>
 #include <string>
 
-#include "umpire/config.hpp"
-#include "umpire/ResourceManager.hpp"
-
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 
 class replayTest {
 public:
@@ -47,19 +45,6 @@ public:
         "host_simpool_spec2", rm.getAllocator("HOST"), 9876, 1234);
     allocatorNames.push_back("host_simpool_spec2");
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
-    allocatorNames.push_back("read_only_um");
-#endif
-
-#if defined(UMPIRE_ENABLE_UM)
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "preferred_location_host", rm.getAllocator("UM"),
-      "PREFERRED_LOCATION", rm.getAllocator("HOST"));
-    allocatorNames.push_back("preferred_location_host");
-#endif
-
     rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
     allocatorNames.push_back("MONOTONIC 1024");
@@ -72,11 +57,18 @@ public:
       "thread_safe_allocator", rm.getAllocator("HOST"));
     allocatorNames.push_back("thread_safe_allocator");
 
+#if 0
+    //
+    // Replay currently cannot support replaying FixedPool allocations.
+    // This is because replay does its work at runtime and the FixedPool
+    // is a template where sizes are generated at compile time.
+    //
     struct data { char _[1024*1024]; };
 
     rm.makeAllocator<umpire::strategy::FixedPool<data>>(
         "fixed_pool_allocator", rm.getAllocator("HOST"));
     allocatorNames.push_back("fixed_pool_allocator");
+#endif
   }
 
   ~replayTest( void )
@@ -88,13 +80,13 @@ public:
     auto& rm = umpire::ResourceManager::getInstance();
     auto pooled_allocator = rm.getAllocator("host_simpool_spec1");
     auto strategy = pooled_allocator.getAllocationStrategy();
-    auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+    auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
     if (tracker) {
       strategy = tracker->getAllocationStrategy();
     }
 
-    auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+    auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
     if (! dynamic_pool ) {
       std::cerr << "host_simpool_spec1 is not a dynamic pool!\n";

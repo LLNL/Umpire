@@ -20,20 +20,6 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
-class CudaAdviseOpTest : public ::testing::Test {
-  protected:
-    virtual void SetUp() {
-      auto& rm = umpire::ResourceManager::getInstance();
-      auto allocator = rm.getAllocator("UM");
-      auto strategy = allocator.getAllocationStrategy();
-    }
-
-    virtual void TearDown() {
-    }
-
-    umpire::util::AllocationRecord* record;
-};
-
 TEST(CudaAdviseAccessedBy, Find)
 {
   auto& rm = umpire::ResourceManager::getInstance();

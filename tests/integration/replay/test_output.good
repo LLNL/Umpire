@@ -1,0 +1,45 @@
+makeAllocator <umpire::strategy::DynamicPool>(host_simpool_defaults, getAllocator(HOST))
+makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec1, getAllocator(HOST), 9876, 1234)
+makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec2, getAllocator(HOST), 9876, 1234)
+makeAllocator <umpire::strategy::MonotonicAllocationStrategy>(MONOTONIC 1024, 1024, getAllocator(HOST))
+makeAllocator <umpire::strategy::SlotPool>(host_slot_pool, 64, getAllocator(HOST))
+makeAllocator <umpire::strategy::ThreadSafeAllocator>(thread_safe_allocator, getAllocator(HOST))
+allocate (17) host_simpool_defaults --> 1
+allocate (18) host_simpool_spec1 --> 2
+allocate (19) host_simpool_spec2 --> 3
+allocate (20) MONOTONIC 1024 --> 4
+allocate (21) host_slot_pool --> 5
+allocate (22) thread_safe_allocator --> 6
+allocate (23) host_simpool_defaults --> 7
+allocate (24) host_simpool_spec1 --> 8
+allocate (25) host_simpool_spec2 --> 9
+allocate (26) MONOTONIC 1024 --> 10
+allocate (27) host_slot_pool --> 11
+allocate (28) thread_safe_allocator --> 12
+allocate (29) host_simpool_defaults --> 13
+allocate (30) host_simpool_spec1 --> 14
+allocate (31) host_simpool_spec2 --> 15
+allocate (32) MONOTONIC 1024 --> 16
+allocate (33) host_slot_pool --> 17
+allocate (34) thread_safe_allocator --> 18
+coalesce host_simpool_spec1
+deallocate host_simpool_defaults(1)
+deallocate host_simpool_spec1(2)
+deallocate host_simpool_spec2(3)
+deallocate MONOTONIC 1024(4)
+deallocate host_slot_pool(5)
+deallocate thread_safe_allocator(6)
+deallocate host_simpool_defaults(7)
+deallocate host_simpool_spec1(8)
+deallocate host_simpool_spec2(9)
+deallocate MONOTONIC 1024(10)
+deallocate host_slot_pool(11)
+deallocate thread_safe_allocator(12)
+deallocate host_simpool_defaults(13)
+deallocate host_simpool_spec1(14)
+deallocate host_simpool_spec2(15)
+deallocate MONOTONIC 1024(16)
+deallocate host_slot_pool(17)
+deallocate thread_safe_allocator(18)
+coalesce host_simpool_spec1
+release host_simpool_spec1

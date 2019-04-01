@@ -52,7 +52,7 @@ class SlotPool :
 
     size_t m_slots;
 
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

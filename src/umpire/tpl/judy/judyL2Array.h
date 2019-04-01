@@ -217,7 +217,7 @@ class judyL2Array {
         bool removeEntry( JudyKey key ) {
             if( 0 != ( _lastSlot = ( vector ** ) judy_slot( _judyarray, ( const unsigned char * ) &key, _depth * JUDY_key_size ) ) ) {
                 // _lastSlot->~vector(); //for use with placement new
-                // delete _lastSlot;
+                delete *_lastSlot;
                 _lastSlot = ( vector ** ) judy_del( _judyarray );
                 return true;
             } else {

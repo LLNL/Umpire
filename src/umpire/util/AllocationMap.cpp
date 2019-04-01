@@ -38,6 +38,8 @@ AllocationMap::AllocationMap() :
 
 AllocationMap::~AllocationMap()
 {
+  delete m_records;
+  delete m_mutex;
 }
 
 void

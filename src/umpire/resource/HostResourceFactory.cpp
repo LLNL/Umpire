@@ -36,7 +36,7 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
   }
 }
 
-std::shared_ptr<MemoryResource>
+resource::MemoryResource*
 HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -62,7 +62,7 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<DefaultMemoryResource<HostAllocator> >(Platform::cpu, "HOST", id, traits);
+  return new DefaultMemoryResource<HostAllocator>(Platform::cpu, "HOST", id, traits);
 }
 
 } // end of namespace resource

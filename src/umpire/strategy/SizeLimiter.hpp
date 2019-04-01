@@ -49,7 +49,7 @@ class SizeLimiter :
 
     Platform getPlatform() noexcept;
   private:
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 
     size_t m_size_limit;
     size_t m_total_size;
