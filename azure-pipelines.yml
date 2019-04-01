@@ -12,6 +12,7 @@ variables:
 
 steps:
 - script:  |
+   git submodule init && git submodule update --recursive
    docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
    docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
 
