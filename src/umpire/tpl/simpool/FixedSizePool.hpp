@@ -71,7 +71,8 @@ public:
   ~FixedSizePool() {
     for (struct Pool *curr = pool; curr; ) {
       struct Pool *next = curr->next;
-      MA::deallocate(curr);
+      MA::deallocate(curr->data);
+      IA::deallocate(curr);
       curr = next;
     }
   }
