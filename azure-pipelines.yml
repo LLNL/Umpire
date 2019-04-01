@@ -40,9 +40,13 @@ steps:
     make
   displayName: 'OSX Build'
   condition: eq( variables['Agent.OS'], 'Darwin')
+- script: |
+    cd build
+    make test
+  displayName: 'OSX Test'
+  condition: eq( variables['Agent.OS'], 'Darwin')
 - script:  |
    docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
    docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
   condition: eq( variables['Agent.OS'], 'Linux')
-
-  displayName: 'Linux (Docker) Build'
+  displayName: 'Linux (Docker) Build & Test'
