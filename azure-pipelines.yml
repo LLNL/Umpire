@@ -33,14 +33,16 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: 'build/*.sln'
+  displayName: 'VS Build'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
 - script: |
     cd build
     make
+  displayName: 'OSX Build'
   condition: eq( variables['Agent.OS'], 'Darwin')
 - script:  |
    docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
    docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
   condition: eq( variables['Agent.OS'], 'Linux')
 
-  displayName: 'build'
+  displayName: 'Linux (Docker) Build'
