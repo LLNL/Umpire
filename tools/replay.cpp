@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "umpire/config.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
@@ -90,6 +91,12 @@ class Replay {
           usage_and_exit( "Unable to open output file " + out_file_name );
         replay_out(m_replayout);
       }
+
+      std::ostringstream version_stringstream;
+      version_stringstream << "Umpire v" << UMPIRE_VERSION_MAJOR 
+        << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH;
+      m_umpire_version_string = version_stringstream.str();
+
     }
 
     static void usage_and_exit( const std::string& errorMessage ) {
@@ -134,7 +141,7 @@ class Replay {
           replay_release();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == "Umpire v0.3.2") {
+        else if ( m_row[1] == m_umpire_version_string) {
         }
         else {
           replay_out() << m_row[1] << " ";
@@ -154,6 +161,7 @@ class Replay {
     std::unordered_map<void*, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::unordered_map<void*, uint64_t> m_allocation_seq;    // key(alloc_ptr), val(m_sequence_id)
     CSVRow m_row;
+    std::string m_umpire_version_string;
 
     std::ostream& replay_out(std::ostream& outs = null_stream)
     {
