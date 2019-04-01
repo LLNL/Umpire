@@ -24,7 +24,7 @@ steps:
 - task: CMake@1
   inputs:
     workingDir: 'build'
-    cmakeArgs: '../'
+    cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
 - script:  |
    git submodule init && git submodule update --recursive
