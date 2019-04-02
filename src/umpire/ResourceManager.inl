@@ -18,7 +18,11 @@
 #include "umpire/ResourceManager.hpp"
 
 #include <sstream>
+
+#if !defined(_MSC_VER)
 #include <cxxabi.h>
+#endif
+
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
@@ -41,7 +45,11 @@ Allocator ResourceManager::makeAllocator(
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
     UMPIRE_REPLAY("makeAllocator,"
+#if defined(_MSC_VER)
+        << typeid(Strategy).name()
+#else
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+#endif
         << "," << (introspection ? "true" : "false")
         << "," << name
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
