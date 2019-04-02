@@ -53,16 +53,18 @@ if (ENABLE_CUDA)
     DEPENDS_ON umpire
     OUTPUT_DIR ${cookbook_dir})
 
-  blt_add_executable(
-    NAME recipe_pinned_pool
-    SOURCES recipe_pinned_pool.F
-    DEPENDS_ON umpire
-    OUTPUT_DIR ${cookbook_dir})
+  if (ENABLE_FORTRAN)
+    blt_add_executable(
+      NAME recipe_pinned_pool
+      SOURCES recipe_pinned_pool.F
+      DEPENDS_ON umpire
+      OUTPUT_DIR ${cookbook_dir})
 
-  set_source_files_properties(
-    recipe_pinned_pool.F
-    PROPERTIES
-    Fortran_FORMAT FREE)
+    set_source_files_properties(
+      recipe_pinned_pool.F
+      PROPERTIES
+      Fortran_FORMAT FREE)
+  endif ()
 endif ()
 
 blt_add_executable(
