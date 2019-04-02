@@ -24,6 +24,7 @@ these can be replayed.
 - The replay tool can produce an output file that can be used to verify the
 replayed events are correct.
 
+- Cookbook example for creating a pool in pinned memory using FORTRAN.
 
 ### Changed
 
