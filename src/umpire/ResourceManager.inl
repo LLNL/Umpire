@@ -44,16 +44,21 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-    UMPIRE_REPLAY("makeAllocator,"
 #if defined(_MSC_VER)
+    UMPIRE_REPLAY("makeAllocator,"
         << typeid(Strategy).name()
-#else
-        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-#endif
         << "," << (introspection ? "true" : "false")
         << "," << name
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
     );
+#else
+    UMPIRE_REPLAY("makeAllocator,"
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+    );
+#endif
 
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
