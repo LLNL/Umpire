@@ -1,5 +1,5 @@
 workflow "New workflow" {
-  on = "pull_request"
+  on = "push"
   resolves = ["Check CHANGELOG"]
 }
 
