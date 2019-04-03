@@ -1,10 +1,8 @@
-# Submitting a Bug Fix
+Thanks for submitting a pull request! Please make sure that your PR includes the following items:
 
-- [ ] Tests added (to reproduce and demonstrate bug is fixed)
-- [ ] CHANGELOG updated
+- [ ] Tests
+- [ ] Update CHANGELOG
 
-# Proposing a New Feature
+If you are adding a new feature, please consider:
 
 - [ ] Documentation added to Sphinx
-- [ ] Tests added
-- [ ] CHANGELOG updated
