@@ -5,5 +5,5 @@ workflow "New workflow" {
 
 action "Check CHANGELOG" {
   uses = "./.github/actions/bin/sh"
-  args = ["git diff --exit-code CHANGELOG; exit `expr $? - 1`"]
+  args = ["git diff --exit-code CHANGELOG && $(exit `expr $? - 1`)"]
 }
