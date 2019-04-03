@@ -110,6 +110,16 @@ void
 ResourceManager::initialize()
 {
   UMPIRE_LOG(Debug, "() entering");
+
+  UMPIRE_LOG(Debug, "Umpire v" << UMPIRE_VERSION_MAJOR << "." <<
+      UMPIRE_VERSION_MINOR << "." <<
+      UMPIRE_VERSION_PATCH);
+
+  UMPIRE_REPLAY( "Umpire v" << UMPIRE_VERSION_MAJOR 
+      << "." << UMPIRE_VERSION_MINOR
+      << "." << UMPIRE_VERSION_PATCH);
+  UMPIRE_REPLAY_CONT("\n");
+
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
