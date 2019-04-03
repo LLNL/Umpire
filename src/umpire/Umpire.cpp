@@ -22,10 +22,10 @@ namespace umpire {
 void print_allocator_records(Allocator alloc, std::ostream& os) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto strategy = alloc.getAllocationStrategy().get();
+  auto strategy = alloc.getAllocationStrategy();
 
   rm.m_allocations.print([strategy] (const util::AllocationRecord* rec) {
-    return rec->m_strategy.get() == strategy;
+    return rec->m_strategy == strategy;
   }, os);
 }
 
