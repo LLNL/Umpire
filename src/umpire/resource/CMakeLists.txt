@@ -53,7 +53,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_ROCM)
+if (ENABLE_HCC)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     RocmDeviceResourceFactory.hpp

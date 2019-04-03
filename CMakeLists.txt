@@ -39,6 +39,8 @@ option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_TOOLS "Enable Umpire Development Tools" On)
 
+set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
 else ()
@@ -79,7 +81,6 @@ if (NOT BLT_LOADED)
 
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
-
 
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)

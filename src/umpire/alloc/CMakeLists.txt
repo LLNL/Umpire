@@ -29,7 +29,7 @@ if (ENABLE_CUDA)
     CudaPinnedAllocator.hpp)
 endif ()
 
-if (ENABLE_ROCM)
+if (ENABLE_HCC)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     AmAllocAllocator.hpp)
