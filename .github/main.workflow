@@ -1,6 +1,6 @@
 workflow "New workflow" {
   on = "push"
-  resolves = ["Filters for GitHub Actions"]
+  resolves = ["Check CHANGELOG"]
 }
 
 action "Check CHANGELOG" {
