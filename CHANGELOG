@@ -46,3 +46,5 @@ this.
 - Memory leak in judyL2Array.
 
 - While replay already was recording release operations, the tool was not actually replaying them.  A fix was implemented so that the replay tool will now also replay any captured release operations.
+
+- `make docs` used to fail, because the build was setup for Read the Docs. A fix was implemented so Doxygen and Sphinx can be run locally, for instance to test out new cookbooks.
