@@ -26,6 +26,8 @@ replayed events are correct.
 
 - Cookbook example for creating a pool in pinned memory using FORTRAN.
 
+- GitHub workflow to check for CHANGELOG updates.
+
 ### Changed
 
 - Umpire now builds as a single library, libumpire.a or libumpire.so, rather
