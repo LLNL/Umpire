@@ -19,6 +19,10 @@
 
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/Allocator.hpp"
+
+#include <iostream>
+
 namespace umpire {
 
 /*!
@@ -66,6 +70,14 @@ int get_patch_version()
 {
   return UMPIRE_VERSION_PATCH;
 }
+
+/*!
+ * \brief Print the allocations from a specific allocator
+ *
+ * \param allocator source Allocator.
+ * \param os output stream
+ */
+void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
 
 } // end of namespace umpire
 

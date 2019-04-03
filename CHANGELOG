@@ -28,6 +28,10 @@ replayed events are correct.
 
 - GitHub workflow to check for CHANGELOG updates.
 
+- Ability to print allocation records that only match a predicate,
+`print_allocator_records()` to get all records from a specific
+allocator, and a cookbook recipe to do that.
+
 ### Changed
 
 - Umpire now builds as a single library, libumpire.a or libumpire.so, rather
@@ -48,3 +52,7 @@ this.
 - Memory leak in judyL2Array.
 
 - While replay already was recording release operations, the tool was not actually replaying them.  A fix was implemented so that the replay tool will now also replay any captured release operations.
+
+- `make docs` used to fail, because the build was setup for Read the Docs. A fix
+was implemented so Doxygen and Sphinx can be run locally, for instance to test
+out new cookbooks.
