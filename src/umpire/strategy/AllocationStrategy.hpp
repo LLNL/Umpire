@@ -20,6 +20,7 @@
 #include <string>
 #include <memory>
 #include <cstddef>
+#include <ostream>
 
 namespace umpire {
 namespace strategy {
@@ -28,8 +29,7 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy :
-  public std::enable_shared_from_this<AllocationStrategy>
+class AllocationStrategy 
 {
   public:
     /*!
@@ -109,7 +109,7 @@ class AllocationStrategy :
      *
      * \return The name of this AllocationStrategy.
      */
-    std::string getName() noexcept;
+    const std::string& getName() noexcept;
 
 
     /*!
@@ -118,6 +118,8 @@ class AllocationStrategy :
      * \return The id of this AllocationStrategy.
      */
     int getId() noexcept;
+
+    friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
 
   protected:
     std::string m_name;

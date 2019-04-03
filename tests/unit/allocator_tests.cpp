@@ -62,7 +62,7 @@ protected:
     free(data);
   }
 
-  std::shared_ptr<MockAllocationStrategy> m_strategy;
+  strategy::AllocationStrategy* m_strategy;
   umpire::Allocator m_allocator;
   void* data;
 };

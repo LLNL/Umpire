@@ -1,3 +1,17 @@
+##############################################################################
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
+# Produced at the Lawrence Livermore National Laboratory
+#
+# Created by David Beckingsale, david@llnl.gov
+# LLNL-CODE-747640
+#
+# All rights reserved.
+#
+# This file is part of Umpire.
+#
+# For details, see https://github.com/LLNL/Umpire
+# Please also see the LICENSE file for MIT license.
+##############################################################################
 REPLAY,makeAllocator,umpire::strategy::DynamicPool,true,pool,HOST,0x7fcc98400260
 REPLAY,allocate,134,0x7fcc98400260,0x116076000
 REPLAY,allocate,774,0x7fcc98400260,0x116076090

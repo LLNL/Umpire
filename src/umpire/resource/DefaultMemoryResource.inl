@@ -40,7 +40,7 @@ void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
 
-  registerAllocation(ptr, bytes, this->shared_from_this());
+  registerAllocation(ptr, bytes, this);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");

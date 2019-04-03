@@ -17,7 +17,7 @@
 #include "umpire/config.hpp"
 
 #include "umpire/ResourceManager.hpp"
-#include "umpire/resource/MemoryResourceTraits.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 TEST(Traits, DDR) {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
