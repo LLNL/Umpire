@@ -24,33 +24,30 @@ set (umpire_headers
 set (umpire_sources
   Allocator.cpp
   Replay.cpp
-  ResourceManager.cpp)
+  ResourceManager.cpp
+  Umpire.cpp)
 
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
-    interface/umpire.h
-  )
+    interface/umpire.h)
 
   set (umpire_interface_c_fortran_headers
     interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
-    interface/c_fortran/typesUmpire.h
-  )
+    interface/c_fortran/typesUmpire.h)
 
   if (ENABLE_C)
     set (umpire_interface_sources
       interface/c_fortran/shroudrt.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
-      interface/c_fortran/wrapUmpire.cpp
-      )
+      interface/c_fortran/wrapUmpire.cpp)
 
     if (ENABLE_FORTRAN)
       set (umpire_interface_sources
         ${umpire_interface_sources}
-        interface/c_fortran/wrapfumpire.f
-      )
+        interface/c_fortran/wrapfumpire.f)
 
       set_source_files_properties(
         interface/c_fortran/wrapfumpire.f

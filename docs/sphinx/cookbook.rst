@@ -24,3 +24,4 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/move_between_numa.rst
    cookbook/coalesce_pool.rst
    cookbook/pinned_pool.rst
+   cookbook/plot_allocations.rst
