@@ -9,5 +9,5 @@ action "Check CHANGELOG" {
 }
 
 action "Static Analysis" {
-  uses = "./.github/actions/bin/static-analysis"
+  uses = "./.github/actions/static-analysis"
 }
