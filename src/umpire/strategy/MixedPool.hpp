@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <array>
+#include <map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
@@ -57,12 +58,12 @@ class MixedPoolImpl :
     Platform getPlatform() noexcept override;
 
   private:
-    static size_t nextPower2(unsigned int n);
-
     enum { NUM_FIXED_POOLS = LastFixed - FirstFixed + 1 };
     using StrategyPtr = std::shared_ptr<umpire::strategy::AllocationStrategy>;
     using FixedPoolArray = std::array<StrategyPtr, NUM_FIXED_POOLS>;
+    using Map = std::map<uintptr_t, int>;
 
+    Map m_map;
     FixedPoolArray m_fixed_pool;
     StrategyPtr m_dynamic_pool;
     StrategyPtr m_allocator;

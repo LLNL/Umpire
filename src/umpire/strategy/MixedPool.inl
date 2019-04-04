@@ -48,8 +48,7 @@ struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
 
 } // anonymous namespace
 
-template<int FirstFixed, int Increment, int LastFixed>
-size_t MixedPoolImpl<FirstFixed,Increment,LastFixed>::nextPower2(unsigned int n) {
+inline static size_t nextPower2(unsigned int n) {
   n--;
   n |= n >> 1;
   n |= n >> 2;
@@ -67,8 +66,8 @@ MixedPoolImpl<FirstFixed,Increment,LastFixed>::MixedPoolImpl(
     Allocator allocator) noexcept
 :
   AllocationStrategy(name, id),
+  m_map(),
   m_allocator(allocator.getAllocationStrategy())
-
 {
   m_dynamic_pool = std::make_shared<DynamicPool>(
       "internal_dynamic_pool",
@@ -78,16 +77,11 @@ MixedPoolImpl<FirstFixed,Increment,LastFixed>::MixedPoolImpl(
   make_fixed_pool_array<FirstFixed,FirstFixed,LastFixed,Increment>::eval(m_fixed_pool, allocator);
 }
 
-union AlignedSize {
-  int index;
-  std::max_align_t a;
-};
-
 template<int FirstFixed, int Increment, int LastFixed>
 void* MixedPoolImpl<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
 {
   const size_t bytes_with_index = bytes + sizeof(unsigned int);
-  AlignedSize* s = nullptr;
+  void* mem;
   if (bytes <= (1 << LastFixed)) {
     // Find next power of 2
     const size_t alloc_size = nextPower2(bytes_with_index);
@@ -104,27 +98,28 @@ void* MixedPoolImpl<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
     while (alloc_size > nearest_bytes) { index++; nearest_bytes <<= 1; }
 
     // Allocate
-    s = static_cast<AlignedSize*>(m_fixed_pool[index]->allocate(alloc_size));
-    s->index = index;
+    mem = m_fixed_pool[index]->allocate(alloc_size);
+    m_map.insert(std::make_pair(reinterpret_cast<uintptr_t>(mem), index));
   }
   else {
-    s = static_cast<AlignedSize*>(m_dynamic_pool->allocate(bytes_with_index));
-    s->index = -1;
+    mem = m_dynamic_pool->allocate(bytes_with_index);
+    m_map.insert(std::make_pair(reinterpret_cast<uintptr_t>(mem), -1));
   }
-  return ++s;
+  return mem;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
 void MixedPoolImpl<FirstFixed,Increment,LastFixed>::deallocate(void* ptr)
 {
-  AlignedSize* s = static_cast<AlignedSize*>(ptr);
-  s--;
-  const int index = s->index;
-  if (index < 0) {
-    m_dynamic_pool->deallocate((void *) s);
-  }
-  else {
-    m_fixed_pool[index]->deallocate((void *) s);
+  Map::const_iterator iter = m_map.find(reinterpret_cast<uintptr_t>(ptr));
+  if (iter != m_map.end()) {
+    const int index = iter->second;
+    if (index < 0) {
+      m_dynamic_pool->deallocate(ptr);
+    }
+    else {
+      m_fixed_pool[index]->deallocate(ptr);
+    }
   }
 }
 
