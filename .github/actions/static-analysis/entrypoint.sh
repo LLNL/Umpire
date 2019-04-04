@@ -1,9 +1,6 @@
 #!/bin/sh
 
-echo "I am `whoami`"
-echo "In dir: `pwd`"
-
-ls -la
+git submodule update --init --recursive
 
 mkdir build && cd build
 
