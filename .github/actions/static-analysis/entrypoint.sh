@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mkdir build && cd build
+sudo mkdir build && cd build
 
 export CCC_CC=clang
 export CCC_CXX=clang++
