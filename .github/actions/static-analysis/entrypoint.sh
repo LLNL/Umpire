@@ -1,6 +1,11 @@
 #!/bin/sh
 
-sudo mkdir build && cd build
+echo "I am `whoami`"
+echo "In dir: `pwd`"
+
+ls -la
+
+mkdir build && cd build
 
 export CCC_CC=clang
 export CCC_CXX=clang++
