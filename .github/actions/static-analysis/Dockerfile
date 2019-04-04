@@ -13,4 +13,4 @@ COPY entrypoint.sh /entrypoint.sh
 
 USER root
 
-ENTRYPOINT ["/home/axom/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
