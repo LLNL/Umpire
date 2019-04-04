@@ -9,6 +9,9 @@ LABEL "com.github.actions.description"="Run scan-build on a CMake project"
 LABEL "com.github.actions.icon"="aperture"
 LABEL "com.github.actions.color"="orange"
 
-COPY entrypoint.sh /home/axom/entrypoint.sh
+COPY --chown axom:axom entrypoint.sh /home/axom/entrypoint.sh
+
+USER axom
+WORKDIR /home/axom
 
 ENTRYPOINT ["/home/axom/entrypoint.sh"]
