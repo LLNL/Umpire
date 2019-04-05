@@ -255,11 +255,11 @@ class ResourceManager {
 
     util::AllocationMap m_allocations;
 
-    strategy::AllocationStrategy* m_default_allocator;
+    strategy::AllocationStrategy* m_default_allocator{};
 
     std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash > m_memory_resources;
 
-    int m_id;
+    int m_id{0};
 
     std::mutex* m_mutex;
 

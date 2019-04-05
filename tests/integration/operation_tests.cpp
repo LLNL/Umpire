@@ -131,7 +131,7 @@ TEST_P(CopyTest, InvalidSize)
         rm.copy(dest_array, source_array, (m_size+100)*sizeof(float)),
         umpire::util::Exception);
 
-    float* small_dest_array = static_cast<float*>(
+    auto* small_dest_array = static_cast<float*>(
         dest_allocator->allocate(10*sizeof(float)));
 
     ASSERT_THROW(
@@ -198,7 +198,7 @@ TEST_P(MemsetTest, Offset) {
 
   rm.copy(check_array, source_array);
 
-  char * check_chars = reinterpret_cast<char*>(check_array);
+  auto * check_chars = reinterpret_cast<char*>(check_array);
   
   for (size_t i = 0; i < m_size / 2 * sizeof(float); ++i) {
     ASSERT_EQ(1, check_chars[i]);
@@ -306,7 +306,7 @@ TEST_P(ReallocateTest, ReallocateLarger)
       source_array, 
       reallocated_size*sizeof(float));
 
-  char * check_interrogator = reinterpret_cast<char*>(check_array);
+  auto * check_interrogator = reinterpret_cast<char*>(check_array);
   for (size_t i = 0; i < m_size * sizeof(float) / sizeof(char); i++) {
     ASSERT_EQ(check_interrogator[i], 1);
   }
@@ -326,7 +326,7 @@ TEST_P(ReallocateTest, RealocateNull)
 
   void* null_array = nullptr;
 
-  float* reallocated_array = 
+  auto* reallocated_array = 
     static_cast<float*>(
         rm.reallocate(null_array, reallocated_size*sizeof(float)));
 
@@ -346,7 +346,7 @@ TEST_P(ReallocateTest, ReallocateNullWithAllocator)
 
   void* null_array = nullptr;
 
-  float* reallocated_array = 
+  auto* reallocated_array = 
     static_cast<float*>(
         rm.reallocate(null_array, reallocated_size*sizeof(float), *source_allocator));
 
@@ -363,7 +363,7 @@ TEST_P(ReallocateTest, ReallocateWithAllocator)
 
   const size_t reallocated_size = (m_size+50);
 
-  float* reallocated_array = 
+  auto* reallocated_array = 
     static_cast<float*>(
         rm.reallocate(source_array, reallocated_size*sizeof(float), *source_allocator));
 
@@ -427,7 +427,7 @@ TEST_P(MoveTest, Move)
     source_array[i] = i;
   }
 
-  float* moved_array = static_cast<float*>(rm.move(source_array, *dest_allocator));
+  auto* moved_array = static_cast<float*>(rm.move(source_array, *dest_allocator));
 
   if ( dest_allocator->getAllocationStrategy() 
       == source_allocator->getAllocationStrategy()) {

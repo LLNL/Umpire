@@ -37,7 +37,7 @@ class HostCopyOperation : public MemoryOperation {
       void** dst_ptr,
       umpire::util::AllocationRecord *src_allocation,
       umpire::util::AllocationRecord *dst_allocation,
-      size_t length);
+      size_t length) override;
 };
 
 } // end of naemspace op

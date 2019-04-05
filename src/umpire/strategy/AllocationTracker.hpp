@@ -34,17 +34,17 @@ class AllocationTracker :
         int id,
         Allocator allocator) noexcept;
 
-    void* allocate(size_t bytes);
+    void* allocate(size_t bytes) override;
 
-    void deallocate(void* ptr);
+    void deallocate(void* ptr) override;
 
-    void release();
+    void release() override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+    long getActualSize() const noexcept override;
 
-    Platform getPlatform() noexcept;
+    Platform getPlatform() noexcept override;
 
     strategy::AllocationStrategy* getAllocationStrategy();
 

@@ -35,16 +35,16 @@ void benchmark_allocator(std::string name) {
 
   auto begin_alloc = std::chrono::system_clock::now();
 
-  for (int i = 0; i < ALLOCATIONS; i++) {
+  for (auto & allocation : allocations) {
     std::size_t size = dist(gen);
-    allocations[i] = alloc.allocate(size);
+    allocation = alloc.allocate(size);
   }
 
   auto end_alloc = std::chrono::system_clock::now();
 
   auto begin_dealloc = std::chrono::system_clock::now();
-  for (int i = 0; i < ALLOCATIONS; i++) {
-    alloc.deallocate(allocations[i]);
+  for (auto & allocation : allocations) {
+    alloc.deallocate(allocation);
   }
   auto end_dealloc = std::chrono::system_clock::now();
 

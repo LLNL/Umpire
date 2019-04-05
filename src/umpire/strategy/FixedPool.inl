@@ -25,7 +25,7 @@ namespace strategy {
 template <typename T, int NP, typename IA>
 void
 FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
-  struct Pool *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
+  auto *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
   p->numAvail = m_num_per_pool;
   p->next = nullptr;
 
@@ -117,7 +117,7 @@ FixedPool<T, NP, IA>::allocate(size_t bytes) {
 template <typename T, int NP, typename IA>
 void
 FixedPool<T,NP, IA>::deallocate(void* ptr) {
-  T* t_ptr = static_cast<T*>(ptr);
+  auto* t_ptr = static_cast<T*>(ptr);
 
   int i = 0;
   for (struct Pool *curr = m_pool; curr; curr = curr->next) {

@@ -37,13 +37,13 @@ class DefaultMemoryResource :
   public: 
     DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
-    void* allocate(size_t bytes);
-    void deallocate(void* ptr);
+    void* allocate(size_t bytes) override;
+    void deallocate(void* ptr) override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
 
-    Platform getPlatform() noexcept;
+    Platform getPlatform() noexcept override;
 
   protected:
     _allocator m_allocator;

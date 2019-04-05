@@ -29,10 +29,10 @@ public:
   using ::benchmark::Fixture::SetUp;
   using ::benchmark::Fixture::TearDown;
 
-  allocatorBenchmark() : max_allocations(100000) { 
+  allocatorBenchmark() : { 
     allocations = new void*[max_allocations];
   }
-  virtual ~allocatorBenchmark() {
+  ~allocatorBenchmark() override {
     delete[] allocations;
   }
 
@@ -40,7 +40,7 @@ public:
   virtual void deallocate( void* ptr ) = 0;
 
   void largeAllocDealloc(benchmark::State &st) {
-    uint64_t size = (uint64_t)((uint64_t)st.range(0) * 1024 * 1024 * 1024);
+    auto size = (uint64_t)((uint64_t)st.range(0) * 1024 * 1024 * 1024);
     void* allocation;
 
     while (st.KeepRunning()) {
@@ -50,7 +50,7 @@ public:
   }
 
   void allocation(benchmark::State &st) {
-    uint64_t size = (uint64_t)st.range(0);
+    auto size = (uint64_t)st.range(0);
     uint64_t i = 0;
 
     while (st.KeepRunning()) {
@@ -84,14 +84,14 @@ public:
       deallocate(allocations[j]);
   }
 
-  const uint64_t max_allocations;
+  const uint64_t max_allocations{100000};
   void** allocations;
 };
 
 class Malloc : public ::allocatorBenchmark {
   public:
-  virtual void* allocate( uint64_t nbytes ) { return malloc(nbytes); }
-  virtual void deallocate( void* ptr ) { free(ptr); }
+  void* allocate( uint64_t nbytes ) override { return malloc(nbytes); }
+  void deallocate( void* ptr ) override { free(ptr); }
 };
 BENCHMARK_DEFINE_F(Malloc, malloc)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(Malloc, free)(benchmark::State &st)   { deallocation(st); }
@@ -100,16 +100,16 @@ class allocator : public ::allocatorBenchmark {
 public:
   using allocatorBenchmark::SetUp;
   using allocatorBenchmark::TearDown;
-  void SetUp(const ::benchmark::State&) {
+  void SetUp(const ::benchmark::State&) override {
     auto& rm = umpire::ResourceManager::getInstance();
     allocator = new umpire::Allocator(rm.getAllocator(getName()));
   }
-  void TearDown(const ::benchmark::State&) {
+  void TearDown(const ::benchmark::State&) override {
     delete allocator;
   }
-  virtual void* allocate( uint64_t nbytes ) { return allocator->allocate(nbytes); }
-  virtual void deallocate( void* ptr ) { allocator->deallocate(ptr); }
-  virtual const std::string& getName( void ) = 0;
+  void* allocate( uint64_t nbytes ) override { return allocator->allocate(nbytes); }
+  void deallocate( void* ptr ) override { allocator->deallocate(ptr); }
+  virtual const std::string& getName( ) = 0;
 
   umpire::Allocator* allocator;
 };
@@ -117,7 +117,7 @@ public:
 class Host : public ::allocator {
   public:
     Host(): name("HOST") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -127,7 +127,7 @@ BENCHMARK_DEFINE_F(Host, deallocate)(benchmark::State &st)   { deallocation(st);
 class Device : public ::allocator {
   public:
     Device(): name("DEVICE") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -138,7 +138,7 @@ BENCHMARK_DEFINE_F(Device, largeAllocDealloc)(benchmark::State &st)   { largeAll
 class UM : public ::allocator {
   public:
     UM(): name("UM") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -151,7 +151,7 @@ class Pool : public ::allocatorBenchmark {
 public:
   using allocatorBenchmark::SetUp;
   using allocatorBenchmark::TearDown;
-  void SetUp(const ::benchmark::State&) {
+  void SetUp(const ::benchmark::State&) override {
     std::stringstream ss;
     ss << "host_pool" << namecnt++;
     auto& rm = umpire::ResourceManager::getInstance();
@@ -163,13 +163,13 @@ public:
     deallocate(ptr);
   }
 
-  void TearDown(const ::benchmark::State&) {
+  void TearDown(const ::benchmark::State&) override {
     delete allocator;
   }
-  virtual void* allocate( uint64_t nbytes ) { return allocator->allocate(nbytes); }
-  virtual void deallocate( void* ptr ) { allocator->deallocate(ptr); }
+  void* allocate( uint64_t nbytes ) override { return allocator->allocate(nbytes); }
+  void deallocate( void* ptr ) override { allocator->deallocate(ptr); }
 
-  virtual const std::string& getName( void ) = 0;
+  virtual const std::string& getName( ) = 0;
 
   umpire::Allocator* allocator;
 };
@@ -177,7 +177,7 @@ public:
 class PoolHost : public ::Pool {
   public:
     PoolHost(): name("HOST") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -187,7 +187,7 @@ BENCHMARK_DEFINE_F(PoolHost, deallocate)(benchmark::State &st)   { deallocation(
 class PoolDevice : public ::Pool {
   public:
     PoolDevice(): name("DEVICE") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -197,7 +197,7 @@ BENCHMARK_DEFINE_F(PoolDevice, deallocate)(benchmark::State &st)   { deallocatio
 class PoolUM : public ::Pool {
   public:
     PoolUM(): name("UM") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -209,7 +209,7 @@ public:
   using allocatorBenchmark::SetUp;
   using allocatorBenchmark::TearDown;
 
-  void SetUp(const ::benchmark::State&) {
+  void SetUp(const ::benchmark::State&) override {
     struct data { char _[8388608]; };
 
     std::stringstream ss;
@@ -223,13 +223,13 @@ public:
     deallocate(ptr);
   }
 
-  void TearDown(const ::benchmark::State&) {
+  void TearDown(const ::benchmark::State&) override {
     delete allocator;
   }
 
-  virtual void* allocate( uint64_t nbytes ) { return allocator->allocate(nbytes); }
-  virtual void deallocate( void* ptr ) { allocator->deallocate(ptr); }
-  virtual const std::string& getName( void ) = 0;
+  void* allocate( uint64_t nbytes ) override { return allocator->allocate(nbytes); }
+  void deallocate( void* ptr ) override { allocator->deallocate(ptr); }
+  virtual const std::string& getName( ) = 0;
 
   umpire::Allocator* allocator;
 };
@@ -237,7 +237,7 @@ public:
 class FixedPoolHost : public ::FixedPool {
   public:
     FixedPoolHost(): name("HOST") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -247,7 +247,7 @@ BENCHMARK_DEFINE_F(FixedPoolHost, deallocate)(benchmark::State &st)   { dealloca
 class FixedPoolUM : public ::FixedPool {
   public:
     FixedPoolUM(): name("UM") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };
@@ -257,7 +257,7 @@ BENCHMARK_DEFINE_F(FixedPoolUM, deallocate)(benchmark::State &st)   { deallocati
 class FixedPoolDevice : public ::FixedPool {
   public:
     FixedPoolDevice(): name("DEVICE") { }
-    const std::string& getName( void ) { return name; }
+    const std::string& getName( ) override { return name; }
   private:
     const std::string name;
 };

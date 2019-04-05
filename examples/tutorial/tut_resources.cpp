@@ -23,7 +23,7 @@ void allocate_and_deallocate(const std::string& resource)
 
   umpire::Allocator allocator = rm.getAllocator(resource);
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
       allocator.allocate(SIZE*sizeof(double)));
 
   std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

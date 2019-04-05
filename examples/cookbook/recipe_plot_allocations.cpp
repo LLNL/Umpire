@@ -28,7 +28,7 @@ int main(int, char**) {
                                                                           1024 * 16);
 
   void* a[4];
-  for (int i = 0; i < 4; ++i) a[i] = pooled_allocator.allocate(1024);
+  for (auto & i : a) i = pooled_allocator.allocate(1024);
 
   // Create fragmentation
   pooled_allocator.deallocate(a[2]);
@@ -48,7 +48,7 @@ int main(int, char**) {
     out.close();
   }
 
-  for (int i = 0; i < 4; ++i) pooled_allocator.deallocate(a[i]);
+  for (auto & i : a) pooled_allocator.deallocate(i);
 
   // Visualize this using the python script. Example usage:
   // tools/plot_allocations allocator.log gray 0.2 pooled_allocator.log purple 0.8

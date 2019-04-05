@@ -15,7 +15,7 @@
 #include "umpire/util/Logger.hpp"
 
 #include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
+#include <cstdlib>   // for getenv()
 #include <strings.h>  // for strcasecmp()
 
 namespace umpire {
@@ -35,13 +35,12 @@ static const std::string MessageLevelName[ message::Num_Levels ] = {
 Logger::Logger() noexcept
 {
   // by default, all message streams are disabled
-  for ( int i=0 ; i < message::Num_Levels ; ++i )
-    m_isEnabled[ i ] = false;
+  for (bool & i : m_isEnabled)
+    i = false;
 }
 
 Logger::~Logger() noexcept
-{
-}
+= default;
 
 void Logger::setLoggingMsgLevel( message::Level level ) noexcept
 {
@@ -72,7 +71,7 @@ void Logger::initialize()
   message::Level level = defaultLevel;
   char* enval = getenv(env_name);
 
-  if ( enval != NULL ) {
+  if ( enval != nullptr ) {
     for ( int i = 0; i < message::Num_Levels; ++i ) {
       if ( strcasecmp( enval, MessageLevelName[ i ].c_str() ) == 0 ) {
         level = (message::Level)i;

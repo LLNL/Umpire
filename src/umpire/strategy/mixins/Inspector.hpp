@@ -37,8 +37,8 @@ class Inspector
     void deregisterAllocation(void* ptr);
 
   protected:
-    long m_current_size;
-    long m_high_watermark;
+    long m_current_size{0};
+    long m_high_watermark{0};
 };
 
 } // end of namespace mixins

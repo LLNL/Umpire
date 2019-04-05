@@ -37,7 +37,7 @@ public:
   static Replay* getReplayLogger();
   bool replayLoggingEnabled();
 
-  static std::string printReplayAllocator( void ) {
+  static std::string printReplayAllocator( ) {
     return std::string("");
   }
 

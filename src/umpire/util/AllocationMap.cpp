@@ -71,7 +71,7 @@ AllocationMap::remove(void* ptr)
 
     UMPIRE_LOG(Debug, "Removing " << ptr);
 
-    EntryVector* record_vector =
+    auto* record_vector =
       const_cast<EntryVector*>(
           m_records->find(reinterpret_cast<uintptr_t>(ptr)));
 
@@ -108,7 +108,7 @@ AllocationMap::findRecord(void* ptr) const
     UMPIRE_LOCK;
     auto record = m_records->atOrBefore(reinterpret_cast<uintptr_t>(ptr));
     if (record.value) {
-      void* parent_ptr = reinterpret_cast<void*>(record.key);
+      auto* parent_ptr = reinterpret_cast<void*>(record.key);
       alloc_record =
         reinterpret_cast<Entry>(record.value->back());
 
@@ -172,7 +172,7 @@ AllocationMap::print(const std::function<bool (const AllocationRecord*)>&& pred,
     ss << reinterpret_cast<void*>(addr) << " : {" << std::endl;
     bool any_match = false;
     for (auto const& records : vec) {
-      AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
+      auto* tmp = reinterpret_cast<AllocationRecord*>(records);
       if (pred(tmp)) {
         any_match = true;
         ss << "  " << tmp->m_size <<

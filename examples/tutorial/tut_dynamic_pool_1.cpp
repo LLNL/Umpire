@@ -29,7 +29,7 @@ void allocate_and_deallocate_pool(const std::string& resource)
     rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
                                                     allocator);
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
       pooled_allocator.allocate(SIZE*sizeof(double)));
 
   std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

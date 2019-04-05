@@ -23,7 +23,7 @@ int main() {
 
   const int size = 100;
 
-  double* my_array = static_cast<double*>(alloc.allocate(100 * sizeof(double)));
+  auto* my_array = static_cast<double*>(alloc.allocate(100 * sizeof(double)));
 
   for (int i = 0; i < size; i++) {
     my_array[i] = static_cast<double>(i);

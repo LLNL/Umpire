@@ -68,9 +68,9 @@ ResourceManager::ResourceManager() :
   m_allocators_by_name(),
   m_allocators_by_id(),
   m_allocations(),
-  m_default_allocator(),
+  ,
   m_memory_resources(),
-  m_id(0),
+  ,
   m_mutex(new std::mutex())
 {
   UMPIRE_LOG(Debug, "() entering");
@@ -551,8 +551,8 @@ std::vector<std::string>
 ResourceManager::getAllocatorNames() const noexcept
 {
   std::vector<std::string> names;
-  for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
-    names.push_back(it->first);
+  for(const auto & it : m_allocators_by_name) {
+    names.push_back(it.first);
   }
 
   UMPIRE_LOG(Debug, "() returning " << names.size() << " allocators");

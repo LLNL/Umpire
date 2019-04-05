@@ -38,7 +38,7 @@ class HostReallocateOperation :
       void** dst_ptr,
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
-      size_t length);
+      size_t length) override;
 };
 
 } // end of naemspace op

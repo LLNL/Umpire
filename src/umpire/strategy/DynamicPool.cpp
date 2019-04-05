@@ -14,6 +14,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/DynamicPool.hpp"
 
+#include <utility>
+
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -33,7 +35,7 @@ DynamicPool::DynamicPool(
   AllocationStrategy(name, id),
   dpa(nullptr),
   m_allocator(allocator.getAllocationStrategy()),
-  do_coalesce{coalesce_heuristic}
+  do_coalesce{std::move(coalesce_heuristic)}
 {
   dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
 }

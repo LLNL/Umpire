@@ -36,7 +36,7 @@ class HostMemsetOperation : public MemoryOperation {
       void* src_ptr,
       util::AllocationRecord* allocation,
       int value,
-      size_t length);
+      size_t length) override;
 };
 
 } // end of namespace op

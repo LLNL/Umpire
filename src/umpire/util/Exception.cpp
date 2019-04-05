@@ -15,16 +15,17 @@
 #include "umpire/util/Exception.hpp"
 
 #include <sstream>
+#include <utility>
 
 namespace umpire {
 namespace util {
 
 Exception::Exception(
-    const std::string& message,
-    const std::string &file,
+    std::string  message,
+    std::string file,
     int line) :
-  m_message(message),
-  m_file(file),
+  m_message(std::move(message)),
+  m_file(std::move(file)),
   m_line(line)
 {
   m_what = this->message();

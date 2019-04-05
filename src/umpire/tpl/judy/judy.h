@@ -43,8 +43,8 @@
     defined(__powerpc64__) || \
     defined (__s390x__)
 //    defines for 64 bit
-typedef unsigned long long judyvalue;
-typedef unsigned long long JudySlot;
+using judyvalue = unsigned long long;
+using JudySlot = unsigned long long;
 #define JUDY_key_mask (0x07)
 #define JUDY_key_size 8
 #define JUDY_slot_size 8

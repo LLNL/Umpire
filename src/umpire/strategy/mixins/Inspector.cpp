@@ -21,10 +21,9 @@ namespace strategy {
 namespace mixins {
 
 Inspector::Inspector() :
-  m_current_size(0),
-  m_high_watermark(0)
-{
-}
+  ,
+  
+= default;
 
 
 void 

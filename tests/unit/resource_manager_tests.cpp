@@ -32,7 +32,7 @@ TEST(ResourceManager, findAllocationRecord)
   const size_t size = 1024 * 1024;
   const size_t offset = 1024;
 
-  char* ptr = static_cast<char*>(alloc.allocate(size));
+  auto* ptr = static_cast<char*>(alloc.allocate(size));
   const umpire::util::AllocationRecord* rec = rm.findAllocationRecord(ptr + offset);
 
   ASSERT_EQ(ptr, rec->m_ptr);

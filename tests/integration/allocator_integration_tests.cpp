@@ -24,13 +24,13 @@ class AllocatorTest :
   public ::testing::TestWithParam< std::string >
 {
   public:
-  virtual void SetUp()
+  void SetUp() override
   {
       auto& rm = umpire::ResourceManager::getInstance();
       m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
   }
 
-  virtual void TearDown()
+  void TearDown() override
   {
     delete m_allocator;
   }
@@ -44,7 +44,7 @@ class AllocatorTest :
 
 TEST_P(AllocatorTest, AllocateDeallocateBig)
 {
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
     m_allocator->allocate(m_big*sizeof(double)));
 
   ASSERT_NE(nullptr, data);
@@ -54,7 +54,7 @@ TEST_P(AllocatorTest, AllocateDeallocateBig)
 
 TEST_P(AllocatorTest, AllocateDeallocateSmall)
 {
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
     m_allocator->allocate(m_small*sizeof(double)));
 
   ASSERT_NE(nullptr, data);
@@ -69,7 +69,7 @@ TEST_P(AllocatorTest, AllocateDeallocateNothing)
       m_allocator->getPlatform() == umpire::Platform::rocm) {
     SUCCEED();
   } else {
-    double* data = static_cast<double*>(
+    auto* data = static_cast<double*>(
       m_allocator->allocate(m_nothing*sizeof(double)));
 
     ASSERT_NE(nullptr, data);
@@ -93,7 +93,7 @@ TEST_P(AllocatorTest, GetSize)
 {
   const size_t size = m_big*sizeof(double);
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
     m_allocator->allocate(size));
 
   ASSERT_EQ(size, m_allocator->getSize(data));
@@ -185,13 +185,13 @@ class AllocatorByResourceTest :
   public ::testing::TestWithParam< umpire::resource::MemoryResourceType >
 {
   public:
-  virtual void SetUp()
+  void SetUp() override
   {
       auto& rm = umpire::ResourceManager::getInstance();
       m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
   }
 
-  virtual void TearDown()
+  void TearDown() override
   {
     delete m_allocator;
   }
@@ -205,7 +205,7 @@ class AllocatorByResourceTest :
 
 TEST_P(AllocatorByResourceTest, AllocateDeallocate)
 {
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
     m_allocator->allocate(m_big*sizeof(double)));
 
   ASSERT_NE(nullptr, data);
@@ -215,7 +215,7 @@ TEST_P(AllocatorByResourceTest, AllocateDeallocate)
 
 TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
 {
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
     m_allocator->allocate(m_big*sizeof(double)));
 
   ASSERT_NE(nullptr, data);

@@ -56,8 +56,8 @@ protected:
 
   // Search the list of free blocks and return a usable one if that exists, else NULL
   void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size) {
-    best = prev = NULL;
-    for ( struct Block *iter = freeBlocks, *iterPrev = NULL ; iter ; iter = iter->next ) {
+    best = prev = nullptr;
+    for ( struct Block *iter = freeBlocks, *iterPrev = nullptr ; iter ; iter = iter->next ) {
       if ( iter->size >= size && (!best || iter->size < best->size) ) {
         best = iter;
         prev = iterPrev;
@@ -83,7 +83,7 @@ protected:
       sizeToAlloc = std::max(size, minBytes);
 
     curr = prev = NULL;
-    void *data = NULL;
+    void *data = nullptr;
 
     // Allocate data
     try {
@@ -156,7 +156,7 @@ protected:
     else {
       // Split the block
       std::size_t remaining = curr->size - size;
-      struct Block *newBlock = (struct Block *) blockPool.allocate();
+      auto *newBlock = (struct Block *) blockPool.allocate();
       if (!newBlock) return;
       newBlock->data = curr->data + size;
       newBlock->size = remaining;
@@ -309,7 +309,7 @@ public:
     assert(ptr);
 
     // Find the associated block
-    struct Block *curr = usedBlocks, *prev = NULL;
+    struct Block *curr = usedBlocks, *prev = nullptr;
     for ( ; curr && curr->data != ptr; curr = curr->next ) {
       prev = curr;
     }

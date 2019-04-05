@@ -14,13 +14,15 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/AllocationStrategy.hpp"
 
+#include <utility>
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept :
-  m_name(name),
+AllocationStrategy::AllocationStrategy(std::string  name, int id) noexcept :
+  m_name(std::move(name)),
   m_id(id)
 {
 }

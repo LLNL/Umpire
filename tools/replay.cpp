@@ -55,7 +55,7 @@ public:
     // This checks for a trailing comma with no data after it.
     if (!lineStream && cell.empty()) {
       // If there was a trailing comma then add an empty element.
-      m_data.push_back("");
+      m_data.emplace_back("");
     }
   }
 private:
@@ -70,7 +70,7 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 
 class NullBuffer : public std::streambuf {
   public:
-    int overflow(int c) { return c; }
+    int overflow(int c) override { return c; }
 };
 static NullBuffer null_buffer;
 static std::ostream null_stream(&null_buffer);
@@ -107,7 +107,7 @@ class Replay {
       exit (1);
     }
 
-    void run(void)
+    void run()
     {
       while ( m_input_file >> m_row ) {
         if ( m_row[0] != "REPLAY" )
@@ -187,7 +187,7 @@ class Replay {
       }
     }
 
-    void replay_coalesce( void )
+    void replay_coalesce( )
     {
       std::string allocName = m_row[m_row.size() - 1];
       strip_off_base(allocName);
@@ -220,7 +220,7 @@ class Replay {
       }
     }
 
-    void replay_release( void )
+    void replay_release( )
     {
       void* alloc_obj_ref;
 
@@ -241,7 +241,7 @@ class Replay {
       alloc.release();
     }
 
-    void replay_allocate( void )
+    void replay_allocate( )
     {
       void* alloc_obj_ref;
       std::size_t alloc_size;
@@ -271,7 +271,7 @@ class Replay {
       replay_out() << "(" << alloc_size << ") " << allocName << " --> " << m_sequence_id;
     }
 
-    void replay_deallocate( void )
+    void replay_deallocate( )
     {
       void* alloc_obj_ref;
       void* alloc_ptr;
@@ -307,7 +307,7 @@ class Replay {
       alloc.deallocate(replay_alloc_ptr);
     }
 
-    void replay_makeMemoryResource( void )
+    void replay_makeMemoryResource( )
     {
       void* alloc_obj_ref;
 
@@ -317,7 +317,7 @@ class Replay {
       m_allocators[alloc_obj_ref] = name;
     }
 
-    void replay_makeAllocator( void )
+    void replay_makeAllocator( )
     {
       bool introspection = ( m_row[3] == "true" );
       const std::string& name = m_row[4];

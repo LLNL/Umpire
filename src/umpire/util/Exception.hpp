@@ -23,14 +23,14 @@ namespace util {
 
 class Exception : public std::exception {
   public:
-    Exception(const std::string& msg,
-        const std::string &file,
+    Exception(std::string  msg,
+        std::string file,
         int line);
 
-    virtual ~Exception() = default;
+    ~Exception() override = default;
 
     std::string message() const;
-    virtual const char* what() const throw();
+    const char* what() const throw() override;
 
   private:
     std::string m_message;

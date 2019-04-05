@@ -23,7 +23,7 @@ int main(int, char**) {
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
       allocator.allocate(SIZE*sizeof(double)));
 
   std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

@@ -58,11 +58,11 @@ int main(int, char**) {
   auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   void* a[4];
-  for (int i = 0; i < 4; ++i)
-    a[i] = pooled_allocator.allocate(1024);
+  for (auto & i : a)
+    i = pooled_allocator.allocate(1024);
 
-  for (int i = 0; i < 4; ++i) {
-    pooled_allocator.deallocate(a[i]);
+  for (auto & i : a) {
+    pooled_allocator.deallocate(i);
     std::cout
       << "Pool has " << pooled_allocator.getActualSize() << " bytes of memory. "
       << pooled_allocator.getCurrentSize() << " bytes are used. "

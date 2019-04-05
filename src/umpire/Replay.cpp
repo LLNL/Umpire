@@ -14,7 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
+#include <cstdlib>   // for getenv()
 #include <strings.h>  // for strcasecmp()
 
 #include "umpire/Allocator.hpp"
@@ -34,8 +34,7 @@ Replay::Replay(bool enable_replay) : replayEnabled(enable_replay)
 }
 
 Replay::~Replay()
-{
-}
+= default;
 
 void Replay::logMessage( const std::string& message )
 {
@@ -56,7 +55,7 @@ void Replay::initialize()
     return;
 
   char* enval = getenv(env_name);
-  bool enable_replay = ( enval != NULL );
+  bool enable_replay = ( enval != nullptr );
 
   s_Replay = new Replay(enable_replay);
 }

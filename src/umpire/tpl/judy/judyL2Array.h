@@ -12,7 +12,7 @@
 ********************************************************************************/
 
 #include "judy.h"
-#include "assert.h"
+#include <cassert>
 #include <iterator>
 #include <vector>
 
@@ -33,19 +33,19 @@ struct judyl2KVpair {
 template< typename JudyKey, typename JudyValue >
 class judyL2Array {
     public:
-        typedef std::vector< JudyValue > vector;
-        typedef const vector cvector;
+        using vector = std::vector<unsigned long>;
+        using cvector = const vector;
         typedef judyl2KVpair< JudyKey, vector * > pair;
         typedef judyl2KVpair< JudyKey, cvector * > cpair;
     protected:
         Judy * _judyarray;
-        unsigned int _maxLevels, _depth;
+        unsigned int _maxLevels, _depth{ 1 };
         vector ** _lastSlot;
         JudyKey _buff[1];
-        bool _success;
+        bool _success{ true };
         cpair kv;
     public:
-        judyL2Array(): _maxLevels( sizeof( JudyKey ) ), _depth( 1 ), _lastSlot( 0 ), _success( true ) {
+        judyL2Array(): _maxLevels( sizeof( JudyKey ) ), , _lastSlot( 0 ), {
             assert( sizeof( JudyKey ) == JUDY_key_size && "JudyKey *must* be the same size as a pointer!" );
             _judyarray = judy_open( _maxLevels, _depth );
             _buff[0] = 0;
@@ -67,7 +67,7 @@ class judyL2Array {
         /// delete all vectors and empty the array
         void clear() {
             JudyKey key = 0;
-            while( 0 != ( _lastSlot = ( vector ** ) judy_strt( _judyarray, ( const unsigned char * ) &key, 0 ) ) ) {
+            while( nullptr != ( _lastSlot = ( vector ** ) judy_strt( _judyarray, ( const unsigned char * ) &key, 0 ) ) ) {
                 //( * _lastSlot )->~vector(); //TODO: placement new
                 delete( * _lastSlot );
                 judy_del( _judyarray );
@@ -167,7 +167,7 @@ class judyL2Array {
                 return * _lastSlot;
             } else {
                 _success = false;
-                return 0;
+                return nullptr;
             }
         }
 
@@ -215,7 +215,7 @@ class judyL2Array {
          * \sa isEmpty()
          */
         bool removeEntry( JudyKey key ) {
-            if( 0 != ( _lastSlot = ( vector ** ) judy_slot( _judyarray, ( const unsigned char * ) &key, _depth * JUDY_key_size ) ) ) {
+            if( nullptr != ( _lastSlot = ( vector ** ) judy_slot( _judyarray, ( const unsigned char * ) &key, _depth * JUDY_key_size ) ) ) {
                 // _lastSlot->~vector(); //for use with placement new
                 delete *_lastSlot;
                 _lastSlot = ( vector ** ) judy_del( _judyarray );

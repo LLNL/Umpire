@@ -41,7 +41,7 @@ class AllocationStrategy
      * \param name The name of this AllocationStrategy object.
      * \param id The id of this AllocationStrategy object.
      */
-    AllocationStrategy(const std::string& name, int id) noexcept;
+    AllocationStrategy(std::string  name, int id) noexcept;
 
     virtual ~AllocationStrategy() = default;
 

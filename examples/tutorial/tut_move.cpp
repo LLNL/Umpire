@@ -22,7 +22,7 @@ double* move_data(double* source_data, const std::string& destination)
 
   std::cout << "Moved source data (" << source_data << ") to destination ";
 
-  double* dest_data = static_cast<double*>(
+  auto* dest_data = static_cast<double*>(
       rm.move(source_data, dest_allocator));
 
   std::cout << destination << " (" << dest_data << ")" << std::endl;
@@ -37,7 +37,7 @@ int main(int, char**) {
 
   auto allocator = rm.getAllocator("HOST");
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
       allocator.allocate(SIZE*sizeof(double)));
 
   std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

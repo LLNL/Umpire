@@ -29,33 +29,33 @@
 
 class replayTest {
 public:
-  replayTest() : testAllocations(3), allocationSize(16)
+  replayTest() : , 
   {
     auto& rm = umpire::ResourceManager::getInstance();
 
     rm.makeAllocator<umpire::strategy::DynamicPool>(
         "host_simpool_defaults", rm.getAllocator("HOST"));
-    allocatorNames.push_back("host_simpool_defaults");
+    allocatorNames.emplace_back("host_simpool_defaults");
 
     rm.makeAllocator<umpire::strategy::DynamicPool>(
         "host_simpool_spec1", rm.getAllocator("HOST"), 9876, 1234);
-    allocatorNames.push_back("host_simpool_spec1");
+    allocatorNames.emplace_back("host_simpool_spec1");
 
     rm.makeAllocator<umpire::strategy::DynamicPool, false>(
         "host_simpool_spec2", rm.getAllocator("HOST"), 9876, 1234);
-    allocatorNames.push_back("host_simpool_spec2");
+    allocatorNames.emplace_back("host_simpool_spec2");
 
     rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
-    allocatorNames.push_back("MONOTONIC 1024");
+    allocatorNames.emplace_back("MONOTONIC 1024");
 
     rm.makeAllocator<umpire::strategy::SlotPool>(
       "host_slot_pool", 64, rm.getAllocator("HOST"));
-    allocatorNames.push_back("host_slot_pool");
+    allocatorNames.emplace_back("host_slot_pool");
 
     rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
       "thread_safe_allocator", rm.getAllocator("HOST"));
-    allocatorNames.push_back("thread_safe_allocator");
+    allocatorNames.emplace_back("thread_safe_allocator");
 
 #if 0
     //
@@ -71,9 +71,8 @@ public:
 #endif
   }
 
-  ~replayTest( void )
-  {
-  }
+  ~replayTest( )
+  = default;
 
   void runTest()
   {
@@ -96,7 +95,7 @@ public:
     for ( int i = 0; i < testAllocations; ++i ) {
       for ( auto n : allocatorNames ) {
         auto alloc = rm.getAllocator(n);
-        allocations.push_back( std::make_pair(alloc.allocate( ++allocationSize ), n) );
+        allocations.emplace_back(alloc.allocate( ++allocationSize ), n );
       }
     }
 
@@ -111,8 +110,8 @@ public:
     pooled_allocator.release();
   }
 private:
-  const int testAllocations;
-  std::size_t allocationSize;
+  const int testAllocations{3};
+  std::size_t allocationSize{16};
   std::vector<std::string> allocatorNames;
   std::vector<std::pair<void*, std::string>> allocations;
 };

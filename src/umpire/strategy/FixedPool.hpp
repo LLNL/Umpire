@@ -45,17 +45,17 @@ class FixedPool
         int id,
         Allocator allocator);
 
-    ~FixedPool();
+    ~FixedPool() override;
 
-    void* allocate(size_t bytes);
+    void* allocate(size_t bytes) override;
 
-    void deallocate(void* ptr);
+    void deallocate(void* ptr) override;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    long getCurrentSize() const noexcept override;
+    long getHighWatermark() const noexcept override;
+    long getActualSize() const noexcept override;
 
-    Platform getPlatform() noexcept;
+    Platform getPlatform() noexcept override;
 
   private:
     struct Pool

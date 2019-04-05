@@ -20,7 +20,7 @@ void copy_data(double* source_data, size_t size, const std::string& destination)
   auto& rm = umpire::ResourceManager::getInstance();
   auto dest_allocator = rm.getAllocator(destination);
 
-  double* dest_data = static_cast<double*>(
+  auto* dest_data = static_cast<double*>(
       dest_allocator.allocate(size*sizeof(double)));
 
   rm.copy(dest_data, source_data);
@@ -38,7 +38,7 @@ int main(int, char**) {
 
   auto allocator = rm.getAllocator("HOST");
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
       allocator.allocate(SIZE*sizeof(double)));
 
   std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

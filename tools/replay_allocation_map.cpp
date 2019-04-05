@@ -55,7 +55,7 @@ public:
     // This checks for a trailing comma with no data after it.
     if (!lineStream && cell.empty()) {
       // If there was a trailing comma then add an empty element.
-      m_data.push_back("");
+      m_data.emplace_back("");
     }
   }
 private:
@@ -86,7 +86,7 @@ class Replay {
       exit (1);
     }
 
-    void run(void)
+    void run()
     {
       while ( m_file >> m_row ) {
         if ( m_row[0] != "REPLAY" )
@@ -133,7 +133,7 @@ class Replay {
       }
     }
 
-    void replay_map_insert( void )
+    void replay_map_insert( )
     {
       std::size_t alloc_size;
       void* alloc_ptr;
@@ -149,7 +149,7 @@ class Replay {
       replay_allocation_map_valid((char*)alloc_ptr, alloc_size);
     }
 
-    void replay_map_remove( void )
+    void replay_map_remove( )
     {
       void* alloc_ptr;
 

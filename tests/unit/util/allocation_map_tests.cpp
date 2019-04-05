@@ -27,7 +27,7 @@ class AllocationMapTest : public ::testing::Test {
         size(15*sizeof(double)),
         record(new umpire::util::AllocationRecord{data, size, nullptr}) {}
 
-    virtual ~AllocationMapTest() {
+    ~AllocationMapTest() override {
       delete[] data;
     }
 
@@ -124,7 +124,7 @@ TEST_F(AllocationMapTest, RemoveAndUse)
 
 TEST_F(AllocationMapTest, RegisterMultiple)
 {
-  umpire::util::AllocationRecord* next_record =
+  auto* next_record =
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
   ASSERT_NO_THROW(
@@ -135,7 +135,7 @@ TEST_F(AllocationMapTest, RegisterMultiple)
 
 TEST_F(AllocationMapTest, FindMultiple)
 {
-  umpire::util::AllocationRecord* next_record =
+  auto* next_record =
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
   EXPECT_NO_THROW({
@@ -158,11 +158,11 @@ TEST_F(AllocationMapTest, FindMultiple)
 
 TEST_F(AllocationMapTest, Print)
 {
-  umpire::util::AllocationRecord* next_record =
+  auto* next_record =
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
   auto extra_data = new double[10];
-  umpire::util::AllocationRecord* extra_record =
+  auto* extra_record =
     new umpire::util::AllocationRecord{extra_data, 10, nullptr};
 
   map.insert(data, record);

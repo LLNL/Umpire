@@ -29,7 +29,7 @@ namespace umpire {
 template<typename T>
 class TypedAllocator {
   public:
-  typedef T value_type;
+  using value_type = T;
 
   /*!
    *

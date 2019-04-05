@@ -27,8 +27,8 @@ namespace resource {
 class HostResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name) noexcept;
-  resource::MemoryResource* create(const std::string& name, int id);
+  bool isValidMemoryResourceFor(const std::string& name) noexcept override;
+  resource::MemoryResource* create(const std::string& name, int id) override;
 };
 
 } // end of namespace resource

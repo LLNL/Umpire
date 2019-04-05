@@ -31,7 +31,7 @@ int main(int, char**) {
 
   for (auto& destination : destinations) {
     auto allocator = rm.getAllocator(destination);
-    double* data = static_cast<double*>(
+    auto* data = static_cast<double*>(
         allocator.allocate(SIZE*sizeof(double)));
 
     std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

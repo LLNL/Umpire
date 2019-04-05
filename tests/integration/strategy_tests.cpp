@@ -323,7 +323,7 @@ TEST(ThreadSafeAllocator, Host)
   {
     const size_t size = 1024*omp_get_thread_num();
 
-    double* thread_data = static_cast<double*>(
+    auto* thread_data = static_cast<double*>(
      allocator.allocate(size*sizeof(double)));
 
     allocator.deallocate(thread_data);

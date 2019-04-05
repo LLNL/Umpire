@@ -34,7 +34,7 @@ void allocate_and_deallocate_pool(
                                                     initial_size, /* default = 512Mb*/
                                                     min_block_size /* default = 1Mb */);
 
-  double* data = static_cast<double*>(
+  auto* data = static_cast<double*>(
       pooled_allocator.allocate(SIZE*sizeof(double)));
 
   std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "

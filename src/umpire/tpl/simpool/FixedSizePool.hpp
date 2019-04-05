@@ -5,7 +5,7 @@
 #define  _XOPEN_SOURCE_EXTENDED 1
 #include <strings.h>
 #include <iostream>
-#include <stdio.h>
+#include <cstdio>
 #include "StdAllocator.hpp"
 
 template<class T, class MA, class IA = StdAllocator, int NP=(1<<6)>
@@ -24,10 +24,10 @@ protected:
   const std::size_t numPerPool;
   const std::size_t totalPoolSize;
 
-  std::size_t numBlocks;
+  std::size_t numBlocks{0};
 
   void newPool(struct Pool **pnew) {
-    struct Pool *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
+    auto *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
     p->numAvail = numPerPool;
     p->next = NULL;
 
@@ -65,7 +65,7 @@ public:
       totalPoolSize(sizeof(struct Pool) +
 		    numPerPool * sizeof(T) +
                     NP * sizeof(unsigned int)),
-      numBlocks(0)
+      
   { newPool(&pool); }
 
   ~FixedSizePool() {

@@ -40,7 +40,7 @@ std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( 
     };
   }
 
-  float f = (float)((float)percentage / (float)100.0);
+  auto f = (float)((float)percentage / (float)100.0);
 
   return [=] (const strategy::DynamicPool& pool) {
       const long threshold = f * pool.getActualSize();
