@@ -37,6 +37,8 @@ and CUDA
 
 - GitHub action to run Clang static analysis.
 
+- GitHub action to run clang-tidy "modernize" checks.
+
 ### Changed
 
 - Umpire now builds as a single library, libumpire.a or libumpire.so, rather
