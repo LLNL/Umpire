@@ -38,7 +38,7 @@
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
 #include "umpire/op/RocmCopyOperation.hpp"
 #include "umpire/op/RocmMemsetOperation.hpp"
 #endif
@@ -146,7 +146,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
   registerOperation(
       "COPY",
       std::make_pair(Platform::rocm, Platform::cpu),

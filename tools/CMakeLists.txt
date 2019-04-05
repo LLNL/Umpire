@@ -23,3 +23,5 @@ blt_add_executable(
   SOURCES replay_allocation_map.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
+
+install(FILES plot_allocations DESTINATION bin)

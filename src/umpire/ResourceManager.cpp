@@ -33,7 +33,7 @@
 #include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
 #include "umpire/resource/RocmDeviceResourceFactory.hpp"
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
@@ -94,7 +94,7 @@ ResourceManager::ResourceManager() :
     new resource::CudaConstantMemoryResourceFactory());
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
   registry.registerMemoryResource(
     new resource::RocmDeviceResourceFactory());
 
@@ -192,7 +192,7 @@ ResourceManager::getAllocationStrategy(const std::string& name)
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: " 
+    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: "
         << getAllocatorInformation());
   }
 
@@ -327,7 +327,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   auto src_alloc_record = m_allocations.find(src_ptr);
   std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->m_ptr);
   std::size_t src_size = src_alloc_record->m_size - src_offset;
-  
+
   auto dst_alloc_record = m_allocations.find(dst_ptr);
   std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->m_ptr);
   std::size_t dst_size = dst_alloc_record->m_size - dst_offset;
