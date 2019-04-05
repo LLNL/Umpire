@@ -28,11 +28,11 @@ cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DENABLE_CUDA=Off -D
 /run-clang-tidy.py -header-filter='.*' -checks='-*,modernize-use-using' -fix
 
 cd ../
-
+rm -rf build/
 
 git config --global user.name "github-actions[bot]"
 git config --global user.email "github-actions[bot]@users.noreply.github.com"
-git add .
-git commit -m "${GITHUB_ACTION}: lint fix"
+git add -u
+git commit -m "${GITHUB_ACTION}: fixing code"
 
 git push origin ${GITHUB_REF}
