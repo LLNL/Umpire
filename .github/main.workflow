@@ -14,4 +14,5 @@ action "Static Analysis" {
 
 action "Clang Tidy" {
   uses = "./.github/actions/clang-tidy"
+  secrets = ["GITHUB_TOKEN"]
 }
