@@ -1,10 +1,10 @@
-.. _move_between_numa::
+.. _move_between_numa:
 
-==============================
-Move memory between NUMA nodes
-==============================
+===================================
+Move Allocations Between NUMA Nodes
+===================================
 
- When using NUMA (cache coherent or non uniform memory access) systems, there
+When using NUMA (cache coherent or non uniform memory access) systems, there
 are different latencies to parts of the memory. From an application
 perspective, the memory looks the same, yet especially for high-performance
 computing it is advantageous to have finer control. `malloc()` attempts to
@@ -16,7 +16,7 @@ is the length or unit of address space loaded into a processor cache at once.
 
 A page range may be bound to a NUMA node using the
 :class:`umpire::strategy::NumaPolicy`. It can therefore also be moved between
-NUMA nodes using the :meth:`umpire::ResourceManager::move` with a different
+NUMA nodes using the :func:`umpire::ResourceManager::move` with a different
 allocator. The power of using such an abstraction is that the NUMA node can be
 associated with a device, in which case the memory is moved to, for example,
 GPU memory.

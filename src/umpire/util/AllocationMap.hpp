@@ -19,6 +19,8 @@
 
 #include <cstdint>
 #include <mutex>
+#include <iostream>
+#include <functional>
 
 template< typename JudyKey, typename JudyValue >
 class judyL2Array;
@@ -29,29 +31,25 @@ namespace util {
 class AllocationMap
 {
   public:
+    AllocationMap();
+    ~AllocationMap();
 
-  AllocationMap();
-  ~AllocationMap();
+    void insert(void* ptr, AllocationRecord* record);
 
-  void
-  insert(void* ptr, AllocationRecord* record);
+    AllocationRecord* remove(void* ptr);
 
-  AllocationRecord*
-  remove(void* ptr);
+    AllocationRecord* find(void* ptr) const;
 
-  AllocationRecord*
-  find(void* ptr) const;
+    bool contains(void* ptr);
 
-  bool
-  contains(void* ptr);
+    void reset();
 
-  void
-    reset();
+    void printAll(std::ostream& os = std::cout) const;
 
-  void
-    printAll() const;
+    void print(const std::function<bool (const AllocationRecord*)>&& predicate,
+               std::ostream& os = std::cout) const;
 
-  private:
+private:
     AllocationRecord* findRecord(void* ptr) const;
 
     judyL2Array<uintptr_t, uintptr_t>* m_records;

@@ -22,13 +22,13 @@
 
 class AllocationMapTest : public ::testing::Test {
   protected:
-    virtual void SetUp() {
-      data = new double[15];
-      size = 15*sizeof(double);
-      record = new umpire::util::AllocationRecord{data, size, nullptr};
-    }
+    AllocationMapTest()
+      : data(new double[15]),
+        size(15*sizeof(double)),
+        record(new umpire::util::AllocationRecord{data, size, nullptr}) {}
 
-    virtual void TearDown() {
+    virtual ~AllocationMapTest() {
+      delete[] data;
     }
 
     umpire::util::AllocationMap map;
@@ -124,7 +124,7 @@ TEST_F(AllocationMapTest, RemoveAndUse)
 
 TEST_F(AllocationMapTest, RegisterMultiple)
 {
-  umpire::util::AllocationRecord* next_record = 
+  umpire::util::AllocationRecord* next_record =
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
   ASSERT_NO_THROW(
@@ -135,7 +135,7 @@ TEST_F(AllocationMapTest, RegisterMultiple)
 
 TEST_F(AllocationMapTest, FindMultiple)
 {
-  umpire::util::AllocationRecord* next_record = 
+  umpire::util::AllocationRecord* next_record =
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
   EXPECT_NO_THROW({
@@ -156,9 +156,9 @@ TEST_F(AllocationMapTest, FindMultiple)
   ASSERT_EQ(actual_record, record);
 }
 
-TEST_F(AllocationMapTest, PrintAll)
+TEST_F(AllocationMapTest, Print)
 {
-  umpire::util::AllocationRecord* next_record = 
+  umpire::util::AllocationRecord* next_record =
     new umpire::util::AllocationRecord{data, 1, nullptr};
 
   auto extra_data = new double[10];
@@ -170,4 +170,8 @@ TEST_F(AllocationMapTest, PrintAll)
   map.insert(extra_data, extra_record);
 
   map.printAll();
+
+  map.print([this](const umpire::util::AllocationRecord* r) {
+    return r->m_ptr == data;
+  });
 }
