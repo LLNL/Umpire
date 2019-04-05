@@ -1,6 +1,6 @@
 workflow "New workflow" {
   on = "push"
-  resolves = ["Check CHANGELOG", "Static Analysis"]
+  resolves = ["Check CHANGELOG", "Static Analysis", "Clang Tidy"]
 }
 
 action "Check CHANGELOG" {
@@ -10,4 +10,8 @@ action "Check CHANGELOG" {
 
 action "Static Analysis" {
   uses = "./.github/actions/static-analysis"
+}
+
+action "Clang Tidy" {
+  uses = "./.github/actions/clang-tidy"
 }
