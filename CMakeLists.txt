@@ -77,11 +77,12 @@ if (NOT BLT_LOADED)
     set (BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/blt CACHE PATH "")
 
     if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
-      message(FATAL_ERROR "\
-      The BLT submodule is not present. \
-      If in git repository run the following two commands:\n \
-      git submodule init\n \
-      git submodule update")
+      message(FATAL_ERROR
+          "The BLT git submodule is not present. "
+          "Either run the following two commands in your git repository: \n"
+          "    git submodule init\n"
+          "    git submodule update\n"
+          "Or add -DBLT_SOURCE_DIR=/path/to/blt to your CMake command." )
     endif ()
   endif ()
 
