@@ -78,7 +78,7 @@ if (NOT BLT_LOADED)
 
     if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
       message(FATAL_ERROR
-          "BLT is not present. "
+          "The BLT git submodule is not present. "
           "Either run the following two commands in your git repository: \n"
           "    git submodule init\n"
           "    git submodule update\n"
