@@ -23,7 +23,7 @@
 class AllocationMapTest : public ::testing::Test {
   protected:
     virtual void SetUp() {
-      double* data = new double[15];
+      data = new double[15];
       size = 15*sizeof(double);
       record = new umpire::util::AllocationRecord{data, size, nullptr};
     }

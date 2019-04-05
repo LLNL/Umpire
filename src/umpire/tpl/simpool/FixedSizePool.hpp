@@ -40,9 +40,10 @@ protected:
   inline int findFirstSet(int i)
   {
 #if defined(_MSC_VER)
-      int bit;
-      _BitScanForward(&bit, i);
-      return bit
+      unsigned long bit;
+	  unsigned long i_l = static_cast<unsigned long>(i);
+      _BitScanForward(&bit, i_l);
+	  return static_cast<int>(bit);
 #else
       return ffs(i);
 #endif
