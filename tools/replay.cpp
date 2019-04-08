@@ -22,6 +22,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "InputParser.hpp"
 #include "umpire/config.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -102,8 +103,19 @@ class Replay {
     static void usage_and_exit( const std::string& errorMessage ) {
       std::cerr << errorMessage
       << std::endl
-      << "Usage: replay <replayfile.csv>"
-      << std::endl;
+      << "Usage: replay <options>\n"
+      << "Common Options:\n"
+      << "    -inputfile filename          CSV file created by Umpire library\n"
+      << "                                 with UMPIRE_REPLAY=\"On\"\n"
+      << "\n"
+      << "Testing Options:\n"
+      << "    -replay_ops_file filename    Generate an output file that\n"
+      << "                                 contains operational output of\n"
+      << "                                 the running the replay program\n"
+      << "\n"
+      << "Additional information may be found at:\n"
+      << "https://umpire.readthedocs.io/en/develop/tutorial/replay.html\n"
+      << "\n";
       exit (1);
     }
 
@@ -484,18 +496,19 @@ class Replay {
 
 int main(int ac, char** av)
 {
-  if ( ac < 2 || ac > 3 )
-    Replay::usage_and_exit( "Incorrect number of program arguments" );
+  umpire::tools::InputParser input(ac, av);
 
-  std::string infile(av[1]);
-  std::string outfile;
+  if (input.command_option_exists("-help"))
+    Replay::usage_and_exit( "" );
+
+  const std::string& input_file_name = input.get_command_option("-inputfile");
+
+  if (input_file_name.empty())
+    Replay::usage_and_exit( "Input file name not specified" );
+
+  const std::string& output_file_name = input.get_command_option("-replay_ops_file");
   
-  if (ac == 3)
-    outfile = av[2];
-  else 
-    outfile = "";
-
-  Replay replay(infile, outfile);
+  Replay replay(input_file_name, output_file_name);
 
   replay.run();
 

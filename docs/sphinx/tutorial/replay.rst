@@ -56,4 +56,4 @@ Loading this file with the ``replay`` program will replay this sequence of
 
 .. code-block:: bash
 
-   ./bin/replay ../tutorial/examples/tut_replay_log.csv
+   ./bin/replay -inputfile ../tutorial/examples/tut_replay_log.csv
