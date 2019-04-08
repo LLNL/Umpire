@@ -14,13 +14,13 @@
 ##############################################################################
 blt_add_executable(
   NAME replay
-  SOURCES InputParser.hpp replay.cpp
+  SOURCES replay.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
 
 blt_add_executable(
   NAME replay_allocation_map
-  SOURCES InputParser.hpp replay_allocation_map.cpp
+  SOURCES replay_allocation_map.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
 
