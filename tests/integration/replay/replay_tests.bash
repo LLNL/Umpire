@@ -31,7 +31,7 @@ fi
 #
 # Now replay from the activity captured in the replay_test1.csv file
 #
-$replayprogram -inputfile replay_test1.csv -replay_ops_file replay.out
+$replayprogram -i replay_test1.csv -t replay.out
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $replayprogram"
     exit 1

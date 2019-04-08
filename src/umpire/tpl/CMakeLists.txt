@@ -42,5 +42,6 @@ if (ENABLE_STATISTICS)
     LIBRARIES conduit)
 endif()
 
+add_subdirectory(cxxopts)
 add_subdirectory(simpool)
 add_subdirectory(judy)

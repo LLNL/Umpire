@@ -22,7 +22,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include "InputParser.hpp"
 #include "umpire/config.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -36,6 +35,7 @@
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/tpl/cxxopts/cxxopts/include/cxxopts.hpp"
 
 class CSVRow {
 public:
@@ -100,22 +100,7 @@ class Replay {
 
     }
 
-    static void usage_and_exit( const std::string& errorMessage ) {
-      std::cerr << errorMessage
-      << std::endl
-      << "Usage: replay <options>\n"
-      << "Common Options:\n"
-      << "    -inputfile filename          CSV file created by Umpire library\n"
-      << "                                 with UMPIRE_REPLAY=\"On\"\n"
-      << "\n"
-      << "Testing Options:\n"
-      << "    -replay_ops_file filename    Generate an output file that\n"
-      << "                                 contains operational output of\n"
-      << "                                 the running the replay program\n"
-      << "\n"
-      << "Additional information may be found at:\n"
-      << "https://umpire.readthedocs.io/en/develop/tutorial/replay.html\n"
-      << "\n";
+    static void usage_and_exit( const std::string& /* errorMessage */ ) {
       exit (1);
     }
 
@@ -494,19 +479,56 @@ class Replay {
     }
 };
 
-int main(int ac, char** av)
+static cxxopts::ParseResult parse(int argc, char* argv[])
 {
-  umpire::tools::InputParser input(ac, av);
+  try
+  {
+    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
 
-  if (input.command_option_exists("-help"))
-    Replay::usage_and_exit( "" );
+    options
+      .add_options()
+      (  "h, help", "Print help")
+      (  "i, infile"
+       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
+       , cxxopts::value<std::string>(), "FILE"
+      )
+      (  "t, testfile"
+       , "Test file created used for testing replay only"
+       , cxxopts::value<std::string>(), "FILE"
+      )
+    ;
 
-  const std::string& input_file_name = input.get_command_option("-inputfile");
+    auto result = options.parse(argc, argv);
 
-  if (input_file_name.empty())
-    Replay::usage_and_exit( "Input file name not specified" );
+    if (result.count("help"))
+    {
+      std::cout << options.help({""}) << std::endl;
+      exit(0);
+    }
 
-  const std::string& output_file_name = input.get_command_option("-replay_ops_file");
+    return result;
+  } catch (const cxxopts::OptionException& e)
+  {
+    std::cout << "error parsing options: " << e.what() << std::endl;
+    exit(1);
+  }
+}
+
+
+int main(int ac, char* av[])
+{
+  auto result = parse(ac, av);
+
+  if ( ! result.count("infile") ) {
+    std::cerr << "No input file specified\n";
+    exit(1);
+  }
+
+  std::string input_file_name = result["infile"].as<std::string>();
+
+  std::string output_file_name;
+  if ( result.count("testfile") )
+    output_file_name = result["testfile"].as<std::string>();
   
   Replay replay(input_file_name, output_file_name);
 
