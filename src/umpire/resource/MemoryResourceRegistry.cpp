@@ -49,7 +49,7 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
   for (auto allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
       auto a = allocator_factory->create(name, id);
-      UMPIRE_REPLAY("makeMemoryResource," << name << "," << a << "\n");
+      UMPIRE_REPLAY("makeMemoryResource," << name << "," << a);
       return a;
     }
   }
