@@ -92,7 +92,8 @@ void* MixedPoolImpl<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
       size_t size = alloc_size;
       while (size) { size >>= 1; ++bit; }
     }
-    // Find index such that alloc_size is equal to size[index] (or, bytes < size[index] and bytes > size[index-1] if that exists)
+    // Find index such that alloc_size is equal to size[index] (or,
+    // bytes < size[index] and bytes > size[index-1] if that exists)
     int index = 0;
     size_t nearest_bytes = 1 << FirstFixed;
     while (alloc_size > nearest_bytes) { index++; nearest_bytes <<= 1; }
