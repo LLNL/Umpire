@@ -67,7 +67,7 @@ FixedPool<T, NP, IA>::FixedPool(
   AllocationStrategy(name, id),
   m_pool(nullptr),
   m_num_per_pool(NP * sizeof(unsigned int) * 8),
-  m_total_pool_size(sizeof(struct Pool) + m_num_per_pool * sizeof(T) + NP * sizeof(unsigned int)),
+  m_overhead(sizeof(struct Pool) + NP * sizeof(unsigned int)),
   m_num_blocks(0),
   m_highwatermark(0),
   m_current_size(0),
@@ -154,7 +154,7 @@ FixedPool<T, NP, IA>::getCurrentSize() const noexcept {
 template <typename T, int NP, typename IA>
 long
 FixedPool<T, NP, IA>::getActualSize() const noexcept {
-    return m_total_pool_size;
+    return m_overhead + m_current_size;
 }
 
 template <typename T, int NP, typename IA>

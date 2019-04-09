@@ -75,7 +75,7 @@ class FixedPool
 
     struct Pool *m_pool;
     size_t m_num_per_pool;
-    size_t m_total_pool_size;
+    size_t m_overhead;
 
     size_t m_num_blocks;
 
