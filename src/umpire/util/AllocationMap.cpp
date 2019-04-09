@@ -21,14 +21,72 @@
 #include <sstream>
 
 namespace {
-  using AddressPair = judyL2Array<uintptr_t, uintptr_t>::cpair;
-  using EntryVector = judyL2Array<uintptr_t, uintptr_t>::vector;
+  using Map = judyL2Array<uintptr_t, uintptr_t>;
+  using AddressPair = Map::cpair;
+  using EntryVector = Map::vector;
   using Entry = umpire::util::AllocationRecord*;
 }
 
 namespace umpire {
 namespace util {
 
+struct AllocationMap::ConstIterator::JudyL2ArrayCounter {
+  Map* map;
+  uintptr_t key;
+  Map::cvector::const_iterator it;
+};
+
+const AllocationRecord& AllocationMap::ConstIterator::operator*() {
+  return *reinterpret_cast<Entry>(*data->it);
+}
+
+const AllocationRecord* AllocationMap::ConstIterator::operator->() {
+  return reinterpret_cast<Entry>(*data->it);
+}
+
+
+AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++() {
+  if (!end) {
+    ++(data->it);
+
+    // NOTE: Need find() here rather than using the last lookup
+    // because judyL2Array is stateful
+
+    const auto* vec = data->map->find(data->key);
+    if (data->it == vec->end()) {
+      // Reached end of a vector
+      const auto& pair = data->map->next();
+
+      // Update key
+      data->key = pair.key;
+
+      if (data->map->success()) {
+        data->it = pair.value->begin();
+      }
+      else {
+        end = true;
+        data->it = data->map->begin().value->begin();
+      }
+    }
+  }
+
+  return *this;
+}
+
+bool AllocationMap::ConstIterator::operator==(const AllocationMap::ConstIterator& other)
+{
+  return (data->map == other.data->map) && (data->it == other.data->it) && (end == other.end);
+}
+
+bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator& other)
+{
+  return !(*this == other);
+}
+
+AllocationMap::ConstIterator::ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_) :
+  end(end_), data(new JudyL2ArrayCounter{map_,
+                                         map_->begin().key,
+                                         map_->begin().value->begin()}) {}
 
 AllocationMap::AllocationMap() :
   m_records(new judyL2Array<uintptr_t, uintptr_t>()),
@@ -152,6 +210,15 @@ AllocationMap::find(void* ptr) const
   }
 }
 
+AllocationMap::ConstIterator AllocationMap::begin() const {
+  return ConstIterator(m_records, false);
+}
+
+AllocationMap::ConstIterator AllocationMap::end() const {
+  return ConstIterator(m_records, true);
+}
+
+
 bool
 AllocationMap::contains(void* ptr)
 {
@@ -164,7 +231,7 @@ void
 AllocationMap::print(const std::function<bool (const AllocationRecord*)>&& pred,
                      std::ostream& os) const
 {
-  for (auto record = m_records->begin(); m_records->success(); record=m_records->next()){
+  for (auto record = m_records->begin(); m_records->success(); record = m_records->next()) {
     auto addr = record.key;
     auto vec = *record.value;
 

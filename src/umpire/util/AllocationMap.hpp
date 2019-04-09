@@ -31,6 +31,22 @@ namespace util {
 class AllocationMap
 {
   public:
+
+    class ConstIterator {
+    public:
+      const AllocationRecord& operator*();
+      const AllocationRecord* operator->();
+      ConstIterator& operator++();
+      bool operator==(const ConstIterator& other);
+      bool operator!=(const ConstIterator& other);
+    private:
+      struct JudyL2ArrayCounter;
+      bool end;
+      JudyL2ArrayCounter* data;
+      ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_ = false);
+      friend class AllocationMap;
+    };
+
     AllocationMap();
     ~AllocationMap();
 
@@ -39,6 +55,10 @@ class AllocationMap
     AllocationRecord* remove(void* ptr);
 
     AllocationRecord* find(void* ptr) const;
+
+    ConstIterator begin() const;
+
+    ConstIterator end() const;
 
     bool contains(void* ptr);
 
@@ -52,7 +72,8 @@ class AllocationMap
 private:
     AllocationRecord* findRecord(void* ptr) const;
 
-    judyL2Array<uintptr_t, uintptr_t>* m_records;
+    // TODO: Make const version of judyL2Array begin/end
+    mutable judyL2Array<uintptr_t, uintptr_t>* m_records;
 
     std::mutex* m_mutex;
 };
