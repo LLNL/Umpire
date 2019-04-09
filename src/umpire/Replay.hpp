@@ -66,7 +66,7 @@ private:
 {                                                                            \
   if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
     std::ostringstream local_msg;                                            \
-    local_msg  << "REPLAY," << msg << "\n";                                  \
+    local_msg  << "REPLAY," << msg << std::endl;                             \
     umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());  \
   }                                                                          \
 }

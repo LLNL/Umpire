@@ -40,7 +40,7 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-    UMPIRE_REPLAY("makeAllocator_pre,"
+    UMPIRE_REPLAY("makeAllocator_attempt,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name
@@ -69,7 +69,7 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
-    UMPIRE_REPLAY("makeAllocator_post,"
+    UMPIRE_REPLAY("makeAllocator_success,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name

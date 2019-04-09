@@ -37,11 +37,11 @@ Allocator::allocate(size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY("allocate_pre" << "," << bytes << "," << m_allocator);
+  UMPIRE_REPLAY("allocate_attempt" << "," << bytes << "," << m_allocator);
 
   ret = m_allocator->allocate(bytes);
 
-  UMPIRE_REPLAY("allocate_post" << "," << bytes << "," << m_allocator << "," << ret);
+  UMPIRE_REPLAY("allocate_success" << "," << bytes << "," << m_allocator << "," << ret);
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
   return ret;

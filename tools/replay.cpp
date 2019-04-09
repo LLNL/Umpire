@@ -113,23 +113,23 @@ class Replay {
         if ( m_row[0] != "REPLAY" )
           continue;
 
-        if ( m_row[1] == "makeAllocator_pre" ) {
+        if ( m_row[1] == "makeAllocator_attempt" ) {
           replay_out() << "makeAllocator ";
-          replay_makeAllocator_pre();
+          replay_makeAllocator_attempt();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == "makeAllocator_post" ) {
-          replay_makeAllocator_post();
+        else if ( m_row[1] == "makeAllocator_success" ) {
+          replay_makeAllocator_success();
         }
         else if ( m_row[1] == "makeMemoryResource" ) {
           replay_makeMemoryResource();
         }
-        else if ( m_row[1] == "allocate_pre" ) {
-          replay_allocate_pre();
+        else if ( m_row[1] == "allocate_attempt" ) {
+          replay_allocate_attempt();
         }
-        else if ( m_row[1] == "allocate_post" ) {
+        else if ( m_row[1] == "allocate_success" ) {
           replay_out() << "allocate ";
-          replay_allocate_post();
+          replay_allocate_success();
           replay_out() << "\n";
         }
         else if ( m_row[1] == "deallocate" ) {
@@ -248,7 +248,7 @@ class Replay {
       alloc.release();
     }
 
-    void replay_allocate_pre( void )
+    void replay_allocate_attempt( void )
     {
       void* alloc_obj_ref;
       std::size_t alloc_size;
@@ -269,7 +269,7 @@ class Replay {
       m_alloc_ptr = alloc.allocate(alloc_size);
     }
 
-    void replay_allocate_post( void )
+    void replay_allocate_success( void )
     {
       void* alloc_obj_ref;
       std::size_t alloc_size;
@@ -341,7 +341,7 @@ class Replay {
       m_allocators[alloc_obj_ref] = name;
     }
 
-    void replay_makeAllocator_pre( void )
+    void replay_makeAllocator_attempt( void )
     {
       bool introspection = ( m_row[3] == "true" );
       const std::string& name = m_row[4];
@@ -500,7 +500,7 @@ class Replay {
       }
     }
 
-    void replay_makeAllocator_post( void )
+    void replay_makeAllocator_success( void )
     {
       const std::string& name = m_row[4];
       void* alloc_obj_ref;
