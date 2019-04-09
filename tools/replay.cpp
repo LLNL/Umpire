@@ -35,7 +35,7 @@
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
-#include "umpire/tpl/cxxopts/cxxopts/include/cxxopts.hpp"
+#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
 class CSVRow {
 public:

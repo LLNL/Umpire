@@ -5,5 +5,5 @@
 	path = src/umpire/tpl/conduit
 	url = https://github.com/LLNL/conduit.git
 [submodule "src/umpire/tpl/cxxopts/cxxopts"]
-	path = src/umpire/tpl/cxxopts/cxxopts
+	path = src/umpire/tpl/cxxopts
 	url = https://github.com/jarro2783/cxxopts.git
