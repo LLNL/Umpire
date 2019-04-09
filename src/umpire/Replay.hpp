@@ -36,6 +36,7 @@ public:
   void logMessage( const std::string& message );
   static Replay* getReplayLogger();
   bool replayLoggingEnabled();
+  uint64_t replayPid() { return m_replayPid; }
 
   static std::string printReplayAllocator( void ) {
     return std::string("");
@@ -56,6 +57,7 @@ private:
   ~Replay();
 
   bool replayEnabled;
+  uint64_t m_replayPid;
   static Replay* s_Replay;
 };
 
@@ -66,7 +68,11 @@ private:
 {                                                                            \
   if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
     std::ostringstream local_msg;                                            \
-    local_msg  << "REPLAY," << msg << std::endl;                             \
+    local_msg                                                                \
+      << "REPLAY,"                                                           \
+      << umpire::replay::Replay::getReplayLogger()->replayPid() << ","       \
+      << msg                                                                 \
+      << std::endl;                                                          \
     umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());  \
   }                                                                          \
 }

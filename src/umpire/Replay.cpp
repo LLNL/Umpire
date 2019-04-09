@@ -16,6 +16,7 @@
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
+#include <unistd.h>   // getpid()
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -29,7 +30,7 @@ namespace replay {
 static const char* env_name = "UMPIRE_REPLAY";
 Replay* Replay::s_Replay = nullptr;
 
-Replay::Replay(bool enable_replay) : replayEnabled(enable_replay)
+Replay::Replay(bool enable_replay) : replayEnabled(enable_replay), m_replayPid(getpid())
 {
 }
 
