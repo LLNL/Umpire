@@ -492,8 +492,11 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
        , "Input file created by Umpire library with UMPIRE_REPLAY=On"
        , cxxopts::value<std::string>(), "FILE"
       )
+    ;
+
+    options.add_options("Group")
       (  "t, testfile"
-       , "Test file created used for testing replay only"
+       , "Generate a file to be used for unit testing."
        , cxxopts::value<std::string>(), "FILE"
       )
     ;
