@@ -35,6 +35,7 @@
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
 class CSVRow {
 public:
@@ -99,11 +100,7 @@ class Replay {
 
     }
 
-    static void usage_and_exit( const std::string& errorMessage ) {
-      std::cerr << errorMessage
-      << std::endl
-      << "Usage: replay <replayfile.csv>"
-      << std::endl;
+    static void usage_and_exit( const std::string& /* errorMessage */ ) {
       exit (1);
     }
 
@@ -511,20 +508,66 @@ class Replay {
     }
 };
 
-int main(int ac, char** av)
+static cxxopts::ParseResult parse(int argc, char* argv[])
 {
-  if ( ac < 2 || ac > 3 )
-    Replay::usage_and_exit( "Incorrect number of program arguments" );
+  try
+  {
+    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
 
-  std::string infile(av[1]);
-  std::string outfile;
+    options
+      .add_options()
+      (  "h, help", "Print help")
+      (  "i, infile"
+       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
+       , cxxopts::value<std::string>(), "FILE"
+      )
+    ;
+
+    options.add_options("HiddenGroup")
+      (  "t, testfile"
+       , "Generate a file to be used for unit testing."
+       , cxxopts::value<std::string>(), "FILE"
+      )
+    ;
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help"))
+    {
+      // You can output our default, unnamed group and our HiddenGroup 
+      // of help with the following line:
+      //
+      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
+      //
+      std::cout << options.help({""}) << std::endl;
+      exit(0);
+    }
+
+    return result;
+  } catch (const cxxopts::OptionException& e)
+  {
+    std::cout << "error parsing options: " << e.what() << std::endl;
+    exit(1);
+  }
+}
+
+
+int main(int ac, char* av[])
+{
+  auto result = parse(ac, av);
+
+  if ( ! result.count("infile") ) {
+    std::cerr << "No input file specified\n";
+    exit(1);
+  }
+
+  std::string input_file_name = result["infile"].as<std::string>();
+
+  std::string output_file_name;
+  if ( result.count("testfile") )
+    output_file_name = result["testfile"].as<std::string>();
   
-  if (ac == 3)
-    outfile = av[2];
-  else 
-    outfile = "";
-
-  Replay replay(infile, outfile);
+  Replay replay(input_file_name, output_file_name);
 
   replay.run();
 

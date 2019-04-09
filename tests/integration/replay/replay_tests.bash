@@ -31,7 +31,7 @@ fi
 #
 # Now replay from the activity captured in the replay_test1.csv file
 #
-$replayprogram replay_test1.csv replay.out
+$replayprogram -i replay_test1.csv -t replay.out
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $replayprogram"
     exit 1
@@ -46,4 +46,6 @@ if [ $? -ne 0 ]; then
     echo "Diff failed"
     exit 1
 fi
+
+/bin/rm -f replay.out replay_test1.csv
 exit 0
