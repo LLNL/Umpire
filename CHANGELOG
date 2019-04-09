@@ -37,6 +37,8 @@ and CUDA
 
 - GitHub action to run Clang static analysis.
 
+- Replay now includes the process ID of the logging process to help
+distinguish processes in an multi-process run.
 ### Changed
 
 - Umpire now builds as a single library, libumpire.a or libumpire.so, rather
