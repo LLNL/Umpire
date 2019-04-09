@@ -37,6 +37,55 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
+static cxxopts::ParseResult parse(int argc, char* argv[])
+{
+  try
+  {
+    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
+
+    options
+      .add_options()
+      (  "h, help"
+       , "Print help"
+      )
+      (  "i, infile"
+       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
+       , cxxopts::value<std::string>(), "FILE" 
+      )
+      (  "u, uid"
+       , "The format of a REPLAY line begins with REPLAY,UID,...  This instructs replay to only replay items for the specified UID."
+       , cxxopts::value<uint64_t>(), "UID"
+      )
+    ;
+
+    options.add_options("HiddenGroup")
+      (  "t, testfile"
+       , "Generate a file to be used for unit testing."
+       , cxxopts::value<std::string>(), "FILE"
+      )
+    ;
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help"))
+    {
+      // You can output our default, unnamed group and our HiddenGroup 
+      // of help with the following line:
+      //
+      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
+      //
+      std::cout << options.help({""}) << std::endl;
+      exit(0);
+    }
+
+    return result;
+  } catch (const cxxopts::OptionException& e)
+  {
+    std::cout << "error parsing options: " << e.what() << std::endl;
+    exit(1);
+  }
+}
+
 class CSVRow {
 public:
   std::string const& operator[](std::size_t index) const { return m_data[index]; }
@@ -78,8 +127,10 @@ static std::ostream null_stream(&null_buffer);
 
 class Replay {
   public:
-    Replay( std::string in_file_name, std::string out_file_name ):
+    Replay( cxxopts::ParseResult options, std::string in_file_name, std::string out_file_name ):
         m_sequence_id(0)
+      , m_replay_uid(0)
+      , m_options(options)
       , m_input_file(in_file_name)
       , m_rm(umpire::ResourceManager::getInstance())
     {
@@ -98,6 +149,10 @@ class Replay {
         << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH;
       m_umpire_version_string = version_stringstream.str();
 
+      if ( m_options.count("uid") ) {
+        m_replay_uid = m_options["uid"].as<uint64_t>();
+        m_uids[m_replay_uid] = true;
+      }
     }
 
     static void usage_and_exit( const std::string& /* errorMessage */ ) {
@@ -110,45 +165,65 @@ class Replay {
         if ( m_row[0] != "REPLAY" )
           continue;
 
-        if ( m_row[1] == "makeAllocator_attempt" ) {
+        uint64_t uid;
+
+        get_from_string(m_row[1], uid);
+
+        if ( ! m_replay_uid ) {
+          m_replay_uid = uid;
+          m_uids[uid] = true;
+        }
+
+        if ( m_replay_uid != uid ) {
+          if ( m_uids.find(uid) == m_uids.end()) {
+            //
+            // Only note a message once per uid
+            //
+            std::cerr << "Skipping Replay for PID " << uid << std::endl;
+            m_uids[uid] = true;
+          }
+          continue;
+        }
+
+        if ( m_row[2] == "makeAllocator_attempt" ) {
           replay_out() << "makeAllocator ";
           replay_makeAllocator_attempt();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == "makeAllocator_success" ) {
+        else if ( m_row[2] == "makeAllocator_success" ) {
           replay_makeAllocator_success();
         }
-        else if ( m_row[1] == "makeMemoryResource" ) {
+        else if ( m_row[2] == "makeMemoryResource" ) {
           replay_makeMemoryResource();
         }
-        else if ( m_row[1] == "allocate_attempt" ) {
+        else if ( m_row[2] == "allocate_attempt" ) {
           replay_allocate_attempt();
         }
-        else if ( m_row[1] == "allocate_success" ) {
+        else if ( m_row[2] == "allocate_success" ) {
           replay_out() << "allocate ";
           replay_allocate_success();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == "deallocate" ) {
-          replay_out() << m_row[1] << " ";
+        else if ( m_row[2] == "deallocate" ) {
+          replay_out() << m_row[2] << " ";
           replay_deallocate();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == "coalesce" ) {
-          replay_out() << m_row[1] << " ";
+        else if ( m_row[2] == "coalesce" ) {
+          replay_out() << m_row[2] << " ";
           replay_coalesce();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == "release" ) {
-          replay_out() << m_row[1] << " ";
+        else if ( m_row[2] == "release" ) {
+          replay_out() << m_row[2] << " ";
           replay_release();
           replay_out() << "\n";
         }
-        else if ( m_row[1] == m_umpire_version_string) {
+        else if ( m_row[2] == m_umpire_version_string) {
         }
         else {
-          replay_out() << m_row[1] << " ";
-          std::cerr << "Unknown Replay (" << m_row[1] << ")\n";
+          replay_out() << m_row[2] << " ";
+          std::cerr << "Unknown Replay (" << m_row[2] << ")\n";
           replay_out() << "\n";
           exit (1);
         }
@@ -157,9 +232,12 @@ class Replay {
 
   private:
     uint64_t m_sequence_id;
+    uint64_t m_replay_uid;
+    cxxopts::ParseResult m_options;
     std::ifstream m_input_file;
     umpire::ResourceManager& m_rm;
     std::ofstream m_replayout;
+    std::unordered_map<uint64_t, bool> m_uids;  // key(uid), val(always true)
     std::unordered_map<void*, std::string> m_allocators;  // key(alloc_obj), val(alloc name)
     std::unordered_map<void*, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::unordered_map<void*, uint64_t> m_allocation_seq;    // key(alloc_ptr), val(m_sequence_id)
@@ -332,25 +410,25 @@ class Replay {
     {
       void* alloc_obj_ref;
 
-      const std::string& name = m_row[2];
-      get_from_string(m_row[3], alloc_obj_ref);
+      const std::string& name = m_row[3];
+      get_from_string(m_row[4], alloc_obj_ref);
 
       m_allocators[alloc_obj_ref] = name;
     }
 
     void replay_makeAllocator_attempt( void )
     {
-      bool introspection = ( m_row[3] == "true" );
-      const std::string& name = m_row[4];
+      bool introspection = ( m_row[4] == "true" );
+      const std::string& name = m_row[5];
 
-      replay_out() << "<" << m_row[2] << ">" ;
+      replay_out() << "<" << m_row[3] << ">" ;
 
-      if ( m_row[2] == "umpire::strategy::AllocationAdvisor" ) {
-        const std::string& allocName = m_row[5];
-        const std::string& adviceOperation = m_row[6];
+      if ( m_row[3] == "umpire::strategy::AllocationAdvisor" ) {
+        const std::string& allocName = m_row[6];
+        const std::string& adviceOperation = m_row[7];
         // Now grab the optional fields
-        if (m_row.size() >= 8) {
-          const std::string& accessingAllocatorName = m_row[7];
+        if (m_row.size() >= 9) {
+          const std::string& accessingAllocatorName = m_row[8];
 
           replay_out() 
             << "(" << name
@@ -374,15 +452,15 @@ class Replay {
           else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(name, m_rm.getAllocator(allocName), adviceOperation);
         }
       }
-      else if ( m_row[2] == "umpire::strategy::DynamicPool" ) {
-        const std::string& allocName = m_row[5];
-        std::size_t min_initial_alloc_size; // Optional: m_row[6]
-        std::size_t min_alloc_size;         // Optional: m_row[7]
+      else if ( m_row[3] == "umpire::strategy::DynamicPool" ) {
+        const std::string& allocName = m_row[6];
+        std::size_t min_initial_alloc_size; // Optional: m_row[7]
+        std::size_t min_alloc_size;         // Optional: m_row[8]
 
         // Now grab the optional fields
-        if (m_row.size() >= 8) {
-          get_from_string(m_row[6], min_initial_alloc_size);
-          get_from_string(m_row[7], min_alloc_size);
+        if (m_row.size() >= 9) {
+          get_from_string(m_row[7], min_initial_alloc_size);
+          get_from_string(m_row[8], min_alloc_size);
 
           replay_out() 
             << "(" << name
@@ -394,8 +472,8 @@ class Replay {
           if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
           else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
         }
-        else if ( m_row.size() >= 7 ) {
-          get_from_string(m_row[6], min_initial_alloc_size);
+        else if ( m_row.size() >= 8 ) {
+          get_from_string(m_row[7], min_initial_alloc_size);
 
           replay_out() 
             << "(" << name
@@ -417,11 +495,11 @@ class Replay {
           else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName));
         }
       }
-      else if ( m_row[2] == "umpire::strategy::MonotonicAllocationStrategy" ) {
+      else if ( m_row[3] == "umpire::strategy::MonotonicAllocationStrategy" ) {
         std::size_t capacity;
-        get_from_string(m_row[5], capacity);
+        get_from_string(m_row[6], capacity);
 
-        const std::string& allocName = m_row[6];
+        const std::string& allocName = m_row[7];
 
         replay_out() 
           << "(" << name
@@ -432,10 +510,10 @@ class Replay {
         if ( introspection )  m_rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>(name, capacity, m_rm.getAllocator(allocName));
         else                  m_rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(name, capacity, m_rm.getAllocator(allocName));
       }
-      else if ( m_row[2] == "umpire::strategy::SizeLimiter" ) {
-        const std::string& allocName = m_row[5];
+      else if ( m_row[3] == "umpire::strategy::SizeLimiter" ) {
+        const std::string& allocName = m_row[6];
         std::size_t size_limit;
-        get_from_string(m_row[6], size_limit);
+        get_from_string(m_row[7], size_limit);
 
         replay_out() 
           << "(" << name
@@ -446,10 +524,10 @@ class Replay {
         if ( introspection )  m_rm.makeAllocator<umpire::strategy::SizeLimiter, true>(name, m_rm.getAllocator(allocName), size_limit);
         else                  m_rm.makeAllocator<umpire::strategy::SizeLimiter, false>(name, m_rm.getAllocator(allocName), size_limit);
       }
-      else if ( m_row[2] == "umpire::strategy::SlotPool" ) {
-        const std::string& allocName = m_row[6];
+      else if ( m_row[3] == "umpire::strategy::SlotPool" ) {
+        const std::string& allocName = m_row[7];
         std::size_t slots;
-        get_from_string(m_row[5], slots);
+        get_from_string(m_row[6], slots);
 
         replay_out() 
           << "(" << name
@@ -460,8 +538,8 @@ class Replay {
         if ( introspection )  m_rm.makeAllocator<umpire::strategy::SlotPool, true>(name, slots, m_rm.getAllocator(allocName));
         else                  m_rm.makeAllocator<umpire::strategy::SlotPool, false>(name, slots, m_rm.getAllocator(allocName));
       }
-      else if ( m_row[2] == "umpire::strategy::ThreadSafeAllocator" ) {
-        const std::string& allocName = m_row[5];
+      else if ( m_row[3] == "umpire::strategy::ThreadSafeAllocator" ) {
+        const std::string& allocName = m_row[6];
 
         replay_out() 
           << "(" << name
@@ -471,7 +549,7 @@ class Replay {
         if ( introspection )  m_rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, true>(name, m_rm.getAllocator(allocName));
         else                  m_rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, false>(name, m_rm.getAllocator(allocName));
       }
-      else if ( m_row[2] == "umpire::strategy::FixedPool" ) {
+      else if ( m_row[3] == "umpire::strategy::FixedPool" ) {
         //
         // Need to skip FixedPool for now since I haven't figured out how to
         // dynamically parse/creat the data type parameter
@@ -484,7 +562,7 @@ class Replay {
         // This is because replay does its work at runtime and the FixedPool
         // is a template where sizes are generated at compile time.
         //
-        const std::string& allocName = m_row[5];
+        const std::string& allocName = m_row[6];
         std::size_t PoolSize = hmm...
 
         if ( introspection )  m_rm.makeAllocator<umpire::strategy::FixedPool<PoolSize>, true>(name, m_rm.getAllocator(allocName));
@@ -492,14 +570,14 @@ class Replay {
 #endif
       }
       else {
-        std::cerr << "Unknown class (" << m_row[2] << "), skipping.\n";
+        std::cerr << "Unknown class (" << m_row[3] << "), skipping.\n";
         return;
       }
     }
 
     void replay_makeAllocator_success( void )
     {
-      const std::string& name = m_row[4];
+      const std::string& name = m_row[5];
       void* alloc_obj_ref;
 
       get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
@@ -507,49 +585,6 @@ class Replay {
       m_allocators[alloc_obj_ref] = name;
     }
 };
-
-static cxxopts::ParseResult parse(int argc, char* argv[])
-{
-  try
-  {
-    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
-
-    options
-      .add_options()
-      (  "h, help", "Print help")
-      (  "i, infile"
-       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
-       , cxxopts::value<std::string>(), "FILE"
-      )
-    ;
-
-    options.add_options("HiddenGroup")
-      (  "t, testfile"
-       , "Generate a file to be used for unit testing."
-       , cxxopts::value<std::string>(), "FILE"
-      )
-    ;
-
-    auto result = options.parse(argc, argv);
-
-    if (result.count("help"))
-    {
-      // You can output our default, unnamed group and our HiddenGroup 
-      // of help with the following line:
-      //
-      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
-      //
-      std::cout << options.help({""}) << std::endl;
-      exit(0);
-    }
-
-    return result;
-  } catch (const cxxopts::OptionException& e)
-  {
-    std::cout << "error parsing options: " << e.what() << std::endl;
-    exit(1);
-  }
-}
 
 
 int main(int ac, char* av[])
@@ -567,7 +602,7 @@ int main(int ac, char* av[])
   if ( result.count("testfile") )
     output_file_name = result["testfile"].as<std::string>();
   
-  Replay replay(input_file_name, output_file_name);
+  Replay replay(result, input_file_name, output_file_name);
 
   replay.run();
 
