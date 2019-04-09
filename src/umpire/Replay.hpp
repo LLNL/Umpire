@@ -62,22 +62,12 @@ private:
 } /* namespace replay */
 } /* namespace umpire */
 
-#define UMPIRE_REPLAY( msg )                                             \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "REPLAY," << msg;                                      \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
+#define UMPIRE_REPLAY( msg )                                                 \
+{                                                                            \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
+    std::ostringstream local_msg;                                            \
+    local_msg  << "REPLAY," << msg << std::endl;                             \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());  \
+  }                                                                          \
 }
-
-#define UMPIRE_REPLAY_CONT( msg )                                        \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "," << msg;                                            \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
-
 #endif /* UMPIRE_Replay_HPP */
