@@ -37,10 +37,10 @@ and CUDA
 
 - GitHub action to run Clang static analysis.
 
-- Replay now includes the process ID of the logging process to help
+- Replay now includes unique replay ID of the logging process to help
 distinguish processes in an multi-process run.
 
-- Umpire replay now takes a "-help" option and displays usage information.
+- Umpire replay now takes a "--help" option and displays usage information.
 
 ### Changed
 

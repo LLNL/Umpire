@@ -37,6 +37,55 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
+static cxxopts::ParseResult parse(int argc, char* argv[])
+{
+  try
+  {
+    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
+
+    options
+      .add_options()
+      (  "h, help"
+       , "Print help"
+      )
+      (  "i, infile"
+       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
+       , cxxopts::value<std::string>(), "FILE" 
+      )
+      (  "u, uid"
+       , "The format of a REPLAY line begins with REPLAY,UID,...  This instructs replay to only replay items for the specified UID."
+       , cxxopts::value<uint64_t>(), "UID"
+      )
+    ;
+
+    options.add_options("HiddenGroup")
+      (  "t, testfile"
+       , "Generate a file to be used for unit testing."
+       , cxxopts::value<std::string>(), "FILE"
+      )
+    ;
+
+    auto result = options.parse(argc, argv);
+
+    if (result.count("help"))
+    {
+      // You can output our default, unnamed group and our HiddenGroup 
+      // of help with the following line:
+      //
+      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
+      //
+      std::cout << options.help({""}) << std::endl;
+      exit(0);
+    }
+
+    return result;
+  } catch (const cxxopts::OptionException& e)
+  {
+    std::cout << "error parsing options: " << e.what() << std::endl;
+    exit(1);
+  }
+}
+
 class CSVRow {
 public:
   std::string const& operator[](std::size_t index) const { return m_data[index]; }
@@ -78,9 +127,10 @@ static std::ostream null_stream(&null_buffer);
 
 class Replay {
   public:
-    Replay( std::string in_file_name, std::string out_file_name ):
+    Replay( cxxopts::ParseResult options, std::string in_file_name, std::string out_file_name ):
         m_sequence_id(0)
       , m_replay_uid(0)
+      , m_options(options)
       , m_input_file(in_file_name)
       , m_rm(umpire::ResourceManager::getInstance())
     {
@@ -99,6 +149,10 @@ class Replay {
         << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH;
       m_umpire_version_string = version_stringstream.str();
 
+      if ( m_options.count("uid") ) {
+        m_replay_uid = m_options["uid"].as<uint64_t>();
+        m_uids[m_replay_uid] = true;
+      }
     }
 
     static void usage_and_exit( const std::string& /* errorMessage */ ) {
@@ -179,6 +233,7 @@ class Replay {
   private:
     uint64_t m_sequence_id;
     uint64_t m_replay_uid;
+    cxxopts::ParseResult m_options;
     std::ifstream m_input_file;
     umpire::ResourceManager& m_rm;
     std::ofstream m_replayout;
@@ -531,49 +586,6 @@ class Replay {
     }
 };
 
-static cxxopts::ParseResult parse(int argc, char* argv[])
-{
-  try
-  {
-    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
-
-    options
-      .add_options()
-      (  "h, help", "Print help")
-      (  "i, infile"
-       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
-       , cxxopts::value<std::string>(), "FILE"
-      )
-    ;
-
-    options.add_options("HiddenGroup")
-      (  "t, testfile"
-       , "Generate a file to be used for unit testing."
-       , cxxopts::value<std::string>(), "FILE"
-      )
-    ;
-
-    auto result = options.parse(argc, argv);
-
-    if (result.count("help"))
-    {
-      // You can output our default, unnamed group and our HiddenGroup 
-      // of help with the following line:
-      //
-      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
-      //
-      std::cout << options.help({""}) << std::endl;
-      exit(0);
-    }
-
-    return result;
-  } catch (const cxxopts::OptionException& e)
-  {
-    std::cout << "error parsing options: " << e.what() << std::endl;
-    exit(1);
-  }
-}
-
 
 int main(int ac, char* av[])
 {
@@ -590,7 +602,7 @@ int main(int ac, char* av[])
   if ( result.count("testfile") )
     output_file_name = result["testfile"].as<std::string>();
   
-  Replay replay(input_file_name, output_file_name);
+  Replay replay(result, input_file_name, output_file_name);
 
   replay.run();
 
