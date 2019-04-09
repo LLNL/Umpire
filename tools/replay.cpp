@@ -494,7 +494,7 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
       )
     ;
 
-    options.add_options("Group")
+    options.add_options("HiddenGroup")
       (  "t, testfile"
        , "Generate a file to be used for unit testing."
        , cxxopts::value<std::string>(), "FILE"
@@ -505,6 +505,11 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
 
     if (result.count("help"))
     {
+      // You can output our default, unnamed group and our HiddenGroup 
+      // of help with the following line:
+      //
+      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
+      //
       std::cout << options.help({""}) << std::endl;
       exit(0);
     }
