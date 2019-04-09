@@ -113,17 +113,23 @@ class Replay {
         if ( m_row[0] != "REPLAY" )
           continue;
 
-        if ( m_row[1] == "makeAllocator" ) {
-          replay_out() << m_row[1] << " ";
-          replay_makeAllocator();
+        if ( m_row[1] == "makeAllocator_pre" ) {
+          replay_out() << "makeAllocator ";
+          replay_makeAllocator_pre();
           replay_out() << "\n";
+        }
+        else if ( m_row[1] == "makeAllocator_post" ) {
+          replay_makeAllocator_post();
         }
         else if ( m_row[1] == "makeMemoryResource" ) {
           replay_makeMemoryResource();
         }
-        else if ( m_row[1] == "allocate" ) {
-          replay_out() << m_row[1] << " ";
-          replay_allocate();
+        else if ( m_row[1] == "allocate_pre" ) {
+          replay_allocate_pre();
+        }
+        else if ( m_row[1] == "allocate_post" ) {
+          replay_out() << "allocate ";
+          replay_allocate_post();
           replay_out() << "\n";
         }
         else if ( m_row[1] == "deallocate" ) {
@@ -162,6 +168,7 @@ class Replay {
     std::unordered_map<void*, uint64_t> m_allocation_seq;    // key(alloc_ptr), val(m_sequence_id)
     CSVRow m_row;
     std::string m_umpire_version_string;
+    void* m_alloc_ptr;
 
     std::ostream& replay_out(std::ostream& outs = null_stream)
     {
@@ -241,12 +248,32 @@ class Replay {
       alloc.release();
     }
 
-    void replay_allocate( void )
+    void replay_allocate_pre( void )
+    {
+      void* alloc_obj_ref;
+      std::size_t alloc_size;
+
+      get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
+      get_from_string(m_row[m_row.size() - 2], alloc_size);
+
+      auto n_iter = m_allocators.find(alloc_obj_ref);
+
+      if ( n_iter == m_allocators.end() ) {
+        std::cerr << "Unknown allocator " << alloc_obj_ref << std::endl;
+        return;           // Just skip unknown allocators
+      }
+
+      const std::string& allocName = n_iter->second;
+
+      auto alloc = m_rm.getAllocator(allocName);
+      m_alloc_ptr = alloc.allocate(alloc_size);
+    }
+
+    void replay_allocate_post( void )
     {
       void* alloc_obj_ref;
       std::size_t alloc_size;
       void* alloc_ptr;
-      void* replay_alloc_ptr;
 
       get_from_string(m_row[m_row.size() - 1], alloc_ptr);
       get_from_string(m_row[m_row.size() - 2], alloc_obj_ref);
@@ -261,10 +288,7 @@ class Replay {
 
       const std::string& allocName = n_iter->second;
 
-      auto alloc = m_rm.getAllocator(allocName);
-      replay_alloc_ptr = alloc.allocate(alloc_size);
-
-      m_allocated_ptrs[alloc_ptr] = replay_alloc_ptr;
+      m_allocated_ptrs[alloc_ptr] = m_alloc_ptr;
       m_sequence_id++;
       m_allocation_seq[alloc_ptr] = m_sequence_id;
 
@@ -317,13 +341,10 @@ class Replay {
       m_allocators[alloc_obj_ref] = name;
     }
 
-    void replay_makeAllocator( void )
+    void replay_makeAllocator_pre( void )
     {
       bool introspection = ( m_row[3] == "true" );
       const std::string& name = m_row[4];
-      void* alloc_obj_ref;
-
-      get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
 
       replay_out() << "<" << m_row[2] << ">" ;
 
@@ -331,7 +352,7 @@ class Replay {
         const std::string& allocName = m_row[5];
         const std::string& adviceOperation = m_row[6];
         // Now grab the optional fields
-        if (m_row.size() > 8) {
+        if (m_row.size() >= 8) {
           const std::string& accessingAllocatorName = m_row[7];
 
           replay_out() 
@@ -362,7 +383,7 @@ class Replay {
         std::size_t min_alloc_size;         // Optional: m_row[7]
 
         // Now grab the optional fields
-        if (m_row.size() > 8) {
+        if (m_row.size() >= 8) {
           get_from_string(m_row[6], min_initial_alloc_size);
           get_from_string(m_row[7], min_alloc_size);
 
@@ -376,7 +397,7 @@ class Replay {
           if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
           else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(name, m_rm.getAllocator(allocName), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
         }
-        else if ( m_row.size() > 7 ) {
+        else if ( m_row.size() >= 7 ) {
           get_from_string(m_row[6], min_initial_alloc_size);
 
           replay_out() 
@@ -477,6 +498,14 @@ class Replay {
         std::cerr << "Unknown class (" << m_row[2] << "), skipping.\n";
         return;
       }
+    }
+
+    void replay_makeAllocator_post( void )
+    {
+      const std::string& name = m_row[4];
+      void* alloc_obj_ref;
+
+      get_from_string(m_row[m_row.size() - 1], alloc_obj_ref);
 
       m_allocators[alloc_obj_ref] = name;
     }

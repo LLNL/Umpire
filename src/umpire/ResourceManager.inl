@@ -40,6 +40,13 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
+    UMPIRE_REPLAY("makeAllocator_pre,"
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+    );
+
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
     }
@@ -62,7 +69,7 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
-    UMPIRE_REPLAY("makeAllocator,"
+    UMPIRE_REPLAY("makeAllocator_post,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name
