@@ -80,7 +80,7 @@ class Replay {
   public:
     Replay( std::string in_file_name, std::string out_file_name ):
         m_sequence_id(0)
-      , m_replay_pid(0)
+      , m_replay_uid(0)
       , m_input_file(in_file_name)
       , m_rm(umpire::ResourceManager::getInstance())
     {
@@ -111,22 +111,22 @@ class Replay {
         if ( m_row[0] != "REPLAY" )
           continue;
 
-        uint64_t pid;
+        uint64_t uid;
 
-        get_from_string(m_row[1], pid);
+        get_from_string(m_row[1], uid);
 
-        if ( ! m_replay_pid ) {
-          m_replay_pid = pid;
-          m_pids[pid] = true;
+        if ( ! m_replay_uid ) {
+          m_replay_uid = uid;
+          m_uids[uid] = true;
         }
 
-        if ( m_replay_pid != pid ) {
-          if ( m_pids.find(pid) == m_pids.end()) {
+        if ( m_replay_uid != uid ) {
+          if ( m_uids.find(uid) == m_uids.end()) {
             //
-            // Only note a message once per pid
+            // Only note a message once per uid
             //
-            std::cerr << "Skipping Replay for PID " << pid << std::endl;
-            m_pids[pid] = true;
+            std::cerr << "Skipping Replay for PID " << uid << std::endl;
+            m_uids[uid] = true;
           }
           continue;
         }
@@ -178,11 +178,11 @@ class Replay {
 
   private:
     uint64_t m_sequence_id;
-    uint64_t m_replay_pid;
+    uint64_t m_replay_uid;
     std::ifstream m_input_file;
     umpire::ResourceManager& m_rm;
     std::ofstream m_replayout;
-    std::unordered_map<uint64_t, bool> m_pids;  // key(pid), val(always true)
+    std::unordered_map<uint64_t, bool> m_uids;  // key(uid), val(always true)
     std::unordered_map<void*, std::string> m_allocators;  // key(alloc_obj), val(alloc name)
     std::unordered_map<void*, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::unordered_map<void*, uint64_t> m_allocation_seq;    // key(alloc_ptr), val(m_sequence_id)

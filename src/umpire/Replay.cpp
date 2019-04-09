@@ -30,7 +30,7 @@ namespace replay {
 static const char* env_name = "UMPIRE_REPLAY";
 Replay* Replay::s_Replay = nullptr;
 
-Replay::Replay(bool enable_replay) : replayEnabled(enable_replay), m_replayPid(getpid())
+Replay::Replay(bool enable_replay) : replayEnabled(enable_replay), m_replayUid(getpid())
 {
 }
 
