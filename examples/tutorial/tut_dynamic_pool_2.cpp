@@ -39,6 +39,9 @@ void allocate_and_deallocate_pool(
 
 int main(int, char**) {
   allocate_and_deallocate_pool("HOST", 65536, 512);
+#if defined(UMPIRE_ENABLE_SICM)
+  allocate_and_deallocate_pool("SICM", 65536, 512);
+#endif
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate_pool("DEVICE", (1024*1024*1024), (1024*1024));
   allocate_and_deallocate_pool("UM", (1024*64), 1024);

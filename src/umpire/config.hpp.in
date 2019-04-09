@@ -17,6 +17,7 @@
 
 #include <string>
 
+#cmakedefine UMPIRE_ENABLE_SICM
 #cmakedefine UMPIRE_ENABLE_CUDA
 #cmakedefine UMPIRE_ENABLE_NUMA
 #cmakedefine UMPIRE_ENABLE_SLIC

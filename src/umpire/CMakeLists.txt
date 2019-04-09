@@ -66,6 +66,7 @@ blt_add_library(
   SOURCES ${umpire_sources} ${umpire_interface_sources}
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
 
+set(UMPIRE_ENABLE_SICM ${ENABLE_SICM})
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})

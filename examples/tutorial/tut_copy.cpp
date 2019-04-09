@@ -45,6 +45,9 @@ int main(int, char**) {
   std::cout << "done." << std::endl;
 
   copy_data(data, SIZE, "HOST");
+#if defined(UMPIRE_ENABLE_SICM)
+  copy_data(data, SIZE, "SICM");
+#endif
 #if defined(UMPIRE_ENABLE_CUDA)
   copy_data(data, SIZE, "DEVICE");
   copy_data(data, SIZE, "UM");

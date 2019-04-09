@@ -24,6 +24,17 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
+if (ENABLE_SICM)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    SICMResourceFactory.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    SICMResourceFactory.cpp
+  )
+endif()
+
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}

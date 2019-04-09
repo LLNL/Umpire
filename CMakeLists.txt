@@ -25,6 +25,8 @@ endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
+set(ENABLE_SICM Off CACHE BOOL "")
+set(ENABLE_CUDA On CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
@@ -41,6 +43,14 @@ option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+
+if (ENABLE_SICM)
+  set(SICM_INCLUDE_PATH     SICM/include CACHE PATH "")
+  set(SICM_LIBRARY_PATH     SICM/lib     CACHE PATH "")
+  set(JEMALLOC_LIBRARY_PATH jemalloc/lib CACHE PATH "")
+  include_directories(${SICM_INCLUDE_PATH})
+  link_libraries(-L${SICM_LIBRARY_PATH} -lsicm -L${JEMALLOC_LIBRARY_PATH} -ljemalloc)
+endif()
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)

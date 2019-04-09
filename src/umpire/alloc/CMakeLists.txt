@@ -7,6 +7,12 @@
 set(umpire_alloc_headers
   MallocAllocator.hpp)
 
+if (ENABLE_SICM)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    SICMAllocator.hpp)
+endif()
+
 if (ENABLE_NUMA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}

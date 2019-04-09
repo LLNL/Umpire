@@ -15,6 +15,9 @@ int main(int, char**) {
 
   const std::string destinations[] = {
     "HOST"
+#if defined(UMPIRE_ENABLE_SICM)
+      , "SICM"
+#endif
 #if defined(UMPIRE_ENABLE_CUDA)
       , "DEVICE"
       , "UM"

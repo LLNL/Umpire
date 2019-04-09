@@ -14,6 +14,10 @@
 
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
 
+#if defined(UMPIRE_ENABLE_SICM)
+#include "umpire/resource/SICMResourceFactory.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -99,6 +103,11 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
+
+#if defined(UMPIRE_ENABLE_SICM)
+  registry.registerMemoryResource(
+      new resource::SICMResourceFactory());
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
@@ -198,6 +207,10 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
 
+#if defined(UMPIRE_ENABLE_SICM)
+  m_memory_resources[resource::SICM] = registry.makeMemoryResource("SICM", getNextId());
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
   int count;
   auto error = ::cudaGetDeviceCount(&count);
@@ -236,6 +249,40 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
+  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_PINNED)
+  m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+  m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
+#endif
+
+  /*
+   * Construct default allocators for each resource
+   */
+  auto host_allocator = m_memory_resources[resource::Host];
+  m_allocators_by_name["HOST"] = host_allocator;
+  m_allocators_by_id[host_allocator->getId()] = host_allocator;
+
+  m_default_allocator = host_allocator;
+
+#if defined(UMPIRE_ENABLE_SICM)
+  auto sicm_allocator = m_memory_resources[resource::SICM];
+  m_allocators_by_name["SICM"] = sicm_allocator;
+  m_allocators_by_id[sicm_allocator->getId()] = sicm_allocator;
+#endif
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+  auto device_allocator = m_memory_resources[resource::Device];
+  m_allocators_by_name["DEVICE"] = device_allocator;
+  m_allocators_by_id[device_allocator->getId()] = device_allocator;
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)
