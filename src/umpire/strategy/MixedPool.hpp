@@ -45,6 +45,8 @@ class MixedPoolImpl :
         int id,
         Allocator allocator) noexcept;
 
+    ~MixedPoolImpl();
+
     void* allocate(size_t bytes) override;
 
     void deallocate(void* ptr) override;
@@ -59,14 +61,13 @@ class MixedPoolImpl :
 
   private:
     enum { NUM_FIXED_POOLS = LastFixed - FirstFixed + 1 };
-    using StrategyPtr = std::shared_ptr<umpire::strategy::AllocationStrategy>;
-    using FixedPoolArray = std::array<StrategyPtr, NUM_FIXED_POOLS>;
+    using FixedPoolArray = std::array<AllocationStrategy*, NUM_FIXED_POOLS>;
     using Map = std::map<uintptr_t, int>;
 
     Map m_map;
     FixedPoolArray m_fixed_pool;
-    StrategyPtr m_dynamic_pool;
-    StrategyPtr m_allocator;
+    AllocationStrategy* m_dynamic_pool;
+    AllocationStrategy* m_allocator;
 };
 
 using MixedPool = MixedPoolImpl<>;

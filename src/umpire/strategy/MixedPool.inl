@@ -29,7 +29,7 @@ struct make_fixed_pool_array {
     const std::size_t size = 1 << Current;
     std::stringstream ss{"internal_fixed_"};
     ss << size;
-    fixed_pool[index] = std::make_shared<FixedPool<unsigned char[size]> >(ss.str(), -1, allocator);
+    fixed_pool[index] = new FixedPool<unsigned char[size]>(ss.str(), -1, allocator);
     make_fixed_pool_array<FirstFixed, Current+Increment, LastFixed, Increment>::eval(fixed_pool, allocator);
   }
 };
@@ -42,7 +42,7 @@ struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
     const std::size_t size = 1 << LastFixed;
     std::stringstream ss{"internal_fixed_"};
     ss << size;
-    fixed_pool[index] = std::make_shared<FixedPool<unsigned char[size]> >(ss.str(), -1, allocator);
+    fixed_pool[index] = new FixedPool<unsigned char[size]>(ss.str(), -1, allocator);
   }
 };
 
@@ -67,14 +67,19 @@ MixedPoolImpl<FirstFixed,Increment,LastFixed>::MixedPoolImpl(
 :
   AllocationStrategy(name, id),
   m_map(),
+  m_fixed_pool(),
+  m_dynamic_pool(nullptr),
   m_allocator(allocator.getAllocationStrategy())
 {
-  m_dynamic_pool = std::make_shared<DynamicPool>(
-      "internal_dynamic_pool",
-      -1,
-      allocator);
-
+  m_dynamic_pool = new DynamicPool("internal_dynamic_pool", -1, allocator);
   make_fixed_pool_array<FirstFixed,FirstFixed,LastFixed,Increment>::eval(m_fixed_pool, allocator);
+}
+
+template<int FirstFixed, int Increment, int LastFixed>
+MixedPoolImpl<FirstFixed,Increment,LastFixed>::~MixedPoolImpl()
+{
+  for (std::size_t i = 0; i < m_fixed_pool.size(); ++i) delete m_fixed_pool[i];
+  delete m_dynamic_pool;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
