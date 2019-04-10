@@ -17,6 +17,8 @@
 
 #include "umpire/config.hpp"
 
+#include "umpire/util/IOManager.hpp"
+
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/Allocator.hpp"
@@ -24,6 +26,18 @@
 #include <iostream>
 
 namespace umpire {
+
+void
+initialize()
+{
+  util::IOManager::initialize();
+  ResourceManager::getInstance().initialize();
+}
+
+void
+finalize()
+{
+}
 
 /*!
  * \brief Allocate memory in the default space, with the default allocator.

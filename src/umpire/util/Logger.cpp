@@ -14,6 +14,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/Logger.hpp"
 
+#include "umpire/util/IOManager.hpp"
+
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 #include <strings.h>  // for strcasecmp()
@@ -57,7 +59,7 @@ void Logger::logMessage( message::Level level,
   if ( !logLevelEnabled( level ) )
     return;   /* short-circuit */
 
-  std::cout
+  umpire::log
     << "[" << MessageLevelName[ level ] << "]"
     << "[" << fileName  << ":" << line << "]:"
     << message

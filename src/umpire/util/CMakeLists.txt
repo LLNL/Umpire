@@ -17,9 +17,11 @@ set (umpire_util_headers
   AllocationRecord.hpp
   detect_vendor.hpp
   Exception.hpp
+  IOManager.hpp
   Logger.hpp
   Macros.hpp
   MemoryResourceTraits.hpp
+  OutputBuffer.hpp
   Platform.hpp)
 
 if (ENABLE_STATISTICS)
@@ -40,7 +42,9 @@ set (umpire_util_sources
   AllocationMap.cpp
   detect_vendor.cpp
   Exception.cpp
-  Logger.cpp)
+  IOManager.cpp
+  Logger.cpp
+  OutputBuffer.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources

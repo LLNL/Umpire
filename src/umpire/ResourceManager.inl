@@ -44,7 +44,7 @@ Allocator ResourceManager::makeAllocator(
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
     );
 
     if (isAllocator(name)) {
@@ -73,7 +73,7 @@ Allocator ResourceManager::makeAllocator(
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << "," << allocator
     );
 

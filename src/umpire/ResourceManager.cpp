@@ -102,7 +102,6 @@ ResourceManager::ResourceManager() :
     new resource::RocmPinnedMemoryResourceFactory());
 #endif
 
-  initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
 

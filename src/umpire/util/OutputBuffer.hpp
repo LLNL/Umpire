@@ -12,22 +12,31 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
+#ifndef UMPIRE_OutputBuffer_HPP
+#define UMPIRE_OutputBuffer_HPP
 
-#include "umpire/Umpire.hpp"
-#include "umpire/ResourceManager.hpp"
-
-#include <iostream>
+#include <streambuf>
 
 namespace umpire {
+namespace util {
 
-void print_allocator_records(Allocator alloc, std::ostream& os) {
-  auto& rm = umpire::ResourceManager::getInstance();
+class OutputBuffer : public std::streambuf
+{
+public:
+  OutputBuffer() = default;
 
-  auto strategy = alloc.getAllocationStrategy();
+  void setConsoleStream(std::ostream* stream);
+  void setFileStream(std::ostream* stream);
 
-  rm.m_allocations.print([strategy] (const util::AllocationRecord* rec) {
-    return rec->m_strategy == strategy;
-  }, os);
-}
+  int overflow(int ch) override;
+  int sync() override;
 
-}
+private:
+  std::streambuf* d_console_stream;
+  std::streambuf* d_file_stream;
+};
+
+} // end of namespace util
+} // end of namespace umpire
+
+#endif // UMPIRE_OutputBuffer_HPP
