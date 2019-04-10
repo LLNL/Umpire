@@ -16,6 +16,8 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
+#include <cstdint>
+
 namespace umpire {
 namespace strategy {
 
@@ -48,7 +50,7 @@ struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
 
 } // anonymous namespace
 
-inline static size_t nextPower2(unsigned int n) {
+inline static uint32_t next_power_2(uint32_t n) {
   n--;
   n |= n >> 1;
   n |= n >> 2;
@@ -85,11 +87,11 @@ MixedPoolImpl<FirstFixed,Increment,LastFixed>::~MixedPoolImpl()
 template<int FirstFixed, int Increment, int LastFixed>
 void* MixedPoolImpl<FirstFixed,Increment,LastFixed>::allocate(size_t bytes)
 {
-  const size_t bytes_with_index = bytes + sizeof(unsigned int);
+  const uint32_t bytes_with_index = bytes + sizeof(unsigned int);
   void* mem;
   if (bytes <= (1 << LastFixed)) {
     // Find next power of 2
-    const size_t alloc_size = nextPower2(bytes_with_index);
+    const uint32_t alloc_size = next_power_2(bytes_with_index);
 
     // Convert that to bit index
     size_t bit = 0;
