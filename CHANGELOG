@@ -37,6 +37,11 @@ and CUDA
 
 - GitHub action to run Clang static analysis.
 
+- Replay now includes unique replay ID of the logging process to help
+distinguish processes in an multi-process run.
+
+- Umpire replay now takes a "--help" option and displays usage information.
+
 ### Changed
 
 - Umpire now builds as a single library, libumpire.a or libumpire.so, rather
@@ -61,3 +66,7 @@ this.
 - `make docs` used to fail, because the build was setup for Read the Docs. A fix
 was implemented so Doxygen and Sphinx can be run locally, for instance to test
 out new cookbooks.
+
+- REPLAY previously recorded some operations with multiple print statements
+causing REPLAY output from MPI runs to become mixed between multiple ranks.
+REPLAY has been modified to output each operation onto a single line.

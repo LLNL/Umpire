@@ -36,6 +36,7 @@ public:
   void logMessage( const std::string& message );
   static Replay* getReplayLogger();
   bool replayLoggingEnabled();
+  uint64_t replayUid() { return m_replayUid; }
 
   static std::string printReplayAllocator( void ) {
     return std::string("");
@@ -56,28 +57,23 @@ private:
   ~Replay();
 
   bool replayEnabled;
+  uint64_t m_replayUid;
   static Replay* s_Replay;
 };
 
 } /* namespace replay */
 } /* namespace umpire */
 
-#define UMPIRE_REPLAY( msg )                                             \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "REPLAY," << msg;                                      \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
+#define UMPIRE_REPLAY( msg )                                                 \
+{                                                                            \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
+    std::ostringstream local_msg;                                            \
+    local_msg                                                                \
+      << "REPLAY,"                                                           \
+      << umpire::replay::Replay::getReplayLogger()->replayUid() << ","       \
+      << msg                                                                 \
+      << std::endl;                                                          \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());  \
+  }                                                                          \
 }
-
-#define UMPIRE_REPLAY_CONT( msg )                                        \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "," << msg;                                            \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
-
 #endif /* UMPIRE_Replay_HPP */
