@@ -55,18 +55,6 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
        , "Input file created by Umpire library with UMPIRE_REPLAY=On"
        , cxxopts::value<std::string>(), "FILE" 
       )
-      (  "a, allocator"
-       , "Calculates the statistic of this allocator"
-         , cxxopts::value<std::string>()->default_value("HOST"), "ALLOC"
-      )
-      (  "s, statistic"
-       , "Calculates this statistic"
-       , cxxopts::value<std::string>()->default_value("NONE"), "STAT"
-      )
-      (  "n, steps"
-       , "Calculates the statistic after this many steps"
-       , cxxopts::value<long>()->default_value(-1), "N"
-      )
       (  "u, uid"
        , "The format of a REPLAY line begins with REPLAY,UID,...  This instructs replay to only replay items for the specified UID."
        , cxxopts::value<uint64_t>(), "UID"
@@ -176,8 +164,6 @@ class Replay {
 
     void run(void)
     {
-      long step = 0;
-      const long target_step = m_options["N"]->as<long>();
       while ( m_input_file >> m_row ) {
         if ( m_row[0] != "REPLAY" )
           continue;
@@ -243,17 +229,6 @@ class Replay {
           std::cerr << "Unknown Replay (" << m_row[2] << ")\n";
           replay_out() << "\n";
           exit (1);
-        }
-
-        if (step == target_step) {
-          const std::string alloc_name{m_options["ALLOC"]->as<std::string>()};
-          if (alloc_name != "NONE") {
-            auto allocator = m_rm.getAllocator(alloc_name);
-            auto recs = umpire::get_allocator_records(allocator);
-            if (m_options["STAT"]->as<std::string>() == "fragmentation") {
-              // TODO: Filter based on pool type...
-            }
-          }
         }
       }
     }
@@ -581,6 +556,10 @@ class Replay {
         //
         // Need to skip FixedPool for now since I haven't figured out how to
         // dynamically parse/creat the data type parameter
+        //
+        // Replay currently cannot support replaying FixedPool allocations.
+        // This is because replay does its work at runtime and the FixedPool
+        // is a template where sizes are generated at compile time.
         //
         replay_out() << " (ignored) ";
         return;

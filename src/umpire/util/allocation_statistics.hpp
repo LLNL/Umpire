@@ -23,7 +23,9 @@ namespace umpire {
 namespace util {
 
 /*!
- * \brief
+ * \brief Compute the relative fragmentation of a set of allocation records.
+ *
+ * Fragmentat = 1 - (largest free block) / (total free space)
  */
 float relative_fragmentation(std::vector<util::AllocationRecord>& recs);
 

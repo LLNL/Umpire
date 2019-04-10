@@ -13,6 +13,7 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 REPLAY,makeAllocator,umpire::strategy::DynamicPool,true,pool,HOST,0x7fcc98400260
+REPLAY,allocate,0,0x7fcc98400260,0x116076000
 REPLAY,allocate,134,0x7fcc98400260,0x116076000
 REPLAY,allocate,774,0x7fcc98400260,0x116076090
 REPLAY,allocate,470,0x7fcc98400260,0x1160763a0
@@ -76,6 +77,7 @@ REPLAY,allocate,927,0x7fcc98400260,0x11607d910
 REPLAY,allocate,517,0x7fcc98400260,0x11607dcb0
 REPLAY,allocate,529,0x7fcc98400260,0x11607dec0
 REPLAY,allocate,327,0x7fcc98400260,0x11607e0e0
+REPLAY,deallocate,0x116076000,0x7fcc98400260
 REPLAY,deallocate,0x116076000,0x7fcc98400260
 REPLAY,deallocate,0x116076090,0x7fcc98400260
 REPLAY,deallocate,0x1160763a0,0x7fcc98400260

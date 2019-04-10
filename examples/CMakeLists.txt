@@ -58,11 +58,6 @@ if (ENABLE_STATISTICS)
     OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 endif()
 
-blt_add_executable(
-  NAME mixed_pool_example
-  SOURCES mixed_pool.cpp
-  DEPENDS_ON umpire)
-
 add_subdirectory(tutorial)
 
 add_subdirectory(cookbook)
