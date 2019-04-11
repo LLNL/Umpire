@@ -20,6 +20,7 @@ set (umpire_util_headers
   IOManager.hpp
   Logger.hpp
   Macros.hpp
+  MPI.hpp
   MemoryResourceTraits.hpp
   OutputBuffer.hpp
   Platform.hpp)
@@ -44,6 +45,7 @@ set (umpire_util_sources
   Exception.cpp
   IOManager.cpp
   Logger.cpp
+  MPI.cpp
   OutputBuffer.cpp)
 
 if (ENABLE_STATISTICS)
@@ -78,6 +80,12 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
     ${umpire_util_depends}
     slic)
 endif()
+
+if (ENABLE_MPI)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    mpi)
+endif ()
 
 blt_add_library(
   NAME umpire_util

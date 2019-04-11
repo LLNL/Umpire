@@ -16,6 +16,7 @@
 #include "umpire/util/IOManager.hpp"
 #include "umpire/util/OutputBuffer.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/MPI.hpp"
 
 #include <iostream>
 #include <ostream>
@@ -41,6 +42,7 @@ std::ostream error(&error_buffer);
 namespace util {
 
 std::string IOManager::s_root_io_dir = "./";
+std::string IOManager::s_file_basename = "umpire";
 
 std::string IOManager::s_log_filename;
 std::string IOManager::s_replay_filename;
@@ -65,19 +67,34 @@ void
 IOManager::initialize()
 {
   if (!s_initialized) {
-    s_log_filename = makeUniqueFilename(s_root_io_dir, "umpire", "log");
-    s_replay_filename = makeUniqueFilename(s_root_io_dir, "umpire", "replay");
+    auto output_dir = std::getenv("UMPIRE_OUTPUT_DIR");
+
+    if (output_dir) {
+      s_root_io_dir = std::string(output_dir);
+    }
+
+    auto base_name = std::getenv("UMPIRE_OUTPUT_BASENAME");
+
+    if (base_name) {
+      s_file_basename = std::string(base_name);
+    }
+
+    auto rank = MPI::getRank();
+
+    s_log_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "log");
+    s_replay_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "replay");
     s_error_filename = "";
 
     log_buffer.setConsoleStream(&std::cout);
     replay_buffer.setConsoleStream(nullptr);
-    error_buffer.setConsoleStream(&std::cout);
+    error_buffer.setConsoleStream(&std::cerr);
 
-    std::cout << s_log_filename << std::endl;
 
-    if (!opendir(s_root_io_dir.c_str()))
-    {
-      mkdir(s_root_io_dir.c_str(), 0700);
+    if (rank == 0) {
+      if (!opendir(s_root_io_dir.c_str()))
+      {
+        mkdir(s_root_io_dir.c_str(), 0700);
+      }
     }
 
     s_log_ofstream = new std::ofstream(s_log_filename);
@@ -85,7 +102,7 @@ IOManager::initialize()
     if (*s_log_ofstream) {
       log_buffer.setFileStream(s_log_ofstream);
     } else {
-      std::cerr << "EEROREUAEOUA" << std::endl;
+      UMPIRE_ERROR("Couldn't open log file:" << s_log_filename);
     }
 
     s_replay_ofstream = new std::ofstream(s_replay_filename);
@@ -93,7 +110,7 @@ IOManager::initialize()
     if (*s_replay_ofstream) {
       replay_buffer.setFileStream(s_replay_ofstream);
     } else {
-      std::cerr << "EEROREUAEOUA" << std::endl;
+      UMPIRE_ERROR("Couldn't open replay file:" << s_log_filename);
     }
 
     s_initialized = true;
@@ -104,6 +121,7 @@ std::string
 IOManager::makeUniqueFilename(
     const std::string& base_dir,
     const std::string& name, 
+    int rank,
     const std::string& extension)
 {
   int unique_id = -1;
@@ -114,7 +132,7 @@ IOManager::makeUniqueFilename(
     ss.str("");
     ss.clear();
     unique_id++;
-    ss << base_dir << "/" << name << "." << unique_id << "." << extension;
+    ss << base_dir << "/" << name << "." << rank << "." << unique_id << "." << extension;
     filename = ss.str();
   } while (fileExists(filename));
 

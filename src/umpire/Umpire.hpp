@@ -17,6 +17,7 @@
 
 #include "umpire/config.hpp"
 
+#include "umpire/util/MPI.hpp"
 #include "umpire/util/IOManager.hpp"
 
 #include "umpire/ResourceManager.hpp"
@@ -27,14 +28,15 @@
 
 namespace umpire {
 
-void
+inline void
 initialize()
 {
+  util::MPI::initialize();
   util::IOManager::initialize();
   ResourceManager::getInstance().initialize();
 }
 
-void
+inline void
 finalize()
 {
 }
