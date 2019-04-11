@@ -14,6 +14,10 @@
 
 #include "umpire/op/GenericReallocateOperation.hpp"
 
+#if defined(UMPIRE_ENABLE_SICM)
+#include "umpire/op/SICMReallocateOperation.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/op/NumaMoveOperation.hpp"
 #endif
@@ -71,6 +75,33 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
+
+#if defined(UMPIRE_ENABLE_SICM)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cpu, Platform::sicm),
+      std::make_shared<HostCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sicm, Platform::sicm),
+      std::make_shared<HostCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::cpu, Platform::sicm),
+      std::make_shared<HostMemsetOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::sicm, Platform::sicm),
+      std::make_shared<HostMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::sicm, Platform::sicm),
+      std::make_shared<SICMReallocateOperation>());
+#endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
   registerOperation(

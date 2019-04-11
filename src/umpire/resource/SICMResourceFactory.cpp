@@ -45,7 +45,7 @@ SICMResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::cpu, "SICM", id, traits);
+  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::sicm, "SICM", id, traits);
 }
 
 } // end of namespace resource

@@ -22,6 +22,16 @@ set (umpire_op_sources
 
 set (umpire_op_depends)
 
+if (ENABLE_SICM)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    SICMReallocateOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    SICMReallocateOperation.cpp)
+endif ()
+
 if (ENABLE_NUMA)
   set (umpire_op_headers
     ${umpire_op_headers}
