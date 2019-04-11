@@ -50,6 +50,8 @@ than having one library per source subdirectory.
 - Removed shared_ptr usage entirely. Ownership of objects was never "shared"
 and the smart pointers added unecessary overhead.
 
+- Moved CHANGELOG to CHANGELOG.md.
+
 ### Removed
 
 - The 'coalesce' method was removed from ResourceManager and now must be
