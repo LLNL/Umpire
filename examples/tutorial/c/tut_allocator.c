@@ -18,7 +18,7 @@
 
 #define SIZE 1024
 
-int main(int argc, char** argv) {
+int main() {
   umpire_resourcemanager rm;
   umpire_resourcemanager_get_instance(&rm);
 
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 
   double* data = (double*) umpire_allocator_allocate(&allocator, SIZE*sizeof(double));
 
-  printf("Allocated %d bytes using the %s allocator...", (SIZE*sizeof(double)), umpire_allocator_get_name(&allocator));
+  printf("Allocated %lu bytes using the %s allocator...", (SIZE*sizeof(double)), umpire_allocator_get_name(&allocator));
 
   umpire_allocator_deallocate(&allocator, data);
 

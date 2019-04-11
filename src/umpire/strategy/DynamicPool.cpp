@@ -17,6 +17,7 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -55,7 +56,7 @@ DynamicPool::deallocate(void* ptr)
   if ( do_coalesce(*this) ) {
     UMPIRE_LOG(Debug, "Heuristic returned true, "
         "performing coalesce operation for " << this << "\n");
-    dpa->coalesce();
+    coalesce();
   }
 }
 
@@ -114,6 +115,7 @@ DynamicPool::getPlatform() noexcept
 void
 DynamicPool::coalesce() noexcept
 {
+  UMPIRE_REPLAY( "coalesce," << getName());
   dpa->coalesce();
 }
 

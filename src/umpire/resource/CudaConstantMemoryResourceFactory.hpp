@@ -29,7 +29,7 @@ class CudaConstantMemoryResourceFactory :
 {
   bool isValidMemoryResourceFor(const std::string& name) noexcept;
 
-  std::shared_ptr<MemoryResource> create(const std::string& name, int id);
+  resource::MemoryResource* create(const std::string& name, int id);
 };
 
 } // end of namespace resource

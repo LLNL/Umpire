@@ -41,7 +41,7 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_name(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_get_allocator_by_name_b(
+umpire_allocator * umpire_resourcemanager_get_allocator_by_name_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator * SHC_rv);
 
@@ -82,12 +82,12 @@ void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
 size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
     void * ptr);
 
-umpire_allocator * umpire_resourcemanager_make_pool_allocator(
+umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, int initial_size, int block,
     umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_pool_allocator_b(
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, int initial_size, int block,
     umpire_allocator * SHC_rv);

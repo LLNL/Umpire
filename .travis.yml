@@ -11,12 +11,13 @@ matrix:
     env:
     - COMPILER=g++
     - IMG=gcc-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_COVERAGE=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_COVERAGE=On -DENABLE_C=On"
+    - DO_MEMCHECK=yes
   - compiler: gcc6
     env:
     - COMPILER=g++
     - IMG=gcc-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_C=On"
   - compiler: gcc7
     env:
     - COMPILER=g++
@@ -52,12 +53,12 @@ matrix:
     env:
       - COMPILER=hcc
       - IMG=rocm
-      - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hcc -DENABLE_ROCM=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off"
+      - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hcc -DENABLE_HCC=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off"
       - DO_TEST=no
 
 script:
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
-- docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:$IMG ./scripts/travis/build_and_test.sh
+- docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_MEMCHECK -e CMAKE_EXTRA_FLAGS axom/compilers:$IMG ./scripts/travis/build_and_test.sh
 
 after_success:
 - if [[ "${CMAKE_EXTRA_FLAGS}" == *"ENABLE_COVERAGE"* ]] ; then bash <(curl -s https://codecov.io/bash) -a "-f" >& /dev/null; fi

@@ -24,7 +24,7 @@ class DefaultAllocationStrategy :
   public AllocationStrategy
 {
   public:
-    DefaultAllocationStrategy(std::shared_ptr<AllocationStrategy> allocator);
+    DefaultAllocationStrategy(strategy::AllocationStrategy* allocator);
 
     void* allocate(size_t bytes);
 
@@ -41,7 +41,7 @@ class DefaultAllocationStrategy :
     Platform getPlatform();
 
   protected:
-    std::shared_ptr<AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

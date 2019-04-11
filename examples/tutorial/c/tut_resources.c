@@ -12,6 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
+#include <stdio.h>
+
 #include "umpire/interface/umpire.h"
 
 #define SIZE 1024
@@ -27,7 +29,7 @@ void allocate_and_deallocate(const char* resource)
   double* data = (double*) umpire_allocator_allocate(&allocator, SIZE*sizeof(double));
 
 
-  printf("Allocated %d bytes using the %s allocator...", 
+  printf("Allocated %lu bytes using the %s allocator...", 
       (SIZE*sizeof(double)), umpire_allocator_get_name(&allocator));
 
   umpire_allocator_deallocate(&allocator, data);
@@ -35,7 +37,7 @@ void allocate_and_deallocate(const char* resource)
   printf("deallocated.\n");
 }
 
-int main(int argc, char** argv)
+int main()
 {
   allocate_and_deallocate("HOST");
 

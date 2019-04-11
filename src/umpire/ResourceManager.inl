@@ -33,14 +33,14 @@ Allocator ResourceManager::makeAllocator(
     const std::string& name, 
     Args&&... args)
 {
-  std::shared_ptr<strategy::AllocationStrategy> allocator;
+  strategy::AllocationStrategy* allocator;
 
   try {
     UMPIRE_LOCK;
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-    UMPIRE_REPLAY("makeAllocator,"
+    UMPIRE_REPLAY("makeAllocator_attempt,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name
@@ -52,7 +52,7 @@ Allocator ResourceManager::makeAllocator(
     }
 
     if (!introspection) {
-      allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+      allocator = new Strategy(name, getNextId(), std::forward<Args>(args)...);
 
       m_allocators_by_name[name] = allocator;
       m_allocators_by_id[allocator->getId()] = allocator;
@@ -60,16 +60,22 @@ Allocator ResourceManager::makeAllocator(
       std::stringstream base_name;
       base_name << name << "_base";
 
-      auto base_allocator = std::make_shared<Strategy>(base_name.str(), getNextId(), std::forward<Args>(args)...);
+      auto base_allocator = new Strategy(base_name.str(), getNextId(), std::forward<Args>(args)...);
 
-      allocator = std::make_shared<umpire::strategy::AllocationTracker>(name, getNextId(), Allocator(base_allocator));
+      allocator = new umpire::strategy::AllocationTracker(name, getNextId(), Allocator(base_allocator));
 
       m_allocators_by_name[name] = allocator;
       m_allocators_by_id[allocator->getId()] = allocator;
 
     }
 
-    UMPIRE_REPLAY_CONT("" << allocator << "\n");
+    UMPIRE_REPLAY("makeAllocator_success,"
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << "," << allocator
+    );
 
     UMPIRE_UNLOCK;
   } catch (...) {

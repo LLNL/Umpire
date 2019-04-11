@@ -46,15 +46,6 @@ if (ENABLE_C)
     COMMAND operation_c_tests)
 
   if (ENABLE_FORTRAN)
-    blt_add_executable(
-      NAME fortran_interface_tests
-      SOURCES umpire_fortran_interface.f
-      DEPENDS_ON fruit umpire
-    )
-
-    set_source_files_properties(
-      umpire_fortran_interface.f
-      PROPERTIES
-      Fortran_FORMAT FREE)
+    add_subdirectory(fortran)
   endif()
 endif()

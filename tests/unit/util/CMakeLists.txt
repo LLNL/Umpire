@@ -17,7 +17,7 @@ set (util_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/util)
 blt_add_executable(
   NAME exception_tests
   SOURCES exception_tests.cpp
-  DEPENDS_ON umpire_util gtest
+  DEPENDS_ON umpire gtest
   OUTPUT_DIR ${util_dir})
 
 blt_add_test(
@@ -27,7 +27,7 @@ blt_add_test(
 blt_add_executable(
   NAME allocation_map_tests
   SOURCES allocation_map_tests.cpp
-  DEPENDS_ON umpire_util gtest
+  DEPENDS_ON umpire gtest
   OUTPUT_DIR ${util_dir})
 
 blt_add_test(
@@ -39,7 +39,7 @@ if (False)
   blt_add_executable(
     NAME allocation_map_performance_tests
     SOURCES allocation_map_performance_tests.cpp
-    DEPENDS_ON umpire_util gtest
+    DEPENDS_ON umpire gtest
     OUTPUT_DIR ${util_dir})
 
   blt_add_test(

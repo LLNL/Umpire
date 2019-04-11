@@ -29,6 +29,11 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#include "umpire/util/numa.hpp"
+#endif
+
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
@@ -53,24 +58,29 @@ const char* AllocationDevices[] = {
 class StrategyTest :
   public ::testing::TestWithParam<const char*>
 {
-  public:
-    virtual void SetUp() {
-      auto& rm = umpire::ResourceManager::getInstance();
-      allocatorName = GetParam();
-      poolName << allocatorName << "_pool_" << unique_pool_name++;
+public:
+  void SetUp() override {
+    auto& rm = umpire::ResourceManager::getInstance();
+    allocatorName = GetParam();
+    poolName << allocatorName << "_pool_" << unique_pool_name++;
 
-     rm.makeAllocator<umpire::strategy::DynamicPool>
-                    (  poolName.str()
-                     , rm.getAllocator(allocatorName)
-                     , initial_min_size
-                     , subsequent_min_size);
+    rm.makeAllocator<umpire::strategy::DynamicPool>
+                  (  poolName.str()
+                   , rm.getAllocator(allocatorName)
+                   , initial_min_size
+                   , subsequent_min_size);
 
-     allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
-    }
+    allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
+  }
 
-    umpire::Allocator* allocator;
-    std::string allocatorName;
-    std::stringstream poolName;
+  void TearDown() override {
+    delete allocator;
+    allocator = nullptr;
+  }
+
+  umpire::Allocator* allocator;
+  std::string allocatorName;
+  std::stringstream poolName;
 };
 
 TEST_P(StrategyTest, Allocate) {
@@ -182,6 +192,8 @@ TEST(MonotonicStrategy, Host)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -198,6 +210,8 @@ TEST(MonotonicStrategy, Device)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "device_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 #endif // defined(UMPIRE_ENABLE_DEVICE)
 
@@ -215,6 +229,8 @@ TEST(MonotonicStrategy, UM)
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "um_monotonic_pool");
+
+  allocator.deallocate(alloc);
 }
 #endif // defined(UMPIRE_ENABLE_UM)
 
@@ -225,13 +241,15 @@ TEST(AllocationAdvisor, Create)
 
   ASSERT_NO_THROW(
     auto read_only_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY"));
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR"));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+          "read_only_um_nonsense_operator", rm.getAllocator("UM"), "FOOBAR");
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, CreateWithId)
@@ -243,13 +261,15 @@ TEST(AllocationAdvisor, CreateWithId)
   ASSERT_NO_THROW(
     auto read_only_alloc =
     rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id));
+      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id);
+    UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(
-      auto failed_alloc =
-    rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "read_only_um_nonsense_operator_device_id",
-      rm.getAllocator("UM"), "FOOBAR", device_id));
+    auto failed_alloc =
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "read_only_um_nonsense_operator_device_id",
+      rm.getAllocator("UM"), "FOOBAR", device_id);
+    UMPIRE_USE_VAR(failed_alloc));
 }
 
 TEST(AllocationAdvisor, Host)
@@ -287,6 +307,8 @@ TEST(FixedPool, Host)
   ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
   ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
+
+  allocator.deallocate(alloc);
 }
 
 #if defined(_OPENMP)
@@ -332,32 +354,6 @@ TEST(SizeLimiter, Host)
     alloc.deallocate(data));
 }
 
-
-TEST(CoalesceTest, CanCoalesce)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_simpool", rm.getAllocator("HOST"), 64, 64);
-
-  void* ptr_one = alloc.allocate(62);
-  void* ptr_two = alloc.allocate(1024);
-  alloc.deallocate(ptr_two);
-
-  EXPECT_NO_THROW(rm.coalesce(alloc));
-
-  alloc.deallocate(ptr_one);
-}
-
-TEST(CoalesceTest, Unsupported)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  EXPECT_THROW(
-  rm.coalesce(rm.getAllocator("HOST")),
-  umpire::util::Exception);
-}
-
 TEST(ReleaseTest, Works)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -398,13 +394,13 @@ TEST(HeuristicTest, EdgeCases_75)
       1024ul, 1024ul, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -442,13 +438,13 @@ TEST(HeuristicTest, EdgeCases_100)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -507,13 +503,13 @@ TEST(HeuristicTest, EdgeCases_0)
       initial_min_size, subsequent_min_size, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
 
   if (tracker) {
     strategy = tracker->getAllocationStrategy();
   }
 
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
@@ -553,3 +549,44 @@ TEST(HeuristicTest, EdgeCases_0)
   ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 3*initial_min_size);
 }
+
+#if defined(UMPIRE_ENABLE_NUMA)
+TEST(NumaPolicyTest, EdgeCases) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
+                 "numa_alloc", -1, rm.getAllocator("HOST")),
+               umpire::util::Exception);
+
+  const int numa_node = umpire::numa::preferred_node();
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  // Only works with HOST allocators
+  EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
+                 "numa_alloc", numa_node, rm.getAllocator("DEVICE")),
+               umpire::util::Exception);
+#endif
+}
+
+TEST(NumaPolicyTest, Location) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  // TODO Switch this to numa::get_allocatable_nodes() when the issue is fixed
+  auto nodes = umpire::numa::get_host_nodes();
+  for (auto n : nodes) {
+    std::stringstream ss;
+    ss << "numa_alloc_" << n;
+
+    auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
+      ss.str(), n, rm.getAllocator("HOST"));
+
+    void* ptr = alloc.allocate(10 * umpire::get_page_size());
+
+    rm.memset(ptr, 0);
+    ASSERT_EQ(umpire::numa::get_location(ptr), n);
+
+    alloc.deallocate(ptr);
+  }
+}
+
+#endif // defined(UMPIRE_ENABLE_NUMA)

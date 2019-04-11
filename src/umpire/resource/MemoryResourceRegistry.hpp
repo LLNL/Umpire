@@ -28,9 +28,9 @@ class MemoryResourceRegistry {
   public:
     static MemoryResourceRegistry& getInstance() noexcept;
 
-    std::shared_ptr<umpire::resource::MemoryResource> makeMemoryResource(const std::string& name, int id);
+    resource::MemoryResource* makeMemoryResource(const std::string& name, int id);
 
-    void registerMemoryResource(std::shared_ptr<MemoryResourceFactory>&& factory);
+    void registerMemoryResource(MemoryResourceFactory* factory);
 
   protected:
     MemoryResourceRegistry() noexcept;
@@ -38,7 +38,7 @@ class MemoryResourceRegistry {
   private:
     static MemoryResourceRegistry* s_allocator_registry_instance;
 
-    std::list<std::shared_ptr<MemoryResourceFactory> > m_allocator_factories;
+    std::list<MemoryResourceFactory*> m_allocator_factories;
 };
 
 } // end of namespace resource

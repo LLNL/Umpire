@@ -20,6 +20,10 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 
@@ -29,7 +33,7 @@
 #include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
 #include "umpire/resource/RocmDeviceResourceFactory.hpp"
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
@@ -40,6 +44,10 @@
 #include "umpire/strategy/AllocationTracker.hpp"
 
 #include "umpire/util/Macros.hpp"
+
+#include <iterator>
+#include <memory>
+#include <sstream>
 
 namespace umpire {
 
@@ -57,7 +65,6 @@ ResourceManager::getInstance()
 }
 
 ResourceManager::ResourceManager() :
-  m_allocator_names(),
   m_allocators_by_name(),
   m_allocators_by_id(),
   m_allocations(),
@@ -71,28 +78,28 @@ ResourceManager::ResourceManager() :
     resource::MemoryResourceRegistry::getInstance();
 
   registry.registerMemoryResource(
-      std::make_shared<resource::HostResourceFactory>());
+      new resource::HostResourceFactory());
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaDeviceResourceFactory>());
+    new resource::CudaDeviceResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaUnifiedMemoryResourceFactory>());
+    new resource::CudaUnifiedMemoryResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaPinnedMemoryResourceFactory>());
+    new resource::CudaPinnedMemoryResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::CudaConstantMemoryResourceFactory>());
+    new resource::CudaConstantMemoryResourceFactory());
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
   registry.registerMemoryResource(
-    std::make_shared<resource::RocmDeviceResourceFactory>());
+    new resource::RocmDeviceResourceFactory());
 
   registry.registerMemoryResource(
-    std::make_shared<resource::RocmPinnedMemoryResourceFactory>());
+    new resource::RocmPinnedMemoryResourceFactory());
 #endif
 
   initialize();
@@ -103,6 +110,15 @@ void
 ResourceManager::initialize()
 {
   UMPIRE_LOG(Debug, "() entering");
+
+  UMPIRE_LOG(Debug, "Umpire v" << UMPIRE_VERSION_MAJOR << "." <<
+      UMPIRE_VERSION_MINOR << "." <<
+      UMPIRE_VERSION_PATCH);
+
+  UMPIRE_REPLAY( "Umpire v" << UMPIRE_VERSION_MAJOR 
+      << "." << UMPIRE_VERSION_MINOR
+      << "." << UMPIRE_VERSION_PATCH);
+
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
@@ -169,13 +185,14 @@ ResourceManager::initialize()
   UMPIRE_LOG(Debug, "() leaving");
 }
 
-std::shared_ptr<strategy::AllocationStrategy>&
+strategy::AllocationStrategy*
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    UMPIRE_ERROR("Allocator \"" << name << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << name << "\" not found. Available allocators: "
+        << getAllocatorInformation());
   }
 
   return m_allocators_by_name[name];
@@ -195,7 +212,8 @@ ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 
   auto allocator = m_memory_resources.find(resource_type);
   if (allocator == m_memory_resources.end()) {
-    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type) << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type)
+        << "\" not found. Available allocators: " << getAllocatorInformation());
   }
 
   return Allocator(m_memory_resources[resource_type]);
@@ -208,7 +226,8 @@ ResourceManager::getAllocator(int id)
 
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
-    UMPIRE_ERROR("Allocator \"" << id << "\" not found.");
+    UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: "
+        << getAllocatorInformation());
   }
 
   return Allocator(m_allocators_by_id[id]);
@@ -305,10 +324,12 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
-  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->m_ptr);
+  std::size_t src_size = src_alloc_record->m_size - src_offset;
 
-  std::size_t src_size = src_alloc_record->m_size;
-  std::size_t dst_size = dst_alloc_record->m_size;
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->m_ptr);
+  std::size_t dst_size = dst_alloc_record->m_size - dst_offset;
 
   if (size == 0) {
     size = src_size;
@@ -333,14 +354,15 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
 
   auto alloc_record = m_allocations.find(ptr);
 
-  std::size_t src_size = alloc_record->m_size;
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->m_ptr);
+  std::size_t size = alloc_record->m_size - offset;
 
   if (length == 0) {
-    length = src_size;
+    length = size;
   }
 
-  if (length > src_size) {
-    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << src_size);
+  if (length > size) {
+    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
   }
 
   auto op = op_registry.find("MEMSET",
@@ -401,6 +423,27 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
   return dst_ptr;
 }
 
+#if defined(UMPIRE_ENABLE_NUMA)
+static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
+  std::shared_ptr<strategy::NumaPolicy> numa_alloc;
+
+  numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
+    allocator.getAllocationStrategy());
+
+  // ... or an AllocationTracker wrapping a NumaPolicy
+  if (!numa_alloc) {
+    auto alloc_tracker = dynamic_cast<strategy::AllocationTracker*>(
+      allocator.getAllocationStrategy());
+    if (alloc_tracker) {
+      numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
+        alloc_tracker->getAllocationStrategy());
+    }
+  }
+
+  return numa_alloc;
+}
+#endif
+
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
@@ -412,6 +455,42 @@ ResourceManager::move(void* ptr, Allocator allocator)
   if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
     return ptr;
   }
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  {
+    // short circuit if allocator has a NumaPolicy
+    auto numa_alloc = cast_as_numa_policy(allocator);
+
+    // If found, use op::NumaMoveOperation to move in-place (same address returned)
+    if (numa_alloc) {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      auto src_alloc_record = m_allocations.find(ptr);
+
+      const size_t size = src_alloc_record->m_size;
+      util::AllocationRecord dst_alloc_record;
+      dst_alloc_record.m_size = src_alloc_record->m_size;
+      dst_alloc_record.m_strategy = numa_alloc;
+
+      void *ret = nullptr;
+      if (size > 0) {
+        auto op = op_registry.find("MOVE",
+                                   src_alloc_record->m_strategy,
+                                   dst_alloc_record.m_strategy);
+
+        op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
+        if (ret != ptr) {
+          UMPIRE_ERROR("Numa move error");
+        }
+      }
+      else {
+        ret = ptr;
+      }
+
+      return ret;
+    }
+  }
+#endif
 
   if (ptr != alloc_record->m_ptr) {
     UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);
@@ -443,28 +522,7 @@ ResourceManager::getSize(void* ptr) const
   return record->m_size;
 }
 
-void
-ResourceManager::coalesce(Allocator allocator)
-{
-  auto strategy = allocator.getAllocationStrategy();
-
-  auto tracker = std::dynamic_pointer_cast<umpire::strategy::AllocationTracker>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-
-  }
-
-  auto dynamic_pool = std::dynamic_pointer_cast<umpire::strategy::DynamicPool>(strategy);
-
-  if (dynamic_pool) {
-    dynamic_pool->coalesce();
-  } else {
-    UMPIRE_ERROR(allocator.getName() << " is not a DynamicPool, cannot coalesce!");
-  }
-}
-
-std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForId(int id)
+strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
 
@@ -476,7 +534,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
   return allocator_i->second;
 }
 
-std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorForPointer(void* ptr)
+strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr)
 {
   auto allocation_record = m_allocations.find(ptr);
 
@@ -489,7 +547,7 @@ std::shared_ptr<strategy::AllocationStrategy>& ResourceManager::findAllocatorFor
 }
 
 std::vector<std::string>
-ResourceManager::getAvailableAllocators() noexcept
+ResourceManager::getAllocatorNames() const noexcept
 {
   std::vector<std::string> names;
   for(auto it = m_allocators_by_name.begin(); it != m_allocators_by_name.end(); ++it) {
@@ -500,10 +558,33 @@ ResourceManager::getAvailableAllocators() noexcept
   return names;
 }
 
+std::vector<int>
+ResourceManager::getAllocatorIds() const noexcept
+{
+  std::vector<int> ids;
+  for (auto& it : m_allocators_by_id) {
+    ids.push_back(it.first);
+  }
+
+  return ids;
+}
+
 int
 ResourceManager::getNextId() noexcept
 {
   return m_id++;
+}
+
+std::string
+ResourceManager::getAllocatorInformation() const noexcept
+{
+  std::ostringstream info;
+
+  for (auto& it : m_allocators_by_name) {
+    info << *it.second << " ";
+  }
+
+  return info.str();
 }
 
 } // end of namespace umpire

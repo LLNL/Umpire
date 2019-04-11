@@ -41,7 +41,7 @@ class ThreadSafeAllocator :
     Platform getPlatform() noexcept;
 
   protected:
-    std::shared_ptr<AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 
     std::mutex* m_mutex;
 };

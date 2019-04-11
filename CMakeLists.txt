@@ -19,24 +19,27 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 0.3.2)
+  VERSION 0.3.3)
 
-set(ENABLE_OPENMP On CACHE Bool "")
-set(ENABLE_CUDA On CACHE Bool "")
-set(ENABLE_COPY_HEADERS Off CACHE Bool "")
-set(ENABLE_TESTS On CACHE Bool "")
-set(ENABLE_BENCHMARKS On CACHE Bool "")
-set(ENABLE_GMOCK On CACHE Bool "")
-set(ENABLE_DOCS Off CACHE Bool "")
-set(ENABLE_WARNINGS_AS_ERRORS On CACHE Bool "")
+set(ENABLE_OPENMP On CACHE BOOL "")
+set(ENABLE_CUDA On CACHE BOOL "")
+set(ENABLE_NUMA Off CACHE BOOL "")
+set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
+set(ENABLE_TESTS On CACHE BOOL "")
+set(ENABLE_BENCHMARKS On CACHE BOOL "")
+set(ENABLE_GMOCK On CACHE BOOL "")
+set(ENABLE_DOCS Off CACHE BOOL "")
+set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_ASSERTS "Build Umpire with assert() enabled" On)
-set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE Bool "")
+set(ENABLE_GTEST_DEATH_TESTS ${ENABLE_ASSERTS} CACHE BOOL "")
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_TOOLS "Enable Umpire Development Tools" On)
+
+set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
@@ -50,6 +53,18 @@ if (ENABLE_FORTRAN)
   set(ENABLE_C On)
 endif()
 
+if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
+  message(FATAL_ERROR "\
+  Sphinx documentation requires Doxygen, \
+  please re-configure with ENABLE_DOXYGEN=ON")
+endif ()
+
+if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+  message(FATAL_ERROR "\
+  NUMA support unavailable. \
+  Please re-configure with ENABLE_NUMA=Off (default value)")
+endif ()
+
 ################################
 # BLT
 ################################
@@ -62,17 +77,17 @@ if (NOT BLT_LOADED)
     set (BLT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/blt CACHE PATH "")
 
     if (NOT EXISTS ${BLT_SOURCE_DIR}/SetupBLT.cmake)
-      message(FATAL_ERROR "\
-      The BLT submodule is not present. \
-      If in git repository run the following two commands:\n \
-      git submodule init\n \
-      git submodule update")
+      message(FATAL_ERROR
+          "The BLT git submodule is not present. "
+          "Either run the following two commands in your git repository: \n"
+          "    git submodule init\n"
+          "    git submodule update\n"
+          "Or add -DBLT_SOURCE_DIR=/path/to/blt to your CMake command." )
     endif ()
   endif ()
 
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
-
 
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)

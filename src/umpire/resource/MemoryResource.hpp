@@ -15,9 +15,9 @@
 #ifndef UMPIRE_MemoryResource_HPP
 #define UMPIRE_MemoryResource_HPP
 
-#include "umpire/resource/MemoryResourceTraits.hpp"
-
 #include "umpire/strategy/AllocationStrategy.hpp"
+
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace umpire {
 namespace resource {
