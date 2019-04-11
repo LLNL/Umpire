@@ -91,7 +91,7 @@ void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
  *
  * \param allocator source Allocator.
  */
-std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
+std::vector<const util::AllocationRecord*> get_allocator_records(Allocator allocator);
 
 } // end of namespace umpire
 

@@ -30,20 +30,19 @@ namespace {
 namespace umpire {
 namespace util {
 
-struct AllocationMap::ConstIterator::JudyL2ArrayCounter {
+struct AllocationMap::ConstIterator::JudyL2Data {
   Map* map;
   uintptr_t key;
   Map::cvector::const_iterator it;
 };
 
-const AllocationRecord& AllocationMap::ConstIterator::operator*() {
-  return *reinterpret_cast<Entry>(*data->it);
-}
-
-const AllocationRecord* AllocationMap::ConstIterator::operator->() {
+const AllocationRecord* AllocationMap::ConstIterator::operator*() {
   return reinterpret_cast<Entry>(*data->it);
 }
 
+// const AllocationRecord* AllocationMap::ConstIterator::operator->() {
+//   return reinterpret_cast<Entry>(*data->it);
+// }
 
 AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++() {
   if (!end) {
@@ -84,9 +83,9 @@ bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator
 }
 
 AllocationMap::ConstIterator::ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_) :
-  end(end_), data(new JudyL2ArrayCounter{map_,
-                                         map_->begin().key,
-                                         map_->begin().value->begin()}) {}
+  end(end_), data(new JudyL2Data{map_,
+                                 map_->begin().key,
+                                 map_->begin().value->begin()}) {}
 
 AllocationMap::AllocationMap() :
   m_records(new judyL2Array<uintptr_t, uintptr_t>()),

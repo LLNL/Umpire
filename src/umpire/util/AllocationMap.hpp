@@ -34,15 +34,14 @@ class AllocationMap
 
     class ConstIterator {
     public:
-      const AllocationRecord& operator*();
-      const AllocationRecord* operator->();
+      const AllocationRecord* operator*();
       ConstIterator& operator++();
       bool operator==(const ConstIterator& other);
       bool operator!=(const ConstIterator& other);
     private:
-      struct JudyL2ArrayCounter;
+      struct JudyL2Data;
       bool end;
-      JudyL2ArrayCounter* data;
+      JudyL2Data* data;
       ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_ = false);
       friend class AllocationMap;
     };

@@ -265,7 +265,7 @@ class ResourceManager {
 
     // Methods that need access to m_allocations to print/filter records
     friend void print_allocator_records(Allocator, std::ostream&);
-    friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
+    friend std::vector<const util::AllocationRecord*> get_allocator_records(Allocator);
 };
 
 } // end of namespace umpire

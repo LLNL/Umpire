@@ -25,9 +25,9 @@ namespace util {
 /*!
  * \brief Compute the relative fragmentation of a set of allocation records.
  *
- * Fragmentat = 1 - (largest free block) / (total free space)
+ * Fragmentation = 1 - (largest free block) / (total free space)
  */
-float relative_fragmentation(std::vector<util::AllocationRecord>& recs);
+float relative_fragmentation(std::vector<const util::AllocationRecord*>& recs);
 
 }
 }
