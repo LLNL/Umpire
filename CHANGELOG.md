@@ -8,6 +8,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+- Replay has been changed to produce and interpret its output in JSON format.
+
+### Removed
+
+### Fixed
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
