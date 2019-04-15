@@ -40,16 +40,12 @@ const AllocationRecord* AllocationMap::ConstIterator::operator*() {
   return reinterpret_cast<Entry>(*data->it);
 }
 
-// const AllocationRecord* AllocationMap::ConstIterator::operator->() {
-//   return reinterpret_cast<Entry>(*data->it);
-// }
-
 AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++() {
   if (!end) {
     ++(data->it);
 
-    // NOTE: Need find() here rather than using the last lookup
-    // because judyL2Array is stateful
+    // Use find() here rather than using the last lookup because
+    // judyL2Array begin()/end() cache the state internally.
 
     const auto* vec = data->map->find(data->key);
     if (data->it == vec->end()) {

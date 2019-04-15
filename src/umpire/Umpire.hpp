@@ -83,11 +83,7 @@ int get_patch_version()
 void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
 
 /*!
- * \brief Filters and returns a vector of AllocationRecords.
- *
- * Note that this returns a vector of allocations because unlike
- * general allocation tracking, no more than one address can be
- * associated with an allocator.
+ * \brief Returns vector of AllocationRecords created by the allocator.
  *
  * \param allocator source Allocator.
  */
