@@ -40,11 +40,11 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-    UMPIRE_REPLAY("event: \"makeAllocator\", payload: { type:\""
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-        << "\", with_introspection:\"" << (introspection ? "true" : "false") << "\""
-        << ", allocator_name:\"" << name << "\""
-        << ", args: [ "
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
     );
@@ -71,14 +71,14 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
-    UMPIRE_REPLAY("event: \"makeAllocator\", payload: { type:\""
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-        << "\", with_introspection:\"" << (introspection ? "true" : "false") << "\""
-        << ", allocator_name:\"" << name << "\""
-        << ", args: [ "
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
-        << ", result: { allocator:\"" << allocator << "\" }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
     );
 
     UMPIRE_UNLOCK;

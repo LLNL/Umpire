@@ -50,9 +50,9 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
     if (allocator_factory->isValidMemoryResourceFor(name)) {
       auto a = allocator_factory->create(name, id);
       UMPIRE_REPLAY(
-           "event: \"makeMemoryResource\""
-        << ", payload: { name: \"" << name << "\" }"
-        << ", result: \"" << a << "\""
+           "\"event\": \"makeMemoryResource\""
+        << ", \"payload\": { \"name\": \"" << name << "\" }"
+        << ", \"result\": \"" << a << "\""
       );
       return a;
     }

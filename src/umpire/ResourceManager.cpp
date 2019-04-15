@@ -115,9 +115,9 @@ ResourceManager::initialize()
       UMPIRE_VERSION_MINOR << "." <<
       UMPIRE_VERSION_PATCH);
 
-  UMPIRE_REPLAY( "event: \"version\", result: { major:" << UMPIRE_VERSION_MAJOR 
-      << ", minor:" << UMPIRE_VERSION_MINOR
-      << ", patch:" << UMPIRE_VERSION_PATCH
+  UMPIRE_REPLAY( "\"event\": \"version\", \"result\": { \"major\":" << UMPIRE_VERSION_MAJOR 
+      << ", \"minor\":" << UMPIRE_VERSION_MINOR
+      << ", \"patch\":" << UMPIRE_VERSION_PATCH
       << " }");
 
   resource::MemoryResourceRegistry& registry =

@@ -115,7 +115,7 @@ DynamicPool::getPlatform() noexcept
 void
 DynamicPool::coalesce() noexcept
 {
-  UMPIRE_REPLAY("event: \"coalesce\", payload: { allocator_name: \"" << getName() << "\" }");
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
   dpa->coalesce();
 }
 

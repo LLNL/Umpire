@@ -78,9 +78,9 @@ private:
     std::ostringstream local_msg;                                            \
     auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch();\
     local_msg                                                                \
-      << "{ kind:\"replay\", uid:"                                           \
+      << "{ \"kind\":\"replay\", \"uid\":"                                   \
       << umpire::replay::Replay::getReplayLogger()->replayUid() << ", "      \
-      << "timestamp:"                                                        \
+      << "\"timestamp\":"                                                    \
       << static_cast<long>(time.count()) << ", "                             \
       << msg                                                                 \
       << " }"                                                                \
