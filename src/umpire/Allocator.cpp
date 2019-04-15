@@ -37,11 +37,11 @@ Allocator::allocate(size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY("allocate_attempt" << "," << bytes << "," << m_allocator);
+  UMPIRE_REPLAY("event: \"allocate\", payload: { allocator: \"" << m_allocator << "\", size: " << bytes << " }");
 
   ret = m_allocator->allocate(bytes);
 
-  UMPIRE_REPLAY("allocate_success" << "," << bytes << "," << m_allocator << "," << ret);
+  UMPIRE_REPLAY("event: \"allocate\", payload: { allocator: \"" << m_allocator << "\", size: " << bytes << " }, result: { pointer: \"" << ret << "\" }");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
   return ret;
@@ -50,7 +50,7 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY("deallocate," << ptr << "," << m_allocator);
+  UMPIRE_REPLAY("event: \"deallocate\", payload: { allocator: \"" << m_allocator << "\", pointer: \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -67,7 +67,7 @@ Allocator::deallocate(void* ptr)
 void
 Allocator::release()
 {
-  UMPIRE_REPLAY("release," <<  m_allocator);
+  UMPIRE_REPLAY("event: \"release\", payload: { allocator: \"" <<  m_allocator << "\" }");
 
   UMPIRE_LOG(Debug, "");
 
