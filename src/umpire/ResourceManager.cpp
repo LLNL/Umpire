@@ -45,6 +45,9 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/IOManager.hpp"
+
 #include <iterator>
 #include <memory>
 #include <sstream>
@@ -57,6 +60,9 @@ ResourceManager&
 ResourceManager::getInstance()
 {
   if (!s_resource_manager_instance) {
+    util::MPI::initialize();
+    util::IOManager::initialize();
+
     s_resource_manager_instance = new ResourceManager();
   }
 
@@ -101,6 +107,8 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     new resource::RocmPinnedMemoryResourceFactory());
 #endif
+
+  initialize();
 
   UMPIRE_LOG(Debug, "() leaving");
 }

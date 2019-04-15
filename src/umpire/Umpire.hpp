@@ -28,19 +28,6 @@
 
 namespace umpire {
 
-inline void
-initialize()
-{
-  util::MPI::initialize();
-  util::IOManager::initialize();
-  ResourceManager::getInstance().initialize();
-}
-
-inline void
-finalize()
-{
-}
-
 /*!
  * \brief Allocate memory in the default space, with the default allocator.
  *
