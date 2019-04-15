@@ -1,0 +1,13 @@
+testing:
+ tags:
+   - shell
+   - quartz
+ before_script:
+   - git submodule sync --recursive
+   - git submodule update --init --recursive
+ script:
+   - module load cmake/3.9.2
+   - module load gcc
+   - mkdir build && cd build
+   - cmake -DENABLE_CUDA=Off ..
+   - make
