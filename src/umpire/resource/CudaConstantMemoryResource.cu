@@ -68,11 +68,11 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record->m_size;
+  m_current_size -= record->size;
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record->size))
       == static_cast<char*>(ptr)) {
-    m_offset -= record->m_size;
+    m_offset -= record->size;
   } else {
     UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
   }

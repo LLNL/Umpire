@@ -29,7 +29,7 @@ void HostReallocateOperation::transform(
     util::AllocationRecord *dst_allocation,
     size_t length)
 {
-  auto allocator = dst_allocation->m_strategy;
+  auto allocator = dst_allocation->strategy;
 
   delete ResourceManager::getInstance().deregisterAllocation(src_ptr);
 

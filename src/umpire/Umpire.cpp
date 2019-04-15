@@ -25,7 +25,7 @@ void print_allocator_records(Allocator alloc, std::ostream& os) {
   auto strategy = alloc.getAllocationStrategy();
 
   rm.m_allocations.print([strategy] (const util::AllocationRecord* rec) {
-    return rec->m_strategy == strategy;
+    return rec->strategy == strategy;
   }, os);
 }
 

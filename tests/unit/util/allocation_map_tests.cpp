@@ -172,6 +172,6 @@ TEST_F(AllocationMapTest, Print)
   map.printAll();
 
   map.print([this](const umpire::util::AllocationRecord* r) {
-    return r->m_ptr == data;
+    return r->ptr == data;
   });
 }

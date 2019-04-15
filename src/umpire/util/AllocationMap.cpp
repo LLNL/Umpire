@@ -113,11 +113,11 @@ AllocationMap::findRecord(void* ptr) const
         reinterpret_cast<Entry>(record.value->back());
 
       if (alloc_record &&
-          ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
+          ((static_cast<char*>(parent_ptr) + alloc_record->size)
              > static_cast<char*>(ptr))) {
 
          UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
-            << " with size " << alloc_record->m_size);
+            << " with size " << alloc_record->size);
 
       }
       else {
@@ -175,9 +175,9 @@ AllocationMap::print(const std::function<bool (const AllocationRecord*)>&& pred,
       AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
       if (pred(tmp)) {
         any_match = true;
-        ss << "  " << tmp->m_size <<
+        ss << "  " << tmp->size <<
           " [ " << reinterpret_cast<void*>(addr) <<
-          " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
+          " -- " << reinterpret_cast<void*>(addr+tmp->size) <<
           " ] " << std::endl;
       }
     }
