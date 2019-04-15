@@ -250,3 +250,19 @@ INSTANTIATE_TEST_CASE_P(
     Resources,
     AllocatorByResourceTest,
     ::testing::ValuesIn(resource_types));
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Allocator, DeallocateWithDifferent)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc_um = rm.getAllocator("UM");
+  auto alloc_dev = rm.getAllocator("DEVICE");
+
+  double* data = static_cast<double*>(alloc_um.allocate(1024*sizeof(double)));
+
+  ASSERT_THROW(
+    alloc_dev.deallocate(data),
+    umpire::util::Exception);
+
+}
+#endif
