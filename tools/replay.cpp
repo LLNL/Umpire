@@ -36,6 +36,7 @@
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
+#include "umpire/tpl/json/json.hpp"
 
 static cxxopts::ParseResult parse(int argc, char* argv[])
 {

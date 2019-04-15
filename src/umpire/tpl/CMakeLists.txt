@@ -43,6 +43,28 @@ if (ENABLE_STATISTICS)
 endif()
 
 #
+# Json
+set (json_headers
+  ./json/json.hpp )
+
+blt_add_library(
+  NAME umpire_tpl_json
+  HEADERS ${json_headers})
+
+target_link_libraries(umpire_tpl_json INTERFACE)
+
+install(FILES
+  ${json_headers}
+  DESTINATION include/umpire/tpl/json)
+
+install(TARGETS
+  umpire_tpl_json
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
+#
 # CXX Option Parsing Headers
 set (cxxopts_headers
   ./cxxopts/include/cxxopts.hpp )
