@@ -54,6 +54,8 @@ and the smart pointers added unecessary overhead.
 
 - Moved CHANGELOG to CHANGELOG.md.
 
+- Removed `m_` prefixes from AllocationRecord members.
+
 ### Removed
 
 - The 'coalesce' method was removed from ResourceManager and now must be
