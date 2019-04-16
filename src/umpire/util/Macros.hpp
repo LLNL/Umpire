@@ -25,13 +25,13 @@
 #include <sstream>
 #include <iostream>
 #include <mutex>
-
-#ifdef UMPIRE_ENABLE_ASSERTS
 #include <cassert>
+
+#ifndef NDEBUG
 #define UMPIRE_ASSERT(condition) assert(condition)
 #else
 #define UMPIRE_ASSERT(condition) ((void)0)
-#endif // UMPIRE_ENABLE_ASSERTS
+#endif
 
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
