@@ -49,6 +49,8 @@ AllocationTracker::deallocate(void* ptr)
   }
 
   m_allocator->deallocate(ptr);
+
+  delete record;
 }
 
 void
