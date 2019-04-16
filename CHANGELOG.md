@@ -11,7 +11,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 
 - Exclude third-party libraries from Doxygen to fix out-of-resources error on
-  ReadTheDocs
+ReadTheDocs.
+
+### Changed
+
+- OpenMP changed to off by default.
+
+### Removed
+
+- `ENABLE_ASSERTS` was removed in factor of checking the `NDEBUG` macro.
 
 ## [0.3.3] - 2019-04-11
 
@@ -59,15 +67,11 @@ and the smart pointers added unecessary overhead.
 
 - Moved CHANGELOG to CHANGELOG.md.
 
-- OpenMP changed to off by default.
-
 ### Removed
 
 - The 'coalesce' method was removed from ResourceManager and now must be
 accessed directory. examples/cookbook/recipe_coalesce_pool.cpp shows how to do
 this.
-
-- `ENABLE_ASSERTS` was removed in factor of checking the `NDEBUG` macro.
 
 ### Fixed
 
