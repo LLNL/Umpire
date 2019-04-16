@@ -58,13 +58,9 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 
   auto record = deregisterAllocation(ptr);
 
-  if (record->m_strategy != this) {
-    UMPIRE_ERROR(ptr << " was not allocated by " << getName());
-  }
+  UMPIRE_CHECK_ALLOCATOR(record, getName());
 
   m_allocator.deallocate(ptr);
-
-  delete record;
 }
 
 template<typename _allocator>

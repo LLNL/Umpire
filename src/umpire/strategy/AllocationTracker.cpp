@@ -44,13 +44,9 @@ AllocationTracker::deallocate(void* ptr)
 {
   auto record = deregisterAllocation(ptr);
 
-  if (record->m_strategy != this) {
-    UMPIRE_ERROR(ptr << " was not allocated by " << m_allocator->getName());
-  }
+  UMPIRE_CHECK_ALLOCATOR(record, m_allocator->getName());
 
   m_allocator->deallocate(ptr);
-
-  delete record;
 }
 
 void
