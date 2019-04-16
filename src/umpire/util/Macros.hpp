@@ -127,9 +127,8 @@
   m_mutex->unlock();
 
 #define UMPIRE_CHECK_ALLOCATOR(record, name) \
-  if (record->m_strategy != this) { \
+  if (record.m_strategy != this) { \
     UMPIRE_ERROR(ptr << " was not allocated by " << name); \
   } \
-  delete record;
 
 #endif // UMPIRE_Macros_HPP

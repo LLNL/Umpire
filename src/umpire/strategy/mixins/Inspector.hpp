@@ -36,7 +36,7 @@ class Inspector
         size_t size,
         strategy::AllocationStrategy* strategy);
 
-    util::AllocationRecord* deregisterAllocation(void* ptr);
+    util::AllocationRecord deregisterAllocation(void* ptr);
 
   protected:
     long m_current_size;
