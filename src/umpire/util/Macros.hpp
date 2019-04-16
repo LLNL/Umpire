@@ -128,7 +128,7 @@
 
 #define UMPIRE_CHECK_ALLOCATOR(record, name) \
   if (record->m_strategy != this) { \
-    UMPIRE_ERROR(ptr << " was not allocated by " << m_allocator->getName()); \
+    UMPIRE_ERROR(ptr << " was not allocated by " << name); \
   } \
   delete record;
 
