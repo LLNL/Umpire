@@ -67,7 +67,7 @@ and the smart pointers added unecessary overhead.
 accessed directory. examples/cookbook/recipe_coalesce_pool.cpp shows how to do
 this.
 
-- The `ENABLE_ASSERTS` macro was removed in favor of checking `NDEBUG`.
+- `ENABLE_ASSERTS` was removed in factor of checking the `NDEBUG` macro.
 
 ### Fixed
 
