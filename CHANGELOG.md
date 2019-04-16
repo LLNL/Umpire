@@ -8,10 +8,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-### Fixed
-
-- Exclude third-party libraries from Doxygen to fix out-of-resources error on
-ReadTheDocs.
+### Added
 
 ### Changed
 
@@ -20,6 +17,14 @@ ReadTheDocs.
 ### Removed
 
 - `ENABLE_ASSERTS` was removed in factor of checking the `NDEBUG` macro.
+
+### Fixed
+
+- Exclude third-party libraries from Doxygen to fix out-of-resources error on
+ReadTheDocs.
+
+- Throw an error if attempting to deallocate with a different Allocator than
+performed the allocation.
 
 ## [0.3.3] - 2019-04-11
 
