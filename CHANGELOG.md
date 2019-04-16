@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [0.3.3] - 2019-04-11
+
 ### Added
 
 - NUMA strategy (umpire::strategy::NumaPolicy) that allows allocating memory
@@ -57,6 +59,8 @@ than having one library per source subdirectory.
 - Removed shared_ptr usage entirely. Ownership of objects was never "shared"
 and the smart pointers added unecessary overhead.
 
+- Moved CHANGELOG to CHANGELOG.md.
+
 ### Removed
 
 - The 'coalesce' method was removed from ResourceManager and now must be
@@ -64,11 +68,15 @@ accessed directory. examples/cookbook/recipe_coalesce_pool.cpp shows how to do
 this.
 
 ### Fixed
-- Bug in ResourceManager::copy/memset when given a pointer offset into an allocation.
+
+- Bug in ResourceManager::copy/memset when given a pointer offset into an
+allocation.
 
 - Memory leak in judyL2Array.
 
-- While replay already was recording release operations, the tool was not actually replaying them.  A fix was implemented so that the replay tool will now also replay any captured release operations.
+- While replay already was recording release operations, the tool was not
+actually replaying them.  A fix was implemented so that the replay tool will
+now also replay any captured release operations.
 
 - `make docs` used to fail, because the build was setup for Read the Docs. A fix
 was implemented so Doxygen and Sphinx can be run locally, for instance to test

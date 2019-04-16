@@ -5,7 +5,7 @@ workflow "New workflow" {
 
 action "Check CHANGELOG" {
   uses = "./.github/actions/bin/diff-check"
-  args = ["CHANGELOG"]
+  args = ["CHANGELOG.md"]
 }
 
 action "Static Analysis" {
