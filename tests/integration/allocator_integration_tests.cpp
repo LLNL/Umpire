@@ -19,6 +19,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 class AllocatorTest :
   public ::testing::TestWithParam< std::string >
@@ -251,8 +252,23 @@ INSTANTIATE_TEST_CASE_P(
     AllocatorByResourceTest,
     ::testing::ValuesIn(resource_types));
 
+TEST(Allocation, DeallocateDifferent)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc_one  = rm.getAllocator("HOST");
+  auto alloc_two = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "POOL_different_deallocate", alloc_one);
+
+  double* data = static_cast<double*>(alloc_one.allocate(1024*sizeof(double)));
+
+  ASSERT_THROW(
+    alloc_two.deallocate(data),
+    umpire::util::Exception);
+}
+
 #if defined(UMPIRE_ENABLE_CUDA)
-TEST(Allocator, DeallocateWithDifferent)
+TEST(Allocator, DeallocateDifferentCuda)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc_um = rm.getAllocator("UM");
