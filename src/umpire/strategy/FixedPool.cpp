@@ -79,10 +79,12 @@ FixedPool::allocInPool(Pool& p) noexcept
   for (int int_index = 0; int_index < avail_bytes; ++int_index) {
     const int bit_index = ffs(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
-      p.avail[int_index] ^= 1 << bit_index;
-      p.num_avail--;
-      const int offset = int_index * bits_per_int + bit_index;
-      return reinterpret_cast<void*>(p.data + m_obj_bytes * offset);
+      const size_t index = int_index * bits_per_int + bit_index;
+      if (index < m_obj_per_pool) {
+        p.avail[int_index] ^= 1 << bit_index;
+        p.num_avail--;
+        return reinterpret_cast<void*>(p.data + m_obj_bytes * index);
+      }
     }
   }
 
