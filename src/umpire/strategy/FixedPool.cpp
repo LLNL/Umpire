@@ -98,8 +98,8 @@ FixedPool::allocate(size_t bytes)
 {
   void* ptr = nullptr;
 
-  for (auto& p : m_pool) {
-    ptr = allocInPool(p);
+  for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
+    ptr = allocInPool(*it);
     if (ptr) break;
   }
 
