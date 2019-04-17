@@ -17,8 +17,6 @@
 
 #include "umpire/Allocator.hpp"
 
-#include "umpire/alloc/MallocAllocator.hpp"
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 #include <cstddef>

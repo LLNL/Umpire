@@ -67,8 +67,6 @@ void
 FixedPool::newPool()
 {
   m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool);
-  m_current_bytes += m_obj_bytes * m_obj_per_pool;
-  m_highwatermark = std::max(m_highwatermark, m_current_bytes);
 }
 
 void*
@@ -110,6 +108,9 @@ FixedPool::allocate(size_t bytes)
 
   UMPIRE_ASSERT(ptr);
 
+  m_current_bytes += m_obj_bytes;
+  m_highwatermark = std::max(m_highwatermark, m_current_bytes);
+
   return ptr;
 }
 
@@ -142,9 +143,9 @@ long
 FixedPool::getActualSize() const noexcept
 {
   const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
-  return m_current_bytes
-    + m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes)
-    + m_pool.capacity() * sizeof(Pool);
+  return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes)
+    + m_pool.capacity() * sizeof(Pool)
+    + sizeof(FixedPool);
 }
 
 long
