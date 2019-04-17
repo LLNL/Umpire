@@ -26,6 +26,7 @@
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
@@ -309,6 +310,32 @@ TEST(FixedPool, Host)
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 
   allocator.deallocate(alloc);
+}
+
+TEST(MixedPool, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
+      "host_mixed_pool", rm.getAllocator("HOST"));
+
+  const int max_power = 5;
+  void* alloc[max_power];
+  int size = 1024, total_size = 0;
+  for (int i = 0; i < max_power; ++i) {
+    alloc[i] = allocator.allocate(size);
+    total_size += size;
+    size *= 1024;
+  }
+
+  ASSERT_EQ(allocator.getCurrentSize(), total_size);
+  ASSERT_GT(allocator.getActualSize(), total_size);
+  ASSERT_EQ(allocator.getSize(alloc[0]), 1024);
+  ASSERT_GE(allocator.getHighWatermark(), total_size);
+  ASSERT_EQ(allocator.getName(), "host_mixed_pool");
+
+  for (int i = 0; i < max_power; ++i)
+    allocator.deallocate(alloc[i]);
 }
 
 #if defined(_OPENMP)

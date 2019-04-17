@@ -139,19 +139,28 @@ void MixedPoolImpl<FirstFixed,Increment,LastFixed>::release()
 template<int FirstFixed, int Increment, int LastFixed>
 long MixedPoolImpl<FirstFixed,Increment,LastFixed>::getCurrentSize() const noexcept
 {
-  return 0;
+  size_t size = 0;
+  for (auto& fp : m_fixed_pool) size += fp->getCurrentSize();
+  size += m_dynamic_pool->getCurrentSize();
+  return size;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
 long MixedPoolImpl<FirstFixed,Increment,LastFixed>::getActualSize() const noexcept
 {
-  return 0;
+  size_t size = 0;
+  for (auto& fp : m_fixed_pool) size += fp->getActualSize();
+  size += m_dynamic_pool->getActualSize();
+  return size;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
 long MixedPoolImpl<FirstFixed,Increment,LastFixed>::getHighWatermark() const noexcept
 {
-  return 0;
+  size_t size = 0;
+  for (auto& fp : m_fixed_pool) size += fp->getHighWatermark();
+  size += m_dynamic_pool->getHighWatermark();
+  return size;
 }
 
 template<int FirstFixed, int Increment, int LastFixed>
