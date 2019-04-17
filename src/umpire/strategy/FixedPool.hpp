@@ -15,80 +15,48 @@
 #ifndef UMPIRE_FixedPool_HPP
 #define UMPIRE_FixedPool_HPP
 
-#include <memory>
-#include <vector>
+#include "umpire/alloc/MallocAllocator.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
-#include "umpire/Allocator.hpp"
-
-#include "umpire/tpl/simpool/StdAllocator.hpp"
+#include <cstddef>
 
 namespace umpire {
 namespace strategy {
 
-/*!
- * \brief Pool for fixed size allocations
- *
- * This AllocationStrategy provides an efficient pool for fixed size
- * allocations of size T. Pools of NP objects of type T are constructed, and
- * used to quickly allocate and deallocate objects.
- */
-template <typename T, int NP=64, typename IA=StdAllocator>
-class FixedPool
-  : public AllocationStrategy
+class FixedPool : public AllocationStrategy
 {
+public:
+  FixedPool(const std::string& name, int id,
+            Allocator allocator, const size_t object_size,
+            const size_t objects_per_pool = 1024 * sizeof(int) * sizeof(char));
 
-  public:
-    FixedPool(
-        const std::string& name,
-        int id,
-        Allocator allocator);
+  void* allocate(size_t bytes) override final;
+  void deallocate(void* ptr) override final;
 
-    ~FixedPool();
+  long getCurrentSize() const noexcept override final;
+  long getHighWatermark() const noexcept override final;
+  long getActualSize() const noexcept override final;
+  Platform getPlatform() noexcept override final;
 
-    void* allocate(size_t bytes);
+private:
+  constexpr size_t bits_per_int = sizeof(int) * sizeof(char);
 
-    void deallocate(void* ptr);
+  struct Pool {
+    char data[];
+    int avail[];
+    size_t num_avail;
+    Pool(const size_t object_size, const size_t num_objects, FixedPool* fp);
+  };
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
-
-    Platform getPlatform() noexcept;
-
-  private:
-    struct Pool
-    {
-      unsigned char *data;
-      unsigned int *avail;
-      unsigned int numAvail;
-      struct Pool* next;
-    };
-
-    void newPool(struct Pool **pnew);
-
-    T* allocInPool(struct Pool *p);
-
-    size_t numPools() const noexcept;
-
-
-    struct Pool *m_pool;
-    size_t m_num_per_pool;
-    size_t m_total_pool_size;
-
-    size_t m_num_blocks;
-
-
-    long m_highwatermark;
-    long m_current_size;
-
-    strategy::AllocationStrategy* m_allocator;
+  size_t m_avail_bytes;
+  size_t m_obj_bytes;
+  size_t m_num_obj;
+  AllocationStrategy* m_allocator;
+  std::vector<Pool> m_pool;
 };
 
-} // end of namespace strategy
+} // end namespace strategy
 } // end namespace umpire
 
-#include "umpire/strategy/FixedPool.inl"
-
-#endif // UMPIRE_FixedPool_HPP
+#endif // UMPIRE_ObjectPool_HPP
