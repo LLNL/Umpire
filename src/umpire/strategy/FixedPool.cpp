@@ -13,10 +13,13 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/strategy/FixedPool.hpp"
+
 #include "umpire/util/Macros.hpp"
 
-#include <memory>
 #include <cstring>
+#include <cstdlib>
+#include <algorithm>
 
 // TODO: Support for Windows
 #include <strings.h>
@@ -24,35 +27,84 @@
 namespace umpire {
 namespace strategy {
 
-FixedPool(const std::string& name, int id,
-          Allocator allocator, const size_t object_size,
-          const size_t objects_per_pool) :
-  AllocationStrategy(name, id),
-  m_strategy(allocator.getAllocationStrategy()),
-  m_avail_bytes(num_objects/bits_per_int + 1),
-  m_obj_bytes(object_size),
-  m_num_obj(num_objects)
+static constexpr size_t bits_per_int = sizeof(int) * 8;
+
+FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
+                      const size_t object_bytes, const size_t objects_per_pool) :
+  strategy(allocation_strategy),
+  data(reinterpret_cast<char*>(strategy->allocate(object_bytes * objects_per_pool))),
+  avail(reinterpret_cast<int*>(std::malloc(objects_per_pool/bits_per_int + 1))),
+  num_avail(objects_per_pool)
 {
+  std::memset(avail, ~0, objects_per_pool/bits_per_int + 1);
 }
 
-FixedPool::Pool::Pool(const size_t object_size, const size_t num_objects,
-                      FixedPool* fp) :
-  data(reinterpret_cast<char*>(fp->m_strategy->allocate(fp->m_obj_bytes * fp->m_num_obj))),
-  avail(reinterpret_cast<int*>(std::malloc(fp->m_avail_bytes))),
-  num_avail(fp->m_num_objs)
+FixedPool::Pool::~Pool()
 {
-  std::memset(avail, ~0, fp->m_avail_bytes);
+  strategy->deallocate(data);
+  std::free(avail);
+  data = nullptr;
+  avail = nullptr;
+  strategy = nullptr;
+  num_avail = 0;
+}
+
+FixedPool::FixedPool(const std::string& name, int id,
+                     Allocator allocator, const size_t object_bytes,
+                     const size_t objects_per_pool) :
+  AllocationStrategy(name, id),
+  m_strategy(allocator.getAllocationStrategy()),
+  m_obj_bytes(object_bytes),
+  m_obj_per_pool(objects_per_pool),
+  m_current_bytes(0),
+  m_highwatermark(0),
+  m_pool()
+{
+  newPool();
+}
+
+void
+FixedPool::newPool()
+{
+  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool);
+  m_current_bytes += m_obj_bytes * m_obj_per_pool;
+  m_highwatermark = std::max(m_highwatermark, m_current_bytes);
+}
+
+void*
+FixedPool::allocInPool(Pool& p) noexcept
+{
+  if (!p.num_avail) return nullptr;
+
+  const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
+
+  for (int int_index = 0; int_index < avail_bytes; ++int_index) {
+    const int bit_index = ffs(p.avail[int_index]) - 1;
+    if (bit_index >= 0) {
+      p.avail[int_index] ^= 1 << bit_index;
+      p.num_avail--;
+      const int offset = int_index * bits_per_int + bit_index;
+      return reinterpret_cast<void*>(p.data + m_obj_bytes * offset);
+    }
+  }
+
+  UMPIRE_ASSERT("FixedPool: Logic error in allocate");
+
+  return nullptr;
 }
 
 void*
 FixedPool::allocate(size_t bytes)
 {
-  T* ptr = nullptr;
+  void* ptr = nullptr;
 
-  for (size_t i = m_pool.size(); i-- > 0; ) allocInPool(m_pool[i]);
+  for (auto& p : m_pool) {
+    ptr = allocInPool(p);
+    if (ptr) break;
+  }
 
   if (!ptr) {
-    m_pool.emplace_back(m_obj_bytes, m_num_obj, this);
+    newPool();
     ptr = allocate(bytes);
   }
 
@@ -61,36 +113,18 @@ FixedPool::allocate(size_t bytes)
   return ptr;
 }
 
-void*
-FixedPool::allocInPool(Pool& p)
-{
-  if (!p.num_avail) return nullptr;
-
-  for (int a = 0; a < m_abytes; ++a) {
-    const int bit = ffs(p.avail[i]) - 1;
-    if (bit >= 0) {
-      p.avail[i] ^= 1 << bit;
-      p.num_avail--;
-      const int index = a * bits_per_int + bit;
-      return reinterpret_cast<void*>(p.data + m_obj_size * index);
-    }
-  }
-
-  UMPIRE_ERROR("FixedPool: Logic error in allocate");
-}
-
 void
 FixedPool::deallocate(void* ptr)
 {
   for (auto& p : m_pool) {
     const int object_index = (reinterpret_cast<char*>(ptr) - p.data) / m_obj_bytes;
-    if (static_cast<unsigned int>(object_index) < m_num_objs) {
+    if (static_cast<unsigned int>(object_index) < m_obj_per_pool) {
       const int byte_index = object_index * m_obj_bytes;
       const int int_index = byte_index / bits_per_int;
       const short bit_index = byte_index % bits_per_int;
 
-      UMPIRE_ASSERT(p.avail[int_index] & (1 << bit_index));
-      p.avail[int_index] ^= 1 << byte_index;
+      UMPIRE_ASSERT(! (p.avail[int_index] & (1 << bit_index)));
+      p.avail[int_index] ^= 1 << bit_index;
       p.num_avail++;
 
       return;
@@ -101,13 +135,16 @@ FixedPool::deallocate(void* ptr)
 long
 FixedPool::getCurrentSize() const noexcept
 {
-  return m_current_size;
+  return m_current_bytes;
 }
 
 long
 FixedPool::getActualSize() const noexcept
 {
-  return m_total_pool_size;
+  const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
+  return m_current_bytes
+    + m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes)
+    + m_pool.capacity() * sizeof(Pool);
 }
 
 long
@@ -116,10 +153,10 @@ FixedPool::getHighWatermark() const noexcept
   return m_highwatermark;
 }
 
-long
+Platform
 FixedPool::getPlatform() noexcept
 {
-  return m_allocator->getPlatform();
+  return m_strategy->getPlatform();
 }
 
 } // end of namespace strategy

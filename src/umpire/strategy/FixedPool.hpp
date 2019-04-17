@@ -15,11 +15,14 @@
 #ifndef UMPIRE_FixedPool_HPP
 #define UMPIRE_FixedPool_HPP
 
+#include "umpire/Allocator.hpp"
+
 #include "umpire/alloc/MallocAllocator.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 #include <cstddef>
+#include <vector>
 
 namespace umpire {
 namespace strategy {
@@ -34,8 +37,8 @@ class FixedPool : public AllocationStrategy
 {
 public:
   FixedPool(const std::string& name, int id,
-            Allocator allocator, const size_t object_size,
-            const size_t objects_per_pool = 1024 * sizeof(int) * sizeof(char));
+            Allocator allocator, const size_t object_bytes,
+            const size_t objects_per_pool = 64 * sizeof(int) * 8);
 
   void* allocate(size_t bytes) override final;
   void deallocate(void* ptr) override final;
@@ -46,19 +49,24 @@ public:
   Platform getPlatform() noexcept override final;
 
 private:
-  constexpr size_t bits_per_int = sizeof(int) * sizeof(char);
-
   struct Pool {
-    char data[];
-    int avail[];
+    AllocationStrategy* strategy;
+    char* data;
+    int* avail;
     size_t num_avail;
-    Pool(const size_t object_size, const size_t num_objects, FixedPool* fp);
+    Pool(AllocationStrategy* allocation_strategy,
+         const size_t object_bytes, const size_t objects_per_pool);
+    ~Pool();
   };
 
-  size_t m_avail_bytes;
+  void newPool();
+  void* allocInPool(Pool& p) noexcept;
+
+  AllocationStrategy* m_strategy;
   size_t m_obj_bytes;
-  size_t m_num_obj;
-  AllocationStrategy* m_allocator;
+  size_t m_obj_per_pool;
+  size_t m_current_bytes;
+  size_t m_highwatermark;
   std::vector<Pool> m_pool;
 };
 
