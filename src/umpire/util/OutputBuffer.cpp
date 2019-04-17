@@ -79,5 +79,16 @@ OutputBuffer::sync()
   return ret == 0 ? 0 : -1;
 }
 
+OutputBuffer::~OutputBuffer()
+{
+  if (d_console_stream) {
+    d_console_stream->pubsync();
+  }
+
+  if (d_file_stream) {
+    d_file_stream->pubsync();
+  }
+}
+
 } // end of namespace util
 } // end of namespace umpire

@@ -25,6 +25,8 @@ class OutputBuffer : public std::streambuf
 public:
   OutputBuffer() = default;
 
+  ~OutputBuffer();
+
   void setConsoleStream(std::ostream* stream);
   void setFileStream(std::ostream* stream);
 
