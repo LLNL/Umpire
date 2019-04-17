@@ -8,6 +8,20 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+- Exclude third-party libraries from Doxygen to fix out-of-resources error on
+  ReadTheDocs
+  
+- Throw an error if attempting to deallocate with a different Allocator than
+  performed the allocation
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
