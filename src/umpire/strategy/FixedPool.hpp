@@ -24,6 +24,12 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ * \brief Pool for fixed size allocations
+ *
+ * This AllocationStrategy provides an efficient pool for fixed size
+ * allocations, and used to quickly allocate and deallocate objects.
+ */
 class FixedPool : public AllocationStrategy
 {
 public:
