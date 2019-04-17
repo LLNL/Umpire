@@ -82,8 +82,7 @@ FixedPool::allocInPool(Pool& p)
 void
 FixedPool::deallocate(void* ptr)
 {
-
-  for (const auto& p : m_pool) {
+  for (auto& p : m_pool) {
     const int object_index = (reinterpret_cast<char*>(ptr) - p.data) / m_obj_bytes;
     if (static_cast<unsigned int>(object_index) < m_num_objs) {
       const int byte_index = object_index * m_obj_bytes;

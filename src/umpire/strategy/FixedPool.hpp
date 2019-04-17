@@ -59,4 +59,4 @@ private:
 } // end namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_ObjectPool_HPP
+#endif // UMPIRE_FixedPool_HPP
