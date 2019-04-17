@@ -34,6 +34,20 @@ namespace strategy {
 class FixedPool : public AllocationStrategy
 {
   public:
+    /*!
+     * \brief Constructs a FixedPool.
+     *
+     * \param name The allocator name for reference later in ResourceManager
+     * \param id The allocator id for reference later in ResourceManager
+     * \param allocator Used for data allocation. It uses std::malloc
+     * for internal tracking of these allocations.
+     * \param object_bytes The fixed size (in bytes) for each allocation
+     * \param objects_per_pool Number of objects in each sub-pool
+     * internally. Performance likely improves if this is large, at
+     * the cost of memory usage. This does not have to be a multiple
+     * of sizeof(int)*8, but it will also likely improve performance
+     * if so.
+     */
     FixedPool(const std::string& name, int id,
               Allocator allocator, const size_t object_bytes,
               const size_t objects_per_pool = 64 * sizeof(int) * 8);
@@ -69,6 +83,9 @@ class FixedPool : public AllocationStrategy
     size_t m_current_bytes;
     size_t m_highwatermark;
     std::vector<Pool> m_pool;
+    // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
+    // ever reduced in size, then .data and .avail have to be manually
+    // deallocated to avoid a memory leak.
 };
 
 } // end namespace strategy
