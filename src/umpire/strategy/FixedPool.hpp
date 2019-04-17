@@ -33,39 +33,42 @@ namespace strategy {
  */
 class FixedPool : public AllocationStrategy
 {
-public:
-  FixedPool(const std::string& name, int id,
-            Allocator allocator, const size_t object_bytes,
-            const size_t objects_per_pool = 64 * sizeof(int) * 8);
+  public:
+    FixedPool(const std::string& name, int id,
+              Allocator allocator, const size_t object_bytes,
+              const size_t objects_per_pool = 64 * sizeof(int) * 8);
 
-  void* allocate(size_t bytes) override final;
-  void deallocate(void* ptr) override final;
+    ~FixedPool();
+    
+    void* allocate(size_t bytes) override final;
+    void deallocate(void* ptr) override final;
+    
+    long getCurrentSize() const noexcept override final;
+    long getHighWatermark() const noexcept override final;
+    long getActualSize() const noexcept override final;
+    Platform getPlatform() noexcept override final;
 
-  long getCurrentSize() const noexcept override final;
-  long getHighWatermark() const noexcept override final;
-  long getActualSize() const noexcept override final;
-  Platform getPlatform() noexcept override final;
+    size_t numPools() const noexcept;
 
-private:
-  struct Pool {
-    AllocationStrategy* strategy;
-    char* data;
-    int* avail;
-    size_t num_avail;
-    Pool(AllocationStrategy* allocation_strategy,
-         const size_t object_bytes, const size_t objects_per_pool);
-    ~Pool();
-  };
+  private:
+    struct Pool {
+      AllocationStrategy* strategy;
+      char* data;
+      int* avail;
+      size_t num_avail;
+      Pool(AllocationStrategy* allocation_strategy,
+           const size_t object_bytes, const size_t objects_per_pool);
+    };
 
-  void newPool();
-  void* allocInPool(Pool& p) noexcept;
+    void newPool();
+    void* allocInPool(Pool& p) noexcept;
 
-  AllocationStrategy* m_strategy;
-  size_t m_obj_bytes;
-  size_t m_obj_per_pool;
-  size_t m_current_bytes;
-  size_t m_highwatermark;
-  std::vector<Pool> m_pool;
+    AllocationStrategy* m_strategy;
+    size_t m_obj_bytes;
+    size_t m_obj_per_pool;
+    size_t m_current_bytes;
+    size_t m_highwatermark;
+    std::vector<Pool> m_pool;
 };
 
 } // end namespace strategy

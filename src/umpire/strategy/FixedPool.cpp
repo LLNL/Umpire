@@ -39,16 +39,6 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
   std::memset(avail, ~0, objects_per_pool/bits_per_int + 1);
 }
 
-FixedPool::Pool::~Pool()
-{
-  strategy->deallocate(data);
-  std::free(avail);
-  data = nullptr;
-  avail = nullptr;
-  strategy = nullptr;
-  num_avail = 0;
-}
-
 FixedPool::FixedPool(const std::string& name, int id,
                      Allocator allocator, const size_t object_bytes,
                      const size_t objects_per_pool) :
@@ -61,6 +51,14 @@ FixedPool::FixedPool(const std::string& name, int id,
   m_pool()
 {
   newPool();
+}
+
+FixedPool::~FixedPool()
+{
+  for (auto& a : m_pool) {
+    a.strategy->deallocate(a.data);
+    std::free(a.avail);
+  }
 }
 
 void
@@ -100,7 +98,11 @@ FixedPool::allocate(size_t bytes)
 
   for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
     ptr = allocInPool(*it);
-    if (ptr) break;
+    if (ptr) {
+      m_current_bytes += m_obj_bytes;
+      m_highwatermark = std::max(m_highwatermark, m_current_bytes);
+      break;
+    }
   }
 
   if (!ptr) {
@@ -109,10 +111,6 @@ FixedPool::allocate(size_t bytes)
   }
 
   UMPIRE_ASSERT(ptr);
-
-  m_current_bytes += m_obj_bytes;
-  m_highwatermark = std::max(m_highwatermark, m_current_bytes);
-
   return ptr;
 }
 
@@ -120,19 +118,26 @@ void
 FixedPool::deallocate(void* ptr)
 {
   for (auto& p : m_pool) {
-    const int object_index = (reinterpret_cast<char*>(ptr) - p.data) / m_obj_bytes;
-    if (static_cast<unsigned int>(object_index) < m_obj_per_pool) {
-      const int byte_index = object_index * m_obj_bytes;
-      const int int_index = byte_index / bits_per_int;
-      const short bit_index = byte_index % bits_per_int;
+    const char* start = reinterpret_cast<char*>(p.data);
+    const char* t_ptr = reinterpret_cast<char*>(ptr);
+    const long alloc_index = (t_ptr - start) / m_obj_bytes;
+
+    if ((alloc_index >= 0) && (alloc_index < static_cast<long>(m_obj_per_pool))) {
+      const int int_index   = alloc_index / bits_per_int;
+      const short bit_index = alloc_index % bits_per_int;
 
       UMPIRE_ASSERT(! (p.avail[int_index] & (1 << bit_index)));
+
       p.avail[int_index] ^= 1 << bit_index;
       p.num_avail++;
+
+      m_current_bytes -= m_obj_bytes;
 
       return;
     }
   }
+
+  UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
 long
@@ -145,8 +150,7 @@ long
 FixedPool::getActualSize() const noexcept
 {
   const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
-  return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes)
-    + m_pool.capacity() * sizeof(Pool)
+  return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes + sizeof(Pool))
     + sizeof(FixedPool);
 }
 
@@ -160,6 +164,12 @@ Platform
 FixedPool::getPlatform() noexcept
 {
   return m_strategy->getPlatform();
+}
+
+size_t
+FixedPool::numPools() const noexcept
+{
+  return m_pool.size();
 }
 
 } // end of namespace strategy
