@@ -8,7 +8,7 @@ strategy:
       CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
     windows:
       imageName: 'vs2017-win2016'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DBUILD_SHARED_LIBS=On'
     mac:
       imageName: 'macos-10.13'
       CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_OPENMP=Off'
