@@ -263,12 +263,12 @@ BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 static const int RangeLow = 4;
-// static const int RangeHi = 512;
+static const int RangeHi = 1024;
 
-// BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
-// BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
-// BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
-// BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
 // NOTE: always allocates 8mb, ignores size argument

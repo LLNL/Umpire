@@ -298,11 +298,11 @@ TEST(FixedPool, Host)
   const int data_size = 100 * sizeof(int);
 
   auto allocator = rm.makeAllocator<umpire::strategy::FixedPool>(
-    "host_fixed_pool", rm.getAllocator("HOST"), data_size);
+    "host_fixed_pool", rm.getAllocator("HOST"), data_size, 64);
 
   void* alloc = allocator.allocate(data_size);
 
-  ASSERT_GE(allocator.getCurrentSize(), data_size);
+  ASSERT_EQ(allocator.getCurrentSize(), data_size);
   ASSERT_GE(allocator.getActualSize(), data_size*64);
   ASSERT_EQ(allocator.getSize(alloc), data_size);
   ASSERT_GE(allocator.getHighWatermark(), data_size);

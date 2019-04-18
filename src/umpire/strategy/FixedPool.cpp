@@ -120,9 +120,9 @@ FixedPool::deallocate(void* ptr)
   for (auto& p : m_pool) {
     const char* start = reinterpret_cast<char*>(p.data);
     const char* t_ptr = reinterpret_cast<char*>(ptr);
-    const long alloc_index = (t_ptr - start) / m_obj_bytes;
+    const size_t alloc_index = (t_ptr - start) / m_obj_bytes;
 
-    if ((alloc_index >= 0) && (alloc_index < static_cast<long>(m_obj_per_pool))) {
+    if ((alloc_index >= 0) && (alloc_index < m_obj_per_pool)) {
       const int int_index   = alloc_index / bits_per_int;
       const short bit_index = alloc_index % bits_per_int;
 
