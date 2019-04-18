@@ -48,6 +48,7 @@ FixedPool::FixedPool(const std::string& name, int id,
   m_strategy(allocator.getAllocationStrategy()),
   m_obj_bytes(object_bytes),
   m_obj_per_pool(objects_per_pool),
+  m_data_bytes(m_obj_bytes * m_obj_per_pool),
   m_avail_length(objects_per_pool/bits_per_int + 1),
   m_current_bytes(0),
   m_highwatermark(0),
@@ -118,13 +119,12 @@ void
 FixedPool::deallocate(void* ptr)
 {
   for (auto& p : m_pool) {
-    const char* start = reinterpret_cast<char*>(p.data);
     const char* t_ptr = reinterpret_cast<char*>(ptr);
-    const size_t alloc_index = (t_ptr - start) / m_obj_bytes;
-
-    if ((alloc_index >= 0) && (alloc_index < m_obj_per_pool)) {
-      const int int_index   = alloc_index / bits_per_int;
-      const short bit_index = alloc_index % bits_per_int;
+    const ptrdiff_t offset = t_ptr - p.data;
+    if ((offset >= 0) && (offset < static_cast<ptrdiff_t>(m_data_bytes))) {
+      const size_t alloc_index = offset / m_obj_bytes;
+      const size_t int_index   = alloc_index / bits_per_int;
+      const short  bit_index   = alloc_index % bits_per_int;
 
       UMPIRE_ASSERT(! (p.avail[int_index] & (1 << bit_index)));
 
