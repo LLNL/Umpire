@@ -207,7 +207,7 @@ ResourceManager::getAllocator(const std::string& name)
 }
 
 Allocator
-ResourceManager::getAllocator(char* name)
+ResourceManager::getAllocator(const char* name)
 {
   return getAllocator(std::string{name});
 }
