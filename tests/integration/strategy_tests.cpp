@@ -319,18 +319,18 @@ TEST(MixedPool, Host)
   auto allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
       "host_mixed_pool", rm.getAllocator("HOST"));
 
-  const int max_power = 5;
+  const int max_power = 10;
   void* alloc[max_power];
-  int size = 1024, total_size = 0;
+  int size = 4, total_size = 0;
   for (int i = 0; i < max_power; ++i) {
     alloc[i] = allocator.allocate(size);
     total_size += size;
-    size *= 1024;
+    size *= 4;
   }
 
   ASSERT_EQ(allocator.getCurrentSize(), total_size);
   ASSERT_GT(allocator.getActualSize(), total_size);
-  ASSERT_EQ(allocator.getSize(alloc[0]), 1024);
+  ASSERT_EQ(allocator.getSize(alloc[9]), size/4);
   ASSERT_GE(allocator.getHighWatermark(), total_size);
   ASSERT_EQ(allocator.getName(), "host_mixed_pool");
 
