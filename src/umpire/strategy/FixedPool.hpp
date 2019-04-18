@@ -71,7 +71,8 @@ class FixedPool : public AllocationStrategy
       int* avail;
       size_t num_avail;
       Pool(AllocationStrategy* allocation_strategy,
-           const size_t object_bytes, const size_t objects_per_pool);
+           const size_t object_bytes, const size_t objects_per_pool,
+           const size_t avail_bytes);
     };
 
     void newPool();
@@ -80,6 +81,7 @@ class FixedPool : public AllocationStrategy
     AllocationStrategy* m_strategy;
     size_t m_obj_bytes;
     size_t m_obj_per_pool;
+    size_t m_avail_length;
     size_t m_current_bytes;
     size_t m_highwatermark;
     std::vector<Pool> m_pool;

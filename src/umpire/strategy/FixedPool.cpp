@@ -30,13 +30,15 @@ namespace strategy {
 static constexpr size_t bits_per_int = sizeof(int) * 8;
 
 FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
-                      const size_t object_bytes, const size_t objects_per_pool) :
+                      const size_t object_bytes, const size_t objects_per_pool,
+                      const size_t avail_bytes) :
   strategy(allocation_strategy),
   data(reinterpret_cast<char*>(strategy->allocate(object_bytes * objects_per_pool))),
-  avail(reinterpret_cast<int*>(std::malloc(objects_per_pool/bits_per_int + 1))),
+  avail(reinterpret_cast<int*>(std::malloc(avail_bytes))),
   num_avail(objects_per_pool)
 {
-  std::memset(avail, ~0, objects_per_pool/bits_per_int + 1);
+  const unsigned char not_zero = ~0;
+  std::memset(avail, not_zero, avail_bytes);
 }
 
 FixedPool::FixedPool(const std::string& name, int id,
@@ -46,6 +48,7 @@ FixedPool::FixedPool(const std::string& name, int id,
   m_strategy(allocator.getAllocationStrategy()),
   m_obj_bytes(object_bytes),
   m_obj_per_pool(objects_per_pool),
+  m_avail_length(objects_per_pool/bits_per_int + 1),
   m_current_bytes(0),
   m_highwatermark(0),
   m_pool()
@@ -64,7 +67,7 @@ FixedPool::~FixedPool()
 void
 FixedPool::newPool()
 {
-  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool);
+  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool, m_avail_length * sizeof(int));
 }
 
 void*
@@ -72,22 +75,19 @@ FixedPool::allocInPool(Pool& p) noexcept
 {
   if (!p.num_avail) return nullptr;
 
-  const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
-
-  for (int int_index = 0; int_index < avail_bytes; ++int_index) {
+  for (unsigned int int_index = 0; int_index < m_avail_length; ++int_index) {
     const int bit_index = ffs(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
       const size_t index = int_index * bits_per_int + bit_index;
       if (index < m_obj_per_pool) {
         p.avail[int_index] ^= 1 << bit_index;
         p.num_avail--;
-        return reinterpret_cast<void*>(p.data + m_obj_bytes * index);
+        return static_cast<void*>(p.data + m_obj_bytes * index);
       }
     }
   }
 
   UMPIRE_ASSERT("FixedPool: Logic error in allocate");
-
   return nullptr;
 }
 

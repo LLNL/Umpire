@@ -213,7 +213,7 @@ public:
     std::stringstream ss;
     ss << "fixedpool" << namecnt++;
     auto& rm = umpire::ResourceManager::getInstance();
-    rm.makeAllocator<umpire::strategy::FixedPool>(ss.str(), rm.getAllocator(getName()), 8388608, 32 * sizeof(int) * 8);
+    rm.makeAllocator<umpire::strategy::FixedPool>(ss.str(), rm.getAllocator(getName()), 8388608, 64 * sizeof(int) * 8);
     allocator = new umpire::Allocator(rm.getAllocator(ss.str()));
 
     void* ptr;
@@ -263,12 +263,12 @@ BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
 
 static const int RangeLow = 4;
-static const int RangeHi = 1024;
+// static const int RangeHi = 512;
 
-BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
 // NOTE: always allocates 8mb, ignores size argument
