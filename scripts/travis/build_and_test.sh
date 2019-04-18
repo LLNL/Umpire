@@ -18,6 +18,12 @@ function or_die () {
 
 or_die mkdir travis-build
 cd travis-build
+
+if [[ "$BUILD_SICM" == "yes" ]]; then
+    or_die ../scripts/travis/build_and_install_sicm.sh
+    export LD_LIBRARY_PATH=/tmp/SICM/lib:/tmp/jemalloc/lib:${LD_LIBRARY_PATH}
+fi
+
 if [[ "$DO_BUILD" == "yes" ]] ; then
     or_die cmake -DCMAKE_CXX_COMPILER="${COMPILER}" ${CMAKE_EXTRA_FLAGS} ../
     if [[ ${CMAKE_EXTRA_FLAGS} == *COVERAGE* ]] ; then
