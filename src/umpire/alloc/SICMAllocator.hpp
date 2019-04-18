@@ -28,7 +28,7 @@ namespace umpire {
 namespace alloc {
 
 /*!
- * \brief Uses SICM and free to allocate and deallocate CPU memory.
+ * \brief Uses SICM to allocate and deallocate memory into arenas.
  */
 struct SICMAllocator
 {
@@ -42,7 +42,7 @@ struct SICMAllocator
   // }
 
   /*!
-   * \brief Allocate bytes of memory using SICM.
+   * \brief Allocate bytes of memory using sicm_alloc.
    *
    * \param bytes Number of bytes to allocate.
    * \return Pointer to start of the allocation.
@@ -52,7 +52,7 @@ struct SICMAllocator
   void* allocate(size_t bytes)
   {
     // void* ret = sicm_arena_alloc(sa, bytes);
-    void* ret = ::sicm_alloc(bytes);
+    void* ret = sicm_alloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
      if  (ret == nullptr) {
       UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed");
@@ -62,7 +62,7 @@ struct SICMAllocator
   }
 
   /*!
-   * \brief Deallocate memory using free.
+   * \brief Deallocate memory using sicm_free.
    *
    * \param ptr Address to deallocate.
    *
@@ -71,7 +71,7 @@ struct SICMAllocator
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-    ::sicm_free(ptr);
+    sicm_free(ptr);
   }
 
   // sicm_device_list devs;

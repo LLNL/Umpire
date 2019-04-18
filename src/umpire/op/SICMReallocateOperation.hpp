@@ -29,7 +29,7 @@ class SICMReallocateOperation :
   /*!
    * \copybrief MemoryOperation::transform
    *
-   * Uses POSIX realloc to reallocate memory in the CPU memory.
+   * Uses sicm_realloc to reallocate memory.
    *
    * \copydetails MemoryOperation::transform
    */

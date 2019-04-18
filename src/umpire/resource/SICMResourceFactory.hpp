@@ -22,7 +22,7 @@ namespace resource {
 
 
 /*!
- * \brief Factory class to construct a MemoryResource that uses CPU memory.
+ * \brief Factory class to construct a MemoryResource that uses SICM.
  */
 class SICMResourceFactory :
   public MemoryResourceFactory
