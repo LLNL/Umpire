@@ -89,6 +89,7 @@ Allocator ResourceManager::makeAllocator(
         << "," << name
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << "," << allocator
+    );
 #else
     UMPIRE_REPLAY("makeAllocator_success,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
@@ -96,8 +97,8 @@ Allocator ResourceManager::makeAllocator(
         << "," << name
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << "," << allocator
-#endif
     );
+#endif
 
     UMPIRE_UNLOCK;
   } catch (...) {
