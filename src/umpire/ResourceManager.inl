@@ -82,7 +82,7 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
-#if defined(_MSV_VER)
+#if defined(_MSC_VER)
     UMPIRE_REPLAY("makeAllocator_success,"
         << typeid(Strategy).name()
         << "," << (introspection ? "true" : "false")
