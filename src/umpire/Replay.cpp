@@ -18,11 +18,10 @@
 
 #if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
+#include <unistd.h>   // getpid()
 #else
 #define strcasecmp _stricmp
 #endif
-
-#include <unistd.h>   // getpid()
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
