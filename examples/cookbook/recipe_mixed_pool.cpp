@@ -33,9 +33,9 @@ int main(int, char**) {
 
   /*
    * Create a mixed pool using fixed pool bins of size 2^8 = 256 Bytes
-   * to 2^20 = 1 MB in increments of powers of 2, skipping every other power.
+   * to 2^14 = 16 kB in increments of powers of 2, skipping every other power.
    */
-  auto custom_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPoolImpl<8,2,20>>(
+  auto custom_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPoolImpl<8,2,14>>(
     "custom_mixed_pool", allocator);
 
   /*
@@ -51,7 +51,7 @@ int main(int, char**) {
    * reserved will be exactly what was requested by the allocate()
    * method.
    */
-  void *ptr2 = custom_mixed_allocator.allocate(1 << 21);
+  void *ptr2 = custom_mixed_allocator.allocate(1 << 18);
 
   /*
    * Clean up

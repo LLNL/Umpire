@@ -23,28 +23,41 @@ namespace strategy {
 
 namespace {
 
+template<int Power>
+static AllocationStrategy* make_fixed_pool(Allocator& allocator)
+{
+  const std::size_t size = 1 << Power;
+  std::stringstream ss{"internal_fixed_"};
+  ss << size;
+  const size_t NP = 1024 * 1024 / (sizeof(unsigned char) * 8 * size) + 1;
+  if (Power < 12) {
+    return new FixedPool<unsigned char[size]>(ss.str(), -1, allocator);
+  }
+  else {
+    return new FixedPool<unsigned char[size], NP>(ss.str(), -1, allocator);
+  }
+}
+
 template<int FirstFixed, int Current, int LastFixed, int Increment>
-struct make_fixed_pool_array {
+struct make_fixed_pool_array
+{
   template<typename Array>
-  static void eval(Array& fixed_pool, Allocator& allocator) {
+  static void eval(Array& fixed_pool, Allocator& allocator)
+  {
     const int index = Current - FirstFixed;
-    const std::size_t size = 1 << Current;
-    std::stringstream ss{"internal_fixed_"};
-    ss << size;
-    fixed_pool[index] = new FixedPool<unsigned char[size]>(ss.str(), -1, allocator);
+    fixed_pool[index] = make_fixed_pool<Current>(allocator);
     make_fixed_pool_array<FirstFixed, Current+Increment, LastFixed, Increment>::eval(fixed_pool, allocator);
   }
 };
 
 template<int FirstFixed, int LastFixed, int Increment>
-struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment> {
+struct make_fixed_pool_array<FirstFixed,LastFixed,LastFixed,Increment>
+{
   template<typename Array>
-  static void eval(Array& fixed_pool, Allocator& allocator) {
+  static void eval(Array& fixed_pool, Allocator& allocator)
+  {
     const int index = LastFixed - FirstFixed;
-    const std::size_t size = 1 << LastFixed;
-    std::stringstream ss{"internal_fixed_"};
-    ss << size;
-    fixed_pool[index] = new FixedPool<unsigned char[size]>(ss.str(), -1, allocator);
+    fixed_pool[index] = make_fixed_pool<LastFixed>(allocator);
   }
 };
 

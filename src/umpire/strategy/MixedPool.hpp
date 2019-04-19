@@ -35,7 +35,7 @@ namespace strategy {
  * Pool implementation using a series of FixedPools for small sizes,
  * and a DynamicPool for sizes larger than (1 << LastFixed) bytes.
  */
-template<int FirstFixed = 8, int Increment = 1, int LastFixed = 22>
+template<int FirstFixed = 8, int Increment = 1, int LastFixed = 18>
 class MixedPoolImpl :
   public AllocationStrategy
 {
