@@ -330,7 +330,7 @@ TEST(MixedPool, Host)
 
   ASSERT_EQ(allocator.getCurrentSize(), total_size);
   ASSERT_GT(allocator.getActualSize(), total_size);
-  ASSERT_EQ(allocator.getSize(alloc[9]), size/4);
+  ASSERT_EQ(allocator.getSize(alloc[max_power-1]), size/4);
   ASSERT_GE(allocator.getHighWatermark(), total_size);
   ASSERT_EQ(allocator.getName(), "host_mixed_pool");
 
