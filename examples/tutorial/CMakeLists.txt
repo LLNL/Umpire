@@ -62,11 +62,13 @@ blt_add_executable(
   DEPENDS_ON umpire
   OUTPUT_DIR ${tutorial_dir})
 
-blt_add_executable(
-  NAME tut_typed_allocator
-  SOURCES tut_typed_allocator.cpp
-  DEPENDS_ON umpire
-  OUTPUT_DIR ${tutorial_dir})
+if (NOT MSVC)
+  blt_add_executable(
+    NAME tut_typed_allocator
+    SOURCES tut_typed_allocator.cpp
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${tutorial_dir})
+endif ()
 
 blt_add_executable(
   NAME tut_introspection

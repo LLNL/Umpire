@@ -32,11 +32,13 @@ if (ENABLE_C)
     OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 endif ()
 
-blt_add_executable(
-  NAME vector_allocator
-  SOURCES vector_allocator.cpp
-  DEPENDS_ON umpire
-  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
+if (NOT MSVC)
+  blt_add_executable(
+    NAME vector_allocator
+    SOURCES vector_allocator.cpp
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
+endif()
 
 blt_add_executable(
   NAME size_limiter
