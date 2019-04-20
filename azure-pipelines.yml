@@ -47,6 +47,10 @@ steps:
    docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Linux (Docker) Build & Test'
+- task: VSTest@2
+  inputs:
+    configuration: 'Release'
+  condition: eq( variables['Agent.OS'], 'Windows_NT')
 - task: PublishTestResults@2
   inputs:
     testResultsFormat: 'cTest'
