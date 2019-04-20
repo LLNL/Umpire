@@ -27,11 +27,7 @@
 #include <mutex>
 #include <cassert>
 
-#ifndef NDEBUG
 #define UMPIRE_ASSERT(condition) assert(condition)
-#else
-#define UMPIRE_ASSERT(condition) ((void)0)
-#endif
 
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
