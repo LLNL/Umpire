@@ -23,6 +23,7 @@ namespace strategy {
 
 namespace {
 
+// Used to keep the size of each fixed pool under ~1MB in size
 template<int Power>
 static AllocationStrategy* make_fixed_pool(Allocator& allocator)
 {

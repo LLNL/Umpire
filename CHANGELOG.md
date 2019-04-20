@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Added a mixed pool that uses faster fixed pools for smaller allocation sizes,
+and a dynamic pool for those that are larger.
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
@@ -43,9 +48,6 @@ and CUDA.
 distinguish processes in an multi-process run.
 
 - Umpire replay now takes a "--help" option and displays usage information.
-
-- Added a mixed pool that uses faster fixed pools for smaller allocation sizes,
-and a dynamic pool for those that are larger.
 
 - A const iterator for AllocationMap, a free function to pull out a vector of
 allocation records for a specific allocator, and a method to calculate the

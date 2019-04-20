@@ -27,7 +27,6 @@ namespace strategy {
 
 namespace util {
 
-// TODO: remove m_ here
 struct AllocationRecord
 {
   void* m_ptr;
