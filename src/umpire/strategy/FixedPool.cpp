@@ -21,8 +21,20 @@
 #include <cstdlib>
 #include <algorithm>
 
-// TODO: Support for Windows
+#define  _XOPEN_SOURCE_EXTENDED 1
 #include <strings.h>
+
+static int find_first_set(int i)
+{
+#if defined(_MSC_VER)
+  unsigned long bit;
+  unsigned long i_l = static_cast<unsigned long>(i);
+  _BitScanForward(&bit, i_l);
+  return static_cast<int>(bit);
+#else
+  return ffs(i);
+#endif
+}
 
 namespace umpire {
 namespace strategy {
@@ -37,6 +49,7 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
   avail(reinterpret_cast<int*>(std::malloc(avail_bytes))),
   num_avail(objects_per_pool)
 {
+  // Set all bits to 1
   const unsigned char not_zero = ~0;
   std::memset(avail, not_zero, avail_bytes);
 }
@@ -77,10 +90,12 @@ FixedPool::allocInPool(Pool& p) noexcept
   if (!p.num_avail) return nullptr;
 
   for (unsigned int int_index = 0; int_index < m_avail_length; ++int_index) {
-    const int bit_index = ffs(p.avail[int_index]) - 1;
+    // Return the index of the first 1 bit
+    const int bit_index = find_first_set(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
       const size_t index = int_index * bits_per_int + bit_index;
       if (index < m_obj_per_pool) {
+        // Flip bit 1 -> 0
         p.avail[int_index] ^= 1 << bit_index;
         p.num_avail--;
         return static_cast<void*>(p.data + m_obj_bytes * index);
@@ -128,6 +143,7 @@ FixedPool::deallocate(void* ptr)
 
       UMPIRE_ASSERT(! (p.avail[int_index] & (1 << bit_index)));
 
+        // Flip bit 0 -> 1
       p.avail[int_index] ^= 1 << bit_index;
       p.num_avail++;
 
