@@ -126,4 +126,9 @@
 #define UMPIRE_UNLOCK \
   m_mutex->unlock();
 
+#define UMPIRE_CHECK_ALLOCATOR(record, name) \
+  if (record.strategy != this) { \
+    UMPIRE_ERROR(ptr << " was not allocated by " << name); \
+  } \
+
 #endif // UMPIRE_Macros_HPP

@@ -47,13 +47,16 @@ Inspector::registerAllocation(
   ResourceManager::getInstance().registerAllocation(ptr, record);
 }
 
-void 
+util::AllocationRecord
 Inspector::deregisterAllocation(void* ptr)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
   m_current_size -= record->size;
+
+  util::AllocationRecord rec(*record);
   delete record;
+  return rec;
 }
 
 } // end of namespace mixins
