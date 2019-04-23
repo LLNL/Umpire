@@ -210,12 +210,10 @@ public:
   using allocatorBenchmark::TearDown;
 
   void SetUp(const ::benchmark::State&) {
-    struct data { char _[8388608]; };
-
     std::stringstream ss;
     ss << "fixedpool" << namecnt++;
     auto& rm = umpire::ResourceManager::getInstance();
-    rm.makeAllocator<umpire::strategy::FixedPool<data>>(ss.str(), rm.getAllocator(getName()));
+    rm.makeAllocator<umpire::strategy::FixedPool>(ss.str(), rm.getAllocator(getName()), 8388608, 64 * sizeof(int) * 8);
     allocator = new umpire::Allocator(rm.getAllocator(ss.str()));
 
     void* ptr;

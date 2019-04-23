@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Switched template parameters to runtime constructor arguments in `FixedPool`.
+
 - Replay CI tests temporarily disabled.  This line to be removed once we
   enable the tests again after replay works with Azure pipelines and MixedPool
 
