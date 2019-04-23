@@ -6,6 +6,13 @@ RUN cd build && make -j 16
 RUN cd build && make test
 
 
+FROM axom/compilers:rocm AS hcc
+COPY --chown=axom:axom . /home/axom/workspace
+WORKDIR /home/axom/workspace
+RUN mkdir build && cd build && cmake -C ../host-configs/rocm.cmake ..
+RUN cd build && make -j 16
+
+
 FROM axom/compilers:clang-6 AS clang
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
