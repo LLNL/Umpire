@@ -2405,6 +2405,10 @@ class input_buffer_adapter : public input_adapter_protocol
         : cursor(b), limit(b + l)
     {}
 
+    input_buffer_adapter(const char* b, const unsigned long l) noexcept
+        : cursor(b), limit(b + l)
+    {}
+
     // delete because of pointer members
     input_buffer_adapter(const input_buffer_adapter&) = delete;
     input_buffer_adapter& operator=(input_buffer_adapter&) = delete;
