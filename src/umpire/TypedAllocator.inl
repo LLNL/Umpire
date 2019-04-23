@@ -26,6 +26,13 @@ TypedAllocator<T>::TypedAllocator(Allocator allocator) :
 }
 
 template<typename T>
+template<typename U>
+TypedAllocator<T>::TypedAllocator(const TypedAllocator<U>& other) :
+  m_allocator(other.m_allocator)
+{
+}
+
+template<typename T>
 T* 
 TypedAllocator<T>::allocate(size_t size)
 {

@@ -10,9 +10,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- CI builds for Mac, Linux and Windows via Azure Pipelines
+
 ### Changed
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
+
+- Replay CI tests temporarily disabled.  This line to be removed once we
+  enable the tests again after replay works with Azure pipelines and MixedPool
 
 ### Removed
 
@@ -23,6 +28,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   
 - Throw an error if attempting to deallocate with a different Allocator than
   performed the allocation
+
+- Building on Windows
 
 ## [0.3.3] - 2019-04-11
 
