@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- CI builds for Mac, Linux and Windows via Azure Pipelines
+
 ### Changed
 
 ### Removed
@@ -21,6 +23,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   
 - Throw an error if attempting to deallocate with a different Allocator than
   performed the allocation
+
+- Building on Windows
 
 ## [0.3.3] - 2019-04-11
 
