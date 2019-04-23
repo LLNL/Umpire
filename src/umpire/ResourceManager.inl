@@ -18,7 +18,11 @@
 #include "umpire/ResourceManager.hpp"
 
 #include <sstream>
+
+#if !defined(_MSC_VER)
 #include <cxxabi.h>
+#endif
+
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
@@ -40,12 +44,21 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
+#if defined(_MSC_VER)
+    UMPIRE_REPLAY("makeAllocator_attempt,"
+        << typeid(Strategy).name()
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+    );
+#else
     UMPIRE_REPLAY("makeAllocator_attempt,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
         << "," << name
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
     );
+#endif
 
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
@@ -69,6 +82,15 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
+#if defined(_MSC_VER)
+    UMPIRE_REPLAY("makeAllocator_success,"
+        << typeid(Strategy).name()
+        << "," << (introspection ? "true" : "false")
+        << "," << name
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << "," << allocator
+    );
+#else
     UMPIRE_REPLAY("makeAllocator_success,"
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "," << (introspection ? "true" : "false")
@@ -76,6 +98,7 @@ Allocator ResourceManager::makeAllocator(
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << "," << allocator
     );
+#endif
 
     UMPIRE_UNLOCK;
   } catch (...) {
