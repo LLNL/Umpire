@@ -41,13 +41,26 @@ FixedPool<T, NP, IA>::newPool(struct Pool **pnew) {
   }
 }
 
+template<typename T, int NP, typename IA>
+int FixedPool<T, NP, IA>::findFirstSet(int i)
+{
+#if defined(_MSC_VER)
+	unsigned long bit;
+	unsigned long i_l = static_cast<unsigned long>(i);
+	_BitScanForward(&bit, i_l);
+	return static_cast<int>(bit);
+#else
+	return ffs(i);
+#endif
+}
+
 template <typename T, int NP, typename IA>
 T*
 FixedPool<T, NP, IA>::allocInPool(struct Pool *p) {
     if (!p->numAvail) return nullptr;
 
     for (int i = 0; i < NP; i++) {
-      const int bit = ffs(p->avail[i]) - 1;
+      const int bit = findFirstSet(p->avail[i]) - 1;
       if (bit >= 0) {
         p->avail[i] ^= 1 << bit;
         p->numAvail--;

@@ -18,7 +18,11 @@
 #include "umpire/ResourceManager.hpp"
 
 #include <sstream>
+
+#if !defined(_MSC_VER)
 #include <cxxabi.h>
+#endif
+
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
@@ -41,12 +45,21 @@ Allocator ResourceManager::makeAllocator(
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
     UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+#if defined(_MSC_VER)
+        << typeid(Strategy).name()
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
+#else
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
+#endif
     );
 
     if (isAllocator(name)) {
@@ -72,6 +85,15 @@ Allocator ResourceManager::makeAllocator(
     }
 
     UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+#if defined(_MSC_VER)
+        << typeid(Strategy).name()
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+#else
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
@@ -79,6 +101,7 @@ Allocator ResourceManager::makeAllocator(
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
         << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+#endif
     );
 
     UMPIRE_UNLOCK;

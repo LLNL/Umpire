@@ -62,6 +62,8 @@ class ResourceManager {
      */
     Allocator getAllocator(const std::string& name);
 
+    Allocator getAllocator(const char* name);
+
     /*!
      * \brief Get the default Allocator for the given resource_type.
      */
