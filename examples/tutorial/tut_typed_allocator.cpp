@@ -21,14 +21,14 @@ int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
-  umpire::TypedAllocator<double> double_allocator(alloc);
+  umpire::TypedAllocator<double> double_allocator{alloc};
 
   double* my_doubles = double_allocator.allocate(1024);
 
   double_allocator.deallocate(my_doubles, 1024);
 
   std::vector< double, umpire::TypedAllocator<double> > 
-    my_vector(double_allocator);
+    my_vector{double_allocator};
 
   my_vector.resize(100);
 

@@ -72,6 +72,7 @@ class FixedPool
 
     size_t numPools() const noexcept;
 
+	int findFirstSet(int i);
 
     struct Pool *m_pool;
     size_t m_num_per_pool;

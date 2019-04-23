@@ -213,6 +213,12 @@ ResourceManager::getAllocator(const std::string& name)
 }
 
 Allocator
+ResourceManager::getAllocator(const char* name)
+{
+  return getAllocator(std::string{name});
+}
+
+Allocator
 ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 {
   UMPIRE_LOG(Debug, "(\"" << static_cast<size_t>(resource_type) << "\")");
