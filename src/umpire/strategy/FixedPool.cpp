@@ -21,8 +21,10 @@
 #include <cstdlib>
 #include <algorithm>
 
+#if !defined(_MSC_VER)
 #define  _XOPEN_SOURCE_EXTENDED 1
 #include <strings.h>
+#endif
 
 static int find_first_set(int i)
 {
