@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI builds for Mac, Linux and Windows via Azure Pipelines
 
+- Added HCC stage in Docker file
+
 ### Changed
 
 - Replay CI tests temporarily disabled.  This line to be removed once we
