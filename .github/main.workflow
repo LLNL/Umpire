@@ -19,6 +19,6 @@ workflow "on pull request merge, delete the branch" {
 }
 
 action "Delete merged branch" {
-  uses = "jessfraz/branch-cleanup-action@master"
+  uses = "jessfraz/branch-cleanup-action@b3a2b299e1ce42dbcbef5c4a0b9e97b8068154b8"
   secrets = ["GITHUB_TOKEN"]
 }
