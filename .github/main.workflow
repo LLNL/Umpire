@@ -15,10 +15,10 @@ action "Static Analysis" {
 
 workflow "on pull request merge, delete the branch" {
   on = "pull_request"
-  resolves = ["branch cleanup"]
+  resolves = ["Delete merged branch"]
 }
 
-action "branch cleanup" {
+action "Delete merged branch" {
   uses = "jessfraz/branch-cleanup-action@master"
   secrets = ["GITHUB_TOKEN"]
 }
