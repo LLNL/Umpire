@@ -14,7 +14,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added HCC stage in Docker file
 
-- Added a mixed pool that uses faster fixed pools for smaller allocation sizes,
+- GitHub action to automatically delete merged branches
+
+- Mixed pool that uses faster fixed pools for smaller allocation sizes,
 and a dynamic pool for those that are larger.
 
 ### Changed
