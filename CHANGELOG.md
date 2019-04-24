@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added HCC stage in Docker file
 
+- GitHub action to automatically delete merged branches
+
 ### Changed
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
