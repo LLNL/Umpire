@@ -54,7 +54,7 @@ class FixedPool : public AllocationStrategy
 
     ~FixedPool();
     
-    void* allocate(size_t bytes) override final;
+    void* allocate(size_t bytes = 0) override final;
     void deallocate(void* ptr) override final;
     
     long getCurrentSize() const noexcept override final;

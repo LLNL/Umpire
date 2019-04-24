@@ -16,6 +16,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitHub action to automatically delete merged branches
 
+- Mixed pool that uses faster fixed pools for smaller allocation sizes,
+and a dynamic pool for those that are larger.
+
 ### Changed
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
@@ -62,7 +65,7 @@ replayed events are correct.
 allocator, and a cookbook recipe to do that.
 
 - Dockerfile for multi-stage builds. Supports building Umpire with GCC, Clang,
-and CUDA
+and CUDA.
 
 - GitHub action to run Clang static analysis.
 
@@ -70,6 +73,10 @@ and CUDA
 distinguish processes in an multi-process run.
 
 - Umpire replay now takes a "--help" option and displays usage information.
+
+- A const iterator for AllocationMap, a free function to pull out a vector of
+allocation records for a specific allocator, and a method to calculate the
+relative fragmentation.
 
 ### Changed
 
