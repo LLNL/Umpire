@@ -44,23 +44,25 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
 #if defined(_MSC_VER)
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << typeid(Strategy).name()
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
+    );
 #else
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
-#endif
     );
+#endif
 
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
@@ -84,8 +86,8 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
-    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
 #if defined(_MSC_VER)
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << typeid(Strategy).name()
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
@@ -93,7 +95,9 @@ Allocator ResourceManager::makeAllocator(
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
         << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+    );
 #else
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
@@ -101,8 +105,8 @@ Allocator ResourceManager::makeAllocator(
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
         << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
-#endif
     );
+#endif
 
     UMPIRE_UNLOCK;
   } catch (...) {
