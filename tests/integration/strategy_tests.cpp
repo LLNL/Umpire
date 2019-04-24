@@ -294,19 +294,19 @@ TEST(AllocationAdvisor, Host)
 
 TEST(FixedPool, Host)
 {
-  struct data { int _[100]; };
-
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool<data>>(
-      "host_fixed_pool", rm.getAllocator("HOST"));
+  const int data_size = 100 * sizeof(int);
 
-  void* alloc = allocator.allocate(sizeof(data));
+  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool>(
+    "host_fixed_pool", rm.getAllocator("HOST"), data_size, 64);
 
-  ASSERT_GE(allocator.getCurrentSize(), sizeof(data));
-  ASSERT_GE(allocator.getActualSize(), sizeof(data)*64);
-  ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
-  ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
+  void* alloc = allocator.allocate(data_size);
+
+  ASSERT_EQ(allocator.getCurrentSize(), data_size);
+  ASSERT_GE(allocator.getActualSize(), data_size*64);
+  ASSERT_EQ(allocator.getSize(alloc), data_size);
+  ASSERT_GE(allocator.getHighWatermark(), data_size);
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 
   allocator.deallocate(alloc);

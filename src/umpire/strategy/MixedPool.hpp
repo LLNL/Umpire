@@ -16,7 +16,7 @@
 #define UMPIRE_MixedPool_HPP
 
 #include <memory>
-#include <array>
+#include <vector>
 #include <map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -35,20 +35,19 @@ namespace strategy {
  * Pool implementation using a series of FixedPools for small sizes,
  * and a DynamicPool for sizes larger than (1 << LastFixed) bytes.
  */
-template<int FirstFixed = 8, int Increment = 1, int LastFixed = 18>
-class MixedPoolImpl :
+class MixedPool :
   public AllocationStrategy
 {
   public:
-    MixedPoolImpl(
-        const std::string& name,
-        int id,
-        Allocator allocator) noexcept;
-
-    ~MixedPoolImpl();
+    MixedPool(const std::string& name, int id,
+      Allocator allocator,
+      size_t smallest_fixed_blocksize = (1 << 8), // 256B
+      size_t largest_fixed_blocksize = (1 << 17), // 1024K
+      size_t max_fixed_pool_size = 1024*1024 * 2, // 2MB
+      float size_multiplier = 10 // each fixed pool will be 10x larger than the last
+      ) noexcept;
 
     void* allocate(size_t bytes) override;
-
     void deallocate(void* ptr) override;
 
     void release() override;
@@ -60,21 +59,14 @@ class MixedPoolImpl :
     Platform getPlatform() noexcept override;
 
   private:
-    enum { NUM_FIXED_POOLS = LastFixed - FirstFixed + 1 };
-    using FixedPoolArray = std::array<AllocationStrategy*, NUM_FIXED_POOLS>;
-    using Map = std::map<uintptr_t, int>;
-
-    Map m_map;
-    FixedPoolArray m_fixed_pool;
-    AllocationStrategy* m_dynamic_pool;
+    std::map<uintptr_t, int> m_map;
+    std::vector<size_t> m_fixed_pool_map;
+    std::vector<FixedPool> m_fixed_pool;
+    DynamicPool m_dynamic_pool;
     AllocationStrategy* m_allocator;
 };
 
-using MixedPool = MixedPoolImpl<>;
-
 } // end of namespace strategy
 } // end namespace umpire
-
-#include "umpire/strategy/MixedPool.inl"
 
 #endif // UMPIRE_MixedPool_HPP

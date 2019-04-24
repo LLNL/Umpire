@@ -1,6 +1,7 @@
 #ifndef _DYNAMICSIZEPOOL_HPP
 #define _DYNAMICSIZEPOOL_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <cassert>
 #include <string>

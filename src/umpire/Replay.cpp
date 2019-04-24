@@ -15,8 +15,15 @@
 
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
+
+#if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
 #include <unistd.h>   // getpid()
+#else
+#include <process.h>
+#define strcasecmp _stricmp
+#define getpid _getpid
+#endif
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
