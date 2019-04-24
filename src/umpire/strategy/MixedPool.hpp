@@ -24,6 +24,8 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
+
 #include "umpire/Allocator.hpp"
 
 namespace umpire {
@@ -39,12 +41,16 @@ class MixedPool :
   public AllocationStrategy
 {
   public:
-    MixedPool(const std::string& name, int id,
+    MixedPool(
+      const std::string& name, int id,
       Allocator allocator,
       size_t smallest_fixed_blocksize = (1 << 8), // 256B
       size_t largest_fixed_blocksize = (1 << 17), // 1024K
       size_t max_fixed_pool_size = 1024*1024 * 2, // 2MB
-      float size_multiplier = 10 // each fixed pool will be 10x larger than the last
+      float size_multiplier = 10,                 // 10x over previous size
+      size_t dynamic_min_initial_alloc_size = (512 * 1024 * 1024),
+      size_t dynamic_min_alloc_size = (1 * 1024 *1024),
+      DynamicPool::Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)
       ) noexcept;
 
     void* allocate(size_t bytes) override;
