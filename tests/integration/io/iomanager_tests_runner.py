@@ -19,7 +19,9 @@ formatters = {
     'END': '\033[0m',
 }
 
+
 errors = 0
+
 
 def check_output(name, file_object, expected):
 
@@ -33,11 +35,20 @@ def check_output(name, file_object, expected):
         print("{GREEN}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
 
-def run_io_test():
-    import subprocess
+def check_file_exists(filename):
     import os
 
-    test_env = {'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}
+    print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
+    if (not os.path.isfile(filename)):
+        print("{RED}[   ERROR])END} {myfile} not found".format(myfile=filename, **formatters))
+        errors += 1
+    else:
+        print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=filename, **formatters))
+
+
+def run_io_test(test_env, file_uid):
+    import subprocess
+    import os
 
     test_program = subprocess.Popen('./iomanager_tests', 
             env=dict(os.environ, **test_env),
@@ -52,22 +63,14 @@ def run_io_test():
     check_output('stdout', output, 'testing log stream')
     check_output('stderr', error, 'testing error stream')
 
-    output_filename = 'umpire_io_tests.0.0.log'
-    replay_filename = 'umpire_io_tests.0.0.replay'
+    output_filename = 'umpire_io_tests.0.{uid}.log'.format(uid=file_uid)
+    replay_filename = 'umpire_io_tests.0.{uid}.replay'.format(uid=file_uid)
+    if 'UMPIRE_OUTPUT_DIR' in test_env.keys():
+        output_filename = '{dir}/umpire_io_tests.0.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid)
+        replay_filename = '{dir}/umpire_io_tests.0.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid)
 
-    print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=output_filename, **formatters))
-    if (not os.path.isfile(output_filename)):
-        print("{RED}[   ERROR])END} {myfile} not found".format(myfile=output_filename, **formatters))
-        errors += 1
-    else:
-        print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=output_filename, **formatters))
-
-    print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=replay_filename, **formatters))
-    if (not os.path.isfile(replay_filename)):
-        print("{RED}[   ERROR])END} {myfile} not found".format(myfile=replay_filename, **formatters))
-        errors += 1
-    else:
-        print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=replay_filename, **formatters))
+    check_file_exists(output_filename)
+    check_file_exists(replay_filename)
 
     with open(output_filename) as output_file:
         check_output(output_filename, output_file, 'testing log stream')
@@ -75,9 +78,13 @@ def run_io_test():
     with open(replay_filename) as replay_file:
         check_output(replay_filename, replay_file, 'testing replay stream')
 
+
+
 if __name__ == '__main__':
     import sys
     print("{GREEN}[--------]{END}".format(**formatters))
-    run_io_test()
+    run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
+    run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
+    run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 1)
     print("{GREEN}[--------]{END}".format(**formatters))
     sys.exit(errors)
