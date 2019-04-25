@@ -285,8 +285,8 @@ BENCHMARK_REGISTER_F(UM, deallocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Device, largeAllocDealloc)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13);
 BENCHMARK_REGISTER_F(UM, largeAllocDealloc)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13);
 
-BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
+// BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
 
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
