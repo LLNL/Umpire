@@ -13,21 +13,29 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
-def check_output(file_object, expected):
-    import sys
+formatters = {
+    'RED': '\033[91m',
+    'GREEN': '\033[92m',
+    'END': '\033[0m',
+}
+
+errors = 0
+
+def check_output(name, file_object, expected):
+
+    print("{GREEN}[RUN     ]{END} Checking for \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
     contents = file_object.readline().rstrip()
     if (contents != expected):
-        print("ERROR: output incorrect. Was %s, expected \"%s\"" % (contents, expected))
-        sys.exit(1)
+        print("{RED}[   ERROR])END} Got {contents}".format(contents=contents, expected=expected, **formatters))
+        errors += 1
+    else:
+        print("{GREEN}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
 
 def run_io_test():
     import subprocess
     import os
-    import sys
-
-    print(os.getcwd())
 
     test_env = {'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}
 
@@ -41,25 +49,35 @@ def run_io_test():
     output = test_program.stdout
     error = test_program.stderr
 
-    check_output(output, 'testing log stream')
-    check_output(error, 'testing error stream')
+    check_output('stdout', output, 'testing log stream')
+    check_output('stderr', error, 'testing error stream')
 
     output_filename = 'umpire_io_tests.0.0.log'
     replay_filename = 'umpire_io_tests.0.0.replay'
 
+    print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=output_filename, **formatters))
     if (not os.path.isfile(output_filename)):
-        print("ERROR: %s doesn't exist" % (output_filename))
-        sys.exit(1)
+        print("{RED}[   ERROR])END} {myfile} not found".format(myfile=output_filename, **formatters))
+        errors += 1
+    else:
+        print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=output_filename, **formatters))
 
+    print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=replay_filename, **formatters))
     if (not os.path.isfile(replay_filename)):
-        print("ERROR: %s doesn't exist" % (replay_filename))
-        sys.exit(1)
+        print("{RED}[   ERROR])END} {myfile} not found".format(myfile=replay_filename, **formatters))
+        errors += 1
+    else:
+        print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=replay_filename, **formatters))
 
     with open(output_filename) as output_file:
-        check_output(output_file, 'testing log stream')
+        check_output(output_filename, output_file, 'testing log stream')
 
     with open(replay_filename) as replay_file:
-        check_output(replay_file, 'testing replay stream')
+        check_output(replay_filename, replay_file, 'testing replay stream')
 
 if __name__ == '__main__':
+    import sys
+    print("{GREEN}[--------]{END}".format(**formatters))
     run_io_test()
+    print("{GREEN}[--------]{END}".format(**formatters))
+    sys.exit(errors)

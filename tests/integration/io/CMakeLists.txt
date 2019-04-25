@@ -22,6 +22,8 @@ blt_add_executable(
 
 include(FindPythonInterp)
 
-add_test(
-  NAME iomanager_tests
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/verify-io-output.py WORKING_DIRECTORY ${io_dir})
+if (PYTHON_EXECUTABLE)
+  add_test(
+    NAME iomanager_tests
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/verify-io-output.py WORKING_DIRECTORY ${io_dir})
+endif ()
