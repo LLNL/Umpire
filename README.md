@@ -6,7 +6,7 @@
 [![codecov](https://codecov.io/gh/LLNL/Umpire/branch/develop/graph/badge.svg)](https://codecov.io/gh/LLNL/Umpire) [![Join the chat at https://gitter.im/LLNL/Umpire](https://badges.gitter.im/LLNL/Umpire.svg)](https://gitter.im/LLNL/Umpire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Umpire is a resource management library that allows the discovery, provision,
-and management of memory on machines with multi-level memory like NUMA and GPUs.
+and management of memory on machines with multiple memory devices like NUMA and GPUs.
 
 Umpire uses CMake and BLT to handle builds. Since BLT is included as a
 submodule, first make sure you run:
