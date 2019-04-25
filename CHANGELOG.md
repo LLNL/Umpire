@@ -26,6 +26,8 @@ and a dynamic pool for those that are larger.
 - Replay CI tests temporarily disabled.  This line to be removed once we
   enable the tests again after replay works with Azure pipelines and MixedPool
 
+- Updated README to better describe Umpire capability
+
 ### Removed
 
 ### Fixed
