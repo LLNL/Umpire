@@ -19,6 +19,7 @@ set (umpire_strategy_headers
   DynamicPool.hpp
   DynamicPoolHeuristic.hpp
   FixedPool.hpp
+  MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   SizeLimiter.hpp
@@ -40,6 +41,7 @@ set (umpire_strategy_sources
   DynamicPool.cpp
   DynamicPoolHeuristic.cpp
   FixedPool.cpp
+  MixedPool.cpp
   mixins/Inspector.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
