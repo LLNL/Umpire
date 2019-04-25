@@ -83,12 +83,12 @@ IOManager::initialize()
 
     s_log_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "log");
     s_replay_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "replay");
+    s_error_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "error");
     s_error_filename = "";
 
     log_buffer.setConsoleStream(&std::cout);
     replay_buffer.setConsoleStream(nullptr);
     error_buffer.setConsoleStream(&std::cerr);
-
 
     if (rank == 0) {
       if (!opendir(s_root_io_dir.c_str()))

@@ -112,3 +112,5 @@ add_subdirectory(replay)
 if (ENABLE_C OR ENABLE_FORTRAN)
   add_subdirectory(interface)
 endif()
+
+add_subdirectory(io)
