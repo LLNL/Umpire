@@ -33,3 +33,13 @@ blt_add_executable(
 blt_add_test(
   NAME simpool_smoke_tests
   COMMAND simpool_smoke_tests)
+
+blt_add_executable(
+  NAME cxxopts_smoke_tests
+  SOURCES cxxopts_smoke_tests.cpp
+  DEPENDS_ON umpire_tpl_cxxopts gtest
+  OUTPUT_DIR ${unit_dir})
+
+blt_add_test(
+  NAME cxxopts_smoke_tests
+  COMMAND cxxopts_smoke_tests)
