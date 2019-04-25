@@ -12,25 +12,24 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/ResourceManager.hpp"
-#include "umpire/Allocator.hpp"
+#ifndef UMPIRE_allocation_statistics_HPP
+#define UMPIRE_allocation_statistics_HPP
 
-#include "umpire/TypedAllocator.hpp"
+#include "umpire/util/AllocationRecord.hpp"
 
-int main(int, char**) {
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto alloc = rm.getAllocator("HOST");
+#include <vector>
 
-  umpire::TypedAllocator<double> double_allocator{alloc};
+namespace umpire {
+namespace util {
 
-  double* my_doubles = double_allocator.allocate(1024);
+/*!
+ * \brief Compute the relative fragmentation of a set of allocation records.
+ *
+ * Fragmentation = 1 - (largest free block) / (total free space)
+ */
+float relative_fragmentation(std::vector<const util::AllocationRecord*>& recs);
 
-  double_allocator.deallocate(my_doubles, 1024);
-
-  std::vector< double, umpire::TypedAllocator<double> > 
-    my_vector{double_allocator};
-
-  my_vector.resize(100);
-
-  return 0;
 }
+}
+
+#endif // UMPIRE_allocation_statistics_HPP

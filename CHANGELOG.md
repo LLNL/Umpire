@@ -10,7 +10,25 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- CI builds for Mac, Linux and Windows via Azure Pipelines
+
+- Added HCC stage in Docker file
+
+- GitHub action to automatically delete merged branches
+
+- Enabled `FixedPool` allocator benchmarks.
+
+- Mixed pool that uses faster fixed pools for smaller allocation sizes,
+and a dynamic pool for those that are larger.
+
 ### Changed
+
+- Switched template parameters to runtime constructor arguments in `FixedPool`.
+
+- Replay CI tests temporarily disabled.  This line to be removed once we
+  enable the tests again after replay works with Azure pipelines and MixedPool
+
+- Updated README to better describe Umpire capability
 
 ### Removed
 
@@ -21,6 +39,8 @@ ReadTheDocs
 
 - Throw an error if attempting to deallocate with a different Allocator than
 performed the allocation
+
+- Building on Windows
 
 ## [0.3.3] - 2019-04-11
 
@@ -49,7 +69,7 @@ replayed events are correct.
 allocator, and a cookbook recipe to do that.
 
 - Dockerfile for multi-stage builds. Supports building Umpire with GCC, Clang,
-and CUDA
+and CUDA.
 
 - GitHub action to run Clang static analysis.
 
@@ -57,6 +77,10 @@ and CUDA
 distinguish processes in an multi-process run.
 
 - Umpire replay now takes a "--help" option and displays usage information.
+
+- A const iterator for AllocationMap, a free function to pull out a vector of
+allocation records for a specific allocator, and a method to calculate the
+relative fragmentation.
 
 ### Changed
 

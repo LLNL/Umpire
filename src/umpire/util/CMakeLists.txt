@@ -15,6 +15,7 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
+  allocation_statistics.hpp
   detect_vendor.hpp
   Exception.hpp
   Logger.hpp
@@ -38,6 +39,7 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
+  allocation_statistics.cpp
   detect_vendor.cpp
   Exception.cpp
   Logger.cpp)
