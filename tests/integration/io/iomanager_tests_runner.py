@@ -29,7 +29,7 @@ def check_output(name, file_object, expected):
 
     contents = file_object.readline().rstrip()
     if (contents != expected):
-        print("{RED}[   ERROR])END} Got {contents}".format(contents=contents, expected=expected, **formatters))
+        print("{RED}[   ERROR]){END} Got {contents}".format(contents=contents, expected=expected, **formatters))
         errors += 1
     else:
         print("{GREEN}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
@@ -40,7 +40,7 @@ def check_file_exists(filename):
 
     print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
     if (not os.path.isfile(filename)):
-        print("{RED}[   ERROR])END} {myfile} not found".format(myfile=filename, **formatters))
+        print("{RED}[   ERROR]){END} {myfile} not found".format(myfile=filename, **formatters))
         errors += 1
     else:
         print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=filename, **formatters))

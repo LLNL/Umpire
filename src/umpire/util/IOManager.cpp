@@ -30,7 +30,6 @@
 #include <dirent.h>
 #else
 #include <direct.h>
-#define mkdir _mkdir
 #endif
 
 namespace umpire {
@@ -100,7 +99,11 @@ IOManager::initialize()
       stat( s_root_io_dir.c_str(), &info );
       if(!(info.st_mode & S_IFDIR))
       {
+#if defined(_MSC_VER)
+        mkdir(s_root_io_dir.c_str());
+#else
         mkdir(s_root_io_dir.c_str(), 0700);
+#endif
       }
     }
 
