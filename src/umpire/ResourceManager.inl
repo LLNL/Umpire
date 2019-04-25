@@ -49,7 +49,7 @@ Allocator ResourceManager::makeAllocator(
         << typeid(Strategy).name()
         << "," << (introspection ? "true" : "false")
         << "," << name
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
     );
 #else
     UMPIRE_REPLAY("makeAllocator_attempt,"
@@ -87,7 +87,7 @@ Allocator ResourceManager::makeAllocator(
         << typeid(Strategy).name()
         << "," << (introspection ? "true" : "false")
         << "," << name
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << "," << allocator
     );
 #else
