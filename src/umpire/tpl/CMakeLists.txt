@@ -53,6 +53,13 @@ blt_add_library(
 
 target_link_libraries(umpire_tpl_cxxopts INTERFACE)
 
+target_include_directories(
+  umpire_tpl_cxxopts
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 install(FILES
   ${cxxopts_headers}
   DESTINATION include/umpire/tpl/cxxopts/include)

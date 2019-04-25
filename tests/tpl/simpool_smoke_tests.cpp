@@ -21,11 +21,11 @@
 
 TEST(Simpool, FixedPool)
 {
-  pool = FixedPool<int, StdAllocator>{};
+  FixedSizePool<int, StdAllocator> pool{};
 
   int* i = pool.allocate();
 
   pool.deallocate(i);
 
-  ASSERT_TRUE();
+  SUCCEED();
 }
