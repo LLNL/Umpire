@@ -23,10 +23,14 @@
 #include <fstream>
 #include <sstream>
 
-#if !defined(_MSC_VER)
 #include <sys/stat.h>
 #include <sys/types.h>
+
+#if !defined(_MSC_VER)
 #include <dirent.h>
+#else
+#include <direct.h>
+#define mkdir _mkdir
 #endif
 
 namespace umpire {
@@ -91,7 +95,10 @@ IOManager::initialize()
     error_buffer.setConsoleStream(&std::cerr);
 
     if (rank == 0) {
-      if (!opendir(s_root_io_dir.c_str()))
+      struct stat info;
+
+      stat( s_root_io_dir.c_str(), &info );
+      if(!(info.st_mode & S_IFDIR))
       {
         mkdir(s_root_io_dir.c_str(), 0700);
       }
