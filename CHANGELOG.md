@@ -30,6 +30,8 @@ and a dynamic pool for those that are larger.
 
 - Updated README to better describe Umpire capability
 
+- Update BLT to fix CMake 3.13 warnings and MSVC compatability
+
 ### Removed
 
 ### Fixed
