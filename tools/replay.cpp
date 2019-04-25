@@ -22,7 +22,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "umpire/config.hpp"
+#include <cstdlib>
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
@@ -31,9 +32,11 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
@@ -116,7 +119,7 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 {
   data.readNextRow(str);
   return str;
-}   
+}
 
 class NullBuffer : public std::streambuf {
   public:
@@ -145,7 +148,7 @@ class Replay {
       }
 
       std::ostringstream version_stringstream;
-      version_stringstream << "Umpire v" << UMPIRE_VERSION_MAJOR 
+      version_stringstream << "Umpire v" << UMPIRE_VERSION_MAJOR
         << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH;
       m_umpire_version_string = version_stringstream.str();
 
@@ -430,7 +433,7 @@ class Replay {
         if (m_row.size() >= 9) {
           const std::string& accessingAllocatorName = m_row[8];
 
-          replay_out() 
+          replay_out()
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << adviceOperation
@@ -442,7 +445,7 @@ class Replay {
         }
         else {
 
-          replay_out() 
+          replay_out()
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << adviceOperation
@@ -462,7 +465,7 @@ class Replay {
           get_from_string(m_row[7], min_initial_alloc_size);
           get_from_string(m_row[8], min_alloc_size);
 
-          replay_out() 
+          replay_out()
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << min_initial_alloc_size
@@ -475,7 +478,7 @@ class Replay {
         else if ( m_row.size() >= 8 ) {
           get_from_string(m_row[7], min_initial_alloc_size);
 
-          replay_out() 
+          replay_out()
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ", " << min_initial_alloc_size
@@ -486,7 +489,7 @@ class Replay {
         }
         else {
 
-          replay_out() 
+          replay_out()
             << "(" << name
             << ", getAllocator(" << allocName << ")"
             << ")";
@@ -501,7 +504,7 @@ class Replay {
 
         const std::string& allocName = m_row[7];
 
-        replay_out() 
+        replay_out()
           << "(" << name
           << ", " << capacity
             << ", getAllocator(" << allocName << ")"
@@ -515,7 +518,7 @@ class Replay {
         std::size_t size_limit;
         get_from_string(m_row[7], size_limit);
 
-        replay_out() 
+        replay_out()
           << "(" << name
           << ", getAllocator(" << allocName << ")"
           << ", " << size_limit
@@ -529,7 +532,7 @@ class Replay {
         std::size_t slots;
         get_from_string(m_row[6], slots);
 
-        replay_out() 
+        replay_out()
           << "(" << name
           << ", " << slots
           << ", getAllocator(" << allocName << ")"
@@ -541,7 +544,7 @@ class Replay {
       else if ( m_row[3] == "umpire::strategy::ThreadSafeAllocator" ) {
         const std::string& allocName = m_row[6];
 
-        replay_out() 
+        replay_out()
           << "(" << name
           << ", getAllocator(" << allocName << ")"
           << ")";
@@ -554,20 +557,17 @@ class Replay {
         // Need to skip FixedPool for now since I haven't figured out how to
         // dynamically parse/creat the data type parameter
         //
-        replay_out() << " (ignored) ";
-        return;
-#if 0
-        //
         // Replay currently cannot support replaying FixedPool allocations.
         // This is because replay does its work at runtime and the FixedPool
         // is a template where sizes are generated at compile time.
         //
+        replay_out() << " (ignored) ";
+        return;
+      }
+      else if (m_row[3] == "umpire::strategy::MixedPool" ) {
         const std::string& allocName = m_row[6];
-        std::size_t PoolSize = hmm...
-
-        if ( introspection )  m_rm.makeAllocator<umpire::strategy::FixedPool<PoolSize>, true>(name, m_rm.getAllocator(allocName));
-        else                  m_rm.makeAllocator<umpire::strategy::FixedPool<PoolSize>, false>(name, m_rm.getAllocator(allocName));
-#endif
+        if ( introspection ) m_rm.makeAllocator<umpire::strategy::MixedPool, true>(name, m_rm.getAllocator(allocName));
+        else                 m_rm.makeAllocator<umpire::strategy::MixedPool, false>(name, m_rm.getAllocator(allocName));
       }
       else {
         std::cerr << "Unknown class (" << m_row[3] << "), skipping.\n";

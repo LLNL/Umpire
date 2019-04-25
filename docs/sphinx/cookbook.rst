@@ -25,3 +25,4 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/coalesce_pool.rst
    cookbook/pinned_pool.rst
    cookbook/plot_allocations.rst
+   cookbook/mixed_pool.rst

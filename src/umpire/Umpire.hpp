@@ -24,6 +24,8 @@
 
 #include "umpire/Allocator.hpp"
 
+#include "umpire/util/AllocationRecord.hpp"
+
 #include <iostream>
 
 namespace umpire {
@@ -75,12 +77,20 @@ int get_patch_version()
 }
 
 /*!
- * \brief Print the allocations from a specific allocator
+ * \brief Print the allocations from a specific allocator in a
+ * human-readable format.
  *
  * \param allocator source Allocator.
  * \param os output stream
  */
 void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
+
+/*!
+ * \brief Returns vector of AllocationRecords created by the allocator.
+ *
+ * \param allocator source Allocator.
+ */
+std::vector<const util::AllocationRecord*> get_allocator_records(Allocator allocator);
 
 } // end of namespace umpire
 
