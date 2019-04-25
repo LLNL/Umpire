@@ -22,15 +22,15 @@ formatters = {
 
 errors = 0
 
-
 def check_output(name, file_object, expected):
+    global errors
 
     print("{GREEN}[RUN     ]{END} Checking for \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
     contents = file_object.readline().rstrip()
     if (contents != expected):
-        print("{RED}[   ERROR]){END} Got {contents}".format(contents=contents, expected=expected, **formatters))
-        errors += 1
+        print("{RED}[   ERROR]{END} Got {contents}".format(contents=contents, expected=expected, **formatters))
+        errors = errors + 1
     else:
         print("{GREEN}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
@@ -38,10 +38,12 @@ def check_output(name, file_object, expected):
 def check_file_exists(filename):
     import os
 
+    global errors
+
     print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
     if (not os.path.isfile(filename)):
-        print("{RED}[   ERROR]){END} {myfile} not found".format(myfile=filename, **formatters))
-        errors += 1
+        print("{RED}[   ERROR]{END} {myfile} not found".format(myfile=filename, **formatters))
+        errors += errors + 1
     else:
         print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=filename, **formatters))
 
@@ -82,6 +84,7 @@ def run_io_test(test_env, file_uid):
 
 if __name__ == '__main__':
     import sys
+
     print("{GREEN}[--------]{END}".format(**formatters))
     run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
     run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
