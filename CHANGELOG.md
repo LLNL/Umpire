@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitHub action to automatically delete merged branches
 
+- Enabled `FixedPool` allocator benchmarks.
+
 - Mixed pool that uses faster fixed pools for smaller allocation sizes,
 and a dynamic pool for those that are larger.
 
