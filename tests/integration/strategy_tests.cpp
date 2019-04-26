@@ -585,9 +585,9 @@ TEST(NumaPolicyTest, EdgeCases) {
                  "numa_alloc", -1, rm.getAllocator("HOST")),
                umpire::util::Exception);
 
+#if defined(UMPIRE_ENABLE_CUDA)
   const int numa_node = umpire::numa::preferred_node();
 
-#if defined(UMPIRE_ENABLE_CUDA)
   // Only works with HOST allocators
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
                  "numa_alloc", numa_node, rm.getAllocator("DEVICE")),
