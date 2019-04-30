@@ -47,6 +47,11 @@ struct SICMAllocator
   //   }
   // }
 
+  // ~SICMAllocator() {
+  //   sicm_arena_destroy(sa);
+  //   sicm_fini();
+  // }
+
   /*!
    * \brief Allocate bytes of memory using sicm_alloc.
    *
@@ -61,6 +66,7 @@ struct SICMAllocator
     void* ret = sicm_alloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
      if  (ret == nullptr) {
+      // sicm_arena_destroy(sa);
       sicm_fini();
       UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed");
     } else {
