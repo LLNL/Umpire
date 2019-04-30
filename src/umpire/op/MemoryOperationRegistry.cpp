@@ -94,11 +94,6 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
   registerOperation(
       "MEMSET",
-      std::make_pair(Platform::cpu, Platform::sicm),
-      std::make_shared<HostMemsetOperation>());
-
-  registerOperation(
-      "MEMSET",
       std::make_pair(Platform::sicm, Platform::sicm),
       std::make_shared<HostMemsetOperation>());
 
