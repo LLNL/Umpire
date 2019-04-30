@@ -261,6 +261,9 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
 
 const umpire::resource::MemoryResourceType resource_types[] = {
   umpire::resource::Host
+#if defined(UMPIRE_ENABLE_SICM)
+  , umpire::resource::SICM
+#endif
 #if defined(UMPIRE_ENABLE_DEVICE)
   , umpire::resource::Device
 #endif

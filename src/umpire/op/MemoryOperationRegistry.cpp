@@ -88,6 +88,11 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_shared<HostCopyOperation>());
 
   registerOperation(
+      "COPY",
+      std::make_pair(Platform::sicm, Platform::cpu),
+      std::make_shared<HostCopyOperation>());
+
+  registerOperation(
       "MEMSET",
       std::make_pair(Platform::cpu, Platform::sicm),
       std::make_shared<HostMemsetOperation>());
