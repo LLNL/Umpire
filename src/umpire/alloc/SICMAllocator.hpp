@@ -37,10 +37,12 @@ struct SICMAllocator
   //     sa(nullptr)
   // {
   //   if (device >= devs.count) {
+  //     sicm_fini();
   //     UMPIRE_ERROR("SICMAllocator Bad device index: " << device << " / " << devs.count);
   //   }
 
   //   if (!(sa = sicm_arena_create(0, &devs.devices[device]))) {
+  //     sicm_fini();
   //     UMPIRE_ERROR("SICMAllocator Could not create arena on device " << device);
   //   }
   // }
@@ -59,6 +61,7 @@ struct SICMAllocator
     void* ret = sicm_alloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
      if  (ret == nullptr) {
+      sicm_fini();
       UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed");
     } else {
       return ret;
