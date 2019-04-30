@@ -32,13 +32,17 @@ namespace alloc {
  */
 struct SICMAllocator
 {
-  // SICMAllocator()
+  // SICMAllocator(unsigned int device = 0)
   //   : devs(sicm_init()),
-  //     sa(sicm_arena_create(0, &devs.devices[0]))
+  //     sa(nullptr)
   // {
-  //     if (!sa) {
-  //       UMPIRE_ERROR("SICMAllocator Could not create arena");
-  //     }
+  //   if (device >= devs.count) {
+  //     UMPIRE_ERROR("SICMAllocator Bad device index: " << device << " / " << devs.count);
+  //   }
+
+  //   if (!(sa = sicm_arena_create(0, &devs.devices[device]))) {
+  //     UMPIRE_ERROR("SICMAllocator Could not create arena on device " << device);
+  //   }
   // }
 
   /*!
