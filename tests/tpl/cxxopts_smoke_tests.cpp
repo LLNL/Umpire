@@ -17,7 +17,7 @@
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
-TEST(Cxxopts, )
+TEST(Cxxopts, TestOptions)
 {
   const char* args_const[2] = {"cxxopts_smoke_tests", "--test"};
   char** args = const_cast<char**>(args_const);
