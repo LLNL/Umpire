@@ -21,6 +21,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Mixed pool that uses faster fixed pools for smaller allocation sizes,
 and a dynamic pool for those that are larger.
 
+- Smoke tests for required third-party libraries
+
 ### Changed
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
