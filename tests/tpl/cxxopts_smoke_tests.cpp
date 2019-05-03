@@ -12,25 +12,22 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/ResourceManager.hpp"
-#include "umpire/Allocator.hpp"
 
-#include "umpire/TypedAllocator.hpp"
+#include "gtest/gtest.h"
 
-int main(int, char**) {
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto alloc = rm.getAllocator("HOST");
+#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
-  umpire::TypedAllocator<double> double_allocator{alloc};
+TEST(Cxxopts, TestOptions)
+{
+  const char* args_const[2] = {"cxxopts_smoke_tests", "--test"};
+  char** args = const_cast<char**>(args_const);
+  int argc = 2;
 
-  double* my_doubles = double_allocator.allocate(1024);
+  cxxopts::Options options(args[0], "test cxxopts");
 
-  double_allocator.deallocate(my_doubles, 1024);
+  options.add_options()("t, test", "test option");
 
-  std::vector< double, umpire::TypedAllocator<double> > 
-    my_vector{double_allocator};
+  auto result = options.parse(argc, args);
 
-  my_vector.resize(100);
-
-  return 0;
+  ASSERT_TRUE(result.count("test"));
 }

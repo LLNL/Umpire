@@ -206,6 +206,12 @@ ResourceManager::getAllocator(const std::string& name)
 }
 
 Allocator
+ResourceManager::getAllocator(const char* name)
+{
+  return getAllocator(std::string{name});
+}
+
+Allocator
 ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 {
   UMPIRE_LOG(Debug, "(\"" << static_cast<size_t>(resource_type) << "\")");
@@ -424,8 +430,8 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
-static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
-  std::shared_ptr<strategy::NumaPolicy> numa_alloc;
+static strategy::NumaPolicy* cast_as_numa_policy(Allocator& allocator) {
+  strategy::NumaPolicy* numa_alloc;
 
   numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
     allocator.getAllocationStrategy());

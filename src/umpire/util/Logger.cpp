@@ -16,7 +16,12 @@
 
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
+#if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
+#else
+#define strcasecmp _stricmp
+#endif
+
 
 namespace umpire {
 namespace util {

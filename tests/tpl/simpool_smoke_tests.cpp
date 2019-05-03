@@ -12,25 +12,20 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/ResourceManager.hpp"
-#include "umpire/Allocator.hpp"
 
-#include "umpire/TypedAllocator.hpp"
+#include "gtest/gtest.h"
 
-int main(int, char**) {
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto alloc = rm.getAllocator("HOST");
+#include "umpire/tpl/simpool/FixedSizePool.hpp"
+#include "umpire/tpl/simpool/DynamicSizePool.hpp"
+#include "umpire/tpl/simpool/StdAllocator.hpp"
 
-  umpire::TypedAllocator<double> double_allocator{alloc};
+TEST(Simpool, FixedPool)
+{
+  FixedSizePool<int, StdAllocator> pool{};
 
-  double* my_doubles = double_allocator.allocate(1024);
+  int* i = pool.allocate();
 
-  double_allocator.deallocate(my_doubles, 1024);
+  pool.deallocate(i);
 
-  std::vector< double, umpire::TypedAllocator<double> > 
-    my_vector{double_allocator};
-
-  my_vector.resize(100);
-
-  return 0;
+  SUCCEED();
 }

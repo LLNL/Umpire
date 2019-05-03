@@ -27,6 +27,13 @@ blt_add_library(
   HEADERS ${judy_headers}
   OBJECT TRUE)
 
+target_include_directories(
+  umpire_tpl_judy
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
 install(FILES
   ${judy_headers}
   DESTINATION include/umpire/tpl/judy)
