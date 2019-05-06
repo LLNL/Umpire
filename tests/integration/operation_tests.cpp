@@ -480,9 +480,6 @@ TEST_P(MoveTest, Move)
 
 const std::string move_sources[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_SICM)
-  , "SICM"
-#endif
 #if defined(UMPIRE_ENABLE_UM)
   , "UM"
 #endif
@@ -493,9 +490,6 @@ const std::string move_sources[] = {
 
 const std::string move_dests[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_SICM)
-  , "SICM"
-#endif
 #if defined(UMPIRE_ENABLE_DEVICE)
   , "DEVICE"
 #endif

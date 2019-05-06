@@ -18,6 +18,14 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends}
   OUTPUT_DIR ${cookbook_dir})
 
+if (ENABLE_SICM)
+  blt_add_executable(
+    NAME recipe_move_between_sicm_devices
+    SOURCES recipe_move_between_sicm_devices.cpp
+    DEPENDS_ON umpire
+    OUTPUT_DIR ${cookbook_dir})
+endif ()
+
 if (ENABLE_NUMA)
   blt_add_executable(
     NAME recipe_move_between_numa

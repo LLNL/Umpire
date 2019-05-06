@@ -25,10 +25,12 @@ set (umpire_op_depends)
 if (ENABLE_SICM)
   set (umpire_op_headers
     ${umpire_op_headers}
+    SICMMoveOperation.hpp
     SICMReallocateOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
+    SICMMoveOperation.cpp
     SICMReallocateOperation.cpp)
 endif ()
 

@@ -15,6 +15,7 @@
 #include "umpire/op/GenericReallocateOperation.hpp"
 
 #if defined(UMPIRE_ENABLE_SICM)
+#include "umpire/op/SICMMoveOperation.hpp"
 #include "umpire/op/SICMReallocateOperation.hpp"
 #endif
 
@@ -91,6 +92,11 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "COPY",
       std::make_pair(Platform::sicm, Platform::cpu),
       std::make_shared<HostCopyOperation>());
+
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::sicm, Platform::sicm),
+      std::make_shared<SICMMoveOperation>());
 
   registerOperation(
       "MEMSET",

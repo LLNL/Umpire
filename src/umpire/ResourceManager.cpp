@@ -16,6 +16,7 @@
 
 #if defined(UMPIRE_ENABLE_SICM)
 #include "umpire/resource/SICMResourceFactory.hpp"
+#include "umpire/strategy/SICMStrategy.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -620,6 +621,37 @@ ResourceManager::move(void* ptr, Allocator allocator)
   if (alloc_record->strategy == allocator.getAllocationStrategy()) {
     return ptr;
   }
+
+#if defined(UMPIRE_ENABLE_SICM)
+  auto sicm_alloc = static_cast<strategy::SICMStrategy *>(allocator.m_allocator);
+  if (sicm_alloc) {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      auto src_alloc_record = m_allocations.find(ptr);
+
+      const size_t size = src_alloc_record->m_size;
+      util::AllocationRecord dst_alloc_record;
+      dst_alloc_record.m_size = src_alloc_record->m_size;
+      dst_alloc_record.m_strategy = sicm_alloc;
+
+      void *ret = nullptr;
+      if (size > 0) {
+        auto op = op_registry.find("MOVE",
+                                   src_alloc_record->m_strategy,
+                                   dst_alloc_record.m_strategy);
+
+        op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
+        if (ret != ptr) {
+          UMPIRE_ERROR("SICM move error");
+        }
+      }
+      else {
+        ret = ptr;
+      }
+
+      return ret;
+  }
+#endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
   {

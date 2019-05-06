@@ -18,6 +18,13 @@ set (umpire_strategy_headers
   ThreadSafeAllocator.hpp
   ZeroByteHandler.hpp)
 
+if (ENABLE_SICM)
+  set (umpire_strategy_headers
+    ${umpire_strategy_headers}
+    SICMStrategy.hpp)
+endif ()
+
+
 if (ENABLE_NUMA)
   set (umpire_strategy_headers
     ${umpire_strategy_headers}
@@ -41,6 +48,12 @@ set (umpire_strategy_sources
   SizeLimiter.cpp
   ThreadSafeAllocator.cpp
   ZeroByteHandler.cpp)
+
+if (ENABLE_SICM)
+  set (umpire_strategy_sources
+    ${umpire_strategy_sources}
+    SICMStrategy.cpp)
+endif ()
 
 if (ENABLE_NUMA)
   set (umpire_strategy_sources

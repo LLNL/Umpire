@@ -53,9 +53,6 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
 
 const std::string allocators[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_SICM)
-  , "SICM"
-#endif
 #if defined(UMPIRE_ENABLE_CUDA)
   , "DEVICE"
   , "UM"

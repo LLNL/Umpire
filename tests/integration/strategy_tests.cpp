@@ -43,9 +43,6 @@ static int subsequent_min_size = 512;
 
 const char* AllocationDevices[] = {
   "HOST"
-#if defined(UMPIRE_ENABLE_SICM)
-    , "SICM"
-#endif
 #if defined(UMPIRE_ENABLE_DEVICE)
     , "DEVICE"
 #endif

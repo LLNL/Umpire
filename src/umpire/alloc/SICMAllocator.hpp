@@ -32,25 +32,25 @@ namespace alloc {
  */
 struct SICMAllocator
 {
-  // SICMAllocator(unsigned int device = 0)
-  //   : devs(sicm_init()),
-  //     sa(nullptr)
-  // {
-  //   if (device >= devs.count) {
-  //     sicm_fini();
-  //     UMPIRE_ERROR("SICMAllocator Bad device index: " << device << " / " << devs.count);
-  //   }
+  SICMAllocator(unsigned int device = 0)
+    : devs(sicm_init()),
+      sa(nullptr)
+  {
+    if (device >= devs.count) {
+      sicm_fini();
+      UMPIRE_ERROR("SICMAllocator Bad device index: " << device << " / " << devs.count);
+    }
 
-  //   if (!(sa = sicm_arena_create(0, &devs.devices[device]))) {
-  //     sicm_fini();
-  //     UMPIRE_ERROR("SICMAllocator Could not create arena on device " << device);
-  //   }
-  // }
+    if (!(sa = sicm_arena_create(0, &devs.devices[device]))) {
+      sicm_fini();
+      UMPIRE_ERROR("SICMAllocator Could not create arena on device " << device);
+    }
+  }
 
-  // ~SICMAllocator() {
-  //   sicm_arena_destroy(sa);
-  //   sicm_fini();
-  // }
+  ~SICMAllocator() {
+    sicm_arena_destroy(sa);
+    sicm_fini();
+  }
 
   /*!
    * \brief Allocate bytes of memory using sicm_alloc.
@@ -66,7 +66,7 @@ struct SICMAllocator
     void* ret = sicm_alloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
      if  (ret == nullptr) {
-      // sicm_arena_destroy(sa);
+      sicm_arena_destroy(sa);
       sicm_fini();
       UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed");
     } else {
@@ -87,8 +87,8 @@ struct SICMAllocator
     sicm_free(ptr);
   }
 
-  // sicm_device_list devs;
-  // sicm_arena sa;
+  sicm_device_list devs;
+  sicm_arena sa;
 };
 
 } // end of namespace alloc

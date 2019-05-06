@@ -45,6 +45,7 @@ option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 
 if (ENABLE_SICM)
+  set(ENABLE_NUMA ON)
   set(SICM_INCLUDE_PATH     SICM/include CACHE PATH "")
   set(SICM_LIBRARY_PATH     SICM/lib     CACHE PATH "")
   set(JEMALLOC_LIBRARY_PATH jemalloc/lib CACHE PATH "")
