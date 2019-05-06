@@ -40,7 +40,7 @@ int main(int, char**) {
 
   // Create an allocator on the first SICM node
   auto sicm_src_alloc = rm.makeAllocator<umpire::strategy::SICMStrategy>(
-    "sicm_src_alloc", 3);
+    "sicm_src_alloc", 0);
 
   // Create an allocation on that node
   void* src_ptr = sicm_src_alloc.allocate(alloc_size);
