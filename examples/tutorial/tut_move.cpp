@@ -44,9 +44,6 @@ int main(int, char**) {
   std::cout << "done." << std::endl;
 
   data = move_data(data, "HOST");
-#if defined(UMPIRE_ENABLE_SICM)
-  data = move_data(data, "SICM");
-#endif
 #if defined(UMPIRE_ENABLE_CUDA)
   data = move_data(data, "DEVICE");
   data = move_data(data, "UM");
