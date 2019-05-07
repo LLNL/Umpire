@@ -63,7 +63,7 @@ endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
 
-if (ENABLE_NUMA)
+if (ENABLE_SICM OR ENABLE_NUMA)
   set (umpire_util_depends
     ${umpire_util_depends}
     numa)
