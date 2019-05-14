@@ -31,7 +31,7 @@ if (ENABLE_STATISTICS)
     StatisticsDatabase.hpp)
 endif ()
 
-if (ENABLE_NUMA)
+if (ENABLE_SICM OR ENABLE_NUMA)
   set (umpire_util_headers
     ${umpire_util_headers}
     numa.hpp)
@@ -55,7 +55,7 @@ if (ENABLE_STATISTICS)
     StatisticsDatabase.cpp)
 endif ()
 
-if (ENABLE_NUMA)
+if (ENABLE_SICM OR ENABLE_NUMA)
   set (umpire_util_sources
     ${umpire_util_sources}
     numa.cpp)
