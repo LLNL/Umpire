@@ -19,7 +19,7 @@ make install -i
 cd ../..
 
 # install SICM
-git clone --depth 1 --branch build https://github.com/lanl/SICM.git
+git clone --depth 1 https://github.com/lanl/SICM.git
 cd SICM
 mkdir build
 cd build
