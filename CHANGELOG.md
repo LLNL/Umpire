@@ -120,3 +120,7 @@ out new cookbooks.
 - REPLAY previously recorded some operations with multiple print statements
 causing REPLAY output from MPI runs to become mixed between multiple ranks.
 REPLAY has been modified to output each operation onto a single line.
+
+- Update calls to allocate_pointer in the FORTRAN bindings to ensure that the
+  correct variable type of C_SIZE_T is passed in.  This fixes compile errors in
+  IBM XL.
