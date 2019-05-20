@@ -12,30 +12,34 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (unit_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit)
+set (unit_dir ${UMPIRE_TESTS_OUTPUT_DIR}/tpl)
 
 blt_add_executable(
-  NAME resource_manager_tests
-  SOURCES resource_manager_tests.cpp
-  DEPENDS_ON umpire gtest
+  NAME judy_smoke_tests
+  SOURCES judy_smoke_tests.cpp
+  DEPENDS_ON umpire_tpl_judy gtest
   OUTPUT_DIR ${unit_dir})
 
 blt_add_test(
-  NAME resource_manager_tests
-  COMMAND resource_manager_tests)
+  NAME judy_smoke_tests
+  COMMAND judy_smoke_tests)
 
 blt_add_executable(
-  NAME version_tests
-  SOURCES version_tests.cpp
-  DEPENDS_ON umpire gtest
+  NAME simpool_smoke_tests
+  SOURCES simpool_smoke_tests.cpp
+  DEPENDS_ON umpire_tpl_simpool gtest
   OUTPUT_DIR ${unit_dir})
 
 blt_add_test(
-  NAME version_tests
-  COMMAND version_tests)
+  NAME simpool_smoke_tests
+  COMMAND simpool_smoke_tests)
 
-add_subdirectory(alloc)
-add_subdirectory(op)
-add_subdirectory(resource)
-add_subdirectory(util)
-add_subdirectory(strategy)
+blt_add_executable(
+  NAME cxxopts_smoke_tests
+  SOURCES cxxopts_smoke_tests.cpp
+  DEPENDS_ON umpire_tpl_cxxopts gtest
+  OUTPUT_DIR ${unit_dir})
+
+blt_add_test(
+  NAME cxxopts_smoke_tests
+  COMMAND cxxopts_smoke_tests)

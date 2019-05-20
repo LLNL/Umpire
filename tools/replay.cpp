@@ -24,6 +24,7 @@
 #include <vector>
 
 #include "umpire/config.hpp"
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
@@ -32,9 +33,11 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "umpire/tpl/json/json.hpp"
@@ -52,7 +55,7 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
       )
       (  "i, infile"
        , "Input file created by Umpire library with UMPIRE_REPLAY=On"
-       , cxxopts::value<std::string>(), "FILE" 
+       , cxxopts::value<std::string>(), "FILE"
       )
       (  "u, uid"
        , "The format of a REPLAY line begins with REPLAY,UID,...  This instructs replay to only replay items for the specified UID."
@@ -71,7 +74,7 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
 
     if (result.count("help"))
     {
-      // You can output our default, unnamed group and our HiddenGroup 
+      // You can output our default, unnamed group and our HiddenGroup
       // of help with the following line:
       //
       //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
@@ -177,12 +180,12 @@ class Replay {
           replay_out() << std::endl;
         }
         else if ( m_json["event"] == "version" ) {
-          if (   m_json["result"]["major"] != UMPIRE_VERSION_MAJOR 
-              || m_json["result"]["minor"] != UMPIRE_VERSION_MINOR 
+          if (   m_json["result"]["major"] != UMPIRE_VERSION_MAJOR
+              || m_json["result"]["minor"] != UMPIRE_VERSION_MINOR
               || m_json["result"]["patch"] != UMPIRE_VERSION_PATCH ) {
             std::cerr << "Warning, version mismatch:\n"
               << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
-              << "  Log  version: " 
+              << "  Log  version: "
               << m_json["result"]["major"] << "."
               << m_json["result"]["minor"]  << "."
               << m_json["result"]["patch"]  << std::endl;
@@ -378,7 +381,7 @@ class Replay {
           if (m_json["payload"]["args"].size() >= 3) {
             const std::string& accessing_allocator_name = m_json["payload"]["args"][2];
 
-            replay_out() 
+            replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
               << ", " << advice_operation
@@ -390,7 +393,7 @@ class Replay {
           }
           else {
 
-            replay_out() 
+            replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
               << ", " << advice_operation
@@ -411,7 +414,7 @@ class Replay {
             get_from_string(m_json["payload"]["args"][1], min_initial_alloc_size);
             get_from_string(m_json["payload"]["args"][2], min_alloc_size);
 
-            replay_out() 
+            replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
               << ", " << min_initial_alloc_size
@@ -424,7 +427,7 @@ class Replay {
           else if (m_json["payload"]["args"].size() >= 2) {
             get_from_string(m_json["payload"]["args"][1], min_initial_alloc_size);
 
-            replay_out() 
+            replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
               << ", " << min_initial_alloc_size
@@ -434,7 +437,7 @@ class Replay {
             else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size);
           }
           else {
-            replay_out() 
+            replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
               << ")";
@@ -449,7 +452,7 @@ class Replay {
           std::size_t capacity;
           get_from_string(m_json["payload"]["args"][0], capacity);
 
-          replay_out() 
+          replay_out()
             << "(" << allocator_name
             << ", " << capacity
               << ", getAllocator(" << base_allocator_name << ")"
@@ -464,7 +467,7 @@ class Replay {
           std::size_t slots;
           get_from_string(m_json["payload"]["args"][0], slots);
 
-          replay_out() 
+          replay_out()
             << "(" << allocator_name
             << ", " << slots
             << ", getAllocator(" << base_allocator_name << ")"
@@ -478,7 +481,7 @@ class Replay {
           std::size_t size_limit;
           get_from_string(m_json["payload"]["args"][1], size_limit);
 
-          replay_out() 
+          replay_out()
             << "(" << allocator_name
             << ", getAllocator(" << base_allocator_name << ")"
             << ", " << size_limit
@@ -490,7 +493,7 @@ class Replay {
         else if ( type == "umpire::strategy::ThreadSafeAllocator" ) {
           const std::string& base_allocator_name = m_json["payload"]["args"][0];
 
-          replay_out() 
+          replay_out()
             << "(" << allocator_name
             << ", getAllocator(" << base_allocator_name << ")"
             << ")";
@@ -505,18 +508,11 @@ class Replay {
           //
           replay_out() << " (ignored) ";
           return;
-#if 0
-          //
-          // Replay currently cannot support replaying FixedPool allocations.
-          // This is because replay does its work at runtime and the FixedPool
-          // is a template where sizes are generated at compile time.
-          //
-          const std::string& base_allocator_name = m_json["payload"]["args"][0];
-          std::size_t PoolSize = hmm...
-
-          if ( introspection )  m_rm.makeAllocator<umpire::strategy::FixedPool<PoolSize>, true>(name, m_rm.getAllocator(base_allocator_name));
-          else                  m_rm.makeAllocator<umpire::strategy::FixedPool<PoolSize>, false>(name, m_rm.getAllocator(base_allocator_name));
-#endif
+        }
+        else if ( type == "umpire::strategy::MixedPool" ) {
+          // TODO: Get MixedPool working with JSON
+          replay_out() << " (ignored) ";
+          return;
         }
         else {
           std::cerr << "Unknown class (" << type << "), skipping.\n";
@@ -545,7 +541,7 @@ int main(int ac, char* av[])
   std::string output_file_name;
   if ( result.count("testfile") )
     output_file_name = result["testfile"].as<std::string>();
-  
+
   Replay replay(result, input_file_name, output_file_name);
 
   replay.run();
