@@ -37,17 +37,17 @@ Running this program with the ``UMPIRE_REPLAY`` environment variable set to
 that this file contains lines for making the :class:`umpire::Allocator`:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.csv
-                    :lines: 1
+                    :lines: 21-22
 
 Doing allocations:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.csv
-                    :lines: 4
+                    :lines: 23-24
 
 and finally, doing the deallocations:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.csv
-                    :lines: 80 
+                    :lines: 151
 
                  
 
