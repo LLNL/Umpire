@@ -63,14 +63,21 @@ information as follows:
 
 Each line contains the following set of common elements:
 
-- **kind** - Always set to *replay*
-- **uid** - This is the MPI rank of the process generating the event for mpi
-            programs or the PID for non-mpi.
-- **timestamp** - Set to the time when the event occurred
-- **event** - Set to one of: *version*, *makeMemoryResource*, *makeAllocator*,
-              *allocate*, or *deallocate*
-- **payload** - Optional and varies upon event type
-- **result** - Optional and varies upon event type
++-----------+---------------------------------------------------------------------------------------------------+
+| Element   | Description                                                                                       |
++===========+===================================================================================================+
+| kind      | Always set to *replay*                                                                            |
++-----------+---------------------------------------------------------------------------------------------------+
+| uid       | This is the MPI rank of the process generating the event for mpi programs or the PID for non-mpi. |
++-----------+---------------------------------------------------------------------------------------------------+
+| timestamp | Set to the time when the event occurred.                                                          |
++-----------+---------------------------------------------------------------------------------------------------+
+| event     | Set to one of: *version*, *makeMemoryResource*, *makeAllocator*, *allocate*, or *deallocate*      |
++-----------+---------------------------------------------------------------------------------------------------+
+| payload   | Optional and varies upon event type                                                               |
++-----------+---------------------------------------------------------------------------------------------------+
+| result    | Optional and varies upon event type                                                               |
++-----------+---------------------------------------------------------------------------------------------------+
 
 As can be seen, the *major*, *minor*, and *patch* version numbers are captured
 within the *result* for this event.
