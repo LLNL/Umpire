@@ -78,12 +78,12 @@ void SICMMoveOperation::transform(
         alloc::SICMAllocator::arenas[dst_allocator->getDeviceIndex()].push_back(sa);
       }
       else {
-          // is this an error?
+        // is this an error?
       }
     }
   }
 
-  (void) length; // length is not detected as being used by the macro
+  UMPIRE_USE_VAR(length); // length is not detected as being used
 
   UMPIRE_RECORD_STATISTIC(
       "SICMMoveOperation",

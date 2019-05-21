@@ -41,7 +41,9 @@ struct SICMAllocator
       allowed_devices(),
       best_device_index(0)
   {
-    // empty device list is allowed, but leaves the instance of SICMAllocator unable to do anything
+    if (!devices.size()) {
+      UMPIRE_ERROR("SICMAllocator construction failed due to lack of allowed devices");
+    }
 
     // check if any of the devices are out of bounds
     for(const unsigned int dev : devices) {
@@ -51,7 +53,7 @@ struct SICMAllocator
       }
 
       allowed_devices.push_back(dev);     // move the contents of devices into allowed devices
-      (void) arenas[dev];                 // create the map node
+      UMPIRE_USE_VAR(arenas[dev]);        // create the map node
     }
   }
 
@@ -85,11 +87,6 @@ struct SICMAllocator
     void* ret = nullptr;
     {
       std::lock_guard <std::mutex> lock(arena_mutex);
-
-      if (!allowed_devices.size()) {
-        cleanup();
-        UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed due to lack of allowed devics");
-      }
 
       // find best device
       const int best = allowed_devices[best_device_index];
@@ -126,7 +123,6 @@ struct SICMAllocator
       arenas_on_device.push_back(sa);
     }
 
-    // void* ret = sicm_alloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
     if  (ret == nullptr) {
       cleanup();
