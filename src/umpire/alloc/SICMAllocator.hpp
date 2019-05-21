@@ -86,12 +86,12 @@ struct SICMAllocator
   {
     void* ret = nullptr;
     {
-      std::lock_guard <std::mutex> lock(arena_mutex);
-
       // find best device
       const int best = allowed_devices[best_device_index];
       UMPIRE_LOG(Debug, "Best device to allocate on: " << best);
       best_device_index = (best_device_index + 1) % allowed_devices.size();
+
+      std::lock_guard <std::mutex> lock(arena_mutex);
 
       // get list of arenas currently on the device
       std::list <sicm_arena> & arenas_on_device = arenas[best];
