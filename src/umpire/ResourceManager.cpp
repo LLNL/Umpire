@@ -17,6 +17,7 @@
 #if defined(UMPIRE_ENABLE_SICM)
 #include "umpire/resource/SICMResourceFactory.hpp"
 #include "umpire/strategy/SICMStrategy.hpp"
+#include "umpire/util/numa.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -99,14 +100,23 @@ ResourceManager::ResourceManager() :
   resource::MemoryResourceRegistry& registry{
     resource::MemoryResourceRegistry::getInstance()};
 
-// read config file/figure out which device belongs to what
+#if defined(UMPIRE_ENABLE_SICM)
+  // read config file/figure out which device belongs to what
+  const std::vector <int> nodes = numa::get_allocatable_nodes();
+  std::set <unsigned int> devices = {};
+  for(const int n : nodes) {
+      devices.insert(n * 3);
+      devices.insert(n * 3 + 1);
+      devices.insert(n * 3 + 2);
+  }
+#endif
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_SICM)
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("HOST", {0, 1, 2, 3, 4, 5}));
+    util::make_uniqe<resource::SICMResourceFactory>("HOST", devices));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::HostResourceFactory>());
