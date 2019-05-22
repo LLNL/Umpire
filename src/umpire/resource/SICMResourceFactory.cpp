@@ -32,7 +32,7 @@ SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::set
 bool
 SICMResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  return (name.compare(replacement) == 0);
+  return (replacement.compare(name) == 0);
 }
 
 resource::MemoryResource*
