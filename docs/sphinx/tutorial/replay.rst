@@ -84,7 +84,7 @@ Each line contains the following set of common elements:
   Optional and varies upon event type
 
 As can be seen, the *major*, *minor*, and *patch* version numbers are captured
-within the *result* for this event.
+within the *payload* for this event.
 
 makeMemoryResource Event
 ------------------------

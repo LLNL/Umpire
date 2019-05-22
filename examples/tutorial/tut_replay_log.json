@@ -12,7 +12,7 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-{ "kind":"replay", "uid":27494, "timestamp":1558388052211435757, "event": "version", "result": { "major":0, "minor":3, "patch":3 } }
+{ "kind":"replay", "uid":27494, "timestamp":1558388052211435757, "event": "version", "payload": { "major":0, "minor":3, "patch":3 } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052211477678, "event": "makeMemoryResource", "payload": { "name": "HOST" }, "result": "0x101626b0" }
 { "kind":"replay", "uid":27494, "timestamp":1558388052471684134, "event": "makeMemoryResource", "payload": { "name": "DEVICE" }, "result": "0x101d79a0" }
 { "kind":"replay", "uid":27494, "timestamp":1558388052471698804, "event": "makeMemoryResource", "payload": { "name": "PINNED" }, "result": "0x101d7a50" }

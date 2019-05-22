@@ -180,15 +180,15 @@ class Replay {
           replay_out() << std::endl;
         }
         else if ( m_json["event"] == "version" ) {
-          if (   m_json["result"]["major"] != UMPIRE_VERSION_MAJOR
-              || m_json["result"]["minor"] != UMPIRE_VERSION_MINOR
-              || m_json["result"]["patch"] != UMPIRE_VERSION_PATCH ) {
+          if (   m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR
+              || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
+              || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
             std::cerr << "Warning, version mismatch:\n"
               << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
               << "  Log  version: "
-              << m_json["result"]["major"] << "."
-              << m_json["result"]["minor"]  << "."
-              << m_json["result"]["patch"]  << std::endl;
+              << m_json["payload"]["major"] << "."
+              << m_json["payload"]["minor"]  << "."
+              << m_json["payload"]["patch"]  << std::endl;
           }
         }
         else {
