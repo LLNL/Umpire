@@ -84,3 +84,9 @@ blt_add_executable(
   SOURCES recipe_plot_allocations.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${cookbook_dir})
+
+blt_add_executable(
+  NAME recipe_mixed_pool
+  SOURCES recipe_mixed_pool.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${cookbook_dir})
