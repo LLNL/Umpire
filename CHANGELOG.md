@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - CI builds for Mac, Linux and Windows via Azure Pipelines
+- Replay has been changed to produce and interpret its output in JSON format.
 
 - Added HCC stage in Docker file
 
