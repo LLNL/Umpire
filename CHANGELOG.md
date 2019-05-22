@@ -38,6 +38,10 @@ and a dynamic pool for those that are larger.
 
 ### Fixed
 
+- Added YAML file for ReadTheDocs to read in that will cause it to use
+  Python 3.7 so that it quits producing build failures when it receives
+  a deprecation warning when attempting to run older versions of python.
+
 - Exclude third-party libraries from Doxygen to fix out-of-resources error on
   ReadTheDocs
   
