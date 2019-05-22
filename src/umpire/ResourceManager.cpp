@@ -151,19 +151,11 @@ ResourceManager::ResourceManager() :
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)
-#if defined(UMPIRE_ENABLE_SICM)
-  registry.registerMemoryResource(
-      util::make_unique<resource::SICMResourceFactory>("DEVICE", {}));
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::SICMResourceFactory>("PINNED", {}));
-#else
   registry.registerMemoryResource(
     util::make_unique<resource::RocmDeviceResourceFactory>());
 
   registry.registerMemoryResource(
     util::make_unique<resource::RocmPinnedMemoryResourceFactory>());
-#endif
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
