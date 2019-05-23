@@ -19,14 +19,6 @@ testprogram=$replay_tests_dir/replay_tests
 replayprogram=$tools_dir/replay
 
 #
-# Temporarily disable replay tests until after flurry of new functionality
-# (MixedPool) and platform support (Azure) has been merged into branch.  Once
-# that is done, Marty will update replay and its tests to work with those new
-# items.
-echo "Replay tests have (temporarily) been disabled (UM-343)"
-exit 0
-
-#
 # The following program will generate a CSV file of Umpire activity that
 # may be replayed.
 #
@@ -55,5 +47,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-/bin/rm -f replay.out replay_test1.csv
+# /bin/rm -f replay.out replay_test1.csv
 exit 0
