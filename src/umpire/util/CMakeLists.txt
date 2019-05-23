@@ -31,6 +31,12 @@ if (ENABLE_STATISTICS)
     StatisticsDatabase.hpp)
 endif ()
 
+if (ENABLE_SICM)
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    SICM_device.hpp)
+endif ()
+
 if (ENABLE_SICM OR ENABLE_NUMA)
   set (umpire_util_headers
     ${umpire_util_headers}
@@ -53,6 +59,12 @@ if (ENABLE_STATISTICS)
     ${umpire_util_sources}
     Statistic.cpp
     StatisticsDatabase.cpp)
+endif ()
+
+if (ENABLE_SICM)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    SICM_device.cpp)
 endif ()
 
 if (ENABLE_SICM OR ENABLE_NUMA)

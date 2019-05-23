@@ -18,10 +18,12 @@
 #include <cstdlib>
 #include <list>
 #include <map>
+#include <sched.h>
 #include <set>
 #include <vector>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/SICM_device.hpp"
 
 extern "C"
 {
@@ -38,8 +40,7 @@ struct SICMAllocator
 {
   SICMAllocator(const std::set <unsigned int> & devices)
     : devs(sicm_init()),
-      allowed_devices(),
-      best_device_index(0)
+      allowed_devices()
   {
     if (!devices.size()) {
       UMPIRE_ERROR("SICMAllocator construction failed due to lack of allowed devices");
@@ -87,9 +88,8 @@ struct SICMAllocator
     void* ret = nullptr;
     {
       // find best device
-      const int best = allowed_devices[best_device_index];
+      const int best = sicm::best_device(sched_getcpu(), bytes, allowed_devices, devs);
       UMPIRE_LOG(Debug, "Best device to allocate on: " << best);
-      best_device_index = (best_device_index + 1) % allowed_devices.size();
 
       std::lock_guard <std::mutex> lock(arena_mutex);
 
@@ -147,7 +147,6 @@ struct SICMAllocator
 
   sicm_device_list devs;
   std::vector <unsigned int> allowed_devices;
-  std::size_t best_device_index; // this should be deleted once a better selector is created
 
   static std::mutex arena_mutex;
   static std::map <unsigned int, std::list <sicm_arena> > arenas; // device index -> arenas on that device
