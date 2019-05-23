@@ -17,7 +17,6 @@
 #if defined(UMPIRE_ENABLE_SICM)
 #include "umpire/resource/SICMResourceFactory.hpp"
 #include "umpire/strategy/SICMStrategy.hpp"
-#include "umpire/util/numa.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -101,22 +100,27 @@ ResourceManager::ResourceManager() :
     resource::MemoryResourceRegistry::getInstance()};
 
 #if defined(UMPIRE_ENABLE_SICM)
-  // read config file/figure out which device belongs to what
-  const std::vector <int> nodes = numa::get_allocatable_nodes();
-  std::set <unsigned int> devices = {};
-  for(const int n : nodes) {
-      devices.insert(n * 3);
-      devices.insert(n * 3 + 1);
-      devices.insert(n * 3 + 2);
-  }
+  struct sicm_device_list devs = sicm_init();
 #endif
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_SICM)
+  std::set <unsigned int> host_devices; // device indicies, not numa nodes
+  for(unsigned int i = 0; i < devs.count; i++) {
+      switch (devs.devices[i].tag) {
+          case SICM_DRAM:
+          case SICM_KNL_HBM:
+              host_devices.insert(i);
+              break;
+          default:
+              break;
+      }
+  }
+
   registry.registerMemoryResource(
-    util::make_uniqe<resource::SICMResourceFactory>("HOST", devices));
+    util::make_uniqe<resource::SICMResourceFactory>("HOST", host_devices));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::HostResourceFactory>());
@@ -124,7 +128,15 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #if defined(UMPIRE_ENABLE_SICM)
+  std::set <unsigned int> cuda_devices;
+  for(unsigned int i = 0; i < devs.count; i++) {
+      if (devs.devices[i].tag == SICM_POWERPC_HBM) { // device indicies, not numa nodes
+          cuda_devices.insert(i);
+      }
+  }
+
   registry.registerMemoryResource(
+<<<<<<< HEAD
     util::make_unique<resource::SICMResourceFactory>("DEVICE", {}));
 
   registry.registerMemoryResource(
@@ -135,6 +147,18 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     util::make_unique<resource::SICMResourceFactory>("CONSTANT", {}));
+=======
+      new resource::SICMResourceFactory("DEVICE", cuda_devices));
+
+  registry.registerMemoryResource(
+      new resource::SICMResourceFactory("UM", cuda_devices));
+
+  registry.registerMemoryResource(
+      new resource::SICMResourceFactory("PINNED", cuda_devices));
+
+  registry.registerMemoryResource(
+      new resource::SICMResourceFactory("DEVICE_CONST", cuda_devices));
+>>>>>>> search through sicm_device_list to assign devices to resources
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::CudaDeviceResourceFactory>());
@@ -167,6 +191,10 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     util::make_unique<resource::HipConstantMemoryResourceFactory>());
+#endif
+
+#if defined(UMPIRE_ENABLE_SICM)
+  sicm_fini();
 #endif
 
   initialize();

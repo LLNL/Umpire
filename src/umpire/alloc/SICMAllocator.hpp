@@ -145,7 +145,7 @@ struct SICMAllocator
     sicm_free(ptr);
   }
 
-  sicm_device_list devs;
+  const sicm_device_list devs;
   std::vector <unsigned int> allowed_devices;
 
   static std::mutex arena_mutex;
