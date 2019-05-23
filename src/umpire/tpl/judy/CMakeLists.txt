@@ -25,21 +25,14 @@ blt_add_library(
   NAME umpire_tpl_judy
   SOURCES ${judy_sources}
   HEADERS ${judy_headers}
-  HEADERS_OUTPUT_SUBDIR umpire/tpl/judy)
+  OBJECT TRUE)
 
-if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  target_compile_options(
-    umpire_tpl_judy
-    PRIVATE
-    -Os)
-endif()
-
-install(TARGETS
+target_include_directories(
   umpire_tpl_judy
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 install(FILES
   ${judy_headers}

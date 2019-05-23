@@ -37,11 +37,11 @@ Inspector::Inspector() :
 }
 
 
-void 
+void
 Inspector::registerAllocation(
-    void* ptr, 
-    size_t size, 
-    std::shared_ptr<AllocationStrategy> strategy)
+    void* ptr,
+    size_t size,
+    strategy::AllocationStrategy* strategy)
 {
   m_current_size += size;
 
@@ -58,15 +58,17 @@ Inspector::registerAllocation(
   ResourceManager::getInstance().registerAllocation(ptr, record);
 }
 
-void 
+util::AllocationRecord
 Inspector::deregisterAllocation(void* ptr)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
   m_current_size -= record->m_size;
 
+  util::AllocationRecord rec(*record);
   pool.deallocate(record);
   //delete record;
+  return rec;
 }
 
 } // end of namespace mixins

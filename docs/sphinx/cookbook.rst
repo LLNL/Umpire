@@ -21,3 +21,8 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/advice_device_id.rst
    cookbook/move_to_managed.rst
    cookbook/dynamic_pool_heuristics.rst
+   cookbook/move_between_numa.rst
+   cookbook/coalesce_pool.rst
+   cookbook/pinned_pool.rst
+   cookbook/plot_allocations.rst
+   cookbook/mixed_pool.rst

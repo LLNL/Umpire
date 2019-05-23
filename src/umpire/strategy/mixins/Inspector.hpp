@@ -15,6 +15,8 @@
 #ifndef UMPIRE_Inspector_HPP
 #define UMPIRE_Inspector_HPP
 
+#include "umpire/util/AllocationRecord.hpp"
+
 #include <memory>
 
 namespace umpire {
@@ -32,9 +34,9 @@ class Inspector
     void registerAllocation(
         void* ptr,
         size_t size,
-        std::shared_ptr<umpire::strategy::AllocationStrategy> strategy);
+        strategy::AllocationStrategy* strategy);
 
-    void deregisterAllocation(void* ptr);
+    util::AllocationRecord deregisterAllocation(void* ptr);
 
   protected:
     long m_current_size;

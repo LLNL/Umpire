@@ -1,6 +1,7 @@
 #ifndef _DYNAMICSIZEPOOL_HPP
 #define _DYNAMICSIZEPOOL_HPP
 
+#include <algorithm>
 #include <cstddef>
 #include <cassert>
 #include <string>
@@ -52,7 +53,7 @@ protected:
   std::size_t highWatermark;
 
   // Pointer to our allocator's allocation strategy
-  std::shared_ptr<umpire::strategy::AllocationStrategy> allocator;
+  umpire::strategy::AllocationStrategy* allocator;
 
   // Search the list of free blocks and return a usable one if that exists, else NULL
   void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size) {
@@ -262,7 +263,7 @@ protected:
 
 public:
   DynamicSizePool(
-      std::shared_ptr<umpire::strategy::AllocationStrategy> strat,
+      umpire::strategy::AllocationStrategy* strat,
       const std::size_t _minInitialBytes = (16 * 1024),
       const std::size_t _minBytes = 256
       )

@@ -22,6 +22,10 @@
 
 #include "umpire/op/GenericReallocateOperation.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/op/NumaMoveOperation.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/op/CudaCopyFromOperation.hpp"
 #include "umpire/op/CudaCopyToOperation.hpp"
@@ -34,7 +38,7 @@
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
 #include "umpire/op/RocmCopyOperation.hpp"
 #include "umpire/op/RocmMemsetOperation.hpp"
 #endif
@@ -74,6 +78,25 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
+
+#if defined(UMPIRE_ENABLE_NUMA)
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<NumaMoveOperation>());
+
+// NOTE: We don't use CUDA calls in the move operation so no guard is needed
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_shared<NumaMoveOperation>());
+
+  registerOperation(
+      "MOVE",
+      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_shared<NumaMoveOperation>());
+// NOTE: Add cpu<->rocm pairs here when needed
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(
@@ -123,7 +146,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
   registerOperation(
       "COPY",
       std::make_pair(Platform::rocm, Platform::cpu),
@@ -172,8 +195,8 @@ MemoryOperationRegistry::registerOperation(
 std::shared_ptr<umpire::op::MemoryOperation>
 MemoryOperationRegistry::find(
     const std::string& name,
-    std::shared_ptr<strategy::AllocationStrategy>& src_allocator,
-    std::shared_ptr<strategy::AllocationStrategy>& dst_allocator)
+    strategy::AllocationStrategy* src_allocator,
+    strategy::AllocationStrategy* dst_allocator)
 {
   auto platforms = std::make_pair(
       src_allocator->getPlatform(),

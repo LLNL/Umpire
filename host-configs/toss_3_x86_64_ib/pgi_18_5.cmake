@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -12,5 +12,6 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set(CMAKE_CXX_COMPILER "/usr/local/tools/compilers/ibm/mpicxx-4.7.2b" CACHE PATH "")
-set(CMAKE_C_COMPILER "/usr/local/tools/compilers/ibm/mpicc-4.7.2b" CACHE PATH "")
+set(CMAKE_C_COMPILER "/usr/tce/packages/pgi/pgi-18.5/bin/pgcc" CACHE PATH "")
+set(CMAKE_CXX_COMPILER "/usr/tce/packages/pgi/pgi-18.5/bin/pgc++" CACHE PATH "")
+set(CMAKE_Fortran_COMPILER "/usr/tce/packages/pgi/pgi-18.5/bin/pgfortran" CACHE PATH "")

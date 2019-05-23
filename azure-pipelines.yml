@@ -1,0 +1,57 @@
+strategy:
+  matrix: 
+    linux: 
+      imageName: 'ubuntu-16.04'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
+    windows:
+      imageName: 'vs2017-win2016'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off'
+    mac:
+      imageName: 'macos-10.13'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_OPENMP=Off'
+
+pool:
+  vmImage: $(imageName)
+
+variables:
+  DO_BUILD: 'yes'
+  DO_TEST: 'yes'
+  COMPILER: 'g++'
+
+steps:
+- checkout: self
+  clean: boolean
+  submodules: recursive
+- task: CMake@1
+  inputs:
+    workingDir: 'build'
+    cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
+  condition: or( eq( variables['Agent.OS'], 'Windows_NT'), eq( variables['Agent.OS'], 'Darwin'))
+- task: VSBuild@1
+  inputs:
+    solution: 'build/*.sln'
+  displayName: 'VS Build'
+  condition: eq( variables['Agent.OS'], 'Windows_NT')
+- script: |
+    cd build
+    make
+  displayName: 'OSX Build'
+  condition: eq( variables['Agent.OS'], 'Darwin')
+- script: |
+    cd build
+    ctest -T test
+  displayName: 'OSX Test'
+  condition: eq( variables['Agent.OS'], 'Darwin')
+- script:  |
+   docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
+   docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
+  condition: eq( variables['Agent.OS'], 'Linux')
+  displayName: 'Linux (Docker) Build & Test'
+- task: VSTest@2
+  inputs:
+    configuration: 'Release'
+  condition: eq( variables['Agent.OS'], 'Windows_NT')
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'cTest'
+    testResultsFiles: '**/Test.xml'

@@ -16,11 +16,12 @@
 #define UMPIRE_config_HPP
 
 #cmakedefine UMPIRE_ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_NUMA
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_ASSERTS
 #cmakedefine UMPIRE_ENABLE_STATISTICS
-#cmakedefine UMPIRE_ENABLE_ROCM
+#cmakedefine UMPIRE_ENABLE_HCC
 
 #cmakedefine UMPIRE_ENABLE_DEVICE
 #cmakedefine UMPIRE_ENABLE_PINNED

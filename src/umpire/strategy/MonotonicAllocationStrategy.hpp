@@ -49,7 +49,7 @@ class MonotonicAllocationStrategy :
     size_t m_size;
     size_t m_capacity;
 
-    std::shared_ptr<AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

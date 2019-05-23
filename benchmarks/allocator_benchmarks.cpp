@@ -38,7 +38,6 @@ public:
 
   virtual void* allocate( uint64_t nbytes ) = 0;
   virtual void deallocate( void* ptr ) = 0;
-  virtual void coalesce( void ) {};
 
   void largeAllocDealloc(benchmark::State &st) {
     uint64_t size = (uint64_t)((uint64_t)st.range(0) * 1024 * 1024 * 1024);
@@ -48,11 +47,6 @@ public:
       allocation = allocate(size);
       deallocate(allocation);
     }
-  }
-
-  void coalesceBench(benchmark::State &st) {
-    while (st.KeepRunning())
-      coalesce();
   }
 
   void allocation(benchmark::State &st) {
@@ -174,7 +168,6 @@ public:
   }
   virtual void* allocate( uint64_t nbytes ) { return allocator->allocate(nbytes); }
   virtual void deallocate( void* ptr ) { allocator->deallocate(ptr); }
-  virtual void coalesce( void ) { umpire::ResourceManager::getInstance().coalesce(*allocator); }
 
   virtual const std::string& getName( void ) = 0;
 
@@ -200,7 +193,6 @@ class PoolDevice : public ::Pool {
 };
 BENCHMARK_DEFINE_F(PoolDevice, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(PoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_DEFINE_F(PoolDevice, coalesceBench)(benchmark::State &st) { coalesceBench(st); }
 
 class PoolUM : public ::Pool {
   public:
@@ -211,7 +203,6 @@ class PoolUM : public ::Pool {
 };
 BENCHMARK_DEFINE_F(PoolUM, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(PoolUM, deallocate)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_DEFINE_F(PoolUM, coalesceBench)(benchmark::State &st) { coalesceBench(st); }
 
 class FixedPool : public ::allocatorBenchmark {
 public:
@@ -219,12 +210,10 @@ public:
   using allocatorBenchmark::TearDown;
 
   void SetUp(const ::benchmark::State&) {
-    struct data { char _[8388608]; };
-
     std::stringstream ss;
     ss << "fixedpool" << namecnt++;
     auto& rm = umpire::ResourceManager::getInstance();
-    rm.makeAllocator<umpire::strategy::FixedPool<data>>(ss.str(), rm.getAllocator(getName()));
+    rm.makeAllocator<umpire::strategy::FixedPool>(ss.str(), rm.getAllocator(getName()), 256, 128 * sizeof(int) * 8);
     allocator = new umpire::Allocator(rm.getAllocator(ss.str()));
 
     void* ptr;
@@ -282,7 +271,6 @@ BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
-// NOTE: always allocates 8mb, ignores size argument
 BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(RangeLow);
 
@@ -295,19 +283,15 @@ BENCHMARK_REGISTER_F(UM, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(UM, deallocate)->Range(RangeLow, RangeHi);
 
 BENCHMARK_REGISTER_F(Device, largeAllocDealloc)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13);
-BENCHMARK_REGISTER_F(PoolDevice, coalesceBench)->Arg(0);
 BENCHMARK_REGISTER_F(UM, largeAllocDealloc)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13);
-BENCHMARK_REGISTER_F(PoolUM, coalesceBench)->Arg(0);
 
 // BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
-// NOTE: always allocates 8mb, ignores size argument
-#if DOESNT_WORK_YET
+
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, deallocate)->Arg(RangeLow);
-#endif
 #endif
 
 

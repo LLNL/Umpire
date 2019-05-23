@@ -41,7 +41,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
   m_size += bytes;
 
   if (m_size > m_capacity) {
-    UMPIRE_ERROR("MonoticAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
+    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
@@ -51,9 +51,7 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 
 void
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
-{
-  UMPIRE_LOG(Info, "() doesn't do anything");
-}
+{}
 
 long
 MonotonicAllocationStrategy::getCurrentSize() const noexcept

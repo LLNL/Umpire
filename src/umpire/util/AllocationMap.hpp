@@ -19,6 +19,8 @@
 
 #include <cstdint>
 #include <mutex>
+#include <iostream>
+#include <functional>
 
 template< typename JudyKey, typename JudyValue >
 class judyL2Array;
@@ -30,31 +32,47 @@ class AllocationMap
 {
   public:
 
-  AllocationMap();
-  ~AllocationMap();
+    class ConstIterator {
+    public:
+      const AllocationRecord* operator*();
+      ConstIterator& operator++();
+      bool operator==(const ConstIterator& other);
+      bool operator!=(const ConstIterator& other);
+    private:
+      struct JudyL2Data;
+      bool end;
+      JudyL2Data* data;
+      ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_ = false);
+      friend class AllocationMap;
+    };
 
-  void
-  insert(void* ptr, AllocationRecord* record);
+    AllocationMap();
+    ~AllocationMap();
 
-  AllocationRecord*
-  remove(void* ptr);
+    void insert(void* ptr, AllocationRecord* record);
 
-  AllocationRecord*
-  find(void* ptr) const;
+    AllocationRecord* remove(void* ptr);
 
-  bool
-  contains(void* ptr);
+    AllocationRecord* find(void* ptr) const;
 
-  void
-    reset();
+    ConstIterator begin() const;
 
-  void
-    printAll() const;
+    ConstIterator end() const;
 
-  private:
+    bool contains(void* ptr);
+
+    void reset();
+
+    void printAll(std::ostream& os = std::cout) const;
+
+    void print(const std::function<bool (const AllocationRecord*)>&& predicate,
+               std::ostream& os = std::cout) const;
+
+private:
     AllocationRecord* findRecord(void* ptr) const;
 
-    judyL2Array<uintptr_t, uintptr_t>* m_records;
+    // TODO: Make const version of judyL2Array begin/end
+    mutable judyL2Array<uintptr_t, uintptr_t>* m_records;
 
     std::mutex* m_mutex;
 };

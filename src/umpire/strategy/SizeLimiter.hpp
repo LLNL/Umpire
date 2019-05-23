@@ -30,7 +30,7 @@ namespace strategy {
  * Using this AllocationStrategy with another can be a good way to limit the
  * total size of allocations made on a particular resource or from a particular
  * context.
- * */
+ */
 class SizeLimiter :
   public AllocationStrategy
 {
@@ -49,7 +49,7 @@ class SizeLimiter :
 
     Platform getPlatform() noexcept;
   private:
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 
     size_t m_size_limit;
     size_t m_total_size;

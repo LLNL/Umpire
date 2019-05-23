@@ -41,11 +41,17 @@ void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 
 void umpire_allocator_deallocate(umpire_allocator * self, void * ptr);
 
+void umpire_allocator_release(umpire_allocator * self);
+
 size_t umpire_allocator_get_size(umpire_allocator * self, void * ptr);
 
 size_t umpire_allocator_get_high_watermark(umpire_allocator * self);
 
 size_t umpire_allocator_get_current_size(umpire_allocator * self);
+
+size_t umpire_allocator_get_actual_size(umpire_allocator * self);
+
+const char * umpire_allocator_get_name(umpire_allocator * self);
 
 void umpire_allocator_get_name_bufferify(umpire_allocator * self,
     UMP_SHROUD_array *DSHF_rv);
