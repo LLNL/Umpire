@@ -28,9 +28,6 @@ and a dynamic pool for those that are larger.
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
-- Replay CI tests temporarily disabled.  This line to be removed once we
-  enable the tests again after replay works with Azure pipelines and MixedPool
-
 - Updated README to better describe Umpire capability
 
 - Update BLT to fix CMake 3.13 warnings and MSVC compatibility
