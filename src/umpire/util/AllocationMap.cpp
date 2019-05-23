@@ -228,7 +228,7 @@ AllocationMap::print(const std::function<bool (const AllocationRecord*)>&& pred,
 {
   for (auto record = m_records->begin(); m_records->success(); record = m_records->next()) {
     auto addr = record.key;
-    //auto vec = *record.value;
+    auto vec = *record.value;
 
     std::stringstream ss;
     ss << reinterpret_cast<void*>(addr) << " : {" << std::endl;

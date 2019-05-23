@@ -32,7 +32,7 @@ static void benchmark_inspector(benchmark::State& state) {
 
   void* ptr = static_cast<void*>(data);
   size_t length = 256*sizeof(double);
-  std::shared_ptr<umpire::strategy::AllocationStrategy> strat(nullptr);
+  umpire::strategy::AllocationStrategy* strat = nullptr;
 
   while (state.KeepRunning()) {
     inspector.registerAllocation(
