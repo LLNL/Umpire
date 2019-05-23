@@ -47,5 +47,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# /bin/rm -f replay.out replay_test1.csv
+/bin/rm -f replay.out replay_test1.csv
 exit 0
