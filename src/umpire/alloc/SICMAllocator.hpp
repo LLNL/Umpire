@@ -38,8 +38,9 @@ namespace alloc {
  */
 struct SICMAllocator
 {
-  SICMAllocator(const std::set <unsigned int> & devices)
+  SICMAllocator(const std::string& name, const std::set <unsigned int>& devices)
     : devs(sicm_init()),
+      name(name),
       allowed_devices()
   {
     if (!devices.size()) {
@@ -89,7 +90,7 @@ struct SICMAllocator
     {
       // find best device
       const int best = sicm::best_device(sched_getcpu(), bytes, allowed_devices, devs);
-      UMPIRE_LOG(Debug, "Best device to allocate on: " << best);
+      UMPIRE_LOG(Debug, "Best " << name << " device to allocate on: " << best);
 
       std::lock_guard <std::mutex> lock(arena_mutex);
 
@@ -99,14 +100,14 @@ struct SICMAllocator
       // get an arena
       sicm_arena sa = nullptr;
       if (!arenas_on_device.size()) {
-        UMPIRE_LOG(Debug, "Creating new arena on device " << best);
+        UMPIRE_LOG(Debug, "Creating new " << name << " arena on device " << best);
         if (!(sa = sicm_arena_create(0, &devs.devices[best]))) {
           cleanup();
-          UMPIRE_ERROR("SICMAllocator Could not create arena on device " << best);
+          UMPIRE_ERROR("SICMAllocator Could not create " << name << " arena on device " << best);
         }
       }
       else {
-        UMPIRE_LOG(Debug, "Using existing arena on device " << best);
+        UMPIRE_LOG(Debug, "Using existing " << name << " arena on device " << best);
 
         // take first arena
         sa = arenas_on_device.front();
@@ -116,7 +117,7 @@ struct SICMAllocator
       }
 
       // allocate on arena
-      UMPIRE_LOG(Debug, "Using arena located at " << sa << " on device " << best);
+      UMPIRE_LOG(Debug, "Using " << name << " arena located at " << sa << " on device " << best);
       ret = sicm_arena_alloc(sa, bytes);
 
       // push arena to back of list
@@ -146,6 +147,7 @@ struct SICMAllocator
   }
 
   const sicm_device_list devs;
+  const std::string name;
   std::vector <unsigned int> allowed_devices;
 
   static std::mutex arena_mutex;
