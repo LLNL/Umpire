@@ -21,7 +21,7 @@
 #include "umpire/util/FixedMallocPool.hpp"
 
 namespace {
-static umpire::util::FixedMallocPool *pool;
+static umpire::util::FixedMallocPool pool(sizeof(umpire::util::AllocationRecord));
 }
 
 namespace umpire {
@@ -33,9 +33,6 @@ Inspector::Inspector() :
   m_current_size(0),
   m_high_watermark(0)
 {
-  if (!pool) {
-    pool = new umpire::util::FixedMallocPool(sizeof(util::AllocationRecord));
-  }
 }
 
 
@@ -51,7 +48,7 @@ Inspector::registerAllocation(
     m_high_watermark = m_current_size;
   }
 
-  auto record = new (pool->allocate()) umpire::util::AllocationRecord{
+  auto record = new (pool.allocate()) umpire::util::AllocationRecord{
     ptr,
     size,
     strategy};
@@ -67,7 +64,7 @@ Inspector::deregisterAllocation(void* ptr)
   m_current_size -= record->m_size;
 
   util::AllocationRecord rec(*record);
-  pool->deallocate(record);
+  pool.deallocate(record);
   //delete record;
   return rec;
 }

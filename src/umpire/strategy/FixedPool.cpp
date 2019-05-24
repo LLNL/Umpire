@@ -105,7 +105,6 @@ FixedPool::allocInPool(Pool& p) noexcept
     }
   }
 
-  UMPIRE_ASSERT("FixedPool: Logic error in allocate");
   return nullptr;
 }
 

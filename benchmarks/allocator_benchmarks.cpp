@@ -267,7 +267,7 @@ BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallo
 class FixedMallocPool : public ::allocatorBenchmark {
   public:
   void SetUp(const ::benchmark::State&) {
-    pool = new umpire::util::FixedMallocPool(256);
+    pool = new umpire::util::FixedMallocPool(8);
   }
   void TearDown(const ::benchmark::State&) {
     delete pool;
