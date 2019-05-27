@@ -31,6 +31,10 @@ class AllocationMapTest : public ::testing::Test {
       delete[] data;
     }
 
+    void TearDown() override {
+      map.clear();
+    }
+
     umpire::util::AllocationRecordMap map;
 
     double* data;
@@ -58,9 +62,9 @@ TEST_F(AllocationMapTest, Find)
     map.insert(data,record)
   );
 
-  // auto actual_record = map.find(data);
+  auto actual_record = map.find(data);
 
-  // ASSERT_EQ(record, actual_record);
+  ASSERT_EQ(record, *actual_record);
 }
 
 TEST_F(AllocationMapTest, FindOffset)
@@ -69,9 +73,9 @@ TEST_F(AllocationMapTest, FindOffset)
     map.insert(data,record)
   );
 
-  // auto actual_record = map.find(&data[4]);
+  auto actual_record = map.find(&data[4]);
 
-  // ASSERT_EQ(record, actual_record);
+  ASSERT_EQ(record, *actual_record);
 }
 
 TEST_F(AllocationMapTest, Contains)
@@ -116,9 +120,9 @@ TEST_F(AllocationMapTest, RemoveAndUse)
     map.insert(data, record)
   );
 
-  // auto found_record = map.remove(data);
+  auto found_record = map.remove(data);
 
-  // ASSERT_EQ(&record, found_record);
+  ASSERT_EQ(record, found_record);
 }
 
 TEST_F(AllocationMapTest, RegisterMultiple)
@@ -140,16 +144,16 @@ TEST_F(AllocationMapTest, FindMultiple)
     map.insert(data, next_record);
   });
 
-  // auto actual_record = map.find(data);
-  // ASSERT_EQ(next_record, actual_record);
+  auto actual_record = map.find(data);
+  ASSERT_EQ(next_record, *actual_record);
 
   map.remove(data);
 
-  // EXPECT_NO_THROW(
-  //   actual_record = map.find(data);
-  // );
+  EXPECT_NO_THROW(
+    actual_record = map.find(data);
+  );
 
-  // ASSERT_EQ(actual_record, record);
+  ASSERT_EQ(*actual_record, record);
 }
 
 TEST_F(AllocationMapTest, Print)
@@ -165,7 +169,7 @@ TEST_F(AllocationMapTest, Print)
 
   map.printAll();
 
-  map.print([this](const umpire::util::AllocationRecord* r) {
-    return r->m_ptr == data;
+  map.print([this](const umpire::util::AllocationRecord& r) {
+    return r.m_ptr == data;
   });
 }

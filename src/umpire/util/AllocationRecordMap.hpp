@@ -40,6 +40,9 @@ public:
 
   AllocationRecord* find(void* ptr) const;
 
+  // This version of find does not throw an exception if the record is not found
+  AllocationRecord* findRecord(void* ptr) const;
+
   // Only allows erasing the last inserted entry for key = ptr
   AllocationRecord remove(void* ptr);
 
@@ -47,7 +50,7 @@ public:
 
   void clear();
 
-  void print(const std::function<bool (const AllocationRecord*)>&& predicate,
+  void print(const std::function<bool (const AllocationRecord&)>&& predicate,
              std::ostream& os = std::cout) const;
 
   void printAll(std::ostream& os = std::cout) const;
@@ -59,6 +62,9 @@ private:
 
   std::mutex* m_mutex;
 };
+
+bool operator==(const AllocationRecord& left, const AllocationRecord& right);
+bool operator!=(const AllocationRecord& left, const AllocationRecord& right);
 
 } // end of namespace util
 } // end of namespace umpire

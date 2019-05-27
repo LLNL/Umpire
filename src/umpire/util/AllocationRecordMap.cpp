@@ -18,6 +18,9 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include <iterator>
+#include <sstream>
+
 namespace umpire {
 namespace util {
 
@@ -32,26 +35,35 @@ struct ListBlock
 
 static umpire::util::FixedMallocPool block_pool(sizeof(ListBlock<AllocationRecord>));
 
+// Forward declare const iterator
+class RecordListConstIterator;
+
 // TODO Profile this to determine if we should add a small string
 // optimization on top of the block pooling.
 class RecordList
 {
 public:
-  using RecordListBlock = ListBlock<AllocationRecord>;
+  using Block = ListBlock<AllocationRecord>;
+  friend RecordListConstIterator;
 
-  RecordList() : m_tail(nullptr) {}
+  RecordList() : m_tail(nullptr), m_length(0) {}
+
+  RecordList(const AllocationRecord& record) : m_tail(nullptr), m_length(0) {
+    push_back(record);
+    m_tail->prev = nullptr;
+  }
 
   ~RecordList() {
-    RecordListBlock* curr = m_tail;
+    Block* curr = m_tail;
     while (curr) {
-      RecordListBlock* prev = curr->prev;
+      Block* prev = curr->prev;
       block_pool.deallocate(curr);
       curr = prev;
     }
   }
 
   void push_back(AllocationRecord rec) {
-    RecordListBlock* curr = reinterpret_cast<RecordListBlock*>(block_pool.allocate());
+    Block* curr = reinterpret_cast<Block*>(block_pool.allocate());
     curr->prev = m_tail;
     curr->rec = rec;
     m_tail = curr;
@@ -60,12 +72,15 @@ public:
 
   AllocationRecord pop_back() {
     AllocationRecord ret = m_tail->rec;
-    RecordListBlock* prev = m_tail->prev;
+    Block* prev = m_tail->prev;
     block_pool.deallocate(m_tail);
     m_tail = prev;
     m_length--;
     return ret;
   }
+
+  RecordListConstIterator begin() const;
+  RecordListConstIterator end() const;
 
   size_t size() const { return m_length; }
   bool empty() const { return size() == 0; }
@@ -73,11 +88,67 @@ public:
   AllocationRecord* back() { return &m_tail->rec; }
 
 private:
-  RecordListBlock* m_tail;
+  Block* m_tail;
   size_t m_length;
 };
 
 static umpire::util::FixedMallocPool list_pool(sizeof(RecordList));
+
+
+// Iterator for RecordList
+class RecordListConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+{
+  const RecordList *m_list;
+  RecordList::Block* m_curr;
+
+public:
+  RecordListConstIterator(const RecordList* list, RecordList::Block* curr, bool end) :
+    m_list(list), m_curr(curr) {
+    if (end) {
+      // Skip to the head of the list
+      while(m_curr->prev != nullptr) m_curr = m_curr->prev;
+    }
+  }
+
+  RecordListConstIterator(const RecordListConstIterator& other) = default;
+
+
+  AllocationRecord& operator*() const {
+    return m_curr->rec;
+  }
+
+  const AllocationRecord* operator->() const {
+    return &(m_curr->rec);
+  }
+
+  RecordListConstIterator& operator++() {
+    m_curr = m_curr->prev;
+    return *this;
+  }
+
+  RecordListConstIterator operator++(int) {
+    RecordListConstIterator tmp{*this};
+    m_curr = m_curr->prev;
+    return tmp;
+  }
+
+  bool operator==(const RecordListConstIterator& other) {
+    return m_list == other.m_list && m_curr == other.m_curr;
+  }
+
+  bool operator!=(const RecordListConstIterator& other) {
+    return !(*this == other);
+  }
+};
+
+RecordListConstIterator RecordList::begin() const {
+  return RecordListConstIterator{this, m_tail, false};
+}
+
+RecordListConstIterator RecordList::end() const {
+  return RecordListConstIterator{this, m_tail, true};
+}
+
 
 } // end of anonymous namespace
 
@@ -118,8 +189,8 @@ void AllocationRecordMap::insert(void* ptr, AllocationRecord record)
     UMPIRE_ASSERT(m_last);
 
     auto plist = reinterpret_cast<RecordList**>(m_last);
-    if (!*plist) (*plist) = new (list_pool.allocate()) RecordList;
-    (*plist)->push_back(record);
+    if (!*plist) (*plist) = new (list_pool.allocate()) RecordList{record};
+    else (*plist)->push_back(record);
 
     UMPIRE_UNLOCK;
   } catch (...) {
@@ -131,6 +202,23 @@ void AllocationRecordMap::insert(void* ptr, AllocationRecord record)
 AllocationRecord* AllocationRecordMap::find(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
+
+  auto alloc_record = findRecord(ptr);
+
+  if (alloc_record) {
+    return alloc_record;
+  } else {
+#if !defined(NDEBUG)
+    // use this from a debugger to dump the contents of the AllocationMap
+    printAll();
+#endif
+    UMPIRE_ERROR("Allocation not mapped: " << ptr);
+  }
+}
+
+
+AllocationRecord* AllocationRecordMap::findRecord(void* ptr) const
+{
   AllocationRecord* alloc_record = nullptr;
 
   try {
@@ -171,15 +259,7 @@ AllocationRecord* AllocationRecordMap::find(void* ptr) const
     throw;
   }
 
-  if (alloc_record) {
-    return alloc_record;
-  } else {
-#if !defined(NDEBUG)
-    // use this from a debugger to dump the contents of the AllocationMap
-    printAll();
-#endif
-    UMPIRE_ERROR("Allocation not mapped: " << ptr);
-  }
+  return alloc_record;
 }
 
 AllocationRecord AllocationRecordMap::remove(void* ptr)
@@ -230,7 +310,7 @@ AllocationRecord AllocationRecordMap::remove(void* ptr)
 bool AllocationRecordMap::contains(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
-  return (find(ptr) != nullptr);
+  return (findRecord(ptr) != nullptr);
 }
 
 void AllocationRecordMap::clear()
@@ -252,15 +332,55 @@ void AllocationRecordMap::clear()
 }
 
 void
-AllocationRecordMap::print(const std::function<bool (const AllocationRecord*)>&& UMPIRE_UNUSED_ARG(pred),
-                           std::ostream& UMPIRE_UNUSED_ARG(os)) const
+AllocationRecordMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
+                           std::ostream& os) const
 {
-  UMPIRE_ERROR("TBD");
+  uintptr_t key = 0;
+  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0);
+      m_last != nullptr;
+      m_last = judy_nxt(m_array)) {
+    auto list = reinterpret_cast<RecordList*>(*m_last);
+
+    void* addr;
+    judy_key(m_array, reinterpret_cast<unsigned char*>(&addr), m_depth * JUDY_key_size);
+
+    std::stringstream ss;
+    bool any_match = false;
+    ss << addr << " {" << std::endl;
+    for (auto iter = list->begin(); iter != list->end(); iter++) {
+      if (pred(*iter)) {
+        any_match = true;
+        ss << iter->m_size <<
+          " [ " << reinterpret_cast<void*>(iter->m_ptr) <<
+          " -- " << reinterpret_cast<void*>(static_cast<unsigned char*>(iter->m_ptr)+iter->m_size) <<
+          " ] " << std::endl;
+      }
+    }
+    ss << "}" << std::endl;
+
+    if (any_match) {
+      os << ss.str();
+    }
+  }
 }
 
-void AllocationRecordMap::printAll(std::ostream& UMPIRE_UNUSED_ARG(os)) const
+void AllocationRecordMap::printAll(std::ostream& os) const
 {
-  UMPIRE_ERROR("TBD");
+  os << "🔍 Printing allocation map contents..." << std::endl;
+
+  print([] (const AllocationRecord&) { return true; }, os);
+
+  os << "done." << std::endl;
+}
+
+bool operator==(const AllocationRecord& left, const AllocationRecord& right)
+{
+  return left.m_ptr == right.m_ptr && left.m_size == right.m_size && left.m_strategy == right.m_strategy;
+}
+
+bool operator!=(const AllocationRecord& left, const AllocationRecord& right)
+{
+  return !(left == right);
 }
 
 } // end of namespace util
