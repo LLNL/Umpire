@@ -16,6 +16,7 @@
 #define UMPIRE_AllocationRecord_HPP
 
 #include <cstddef>
+
 #include <memory>
 
 namespace umpire {
