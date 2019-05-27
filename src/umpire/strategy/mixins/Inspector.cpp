@@ -20,9 +20,6 @@
 
 #include "umpire/util/FixedMallocPool.hpp"
 
-namespace {
-static umpire::util::FixedMallocPool pool(sizeof(umpire::util::AllocationRecord));
-}
 
 namespace umpire {
 namespace strategy {
@@ -48,7 +45,7 @@ Inspector::registerAllocation(
     m_high_watermark = m_current_size;
   }
 
-  auto record = new (pool.allocate()) umpire::util::AllocationRecord{
+  umpire::util::AllocationRecord record{
     ptr,
     size,
     strategy};
@@ -60,13 +57,9 @@ util::AllocationRecord
 Inspector::deregisterAllocation(void* ptr)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
+  m_current_size -= record.m_size;
 
-  m_current_size -= record->m_size;
-
-  util::AllocationRecord rec(*record);
-  pool.deallocate(record);
-  //delete record;
-  return rec;
+  return record;
 }
 
 } // end of namespace mixins

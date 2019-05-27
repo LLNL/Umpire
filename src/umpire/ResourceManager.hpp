@@ -24,7 +24,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocationMap.hpp"
+#include "umpire/util/AllocationRecordMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
@@ -135,14 +135,14 @@ class ResourceManager {
     /*!
      * \brief register an allocation with the manager.
      */
-    void registerAllocation(void* ptr, util::AllocationRecord* record);
+    void registerAllocation(void* ptr, util::AllocationRecord record);
 
     /*!
      * \brief de-register the address ptr with the manager.
      *
      * \return the allocation record removed from the manager.
      */
-    util::AllocationRecord* deregisterAllocation(void* ptr);
+    util::AllocationRecord deregisterAllocation(void* ptr);
 
     /*!
      * \brief Find the allocation record associated with an address ptr.
@@ -255,7 +255,7 @@ class ResourceManager {
     std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
     std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
 
-    util::AllocationMap m_allocations;
+    util::AllocationRecordMap m_allocations;
 
     strategy::AllocationStrategy* m_default_allocator;
 

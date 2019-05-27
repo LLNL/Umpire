@@ -115,7 +115,7 @@ ResourceManager::initialize()
       UMPIRE_VERSION_MINOR << "." <<
       UMPIRE_VERSION_PATCH);
 
-  UMPIRE_REPLAY( "\"event\": \"version\", \"payload\": { \"major\":" << UMPIRE_VERSION_MAJOR 
+  UMPIRE_REPLAY( "\"event\": \"version\", \"payload\": { \"major\":" << UMPIRE_VERSION_MAJOR
       << ", \"minor\":" << UMPIRE_VERSION_MINOR
       << ", \"patch\":" << UMPIRE_VERSION_PATCH
       << " }");
@@ -291,14 +291,14 @@ ResourceManager::hasAllocator(void* ptr)
   return m_allocations.contains(ptr);
 }
 
-void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord* record)
+void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", record=" << record << ") with " << this );
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") with " << this );
 
   m_allocations.insert(ptr, record);
 }
 
-util::AllocationRecord* ResourceManager::deregisterAllocation(void* ptr)
+util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   return m_allocations.remove(ptr);
