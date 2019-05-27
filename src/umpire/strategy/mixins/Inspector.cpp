@@ -14,16 +14,10 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/mixins/Inspector.hpp"
 
-#include "umpire/util/AllocationRecord.hpp"
-
 #include "umpire/ResourceManager.hpp"
-
-#include "umpire/util/FixedMallocPool.hpp"
-
 
 namespace umpire {
 namespace strategy {
-
 namespace mixins {
 
 Inspector::Inspector() :
@@ -45,21 +39,15 @@ Inspector::registerAllocation(
     m_high_watermark = m_current_size;
   }
 
-  umpire::util::AllocationRecord record{
-    ptr,
-    size,
-    strategy};
-
+  umpire::util::AllocationRecord record{ptr, size, strategy};
   ResourceManager::getInstance().registerAllocation(ptr, record);
 }
 
 util::AllocationRecord
 Inspector::deregisterAllocation(void* ptr)
 {
-  auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record.m_size;
-
-  return record;
+  return ResourceManager::getInstance().deregisterAllocation(ptr);
 }
 
 } // end of namespace mixins
