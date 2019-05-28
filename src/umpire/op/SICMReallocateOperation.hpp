@@ -41,7 +41,7 @@ class SICMReallocateOperation :
       size_t length);
 };
 
-} // end of naemspace op
+} // end of namespace op
 } // end of namespace umpire
 
 #endif // UMPIRE_SICMReallocateOperation_HPP

@@ -671,8 +671,11 @@ ResourceManager::move(void* ptr, Allocator allocator)
   }
 
 #if defined(UMPIRE_ENABLE_SICM)
-  auto sicm_alloc = static_cast<strategy::SICMStrategy *>(allocator.m_allocator);
-  if (sicm_alloc) {
+  {
+    // short circuit if allocator is SICM
+    auto sicm_alloc = static_cast<strategy::SICMStrategy *>(allocator.m_allocator);
+
+    if (sicm_alloc) {
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
       auto src_alloc_record = m_allocations.find(ptr);
@@ -698,6 +701,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
       }
 
       return ret;
+    }
   }
 #endif
 

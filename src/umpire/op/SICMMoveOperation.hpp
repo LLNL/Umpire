@@ -47,10 +47,10 @@ class SICMMoveOperation :
       size_t length);
 
  private:
-    static sicm_device_list m_devices;
+      static sicm_device_list m_devices;
 };
 
-} // end of naemspace op
+} // end of namespace op
 } // end of namespace umpire
 
 #endif // UMPIRE_SICMMoveOperation_HPP
