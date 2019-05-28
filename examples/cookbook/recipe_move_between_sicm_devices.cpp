@@ -24,8 +24,6 @@ extern "C" {
 #include "sicm_low.h"
 }
 
-#include <iostream>
-
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -38,7 +36,7 @@ int main(int, char**) {
     UMPIRE_ERROR("SICM did not dectect any devices");
   }
 
-  // Create an allocator on the first SICM node
+  // Create an allocator on the first SICM device
   auto sicm_src_alloc = rm.makeAllocator<umpire::strategy::SICMStrategy>(
     "sicm_src_alloc", 0);
 
@@ -46,9 +44,12 @@ int main(int, char**) {
   void* src_ptr = sicm_src_alloc.allocate(alloc_size);
 
   if (devs.count > 1) {
-    // Create an allocator on another host SICM node.
+    const unsigned int dst_dev = devs.count - 3;
+    const int dst_node = devs.devices[dst_dev].node;
+
+    // Create an allocator on another SICM device
     auto sicm_dst_alloc = rm.makeAllocator<umpire::strategy::SICMStrategy>(
-        "sicm_dst_alloc", ((devs.count - 1) / 3) * 3);
+        "sicm_dst_alloc", dst_dev);
 
     // Move the entire arena
     void* dst_ptr = rm.move(src_ptr, sicm_dst_alloc);
@@ -62,8 +63,9 @@ int main(int, char**) {
     rm.memset(dst_ptr, 0);
 
     // Verify SICM device
-    if (umpire::numa::get_location(dst_ptr) != (int) ((devs.count - 1) / 3)) {
-      UMPIRE_ERROR("Move was unsuccessful " << umpire::numa::get_location(dst_ptr) << " " << (int) ((devs.count - 1) / 3));
+    const int actual_location = umpire::numa::get_location(dst_ptr);
+    if (actual_location != dst_node) {
+      UMPIRE_ERROR("Move was unsuccessful. Expected location: " << dst_node << " Actual Location: " << actual_location);
     }
   }
 
