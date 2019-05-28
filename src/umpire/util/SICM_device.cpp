@@ -34,13 +34,15 @@ std::set <unsigned int> get_devices(const struct sicm_device_list& devs, const u
                 }
             }
             break;
+#if defined(UMPIRE_ENABLE_CUDA)
         case umpire::Platform::cuda:
             for(unsigned int i = 0; i < devs.count; i++) {
-                if (devs.devices[i].tag == SICM_POWERPC_HBM) { // device indicies, not numa nodes
+                if (devs.devices[i].tag == SICM_POWERPC_HBM) {
                     devices.insert(i);
                 }
             }
             break;
+#endif
         default:
             break;
     }
