@@ -19,10 +19,39 @@
 namespace umpire {
 namespace sicm {
 
+std::set <unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform) {
+    std::set <unsigned int> devices;
+    switch (platform) {
+        case umpire::Platform::cpu:
+            for(unsigned int i = 0; i < devs.count; i++) {
+                switch (devs.devices[i].tag) {
+                    case SICM_DRAM:
+                    case SICM_KNL_HBM:
+                        devices.insert(i);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            break;
+        case umpire::Platform::cuda:
+            for(unsigned int i = 0; i < devs.count; i++) {
+                if (devs.devices[i].tag == SICM_POWERPC_HBM) { // device indicies, not numa nodes
+                    devices.insert(i);
+                }
+            }
+            break;
+        default:
+            break;
+    }
+
+    return devices;
+}
+
 unsigned int best_device(const int UMPIRE_UNUSED_ARG(running_at),
                              const std::size_t UMPIRE_UNUSED_ARG(size),
-                             const std::vector <unsigned int> & allowed_devices,
-                             const sicm_device_list & UMPIRE_UNUSED_ARG(devs)) {
+                             const std::vector <unsigned int>& allowed_devices,
+                             const sicm_device_list& UMPIRE_UNUSED_ARG(devs)) {
     static std::size_t index = 0;
     const unsigned int dev = allowed_devices[index % allowed_devices.size()];
     index = (index + 1) % allowed_devices.size();

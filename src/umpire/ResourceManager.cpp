@@ -17,6 +17,7 @@
 #if defined(UMPIRE_ENABLE_SICM)
 #include "umpire/resource/SICMResourceFactory.hpp"
 #include "umpire/strategy/SICMStrategy.hpp"
+#include "umpire/util/SICM_device.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -107,17 +108,7 @@ ResourceManager::ResourceManager() :
       util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_SICM)
-  std::set <unsigned int> host_devices; // device indicies, not numa nodes
-  for(unsigned int i = 0; i < devs.count; i++) {
-      switch (devs.devices[i].tag) {
-          case SICM_DRAM:
-          case SICM_KNL_HBM:
-              host_devices.insert(i);
-              break;
-          default:
-              break;
-      }
-  }
+  const std::set <unsigned int> host_devices = sicm::get_devices(devs, Platform::cpu);
 
   registry.registerMemoryResource(
     util::make_uniqe<resource::SICMResourceFactory>("HOST", host_devices));
@@ -128,12 +119,7 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #if defined(UMPIRE_ENABLE_SICM)
-  std::set <unsigned int> cuda_devices;
-  for(unsigned int i = 0; i < devs.count; i++) {
-      if (devs.devices[i].tag == SICM_POWERPC_HBM) { // device indicies, not numa nodes
-          cuda_devices.insert(i);
-      }
-  }
+  const std::set <unsigned int> cuda_devices = sicm::get_devices(devs, Platform::cuda);
 
   registry.registerMemoryResource(
 <<<<<<< HEAD
