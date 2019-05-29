@@ -24,7 +24,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AllocationRecordMap.hpp"
+#include "umpire/util/AllocationMap.hpp"
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
@@ -255,7 +255,7 @@ class ResourceManager {
     std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
     std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
 
-    util::AllocationRecordMap m_allocations;
+    util::AllocationMap m_allocations;
 
     strategy::AllocationStrategy* m_default_allocator;
 

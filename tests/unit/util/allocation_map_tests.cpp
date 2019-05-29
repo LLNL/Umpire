@@ -20,22 +20,43 @@
 
 #include "gtest/gtest.h"
 
+// Define equality operators for tests
+namespace umpire {
+namespace util {
+
+bool operator==(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
+{
+  return left.m_ptr == right.m_ptr && left.m_size == right.m_size && left.m_strategy == right.m_strategy;
+}
+
+bool operator!=(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
+{
+  return !(left == right);
+}
+
+} // end namespace util
+} // end namespace umpire
+
 class AllocationMapTest : public ::testing::Test {
   protected:
     AllocationMapTest()
       : data(new double[15]),
         size(15*sizeof(double)),
-        record(new umpire::util::AllocationRecord{data, size, nullptr}) {}
+        record({data, size, nullptr}) {}
 
     virtual ~AllocationMapTest() {
       delete[] data;
+    }
+
+    void TearDown() override {
+      map.clear();
     }
 
     umpire::util::AllocationMap map;
 
     double* data;
     size_t size;
-    umpire::util::AllocationRecord* record;
+    umpire::util::AllocationRecord record;
 };
 
 TEST_F(AllocationMapTest, Add)
@@ -60,7 +81,7 @@ TEST_F(AllocationMapTest, Find)
 
   auto actual_record = map.find(data);
 
-  ASSERT_EQ(record, actual_record);
+  ASSERT_EQ(record, *actual_record);
 }
 
 TEST_F(AllocationMapTest, FindOffset)
@@ -71,7 +92,7 @@ TEST_F(AllocationMapTest, FindOffset)
 
   auto actual_record = map.find(&data[4]);
 
-  ASSERT_EQ(record, actual_record);
+  ASSERT_EQ(record, *actual_record);
 }
 
 TEST_F(AllocationMapTest, Contains)
@@ -119,13 +140,11 @@ TEST_F(AllocationMapTest, RemoveAndUse)
   auto found_record = map.remove(data);
 
   ASSERT_EQ(record, found_record);
-
 }
 
 TEST_F(AllocationMapTest, RegisterMultiple)
 {
-  umpire::util::AllocationRecord* next_record =
-    new umpire::util::AllocationRecord{data, 1, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr};
 
   ASSERT_NO_THROW(
     map.insert(data, record);
@@ -135,8 +154,7 @@ TEST_F(AllocationMapTest, RegisterMultiple)
 
 TEST_F(AllocationMapTest, FindMultiple)
 {
-  umpire::util::AllocationRecord* next_record =
-    new umpire::util::AllocationRecord{data, 1, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr};
 
   EXPECT_NO_THROW({
     map.insert(data, record);
@@ -144,8 +162,7 @@ TEST_F(AllocationMapTest, FindMultiple)
   });
 
   auto actual_record = map.find(data);
-
-  ASSERT_EQ(next_record, actual_record);
+  ASSERT_EQ(next_record, *actual_record);
 
   map.remove(data);
 
@@ -153,17 +170,15 @@ TEST_F(AllocationMapTest, FindMultiple)
     actual_record = map.find(data);
   );
 
-  ASSERT_EQ(actual_record, record);
+  ASSERT_EQ(*actual_record, record);
 }
 
 TEST_F(AllocationMapTest, Print)
 {
-  umpire::util::AllocationRecord* next_record =
-    new umpire::util::AllocationRecord{data, 1, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr};
 
   auto extra_data = new double[10];
-  umpire::util::AllocationRecord* extra_record =
-    new umpire::util::AllocationRecord{extra_data, 10, nullptr};
+  umpire::util::AllocationRecord extra_record{extra_data, 10, nullptr};
 
   map.insert(data, record);
   map.insert(data, next_record);
@@ -171,7 +186,7 @@ TEST_F(AllocationMapTest, Print)
 
   map.printAll();
 
-  map.print([this](const umpire::util::AllocationRecord* r) {
-    return r->m_ptr == data;
+  map.print([this](const umpire::util::AllocationRecord& r) {
+    return r.m_ptr == data;
   });
 }

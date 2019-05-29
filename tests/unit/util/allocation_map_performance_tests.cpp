@@ -22,6 +22,7 @@
 
 #include <chrono>
 
+// TODO Can this be removed now that there is an inspector test?
 class AllocationMapPerformanceTest : public ::testing::Test {
   protected:
     virtual void SetUp() {

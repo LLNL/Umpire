@@ -14,98 +14,187 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/AllocationMap.hpp"
 
+#include "umpire/util/FixedMallocPool.hpp"
+
 #include "umpire/util/Macros.hpp"
 
-#include "umpire/tpl/judy/judyL2Array.h"
-
+#include <iterator>
 #include <sstream>
-
-namespace {
-  using Map = judyL2Array<uintptr_t, uintptr_t>;
-  using AddressPair = Map::cpair;
-  using EntryVector = Map::vector;
-  using Entry = umpire::util::AllocationRecord*;
-}
 
 namespace umpire {
 namespace util {
 
-struct AllocationMap::ConstIterator::JudyL2Data {
-  Map* map;
-  uintptr_t key;
-  Map::cvector::const_iterator it;
+namespace {
+
+template <typename T>
+struct ListBlock
+{
+  T rec;
+  ListBlock* prev;
 };
 
-const AllocationRecord* AllocationMap::ConstIterator::operator*() {
-  return reinterpret_cast<Entry>(*data->it);
-}
+static umpire::util::FixedMallocPool block_pool(sizeof(ListBlock<AllocationRecord>));
 
-AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++() {
-  if (!end) {
-    ++(data->it);
+// Forward declare const iterator
+class RecordListConstIterator;
 
-    // Use find() here rather than using the last lookup because
-    // judyL2Array begin()/end() cache the state internally.
+// TODO Profile this to determine if we should add a small string
+// optimization on top of the block pooling.
+class RecordList
+{
+public:
+  using Block = ListBlock<AllocationRecord>;
+  friend RecordListConstIterator;
 
-    const auto* vec = data->map->find(data->key);
-    if (data->it == vec->end()) {
-      // Reached end of a vector
-      const auto& pair = data->map->next();
+  RecordList() : m_tail(nullptr), m_length(0) {}
 
-      // Update key
-      data->key = pair.key;
+  RecordList(const AllocationRecord& record) : m_tail(nullptr), m_length(0) {
+    push_back(record);
+    m_tail->prev = nullptr;
+  }
 
-      if (data->map->success()) {
-        data->it = pair.value->begin();
-      }
-      else {
-        end = true;
-        data->it = data->map->begin().value->begin();
-      }
+  ~RecordList() {
+    Block* curr = m_tail;
+    while (curr) {
+      Block* prev = curr->prev;
+      block_pool.deallocate(curr);
+      curr = prev;
     }
   }
 
-  return *this;
-}
+  void push_back(AllocationRecord rec) {
+    Block* curr = reinterpret_cast<Block*>(block_pool.allocate());
+    curr->prev = m_tail;
+    curr->rec = rec;
+    m_tail = curr;
+    m_length++;
+  }
 
-bool AllocationMap::ConstIterator::operator==(const AllocationMap::ConstIterator& other)
+  AllocationRecord pop_back() {
+    AllocationRecord ret{};
+    if (m_length > 0) {
+      ret = m_tail->rec;
+      Block* prev = m_tail->prev;
+      block_pool.deallocate(m_tail);
+      m_tail = prev;
+      m_length--;
+    }
+    return ret;
+  }
+
+  RecordListConstIterator begin() const;
+  RecordListConstIterator end() const;
+
+  size_t size() const { return m_length; }
+  bool empty() const { return size() == 0; }
+
+  AllocationRecord* back() { return &m_tail->rec; }
+
+private:
+  Block* m_tail;
+  size_t m_length;
+};
+
+static umpire::util::FixedMallocPool list_pool(sizeof(RecordList));
+
+
+// Iterator for RecordList
+class RecordListConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
 {
-  return (data->map == other.data->map) && (data->it == other.data->it) && (end == other.end);
+  const RecordList *m_list;
+  RecordList::Block* m_curr;
+
+public:
+  RecordListConstIterator(const RecordList* list, RecordList::Block* curr, bool end) :
+    m_list(list), m_curr(curr) {
+    if (end) {
+      // Skip to the head of the list
+      while(m_curr->prev != nullptr) m_curr = m_curr->prev;
+    }
+  }
+
+  RecordListConstIterator(const RecordListConstIterator& other) = default;
+
+
+  AllocationRecord& operator*() const {
+    return m_curr->rec;
+  }
+
+  const AllocationRecord* operator->() const {
+    return &(m_curr->rec);
+  }
+
+  RecordListConstIterator& operator++() {
+    m_curr = m_curr->prev;
+    return *this;
+  }
+
+  RecordListConstIterator operator++(int) {
+    RecordListConstIterator tmp{*this};
+    m_curr = m_curr->prev;
+    return tmp;
+  }
+
+  bool operator==(const RecordListConstIterator& other) {
+    return m_list == other.m_list && m_curr == other.m_curr;
+  }
+
+  bool operator!=(const RecordListConstIterator& other) {
+    return !(*this == other);
+  }
+};
+
+RecordListConstIterator RecordList::begin() const {
+  return RecordListConstIterator{this, m_tail, false};
 }
 
-bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator& other)
-{
-  return !(*this == other);
+RecordListConstIterator RecordList::end() const {
+  return RecordListConstIterator{this, m_tail, true};
 }
 
-AllocationMap::ConstIterator::ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_) :
-  end(end_), data(new JudyL2Data{map_,
-                                 map_->begin().key,
-                                 map_->begin().value->begin()}) {}
+
+} // end of anonymous namespace
+
+static inline const unsigned char* to_judy_buff(void*& key) {
+  return reinterpret_cast<const unsigned char*>(&key);
+}
 
 AllocationMap::AllocationMap() :
-  m_records(new judyL2Array<uintptr_t, uintptr_t>()),
+  m_array(nullptr),
+  m_last(nullptr),
+  m_max_levels(sizeof(uintptr_t)),
+  m_depth(1),
   m_mutex(new std::mutex())
 {
+  // Create new judy array
+  m_array = judy_open(m_max_levels, m_depth);
 }
 
 AllocationMap::~AllocationMap()
 {
-  delete m_records;
+  // Delete all entries
+  clear();
+
+  // Close the judy array, freeing all memory.
+  judy_close(m_array);
+
+  // Delete the mutex
   delete m_mutex;
 }
 
-void
-AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
+void AllocationMap::insert(void* ptr, AllocationRecord record)
 {
   try {
     UMPIRE_LOCK;
-
     UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-    m_records->insert(
-        reinterpret_cast<uintptr_t>(ptr),
-        reinterpret_cast<uintptr_t>(alloc_record));
+    // Find the key
+    m_last = judy_cell(m_array, to_judy_buff(ptr), m_depth * JUDY_key_size);
+    UMPIRE_ASSERT(m_last);
+
+    auto plist = reinterpret_cast<RecordList**>(m_last);
+    if (!*plist) (*plist) = new (list_pool.allocate()) RecordList{record};
+    else (*plist)->push_back(record);
 
     UMPIRE_UNLOCK;
   } catch (...) {
@@ -114,81 +203,7 @@ AllocationMap::insert(void* ptr, AllocationRecord* alloc_record)
   }
 }
 
-AllocationRecord*
-AllocationMap::remove(void* ptr)
-{
-  Entry ret = nullptr;
-
-  try {
-    UMPIRE_LOCK;
-
-    UMPIRE_LOG(Debug, "Removing " << ptr);
-
-    EntryVector* record_vector =
-      const_cast<EntryVector*>(
-          m_records->find(reinterpret_cast<uintptr_t>(ptr)));
-
-    if (record_vector) {
-      if (record_vector->size() > 0) {
-
-        ret = reinterpret_cast<Entry>(record_vector->back());
-        record_vector->pop_back();
-
-        if (record_vector->empty()) {
-          m_records->removeEntry(reinterpret_cast<uintptr_t>(ptr));
-        }
-      }
-    } else {
-      UMPIRE_ERROR("Cannot remove " << ptr );
-    }
-
-    UMPIRE_UNLOCK;
-  } catch (...) {
-    UMPIRE_UNLOCK;
-    throw;
-  }
-
-  return ret;
-}
-
-AllocationRecord*
-AllocationMap::findRecord(void* ptr) const
-{
-
-  Entry alloc_record = nullptr;
-
-  try {
-    UMPIRE_LOCK;
-    auto record = m_records->atOrBefore(reinterpret_cast<uintptr_t>(ptr));
-    if (record.value) {
-      void* parent_ptr = reinterpret_cast<void*>(record.key);
-      alloc_record =
-        reinterpret_cast<Entry>(record.value->back());
-
-      if (alloc_record &&
-          ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
-             > static_cast<char*>(ptr))) {
-
-         UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
-            << " with size " << alloc_record->m_size);
-
-      }
-      else {
-         alloc_record = nullptr;
-      }
-    }
-    UMPIRE_UNLOCK;
-  }
-  catch (...){
-    UMPIRE_UNLOCK;
-    throw;
-  }
-
-  return alloc_record;
-}
-
-AllocationRecord*
-AllocationMap::find(void* ptr) const
+AllocationRecord* AllocationMap::find(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
@@ -205,55 +220,159 @@ AllocationMap::find(void* ptr) const
   }
 }
 
-AllocationMap::ConstIterator AllocationMap::begin() const {
-  return ConstIterator(m_records, false);
+
+AllocationRecord* AllocationMap::findRecord(void* ptr) const
+{
+  AllocationRecord* alloc_record = nullptr;
+
+  try {
+    UMPIRE_LOCK;
+    uintptr_t parent_ptr;
+
+    // Seek and find key (key = parent_ptr)
+    m_last = judy_strt(m_array, to_judy_buff(ptr), m_depth * JUDY_key_size);
+    judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
+
+    // If not found, get the previous one
+    // TODO Start fixing here
+    if (parent_ptr != reinterpret_cast<uintptr_t>(ptr) || reinterpret_cast<RecordList*>(*m_last) == nullptr)
+    {
+      m_last = judy_prv(m_array);
+      // Find key associated to this one
+      judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
+    }
+
+    auto list = m_last ? reinterpret_cast<RecordList*>(*m_last) : nullptr;
+
+    // If a value was found
+    if (list) {
+      alloc_record = list->back();
+
+      if (alloc_record && ((parent_ptr + alloc_record->m_size) > reinterpret_cast<uintptr_t>(ptr))) {
+         UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
+                    << " with size " << alloc_record->m_size);
+      }
+      else {
+         alloc_record = nullptr;
+      }
+    }
+    UMPIRE_UNLOCK;
+  }
+  catch (...){
+    UMPIRE_UNLOCK;
+    throw;
+  }
+
+  return alloc_record;
 }
 
-AllocationMap::ConstIterator AllocationMap::end() const {
-  return ConstIterator(m_records, true);
+AllocationRecord AllocationMap::remove(void* ptr)
+{
+  AllocationRecord ret{};
+
+  try {
+    UMPIRE_LOCK;
+
+    UMPIRE_LOG(Debug, "Removing " << ptr);
+
+    // Locate ptr
+    m_last = judy_slot(m_array, to_judy_buff(ptr), m_depth * JUDY_key_size);
+
+    // If found, remove it
+    if (m_last && *m_last) {
+      RecordList* list = reinterpret_cast<RecordList*>(*m_last);
+      UMPIRE_ASSERT(list->size());
+
+      ret = list->pop_back();
+
+      if (list->empty()) {
+        if((m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size)) != nullptr) {
+          auto list = reinterpret_cast<RecordList*>(*m_last);
+
+          // Manually call destructor
+          list->~RecordList();
+
+          // Mark as deallocated in the pool
+          list_pool.deallocate(list);
+
+          m_last = judy_del(m_array);
+        }
+      }
+    } else {
+      UMPIRE_ERROR("Cannot remove " << ptr );
+    }
+
+    UMPIRE_UNLOCK;
+  } catch (...) {
+    UMPIRE_UNLOCK;
+    throw;
+  }
+
+  return ret;
 }
 
-
-bool
-AllocationMap::contains(void* ptr)
+bool AllocationMap::contains(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
-
   return (findRecord(ptr) != nullptr);
 }
 
-void
-AllocationMap::print(const std::function<bool (const AllocationRecord*)>&& pred,
-                     std::ostream& os) const
+void AllocationMap::clear()
 {
-  for (auto record = m_records->begin(); m_records->success(); record = m_records->next()) {
-    auto addr = record.key;
-    auto vec = *record.value;
+  uintptr_t key = 0;
+  // TODO Why is max = 0 here?
+  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)) != nullptr) {
+    auto list = reinterpret_cast<RecordList*>(*m_last);
 
-    std::stringstream ss;
-    ss << reinterpret_cast<void*>(addr) << " : {" << std::endl;
-    bool any_match = false;
-    for (auto const& records : vec) {
-      AllocationRecord* tmp = reinterpret_cast<AllocationRecord*>(records);
-      if (pred(tmp)) {
-        any_match = true;
-        ss << "  " << tmp->m_size <<
-          " [ " << reinterpret_cast<void*>(addr) <<
-          " -- " << reinterpret_cast<void*>(addr+tmp->m_size) <<
-          " ] " << std::endl;
-      }
-    }
-    ss << "}" << std::endl;
-    if (any_match) { os << ss.str(); }
+    // Manually call destructor
+    list->~RecordList();
+
+    // Mark as deallocated in the pool
+    list_pool.deallocate(list);
+
+    // delete the key and cell for the current stack entry.
+    judy_del(m_array);
   }
 }
 
 void
-AllocationMap::printAll(std::ostream& os) const
+AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
+                           std::ostream& os) const
+{
+  uintptr_t key = 0;
+  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0);
+      m_last != nullptr;
+      m_last = judy_nxt(m_array)) {
+    auto list = reinterpret_cast<RecordList*>(*m_last);
+
+    void* addr;
+    judy_key(m_array, reinterpret_cast<unsigned char*>(&addr), m_depth * JUDY_key_size);
+
+    std::stringstream ss;
+    bool any_match = false;
+    ss << addr << " {" << std::endl;
+    for (auto iter = list->begin(); iter != list->end(); iter++) {
+      if (pred(*iter)) {
+        any_match = true;
+        ss << iter->m_size <<
+          " [ " << reinterpret_cast<void*>(iter->m_ptr) <<
+          " -- " << reinterpret_cast<void*>(static_cast<unsigned char*>(iter->m_ptr)+iter->m_size) <<
+          " ] " << std::endl;
+      }
+    }
+    ss << "}" << std::endl;
+
+    if (any_match) {
+      os << ss.str();
+    }
+  }
+}
+
+void AllocationMap::printAll(std::ostream& os) const
 {
   os << "🔍 Printing allocation map contents..." << std::endl;
 
-  print([] (const AllocationRecord*) { return true; }, os);
+  print([] (const AllocationRecord&) { return true; }, os);
 
   os << "done." << std::endl;
 }

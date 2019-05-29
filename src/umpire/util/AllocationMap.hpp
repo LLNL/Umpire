@@ -12,72 +12,67 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_AllocationMap_HPP
-#define UMPIRE_AllocationMap_HPP
+#ifndef UMPIRE_MemoryMap_HPP
+#define UMPIRE_MemoryMap_HPP
+
+// AllocationMap is a multimap of addresses to addresses. It uses Judy
+// for the map, with an array-like object to hold multiple values with
+// the same key.
+
+#include <cstddef>
+#include <mutex>
+#include <iostream>
 
 #include "umpire/util/AllocationRecord.hpp"
 
-#include <cstdint>
-#include <mutex>
-#include <iostream>
-#include <functional>
-
-template< typename JudyKey, typename JudyValue >
-class judyL2Array;
+// TODO Forward declare Judy and JudySlot
+#include "umpire/tpl/judy/judy.h"
 
 namespace umpire {
 namespace util {
 
-class AllocationMap
+struct AllocationMap
 {
-  public:
+public:
+  AllocationMap();
+  ~AllocationMap();
 
-    class ConstIterator {
-    public:
-      const AllocationRecord* operator*();
-      ConstIterator& operator++();
-      bool operator==(const ConstIterator& other);
-      bool operator!=(const ConstIterator& other);
-    private:
-      struct JudyL2Data;
-      bool end;
-      JudyL2Data* data;
-      ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_ = false);
-      friend class AllocationMap;
-    };
+  // Would require a deep copy of the Judy data
+  AllocationMap(const AllocationMap&) = delete;
 
-    AllocationMap();
-    ~AllocationMap();
+  void insert(void* ptr, AllocationRecord record);
 
-    void insert(void* ptr, AllocationRecord* record);
+  // Find a record -- throws an exception of the record is not found
+  AllocationRecord* find(void* ptr) const;
 
-    AllocationRecord* remove(void* ptr);
+  // This version of find never throws an exception
+  AllocationRecord* findRecord(void* ptr) const;
 
-    AllocationRecord* find(void* ptr) const;
+  // Only allows erasing the last inserted entry for key = ptr
+  AllocationRecord remove(void* ptr);
 
-    ConstIterator begin() const;
+  // Check if a pointer has been added to the map
+  bool contains(void* ptr) const;
 
-    ConstIterator end() const;
+  // Clear all records from the map
+  void clear();
 
-    bool contains(void* ptr);
+  // Print methods -- either matching a predicate or all records
+  void print(const std::function<bool (const AllocationRecord&)>&& predicate,
+             std::ostream& os = std::cout) const;
 
-    void reset();
-
-    void printAll(std::ostream& os = std::cout) const;
-
-    void print(const std::function<bool (const AllocationRecord*)>&& predicate,
-               std::ostream& os = std::cout) const;
+  void printAll(std::ostream& os = std::cout) const;
 
 private:
-    AllocationRecord* findRecord(void* ptr) const;
+  Judy* m_array;
+  mutable JudySlot* m_last; // last found value in Judy
+  unsigned int m_max_levels, m_depth;
 
-    // TODO: Make const version of judyL2Array begin/end
-    mutable judyL2Array<uintptr_t, uintptr_t>* m_records;
-
-    std::mutex* m_mutex;
+  // TODO remove pointer
+  std::mutex* m_mutex;
 };
 
 } // end of namespace util
 } // end of namespace umpire
 
-#endif // UMPIRE_AllocationMap_HPP
+#endif // UMPIRE_MemoryMap_HPP
