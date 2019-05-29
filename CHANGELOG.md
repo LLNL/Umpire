@@ -100,6 +100,9 @@ and a dynamic pool for those that are larger.
 - RELEASE_NOTES file detailing the subset of changes that will impact users the
   most.
 
+- Integrated SICM as a replacement (when enabled) for HOST and CUDA
+resources and allocators, and as a strategy similar to NumaPolicy.
+
 ### Changed
 
 - Replay program refactored to speed up running of the operations being
