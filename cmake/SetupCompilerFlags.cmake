@@ -17,3 +17,7 @@ if (ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "-coverage ${CMAKE_CXX_FLAGS}")
   set(CMAKE_EXE_LINKER_FLAGS "-coverage ${CMAKE_EXE_LINKER_FLAGS}")
 endif ()
+
+if (ENABLE_HIP)
+	set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
+endif()

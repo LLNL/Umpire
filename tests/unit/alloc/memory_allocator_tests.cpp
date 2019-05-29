@@ -29,6 +29,11 @@ using namespace umpire::alloc;
 #include "umpire/alloc/AmPinnedAllocator.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+#include "umpire/alloc/HipMallocAllocator.hpp"
+#include "umpire/alloc/HipPinnedAllocator.hpp"
+#endif
+
 #include "gtest/gtest.h"
 
 template <typename T>
@@ -56,6 +61,9 @@ using test_types = ::testing::Types<
 #endif
 #if defined(UMPIRE_ENABLE_HCC)
     , AmAllocAllocator, AmPinnedAllocator
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    , HipMallocAllocator, HipPinnedAllocator
 #endif
 >;
 

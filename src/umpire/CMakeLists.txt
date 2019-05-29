@@ -27,6 +27,8 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
+set (umpire_depends)
+
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
@@ -57,6 +59,10 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   endif ()
 endif ()
 
+if (ENABLE_HIP)
+  set (umpire_depends ${umpire_depends} hip)
+endif()
+
 add_subdirectory(tpl)
 
 add_subdirectory(resource)
@@ -80,8 +86,9 @@ set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_HCC ${ENABLE_HCC})
+set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
 
-if (ENABLE_CUDA OR ENABLE_HCC)
+if (ENABLE_CUDA OR ENABLE_HCC OR ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
 else ()

@@ -68,6 +68,7 @@ TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
   if (m_allocator->getPlatform() == umpire::Platform::cuda ||
+      m_allocator->getPlatform() == umpire::Platform::hip  ||
       m_allocator->getPlatform() == umpire::Platform::rocm) {
     SUCCEED();
   } else {

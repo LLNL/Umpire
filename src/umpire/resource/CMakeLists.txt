@@ -69,12 +69,37 @@ if (ENABLE_HCC)
     rocm)
 endif ()
 
-blt_add_library(
-  NAME umpire_resource
-  HEADERS ${umpire_resource_headers}
-  SOURCES ${umpire_resource_sources}
-  DEPENDS_ON ${umpire_resource_depends}
-  OBJECT TRUE)
+if (ENABLE_HIP)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    HipDeviceResourceFactory.hpp
+    HipPinnedMemoryResourceFactory.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    HipDeviceResourceFactory.cpp
+    HipPinnedMemoryResourceFactory.cpp)
+
+  set(umpire_resource_depends
+    ${umpire_resource_depends}
+    hip)
+endif ()
+
+#OBJECT flag causing errors?
+if (ENABLE_HIP)
+  blt_add_library(
+    NAME umpire_resource
+    HEADERS ${umpire_resource_headers}
+    SOURCES ${umpire_resource_sources}
+    DEPENDS_ON ${umpire_resource_depends})
+else ()
+  blt_add_library(
+    NAME umpire_resource
+    HEADERS ${umpire_resource_headers}
+    SOURCES ${umpire_resource_sources}
+    DEPENDS_ON ${umpire_resource_depends}
+    OBJECT TRUE)
+endif()
 
 target_include_directories(
   umpire_resource

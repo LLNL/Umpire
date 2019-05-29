@@ -86,13 +86,41 @@ if (ENABLE_HCC)
     rocm)
 endif ()
 
+if (ENABLE_HIP)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    HipCopyOperation.hpp
+    HipCopyFromOperation.hpp
+    HipCopyToOperation.hpp
+    HipMemsetOperation.hpp)
 
-blt_add_library(
-  NAME umpire_op
-  HEADERS ${umpire_op_headers}
-  SOURCES ${umpire_op_sources}
-  DEPENDS_ON ${umpire_op_depends}
-  OBJECT TRUE)
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    HipCopyOperation.cpp
+    HipCopyFromOperation.cpp
+    HipCopyToOperation.cpp
+    HipMemsetOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    hip)
+endif ()
+
+#OBJECT flag causing errors?
+if (ENABLE_HIP)
+  blt_add_library(
+    NAME umpire_op
+    HEADERS ${umpire_op_headers}
+    SOURCES ${umpire_op_sources}
+    DEPENDS_ON ${umpire_op_depends})
+else ()
+  blt_add_library(
+    NAME umpire_op
+    HEADERS ${umpire_op_headers}
+    SOURCES ${umpire_op_sources}
+    DEPENDS_ON ${umpire_op_depends}
+    OBJECT TRUE)
+endif()
 
 target_include_directories(
   umpire_op

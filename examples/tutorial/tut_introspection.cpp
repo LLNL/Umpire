@@ -27,6 +27,10 @@ int main(int, char**) {
       , "UM"
       , "PINNED"
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+      , "DEVCIE"
+      , "PINNED"
+#endif
   };
 
   for (auto& destination : destinations) {
@@ -39,12 +43,12 @@ int main(int, char**) {
 
     auto found_allocator = rm.getAllocator(data);
 
-    std::cout << "According to the ResourceManager, the Allocator used is " 
-      << found_allocator.getName() 
-      << ", which has the Platform " 
+    std::cout << "According to the ResourceManager, the Allocator used is "
+      << found_allocator.getName()
+      << ", which has the Platform "
       << static_cast<int>(found_allocator.getPlatform()) << std::endl;
 
-    std::cout << "The size of the allocation is << " 
+    std::cout << "The size of the allocation is << "
       << found_allocator.getSize(data) << std::endl;
 
     allocator.deallocate(data);

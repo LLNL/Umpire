@@ -47,7 +47,7 @@ int do_copy(std::string src, std::string dst, std::size_t size = 4096) {
 
   std::cout << src << "->" << dst << std::endl;
   std::cout << "    copy: " <<  std::chrono::duration<double>(end_copy - begin_copy).count()/ALLOCATIONS << std::endl;
-  
+
   return 0;
 }
 
@@ -65,5 +65,10 @@ int main(int, char**) {
 
   do_copy("UM", "DEVICE");
   do_copy("DEVICE", "UM");
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+  do_copy("HOST", "DEVICE");
+  do_copy("DEVICE", "HOST");
+  do_copy("DEVICE", "DEVICE");
 #endif
 }

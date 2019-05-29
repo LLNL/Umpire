@@ -28,7 +28,7 @@ void allocate_and_deallocate_pool(
 
   auto allocator = rm.getAllocator(resource);
 
-  auto pooled_allocator = 
+  auto pooled_allocator =
     rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
                                                     allocator,
                                                     initial_size, /* default = 512Mb*/
@@ -50,6 +50,10 @@ int main(int, char**) {
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate_pool("DEVICE", (1024*1024*1024), (1024*1024));
   allocate_and_deallocate_pool("UM", (1024*64), 1024);
+  allocate_and_deallocate_pool("PINNED", (1024*16), 1024);
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+  allocate_and_deallocate_pool("DEVICE", (1024*1024*1024), (1024*1024));
   allocate_and_deallocate_pool("PINNED", (1024*16), 1024);
 #endif
 

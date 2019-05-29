@@ -60,4 +60,7 @@ int main(int, char**) {
   benchmark_allocator("DEVICE");
   benchmark_allocator("UM");
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+  benchmark_allocator("DEVICE");
+#endif
 }

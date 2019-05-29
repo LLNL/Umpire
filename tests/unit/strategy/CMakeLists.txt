@@ -17,6 +17,10 @@ set (strategy_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/strategy)
 set (strategy_tests_depends
   umpire gtest)
 
+if (ENABLE_HIP)
+  set (strategy_tests_depends ${strategy_tests_depends} hip)
+endif()
+
 blt_add_executable(
   NAME fixed_pool_tests
   SOURCES fixed_pool_tests.cpp

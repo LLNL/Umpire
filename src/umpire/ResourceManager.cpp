@@ -38,6 +38,13 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+
+#include "umpire/resource/HipDeviceResourceFactory.hpp"
+#include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
+#endif
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/strategy/DynamicPool.hpp"
@@ -102,6 +109,14 @@ ResourceManager::ResourceManager() :
     new resource::RocmPinnedMemoryResourceFactory());
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+  registry.registerMemoryResource(
+    new resource::HipDeviceResourceFactory());
+
+  registry.registerMemoryResource(
+    new resource::HipPinnedMemoryResourceFactory());
+#endif
+
   initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -131,6 +146,15 @@ ResourceManager::initialize()
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
+  }
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+  int count;
+  auto error = ::hipGetDeviceCount(&count);
+
+  if (error != hipSuccess) {
+    UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
   }
 #endif
 

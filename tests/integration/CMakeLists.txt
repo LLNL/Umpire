@@ -22,6 +22,11 @@ if (ENABLE_CUDA)
     ${allocator_integration_tests_depends}
     cuda_runtime)
 endif ()
+if (ENABLE_HIP)
+  set (allocator_integration_tests_depends
+    ${allocator_integration_tests_depends}
+    hip)
+endif ()
 
 blt_add_executable(
   NAME allocator_integration_tests
@@ -47,6 +52,12 @@ if (ENABLE_OPENMP)
     openmp)
 endif ()
 
+if (ENABLE_HIP)
+  set (strategy_test_depends
+      ${strategy_test_depends}
+      hip)
+endif()
+
 blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
@@ -62,10 +73,17 @@ blt_add_test(
   NAME strategy_tests
   COMMAND strategy_tests)
 
+set (operation_test_depends
+  umpire gtest)
+
+if (ENABLE_HIP)
+  set (operation_test_depends ${operation_test_depends} hip)
+endif()
+
 blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
-  DEPENDS_ON umpire gtest
+  DEPENDS_ON ${operation_test_depends}
   OUTPUT_DIR ${integration_dir})
 
 target_include_directories(
@@ -77,10 +95,19 @@ blt_add_test(
   NAME operation_tests
   COMMAND operation_tests)
 
+set (free_functions_integration_tests_depends
+  umpire gtest)
+
+if (ENABLE_HIP)
+  set (free_functions_integration_tests_depends
+      ${free_functions_integration_tests_depends}
+      hip)
+endif()
+
 blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
-  DEPENDS_ON umpire gtest
+  DEPENDS_ON ${free_functions_integration_tests_depends}
   OUTPUT_DIR ${integration_dir})
 
 target_include_directories(
