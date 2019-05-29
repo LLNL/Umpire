@@ -47,14 +47,11 @@ void deregister_all(umpire::strategy::mixins::Inspector& inspector, uintptr_t pt
 
 class InspectorRegister : public ::benchmark::Fixture {
 public:
-  using ::benchmark::Fixture::SetUp;
-  // using ::benchmark::Fixture::TearDown;
-
   InspectorRegister() { fill_ptr(ptr); }
 
-  void TearDown(const ::benchmark::State& UMPIRE_UNUSED_ARG(st)) {
-    // deregister_all(inspector, ptr);
-  }
+  using ::benchmark::Fixture::SetUp;
+
+  void TearDown(const ::benchmark::State& UMPIRE_UNUSED_ARG(st)) {}
 
   umpire::strategy::mixins::Inspector inspector;
   uintptr_t ptr[MAX_REGISTRATIONS];
@@ -78,18 +75,13 @@ BENCHMARK_F(InspectorRegister, add)(benchmark::State &st)
 
 class InspectorDeregister : public ::benchmark::Fixture {
 public:
-  // using ::benchmark::Fixture::SetUp;
-  // using ::benchmark::Fixture::TearDown;
-
   InspectorDeregister() { fill_ptr(ptr); }
 
   void SetUp(const ::benchmark::State& UMPIRE_UNUSED_ARG(st)) {
     register_all(inspector, ptr);
   }
 
-  void TearDown(const ::benchmark::State& UMPIRE_UNUSED_ARG(st)) {
-    // deregister_all(inspector, ptr);
-  }
+  void TearDown(const ::benchmark::State& UMPIRE_UNUSED_ARG(st)) {}
 
   umpire::strategy::mixins::Inspector inspector;
   uintptr_t ptr[MAX_REGISTRATIONS];
@@ -109,12 +101,5 @@ BENCHMARK_F(InspectorDeregister, remove)(benchmark::State &st)
     inspector.deregisterAllocation(reinterpret_cast<void*>(ptr[i++]));
   }
 }
-
-
-// // BENCHMARK_DEFINE_F(InspectorBenchmark, add   )(benchmark::State &st) { add(st);    }
-// // BENCHMARK_DEFINE_F(InspectorBenchmark, remove)(benchmark::State &st) { remove(st); }
-
-// BENCHMARK_REGISTER_F(InspectorBenchmark, add);
-// BENCHMARK_REGISTER_F(InspectorBenchmark, remove);
 
 BENCHMARK_MAIN();

@@ -20,16 +20,22 @@
 
 #include "gtest/gtest.h"
 
-bool operator==(const AllocationRecord& left, const AllocationRecord& right)
+// Define equality operators for tests
+namespace umpire {
+namespace util {
+
+bool operator==(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
 {
   return left.m_ptr == right.m_ptr && left.m_size == right.m_size && left.m_strategy == right.m_strategy;
 }
 
-bool operator!=(const AllocationRecord& left, const AllocationRecord& right)
+bool operator!=(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
 {
   return !(left == right);
 }
 
+} // end namespace util
+} // end namespace umpire
 
 class AllocationMapTest : public ::testing::Test {
   protected:
