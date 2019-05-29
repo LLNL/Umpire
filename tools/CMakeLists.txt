@@ -13,7 +13,7 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
-set (tools_depends umpire umpire_tpl_cxxopts)
+set (tools_depends umpire umpire_tpl_cxxopts umpire_tpl_json)
 
 if (ENABLE_HIP)
 	set (tools_depends ${tools_depends} hip)
@@ -22,7 +22,7 @@ endif()
 blt_add_executable(
   NAME replay
   SOURCES replay.cpp
-  DEPENDS_ON ${tool_depends} umpire umpire_tpl_cxxopts umpire_tpl_json
+  DEPENDS_ON ${tools_depends}
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
 
 install(FILES plot_allocations DESTINATION bin)
