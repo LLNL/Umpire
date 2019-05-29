@@ -32,39 +32,39 @@ namespace util {
  */
 class FixedMallocPool
 {
-  public:
-    FixedMallocPool(const size_t object_bytes,
-                    const size_t objects_per_pool = 64 * sizeof(int) * 8);
+public:
+  FixedMallocPool(const size_t object_bytes,
+                  const size_t objects_per_pool = 1024*1024);
 
-    ~FixedMallocPool();
+  ~FixedMallocPool();
 
-    void* allocate(size_t bytes = 0);
-    void deallocate(void* ptr);
+  void* allocate(size_t bytes = 0);
+  void deallocate(void* ptr);
 
-    size_t numPools() const noexcept;
+  size_t numPools() const noexcept;
 
-  private:
-    struct Pool {
-      char* data;
-      int* avail;
-      size_t num_avail;
-      Pool(const size_t object_bytes, const size_t objects_per_pool,
-           const size_t avail_bytes);
-    };
+private:
+  struct Pool {
+    unsigned char* data;
+    unsigned char* next;
+    unsigned int num_initialized;
+    unsigned int num_free;
+    Pool(const size_t object_bytes, const size_t objects_per_pool);
+  };
 
-    void newPool();
-    void* allocInPool(Pool& p) noexcept;
+  void newPool();
+  void* allocInPool(Pool& p) noexcept;
 
-    size_t m_obj_bytes;
-    size_t m_obj_per_pool;
-    size_t m_data_bytes;
-    size_t m_avail_length;
-    size_t m_current_bytes;
-    size_t m_highwatermark;
-    std::vector<Pool> m_pool;
-    // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
-    // ever reduced in size, then .data and .avail have to be manually
-    // deallocated to avoid a memory leak.
+  unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
+  unsigned int index_from_addr(const Pool& p, const unsigned char* ptr) const;
+
+  const size_t m_obj_bytes;
+  const size_t m_obj_per_pool;
+  const size_t m_data_bytes;
+  std::vector<Pool> m_pool;
+  // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
+  // ever reduced in size, then .data and .avail have to be manually
+  // deallocated to avoid a memory leak.
 };
 
 } // end namespace strategy

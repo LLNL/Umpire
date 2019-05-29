@@ -21,47 +21,33 @@
 #include <cstdlib>
 #include <algorithm>
 
-#if !defined(_MSC_VER)
-#define  _XOPEN_SOURCE_EXTENDED 1
-#include <strings.h>
-#endif
-
-static int find_first_set(int i)
-{
-#if defined(_MSC_VER)
-  unsigned long bit;
-  unsigned long i_l = static_cast<unsigned long>(i);
-  _BitScanForward(&bit, i_l);
-  return static_cast<int>(bit);
-#else
-  return ffs(i);
-#endif
-}
-
 namespace umpire {
 namespace util {
 
-static constexpr size_t bits_per_int = sizeof(int) * 8;
-
-FixedMallocPool::Pool::Pool(const size_t object_bytes, const size_t objects_per_pool,
-                            const size_t avail_bytes) :
-  data(reinterpret_cast<char*>(std::malloc(object_bytes * objects_per_pool + avail_bytes))),
-  avail(reinterpret_cast<int*>(data + object_bytes * objects_per_pool)),
-  num_avail(objects_per_pool)
+inline unsigned char*
+FixedMallocPool::addr_from_index(const FixedMallocPool::Pool& p, unsigned int i) const
 {
-  // Set all bits to 1
-  const unsigned char not_zero = ~0;
-  std::memset(avail, not_zero, avail_bytes);
+  return p.data + i * m_obj_bytes;
 }
+
+inline unsigned int
+FixedMallocPool::index_from_addr(const FixedMallocPool::Pool& p, const unsigned char* ptr) const
+{
+  return static_cast<unsigned int>(ptr - p.data) / m_obj_bytes;
+}
+
+FixedMallocPool::Pool::Pool(const size_t object_bytes,
+                            const size_t objects_per_pool) :
+  data(static_cast<unsigned char*>(std::malloc(object_bytes * objects_per_pool))),
+  next(data),
+  num_initialized(0),
+  num_free(objects_per_pool) {}
 
 FixedMallocPool::FixedMallocPool(const size_t object_bytes,
                                  const size_t objects_per_pool) :
   m_obj_bytes(object_bytes),
   m_obj_per_pool(objects_per_pool),
   m_data_bytes(m_obj_bytes * m_obj_per_pool),
-  m_avail_length(objects_per_pool/bits_per_int + 1),
-  m_current_bytes(0),
-  m_highwatermark(0),
   m_pool()
 {
   newPool();
@@ -75,29 +61,26 @@ FixedMallocPool::~FixedMallocPool()
 void
 FixedMallocPool::newPool()
 {
-  m_pool.emplace_back(m_obj_bytes, m_obj_per_pool, m_avail_length * sizeof(int));
+  m_pool.emplace_back(m_obj_bytes, m_obj_per_pool);
 }
 
 void*
 FixedMallocPool::allocInPool(Pool& p) noexcept
 {
-  if (!p.num_avail) return nullptr;
-
-  for (unsigned int int_index = 0; int_index < m_avail_length; ++int_index) {
-    // Return the index of the first 1 bit
-    const int bit_index = find_first_set(p.avail[int_index]) - 1;
-    if (bit_index >= 0) {
-      const size_t index = int_index * bits_per_int + bit_index;
-      if (index < m_obj_per_pool) {
-        // Flip bit 1 -> 0
-        p.avail[int_index] ^= 1 << bit_index;
-        p.num_avail--;
-        return static_cast<void*>(p.data + m_obj_bytes * index);
-      }
-    }
+  if (p.num_initialized < m_obj_per_pool) {
+    unsigned int* ptr = reinterpret_cast<unsigned int*>(addr_from_index(p, p.num_initialized));
+    *ptr = p.num_initialized + 1;
+    p.num_initialized++;
   }
 
-  return nullptr;
+  void* ret = nullptr;
+  if (p.num_free > 0) {
+    ret = static_cast<void*>(p.next);
+    --p.num_free;
+    p.next = (p.num_free != 0) ? addr_from_index(p, *reinterpret_cast<unsigned int*>(p.next)) : nullptr;
+  }
+
+  return ret;
 }
 
 void*
@@ -107,11 +90,7 @@ FixedMallocPool::allocate(size_t bytes)
 
   for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
     ptr = allocInPool(*it);
-    if (ptr) {
-      m_current_bytes += m_obj_bytes;
-      m_highwatermark = std::max(m_highwatermark, m_current_bytes);
-      break;
-    }
+    if (ptr) return ptr;
   }
 
   if (!ptr) {
@@ -127,21 +106,18 @@ void
 FixedMallocPool::deallocate(void* ptr)
 {
   for (auto& p : m_pool) {
-    const char* t_ptr = reinterpret_cast<char*>(ptr);
+    const unsigned char* t_ptr = reinterpret_cast<unsigned char*>(ptr);
     const ptrdiff_t offset = t_ptr - p.data;
     if ((offset >= 0) && (offset < static_cast<ptrdiff_t>(m_data_bytes))) {
-      const size_t alloc_index = offset / m_obj_bytes;
-      const size_t int_index   = alloc_index / bits_per_int;
-      const short  bit_index   = alloc_index % bits_per_int;
-
-      UMPIRE_ASSERT(! (p.avail[int_index] & (1 << bit_index)));
-
-        // Flip bit 0 -> 1
-      p.avail[int_index] ^= 1 << bit_index;
-      p.num_avail++;
-
-      m_current_bytes -= m_obj_bytes;
-
+      if (p.next != nullptr) {
+        *reinterpret_cast<unsigned int*>(ptr) = index_from_addr(p, p.next);
+        p.next = reinterpret_cast<unsigned char*>(ptr);
+      }
+      else {
+        *reinterpret_cast<unsigned int*>(ptr) = m_obj_per_pool;
+        p.next = reinterpret_cast<unsigned char*>(ptr);
+      }
+      ++p.num_free;
       return;
     }
   }

@@ -71,11 +71,14 @@ public:
   }
 
   AllocationRecord pop_back() {
-    AllocationRecord ret = m_tail->rec;
-    Block* prev = m_tail->prev;
-    block_pool.deallocate(m_tail);
-    m_tail = prev;
-    m_length--;
+    AllocationRecord ret{};
+    if (m_length > 0) {
+      ret = m_tail->rec;
+      Block* prev = m_tail->prev;
+      block_pool.deallocate(m_tail);
+      m_tail = prev;
+      m_length--;
+    }
     return ret;
   }
 
@@ -371,16 +374,6 @@ void AllocationRecordMap::printAll(std::ostream& os) const
   print([] (const AllocationRecord&) { return true; }, os);
 
   os << "done." << std::endl;
-}
-
-bool operator==(const AllocationRecord& left, const AllocationRecord& right)
-{
-  return left.m_ptr == right.m_ptr && left.m_size == right.m_size && left.m_strategy == right.m_strategy;
-}
-
-bool operator!=(const AllocationRecord& left, const AllocationRecord& right)
-{
-  return !(left == right);
 }
 
 } // end of namespace util

@@ -54,4 +54,4 @@ blt_add_executable(
   NAME inspector_benchmarks
   SOURCES inspector_benchmarks.cpp
   DEPENDS_ON gbenchmark umpire
-  OUTPUT_DIR ${UMPIRE_BENCHMARK_OUTPUT_DIR})
+  OUTPUT_DIR ${UMPIRE_BENCHMARKS_OUTPUT_DIR})

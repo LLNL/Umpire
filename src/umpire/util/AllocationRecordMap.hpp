@@ -63,9 +63,6 @@ private:
   std::mutex* m_mutex;
 };
 
-bool operator==(const AllocationRecord& left, const AllocationRecord& right);
-bool operator!=(const AllocationRecord& left, const AllocationRecord& right);
-
 } // end of namespace util
 } // end of namespace umpire
 
