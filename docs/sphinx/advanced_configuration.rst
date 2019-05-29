@@ -21,6 +21,7 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_HIP``               Off      Enable HIP support
       ``ENABLE_HCC``               Off      Enable HCC support
       ``ENABLE_NUMA``              Off      Enable NUMA support
+      ``ENABLE_SICM``              Off      Enable SICM support
       ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
@@ -53,6 +54,11 @@ These arguments are explained in more detail below:
   This option enables support for NUMA. The
   :class:`umpire::strategy::NumaPolicy` is available when built with this
   option, which may be used to locate the allocation to a specific node.
+
+* ``ENABLE_SICM``
+  This option replaces the underlying resources and allocators for ``HOST``
+  and CUDA memory with SICM. ``SICM_INCLUDE_PATH``, ``SICM_LIBRARY_PATH``,
+  and ``JEMALLOC_LIBRARY_PATH`` will need to be provided to CMake.
 
 * ``ENABLE_STATISTICS``
   This option enables collection of memory statistics. If Umpire is built with

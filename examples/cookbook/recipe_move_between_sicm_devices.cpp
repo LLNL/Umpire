@@ -33,7 +33,7 @@ int main(int, char**) {
   sicm_device_list devs = sicm_init();
 
   if (devs.count < 1) {
-    UMPIRE_ERROR("SICM did not dectect any devices");
+    UMPIRE_ERROR("SICM did not detect any devices");
   }
 
   // Create an allocator on the first SICM device
