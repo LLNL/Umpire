@@ -36,7 +36,7 @@ and a dynamic pool for those that are larger.
 
 ### Removed
 
-- `ENABLE_ASSERTS` was removed in factor of checking the `NDEBUG` macro.
+- `ENABLE_ASSERTS` was removed in favor of checking the `NDEBUG` macro.
 
 ### Fixed
 
