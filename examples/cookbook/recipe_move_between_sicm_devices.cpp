@@ -40,8 +40,11 @@ int main(int, char**) {
   auto sicm_src_alloc = rm.makeAllocator<umpire::strategy::SICMStrategy>(
     "sicm_src_alloc", 0);
 
-  // Create an allocation on that node
+  // Create an allocation on that device
   void* src_ptr = sicm_src_alloc.allocate(alloc_size);
+
+  // Create another allocation on that device
+  void* src_ptr2 = sicm_src_alloc.allocate(alloc_size);
 
   if ((devs.count / 3) > 1) {                    // want at least 2 NUMA nodes
     const unsigned int dst_dev = devs.count - 3; // destination page size must be the same, so pick device + offset 0 on the NUMA node
@@ -59,19 +62,31 @@ int main(int, char**) {
       UMPIRE_ERROR("Pointers should match " << dst_ptr << " " << src_ptr);
     }
 
-    // Touch it
-    rm.memset(dst_ptr, 0);
+    // Verify the location of the pointer is on the destination SICM device
+    {
+      rm.memset(dst_ptr, 0);
 
-    // Verify SICM device
-    const int actual_location = umpire::numa::get_location(dst_ptr);
-    if (actual_location != dst_node) {
-      UMPIRE_ERROR("Move was unsuccessful. Expected location: " << dst_node << " Actual Location: " << actual_location);
+      const int new_location = umpire::numa::get_location(dst_ptr);
+      if (new_location != dst_node) {
+        UMPIRE_ERROR("Move was unsuccessful. Expected location: " << dst_node << " Actual Location: " << new_location);
+      }
+    }
+
+    // The other pointer moved as well!
+    {
+      rm.memset(src_ptr2, 0);
+
+      const int new_location = umpire::numa::get_location(src_ptr2);
+      if (new_location != dst_node) {
+        UMPIRE_ERROR("Move was unsuccessful. Expected location: " << dst_node << " Actual Location: " << new_location);
+      }
     }
   }
 
   // Clean up by deallocating from the original allocator, since the
   // allocation record is still associated with that allocator
   sicm_src_alloc.deallocate(src_ptr);
+  sicm_src_alloc.deallocate(src_ptr2);
 
   sicm_fini();
 
