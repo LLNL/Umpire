@@ -19,15 +19,15 @@
 namespace umpire {
 namespace sicm {
 
-std::set <unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform) {
-    std::set <unsigned int> devices;
+std::vector<unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform) {
+    std::vector<unsigned int> devices;
     switch (platform) {
         case umpire::Platform::cpu:
             for(unsigned int i = 0; i < devs.count; i++) {
                 switch (devs.devices[i].tag) {
                     case SICM_DRAM:
                     case SICM_KNL_HBM:
-                        devices.insert(i);
+                        devices.push_back(i);
                         break;
                     default:
                         break;
@@ -38,7 +38,7 @@ std::set <unsigned int> get_devices(const struct sicm_device_list& devs, const u
         case umpire::Platform::cuda:
             for(unsigned int i = 0; i < devs.count; i++) {
                 if (devs.devices[i].tag == SICM_POWERPC_HBM) {
-                    devices.insert(i);
+                    devices.push_back(i);
                 }
             }
             break;

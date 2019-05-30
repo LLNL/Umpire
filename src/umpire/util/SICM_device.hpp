@@ -17,7 +17,6 @@
 
 #include "umpire/util/Platform.hpp"
 
-#include <set>
 #include <vector>
 
 extern "C" {
@@ -29,7 +28,7 @@ namespace sicm {
 
 // gets set of devices suitable for a given platform
 // returns device indicies, not numa nodes
-std::set <unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform);
+std::vector<unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform);
 
 // get the device index that works best when running on a given CPU
 unsigned int best_device(const int running_at,

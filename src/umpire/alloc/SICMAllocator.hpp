@@ -19,7 +19,6 @@
 #include <list>
 #include <map>
 #include <sched.h>
-#include <set>
 #include <vector>
 
 #include "umpire/util/Macros.hpp"
@@ -38,10 +37,10 @@ namespace alloc {
  */
 struct SICMAllocator
 {
-  SICMAllocator(const std::string& name, const std::set <unsigned int>& devices)
+  SICMAllocator(const std::string& name, const std::vector <unsigned int>& devices)
     : devs(sicm_init()),
       name(name),
-      allowed_devices()
+      allowed_devices(devices)
   {
     if (!devices.size()) {
       UMPIRE_ERROR("SICMAllocator construction failed due to lack of allowed devices");
@@ -54,8 +53,10 @@ struct SICMAllocator
         UMPIRE_ERROR("SICMAllocator Bad device index: " << dev << " [0-" << devs.count << ")");
       }
 
-      allowed_devices.push_back(dev);     // move the contents of devices into allowed devices
-      UMPIRE_USE_VAR(arenas[dev]);        // create the map node
+      std::lock_guard <std::mutex> lock(arena_mutex);
+      if (arenas.find(dev) != arenas.end()) {
+        UMPIRE_ERROR("SICMAllocator Device has already been used in aother SICMAllocator: " << dev);
+      }
     }
   }
 

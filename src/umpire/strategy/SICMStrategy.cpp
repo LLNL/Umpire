@@ -51,7 +51,7 @@ SICMStrategy::~SICMStrategy() {
 void*
 SICMStrategy::allocate(size_t bytes)
 {
-  void * ret = sicm_arena_alloc(m_arena, bytes);
+  void* ret = sicm_arena_alloc(m_arena, bytes);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 

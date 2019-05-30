@@ -30,7 +30,7 @@ extern "C"
 namespace umpire {
 namespace resource {
 
-SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::set <unsigned int> & devices)
+SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices)
   : replacement(name),
     devices(devices)
 {

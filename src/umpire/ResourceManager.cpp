@@ -108,7 +108,7 @@ ResourceManager::ResourceManager() :
       util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_SICM)
-  const std::set <unsigned int> host_devices = sicm::get_devices(devs, Platform::cpu);
+  const std::vector<unsigned int> host_devices = sicm::get_devices(devs, Platform::cpu);
 
   registry.registerMemoryResource(
     util::make_uniqe<resource::SICMResourceFactory>("HOST", host_devices));
@@ -119,7 +119,7 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #if defined(UMPIRE_ENABLE_SICM)
-  const std::set <unsigned int> cuda_devices = sicm::get_devices(devs, Platform::cuda);
+  const std::vector<unsigned int> cuda_devices = sicm::get_devices(devs, Platform::cuda);
 
   registry.registerMemoryResource(
 <<<<<<< HEAD
