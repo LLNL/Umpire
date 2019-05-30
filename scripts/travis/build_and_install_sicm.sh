@@ -3,7 +3,7 @@
 set -e
 
 # install dependencies
-sudo apt-get install -y libhwloc-dev libiomp-dev libnuma-dev libpfm4 libpfm4-dev numactl
+sudo apt-get install -y libnuma-dev
 
 PREFIX="/tmp"
 
