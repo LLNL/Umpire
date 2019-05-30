@@ -12612,7 +12612,7 @@ class serializer
 
     template<typename NumberType, detail::enable_if_t<
                   std::is_same<NumberType, number_unsigned_t>::value, int> = 0>
-    bool is_negative_integer(NumberType x) { return false; }
+    bool is_negative_integer(NumberType ) { return false; }
 
     template<typename NumberType, detail::enable_if_t<
                   std::is_same<NumberType, number_integer_t>::value, int> = 0>
