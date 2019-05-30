@@ -15,6 +15,7 @@
 #ifndef UMPIRE_Replay_HPP
 #define UMPIRE_Replay_HPP
 
+#include <chrono>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -38,6 +39,7 @@ public:
   uint64_t replayUid() { return m_replayUid; }
 
   static std::string printReplayAllocator( void ) {
+    m_argument_number = 0;
     return std::string("");
   }
 
@@ -45,8 +47,13 @@ public:
   static std::string printReplayAllocator(T&& firstArg, Args&&... args) {
     std::stringstream ss;
 
-    if (typeid(firstArg) != typeid(umpire::strategy::DynamicPool::Coalesce_Heuristic))
-      ss << "," << firstArg;
+    if (typeid(firstArg) != typeid(umpire::strategy::DynamicPool::Coalesce_Heuristic)) {
+      m_argument_number++;
+      if ( m_argument_number != 1 )
+        ss << ", ";
+
+      ss << "\"" << firstArg << "\"";
+    }
 
     ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
@@ -57,6 +64,7 @@ private:
 
   bool replayEnabled;
   uint64_t m_replayUid;
+  static int m_argument_number;
   static Replay* s_Replay;
 };
 
@@ -66,10 +74,14 @@ private:
 {                                                                            \
   if (umpire::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
     std::ostringstream local_msg;                                            \
+    auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch();\
     local_msg                                                                \
-      << "REPLAY,"                                                           \
-      << umpire::Replay::getReplayLogger()->replayUid() << ","       \
+      << "{ \"kind\":\"replay\", \"uid\":"                                   \
+      << umpire::replay::Replay::getReplayLogger()->replayUid() << ", "      \
+      << "\"timestamp\":"                                                    \
+      << static_cast<long>(time.count()) << ", "                             \
       << msg                                                                 \
+      << " }"                                                                \
       << std::endl;                                                          \
     umpire::Replay::getReplayLogger()->logMessage(local_msg.str());  \
   }                                                                          \

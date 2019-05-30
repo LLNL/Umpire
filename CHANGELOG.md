@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - CI builds for Mac, Linux and Windows via Azure Pipelines
+- Replay has been changed to produce and interpret its output in JSON format.
 
 - Added HCC stage in Docker file
 
@@ -21,12 +22,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Mixed pool that uses faster fixed pools for smaller allocation sizes,
 and a dynamic pool for those that are larger.
 
+- Smoke tests for required third-party libraries
+
 ### Changed
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
-
-- Replay CI tests temporarily disabled.  This line to be removed once we
-  enable the tests again after replay works with Azure pipelines and MixedPool
 
 - Updated README to better describe Umpire capability
 
@@ -35,6 +35,10 @@ and a dynamic pool for those that are larger.
 ### Removed
 
 ### Fixed
+
+- Added YAML file for ReadTheDocs to read in that will cause it to use
+  Python 3.7 so that it quits producing build failures when it receives
+  a deprecation warning when attempting to run older versions of python.
 
 - Exclude third-party libraries from Doxygen to fix out-of-resources error on
   ReadTheDocs

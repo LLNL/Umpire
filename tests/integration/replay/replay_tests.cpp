@@ -23,6 +23,7 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
@@ -32,6 +33,97 @@ public:
   replayTest() : testAllocations(3), allocationSize(16)
   {
     auto& rm = umpire::ResourceManager::getInstance();
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_default"
+        , rm.getAllocator("HOST")
+        //, 512             // smallest fixed block size (Bytes)
+        //, 1*1024          // largest fixed block size 1KiB
+        //, 4 * 1024 * 1024 // max fixed pool size
+        //, 12.0            // size multiplier
+        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
+        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_default");
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_spec1"
+        , rm.getAllocator("HOST")
+        , 512             // smallest fixed block size (Bytes)
+        //, 1*1024          // largest fixed block size 1KiB
+        //, 4 * 1024 * 1024 // max fixed pool size
+        //, 12.0            // size multiplier
+        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
+        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_spec1");
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_spec2"
+        , rm.getAllocator("HOST")
+        , 512             // smallest fixed block size (Bytes)
+        , 1*1024          // largest fixed block size 1KiB
+        //, 4 * 1024 * 1024 // max fixed pool size
+        //, 12.0            // size multiplier
+        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
+        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_spec2");
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_spec3"
+        , rm.getAllocator("HOST")
+        , 512             // smallest fixed block size (Bytes)
+        , 1*1024          // largest fixed block size 1KiB
+        , 4 * 1024 * 1024 // max fixed pool size
+        //, 12.0            // size multiplier
+        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
+        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_spec3");
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_spec4"
+        , rm.getAllocator("HOST")
+        , 512             // smallest fixed block size (Bytes)
+        , 1*1024          // largest fixed block size 1KiB
+        , 4 * 1024 * 1024 // max fixed pool size
+        , 12.0            // size multiplier
+        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
+        //, 1 * 1024 * 1024   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_spec4");
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_spec5"
+        , rm.getAllocator("HOST")
+        , 512             // smallest fixed block size (Bytes)
+        , 1*1024          // largest fixed block size 1KiB
+        , 4 * 1024 * 1024 // max fixed pool size
+        , 12.0            // size multiplier
+        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
+        //, 1 * 1024 * 1024   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_spec5");
+
+    rm.makeAllocator<umpire::strategy::MixedPool>(
+          "host_mixedpool_spec6"
+        , rm.getAllocator("HOST")
+        , 512             // smallest fixed block size (Bytes)
+        , 1*1024          // largest fixed block size 1KiB
+        , 4 * 1024 * 1024 // max fixed pool size
+        , 12.0            // size multiplier
+        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
+        , 1 * 1024 * 1024   // dynamic pool min allocation size
+        //, heuristic75         // coallesce heuristic
+    );
+    allocatorNames.push_back("host_mixedpool_spec6");
 
     rm.makeAllocator<umpire::strategy::DynamicPool>(
         "host_simpool_defaults", rm.getAllocator("HOST"));

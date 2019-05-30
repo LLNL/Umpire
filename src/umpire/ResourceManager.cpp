@@ -122,9 +122,10 @@ ResourceManager::initialize()
       UMPIRE_VERSION_MINOR << "." <<
       UMPIRE_VERSION_PATCH);
 
-  UMPIRE_REPLAY( "Umpire v" << UMPIRE_VERSION_MAJOR 
-      << "." << UMPIRE_VERSION_MINOR
-      << "." << UMPIRE_VERSION_PATCH);
+  UMPIRE_REPLAY( "\"event\": \"version\", \"payload\": { \"major\":" << UMPIRE_VERSION_MAJOR 
+      << ", \"minor\":" << UMPIRE_VERSION_MINOR
+      << ", \"patch\":" << UMPIRE_VERSION_PATCH
+      << " }");
 
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
@@ -437,8 +438,8 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
-static std::shared_ptr<strategy::NumaPolicy> cast_as_numa_policy(Allocator& allocator) {
-  std::shared_ptr<strategy::NumaPolicy> numa_alloc;
+static strategy::NumaPolicy* cast_as_numa_policy(Allocator& allocator) {
+  strategy::NumaPolicy* numa_alloc;
 
   numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
     allocator.getAllocationStrategy());
