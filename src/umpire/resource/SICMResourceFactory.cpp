@@ -20,6 +20,13 @@
 
 #include "umpire/util/detect_vendor.hpp"
 
+#include <numa.h>
+
+extern "C"
+{
+#include <sicm_low.h>
+}
+
 namespace umpire {
 namespace resource {
 
@@ -40,8 +47,14 @@ SICMResourceFactory::create(const std::string& name, int id)
 {
   MemoryResourceTraits traits;
 
-  traits.unified = false;
+  traits.unified = true;
   traits.size = 0;
+
+  const sicm_device_list devs = sicm_init();
+  for(unsigned int i = 0; i < devs.count; i += 3) {
+    traits.size += numa_node_size(devs.devices[i].node, nullptr);
+  }
+  sicm_fini();
 
   traits.vendor = cpu_vendor_type();
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
