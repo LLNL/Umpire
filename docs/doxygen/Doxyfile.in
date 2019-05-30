@@ -1028,7 +1028,6 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = UMPIRE_ENABLE_CUDA \
                          UMPIRE_ENABLE_SLIC \
                          UMPIRE_ENABLE_LOGGING \
-                         UMPIRE_ENABLE_ASSERTS \
                          UMPIRE_ENABLE_STATISTICS \
                          DOXYGEN_SKIP_THIS
 
