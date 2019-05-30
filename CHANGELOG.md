@@ -48,6 +48,9 @@ and a dynamic pool for those that are larger.
 
 - Building on Windows
 
+- Fixed compilation errors from Intel compiler for newly included third-party
+  libraries for json and command line parsing (cxxopts).
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
