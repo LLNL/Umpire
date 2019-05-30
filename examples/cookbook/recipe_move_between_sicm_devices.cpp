@@ -32,7 +32,7 @@ int main(int, char**) {
   // Get the list of devices recognized by SICM
   sicm_device_list devs = sicm_init();
 
-  if (devs.count < 1) {
+  if ((devs.count / 3) < 1) { // each NUMA node creates 3 SICM devices
     UMPIRE_ERROR("SICM did not detect any devices");
   }
 
@@ -43,8 +43,8 @@ int main(int, char**) {
   // Create an allocation on that node
   void* src_ptr = sicm_src_alloc.allocate(alloc_size);
 
-  if (devs.count > 1) {
-    const unsigned int dst_dev = devs.count - 3;
+  if ((devs.count / 3) > 1) {                    // want at least 2 NUMA nodes
+    const unsigned int dst_dev = devs.count - 3; // destination page size must be the same, so pick device + offset 0 on the NUMA node
     const int dst_node = devs.devices[dst_dev].node;
 
     // Create an allocator on another SICM device

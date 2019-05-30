@@ -48,10 +48,10 @@ void SICMMoveOperation::transform(
   {
     sicm_arena sa = sicm_arena_lookup(src_ptr);
 
-    if (sicm_arena_set_device(sa, &m_devices.devices[dst_allocator->getDeviceIndex()]) != 0) {
-        const int err = errno;
+    const int rc = sicm_arena_set_device(sa, &m_devices.devices[dst_allocator->getDeviceIndex()]);
+    if (rc != 0) {
         sicm_fini();
-        UMPIRE_ERROR("SICMMoveOperation error: " << strerror(err));
+        UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
     }
 
     *dst_ptr = src_ptr;
