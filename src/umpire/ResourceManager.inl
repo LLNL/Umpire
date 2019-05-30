@@ -45,18 +45,22 @@ Allocator ResourceManager::makeAllocator(
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
 #if defined(_MSC_VER)
-    UMPIRE_REPLAY("makeAllocator_attempt,"
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << typeid(Strategy).name()
-        << "," << (introspection ? "true" : "false")
-        << "," << name
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
     );
 #else
-    UMPIRE_REPLAY("makeAllocator_attempt,"
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-        << "," << (introspection ? "true" : "false")
-        << "," << name
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
     );
 #endif
 
@@ -83,20 +87,24 @@ Allocator ResourceManager::makeAllocator(
     }
 
 #if defined(_MSC_VER)
-    UMPIRE_REPLAY("makeAllocator_success,"
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << typeid(Strategy).name()
-        << "," << (introspection ? "true" : "false")
-        << "," << name
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
-        << "," << allocator
+        << " ] }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
     );
 #else
-    UMPIRE_REPLAY("makeAllocator_success,"
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-        << "," << (introspection ? "true" : "false")
-        << "," << name
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
-        << "," << allocator
+        << " ] }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
     );
 #endif
 
