@@ -50,7 +50,7 @@ Allocator ResourceManager::makeAllocator(
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
     );
 #else
@@ -59,7 +59,7 @@ Allocator ResourceManager::makeAllocator(
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
     );
 #endif
@@ -92,7 +92,7 @@ Allocator ResourceManager::makeAllocator(
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
         << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
     );
@@ -102,7 +102,7 @@ Allocator ResourceManager::makeAllocator(
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
         << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
     );

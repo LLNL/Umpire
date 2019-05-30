@@ -77,7 +77,7 @@ private:
     auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch();\
     local_msg                                                                \
       << "{ \"kind\":\"replay\", \"uid\":"                                   \
-      << umpire::replay::Replay::getReplayLogger()->replayUid() << ", "      \
+      << umpire::Replay::getReplayLogger()->replayUid() << ", "      \
       << "\"timestamp\":"                                                    \
       << static_cast<long>(time.count()) << ", "                             \
       << msg                                                                 \
