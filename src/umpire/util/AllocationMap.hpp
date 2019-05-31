@@ -19,7 +19,7 @@
 // for the map, with an array-like object to hold multiple values with
 // the same key.
 
-#include <cstddef>
+#include <cstdint>
 #include <mutex>
 #include <iostream>
 #include <iterator>
@@ -111,7 +111,7 @@ class AllocationMap
   private:
     Judy* m_array;
     size_t m_size;
-    mutable JudySlot* m_last; // last found value in Judy
+    mutable JudySlot* m_last; // last found value in m_array
     mutable std::mutex m_mutex;
 };
 

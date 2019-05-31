@@ -278,6 +278,8 @@ TEST(Allocation, DeallocateDifferent)
   ASSERT_THROW(
     alloc_two.deallocate(data),
     umpire::util::Exception);
+
+  ASSERT_NO_THROW(alloc_one.deallocate(data));
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)

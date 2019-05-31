@@ -189,4 +189,6 @@ TEST_F(AllocationMapTest, Print)
   map.print([this](const umpire::util::AllocationRecord& r) {
     return r.ptr == data;
   });
+
+  delete[] extra_data;
 }

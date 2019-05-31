@@ -127,7 +127,7 @@
   m_mutex.unlock();
 
 #define UMPIRE_CHECK_ALLOCATOR(record, name) \
-  if (record.strategy != this) { \
+  if (record->strategy != this) { \
     UMPIRE_ERROR(ptr << " was not allocated by " << name); \
   } \
 

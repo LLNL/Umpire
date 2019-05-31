@@ -42,10 +42,11 @@ AllocationTracker::allocate(size_t bytes)
 void
 AllocationTracker::deallocate(void* ptr)
 {
-  auto record = deregisterAllocation(ptr);
-
+  // TODO Is there a way to only search the array once?
+  auto record = findAllocation(ptr);
   UMPIRE_CHECK_ALLOCATOR(record, m_allocator->getName());
 
+  deregisterAllocation(ptr);
   m_allocator->deallocate(ptr);
 }
 
@@ -79,7 +80,7 @@ AllocationTracker::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-strategy::AllocationStrategy* 
+strategy::AllocationStrategy*
 AllocationTracker::getAllocationStrategy()
 {
   return m_allocator;

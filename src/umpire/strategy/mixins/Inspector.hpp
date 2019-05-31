@@ -38,6 +38,8 @@ class Inspector
 
     util::AllocationRecord deregisterAllocation(void* ptr);
 
+    const util::AllocationRecord* findAllocation(void* ptr) const;
+
   protected:
     long m_current_size;
     long m_high_watermark;

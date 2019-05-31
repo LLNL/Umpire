@@ -51,6 +51,13 @@ Inspector::deregisterAllocation(void* ptr)
   return record;
 }
 
+const util::AllocationRecord*
+Inspector::findAllocation(void* ptr) const
+{
+  return ResourceManager::getInstance().findAllocationRecord(ptr);
+}
+
+
 } // end of namespace mixins
 } // end of namespace strategy
 } // end of namespace umpire
