@@ -87,7 +87,7 @@ FixedPool::newPool()
 }
 
 void*
-FixedPool::allocInPool(Pool& p) noexcept
+FixedPool::allocInPool(Pool& p)
 {
   if (!p.num_avail) return nullptr;
 
@@ -105,6 +105,9 @@ FixedPool::allocInPool(Pool& p) noexcept
     }
   }
 
+  // The method should either return nullptr at the top, or within the
+  // loop. This should never be reached.
+  UMPIRE_ERROR("A logic error occured");
   return nullptr;
 }
 
