@@ -50,3 +50,15 @@ classes that Umpire provides.
    tutorial/c/allocators.rst
    tutorial/c/resources.rst
    tutorial/c/pools.rst
+
+Finally, we have a tutorial for Umpire's FORTRAN API. These examples will be
+compiled when configuring with ``-DENABLE_FORTRAN=On``. The FORTRAN tutorial
+assumes an understanding of FORTRAN. Familiarity with the FORTRAN's ISO C
+bindings can be useful for understanding why the interface looks the way it
+does.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: FORTRAN API Tutorial
+
+   tutorial/fortran/allocators.rst

@@ -18,7 +18,11 @@
 #include "umpire/ResourceManager.hpp"
 
 #include <sstream>
+
+#if !defined(_MSC_VER)
 #include <cxxabi.h>
+#endif
+
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
@@ -33,26 +37,39 @@ Allocator ResourceManager::makeAllocator(
     const std::string& name, 
     Args&&... args)
 {
-  std::shared_ptr<strategy::AllocationStrategy> allocator;
+  strategy::AllocationStrategy* allocator;
 
   try {
     UMPIRE_LOCK;
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
-    UMPIRE_REPLAY("makeAllocator,"
-        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-        << "," << (introspection ? "true" : "false")
-        << "," << name
+#if defined(_MSC_VER)
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+        << typeid(Strategy).name()
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
     );
+#else
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
+    );
+#endif
 
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
     }
 
     if (!introspection) {
-      allocator = std::make_shared<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+      allocator = new Strategy(name, getNextId(), std::forward<Args>(args)...);
 
       m_allocators_by_name[name] = allocator;
       m_allocators_by_id[allocator->getId()] = allocator;
@@ -60,16 +77,36 @@ Allocator ResourceManager::makeAllocator(
       std::stringstream base_name;
       base_name << name << "_base";
 
-      auto base_allocator = std::make_shared<Strategy>(base_name.str(), getNextId(), std::forward<Args>(args)...);
+      auto base_allocator = new Strategy(base_name.str(), getNextId(), std::forward<Args>(args)...);
 
-      allocator = std::make_shared<umpire::strategy::AllocationTracker>(name, getNextId(), Allocator(base_allocator));
+      allocator = new umpire::strategy::AllocationTracker(name, getNextId(), Allocator(base_allocator));
 
       m_allocators_by_name[name] = allocator;
       m_allocators_by_id[allocator->getId()] = allocator;
 
     }
 
-    UMPIRE_REPLAY_CONT("" << allocator << "\n");
+#if defined(_MSC_VER)
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+        << typeid(Strategy).name()
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+    );
+#else
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+        << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+        << ", \"allocator_name\":\"" << name << "\""
+        << ", \"args\": [ "
+        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
+        << " ] }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+    );
+#endif
 
     UMPIRE_UNLOCK;
   } catch (...) {

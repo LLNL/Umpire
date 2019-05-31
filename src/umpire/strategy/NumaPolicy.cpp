@@ -51,7 +51,7 @@ NumaPolicy::NumaPolicy(
     // distinguish these at run-time.
 #if defined(UMPIRE_ENABLE_CUDA)
     m_platform = Platform::cuda;
-#elif defined(UPIRE_ENABLE_ROCM)
+#elif defined(UMPIRE_ENABLE_HCC)
     m_platform = Platform::rocm;
 #else
     UMPIRE_ERROR("Could not determine device platform.");

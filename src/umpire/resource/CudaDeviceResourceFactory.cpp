@@ -33,7 +33,7 @@ CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   }
 }
 
-std::shared_ptr<MemoryResource>
+resource::MemoryResource*
 CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -52,7 +52,7 @@ CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id, traits);
+  return new resource::DefaultMemoryResource<alloc::CudaMallocAllocator>(Platform::cuda, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

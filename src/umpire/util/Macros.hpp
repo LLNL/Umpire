@@ -25,13 +25,9 @@
 #include <sstream>
 #include <iostream>
 #include <mutex>
-
-#ifdef UMPIRE_ENABLE_ASSERTS
 #include <cassert>
+
 #define UMPIRE_ASSERT(condition) assert(condition)
-#else
-#define UMPIRE_ASSERT(condition) ((void)0)
-#endif // UMPIRE_ENABLE_ASSERTS
 
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
@@ -125,5 +121,10 @@
 
 #define UMPIRE_UNLOCK \
   m_mutex->unlock();
+
+#define UMPIRE_CHECK_ALLOCATOR(record, name) \
+  if (record.m_strategy != this) { \
+    UMPIRE_ERROR(ptr << " was not allocated by " << name); \
+  } \
 
 #endif // UMPIRE_Macros_HPP

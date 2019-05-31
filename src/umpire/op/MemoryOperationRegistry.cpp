@@ -38,7 +38,7 @@
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
 #include "umpire/op/RocmCopyOperation.hpp"
 #include "umpire/op/RocmMemsetOperation.hpp"
 #endif
@@ -146,7 +146,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
 #endif
 
-#if defined(UMPIRE_ENABLE_ROCM)
+#if defined(UMPIRE_ENABLE_HCC)
   registerOperation(
       "COPY",
       std::make_pair(Platform::rocm, Platform::cpu),
@@ -195,8 +195,8 @@ MemoryOperationRegistry::registerOperation(
 std::shared_ptr<umpire::op::MemoryOperation>
 MemoryOperationRegistry::find(
     const std::string& name,
-    std::shared_ptr<strategy::AllocationStrategy>& src_allocator,
-    std::shared_ptr<strategy::AllocationStrategy>& dst_allocator)
+    strategy::AllocationStrategy* src_allocator,
+    strategy::AllocationStrategy* dst_allocator)
 {
   auto platforms = std::make_pair(
       src_allocator->getPlatform(),

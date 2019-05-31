@@ -19,13 +19,12 @@ Here is a summary of the configuration options, their default value, and meaning
       ===========================  ======== ===============================================================================
       ``ENABLE_CUDA``              On       Enable CUDA support
       ``ENABLE_NUMA``              Off      Enable NUMA support
-      ``ENABLE_ROCM``              Off      Enable ROCm support
+      ``ENABLE_HCC``               Off      Enable HCC support
       ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
       ``ENABLE_SLIC``              Off      Enable SLIC logging
-      ``ENABLE_ASSERTS``           On       Enable UMPIRE_ASSERT() within Umpire
       ``ENABLE_TOOLS``             On       Enable tools like replay
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
       ``ENABLE_C``             Off      Build the C API
@@ -36,16 +35,16 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_CUDA``
   This option enables support for NVIDIA GPUs. If Umpire is built without CUDA
-  or ROCM support, then only the ``HOST`` allocator is available for use.
+  or HCC support, then only the ``HOST`` allocator is available for use.
 
 * ``ENABLE_NUMA``
   This option enables support for NUMA. The
   :class:`umpire::strategy::NumaPolicy` is available when built with this
   option, which may be used to locate the allocation to a specific node.
 
-* ``ENABLE_ROCM``
+* ``ENABLE_HCC``
   This option enables support for AMD GPUs using the ROCm stack and HCC
-  programming model. If Umpire is built without CUDA or ROCM support, then only
+  programming model. If Umpire is built without CUDA or HCC support, then only
   the ``HOST`` allocator is available for use.
 
 * ``ENABLE_STATISTICS``
@@ -64,9 +63,6 @@ These arguments are explained in more detail below:
 * ``ENABLE_SLIC``
   This option enables usage of logging services provided by SLIC.
 
-* ``ENABLE_ASSERTS``
-  Enable assert() within Umpire
-
 * ``ENABLE_TOOLS``
   Enable development tools for Umpire (replay, etc.)
 
@@ -78,4 +74,4 @@ These arguments are explained in more detail below:
   ResourceManager through a C interface.
 
 * ``ENABLE_FORTRAN``
-  Build the Fortran API. 
+  Build the Fortran API.

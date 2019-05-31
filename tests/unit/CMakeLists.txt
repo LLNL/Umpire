@@ -24,7 +24,18 @@ blt_add_test(
   NAME resource_manager_tests
   COMMAND resource_manager_tests)
 
+blt_add_executable(
+  NAME version_tests
+  SOURCES version_tests.cpp
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${unit_dir})
+
+blt_add_test(
+  NAME version_tests
+  COMMAND version_tests)
+
 add_subdirectory(alloc)
 add_subdirectory(op)
 add_subdirectory(resource)
 add_subdirectory(util)
+add_subdirectory(strategy)

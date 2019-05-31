@@ -66,7 +66,7 @@ AllocationAdvisor::AllocationAdvisor(
 void* AllocationAdvisor::allocate(size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
-  auto alloc_record = new util::AllocationRecord{ptr, bytes, this->shared_from_this()};
+  auto alloc_record = new util::AllocationRecord{ptr, bytes, this};
 
   m_advice_operation->apply(
       ptr,

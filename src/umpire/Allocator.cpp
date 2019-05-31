@@ -25,7 +25,7 @@
 
 namespace umpire {
 
-Allocator::Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept:
+Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept:
   m_allocator(allocator)
 {
 }
@@ -37,9 +37,11 @@ Allocator::allocate(size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY( "allocate," << bytes << "," << m_allocator);
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }");
+
   ret = m_allocator->allocate(bytes);
-  UMPIRE_REPLAY_CONT( ret << "\n");
+
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
   return ret;
@@ -48,7 +50,7 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY( "deallocate," << ptr << "," << m_allocator << "\n");
+  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -65,7 +67,7 @@ Allocator::deallocate(void* ptr)
 void
 Allocator::release()
 {
-  UMPIRE_REPLAY("release," <<  m_allocator << "\n");
+  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \"" <<  m_allocator << "\" }");
 
   UMPIRE_LOG(Debug, "");
 
@@ -109,7 +111,7 @@ Allocator::getId() const noexcept
   return m_allocator->getId();
 }
 
-std::shared_ptr<strategy::AllocationStrategy>
+strategy::AllocationStrategy*
 Allocator::getAllocationStrategy() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
@@ -120,6 +122,11 @@ Platform
 Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+std::ostream& operator<<(std::ostream& os, const Allocator& allocator) {
+    os << *allocator.m_allocator;
+    return os;
 }
 
 } // end of namespace umpire

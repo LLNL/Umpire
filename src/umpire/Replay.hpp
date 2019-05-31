@@ -15,6 +15,7 @@
 #ifndef UMPIRE_Replay_HPP
 #define UMPIRE_Replay_HPP
 
+#include <chrono>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -36,8 +37,10 @@ public:
   void logMessage( const std::string& message );
   static Replay* getReplayLogger();
   bool replayLoggingEnabled();
+  uint64_t replayUid() { return m_replayUid; }
 
   static std::string printReplayAllocator( void ) {
+    m_argument_number = 0;
     return std::string("");
   }
 
@@ -45,8 +48,13 @@ public:
   static std::string printReplayAllocator(T&& firstArg, Args&&... args) {
     std::stringstream ss;
 
-    if (typeid(firstArg) != typeid(umpire::strategy::DynamicPool::Coalesce_Heuristic))
-      ss << "," << firstArg;
+    if (typeid(firstArg) != typeid(umpire::strategy::DynamicPool::Coalesce_Heuristic)) {
+      m_argument_number++;
+      if ( m_argument_number != 1 )
+        ss << ", ";
+
+      ss << "\"" << firstArg << "\"";
+    }
 
     ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();
@@ -56,28 +64,28 @@ private:
   ~Replay();
 
   bool replayEnabled;
+  uint64_t m_replayUid;
+  static int m_argument_number;
   static Replay* s_Replay;
 };
 
 } /* namespace replay */
 } /* namespace umpire */
 
-#define UMPIRE_REPLAY( msg )                                             \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "REPLAY," << msg;                                      \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
+#define UMPIRE_REPLAY( msg )                                                 \
+{                                                                            \
+  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
+    std::ostringstream local_msg;                                            \
+    auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch();\
+    local_msg                                                                \
+      << "{ \"kind\":\"replay\", \"uid\":"                                   \
+      << umpire::replay::Replay::getReplayLogger()->replayUid() << ", "      \
+      << "\"timestamp\":"                                                    \
+      << static_cast<long>(time.count()) << ", "                             \
+      << msg                                                                 \
+      << " }"                                                                \
+      << std::endl;                                                          \
+    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());  \
+  }                                                                          \
 }
-
-#define UMPIRE_REPLAY_CONT( msg )                                        \
-{                                                                        \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) { \
-    std::ostringstream local_msg;                                        \
-    local_msg  << "," << msg;                                            \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());\
-  }                                                                      \
-}
-
 #endif /* UMPIRE_Replay_HPP */

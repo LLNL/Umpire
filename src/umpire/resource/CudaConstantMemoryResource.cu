@@ -52,7 +52,7 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
   }
 
   ResourceManager::getInstance().registerAllocation(
-      ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
+      ret, new util::AllocationRecord{ret, bytes, this});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
@@ -67,8 +67,12 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
+  auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
   m_current_size -= record->m_size;
+
+  if (record->m_strategy != this) {
+    UMPIRE_ERROR(ptr << " was not allocated by " << getName());
+  }
 
   if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
       == static_cast<char*>(ptr)) {

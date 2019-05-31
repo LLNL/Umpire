@@ -32,7 +32,7 @@ CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& n
   }
 }
 
-std::shared_ptr<MemoryResource>
+resource::MemoryResource*
 CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -45,7 +45,7 @@ CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(n
 
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return std::make_shared<resource::CudaConstantMemoryResource >("DEVICE_CONST", id, traits);
+  return new resource::CudaConstantMemoryResource("DEVICE_CONST", id, traits);
 }
 
 } // end of namespace resource

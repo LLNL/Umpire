@@ -52,10 +52,41 @@ if (ENABLE_CUDA)
     SOURCES recipe_move_to_managed.cpp
     DEPENDS_ON umpire
     OUTPUT_DIR ${cookbook_dir})
+
+  if (ENABLE_FORTRAN)
+    blt_add_executable(
+      NAME recipe_pinned_pool
+      SOURCES recipe_pinned_pool.F
+      DEPENDS_ON umpire
+      OUTPUT_DIR ${cookbook_dir})
+
+    set_source_files_properties(
+      recipe_pinned_pool.F
+      PROPERTIES
+      Fortran_FORMAT FREE)
+  endif ()
 endif ()
 
 blt_add_executable(
   NAME recipe_dynamic_pool_heuristic
   SOURCES recipe_dynamic_pool_heuristic.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${cookbook_dir})
+
+blt_add_executable(
+  NAME recipe_coalesce_pool
+  SOURCES recipe_coalesce_pool.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${cookbook_dir})
+
+blt_add_executable(
+  NAME recipe_plot_allocations
+  SOURCES recipe_plot_allocations.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${cookbook_dir})
+
+blt_add_executable(
+  NAME recipe_mixed_pool
+  SOURCES recipe_mixed_pool.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${cookbook_dir})

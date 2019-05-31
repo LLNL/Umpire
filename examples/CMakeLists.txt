@@ -24,6 +24,12 @@ blt_add_executable(
   DEPENDS_ON umpire
   OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
 
+blt_add_executable(
+  NAME allocator
+  SOURCES allocator.cxx
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${UMPIRE_EXAMPLES_OUTPUT_DIR})
+
 if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c

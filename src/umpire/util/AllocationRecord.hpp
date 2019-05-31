@@ -31,7 +31,7 @@ struct AllocationRecord
 {
   void* m_ptr;
   size_t m_size;
-  std::shared_ptr<strategy::AllocationStrategy> m_strategy;
+  strategy::AllocationStrategy* m_strategy;
 };
 
 } // end of namespace util

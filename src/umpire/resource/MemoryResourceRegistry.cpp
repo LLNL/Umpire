@@ -38,18 +38,22 @@ MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
 }
 
 void
-MemoryResourceRegistry::registerMemoryResource(std::shared_ptr<MemoryResourceFactory>&& factory)
+MemoryResourceRegistry::registerMemoryResource(MemoryResourceFactory* factory)
 {
   m_allocator_factories.push_front(factory);
 }
 
-std::shared_ptr<umpire::resource::MemoryResource>
+resource::MemoryResource*
 MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
   for (auto allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
       auto a = allocator_factory->create(name, id);
-      UMPIRE_REPLAY("makeMemoryResource," << name << "," << a << "\n");
+      UMPIRE_REPLAY(
+           "\"event\": \"makeMemoryResource\""
+        << ", \"payload\": { \"name\": \"" << name << "\" }"
+        << ", \"result\": \"" << a << "\""
+      );
       return a;
     }
   }

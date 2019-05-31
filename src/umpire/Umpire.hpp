@@ -15,7 +15,15 @@
 #ifndef UMPIRE_Umpire_HPP
 #define UMPIRE_Umpire_HPP
 
+#include "umpire/config.hpp"
+
 #include "umpire/ResourceManager.hpp"
+
+#include "umpire/Allocator.hpp"
+
+#include "umpire/util/AllocationRecord.hpp"
+
+#include <iostream>
 
 namespace umpire {
 
@@ -46,6 +54,40 @@ void free(void* ptr)
 {
   return ResourceManager::getInstance().deallocate(ptr);
 }
+
+inline
+int get_major_version()
+{
+  return UMPIRE_VERSION_MAJOR;
+}
+
+inline
+int get_minor_version()
+{
+  return UMPIRE_VERSION_MINOR;
+}
+
+inline
+int get_patch_version()
+{
+  return UMPIRE_VERSION_PATCH;
+}
+
+/*!
+ * \brief Print the allocations from a specific allocator in a
+ * human-readable format.
+ *
+ * \param allocator source Allocator.
+ * \param os output stream
+ */
+void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
+
+/*!
+ * \brief Returns vector of AllocationRecords created by the allocator.
+ *
+ * \param allocator source Allocator.
+ */
+std::vector<const util::AllocationRecord*> get_allocator_records(Allocator allocator);
 
 } // end of namespace umpire
 
