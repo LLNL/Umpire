@@ -12,8 +12,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_MemoryMap_HPP
-#define UMPIRE_MemoryMap_HPP
+#ifndef UMPIRE_AllocationMap_HPP
+#define UMPIRE_AllocationMap_HPP
 
 // AllocationMap is a multimap of addresses to addresses. It uses Judy
 // for the map, with an array-like object to hold multiple values with
@@ -112,4 +112,4 @@ private:
 } // end of namespace util
 } // end of namespace umpire
 
-#endif // UMPIRE_MemoryMap_HPP
+#endif // UMPIRE_AllocationMap_HPP
