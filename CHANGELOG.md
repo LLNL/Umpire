@@ -36,7 +36,9 @@ and a dynamic pool for those that are larger.
 
 - Faster `util::AllocationMap`
 
-- `ResourceManager` registration pass `AllocationRecord` by value.
+- `ResourceManager` de/registration pass `AllocationRecord` by value.
+
+- `AllocationRecord` struct members are no longer prefixed by `m_`
 
 ### Removed
 
