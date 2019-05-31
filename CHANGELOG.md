@@ -36,6 +36,8 @@ and a dynamic pool for those that are larger.
 
 - Faster `util::AllocationMap`
 
+- `ResourceManager` registration pass `AllocationRecord` by value.
+
 ### Removed
 
 ### Fixed
