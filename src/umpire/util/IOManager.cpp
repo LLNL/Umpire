@@ -96,13 +96,14 @@ IOManager::initialize()
     if (rank == 0) {
       struct stat info;
 
-      stat( s_root_io_dir.c_str(), &info );
-      if(!(info.st_mode & S_IFDIR))
+
+      if ( stat( s_root_io_dir.c_str(), &info ) &&
+           !(S_ISDIR(info.st_mode)))
       {
 #if defined(_MSC_VER)
         mkdir(s_root_io_dir.c_str());
 #else
-        mkdir(s_root_io_dir.c_str(), 0700);
+        mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRWXG);
 #endif
       }
     }
