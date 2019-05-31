@@ -34,15 +34,11 @@ void HostReallocateOperation::transform(
   auto allocator = dst_allocation->m_strategy;
 
   ResourceManager::getInstance().deregisterAllocation(src_ptr);
-
   *dst_ptr = ::realloc(src_ptr, length);
 
-  if (*dst_ptr == src_ptr) {
-    dst_allocation->m_size = length;
-  } else {
-    ResourceManager::getInstance().deregisterAllocation(src_ptr);
-    umpire::strategy::mixins::Inspector().registerAllocation(*dst_ptr, length, allocator);
-  }
+  ResourceManager::getInstance().registerAllocation(
+     *dst_ptr,
+     {*dst_ptr, length, allocator});
 
   UMPIRE_RECORD_STATISTIC(
       "HostReallocate",
@@ -50,7 +46,6 @@ void HostReallocateOperation::transform(
       "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "reallocate");
-
 }
 
 } // end of namespace op

@@ -293,8 +293,8 @@ ResourceManager::hasAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") with " << this );
-
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.m_size
+             << ", strategy=" << record.m_strategy << ") with " << this);
   m_allocations.insert(ptr, record);
 }
 

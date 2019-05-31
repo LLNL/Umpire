@@ -22,6 +22,7 @@
 #include <cstddef>
 #include <mutex>
 #include <iostream>
+#include <iterator>
 
 #include "umpire/util/AllocationRecord.hpp"
 
@@ -31,15 +32,47 @@
 namespace umpire {
 namespace util {
 
-struct AllocationMap
+class AllocationMap;
+class RecordList;
+class RecordListConstIterator;
+
+// Note that this iterator is
+class AllocationMapConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
 {
 public:
+  AllocationMapConstIterator(const AllocationMap* map, bool end);
+  AllocationMapConstIterator(const AllocationMapConstIterator& other) = default;
+  ~AllocationMapConstIterator();
+
+  AllocationRecord& operator*() const;
+  const AllocationRecord* operator->() const;
+  AllocationMapConstIterator& operator++();
+  AllocationMapConstIterator operator++(int);
+
+  bool operator==(const AllocationMapConstIterator& other);
+  bool operator!=(const AllocationMapConstIterator& other);
+private:
+  Judy* m_array;
+  JudySlot* m_last;
+  uintptr_t m_ptr;
+  RecordList* m_list;
+  RecordListConstIterator* m_iter;
+};
+
+class AllocationMap
+{
+public:
+  // Friend the iterator class
+  friend class RecordListConstIterator;
+  friend class AllocationMapConstIterator;
+
   AllocationMap();
   ~AllocationMap();
 
   // Would require a deep copy of the Judy data
   AllocationMap(const AllocationMap&) = delete;
 
+  // Insert a new record -- copies record
   void insert(void* ptr, AllocationRecord record);
 
   // Find a record -- throws an exception of the record is not found
@@ -57,18 +90,24 @@ public:
   // Clear all records from the map
   void clear();
 
+  // Number of entries
+  size_t size() const;
+
   // Print methods -- either matching a predicate or all records
   void print(const std::function<bool (const AllocationRecord&)>&& predicate,
              std::ostream& os = std::cout) const;
 
   void printAll(std::ostream& os = std::cout) const;
 
+  // Const iterator
+  AllocationMapConstIterator begin() const;
+  AllocationMapConstIterator end() const;
+
 private:
   Judy* m_array;
   mutable JudySlot* m_last; // last found value in Judy
   unsigned int m_max_levels, m_depth;
-
-  // TODO remove pointer
+  size_t m_size;
   std::mutex* m_mutex;
 };
 

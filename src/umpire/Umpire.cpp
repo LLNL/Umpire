@@ -32,18 +32,15 @@ void print_allocator_records(Allocator allocator, std::ostream& os) {
   }, os);
 }
 
-std::vector<const util::AllocationRecord*> get_allocator_records(Allocator UMPIRE_UNUSED_ARG(allocator)) {
-  // auto& rm = umpire::ResourceManager::getInstance();
+std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator) {
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto strategy = allocator.getAllocationStrategy();
 
-  // auto strategy = allocator.getAllocationStrategy();
-
-  // TODO TBD
-
-  std::vector<const util::AllocationRecord*> recs;
-  // std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
-  //              std::back_inserter(recs), [strategy] (const util::AllocationRecord& rec) {
-  //                return rec.m_strategy == strategy;
-  //              });
+  std::vector<util::AllocationRecord> recs;
+  std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
+               std::back_inserter(recs), [strategy] (const util::AllocationRecord& rec) {
+                 return rec.m_strategy == strategy;
+               });
 
   return recs;
 }
