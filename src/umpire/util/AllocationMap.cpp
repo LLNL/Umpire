@@ -152,7 +152,7 @@ RecordListConstIterator::RecordListConstIterator(const RecordList* list,
 
 AllocationRecord& RecordListConstIterator::operator*() const
 {
-  // WARNING: Don't call this if at end() -- dereferences a nullptr
+  if (!m_curr) UMPIRE_ERROR("Cannot dereference nullptr");
   return m_curr->rec;
 }
 
