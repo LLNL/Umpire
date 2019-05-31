@@ -212,23 +212,24 @@ AllocationMap::~AllocationMap()
 
 void AllocationMap::insert(void* ptr, AllocationRecord record)
 {
-  try {
-    UMPIRE_LOCK;
-    UMPIRE_LOG(Debug, "Inserting " << ptr);
+  UMPIRE_LOCK;
+  UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-    // Find the key
-    m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
-    UMPIRE_ASSERT(m_last);
+  // Find the key
+  m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
+  UMPIRE_ASSERT(m_last);
 
-    auto plist = reinterpret_cast<RecordList**>(m_last);
-    if (!*plist) (*plist) = new (list_pool.allocate()) RecordList{record};
-    else (*plist)->push_back(record);
+  auto plist = reinterpret_cast<RecordList**>(m_last);
 
-    UMPIRE_UNLOCK;
-  } catch (...) {
-    UMPIRE_UNLOCK;
-    throw;
+  if (!*plist) {
+    // if there is no list there, create one and emplace the record
+    (*plist) = new (list_pool.allocate()) RecordList{record};
   }
+  else {
+    // else, push onto that list
+    (*plist)->push_back(record);
+  }
+  UMPIRE_UNLOCK;
 
   ++m_size;
 }
@@ -255,46 +256,40 @@ AllocationRecord* AllocationMap::findRecord(void* ptr) const
 {
   AllocationRecord* alloc_record = nullptr;
 
-  try {
-    UMPIRE_LOCK;
-    uintptr_t parent_ptr;
+  UMPIRE_LOCK;
+  uintptr_t parent_ptr;
 
-    // Seek and find key (key = parent_ptr)
-    m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
+  // Seek and find key (key = parent_ptr)
+  m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
+  judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
+
+  // The record list at that ptr
+  auto list = m_last ? reinterpret_cast<RecordList*>(*m_last) : nullptr;
+
+  // If the ptrs do not match, or the key does not exist, get the previous entry
+  if (parent_ptr != reinterpret_cast<uintptr_t>(ptr) || !list)
+  {
+    m_last = judy_prv(m_array);
+    // Find key associated to this one
     judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
-
-    // The record list at that ptr
-    auto list = m_last ? reinterpret_cast<RecordList*>(*m_last) : nullptr;
-
-    // If the ptrs do not match, or the key does not exist, get the previous entry
-    if (parent_ptr != reinterpret_cast<uintptr_t>(ptr) || !list)
-    {
-      m_last = judy_prv(m_array);
-      // Find key associated to this one
-      judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
-    }
-
-    // Update record list
-    list = m_last ? reinterpret_cast<RecordList*>(*m_last) : nullptr;
-
-    // If a list was found, return its tail
-    if (list) {
-      alloc_record = list->back();
-
-      if (alloc_record && ((parent_ptr + alloc_record->m_size) > reinterpret_cast<uintptr_t>(ptr))) {
-         UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
-                    << " with size " << alloc_record->m_size);
-      }
-      else {
-         alloc_record = nullptr;
-      }
-    }
-    UMPIRE_UNLOCK;
   }
-  catch (...){
-    UMPIRE_UNLOCK;
-    throw;
+
+  // Update record list
+  list = m_last ? reinterpret_cast<RecordList*>(*m_last) : nullptr;
+
+  // If a list was found, return its tail
+  if (list) {
+    alloc_record = list->back();
+
+    if (alloc_record && ((parent_ptr + alloc_record->m_size) > reinterpret_cast<uintptr_t>(ptr))) {
+      UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
+                 << " with size " << alloc_record->m_size);
+    }
+    else {
+      alloc_record = nullptr;
+    }
   }
+  UMPIRE_UNLOCK;
 
   return alloc_record;
 }

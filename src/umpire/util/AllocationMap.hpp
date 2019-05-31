@@ -26,7 +26,6 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
-// TODO Forward declare Judy and JudySlot
 #include "umpire/tpl/judy/judy.h"
 
 namespace umpire {
@@ -36,7 +35,6 @@ class AllocationMap;
 class RecordList;
 class RecordListConstIterator;
 
-// Note that this iterator is
 class AllocationMapConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
 {
 public:
@@ -73,13 +71,13 @@ public:
   AllocationMap(const AllocationMap&) = delete;
 
   // Insert a new record -- copies record
-  void insert(void* ptr, AllocationRecord record);
+  void insert(void* ptr, AllocationRecord record) noexcept;
 
   // Find a record -- throws an exception of the record is not found
   AllocationRecord* find(void* ptr) const;
 
   // This version of find never throws an exception
-  AllocationRecord* findRecord(void* ptr) const;
+  AllocationRecord* findRecord(void* ptr) const noexcept;
 
   // Only allows erasing the last inserted entry for key = ptr
   AllocationRecord remove(void* ptr);
