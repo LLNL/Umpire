@@ -26,7 +26,7 @@ namespace util {
 
 bool operator==(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
 {
-  return left.m_ptr == right.m_ptr && left.m_size == right.m_size && left.m_strategy == right.m_strategy;
+  return left.ptr == right.ptr && left.size == right.size && left.strategy == right.strategy;
 }
 
 bool operator!=(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
@@ -187,6 +187,6 @@ TEST_F(AllocationMapTest, Print)
   map.printAll();
 
   map.print([this](const umpire::util::AllocationRecord& r) {
-    return r.m_ptr == data;
+    return r.ptr == data;
   });
 }

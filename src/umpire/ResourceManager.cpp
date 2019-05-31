@@ -293,8 +293,8 @@ ResourceManager::hasAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.m_size
-             << ", strategy=" << record.m_strategy << ") with " << this);
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.size
+             << ", strategy=" << record.strategy << ") with " << this);
   m_allocations.insert(ptr, record);
 }
 
@@ -309,7 +309,7 @@ ResourceManager::findAllocationRecord(void* ptr) const
 {
   auto alloc_record = m_allocations.find(ptr);
 
-  if (!alloc_record->m_strategy) {
+  if (!alloc_record->strategy) {
     UMPIRE_ERROR("Cannot find allocator for " << ptr);
   }
 
@@ -331,12 +331,12 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
   auto src_alloc_record = m_allocations.find(src_ptr);
-  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->m_ptr);
-  std::size_t src_size = src_alloc_record->m_size - src_offset;
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
 
   auto dst_alloc_record = m_allocations.find(dst_ptr);
-  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->m_ptr);
-  std::size_t dst_size = dst_alloc_record->m_size - dst_offset;
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
 
   if (size == 0) {
     size = src_size;
@@ -347,8 +347,8 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   }
 
   auto op = op_registry.find("COPY",
-      src_alloc_record->m_strategy,
-      dst_alloc_record->m_strategy);
+      src_alloc_record->strategy,
+      dst_alloc_record->strategy);
 
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
@@ -361,8 +361,8 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
 
   auto alloc_record = m_allocations.find(ptr);
 
-  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->m_ptr);
-  std::size_t size = alloc_record->m_size - offset;
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
 
   if (length == 0) {
     length = size;
@@ -373,8 +373,8 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
   }
 
   auto op = op_registry.find("MEMSET",
-      alloc_record->m_strategy,
-      alloc_record->m_strategy);
+      alloc_record->strategy,
+      alloc_record->strategy);
 
   op->apply(ptr, alloc_record, value, length);
 }
@@ -393,13 +393,13 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
 
     auto alloc_record = m_allocations.find(src_ptr);
 
-    if (src_ptr != alloc_record->m_ptr) {
-      UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->m_ptr);
+    if (src_ptr != alloc_record->ptr) {
+      UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->ptr);
     }
 
     auto op = op_registry.find("REALLOCATE",
-        alloc_record->m_strategy,
-        alloc_record->m_strategy);
+        alloc_record->strategy,
+        alloc_record->strategy);
 
 
     op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
@@ -420,7 +420,7 @@ ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
   } else {
     auto alloc_record = m_allocations.find(src_ptr);
 
-    if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
+    if (alloc_record->strategy == allocator.getAllocationStrategy()) {
       dst_ptr = reallocate(src_ptr, size);
     } else {
       UMPIRE_ERROR("Cannot reallocate " << src_ptr << " with Allocator " << allocator.getName());
@@ -459,7 +459,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
   auto alloc_record = m_allocations.find(ptr);
 
   // short-circuit if ptr was allocated by 'allocator'
-  if (alloc_record->m_strategy == allocator.getAllocationStrategy()) {
+  if (alloc_record->strategy == allocator.getAllocationStrategy()) {
     return ptr;
   }
 
@@ -499,11 +499,11 @@ ResourceManager::move(void* ptr, Allocator allocator)
   }
 #endif
 
-  if (ptr != alloc_record->m_ptr) {
-    UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->m_ptr);
+  if (ptr != alloc_record->ptr) {
+    UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->ptr);
   }
 
-  size_t size = alloc_record->m_size;
+  size_t size = alloc_record->size;
   void* dst_ptr = allocator.allocate(size);
 
   copy(dst_ptr, ptr);
@@ -516,7 +516,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
 void ResourceManager::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  auto allocator = findAllocatorForPointer(ptr);;
+  auto allocator = findAllocatorForPointer(ptr);
 
   allocator->deallocate(ptr);
 }
@@ -525,8 +525,8 @@ size_t
 ResourceManager::getSize(void* ptr) const
 {
   auto record = m_allocations.find(ptr);
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->m_size);
-  return record->m_size;
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << record->size);
+  return record->size;
 }
 
 strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
@@ -545,12 +545,12 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr
 {
   auto allocation_record = m_allocations.find(ptr);
 
-  if (! allocation_record->m_strategy) {
+  if (! allocation_record->strategy) {
     UMPIRE_ERROR("Cannot find allocator " << ptr);
   }
 
-  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->m_strategy);
-  return allocation_record->m_strategy;
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);
+  return allocation_record->strategy;
 }
 
 std::vector<std::string>

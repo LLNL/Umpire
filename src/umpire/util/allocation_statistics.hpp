@@ -27,7 +27,7 @@ namespace util {
  *
  * Fragmentation = 1 - (largest free block) / (total free space)
  */
-float relative_fragmentation(std::vector<const util::AllocationRecord*>& recs);
+float relative_fragmentation(std::vector<util::AllocationRecord>& recs);
 
 }
 }

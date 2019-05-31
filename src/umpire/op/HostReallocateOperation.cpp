@@ -31,14 +31,14 @@ void HostReallocateOperation::transform(
     util::AllocationRecord *dst_allocation,
     size_t length)
 {
-  auto allocator = dst_allocation->m_strategy;
+  auto allocator = dst_allocation->strategy;
 
   auto old_record = ResourceManager::getInstance().deregisterAllocation(src_ptr);
   *dst_ptr = ::realloc(src_ptr, length);
 
   if (!*dst_ptr) {
     UMPIRE_ERROR("::realloc(src_ptr=" << src_ptr <<
-                 ", old_length=" << old_record.m_size <<
+                 ", old_length=" << old_record.size <<
                  ", length=" << length << ") failed");
   }
 

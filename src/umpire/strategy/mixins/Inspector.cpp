@@ -47,7 +47,7 @@ util::AllocationRecord
 Inspector::deregisterAllocation(void* ptr)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record.m_size;
+  m_current_size -= record.size;
   return record;
 }
 

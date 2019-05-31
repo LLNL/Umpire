@@ -164,7 +164,7 @@ class Replay {
       auto saved_arec = iter->second;
       auto arec = m_allocation_map.remove(alloc_ptr);
 
-      if ( arec.m_ptr != saved_arec.m_ptr )
+      if ( arec.ptr != saved_arec.ptr )
         std::cerr << "Warning: allocation map mismatch\n";
 
       m_mapped_ptrs.erase(alloc_ptr);

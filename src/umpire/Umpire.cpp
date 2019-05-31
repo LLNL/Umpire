@@ -28,7 +28,7 @@ void print_allocator_records(Allocator allocator, std::ostream& os) {
   auto strategy = allocator.getAllocationStrategy();
 
   rm.m_allocations.print([strategy] (const util::AllocationRecord& rec) {
-    return rec.m_strategy == strategy;
+    return rec.strategy == strategy;
   }, os);
 }
 
@@ -39,7 +39,7 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator) {
   std::vector<util::AllocationRecord> recs;
   std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
                std::back_inserter(recs), [strategy] (const util::AllocationRecord& rec) {
-                 return rec.m_strategy == strategy;
+                 return rec.strategy == strategy;
                });
 
   return recs;
