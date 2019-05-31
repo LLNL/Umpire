@@ -110,10 +110,9 @@ class AllocationMap
 
   private:
     Judy* m_array;
-    mutable JudySlot* m_last; // last found value in Judy
-    unsigned int m_max_levels, m_depth;
     size_t m_size;
-    std::mutex* m_mutex;
+    mutable JudySlot* m_last; // last found value in Judy
+    mutable std::mutex m_mutex;
 };
 
 } // end of namespace util

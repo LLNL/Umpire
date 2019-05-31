@@ -101,7 +101,10 @@ FixedMallocPool::allocate(size_t bytes)
     ptr = allocate(bytes);
   }
 
+  // Could be an error, but FixedMallocPool is used internally and an
+  // error would be unrecoverable
   UMPIRE_ASSERT(ptr);
+
   return ptr;
 }
 

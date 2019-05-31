@@ -120,11 +120,11 @@
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
 
 #define UMPIRE_LOCK \
-  if ( !m_mutex->try_lock() ) \
-    m_mutex->lock();
+  if ( !m_mutex.try_lock() ) \
+    m_mutex.lock();
 
 #define UMPIRE_UNLOCK \
-  m_mutex->unlock();
+  m_mutex.unlock();
 
 #define UMPIRE_CHECK_ALLOCATOR(record, name) \
   if (record.m_strategy != this) { \

@@ -71,7 +71,7 @@ ResourceManager::ResourceManager() :
   m_default_allocator(),
   m_memory_resources(),
   m_id(0),
-  m_mutex(new std::mutex())
+  m_mutex()
 {
   UMPIRE_LOG(Debug, "() entering");
   resource::MemoryResourceRegistry& registry =

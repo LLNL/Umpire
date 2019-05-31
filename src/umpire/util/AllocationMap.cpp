@@ -20,6 +20,15 @@
 
 #include <sstream>
 
+// Judy: number of Integers in a key
+static const unsigned int judy_depth = 1;
+
+// Judy: max height of stack
+static const unsigned int judy_max_levels = sizeof(uintptr_t);
+
+// Judy: length of key in bytes
+static const unsigned int judy_max = judy_depth * JUDY_key_size;
+
 namespace umpire {
 namespace util {
 
@@ -180,14 +189,12 @@ bool RecordListConstIterator::operator!=(const RecordListConstIterator& other)
 // AllocationMap
 AllocationMap::AllocationMap() :
   m_array(nullptr),
-  m_last(nullptr),
-  m_max_levels(sizeof(uintptr_t)),
-  m_depth(1),
   m_size(0),
-  m_mutex(new std::mutex())
+  m_last(nullptr),
+  m_mutex()
 {
   // Create new judy array
-  m_array = judy_open(m_max_levels, m_depth);
+  m_array = judy_open(judy_max_levels, judy_depth);
 }
 
 AllocationMap::~AllocationMap()
@@ -197,9 +204,6 @@ AllocationMap::~AllocationMap()
 
   // Close the judy array, freeing all memory.
   judy_close(m_array);
-
-  // Delete the mutex
-  delete m_mutex;
 }
 
 void AllocationMap::insert(void* ptr, AllocationRecord record)
@@ -208,7 +212,7 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
   // Find the key
-  m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
+  m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   UMPIRE_ASSERT(m_last);
 
   auto plist = reinterpret_cast<RecordList**>(m_last);
@@ -256,8 +260,8 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const
 
   // Seek and find key (key = parent_ptr)
   uintptr_t parent_ptr{0};
-  m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
-  judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
+  m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
 
   // The record list at that ptr
   auto list = m_last ? reinterpret_cast<RecordList*>(*m_last) : nullptr;
@@ -267,7 +271,7 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const
   {
     m_last = judy_prv(m_array);
     // Find key associated to this one
-    judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
+    judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
   }
 
   // Update record list
@@ -303,7 +307,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
     UMPIRE_LOG(Debug, "Removing " << ptr);
 
     // Locate ptr
-    m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
+    m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
 
     // If found, remove it
     if (m_last && *m_last) {
@@ -345,7 +349,8 @@ bool AllocationMap::contains(void* ptr) const
 void AllocationMap::clear()
 {
   uintptr_t key = 0;
-  // TODO Why is max = 0 here?
+
+  // Loop over the level 0 tree
   while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)) != nullptr) {
     auto list = reinterpret_cast<RecordList*>(*m_last);
 
@@ -373,7 +378,7 @@ AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
     auto list = reinterpret_cast<RecordList*>(*m_last);
 
     void* addr;
-    judy_key(m_array, reinterpret_cast<unsigned char*>(&addr), m_depth * JUDY_key_size);
+    judy_key(m_array, reinterpret_cast<unsigned char*>(&addr), judy_max);
 
     std::stringstream ss;
     bool any_match = false;
@@ -421,7 +426,7 @@ AllocationMapConstIterator::AllocationMapConstIterator(const AllocationMap* map,
   : m_array(map->m_array), m_last(nullptr), m_ptr(0), m_iter(nullptr)
 {
   if (!end) {
-    m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), 0);
+    m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), judy_max);
   }
   else {
     m_last = judy_end(m_array);
@@ -437,7 +442,7 @@ AllocationMapConstIterator::AllocationMapConstIterator(const AllocationMap* map,
                                                        uintptr_t ptr)
   : m_array(map->m_array), m_last(nullptr), m_ptr(ptr), m_iter(nullptr)
 {
-  m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), 0);
+  m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), judy_max);
   if (m_last) {
     auto list = reinterpret_cast<RecordList*>(*m_last);
     m_iter = new RecordListConstIterator{list, false};
@@ -465,7 +470,7 @@ AllocationMapConstIterator& AllocationMapConstIterator::operator++()
   (*m_iter)++;
   if (*m_iter == list->end()) {
     // Move to a new pointer
-    JudySlot* new_slot = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), 0);
+    JudySlot* new_slot = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), judy_max);
     if (new_slot && (m_last != new_slot)) {
       m_last = new_slot;
       list = reinterpret_cast<RecordList*>(*m_last);

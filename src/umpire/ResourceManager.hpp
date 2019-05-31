@@ -263,7 +263,7 @@ class ResourceManager {
 
     int m_id;
 
-    std::mutex* m_mutex;
+    std::mutex m_mutex;
 
     // Methods that need access to m_allocations to print/filter records
     friend void print_allocator_records(Allocator, std::ostream&);
