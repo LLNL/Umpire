@@ -112,6 +112,7 @@ FixedPool::allocInPool(Pool& p)
 void*
 FixedPool::allocate(size_t bytes)
 {
+  UMPIRE_ASSERT(!bytes || bytes == m_obj_bytes);
   void* ptr = nullptr;
 
   for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
@@ -128,7 +129,9 @@ FixedPool::allocate(size_t bytes)
     ptr = allocate(bytes);
   }
 
-  UMPIRE_ASSERT(ptr);
+  if (!ptr) {
+    UMPIRE_ERROR("FixedPool::allocate(size=" << m_obj_bytes << "): Could not allocate");
+  }
   return ptr;
 }
 
