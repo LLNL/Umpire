@@ -13,6 +13,9 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 
+// FixedMallocPool follows the algorithm presented in
+// Fast Efficient Fixed-Size Memory Pool -- Ben Kenwright
+
 #include "umpire/util/FixedMallocPool.hpp"
 
 #include "umpire/util/Macros.hpp"
