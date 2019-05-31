@@ -32,15 +32,14 @@ struct ListBlock
 
 static umpire::util::FixedMallocPool block_pool(sizeof(ListBlock<AllocationRecord>));
 
-// Forward declare const iterator
 class RecordListConstIterator;
 
-// TODO Profile this to determine if we should add a small string
-// optimization on top of the block pooling.
 class RecordList
 {
 public:
   using Block = ListBlock<AllocationRecord>;
+
+  // Iterator needs access to m_tail
   friend RecordListConstIterator;
 
   RecordList();
@@ -254,12 +253,12 @@ AllocationRecord* AllocationMap::find(void* ptr) const
 
 AllocationRecord* AllocationMap::findRecord(void* ptr) const
 {
-  AllocationRecord* alloc_record = nullptr;
+  AllocationRecord* alloc_record{nullptr};
 
   UMPIRE_LOCK;
-  uintptr_t parent_ptr;
 
   // Seek and find key (key = parent_ptr)
+  uintptr_t parent_ptr{0};
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size);
   judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), m_depth * JUDY_key_size);
 
@@ -312,21 +311,17 @@ AllocationRecord AllocationMap::remove(void* ptr)
       UMPIRE_ASSERT(list->size());
 
       ret = list->pop_back();
-
       --m_size;
 
       if (list->empty()) {
-        if((m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), m_depth * JUDY_key_size)) != nullptr) {
-          auto list = reinterpret_cast<RecordList*>(*m_last);
+        // Manually call destructor
+        list->~RecordList();
 
-          // Manually call destructor
-          list->~RecordList();
+        // Mark as deallocated in the pool
+        list_pool.deallocate(list);
 
-          // Mark as deallocated in the pool
-          list_pool.deallocate(list);
-
-          m_last = judy_del(m_array);
-        }
+        // Remove entry from judy array
+        m_last = judy_del(m_array);
       }
     } else {
       UMPIRE_ERROR("Cannot remove " << ptr );
@@ -360,7 +355,7 @@ void AllocationMap::clear()
     // Mark as deallocated in the pool
     list_pool.deallocate(list);
 
-    // delete the key and cell for the current stack entry.
+    // Delete the key and cell for the current stack entry.
     judy_del(m_array);
   }
 }
@@ -369,7 +364,7 @@ size_t AllocationMap::size() const { return m_size; }
 
 void
 AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
-                           std::ostream& os) const
+                     std::ostream& os) const
 {
   uintptr_t key = 0;
   for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0);
