@@ -105,9 +105,7 @@ FixedPool::allocInPool(Pool& p)
     }
   }
 
-  // The method should either return nullptr at the top, or within the
-  // loop. This should never be reached.
-  UMPIRE_ERROR("A logic error occured");
+  UMPIRE_ASSERT("A logic error occured" && 0);
   return nullptr;
 }
 
