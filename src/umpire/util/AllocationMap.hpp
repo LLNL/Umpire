@@ -71,24 +71,29 @@ public:
   AllocationMap(const AllocationMap&) = delete;
 
   // Insert a new record -- copies record
-  void insert(void* ptr, AllocationRecord record) noexcept;
+  void insert(void* ptr, AllocationRecord record);
 
-  // Find a record -- throws an exception of the record is not found
+  // Find a record -- throws an exception of the record is not found.
+  // AllocationRecord addresses will not change once registered, so
+  // the resulting address of a find(ptr) call can be stored
+  // externally until deregistered. Note also that this class
+  // deallocates the AllocationRecord when removed(), so the pointer
+  // will become invalid at that point.
   AllocationRecord* find(void* ptr) const;
 
   // This version of find never throws an exception
-  AllocationRecord* findRecord(void* ptr) const noexcept;
+  AllocationRecord* findRecord(void* ptr) const;
 
   // Only allows erasing the last inserted entry for key = ptr
   AllocationRecord remove(void* ptr);
 
-  // Check if a pointer has been added to the map
+  // Check if a pointer has been added to the map.
   bool contains(void* ptr) const;
 
   // Clear all records from the map
   void clear();
 
-  // Number of entries
+  // Returns number of entries
   size_t size() const;
 
   // Print methods -- either matching a predicate or all records
