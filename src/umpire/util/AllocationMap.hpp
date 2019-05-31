@@ -23,6 +23,7 @@
 #include <mutex>
 #include <iostream>
 #include <iterator>
+#include <functional>
 
 #include "umpire/util/AllocationRecord.hpp"
 
