@@ -37,81 +37,82 @@ class RecordListConstIterator;
 
 class AllocationMapConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
 {
-public:
-  AllocationMapConstIterator(const AllocationMap* map, bool end);
-  AllocationMapConstIterator(const AllocationMapConstIterator& other) = default;
-  ~AllocationMapConstIterator();
+  public:
+    AllocationMapConstIterator(const AllocationMap* map, bool end);
+    AllocationMapConstIterator(const AllocationMap* map, uintptr_t ptr);
+    AllocationMapConstIterator(const AllocationMapConstIterator& other) = default;
+    ~AllocationMapConstIterator();
 
-  AllocationRecord& operator*() const;
-  const AllocationRecord* operator->() const;
-  AllocationMapConstIterator& operator++();
-  AllocationMapConstIterator operator++(int);
+    const AllocationRecord& operator*() const;
+    const AllocationRecord* operator->() const;
+    AllocationMapConstIterator& operator++();
+    AllocationMapConstIterator operator++(int);
 
-  bool operator==(const AllocationMapConstIterator& other);
-  bool operator!=(const AllocationMapConstIterator& other);
-private:
-  Judy* m_array;
-  JudySlot* m_last;
-  uintptr_t m_ptr;
-  RecordList* m_list;
-  RecordListConstIterator* m_iter;
+    bool operator==(const AllocationMapConstIterator& other);
+    bool operator!=(const AllocationMapConstIterator& other);
+  private:
+    Judy* m_array;
+    JudySlot* m_last;
+    uintptr_t m_ptr;
+    RecordListConstIterator* m_iter;
 };
 
 class AllocationMap
 {
-public:
-  // Friend the iterator class
-  friend class RecordListConstIterator;
-  friend class AllocationMapConstIterator;
+  public:
+    // Friend the iterator class
+    friend class AllocationMapConstIterator;
 
-  AllocationMap();
-  ~AllocationMap();
+    AllocationMap();
+    ~AllocationMap();
 
-  // Would require a deep copy of the Judy data
-  AllocationMap(const AllocationMap&) = delete;
+    // Would require a deep copy of the Judy data
+    AllocationMap(const AllocationMap&) = delete;
 
-  // Insert a new record -- copies record
-  void insert(void* ptr, AllocationRecord record);
+    // Insert a new record -- copies record
+    void insert(void* ptr, AllocationRecord record);
 
-  // Find a record -- throws an exception of the record is not found.
-  // AllocationRecord addresses will not change once registered, so
-  // the resulting address of a find(ptr) call can be stored
-  // externally until deregistered. Note also that this class
-  // deallocates the AllocationRecord when removed(), so the pointer
-  // will become invalid at that point.
-  AllocationRecord* find(void* ptr) const;
+    // Find a record -- throws an exception of the record is not found.
+    // AllocationRecord addresses will not change once registered, so
+    // the resulting address of a find(ptr) call can be stored
+    // externally until deregistered. Note also that this class
+    // deallocates the AllocationRecord when removed(), so the pointer
+    // will become invalid at that point.
+    const AllocationRecord* find(void* ptr) const;
+    AllocationRecord* find(void* ptr);
 
-  // This version of find never throws an exception
-  AllocationRecord* findRecord(void* ptr) const;
+    // This version of find never throws an exception
+    const AllocationRecord* findRecord(void* ptr) const;
+    AllocationRecord* findRecord(void* ptr);
 
-  // Only allows erasing the last inserted entry for key = ptr
-  AllocationRecord remove(void* ptr);
+    // Only allows erasing the last inserted entry for key = ptr
+    AllocationRecord remove(void* ptr);
 
-  // Check if a pointer has been added to the map.
-  bool contains(void* ptr) const;
+    // Check if a pointer has been added to the map.
+    bool contains(void* ptr) const;
 
-  // Clear all records from the map
-  void clear();
+    // Clear all records from the map
+    void clear();
 
-  // Returns number of entries
-  size_t size() const;
+    // Returns number of entries
+    size_t size() const;
 
-  // Print methods -- either matching a predicate or all records
-  void print(const std::function<bool (const AllocationRecord&)>&& predicate,
-             std::ostream& os = std::cout) const;
+    // Print methods -- either matching a predicate or all records
+    void print(const std::function<bool (const AllocationRecord&)>&& predicate,
+               std::ostream& os = std::cout) const;
 
-  void printAll(std::ostream& os = std::cout) const;
+    void printAll(std::ostream& os = std::cout) const;
 
-  // Const iterator
-  AllocationMapConstIterator begin() const;
-  AllocationMapConstIterator end() const;
+    // Const iterator
+    AllocationMapConstIterator begin() const;
+    AllocationMapConstIterator end() const;
 
-private:
-  Judy* m_array;
-  mutable JudySlot* m_last; // last found value in Judy
-  unsigned int m_max_levels, m_depth;
-  size_t m_size;
-  std::mutex* m_mutex;
+  private:
+    Judy* m_array;
+    mutable JudySlot* m_last; // last found value in Judy
+    unsigned int m_max_levels, m_depth;
+    size_t m_size;
+    std::mutex* m_mutex;
 };
 
 } // end of namespace util
