@@ -42,7 +42,7 @@ void register_all(umpire::strategy::mixins::Inspector& inspector, uintptr_t ptr[
 void deregister_all(umpire::strategy::mixins::Inspector& inspector, uintptr_t ptr[])
 {
   for (int i{0}; i < MAX_REGISTRATIONS; ++i)
-    inspector.deregisterAllocation(reinterpret_cast<void*>(ptr[i]));
+    inspector.deregisterAllocation(reinterpret_cast<void*>(ptr[i]), nullptr);
 }
 
 class InspectorRegister : public ::benchmark::Fixture {
@@ -98,7 +98,7 @@ BENCHMARK_F(InspectorDeregister, remove)(benchmark::State &st)
       i = 0;
       st.ResumeTiming();
     }
-    inspector.deregisterAllocation(reinterpret_cast<void*>(ptr[i++]));
+    inspector.deregisterAllocation(reinterpret_cast<void*>(ptr[i++]), nullptr);
   }
 }
 

@@ -56,11 +56,7 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  // TODO Would it be better if this uses AllocationTracker?
-  auto record = findAllocation(ptr);
-  UMPIRE_CHECK_ALLOCATOR(record, getName());
-
-  deregisterAllocation(ptr);
+  deregisterAllocation(ptr, this);
   m_allocator.deallocate(ptr);
 }
 

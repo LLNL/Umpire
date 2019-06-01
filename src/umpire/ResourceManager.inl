@@ -34,7 +34,7 @@ template <typename Strategy,
          bool introspection,
          typename... Args>
 Allocator ResourceManager::makeAllocator(
-    const std::string& name, 
+    const std::string& name,
     Args&&... args)
 {
   strategy::AllocationStrategy* allocator;
@@ -44,25 +44,18 @@ Allocator ResourceManager::makeAllocator(
 
     UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
 #if defined(_MSC_VER)
-    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << typeid(Strategy).name()
-        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
-        << ", \"allocator_name\":\"" << name << "\""
-        << ", \"args\": [ "
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
-        << " ] }"
-    );
 #else
-    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+#endif
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
     );
-#endif
 
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
@@ -86,19 +79,12 @@ Allocator ResourceManager::makeAllocator(
 
     }
 
+    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
 #if defined(_MSC_VER)
-    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << typeid(Strategy).name()
-        << "\", \"with_introspection\":" << (introspection ? "true" : "false")
-        << ", \"allocator_name\":\"" << name << "\""
-        << ", \"args\": [ "
-        << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
-        << " ] }"
-        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
-    );
 #else
-    UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
         << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
+#endif
         << "\", \"with_introspection\":" << (introspection ? "true" : "false")
         << ", \"allocator_name\":\"" << name << "\""
         << ", \"args\": [ "
@@ -106,7 +92,6 @@ Allocator ResourceManager::makeAllocator(
         << " ] }"
         << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
     );
-#endif
 
     UMPIRE_UNLOCK;
   } catch (...) {
