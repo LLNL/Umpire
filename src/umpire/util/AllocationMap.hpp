@@ -19,15 +19,15 @@
 // for the map, with an array-like object to hold multiple values with
 // the same key.
 
+#include "umpire/util/AllocationRecord.hpp"
+
+#include "umpire/tpl/judy/judy.h"
+
 #include <cstdint>
 #include <mutex>
 #include <iostream>
 #include <iterator>
 #include <functional>
-
-#include "umpire/util/AllocationRecord.hpp"
-
-#include "umpire/tpl/judy/judy.h"
 
 namespace umpire {
 namespace util {

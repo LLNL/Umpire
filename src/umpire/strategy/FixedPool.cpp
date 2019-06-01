@@ -105,7 +105,7 @@ FixedPool::allocInPool(Pool& p)
     }
   }
 
-  UMPIRE_ASSERT("FixedPool::allocInPool(): num_avail > 0 but there was no available slots" && 0);
+  UMPIRE_ASSERT("FixedPool::allocInPool(): num_avail > 0, but no available slots" && 0);
   return nullptr;
 }
 

@@ -58,7 +58,6 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strateg
   return record;
 }
 
-
 } // end of namespace mixins
 } // end of namespace strategy
 } // end of namespace umpire

@@ -63,8 +63,8 @@ private:
   const size_t m_data_bytes;
   std::vector<Pool> m_pool;
   // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
-  // ever reduced in size, then .data and .avail have to be manually
-  // deallocated to avoid a memory leak.
+  // ever reduced in size, then .data has to be manually deallocated
+  // to avoid a memory leak.
 };
 
 } // end namespace strategy
