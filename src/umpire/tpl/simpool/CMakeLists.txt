@@ -10,7 +10,8 @@ blt_add_library(
   NAME umpire_tpl_simpool
   SOURCES ${simpool_sources}
   HEADERS ${simpool_headers}
-  DEPENDS_ON umpire_util)
+  DEPENDS_ON umpire_util
+  OBJECT TRUE)
 
 target_link_libraries(umpire_tpl_simpool INTERFACE)
 

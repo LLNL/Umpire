@@ -59,7 +59,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends)
+set (umpire_util_depends umpire_tpl_judy)
 
 if (ENABLE_NUMA)
   set (umpire_util_depends
