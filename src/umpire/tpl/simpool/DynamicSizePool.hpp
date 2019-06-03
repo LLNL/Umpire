@@ -9,13 +9,11 @@
 #include <sstream>
 
 #include "umpire/tpl/simpool/StdAllocator.hpp"
-#include "umpire/tpl/simpool/FixedSizePool.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
 
-template <class IA = StdAllocator>
 class DynamicSizePool
 {
 protected:

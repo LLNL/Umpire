@@ -35,7 +35,7 @@ DynamicPool::DynamicPool(
   m_allocator(allocator.getAllocationStrategy()),
   do_coalesce{coalesce_heuristic}
 {
-  dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
+  dpa = new DynamicSizePool(m_allocator, min_initial_alloc_size, min_alloc_size);
 }
 
 void*
