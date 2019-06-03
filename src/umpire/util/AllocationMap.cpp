@@ -252,7 +252,7 @@ AllocationRecord* AllocationMap::find(void* ptr)
   return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->find(ptr));
 }
 
-const AllocationRecord* AllocationMap::findRecord(void* ptr) const
+const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 {
   AllocationRecord* alloc_record{nullptr};
 
@@ -291,7 +291,7 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const
   return alloc_record;
 }
 
-AllocationRecord* AllocationMap::findRecord(void* ptr)
+AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
 {
   return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->findRecord(ptr));
 }

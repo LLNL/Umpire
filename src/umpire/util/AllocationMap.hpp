@@ -73,7 +73,7 @@ class AllocationMap
     // Insert a new record -- copies record
     void insert(void* ptr, AllocationRecord record);
 
-    // Find a record -- throws an exception of the record is not found.
+    // Find a record -- throws an exception if the record is not found.
     // AllocationRecord addresses will not change once registered, so
     // the resulting address of a find(ptr) call can be stored
     // externally until deregistered. Note also that this class
@@ -83,8 +83,8 @@ class AllocationMap
     AllocationRecord* find(void* ptr);
 
     // This version of find never throws an exception
-    const AllocationRecord* findRecord(void* ptr) const;
-    AllocationRecord* findRecord(void* ptr);
+    const AllocationRecord* findRecord(void* ptr) const noexcept;
+    AllocationRecord* findRecord(void* ptr) noexcept;
 
     // Only allows erasing the last inserted entry for key = ptr
     AllocationRecord remove(void* ptr);
