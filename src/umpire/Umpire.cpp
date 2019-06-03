@@ -27,20 +27,19 @@ void print_allocator_records(Allocator allocator, std::ostream& os) {
 
   auto strategy = allocator.getAllocationStrategy();
 
-  rm.m_allocations.print([strategy] (const util::AllocationRecord* rec) {
-    return rec->m_strategy == strategy;
+  rm.m_allocations.print([strategy] (const util::AllocationRecord& rec) {
+    return rec.strategy == strategy;
   }, os);
 }
 
-std::vector<const util::AllocationRecord*> get_allocator_records(Allocator allocator) {
+std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator) {
   auto& rm = umpire::ResourceManager::getInstance();
-
   auto strategy = allocator.getAllocationStrategy();
 
-  std::vector<const util::AllocationRecord*> recs;
+  std::vector<util::AllocationRecord> recs;
   std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
-               std::back_inserter(recs), [strategy] (const util::AllocationRecord* rec) {
-                 return rec->m_strategy == strategy;
+               std::back_inserter(recs), [strategy] (const util::AllocationRecord& rec) {
+                 return rec.strategy == strategy;
                });
 
   return recs;

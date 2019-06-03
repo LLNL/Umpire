@@ -34,7 +34,7 @@ template <typename Strategy,
          bool introspection,
          typename... Args>
 Allocator ResourceManager::makeAllocator(
-    const std::string& name, 
+    const std::string& name,
     Args&&... args)
 {
   strategy::AllocationStrategy* allocator;
@@ -63,7 +63,6 @@ Allocator ResourceManager::makeAllocator(
         << " ] }"
     );
 #endif
-
     if (isAllocator(name)) {
       UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
     }

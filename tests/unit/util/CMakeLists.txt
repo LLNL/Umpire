@@ -34,19 +34,6 @@ blt_add_test(
   NAME allocation_map_tests
   COMMAND allocation_map_tests)
 
-# TODO: Make this test a relative performance test
-if (False)
-  blt_add_executable(
-    NAME allocation_map_performance_tests
-    SOURCES allocation_map_performance_tests.cpp
-    DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${util_dir})
-
-  blt_add_test(
-    NAME allocation_map_performance_tests
-    COMMAND allocation_map_performance_tests)
-endif ()
-
 blt_add_executable(
   NAME output_buffer_tests
   SOURCES output_buffer_tests.cpp

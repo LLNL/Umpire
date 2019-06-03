@@ -16,6 +16,7 @@
 
 #include "umpire/config.hpp"
 
+#include "umpire/Umpire.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
@@ -123,6 +124,18 @@ TEST_P(AllocatorTest, GetById)
   ASSERT_THROW(
       rm.getAllocator(-25),
       umpire::util::Exception);
+}
+
+TEST_P(AllocatorTest, get_allocator_records)
+{
+  double* data = static_cast<double*>(
+    m_allocator->allocate(m_small*sizeof(double)));
+
+  auto records = umpire::get_allocator_records(*m_allocator);
+
+  ASSERT_EQ(records.size(), 1);
+
+  m_allocator->deallocate(data);
 }
 
 const std::string allocator_strings[] = {
@@ -265,6 +278,8 @@ TEST(Allocation, DeallocateDifferent)
   ASSERT_THROW(
     alloc_two.deallocate(data),
     umpire::util::Exception);
+
+  ASSERT_NO_THROW(alloc_one.deallocate(data));
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)

@@ -15,66 +15,104 @@
 #ifndef UMPIRE_AllocationMap_HPP
 #define UMPIRE_AllocationMap_HPP
 
+// AllocationMap is a multimap of addresses to addresses. It uses Judy
+// for the map, with an array-like object to hold multiple values with
+// the same key.
+
 #include "umpire/util/AllocationRecord.hpp"
+
+#include "umpire/tpl/judy/judy.h"
 
 #include <cstdint>
 #include <mutex>
 #include <iostream>
+#include <iterator>
 #include <functional>
-
-template< typename JudyKey, typename JudyValue >
-class judyL2Array;
 
 namespace umpire {
 namespace util {
 
+class AllocationMap;
+class RecordList;
+class RecordListConstIterator;
+
+class AllocationMapConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+{
+  public:
+    AllocationMapConstIterator(const AllocationMap* map, bool end);
+    AllocationMapConstIterator(const AllocationMap* map, uintptr_t ptr);
+    AllocationMapConstIterator(const AllocationMapConstIterator& other) = default;
+    ~AllocationMapConstIterator();
+
+    const AllocationRecord& operator*() const;
+    const AllocationRecord* operator->() const;
+    AllocationMapConstIterator& operator++();
+    AllocationMapConstIterator operator++(int);
+
+    bool operator==(const AllocationMapConstIterator& other);
+    bool operator!=(const AllocationMapConstIterator& other);
+  private:
+    Judy* m_array;
+    JudySlot* m_last;
+    uintptr_t m_ptr;
+    RecordListConstIterator* m_iter;
+};
+
 class AllocationMap
 {
   public:
-
-    class ConstIterator {
-    public:
-      const AllocationRecord* operator*();
-      ConstIterator& operator++();
-      bool operator==(const ConstIterator& other);
-      bool operator!=(const ConstIterator& other);
-    private:
-      struct JudyL2Data;
-      bool end;
-      JudyL2Data* data;
-      ConstIterator(judyL2Array<uintptr_t, uintptr_t>* map_, const bool end_ = false);
-      friend class AllocationMap;
-    };
+    // Friend the iterator class
+    friend class AllocationMapConstIterator;
 
     AllocationMap();
     ~AllocationMap();
 
-    void insert(void* ptr, AllocationRecord* record);
+    // Would require a deep copy of the Judy data
+    AllocationMap(const AllocationMap&) = delete;
 
-    AllocationRecord* remove(void* ptr);
+    // Insert a new record -- copies record
+    void insert(void* ptr, AllocationRecord record);
 
-    AllocationRecord* find(void* ptr) const;
+    // Find a record -- throws an exception if the record is not found.
+    // AllocationRecord addresses will not change once registered, so
+    // the resulting address of a find(ptr) call can be stored
+    // externally until deregistered. Note also that this class
+    // deallocates the AllocationRecord when removed(), so the pointer
+    // will become invalid at that point.
+    const AllocationRecord* find(void* ptr) const;
+    AllocationRecord* find(void* ptr);
 
-    ConstIterator begin() const;
+    // This version of find never throws an exception
+    const AllocationRecord* findRecord(void* ptr) const noexcept;
+    AllocationRecord* findRecord(void* ptr) noexcept;
 
-    ConstIterator end() const;
+    // Only allows erasing the last inserted entry for key = ptr
+    AllocationRecord remove(void* ptr);
 
-    bool contains(void* ptr);
+    // Check if a pointer has been added to the map.
+    bool contains(void* ptr) const;
 
-    void reset();
+    // Clear all records from the map
+    void clear();
+
+    // Returns number of entries
+    size_t size() const;
+
+    // Print methods -- either matching a predicate or all records
+    void print(const std::function<bool (const AllocationRecord&)>&& predicate,
+               std::ostream& os = std::cout) const;
 
     void printAll(std::ostream& os = std::cout) const;
 
-    void print(const std::function<bool (const AllocationRecord*)>&& predicate,
-               std::ostream& os = std::cout) const;
+    // Const iterator
+    AllocationMapConstIterator begin() const;
+    AllocationMapConstIterator end() const;
 
-private:
-    AllocationRecord* findRecord(void* ptr) const;
-
-    // TODO: Make const version of judyL2Array begin/end
-    mutable judyL2Array<uintptr_t, uintptr_t>* m_records;
-
-    std::mutex* m_mutex;
+  private:
+    Judy* m_array;
+    size_t m_size;
+    mutable JudySlot* m_last; // last found value in m_array
+    mutable std::mutex m_mutex;
 };
 
 } // end of namespace util

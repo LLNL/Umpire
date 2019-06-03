@@ -87,7 +87,7 @@ FixedPool::newPool()
 }
 
 void*
-FixedPool::allocInPool(Pool& p) noexcept
+FixedPool::allocInPool(Pool& p)
 {
   if (!p.num_avail) return nullptr;
 
@@ -105,13 +105,16 @@ FixedPool::allocInPool(Pool& p) noexcept
     }
   }
 
-  UMPIRE_ASSERT("FixedPool: Logic error in allocate");
+  UMPIRE_ASSERT("FixedPool::allocInPool(): num_avail > 0, but no available slots" && 0);
   return nullptr;
 }
 
 void*
 FixedPool::allocate(size_t bytes)
 {
+  // Check that bytes passed matches m_obj_bytes or bytes was not passed (default = 0)
+  UMPIRE_ASSERT(!bytes || bytes == m_obj_bytes);
+
   void* ptr = nullptr;
 
   for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
@@ -128,7 +131,9 @@ FixedPool::allocate(size_t bytes)
     ptr = allocate(bytes);
   }
 
-  UMPIRE_ASSERT(ptr);
+  if (!ptr) {
+    UMPIRE_ERROR("FixedPool::allocate(size=" << m_obj_bytes << "): Could not allocate");
+  }
   return ptr;
 }
 

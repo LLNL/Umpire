@@ -15,16 +15,17 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
-  allocation_statistics.hpp
-  detect_vendor.hpp
   Exception.hpp
+  FixedMallocPool.hpp
   IOManager.hpp
   Logger.hpp
-  Macros.hpp
   MPI.hpp
+  Macros.hpp
   MemoryResourceTraits.hpp
   OutputBuffer.hpp
-  Platform.hpp)
+  Platform.hpp
+  allocation_statistics.hpp
+  detect_vendor.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -42,13 +43,14 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
-  allocation_statistics.cpp
-  detect_vendor.cpp
   Exception.cpp
+  FixedMallocPool.cpp
   IOManager.cpp
   Logger.cpp
   MPI.cpp
-  OutputBuffer.cpp)
+  OutputBuffer.cpp
+  allocation_statistics.cpp
+  detect_vendor.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources

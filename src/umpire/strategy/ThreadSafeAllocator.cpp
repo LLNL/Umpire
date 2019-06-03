@@ -26,7 +26,7 @@ ThreadSafeAllocator::ThreadSafeAllocator(
     Allocator allocator) :
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
-  m_mutex(new std::mutex())
+  m_mutex()
 {
 }
 

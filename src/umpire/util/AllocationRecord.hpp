@@ -29,9 +29,9 @@ namespace util {
 
 struct AllocationRecord
 {
-  void* m_ptr;
-  size_t m_size;
-  strategy::AllocationStrategy* m_strategy;
+  void* ptr;
+  size_t size;
+  strategy::AllocationStrategy* strategy;
 };
 
 } // end of namespace util
