@@ -31,9 +31,9 @@ DynamicPool::DynamicPool(
     Coalesce_Heuristic coalesce_heuristic) noexcept
   :
   AllocationStrategy(name, id),
-  dpa(m_allocator, min_initial_alloc_size, min_alloc_size),
   m_allocator(allocator.getAllocationStrategy()),
-  do_coalesce{coalesce_heuristic}
+  do_coalesce(coalesce_heuristic),
+  dpa(m_allocator, min_initial_alloc_size, min_alloc_size)
 {
 }
 
