@@ -21,6 +21,7 @@ endif ()
 
 message(STATUS "Checking for std::filesystem")
 
+include(CheckCXXSourceCompiles)
 check_cxx_source_compiles(
   "#include <iostream>
   #include <filesystem>
