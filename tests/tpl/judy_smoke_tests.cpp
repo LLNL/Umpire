@@ -45,7 +45,7 @@ TEST(Judy, L2Array)
   array.insert(1, 6);
 
   array_t::cvector* v = array.find(7);
-  ASSERT_EQ(v, nullptr);
+  ASSERT_TRUE(v == nullptr);
 
   v = array.find(1);
 
