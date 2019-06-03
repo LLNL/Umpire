@@ -13,16 +13,18 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - CI builds for Mac, Linux and Windows via Azure Pipelines
 - Replay has been changed to produce and interpret its output in JSON format.
 
-- Added HCC stage in Docker file
+- Added HCC stage in Docker file.
 
-- GitHub action to automatically delete merged branches
+- GitHub action to automatically delete merged branches.
 
 - Enabled `FixedPool` allocator benchmarks.
 
 - Mixed pool that uses faster fixed pools for smaller allocation sizes,
 and a dynamic pool for those that are larger.
 
-- Smoke tests for required third-party libraries
+- Smoke tests for required third-party libraries.
+
+- Add `util::FixedMallocPool` for internal use.
 
 ### Changed
 
@@ -30,9 +32,15 @@ and a dynamic pool for those that are larger.
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
-- Updated README to better describe Umpire capability
+- Updated README to better describe Umpire capability.
 
-- Update BLT to fix CMake 3.13 warnings and MSVC compatibility
+- Update BLT to fix CMake 3.13 warnings and MSVC compatibility.
+
+- Faster `util::AllocationMap`.
+
+- `ResourceManager` de/registration pass `AllocationRecord` by value.
+
+- `AllocationRecord` struct members are no longer prefixed by `m_`.
 
 ### Removed
 
@@ -50,7 +58,7 @@ ReadTheDocs.
 - Throw an error if attempting to deallocate with a different Allocator than
 performed the allocation.
 
-- Building on Windows
+- Building on Windows.
 
 - Fixed compilation errors from Intel compiler for newly included third-party
   libraries for json and command line parsing (cxxopts).

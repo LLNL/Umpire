@@ -53,10 +53,10 @@ class FixedPool : public AllocationStrategy
               const size_t objects_per_pool = 64 * sizeof(int) * 8);
 
     ~FixedPool();
-    
+
     void* allocate(size_t bytes = 0) override final;
     void deallocate(void* ptr) override final;
-    
+
     long getCurrentSize() const noexcept override final;
     long getHighWatermark() const noexcept override final;
     long getActualSize() const noexcept override final;
@@ -76,7 +76,7 @@ class FixedPool : public AllocationStrategy
     };
 
     void newPool();
-    void* allocInPool(Pool& p) noexcept;
+    void* allocInPool(Pool& p);
 
     AllocationStrategy* m_strategy;
     size_t m_obj_bytes;

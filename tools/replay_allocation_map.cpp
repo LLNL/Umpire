@@ -66,7 +66,7 @@ std::istream& operator>>(std::istream& str, CSVRow& data)
 {
   data.readNextRow(str);
   return str;
-}   
+}
 
 class Replay {
   public:
@@ -108,7 +108,7 @@ class Replay {
     std::string m_filename;
     std::ifstream m_file;
     umpire::util::AllocationMap m_allocation_map;
-    std::unordered_map<void*, void*> m_mapped_ptrs;    // key(alloc_ptr), val(amap*)
+    std::unordered_map<void*, umpire::util::AllocationRecord> m_mapped_ptrs;    // key(alloc_ptr), val(amap)
     CSVRow m_row;
 
     template <typename T>
@@ -141,7 +141,7 @@ class Replay {
       get_from_string(m_row[m_row.size() - 1], alloc_ptr);
       get_from_string(m_row[m_row.size() - 3], alloc_size);
 
-      auto amap = new umpire::util::AllocationRecord{alloc_ptr, alloc_size, nullptr};
+      umpire::util::AllocationRecord amap{alloc_ptr, alloc_size, nullptr};
       m_allocation_map.insert(alloc_ptr, amap);
 
       m_mapped_ptrs[alloc_ptr] = amap;
@@ -164,10 +164,9 @@ class Replay {
       auto saved_arec = iter->second;
       auto arec = m_allocation_map.remove(alloc_ptr);
 
-      if ( arec != saved_arec )
+      if ( arec.ptr != saved_arec.ptr )
         std::cerr << "Warning: allocation map mismatch\n";
 
-      delete arec;
       m_mapped_ptrs.erase(alloc_ptr);
     }
 };

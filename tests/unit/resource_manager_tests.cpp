@@ -35,7 +35,7 @@ TEST(ResourceManager, findAllocationRecord)
   char* ptr = static_cast<char*>(alloc.allocate(size));
   const umpire::util::AllocationRecord* rec = rm.findAllocationRecord(ptr + offset);
 
-  ASSERT_EQ(ptr, rec->m_ptr);
+  ASSERT_EQ(ptr, rec->ptr);
   alloc.deallocate(ptr);
 
   ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::util::Exception);
