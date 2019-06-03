@@ -26,7 +26,7 @@ protected:
   umpire::util::FixedMallocPool blockPool;
 
   // Start of the nodes of used and free block lists
-  struct Block *usedBlocks;
+  struct Block *usedBlocks;1
   struct Block *freeBlocks;
 
   // Total blocks in the pool
@@ -71,29 +71,20 @@ public:
       umpire::strategy::AllocationStrategy* strat,
       const std::size_t _minInitialBytes = (16 * 1024),
       const std::size_t _minBytes = 256);
-
   ~DynamicSizePool();
 
   void *allocate(std::size_t size);
-
   void deallocate(void *ptr);
 
   std::size_t getCurrentSize() const;
-
   std::size_t getActualSize() const;
-
   std::size_t getHighWatermark() const;
-
   std::size_t getBlocksInPool() const;
-
   std::size_t getReleasableSize() const;
-
   std::size_t getFreeBlocks() const;
-
   std::size_t getInUseBlocks() const;
 
   void coalesce();
-
   void release();
 };
 
