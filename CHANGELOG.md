@@ -42,9 +42,14 @@ and a dynamic pool for those that are larger.
 
 - `AllocationRecord` struct members are no longer prefixed by `m_`.
 
+- `DynamicPool` directly incorporates Simpool's `DynamicSizePool` and
+  uses `FixedMallocPool` internally for a small speedup.
+
 ### Removed
 
 - `ENABLE_ASSERTS` was removed in favor of checking the `NDEBUG` macro.
+
+- The remaining classes in Simpool are merged in to the core of Umpire.
 
 ### Fixed
 
