@@ -17,3 +17,26 @@ if (ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "-coverage ${CMAKE_CXX_FLAGS}")
   set(CMAKE_EXE_LINKER_FLAGS "-coverage ${CMAKE_EXE_LINKER_FLAGS}")
 endif ()
+
+
+message(STATUS "Checking for std::filesystem")
+
+check_cxx_source_compiles(
+  "#include <iostream>
+  #include <filesystem>
+
+  int main(int, char**)
+  {
+
+    auto path = std::filesystem::path(\".\");
+    (void)(path);
+
+    return 0;
+  }"
+  UMPIRE_ENABLE_FILESYSTEM)
+
+if (UMPIRE_ENABLE_FILESYSTEM)
+  message(STATUS "std::filesystem found")
+else ()
+  message(STATUS "std::filesystem NOT found, using POSIX")
+endif ()

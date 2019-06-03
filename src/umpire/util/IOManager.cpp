@@ -13,6 +13,7 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/config.hpp"
 #include "umpire/util/IOManager.hpp"
 #include "umpire/util/OutputBuffer.hpp"
 #include "umpire/util/Macros.hpp"
@@ -23,13 +24,12 @@
 #include <fstream>
 #include <sstream>
 
+#if defined(UMPIRE_ENABLE_FILESYSTEM)
+#include <filesystem>
+#else
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#if !defined(_MSC_VER)
 #include <dirent.h>
-#else
-#include <direct.h>
 #endif
 
 namespace umpire {
@@ -94,18 +94,21 @@ IOManager::initialize()
     error_buffer.setConsoleStream(&std::cerr);
 
     if (rank == 0) {
+#if defined(UMPIRE_ENABLE_FILESYSTEM)
+      std::filesystem::path root_io_dir_path(s_root_io_dir);
+
+      if (!std::filesystem::exists(root_io_dir_path))
+      {
+        std::filesystem::create_directories(root_io_dir_path);
+      }
+#else
       struct stat info;
-
-
       if ( stat( s_root_io_dir.c_str(), &info ) &&
            !(S_ISDIR(info.st_mode)))
       {
-#if defined(_MSC_VER)
-        mkdir(s_root_io_dir.c_str());
-#else
         mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRWXG);
-#endif
       }
+#endif
     }
 
     s_log_ofstream = new std::ofstream(s_log_filename);
