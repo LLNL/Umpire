@@ -12,6 +12,7 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
+
 #include "umpire/strategy/DynamicPool.hpp"
 
 #include "umpire/ResourceManager.hpp"
@@ -19,13 +20,15 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
 
+#include <algorithm>
+
 namespace umpire {
 namespace strategy {
 
 
 void DynamicPool::findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size) {
-  best = prev = NULL;
-  for ( struct Block *iter = freeBlocks, *iterPrev = NULL ; iter ; iter = iter->next ) {
+  best = prev = nullptr;
+  for ( struct Block *iter = freeBlocks, *iterPrev = nullptr ; iter ; iter = iter->next ) {
     if ( iter->size >= size && (!best || iter->size < best->size) ) {
       best = iter;
       prev = iterPrev;
@@ -44,13 +47,13 @@ inline static std::size_t alignmentAdjust(const std::size_t size) {
 void DynamicPool::allocateBlock(struct Block *&curr, struct Block *&prev, const std::size_t size) {
   std::size_t sizeToAlloc;
 
-  if ( freeBlocks == NULL && usedBlocks == NULL )
+  if ( freeBlocks == nullptr && usedBlocks == nullptr )
     sizeToAlloc = std::max(size, minInitialBytes);
   else
     sizeToAlloc = std::max(size, minBytes);
 
-  curr = prev = NULL;
-  void *data = NULL;
+  curr = prev = nullptr;
+  void *data = nullptr;
 
   // Allocate data
   try {
@@ -138,13 +141,13 @@ void DynamicPool::splitBlock(struct Block *&curr, struct Block *&prev, const std
 }
 
 void DynamicPool::releaseBlock(struct Block *curr, struct Block *prev) {
-  assert(curr != NULL);
+  assert(curr != nullptr);
 
   if (prev) prev->next = curr->next;
   else usedBlocks = curr->next;
 
   // Find location to put this block in the freeBlocks list
-  prev = NULL;
+  prev = nullptr;
   for ( struct Block *temp = freeBlocks ; temp && temp->data < curr->data ; temp = temp->next )
     prev = temp;
 
@@ -178,7 +181,7 @@ void DynamicPool::releaseBlock(struct Block *curr, struct Block *prev) {
 std::size_t DynamicPool::freeReleasedBlocks() {
   // Release the unused blocks
   struct Block *curr = freeBlocks;
-  struct Block *prev = NULL;
+  struct Block *prev = nullptr;
 
   std::size_t freed = 0;
 
@@ -220,11 +223,11 @@ void DynamicPool::coalesceFreeBlocks(std::size_t size) {
 void DynamicPool::freeAllBlocks() {
   // Release the used blocks
   while(usedBlocks) {
-    releaseBlock(usedBlocks, NULL);
+    releaseBlock(usedBlocks, nullptr);
   }
 
   freeReleasedBlocks();
-  UMPIRE_ASSERT("Not all blocks were released properly" && freeBlocks == NULL );
+  UMPIRE_ASSERT("Not all blocks were released properly" && freeBlocks == nullptr );
 }
 
 DynamicPool::DynamicPool(
@@ -288,7 +291,7 @@ DynamicPool::deallocate(void* ptr)
   UMPIRE_ASSERT(ptr);
 
   // Find the associated block
-  struct Block *curr = usedBlocks, *prev = NULL;
+  struct Block *curr = usedBlocks, *prev = nullptr;
   for ( ; curr && curr->data != ptr; curr = curr->next ) {
     prev = curr;
   }
