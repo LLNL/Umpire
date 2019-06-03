@@ -21,10 +21,9 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
 
 #include "umpire/Allocator.hpp"
-
-#include "umpire/tpl/simpool/DynamicSizePool.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -70,6 +69,8 @@ class DynamicPool :
         const std::size_t min_alloc_size = (1 * 1024 *1024),
         Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
+    ~DynamicPool();
+
     void* allocate(size_t bytes) override;
 
     void deallocate(void* ptr) override;
@@ -79,6 +80,9 @@ class DynamicPool :
     long getCurrentSize() const noexcept override;
     long getActualSize() const noexcept override;
     long getHighWatermark() const noexcept override;
+
+    long getFreeBlocks() const;
+    long getInUseBlocks() const;
 
     Platform getPlatform() noexcept override;
 
@@ -104,9 +108,60 @@ class DynamicPool :
     void coalesce() noexcept;
 
   private:
-    strategy::AllocationStrategy* m_allocator;
-    Coalesce_Heuristic do_coalesce;
-    DynamicSizePool dpa;
+  struct Block
+  {
+    char *data;
+    size_t size;
+    size_t blockSize;
+    Block *next;
+  };
+
+  // Allocator for the underlying data
+  umpire::util::FixedMallocPool blockPool;
+
+  // Start of the nodes of used and free block lists
+  struct Block *usedBlocks;
+  struct Block *freeBlocks;
+
+  // Total blocks in the pool
+  std::size_t totalBlocks;
+
+  // Total size allocated (bytes)
+  std::size_t totalBytes;
+
+  // Allocated size (bytes)
+  std::size_t allocBytes;
+
+  // Minimum size of initial allocation
+  std::size_t minInitialBytes;
+
+  // Minimum size for allocations
+  std::size_t minBytes;
+
+  // High water mark of allocations
+  std::size_t highWatermark;
+
+  // Pointer to our allocator's allocation strategy
+  strategy::AllocationStrategy* m_allocator;
+
+  // Heuristic to use for coalescing
+  Coalesce_Heuristic do_coalesce;
+
+  // Search the list of free blocks and return a usable one if that exists, else NULL
+  void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size);
+
+  // Allocate a new block and add it to the list of free blocks
+  void allocateBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
+
+  void splitBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
+
+  void releaseBlock(struct Block *curr, struct Block *prev);
+
+  std::size_t freeReleasedBlocks();
+
+  void coalesceFreeBlocks(std::size_t size);
+
+  void freeAllBlocks();
 };
 
 } // end of namespace strategy
