@@ -26,7 +26,7 @@ protected:
   umpire::util::FixedMallocPool blockPool;
 
   // Start of the nodes of used and free block lists
-  struct Block *usedBlocks;1
+  struct Block *usedBlocks;
   struct Block *freeBlocks;
 
   // Total blocks in the pool
