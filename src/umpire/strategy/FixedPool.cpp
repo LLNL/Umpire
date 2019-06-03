@@ -112,7 +112,9 @@ FixedPool::allocInPool(Pool& p)
 void*
 FixedPool::allocate(size_t bytes)
 {
+  // Check that bytes passed matches m_obj_bytes or bytes was not passed (default = 0)
   UMPIRE_ASSERT(!bytes || bytes == m_obj_bytes);
+
   void* ptr = nullptr;
 
   for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
