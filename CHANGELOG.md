@@ -26,6 +26,8 @@ and a dynamic pool for those that are larger.
 
 ### Changed
 
+- OpenMP changed to off by default.
+
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
 - Updated README to better describe Umpire capability
@@ -34,6 +36,8 @@ and a dynamic pool for those that are larger.
 
 ### Removed
 
+- `ENABLE_ASSERTS` was removed in favor of checking the `NDEBUG` macro.
+
 ### Fixed
 
 - Added YAML file for ReadTheDocs to read in that will cause it to use
@@ -41,12 +45,15 @@ and a dynamic pool for those that are larger.
   a deprecation warning when attempting to run older versions of python.
 
 - Exclude third-party libraries from Doxygen to fix out-of-resources error on
-  ReadTheDocs
-  
+ReadTheDocs.
+
 - Throw an error if attempting to deallocate with a different Allocator than
-  performed the allocation
+performed the allocation.
 
 - Building on Windows
+
+- Fixed compilation errors from Intel compiler for newly included third-party
+  libraries for json and command line parsing (cxxopts).
 
 ## [0.3.3] - 2019-04-11
 
