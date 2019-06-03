@@ -10,6 +10,7 @@
 
 #include "umpire/tpl/simpool/StdAllocator.hpp"
 #include "umpire/tpl/simpool/FixedSizePool.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
@@ -27,8 +28,7 @@ protected:
   };
 
   // Allocator for the underlying data
-  typedef FixedSizePool<struct Block, IA, IA, (1<<6)> BlockPool;
-  BlockPool blockPool;
+  umpire::util::FixedMallocPool blockPool;
 
   // Start of the nodes of used and free block lists
   struct Block *usedBlocks;
@@ -91,7 +91,7 @@ protected:
       data = allocator->allocate(sizeToAlloc);
     }
     catch (...) {
-      UMPIRE_LOG(Error, 
+      UMPIRE_LOG(Error,
           "\n\tMemory exhausted at allocation resource. "
           "Attempting to give blocks back.\n\t"
           << getCurrentSize() << " Allocated to pool, "
@@ -99,7 +99,7 @@ protected:
           << getInUseBlocks() << " Used Blocks\n"
       );
       freeReleasedBlocks();
-      UMPIRE_LOG(Error, 
+      UMPIRE_LOG(Error,
           "\n\tMemory exhausted at allocation resource.  "
           "\n\tRetrying allocation operation: "
           << getCurrentSize() << " Bytes still allocated to pool, "
@@ -108,12 +108,12 @@ protected:
       );
       try {
         data = allocator->allocate(sizeToAlloc);
-        UMPIRE_LOG(Error, 
+        UMPIRE_LOG(Error,
           "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
       }
       catch (...) {
-        UMPIRE_LOG(Error, 
+        UMPIRE_LOG(Error,
           "\n\tUnable to allocate from resource even after giving back free blocks.\n"
           "\tThrowing to let application know we have no more memory: "
           << getCurrentSize() << " Bytes still allocated to pool\n"
@@ -267,7 +267,7 @@ public:
       const std::size_t _minInitialBytes = (16 * 1024),
       const std::size_t _minBytes = 256
       )
-    : blockPool(),
+    : blockPool(sizeof(struct Block)),
       usedBlocks(NULL),
       freeBlocks(NULL),
       totalBlocks(0),
