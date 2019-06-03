@@ -3,11 +3,13 @@
 ======
 Replay
 ======
+Umpire provides a lightweight replay capability that can be used to investigate
+performance of particular allocation patterns and reproduce bugs.
 
 Input Example
 -------------
-The log can be captured and stored as a JSON file, then used as input to the
-``replay`` application (avaible under the ``bin`` directory). The ``replay``
+A log can be captured and stored as a JSON file, then used as input to the
+``replay`` application (available under the ``bin`` directory). The ``replay``
 program will read the replay log, and recreate the events that occured as part
 of the run that generated the log.
 
