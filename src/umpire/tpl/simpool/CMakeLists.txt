@@ -3,15 +3,19 @@ set (simpool_headers
   FixedSizePool.hpp
   StdAllocator.hpp)
 
+set (simpool_sources
+  DynamicSizePool.cpp)
+
 blt_add_library(
   NAME umpire_tpl_simpool
+  SOURCES ${simpool_sources}
   HEADERS ${simpool_headers})
 
 target_link_libraries(umpire_tpl_simpool INTERFACE)
 
 target_include_directories(
   umpire_tpl_simpool
-  INTERFACE
+  PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
