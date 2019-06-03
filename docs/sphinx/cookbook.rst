@@ -15,7 +15,6 @@ that have introspection disabled for improved performance, and applying CUDA
 .. toctree::
    :maxdepth: 1
 
-   cookbook/logging.rst
    cookbook/shrinking_pools.rst
    cookbook/no_introspection.rst
    cookbook/pool_advice.rst
