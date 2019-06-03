@@ -104,7 +104,7 @@ class DynamicPool :
     void coalesce() noexcept;
 
   private:
-    DynamicSizePool* dpa;
+    DynamicSizePool dpa;
 
     strategy::AllocationStrategy* m_allocator;
     Coalesce_Heuristic do_coalesce;
