@@ -26,6 +26,8 @@ and a dynamic pool for those that are larger.
 
 - Add `util::FixedMallocPool` for internal use.
 
+- Cookbook for enabling Umpire logging
+
 ### Changed
 
 - OpenMP changed to off by default.
