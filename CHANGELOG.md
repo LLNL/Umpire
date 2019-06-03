@@ -42,6 +42,8 @@ and a dynamic pool for those that are larger.
 
 - `AllocationRecord` struct members are no longer prefixed by `m_`.
 
+- Removed deprecated (and unused) replay_allocation_map tool.
+
 ### Removed
 
 - `ENABLE_ASSERTS` was removed in favor of checking the `NDEBUG` macro.
