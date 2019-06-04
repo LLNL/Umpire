@@ -73,6 +73,10 @@ and a dynamic pool for those that are larger.
 - Fixed compilation errors from Intel compiler for newly included third-party
   libraries for json and command line parsing (cxxopts).
 
+- Update calls to allocate_pointer in the FORTRAN bindings to ensure that the
+  correct variable type of C_SIZE_T is passed in.  This fixes compile errors in
+  IBM XL.
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
