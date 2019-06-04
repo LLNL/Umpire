@@ -30,30 +30,30 @@ and a dynamic pool for those that are larger.
 
 ### Changed
 
-- OpenMP changed to off by default.
+- OpenMP is off by default.
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
-- Updated README to better describe Umpire capability.
+- Updated `README.md` to better describe Umpire capability.
 
 - Update BLT to fix CMake 3.13 warnings and MSVC compatibility.
 
-- Faster `util::AllocationMap`.
+- `util::AllocationMap` is significantly faster.
 
 - `ResourceManager` de/registration pass `AllocationRecord` by value.
 
 - `AllocationRecord` struct members are no longer prefixed by `m_`.
-
-- Removed deprecated (and unused) `replay_allocation_map` tool.
 
 - `DynamicPool` directly incorporates Simpool's `DynamicSizePool` and
   uses `FixedMallocPool` internally for a small speedup.
 
 ### Removed
 
-- `ENABLE_ASSERTS` was removed in favor of checking the `NDEBUG` macro.
+- `ENABLE_ASSERTS` is removed in favor of checking the `NDEBUG` macro.
 
 - The remaining classes in Simpool are merged in to the core of Umpire.
+
+- Deprecated and unused `replay_allocation_map` tool is removed.
 
 ### Fixed
 
