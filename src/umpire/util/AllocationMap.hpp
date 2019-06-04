@@ -34,9 +34,7 @@
 namespace umpire {
 namespace util {
 
-class AllocationMap;
 class RecordList;
-class RecordListConstIterator;
 
 class AllocationMap
 {
@@ -47,10 +45,9 @@ class AllocationMap
     ConstIterator(const AllocationMap* map, bool end);
     ConstIterator(const AllocationMap* map, uintptr_t ptr);
     ConstIterator(const ConstIterator& other) = default;
-    ~ConstIterator();
 
-    const AllocationRecord& operator*() const;
-    const AllocationRecord* operator->() const;
+    const RecordList& operator*() const;
+    const RecordList* operator->() const;
     ConstIterator& operator++();
     ConstIterator operator++(int);
 
@@ -60,7 +57,7 @@ class AllocationMap
     Judy* m_array;
     JudySlot* m_last;
     uintptr_t m_ptr;
-    RecordListConstIterator* m_iter;
+    // RecordList::ConstIterator* m_iter;
   };
     // Friend the iterator class
     friend class ConstIterator;
