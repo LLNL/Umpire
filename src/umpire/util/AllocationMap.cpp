@@ -69,8 +69,6 @@ private:
   size_t m_length;
 };
 
-static umpire::util::FixedMallocPool list_pool(sizeof(RecordList));
-
 // Iterator for RecordList
 class RecordListConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
 {
@@ -191,7 +189,8 @@ AllocationMap::AllocationMap() :
   m_array(nullptr),
   m_size(0),
   m_last(nullptr),
-  m_mutex()
+  m_mutex(),
+  m_pool(sizeof(RecordList))
 {
   // Create new judy array
   m_array = judy_open(judy_max_levels, judy_depth);
@@ -219,7 +218,7 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
 
   if (!*plist) {
     // if there is no list there, create one and emplace the record
-    (*plist) = new (list_pool.allocate()) RecordList{record};
+    (*plist) = new (m_pool.allocate()) RecordList{record};
   }
   else {
     // else, push onto that list
@@ -318,11 +317,12 @@ AllocationRecord AllocationMap::remove(void* ptr)
       --m_size;
 
       if (list->empty()) {
+        // TODO Move this to a private method
         // Manually call destructor
         list->~RecordList();
 
         // Mark as deallocated in the pool
-        list_pool.deallocate(list);
+        m_pool.deallocate(list);
 
         // Remove entry from judy array
         m_last = judy_del(m_array);
@@ -358,7 +358,7 @@ void AllocationMap::clear()
     list->~RecordList();
 
     // Mark as deallocated in the pool
-    list_pool.deallocate(list);
+    m_pool.deallocate(list);
 
     // Delete the key and cell for the current stack entry.
     judy_del(m_array);

@@ -21,6 +21,8 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
+#include "umpire/util/FixedMallocPool.hpp"
+
 #include "umpire/tpl/judy/judy.h"
 
 #include <cstdint>
@@ -112,6 +114,7 @@ class AllocationMap
     size_t m_size;
     mutable JudySlot* m_last; // last found value in m_array
     mutable std::mutex m_mutex;
+    FixedMallocPool m_pool;
 };
 
 } // end of namespace util
