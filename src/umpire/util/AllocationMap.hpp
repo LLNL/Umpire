@@ -36,33 +36,32 @@ class AllocationMap;
 class RecordList;
 class RecordListConstIterator;
 
-class AllocationMapConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+class AllocationMap
 {
   public:
-    AllocationMapConstIterator(const AllocationMap* map, bool end);
-    AllocationMapConstIterator(const AllocationMap* map, uintptr_t ptr);
-    AllocationMapConstIterator(const AllocationMapConstIterator& other) = default;
-    ~AllocationMapConstIterator();
+  class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+  {
+  public:
+    ConstIterator(const AllocationMap* map, bool end);
+    ConstIterator(const AllocationMap* map, uintptr_t ptr);
+    ConstIterator(const ConstIterator& other) = default;
+    ~ConstIterator();
 
     const AllocationRecord& operator*() const;
     const AllocationRecord* operator->() const;
-    AllocationMapConstIterator& operator++();
-    AllocationMapConstIterator operator++(int);
+    ConstIterator& operator++();
+    ConstIterator operator++(int);
 
-    bool operator==(const AllocationMapConstIterator& other);
-    bool operator!=(const AllocationMapConstIterator& other);
+    bool operator==(const ConstIterator& other);
+    bool operator!=(const ConstIterator& other);
   private:
     Judy* m_array;
     JudySlot* m_last;
     uintptr_t m_ptr;
     RecordListConstIterator* m_iter;
-};
-
-class AllocationMap
-{
-  public:
+  };
     // Friend the iterator class
-    friend class AllocationMapConstIterator;
+    friend class ConstIterator;
 
     AllocationMap();
     ~AllocationMap();
@@ -105,8 +104,8 @@ class AllocationMap
     void printAll(std::ostream& os = std::cout) const;
 
     // Const iterator
-    AllocationMapConstIterator begin() const;
-    AllocationMapConstIterator end() const;
+    ConstIterator begin() const;
+    ConstIterator end() const;
 
   private:
     Judy* m_array;

@@ -410,20 +410,19 @@ void AllocationMap::printAll(std::ostream& os) const
 }
 
 
-AllocationMapConstIterator AllocationMap::begin() const
+AllocationMap::ConstIterator AllocationMap::begin() const
 {
-  return AllocationMapConstIterator{this, false};
+  return AllocationMap::ConstIterator{this, false};
 }
 
-AllocationMapConstIterator AllocationMap::end() const
+AllocationMap::ConstIterator AllocationMap::end() const
 {
-  return AllocationMapConstIterator{this, true};
+  return AllocationMap::ConstIterator{this, true};
 }
 
 // AllocationMapConstIterator
-AllocationMapConstIterator::AllocationMapConstIterator(const AllocationMap* map,
-                                                       bool end)
-  : m_array(map->m_array), m_last(nullptr), m_ptr(0), m_iter(nullptr)
+AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, bool end) :
+  m_array(map->m_array), m_last(nullptr), m_ptr(0), m_iter(nullptr)
 {
   if (!end) {
     m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), judy_max);
@@ -438,9 +437,8 @@ AllocationMapConstIterator::AllocationMapConstIterator(const AllocationMap* map,
   }
 }
 
-AllocationMapConstIterator::AllocationMapConstIterator(const AllocationMap* map,
-                                                       uintptr_t ptr)
-  : m_array(map->m_array), m_last(nullptr), m_ptr(ptr), m_iter(nullptr)
+AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, uintptr_t ptr) :
+  m_array(map->m_array), m_last(nullptr), m_ptr(ptr), m_iter(nullptr)
 {
   m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_ptr), judy_max);
   if (m_last) {
@@ -449,22 +447,22 @@ AllocationMapConstIterator::AllocationMapConstIterator(const AllocationMap* map,
   }
 }
 
-AllocationMapConstIterator::~AllocationMapConstIterator()
+AllocationMap::ConstIterator::~ConstIterator()
 {
   delete m_iter;
 }
 
-const AllocationRecord& AllocationMapConstIterator::operator*() const
+const AllocationRecord& AllocationMap::ConstIterator::operator*() const
 {
   return m_iter->operator*();
 }
 
-const AllocationRecord* AllocationMapConstIterator::operator->() const
+const AllocationRecord* AllocationMap::ConstIterator::operator->() const
 {
   return m_iter->operator->();
 }
 
-AllocationMapConstIterator& AllocationMapConstIterator::operator++()
+AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++()
 {
   auto list = reinterpret_cast<RecordList*>(*m_last);
   (*m_iter)++;
@@ -481,19 +479,19 @@ AllocationMapConstIterator& AllocationMapConstIterator::operator++()
   return *this;
 }
 
-AllocationMapConstIterator AllocationMapConstIterator::operator++(int)
+AllocationMap::ConstIterator AllocationMap::ConstIterator::operator++(int)
 {
-  AllocationMapConstIterator tmp{*this};
+  AllocationMap::ConstIterator tmp{*this};
   ++(*this);
   return tmp;
 }
 
-bool AllocationMapConstIterator::operator==(const AllocationMapConstIterator& other)
+bool AllocationMap::ConstIterator::operator==(const AllocationMap::ConstIterator& other)
 {
   return (m_array == other.m_array && m_ptr == other.m_ptr && *m_iter == *other.m_iter);
 }
 
-bool AllocationMapConstIterator::operator!=(const AllocationMapConstIterator& other)
+bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator& other)
 {
   return !(*this == other);
 }
