@@ -26,6 +26,8 @@ and a dynamic pool for those that are larger.
 
 - Add `util::FixedMallocPool` for internal use.
 
+- Cookbook for enabling Umpire logging
+
 ### Changed
 
 - OpenMP changed to off by default.
@@ -41,6 +43,8 @@ and a dynamic pool for those that are larger.
 - `ResourceManager` de/registration pass `AllocationRecord` by value.
 
 - `AllocationRecord` struct members are no longer prefixed by `m_`.
+
+- Removed deprecated (and unused) `replay_allocation_map` tool.
 
 - `DynamicPool` directly incorporates Simpool's `DynamicSizePool` and
   uses `FixedMallocPool` internally for a small speedup.
