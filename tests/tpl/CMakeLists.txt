@@ -25,16 +25,6 @@ blt_add_test(
   COMMAND judy_smoke_tests)
 
 blt_add_executable(
-  NAME simpool_smoke_tests
-  SOURCES simpool_smoke_tests.cpp
-  DEPENDS_ON umpire_tpl_simpool gtest
-  OUTPUT_DIR ${unit_dir})
-
-blt_add_test(
-  NAME simpool_smoke_tests
-  COMMAND simpool_smoke_tests)
-
-blt_add_executable(
   NAME cxxopts_smoke_tests
   SOURCES cxxopts_smoke_tests.cpp
   DEPENDS_ON umpire_tpl_cxxopts gtest

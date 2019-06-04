@@ -25,10 +25,10 @@ if (ENABLE_STATISTICS)
   set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
   set(ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
 
-  set (conduit_includes 
+  set (conduit_includes
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit> 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/c>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/python>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs/conduit>
@@ -93,5 +93,4 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-add_subdirectory(simpool)
 add_subdirectory(judy)
