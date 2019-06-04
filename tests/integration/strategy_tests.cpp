@@ -123,7 +123,7 @@ TEST_P(StrategyTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices));
+INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices),);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 TEST(SimpoolStrategy, Device)

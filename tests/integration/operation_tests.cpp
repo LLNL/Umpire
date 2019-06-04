@@ -26,7 +26,7 @@
 #include <cuda_runtime_api.h>
 #endif
 
-class OperationTest : 
+class OperationTest :
   public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
 {
   public:
@@ -113,7 +113,7 @@ TEST_P(CopyTest, Offset) {
 
   rm.copy(check_array, dest_array);
   rm.copy(check_array, dest_array + m_size / 2);
-  
+
   for (size_t i = 0; i < m_size / 2; ++i) {
     ASSERT_EQ(i + m_size / 2, check_array[i]);
   }
@@ -163,15 +163,14 @@ const std::string copy_dests[] = {
     , "PINNED"
 #endif
 };
-    
+
 
 INSTANTIATE_TEST_CASE_P(
     Copies,
     CopyTest,
     ::testing::Combine(
       ::testing::ValuesIn(copy_sources),
-      ::testing::ValuesIn(copy_dests)
-));
+      ::testing::ValuesIn(copy_dests)),);
 
 class MemsetTest :
   public OperationTest
@@ -199,7 +198,7 @@ TEST_P(MemsetTest, Offset) {
   rm.copy(check_array, source_array);
 
   char * check_chars = reinterpret_cast<char*>(check_array);
-  
+
   for (size_t i = 0; i < m_size / 2 * sizeof(float); ++i) {
     ASSERT_EQ(1, check_chars[i]);
   }
@@ -249,8 +248,7 @@ INSTANTIATE_TEST_CASE_P(
     MemsetTest,
     ::testing::Combine(
       ::testing::ValuesIn(memset_sources),
-      ::testing::ValuesIn(memset_dests)
-));
+      ::testing::ValuesIn(memset_dests)),);
 
 class ReallocateTest :
   public OperationTest
@@ -265,12 +263,12 @@ TEST_P(ReallocateTest, Reallocate)
 
   rm.memset(source_array, 0);
 
-  source_array = 
+  source_array =
     static_cast<float*>(
         rm.reallocate(source_array, reallocated_size*sizeof(float)));
 
   ASSERT_EQ(
-      source_allocator->getSize(source_array), 
+      source_allocator->getSize(source_array),
       reallocated_size*sizeof(float));
 
   rm.copy(check_array, source_array, reallocated_size*sizeof(float));
@@ -288,22 +286,22 @@ TEST_P(ReallocateTest, ReallocateLarger)
 
   rm.memset(source_array, 1);
 
-  source_array = 
+  source_array =
     static_cast<float*>(
         rm.reallocate(source_array, reallocated_size*sizeof(float)));
 
   ASSERT_EQ(
-      source_allocator->getSize(source_array), 
+      source_allocator->getSize(source_array),
       reallocated_size*sizeof(float));
 
   rm.memset(source_array + m_size, 2);
 
-  check_array = 
+  check_array =
     static_cast<float*>(
         rm.reallocate(check_array, reallocated_size*sizeof(float)));
 
-  rm.copy(check_array, 
-      source_array, 
+  rm.copy(check_array,
+      source_array,
       reallocated_size*sizeof(float));
 
   char * check_interrogator = reinterpret_cast<char*>(check_array);
@@ -326,12 +324,12 @@ TEST_P(ReallocateTest, RealocateNull)
 
   void* null_array = nullptr;
 
-  float* reallocated_array = 
+  float* reallocated_array =
     static_cast<float*>(
         rm.reallocate(null_array, reallocated_size*sizeof(float)));
 
   ASSERT_EQ(
-      source_allocator->getSize(reallocated_array), 
+      source_allocator->getSize(reallocated_array),
       reallocated_size*sizeof(float));
 
   rm.deallocate(reallocated_array);
@@ -346,12 +344,12 @@ TEST_P(ReallocateTest, ReallocateNullWithAllocator)
 
   void* null_array = nullptr;
 
-  float* reallocated_array = 
+  float* reallocated_array =
     static_cast<float*>(
         rm.reallocate(null_array, reallocated_size*sizeof(float), *source_allocator));
 
   ASSERT_EQ(
-      source_allocator->getSize(reallocated_array), 
+      source_allocator->getSize(reallocated_array),
       reallocated_size*sizeof(float));
 
   rm.deallocate(reallocated_array);
@@ -363,12 +361,12 @@ TEST_P(ReallocateTest, ReallocateWithAllocator)
 
   const size_t reallocated_size = (m_size+50);
 
-  float* reallocated_array = 
+  float* reallocated_array =
     static_cast<float*>(
         rm.reallocate(source_array, reallocated_size*sizeof(float), *source_allocator));
 
   ASSERT_EQ(
-      source_allocator->getSize(reallocated_array), 
+      source_allocator->getSize(reallocated_array),
       reallocated_size*sizeof(float));
 
   rm.deallocate(reallocated_array);
@@ -410,8 +408,7 @@ INSTANTIATE_TEST_CASE_P(
     ReallocateTest,
     ::testing::Combine(
       ::testing::ValuesIn(reallocate_sources),
-      ::testing::ValuesIn(reallocate_dests)
-));
+      ::testing::ValuesIn(reallocate_dests)),);
 
 class MoveTest :
   public OperationTest
@@ -429,7 +426,7 @@ TEST_P(MoveTest, Move)
 
   float* moved_array = static_cast<float*>(rm.move(source_array, *dest_allocator));
 
-  if ( dest_allocator->getAllocationStrategy() 
+  if ( dest_allocator->getAllocationStrategy()
       == source_allocator->getAllocationStrategy()) {
     ASSERT_EQ(moved_array, source_array);
   }
@@ -472,8 +469,7 @@ INSTANTIATE_TEST_CASE_P(
     MoveTest,
     ::testing::Combine(
       ::testing::ValuesIn(move_sources),
-      ::testing::ValuesIn(move_dests)
-));
+      ::testing::ValuesIn(move_dests)),);
 
 #if defined(UMPIRE_ENABLE_CUDA)
 class AdviceTest :
