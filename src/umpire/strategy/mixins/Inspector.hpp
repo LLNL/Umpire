@@ -36,7 +36,9 @@ class Inspector
         size_t size,
         strategy::AllocationStrategy* strategy);
 
-    util::AllocationRecord deregisterAllocation(void* ptr);
+    // Deregisters the allocation if the strategy matches, otherwise throws an error
+    util::AllocationRecord deregisterAllocation(
+      void* ptr, strategy::AllocationStrategy* strategy);
 
   protected:
     long m_current_size;

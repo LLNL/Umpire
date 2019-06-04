@@ -42,10 +42,7 @@ AllocationTracker::allocate(size_t bytes)
 void
 AllocationTracker::deallocate(void* ptr)
 {
-  auto record = deregisterAllocation(ptr);
-
-  UMPIRE_CHECK_ALLOCATOR(record, m_allocator->getName());
-
+  deregisterAllocation(ptr, this);
   m_allocator->deallocate(ptr);
 }
 
@@ -79,7 +76,7 @@ AllocationTracker::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-strategy::AllocationStrategy* 
+strategy::AllocationStrategy*
 AllocationTracker::getAllocationStrategy()
 {
   return m_allocator;
