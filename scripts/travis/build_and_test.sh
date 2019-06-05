@@ -38,6 +38,12 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
     fi
     if [[ "${DO_MEMCHECK}" == "yes" ]] ; then
       or_die ctest -T memcheck
+      for f in ./Testing/Temporary/MemoryChecker.*.log; do
+        if [ -e "$f" ] ; then
+          echo "Memory leaks detected, see $f" 
+          exit 1
+        fi
+      done
     fi
 fi
 
