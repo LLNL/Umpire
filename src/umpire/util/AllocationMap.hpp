@@ -21,9 +21,7 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
-#include "umpire/util/FixedMallocPool.hpp"
-
-#include "umpire/tpl/judy/judy.h"
+#include "umpire/util/MemoryMap.hpp"
 
 #include <cstdint>
 #include <mutex>
@@ -39,28 +37,10 @@ class RecordList;
 class AllocationMap
 {
   public:
-  class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
-  {
-  public:
-    ConstIterator(const AllocationMap* map, bool end);
-    ConstIterator(const AllocationMap* map, uintptr_t ptr);
-    ConstIterator(const ConstIterator& other) = default;
-
-    const RecordList& operator*() const;
-    const RecordList* operator->() const;
-    ConstIterator& operator++();
-    ConstIterator operator++(int);
-
-    bool operator==(const ConstIterator& other);
-    bool operator!=(const ConstIterator& other);
-  private:
-    Judy* m_array;
-    JudySlot* m_last;
-    uintptr_t m_ptr;
-    // RecordList::ConstIterator* m_iter;
-  };
     // Friend the iterator class
     friend class ConstIterator;
+
+    using MapType = MemoryMap<RecordList>;
 
     AllocationMap();
     ~AllocationMap();
@@ -103,15 +83,13 @@ class AllocationMap
     void printAll(std::ostream& os = std::cout) const;
 
     // Const iterator
-    ConstIterator begin() const;
-    ConstIterator end() const;
+    typename MapType::template Iterator<true> begin() const;
+    typename MapType::template Iterator<true> end() const;
 
   private:
-    Judy* m_array;
+    MapType* m_map;
     size_t m_size;
-    mutable JudySlot* m_last; // last found value in m_array
     mutable std::mutex m_mutex;
-    FixedMallocPool m_pool;
 };
 
 } // end of namespace util
