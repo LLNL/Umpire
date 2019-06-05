@@ -44,8 +44,8 @@ SICMStrategy::SICMStrategy(
 }
 
 SICMStrategy::~SICMStrategy() {
-    sicm_arena_destroy(m_arena);
-    sicm_fini();
+  sicm_arena_destroy(m_arena);
+  sicm_fini();
 }
 
 void*
@@ -79,7 +79,7 @@ SICMStrategy::getHighWatermark() const noexcept
 Platform
 SICMStrategy::getPlatform() noexcept
 {
-    return Platform::sicm;
+  return Platform::sicm;
 }
 
 size_t

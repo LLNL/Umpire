@@ -22,7 +22,6 @@ struct MemoryResourceTypeHash
 
 enum MemoryResourceType {
   Host,
-  SICM,
   Device,
   Unified,
   Pinned,

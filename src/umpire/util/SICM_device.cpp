@@ -51,9 +51,9 @@ std::vector<unsigned int> get_devices(const struct sicm_device_list& devs, const
 }
 
 unsigned int best_device(const int UMPIRE_UNUSED_ARG(running_at),
-                             const std::size_t UMPIRE_UNUSED_ARG(size),
-                             const std::vector <unsigned int>& allowed_devices,
-                             const sicm_device_list& UMPIRE_UNUSED_ARG(devs)) {
+                         const std::size_t UMPIRE_UNUSED_ARG(size),
+                         const std::vector <unsigned int>& allowed_devices,
+                         const sicm_device_list& UMPIRE_UNUSED_ARG(devs)) {
     static std::size_t index = 0;
     const unsigned int dev = allowed_devices[index % allowed_devices.size()];
     index = (index + 1) % allowed_devices.size();

@@ -50,8 +50,8 @@ void SICMMoveOperation::transform(
 
     const int rc = sicm_arena_set_device(sa, &m_devices.devices[dst_allocator->getDeviceIndex()]);
     if (rc != 0) {
-        sicm_fini();
-        UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
+      sicm_fini();
+      UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
     }
 
     *dst_ptr = src_ptr;
