@@ -40,12 +40,19 @@ public:
   template <bool Const = false>
   class Iterator : public std::iterator<std::forward_iterator_tag, Value> {
   public:
-    using Reference = typename std::conditional<Const, Value const&, Value&>::type;
-    using Pointer = typename std::conditional<Const, Value const*, Value*>::type;
+
+    template <bool OtherConst> friend class Iterator;
+
+    using ValuePtr = typename std::conditional<Const, const Value*, Value*>::type;
+    using Content = std::pair<void*, ValuePtr>;
+    using Reference = typename std::conditional<Const, const Content&, Content&>::type;
+    using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
     Iterator(Judy* array, JudySlot* last, KeyType key);
     Iterator(Judy* array, bool end);
-    Iterator(const Iterator& other) = default;
+
+    template<bool OtherConst>
+    Iterator(const Iterator<OtherConst>& other);
 
     Reference operator*();
     Pointer operator->();
@@ -59,9 +66,13 @@ public:
     bool operator!=(const Iterator<OtherConst>& other);
 
   private:
+    // Create the m_pair
+    Content makePair();
+
     Judy* m_array;
     JudySlot* m_last;
     KeyType m_key;
+    Content m_pair;
   };
 
   // TODO These should be noexcept

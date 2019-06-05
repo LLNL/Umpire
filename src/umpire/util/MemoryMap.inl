@@ -163,21 +163,39 @@ void MemoryMap<Value>::removeLast()
 
 template <typename Value>
 template <bool Const>
+typename MemoryMap<Value>::template Iterator<Const>::Content
+MemoryMap<Value>::Iterator<Const>::makePair()
+{
+  return std::make_pair(reinterpret_cast<void*>(m_key), m_last ? reinterpret_cast<ValuePtr>(*m_last) : nullptr);
+}
+
+template <typename Value>
+template <bool Const>
 MemoryMap<Value>::Iterator<Const>::Iterator(Judy* array, JudySlot* last, MemoryMap<Value>::KeyType key) :
-  m_array(array), m_last(last), m_key(reinterpret_cast<KeyType>(key))
+  m_array(array), m_last(last), m_key(key), m_pair(makePair())
 {
 }
 
 template <typename Value>
 template <bool Const>
 MemoryMap<Value>::Iterator<Const>::Iterator(Judy* array, bool end) :
-  m_array(array), m_last(nullptr), m_key(0)
+  m_array(array), m_last(nullptr), m_key(0), m_pair()
 {
   if (!end) {
     m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_key), judy_max);
   } else {
     m_key = 0;
   }
+
+  m_pair = makePair();
+}
+
+template <typename Value>
+template <bool Const>
+template <bool OtherConst>
+MemoryMap<Value>::Iterator<Const>::Iterator(const Iterator<OtherConst>& other) :
+  m_array(other.m_array), m_last(other.m_last), m_key(other.m_key), m_pair(makePair())
+{
 }
 
 template <typename Value>
@@ -185,7 +203,7 @@ template <bool Const>
 typename MemoryMap<Value>::template Iterator<Const>::Reference
 MemoryMap<Value>::Iterator<Const>::operator*()
 {
-  return *reinterpret_cast<Pointer>(*m_last);
+  return m_pair;
 }
 
 template <typename Value>
@@ -193,7 +211,7 @@ template <bool Const>
 typename MemoryMap<Value>::template Iterator<Const>::Pointer
 MemoryMap<Value>::Iterator<Const>::operator->()
 {
-  return reinterpret_cast<Pointer>(*m_last);
+  return &m_pair;
 }
 
 template <typename Value>
@@ -212,6 +230,9 @@ MemoryMap<Value>::Iterator<Const>::operator++()
     // Update m_last
     m_last = new_slot;
   }
+
+  // Update pair
+  m_pair = makePair();
 
   return *this;
 }

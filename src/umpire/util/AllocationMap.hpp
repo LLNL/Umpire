@@ -34,62 +34,134 @@ namespace util {
 
 class RecordList;
 
-class AllocationMap
+class RecordList
 {
+public:
+  template <typename T>
+  struct Block
+  {
+    T rec;
+    Block* prev;
+  };
+
+  using BlockType = Block<AllocationRecord>;
+
+  // Iterator for RecordList
+  class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+  {
   public:
-    // Friend the iterator class
-    friend class ConstIterator;
+    ConstIterator(const RecordList* list, bool end);
+    ConstIterator(const ConstIterator&) = default;
 
-    using MapType = MemoryMap<RecordList>;
+    const AllocationRecord& operator*();
+    const AllocationRecord* operator->();
+    ConstIterator& operator++();
+    ConstIterator operator++(int);
 
-    AllocationMap();
-    ~AllocationMap();
-
-    // Would require a deep copy of the Judy data
-    AllocationMap(const AllocationMap&) = delete;
-
-    // Insert a new record -- copies record
-    void insert(void* ptr, AllocationRecord record);
-
-    // Find a record -- throws an exception if the record is not found.
-    // AllocationRecord addresses will not change once registered, so
-    // the resulting address of a find(ptr) call can be stored
-    // externally until deregistered. Note also that this class
-    // deallocates the AllocationRecord when removed(), so the pointer
-    // will become invalid at that point.
-    const AllocationRecord* find(void* ptr) const;
-    AllocationRecord* find(void* ptr);
-
-    // This version of find never throws an exception
-    const AllocationRecord* findRecord(void* ptr) const noexcept;
-    AllocationRecord* findRecord(void* ptr) noexcept;
-
-    // Only allows erasing the last inserted entry for key = ptr
-    AllocationRecord remove(void* ptr);
-
-    // Check if a pointer has been added to the map.
-    bool contains(void* ptr) const;
-
-    // Clear all records from the map
-    void clear();
-
-    // Returns number of entries
-    size_t size() const;
-
-    // Print methods -- either matching a predicate or all records
-    void print(const std::function<bool (const AllocationRecord&)>&& predicate,
-               std::ostream& os = std::cout) const;
-
-    void printAll(std::ostream& os = std::cout) const;
-
-    // Const iterator
-    typename MapType::template Iterator<true> begin() const;
-    typename MapType::template Iterator<true> end() const;
+    bool operator==(const ConstIterator& other);
+    bool operator!=(const ConstIterator& other);
 
   private:
-    MapType* m_map;
-    size_t m_size;
-    mutable std::mutex m_mutex;
+    const RecordList *m_list;
+    BlockType* m_curr;
+  };
+
+  RecordList(AllocationRecord record);
+  ~RecordList();
+
+  void push_back(const AllocationRecord& rec);
+  AllocationRecord pop_back();
+
+  ConstIterator begin() const;
+  ConstIterator end() const;
+
+  size_t size() const;
+  bool empty() const;
+  AllocationRecord* back();
+  const AllocationRecord* back() const;
+
+private:
+  BlockType* m_tail;
+  size_t m_length;
+};
+
+class AllocationMap
+{
+public:
+  using MapType = MemoryMap<RecordList>;
+
+  // Iterator that flattens MemoryMap and RecordList iterators
+  class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+  {
+  public:
+    using OuterIterType = MapType::Iterator<true>;
+    using InnerIterType = RecordList::ConstIterator;
+
+    // Iterator(AllocationMap* map, const OuterIterType& outer_iter, const InnerIterType& inner_iter);
+    ConstIterator(const AllocationMap* map, bool end);
+    ConstIterator(const ConstIterator&) = default;
+
+    const AllocationRecord& operator*();
+    const AllocationRecord* operator->();
+    ConstIterator& operator++();
+    ConstIterator operator++(int);
+
+    bool operator==(const ConstIterator& other);
+    bool operator!=(const ConstIterator& other);
+
+  private:
+    OuterIterType m_outer_iter;
+    InnerIterType m_inner_iter;
+    InnerIterType m_inner_end;
+    OuterIterType m_outer_end;
+  };
+
+  AllocationMap();
+
+  // Would require a deep copy of the Judy data
+  AllocationMap(const AllocationMap&) = delete;
+
+  // Insert a new record -- copies record
+  void insert(void* ptr, AllocationRecord record);
+
+  // Find a record -- throws an exception if the record is not found.
+  // AllocationRecord addresses will not change once registered, so
+  // the resulting address of a find(ptr) call can be stored
+  // externally until deregistered. Note also that this class
+  // deallocates the AllocationRecord when removed(), so the pointer
+  // will become invalid at that point.
+  const AllocationRecord* find(void* ptr) const;
+  AllocationRecord* find(void* ptr);
+
+  // This version of find never throws an exception
+  const AllocationRecord* findRecord(void* ptr) const noexcept;
+  AllocationRecord* findRecord(void* ptr) noexcept;
+
+  // Only allows erasing the last inserted entry for key = ptr
+  AllocationRecord remove(void* ptr);
+
+  // Check if a pointer has been added to the map.
+  bool contains(void* ptr) const;
+
+  // Clear all records from the map
+  void clear();
+
+  // Returns number of entries
+  size_t size() const;
+
+  // Print methods -- either matching a predicate or all records
+  void print(const std::function<bool (const AllocationRecord&)>&& predicate,
+             std::ostream& os = std::cout) const;
+
+  void printAll(std::ostream& os = std::cout) const;
+
+  ConstIterator begin() const;
+  ConstIterator end() const;
+
+private:
+  MapType m_map;
+  size_t m_size;
+  mutable std::mutex m_mutex;
 };
 
 } // end of namespace util
