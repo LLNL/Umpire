@@ -139,8 +139,11 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
 
   auto ret{m_map.get(ptr, record)};
   const bool found{ret.second};
-  auto map_iter = ret.first;
-  if (found) map_iter->second->push_back(record);
+  if (found) {
+    auto map_iter = ret.first;
+    if (found) map_iter->second->push_back(record);
+  }
+  // else (found = false), get() already added it
 
   UMPIRE_UNLOCK;
   ++m_size;
@@ -177,7 +180,8 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
   auto iter = m_map.find(ptr);
 
   // If a list was found, return its tail
-  if (iter != m_map.end()) {
+  if (iter->second) {
+    // faster way of checking iter != m_map->end()
     alloc_record = iter->second->back();
 
     const uintptr_t parent_ptr{reinterpret_cast<uintptr_t>(alloc_record->ptr)};
@@ -210,7 +214,8 @@ AllocationRecord AllocationMap::remove(void* ptr)
 
     auto iter = m_map.find(ptr);
 
-    if (iter != m_map.end()) {
+    if (iter->second) {
+      // faster way of checking iter != m_map->end()
       ret = iter->second->pop_back();
       if (iter->second->empty()) m_map.removeLast();
     }
