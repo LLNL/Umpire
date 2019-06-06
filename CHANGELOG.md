@@ -77,6 +77,9 @@ and a dynamic pool for those that are larger.
   correct variable type of C_SIZE_T is passed in.  This fixes compile errors in
   IBM XL.
 
+- Fix CodeCov reporting by explicitly downloading older version of upload
+  script.
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
