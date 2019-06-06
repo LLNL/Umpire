@@ -12,7 +12,7 @@ matrix:
     env:
     - COMPILER=g++
     - IMG=gcc-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_COVERAGE=On -DENABLE_C=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On -DENABLE_C=On"
     - DO_MEMCHECK=yes
   - compiler: gcc6
     env:
@@ -44,6 +44,11 @@ matrix:
     - COMPILER=clang++
     - IMG=clang-6
     - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
+  - compiler: clang6-debug
+    env:
+    - COMPILER=clang++
+    - IMG=clang-6
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DCMAKE_BUILD_TYPE=Debug"
   - compiler: nvcc
     env:
     - COMPILER=g++
