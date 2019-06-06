@@ -114,7 +114,7 @@ AllocationMap::findRecord(void* ptr) const
 
       if (alloc_record &&
           ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
-             > static_cast<char*>(ptr))) {
+             >= static_cast<char*>(ptr))) {
 
          UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
             << " with size " << alloc_record->m_size);

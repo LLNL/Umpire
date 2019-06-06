@@ -19,7 +19,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 0.3.3)
+  VERSION 0.3.4)
 
 set(ENABLE_OPENMP On CACHE BOOL "")
 set(ENABLE_CUDA On CACHE BOOL "")
