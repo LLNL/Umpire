@@ -28,7 +28,7 @@ matrix:
     env:
     - COMPILER=g++
     - IMG=gcc-8
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DCMAKE_BUILD_TYPE=RelWithDebInfo"
   - compiler: clang4
     env:
     - COMPILER=clang++
