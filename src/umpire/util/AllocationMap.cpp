@@ -281,7 +281,8 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
   if (list) {
     alloc_record = list->back();
 
-    if ((parent_ptr + alloc_record->size) > reinterpret_cast<uintptr_t>(ptr)) {
+    if ((reinterpret_cast<unsigned char*>(parent_ptr) + alloc_record->size)
+         >= reinterpret_cast<unsigned char*>(ptr)) {
       UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
                  << " with size " << alloc_record->size);
     }
