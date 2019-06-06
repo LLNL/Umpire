@@ -48,6 +48,8 @@ and a dynamic pool for those that are larger.
 - `DynamicPool` directly incorporates Simpool's `DynamicSizePool` and
   uses `FixedMallocPool` internally for a small speedup.
 
+- Added Debug and RelWithDebInfo builds to Travis CI.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
