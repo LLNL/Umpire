@@ -87,10 +87,14 @@ public:
 
   // Return pointer-to or emplaces a new Value with args to the constructor
   template <typename... Args>
-  std::pair<Iterator<false>, bool> get(void* ptr, Args&... args) noexcept;
+  std::pair<Iterator<false>, bool> get(void* ptr, Args&&... args) noexcept;
 
   // Insert a new Value at ptr
   Iterator<false> insert(void* ptr, const Value& val);
+
+  // Find a value -- returns what would be the entry immediately before ptr
+  Iterator<true> findOrBefore(void* ptr) const noexcept;
+  Iterator<false> findOrBefore(void* ptr) noexcept;
 
   // Find a value -- returns end() if not found
   Iterator<true> find(void* ptr) const noexcept;
@@ -118,8 +122,8 @@ public:
   size_t size() const noexcept;
 
 private:
-  // Helper method for public find()
-  void doFind(void* ptr) const noexcept;
+  // Helper method for public findOrBefore()
+  void doFindOrBefore(void* ptr) const noexcept;
 
   mutable Judy* m_array;    // Judy array
   mutable JudySlot* m_last; // Last found value in judy array

@@ -177,11 +177,11 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 
   UMPIRE_LOCK;
 
-  auto iter = m_map.find(ptr);
+  auto iter = m_map.findOrBefore(ptr);
 
   // If a list was found, return its tail
   if (iter->second) {
-    // faster way of checking iter != m_map->end()
+    // faster, equivalent way of checking iter != m_map->end()
     alloc_record = iter->second->back();
 
     const uintptr_t parent_ptr{reinterpret_cast<uintptr_t>(alloc_record->ptr)};
@@ -215,7 +215,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
     auto iter = m_map.find(ptr);
 
     if (iter->second) {
-      // faster way of checking iter != m_map->end()
+      // faster, equivalent way of checking iter != m_map->end()
       ret = iter->second->pop_back();
       if (iter->second->empty()) m_map.removeLast();
     }

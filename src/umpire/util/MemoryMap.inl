@@ -59,7 +59,7 @@ MemoryMap<V>::~MemoryMap()
 template <typename V>
 template <typename... Args>
 std::pair<typename MemoryMap<V>::template Iterator<false>, bool>
-MemoryMap<V>::get(void* ptr, Args&... args) noexcept
+MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
 {
   // Find the ptr and update m_oper
   m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
@@ -104,7 +104,7 @@ typename MemoryMap<V>::template Iterator<false> MemoryMap<V>::insert(void* ptr, 
 }
 
 template <typename V>
-void MemoryMap<V>::doFind(void* ptr) const noexcept
+void MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
 {
   // Find the ptr and update m_oper
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
@@ -123,18 +123,37 @@ void MemoryMap<V>::doFind(void* ptr) const noexcept
 }
 
 template <typename V>
+typename MemoryMap<V>::template Iterator<false> MemoryMap<V>::findOrBefore(void* ptr) noexcept
+{
+  doFindOrBefore(ptr);
+  return Iterator<false>{this};
+}
+
+template <typename V>
+typename MemoryMap<V>::template Iterator<true>
+MemoryMap<V>::findOrBefore(void* ptr) const noexcept
+{
+  doFindOrBefore(ptr);
+  return Iterator<true>{this};
+}
+
+template <typename V>
 typename MemoryMap<V>::template Iterator<false> MemoryMap<V>::find(void* ptr) noexcept
 {
-  doFind(ptr);
-  return Iterator<false>{this};
+  // Find the ptr and update m_oper
+  m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
+  return m_last ? Iterator<false>{this} : Iterator<false>{this, iterator_end{}};
 }
 
 template <typename V>
 typename MemoryMap<V>::template Iterator<true>
 MemoryMap<V>::find(void* ptr) const noexcept
 {
-  doFind(ptr);
-  return Iterator<true>{this};
+  // Find the ptr and update m_oper
+  m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
+  return m_last ? Iterator<true>{this} : Iterator<true>{this, iterator_end{}};
 }
 
 template <typename V>
