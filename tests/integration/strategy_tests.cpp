@@ -26,6 +26,7 @@
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
@@ -293,22 +294,48 @@ TEST(AllocationAdvisor, Host)
 
 TEST(FixedPool, Host)
 {
-  struct data { int _[100]; };
-
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool<data>>(
-      "host_fixed_pool", rm.getAllocator("HOST"));
+  const int data_size = 100 * sizeof(int);
 
-  void* alloc = allocator.allocate(sizeof(data));
+  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool>(
+    "host_fixed_pool", rm.getAllocator("HOST"), data_size, 64);
 
-  ASSERT_GE(allocator.getCurrentSize(), sizeof(data));
-  ASSERT_GE(allocator.getActualSize(), sizeof(data)*64);
-  ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
-  ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
+  void* alloc = allocator.allocate(data_size);
+
+  ASSERT_EQ(allocator.getCurrentSize(), data_size);
+  ASSERT_GE(allocator.getActualSize(), data_size*64);
+  ASSERT_EQ(allocator.getSize(alloc), data_size);
+  ASSERT_GE(allocator.getHighWatermark(), data_size);
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 
   allocator.deallocate(alloc);
+}
+
+TEST(MixedPool, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
+      "host_mixed_pool", rm.getAllocator("HOST"));
+
+  const size_t max_power = 9;
+  void* alloc[max_power];
+  size_t size = 4, total_size = 0;
+  for (size_t i = 0; i < max_power; ++i) {
+    alloc[i] = allocator.allocate(size);
+    total_size += size;
+    size *= 4;
+  }
+
+  ASSERT_EQ(allocator.getCurrentSize(), total_size);
+  ASSERT_GT(allocator.getActualSize(), total_size);
+  ASSERT_EQ(allocator.getSize(alloc[max_power-1]), size/4);
+  ASSERT_GE(allocator.getHighWatermark(), total_size);
+  ASSERT_EQ(allocator.getName(), "host_mixed_pool");
+
+  for (size_t i = 0; i < max_power; ++i)
+    allocator.deallocate(alloc[i]);
 }
 
 #if defined(_OPENMP)
@@ -558,9 +585,9 @@ TEST(NumaPolicyTest, EdgeCases) {
                  "numa_alloc", -1, rm.getAllocator("HOST")),
                umpire::util::Exception);
 
+#if defined(UMPIRE_ENABLE_CUDA)
   const int numa_node = umpire::numa::preferred_node();
 
-#if defined(UMPIRE_ENABLE_CUDA)
   // Only works with HOST allocators
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
                  "numa_alloc", numa_node, rm.getAllocator("DEVICE")),

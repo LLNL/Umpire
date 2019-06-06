@@ -39,6 +39,9 @@
 
 #include <memory.h>
 #include <stdlib.h>
+#if defined(_MSC_VER)
+#include <string.h>
+#endif
 
 #ifdef linux
 #  define _FILE_OFFSET_BITS 64

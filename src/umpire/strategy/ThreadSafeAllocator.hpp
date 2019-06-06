@@ -43,7 +43,7 @@ class ThreadSafeAllocator :
   protected:
     strategy::AllocationStrategy* m_allocator;
 
-    std::mutex* m_mutex;
+    std::mutex m_mutex;
 };
 
 } // end of namespace strategy

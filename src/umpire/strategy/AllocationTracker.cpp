@@ -14,6 +14,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/AllocationTracker.hpp"
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace strategy {
 
@@ -40,7 +42,7 @@ AllocationTracker::allocate(size_t bytes)
 void
 AllocationTracker::deallocate(void* ptr)
 {
-  deregisterAllocation(ptr);
+  deregisterAllocation(ptr, this);
   m_allocator->deallocate(ptr);
 }
 
@@ -74,7 +76,7 @@ AllocationTracker::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-strategy::AllocationStrategy* 
+strategy::AllocationStrategy*
 AllocationTracker::getAllocationStrategy()
 {
   return m_allocator;

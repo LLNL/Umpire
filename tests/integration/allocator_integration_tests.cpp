@@ -16,9 +16,11 @@
 
 #include "umpire/config.hpp"
 
+#include "umpire/Umpire.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 class AllocatorTest :
   public ::testing::TestWithParam< std::string >
@@ -122,6 +124,18 @@ TEST_P(AllocatorTest, GetById)
   ASSERT_THROW(
       rm.getAllocator(-25),
       umpire::util::Exception);
+}
+
+TEST_P(AllocatorTest, get_allocator_records)
+{
+  double* data = static_cast<double*>(
+    m_allocator->allocate(m_small*sizeof(double)));
+
+  auto records = umpire::get_allocator_records(*m_allocator);
+
+  ASSERT_EQ(records.size(), 1);
+
+  m_allocator->deallocate(data);
 }
 
 const std::string allocator_strings[] = {
@@ -250,3 +264,36 @@ INSTANTIATE_TEST_CASE_P(
     Resources,
     AllocatorByResourceTest,
     ::testing::ValuesIn(resource_types));
+
+TEST(Allocation, DeallocateDifferent)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc_one  = rm.getAllocator("HOST");
+  auto alloc_two = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "POOL_different_deallocate", alloc_one);
+
+  double* data = static_cast<double*>(alloc_one.allocate(1024*sizeof(double)));
+
+  ASSERT_THROW(
+    alloc_two.deallocate(data),
+    umpire::util::Exception);
+
+  ASSERT_NO_THROW(alloc_one.deallocate(data));
+}
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(Allocator, DeallocateDifferentCuda)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc_um = rm.getAllocator("UM");
+  auto alloc_dev = rm.getAllocator("DEVICE");
+
+  double* data = static_cast<double*>(alloc_um.allocate(1024*sizeof(double)));
+
+  ASSERT_THROW(
+    alloc_dev.deallocate(data),
+    umpire::util::Exception);
+
+}
+#endif

@@ -13,6 +13,78 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Bug AllocationRecord::AllocationMap::findRecord causing it to miss finding
 allocations that were zero bytes in length.
 
+### Added
+
+- CI builds for Mac, Linux and Windows via Azure Pipelines
+
+- HCC stage in Docker file.
+
+- GitHub action to automatically delete merged branches.
+
+- Enabled `FixedPool` allocator benchmarks.
+
+- Mixed pool that uses faster fixed pools for smaller allocation sizes,
+and a dynamic pool for those that are larger.
+
+- Smoke tests for required third-party libraries.
+
+- `util::FixedMallocPool` for internal use.
+
+- Cookbook for enabling Umpire logging.
+
+### Changed
+
+- Replay uses JSON format for its I/O.
+
+- OpenMP is off by default.
+
+- Switched template parameters to runtime constructor arguments in `FixedPool`.
+
+- Update `README.md` to better describe Umpire capability.
+
+- Update BLT to fix CMake 3.13 warnings and MSVC compatibility.
+
+- `util::AllocationMap` is significantly faster.
+
+- `ResourceManager` de/registration pass `AllocationRecord` by value.
+
+- `AllocationRecord` struct members are no longer prefixed by `m_`.
+
+- `DynamicPool` directly incorporates Simpool's `DynamicSizePool` and
+  uses `FixedMallocPool` internally for a small speedup.
+
+### Removed
+
+- `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
+
+- Merge the remaining classes in Simpool into the core of Umpire.
+
+- Deprecated and unused `replay_allocation_map` tool.
+
+### Fixed
+
+- YAML file for ReadTheDocs to read in that will cause it to use
+  Python 3.7 so that it quits producing build failures when it receives
+  a deprecation warning when attempting to run older versions of python.
+
+- Exclude third-party libraries from Doxygen to fix out-of-resources error on
+  ReadTheDocs.
+
+- Throw an error if attempting to deallocate with a different Allocator than
+  performed the allocation.
+
+- Build on Windows.
+
+- Fixed compilation errors from Intel compiler for newly included third-party
+  libraries for json and command line parsing (cxxopts).
+
+- Update calls to allocate_pointer in the FORTRAN bindings to ensure that the
+  correct variable type of C_SIZE_T is passed in.  This fixes compile errors in
+  IBM XL.
+
+- Fix CodeCov reporting by explicitly downloading older version of upload
+  script.
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
@@ -40,7 +112,7 @@ replayed events are correct.
 allocator, and a cookbook recipe to do that.
 
 - Dockerfile for multi-stage builds. Supports building Umpire with GCC, Clang,
-and CUDA
+and CUDA.
 
 - GitHub action to run Clang static analysis.
 
@@ -48,6 +120,10 @@ and CUDA
 distinguish processes in an multi-process run.
 
 - Umpire replay now takes a "--help" option and displays usage information.
+
+- A const iterator for AllocationMap, a free function to pull out a vector of
+allocation records for a specific allocator, and a method to calculate the
+relative fragmentation.
 
 ### Changed
 
