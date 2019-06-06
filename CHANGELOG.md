@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Bug AllocationRecord::AllocationMap::findRecord causing it to miss finding
+allocations that were zero bytes in length.
+
 ## [0.3.3] - 2019-04-11
 
 ### Added
