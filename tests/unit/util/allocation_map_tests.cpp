@@ -152,6 +152,14 @@ TEST_F(AllocationMapTest, RegisterMultiple)
   );
 }
 
+TEST_F(AllocationMapTest, RegisterNone)
+{
+  auto begin{map.begin()}, end{map.end()};
+
+  ASSERT_EQ(begin, end);
+  ASSERT_EQ(map.size(), 0);
+}
+
 TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
 {
   umpire::util::AllocationRecord next_record{data, 1, nullptr};

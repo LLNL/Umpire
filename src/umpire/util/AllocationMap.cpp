@@ -297,8 +297,9 @@ AllocationMap::ConstIterator AllocationMap::end() const
 
 AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_begin) :
   m_outer_iter(map->m_map.begin()),
-  m_inner_iter(m_outer_iter->second->begin()),
-  m_inner_end(m_outer_iter->second->end()),
+  // iterator_end is used below because otherwise the InnerIterType constructor dereferences a nullptr.
+  m_inner_iter(m_outer_iter->first ? m_outer_iter->second->begin() : InnerIterType{nullptr, iterator_end{}}),
+  m_inner_end(m_outer_iter->first ? m_outer_iter->second->end() : InnerIterType{nullptr, iterator_end{}}),
   m_outer_end(map->m_map.end())
 {
 }
