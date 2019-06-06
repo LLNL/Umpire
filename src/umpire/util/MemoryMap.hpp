@@ -27,6 +27,9 @@
 namespace umpire {
 namespace util {
 
+struct iterator_begin {};
+struct iterator_end {};
+
 // MemoryMap maps addresses to a templated type Value, using a
 // FixedMallocPool underneath for speed. It is not threadsafe.
 
@@ -52,7 +55,8 @@ public:
     using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
     Iterator(Map* map);
-    Iterator(Map* map, bool end);
+    Iterator(Map* map, iterator_begin);
+    Iterator(Map* map, iterator_end);
 
     template<bool OtherConst>
     Iterator(const Iterator<OtherConst>& other);

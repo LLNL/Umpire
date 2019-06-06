@@ -108,10 +108,10 @@ void MemoryMap<V>::doFind(void* ptr) const noexcept
 {
   // Find the ptr and update m_oper
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
 
   Key parent_ptr{0};
   judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
-  m_oper = reinterpret_cast<uintptr_t>(this);
 
   // If the ptrs do not match, or the key does not exist, get the previous entry
   if (parent_ptr != ptr || !m_last)
@@ -195,17 +195,20 @@ MemoryMap<V>::Iterator<Const>::Iterator(Map* map) :
 
 template <typename V>
 template <bool Const>
-MemoryMap<V>::Iterator<Const>::Iterator(Map* map, bool end) :
+MemoryMap<V>::Iterator<Const>::Iterator(Map* map, iterator_begin) :
   m_map{map}, m_pair{}
 {
-  if (end) {
-    m_pair = std::make_pair(nullptr, static_cast<ValuePtr>(nullptr));
-  } else {
-    m_map->m_last = judy_strt(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), judy_max);
-    m_map->m_oper = reinterpret_cast<uintptr_t>(this);
-    judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
-    m_pair.second = m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr;
-  }
+  m_map->m_last = judy_strt(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), judy_max);
+  m_map->m_oper = reinterpret_cast<uintptr_t>(this);
+  judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
+  m_pair.second = m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr;
+}
+
+template <typename V>
+template <bool Const>
+MemoryMap<V>::Iterator<Const>::Iterator(Map* map, iterator_end) :
+  m_map{map}, m_pair{std::make_pair(nullptr, static_cast<ValuePtr>(nullptr))}
+{
 }
 
 template <typename V>
@@ -287,28 +290,28 @@ template <typename V>
 typename MemoryMap<V>::template Iterator<true>
 MemoryMap<V>::begin() const
 {
-  return Iterator<true>{this, false};
+  return Iterator<true>{this, iterator_begin{}};
 }
 
 template <typename V>
 typename MemoryMap<V>::template Iterator<false>
 MemoryMap<V>::begin()
 {
-  return Iterator<false>{this, false};
+  return Iterator<false>{this, iterator_begin{}};
 }
 
 template <typename V>
 typename MemoryMap<V>::template Iterator<true>
 MemoryMap<V>::end() const
 {
-  return Iterator<true>{this, true};
+  return Iterator<true>{this, iterator_end{}};
 }
 
 template <typename V>
 typename MemoryMap<V>::template Iterator<false>
 MemoryMap<V>::end()
 {
-  return Iterator<false>{this, true};
+  return Iterator<false>{this, iterator_end{}};
 }
 
 } // end of namespace util

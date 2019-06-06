@@ -67,12 +67,12 @@ AllocationRecord RecordList::pop_back()
 
 RecordList::ConstIterator RecordList::begin() const
 {
-  return RecordList::ConstIterator{this, false};
+  return RecordList::ConstIterator{this, iterator_begin{}};
 }
 
 RecordList::ConstIterator RecordList::end() const
 {
-  return RecordList::ConstIterator{this, true};
+  return RecordList::ConstIterator{this, iterator_end{}};
 }
 
 size_t RecordList::size() const { return m_length; }
@@ -80,8 +80,13 @@ bool RecordList::empty() const { return size() == 0; }
 AllocationRecord* RecordList::back() { return &m_tail->rec; }
 const AllocationRecord* RecordList::back() const { return &m_tail->rec; }
 
-RecordList::ConstIterator::ConstIterator(const RecordList* list, bool end)
-  : m_list(list), m_curr(end ? nullptr : m_list->m_tail)
+RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_begin)
+  : m_list(list), m_curr(m_list->m_tail)
+{
+}
+
+RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_end)
+  : m_list(list), m_curr(nullptr)
 {
 }
 
@@ -277,19 +282,26 @@ void AllocationMap::printAll(std::ostream& os) const
 
 AllocationMap::ConstIterator AllocationMap::begin() const
 {
-  return AllocationMap::ConstIterator{this, false};
+  return AllocationMap::ConstIterator{this, iterator_begin{}};
 }
 
 AllocationMap::ConstIterator AllocationMap::end() const
 {
-  return AllocationMap::ConstIterator{this, true};
+  return AllocationMap::ConstIterator{this, iterator_end{}};
 }
 
-// // AllocationMap::ConstIterator <bool Const>
-AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, bool end) :
-  m_outer_iter(end ? map->m_map.end() : map->m_map.begin()),
-  m_inner_iter(end ? InnerIterType{nullptr, true} : m_outer_iter->second->begin()),
-  m_inner_end(end ? InnerIterType{nullptr, true} : m_outer_iter->second->end()),
+AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_begin) :
+  m_outer_iter(map->m_map.begin()),
+  m_inner_iter(m_outer_iter->second->begin()),
+  m_inner_end(m_outer_iter->second->end()),
+  m_outer_end(map->m_map.end())
+{
+}
+
+AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_end) :
+  m_outer_iter(map->m_map.end()),
+  m_inner_iter(InnerIterType{nullptr, iterator_end{}}),
+  m_inner_end(InnerIterType{nullptr, iterator_end{}}),
   m_outer_end(map->m_map.end())
 {
 }
@@ -315,7 +327,7 @@ AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++()
       m_inner_iter = m_outer_iter->second->begin();
       m_inner_end = m_outer_iter->second->end();
     } else {
-      m_inner_iter = InnerIterType{nullptr, true};
+      m_inner_iter = InnerIterType{nullptr, iterator_end{}};
     }
   }
   return *this;

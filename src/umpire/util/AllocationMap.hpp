@@ -50,7 +50,8 @@ public:
   class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
   {
   public:
-    ConstIterator(const RecordList* list, bool end);
+    ConstIterator(const RecordList* list, iterator_begin);
+    ConstIterator(const RecordList* list, iterator_end);
     ConstIterator(const ConstIterator&) = default;
 
     const AllocationRecord& operator*();
@@ -95,7 +96,8 @@ public:
   {
   public:
     // Iterator(AllocationMap* map, const OuterIterType& outer_iter, const InnerIterType& inner_iter);
-    ConstIterator(const AllocationMap* map, bool end);
+    ConstIterator(const AllocationMap* map, iterator_begin);
+    ConstIterator(const AllocationMap* map, iterator_end);
     ConstIterator(const ConstIterator&) = default;
 
     const AllocationRecord& operator*();
