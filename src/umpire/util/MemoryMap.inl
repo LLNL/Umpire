@@ -31,54 +31,63 @@ static constexpr unsigned int judy_max_levels = sizeof(uintptr_t);
 // Judy: length of key in bytes
 static constexpr unsigned int judy_max = judy_depth * JUDY_key_size;
 
-} // anonymous namespace
+} // end anonymous namespace
 
-template <typename Value>
-MemoryMap<Value>::MemoryMap() :
+// MemoryMap
+template <typename V>
+MemoryMap<V>::MemoryMap() :
   m_array{nullptr},
   m_last{nullptr},
-  m_size{0},
-  m_pool{sizeof(Value)}
+  m_oper{0},
+  m_pool{sizeof(Value)},
+  m_size{0}
 {
   // Create new judy array
   m_array = judy_open(judy_max_levels, judy_depth);
 }
 
-template <typename Value>
-MemoryMap<Value>::~MemoryMap()
+template <typename V>
+MemoryMap<V>::~MemoryMap()
 {
   // Delete all entries
   clear();
 
-  // Close the judy array, freeing all memory.
+  // Close the judy array, freeing all memory
   judy_close(m_array);
 }
 
-template <typename Value>
+template <typename V>
 template <typename... Args>
-std::pair<typename MemoryMap<Value>::template Iterator<false>, bool> MemoryMap<Value>::get(void* ptr, Args&... args)
+std::pair<typename MemoryMap<V>::template Iterator<false>, bool>
+MemoryMap<V>::get(void* ptr, Args&... args) noexcept
 {
-  // Find the key
+  // Find the ptr and update m_oper
   m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
   UMPIRE_ASSERT(m_last);
 
-  auto pval = reinterpret_cast<Value**>(m_last);
+  auto pval{reinterpret_cast<Value**>(m_last)};
 
   const bool found{*pval != nullptr};
 
-  if (!found) (*pval) = new (m_pool.allocate()) Value{args...};
+  if (!found) {
+    // Create it and increment size
+    (*pval) = new (m_pool.allocate()) Value{args...};
+    ++m_size;
+  }
 
-  return std::make_pair(Iterator<false>{m_array, m_last, reinterpret_cast<KeyType>(ptr)}, found);
+  return std::make_pair(Iterator<false>{this}, found);
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<false> MemoryMap<Value>::insert(void* ptr, const Value& val)
+template <typename V>
+typename MemoryMap<V>::template Iterator<false> MemoryMap<V>::insert(void* ptr, const Value& val)
 {
-  // Find the key
+  // Insert the ptr (cell) and update m_oper
   m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
   UMPIRE_ASSERT(m_last);
 
-  auto pval = reinterpret_cast<Value**>(m_last);
+  auto pval{reinterpret_cast<Value**>(m_last)};
 
   // There should not already be a record here
   if (*pval) {
@@ -88,67 +97,78 @@ typename MemoryMap<Value>::template Iterator<false> MemoryMap<Value>::insert(voi
   // Create it
   (*pval) = new (m_pool.allocate()) Value{val};
 
-  return Iterator<false>{m_array, m_last, ptr};
+  // Increment size
+  ++m_size;
+
+  return Iterator<false>{this};
 }
 
-template <typename Value>
-typename MemoryMap<Value>::KeyType MemoryMap<Value>::doFind(void* ptr) const
+template <typename V>
+void MemoryMap<V>::doFind(void* ptr) const noexcept
 {
+  // Find the ptr and update m_oper
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
 
-  KeyType parent_ptr{0};
+  Key parent_ptr{0};
   judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
 
   // If the ptrs do not match, or the key does not exist, get the previous entry
-  if (parent_ptr != reinterpret_cast<uintptr_t>(ptr) || !m_last)
+  if (parent_ptr != ptr || !m_last)
   {
     m_last = judy_prv(m_array);
     // Find key associated to this one
     judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
   }
-
-  return parent_ptr;
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<false> MemoryMap<Value>::find(void* ptr)
+template <typename V>
+typename MemoryMap<V>::template Iterator<false> MemoryMap<V>::find(void* ptr) noexcept
 {
-  KeyType parent_ptr = doFind(ptr);
-  return Iterator<false>{m_array, m_last, parent_ptr};
+  doFind(ptr);
+  return Iterator<false>{this};
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<true>
-MemoryMap<Value>::find(void* ptr) const
+template <typename V>
+typename MemoryMap<V>::template Iterator<true>
+MemoryMap<V>::find(void* ptr) const noexcept
 {
-  KeyType parent_ptr = doFind(ptr);
-  return Iterator<true>{m_array, m_last, parent_ptr};
+  doFind(ptr);
+  return Iterator<true>{this};
 }
 
-template <typename Value>
+template <typename V>
 void
-MemoryMap<Value>::remove(void* ptr)
+MemoryMap<V>::remove(void* ptr)
 {
-  // Locate ptr
+  // Locate ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
+  m_oper = reinterpret_cast<uintptr_t>(this);
 
   // If found, remove it
-  if (m_last && *m_last) removeLast();
+  if (m_last) removeLast();
 }
 
-template <typename Value>
-void MemoryMap<Value>::clear()
+template <typename V>
+void MemoryMap<V>::clear()
 {
   // Loop over the level 0 tree
-  KeyType key{0};
+  Key key{0};
   while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)) != nullptr)
     removeLast();
 }
 
-template <typename Value>
-void MemoryMap<Value>::removeLast()
+template <typename V>
+size_t MemoryMap<V>::size() const noexcept
 {
-  auto v = reinterpret_cast<Value*>(*m_last);
+  return m_size;
+}
+
+// Iterator
+template <typename V>
+void MemoryMap<V>::removeLast()
+{
+  auto v{reinterpret_cast<Value*>(*m_last)};
 
   // Manually call destructor
   v->~Value();
@@ -156,141 +176,140 @@ void MemoryMap<Value>::removeLast()
   // Mark as deallocated in the pool
   m_pool.deallocate(v);
 
-  // Delete the key and cell for the current stack entry.
+  // Delete the key and cell for the current stack entry
   judy_del(m_array);
+
+  // Decrease size
+  --m_size;
 }
 
-
-template <typename Value>
+template <typename V>
 template <bool Const>
-typename MemoryMap<Value>::template Iterator<Const>::Content
-MemoryMap<Value>::Iterator<Const>::makePair()
+MemoryMap<V>::Iterator<Const>::Iterator(Map* map) :
+  m_map{map}, m_pair{}
 {
-  return std::make_pair(reinterpret_cast<void*>(m_key), m_last ? reinterpret_cast<ValuePtr>(*m_last) : nullptr);
+  judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
+  m_pair.second = m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr;
+  m_map->m_oper = reinterpret_cast<uintptr_t>(this);
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
-MemoryMap<Value>::Iterator<Const>::Iterator(Judy* array, JudySlot* last, MemoryMap<Value>::KeyType key) :
-  m_array(array), m_last(last), m_key(key), m_pair(makePair())
+MemoryMap<V>::Iterator<Const>::Iterator(Map* map, bool end) :
+  m_map{map}, m_pair{}
 {
-}
-
-template <typename Value>
-template <bool Const>
-MemoryMap<Value>::Iterator<Const>::Iterator(Judy* array, bool end) :
-  m_array(array), m_last(nullptr), m_key(0), m_pair()
-{
-  if (!end) {
-    m_last = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_key), judy_max);
+  if (end) {
+    m_pair = std::make_pair(nullptr, static_cast<ValuePtr>(nullptr));
   } else {
-    m_key = 0;
+    m_map->m_last = judy_strt(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), judy_max);
+    m_map->m_oper = reinterpret_cast<uintptr_t>(this);
+    judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
+    m_pair.second = m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr;
   }
-
-  m_pair = makePair();
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
 template <bool OtherConst>
-MemoryMap<Value>::Iterator<Const>::Iterator(const Iterator<OtherConst>& other) :
-  m_array(other.m_array), m_last(other.m_last), m_key(other.m_key), m_pair(makePair())
+MemoryMap<V>::Iterator<Const>::Iterator(const Iterator<OtherConst>& other) :
+  m_map{other.m_map}, m_pair{other.m_pair}
 {
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
-typename MemoryMap<Value>::template Iterator<Const>::Reference
-MemoryMap<Value>::Iterator<Const>::operator*()
+typename MemoryMap<V>::template Iterator<Const>::Reference
+MemoryMap<V>::Iterator<Const>::operator*()
 {
   return m_pair;
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
-typename MemoryMap<Value>::template Iterator<Const>::Pointer
-MemoryMap<Value>::Iterator<Const>::operator->()
+typename MemoryMap<V>::template Iterator<Const>::Pointer
+MemoryMap<V>::Iterator<Const>::operator->()
 {
   return &m_pair;
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
-typename MemoryMap<Value>::template Iterator<Const>&
-MemoryMap<Value>::Iterator<Const>::operator++()
+typename MemoryMap<V>::template Iterator<Const>&
+MemoryMap<V>::Iterator<Const>::operator++()
 {
-  // Move to a new pointer
-  auto new_slot = judy_strt(m_array, reinterpret_cast<const unsigned char*>(&m_key), judy_max);
+  if (m_pair.first && m_map->m_oper != reinterpret_cast<uintptr_t>(this)) {
+    // Seek m_array internal position
+    judy_slot(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), judy_max);
+  }
+  m_map->m_last = judy_nxt(m_map->m_array);
+  m_map->m_oper = reinterpret_cast<uintptr_t>(this);
 
-  if (new_slot == m_last) {
+  if (!m_map->m_last) {
     // Reached end
-    m_key = 0;
+    m_pair.first = 0;
   }
   else {
-    // Update m_last
-    m_last = new_slot;
+    // Update m_last and pair
+    judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
+    m_pair.second = reinterpret_cast<ValuePtr>(*m_map->m_last);
   }
-
-  // Update pair
-  m_pair = makePair();
 
   return *this;
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
-typename MemoryMap<Value>::template Iterator<Const>
-MemoryMap<Value>::Iterator<Const>::operator++(int)
+typename MemoryMap<V>::template Iterator<Const>
+MemoryMap<V>::Iterator<Const>::operator++(int)
 {
   Iterator tmp{*this};
   ++(*this);
   return tmp;
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
 template <bool OtherConst>
-bool MemoryMap<Value>::Iterator<Const>::operator==(const MemoryMap<Value>::Iterator<OtherConst>& other)
+bool MemoryMap<V>::Iterator<Const>::operator==(const MemoryMap<V>::Iterator<OtherConst>& other) const
 {
-  return (m_array == other.m_array && m_key == other.m_key);
+  return m_map == other.m_map && m_pair.first == other.m_pair.first;
 }
 
-template <typename Value>
+template <typename V>
 template <bool Const>
 template <bool OtherConst>
-bool MemoryMap<Value>::Iterator<Const>::operator!=(const MemoryMap<Value>::Iterator<OtherConst>& other)
+bool MemoryMap<V>::Iterator<Const>::operator!=(const MemoryMap<V>::Iterator<OtherConst>& other) const
 {
   return !(*this == other);
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<true>
-MemoryMap<Value>::begin() const
+template <typename V>
+typename MemoryMap<V>::template Iterator<true>
+MemoryMap<V>::begin() const
 {
-  return Iterator<true>{m_array, false};
+  return Iterator<true>{this, false};
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<false>
-MemoryMap<Value>::begin()
+template <typename V>
+typename MemoryMap<V>::template Iterator<false>
+MemoryMap<V>::begin()
 {
-  return Iterator<false>{m_array, false};
+  return Iterator<false>{this, false};
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<true>
-MemoryMap<Value>::end() const
+template <typename V>
+typename MemoryMap<V>::template Iterator<true>
+MemoryMap<V>::end() const
 {
-  return Iterator<true>{m_array, true};
+  return Iterator<true>{this, true};
 }
 
-template <typename Value>
-typename MemoryMap<Value>::template Iterator<false>
-MemoryMap<Value>::end()
+template <typename V>
+typename MemoryMap<V>::template Iterator<false>
+MemoryMap<V>::end()
 {
-  return Iterator<false>{m_array, true};
+  return Iterator<false>{this, true};
 }
-
 
 } // end of namespace util
 } // end of namespace umpire

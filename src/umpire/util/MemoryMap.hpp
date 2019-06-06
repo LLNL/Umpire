@@ -30,12 +30,13 @@ namespace util {
 // MemoryMap maps addresses to a templated type Value, using a
 // FixedMallocPool underneath for speed. It is not threadsafe.
 
-template <typename Value>
+template <typename V>
 class MemoryMap
 {
 public:
-  using KeyType = uintptr_t;
-  using ValueType = Value;
+  using Key = void*;
+  using Value = V;
+  using KeyValuePair = std::pair<Key, Value*>;
 
   template <bool Const = false>
   class Iterator : public std::iterator<std::forward_iterator_tag, Value> {
@@ -43,13 +44,15 @@ public:
 
     template <bool OtherConst> friend class Iterator;
 
+    using Map = typename std::conditional<Const, const MemoryMap<Value>, MemoryMap<Value>>::type;
     using ValuePtr = typename std::conditional<Const, const Value*, Value*>::type;
-    using Content = std::pair<void*, ValuePtr>;
+
+    using Content = std::pair<Key, ValuePtr>;
     using Reference = typename std::conditional<Const, const Content&, Content&>::type;
     using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
-    Iterator(Judy* array, JudySlot* last, KeyType key);
-    Iterator(Judy* array, bool end);
+    Iterator(Map* map);
+    Iterator(Map* map, bool end);
 
     template<bool OtherConst>
     Iterator(const Iterator<OtherConst>& other);
@@ -60,22 +63,18 @@ public:
     Iterator operator++(int);
 
     template <bool OtherConst>
-    bool operator==(const Iterator<OtherConst>& other);
+    bool operator==(const Iterator<OtherConst>& other) const;
 
     template <bool OtherConst>
-    bool operator!=(const Iterator<OtherConst>& other);
+    bool operator!=(const Iterator<OtherConst>& other) const;
 
   private:
-    // Create the m_pair
-    Content makePair();
-
-    Judy* m_array;
-    JudySlot* m_last;
-    KeyType m_key;
+    Map* m_map;
     Content m_pair;
   };
 
-  // TODO These should be noexcept
+  template <bool Const> friend class Iterator;
+
   MemoryMap();
   ~MemoryMap();
 
@@ -84,14 +83,14 @@ public:
 
   // Return pointer-to or emplaces a new Value with args to the constructor
   template <typename... Args>
-  std::pair<Iterator<false>, bool> get(void* ptr, Args&... args);
+  std::pair<Iterator<false>, bool> get(void* ptr, Args&... args) noexcept;
 
   // Insert a new Value at ptr
   Iterator<false> insert(void* ptr, const Value& val);
 
   // Find a value -- returns end() if not found
-  Iterator<true> find(void* ptr) const;
-  Iterator<false> find(void* ptr);
+  Iterator<true> find(void* ptr) const noexcept;
+  Iterator<false> find(void* ptr) noexcept;
 
   // Iterators
   Iterator<true> begin() const;
@@ -111,14 +110,18 @@ public:
   // Clear all entries
   void clear();
 
+  // Number of entries
+  size_t size() const noexcept;
+
 private:
   // Helper method for public find()
-  KeyType doFind(void* ptr) const;
+  void doFind(void* ptr) const noexcept;
 
-  mutable Judy* m_array;
-  mutable JudySlot* m_last; // last found value in m_array
-  size_t m_size;
-  FixedMallocPool m_pool;
+  mutable Judy* m_array;    // Judy array
+  mutable JudySlot* m_last; // Last found value in judy array
+  mutable uintptr_t m_oper;     // pointer to object that last operated on judy array
+  FixedMallocPool m_pool;   // value pool
+  size_t m_size;            // number of objects stored
 };
 
 } // end of namespace util

@@ -111,12 +111,12 @@ RecordList::ConstIterator RecordList::ConstIterator::operator++(int)
   return tmp;
 }
 
-bool RecordList::ConstIterator::operator==(const RecordList::ConstIterator& other)
+bool RecordList::ConstIterator::operator==(const RecordList::ConstIterator& other) const
 {
   return m_list == other.m_list && m_curr == other.m_curr;
 }
 
-bool RecordList::ConstIterator::operator!=(const RecordList::ConstIterator& other)
+bool RecordList::ConstIterator::operator!=(const RecordList::ConstIterator& other) const
 {
   return !(*this == other);
 }
@@ -241,8 +241,7 @@ void
 AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
                      std::ostream& os) const
 {
-  for (auto p : m_map)
-  {
+  for (auto p : m_map) {
     std::stringstream ss;
     bool any_match = false;
     ss << p.first << " {" << std::endl;
@@ -263,7 +262,6 @@ AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
     if (any_match) {
       os << ss.str();
     }
-    ++iter;
   }
 }
 
@@ -330,12 +328,12 @@ AllocationMap::ConstIterator AllocationMap::ConstIterator::operator++(int)
   return tmp;
 }
 
-bool AllocationMap::ConstIterator::operator==(const AllocationMap::ConstIterator& other)
+bool AllocationMap::ConstIterator::operator==(const AllocationMap::ConstIterator& other) const
 {
   return m_outer_iter == other.m_outer_iter && m_inner_iter == other.m_inner_iter;
 }
 
-bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator& other)
+bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator& other) const
 {
   return !(*this == other);
 }

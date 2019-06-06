@@ -58,8 +58,8 @@ public:
     ConstIterator& operator++();
     ConstIterator operator++(int);
 
-    bool operator==(const ConstIterator& other);
-    bool operator!=(const ConstIterator& other);
+    bool operator==(const ConstIterator& other) const;
+    bool operator!=(const ConstIterator& other) const;
 
   private:
     const RecordList *m_list;
@@ -94,9 +94,6 @@ public:
   class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
   {
   public:
-    using OuterIterType = MapType::Iterator<true>;
-    using InnerIterType = RecordList::ConstIterator;
-
     // Iterator(AllocationMap* map, const OuterIterType& outer_iter, const InnerIterType& inner_iter);
     ConstIterator(const AllocationMap* map, bool end);
     ConstIterator(const ConstIterator&) = default;
@@ -106,10 +103,13 @@ public:
     ConstIterator& operator++();
     ConstIterator operator++(int);
 
-    bool operator==(const ConstIterator& other);
-    bool operator!=(const ConstIterator& other);
+    bool operator==(const ConstIterator& other) const;
+    bool operator!=(const ConstIterator& other) const;
 
   private:
+    using OuterIterType = MapType::Iterator<true>;
+    using InnerIterType = RecordList::ConstIterator;
+
     OuterIterType m_outer_iter;
     InnerIterType m_inner_iter;
     InnerIterType m_inner_end;
