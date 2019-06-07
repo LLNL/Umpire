@@ -42,7 +42,7 @@ public:
   using KeyValuePair = std::pair<Key, Value*>;
 
   template <bool Const = false>
-  class Iterator : public std::iterator<std::forward_iterator_tag, Value> {
+  class Iterator_ : public std::iterator<std::forward_iterator_tag, Value> {
   public:
 
     template <bool OtherConst> friend class Iterator;
@@ -54,30 +54,33 @@ public:
     using Reference = typename std::conditional<Const, const Content&, Content&>::type;
     using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
-    Iterator(Map* map);
-    Iterator(Map* map, iterator_begin);
-    Iterator(Map* map, iterator_end);
+    Iterator_(Map* map);
+    Iterator_(Map* map, iterator_begin);
+    Iterator_(Map* map, iterator_end);
 
     template<bool OtherConst>
-    Iterator(const Iterator<OtherConst>& other);
+    Iterator_(const Iterator_<OtherConst>& other);
 
     Reference operator*();
     Pointer operator->();
-    Iterator& operator++();
-    Iterator operator++(int);
+    Iterator_& operator++();
+    Iterator_ operator++(int);
 
     template <bool OtherConst>
-    bool operator==(const Iterator<OtherConst>& other) const;
+    bool operator==(const Iterator_<OtherConst>& other) const;
 
     template <bool OtherConst>
-    bool operator!=(const Iterator<OtherConst>& other) const;
+    bool operator!=(const Iterator_<OtherConst>& other) const;
 
   private:
     Map* m_map;
     Content m_pair;
   };
 
-  template <bool Const> friend class Iterator;
+  template <bool Const> friend class Iterator_;
+
+  using Iterator = Iterator_<false>;
+  using ConstIterator = Iterator_<true>;
 
   MemoryMap();
   ~MemoryMap();
@@ -87,25 +90,25 @@ public:
 
   // Return pointer-to or emplaces a new Value with args to the constructor
   template <typename... Args>
-  std::pair<Iterator<false>, bool> get(void* ptr, Args&&... args) noexcept;
+  std::pair<Iterator, bool> get(void* ptr, Args&&... args) noexcept;
 
   // Insert a new Value at ptr
-  Iterator<false> insert(void* ptr, const Value& val);
+  Iterator insert(void* ptr, const Value& val);
 
   // Find a value -- returns what would be the entry immediately before ptr
-  Iterator<true> findOrBefore(void* ptr) const noexcept;
-  Iterator<false> findOrBefore(void* ptr) noexcept;
+  ConstIterator findOrBefore(void* ptr) const noexcept;
+  Iterator findOrBefore(void* ptr) noexcept;
 
   // Find a value -- returns end() if not found
-  Iterator<true> find(void* ptr) const noexcept;
-  Iterator<false> find(void* ptr) noexcept;
+  ConstIterator find(void* ptr) const noexcept;
+  Iterator find(void* ptr) noexcept;
 
   // Iterators
-  Iterator<true> begin() const;
-  Iterator<false> begin();
+  ConstIterator begin() const;
+  Iterator begin();
 
-  Iterator<true> end() const;
-  Iterator<false> end();
+  ConstIterator end() const;
+  Iterator end();
 
   // Remove the entry at ptr
   void remove(void* ptr);
@@ -126,8 +129,8 @@ private:
   void doFindOrBefore(void* ptr) const noexcept;
 
   mutable Judy* m_array;    // Judy array
-  mutable JudySlot* m_last; // Last found value in judy array
-  mutable uintptr_t m_oper;     // pointer to object that last operated on judy array
+  mutable JudySlot* m_last; // last found value in judy array
+  mutable uintptr_t m_oper; // address of last object to set internal judy state
   FixedMallocPool m_pool;   // value pool
   size_t m_size;            // number of objects stored
 };

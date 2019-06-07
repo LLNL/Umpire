@@ -89,7 +89,7 @@ private:
 class AllocationMap
 {
 public:
-  using MapType = MemoryMap<RecordList>;
+  using Map = MemoryMap<RecordList>;
 
   // Iterator that flattens MemoryMap and RecordList iterators
   class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
@@ -109,13 +109,13 @@ public:
     bool operator!=(const ConstIterator& other) const;
 
   private:
-    using OuterIterType = MapType::Iterator<true>;
-    using InnerIterType = RecordList::ConstIterator;
+    using OuterIter = Map::ConstIterator;
+    using InnerIter = RecordList::ConstIterator;
 
-    OuterIterType m_outer_iter;
-    InnerIterType m_inner_iter;
-    InnerIterType m_inner_end;
-    OuterIterType m_outer_end;
+    OuterIter m_outer_iter;
+    InnerIter m_inner_iter;
+    InnerIter m_inner_end;
+    OuterIter m_outer_end;
   };
 
   AllocationMap();
@@ -161,7 +161,7 @@ public:
   ConstIterator end() const;
 
 private:
-  MapType m_map;
+  Map m_map;
   size_t m_size;
   mutable std::mutex m_mutex;
 };

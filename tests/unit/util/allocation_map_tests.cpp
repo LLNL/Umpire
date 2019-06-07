@@ -171,10 +171,18 @@ TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
     map.insert(data, another_record);
   );
 
-  size_t size{0};
+  size_t size = 0;
   auto iter{map.begin()}, end{map.end()};
   while (iter != end) { ++size; ++iter; }
   ASSERT_EQ(size, 3);
+}
+
+TEST_F(AllocationMapTest, RegisterNoneIteratorSize)
+{
+  size_t size = 0;
+  auto iter{map.begin()}, end{map.end()};
+  while (iter != end) { ++size; ++iter; }
+  ASSERT_EQ(size, 0);
 }
 
 TEST_F(AllocationMapTest, FindMultiple)
@@ -186,7 +194,7 @@ TEST_F(AllocationMapTest, FindMultiple)
     map.insert(data, next_record);
   });
 
-  auto actual_record = map.find(data);
+  auto actual_record{map.find(data)};
   ASSERT_EQ(next_record, *actual_record);
 
   map.remove(data);

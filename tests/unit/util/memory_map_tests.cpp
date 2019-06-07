@@ -20,10 +20,10 @@ TEST(MemoryMap, get)
 {
   umpire::util::MemoryMap<int> map{};
 
-  void* a{reinterpret_cast<void*>(1)};
+  void* a = reinterpret_cast<void*>(1);
 
   // Get should emplace an entry if it doens't already exist
-  umpire::util::MemoryMap<int>::Iterator<false> iter{&map};
+  umpire::util::MemoryMap<int>::Iterator iter{&map};
   bool found;
 
   {
@@ -45,8 +45,8 @@ TEST(MemoryMap, insert)
 {
   umpire::util::MemoryMap<int> map{};
 
-  void* a{reinterpret_cast<void*>(1)};
-  void* b{reinterpret_cast<void*>(2)};
+  void* a = reinterpret_cast<void*>(1);
+  void* b = reinterpret_cast<void*>(2);
   EXPECT_NO_THROW(
     map.insert(a, 1);
     map.insert(b, 2));
@@ -60,51 +60,78 @@ TEST(MemoryMap, find)
 {
   umpire::util::MemoryMap<int> map{};
 
-  void* a{reinterpret_cast<void*>(1)};
-  void* b{reinterpret_cast<void*>(2)};
-  void* c{reinterpret_cast<void*>(3)};
+  void* a = reinterpret_cast<void*>(1);
+  void* b = reinterpret_cast<void*>(2);
+  void* c = reinterpret_cast<void*>(3);
   map.insert(a, 1);
   map.insert(b, 2);
 
   {
-    auto iter{map.find(a)};
+    auto iter = map.find(a);
     EXPECT_EQ(iter->first, a);
   }
 
   {
-    const auto& cmap{map};
-    auto iter{cmap.find(b)};
-    EXPECT_EQ(iter->first, b);
-  }
-
-  {
-    auto iter{map.find(c)};
+    auto iter = map.find(c);
     EXPECT_EQ(iter, map.end());
     EXPECT_EQ(iter->second, nullptr);
   }
 }
 
+TEST(MemoryMap, findOrBefore)
+{
+  umpire::util::MemoryMap<int> map{};
+
+  void* a = reinterpret_cast<void*>(1);
+  map.insert(a, 1);
+
+  {
+    auto iter = map.findOrBefore(static_cast<char*>(a) + 10);
+    EXPECT_EQ(iter->first, a);
+  }
+
+  map.remove(a);
+  {
+    auto iter = map.findOrBefore(static_cast<char*>(a) + 10);
+    EXPECT_EQ(iter, map.begin());
+    EXPECT_EQ(iter, map.end());
+  }
+
+  ASSERT_EQ(map.size(), 0);
+}
+
+TEST(MemoryMap, remove)
+{
+  umpire::util::MemoryMap<int> map{};
+
+  void* a = reinterpret_cast<void*>(1);
+  map.insert(a, 1);
+
+  ASSERT_NO_THROW(map.remove(a));
+  ASSERT_ANY_THROW(map.remove(a));
+  ASSERT_EQ(map.size(), 0);
+}
 
 TEST(MemoryMap, Iterator)
 {
   umpire::util::MemoryMap<int> map{};
 
-  void* a{reinterpret_cast<void*>(1)};
-  auto ia{map.insert(a, 1)};
+  void* a = reinterpret_cast<void*>(1);
+  auto ia = map.insert(a, 1);
 
-  auto begin{map.begin()};
+  auto begin = map.begin();
   ASSERT_EQ(begin->first, a);
   ASSERT_EQ(ia, map.begin());
   ASSERT_EQ(++ia, map.end());
 }
 
-TEST(MemoryMap, map_order)
+TEST(MemoryMap, ordering)
 {
   umpire::util::MemoryMap<int> map{};
 
-  void* a{reinterpret_cast<void*>(1)};
-  void* b{reinterpret_cast<void*>(2)};
-  auto ia{map.insert(a, 1)};
-  auto ib{map.insert(b, 2)};
+  void* a = reinterpret_cast<void*>(1);
+  void* b = reinterpret_cast<void*>(2);
+  auto ia = map.insert(a, 1);
+  auto ib = map.insert(b, 2);
   ASSERT_EQ(++ia, ib);
 }
