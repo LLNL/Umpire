@@ -87,7 +87,7 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::insert(void* ptr, const Value& val
   m_oper = reinterpret_cast<uintptr_t>(this);
   UMPIRE_ASSERT(m_last);
 
-  auto pval{reinterpret_cast<Value**>(m_last)};
+  auto pval = reinterpret_cast<Value**>(m_last);
 
   // There should not already be a record here
   if (*pval) {
@@ -189,7 +189,7 @@ size_t MemoryMap<V>::size() const noexcept
 template <typename V>
 void MemoryMap<V>::removeLast()
 {
-  auto v{reinterpret_cast<Value*>(*m_last)};
+  auto v = reinterpret_cast<Value*>(*m_last);
 
   // Manually call destructor
   v->~Value();

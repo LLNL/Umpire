@@ -138,16 +138,16 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   UMPIRE_LOCK;
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-  auto rec{m_map.get(ptr, record)};
+  auto rec = m_map.get(ptr, record);
   const bool found = rec.second;
   if (found) {
-    Map::Iterator map_iter{rec.first};
-    if (found) map_iter->second->push_back(record);
+    // Record was not added
+    rec.first->second->push_back(record);
   }
   // else (found = false), get() already added it
 
-  UMPIRE_UNLOCK;
   ++m_size;
+  UMPIRE_UNLOCK;
 }
 
 const AllocationRecord* AllocationMap::find(void* ptr) const
@@ -178,19 +178,18 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 
   UMPIRE_LOCK;
 
-  auto iter{m_map.findOrBefore(ptr)};
+  auto iter = m_map.findOrBefore(ptr);
 
   // If a list was found, return its tail
   if (iter->second) {
     // faster, equivalent way of checking iter != m_map->end()
-    alloc_record = iter->second->back();
+    auto candidate = iter->second->back();
 
-    UMPIRE_ASSERT(alloc_record->ptr <= ptr);
-    const uintptr_t parent_ptr = reinterpret_cast<uintptr_t>(alloc_record->ptr);
-
-    if ((parent_ptr + alloc_record->size) > reinterpret_cast<uintptr_t>(ptr)) {
-      UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
-                 << " with size " << alloc_record->size);
+    UMPIRE_ASSERT(candidate->ptr <= ptr);
+    if ((static_cast<char*>(candidate->ptr) + candidate->size) > static_cast<char*>(ptr)) {
+      UMPIRE_LOG(Debug, "Found " << ptr << " at " << candidate->ptr
+                 << " with size " << candidate->size);
+      alloc_record = candidate;
     }
   }
 
@@ -257,8 +256,8 @@ AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
     std::stringstream ss;
     bool any_match = false;
     ss << p.first << " {" << std::endl;
-    auto iter{p.second->begin()};
-    auto end{p.second->end()};
+    auto iter = p.second->begin();
+    auto end = p.second->end();
     while (iter != end) {
       if (pred(*iter)) {
         any_match = true;

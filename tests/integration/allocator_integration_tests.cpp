@@ -84,9 +84,7 @@ TEST_P(AllocatorTest, DeallocateNullptr)
 {
   double* data = nullptr;
 
-  ASSERT_NO_THROW(
-  m_allocator->deallocate(data);
-  );
+  ASSERT_NO_THROW(m_allocator->deallocate(data));
 
   SUCCEED();
 }
@@ -238,8 +236,8 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
   );
 
   ASSERT_THROW(
-      m_allocator->deallocate(data),
-      umpire::util::Exception
+    m_allocator->deallocate(data),
+    umpire::util::Exception
   );
 }
 
@@ -278,7 +276,9 @@ TEST(Allocation, DeallocateDifferent)
     alloc_two.deallocate(data),
     umpire::util::Exception);
 
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
+  ASSERT_NO_THROW(
+    alloc_one.deallocate(data)
+  );
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -294,5 +294,8 @@ TEST(Allocator, DeallocateDifferentCuda)
     alloc_dev.deallocate(data),
     umpire::util::Exception);
 
+  ASSERT_NO_THROW(
+    alloc_um.deallocate(data)
+  );
 }
 #endif
