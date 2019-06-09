@@ -39,7 +39,7 @@ and a dynamic pool for those that are larger.
 
 - Update BLT to fix CMake 3.13 warnings and MSVC compatibility.
 
-- `util::AllocationMap` is significantly faster.
+- `AllocationMap` is significantly faster, and uses `MemoryMap`.
 
 - `ResourceManager` de/registration pass `AllocationRecord` by value.
 
