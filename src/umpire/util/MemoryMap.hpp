@@ -54,7 +54,7 @@ public:
     using Reference = typename std::conditional<Const, const Content&, Content&>::type;
     using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
-    Iterator_(Map* map);
+    Iterator_(Map* map, Key ptr);
     Iterator_(Map* map, iterator_begin);
     Iterator_(Map* map, iterator_end);
 
@@ -126,7 +126,7 @@ public:
 
 private:
   // Helper method for public findOrBefore()
-  void doFindOrBefore(void* ptr) const noexcept;
+  Key doFindOrBefore(void* ptr) const noexcept;
 
   mutable Judy* m_array;    // Judy array
   mutable JudySlot* m_last; // last found value in judy array

@@ -76,7 +76,7 @@ MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
     ++m_size;
   }
 
-  return std::make_pair(Iterator{this}, found);
+  return std::make_pair(Iterator{this, ptr}, found);
 }
 
 template <typename V>
@@ -100,11 +100,12 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::insert(void* ptr, const Value& val
   // Increment size
   ++m_size;
 
-  return Iterator{this};
+  return Iterator{this, ptr};
 }
 
 template <typename V>
-void MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
+typename MemoryMap<V>::Key
+MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
 {
   // Find the ptr and update m_oper
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
@@ -117,22 +118,25 @@ void MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
   if (parent_ptr != ptr || !m_last)
   {
     m_last = judy_prv(m_array);
+    judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
   }
+
+  return parent_ptr;
 }
 
 template <typename V>
 typename MemoryMap<V>::Iterator MemoryMap<V>::findOrBefore(void* ptr) noexcept
 {
-  doFindOrBefore(ptr);
-  return Iterator{this};
+  ptr = doFindOrBefore(ptr);
+  return Iterator{this, ptr};
 }
 
 template <typename V>
 typename MemoryMap<V>::ConstIterator
 MemoryMap<V>::findOrBefore(void* ptr) const noexcept
 {
-  doFindOrBefore(ptr);
-  return ConstIterator{this};
+  ptr = doFindOrBefore(ptr);
+  return ConstIterator{this, ptr};
 }
 
 template <typename V>
@@ -141,7 +145,7 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::find(void* ptr) noexcept
   // Find the ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
-  return m_last ? Iterator{this} : Iterator{this, iterator_end{}};
+  return m_last ? Iterator{this, ptr} : Iterator{this, iterator_end{}};
 }
 
 template <typename V>
@@ -151,7 +155,7 @@ MemoryMap<V>::find(void* ptr) const noexcept
   // Find the ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
-  return m_last ? ConstIterator{this} : ConstIterator{this, iterator_end{}};
+  return m_last ? ConstIterator{this, ptr} : ConstIterator{this, iterator_end{}};
 }
 
 template <typename V>
@@ -206,12 +210,9 @@ void MemoryMap<V>::removeLast()
 
 template <typename V>
 template <bool Const>
-MemoryMap<V>::Iterator_<Const>::Iterator_(Map* map) :
-  m_map{map}, m_pair{}
+MemoryMap<V>::Iterator_<Const>::Iterator_(Map* map, Key ptr) :
+  m_map{map}, m_pair{std::make_pair(ptr, m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr)}
 {
-  judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
-  m_pair.second = m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr;
-  m_map->m_oper = reinterpret_cast<uintptr_t>(this);
 }
 
 template <typename V>

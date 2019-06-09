@@ -23,7 +23,7 @@ TEST(MemoryMap, get)
   void* a = reinterpret_cast<void*>(1);
 
   // Get should emplace an entry if it doens't already exist
-  umpire::util::MemoryMap<int>::Iterator iter{&map};
+  umpire::util::MemoryMap<int>::Iterator iter{&map, umpire::util::iterator_begin{}};
   bool found;
 
   {
