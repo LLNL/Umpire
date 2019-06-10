@@ -27,12 +27,12 @@ steps:
     workingDir: 'build'
     cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
   condition: or( eq( variables['Agent.OS'], 'Windows_NT'), eq( variables['Agent.OS'], 'Darwin'))
-- task: VSBuild@1
+- task: CMake@1
   inputs:
-    vsVersion: '15.0'
-    solution: 'build/*.sln'
-  displayName: 'VS Build'
+    workingDir: 'build'
+    cmakeArgs: '--build .'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
+  displayName: 'Build'
 - script: |
     cd build
     make
