@@ -30,6 +30,8 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: 'build/*.sln'
+    vsVersion: 'latest'
+    #msbuildArgs: '-p:VisualStudioVersion:
   condition: eq( variables['Agent.OS'], 'Windows_NT')
   displayName: 'Visual Studio Build'
 - script: |
