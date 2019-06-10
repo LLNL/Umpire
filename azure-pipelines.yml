@@ -1,6 +1,6 @@
 strategy:
-  matrix: 
-    linux: 
+  matrix:
+    linux:
       imageName: 'ubuntu-16.04'
       CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
     windows:
@@ -29,6 +29,7 @@ steps:
   condition: or( eq( variables['Agent.OS'], 'Windows_NT'), eq( variables['Agent.OS'], 'Darwin'))
 - task: VSBuild@1
   inputs:
+    vsVersion: '15.0'
     solution: 'build/*.sln'
   displayName: 'VS Build'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
