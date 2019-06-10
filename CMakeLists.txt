@@ -87,7 +87,7 @@ if (NOT BLT_LOADED)
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
 
-include(cmake/SetupCompilerFlags.cmake)
+include(cmake/SetupCmakeBasics.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
 configure_file(
