@@ -109,7 +109,7 @@ public:
     bool operator!=(const ConstIterator& other) const;
 
   private:
-    using OuterIter = Map::ConstIterator;
+    using OuterIter = MemoryMap<RecordList>::ConstIterator;
     using InnerIter = RecordList::ConstIterator;
 
     OuterIter m_outer_iter;
