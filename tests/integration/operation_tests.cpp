@@ -68,6 +68,23 @@ class OperationTest :
     umpire::Allocator* dest_allocator;
 };
 
+class ZeroCopyTest :
+  public OperationTest
+{
+};
+
+TEST_P(ZeroCopyTest, Zero) {
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  void* src = source_allocator->allocate(0);
+  void* dst = dest_allocator->allocate(0);
+
+  rm.copy(dst, src);
+
+  source_allocator->deallocate(src);
+  dest_allocator->deallocate(dst);
+}
+
 class CopyTest :
   public OperationTest
 {
@@ -141,6 +158,25 @@ TEST_P(CopyTest, InvalidSize)
     dest_allocator->deallocate(small_dest_array);
 }
 
+const std::string zero_copy_sources[] = {
+  "HOST"
+};
+
+const std::string zero_copy_dests[] = {
+    "HOST"
+#if defined(UMPIRE_ENABLE_DEVICE)
+    , "DEVICE"
+#endif
+};
+
+INSTANTIATE_TEST_CASE_P(
+    ZeroCopies,
+    ZeroCopyTest,
+    ::testing::Combine(
+      ::testing::ValuesIn(zero_copy_sources),
+      ::testing::ValuesIn(zero_copy_dests)
+));
+
 const std::string copy_sources[] = {
   "HOST"
 #if defined(UMPIRE_ENABLE_UM)
@@ -163,7 +199,7 @@ const std::string copy_dests[] = {
     , "PINNED"
 #endif
 };
-    
+
 
 INSTANTIATE_TEST_CASE_P(
     Copies,
@@ -223,7 +259,7 @@ TEST_P(MemsetTest, InvalidPointer)
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_THROW(
-    rm.memset(nullptr, 0),
+    rm.memset((void*)0x1, 0),
     umpire::util::Exception);
 }
 

@@ -1,4 +1,4 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v0.3.3
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v0.3.4
 
 [![Travis Build Status](https://travis-ci.com/LLNL/Umpire.svg?branch=develop)](https://travis-ci.com/LLNL/Umpire)
 [![Azure Pipelines Build Status](https://dev.azure.com/davidbeckingsale/Umpire/_apis/build/status/LLNL.Umpire?branchName=develop)](https://dev.azure.com/davidbeckingsale/Umpire/_build/latest?definitionId=1&branchName=develop)
@@ -32,7 +32,7 @@ Both user and code documentation is available [here](http://umpire.readthedocs.i
 
 The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/tutorial.html) provides a step by step introduction to Umpire features.
 
-If you have build problems, we have comprehensive [build sytem documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
+If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
 
 # Getting Involved
 
