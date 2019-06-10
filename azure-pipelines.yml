@@ -31,7 +31,6 @@ steps:
   inputs:
     solution: 'build/*.sln'
     vsVersion: 'latest'
-    msbuildArgs: '-p:VisualStudioVersion=16'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
   displayName: 'Visual Studio Build'
 - script: |
