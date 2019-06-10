@@ -25,7 +25,7 @@ endif ()
 if (ENABLE_HIP)
   set (memory_allocator_tests_depends
     ${memory_allocator_tests_depends}
-    hip)
+    hip_runtime)
 endif ()
 
 blt_add_executable(

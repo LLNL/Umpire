@@ -25,7 +25,7 @@ endif ()
 if (ENABLE_HIP)
   set (allocator_integration_tests_depends
     ${allocator_integration_tests_depends}
-    hip)
+    hip_runtime)
 endif ()
 
 blt_add_executable(
@@ -55,7 +55,7 @@ endif ()
 if (ENABLE_HIP)
   set (strategy_test_depends
       ${strategy_test_depends}
-      hip)
+      hip_runtime)
 endif()
 
 blt_add_executable(

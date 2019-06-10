@@ -17,7 +17,7 @@ set (cookbook_dir ${UMPIRE_EXAMPLES_OUTPUT_DIR}/cookbook)
 set (cookbook_depends umpire)
 
 if (ENABLE_HIP)
-  set (cookbook_depends ${cookbook_depends} hip)
+  set (cookbook_depends ${cookbook_depends} hip_runtime)
 endif()
 
 blt_add_executable(

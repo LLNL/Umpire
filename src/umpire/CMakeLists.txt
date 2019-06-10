@@ -27,8 +27,6 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-set (umpire_depends)
-
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
@@ -59,10 +57,6 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   endif ()
 endif ()
 
-if (ENABLE_HIP)
-  set (umpire_depends ${umpire_depends} hip)
-endif()
-
 add_subdirectory(tpl)
 
 add_subdirectory(resource)
@@ -78,7 +72,7 @@ blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  DEPENDS_ON ${umpire_depends} umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
+  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
 
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})

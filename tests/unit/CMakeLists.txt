@@ -17,7 +17,7 @@ set (unit_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit)
 set (unit_depends umpire gtest)
 
 if (ENABLE_HIP)
-  set (unit_depends ${unit_depends} hip)
+  set (unit_depends ${unit_depends} hip_runtime)
 endif()
 
 blt_add_executable(

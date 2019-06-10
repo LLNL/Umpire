@@ -18,7 +18,7 @@ set (strategy_tests_depends
   umpire gtest)
 
 if (ENABLE_HIP)
-  set (strategy_tests_depends ${strategy_tests_depends} hip)
+  set (strategy_tests_depends ${strategy_tests_depends} hip_runtime)
 endif()
 
 blt_add_executable(

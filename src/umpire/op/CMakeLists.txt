@@ -103,24 +103,15 @@ if (ENABLE_HIP)
 
   set (umpire_op_depends
     ${umpire_op_depends}
-    hip)
+    hip_runtime)
 endif ()
 
-#OBJECT flag causing errors?
-if (ENABLE_HIP)
-  blt_add_library(
-    NAME umpire_op
-    HEADERS ${umpire_op_headers}
-    SOURCES ${umpire_op_sources}
-    DEPENDS_ON ${umpire_op_depends})
-else ()
-  blt_add_library(
-    NAME umpire_op
-    HEADERS ${umpire_op_headers}
-    SOURCES ${umpire_op_sources}
-    DEPENDS_ON ${umpire_op_depends}
-    OBJECT TRUE)
-endif()
+blt_add_library(
+  NAME umpire_op
+  HEADERS ${umpire_op_headers}
+  SOURCES ${umpire_op_sources}
+  DEPENDS_ON ${umpire_op_depends}
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_op

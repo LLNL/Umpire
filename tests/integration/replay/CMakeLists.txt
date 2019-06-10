@@ -22,7 +22,7 @@ set (replay_integration_tests_depends
 if (ENABLE_HIP)
   set (replay_integration_tests_depends
       ${replay_integration_tests_depends}
-      hip)
+      hip_runtime)
 endif()
 
 if (BASH_PROGRAM)

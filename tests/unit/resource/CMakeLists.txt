@@ -17,7 +17,7 @@ set (resource_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/resource)
 set (resource_depends umpire gtest gmock)
 
 if (ENABLE_HIP)
-  set (resource_depends ${resource_depends} hip)
+  set (resource_depends ${resource_depends} hip_runtime)
 endif()
 
 if (ENABLE_GMOCK)

@@ -17,7 +17,7 @@ set (example_depends umpire)
 if (ENABLE_HIP)
   set (example_depends
       ${example_depends}
-      hip)
+      hip_runtime)
 endif()
 
 blt_add_executable(
