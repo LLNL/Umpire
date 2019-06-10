@@ -45,8 +45,6 @@ public:
   class Iterator_ : public std::iterator<std::forward_iterator_tag, Value> {
   public:
 
-    template <bool OtherConst> friend class Iterator;
-
     using Map = typename std::conditional<Const, const MemoryMap<Value>, MemoryMap<Value>>::type;
     using ValuePtr = typename std::conditional<Const, const Value*, Value*>::type;
 
