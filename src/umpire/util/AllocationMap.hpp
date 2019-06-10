@@ -32,8 +32,6 @@
 namespace umpire {
 namespace util {
 
-class RecordList;
-
 class RecordList
 {
 public:
@@ -109,7 +107,7 @@ public:
     bool operator!=(const ConstIterator& other) const;
 
   private:
-    using OuterIter = MemoryMap<RecordList>::ConstIterator;
+    using OuterIter = Map::ConstIterator;
     using InnerIter = RecordList::ConstIterator;
 
     OuterIter m_outer_iter;
