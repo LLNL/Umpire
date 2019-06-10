@@ -180,9 +180,8 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 
   auto iter = m_map.findOrBefore(ptr);
 
-  // If a list was found, return its tail
+  // faster, equivalent way of checking iter != m_map->end()
   if (iter->second) {
-    // faster, equivalent way of checking iter != m_map->end()
     auto candidate = iter->second->back();
 
     UMPIRE_ASSERT(candidate->ptr <= ptr);
