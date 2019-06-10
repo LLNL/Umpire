@@ -4,7 +4,7 @@ strategy:
       imageName: 'ubuntu-16.04'
       CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
     windows:
-      imageName: 'vs2017-win2016'
+      imageName: 'windows-2019'
       CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off'
     mac:
       imageName: 'macos-10.13'
@@ -27,12 +27,11 @@ steps:
     workingDir: 'build'
     cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
   condition: or( eq( variables['Agent.OS'], 'Windows_NT'), eq( variables['Agent.OS'], 'Darwin'))
-- task: CMake@1
+- task: VSBuild@1
   inputs:
-    workingDir: 'build'
-    cmakeArgs: '--build .'
+    solution: 'build/*.sln'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
-  displayName: 'Build'
+  displayName: 'Visual Studio Build'
 - script: |
     cd build
     make
