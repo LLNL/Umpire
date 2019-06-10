@@ -181,6 +181,8 @@ void MemoryMap<V>::clear()
   Key key{0};
   while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)) != nullptr)
     removeLast();
+
+  m_size = 0;
 }
 
 template <typename V>
@@ -220,7 +222,8 @@ template <bool Const>
 MemoryMap<V>::Iterator_<Const>::Iterator_(Map* map, iterator_begin) :
   m_map{map}, m_pair{}
 {
-  m_map->m_last = judy_strt(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), judy_max);
+  m_pair.first = nullptr;
+  m_map->m_last = judy_strt(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), 0);
   judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
   m_map->m_oper = reinterpret_cast<uintptr_t>(this);
   m_pair.second = m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr;

@@ -185,7 +185,7 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
     auto candidate = iter->second->back();
 
     UMPIRE_ASSERT(candidate->ptr <= ptr);
-    if ((static_cast<char*>(candidate->ptr) + candidate->size) > static_cast<char*>(ptr)) {
+    if ((static_cast<char*>(candidate->ptr) + candidate->size) >= static_cast<char*>(ptr)) {
       UMPIRE_LOG(Debug, "Found " << ptr << " at " << candidate->ptr
                  << " with size " << candidate->size);
       alloc_record = candidate;
@@ -242,7 +242,9 @@ bool AllocationMap::contains(void* ptr) const
 
 void AllocationMap::clear()
 {
+  UMPIRE_LOG(Debug, "Clearing...");
   m_map.clear();
+  m_size = 0;
 }
 
 size_t AllocationMap::size() const { return m_size; }
