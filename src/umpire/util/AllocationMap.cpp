@@ -20,6 +20,7 @@
 
 #include <sstream>
 #include <type_traits>
+#include <utility>
 
 namespace umpire {
 namespace util {
@@ -80,6 +81,11 @@ bool RecordList::empty() const { return size() == 0; }
 AllocationRecord* RecordList::back() { return &m_tail->rec; }
 const AllocationRecord* RecordList::back() const { return &m_tail->rec; }
 
+RecordList::ConstIterator::ConstIterator()
+  : m_list(nullptr), m_curr(nullptr)
+{
+}
+
 RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_begin)
   : m_list(list), m_curr(m_list->m_tail)
 {
@@ -138,13 +144,16 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   UMPIRE_LOCK;
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-  auto rec = m_map.get(ptr, record);
-  const bool found = rec.second;
+  Map::Iterator iter{m_map.end()};
+  bool found;
+
+  std::tie(iter, found) = m_map.get(ptr, record);
   if (found) {
     // Record was not added
-    rec.first->second->push_back(record);
+    iter->second->push_back(record);
   }
-  // else (found = false), get() already added it
+  // else (found = false)
+  // -> get() already added record to the end of the RecordList for ptr
 
   ++m_size;
   UMPIRE_UNLOCK;
@@ -154,7 +163,7 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
 {
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
-  auto alloc_record = findRecord(ptr);
+  const AllocationRecord* alloc_record = findRecord(ptr);
 
   if (alloc_record) {
     return alloc_record;
@@ -178,13 +187,13 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 
   UMPIRE_LOCK;
 
-  auto iter = m_map.findOrBefore(ptr);
+  Map::ConstIterator iter = m_map.findOrBefore(ptr);
 
   // faster, equivalent way of checking iter != m_map->end()
   if (iter->second) {
     auto candidate = iter->second->back();
-
     UMPIRE_ASSERT(candidate->ptr <= ptr);
+
     if ((static_cast<char*>(candidate->ptr) + candidate->size) >= static_cast<char*>(ptr)) {
       UMPIRE_LOG(Debug, "Found " << ptr << " at " << candidate->ptr
                  << " with size " << candidate->size);
@@ -242,9 +251,12 @@ bool AllocationMap::contains(void* ptr) const
 
 void AllocationMap::clear()
 {
-  UMPIRE_LOG(Debug, "Clearing...");
+  UMPIRE_LOG(Debug, "Clearing");
+
+  UMPIRE_LOCK;
   m_map.clear();
   m_size = 0;
+  UMPIRE_UNLOCK;
 }
 
 size_t AllocationMap::size() const { return m_size; }
@@ -299,17 +311,16 @@ AllocationMap::ConstIterator AllocationMap::end() const
 
 AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_begin) :
   m_outer_iter(map->m_map.begin()),
-  // iterator_end is used below because otherwise the InnerIter constructor dereferences a nullptr.
-  m_inner_iter(m_outer_iter->first ? m_outer_iter->second->begin() : InnerIter{nullptr, iterator_end{}}),
-  m_inner_end(m_outer_iter->first ? m_outer_iter->second->end() : InnerIter{nullptr, iterator_end{}}),
+  m_inner_iter(m_outer_iter->first ? m_outer_iter->second->begin() : InnerIter{}),
+  m_inner_end(m_outer_iter->first ? m_outer_iter->second->end() : InnerIter{}),
   m_outer_end(map->m_map.end())
 {
 }
 
 AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_end) :
   m_outer_iter(map->m_map.end()),
-  m_inner_iter(InnerIter{nullptr, iterator_end{}}),
-  m_inner_end(InnerIter{nullptr, iterator_end{}}),
+  m_inner_iter(InnerIter{}),
+  m_inner_end(InnerIter{}),
   m_outer_end(map->m_map.end())
 {
 }
@@ -335,7 +346,7 @@ AllocationMap::ConstIterator& AllocationMap::ConstIterator::operator++()
       m_inner_iter = m_outer_iter->second->begin();
       m_inner_end = m_outer_iter->second->end();
     } else {
-      m_inner_iter = InnerIter{nullptr, iterator_end{}};
+      m_inner_iter = InnerIter{};
     }
   }
   return *this;

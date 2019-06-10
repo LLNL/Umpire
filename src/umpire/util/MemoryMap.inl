@@ -23,13 +23,13 @@ namespace util {
 namespace {
 
 // Judy: number of Integers in a key
-static constexpr unsigned int judy_depth = 1;
+static constexpr unsigned int judy_depth{1};
 
 // Judy: max height of stack
-static constexpr unsigned int judy_max_levels = sizeof(uintptr_t);
+static constexpr unsigned int judy_max_levels{sizeof(uintptr_t)};
 
 // Judy: length of key in bytes
-static constexpr unsigned int judy_max = judy_depth * JUDY_key_size;
+static constexpr unsigned int judy_max{judy_depth * JUDY_key_size};
 
 } // end anonymous namespace
 
@@ -68,7 +68,7 @@ MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
 
   auto pval = reinterpret_cast<Value**>(m_last);
 
-  const bool found = (*pval != nullptr);
+  const bool found{*pval != nullptr};
 
   if (!found) {
     // Create it and increment size
@@ -111,7 +111,7 @@ MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
 
-  Key parent_ptr = 0;
+  Key parent_ptr{0};
   judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
 
   // If the ptrs do not match, or the key does not exist, get the previous entry
@@ -175,11 +175,11 @@ MemoryMap<V>::remove(void* ptr)
 }
 
 template <typename V>
-void MemoryMap<V>::clear()
+void MemoryMap<V>::clear() noexcept
 {
   // Loop over the level 0 tree
   Key key{0};
-  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)) != nullptr)
+  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)))
     removeLast();
 
   m_size = 0;

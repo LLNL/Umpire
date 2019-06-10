@@ -117,7 +117,7 @@ public:
   void removeLast();
 
   // Clear all entries
-  void clear();
+  void clear() noexcept;
 
   // Number of entries
   size_t size() const noexcept;

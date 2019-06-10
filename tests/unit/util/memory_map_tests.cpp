@@ -16,14 +16,24 @@
 
 #include "gtest/gtest.h"
 
+using Map = umpire::util::MemoryMap<int>;
+
+static size_t size_by_iterator(Map& map)
+{
+  auto iter = map.begin(), end = map.end();
+  size_t size = 0;
+  while (iter != end) { ++size; ++iter; }
+  return size;
+}
+
 TEST(MemoryMap, get)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
 
   // Get should emplace an entry if it doens't already exist
-  umpire::util::MemoryMap<int>::Iterator iter{&map, umpire::util::iterator_begin{}};
+  Map::Iterator iter{map.end()};
   bool found;
 
   {
@@ -43,7 +53,7 @@ TEST(MemoryMap, get)
 
 TEST(MemoryMap, insert)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
   void* b = reinterpret_cast<void*>(2);
@@ -54,11 +64,12 @@ TEST(MemoryMap, insert)
   EXPECT_THROW(map.insert(b, 2), umpire::util::Exception);
 
   ASSERT_EQ(map.size(), 2);
+  ASSERT_EQ(size_by_iterator(map), 2);
 }
 
 TEST(MemoryMap, find)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
   void* b = reinterpret_cast<void*>(2);
@@ -80,7 +91,7 @@ TEST(MemoryMap, find)
 
 TEST(MemoryMap, findOrBefore)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
   map.insert(a, 1);
@@ -102,7 +113,7 @@ TEST(MemoryMap, findOrBefore)
 
 TEST(MemoryMap, remove)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
   map.insert(a, 1);
@@ -112,9 +123,28 @@ TEST(MemoryMap, remove)
   ASSERT_EQ(map.size(), 0);
 }
 
+TEST(MemoryMap, clear)
+{
+  Map map{};
+
+  void* a = reinterpret_cast<void*>(1);
+  void* b = reinterpret_cast<void*>(2);
+  void* c = reinterpret_cast<void*>(3);
+  map.insert(a, 1);
+  map.insert(b, 2);
+  map.insert(c, 3);
+
+  ASSERT_NO_THROW(map.remove(a));
+
+  map.clear();
+  ASSERT_EQ(map.size(), 0);
+  ASSERT_EQ(size_by_iterator(map), 0);
+}
+
+
 TEST(MemoryMap, Iterator)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
   auto ia = map.insert(a, 1);
@@ -127,7 +157,7 @@ TEST(MemoryMap, Iterator)
 
 TEST(MemoryMap, ordering)
 {
-  umpire::util::MemoryMap<int> map{};
+  Map map{};
 
   void* a = reinterpret_cast<void*>(1);
   void* b = reinterpret_cast<void*>(2);

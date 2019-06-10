@@ -48,6 +48,7 @@ public:
   class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
   {
   public:
+    ConstIterator();
     ConstIterator(const RecordList* list, iterator_begin);
     ConstIterator(const RecordList* list, iterator_end);
     ConstIterator(const ConstIterator&) = default;
