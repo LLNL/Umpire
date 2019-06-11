@@ -27,6 +27,7 @@
 namespace umpire {
 namespace util {
 
+// Tags for iterator constructors
 struct iterator_begin {};
 struct iterator_end {};
 

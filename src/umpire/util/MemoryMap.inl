@@ -166,8 +166,7 @@ MemoryMap<V>::find(void* ptr) const noexcept
 }
 
 template <typename V>
-void
-MemoryMap<V>::remove(void* ptr)
+void MemoryMap<V>::remove(void* ptr)
 {
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 

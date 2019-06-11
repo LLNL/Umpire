@@ -102,4 +102,4 @@ BENCHMARK_F(InspectorDeregister, remove)(benchmark::State &st)
   }
 }
 
-BENCHMARK_MAIN();
+BENCHMARK_MAIN()
