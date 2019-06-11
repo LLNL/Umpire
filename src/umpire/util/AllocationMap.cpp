@@ -55,14 +55,20 @@ void RecordList::push_back(const AllocationRecord& rec)
 
 AllocationRecord RecordList::pop_back()
 {
-  AllocationRecord ret;
-  if (m_length > 0) {
-    ret = m_tail->rec;
-    BlockType* prev = m_tail->prev;
-    block_pool.deallocate(m_tail);
-    m_tail = prev;
-    m_length--;
+  if (m_length == 0) {
+    UMPIRE_ERROR("pop_back() called, but m_length == 0");
   }
+
+  const AllocationRecord ret{m_tail->rec};
+  BlockType* prev = m_tail->prev;
+
+  // Deallocate and move tail pointer
+  block_pool.deallocate(m_tail);
+  m_tail = prev;
+
+  // Reduce size
+  m_length--;
+
   return ret;
 }
 
