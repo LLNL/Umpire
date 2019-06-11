@@ -95,17 +95,6 @@ TEST_F(AllocationMapTest, FindOffset)
   ASSERT_EQ(record, *actual_record);
 }
 
-TEST_F(AllocationMapTest, FindOneAfterEnd)
-{
-  EXPECT_NO_THROW(
-    map.insert(data, record)
-  );
-
-  ASSERT_ANY_THROW(
-    map.find(reinterpret_cast<char*>(data) + record.size)
-  );
-}
-
 TEST_F(AllocationMapTest, Contains)
 {
   EXPECT_NO_THROW(
