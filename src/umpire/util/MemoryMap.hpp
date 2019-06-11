@@ -111,9 +111,9 @@ public:
   // Remove the entry at ptr
   void remove(void* ptr);
 
-  // Remove/Deallocate the last found entry
-  // WARNING: Use this with caution. remove(void*) is safer, but
-  // requires an additional lookup and does not return the contents.
+  // Remove/Deallocate the internal judy position. WARNING: Use this
+  // with caution, only directly after using a method above.
+  // remove(void*) is safer, but requires an additional lookup.
   void removeLast();
 
   // Clear all entries
