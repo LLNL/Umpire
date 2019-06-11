@@ -59,7 +59,7 @@ AllocationRecord RecordList::pop_back()
     UMPIRE_ERROR("pop_back() called, but m_length == 0");
   }
 
-  const AllocationRecord ret{m_tail->rec};
+  const AllocationRecord ret = m_tail->rec;
   BlockType* prev = m_tail->prev;
 
   // Deallocate and move tail pointer
