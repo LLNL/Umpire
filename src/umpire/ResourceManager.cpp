@@ -51,17 +51,13 @@
 
 namespace umpire {
 
-ResourceManager* ResourceManager::s_resource_manager_instance = nullptr;
-
 ResourceManager&
 ResourceManager::getInstance()
 {
-  if (!s_resource_manager_instance) {
-    s_resource_manager_instance = new ResourceManager();
-  }
+  static ResourceManager s_resource_manager_instance;
 
-  UMPIRE_LOG(Debug, "() returning " << s_resource_manager_instance);
-  return *s_resource_manager_instance;
+  UMPIRE_LOG(Debug, "() returning " << &s_resource_manager_instance);
+  return s_resource_manager_instance;
 }
 
 ResourceManager::ResourceManager() :

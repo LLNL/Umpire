@@ -250,8 +250,6 @@ class ResourceManager {
 
     std::string getAllocatorInformation() const noexcept;
 
-    static ResourceManager* s_resource_manager_instance;
-
     std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
     std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
 
