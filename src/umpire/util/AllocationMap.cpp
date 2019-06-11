@@ -109,16 +109,18 @@ AllocationMap::findRecord(void* ptr) const
     auto record = m_records->atOrBefore(reinterpret_cast<uintptr_t>(ptr));
     if (record.value) {
       void* parent_ptr = reinterpret_cast<void*>(record.key);
-      alloc_record =
-        reinterpret_cast<Entry>(record.value->back());
+      alloc_record = reinterpret_cast<Entry>(record.value->back());
 
       if (alloc_record &&
-          ((static_cast<char*>(parent_ptr) + alloc_record->m_size)
-             >= static_cast<char*>(ptr))) {
-
+          (
+           (static_cast<char*>(parent_ptr) + alloc_record->m_size)
+               > static_cast<char*>(ptr)
+             || 
+           static_cast<char*>(parent_ptr) == static_cast<char*>(ptr)
+          )
+      ) {
          UMPIRE_LOG(Debug, "Found " << ptr << " at " << parent_ptr
             << " with size " << alloc_record->m_size);
-
       }
       else {
          alloc_record = nullptr;
