@@ -653,16 +653,16 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
       auto src_alloc_record = m_allocations.find(ptr);
 
-      const size_t size = src_alloc_record->m_size;
+      const size_t size = src_alloc_record->size;
       util::AllocationRecord dst_alloc_record;
-      dst_alloc_record.m_size = src_alloc_record->m_size;
-      dst_alloc_record.m_strategy = sicm_alloc;
+      dst_alloc_record.size = src_alloc_record->size;
+      dst_alloc_record.strategy = sicm_alloc;
 
       void *ret = nullptr;
       if (size > 0) {
         auto op = op_registry.find("MOVE",
-                                   src_alloc_record->m_strategy,
-                                   dst_alloc_record.m_strategy);
+                                   src_alloc_record->strategy,
+                                   dst_alloc_record.strategy);
 
         op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
         if (ret != ptr) {

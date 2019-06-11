@@ -15,8 +15,6 @@
 #ifndef UMPIRE_SICMStrategy_HPP
 #define UMPIRE_SICMStrategy_HPP
 
-#include <vector>
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 #include "umpire/Allocator.hpp"
