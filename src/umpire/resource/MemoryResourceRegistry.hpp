@@ -19,7 +19,7 @@
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
 #include <memory>
-#include <list>
+#include <vector>
 
 namespace umpire {
 namespace resource {
@@ -30,15 +30,16 @@ class MemoryResourceRegistry {
 
     resource::MemoryResource* makeMemoryResource(const std::string& name, int id);
 
-    void registerMemoryResource(MemoryResourceFactory* factory);
+    void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 
-  protected:
-    MemoryResourceRegistry() noexcept;
+    MemoryResourceRegistry(const MemoryResourceRegistry&) = delete;
+    MemoryResourceRegistry& operator=(const MemoryResourceRegistry&) = delete;
+    ~MemoryResourceRegistry() = default;
 
   private:
-    static MemoryResourceRegistry* s_allocator_registry_instance;
+    MemoryResourceRegistry() noexcept;
 
-    std::list<MemoryResourceFactory*> m_allocator_factories;
+    std::vector<std::unique_ptr<MemoryResourceFactory> > m_allocator_factories;
 };
 
 } // end of namespace resource

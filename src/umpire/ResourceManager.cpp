@@ -39,29 +39,26 @@
 #endif
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
-
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/make_unique.hpp"
 
 #include <iterator>
-#include <memory>
 #include <sstream>
+#include <memory>
+
 
 namespace umpire {
-
-ResourceManager* ResourceManager::s_resource_manager_instance = nullptr;
 
 ResourceManager&
 ResourceManager::getInstance()
 {
-  if (!s_resource_manager_instance) {
-    s_resource_manager_instance = new ResourceManager();
-  }
+  static ResourceManager resource_manager;
 
-  UMPIRE_LOG(Debug, "() returning " << s_resource_manager_instance);
-  return *s_resource_manager_instance;
+  UMPIRE_LOG(Debug, "() returning " << &resource_manager);
+  return resource_manager;
 }
 
 ResourceManager::ResourceManager() :
@@ -78,28 +75,28 @@ ResourceManager::ResourceManager() :
     resource::MemoryResourceRegistry::getInstance();
 
   registry.registerMemoryResource(
-      new resource::HostResourceFactory());
+      util::make_unique<resource::HostResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
-    new resource::CudaDeviceResourceFactory());
+    util::make_unique<resource::CudaDeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::CudaUnifiedMemoryResourceFactory());
+    util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::CudaPinnedMemoryResourceFactory());
+    util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::CudaConstantMemoryResourceFactory());
+    util::make_unique<resource::CudaConstantMemoryResourceFactory>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)
   registry.registerMemoryResource(
-    new resource::RocmDeviceResourceFactory());
+    util::make_unique<resource::RocmDeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::RocmPinnedMemoryResourceFactory());
+    util::make_unique<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
   initialize();

@@ -20,16 +20,12 @@
 namespace umpire {
 namespace resource {
 
-MemoryResourceRegistry* MemoryResourceRegistry::s_allocator_registry_instance = nullptr;
-
 MemoryResourceRegistry&
 MemoryResourceRegistry::getInstance() noexcept
 {
-  if (!s_allocator_registry_instance) {
-    s_allocator_registry_instance = new MemoryResourceRegistry();
-  }
+  static MemoryResourceRegistry resource_registry;
 
-  return *s_allocator_registry_instance;
+  return resource_registry;
 }
 
 MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
@@ -38,15 +34,15 @@ MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
 }
 
 void
-MemoryResourceRegistry::registerMemoryResource(MemoryResourceFactory* factory)
+MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory)
 {
-  m_allocator_factories.push_front(factory);
+  m_allocator_factories.push_back(std::move(factory));
 }
 
 resource::MemoryResource*
 MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
-  for (auto allocator_factory : m_allocator_factories) {
+  for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
       auto a = allocator_factory->create(name, id);
       UMPIRE_REPLAY(
