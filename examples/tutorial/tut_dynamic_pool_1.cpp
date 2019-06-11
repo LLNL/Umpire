@@ -17,7 +17,7 @@ void allocate_and_deallocate_pool(const std::string& resource)
 
   auto allocator = rm.getAllocator(resource);
 
-  auto pooled_allocator =
+  auto pooled_allocator = 
     rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
                                                     allocator);
 
@@ -34,9 +34,7 @@ void allocate_and_deallocate_pool(const std::string& resource)
 
 int main(int, char**) {
   allocate_and_deallocate_pool("HOST");
-#if defined(UMPIRE_ENABLE_SICM)
-  allocate_and_deallocate_pool("SICM");
-#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate_pool("DEVICE");
   allocate_and_deallocate_pool("UM");

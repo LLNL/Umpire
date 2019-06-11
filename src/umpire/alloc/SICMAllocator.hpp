@@ -16,6 +16,10 @@
 #define UMPIRE_SICMAllocator_HPP
 
 #include <cstdlib>
+#include <list>
+#include <map>
+#include <set>
+#include <vector>
 
 #include "umpire/util/Macros.hpp"
 
@@ -32,23 +36,39 @@ namespace alloc {
  */
 struct SICMAllocator
 {
-  SICMAllocator(unsigned int device = 0)
+  SICMAllocator(const std::set <unsigned int> & devices)
     : devs(sicm_init()),
-      sa(nullptr)
+      allowed_devices(),
+      best_device_index(0)
   {
-    if (device >= devs.count) {
-      sicm_fini();
-      UMPIRE_ERROR("SICMAllocator Bad device index: " << device << " / " << devs.count);
-    }
+    // empty device list is allowed, but leaves the instance of SICMAllocator unable to do anything
 
-    if (!(sa = sicm_arena_create(0, &devs.devices[device]))) {
-      sicm_fini();
-      UMPIRE_ERROR("SICMAllocator Could not create arena on device " << device);
+    // check if any of the devices are out of bounds
+    for(const unsigned int dev : devices) {
+      if (dev >= devs.count) {
+        cleanup();
+        UMPIRE_ERROR("SICMAllocator Bad device index: " << dev << " [0-" << devs.count << ")");
+      }
+
+      allowed_devices.push_back(dev);     // move the contents of devices into allowed devices
+      (void) arenas[dev];                 // create the map node
     }
   }
 
   ~SICMAllocator() {
-    sicm_arena_destroy(sa);
+    cleanup();
+  }
+
+  void cleanup() {
+    {
+      std::lock_guard <std::mutex> lock(arena_mutex);
+      // only delete the arenas on devices that this instance is allowed to control
+      for(const int dev : allowed_devices) {
+        for(sicm_arena arena : arenas[dev]) {
+          sicm_arena_destroy(arena);
+        }
+      }
+    }
     sicm_fini();
   }
 
@@ -62,12 +82,54 @@ struct SICMAllocator
    */
   void* allocate(size_t bytes)
   {
-    // void* ret = sicm_arena_alloc(sa, bytes);
-    void* ret = sicm_alloc(bytes);
+    void* ret = nullptr;
+    {
+      std::lock_guard <std::mutex> lock(arena_mutex);
+
+      if (!allowed_devices.size()) {
+        cleanup();
+        UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed due to lack of allowed devics");
+      }
+
+      // find best device
+      const int best = allowed_devices[best_device_index];
+      UMPIRE_LOG(Debug, "Best device to allocate on: " << best);
+      best_device_index = (best_device_index + 1) % allowed_devices.size();
+
+      // get list of arenas currently on the device
+      std::list <sicm_arena> & arenas_on_device = arenas[best];
+
+      // get an arena
+      sicm_arena sa = nullptr;
+      if (!arenas_on_device.size()) {
+        UMPIRE_LOG(Debug, "Creating new arena on device " << best);
+        if (!(sa = sicm_arena_create(0, &devs.devices[best]))) {
+          cleanup();
+          UMPIRE_ERROR("SICMAllocator Could not create arena on device " << best);
+        }
+      }
+      else {
+        UMPIRE_LOG(Debug, "Using existing arena on device " << best);
+
+        // take first arena
+        sa = arenas_on_device.front();
+
+        // pop arena
+        arenas_on_device.pop_front();
+      }
+
+      // allocate on arena
+      UMPIRE_LOG(Debug, "Using arena located at " << sa << " on device " << best);
+      ret = sicm_arena_alloc(sa, bytes);
+
+      // push arena to back of list
+      arenas_on_device.push_back(sa);
+    }
+
+    // void* ret = sicm_alloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
-     if  (ret == nullptr) {
-      sicm_arena_destroy(sa);
-      sicm_fini();
+    if  (ret == nullptr) {
+      cleanup();
       UMPIRE_ERROR("SICM( bytes = " << bytes << " ) failed");
     } else {
       return ret;
@@ -88,7 +150,11 @@ struct SICMAllocator
   }
 
   sicm_device_list devs;
-  sicm_arena sa;
+  std::vector <unsigned int> allowed_devices;
+  std::size_t best_device_index; // this should be deleted once a better selector is created
+
+  static std::mutex arena_mutex;
+  static std::map <unsigned int, std::list <sicm_arena> > arenas; // device index -> arenas on that device
 };
 
 } // end of namespace alloc

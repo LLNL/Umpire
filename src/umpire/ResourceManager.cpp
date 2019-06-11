@@ -99,18 +99,33 @@ ResourceManager::ResourceManager() :
   resource::MemoryResourceRegistry& registry{
     resource::MemoryResourceRegistry::getInstance()};
 
-  registry.registerMemoryResource(
-      util::make_unique<resource::HostResourceFactory>());
+// read config file/figure out which device belongs to what
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_SICM)
   registry.registerMemoryResource(
-      new resource::SICMResourceFactory());
+    util::make_unique<resource::SICMResourceFactory>("HOST", {0, 1, 2, 3, 4, 5}));
+#else
+  registry.registerMemoryResource(
+    util::make_unique<resource::HostResourceFactory>());
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_SICM)
+  registry.registerMemoryResource(
+    util::make_unique<resource::SICMResourceFactory>("DEVICE", {}));
+
+  registry.registerMemoryResource(
+    util::make_unique<resource::SICMResourceFactory>("UM", {}));
+
+  registry.registerMemoryResource(
+    util::make_unique<resource::SICMResourceFactory>("PINNED", {}));
+
+  registry.registerMemoryResource(
+    util::make_unique<resource::SICMResourceFactory>("CONSTANT", {}));
+#else
   registry.registerMemoryResource(
     util::make_unique<resource::CudaDeviceResourceFactory>());
 
@@ -123,13 +138,22 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     util::make_unique<resource::CudaConstantMemoryResourceFactory>());
 #endif
+#endif
 
 #if defined(UMPIRE_ENABLE_HCC)
+#if defined(UMPIRE_ENABLE_SICM)
+  registry.registerMemoryResource(
+      util::make_unique<resource::SICMResourceFactory>("DEVICE", {}));
+
+  registry.registerMemoryResource(
+      util::make_unique<resource::SICMResourceFactory>("PINNED", {}));
+#else
   registry.registerMemoryResource(
     util::make_unique<resource::RocmDeviceResourceFactory>());
 
   registry.registerMemoryResource(
     util::make_unique<resource::RocmPinnedMemoryResourceFactory>());
+#endif
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -273,12 +297,6 @@ ResourceManager::initialize()
   m_allocators_by_id[host_allocator->getId()] = host_allocator;
 
   m_default_allocator = host_allocator;
-
-#if defined(UMPIRE_ENABLE_SICM)
-  auto sicm_allocator = m_memory_resources[resource::SICM];
-  m_allocators_by_name["SICM"] = sicm_allocator;
-  m_allocators_by_id[sicm_allocator->getId()] = sicm_allocator;
-#endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   auto device_allocator = m_memory_resources[resource::Device];

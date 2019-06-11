@@ -28,9 +28,7 @@ void allocate_and_deallocate(const std::string& resource)
 
 int main(int, char**) {
   allocate_and_deallocate("HOST");
-#if defined(UMPIRE_ENABLE_SICM)
-  allocate_and_deallocate("SICM");
-#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("UM");

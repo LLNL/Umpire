@@ -23,18 +23,20 @@
 namespace umpire {
 namespace resource {
 
+SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::set <unsigned int> & devices)
+  : replacement(name),
+    devices(devices)
+{
+}
+
 bool
 SICMResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name.compare("SICM") == 0) {
-    return true;
-  } else {
-    return false;
-  }
+  return (name.compare(replacement) == 0);
 }
 
 resource::MemoryResource*
-SICMResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+SICMResourceFactory::create(const std::string& name, int id)
 {
   MemoryResourceTraits traits;
 
@@ -45,7 +47,7 @@ SICMResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::sicm, "SICM", id, traits);
+  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::sicm, name, id, traits, devices);
 }
 
 } // end of namespace resource

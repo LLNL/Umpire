@@ -62,35 +62,10 @@ MemoryOperationRegistry::getInstance() noexcept
 
 MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
-  registerOperation(
-      "COPY",
-      std::make_pair(Platform::cpu, Platform::cpu),
-      std::make_shared<HostCopyOperation>());
-
-  registerOperation(
-      "MEMSET",
-      std::make_pair(Platform::cpu, Platform::cpu),
-      std::make_shared<HostMemsetOperation>());
-
-  registerOperation(
-      "REALLOCATE",
-      std::make_pair(Platform::cpu, Platform::cpu),
-      std::make_shared<HostReallocateOperation>());
-
 #if defined(UMPIRE_ENABLE_SICM)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::sicm),
-      std::make_shared<HostCopyOperation>());
-
-  registerOperation(
-      "COPY",
       std::make_pair(Platform::sicm, Platform::sicm),
-      std::make_shared<HostCopyOperation>());
-
-  registerOperation(
-      "COPY",
-      std::make_pair(Platform::sicm, Platform::cpu),
       std::make_shared<HostCopyOperation>());
 
   registerOperation(
@@ -107,7 +82,21 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::sicm, Platform::sicm),
       std::make_shared<SICMReallocateOperation>());
-#endif
+#else
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<HostReallocateOperation>());
 
 #if defined(UMPIRE_ENABLE_NUMA)
   registerOperation(
@@ -228,7 +217,6 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
-
 #endif
 }
 

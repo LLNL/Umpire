@@ -15,9 +15,6 @@ int main(int, char**) {
 
   const std::string destinations[] = {
     "HOST"
-#if defined(UMPIRE_ENABLE_SICM)
-      , "SICM"
-#endif
 #if defined(UMPIRE_ENABLE_CUDA)
       , "DEVICE"
       , "UM"
@@ -37,7 +34,7 @@ int main(int, char**) {
     std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
       << allocator.getName() << " allocator." << std::endl;
 
-    std::cout << "Reallocating data (" << data << ") to size "
+    std::cout << "Reallocating data (" << data << ") to size " 
       << REALLOCATED_SIZE << "...";
 
     data = static_cast<double*>(rm.reallocate(data, REALLOCATED_SIZE));

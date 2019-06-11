@@ -20,9 +20,10 @@ namespace umpire {
 namespace resource {
 
 template<typename _allocator>
-DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits) :
+template<typename ...Args>
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, Args && ...args) :
   MemoryResource(name, id, traits),
-  m_allocator(),
+  m_allocator(std::forward<Args>(args)...),
   m_platform(platform)
 {
 }

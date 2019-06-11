@@ -15,6 +15,8 @@
 #ifndef UMPIRE_SICMResourceFactory_HPP
 #define UMPIRE_SICMResourceFactory_HPP
 
+#include <set>
+
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
@@ -27,8 +29,15 @@ namespace resource {
 class SICMResourceFactory :
   public MemoryResourceFactory
 {
+public:
+  SICMResourceFactory(const std::string& name, const std::set <unsigned int> & devices);
+
+private:
   bool isValidMemoryResourceFor(const std::string& name) noexcept;
   resource::MemoryResource* create(const std::string& name, int id);
+
+  const std::string & replacement;
+  const std::set <unsigned int> devices;
 };
 
 } // end of namespace resource

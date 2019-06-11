@@ -11,6 +11,10 @@ if (ENABLE_SICM)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     SICMAllocator.hpp)
+
+  set (umpire_alloc_sources
+    ${umpire_alloc_sources}
+    SICMAllocator.cpp)
 endif()
 
 if (ENABLE_NUMA)
@@ -44,19 +48,38 @@ blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers})
 
-target_include_directories(
-  umpire_alloc
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+if ("${umpire_alloc_sources}" STREQUAL "")
+  blt_add_library(
+    NAME umpire_alloc
+    HEADERS ${umpire_alloc_headers})
 
-install(TARGETS
-  umpire_alloc
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+  target_include_directories(
+    umpire_alloc
+    INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+  install(TARGETS
+    umpire_alloc
+    EXPORT umpire-targets
+    RUNTIME DESTINATION lib
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
+else()
+  blt_add_library(
+    NAME umpire_alloc
+    HEADERS ${umpire_alloc_headers}
+    SOURCES ${umpire_alloc_sources}
+    OBJECT TRUE)
+
+  target_include_directories(
+    umpire_alloc
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+endif()
 
 install(FILES
   ${umpire_alloc_headers}

@@ -10,14 +10,14 @@
 #include "umpire/Umpire.hpp"
 
 class FreeFunctionsTest :
-  public ::testing::TestWithParam<std::string>
+  public ::testing::TestWithParam<std::string> 
 {
 };
 
 TEST_P(FreeFunctionsTest, DefaultMallocFree)
 {
   double* test_alloc;
-
+ 
   ASSERT_NO_THROW(
      test_alloc = static_cast<double*>(umpire::malloc(100*sizeof(double)))
   );
@@ -39,7 +39,7 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
   );
 
   double* test_alloc;
-
+ 
   ASSERT_NO_THROW(
      test_alloc = static_cast<double*>(umpire::malloc(100*sizeof(double)))
   );
