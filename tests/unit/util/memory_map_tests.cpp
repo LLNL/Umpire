@@ -26,12 +26,26 @@ static size_t size_by_iterator(Map& map)
   return size;
 }
 
-TEST(MemoryMap, get)
+class MemoryMapTest : public ::testing::Test {
+  protected:
+    MemoryMapTest()
+      : a{reinterpret_cast<void*>(1)},
+        b{reinterpret_cast<void*>(2)},
+        c{reinterpret_cast<void*>(3)} {}
+
+    void TearDown() override {
+      map.clear();
+    }
+
+    Map map;
+    void* a;
+    void* b;
+    void* c;
+};
+
+
+TEST_F(MemoryMapTest, get)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
-
   // Get should emplace an entry if it doens't already exist
   Map::Iterator iter{map.end()};
   bool found;
@@ -51,15 +65,12 @@ TEST(MemoryMap, get)
   ASSERT_EQ(map.size(), 1);
 }
 
-TEST(MemoryMap, insert)
+TEST_F(MemoryMapTest, insert)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
-  void* b = reinterpret_cast<void*>(2);
-  EXPECT_NO_THROW(
+  EXPECT_NO_THROW({
     map.insert(a, 1);
-    map.insert(b, 2));
+    map.insert(b, 2);
+  });
 
   EXPECT_THROW(map.insert(b, 2), umpire::util::Exception);
 
@@ -67,15 +78,12 @@ TEST(MemoryMap, insert)
   ASSERT_EQ(size_by_iterator(map), 2);
 }
 
-TEST(MemoryMap, find)
+TEST_F(MemoryMapTest, find)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
-  void* b = reinterpret_cast<void*>(2);
-  void* c = reinterpret_cast<void*>(3);
-  map.insert(a, 1);
-  map.insert(b, 2);
+  EXPECT_NO_THROW({
+    map.insert(a, 1);
+    map.insert(b, 2);
+  });
 
   {
     auto iter = map.find(a);
@@ -89,12 +97,9 @@ TEST(MemoryMap, find)
   }
 }
 
-TEST(MemoryMap, findOrBefore)
+TEST_F(MemoryMapTest, findOrBefore)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
-  map.insert(a, 1);
+  EXPECT_NO_THROW(map.insert(a, 1));
 
   {
     auto iter = map.findOrBefore(static_cast<char*>(a) + 10);
@@ -111,11 +116,8 @@ TEST(MemoryMap, findOrBefore)
   ASSERT_EQ(map.size(), 0);
 }
 
-TEST(MemoryMap, remove)
+TEST_F(MemoryMapTest, remove)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
   map.insert(a, 1);
 
   ASSERT_NO_THROW(map.remove(a));
@@ -123,13 +125,8 @@ TEST(MemoryMap, remove)
   ASSERT_EQ(map.size(), 0);
 }
 
-TEST(MemoryMap, clear)
+TEST_F(MemoryMapTest, clear)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
-  void* b = reinterpret_cast<void*>(2);
-  void* c = reinterpret_cast<void*>(3);
   map.insert(a, 1);
   map.insert(b, 2);
   map.insert(c, 3);
@@ -142,11 +139,8 @@ TEST(MemoryMap, clear)
 }
 
 
-TEST(MemoryMap, Iterator)
+TEST_F(MemoryMapTest, Iterator)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
   auto ia = map.insert(a, 1);
 
   auto begin = map.begin();
@@ -155,12 +149,8 @@ TEST(MemoryMap, Iterator)
   ASSERT_EQ(++ia, map.end());
 }
 
-TEST(MemoryMap, ordering)
+TEST_F(MemoryMapTest, ordering)
 {
-  Map map{};
-
-  void* a = reinterpret_cast<void*>(1);
-  void* b = reinterpret_cast<void*>(2);
   auto ia = map.insert(a, 1);
   auto ib = map.insert(b, 2);
   ASSERT_EQ(++ia, ib);
