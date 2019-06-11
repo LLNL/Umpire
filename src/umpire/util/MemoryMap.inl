@@ -61,6 +61,8 @@ template <typename... Args>
 std::pair<typename MemoryMap<V>::Iterator, bool>
 MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
 {
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Find the ptr and update m_oper
   m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -82,6 +84,8 @@ MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
 template <typename V>
 typename MemoryMap<V>::Iterator MemoryMap<V>::insert(void* ptr, const Value& val)
 {
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Insert the ptr (cell) and update m_oper
   m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -107,6 +111,8 @@ template <typename V>
 typename MemoryMap<V>::Key
 MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
 {
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Find the ptr and update m_oper
   m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -120,6 +126,7 @@ MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
     m_last = judy_prv(m_array);
     judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
   }
+  UMPIRE_LOG(Debug, "returning " << parent_ptr);
 
   return parent_ptr;
 }
@@ -162,6 +169,8 @@ template <typename V>
 void
 MemoryMap<V>::remove(void* ptr)
 {
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Locate ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -196,6 +205,9 @@ template <typename V>
 void MemoryMap<V>::removeLast()
 {
   auto v = reinterpret_cast<Value*>(*m_last);
+  UMPIRE_ASSERT(v != nullptr);
+
+  UMPIRE_LOG(Debug, "value pointer = " << v);
 
   // Manually call destructor
   v->~Value();
