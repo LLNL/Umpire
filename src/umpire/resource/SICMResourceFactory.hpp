@@ -18,6 +18,7 @@
 #include <vector>
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
+#include "umpire/util/SICM_device.hpp"
 
 namespace umpire {
 namespace resource {
@@ -30,7 +31,7 @@ class SICMResourceFactory :
   public MemoryResourceFactory
 {
 public:
-  SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices);
+  SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices, const sicm::device_chooser_t& chooser);
 
 private:
   bool isValidMemoryResourceFor(const std::string& name) noexcept;
@@ -38,6 +39,7 @@ private:
 
   const std::string replacement;
   const std::vector<unsigned int> devices;
+  const sicm::device_chooser_t chooser;
 };
 
 } // end of namespace resource

@@ -17,6 +17,7 @@
 
 #include "umpire/util/Platform.hpp"
 
+#include <functional>
 #include <vector>
 
 extern "C" {
@@ -35,6 +36,8 @@ unsigned int best_device(const int running_at,
                          const std::size_t size,
                          const std::vector <unsigned int>& allowed_devices,
                          const sicm_device_list& devs);
+
+typedef std::function<decltype(best_device)> device_chooser_t;
 
 } // end namespace sicm
 } // end namespace umpire

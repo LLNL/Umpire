@@ -37,10 +37,11 @@ namespace alloc {
  */
 struct SICMAllocator
 {
-  SICMAllocator(const std::string& name, const std::vector <unsigned int>& devices)
+  SICMAllocator(const std::string& name, const std::vector <unsigned int>& devices, const sicm::device_chooser_t& chooser)
     : devs(sicm_init()),
       name(name),
-      allowed_devices(devices)
+      allowed_devices(devices),
+      chooser(chooser)
   {
     if (!devices.size()) {
       UMPIRE_ERROR("SICMAllocator construction failed due to lack of allowed devices");
@@ -57,6 +58,11 @@ struct SICMAllocator
       if (arenas.find(dev) != arenas.end()) {
         UMPIRE_ERROR("SICMAllocator Device has already been used in aother SICMAllocator: " << dev);
       }
+    }
+
+    // check if the device chooser is NULL
+    if (!chooser) {
+      UMPIRE_ERROR("SICMAllocator Bad device chooser.");
     }
   }
 
@@ -90,13 +96,14 @@ struct SICMAllocator
     void* ret = nullptr;
     {
       // find best device
-      const int best = sicm::best_device(sched_getcpu(), bytes, allowed_devices, devs);
+      const unsigned int best = chooser(sched_getcpu(), bytes, allowed_devices, devs);
       UMPIRE_LOG(Debug, "Best " << name << " device to allocate on: " << best);
 
       std::lock_guard <std::mutex> lock(arena_mutex);
 
       // get list of arenas currently on the device
-      std::list <sicm_arena> & arenas_on_device = arenas[best];
+      // create new mapping if best isn't found
+      std::list<sicm_arena>& arenas_on_device = arenas[best];
 
       // get an arena
       sicm_arena sa = nullptr;
@@ -150,6 +157,7 @@ struct SICMAllocator
   const sicm_device_list devs;
   const std::string name;
   std::vector <unsigned int> allowed_devices;
+  const sicm::device_chooser_t& chooser;
 
   static std::mutex arena_mutex;
   static std::map <unsigned int, std::list <sicm_arena> > arenas; // device index -> arenas on that device

@@ -30,9 +30,10 @@ extern "C"
 namespace umpire {
 namespace resource {
 
-SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices)
+SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices, const sicm::device_chooser_t& chooser)
   : replacement(name),
-    devices(devices)
+    devices(devices),
+    chooser(chooser)
 {
 }
 
@@ -60,7 +61,7 @@ SICMResourceFactory::create(const std::string& name, int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::sicm, name, id, traits, name, devices);
+  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::sicm, name, id, traits, name, devices, chooser);
 }
 
 } // end of namespace resource

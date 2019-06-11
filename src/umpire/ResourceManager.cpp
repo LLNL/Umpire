@@ -100,18 +100,18 @@ ResourceManager::ResourceManager() :
   resource::MemoryResourceRegistry& registry{
     resource::MemoryResourceRegistry::getInstance()};
 
+  registry.registerMemoryResource(
+      util::make_unique<resource::NullMemoryResourceFactory>());
+
 #if defined(UMPIRE_ENABLE_SICM)
   struct sicm_device_list devs = sicm_init();
 #endif
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_SICM)
   const std::vector<unsigned int> host_devices = sicm::get_devices(devs, Platform::cpu);
 
   registry.registerMemoryResource(
-    util::make_uniqe<resource::SICMResourceFactory>("HOST", host_devices));
+    util::make_unique<resource::SICMResourceFactory>("HOST", sicm::get_devices(devs, Platform::cpu), sicm::best_device)));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::HostResourceFactory>());
@@ -122,29 +122,16 @@ ResourceManager::ResourceManager() :
   const std::vector<unsigned int> cuda_devices = sicm::get_devices(devs, Platform::cuda);
 
   registry.registerMemoryResource(
-<<<<<<< HEAD
-    util::make_unique<resource::SICMResourceFactory>("DEVICE", {}));
+    util::make_unique<resource::SICMResourceFactory>("DEVICE",   cuda_devices, sicm::best_device));
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("UM", {}));
+    util::make_unique<resource::SICMResourceFactory>("UM",       cuda_devices, sicm::best_device));
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("PINNED", {}));
+    util::make_unique<resource::SICMResourceFactory>("PINNED",   cuda_devices, sicm::best_device));
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("CONSTANT", {}));
-=======
-      new resource::SICMResourceFactory("DEVICE", cuda_devices));
-
-  registry.registerMemoryResource(
-      new resource::SICMResourceFactory("UM", cuda_devices));
-
-  registry.registerMemoryResource(
-      new resource::SICMResourceFactory("PINNED", cuda_devices));
-
-  registry.registerMemoryResource(
-      new resource::SICMResourceFactory("DEVICE_CONST", cuda_devices));
->>>>>>> search through sicm_device_list to assign devices to resources
+    util::make_unique<resource::SICMResourceFactory>("CONSTANT", cuda_devices, sicm::best_device));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::CudaDeviceResourceFactory>());

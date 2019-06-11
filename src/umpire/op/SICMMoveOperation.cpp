@@ -45,41 +45,39 @@ void SICMMoveOperation::transform(
       static_cast<strategy::SICMStrategy *>(
           static_cast<strategy::AllocationStrategy*>(
               static_cast<strategy::AllocationTracker *>(dst_allocation->m_strategy)->getAllocationStrategy()));
+  sicm_arena sa = sicm_arena_lookup(src_ptr);
+
+  const int rc = sicm_arena_set_device(sa, &m_devices.devices[dst_allocator->getDeviceIndex()]);
+  if (rc != 0) {
+    sicm_fini();
+    UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
+  }
+
+  *dst_ptr = src_ptr;
+
+  // find the arena the src_ptr was at and move the record to the new device
   {
-    sicm_arena sa = sicm_arena_lookup(src_ptr);
-
-    const int rc = sicm_arena_set_device(sa, &m_devices.devices[dst_allocator->getDeviceIndex()]);
-    if (rc != 0) {
-      sicm_fini();
-      UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
-    }
-
-    *dst_ptr = src_ptr;
-
-    // find the arena the src_ptr was at and move the record to the new device
-    {
-      std::lock_guard <std::mutex> lock(alloc::SICMAllocator::arena_mutex);
-      bool found = false;
-      for(std::pair <const unsigned int, std::list <sicm_arena> > & device : alloc::SICMAllocator::arenas) {
-        for(std::list <sicm_arena>::const_iterator it = device.second.begin(); it != device.second.end(); it++) {
-          if (*it == sa) {
-            device.second.erase(it);
-            found = true;
-            break;
-          }
-        }
-
-        if (found) {
+    std::lock_guard <std::mutex> lock(alloc::SICMAllocator::arena_mutex);
+    bool found = false;
+    for(std::pair <const unsigned int, std::list <sicm_arena> > & device : alloc::SICMAllocator::arenas) {
+      for(std::list <sicm_arena>::const_iterator it = device.second.begin(); it != device.second.end(); it++) {
+        if (*it == sa) {
+          device.second.erase(it);
+          found = true;
           break;
         }
       }
 
       if (found) {
-        alloc::SICMAllocator::arenas[dst_allocator->getDeviceIndex()].push_back(sa);
+        break;
       }
-      else {
-        // is this an error?
-      }
+    }
+
+    if (found) {
+      alloc::SICMAllocator::arenas[dst_allocator->getDeviceIndex()].push_back(sa);
+    }
+    else {
+      // is this an error?
     }
   }
 
