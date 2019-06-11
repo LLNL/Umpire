@@ -48,18 +48,11 @@
 namespace umpire {
 namespace op {
 
-MemoryOperationRegistry*
-MemoryOperationRegistry::s_memory_operation_registry_instance = nullptr;
-
 MemoryOperationRegistry&
 MemoryOperationRegistry::getInstance() noexcept
 {
-  if (!s_memory_operation_registry_instance) {
-    s_memory_operation_registry_instance = new MemoryOperationRegistry();
-    UMPIRE_LOG(Debug, "() Created MemoryOperationRegistry at " << s_memory_operation_registry_instance);
-  }
-
-  return *s_memory_operation_registry_instance;
+  static MemoryOperationRegistry memory_operation_registry;
+  return memory_operation_registry;
 }
 
 MemoryOperationRegistry::MemoryOperationRegistry() noexcept
