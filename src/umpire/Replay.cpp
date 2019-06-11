@@ -35,15 +35,14 @@ namespace umpire {
 namespace replay {
 
 static const char* env_name = "UMPIRE_REPLAY";
-Replay* Replay::s_Replay = nullptr;
 int Replay::m_argument_number = 0;
 
-Replay::Replay(bool enable_replay) : replayEnabled(enable_replay), m_replayUid(getpid())
+Replay::Replay() : m_replayUid(getpid())
 {
-}
+  char* enval = getenv(env_name);
+  bool enable_replay = ( enval != NULL );
 
-Replay::~Replay()
-{
+  replayEnabled =  enable_replay;
 }
 
 void Replay::logMessage( const std::string& message )
@@ -59,29 +58,11 @@ bool Replay::replayLoggingEnabled()
   return replayEnabled;
 }
 
-void Replay::initialize()
-{
-  if ( s_Replay != nullptr )
-    return;
-
-  char* enval = getenv(env_name);
-  bool enable_replay = ( enval != NULL );
-
-  s_Replay = new Replay(enable_replay);
-}
-
-void Replay::finalize()
-{
-  delete s_Replay;
-  s_Replay = nullptr;
-}
-
 Replay* Replay::getReplayLogger()
 {
-  if ( s_Replay == nullptr )
-    Replay::initialize();
+  static Replay replay;
 
-  return s_Replay;
+  return &replay;
 }
 
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
