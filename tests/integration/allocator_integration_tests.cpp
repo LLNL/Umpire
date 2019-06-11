@@ -164,7 +164,9 @@ TEST(Allocator, isRegistered)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_TRUE(rm.isAllocatorRegistered("HOST"));
+  for(const std::string & allocator_string : allocator_strings) {
+      ASSERT_TRUE(rm.isAllocatorRegistered(allocator_string));
+  }
   ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
 }
 
