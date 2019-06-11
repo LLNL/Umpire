@@ -266,12 +266,16 @@ BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallo
 
 class FixedMallocPool : public ::allocatorBenchmark {
   public:
-  void SetUp(const ::benchmark::State&) override {
+  using allocatorBenchmark::SetUp;
+  using allocatorBenchmark::TearDown;
+
+  void SetUp(const ::benchmark::State&) override final {
     pool = new umpire::util::FixedMallocPool(8);
   }
-  void TearDown(const ::benchmark::State&) override {
+  void TearDown(const ::benchmark::State&) override final {
     delete pool;
   }
+
   virtual void* allocate( uint64_t nbytes ) override final { return pool->allocate(nbytes); }
   virtual void deallocate( void* ptr ) override final { pool->deallocate(ptr); }
   private:
