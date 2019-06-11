@@ -19,6 +19,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
+#include "umpire/strategy/mixins/Inspector.hpp"
+
 namespace umpire {
 namespace op {
 
@@ -29,11 +31,19 @@ void HostReallocateOperation::transform(
     util::AllocationRecord *dst_allocation,
     size_t length)
 {
-  auto allocator = dst_allocation->m_strategy;
+  auto allocator = dst_allocation->strategy;
 
-  delete ResourceManager::getInstance().deregisterAllocation(src_ptr);
-
+  auto old_record = ResourceManager::getInstance().deregisterAllocation(src_ptr);
   *dst_ptr = ::realloc(src_ptr, length);
+
+  if (!*dst_ptr) {
+    UMPIRE_ERROR("::realloc(src_ptr=" << src_ptr <<
+                 ", old_length=" << old_record.size <<
+                 ", length=" << length << ") failed");
+  }
+
+  ResourceManager::getInstance().registerAllocation(
+     *dst_ptr, {*dst_ptr, length, allocator});
 
   UMPIRE_RECORD_STATISTIC(
       "HostReallocate",
@@ -41,10 +51,6 @@ void HostReallocateOperation::transform(
       "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "reallocate");
-
-  ResourceManager::getInstance().registerAllocation(
-      *dst_ptr,
-      new util::AllocationRecord{*dst_ptr, length, allocator});
 }
 
 } // end of namespace op

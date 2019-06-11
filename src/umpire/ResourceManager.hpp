@@ -62,6 +62,8 @@ class ResourceManager {
      */
     Allocator getAllocator(const std::string& name);
 
+    Allocator getAllocator(const char* name);
+
     /*!
      * \brief Get the default Allocator for the given resource_type.
      */
@@ -133,14 +135,14 @@ class ResourceManager {
     /*!
      * \brief register an allocation with the manager.
      */
-    void registerAllocation(void* ptr, util::AllocationRecord* record);
+    void registerAllocation(void* ptr, util::AllocationRecord record);
 
     /*!
      * \brief de-register the address ptr with the manager.
      *
      * \return the allocation record removed from the manager.
      */
-    util::AllocationRecord* deregisterAllocation(void* ptr);
+    util::AllocationRecord deregisterAllocation(void* ptr);
 
     /*!
      * \brief Find the allocation record associated with an address ptr.
@@ -261,9 +263,11 @@ class ResourceManager {
 
     int m_id;
 
-    std::mutex* m_mutex;
+    std::mutex m_mutex;
 
+    // Methods that need access to m_allocations to print/filter records
     friend void print_allocator_records(Allocator, std::ostream&);
+    friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
 };
 
 } // end of namespace umpire

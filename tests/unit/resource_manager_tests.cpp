@@ -37,9 +37,9 @@ TEST(ResourceManager, findAllocationRecord)
   const umpire::util::AllocationRecord* rec_middle = rm.findAllocationRecord(ptr + offset);
   const umpire::util::AllocationRecord* rec_end = rm.findAllocationRecord(ptr + (size-1));
 
-  ASSERT_EQ(ptr, rec_begin->m_ptr);
-  ASSERT_EQ(ptr, rec_middle->m_ptr);
-  ASSERT_EQ(ptr, rec_end->m_ptr);
+  ASSERT_EQ(ptr, rec_begin->ptr);
+  ASSERT_EQ(ptr, rec_middle->ptr);
+  ASSERT_EQ(ptr, rec_end->ptr);
 
   ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::util::Exception);
 

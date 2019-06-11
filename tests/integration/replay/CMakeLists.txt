@@ -38,4 +38,8 @@ if (BASH_PROGRAM)
     COMMAND ${BASH_PROGRAM}
     ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
 
+else()
+
+  message(STATUS, "Bash not configured, replay tests disabled.")
+
 endif()

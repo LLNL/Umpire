@@ -15,8 +15,10 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
+  allocation_statistics.hpp
   detect_vendor.hpp
   Exception.hpp
+  FixedMallocPool.hpp
   Logger.hpp
   Macros.hpp
   MemoryResourceTraits.hpp
@@ -38,8 +40,10 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
+  allocation_statistics.cpp
   detect_vendor.cpp
   Exception.cpp
+  FixedMallocPool.cpp
   Logger.cpp)
 
 if (ENABLE_STATISTICS)
@@ -55,7 +59,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends)
+set (umpire_util_depends umpire_tpl_judy)
 
 if (ENABLE_NUMA)
   set (umpire_util_depends

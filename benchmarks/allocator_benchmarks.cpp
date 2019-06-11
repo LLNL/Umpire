@@ -24,12 +24,14 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
+#include "umpire/util/FixedMallocPool.hpp"
+
 class allocatorBenchmark : public ::benchmark::Fixture {
 public:
   using ::benchmark::Fixture::SetUp;
   using ::benchmark::Fixture::TearDown;
 
-  allocatorBenchmark() : max_allocations(100000) { 
+  allocatorBenchmark() : max_allocations(100000) {
     allocations = new void*[max_allocations];
   }
   virtual ~allocatorBenchmark() {
@@ -210,12 +212,10 @@ public:
   using allocatorBenchmark::TearDown;
 
   void SetUp(const ::benchmark::State&) {
-    struct data { char _[8388608]; };
-
     std::stringstream ss;
     ss << "fixedpool" << namecnt++;
     auto& rm = umpire::ResourceManager::getInstance();
-    rm.makeAllocator<umpire::strategy::FixedPool<data>>(ss.str(), rm.getAllocator(getName()));
+    rm.makeAllocator<umpire::strategy::FixedPool>(ss.str(), rm.getAllocator(getName()), 256, 128 * sizeof(int) * 8);
     allocator = new umpire::Allocator(rm.getAllocator(ss.str()));
 
     void* ptr;
@@ -264,16 +264,35 @@ class FixedPoolDevice : public ::FixedPool {
 BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
 
+class FixedMallocPool : public ::allocatorBenchmark {
+  public:
+  void SetUp(const ::benchmark::State&) override {
+    pool = new umpire::util::FixedMallocPool(8);
+  }
+  void TearDown(const ::benchmark::State&) override {
+    delete pool;
+  }
+  virtual void* allocate( uint64_t nbytes ) override final { return pool->allocate(nbytes); }
+  virtual void deallocate( void* ptr ) override final { pool->deallocate(ptr); }
+  private:
+  umpire::util::FixedMallocPool *pool;
+};
+
+BENCHMARK_DEFINE_F(FixedMallocPool, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedMallocPool, deallocate)(benchmark::State &st)   { deallocation(st); }
+
+
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
 BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedMallocPool, allocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedMallocPool, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, deallocate)->Range(RangeLow, RangeHi);
-// NOTE: always allocates 8mb, ignores size argument
 BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(RangeLow);
 
@@ -290,13 +309,11 @@ BENCHMARK_REGISTER_F(UM, largeAllocDealloc)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg
 
 // BENCHMARK_REGISTER_F(PoolUM, allocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolUM, deallocate)->Range(RangeLow, RangeHi);
-// NOTE: always allocates 8mb, ignores size argument
-#if DOESNT_WORK_YET
+
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, deallocate)->Arg(RangeLow);
-#endif
 #endif
 
 

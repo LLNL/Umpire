@@ -31,6 +31,9 @@ class TypedAllocator {
   public:
   typedef T value_type;
 
+  template <typename U>
+  friend class TypedAllocator;
+
   /*!
    *
    * \brief Construct a new TypedAllocator that will use allocator to allocate
@@ -38,7 +41,10 @@ class TypedAllocator {
    *
    * \param allocator Allocator to use for allocating memory.
    */
-  TypedAllocator(Allocator allocator);
+  explicit TypedAllocator(Allocator allocator);
+
+  template<typename U>
+  TypedAllocator(const TypedAllocator<U>& other);
 
   /*
    * \brief Allocate size objects of type T.

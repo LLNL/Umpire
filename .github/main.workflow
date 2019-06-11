@@ -11,3 +11,14 @@ action "Check CHANGELOG" {
 action "Static Analysis" {
   uses = "./.github/actions/static-analysis"
 }
+
+
+workflow "on pull request merge, delete the branch" {
+  on = "pull_request"
+  resolves = ["Delete merged branch"]
+}
+
+action "Delete merged branch" {
+  uses = "jessfraz/branch-cleanup-action@b3a2b299e1ce42dbcbef5c4a0b9e97b8068154b8"
+  secrets = ["GITHUB_TOKEN"]
+}

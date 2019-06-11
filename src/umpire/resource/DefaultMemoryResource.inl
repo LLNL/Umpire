@@ -18,6 +18,7 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 
 #include "umpire/ResourceManager.hpp"
+
 #include "umpire/util/Macros.hpp"
 
 #include <memory>
@@ -55,7 +56,7 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  deregisterAllocation(ptr);
+  deregisterAllocation(ptr, this);
   m_allocator.deallocate(ptr);
 }
 

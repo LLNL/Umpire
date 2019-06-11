@@ -25,13 +25,9 @@
 #include <sstream>
 #include <iostream>
 #include <mutex>
-
-#ifdef UMPIRE_ENABLE_ASSERTS
 #include <cassert>
+
 #define UMPIRE_ASSERT(condition) assert(condition)
-#else
-#define UMPIRE_ASSERT(condition) ((void)0)
-#endif // UMPIRE_ENABLE_ASSERTS
 
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
@@ -120,10 +116,10 @@
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
 
 #define UMPIRE_LOCK \
-  if ( !m_mutex->try_lock() ) \
-    m_mutex->lock();
+  if ( !m_mutex.try_lock() ) \
+    m_mutex.lock();
 
 #define UMPIRE_UNLOCK \
-  m_mutex->unlock();
+  m_mutex.unlock();
 
 #endif // UMPIRE_Macros_HPP
