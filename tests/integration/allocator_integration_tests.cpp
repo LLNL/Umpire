@@ -145,7 +145,7 @@ const std::string allocator_strings[] = {
 #if defined(UMPIRE_ENABLE_UM)
   , "UM"
 #endif
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   , "DEVICE_CONST"
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
@@ -255,7 +255,7 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 #if defined(UMPIRE_ENABLE_PINNED)
   , umpire::resource::Pinned
 #endif
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   , umpire::resource::Constant
 #endif
 };

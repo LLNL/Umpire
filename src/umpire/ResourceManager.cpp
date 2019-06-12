@@ -43,6 +43,7 @@
 
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 #include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
 #endif
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
@@ -115,6 +116,9 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     new resource::HipPinnedMemoryResourceFactory());
+
+  registry.registerMemoryResource(
+    new resource::HipConstantMemoryResourceFactory());
 #endif
 
   initialize();
@@ -170,7 +174,7 @@ ResourceManager::initialize()
   m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
@@ -201,7 +205,7 @@ ResourceManager::initialize()
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   auto device_const_allocator = m_memory_resources[resource::Constant];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;

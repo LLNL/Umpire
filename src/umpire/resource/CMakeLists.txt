@@ -73,10 +73,14 @@ if (ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     HipDeviceResourceFactory.hpp
-    HipPinnedMemoryResourceFactory.hpp)
+    HipPinnedMemoryResourceFactory.hpp
+    HipConstantMemoryResourceFactory.hpp
+    HipConstantMemoryResource.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
+    HipConstantMemoryResourceFactory.cpp
+    HipConstantMemoryResource.cpp
     HipDeviceResourceFactory.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
