@@ -152,6 +152,39 @@ TEST_F(AllocationMapTest, RegisterMultiple)
   );
 }
 
+TEST_F(AllocationMapTest, RegisterNone)
+{
+  auto begin = map.begin(), end = map.end();
+
+  ASSERT_EQ(begin, end);
+  ASSERT_EQ(map.size(), 0);
+}
+
+TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
+{
+  umpire::util::AllocationRecord next_record{data, 1, nullptr};
+  umpire::util::AllocationRecord another_record{data + 10, 5, nullptr};
+
+  ASSERT_NO_THROW(
+    map.insert(data, record);
+    map.insert(data, next_record);
+    map.insert(data, another_record);
+  );
+
+  size_t size = 0;
+  auto iter = map.begin(), end = map.end();
+  while (iter != end) { ++size; ++iter; }
+  ASSERT_EQ(size, 3);
+}
+
+TEST_F(AllocationMapTest, RegisterNoneIteratorSize)
+{
+  size_t size = 0;
+  auto iter = map.begin(), end = map.end();
+  while (iter != end) { ++size; ++iter; }
+  ASSERT_EQ(size, 0);
+}
+
 TEST_F(AllocationMapTest, FindMultiple)
 {
   umpire::util::AllocationRecord next_record{data, 1, nullptr};

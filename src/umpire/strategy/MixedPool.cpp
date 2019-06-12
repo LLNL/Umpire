@@ -27,7 +27,7 @@ MixedPool::MixedPool(const std::string& name, int id,
                      size_t smallest_fixed_blocksize,
                      size_t largest_fixed_blocksize,
                      size_t max_fixed_pool_size,
-                     float size_multiplier,
+                     size_t size_multiplier,
                      size_t dynamic_min_initial_alloc_size,
                      size_t dynamic_min_alloc_size,
                      DynamicPool::Coalesce_Heuristic coalesce_heuristic) noexcept :

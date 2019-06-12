@@ -84,9 +84,7 @@ TEST_P(AllocatorTest, DeallocateNullptr)
 {
   double* data = nullptr;
 
-  ASSERT_NO_THROW(
-  m_allocator->deallocate(data);
-  );
+  ASSERT_NO_THROW(m_allocator->deallocate(data));
 
   SUCCEED();
 }
@@ -157,8 +155,7 @@ const std::string allocator_strings[] = {
 INSTANTIATE_TEST_CASE_P(
     Allocators,
     AllocatorTest,
-    ::testing::ValuesIn(allocator_strings)
-);
+    ::testing::ValuesIn(allocator_strings),);
 
 TEST(Allocator, isRegistered)
 {
@@ -241,8 +238,8 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
   );
 
   ASSERT_THROW(
-      m_allocator->deallocate(data),
-      umpire::util::Exception
+    m_allocator->deallocate(data),
+    umpire::util::Exception
   );
 }
 
@@ -265,7 +262,7 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 INSTANTIATE_TEST_CASE_P(
     Resources,
     AllocatorByResourceTest,
-    ::testing::ValuesIn(resource_types));
+    ::testing::ValuesIn(resource_types),);
 
 TEST(Allocation, DeallocateDifferent)
 {
@@ -281,7 +278,9 @@ TEST(Allocation, DeallocateDifferent)
     alloc_two.deallocate(data),
     umpire::util::Exception);
 
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
+  ASSERT_NO_THROW(
+    alloc_one.deallocate(data)
+  );
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -297,5 +296,8 @@ TEST(Allocator, DeallocateDifferentCuda)
     alloc_dev.deallocate(data),
     umpire::util::Exception);
 
+  ASSERT_NO_THROW(
+    alloc_um.deallocate(data)
+  );
 }
 #endif
