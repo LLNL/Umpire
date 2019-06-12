@@ -121,13 +121,15 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  auto host_allocator{registry.makeMemoryResource("HOST", getNextId())};
-  int id{host_allocator->getId()};
-  m_allocators_by_name["HOST"]  = host_allocator.get();
-  m_memory_resources[resource::Host] = host_allocator.get();
-  m_default_allocator = host_allocator.get();
-  m_allocators_by_id[id] = host_allocator.get();
-  m_allocators.emplace_front(std::move(host_allocator));
+  {
+    auto host_allocator{registry.makeMemoryResource("HOST", getNextId())};
+    int id{host_allocator->getId()};
+    m_allocators_by_name["HOST"]  = host_allocator.get();
+    m_memory_resources[resource::Host] = host_allocator.get();
+    m_default_allocator = host_allocator.get();
+    m_allocators_by_id[id] = host_allocator.get();
+    m_allocators.emplace_front(std::move(host_allocator));
+  }
 
 #if defined(UMPIRE_ENABLE_CUDA)
   int count;
@@ -139,44 +141,47 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  auto device_allocator = (*m_allocators_by_;
-  m_allocators_by_name["DEVICE"] = device_allocator;
-  m_allocators_by_id[device_allocator->getId()] = device_allocator;
-  m_memory_resources[resource::Device] = ;
+  {
+    auto allocator{registry.makeMemoryResource("DEVICE", getNextId())};
+    int id{allocator->getId()};
+    m_allocators_by_name["DEVICE"] = allocator.get();
+    m_memory_resources[resource::Device] = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)
-  m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
+  {
+    auto allocator{registry.makeMemoryResource("PINNED", getNextId())};
+    int id{allocator->getId()};
+    m_allocators_by_name["PINNED"] = allocator.get();
+    m_memory_resources[resource::Pinned] = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-  m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
+  {
+    auto allocator{registry.makeMemoryResource("UM", getNextId())};
+    int id{allocator->getId()};
+    m_allocators_by_name["UM"] = allocator.get();
+    m_memory_resources[resource::Unified] = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
-#endif
-
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-#endif
-
-#if defined(UMPIRE_ENABLE_PINNED)
-  auto pinned_allocator = m_memory_resources[resource::Pinned];
-  m_allocators_by_name["PINNED"] = pinned_allocator;
-  m_allocators_by_id[pinned_allocator->getId()] = pinned_allocator;
-#endif
-
-#if defined(UMPIRE_ENABLE_UM)
-  auto um_allocator = m_memory_resources[resource::Unified];
-  m_allocators_by_name["UM"] = um_allocator;
-  m_allocators_by_id[um_allocator->getId()] = um_allocator;
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA)
-  auto device_const_allocator = m_memory_resources[resource::Constant];
-  m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
-  m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;
+  {
+    auto allocator{registry.makeMemoryResource("DEVICE_CONST", getNextId())};
+    int id{allocator->getId()};
+    m_allocators_by_name["DEVICE_CONST"] = allocator.get();
+    m_memory_resources[resource::Constant] = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
 #endif
 
   UMPIRE_LOG(Debug, "() leaving");
