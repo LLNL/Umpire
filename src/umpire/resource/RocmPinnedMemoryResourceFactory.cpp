@@ -17,6 +17,8 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/AmPinnedAllocator.hpp"
 
+#include "umpire/util/make_unique.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -31,7 +33,7 @@ RocmPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 RocmPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -41,7 +43,7 @@ RocmPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return new resource::DefaultMemoryResource<alloc::AmPinnedAllocator>(Platform::rocm, "PINNED", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::AmPinnedAllocator>>(Platform::rocm, "PINNED", id, traits);
 }
 
 } // end of namespace resource

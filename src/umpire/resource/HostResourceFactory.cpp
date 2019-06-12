@@ -22,6 +22,7 @@
 #endif
 
 #include "umpire/util/detect_vendor.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
@@ -36,7 +37,7 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -62,7 +63,7 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new DefaultMemoryResource<HostAllocator>(Platform::cpu, "HOST", id, traits);
+  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::cpu, "HOST", id, traits);
 }
 
 } // end of namespace resource

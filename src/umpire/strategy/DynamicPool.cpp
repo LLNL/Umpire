@@ -143,6 +143,8 @@ void DynamicPool::splitBlock(struct Block *&curr, struct Block *&prev, const std
 void DynamicPool::releaseBlock(struct Block *curr, struct Block *prev) {
   assert(curr != nullptr);
 
+  UMPIRE_LOG(Debug, "(" << curr << ", " << prev << ")");
+
   if (prev) prev->next = curr->next;
   else usedBlocks = curr->next;
 
@@ -179,6 +181,7 @@ void DynamicPool::releaseBlock(struct Block *curr, struct Block *prev) {
 }
 
 std::size_t DynamicPool::freeReleasedBlocks() {
+  UMPIRE_LOG(Debug, "()");
   // Release the unused blocks
   struct Block *curr = freeBlocks;
   struct Block *prev = nullptr;
@@ -221,6 +224,7 @@ void DynamicPool::coalesceFreeBlocks(std::size_t size) {
 }
 
 void DynamicPool::freeAllBlocks() {
+  UMPIRE_LOG(Debug, "()");
   // Release the used blocks
   while(usedBlocks) {
     releaseBlock(usedBlocks, nullptr);
@@ -252,7 +256,11 @@ DynamicPool::DynamicPool(
 {
 }
 
-DynamicPool::~DynamicPool() { freeAllBlocks(); }
+DynamicPool::~DynamicPool()
+{ 
+  UMPIRE_LOG(Debug, "()");
+  freeAllBlocks(); 
+}
 
 void*
 DynamicPool::allocate(size_t bytes)

@@ -62,11 +62,12 @@ ResourceManager::getInstance()
 }
 
 ResourceManager::ResourceManager() :
-  m_allocators_by_name(),
-  m_allocators_by_id(),
   m_allocations(),
-  m_default_allocator(),
+  m_allocators(),
+  m_allocators_by_id(),
+  m_allocators_by_name(),
   m_memory_resources(),
+  m_default_allocator(),
   m_id(0),
   m_mutex()
 {
@@ -120,7 +121,13 @@ ResourceManager::initialize()
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
-  m_memory_resources[resource::Host] = registry.makeMemoryResource("HOST", getNextId());
+  auto host_allocator{registry.makeMemoryResource("HOST", getNextId())};
+  int id{host_allocator->getId()};
+  m_allocators_by_name["HOST"]  = host_allocator.get();
+  m_memory_resources[resource::Host] = host_allocator.get();
+  m_default_allocator = host_allocator.get();
+  m_allocators_by_id[id] = host_allocator.get();
+  m_allocators.emplace_front(std::move(host_allocator));
 
 #if defined(UMPIRE_ENABLE_CUDA)
   int count;
@@ -132,7 +139,10 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
+  auto device_allocator = (*m_allocators_by_;
+  m_allocators_by_name["DEVICE"] = device_allocator;
+  m_allocators_by_id[device_allocator->getId()] = device_allocator;
+  m_memory_resources[resource::Device] = ;
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)
@@ -147,19 +157,8 @@ ResourceManager::initialize()
   m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
-  /*
-   * Construct default allocators for each resource
-   */
-  auto host_allocator = m_memory_resources[resource::Host];
-  m_allocators_by_name["HOST"] = host_allocator;
-  m_allocators_by_id[host_allocator->getId()] = host_allocator;
-
-  m_default_allocator = host_allocator;
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  auto device_allocator = m_memory_resources[resource::Device];
-  m_allocators_by_name["DEVICE"] = device_allocator;
-  m_allocators_by_id[device_allocator->getId()] = device_allocator;
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)

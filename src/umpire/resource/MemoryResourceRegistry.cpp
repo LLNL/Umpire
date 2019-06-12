@@ -39,7 +39,7 @@ MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFac
   m_allocator_factories.push_back(std::move(factory));
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
   for (auto const& allocator_factory : m_allocator_factories) {
@@ -48,7 +48,7 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
       UMPIRE_REPLAY(
            "\"event\": \"makeMemoryResource\""
         << ", \"payload\": { \"name\": \"" << name << "\" }"
-        << ", \"result\": \"" << a << "\""
+        << ", \"result\": \"" << a.get() << "\""
       );
       return a;
     }

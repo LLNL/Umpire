@@ -49,7 +49,7 @@ class MemoryResourceFactory {
      * \param name Name of the MemoryResource.
      * \param id ID of the MemoryResource.
      */
-    virtual resource::MemoryResource* create(const std::string& name, int id) = 0;
+    virtual std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id) = 0;
 };
 
 } // end of namespace strategy

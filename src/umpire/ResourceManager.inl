@@ -37,7 +37,7 @@ Allocator ResourceManager::makeAllocator(
     const std::string& name,
     Args&&... args)
 {
-  strategy::AllocationStrategy* allocator;
+  std::unique_ptr<strategy::AllocationStrategy> allocator;
 
   try {
     UMPIRE_LOCK;
@@ -68,21 +68,12 @@ Allocator ResourceManager::makeAllocator(
     }
 
     if (!introspection) {
-      allocator = new Strategy(name, getNextId(), std::forward<Args>(args)...);
-
-      m_allocators_by_name[name] = allocator;
-      m_allocators_by_id[allocator->getId()] = allocator;
+      allocator.reset(new Strategy(name, getNextId(), std::forward<Args>(args)...));
     } else {
       std::stringstream base_name;
       base_name << name << "_base";
-
-      auto base_allocator = new Strategy(base_name.str(), getNextId(), std::forward<Args>(args)...);
-
-      allocator = new umpire::strategy::AllocationTracker(name, getNextId(), Allocator(base_allocator));
-
-      m_allocators_by_name[name] = allocator;
-      m_allocators_by_id[allocator->getId()] = allocator;
-
+      std::unique_ptr<strategy::AllocationStrategy> base_allocator{new Strategy(base_name.str(), getNextId(), std::forward<Args>(args)...)};
+      allocator.reset(new umpire::strategy::AllocationTracker(name, getNextId(), std::move(base_allocator)));
     }
 
 #if defined(_MSC_VER)
@@ -93,7 +84,7 @@ Allocator ResourceManager::makeAllocator(
         << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
-        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }"
     );
 #else
     UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
@@ -103,9 +94,13 @@ Allocator ResourceManager::makeAllocator(
         << ", \"args\": [ "
         << umpire::replay::Replay::printReplayAllocator(std::forward<Args>(args)...)
         << " ] }"
-        << ", \"result\": { \"allocator_ref\":\"" << allocator << "\" }"
+        << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }"
     );
 #endif
+
+      m_allocators_by_name[name] = allocator.get();
+      m_allocators_by_id[allocator->getId()] = allocator.get();
+      m_allocators.emplace_front(std::move(allocator));
 
     UMPIRE_UNLOCK;
   } catch (...) {
@@ -113,7 +108,7 @@ Allocator ResourceManager::makeAllocator(
     throw;
   }
 
-  return Allocator(allocator);
+  return Allocator(m_allocators_by_name[name]);
 }
 
 } // end of namespace umpire

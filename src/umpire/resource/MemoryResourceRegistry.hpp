@@ -28,7 +28,8 @@ class MemoryResourceRegistry {
   public:
     static MemoryResourceRegistry& getInstance() noexcept;
 
-    resource::MemoryResource* makeMemoryResource(const std::string& name, int id);
+    std::unique_ptr<resource::MemoryResource>
+    makeMemoryResource(const std::string& name, int id);
 
     void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 
