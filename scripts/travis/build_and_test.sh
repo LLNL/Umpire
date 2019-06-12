@@ -43,7 +43,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
             echo "Found leaks: $line"
             exit 1
           fi
-      done < <(ctest -T memcheck)
+      done < <(ctest -E replay -T memcheck)
     fi
 fi
 
