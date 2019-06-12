@@ -76,6 +76,7 @@
    libcuda realloc
    Memcheck:Leak
    fun:realloc
+   ...
    obj:/*/valgrind/*
    obj:/*/libcuda.so*
    ...
@@ -85,6 +86,7 @@
    libcuda calloc
    Memcheck:Leak
    fun:calloc
+   ...
    obj:/*/libcuda.so*
    ...
 }
@@ -120,5 +122,29 @@
    fun:malloc
    ...
    fun:__cudaPushCallConfiguration
+   ...
+}
+
+{
+   cuinit
+   Memcheck:Leak
+   ...
+   fun:cuInit
+   ...
+}
+
+{
+   cuinit
+   Memcheck:Addr8
+   ...
+   fun:cuInit
+   ...
+}
+
+{
+   cuinit
+   Memcheck:Addr2
+   ...
+   fun:cuInit
    ...
 }
