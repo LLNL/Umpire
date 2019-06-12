@@ -27,4 +27,4 @@ static void benchmark_DebugLogger(benchmark::State& state) {
 // Register the function as a benchmark
 BENCHMARK(benchmark_DebugLogger);
 
-BENCHMARK_MAIN();
+BENCHMARK_MAIN()

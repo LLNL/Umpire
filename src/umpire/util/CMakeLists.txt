@@ -22,6 +22,7 @@ set (umpire_util_headers
   Logger.hpp
   Macros.hpp
   MemoryResourceTraits.hpp
+  MemoryMap.hpp
   Platform.hpp)
 
 if (ENABLE_STATISTICS)

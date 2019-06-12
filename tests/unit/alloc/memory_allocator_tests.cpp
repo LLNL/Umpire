@@ -49,12 +49,14 @@ REGISTER_TYPED_TEST_CASE_P(
     MemoryAllocatorTest,
     Allocate);
 
+using test_types = ::testing::Types<
+    MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
-using test_types = ::testing::Types<MallocAllocator, CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator>;
-#elif defined(UMPIRE_ENABLE_HCC)
-using test_types = ::testing::Types<MallocAllocator, AmAllocAllocator, AmPinnedAllocator>;
-#else
-using test_types = ::testing::Types<MallocAllocator>;
+    , CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
 #endif
+#if defined(UMPIRE_ENABLE_HCC)
+    , AmAllocAllocator, AmPinnedAllocator
+#endif
+>;
 
 INSTANTIATE_TYPED_TEST_CASE_P(Default, MemoryAllocatorTest, test_types);

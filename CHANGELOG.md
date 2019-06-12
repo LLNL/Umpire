@@ -39,7 +39,7 @@ and a dynamic pool for those that are larger.
 
 - Update BLT to fix CMake 3.13 warnings and MSVC compatibility.
 
-- `util::AllocationMap` is significantly faster.
+- `AllocationMap` is significantly faster, and uses `MemoryMap`.
 
 - `ResourceManager` de/registration pass `AllocationRecord` by value.
 
@@ -81,6 +81,14 @@ and a dynamic pool for those that are larger.
 
 - Fix CodeCov reporting by explicitly downloading older version of upload
   script.
+
+## [0.3.5] - 2019-06-11
+
+### Fixed
+
+- Off by one regression introduced in 0.3.4 in
+AllocationRecord::AllocationMap::findRecord causing it to incorrectly report
+offset of `ptr+size_of_allocation` as found.
 
 ## [0.3.4] - 2019-06-06
 

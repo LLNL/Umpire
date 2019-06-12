@@ -56,4 +56,4 @@ BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::str
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("DEVICE"))->Range(4, 4096);
 #endif
 
-BENCHMARK_MAIN();
+BENCHMARK_MAIN()
