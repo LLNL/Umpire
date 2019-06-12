@@ -35,6 +35,8 @@ class MonotonicAllocationStrategy :
         size_t capacity,
         Allocator allocator);
 
+    ~MonotonicAllocationStrategy();
+
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
