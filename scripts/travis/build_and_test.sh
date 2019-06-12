@@ -41,6 +41,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
       while read -r line; do
           if [[ "$line" =~ $regex ]]; then
             echo "Found leaks: $line"
+            cat Testing/Temporary/MemoryChecker.*.log
             exit 1
           fi
       done < <(ctest -E replay -T memcheck)
