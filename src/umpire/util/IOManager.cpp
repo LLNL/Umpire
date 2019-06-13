@@ -103,10 +103,16 @@ IOManager::initialize()
       }
 #else
       struct stat info;
-      if ( stat( s_root_io_dir.c_str(), &info ) &&
-           !(S_ISDIR(info.st_mode)))
+      if ( stat( s_root_io_dir.c_str(), &info ) )
       {
-        mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRWXG);
+        if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRWXG) )
+        {
+          UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
+        }
+      }
+      else if ( !(S_ISDIR(info.st_mode)) )
+      {
+        UMPIRE_ERROR(s_root_io_dir << "exists and is not a directory");
       }
 #endif
     }
