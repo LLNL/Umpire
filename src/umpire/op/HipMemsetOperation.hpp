@@ -40,6 +40,6 @@ class HipMemsetOperation : public MemoryOperation {
 };
 
 } // end of naemspace op
-} //end of namespace umpire
+} // end of namespace umpire
 
 #endif // UMPIRE_HipMemsetOperation_HPP
