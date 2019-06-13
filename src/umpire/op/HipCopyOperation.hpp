@@ -28,7 +28,7 @@ class HipCopyOperation : public MemoryOperation {
    /*!
     * @copybrief MemoryOperation::transform
     *
-    * Uses cudaMemcpy to move data when both src_ptr  and dst_ptr are on AMD
+    * Uses hipMemcpy to move data when both src_ptr  and dst_ptr are on AMD
     * GPUs.
     *
     * @copydetails MemoryOperation::transform
