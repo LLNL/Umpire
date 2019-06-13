@@ -23,6 +23,7 @@
 #include <iterator>
 #include <utility>
 #include <type_traits>
+#include <mutex>
 
 namespace umpire {
 namespace util {
@@ -129,11 +130,15 @@ private:
   // Helper method for public findOrBefore()
   Key doFindOrBefore(Key ptr) const noexcept;
 
-  mutable Judy* m_array;    // Judy array
-  mutable JudySlot* m_last; // last found value in judy array
-  mutable uintptr_t m_oper; // address of last object to set internal judy state
-  FixedMallocPool m_pool;   // value pool
-  size_t m_size;            // number of objects stored
+  // Content of removeLast()
+  void doRemoveLast();
+
+  mutable Judy* m_array;      // Judy array
+  mutable JudySlot* m_last;   // last found value in judy array
+  mutable uintptr_t m_oper;   // address of last object to set internal judy state
+  mutable std::mutex m_mutex; // lock for thread safety
+  FixedMallocPool m_pool;     // value pool
+  size_t m_size;              // number of objects stored
 };
 
 } // end of namespace util

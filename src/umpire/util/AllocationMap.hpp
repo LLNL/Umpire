@@ -24,7 +24,6 @@
 #include "umpire/util/MemoryMap.hpp"
 
 #include <cstdint>
-#include <mutex>
 #include <iostream>
 #include <iterator>
 #include <functional>
@@ -162,7 +161,6 @@ public:
 private:
   Map m_map;
   size_t m_size;
-  mutable std::mutex m_mutex;
 };
 
 } // end of namespace util

@@ -39,6 +39,7 @@ MemoryMap<V>::MemoryMap() :
   m_array{nullptr},
   m_last{nullptr},
   m_oper{0},
+  m_mutex{},
   m_pool{sizeof(Value)},
   m_size{0}
 {
@@ -61,6 +62,9 @@ template <typename... Args>
 std::pair<typename MemoryMap<V>::Iterator, bool>
 MemoryMap<V>::get(Key ptr, Args&&... args) noexcept
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
   // Find the ptr and update m_oper
@@ -84,6 +88,9 @@ MemoryMap<V>::get(Key ptr, Args&&... args) noexcept
 template <typename V>
 typename MemoryMap<V>::Iterator MemoryMap<V>::insert(Key ptr, const Value& val)
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
   // Insert the ptr (cell) and update m_oper
@@ -111,6 +118,9 @@ template <typename V>
 typename MemoryMap<V>::Key
 MemoryMap<V>::doFindOrBefore(Key ptr) const noexcept
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
   // Find the ptr and update m_oper
@@ -149,6 +159,11 @@ MemoryMap<V>::findOrBefore(Key ptr) const noexcept
 template <typename V>
 typename MemoryMap<V>::Iterator MemoryMap<V>::find(Key ptr) noexcept
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Find the ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -159,6 +174,11 @@ template <typename V>
 typename MemoryMap<V>::ConstIterator
 MemoryMap<V>::find(Key ptr) const noexcept
 {
+  // Aquire lock
+ std::lock_guard<std::mutex> lock(m_mutex);
+
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Find the ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -168,6 +188,9 @@ MemoryMap<V>::find(Key ptr) const noexcept
 template <typename V>
 void MemoryMap<V>::erase(Key ptr)
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
   // Locate ptr and update m_oper
@@ -176,7 +199,7 @@ void MemoryMap<V>::erase(Key ptr)
 
   // If found, remove it
   if (m_last) {
-    removeLast();
+    doRemoveLast();
   } else {
     UMPIRE_ERROR("Could not remove ptr = " << ptr);
   }
@@ -195,25 +218,7 @@ void MemoryMap<V>::erase(ConstIterator iter)
 }
 
 template <typename V>
-void MemoryMap<V>::clear() noexcept
-{
-  // Loop over the level 0 tree
-  Key key{0};
-  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)))
-    removeLast();
-
-  m_size = 0;
-}
-
-template <typename V>
-size_t MemoryMap<V>::size() const noexcept
-{
-  return m_size;
-}
-
-// Iterator
-template <typename V>
-void MemoryMap<V>::removeLast()
+void MemoryMap<V>::doRemoveLast()
 {
   auto v = reinterpret_cast<Value*>(*m_last);
   UMPIRE_ASSERT(v != nullptr);
@@ -234,6 +239,35 @@ void MemoryMap<V>::removeLast()
 }
 
 template <typename V>
+void MemoryMap<V>::clear() noexcept
+{
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  // Loop over the level 0 tree
+  Key key{0};
+  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)))
+    doRemoveLast();
+
+  m_size = 0;
+}
+
+template <typename V>
+size_t MemoryMap<V>::size() const noexcept
+{
+  return m_size;
+}
+
+template <typename V>
+void MemoryMap<V>::removeLast()
+{
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+  doRemoveLast();
+}
+
+
+template <typename V>
 template <bool Const>
 MemoryMap<V>::Iterator_<Const>::Iterator_(Map* map, Key ptr) :
   m_map{map}, m_pair{std::make_pair(ptr, m_map->m_last ? reinterpret_cast<ValuePtr>(*m_map->m_last) : nullptr)}
@@ -245,6 +279,9 @@ template <bool Const>
 MemoryMap<V>::Iterator_<Const>::Iterator_(Map* map, iterator_begin) :
   m_map{map}, m_pair{}
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_map->m_mutex);
+
   m_pair.first = nullptr;
   m_map->m_last = judy_strt(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), 0);
   judy_key(m_map->m_array, reinterpret_cast<unsigned char*>(&m_pair.first), judy_max);
@@ -288,6 +325,9 @@ template <bool Const>
 typename MemoryMap<V>::template Iterator_<Const>&
 MemoryMap<V>::Iterator_<Const>::operator++()
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_map->m_mutex);
+
   // Check whether this object was not the last to set the internal judy state
   if (m_pair.first && m_map->m_oper != reinterpret_cast<uintptr_t>(this)) {
     // Seek m_array internal position

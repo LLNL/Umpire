@@ -141,13 +141,12 @@ bool RecordList::ConstIterator::operator!=(const RecordList::ConstIterator& othe
 
 // AllocationMap
 AllocationMap::AllocationMap() :
-  m_map{}, m_size{0}, m_mutex{}
+  m_map{}, m_size{0}
 {
 }
 
 void AllocationMap::insert(void* ptr, AllocationRecord record)
 {
-  UMPIRE_LOCK;
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
   Map::Iterator iter{m_map.end()};
@@ -162,7 +161,6 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   // -> get() already added record to the end of the RecordList for ptr
 
   ++m_size;
-  UMPIRE_UNLOCK;
 }
 
 const AllocationRecord* AllocationMap::find(void* ptr) const
@@ -191,8 +189,6 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 {
   const AllocationRecord* alloc_record = nullptr;
 
-  UMPIRE_LOCK;
-
   Map::ConstIterator iter = m_map.findOrBefore(ptr);
 
   // faster, equivalent way of checking iter != m_map->end()
@@ -215,8 +211,6 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
     }
   }
 
-  UMPIRE_UNLOCK;
-
   return alloc_record;
 }
 
@@ -230,29 +224,20 @@ AllocationRecord AllocationMap::remove(void* ptr)
 {
   AllocationRecord ret;
 
-  try {
-    UMPIRE_LOCK;
+  UMPIRE_LOG(Debug, "Removing " << ptr);
 
-    UMPIRE_LOG(Debug, "Removing " << ptr);
+  auto iter = m_map.find(ptr);
 
-    auto iter = m_map.find(ptr);
-
-    if (iter->second) {
-      // faster, equivalent way of checking iter != m_map->end()
-      ret = iter->second->pop_back();
-      if (iter->second->empty()) m_map.removeLast();
-    }
-    else {
-      UMPIRE_ERROR("Cannot remove " << ptr);
-    }
-
-    --m_size;
-
-    UMPIRE_UNLOCK;
-  } catch (...) {
-    UMPIRE_UNLOCK;
-    throw;
+  if (iter->second) {
+    // faster, equivalent way of checking iter != m_map->end()
+    ret = iter->second->pop_back();
+    if (iter->second->empty()) m_map.removeLast();
   }
+  else {
+    UMPIRE_ERROR("Cannot remove " << ptr);
+  }
+
+  --m_size;
 
   return ret;
 }
@@ -267,10 +252,8 @@ void AllocationMap::clear()
 {
   UMPIRE_LOG(Debug, "Clearing");
 
-  UMPIRE_LOCK;
   m_map.clear();
   m_size = 0;
-  UMPIRE_UNLOCK;
 }
 
 size_t AllocationMap::size() const { return m_size; }
