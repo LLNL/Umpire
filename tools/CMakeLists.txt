@@ -16,7 +16,7 @@
 set (tools_depends umpire umpire_tpl_cxxopts umpire_tpl_json)
 
 if (ENABLE_HIP)
-	set (tools_depends ${tools_depends} hip_runtime)
+  set (tools_depends ${tools_depends} hip_runtime)
 endif()
 
 blt_add_executable(
