@@ -26,6 +26,7 @@ function or_die () {
 
 or_die mkdir travis-build
 cd travis-build
+ls -al .
 if [[ "$DO_BUILD" == "yes" ]] ; then
     or_die cmake -DCMAKE_CXX_COMPILER="${COMPILER}" ${CMAKE_EXTRA_FLAGS} ../
     if [[ ${CMAKE_EXTRA_FLAGS} == *COVERAGE* ]] ; then
