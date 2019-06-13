@@ -35,7 +35,7 @@ Here is a summary of the configuration options, their default value, and meaning
 These arguments are explained in more detail below:
 
 * ``ENABLE_CUDA``
-  This option enables support for NVIDIA GPUs. If Umpire is built without CUDA,
+  This option enables support for NVIDIA GPUs using the CUDA programming model. If Umpire is built without CUDA,
   HCC, or HIP support, then only the ``HOST`` allocator is available for use.
 
 * ``ENABLE_HIP``
