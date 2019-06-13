@@ -38,6 +38,14 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+
+#include "umpire/resource/HipDeviceResourceFactory.hpp"
+#include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
+#endif
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #include "umpire/strategy/DynamicPool.hpp"
@@ -102,6 +110,17 @@ ResourceManager::ResourceManager() :
     new resource::RocmPinnedMemoryResourceFactory());
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+  registry.registerMemoryResource(
+    new resource::HipDeviceResourceFactory());
+
+  registry.registerMemoryResource(
+    new resource::HipPinnedMemoryResourceFactory());
+
+  registry.registerMemoryResource(
+    new resource::HipConstantMemoryResourceFactory());
+#endif
+
   initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -134,6 +153,15 @@ ResourceManager::initialize()
   }
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+  int count;
+  auto error = ::hipGetDeviceCount(&count);
+
+  if (error != hipSuccess) {
+    UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
+  }
+#endif
+
 #if defined(UMPIRE_ENABLE_DEVICE)
   m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
 #endif
@@ -146,7 +174,7 @@ ResourceManager::initialize()
   m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
 #endif
 
@@ -177,7 +205,7 @@ ResourceManager::initialize()
   m_allocators_by_id[um_allocator->getId()] = um_allocator;
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   auto device_const_allocator = m_memory_resources[resource::Constant];
   m_allocators_by_name["DEVICE_CONST"] = device_const_allocator;
   m_allocators_by_id[device_const_allocator->getId()] = device_const_allocator;

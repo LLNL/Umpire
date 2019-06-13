@@ -58,6 +58,10 @@ int main(int, char**) {
   copy_data(data, SIZE, "UM");
   copy_data(data, SIZE, "PINNED");
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+  copy_data(data, SIZE, "DEVICE");
+  copy_data(data, SIZE, "PINNED");
+#endif
 
   allocator.deallocate(data);
 

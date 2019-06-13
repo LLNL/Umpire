@@ -14,11 +14,17 @@
 ##############################################################################
 set (resource_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/resource)
 
+set (resource_depends umpire gtest gmock)
+
+if (ENABLE_HIP)
+  set (resource_depends ${resource_depends} hip_runtime)
+endif()
+
 if (ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
     SOURCES resource_tests.cpp
-    DEPENDS_ON umpire gtest gmock
+    DEPENDS_ON ${resource_depends}
     OUTPUT_DIR ${resource_dir})
 
   blt_add_test(

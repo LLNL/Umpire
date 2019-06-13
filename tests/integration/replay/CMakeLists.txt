@@ -19,6 +19,12 @@ set (replay_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration/replay)
 set (replay_integration_tests_depends
   umpire)
 
+if (ENABLE_HIP)
+  set (replay_integration_tests_depends
+      ${replay_integration_tests_depends}
+      hip_runtime)
+endif()
+
 if (BASH_PROGRAM)
 
   configure_file(

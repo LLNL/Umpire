@@ -55,5 +55,10 @@ BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string(
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("UM"))->Range(4, 4096);
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("DEVICE"))->Range(4, 4096);
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("DEVICE"))->Range(4, 4096);
+BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::string("HOST"))->Range(4, 4096);
+BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
+#endif
 
 BENCHMARK_MAIN()

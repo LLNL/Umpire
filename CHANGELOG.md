@@ -27,6 +27,8 @@ and a dynamic pool for those that are larger.
 
 - Cookbook for enabling Umpire logging.
 
+- Support for AMD's HIP.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.
