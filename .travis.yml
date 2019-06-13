@@ -62,6 +62,13 @@ matrix:
       - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hcc -DENABLE_HCC=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off"
       - DO_TEST=no
 
+   - compiler: hip
+     env:
+       - COMPILER=g++
+       - IMD=rocm
+       - CMAKE_EXTRA_FLAGS="-C ../host-configs/hip.cmake"
+       - DO_TEST=no
+
 script:
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
 - docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_MEMCHECK -e CMAKE_EXTRA_FLAGS -e GTEST_COLOR axom/compilers:$IMG ./scripts/travis/build_and_test.sh
