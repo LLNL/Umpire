@@ -43,6 +43,6 @@ class HipCopyFromOperation :
 };
 
 } // end of namespace op
-} //end of namespace umpire
+} // end of namespace umpire
 
 #endif // UMPIRE_HipCopyFromOperation_HPP
