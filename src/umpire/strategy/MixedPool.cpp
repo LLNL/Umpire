@@ -74,12 +74,12 @@ void* MixedPool::allocate(size_t bytes)
   if (index < m_fixed_pool.size()) {
     // allocate in fixed pool
     mem = m_fixed_pool[index].allocate();
-    m_map.insert(IntMap::value_type{reinterpret_cast<uintptr_t>(mem), index});
+    m_map[reinterpret_cast<uintptr_t>(mem)] = index;
   }
   else {
     // allocate in dynamic pool
     mem = m_dynamic_pool.allocate(bytes);
-    m_map.insert(IntMap::value_type{reinterpret_cast<uintptr_t>(mem), -1});
+    m_map[reinterpret_cast<uintptr_t>(mem)] = -1;
   }
   return mem;
 }
