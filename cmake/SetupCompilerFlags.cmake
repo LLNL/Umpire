@@ -12,31 +12,6 @@
 # For details, see https://github.com/LLNL/Umpire
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
-set (tutorial_depends umpire)
-
 if (ENABLE_HIP)
-  set (tutorial_depends
-      ${tutorial_depends}
-      hip)
+	set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 endif()
-
-blt_add_executable(
-  NAME tut_allocator_c
-  SOURCES tut_allocator.c
-  DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir}
-)
-
-blt_add_executable(
-  NAME tut_resources_c
-  SOURCES tut_resources.c
-  DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir}
-)
-
-blt_add_executable(
-  NAME tut_pool_c
-  SOURCES tut_pool.c
-  DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir}
-)

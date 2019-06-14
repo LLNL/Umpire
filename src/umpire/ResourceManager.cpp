@@ -38,6 +38,14 @@
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+
+#include "umpire/resource/HipDeviceResourceFactory.hpp"
+#include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
+#endif
+
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
@@ -100,6 +108,17 @@ ResourceManager::ResourceManager() :
     util::make_unique<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+  registry.registerMemoryResource(
+    new resource::HipDeviceResourceFactory());
+
+  registry.registerMemoryResource(
+    new resource::HipPinnedMemoryResourceFactory());
+
+  registry.registerMemoryResource(
+    new resource::HipConstantMemoryResourceFactory());
+#endif
+
   initialize();
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -140,6 +159,15 @@ ResourceManager::initialize()
   }
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+  int count;
+  auto error = ::hipGetDeviceCount(&count);
+
+  if (error != hipSuccess) {
+    UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
+  }
+#endif
+
 #if defined(UMPIRE_ENABLE_DEVICE)
   {
     auto allocator{registry.makeMemoryResource("DEVICE", getNextId())};
@@ -173,7 +201,7 @@ ResourceManager::initialize()
   }
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   {
     auto allocator{registry.makeMemoryResource("DEVICE_CONST", getNextId())};
     int id{allocator->getId()};

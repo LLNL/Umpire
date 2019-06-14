@@ -86,6 +86,25 @@ if (ENABLE_HCC)
     rocm)
 endif ()
 
+if (ENABLE_HIP)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    HipCopyOperation.hpp
+    HipCopyFromOperation.hpp
+    HipCopyToOperation.hpp
+    HipMemsetOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    HipCopyOperation.cpp
+    HipCopyFromOperation.cpp
+    HipCopyToOperation.cpp
+    HipMemsetOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    hip_runtime)
+endif ()
 
 blt_add_library(
   NAME umpire_op

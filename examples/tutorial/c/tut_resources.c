@@ -29,7 +29,7 @@ void allocate_and_deallocate(const char* resource)
   double* data = (double*) umpire_allocator_allocate(&allocator, SIZE*sizeof(double));
 
 
-  printf("Allocated %lu bytes using the %s allocator...", 
+  printf("Allocated %lu bytes using the %s allocator...",
       (SIZE*sizeof(double)), umpire_allocator_get_name(&allocator));
 
   umpire_allocator_deallocate(&allocator, data);
@@ -44,6 +44,10 @@ int main()
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("UM");
+  allocate_and_deallocate("PINNED");
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+  allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("PINNED");
 #endif
 

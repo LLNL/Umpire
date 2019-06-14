@@ -27,6 +27,10 @@ int main(int, char**) {
       , "UM"
       , "PINNED"
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+      , "DEVICE"
+      , "PINNED"
+#endif
   };
 
   for (auto& destination : destinations) {
