@@ -147,7 +147,6 @@ AllocationMap::AllocationMap() :
 
 void AllocationMap::insert(void* ptr, AllocationRecord record)
 {
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
@@ -168,7 +167,6 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
 
 const AllocationRecord* AllocationMap::find(void* ptr) const
 {
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Searching for " << ptr);
@@ -222,7 +220,6 @@ const AllocationRecord* AllocationMap::doFindRecord(void* ptr) const noexcept
 
 const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 {
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
 
   // Call method
@@ -237,7 +234,6 @@ AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
 
 AllocationRecord AllocationMap::remove(void* ptr)
 {
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
 
   AllocationRecord ret;
@@ -268,7 +264,6 @@ bool AllocationMap::contains(void* ptr) const
 
 void AllocationMap::clear()
 {
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Clearing");
@@ -287,7 +282,6 @@ void
 AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
                      std::ostream& os) const
 {
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
 
   for (auto p : m_map) {

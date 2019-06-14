@@ -37,10 +37,9 @@ Allocator ResourceManager::makeAllocator(
     const std::string& name,
     Args&&... args)
 {
-  strategy::AllocationStrategy* allocator;
-
-  // Aquire lock
   std::lock_guard<std::mutex> lock(m_mutex);
+
+  strategy::AllocationStrategy* allocator;
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
 
 #if defined(_MSC_VER)
