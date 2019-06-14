@@ -17,43 +17,39 @@ matrix:
     env:
     - COMPILER=g++
     - IMG=gcc-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On -DENABLE_C=On"
+    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On -DENABLE_C=On"
     - DO_MEMCHECK=yes
   - compiler: gcc6
     env:
     - COMPILER=g++
     - IMG=gcc-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_C=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_C=On"
   - compiler: gcc7
     env:
     - COMPILER=g++
     - IMG=gcc-7
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
   - compiler: gcc8
     env:
     - COMPILER=g++
     - IMG=gcc-8
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo"
   - compiler: clang4
     env:
     - COMPILER=clang++
     - IMG=clang-4
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
   - compiler: clang5
     env:
     - COMPILER=clang++
     - IMG=clang-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
   - compiler: clang6
     env:
     - COMPILER=clang++
     - IMG=clang-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off"
   - compiler: clang6-debug
     env:
     - COMPILER=clang++
     - IMG=clang-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DCMAKE_BUILD_TYPE=Debug"
+    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=Debug"
   - compiler: nvcc
     env:
     - COMPILER=g++
