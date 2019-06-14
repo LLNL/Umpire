@@ -36,7 +36,7 @@ FixedMallocPool::addr_from_index(const FixedMallocPool::Pool& p, unsigned int i)
 inline unsigned int
 FixedMallocPool::index_from_addr(const FixedMallocPool::Pool& p, const unsigned char* ptr) const
 {
-  return static_cast<unsigned int>(ptr - p.data) / m_obj_bytes;
+  return static_cast<unsigned int>((ptr - p.data) / m_obj_bytes);
 }
 
 FixedMallocPool::Pool::Pool(const size_t object_bytes,

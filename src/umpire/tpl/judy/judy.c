@@ -265,7 +265,8 @@ void * judy_data( Judy * judy, unsigned int amt )
     }
 
     if( judy->seg->next < amt + sizeof( *seg ) ) {
-        if( ( seg = malloc( JUDY_seg ) ) ) {
+        seg = malloc( JUDY_seg );
+        if( seg ) {
             seg->next = JUDY_seg;
             seg->seg = judy->seg;
             judy->seg = seg;
@@ -887,7 +888,8 @@ JudySlot * judy_last( Judy * judy, JudySlot next, unsigned int off, unsigned int
                     judy->stack[judy->level].slot = slot;
                     inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
                     if( inner ) {
-                        if( ( next = inner[slot & 0x0F] ) ) {
+                        next = inner[slot & 0x0F];
+                        if( next ) {
                             if( ( !judy->depth && !slot ) || ( judy->depth && depth == judy->depth ) ) {
                                 return &inner[0];
                             } else {
@@ -985,8 +987,9 @@ JudySlot * judy_nxt( Judy * judy ) {
                         depth++;
                     }
 
-                while( ++slot < 256 )
-                    if( ( inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask ) ) ) {
+                while( ++slot < 256 ) {
+                    inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
+                    if( inner ) {
                         if( inner[slot & 0x0F] ) {
                             judy->stack[judy->level].slot = slot;
                             if( !judy->depth || depth < judy->depth ) {
@@ -997,6 +1000,7 @@ JudySlot * judy_nxt( Judy * judy ) {
                     } else {
                         slot |= 0x0F;
                     }
+                }
 
                 judy->level--;
                 continue;
