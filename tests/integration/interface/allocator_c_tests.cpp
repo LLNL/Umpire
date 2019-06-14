@@ -33,9 +33,9 @@ class AllocatorCTest :
 
   umpire_allocator m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorCTest, AllocateDeallocateBig)
@@ -64,7 +64,7 @@ TEST_P(AllocatorCTest, AllocateDeallocateNothing)
 
 TEST_P(AllocatorCTest, GetSize)
 {
-  const size_t size = m_big * sizeof(double);
+  const std::size_t size = m_big * sizeof(double);
 
   double* data = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
 
@@ -95,7 +95,7 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
   double* data_three = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
   ASSERT_NE(nullptr, data_three);
 
-  size_t total_size = 3*m_big*sizeof(double);
+  std::size_t total_size = 3*m_big*sizeof(double);
 
   ASSERT_EQ(total_size, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));

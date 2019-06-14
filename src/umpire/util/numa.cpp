@@ -36,7 +36,7 @@ int preferred_node()
   return numa_preferred();
 }
 
-void move_to_node(void* ptr, size_t bytes, int node)
+void move_to_node(void* ptr, std::size_t bytes, int node)
 {
   if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
 

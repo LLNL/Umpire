@@ -34,7 +34,7 @@ public:
         void* src_ptr,
         util::AllocationRecord *src_allocation,
         int val,
-        size_t length);
+        std::size_t length);
 };
 
 } // end of namespace op

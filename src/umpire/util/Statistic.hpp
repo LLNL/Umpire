@@ -40,7 +40,7 @@ class Statistic {
 
   private:
     std::string m_name;
-    size_t m_counter;
+    std::size_t m_counter;
 
     conduit::Node m_data;
 };

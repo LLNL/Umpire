@@ -22,7 +22,7 @@ namespace alloc {
 
 struct HipPinnedAllocator
 {
-  void* allocate(size_t bytes)
+  void* allocate(std::size_t bytes)
   {
     void* ptr = nullptr;
     hipError_t error = ::hipHostMalloc(&ptr, bytes);

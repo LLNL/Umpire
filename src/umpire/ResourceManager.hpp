@@ -169,7 +169,7 @@ class ResourceManager {
      * \param src_ptr Source pointer.
      * \param size Size in bytes.
      */
-    void copy(void* dst_ptr, void* src_ptr, size_t size=0);
+    void copy(void* dst_ptr, void* src_ptr, std::size_t size=0);
 
     /*!
      * \brief Set the first length bytes of ptr to the value val.
@@ -178,7 +178,7 @@ class ResourceManager {
      * \param val Value to set.
      * \param length Number of bytes to set to val.
      */
-    void memset(void* ptr, int val, size_t length=0);
+    void memset(void* ptr, int val, std::size_t length=0);
 
     /*!
      * \brief Reallocate src_ptr to size.
@@ -192,7 +192,7 @@ class ResourceManager {
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* src_ptr, size_t size);
+    void* reallocate(void* src_ptr, std::size_t size);
 
     /*!
      * \brief Reallocate src_ptr to size.
@@ -206,7 +206,7 @@ class ResourceManager {
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* src_ptr, size_t size, Allocator allocator);
+    void* reallocate(void* src_ptr, std::size_t size, Allocator allocator);
 
     /*!
      * \brief Move src_ptr to memory from allocator
@@ -232,7 +232,7 @@ class ResourceManager {
      *
      * \return Size of allocation in bytes.
      */
-    size_t getSize(void* ptr) const;
+    std::size_t getSize(void* ptr) const;
 
   private:
     ResourceManager();

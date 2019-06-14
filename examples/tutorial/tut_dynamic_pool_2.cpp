@@ -22,7 +22,7 @@ void allocate_and_deallocate_pool(
     std::size_t initial_size,
     std::size_t min_block_size)
 {
-  constexpr size_t SIZE = 1024;
+  constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 

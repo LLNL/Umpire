@@ -71,7 +71,7 @@ void* MixedPool::allocate(size_t bytes)
 
   void* mem;
 
-  if (index < m_fixed_pool.size()) {
+  if (static_cast<std::size_t>(index) < m_fixed_pool.size()) {
     // allocate in fixed pool
     mem = m_fixed_pool[index].allocate();
     m_map[reinterpret_cast<uintptr_t>(mem)] = index;

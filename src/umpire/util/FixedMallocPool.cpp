@@ -39,15 +39,15 @@ FixedMallocPool::index_from_addr(const FixedMallocPool::Pool& p, const unsigned 
   return static_cast<unsigned int>((ptr - p.data) / m_obj_bytes);
 }
 
-FixedMallocPool::Pool::Pool(const size_t object_bytes,
-                            const size_t objects_per_pool) :
+FixedMallocPool::Pool::Pool(const std::size_t object_bytes,
+                            const std::size_t objects_per_pool) :
   data(static_cast<unsigned char*>(std::malloc(object_bytes * objects_per_pool))),
   next(data),
   num_initialized(0),
   num_free(objects_per_pool) {}
 
-FixedMallocPool::FixedMallocPool(const size_t object_bytes,
-                                 const size_t objects_per_pool) :
+FixedMallocPool::FixedMallocPool(const std::size_t object_bytes,
+                                 const std::size_t objects_per_pool) :
   m_obj_bytes(object_bytes),
   m_obj_per_pool(objects_per_pool),
   m_data_bytes(m_obj_bytes * m_obj_per_pool),
@@ -87,7 +87,7 @@ FixedMallocPool::allocInPool(Pool& p) noexcept
 }
 
 void*
-FixedMallocPool::allocate(size_t bytes)
+FixedMallocPool::allocate(std::size_t bytes)
 {
   void* ptr = nullptr;
 
