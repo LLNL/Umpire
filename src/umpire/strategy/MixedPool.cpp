@@ -63,7 +63,7 @@ MixedPool::MixedPool(const std::string& name, int id,
 void* MixedPool::allocate(size_t bytes)
 {
   // Find pool index
-  size_t index = 0;
+  int index = 0;
   for (size_t i = 0; i < m_fixed_pool_map.size(); ++i) {
     if (bytes > m_fixed_pool_map[index]) { index++; }
     else { break; }
