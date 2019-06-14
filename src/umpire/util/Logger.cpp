@@ -12,13 +12,14 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "umpire/util/Logger.hpp"
 
 #if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
 #else
 #define strcasecmp _stricmp
-#define _CRT_SECURE_NO_WARNINGS
 #endif
 
 #include <iostream>   // for std::cout, std::cerr
