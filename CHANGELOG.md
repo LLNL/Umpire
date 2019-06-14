@@ -29,11 +29,15 @@ and a dynamic pool for those that are larger.
 
 - Support for AMD's HIP.
 
+- GCC 4.9 build to Travis CI.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.
 
 - OpenMP is off by default.
+
+- CUDA is off by default.
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
