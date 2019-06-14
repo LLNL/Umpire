@@ -29,6 +29,8 @@ and a dynamic pool for those that are larger.
 
 - Support for AMD's HIP.
 
+- Added a new IOManager that stores logging and replay output to files.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.
