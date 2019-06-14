@@ -35,6 +35,8 @@ and a dynamic pool for those that are larger.
 
 - OpenMP is off by default.
 
+- CUDA is off by default.
+
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
 - Update `README.md` to better describe Umpire capability.
