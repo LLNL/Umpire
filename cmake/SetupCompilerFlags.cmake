@@ -25,7 +25,7 @@ endif()
 blt_append_custom_compiler_flag(
   FLAGS_VAR UMPIRE_PEDANTIC_FLAG
   DEFAULT  "-Wpedantic"
-  MSVC "/Wall /Za"
+  MSVC "/Wall"
 )
 
 set(CMAKE_CXX_FLAGS "${UMPIRE_PEDANTIC_FLAG} ${CMAKE_CXX_FLAGS}")
