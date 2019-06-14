@@ -105,7 +105,7 @@ IOManager::initialize()
       struct stat info;
       if ( stat( s_root_io_dir.c_str(), &info ) )
       {
-        if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRWXG) )
+        if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
         {
           UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
         }
