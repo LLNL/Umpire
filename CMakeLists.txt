@@ -36,8 +36,8 @@ option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
-option(ENABLE_TOOLS "Enable Umpire Development Tools" On)
-option(ENABLE_PEDANTIC_WARNINGS "Enable Pedantic Compiler Warnings" On)
+option(ENABLE_TOOLS "Enable Umpire development tools" On)
+option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 
