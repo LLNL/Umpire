@@ -21,3 +21,10 @@ endif ()
 if (ENABLE_HIP)
 	set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 endif()
+
+blt_append_custom_compiler_flag(
+  FLAGS_VAR UMPIRE_PEDANTIC_FLAG
+  DEFAULT  "-Wpedantic"
+)
+
+set(CMAKE_CXX_FLAGS "${UMPIRE_PEDANTIC_FLAG} ${CMAKE_CXX_FLAGS}")
