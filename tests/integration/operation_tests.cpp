@@ -175,7 +175,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(zero_copy_sources),
       ::testing::ValuesIn(zero_copy_dests)
-));
+),);
 
 const std::string copy_sources[] = {
   "HOST"
