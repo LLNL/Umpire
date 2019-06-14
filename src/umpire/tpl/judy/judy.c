@@ -796,7 +796,7 @@ JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned in
                     }
 
                 table = ( JudySlot * )( next & JUDY_mask );
-                for( slot = 0; slot < 256; slot++ )
+                for( slot = 0; slot < 256; slot++ ) {
                     inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
                     if( inner ) {
                         next = inner[slot & 0x0F];
@@ -811,6 +811,7 @@ JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned in
                     } else {
                         slot |= 0x0F;
                     }
+                }
                 continue;
 #ifndef ASKITIS
             case JUDY_span:
