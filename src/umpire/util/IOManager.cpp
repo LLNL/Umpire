@@ -66,8 +66,6 @@ IOManager::setOutputDir(const std::string& dir)
   s_root_io_dir = dir;
 }
 
-#include <string.h>
-
 void
 IOManager::initialize()
 {
@@ -105,13 +103,16 @@ IOManager::initialize()
       }
 #else
       struct stat info;
-      if ( stat( s_root_io_dir.c_str(), &info ) &&
-           !(S_ISDIR(info.st_mode)))
+      if ( stat( s_root_io_dir.c_str(), &info ) )
       {
-        if (mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRWXG) < 0) {
-          int eno = errno;
-          std::cerr << "mkdir(" << s_root_io_dir << ") failed: " << strerror(eno) << std::endl;
+        if ( mkdir(s_root_io_dir.c_str(), 0777 ) )
+        {
+          UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
         }
+      }
+      else if ( !(S_ISDIR(info.st_mode)) )
+      {
+        UMPIRE_ERROR(s_root_io_dir << "exists and is not a directory");
       }
 #endif
     }
