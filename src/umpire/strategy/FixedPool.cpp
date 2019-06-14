@@ -163,13 +163,13 @@ FixedPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
-long
+std::size_t
 FixedPool::getCurrentSize() const noexcept
 {
   return m_current_bytes;
 }
 
-long
+std::size_t
 FixedPool::getActualSize() const noexcept
 {
   const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
@@ -177,7 +177,7 @@ FixedPool::getActualSize() const noexcept
     + sizeof(FixedPool);
 }
 
-long
+std::size_t
 FixedPool::getHighWatermark() const noexcept
 {
   return m_highwatermark;

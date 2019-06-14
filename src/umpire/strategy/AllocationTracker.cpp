@@ -52,19 +52,19 @@ AllocationTracker::release()
   m_allocator->release();
 }
 
-long
+std::size_t
 AllocationTracker::getCurrentSize() const noexcept
 {
   return m_current_size;
 }
 
-long
+std::size_t
 AllocationTracker::getHighWatermark() const noexcept
 {
   return m_high_watermark;
 }
 
-long
+std::size_t
 AllocationTracker::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();

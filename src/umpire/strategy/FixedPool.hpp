@@ -57,9 +57,9 @@ class FixedPool : public AllocationStrategy
     void* allocate(size_t bytes = 0) override final;
     void deallocate(void* ptr) override final;
 
-    long getCurrentSize() const noexcept override final;
-    long getHighWatermark() const noexcept override final;
-    long getActualSize() const noexcept override final;
+    std::size_t getCurrentSize() const noexcept override final;
+    std::size_t getHighWatermark() const noexcept override final;
+    std::size_t getActualSize() const noexcept override final;
     Platform getPlatform() noexcept override final;
 
     size_t numPools() const noexcept;

@@ -77,14 +77,14 @@ SlotPool::deallocate(void* ptr)
   }
 }
 
-long
+std::size_t
 SlotPool::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long
+std::size_t
 SlotPool::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);

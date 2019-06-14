@@ -53,14 +53,14 @@ void
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {}
 
-long
+std::size_t
 MonotonicAllocationStrategy::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_size);
   return m_size;
 }
 
-long
+std::size_t
 MonotonicAllocationStrategy::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_capacity);

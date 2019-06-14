@@ -82,12 +82,12 @@ void AllocationAdvisor::deallocate(void* ptr)
 
 }
 
-long AllocationAdvisor::getCurrentSize() const noexcept
+std::size_t AllocationAdvisor::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long AllocationAdvisor::getHighWatermark() const noexcept
+std::size_t AllocationAdvisor::getHighWatermark() const noexcept
 {
   return 0;
 }

@@ -58,9 +58,9 @@ class MixedPool :
 
     void release() override;
 
-    long getCurrentSize() const noexcept override;
-    long getActualSize() const noexcept override;
-    long getHighWatermark() const noexcept override;
+    std::size_t getCurrentSize() const noexcept override;
+    std::size_t getActualSize() const noexcept override;
+    std::size_t getHighWatermark() const noexcept override;
 
     Platform getPlatform() noexcept override;
 

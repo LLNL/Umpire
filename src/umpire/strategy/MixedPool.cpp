@@ -103,7 +103,7 @@ void MixedPool::release()
   UMPIRE_LOG(Debug, "MixedPool::release(): Not yet implemented");
 }
 
-long MixedPool::getCurrentSize() const noexcept
+std::size_t MixedPool::getCurrentSize() const noexcept
 {
   size_t size = 0;
   for (auto& fp : m_fixed_pool) size += fp.getCurrentSize();
@@ -111,7 +111,7 @@ long MixedPool::getCurrentSize() const noexcept
   return size;
 }
 
-long MixedPool::getActualSize() const noexcept
+std::size_t MixedPool::getActualSize() const noexcept
 {
   size_t size = 0;
   for (auto& fp : m_fixed_pool) size += fp.getActualSize();
@@ -119,7 +119,7 @@ long MixedPool::getActualSize() const noexcept
   return size;
 }
 
-long MixedPool::getHighWatermark() const noexcept
+std::size_t MixedPool::getHighWatermark() const noexcept
 {
   size_t size = 0;
   for (auto& fp : m_fixed_pool) size += fp.getHighWatermark();

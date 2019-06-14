@@ -74,7 +74,7 @@ class MemoryResource :
      *
      * \return current total size of active allocations in this MemoryResource.
      */
-    virtual long getCurrentSize() const noexcept = 0;
+    virtual std::size_t getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Return the memory high watermark for this MemoryResource.
@@ -85,7 +85,7 @@ class MemoryResource :
      *
      * \return Memory high watermark.
      */
-    virtual long getHighWatermark() const noexcept = 0;
+    virtual std::size_t getHighWatermark() const noexcept = 0;
 
 
     /*!
