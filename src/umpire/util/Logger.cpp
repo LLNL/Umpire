@@ -14,14 +14,15 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/Logger.hpp"
 
-#include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
 #if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
 #else
 #define strcasecmp _stricmp
+#define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <iostream>   // for std::cout, std::cerr
+#include <stdlib.h>   // for getenv()
 
 namespace umpire {
 namespace util {

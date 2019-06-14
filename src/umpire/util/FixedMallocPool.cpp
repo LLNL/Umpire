@@ -120,7 +120,7 @@ FixedMallocPool::deallocate(void* ptr)
         p.next = reinterpret_cast<unsigned char*>(ptr);
       }
       else {
-        *reinterpret_cast<unsigned int*>(ptr) = m_obj_per_pool;
+        *reinterpret_cast<std::size_t*>(ptr) = m_obj_per_pool;
         p.next = reinterpret_cast<unsigned char*>(ptr);
       }
       ++p.num_free;

@@ -65,7 +65,8 @@ class MixedPool :
     Platform getPlatform() noexcept override;
 
   private:
-    std::map<uintptr_t, int> m_map;
+    using IntMap = std::map<uintptr_t, int>;
+    IntMap m_map;
     std::vector<size_t> m_fixed_pool_map;
     std::vector<FixedPool> m_fixed_pool;
     DynamicPool m_dynamic_pool;

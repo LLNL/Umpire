@@ -48,7 +48,7 @@ private:
     unsigned char* data;
     unsigned char* next;
     unsigned int num_initialized;
-    unsigned int num_free;
+    std::size_t num_free;
     Pool(const size_t object_bytes, const size_t objects_per_pool);
   };
 
