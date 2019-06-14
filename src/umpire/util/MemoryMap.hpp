@@ -90,7 +90,7 @@ public:
 
   // Return pointer-to or emplaces a new Value with args to the constructor
   template <typename... Args>
-  std::pair<Iterator, bool> get(void* ptr, Args&&... args) noexcept;
+  std::pair<Iterator, bool> get(Key ptr, Args&&... args) noexcept;
 
   // Insert a new Value at ptr
   Iterator insert(Key ptr, const Value& val);
@@ -117,7 +117,7 @@ public:
 
   // Remove/Deallocate the internal judy position. WARNING: Use this
   // with caution, only directly after using a method above.
-  // erase(void*) is safer, but requires an additional lookup.
+  // erase(Key) is safer, but requires an additional lookup.
   void removeLast();
 
   // Clear all entries
@@ -130,16 +130,13 @@ private:
   // Helper method for public findOrBefore()
   Key doFindOrBefore(Key ptr) const noexcept;
 
-  // Content of removeLast()
-  void doRemoveLast();
-
-  mutable Judy* m_array;      // Judy array
-  mutable JudySlot* m_last;   // last found value in judy array
-  mutable uintptr_t m_oper;   // address of last object to set internal judy state
-  mutable std::mutex m_mutex; // lock for thread safety
-  FixedMallocPool m_pool;     // value pool
-  size_t m_size;              // number of objects stored
+  mutable Judy* m_array;    // Judy array
+  mutable JudySlot* m_last; // last found value in judy array
+  mutable uintptr_t m_oper; // address of last object to set internal judy state
+  FixedMallocPool m_pool;   // value pool
+  size_t m_size;            // number of objects stored
 };
+
 
 } // end of namespace util
 } // end of namespace umpire

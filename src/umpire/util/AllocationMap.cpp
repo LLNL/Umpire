@@ -141,12 +141,15 @@ bool RecordList::ConstIterator::operator!=(const RecordList::ConstIterator& othe
 
 // AllocationMap
 AllocationMap::AllocationMap() :
-  m_map{}, m_size{0}
+  m_map{}, m_size{0}, m_mutex{}
 {
 }
 
 void AllocationMap::insert(void* ptr, AllocationRecord record)
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
   Map::Iterator iter{m_map.end()};
@@ -165,9 +168,12 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
 
 const AllocationRecord* AllocationMap::find(void* ptr) const
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
-  const AllocationRecord* alloc_record = findRecord(ptr);
+  const AllocationRecord* alloc_record = doFindRecord(ptr);
 
   if (alloc_record) {
     return alloc_record;
@@ -185,7 +191,7 @@ AllocationRecord* AllocationMap::find(void* ptr)
   return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->find(ptr));
 }
 
-const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
+const AllocationRecord* AllocationMap::doFindRecord(void* ptr) const noexcept
 {
   const AllocationRecord* alloc_record = nullptr;
 
@@ -214,6 +220,15 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
   return alloc_record;
 }
 
+const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
+{
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  // Call method
+  return doFindRecord(ptr);
+}
+
 AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
 {
   return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->findRecord(ptr));
@@ -222,6 +237,9 @@ AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
 
 AllocationRecord AllocationMap::remove(void* ptr)
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   AllocationRecord ret;
 
   UMPIRE_LOG(Debug, "Removing " << ptr);
@@ -250,18 +268,28 @@ bool AllocationMap::contains(void* ptr) const
 
 void AllocationMap::clear()
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "Clearing");
 
   m_map.clear();
   m_size = 0;
 }
 
-size_t AllocationMap::size() const { return m_size; }
+size_t
+AllocationMap::size() const
+{
+  return m_size;
+}
 
 void
 AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
                      std::ostream& os) const
 {
+  // Aquire lock
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   for (auto p : m_map) {
     std::stringstream ss;
     bool any_match = false;

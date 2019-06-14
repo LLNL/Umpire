@@ -33,35 +33,16 @@ ThreadSafeAllocator::ThreadSafeAllocator(
 void*
 ThreadSafeAllocator::allocate(size_t bytes)
 {
-  void* ret = nullptr;
-
-  try {
-    UMPIRE_LOCK;
-
-    ret = m_allocator->allocate(bytes);
-
-    UMPIRE_UNLOCK;
-  } catch (...) {
-    UMPIRE_UNLOCK;
-    throw;
-  }
-
+  std::lock_guard<std::mutex> lock(m_mutex);
+  void *ret = m_allocator->allocate(bytes);
   return ret;
 }
 
 void
 ThreadSafeAllocator::deallocate(void* ptr)
 {
-  try {
-    UMPIRE_LOCK;
-
-    m_allocator->deallocate(ptr);
-
-    UMPIRE_UNLOCK;
-  } catch (...) {
-    UMPIRE_UNLOCK;
-    throw;
-  }
+  std::lock_guard<std::mutex> lock(m_mutex);
+  m_allocator->deallocate(ptr);
 }
 
 long

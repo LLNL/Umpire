@@ -115,11 +115,4 @@
 
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
 
-#define UMPIRE_LOCK \
-  if ( !m_mutex.try_lock() ) \
-    m_mutex.lock();
-
-#define UMPIRE_UNLOCK \
-  m_mutex.unlock();
-
 #endif // UMPIRE_Macros_HPP
