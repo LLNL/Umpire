@@ -8,6 +8,11 @@ env:
   - GTEST_COLOR=1
 matrix:
   include:
+  - compiler: gcc4
+    env:
+    - COMPILER=g++
+    - IMG=gcc-4
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=Off -DENABLE_C=On"
   - compiler: gcc5
     env:
     - COMPILER=g++
