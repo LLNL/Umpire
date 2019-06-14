@@ -6,14 +6,13 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Unreleased
 
 ### Added
 
 - CI builds for Mac, Linux and Windows via Azure Pipelines
-- Replay has been changed to produce and interpret its output in JSON format.
 
-- Added HCC stage in Docker file.
+- HCC stage in Docker file.
 
 - GitHub action to automatically delete merged branches.
 
@@ -24,48 +23,83 @@ and a dynamic pool for those that are larger.
 
 - Smoke tests for required third-party libraries.
 
-- Add `util::FixedMallocPool` for internal use.
+- `util::FixedMallocPool` for internal use.
 
-- Cookbook for enabling Umpire logging
+- Cookbook for enabling Umpire logging.
+
+- Support for AMD's HIP.
 
 ### Changed
 
-- OpenMP changed to off by default.
+- Replay uses JSON format for its I/O.
+
+- OpenMP is off by default.
+
+- CUDA is off by default.
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
-- Updated README to better describe Umpire capability.
+- Update `README.md` to better describe Umpire capability.
 
 - Update BLT to fix CMake 3.13 warnings and MSVC compatibility.
 
-- Faster `util::AllocationMap`.
+- `AllocationMap` is significantly faster, and uses `MemoryMap`.
 
 - `ResourceManager` de/registration pass `AllocationRecord` by value.
 
 - `AllocationRecord` struct members are no longer prefixed by `m_`.
 
-- Removed deprecated (and unused) replay_allocation_map tool.
+- `DynamicPool` directly incorporates Simpool's `DynamicSizePool` and
+  uses `FixedMallocPool` internally for a small speedup.
+
+- Added Debug and RelWithDebInfo builds to Travis CI.
 
 ### Removed
 
-- `ENABLE_ASSERTS` was removed in favor of checking the `NDEBUG` macro.
+- `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
+
+- Merge the remaining classes in Simpool into the core of Umpire.
+
+- Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
 
-- Added YAML file for ReadTheDocs to read in that will cause it to use
+- YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives
   a deprecation warning when attempting to run older versions of python.
 
 - Exclude third-party libraries from Doxygen to fix out-of-resources error on
-ReadTheDocs.
+  ReadTheDocs.
 
 - Throw an error if attempting to deallocate with a different Allocator than
-performed the allocation.
+  performed the allocation.
 
-- Building on Windows.
+- Build on Windows.
 
 - Fixed compilation errors from Intel compiler for newly included third-party
   libraries for json and command line parsing (cxxopts).
+
+- Update calls to allocate_pointer in the FORTRAN bindings to ensure that the
+  correct variable type of C_SIZE_T is passed in.  This fixes compile errors in
+  IBM XL.
+
+- Fix CodeCov reporting by explicitly downloading older version of upload
+  script.
+
+## [0.3.5] - 2019-06-11
+
+### Fixed
+
+- Off by one regression introduced in 0.3.4 in
+AllocationRecord::AllocationMap::findRecord causing it to incorrectly report
+offset of `ptr+size_of_allocation` as found.
+
+## [0.3.4] - 2019-06-06
+
+### Fixed
+
+- Bug AllocationRecord::AllocationMap::findRecord causing it to miss finding
+allocations that were zero bytes in length.
 
 ## [0.3.3] - 2019-04-11
 

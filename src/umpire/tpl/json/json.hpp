@@ -2410,7 +2410,7 @@ class input_buffer_adapter : public input_adapter_protocol
     input_buffer_adapter& operator=(input_buffer_adapter&) = delete;
     input_buffer_adapter(input_buffer_adapter&&) = delete;
     input_buffer_adapter& operator=(input_buffer_adapter&&) = delete;
-    ~input_buffer_adapter() override = default;
+    ~input_buffer_adapter() override {};
 
     std::char_traits<char>::int_type get_character() noexcept override
     {

@@ -1,14 +1,12 @@
 strategy:
-  matrix: 
-    linux: 
+  matrix:
+    linux:
       imageName: 'ubuntu-16.04'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off'
     windows:
-      imageName: 'vs2017-win2016'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
+      imageName: 'windows-2019'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
     mac:
       imageName: 'macos-10.13'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_CUDA=Off -DENABLE_OPENMP=Off'
 
 pool:
   vmImage: $(imageName)
@@ -30,8 +28,9 @@ steps:
 - task: VSBuild@1
   inputs:
     solution: 'build/*.sln'
-  displayName: 'VS Build'
+    vsVersion: 'latest'
   condition: eq( variables['Agent.OS'], 'Windows_NT')
+  displayName: 'Visual Studio Build'
 - script: |
     cd build
     make

@@ -107,7 +107,7 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
   umpire_allocator_deallocate(&m_allocator, data_two);
   ASSERT_EQ((m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
- 
+
   umpire_allocator_deallocate(&m_allocator, data_three);
   ASSERT_EQ(0, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
@@ -121,7 +121,7 @@ const char* allocator_names[] = {
 #if defined(UMPIRE_ENABLE_UM)
   , "UM"
 #endif
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   , "DEVICE_CONST"
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
@@ -154,7 +154,7 @@ INSTANTIATE_TEST_CASE_P(
 //   umpire_resourcemanager* rm = umpire_resourcemanager_get_instance();
 //   double* ptr = new double[20];
 //   ASSERT_ANY_THROW( umpire_resourcemanager_deallocate(rm, ptr) );
-// 
+//
 //   delete[] ptr;
 // }
-// 
+//

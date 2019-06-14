@@ -35,6 +35,13 @@ if (ENABLE_HCC)
     AmAllocAllocator.hpp)
 endif ()
 
+if (ENABLE_HIP)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    HipMallocAllocator.hpp
+    HipPinnedAllocator.hpp)
+endif ()
+
 blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers})

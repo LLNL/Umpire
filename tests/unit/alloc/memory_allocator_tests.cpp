@@ -29,6 +29,11 @@ using namespace umpire::alloc;
 #include "umpire/alloc/AmPinnedAllocator.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+#include "umpire/alloc/HipMallocAllocator.hpp"
+#include "umpire/alloc/HipPinnedAllocator.hpp"
+#endif
+
 #include "gtest/gtest.h"
 
 template <typename T>
@@ -49,12 +54,17 @@ REGISTER_TYPED_TEST_CASE_P(
     MemoryAllocatorTest,
     Allocate);
 
+using test_types = ::testing::Types<
+    MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
-using test_types = ::testing::Types<MallocAllocator, CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator>;
-#elif defined(UMPIRE_ENABLE_HCC)
-using test_types = ::testing::Types<MallocAllocator, AmAllocAllocator, AmPinnedAllocator>;
-#else
-using test_types = ::testing::Types<MallocAllocator>;
+    , CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
 #endif
+#if defined(UMPIRE_ENABLE_HCC)
+    , AmAllocAllocator, AmPinnedAllocator
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    , HipMallocAllocator, HipPinnedAllocator
+#endif
+>;
 
 INSTANTIATE_TYPED_TEST_CASE_P(Default, MemoryAllocatorTest, test_types);

@@ -69,6 +69,26 @@ if (ENABLE_HCC)
     rocm)
 endif ()
 
+if (ENABLE_HIP)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    HipDeviceResourceFactory.hpp
+    HipPinnedMemoryResourceFactory.hpp
+    HipConstantMemoryResourceFactory.hpp
+    HipConstantMemoryResource.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    HipConstantMemoryResourceFactory.cpp
+    HipConstantMemoryResource.cpp
+    HipDeviceResourceFactory.cpp
+    HipPinnedMemoryResourceFactory.cpp)
+
+  set(umpire_resource_depends
+    ${umpire_resource_depends}
+    hip_runtime)
+endif ()
+
 blt_add_library(
   NAME umpire_resource
   HEADERS ${umpire_resource_headers}

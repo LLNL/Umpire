@@ -18,7 +18,6 @@ if (ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "-coverage ${CMAKE_EXE_LINKER_FLAGS}")
 endif ()
 
-
 message(STATUS "Checking for std::filesystem")
 
 include(CheckCXXSourceCompiles)
@@ -41,3 +40,7 @@ if (UMPIRE_ENABLE_FILESYSTEM)
 else ()
   message(STATUS "std::filesystem NOT found, using POSIX")
 endif ()
+
+if (ENABLE_HIP)
+  set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
+endif()

@@ -57,6 +57,10 @@ int main(int, char**) {
   data = move_data(data, "UM");
   data = move_data(data, "PINNED");
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+  data = move_data(data, "DEVICE");
+  data = move_data(data, "PINNED");
+#endif
 
   rm.deallocate(data);
 

@@ -12,20 +12,22 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
+#ifndef UMPIRE_HipPinnedMemoryResourceFactory_HPP
+#define UMPIRE_HipPinnedMemoryResourceFactory_HPP
 
-#include "gtest/gtest.h"
+#include "umpire/resource/MemoryResourceFactory.hpp"
 
-#include "umpire/tpl/simpool/FixedSizePool.hpp"
-#include "umpire/tpl/simpool/DynamicSizePool.hpp"
-#include "umpire/tpl/simpool/StdAllocator.hpp"
+namespace umpire {
+namespace resource {
 
-TEST(Simpool, FixedPool)
+class HipPinnedMemoryResourceFactory :
+  public MemoryResourceFactory
 {
-  FixedSizePool<int, StdAllocator> pool{};
+  bool isValidMemoryResourceFor(const std::string& name) noexcept;
+  resource::MemoryResource* create(const std::string& name, int id);
+};
 
-  int* i = pool.allocate();
+} // end of namespace resource
+} // end of namespace umpire
 
-  pool.deallocate(i);
-
-  SUCCEED();
-}
+#endif // UMPIRE_HipPinnedMemoryResourceFactory_HPP

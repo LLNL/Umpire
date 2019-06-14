@@ -682,8 +682,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_1d
 
@@ -716,8 +718,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_2d
 
@@ -750,8 +754,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_3d
 
@@ -784,8 +790,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_INT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_int_array_4d
 
@@ -818,8 +826,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_1d
 
@@ -852,8 +862,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_2d
 
@@ -886,8 +898,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_3d
 
@@ -920,8 +934,10 @@ contains
           type(C_PTR) :: data_ptr
 
           integer(C_LONG) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_long_array_4d
 
@@ -954,8 +970,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_1d
 
@@ -988,8 +1006,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_2d
 
@@ -1022,8 +1042,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_3d
 
@@ -1056,8 +1078,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_FLOAT) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_float_array_4d
 
@@ -1090,8 +1114,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_1d
 
@@ -1124,8 +1150,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_2d
 
@@ -1158,8 +1186,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_3d
 
@@ -1192,8 +1222,10 @@ contains
           type(C_PTR) :: data_ptr
 
           real(C_DOUBLE) :: size_type
+          integer(C_SIZE_T) :: num_bytes
 
-          data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+          num_bytes = product(dims) * sizeof(size_type)
+          data_ptr = this%allocate_pointer(num_bytes)
           call c_f_pointer(data_ptr, array, dims)
     end subroutine allocator_allocate_double_array_4d
 

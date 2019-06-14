@@ -19,14 +19,14 @@
 #include "umpire/Umpire.hpp"
 
 class FreeFunctionsTest :
-  public ::testing::TestWithParam<std::string> 
+  public ::testing::TestWithParam<std::string>
 {
 };
 
 TEST_P(FreeFunctionsTest, DefaultMallocFree)
 {
   double* test_alloc;
- 
+
   ASSERT_NO_THROW(
      test_alloc = static_cast<double*>(umpire::malloc(100*sizeof(double)))
   );
@@ -48,7 +48,7 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
   );
 
   double* test_alloc;
- 
+
   ASSERT_NO_THROW(
      test_alloc = static_cast<double*>(umpire::malloc(100*sizeof(double)))
   );
@@ -67,9 +67,13 @@ const std::string allocators[] = {
   , "UM"
   , "PINNED"
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+  , "DEVICE"
+  , "PINNED"
+#endif
 };
 
 INSTANTIATE_TEST_CASE_P(
   FreeFunctions,
   FreeFunctionsTest,
-  ::testing::ValuesIn(allocators));
+  ::testing::ValuesIn(allocators),);

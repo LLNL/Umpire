@@ -42,6 +42,10 @@ int main(int, char**) {
   allocate_and_deallocate("UM");
   allocate_and_deallocate("PINNED");
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+  allocate_and_deallocate("DEVICE");
+  allocate_and_deallocate("PINNED");
+#endif
 
   return 0;
 }
