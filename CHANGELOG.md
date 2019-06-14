@@ -52,6 +52,8 @@ and a dynamic pool for those that are larger.
 
 - Added Debug and RelWithDebInfo builds to Travis CI.
 
+- Use RAII locks with `std::lock_guard`.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
