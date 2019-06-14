@@ -236,7 +236,6 @@ void MemoryMap<V>::removeLast()
   --m_size;
 }
 
-
 template <typename V>
 template <bool Const>
 MemoryMap<V>::Iterator_<Const>::Iterator_(Map* map, Key ptr) :

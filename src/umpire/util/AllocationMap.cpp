@@ -282,8 +282,6 @@ void
 AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
                      std::ostream& os) const
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
-
   for (auto p : m_map) {
     std::stringstream ss;
     bool any_match = false;
