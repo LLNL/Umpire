@@ -41,8 +41,8 @@ class Inspector
       void* ptr, strategy::AllocationStrategy* strategy);
 
   protected:
-    long m_current_size;
-    long m_high_watermark;
+    std::size_t m_current_size;
+    std::size_t m_high_watermark;
 };
 
 } // end of namespace mixins

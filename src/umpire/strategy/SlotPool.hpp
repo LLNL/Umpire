@@ -45,7 +45,7 @@ class SlotPool :
     void init();
 
     void** m_pointers;
-    size_t* m_lengths;
+    int64_t* m_lengths;
 
     std::size_t m_current_size;
     std::size_t m_highwatermark;

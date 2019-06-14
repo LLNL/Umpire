@@ -33,7 +33,7 @@ SlotPool::SlotPool(
 {
   UMPIRE_LOG(Debug, "Creating " << m_slots << "-slot pool.");
 
-  m_lengths = new size_t[m_slots];
+  m_lengths = new int64_t[m_slots];
   m_pointers = new void*[m_slots];
 
   for (size_t i = 0; i < m_slots; ++i) {
@@ -46,14 +46,20 @@ void*
 SlotPool::allocate(size_t bytes)
 {
   void* ptr = nullptr;
+  int64_t int_bytes = static_cast<int64_t>(bytes);
+
+  if (int_bytes < 0) {
+    UMPIRE_ERROR("allocation request of size: "
+        << bytes << " bytes is too large for this pool");
+  }
 
   for (size_t i = 0; i < m_slots; ++i) {
-     if (m_lengths[i] == bytes) {
+     if (m_lengths[i] == int_bytes) {
         m_lengths[i] = -m_lengths[i] ;
         ptr = m_pointers[i] ;
         break ;
      } else if (m_lengths[i] == 0) {
-        m_lengths[i] = -static_cast<int>(bytes) ;
+        m_lengths[i] = -int_bytes;
         m_pointers[i] = m_allocator->allocate(bytes);
         ptr = m_pointers[i] ;
         break ;

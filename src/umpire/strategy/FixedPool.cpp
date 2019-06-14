@@ -52,7 +52,7 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
   num_avail(objects_per_pool)
 {
   // Set all bits to 1
-  const unsigned char not_zero = ~0;
+  const unsigned char not_zero = static_cast<unsigned char>(~0);
   std::memset(avail, not_zero, avail_bytes);
 }
 
@@ -172,7 +172,7 @@ FixedPool::getCurrentSize() const noexcept
 std::size_t
 FixedPool::getActualSize() const noexcept
 {
-  const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
+  const std::size_t avail_bytes = m_obj_per_pool/bits_per_int + 1;
   return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes + sizeof(Pool))
     + sizeof(FixedPool);
 }
