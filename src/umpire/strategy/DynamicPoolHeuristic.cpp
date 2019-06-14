@@ -43,7 +43,7 @@ std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( 
   float f = (float)((float)percentage / (float)100.0);
 
   return [=] (const strategy::DynamicPool& pool) {
-      const std::size_t threshold = (std::size_t)(f * pool.getActualSize());
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return (pool.getReleasableSize() >= threshold);
   };
 }
