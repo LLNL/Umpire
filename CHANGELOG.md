@@ -29,6 +29,8 @@ and a dynamic pool for those that are larger.
 
 - Support for AMD's HIP.
 
+- GCC 4.9 build to Travis CI.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.
