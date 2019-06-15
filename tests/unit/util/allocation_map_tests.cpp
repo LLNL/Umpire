@@ -171,18 +171,18 @@ TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
     map.insert(data, another_record);
   );
 
-  std::size_t size = 0;
+  std::size_t sz = 0;
   auto iter = map.begin(), end = map.end();
-  while (iter != end) { ++size; ++iter; }
-  ASSERT_EQ(size, 3);
+  while (iter != end) { ++sz; ++iter; }
+  ASSERT_EQ(sz, 3);
 }
 
 TEST_F(AllocationMapTest, RegisterNoneIteratorSize)
 {
-  std::size_t size = 0;
+  std::size_t sz = 0;
   auto iter = map.begin(), end = map.end();
-  while (iter != end) { ++size; ++iter; }
-  ASSERT_EQ(size, 0);
+  while (iter != end) { ++sz; ++iter; }
+  ASSERT_EQ(sz, 0);
 }
 
 TEST_F(AllocationMapTest, FindMultiple)
