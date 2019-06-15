@@ -12,7 +12,6 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#define _CRT_SECURE_NO_WARNINGS
 
 #include "umpire/util/Logger.hpp"
 

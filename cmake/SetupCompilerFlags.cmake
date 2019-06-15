@@ -30,4 +30,8 @@ if (ENABLE_PEDANTIC_WARNINGS)
   )
 
   set(CMAKE_CXX_FLAGS "${UMPIRE_PEDANTIC_FLAG} ${CMAKE_CXX_FLAGS}")
+
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  endif()
 endif()
