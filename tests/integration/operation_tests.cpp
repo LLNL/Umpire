@@ -94,7 +94,7 @@ TEST_P(CopyTest, Copy) {
     auto& rm = umpire::ResourceManager::getInstance();
 
     for (std::size_t i = 0; i < m_size; i++) {
-      source_array[i] = i;
+      source_array[i] = static_cast<float>(i);
     }
 
     rm.copy(dest_array, source_array);
@@ -110,7 +110,7 @@ TEST_P(CopyTest, Single)
 {
     auto& rm = umpire::ResourceManager::getInstance();
 
-    check_array[10] = 3.14;
+    check_array[10] = 3.14f;
 
     rm.copy(&dest_array[11], &check_array[10], sizeof(float));
     rm.copy(&check_array[0], &dest_array[11], sizeof(float));
@@ -123,7 +123,7 @@ TEST_P(CopyTest, Offset) {
 
   for (std::size_t i = 0; i < m_size; ++i)
   {
-    source_array[i] = i;
+    source_array[i] = static_cast<float>(i);
   }
 
   rm.copy(dest_array, source_array);
@@ -457,7 +457,7 @@ TEST_P(MoveTest, Move)
 
   // this works because source should always be host!
   for (std::size_t i = 0; i < m_size; i++) {
-    source_array[i] = i;
+    source_array[i] = static_cast<float>(i);
   }
 
   float* moved_array = static_cast<float*>(rm.move(source_array, *dest_allocator));
@@ -470,7 +470,7 @@ TEST_P(MoveTest, Move)
   rm.copy(check_array, moved_array);
 
   for (std::size_t i = 0; i < m_size; i++) {
-    ASSERT_FLOAT_EQ(check_array[i], i);
+    ASSERT_FLOAT_EQ(check_array[i], static_cast<float>(i));
   }
 
   dest_allocator->deallocate(moved_array);
