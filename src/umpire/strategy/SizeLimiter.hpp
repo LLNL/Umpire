@@ -39,9 +39,9 @@ class SizeLimiter :
         const std::string& name,
         int id,
         Allocator allocator,
-        size_t size_limit);
+        std::size_t size_limit);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
     std::size_t getCurrentSize() const noexcept;
@@ -51,8 +51,8 @@ class SizeLimiter :
   private:
     strategy::AllocationStrategy* m_allocator;
 
-    size_t m_size_limit;
-    size_t m_total_size;
+    std::size_t m_size_limit;
+    std::size_t m_total_size;
 };
 
 } // end of namespace strategy

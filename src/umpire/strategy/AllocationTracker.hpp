@@ -34,7 +34,7 @@ class AllocationTracker :
         int id,
         Allocator allocator) noexcept;
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
 
     void deallocate(void* ptr);
 

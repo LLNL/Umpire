@@ -30,7 +30,7 @@ m_allocator(allocator.getAllocationStrategy())
 }
 
 void*
-AllocationTracker::allocate(size_t bytes)
+AllocationTracker::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
 

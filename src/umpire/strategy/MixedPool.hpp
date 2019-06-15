@@ -44,16 +44,16 @@ class MixedPool :
     MixedPool(
       const std::string& name, int id,
       Allocator allocator,
-      size_t smallest_fixed_blocksize = (1 << 8), // 256B
-      size_t largest_fixed_blocksize = (1 << 17), // 1024K
-      size_t max_fixed_pool_size = 1024*1024 * 2, // 2MB
-      size_t size_multiplier = 10,                // 10x over previous size
-      size_t dynamic_min_initial_alloc_size = (512 * 1024 * 1024),
-      size_t dynamic_min_alloc_size = (1 * 1024 *1024),
+      std::size_t smallest_fixed_blocksize = (1 << 8), // 256B
+      std::size_t largest_fixed_blocksize = (1 << 17), // 1024K
+      std::size_t max_fixed_pool_size = 1024*1024 * 2, // 2MB
+      std::size_t size_multiplier = 10,                // 10x over previous size
+      std::size_t dynamic_min_initial_alloc_size = (512 * 1024 * 1024),
+      std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
       DynamicPool::Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)
       ) noexcept;
 
-    void* allocate(size_t bytes) override;
+    void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
 
     void release() override;
@@ -67,7 +67,7 @@ class MixedPool :
   private:
     using IntMap = std::map<uintptr_t, int>;
     IntMap m_map;
-    std::vector<size_t> m_fixed_pool_map;
+    std::vector<std::size_t> m_fixed_pool_map;
     std::vector<FixedPool> m_fixed_pool;
     DynamicPool m_dynamic_pool;
     AllocationStrategy* m_allocator;

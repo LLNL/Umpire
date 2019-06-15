@@ -23,7 +23,7 @@ namespace strategy {
 SlotPool::SlotPool(
     const std::string& name,
     int id,
-    size_t slots,
+    std::size_t slots,
     Allocator allocator) :
   AllocationStrategy(name, id),
   m_current_size(0),
@@ -36,14 +36,14 @@ SlotPool::SlotPool(
   m_lengths = new int64_t[m_slots];
   m_pointers = new void*[m_slots];
 
-  for (size_t i = 0; i < m_slots; ++i) {
+  for (std::size_t i = 0; i < m_slots; ++i) {
     m_pointers[i] = nullptr;
     m_lengths[i] = 0;
   }
 }
 
 void*
-SlotPool::allocate(size_t bytes)
+SlotPool::allocate(std::size_t bytes)
 {
   void* ptr = nullptr;
   int64_t int_bytes = static_cast<int64_t>(bytes);
@@ -53,7 +53,7 @@ SlotPool::allocate(size_t bytes)
         << bytes << " bytes is too large for this pool");
   }
 
-  for (size_t i = 0; i < m_slots; ++i) {
+  for (std::size_t i = 0; i < m_slots; ++i) {
      if (m_lengths[i] == int_bytes) {
         m_lengths[i] = -m_lengths[i] ;
         ptr = m_pointers[i] ;
@@ -74,7 +74,7 @@ void
 SlotPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  for (size_t i = 0; i < m_slots; ++i) {
+  for (std::size_t i = 0; i < m_slots; ++i) {
     if (m_pointers[i] == ptr) {
       m_lengths[i] = -m_lengths[i];
       ptr = nullptr;

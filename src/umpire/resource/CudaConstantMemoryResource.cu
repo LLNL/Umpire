@@ -39,7 +39,7 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
   }
 }
 
-void* CudaConstantMemoryResource::allocate(size_t bytes)
+void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 {
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;

@@ -255,7 +255,7 @@ DynamicPool::DynamicPool(
 DynamicPool::~DynamicPool() { freeAllBlocks(); }
 
 void*
-DynamicPool::allocate(size_t bytes)
+DynamicPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 

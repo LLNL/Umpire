@@ -71,7 +71,7 @@ class DynamicPool :
 
     ~DynamicPool();
 
-    void* allocate(size_t bytes) override;
+    void* allocate(std::size_t bytes) override;
 
     void deallocate(void* ptr) override;
 
@@ -111,8 +111,8 @@ class DynamicPool :
   struct Block
   {
     char *data;
-    size_t size;
-    size_t blockSize;
+    std::size_t size;
+    std::size_t blockSize;
     Block *next;
   };
 

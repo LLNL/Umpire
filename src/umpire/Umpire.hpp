@@ -36,7 +36,7 @@ namespace umpire {
  * \param size Number of bytes to allocate.
  */
 inline
-void* malloc(size_t size)
+void* malloc(std::size_t size)
 {
   return ResourceManager::getInstance().getDefaultAllocator().allocate(size);
 }

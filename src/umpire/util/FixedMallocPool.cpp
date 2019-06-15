@@ -131,7 +131,7 @@ FixedMallocPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
-size_t
+std::size_t
 FixedMallocPool::numPools() const noexcept
 {
   return m_pool.size();

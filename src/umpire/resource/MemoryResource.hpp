@@ -54,7 +54,7 @@ class MemoryResource :
      *
      * \return Pointer to start of allocation.
      */
-    virtual void* allocate(size_t bytes) = 0;
+    virtual void* allocate(std::size_t bytes) = 0;
 
     /*!
      * \brief Free the memory at ptr.

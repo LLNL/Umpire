@@ -61,7 +61,7 @@ NumaPolicy::NumaPolicy(
 }
 
 void*
-NumaPolicy::allocate(size_t bytes)
+NumaPolicy::allocate(std::size_t bytes)
 {
   void *ret = m_allocator->allocate(bytes);
 

@@ -37,7 +37,7 @@ DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, cons
 }
 
 template<typename _allocator>
-void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
+void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
 

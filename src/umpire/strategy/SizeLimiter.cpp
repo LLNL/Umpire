@@ -24,7 +24,7 @@ SizeLimiter::SizeLimiter(
     const std::string& name,
     int id,
     Allocator allocator,
-    size_t size_limit) :
+    std::size_t size_limit) :
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
   m_size_limit(size_limit),
@@ -32,7 +32,7 @@ SizeLimiter::SizeLimiter(
 {
 }
 
-void* SizeLimiter::allocate(size_t bytes)
+void* SizeLimiter::allocate(std::size_t bytes)
 {
   m_total_size += bytes;
 

@@ -194,7 +194,7 @@ void MemoryMap<V>::clear() noexcept
 }
 
 template <typename V>
-size_t MemoryMap<V>::size() const noexcept
+std::size_t MemoryMap<V>::size() const noexcept
 {
   return m_size;
 }

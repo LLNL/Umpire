@@ -52,7 +52,7 @@ class AllocationStrategy
      *
      * \return Pointer to start of allocated bytes.
      */
-    virtual void* allocate(size_t bytes) = 0;
+    virtual void* allocate(std::size_t bytes) = 0;
 
     /*!
      * \brief Free the memory at ptr.

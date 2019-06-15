@@ -31,7 +31,7 @@ ThreadSafeAllocator::ThreadSafeAllocator(
 }
 
 void*
-ThreadSafeAllocator::allocate(size_t bytes)
+ThreadSafeAllocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 

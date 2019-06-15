@@ -53,7 +53,7 @@ class TypedAllocator {
    *
    * \return Pointer to the start of the allocated memory.
    */
-  T* allocate(size_t size);
+  T* allocate(std::size_t size);
 
   /*!
    * \brief Deallocate ptr, the passed size is ignored.
@@ -61,7 +61,7 @@ class TypedAllocator {
    * \param ptr Pointer to deallocate
    * \param size Size of allocation (ignored).
    */
-  void deallocate(T* ptr, size_t size);
+  void deallocate(T* ptr, std::size_t size);
 
   private:
     umpire::Allocator m_allocator;

@@ -31,10 +31,10 @@ class SlotPool :
       SlotPool(
         const std::string& name,
         int id,
-        size_t slots,
+        std::size_t slots,
         Allocator allocator);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
     std::size_t getCurrentSize() const noexcept;
@@ -50,7 +50,7 @@ class SlotPool :
     std::size_t m_current_size;
     std::size_t m_highwatermark;
 
-    size_t m_slots;
+    std::size_t m_slots;
 
     strategy::AllocationStrategy* m_allocator;
 };

@@ -57,7 +57,7 @@ class AllocationAdvisor :
         Allocator accessing_allocator,
         int device_id = 0);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
     std::size_t getCurrentSize() const noexcept;
