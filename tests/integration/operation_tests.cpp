@@ -603,6 +603,6 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(advice_sources),
       ::testing::ValuesIn(advice_dests)
-));
+),);
 
 #endif
