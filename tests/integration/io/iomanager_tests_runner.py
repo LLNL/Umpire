@@ -15,7 +15,7 @@
 
 formatters = {
     'RED': '\033[91m',
-    'GREEN': '\033[92m',
+    'BLUE': '\033[94m',
     'END': '\033[0m',
 }
 
@@ -25,14 +25,14 @@ errors = 0
 def check_output(name, file_object, expected):
     global errors
 
-    print("{GREEN}[RUN     ]{END} Checking for \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
+    print("{BLUE}[RUN     ]{END} Checking for \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
     contents = file_object.readline().rstrip()
     if (contents != expected):
         print("{RED}[   ERROR]{END} Got {contents}".format(contents=contents, expected=expected, **formatters))
         errors = errors + 1
     else:
-        print("{GREEN}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
+        print("{BLUE}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
 
 def check_file_exists(filename):
@@ -45,7 +45,7 @@ def check_file_exists(filename):
         print("{RED}[   ERROR]{END} {myfile} not found".format(myfile=filename, **formatters))
         errors += errors + 1
     else:
-        print("{GREEN}[      OK]{END} {myfile} exists".format(myfile=filename, **formatters))
+        print("{BLUE}[      OK]{END} {myfile} exists".format(myfile=filename, **formatters))
 
 
 def run_io_test(test_env, file_uid):
@@ -85,9 +85,9 @@ def run_io_test(test_env, file_uid):
 if __name__ == '__main__':
     import sys
 
-    print("{GREEN}[--------]{END}".format(**formatters))
+    print("{BLUE}[--------]{END}".format(**formatters))
     run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
     run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
     run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 1)
-    print("{GREEN}[--------]{END}".format(**formatters))
+    print("{BLUE}[--------]{END}".format(**formatters))
     sys.exit(errors)
