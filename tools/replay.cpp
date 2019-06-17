@@ -514,7 +514,7 @@ class Replay {
           std::size_t smallest_fixed_blocksize;
           std::size_t largest_fixed_blocksize;
           std::size_t max_fixed_blocksize;
-          float size_multiplier;
+          std::size_t size_multiplier;
           std::size_t dynamic_min_initial_alloc_size;
           std::size_t dynamic_min_alloc_size;
 

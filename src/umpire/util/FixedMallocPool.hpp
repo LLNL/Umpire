@@ -33,23 +33,23 @@ namespace util {
 class FixedMallocPool
 {
 public:
-  FixedMallocPool(const size_t object_bytes,
-                  const size_t objects_per_pool = 1024*1024);
+  FixedMallocPool(const std::size_t object_bytes,
+                  const std::size_t objects_per_pool = 1024*1024);
 
   ~FixedMallocPool();
 
-  void* allocate(size_t bytes = 0);
+  void* allocate(std::size_t bytes = 0);
   void deallocate(void* ptr);
 
-  size_t numPools() const noexcept;
+  std::size_t numPools() const noexcept;
 
 private:
   struct Pool {
     unsigned char* data;
     unsigned char* next;
     unsigned int num_initialized;
-    unsigned int num_free;
-    Pool(const size_t object_bytes, const size_t objects_per_pool);
+    std::size_t num_free;
+    Pool(const std::size_t object_bytes, const std::size_t objects_per_pool);
   };
 
   void newPool();
@@ -58,9 +58,9 @@ private:
   unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
   unsigned int index_from_addr(const Pool& p, const unsigned char* ptr) const;
 
-  const size_t m_obj_bytes;
-  const size_t m_obj_per_pool;
-  const size_t m_data_bytes;
+  const std::size_t m_obj_bytes;
+  const std::size_t m_obj_per_pool;
+  const std::size_t m_data_bytes;
   std::vector<Pool> m_pool;
   // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
   // ever reduced in size, then .data has to be manually deallocated

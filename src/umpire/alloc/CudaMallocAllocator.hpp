@@ -33,7 +33,7 @@ struct CudaMallocAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(size_t size)
+  void* allocate(std::size_t size)
   {
     void* ptr = nullptr;
     cudaError_t error = ::cudaMalloc(&ptr, size);

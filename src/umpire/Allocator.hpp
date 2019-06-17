@@ -58,7 +58,7 @@ class Allocator {
      *
      * \return Pointer to start of the allocation.
      */
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
 
     /*!
      * \brief Free the memory at ptr.
@@ -83,7 +83,7 @@ class Allocator {
      *
      * \return number of bytes allocated for ptr
      */
-    size_t getSize(void* ptr) const;
+    std::size_t getSize(void* ptr) const;
 
     /*!
      * \brief Return the memory high watermark for this Allocator.
@@ -94,7 +94,7 @@ class Allocator {
      *
      * \return Memory high watermark.
      */
-    size_t getHighWatermark() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     /*!
      * \brief Return the current size of this Allocator.
@@ -104,7 +104,7 @@ class Allocator {
      *
      * \return current size of Allocator.
      */
-    size_t getCurrentSize() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
 
     /*!
      * \brief Return the actual size of this Allocator.
@@ -116,7 +116,7 @@ class Allocator {
      *
      * \return actual size of Allocator.
      */
-    size_t getActualSize() const noexcept;
+    std::size_t getActualSize() const noexcept;
 
     /*!
      * \brief Get the name of this Allocator.

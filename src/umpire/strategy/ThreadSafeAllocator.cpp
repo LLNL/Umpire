@@ -31,7 +31,7 @@ ThreadSafeAllocator::ThreadSafeAllocator(
 }
 
 void*
-ThreadSafeAllocator::allocate(size_t bytes)
+ThreadSafeAllocator::allocate(std::size_t bytes)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   void *ret = m_allocator->allocate(bytes);
@@ -45,13 +45,13 @@ ThreadSafeAllocator::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-long
+std::size_t
 ThreadSafeAllocator::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long
+std::size_t
 ThreadSafeAllocator::getHighWatermark() const noexcept
 {
   return 0;

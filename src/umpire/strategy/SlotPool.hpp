@@ -31,26 +31,26 @@ class SlotPool :
       SlotPool(
         const std::string& name,
         int id,
-        size_t slots,
+        std::size_t slots,
         Allocator allocator);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
   private:
     void init();
 
     void** m_pointers;
-    size_t* m_lengths;
+    int64_t* m_lengths;
 
-    long m_current_size;
-    long m_highwatermark;
+    std::size_t m_current_size;
+    std::size_t m_highwatermark;
 
-    size_t m_slots;
+    std::size_t m_slots;
 
     strategy::AllocationStrategy* m_allocator;
 };

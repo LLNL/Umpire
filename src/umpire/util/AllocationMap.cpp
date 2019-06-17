@@ -82,7 +82,7 @@ RecordList::ConstIterator RecordList::end() const
   return RecordList::ConstIterator{this, iterator_end{}};
 }
 
-size_t RecordList::size() const { return m_length; }
+std::size_t RecordList::size() const { return m_length; }
 bool RecordList::empty() const { return size() == 0; }
 AllocationRecord* RecordList::back() { return &m_tail->rec; }
 const AllocationRecord* RecordList::back() const { return &m_tail->rec; }
@@ -272,8 +272,7 @@ void AllocationMap::clear()
   m_size = 0;
 }
 
-size_t
-AllocationMap::size() const
+std::size_t AllocationMap::size() const
 {
   return m_size;
 }

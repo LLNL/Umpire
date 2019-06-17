@@ -31,7 +31,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept:
 }
 
 void*
-Allocator::allocate(size_t bytes)
+Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
@@ -74,26 +74,26 @@ Allocator::release()
   m_allocator->release();
 }
 
-size_t
+std::size_t
 Allocator::getSize(void* ptr) const
 {
   UMPIRE_LOG(Debug, "(" << ptr << ")");
   return ResourceManager::getInstance().getSize(ptr);
 }
 
-size_t
+std::size_t
 Allocator::getHighWatermark() const noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
-size_t
+std::size_t
 Allocator::getCurrentSize() const noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
-size_t
+std::size_t
 Allocator::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();

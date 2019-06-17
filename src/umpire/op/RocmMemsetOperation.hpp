@@ -36,7 +36,7 @@ class RocmMemsetOperation : public MemoryOperation {
       void* src_ptr,
       util::AllocationRecord* allocation,
       int value,
-      size_t length);
+      std::size_t length);
 };
 
 } // end of namespace op

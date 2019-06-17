@@ -43,7 +43,7 @@ AllocationStrategy::getId() noexcept
   return m_id;
 }
 
-long
+std::size_t
 AllocationStrategy::getActualSize() const noexcept
 {
   return getCurrentSize();

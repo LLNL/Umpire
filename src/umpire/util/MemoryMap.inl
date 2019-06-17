@@ -203,14 +203,14 @@ void MemoryMap<V>::clear() noexcept
 {
   // Loop over the level 0 tree
   Key key{0};
-  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)))
+  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0); m_last; m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0))
     removeLast();
 
   m_size = 0;
 }
 
 template <typename V>
-size_t MemoryMap<V>::size() const noexcept
+std::size_t MemoryMap<V>::size() const noexcept
 {
   return m_size;
 }

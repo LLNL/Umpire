@@ -26,7 +26,7 @@ class DefaultAllocationStrategy :
   public:
     DefaultAllocationStrategy(strategy::AllocationStrategy* allocator);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
 
     /*!
      * \brief Free the memory at ptr.

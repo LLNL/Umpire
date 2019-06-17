@@ -29,6 +29,8 @@ and a dynamic pool for those that are larger.
 
 - Support for AMD's HIP.
 
+- GCC 4.9 build to Travis CI.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.
@@ -65,6 +67,8 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Enabled pedantic compiler warnings and fixed errors.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives

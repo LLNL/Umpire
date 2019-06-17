@@ -124,7 +124,7 @@ public:
   void clear() noexcept;
 
   // Number of entries
-  size_t size() const noexcept;
+  std::size_t size() const noexcept;
 
 private:
   // Helper method for public findOrBefore()
@@ -134,7 +134,7 @@ private:
   mutable JudySlot* m_last; // last found value in judy array
   mutable uintptr_t m_oper; // address of last object to set internal judy state
   FixedMallocPool m_pool;   // value pool
-  size_t m_size;            // number of objects stored
+  std::size_t m_size;            // number of objects stored
 };
 
 

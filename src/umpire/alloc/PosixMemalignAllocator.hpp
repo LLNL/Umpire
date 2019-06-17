@@ -36,7 +36,7 @@ struct PosixMemalignAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(size_t bytes)
+  void* allocate(std::size_t bytes)
   {
     void* ret = NULL;
     ::posix_memalign(&ret, get_page_size(), bytes);

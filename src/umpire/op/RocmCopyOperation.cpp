@@ -26,7 +26,7 @@ void RocmCopyOperation::transform(
     void** dst_ptr,
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
-    size_t length)
+    std::size_t length)
 {
   hc::accelerator acc;
   hc::accelerator_view av = acc.get_default_view();
