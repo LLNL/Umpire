@@ -40,7 +40,7 @@ def check_file_exists(filename):
 
     global errors
 
-    print("{GREEN}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
+    print("{BLUE}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
     if (not os.path.isfile(filename)):
         print("{RED}[   ERROR]{END} {myfile} not found".format(myfile=filename, **formatters))
         errors += errors + 1
