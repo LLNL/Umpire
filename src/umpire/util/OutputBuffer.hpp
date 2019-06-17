@@ -30,7 +30,7 @@ public:
   void setConsoleStream(std::ostream* stream);
   void setFileStream(std::ostream* stream);
 
-  char overflow(char ch) override;
+  int overflow(int ch) override;
   int sync() override;
 
 private:

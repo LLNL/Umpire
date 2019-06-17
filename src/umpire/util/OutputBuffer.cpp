@@ -40,22 +40,22 @@ OutputBuffer::setFileStream(std::ostream* stream)
   }
 }
 
-char
-OutputBuffer::overflow(char ch)
+int
+OutputBuffer::overflow(int ch)
 {
   if (ch == EOF)
   {
     return !EOF;
   } else {
-    char r_console{ch};
-    char r_file{ch};
+    int r_console{ch};
+    int r_file{ch};
 
     if (d_console_stream) {
-      r_console = d_console_stream->sputc(ch);
+      r_console = d_console_stream->sputc(static_cast<char>(ch));
     }
 
     if (d_file_stream) {
-      r_file = d_file_stream->sputc(ch);
+      r_file = d_file_stream->sputc(static_cast<char>(ch));
     }
 
     return r_console == EOF || r_file == EOF ? EOF : ch;
