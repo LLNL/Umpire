@@ -47,8 +47,8 @@ OutputBuffer::overflow(char ch)
   {
     return !EOF;
   } else {
-    auto r_console = ch;
-    auto r_file = ch;
+    char r_console{ch};
+    char r_file{ch};
 
     if (d_console_stream) {
       r_console = d_console_stream->sputc(ch);
