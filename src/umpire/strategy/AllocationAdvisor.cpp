@@ -63,7 +63,7 @@ AllocationAdvisor::AllocationAdvisor(
 #endif
 }
 
-void* AllocationAdvisor::allocate(size_t bytes)
+void* AllocationAdvisor::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
 
@@ -82,12 +82,12 @@ void AllocationAdvisor::deallocate(void* ptr)
 
 }
 
-long AllocationAdvisor::getCurrentSize() const noexcept
+std::size_t AllocationAdvisor::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long AllocationAdvisor::getHighWatermark() const noexcept
+std::size_t AllocationAdvisor::getHighWatermark() const noexcept
 {
   return 0;
 }

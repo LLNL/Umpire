@@ -16,8 +16,8 @@
 #include "umpire/ResourceManager.hpp"
 
 int main(int, char**) {
-  constexpr size_t SIZE = 1024;
-  constexpr size_t REALLOCATED_SIZE = 256;
+  constexpr std::size_t SIZE = 1024;
+  constexpr std::size_t REALLOCATED_SIZE = 256;
 
   auto& rm = umpire::ResourceManager::getInstance();
 

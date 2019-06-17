@@ -38,7 +38,7 @@ class HipCopyToOperation : public MemoryOperation {
       void** dst_ptr,
       umpire::util::AllocationRecord *src_allocation,
       umpire::util::AllocationRecord *dst_allocation,
-      size_t length);
+      std::size_t length);
 };
 
 } // end of namespace op

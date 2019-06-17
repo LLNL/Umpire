@@ -39,7 +39,7 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
   }
 }
 
-void* CudaConstantMemoryResource::allocate(size_t bytes)
+void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 {
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;
@@ -81,13 +81,13 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
   }
 }
 
-long CudaConstantMemoryResource::getCurrentSize() const noexcept
+std::size_t CudaConstantMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long CudaConstantMemoryResource::getHighWatermark() const noexcept
+std::size_t CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;

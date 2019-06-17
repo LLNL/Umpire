@@ -24,7 +24,7 @@ namespace strategy {
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
     const std::string& name,
     int id,
-    size_t capacity,
+    std::size_t capacity,
     Allocator allocator) :
   AllocationStrategy(name, id),
   m_size(0),
@@ -35,7 +35,7 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
 }
 
 void*
-MonotonicAllocationStrategy::allocate(size_t bytes)
+MonotonicAllocationStrategy::allocate(std::size_t bytes)
 {
   void* ret = static_cast<char*>(m_block) + bytes;
   m_size += bytes;
@@ -53,14 +53,14 @@ void
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
 {}
 
-long
+std::size_t
 MonotonicAllocationStrategy::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_size);
   return m_size;
 }
 
-long
+std::size_t
 MonotonicAllocationStrategy::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_capacity);

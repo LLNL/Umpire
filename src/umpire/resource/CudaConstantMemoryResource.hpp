@@ -34,21 +34,21 @@ class CudaConstantMemoryResource :
   public:
     CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
 
   private:
-    long m_current_size;
-    long m_highwatermark;
+    std::size_t m_current_size;
+    std::size_t m_highwatermark;
 
     Platform m_platform;
 
-    size_t m_offset;
+    std::size_t m_offset;
     void* m_ptr;
 };
 

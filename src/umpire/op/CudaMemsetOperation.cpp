@@ -26,7 +26,7 @@ CudaMemsetOperation::apply(
     void* src_ptr,
     util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
     int value,
-    size_t length)
+    std::size_t length)
 {
   cudaError_t error = ::cudaMemset(src_ptr, value, length);
 

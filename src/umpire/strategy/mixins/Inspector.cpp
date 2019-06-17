@@ -30,7 +30,7 @@ Inspector::Inspector() :
 void
 Inspector::registerAllocation(
     void* ptr,
-    size_t size,
+    std::size_t size,
     strategy::AllocationStrategy* strategy)
 {
   m_current_size += size;

@@ -18,10 +18,10 @@
 
 using Map = umpire::util::MemoryMap<int>;
 
-static size_t size_by_iterator(Map& map)
+static std::size_t size_by_iterator(Map& map)
 {
   auto iter = map.begin(), end = map.end();
-  size_t size = 0;
+  std::size_t size = 0;
   while (iter != end) { ++size; ++iter; }
   return size;
 }

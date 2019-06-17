@@ -39,7 +39,7 @@ class HipCopyFromOperation :
       void** dst_ptr,
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
-      size_t length);
+      std::size_t length);
 };
 
 } // end of namespace op

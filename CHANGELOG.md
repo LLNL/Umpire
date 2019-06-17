@@ -66,6 +66,8 @@ and a dynamic pool for those that are larger.
 
 ### Fixed
 
+- Enabled pedantic compiler warnings and fixed errors.
+
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives
   a deprecation warning when attempting to run older versions of python.

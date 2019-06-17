@@ -319,10 +319,10 @@ TEST(MixedPool, Host)
   auto allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
       "host_mixed_pool", rm.getAllocator("HOST"));
 
-  const size_t max_power = 9;
+  const std::size_t max_power = 9;
   void* alloc[max_power];
-  size_t size = 4, total_size = 0;
-  for (size_t i = 0; i < max_power; ++i) {
+  std::size_t size = 4, total_size = 0;
+  for (std::size_t i = 0; i < max_power; ++i) {
     alloc[i] = allocator.allocate(size);
     total_size += size;
     size *= 4;
@@ -334,7 +334,7 @@ TEST(MixedPool, Host)
   ASSERT_GE(allocator.getHighWatermark(), total_size);
   ASSERT_EQ(allocator.getName(), "host_mixed_pool");
 
-  for (size_t i = 0; i < max_power; ++i)
+  for (std::size_t i = 0; i < max_power; ++i)
     allocator.deallocate(alloc[i]);
 }
 
@@ -348,7 +348,7 @@ TEST(ThreadSafeAllocator, Host)
 
 #pragma omp parallel
   {
-    const size_t size = 1024*omp_get_thread_num();
+    const std::size_t size = 1024*omp_get_thread_num();
 
     double* thread_data = static_cast<double*>(
      allocator.allocate(size*sizeof(double)));

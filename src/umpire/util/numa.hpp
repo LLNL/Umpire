@@ -29,7 +29,7 @@ namespace numa {
 int preferred_node();
 
 // Move page-aligned address of size bytes to node
-void move_to_node(void* ptr, size_t bytes, int node);
+void move_to_node(void* ptr, std::size_t bytes, int node);
 
 // Return the numa node where address ptr resides
 int get_location(void* ptr);

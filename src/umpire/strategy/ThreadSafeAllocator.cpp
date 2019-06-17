@@ -31,7 +31,7 @@ ThreadSafeAllocator::ThreadSafeAllocator(
 }
 
 void*
-ThreadSafeAllocator::allocate(size_t bytes)
+ThreadSafeAllocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
@@ -64,13 +64,13 @@ ThreadSafeAllocator::deallocate(void* ptr)
   }
 }
 
-long
+std::size_t
 ThreadSafeAllocator::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long
+std::size_t
 ThreadSafeAllocator::getHighWatermark() const noexcept
 {
   return 0;

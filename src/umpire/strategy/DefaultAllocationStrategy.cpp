@@ -25,7 +25,7 @@ DefaultAllocationStrategy::DefaultAllocationStrategy(strategy::AllocationStrateg
 }
 
 void* 
-DefaultAllocationStrategy::allocate(size_t bytes)
+DefaultAllocationStrategy::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   return m_allocator->allocate(bytes);

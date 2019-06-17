@@ -33,7 +33,7 @@ struct HipMallocAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(size_t size)
+  void* allocate(std::size_t size)
   {
     void* ptr = nullptr;
     hipError_t error = ::hipMalloc(&ptr, size);

@@ -75,14 +75,14 @@ public:
   ConstIterator begin() const;
   ConstIterator end() const;
 
-  size_t size() const;
+  std::size_t size() const;
   bool empty() const;
   AllocationRecord* back();
   const AllocationRecord* back() const;
 
 private:
   BlockType* m_tail;
-  size_t m_length;
+  std::size_t m_length;
 };
 
 class AllocationMap
@@ -148,7 +148,7 @@ public:
   void clear();
 
   // Returns number of entries
-  size_t size() const;
+  std::size_t size() const;
 
   // Print methods -- either matching a predicate or all records
   void print(const std::function<bool (const AllocationRecord&)>&& predicate,
@@ -161,7 +161,7 @@ public:
 
 private:
   Map m_map;
-  size_t m_size;
+  std::size_t m_size;
   mutable std::mutex m_mutex;
 };
 

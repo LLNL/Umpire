@@ -45,7 +45,7 @@ struct MemoryResourceTraits {
   };
 
   bool unified = false;
-  size_t size = 0;
+  std::size_t size = 0;
 
   vendor_type vendor = vendor_type::UNKNOWN;
   memory_type kind = memory_type::UNKNOWN;

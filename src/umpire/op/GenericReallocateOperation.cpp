@@ -30,13 +30,13 @@ void GenericReallocateOperation::transform(
     void** dst_ptr,
     util::AllocationRecord *src_allocation,
     util::AllocationRecord *dst_allocation,
-    size_t length)
+    std::size_t length)
 {
   auto allocator = dst_allocation->strategy;
   *dst_ptr = allocator->allocate(length);
 
-  size_t old_size = src_allocation->size;
-  size_t copy_size = ( old_size > length ) ? length : old_size;
+  std::size_t old_size = src_allocation->size;
+  std::size_t copy_size = ( old_size > length ) ? length : old_size;
 
   ResourceManager::getInstance().copy(*dst_ptr, src_ptr, copy_size);
 

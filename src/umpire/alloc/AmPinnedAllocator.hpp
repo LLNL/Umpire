@@ -33,7 +33,7 @@ struct AmPinnedAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(size_t bytes)
+  void* allocate(std::size_t bytes)
   {
     /* Default accelerator */
     hc::accelerator acc;
