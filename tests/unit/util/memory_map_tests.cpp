@@ -106,7 +106,7 @@ TEST_F(MemoryMapTest, findOrBefore)
     EXPECT_EQ(iter->first, a);
   }
 
-  map.remove(a);
+  map.erase(a);
   {
     auto iter = map.findOrBefore(static_cast<char*>(a) + 10);
     EXPECT_EQ(iter, map.begin());
@@ -116,12 +116,23 @@ TEST_F(MemoryMapTest, findOrBefore)
   ASSERT_EQ(map.size(), 0);
 }
 
-TEST_F(MemoryMapTest, remove)
+TEST_F(MemoryMapTest, erase)
 {
   map.insert(a, 1);
 
-  ASSERT_NO_THROW(map.remove(a));
-  ASSERT_ANY_THROW(map.remove(a));
+  ASSERT_NO_THROW(map.erase(a));
+  ASSERT_ANY_THROW(map.erase(a));
+  ASSERT_EQ(map.size(), 0);
+}
+
+TEST_F(MemoryMapTest, removeLast)
+{
+  map.insert(a, 1);
+
+  map.begin();
+
+  ASSERT_NO_THROW(map.removeLast());
+  ASSERT_ANY_THROW(map.erase(a));
   ASSERT_EQ(map.size(), 0);
 }
 
@@ -131,7 +142,7 @@ TEST_F(MemoryMapTest, clear)
   map.insert(b, 2);
   map.insert(c, 3);
 
-  ASSERT_NO_THROW(map.remove(a));
+  ASSERT_NO_THROW(map.erase(a));
 
   map.clear();
   ASSERT_EQ(map.size(), 0);

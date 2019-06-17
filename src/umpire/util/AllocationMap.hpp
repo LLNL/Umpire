@@ -24,7 +24,6 @@
 #include "umpire/util/MemoryMap.hpp"
 
 #include <cstdint>
-#include <mutex>
 #include <iostream>
 #include <iterator>
 #include <functional>
@@ -160,6 +159,9 @@ public:
   ConstIterator end() const;
 
 private:
+  // Content of findRecord(void*) without the lock
+  const AllocationRecord* doFindRecord(void* ptr) const noexcept;
+
   Map m_map;
   std::size_t m_size;
   mutable std::mutex m_mutex;

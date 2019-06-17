@@ -147,7 +147,8 @@ AllocationMap::AllocationMap() :
 
 void AllocationMap::insert(void* ptr, AllocationRecord record)
 {
-  UMPIRE_LOCK;
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
   Map::Iterator iter{m_map.end()};
@@ -162,14 +163,15 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   // -> get() already added record to the end of the RecordList for ptr
 
   ++m_size;
-  UMPIRE_UNLOCK;
 }
 
 const AllocationRecord* AllocationMap::find(void* ptr) const
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "Searching for " << ptr);
 
-  const AllocationRecord* alloc_record = findRecord(ptr);
+  const AllocationRecord* alloc_record = doFindRecord(ptr);
 
   if (alloc_record) {
     return alloc_record;
@@ -187,11 +189,9 @@ AllocationRecord* AllocationMap::find(void* ptr)
   return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->find(ptr));
 }
 
-const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
+const AllocationRecord* AllocationMap::doFindRecord(void* ptr) const noexcept
 {
   const AllocationRecord* alloc_record = nullptr;
-
-  UMPIRE_LOCK;
 
   Map::ConstIterator iter = m_map.findOrBefore(ptr);
 
@@ -215,9 +215,15 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
     }
   }
 
-  UMPIRE_UNLOCK;
-
   return alloc_record;
+}
+
+const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
+{
+  std::lock_guard<std::mutex> lock(m_mutex);
+
+  // Call method
+  return doFindRecord(ptr);
 }
 
 AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
@@ -228,31 +234,24 @@ AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
 
 AllocationRecord AllocationMap::remove(void* ptr)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   AllocationRecord ret;
 
-  try {
-    UMPIRE_LOCK;
+  UMPIRE_LOG(Debug, "Removing " << ptr);
 
-    UMPIRE_LOG(Debug, "Removing " << ptr);
+  auto iter = m_map.find(ptr);
 
-    auto iter = m_map.find(ptr);
-
-    if (iter->second) {
-      // faster, equivalent way of checking iter != m_map->end()
-      ret = iter->second->pop_back();
-      if (iter->second->empty()) m_map.removeLast();
-    }
-    else {
-      UMPIRE_ERROR("Cannot remove " << ptr);
-    }
-
-    --m_size;
-
-    UMPIRE_UNLOCK;
-  } catch (...) {
-    UMPIRE_UNLOCK;
-    throw;
+  if (iter->second) {
+    // faster, equivalent way of checking iter != m_map->end()
+    ret = iter->second->pop_back();
+    if (iter->second->empty()) m_map.removeLast();
   }
+  else {
+    UMPIRE_ERROR("Cannot remove " << ptr);
+  }
+
+  --m_size;
 
   return ret;
 }
@@ -265,15 +264,18 @@ bool AllocationMap::contains(void* ptr) const
 
 void AllocationMap::clear()
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "Clearing");
 
-  UMPIRE_LOCK;
   m_map.clear();
   m_size = 0;
-  UMPIRE_UNLOCK;
 }
 
-std::size_t AllocationMap::size() const { return m_size; }
+std::size_t AllocationMap::size() const
+{
+  return m_size;
+}
 
 void
 AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
