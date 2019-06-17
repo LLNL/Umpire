@@ -12,18 +12,18 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/Logger.hpp"
 
+#include "umpire/util/Logger.hpp"
 #include "umpire/util/IOManager.hpp"
 
-#include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
 #if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
 #else
 #define strcasecmp _stricmp
 #endif
 
+#include <iostream>   // for std::cout, std::cerr
+#include <stdlib.h>   // for getenv()
 
 namespace umpire {
 namespace util {

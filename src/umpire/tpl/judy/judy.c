@@ -111,7 +111,8 @@ Judy * judy_open( unsigned int max, unsigned int depth ) {
 
     max++;        // allow for zero terminator on keys
 
-    if( ( seg = malloc( JUDY_seg ) ) ) {
+    seg = malloc( JUDY_seg );
+    if( seg ) {
         seg->seg = NULL;
         seg->next = JUDY_seg;
     } else {
@@ -146,7 +147,7 @@ Judy * judy_open( unsigned int max, unsigned int depth ) {
 void judy_close( Judy * judy ) {
     JudySeg * seg, *nxt = judy->seg;
 
-    while( ( seg = nxt ) ) {
+    for( seg = nxt; seg; seg = nxt ) {
         nxt = seg->seg, free( seg );
     }
 }
@@ -184,7 +185,8 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
 
     //    see if free block is already available
 
-    if( ( block = judy->reuse[type] ) ) {
+    block = judy->reuse[type];
+    if( block ) {
         judy->reuse[type] = *block;
         memset( block, 0, amt );
         return ( void * )block;
@@ -194,8 +196,9 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
     //    for reuse into smaller blocks
 
     if( type >= JUDY_1 )
-        for( idx = type; idx++ < JUDY_max; )
-            if( ( block = judy->reuse[idx] ) ) {
+        for( idx = type; idx++ < JUDY_max; ) {
+            block = judy->reuse[idx];
+            if( block ) {
                 judy->reuse[idx] = *block;
                 while( idx-- > type ) {
                     judy->reuse[idx] = block + JudySize[idx] / sizeof( void * );
@@ -204,11 +207,13 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
                 memset( block, 0, amt );
                 return ( void * )block;
             }
+        }
 
     min = amt < JUDY_cache_line ? JUDY_cache_line : amt;
 
     if( judy->seg->next < min + sizeof( *seg ) ) {
-        if( ( seg = malloc( JUDY_seg ) ) ) {
+        seg = malloc( JUDY_seg );
+        if( seg ) {
             seg->next = JUDY_seg;
             seg->seg = judy->seg;
             judy->seg = seg;
@@ -260,7 +265,8 @@ void * judy_data( Judy * judy, unsigned int amt )
     }
 
     if( judy->seg->next < amt + sizeof( *seg ) ) {
-        if( ( seg = malloc( JUDY_seg ) ) ) {
+        seg = malloc( JUDY_seg );
+        if( seg ) {
             seg->next = JUDY_seg;
             seg->seg = judy->seg;
             judy->seg = seg;
@@ -367,12 +373,14 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
 #if BYTE_ORDER != BIG_ENDIAN
                 off = keysize;
 
-                while( off-- && len < max )
-                    if( ( buff[len] = base[slot * keysize + off] ) ) {
+                while( off-- && len < max ) {
+                    buff[len] = base[slot * keysize + off];
+                    if( buff[len] ) {
                         len++;
                     } else {
                         break;
                     }
+                }
 #else
                 for( off = 0; off < keysize && len < max; off++ )
                     if( (buff[len] = base[slot * keysize + off]) ) {
@@ -522,7 +530,8 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
 
                 judy->stack[judy->level].slot = slot;
 #endif
-                if( ( next = table[slot >> 4] ) ) {
+                next = table[slot >> 4];
+                if( next ) {
                     table = ( JudySlot * )( next & JUDY_mask );    // inner radix
                 } else {
                     return NULL;
@@ -645,7 +654,8 @@ void judy_radix( Judy * judy, JudySlot * radix, unsigned char * old, int start, 
 
     //    if necessary, setup inner radix node
 
-    if( !( table = ( JudySlot * )( radix[key >> 4] & JUDY_mask ) ) ) {
+    table = ( JudySlot * )( radix[key >> 4] & JUDY_mask );
+    if( !table ) {
         table = judy_alloc( judy, JUDY_radix );
         radix[key >> 4] = ( JudySlot )table | JUDY_radix;
     }
@@ -787,9 +797,11 @@ JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned in
                     }
 
                 table = ( JudySlot * )( next & JUDY_mask );
-                for( slot = 0; slot < 256; slot++ )
-                    if( ( inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask ) ) ) {
-                        if( ( next = inner[slot & 0x0F] ) ) {
+                for( slot = 0; slot < 256; slot++ ) {
+                    inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
+                    if( inner ) {
+                        next = inner[slot & 0x0F];
+                        if( next ) {
                             judy->stack[judy->level].slot = slot;
                             if( ( !judy->depth && !slot ) || ( judy->depth && depth == judy->depth ) ) {
                                 return &inner[slot & 0x0F];
@@ -800,6 +812,7 @@ JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned in
                     } else {
                         slot |= 0x0F;
                     }
+                }
                 continue;
 #ifndef ASKITIS
             case JUDY_span:
@@ -873,8 +886,10 @@ JudySlot * judy_last( Judy * judy, JudySlot next, unsigned int off, unsigned int
 
                 for( slot = 256; slot--; ) {
                     judy->stack[judy->level].slot = slot;
-                    if( ( inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask ) ) ) {
-                        if( ( next = inner[slot & 0x0F] ) ) {
+                    inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
+                    if( inner ) {
+                        next = inner[slot & 0x0F];
+                        if( next ) {
                             if( ( !judy->depth && !slot ) || ( judy->depth && depth == judy->depth ) ) {
                                 return &inner[0];
                             } else {
@@ -972,8 +987,9 @@ JudySlot * judy_nxt( Judy * judy ) {
                         depth++;
                     }
 
-                while( ++slot < 256 )
-                    if( ( inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask ) ) ) {
+                while( ++slot < 256 ) {
+                    inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
+                    if( inner ) {
                         if( inner[slot & 0x0F] ) {
                             judy->stack[judy->level].slot = slot;
                             if( !judy->depth || depth < judy->depth ) {
@@ -984,6 +1000,7 @@ JudySlot * judy_nxt( Judy * judy ) {
                     } else {
                         slot |= 0x0F;
                     }
+                }
 
                 judy->level--;
                 continue;
@@ -1056,7 +1073,8 @@ JudySlot * judy_prv( Judy * judy ) {
 
                 while( slot-- ) {
                     judy->stack[judy->level].slot--;
-                    if( ( inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask ) ) ) {
+                    inner = ( JudySlot * )( table[slot >> 4] & JUDY_mask );
+                    if( inner ) {
                         if( inner[slot & 0x0F] ) {
                             if( ( !judy->depth && !slot ) || ( judy->depth && depth == judy->depth ) ) {
                                 return &inner[0];
@@ -1187,7 +1205,8 @@ JudySlot * judy_strt( Judy * judy, const unsigned char * buff, unsigned int max 
         return judy_first( judy, *judy->root, 0, 0 );
     }
 
-    if( ( cell = judy_slot( judy, buff, max ) ) ) {
+    cell = judy_slot( judy, buff, max );
+    if( cell ) {
         return cell;
     }
 

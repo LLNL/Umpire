@@ -30,7 +30,7 @@ namespace util {
 struct AllocationRecord
 {
   void* ptr;
-  size_t size;
+  std::size_t size;
   strategy::AllocationStrategy* strategy;
 };
 

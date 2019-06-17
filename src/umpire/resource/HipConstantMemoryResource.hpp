@@ -34,7 +34,7 @@ class HipConstantMemoryResource :
   public:
     HipConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
     long getCurrentSize() const noexcept;
@@ -48,7 +48,7 @@ class HipConstantMemoryResource :
 
     Platform m_platform;
 
-    size_t m_offset;
+    std::size_t m_offset;
     void* m_ptr;
 };
 

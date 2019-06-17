@@ -44,3 +44,18 @@ endif ()
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 endif()
+
+if (ENABLE_PEDANTIC_WARNINGS)
+  blt_append_custom_compiler_flag(
+    FLAGS_VAR UMPIRE_PEDANTIC_FLAG
+    DEFAULT  "-Wpedantic"
+    MSVC "/Wall /WX"
+    INTEL "-Wall -Wcheck -wd2259"
+  )
+
+  set(CMAKE_CXX_FLAGS "${UMPIRE_PEDANTIC_FLAG} ${CMAKE_CXX_FLAGS}")
+
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  endif()
+endif()

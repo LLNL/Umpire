@@ -19,7 +19,7 @@
 
 struct TestAllocator
 {
-  void* allocate(size_t bytes)
+  void* allocate(std::size_t bytes)
   {
     return ::malloc(bytes);
   }

@@ -33,7 +33,7 @@ HipConstantMemoryResource::HipConstantMemoryResource(const std::string& name, in
   m_ptr(umpire_internal_device_constant_memory){}
 
 
-void* HipConstantMemoryResource::allocate(size_t bytes)
+void* HipConstantMemoryResource::allocate(std::size_t bytes)
 {
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;

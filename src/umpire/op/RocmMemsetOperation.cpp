@@ -27,7 +27,7 @@ RocmMemsetOperation::apply(
     void* src_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
     int value,
-    size_t length)
+    std::size_t length)
 {
   unsigned char * cptr = static_cast<unsigned char *>(src_ptr);
   uint32_t * wptr = static_cast<uint32_t *>(src_ptr);

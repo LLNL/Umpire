@@ -39,9 +39,9 @@ class AllocatorTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorTest, AllocateDeallocateBig)
@@ -92,7 +92,7 @@ TEST_P(AllocatorTest, DeallocateNullptr)
 
 TEST_P(AllocatorTest, GetSize)
 {
-  const size_t size = m_big*sizeof(double);
+  const std::size_t size = m_big*sizeof(double);
 
   double* data = static_cast<double*>(
     m_allocator->allocate(size));
@@ -212,9 +212,9 @@ class AllocatorByResourceTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorByResourceTest, AllocateDeallocate)

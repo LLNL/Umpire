@@ -26,7 +26,7 @@
 
 void benchmark_allocator(std::string name) {
   std::mt19937 gen(12345678);
-  std::uniform_int_distribution<size_t> dist(64, 4096);
+  std::uniform_int_distribution<std::size_t> dist(64, 4096);
 
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator(name);

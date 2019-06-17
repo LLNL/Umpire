@@ -58,6 +58,8 @@ and a dynamic pool for those that are larger.
 
 - Added Debug and RelWithDebInfo builds to Travis CI.
 
+- Use RAII locks with `std::lock_guard`.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
@@ -67,6 +69,8 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Enabled pedantic compiler warnings and fixed errors.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives

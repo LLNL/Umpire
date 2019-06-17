@@ -92,7 +92,7 @@ public:
         , 512             // smallest fixed block size (Bytes)
         , 1*1024          // largest fixed block size 1KiB
         , 4 * 1024 * 1024 // max fixed pool size
-        , 12.0            // size multiplier
+        , 12              // size multiplier
         //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
         //, 1 * 1024 * 1024   // dynamic pool min allocation size
         //, heuristic75         // coallesce heuristic
@@ -105,7 +105,7 @@ public:
         , 512             // smallest fixed block size (Bytes)
         , 1*1024          // largest fixed block size 1KiB
         , 4 * 1024 * 1024 // max fixed pool size
-        , 12.0            // size multiplier
+        , 12              // size multiplier
         , 256 * 1024 * 1024 // dynamic pool min initial allocation size
         //, 1 * 1024 * 1024   // dynamic pool min allocation size
         //, heuristic75         // coallesce heuristic
@@ -118,7 +118,7 @@ public:
         , 512             // smallest fixed block size (Bytes)
         , 1*1024          // largest fixed block size 1KiB
         , 4 * 1024 * 1024 // max fixed pool size
-        , 12.0            // size multiplier
+        , 12              // size multiplier
         , 256 * 1024 * 1024 // dynamic pool min initial allocation size
         , 1 * 1024 * 1024   // dynamic pool min allocation size
         //, heuristic75         // coallesce heuristic

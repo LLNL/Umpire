@@ -49,7 +49,7 @@ class MemoryOperation {
         void** dst_ptr,
         util::AllocationRecord *src_allocation,
         util::AllocationRecord *dst_allocation,
-        size_t length);
+        std::size_t length);
 
     /*!
      * \brief Apply val to the first length bytes of src_ptr.
@@ -65,7 +65,7 @@ class MemoryOperation {
         void* src_ptr,
         util::AllocationRecord *src_allocation,
         int val,
-        size_t length);
+        std::size_t length);
 };
 
 } // end of namespace op

@@ -42,7 +42,7 @@ class NumaPolicy :
         int numa_node,
         Allocator allocator);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
     long getCurrentSize() const noexcept;

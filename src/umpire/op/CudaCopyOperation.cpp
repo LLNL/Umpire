@@ -26,16 +26,16 @@ void CudaCopyOperation::transform(
     void** dst_ptr,
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
-    size_t length)
+    std::size_t length)
 {
-  cudaError_t error = 
+  cudaError_t error =
     ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToDevice);
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << *dst_ptr
       << ", src_ptr = " << src_ptr
       << ", length = " << length
-      << ", cudaMemcpyDeviceToDevice ) failed with error: " 
+      << ", cudaMemcpyDeviceToDevice ) failed with error: "
       << cudaGetErrorString(error));
   }
 

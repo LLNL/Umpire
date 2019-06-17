@@ -71,18 +71,18 @@ class DynamicPool :
 
     ~DynamicPool();
 
-    void* allocate(size_t bytes) override;
+    void* allocate(std::size_t bytes) override;
 
     void deallocate(void* ptr) override;
 
     void release() override;
 
-    long getCurrentSize() const noexcept override;
-    long getActualSize() const noexcept override;
-    long getHighWatermark() const noexcept override;
+    std::size_t getCurrentSize() const noexcept override;
+    std::size_t getActualSize() const noexcept override;
+    std::size_t getHighWatermark() const noexcept override;
 
-    long getFreeBlocks() const;
-    long getInUseBlocks() const;
+    std::size_t getFreeBlocks() const;
+    std::size_t getInUseBlocks() const;
 
     Platform getPlatform() noexcept override;
 
@@ -96,14 +96,14 @@ class DynamicPool :
      *
      * \return The total number of bytes that are releasable
      */
-    long getReleasableSize() const noexcept;
+    std::size_t getReleasableSize() const noexcept;
 
     /*!
      * \brief Get the number of memory blocks that the pools has
      *
      * \return The total number of blocks that are allocated by the pool
      */
-    long getBlocksInPool() const noexcept;
+    std::size_t getBlocksInPool() const noexcept;
 
     void coalesce() noexcept;
 
@@ -111,8 +111,8 @@ class DynamicPool :
   struct Block
   {
     char *data;
-    size_t size;
-    size_t blockSize;
+    std::size_t size;
+    std::size_t blockSize;
     Block *next;
   };
 

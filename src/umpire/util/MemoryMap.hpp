@@ -23,6 +23,7 @@
 #include <iterator>
 #include <utility>
 #include <type_traits>
+#include <mutex>
 
 namespace umpire {
 namespace util {
@@ -89,18 +90,18 @@ public:
 
   // Return pointer-to or emplaces a new Value with args to the constructor
   template <typename... Args>
-  std::pair<Iterator, bool> get(void* ptr, Args&&... args) noexcept;
+  std::pair<Iterator, bool> get(Key ptr, Args&&... args) noexcept;
 
   // Insert a new Value at ptr
-  Iterator insert(void* ptr, const Value& val);
+  Iterator insert(Key ptr, const Value& val);
 
   // Find a value -- returns what would be the entry immediately before ptr
-  ConstIterator findOrBefore(void* ptr) const noexcept;
-  Iterator findOrBefore(void* ptr) noexcept;
+  ConstIterator findOrBefore(Key ptr) const noexcept;
+  Iterator findOrBefore(Key ptr) noexcept;
 
   // Find a value -- returns end() if not found
-  ConstIterator find(void* ptr) const noexcept;
-  Iterator find(void* ptr) noexcept;
+  ConstIterator find(Key ptr) const noexcept;
+  Iterator find(Key ptr) noexcept;
 
   // Iterators
   ConstIterator begin() const;
@@ -109,30 +110,33 @@ public:
   ConstIterator end() const;
   Iterator end();
 
-  // Remove the entry at ptr
-  void remove(void* ptr);
+  // Remove the entry
+  void erase(Key ptr);
+  void erase(Iterator iter);
+  void erase(ConstIterator oter);
 
   // Remove/Deallocate the internal judy position. WARNING: Use this
   // with caution, only directly after using a method above.
-  // remove(void*) is safer, but requires an additional lookup.
+  // erase(Key) is safer, but requires an additional lookup.
   void removeLast();
 
   // Clear all entries
   void clear() noexcept;
 
   // Number of entries
-  size_t size() const noexcept;
+  std::size_t size() const noexcept;
 
 private:
   // Helper method for public findOrBefore()
-  Key doFindOrBefore(void* ptr) const noexcept;
+  Key doFindOrBefore(Key ptr) const noexcept;
 
   mutable Judy* m_array;    // Judy array
   mutable JudySlot* m_last; // last found value in judy array
   mutable uintptr_t m_oper; // address of last object to set internal judy state
   FixedMallocPool m_pool;   // value pool
-  size_t m_size;            // number of objects stored
+  std::size_t m_size;            // number of objects stored
 };
+
 
 } // end of namespace util
 } // end of namespace umpire
