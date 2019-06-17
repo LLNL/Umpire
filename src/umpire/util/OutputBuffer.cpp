@@ -40,8 +40,8 @@ OutputBuffer::setFileStream(std::ostream* stream)
   }
 }
 
-int
-OutputBuffer::overflow(int ch)
+char
+OutputBuffer::overflow(char ch)
 {
   if (ch == EOF)
   {
