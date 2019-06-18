@@ -131,6 +131,13 @@ ResourceManager::ResourceManager() :
   UMPIRE_LOG(Debug, "() leaving");
 }
 
+ResourceManager::~ResourceManager()
+{
+  for (auto&& allocator : m_allocators) {
+    allocator.reset();
+  }
+}
+
 void
 ResourceManager::initialize()
 {

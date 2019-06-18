@@ -234,13 +234,12 @@ class ResourceManager {
      */
     std::size_t getSize(void* ptr) const;
 
+    ~ResourceManager();
+    ResourceManager (const ResourceManager&) = delete;
+    ResourceManager& operator= (const ResourceManager&) = delete;
   private:
     ResourceManager();
 
-    ~ResourceManager() = default;
-
-    ResourceManager (const ResourceManager&) = delete;
-    ResourceManager& operator= (const ResourceManager&) = delete;
 
     strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
     strategy::AllocationStrategy* findAllocatorForId(int id);
