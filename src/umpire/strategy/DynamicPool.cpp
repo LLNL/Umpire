@@ -197,6 +197,33 @@ DynamicPool::getPlatform() noexcept
 void DynamicPool::coalesce() noexcept
 {
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
+
+  using PointerMap = std::map<Pointer, std::size_t>;
+
+  // Reverse the free chunk map
+  PointerMap free_pointer_map;
+
+  for (auto& rec : m_free_map) {
+    free_pointer_map.insert(std::make_pair(rec.second, rec.first));
+  }
+
+  // this map is iterated over from low to high in terms of key = pointer address.
+  // Colaesce these...
+
+  for (auto it = free_pointer_map.rbegin(), next_it = it; it != free_pointer_map.rend(); it = next_it) {
+    --next_it;
+    if ((next_it != free_pointer_map.rend()) &&
+        (static_cast<unsigned char*>(next_it->first) + next_it->second == it->first)) {
+      free_pointer_map.erase(std::next(it).base());
+      next_it->second += it->second;
+    }
+  }
+
+  // Now the external map may have shrunk, so rebuild the original map
+  m_free_map.clear();
+  for (auto& rec : free_pointer_map) {
+    m_free_map.insert(std::make_pair(rec.second, rec.first));
+  }
 }
 
 void
