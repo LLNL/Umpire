@@ -45,6 +45,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
             exit 1
           fi
       done < <(ctest -E replay\|io -T memcheck)
+      echo "No leaks detected!"
     fi
 fi
 
