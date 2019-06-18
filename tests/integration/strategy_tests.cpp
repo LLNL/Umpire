@@ -39,6 +39,8 @@
 #include <omp.h>
 #endif
 
+static short alignment = 16;
+
 static int unique_pool_name = 0;
 static int initial_min_size = 1024;
 static int subsequent_min_size = 512;
@@ -418,7 +420,7 @@ TEST(HeuristicTest, EdgeCases_75)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_75", rm.getAllocator("HOST"),
-      1024ul, 1024ul, h_fun);
+      1024ul, 1024ul, alignment, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
   auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
@@ -462,7 +464,7 @@ TEST(HeuristicTest, EdgeCases_100)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_100", rm.getAllocator("HOST"),
-      initial_min_size, subsequent_min_size, h_fun);
+      initial_min_size, subsequent_min_size, alignment, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
   auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
@@ -527,7 +529,7 @@ TEST(HeuristicTest, EdgeCases_0)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_0", rm.getAllocator("HOST"),
-      initial_min_size, subsequent_min_size, h_fun);
+      initial_min_size, subsequent_min_size, alignment, h_fun);
 
   auto strategy = alloc.getAllocationStrategy();
   auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);

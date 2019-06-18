@@ -43,6 +43,7 @@ int main(int, char**) {
                             , allocator
                             , 1024ul
                             , 1024ul
+                            , 16
                             , heuristic_function);
 
   //

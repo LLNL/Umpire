@@ -21,9 +21,11 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
+#include "umpire/util/MemoryMap.hpp"
 
 #include "umpire/Allocator.hpp"
+
+#include <map>
 
 namespace umpire {
 namespace strategy {
@@ -65,8 +67,9 @@ class DynamicPool :
         const std::string& name,
         int id,
         Allocator allocator,
-        const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
+        const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
+        const short align_bytes = 8,
         Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     ~DynamicPool();
@@ -108,60 +111,18 @@ class DynamicPool :
     void coalesce() noexcept;
 
   private:
-  struct Block
-  {
-    char *data;
-    std::size_t size;
-    std::size_t blockSize;
-    Block *next;
-  };
+  using Pointer = void*;
+  using AddressMap = util::MemoryMap<std::size_t>;
+  using SizeMap = std::map<std::size_t, Pointer>;
 
-  // Allocator for the underlying data
-  umpire::util::FixedMallocPool blockPool;
-
-  // Start of the nodes of used and free block lists
-  struct Block *usedBlocks;
-  struct Block *freeBlocks;
-
-  // Total blocks in the pool
-  std::size_t totalBlocks;
-
-  // Total size allocated (bytes)
-  std::size_t totalBytes;
-
-  // Allocated size (bytes)
-  std::size_t allocBytes;
-
-  // Minimum size of initial allocation
-  std::size_t minInitialBytes;
-
-  // Minimum size for allocations
-  std::size_t minBytes;
-
-  // High water mark of allocations
-  std::size_t highWatermark;
-
-  // Pointer to our allocator's allocation strategy
   strategy::AllocationStrategy* m_allocator;
-
-  // Heuristic to use for coalescing
-  Coalesce_Heuristic do_coalesce;
-
-  // Search the list of free blocks and return a usable one if that exists, else NULL
-  void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size);
-
-  // Allocate a new block and add it to the list of free blocks
-  void allocateBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
-
-  void splitBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
-
-  void releaseBlock(struct Block *curr, struct Block *prev);
-
-  std::size_t freeReleasedBlocks();
-
-  void coalesceFreeBlocks(std::size_t size);
-
-  void freeAllBlocks();
+  const std::size_t m_min_alloc_bytes;
+  const short m_align_bytes;
+  AddressMap m_used_map;
+  SizeMap m_free_map;
+  std::size_t m_curr_bytes;
+  std::size_t m_actual_bytes;
+  std::size_t m_highwatermark;
 };
 
 } // end of namespace strategy

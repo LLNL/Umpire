@@ -95,6 +95,9 @@ public:
   // Insert a new Value at ptr
   Iterator insert(Key ptr, const Value& val);
 
+  template<typename P>
+  Iterator insert(P&& pair);
+
   // Find a value -- returns what would be the entry immediately before ptr
   ConstIterator findOrBefore(Key ptr) const noexcept;
   Iterator findOrBefore(Key ptr) noexcept;

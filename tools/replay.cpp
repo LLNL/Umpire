@@ -42,6 +42,8 @@
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "umpire/tpl/json/json.hpp"
 
+static constexpr short alignment = 16;
+
 static cxxopts::ParseResult parse(int argc, char* argv[])
 {
   try
@@ -421,8 +423,8 @@ class Replay {
               << ", " << min_alloc_size
               << ")";
 
-            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
-            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
+            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size, min_alloc_size, alignment, umpire::strategy::heuristic_percent_releasable(0));
+            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size, min_alloc_size, alignment, umpire::strategy::heuristic_percent_releasable(0));
           }
           else if (m_json["payload"]["args"].size() >= 2) {
             get_from_string(m_json["payload"]["args"][1], min_initial_alloc_size);

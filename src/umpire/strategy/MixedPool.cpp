@@ -19,6 +19,8 @@
 #include <cstdint>
 #include <algorithm>
 
+static constexpr short alignment = 16;
+
 namespace umpire {
 namespace strategy {
 
@@ -38,6 +40,7 @@ MixedPool::MixedPool(const std::string& name, int id,
   m_dynamic_pool("internal_dynamic_pool", -1, allocator,
                  dynamic_min_initial_alloc_size,
                  dynamic_min_alloc_size,
+                 alignment,
                  coalesce_heuristic),
   m_allocator(allocator.getAllocationStrategy())
 {

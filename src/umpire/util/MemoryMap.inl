@@ -108,6 +108,13 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::insert(Key ptr, const Value& val)
 }
 
 template <typename V>
+template <typename P>
+typename MemoryMap<V>::Iterator MemoryMap<V>::insert(P&& pair)
+{
+  return insert(pair.first, pair.second);
+}
+
+template <typename V>
 typename MemoryMap<V>::Key
 MemoryMap<V>::doFindOrBefore(Key ptr) const noexcept
 {
