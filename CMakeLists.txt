@@ -90,6 +90,7 @@ if (NOT BLT_LOADED)
 endif()
 
 include(cmake/SetupCMakeBasics.cmake)
+include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
 configure_file(
