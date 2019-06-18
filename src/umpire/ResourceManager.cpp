@@ -149,7 +149,7 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance();
 
   {
-    auto host_allocator{registry.makeMemoryResource("HOST", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy> host_allocator{registry.makeMemoryResource("HOST", getNextId())};
     int id{host_allocator->getId()};
     m_allocators_by_name["HOST"]  = host_allocator.get();
     m_memory_resources[resource::Host] = host_allocator.get();
@@ -178,7 +178,7 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   {
-    auto allocator{registry.makeMemoryResource("DEVICE", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("DEVICE", getNextId())};
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE"] = allocator.get();
     m_memory_resources[resource::Device] = allocator.get();
@@ -189,7 +189,7 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_PINNED)
   {
-    auto allocator{registry.makeMemoryResource("PINNED", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("PINNED", getNextId())};
     int id{allocator->getId()};
     m_allocators_by_name["PINNED"] = allocator.get();
     m_memory_resources[resource::Pinned] = allocator.get();
@@ -200,7 +200,7 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_UM)
   {
-    auto allocator{registry.makeMemoryResource("UM", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("UM", getNextId())};
     int id{allocator->getId()};
     m_allocators_by_name["UM"] = allocator.get();
     m_memory_resources[resource::Unified] = allocator.get();
@@ -211,7 +211,7 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   {
-    auto allocator{registry.makeMemoryResource("DEVICE_CONST", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("DEVICE_CONST", getNextId())};
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE_CONST"] = allocator.get();
     m_memory_resources[resource::Constant] = allocator.get();
