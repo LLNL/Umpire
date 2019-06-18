@@ -96,6 +96,8 @@ and a dynamic pool for those that are larger.
 - Fix CodeCov reporting by explicitly downloading older version of upload
   script.
 
+- Fix error where the MemoryMap.inl was not installed.
+
 ## [0.3.5] - 2019-06-11
 
 ### Fixed
