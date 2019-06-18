@@ -39,7 +39,7 @@
 #include <omp.h>
 #endif
 
-static short alignment = 16;
+static int alignment = 16;
 
 static int unique_pool_name = 0;
 static int initial_min_size = 1024;

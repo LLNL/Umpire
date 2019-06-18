@@ -56,9 +56,10 @@ class DynamicPool : public AllocationStrategy
      *
      * \param name Name of this instance of the DynamicPool.
      * \param id Id of this instance of the DynamicPool.
-     * \param min_initial_alloc_size The minimum size of the first allocation
-     *                               the pool will make.
+     * \param initial_alloc_size The minimum size of the first allocation
+     *                           the pool will make.
      * \param min_alloc_size The minimum size of all future allocations.
+     * \param align_bytes Number of bytes with which to align allocation sizes.
      * \param coalesce_heuristic Heuristic callback function.
      */
     DynamicPool(
@@ -67,7 +68,7 @@ class DynamicPool : public AllocationStrategy
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        const short align_bytes = 16,
+        const int align_bytes = 16,
         Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     ~DynamicPool();
@@ -120,7 +121,7 @@ class DynamicPool : public AllocationStrategy
 
     strategy::AllocationStrategy* m_allocator;
     const std::size_t m_min_alloc_bytes;
-    const short m_align_bytes;
+    const int m_align_bytes;
     Coalesce_Heuristic m_do_coalesce;
     AddressMap m_used_map;
     SizeMap m_free_map;

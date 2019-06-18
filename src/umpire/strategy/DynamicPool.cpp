@@ -36,7 +36,7 @@ DynamicPool::DynamicPool(const std::string& name,
                          Allocator allocator,
                          const std::size_t initial_alloc_bytes,
                          const std::size_t min_alloc_bytes,
-                         const short align_bytes,
+                         const int align_bytes,
                          Coalesce_Heuristic coalesce_heuristic) noexcept :
   AllocationStrategy(name, id),
   m_allocator{allocator.getAllocationStrategy()},
