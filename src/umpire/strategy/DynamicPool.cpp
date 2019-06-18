@@ -58,8 +58,6 @@ DynamicPool::DynamicPool(const std::string& name,
 
 DynamicPool::~DynamicPool()
 {
-  for (auto& rec : m_free_map) m_allocator->deallocate(rec.second);
-  for (auto& rec : m_used_map) m_allocator->deallocate(rec.first);
 }
 
 void*
@@ -75,6 +73,9 @@ DynamicPool::allocate(std::size_t bytes)
     ptr = iter->second;
     // Add used map
     m_used_map.insert(std::make_pair(ptr, actual_bytes));
+
+    // Remove the entry from the free map
+    m_free_map.erase(iter);
 
     m_curr_bytes += actual_bytes;
 
@@ -201,8 +202,11 @@ void DynamicPool::coalesce() noexcept
 void
 DynamicPool::release()
 {
-  for (auto& rec : m_free_map)
+  for (auto& rec : m_free_map) {
+    m_curr_bytes -= rec.first;
+    m_actual_bytes -= rec.first;
     m_allocator->deallocate(rec.second);
+  }
 
   m_free_map.clear();
 }

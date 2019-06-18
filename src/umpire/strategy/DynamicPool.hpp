@@ -113,7 +113,7 @@ class DynamicPool :
   private:
   using Pointer = void*;
   using AddressMap = util::MemoryMap<std::size_t>;
-  using SizeMap = std::map<std::size_t, Pointer>;
+  using SizeMap = std::multimap<std::size_t, Pointer>;
 
   strategy::AllocationStrategy* m_allocator;
   const std::size_t m_min_alloc_bytes;
