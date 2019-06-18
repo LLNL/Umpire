@@ -111,6 +111,8 @@ DynamicPool::allocate(std::size_t bytes)
     }
   }
 
+  if (m_actual_bytes > m_highwatermark) m_highwatermark = m_actual_bytes;
+
   return ptr;
 }
 
@@ -127,7 +129,7 @@ DynamicPool::deallocate(void* ptr)
 
     // Insert in free map
     const std::size_t bytes{*iter->second};
-    m_free_map.insert(SizeMap::value_type{bytes, iter->first});
+    m_free_map.insert(std::make_pair(bytes, iter->first));
 
     // remove from used map
     m_used_map.erase(iter);
@@ -210,13 +212,18 @@ void DynamicPool::coalesce() noexcept
   // this map is iterated over from low to high in terms of key = pointer address.
   // Colaesce these...
 
-  for (auto it = free_pointer_map.rbegin(), next_it = it; it != free_pointer_map.rend(); it = next_it) {
-    --next_it;
-    if ((next_it != free_pointer_map.rend()) &&
-        (static_cast<unsigned char*>(next_it->first) + next_it->second == it->first)) {
-      free_pointer_map.erase(std::next(it).base());
+  auto it = free_pointer_map.rbegin();
+  auto next_it = it;
+  auto end = free_pointer_map.rend();
+  if (next_it != end) { it = next_it; next_it--; }
+  while (next_it != end) {
+    if (static_cast<unsigned char*>(next_it->first) + next_it->second == it->first) {
       next_it->second += it->second;
+      // The std::next(it).base() is needed because it is a reverse iterator
+      free_pointer_map.erase(std::next(it).base());
     }
+    it = next_it;
+    --next_it;
   }
 
   // Now the external map may have shrunk, so rebuild the original map

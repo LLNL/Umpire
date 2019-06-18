@@ -406,7 +406,14 @@ TEST(DynamicPool, coalesce)
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_pool_for_release", rm.getAllocator("HOST"));
 
-  auto* dynamic_pool = static_cast<umpire::strategy::DynamicPool*>(alloc.getAllocationStrategy());
+  auto strategy = alloc.getAllocationStrategy();
+  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
+
+  if (tracker) {
+    strategy = tracker->getAllocationStrategy();
+  }
+
+  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
 
   void* ptr_one = alloc.allocate(62);
   void* ptr_two = alloc.allocate(1024);

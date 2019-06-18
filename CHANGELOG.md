@@ -58,6 +58,8 @@ and a dynamic pool for those that are larger.
 
 - Use RAII locks with `std::lock_guard`.
 
+- `DynamicPool` is significantly faster.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
