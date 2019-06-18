@@ -35,7 +35,7 @@ public:
 
 private:
   bool isValidMemoryResourceFor(const std::string& name) noexcept;
-  resource::MemoryResource* create(const std::string& name, int id);
+    std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id);
 
   const std::string replacement;
   const std::vector<unsigned int> devices;

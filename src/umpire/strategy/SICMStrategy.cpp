@@ -28,8 +28,8 @@ sicm_device_list SICMStrategy::m_devices = sicm_init();
 SICMStrategy::SICMStrategy(
     const std::string& name,
     int id,
-    size_t device_index,
-    size_t max_size) :
+    std::size_t device_index,
+    std::size_t max_size) :
   AllocationStrategy(name, id),
   m_index(device_index),
   m_max_size(max_size),
@@ -64,13 +64,13 @@ SICMStrategy::deallocate(void* ptr)
   sicm_free(ptr);
 }
 
-long
+std::size_t
 SICMStrategy::getCurrentSize() const noexcept
 {
   return sicm_arena_size(m_arena);
 }
 
-long
+std::size_t
 SICMStrategy::getHighWatermark() const noexcept
 {
   return m_max_size?m_max_size:sicm_arena_size(m_arena);
@@ -82,7 +82,7 @@ SICMStrategy::getPlatform() noexcept
   return Platform::sicm;
 }
 
-size_t
+std::size_t
 SICMStrategy::getDeviceIndex() const noexcept
 {
   return m_index;

@@ -97,7 +97,6 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::cpu, Platform::cpu),
       std::make_shared<HostReallocateOperation>());
-
 #if defined(UMPIRE_ENABLE_NUMA)
   registerOperation(
       "MOVE",
@@ -217,6 +216,8 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
+#endif
+
 #endif
 }
 

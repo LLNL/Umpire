@@ -20,7 +20,7 @@ void allocate_and_deallocate_pool(
 
   auto allocator = rm.getAllocator(resource);
 
-  auto pooled_allocator = 
+  auto pooled_allocator =
     rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
                                                     allocator,
                                                     initial_size, /* default = 512Mb*/

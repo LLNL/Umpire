@@ -19,6 +19,7 @@
 #include "umpire/alloc/SICMAllocator.hpp"
 
 #include "umpire/util/detect_vendor.hpp"
+#include "umpire/util/make_unique.hpp"
 
 #include <numa.h>
 
@@ -43,7 +44,7 @@ SICMResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
   return (replacement.compare(name) == 0);
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 SICMResourceFactory::create(const std::string& name, int id)
 {
   MemoryResourceTraits traits;
@@ -61,7 +62,7 @@ SICMResourceFactory::create(const std::string& name, int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new DefaultMemoryResource<alloc::SICMAllocator>(Platform::sicm, name, id, traits, name, devices, chooser);
+  return util::make_unique<DefaultMemoryResource<alloc::SICMAllocator>>(Platform::sicm, name, id, traits, name, devices, chooser);
 }
 
 } // end of namespace resource

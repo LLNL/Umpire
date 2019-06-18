@@ -41,24 +41,24 @@ class SICMStrategy :
     SICMStrategy(
         const std::string& name,
         int id,
-        size_t device_index,
-        size_t max_size = 0);
+        std::size_t device_index,
+        std::size_t max_size = 0);
 
     ~SICMStrategy();
 
     void* allocate(size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
 
-    size_t getDeviceIndex() const noexcept;
+    std::size_t getDeviceIndex() const noexcept;
 
   private:
-    size_t m_index;
-    size_t m_max_size;
+    std::size_t m_index;
+    std::size_t m_max_size;
     sicm_arena m_arena;
 
     static sicm_device_list m_devices;

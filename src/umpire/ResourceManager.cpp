@@ -108,10 +108,8 @@ ResourceManager::ResourceManager() :
 #endif
 
 #if defined(UMPIRE_ENABLE_SICM)
-  const std::vector<unsigned int> host_devices = sicm::get_devices(devs, Platform::cpu);
-
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("HOST", sicm::get_devices(devs, Platform::cpu), sicm::best_device)));
+    util::make_unique<resource::SICMResourceFactory>("HOST", sicm::get_devices(devs, Platform::cpu), sicm::best_device));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::HostResourceFactory>());
