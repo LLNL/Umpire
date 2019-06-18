@@ -44,7 +44,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
             cat Testing/Temporary/MemoryChecker.*.log
             exit 1
           fi
-      done < <(ctest -E replay -T memcheck)
+      done < <(ctest -E replay\|io -T memcheck)
     fi
 fi
 

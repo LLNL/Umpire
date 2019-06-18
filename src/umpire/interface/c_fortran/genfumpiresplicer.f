@@ -91,6 +91,7 @@ subroutine allocator_allocate_int_array_1d(this, array, dims)
 
       num_bytes = product(dims) * sizeof(size_type)
       data_ptr = this%allocate_pointer(num_bytes)
+
       call c_f_pointer(data_ptr, array, dims)
 end subroutine allocator_allocate_int_array_1d
 
