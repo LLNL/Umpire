@@ -404,28 +404,36 @@ TEST(DynamicPool, coalesce)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_pool_for_release", rm.getAllocator("HOST"));
+      "host_pool_for_coalesce", rm.getAllocator("HOST"));
 
   auto strategy = alloc.getAllocationStrategy();
   auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
+  if (tracker) strategy = tracker->getAllocationStrategy();
 
   auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+
+  const std::size_t initial_bytes{dynamic_pool->getActualSize()};
 
   void* ptr_one = alloc.allocate(62);
   void* ptr_two = alloc.allocate(1024);
 
   ASSERT_GT(dynamic_pool->getBlocksInPool(), 2);
 
-  alloc.deallocate(ptr_one);
   alloc.deallocate(ptr_two);
 
   dynamic_pool->coalesce();
 
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+
+  alloc.deallocate(ptr_one);
+
+  dynamic_pool->coalesce();
+
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+
+  ASSERT_EQ(dynamic_pool->getCurrentSize(), 0);
+  ASSERT_EQ(dynamic_pool->getActualSize(), initial_bytes);
+  ASSERT_GE(dynamic_pool->getHighWatermark(), 62 + 1024);
 }
 
 // TEST(HeuristicTest, OutOfBounds)

@@ -60,7 +60,7 @@ and a dynamic pool for those that are larger.
 
 - Use RAII locks with `std::lock_guard`.
 
-- `DynamicPool` is significantly faster.
+- `DynamicPool` uses maps underneath for improved performance.
 
 ### Removed
 

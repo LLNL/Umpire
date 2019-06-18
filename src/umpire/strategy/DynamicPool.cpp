@@ -21,19 +21,15 @@
 #include "umpire/Replay.hpp"
 
 #include <algorithm>
+#include <tuple>
 
-static int round_up(std::size_t num, std::size_t factor)
+static std::size_t round_up(std::size_t num, std::size_t factor)
 {
   return num + factor - 1 - (num - 1) % factor;
 }
 
 namespace umpire {
 namespace strategy {
-
-inline static std::size_t alignmentAdjust(const std::size_t size) {
-  const std::size_t AlignmentBoundary = 16;
-  return std::size_t (size + (AlignmentBoundary-1)) & ~(AlignmentBoundary-1);
-}
 
 DynamicPool::DynamicPool(const std::string& name,
                          int id,
@@ -48,20 +44,36 @@ DynamicPool::DynamicPool(const std::string& name,
   m_align_bytes{align_bytes},
   m_used_map{},
   m_free_map{},
-  m_curr_bytes{initial_alloc_bytes},
+  m_curr_bytes{0},
   m_actual_bytes{initial_alloc_bytes},
   m_highwatermark{initial_alloc_bytes}
 {
-  m_free_map.insert(
-    SizeMap::value_type{initial_alloc_bytes, m_allocator->allocate(initial_alloc_bytes)});
+  insertFree(m_allocator->allocate(initial_alloc_bytes), initial_alloc_bytes, true);
 }
 
 DynamicPool::~DynamicPool()
 {
+  // Free any unused chunks
+  for (auto& rec : m_free_map) {
+    void* addr;
+    bool is_head;
+    std::tie(addr, is_head) = rec.second;
+    // Deallocate if this is a head
+    if (is_head) m_allocator->deallocate(addr);
+  }
 }
 
-void*
-DynamicPool::allocate(std::size_t bytes)
+void DynamicPool::insertUsed(Pointer addr, std::size_t bytes, bool is_head)
+{
+  m_used_map.insert(std::make_pair(addr, std::make_pair(bytes, is_head)));
+}
+
+void DynamicPool::insertFree(Pointer addr, std::size_t bytes, bool is_head)
+{
+  m_free_map.insert(std::make_pair(bytes, std::make_pair(addr, is_head)));
+}
+
+void* DynamicPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
@@ -69,10 +81,24 @@ DynamicPool::allocate(std::size_t bytes)
   SizeMap::iterator iter{m_free_map.upper_bound(actual_bytes)};
   Pointer ptr{nullptr};
 
+  // Check if the previous element is a match
+  if (iter != m_free_map.begin()) {
+    // Back up iterator
+    --iter;
+    const std::size_t test_bytes{iter->first};
+    if (test_bytes < actual_bytes) {
+      // Too small, reset iterator to original upper_bound value
+      ++iter;
+    }
+  }
+
   if (iter != m_free_map.end()) {
-    ptr = iter->second;
+    // Found this acceptable address pair
+    bool is_head;
+    std::tie(ptr, is_head) = iter->second;
+
     // Add used map
-    m_used_map.insert(std::make_pair(ptr, actual_bytes));
+    insertUsed(ptr, actual_bytes, is_head);
 
     // Remove the entry from the free map
     m_free_map.erase(iter);
@@ -81,8 +107,7 @@ DynamicPool::allocate(std::size_t bytes)
 
     const int64_t left_bytes{static_cast<int64_t>(iter->first - actual_bytes)};
     if (left_bytes > m_align_bytes) {
-      // Add to free map
-      m_free_map.insert(SizeMap::value_type{left_bytes, static_cast<unsigned char*>(ptr) + actual_bytes});
+      insertFree(static_cast<unsigned char*>(ptr) + actual_bytes, left_bytes, false);
     }
   } else {
     // Allocate new chunk -- note that this does not check whether alignment is met
@@ -90,34 +115,31 @@ DynamicPool::allocate(std::size_t bytes)
       ptr = m_allocator->allocate(actual_bytes);
 
       // Add used
-      m_used_map.insert(std::make_pair(ptr, actual_bytes));
+      insertUsed(ptr, actual_bytes, true);
 
       m_actual_bytes += actual_bytes;
       m_curr_bytes += actual_bytes;
     } else {
       ptr = m_allocator->allocate(m_min_alloc_bytes);
-
       m_actual_bytes += m_min_alloc_bytes;
 
       // Add used
-      m_used_map.insert(std::make_pair(ptr, actual_bytes));
-
+      insertUsed(ptr, actual_bytes, true);
       m_curr_bytes += actual_bytes;
 
       // Add free
       const int64_t left_bytes{static_cast<int64_t>(m_min_alloc_bytes - actual_bytes)};
       if (left_bytes > m_align_bytes)
-        m_free_map.insert(std::make_pair(left_bytes, static_cast<unsigned char*>(ptr) + actual_bytes));
+        insertFree(static_cast<unsigned char*>(ptr) + actual_bytes, left_bytes, false);
     }
   }
 
-  if (m_actual_bytes > m_highwatermark) m_highwatermark = m_actual_bytes;
+  if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
 
   return ptr;
 }
 
-void
-DynamicPool::deallocate(void* ptr)
+void DynamicPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_ASSERT(ptr);
@@ -127,9 +149,12 @@ DynamicPool::deallocate(void* ptr)
   if (iter->second) {
     // Fast way to check if key was found
 
+    std::size_t bytes;
+    bool is_head;
+    std::tie(bytes, is_head) = *iter->second;
+
     // Insert in free map
-    const std::size_t bytes{*iter->second};
-    m_free_map.insert(std::make_pair(bytes, iter->first));
+    insertFree(ptr, bytes, is_head);
 
     // remove from used map
     m_used_map.erase(iter);
@@ -190,8 +215,7 @@ std::size_t DynamicPool::getInUseBlocks() const
   return m_used_map.size();
 }
 
-Platform
-DynamicPool::getPlatform() noexcept
+Platform DynamicPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }
@@ -200,13 +224,20 @@ void DynamicPool::coalesce() noexcept
 {
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
-  using PointerMap = std::map<Pointer, std::size_t>;
+  // TODO This could be a MemoryMap if it supported reverse iterators and std::next()
+  using PointerMap = std::map<Pointer, SizePair>;
+
+  if (m_free_map.size() == 0) return;
 
   // Reverse the free chunk map
   PointerMap free_pointer_map;
 
   for (auto& rec : m_free_map) {
-    free_pointer_map.insert(std::make_pair(rec.second, rec.first));
+    const std::size_t bytes{rec.first};
+    Pointer ptr;
+    bool is_head;
+    std::tie(ptr, is_head) = rec.second;
+    free_pointer_map.insert(std::make_pair(ptr, std::make_pair(bytes, is_head)));
   }
 
   // this map is iterated over from low to high in terms of key = pointer address.
@@ -215,34 +246,50 @@ void DynamicPool::coalesce() noexcept
   auto it = free_pointer_map.rbegin();
   auto next_it = it;
   auto end = free_pointer_map.rend();
-  if (next_it != end) { it = next_it; next_it--; }
+
+  if (next_it != end) next_it++;
+
   while (next_it != end) {
-    if (static_cast<unsigned char*>(next_it->first) + next_it->second == it->first) {
-      next_it->second += it->second;
+    const bool contiguous{static_cast<unsigned char*>(next_it->first) + next_it->second.first == it->first};
+    const bool was_head{it->second.second};
+    if (contiguous && !was_head) {
+      next_it->second.first += it->second.first;
       // The std::next(it).base() is needed because it is a reverse iterator
       free_pointer_map.erase(std::next(it).base());
     }
     it = next_it;
-    --next_it;
+    ++next_it;
   }
 
   // Now the external map may have shrunk, so rebuild the original map
   m_free_map.clear();
   for (auto& rec : free_pointer_map) {
-    m_free_map.insert(std::make_pair(rec.second, rec.first));
+    Pointer ptr{rec.first};
+    std::size_t bytes;
+    bool is_head;
+    std::tie(bytes, is_head) = rec.second;
+    insertFree(ptr, bytes, is_head);
   }
 }
 
-void
-DynamicPool::release()
+void DynamicPool::release()
 {
-  for (auto& rec : m_free_map) {
-    m_curr_bytes -= rec.first;
-    m_actual_bytes -= rec.first;
-    m_allocator->deallocate(rec.second);
-  }
+  UMPIRE_LOG(Debug, "()");
 
-  m_free_map.clear();
+  // Coalesce first so that we are able to release the most memory possible
+  coalesce();
+
+  for (auto& rec : m_free_map) {
+    std::size_t bytes{rec.first};
+    Pointer ptr;
+    bool is_head;
+    std::tie(ptr, is_head) = rec.second;
+    if (is_head) {
+      m_curr_bytes -= bytes;
+      m_actual_bytes -= bytes;
+      m_allocator->deallocate(ptr);
+    }
+  }
 }
 
 } // end of namespace strategy

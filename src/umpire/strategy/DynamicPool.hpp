@@ -15,10 +15,6 @@
 #ifndef UMPIRE_DynamicPool_HPP
 #define UMPIRE_DynamicPool_HPP
 
-#include <memory>
-#include <vector>
-#include <functional>
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/util/MemoryMap.hpp"
@@ -26,6 +22,7 @@
 #include "umpire/Allocator.hpp"
 
 #include <map>
+#include <utility>
 
 namespace umpire {
 namespace strategy {
@@ -41,10 +38,11 @@ namespace strategy {
  * and the minimum size controls the lower bound on all future chunk
  * allocations.
  */
-class DynamicPool :
-  public AllocationStrategy
+class DynamicPool : public AllocationStrategy
 {
   public:
+    using Pointer = void*;
+
     /*!
      * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
      *
@@ -69,7 +67,7 @@ class DynamicPool :
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        const short align_bytes = 8,
+        const short align_bytes = 16,
         Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     ~DynamicPool();
@@ -111,18 +109,22 @@ class DynamicPool :
     void coalesce() noexcept;
 
   private:
-  using Pointer = void*;
-  using AddressMap = util::MemoryMap<std::size_t>;
-  using SizeMap = std::multimap<std::size_t, Pointer>;
+    using SizePair = std::pair<std::size_t, bool>;
+    using AddressPair = std::pair<Pointer, bool>;
+    using AddressMap = util::MemoryMap<SizePair>;
+    using SizeMap = std::multimap<std::size_t, AddressPair>;
 
-  strategy::AllocationStrategy* m_allocator;
-  const std::size_t m_min_alloc_bytes;
-  const short m_align_bytes;
-  AddressMap m_used_map;
-  SizeMap m_free_map;
-  std::size_t m_curr_bytes;
-  std::size_t m_actual_bytes;
-  std::size_t m_highwatermark;
+    void insertUsed(Pointer addr, std::size_t bytes, bool is_head);
+    void insertFree(Pointer addr, std::size_t bytes, bool is_head);
+
+    strategy::AllocationStrategy* m_allocator;
+    const std::size_t m_min_alloc_bytes;
+    const short m_align_bytes;
+    AddressMap m_used_map;
+    SizeMap m_free_map;
+    std::size_t m_curr_bytes;
+    std::size_t m_actual_bytes;
+    std::size_t m_highwatermark;
 };
 
 } // end of namespace strategy
