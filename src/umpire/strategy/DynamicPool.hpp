@@ -120,6 +120,7 @@ class DynamicPool : public AllocationStrategy
     strategy::AllocationStrategy* m_allocator;
     const std::size_t m_min_alloc_bytes;
     const short m_align_bytes;
+    Coalesce_Heuristic m_do_coalesce;
     AddressMap m_used_map;
     SizeMap m_free_map;
     std::size_t m_curr_bytes;

@@ -33,6 +33,8 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- `DynamicPool` constructor has a new alignment argument.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.

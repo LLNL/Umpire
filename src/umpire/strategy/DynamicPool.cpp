@@ -37,11 +37,12 @@ DynamicPool::DynamicPool(const std::string& name,
                          const std::size_t initial_alloc_bytes,
                          const std::size_t min_alloc_bytes,
                          const short align_bytes,
-                         Coalesce_Heuristic UMPIRE_UNUSED_ARG(coalesce_heuristic)) noexcept :
+                         Coalesce_Heuristic coalesce_heuristic) noexcept :
   AllocationStrategy(name, id),
   m_allocator{allocator.getAllocationStrategy()},
   m_min_alloc_bytes{min_alloc_bytes},
   m_align_bytes{align_bytes},
+  m_do_coalesce{coalesce_heuristic},
   m_used_map{},
   m_free_map{},
   m_curr_bytes{0},
@@ -162,6 +163,12 @@ void DynamicPool::deallocate(void* ptr)
     m_curr_bytes -= bytes;
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
+  }
+
+  if ( m_do_coalesce(*this) ) {
+    UMPIRE_LOG(Debug, "Heuristic returned true, "
+               "performing coalesce operation for " << this << "\n");
+    coalesce();
   }
 }
 

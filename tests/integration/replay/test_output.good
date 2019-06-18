@@ -5,9 +5,9 @@ makeAllocator <umpire::strategy::MixedPool>(host_mixedpool_spec3, getAllocator(H
 makeAllocator <umpire::strategy::MixedPool>(host_mixedpool_spec4, getAllocator(HOST), 512, 1024, 4194304, 12)
 makeAllocator <umpire::strategy::MixedPool>(host_mixedpool_spec5, getAllocator(HOST), 512, 1024, 4194304, 12, 268435456)
 makeAllocator <umpire::strategy::MixedPool>(host_mixedpool_spec6, getAllocator(HOST), 512, 1024, 4194304, 12, 268435456, 1048576)
-makeAllocator <umpire::strategy::DynamicPool>(host_simpool_defaults, getAllocator(HOST))
-makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec1, getAllocator(HOST), 9876, 1234)
-makeAllocator <umpire::strategy::DynamicPool>(host_simpool_spec2, getAllocator(HOST), 9876, 1234)
+makeAllocator <umpire::strategy::DynamicPool>(host_dyn_pool_defaults, getAllocator(HOST))
+makeAllocator <umpire::strategy::DynamicPool>(host_dyn_pool_spec1, getAllocator(HOST), 9876, 1234)
+makeAllocator <umpire::strategy::DynamicPool>(host_dyn_pool_spec2, getAllocator(HOST), 9876, 1234)
 makeAllocator <umpire::strategy::MonotonicAllocationStrategy>(MONOTONIC 1024, 1024, getAllocator(HOST))
 makeAllocator <umpire::strategy::SlotPool>(host_slot_pool, 64, getAllocator(HOST))
 makeAllocator <umpire::strategy::ThreadSafeAllocator>(thread_safe_allocator, getAllocator(HOST))
@@ -18,9 +18,9 @@ allocate (20) host_mixedpool_spec3 --> 4
 allocate (21) host_mixedpool_spec4 --> 5
 allocate (22) host_mixedpool_spec5 --> 6
 allocate (23) host_mixedpool_spec6 --> 7
-allocate (24) host_simpool_defaults --> 8
-allocate (25) host_simpool_spec1 --> 9
-allocate (26) host_simpool_spec2 --> 10
+allocate (24) host_dyn_pool_defaults --> 8
+allocate (25) host_dyn_pool_spec1 --> 9
+allocate (26) host_dyn_pool_spec2 --> 10
 allocate (27) MONOTONIC 1024 --> 11
 allocate (28) host_slot_pool --> 12
 allocate (29) thread_safe_allocator --> 13
@@ -31,9 +31,9 @@ allocate (33) host_mixedpool_spec3 --> 17
 allocate (34) host_mixedpool_spec4 --> 18
 allocate (35) host_mixedpool_spec5 --> 19
 allocate (36) host_mixedpool_spec6 --> 20
-allocate (37) host_simpool_defaults --> 21
-allocate (38) host_simpool_spec1 --> 22
-allocate (39) host_simpool_spec2 --> 23
+allocate (37) host_dyn_pool_defaults --> 21
+allocate (38) host_dyn_pool_spec1 --> 22
+allocate (39) host_dyn_pool_spec2 --> 23
 allocate (40) MONOTONIC 1024 --> 24
 allocate (41) host_slot_pool --> 25
 allocate (42) thread_safe_allocator --> 26
@@ -44,13 +44,13 @@ allocate (46) host_mixedpool_spec3 --> 30
 allocate (47) host_mixedpool_spec4 --> 31
 allocate (48) host_mixedpool_spec5 --> 32
 allocate (49) host_mixedpool_spec6 --> 33
-allocate (50) host_simpool_defaults --> 34
-allocate (51) host_simpool_spec1 --> 35
-allocate (52) host_simpool_spec2 --> 36
+allocate (50) host_dyn_pool_defaults --> 34
+allocate (51) host_dyn_pool_spec1 --> 35
+allocate (52) host_dyn_pool_spec2 --> 36
 allocate (53) MONOTONIC 1024 --> 37
 allocate (54) host_slot_pool --> 38
 allocate (55) thread_safe_allocator --> 39
-coalesce host_simpool_spec1
+coalesce host_dyn_pool_spec1
 deallocate host_mixedpool_default(1)
 deallocate host_mixedpool_spec1(2)
 deallocate host_mixedpool_spec2(3)
@@ -58,9 +58,9 @@ deallocate host_mixedpool_spec3(4)
 deallocate host_mixedpool_spec4(5)
 deallocate host_mixedpool_spec5(6)
 deallocate host_mixedpool_spec6(7)
-deallocate host_simpool_defaults(8)
-deallocate host_simpool_spec1(9)
-deallocate host_simpool_spec2(10)
+deallocate host_dyn_pool_defaults(8)
+deallocate host_dyn_pool_spec1(9)
+deallocate host_dyn_pool_spec2(10)
 deallocate MONOTONIC 1024(11)
 deallocate host_slot_pool(12)
 deallocate thread_safe_allocator(13)
@@ -71,25 +71,35 @@ deallocate host_mixedpool_spec3(17)
 deallocate host_mixedpool_spec4(18)
 deallocate host_mixedpool_spec5(19)
 deallocate host_mixedpool_spec6(20)
-deallocate host_simpool_defaults(21)
-deallocate host_simpool_spec1(22)
-deallocate host_simpool_spec2(23)
+deallocate host_dyn_pool_defaults(21)
+deallocate host_dyn_pool_spec1(22)
+deallocate host_dyn_pool_spec2(23)
 deallocate MONOTONIC 1024(24)
 deallocate host_slot_pool(25)
 deallocate thread_safe_allocator(26)
 deallocate host_mixedpool_default(27)
+coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec1(28)
+coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec2(29)
+coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec3(30)
+coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec4(31)
+coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec5(32)
+coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec6(33)
-deallocate host_simpool_defaults(34)
-deallocate host_simpool_spec1(35)
-deallocate host_simpool_spec2(36)
+coalesce internal_dynamic_pool
+deallocate host_dyn_pool_defaults(34)
+coalesce host_dyn_pool_defaults
+deallocate host_dyn_pool_spec1(35)
+coalesce host_dyn_pool_spec1
+deallocate host_dyn_pool_spec2(36)
+coalesce host_dyn_pool_spec2
 deallocate MONOTONIC 1024(37)
 deallocate host_slot_pool(38)
 deallocate thread_safe_allocator(39)
-coalesce host_simpool_spec1
-release host_simpool_spec1
-coalesce host_simpool_spec1
+coalesce host_dyn_pool_spec1
+release host_dyn_pool_spec1
+coalesce host_dyn_pool_spec1
