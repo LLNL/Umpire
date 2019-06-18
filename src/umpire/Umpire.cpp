@@ -22,12 +22,6 @@
 
 namespace umpire {
 
-void print_all_records(std::ostream& os)
-{
-  umpire::ResourceManager::getInstance().m_allocations.printAll(os);
-}
-
-
 void print_allocator_records(Allocator allocator, std::ostream& os)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -53,4 +47,4 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
   return recs;
 }
 
-}
+} // end namespace umpire

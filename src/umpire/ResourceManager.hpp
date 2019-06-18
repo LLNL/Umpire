@@ -266,7 +266,6 @@ class ResourceManager {
     std::mutex m_mutex;
 
     // Methods that need access to m_allocations to print/filter records
-    friend void print_all_records(std::ostream&);
     friend void print_allocator_records(Allocator, std::ostream&);
     friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
 };

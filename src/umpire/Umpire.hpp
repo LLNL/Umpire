@@ -76,8 +76,6 @@ int get_patch_version()
   return UMPIRE_VERSION_PATCH;
 }
 
-void print_all_records(std::ostream& os = std::cout);
-
 /*!
  * \brief Print the allocations from a specific allocator in a
  * human-readable format.
