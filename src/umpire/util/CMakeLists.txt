@@ -23,6 +23,7 @@ set (umpire_util_headers
   Macros.hpp
   MemoryResourceTraits.hpp
   MemoryMap.hpp
+  MemoryMap.inl
   OutputBuffer.hpp
   Platform.hpp
   allocation_statistics.hpp
