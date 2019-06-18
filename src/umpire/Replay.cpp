@@ -29,10 +29,11 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
+#include "umpire/util/IOManager.hpp"
+
 #include "umpire/Replay.hpp"
 
 namespace umpire {
-namespace replay {
 
 static const char* env_name = "UMPIRE_REPLAY";
 int Replay::m_argument_number = 0;
@@ -50,7 +51,7 @@ void Replay::logMessage( const std::string& message )
   if ( !replayEnabled )
     return;   /* short-circuit */
 
-  std::cout << message;
+  umpire::replay << message;
 }
 
 bool Replay::replayLoggingEnabled()
@@ -76,5 +77,4 @@ std::ostream& operator<< (
   return out;
 }
 
-} /* namespace replay */
 } /* namespace umpire */

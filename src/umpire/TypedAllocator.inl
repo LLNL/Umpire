@@ -34,14 +34,14 @@ TypedAllocator<T>::TypedAllocator(const TypedAllocator<U>& other) :
 
 template<typename T>
 T* 
-TypedAllocator<T>::allocate(size_t size)
+TypedAllocator<T>::allocate(std::size_t size)
 {
   return static_cast<T*>(m_allocator.allocate(sizeof(T)*size));
 }
 
 template<typename T>
 void 
-TypedAllocator<T>::deallocate(T* ptr, size_t UMPIRE_UNUSED_ARG(size))
+TypedAllocator<T>::deallocate(T* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   m_allocator.deallocate(ptr);
 }

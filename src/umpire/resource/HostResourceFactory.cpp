@@ -52,8 +52,8 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   // mib[0] = CTL_HW;
   // mib[1] = HW_MEMSIZE;
 
-  // size_t mem_size;
-  // size_t returnSize = sizeof(mem_size);
+  // std::size_t mem_size;
+  // std::size_t returnSize = sizeof(mem_size);
   // sysctl(mib, 2, &physicalMem, &returnSize, NULL, 0);
 
   traits.unified = false;

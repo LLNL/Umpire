@@ -30,7 +30,7 @@ m_allocator(std::move(allocator))
 }
 
 void*
-AllocationTracker::allocate(size_t bytes)
+AllocationTracker::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
 
@@ -52,19 +52,19 @@ AllocationTracker::release()
   m_allocator->release();
 }
 
-long
+std::size_t
 AllocationTracker::getCurrentSize() const noexcept
 {
   return m_current_size;
 }
 
-long
+std::size_t
 AllocationTracker::getHighWatermark() const noexcept
 {
   return m_high_watermark;
 }
 
-long
+std::size_t
 AllocationTracker::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();

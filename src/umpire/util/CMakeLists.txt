@@ -15,15 +15,18 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
-  allocation_statistics.hpp
-  detect_vendor.hpp
   Exception.hpp
   FixedMallocPool.hpp
+  IOManager.hpp
   Logger.hpp
+  MPI.hpp
   Macros.hpp
   MemoryResourceTraits.hpp
   MemoryMap.hpp
-  Platform.hpp)
+  OutputBuffer.hpp
+  Platform.hpp
+  allocation_statistics.hpp
+  detect_vendor.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -41,11 +44,14 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
-  allocation_statistics.cpp
-  detect_vendor.cpp
   Exception.cpp
   FixedMallocPool.cpp
-  Logger.cpp)
+  IOManager.cpp
+  Logger.cpp
+  MPI.cpp
+  OutputBuffer.cpp
+  allocation_statistics.cpp
+  detect_vendor.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources
@@ -79,6 +85,12 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
     ${umpire_util_depends}
     slic)
 endif()
+
+if (ENABLE_MPI)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    mpi)
+endif ()
 
 blt_add_library(
   NAME umpire_util

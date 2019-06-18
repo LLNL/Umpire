@@ -26,9 +26,9 @@ void CudaCopyFromOperation::transform(
     void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
-    size_t length)
+    std::size_t length)
 {
-  cudaError_t error = 
+  cudaError_t error =
     ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost);
 
   if (error != cudaSuccess) {

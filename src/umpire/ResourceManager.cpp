@@ -53,6 +53,9 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/IOManager.hpp"
+
 #include <iterator>
 #include <sstream>
 #include <memory>
@@ -80,6 +83,10 @@ ResourceManager::ResourceManager() :
   m_mutex()
 {
   UMPIRE_LOG(Debug, "() entering");
+
+  util::MPI::initialize();
+  util::IOManager::initialize();
+
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
 
@@ -120,6 +127,7 @@ ResourceManager::ResourceManager() :
 #endif
 
   initialize();
+
   UMPIRE_LOG(Debug, "() leaving");
 }
 
@@ -244,11 +252,11 @@ ResourceManager::getAllocator(const char* name)
 Allocator
 ResourceManager::getAllocator(resource::MemoryResourceType resource_type)
 {
-  UMPIRE_LOG(Debug, "(\"" << static_cast<size_t>(resource_type) << "\")");
+  UMPIRE_LOG(Debug, "(\"" << static_cast<std::size_t>(resource_type) << "\")");
 
   auto allocator = m_memory_resources.find(resource_type);
   if (allocator == m_memory_resources.end()) {
-    UMPIRE_ERROR("Allocator \"" << static_cast<size_t>(resource_type)
+    UMPIRE_ERROR("Allocator \"" << static_cast<std::size_t>(resource_type)
         << "\" not found. Available allocators: " << getAllocatorInformation());
   }
 
@@ -353,7 +361,7 @@ ResourceManager::isAllocatorRegistered(const std::string& name)
   return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
 
-void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
+void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 
@@ -382,7 +390,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
-void ResourceManager::memset(void* ptr, int value, size_t length)
+void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
 
@@ -409,7 +417,7 @@ void ResourceManager::memset(void* ptr, int value, size_t length)
 }
 
 void*
-ResourceManager::reallocate(void* src_ptr, size_t size)
+ResourceManager::reallocate(void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
@@ -438,7 +446,7 @@ ResourceManager::reallocate(void* src_ptr, size_t size)
 }
 
 void*
-ResourceManager::reallocate(void* src_ptr, size_t size, Allocator allocator)
+ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
@@ -503,7 +511,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
       auto src_alloc_record = m_allocations.find(ptr);
 
-      const size_t size = src_alloc_record->m_size;
+      const std::size_t size = src_alloc_record->m_size;
       util::AllocationRecord dst_alloc_record;
       dst_alloc_record.m_size = src_alloc_record->m_size;
       dst_alloc_record.m_strategy = numa_alloc;
@@ -532,7 +540,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
     UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->ptr);
   }
 
-  size_t size = alloc_record->size;
+  std::size_t size = alloc_record->size;
   void* dst_ptr = allocator.allocate(size);
 
   copy(dst_ptr, ptr);
@@ -550,7 +558,7 @@ void ResourceManager::deallocate(void* ptr)
   allocator->deallocate(ptr);
 }
 
-size_t
+std::size_t
 ResourceManager::getSize(void* ptr) const
 {
   auto record = m_allocations.find(ptr);

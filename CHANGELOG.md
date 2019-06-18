@@ -31,6 +31,8 @@ and a dynamic pool for those that are larger.
 
 - GCC 4.9 build to Travis CI.
 
+- Added a new IOManager that stores logging and replay output to files.
+
 ### Changed
 
 - Replay uses JSON format for its I/O.
@@ -58,6 +60,8 @@ and a dynamic pool for those that are larger.
 
 - Use unique_ptr internally to ensure cleanup at end of program.
 
+- Use RAII locks with `std::lock_guard`.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
@@ -67,6 +71,8 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Enabled pedantic compiler warnings and fixed errors.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives

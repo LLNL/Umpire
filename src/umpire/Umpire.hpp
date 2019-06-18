@@ -17,6 +17,9 @@
 
 #include "umpire/config.hpp"
 
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/IOManager.hpp"
+
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/Allocator.hpp"
@@ -36,7 +39,7 @@ namespace umpire {
  * \param size Number of bytes to allocate.
  */
 inline
-void* malloc(size_t size)
+void* malloc(std::size_t size)
 {
   return ResourceManager::getInstance().getDefaultAllocator().allocate(size);
 }

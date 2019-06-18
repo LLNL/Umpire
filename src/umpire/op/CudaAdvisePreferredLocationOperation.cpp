@@ -26,7 +26,7 @@ CudaAdvisePreferredLocationOperation::apply(
     void* src_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     int val,
-    size_t length)
+    std::size_t length)
 {
   int device = val;
   cudaError_t error;
@@ -36,11 +36,11 @@ CudaAdvisePreferredLocationOperation::apply(
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
-        << " failed with error: " 
+        << " failed with error: "
         << cudaGetErrorString(error));
   }
 
-  if (properties.managedMemory == 1 
+  if (properties.managedMemory == 1
       && properties.concurrentManagedAccess == 1) {
 
     error = ::cudaMemAdvise(

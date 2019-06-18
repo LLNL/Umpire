@@ -23,7 +23,7 @@ namespace op {
 /*!
  * Generic reallocate operation to work on any src_ptr location.
  */
-class GenericReallocateOperation : 
+class GenericReallocateOperation :
   public MemoryOperation {
  public:
    /*!
@@ -40,11 +40,10 @@ class GenericReallocateOperation :
       void** dst_ptr,
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
-      size_t length);
+      std::size_t length);
 };
 
 } // end of naemspace op
 } // end of namespace umpire
 
 #endif // UMPIRE_GenericReallocateOperation_HPP
-

@@ -17,7 +17,7 @@
 
 void allocate_and_deallocate(const std::string& resource)
 {
-  constexpr size_t SIZE = 1024;
+  constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 

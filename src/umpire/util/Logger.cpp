@@ -12,16 +12,18 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/Logger.hpp"
 
-#include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
+#include "umpire/util/Logger.hpp"
+#include "umpire/util/IOManager.hpp"
+
 #if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
 #else
 #define strcasecmp _stricmp
 #endif
 
+#include <iostream>   // for std::cout, std::cerr
+#include <stdlib.h>   // for getenv()
 
 namespace umpire {
 namespace util {
@@ -71,7 +73,7 @@ void Logger::logMessage( message::Level level,
   if ( !logLevelEnabled( level ) )
     return;   /* short-circuit */
 
-  std::cout
+  umpire::log
     << "[" << MessageLevelName[ level ] << "]"
     << "[" << fileName  << ":" << line << "]:"
     << message

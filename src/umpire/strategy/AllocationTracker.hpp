@@ -34,15 +34,15 @@ class AllocationTracker :
         int id,
         std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
 
     void deallocate(void* ptr);
 
     void release();
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
+    std::size_t getActualSize() const noexcept;
 
     Platform getPlatform() noexcept;
 

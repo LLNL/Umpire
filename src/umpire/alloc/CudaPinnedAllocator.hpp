@@ -22,7 +22,7 @@ namespace alloc {
 
 struct CudaPinnedAllocator
 {
-  void* allocate(size_t bytes)
+  void* allocate(std::size_t bytes)
   {
     void* ptr = nullptr;
     cudaError_t error = ::cudaMallocHost(&ptr, bytes);

@@ -24,7 +24,6 @@
 #include "umpire/util/MemoryMap.hpp"
 
 #include <cstdint>
-#include <mutex>
 #include <iostream>
 #include <iterator>
 #include <functional>
@@ -75,14 +74,14 @@ public:
   ConstIterator begin() const;
   ConstIterator end() const;
 
-  size_t size() const;
+  std::size_t size() const;
   bool empty() const;
   AllocationRecord* back();
   const AllocationRecord* back() const;
 
 private:
   BlockType* m_tail;
-  size_t m_length;
+  std::size_t m_length;
 };
 
 class AllocationMap
@@ -148,7 +147,7 @@ public:
   void clear();
 
   // Returns number of entries
-  size_t size() const;
+  std::size_t size() const;
 
   // Print methods -- either matching a predicate or all records
   void print(const std::function<bool (const AllocationRecord&)>&& predicate,
@@ -160,8 +159,11 @@ public:
   ConstIterator end() const;
 
 private:
+  // Content of findRecord(void*) without the lock
+  const AllocationRecord* doFindRecord(void* ptr) const noexcept;
+
   Map m_map;
-  size_t m_size;
+  std::size_t m_size;
   mutable std::mutex m_mutex;
 };
 

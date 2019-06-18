@@ -26,7 +26,7 @@ void HipCopyOperation::transform(
     void** dst_ptr,
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
-    size_t length)
+    std::size_t length)
 {
   hipError_t error =
     ::hipMemcpy(*dst_ptr, src_ptr, length, hipMemcpyDeviceToDevice);

@@ -35,7 +35,7 @@ struct MallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(size_t bytes) 
+  void* allocate(std::size_t bytes)
   {
     void* ret = ::malloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

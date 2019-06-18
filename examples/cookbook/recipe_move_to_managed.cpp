@@ -16,7 +16,7 @@
 #include "umpire/ResourceManager.hpp"
 
 int main(int, char**) {
-  constexpr size_t SIZE = 1024;
+  constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("HOST");

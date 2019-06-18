@@ -31,7 +31,7 @@ double* move_data(double* source_data, const std::string& destination)
 }
 
 int main(int, char**) {
-  constexpr size_t SIZE = 1024;
+  constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -45,7 +45,7 @@ int main(int, char**) {
 
   std::cout << "Filling with 0.0...";
 
-  for (size_t i = 0; i < SIZE; i++) {
+  for (std::size_t i = 0; i < SIZE; i++) {
     data[i] = 0.0;
   }
 
