@@ -61,9 +61,9 @@ bool Replay::replayLoggingEnabled()
 
 Replay* Replay::getReplayLogger()
 {
-  static Replay replay;
+  static Replay replay_logger;
 
-  return &replay;
+  return &replay_logger;
 }
 
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
