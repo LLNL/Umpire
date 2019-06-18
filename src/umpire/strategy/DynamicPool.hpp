@@ -88,7 +88,8 @@ class DynamicPool : public AllocationStrategy
     Platform getPlatform() noexcept override;
 
     /*!
-     * \brief Get the number of bytes that may be released back to resource
+     * \brief Return a lower bound number of bytes that may be
+     * released back to resource.
      *
      * A memory pool has a set of blocks that have no allocations
      * against them.  If the size of the set is greater than one, then
@@ -100,7 +101,7 @@ class DynamicPool : public AllocationStrategy
     std::size_t getReleasableSize() const noexcept;
 
     /*!
-     * \brief Get the number of memory blocks that the pools has
+     * \brief Retrn the number of memory blocks that the pool holds.
      *
      * \return The total number of blocks that are allocated by the pool
      */

@@ -201,12 +201,10 @@ std::size_t DynamicPool::getReleasableSize() const noexcept
 {
   std::size_t releasable_bytes{0};
 
-  auto iter = m_free_map.begin();
-  auto end = m_free_map.end();
-
-  while (iter != end) {
-    releasable_bytes += iter->first;
-    ++iter;
+  for (auto& rec : m_free_map) {
+    const std::size_t bytes{rec.first};
+    const bool is_head{rec.second.second};
+    if (is_head) releasable_bytes += bytes;
   }
 
   return releasable_bytes;
@@ -231,10 +229,7 @@ void DynamicPool::coalesce() noexcept
 {
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
-  // TODO This could be a MemoryMap if it supported reverse iterators and std::next()
   using PointerMap = std::map<Pointer, SizePair>;
-
-  if (m_free_map.size() == 0) return;
 
   // Reverse the free chunk map
   PointerMap free_pointer_map;
@@ -247,14 +242,14 @@ void DynamicPool::coalesce() noexcept
     free_pointer_map.insert(std::make_pair(ptr, std::make_pair(bytes, is_head)));
   }
 
+  if (free_pointer_map.size() < 2) return;
+
   // this map is iterated over from low to high in terms of key = pointer address.
   // Colaesce these...
 
   auto it = free_pointer_map.rbegin();
-  auto next_it = it;
+  auto next_it = it; next_it++;
   auto end = free_pointer_map.rend();
-
-  if (next_it != end) next_it++;
 
   while (next_it != end) {
     const bool contiguous{static_cast<unsigned char*>(next_it->first) + next_it->second.first == it->first};
