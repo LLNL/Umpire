@@ -18,8 +18,31 @@ if (ENABLE_COVERAGE)
   set(CMAKE_EXE_LINKER_FLAGS "-coverage ${CMAKE_EXE_LINKER_FLAGS}")
 endif ()
 
+message(STATUS "Checking for std::filesystem")
+
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+  "#include <iostream>
+  #include <filesystem>
+
+  int main(int, char**)
+  {
+
+    auto path = std::filesystem::path(\".\");
+    (void)(path);
+
+    return 0;
+  }"
+  UMPIRE_ENABLE_FILESYSTEM)
+
+if (UMPIRE_ENABLE_FILESYSTEM)
+  message(STATUS "std::filesystem found")
+else ()
+  message(STATUS "std::filesystem NOT found, using POSIX")
+endif ()
+
 if (ENABLE_HIP)
-	set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
+  set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 endif()
 
 if (ENABLE_PEDANTIC_WARNINGS)

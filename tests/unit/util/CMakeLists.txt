@@ -35,6 +35,16 @@ blt_add_test(
   COMMAND allocation_map_tests)
 
 blt_add_executable(
+  NAME output_buffer_tests
+  SOURCES output_buffer_tests.cpp
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${util_dir})
+
+blt_add_test(
+  NAME output_buffer_tests
+  COMMAND output_buffer_tests)
+
+blt_add_executable(
   NAME memory_map_tests
   SOURCES memory_map_tests.cpp
   DEPENDS_ON umpire_util umpire_tpl_judy gtest

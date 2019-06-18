@@ -22,7 +22,7 @@ replayprogram=$tools_dir/replay
 # The following program will generate a CSV file of Umpire activity that
 # may be replayed.
 #
-UMPIRE_REPLAY="On" $testprogram >& replay_test1.csv
+UMPIRE_REPLAY="On" $testprogram
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $testprogram"
     exit 1
@@ -31,7 +31,7 @@ fi
 #
 # Now replay from the activity captured in the replay_test1.csv file
 #
-$replayprogram -i replay_test1.csv -t replay.out
+$replayprogram -i umpire.0.0.replay -t replay.out
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $replayprogram"
     exit 1
@@ -47,5 +47,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-/bin/rm -f replay.out replay_test1.csv
+/bin/rm -f replay.out umpire*replay umpire*log
 exit 0

@@ -25,7 +25,6 @@
 #include "umpire/strategy/DynamicPool.hpp"
 
 namespace umpire {
-namespace replay {
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
 std::ostream& operator<< (std::ostream& out, 
     umpire::strategy::DynamicPool::Coalesce_Heuristic& );
@@ -69,23 +68,22 @@ private:
   static Replay* s_Replay;
 };
 
-} /* namespace replay */
 } /* namespace umpire */
 
 #define UMPIRE_REPLAY( msg )                                                 \
 {                                                                            \
-  if (umpire::replay::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
+  if (umpire::Replay::getReplayLogger()->replayLoggingEnabled()) {   \
     std::ostringstream local_msg;                                            \
     auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch();\
     local_msg                                                                \
       << "{ \"kind\":\"replay\", \"uid\":"                                   \
-      << umpire::replay::Replay::getReplayLogger()->replayUid() << ", "      \
+      << umpire::Replay::getReplayLogger()->replayUid() << ", "      \
       << "\"timestamp\":"                                                    \
       << static_cast<long>(time.count()) << ", "                             \
       << msg                                                                 \
       << " }"                                                                \
       << std::endl;                                                          \
-    umpire::replay::Replay::getReplayLogger()->logMessage(local_msg.str());  \
+    umpire::Replay::getReplayLogger()->logMessage(local_msg.str());  \
   }                                                                          \
 }
 #endif /* UMPIRE_Replay_HPP */

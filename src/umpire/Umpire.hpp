@@ -17,6 +17,9 @@
 
 #include "umpire/config.hpp"
 
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/IOManager.hpp"
+
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/Allocator.hpp"
