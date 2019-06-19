@@ -12,24 +12,21 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaPinnedMemoryResourceFactory_HPP
-#define UMPIRE_CudaPinnedMemoryResourceFactory_HPP
+#ifndef UMPIRE_make_unique_HPP
+#define UMPIRE_make_unique_HPP
 
-#include "umpire/resource/MemoryResourceFactory.hpp"
+#include <memory>
 
 namespace umpire {
-namespace resource {
+namespace util {
 
-class CudaPinnedMemoryResourceFactory :
-  public MemoryResourceFactory
+template <typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
 {
-  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
 
-  std::unique_ptr<resource::MemoryResource>
-  create(const std::string& name, int id) final override;
-};
-
-} // end of namespace resource
+} // end of namespace util
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaPinnedMemoryResourceFactory_HPP
+#endif

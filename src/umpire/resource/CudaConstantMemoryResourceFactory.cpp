@@ -17,6 +17,7 @@
 #include "umpire/resource/CudaConstantMemoryResource.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
@@ -32,7 +33,7 @@ CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& n
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -45,7 +46,7 @@ CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(n
 
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new resource::CudaConstantMemoryResource("DEVICE_CONST", id, traits);
+  return util::make_unique<resource::CudaConstantMemoryResource>("DEVICE_CONST", id, traits);
 }
 
 } // end of namespace resource

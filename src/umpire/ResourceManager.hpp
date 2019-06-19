@@ -234,13 +234,12 @@ class ResourceManager {
      */
     std::size_t getSize(void* ptr) const;
 
+    ~ResourceManager();
+    ResourceManager (const ResourceManager&) = delete;
+    ResourceManager& operator= (const ResourceManager&) = delete;
   private:
     ResourceManager();
 
-    ~ResourceManager() = default;
-
-    ResourceManager (const ResourceManager&) = delete;
-    ResourceManager& operator= (const ResourceManager&) = delete;
 
     strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
     strategy::AllocationStrategy* findAllocatorForId(int id);
@@ -250,16 +249,15 @@ class ResourceManager {
 
     std::string getAllocatorInformation() const noexcept;
 
-    static ResourceManager* s_resource_manager_instance;
-
-    std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
-    std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
-
     util::AllocationMap m_allocations;
 
-    strategy::AllocationStrategy* m_default_allocator;
+    std::list<std::unique_ptr<strategy::AllocationStrategy> > m_allocators;
 
+    std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
+    std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
     std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash > m_memory_resources;
+
+    strategy::AllocationStrategy* m_default_allocator;
 
     int m_id;
 

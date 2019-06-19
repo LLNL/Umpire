@@ -35,7 +35,10 @@ class MonotonicAllocationStrategy :
         std::size_t capacity,
         Allocator allocator);
 
+    ~MonotonicAllocationStrategy();
+
     void* allocate(std::size_t bytes);
+
     void deallocate(void* ptr);
 
     std::size_t getCurrentSize() const noexcept;

@@ -60,7 +60,11 @@ and a dynamic pool for those that are larger.
 
 - Added Debug and RelWithDebInfo builds to Travis CI.
 
+- Use unique_ptr internally to ensure cleanup at end of program.
+
 - Use RAII locks with `std::lock_guard`.
+
+- Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
 
 - `DynamicPool` uses maps underneath for improved performance.
 
@@ -73,6 +77,9 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Fixed bug in monotonic pool allocator causing it to always return
+  the same allocation.
 
 - Enabled pedantic compiler warnings and fixed errors.
 
@@ -97,6 +104,8 @@ and a dynamic pool for those that are larger.
 
 - Fix CodeCov reporting by explicitly downloading older version of upload
   script.
+
+- Fix error where the MemoryMap.inl was not installed.
 
 ## [0.3.5] - 2019-06-11
 

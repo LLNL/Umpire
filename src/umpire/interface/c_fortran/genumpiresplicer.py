@@ -62,7 +62,7 @@ subroutine allocator_allocate_{name}_array_{dim}d(this, array, dims)
       type(C_PTR) :: data_ptr
 
       {c_type} :: size_type
-      {c_size_t} :: num_bytes
+      integer(C_SIZE_T) :: num_bytes
 
       num_bytes = product(dims) * sizeof(size_type)
       data_ptr = this%allocate_pointer(num_bytes)

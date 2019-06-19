@@ -49,7 +49,7 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_name(
     const std::string SH_name(name);
     *SHCXX_rv = SH_this->getAllocator(SH_name);
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
-    SHC_rv->idtor = 0;
+    SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.get_allocator_by_name
 }
@@ -65,7 +65,7 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_name_bufferify(
     const std::string SH_name(name, Lname);
     *SHCXX_rv = SH_this->getAllocator(SH_name);
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
-    SHC_rv->idtor = 0;
+    SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.get_allocator_by_name_bufferify
 }
@@ -80,7 +80,7 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
     *SHCXX_rv = SH_this->getAllocator(id);
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
-    SHC_rv->idtor = 0;
+    SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.get_allocator_by_id
 }
@@ -95,7 +95,7 @@ umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
     *SHCXX_rv = SH_this->getAllocator(ptr);
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
-    SHC_rv->idtor = 0;
+    SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.get_allocator_for_ptr
 }
@@ -221,7 +221,7 @@ umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPool>(
         SH_name, *SHCXX_allocator, initial_size, block);
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
-    SHC_rv->idtor = 0;
+    SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.make_allocator_pool
 }
@@ -241,7 +241,7 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPool>(
         SH_name, *SHCXX_allocator, initial_size, block);
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
-    SHC_rv->idtor = 0;
+    SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.make_allocator_bufferify_pool
 }

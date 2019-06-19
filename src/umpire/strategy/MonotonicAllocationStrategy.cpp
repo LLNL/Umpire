@@ -34,10 +34,15 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
   m_block = m_allocator->allocate(m_capacity);
 }
 
+MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
+{
+  m_allocator->deallocate(m_block);
+}
+
 void*
 MonotonicAllocationStrategy::allocate(std::size_t bytes)
 {
-  void* ret = static_cast<char*>(m_block) + bytes;
+  void* ret = static_cast<char*>(m_block) + m_size;
   m_size += bytes;
 
   if (m_size > m_capacity) {

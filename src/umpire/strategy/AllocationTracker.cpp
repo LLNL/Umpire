@@ -22,10 +22,10 @@ namespace strategy {
 AllocationTracker::AllocationTracker(
   const std::string& name,
   int id,
-  Allocator allocator) noexcept :
+  std::unique_ptr<AllocationStrategy>&& allocator) noexcept :
 AllocationStrategy(name, id),
 mixins::Inspector(),
-m_allocator(allocator.getAllocationStrategy())
+m_allocator(std::move(allocator))
 {
 }
 
@@ -79,7 +79,7 @@ AllocationTracker::getPlatform() noexcept
 strategy::AllocationStrategy*
 AllocationTracker::getAllocationStrategy()
 {
-  return m_allocator;
+  return m_allocator.get();
 }
 
 } // end of namespace umpire

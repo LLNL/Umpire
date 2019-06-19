@@ -19,6 +19,9 @@
 
 #include <cuda_runtime_api.h>
 
+#include "umpire/util/Macros.hpp"
+#include "umpire/util/make_unique.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -33,7 +36,7 @@ CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -52,7 +55,7 @@ CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new resource::DefaultMemoryResource<alloc::CudaMallocAllocator>(Platform::cuda, "DEVICE", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

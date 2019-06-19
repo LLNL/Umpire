@@ -100,14 +100,14 @@ class MemoryOperationRegistry {
       std::pair<Platform, Platform> platforms,
       std::shared_ptr<MemoryOperation>&& operation) noexcept;
 
-  protected:
-    MemoryOperationRegistry() noexcept;
     MemoryOperationRegistry (const MemoryOperationRegistry&) = delete;
     MemoryOperationRegistry& operator= (const MemoryOperationRegistry&) = delete;
+    ~MemoryOperationRegistry() = default;
+
+  protected:
+    MemoryOperationRegistry() noexcept;
 
   private:
-    static MemoryOperationRegistry* s_memory_operation_registry_instance;
-
     /*
      * Doubly-nested unordered_map that stores MemoryOperations by first name,
      * then by Platform pair.
