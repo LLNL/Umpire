@@ -42,7 +42,7 @@ MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
 void*
 MonotonicAllocationStrategy::allocate(std::size_t bytes)
 {
-  void* ret = static_cast<char*>(m_block) + bytes;
+  void* ret = static_cast<char*>(m_block) + m_size;
   m_size += bytes;
 
   if (m_size > m_capacity) {
