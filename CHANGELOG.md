@@ -62,6 +62,8 @@ and a dynamic pool for those that are larger.
 
 - Use RAII locks with `std::lock_guard`.
 
+- Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
