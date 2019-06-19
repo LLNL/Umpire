@@ -64,6 +64,8 @@ and a dynamic pool for those that are larger.
 
 - Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
 
+- Add PID to filenames for log and replay output.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
