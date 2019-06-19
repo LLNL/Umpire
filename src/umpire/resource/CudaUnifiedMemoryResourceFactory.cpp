@@ -18,7 +18,10 @@
 
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 
+#include "umpire/util/make_unique.hpp"
+
 #include <cuda_runtime_api.h>
+
 
 namespace umpire {
 namespace resource {
@@ -34,7 +37,7 @@ CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& na
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -53,7 +56,7 @@ CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(na
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>(Platform::cuda, "UM", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(Platform::cuda, "UM", id, traits);
 }
 
 } // end of namespace resource

@@ -56,6 +56,10 @@ class OperationTest :
 
       if (check_array)
         umpire_allocator_deallocate(&host_allocator, check_array);
+
+      umpire_allocator_delete(&host_allocator);
+      umpire_allocator_delete(&source_allocator);
+      umpire_allocator_delete(&dest_allocator);
     }
 
     float* source_array;

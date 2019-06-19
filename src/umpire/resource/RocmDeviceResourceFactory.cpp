@@ -17,6 +17,8 @@
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/AmAllocAllocator.hpp"
 
+#include "umpire/util/make_unique.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -31,7 +33,7 @@ RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -41,7 +43,7 @@ RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new resource::DefaultMemoryResource<alloc::AmAllocAllocator>(Platform::rocm, "DEVICE", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::AmAllocAllocator>>(Platform::rocm, "DEVICE", id, traits);
 }
 
 } // end of namespace resource

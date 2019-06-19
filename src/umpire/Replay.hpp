@@ -30,9 +30,6 @@ std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPool::Coalesce_Heuristic& );
 class Replay {
 public:
-  static void initialize();
-  static void finalize();
-
   void logMessage( const std::string& message );
   static Replay* getReplayLogger();
   bool replayLoggingEnabled();
@@ -59,13 +56,15 @@ public:
     return ss.str();
   }
 private:
-  Replay(bool enable_replay);
-  ~Replay();
+  Replay();
+  ~Replay() = default;
+
+  Replay(const Replay&) = delete;
+  Replay& operator=(const Replay&) = delete;
 
   bool replayEnabled;
   uint64_t m_replayUid;
   static int m_argument_number;
-  static Replay* s_Replay;
 };
 
 } /* namespace umpire */

@@ -32,7 +32,7 @@ class AllocationTracker :
     AllocationTracker(
         const std::string& name,
         int id,
-        Allocator allocator) noexcept;
+        std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
     void* allocate(std::size_t bytes);
 
@@ -49,7 +49,7 @@ class AllocationTracker :
     strategy::AllocationStrategy* getAllocationStrategy();
 
   private:
-    strategy::AllocationStrategy* m_allocator;
+    std::unique_ptr<strategy::AllocationStrategy> m_allocator;
 
 };
 

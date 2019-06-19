@@ -58,6 +58,8 @@ and a dynamic pool for those that are larger.
 
 - Added Debug and RelWithDebInfo builds to Travis CI.
 
+- Use unique_ptr internally to ensure cleanup at end of program.
+
 - Use RAII locks with `std::lock_guard`.
 
 ### Removed
@@ -69,6 +71,9 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Fixed bug in monotonic pool allocator causing it to always return
+  the same allocation.
 
 - Enabled pedantic compiler warnings and fixed errors.
 
