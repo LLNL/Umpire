@@ -226,8 +226,6 @@ Platform DynamicPool::getPlatform() noexcept
 
 void DynamicPool::doCoalesce()
 {
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
-
   using PointerMap = std::map<Pointer, SizePair>;
 
   // Reverse the free chunk map
@@ -275,6 +273,8 @@ void DynamicPool::doCoalesce()
 
 void DynamicPool::coalesce()
 {
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
+
   doCoalesce();
 
   // Coalesce should add back a single chunk to keep m_actual_bytes the same as before

@@ -102,4 +102,3 @@ deallocate host_slot_pool(38)
 deallocate thread_safe_allocator(39)
 coalesce host_dyn_pool_spec1
 release host_dyn_pool_spec1
-coalesce host_dyn_pool_spec1
