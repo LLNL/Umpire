@@ -166,8 +166,7 @@ void DynamicPool::deallocate(void* ptr)
   }
 
   if ( m_do_coalesce(*this) ) {
-    UMPIRE_LOG(Debug, "Heuristic returned true, "
-               "performing coalesce operation for " << this << "\n");
+    UMPIRE_LOG(Debug, this << " Heuristic returned true, calling coalesce()");
     coalesce();
   }
 }
@@ -225,7 +224,7 @@ Platform DynamicPool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-void DynamicPool::coalesce() noexcept
+void DynamicPool::doCoalesce()
 {
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
@@ -274,24 +273,59 @@ void DynamicPool::coalesce() noexcept
   }
 }
 
+void DynamicPool::coalesce()
+{
+  doCoalesce();
+
+  // Coalesce should add back a single chunk to keep m_actual_bytes the same as before
+  const std::size_t released_bytes{doRelease()};
+
+  if (released_bytes > 0) {
+    const std::size_t actual_bytes{round_up(released_bytes, m_align_bytes)};
+
+    Pointer ptr{m_allocator->allocate(actual_bytes)};
+    m_actual_bytes += actual_bytes;
+
+    // Add used
+    insertFree(ptr, actual_bytes, true);
+  }
+}
+
+std::size_t DynamicPool::doRelease()
+{
+  UMPIRE_LOG(Debug, "()");
+
+  // Coalesce first so that we are able to release the most memory possible
+  doCoalesce();
+
+  std::size_t released_bytes{0};
+
+  for (auto it = m_free_map.cbegin(), next_it = it; it != m_free_map.cend(); it = next_it) {
+    ++next_it;
+
+    std::size_t bytes{it->first};
+    Pointer ptr;
+    bool is_head;
+    std::tie(ptr, is_head) = it->second;
+    if (is_head) {
+      released_bytes += bytes;
+      m_actual_bytes -= bytes;
+      m_allocator->deallocate(ptr);
+      m_free_map.erase(it);
+    }
+  }
+
+  return released_bytes;
+}
+
 void DynamicPool::release()
 {
   UMPIRE_LOG(Debug, "()");
 
   // Coalesce first so that we are able to release the most memory possible
-  coalesce();
+  doCoalesce();
 
-  for (auto& rec : m_free_map) {
-    std::size_t bytes{rec.first};
-    Pointer ptr;
-    bool is_head;
-    std::tie(ptr, is_head) = rec.second;
-    if (is_head) {
-      m_curr_bytes -= bytes;
-      m_actual_bytes -= bytes;
-      m_allocator->deallocate(ptr);
-    }
-  }
+  doRelease();
 }
 
 } // end of namespace strategy

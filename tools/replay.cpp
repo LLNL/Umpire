@@ -42,8 +42,6 @@
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "umpire/tpl/json/json.hpp"
 
-static constexpr short alignment = 16;
-
 static cxxopts::ParseResult parse(int argc, char* argv[])
 {
   try
