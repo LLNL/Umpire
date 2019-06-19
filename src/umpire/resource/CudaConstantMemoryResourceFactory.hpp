@@ -27,9 +27,10 @@ namespace resource {
 class CudaConstantMemoryResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name) noexcept;
+  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
 
-  resource::MemoryResource* create(const std::string& name, int id);
+  std::unique_ptr<resource::MemoryResource> 
+  create(const std::string& name, int id) final override;
 };
 
 } // end of namespace resource

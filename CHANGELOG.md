@@ -58,6 +58,8 @@ and a dynamic pool for those that are larger.
 
 - Added Debug and RelWithDebInfo builds to Travis CI.
 
+- Use unique_ptr internally to ensure cleanup at end of program.
+
 - Use RAII locks with `std::lock_guard`.
 
 ### Removed

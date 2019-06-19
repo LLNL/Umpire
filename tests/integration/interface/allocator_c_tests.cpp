@@ -29,6 +29,7 @@ class AllocatorCTest :
 
   virtual void TearDown()
   {
+    umpire_allocator_delete(&m_allocator);
   }
 
   umpire_allocator m_allocator;
@@ -82,6 +83,8 @@ TEST_P(AllocatorCTest, GetAllocatorById)
   umpire_allocator alloc_two;
   umpire_resourcemanager_get_allocator_by_id(&rm, alloc_id, &alloc_two);
   ASSERT_EQ(alloc_id, umpire_allocator_get_id(&alloc_two));
+
+  umpire_allocator_delete(&alloc_two);
 }
 
 TEST_P(AllocatorCTest, SizeAndHighWatermark)

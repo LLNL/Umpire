@@ -37,6 +37,8 @@ extern "C" {
 // splicer begin class.Allocator.C_declarations
 // splicer end class.Allocator.C_declarations
 
+void umpire_allocator_delete(umpire_allocator * self);
+
 void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 
 void umpire_allocator_deallocate(umpire_allocator * self, void * ptr);

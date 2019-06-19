@@ -31,6 +31,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_host_array_1d
 
     
@@ -53,6 +54,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_host_array_2d
 
     
@@ -75,6 +77,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_host_array_3d
 
     
@@ -97,6 +100,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_host_array_4d
 
     
@@ -119,6 +123,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_host_array_1d
 
     
@@ -141,6 +146,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_host_array_2d
 
     
@@ -163,6 +169,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_host_array_3d
 
     
@@ -185,6 +192,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_host_array_4d
 
     
@@ -207,6 +215,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_host_array_1d
 
     
@@ -229,6 +238,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_host_array_2d
 
     
@@ -251,6 +261,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_host_array_3d
 
     
@@ -273,6 +284,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_host_array_4d
 
     
@@ -295,6 +307,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_host_array_1d
 
     
@@ -317,6 +330,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_host_array_2d
 
     
@@ -339,6 +353,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_host_array_3d
 
     
@@ -361,6 +376,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_host_array_4d
 
     
@@ -384,6 +400,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_device_array_1d
 
     
@@ -406,6 +423,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_device_array_2d
 
     
@@ -428,6 +446,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_device_array_3d
 
     
@@ -450,6 +469,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_device_array_4d
 
     
@@ -472,6 +492,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_device_array_1d
 
     
@@ -494,6 +515,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_device_array_2d
 
     
@@ -516,6 +538,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_device_array_3d
 
     
@@ -538,6 +561,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_device_array_4d
 
     
@@ -560,6 +584,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_device_array_1d
 
     
@@ -582,6 +607,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_device_array_2d
 
     
@@ -604,6 +630,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_device_array_3d
 
     
@@ -626,6 +653,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_device_array_4d
 
     
@@ -648,6 +676,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_device_array_1d
 
     
@@ -670,6 +699,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_device_array_2d
 
     
@@ -692,6 +722,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_device_array_3d
 
     
@@ -714,6 +745,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_device_array_4d
 
     
@@ -736,6 +768,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_um_array_1d
 
     
@@ -758,6 +791,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_um_array_2d
 
     
@@ -780,6 +814,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_um_array_3d
 
     
@@ -802,6 +837,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_int_um_array_4d
 
     
@@ -824,6 +860,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_um_array_1d
 
     
@@ -846,6 +883,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_um_array_2d
 
     
@@ -868,6 +906,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_um_array_3d
 
     
@@ -890,6 +929,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_long_um_array_4d
 
     
@@ -912,6 +952,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_um_array_1d
 
     
@@ -934,6 +975,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_um_array_2d
 
     
@@ -956,6 +998,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_um_array_3d
 
     
@@ -978,6 +1021,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_float_um_array_4d
 
     
@@ -1000,6 +1044,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_um_array_1d
 
     
@@ -1022,6 +1067,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_um_array_2d
 
     
@@ -1044,6 +1090,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_um_array_3d
 
     
@@ -1066,6 +1113,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_double_um_array_4d
 
     
@@ -1099,7 +1147,6 @@ program fortran_test
   call test_allocate_double_host_array_2d
   call test_allocate_double_host_array_3d
   call test_allocate_double_host_array_4d
-
 #ifdef UMPIRE_ENABLE_CUDA
   call test_allocate_int_device_array_1d
   call test_allocate_int_device_array_2d

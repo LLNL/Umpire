@@ -33,6 +33,12 @@ module umpire_fortran_op_tests
         call rm%copy(dest, source)
 
         call assert_true(.true.)
+
+        call source_allocator%deallocate_pointer(source)
+        call dest_allocator%deallocate_pointer(dest)
+
+        call source_allocator%delete()
+        call dest_allocator%delete()
       end subroutine test_copy_HOST_HOST
 
     

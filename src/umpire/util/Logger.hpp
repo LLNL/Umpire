@@ -54,8 +54,6 @@ class Logger {
 
   static Logger* getActiveLogger();
 
-  static Logger* getRootLogger();
-
   inline bool logLevelEnabled( message::Level level )
   {
     if ( level < 0 || level >= message::Num_Levels || m_isEnabled[ level ] == false  )
@@ -64,12 +62,14 @@ class Logger {
       return true;
   };
 
+  ~Logger() noexcept = default;
+  Logger(const Logger&) = delete;
+  Logger& operator=(const Logger&) = delete;
+
 private:
   Logger() noexcept;
-  ~Logger() noexcept;
 
   bool m_isEnabled[ message::Num_Levels ];
-  static Logger* s_Logger;
 };
 
 } /* namespace util */
