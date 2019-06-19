@@ -58,7 +58,7 @@ matrix:
     env:
     - COMPILER=g++
     - IMG=nvcc-9
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=On -DENABLE_WARNINGS_AS_ERRORS=On"
     - DO_TEST=no
   - compiler: hcc
     env:
