@@ -103,7 +103,7 @@ void* DynamicPool::allocate(std::size_t bytes)
 
   // This is optional, but it might help the growth of the pool...
   if (iter == m_free_map.end()) {
-    coalesce();
+    doCoalesce();
     iter = findFreeChunk(actual_bytes);
   }
 
