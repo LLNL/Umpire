@@ -74,23 +74,37 @@ void DynamicPool::insertFree(Pointer addr, std::size_t bytes, bool is_head)
   m_free_map.insert(std::make_pair(bytes, std::make_pair(addr, is_head)));
 }
 
+DynamicPool::SizeMap::const_iterator DynamicPool::findFreeChunk(std::size_t bytes) const
+{
+  SizeMap::const_iterator iter{m_free_map.upper_bound(bytes)};
+
+  if (iter != m_free_map.begin()) {
+    // Back up iterator
+    --iter;
+    const std::size_t test_bytes{iter->first};
+    if (test_bytes < bytes) {
+      // Too small, reset iterator to what upper_bound returned
+      ++iter;
+    }
+  }
+
+  return iter;
+}
+
 void* DynamicPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
   const std::size_t actual_bytes = round_up(bytes, m_align_bytes);
-  SizeMap::iterator iter{m_free_map.upper_bound(actual_bytes)};
   Pointer ptr{nullptr};
 
   // Check if the previous element is a match
-  if (iter != m_free_map.begin()) {
-    // Back up iterator
-    --iter;
-    const std::size_t test_bytes{iter->first};
-    if (test_bytes < actual_bytes) {
-      // Too small, reset iterator to original upper_bound value
-      ++iter;
-    }
+  SizeMap::const_iterator iter{findFreeChunk(actual_bytes)};
+
+  // This is optional, but it might help the growth of the pool...
+  if (iter == m_free_map.end()) {
+    coalesce();
+    iter = findFreeChunk(actual_bytes);
   }
 
   if (iter != m_free_map.end()) {
@@ -273,11 +287,11 @@ void DynamicPool::doCoalesce()
 
 void DynamicPool::coalesce()
 {
+  // Coalesce differs from release in that it puts back a single chunk of the size it released
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
   doCoalesce();
 
-  // Coalesce should add back a single chunk to keep m_actual_bytes the same as before
   const std::size_t released_bytes{doRelease()};
 
   if (released_bytes > 0) {
@@ -324,7 +338,6 @@ void DynamicPool::release()
 
   // Coalesce first so that we are able to release the most memory possible
   doCoalesce();
-
   doRelease();
 }
 

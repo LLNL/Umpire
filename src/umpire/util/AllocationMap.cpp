@@ -151,16 +151,17 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-  Map::Iterator iter{m_map.end()};
-  bool found;
+  auto pair = m_map.insert(ptr, record);
 
-  std::tie(iter, found) = m_map.get(ptr, record);
-  if (found) {
+  Map::Iterator it{pair.first};
+  const bool inserted{pair.second};
+
+  if (!inserted) {
     // Record was not added
-    iter->second->push_back(record);
+    it->second->push_back(record);
   }
-  // else (found = false)
-  // -> get() already added record to the end of the RecordList for ptr
+  // else
+  // -> insert() already added it
 
   ++m_size;
 }

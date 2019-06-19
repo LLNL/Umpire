@@ -88,15 +88,15 @@ public:
   // Would require a deep copy of the Judy data
   MemoryMap(const MemoryMap&) = delete;
 
-  // Return pointer-to or emplaces a new Value with args to the constructor
-  template <typename... Args>
-  std::pair<Iterator, bool> get(Key ptr, Args&&... args) noexcept;
-
   // Insert a new Value at ptr
-  Iterator insert(Key ptr, const Value& val);
+  // Assumes the copy constructor exists.
+  std::pair<Iterator, bool> insert(Key ptr, const Value& val) noexcept;
 
   template<typename P>
-  Iterator insert(P&& pair);
+  std::pair<Iterator, bool> insert(P&& pair) noexcept;
+
+  template <typename... Args>
+  std::pair<Iterator, bool> insert(Key ptr, Args&&... args) noexcept;
 
   // Find a value -- returns what would be the entry immediately before ptr
   ConstIterator findOrBefore(Key ptr) const noexcept;
@@ -132,6 +132,9 @@ public:
 private:
   // Helper method for public findOrBefore()
   Key doFindOrBefore(Key ptr) const noexcept;
+
+  template <typename... Args>
+  std::pair<Iterator, bool> doInsert(Key ptr, Args&&... args) noexcept;
 
   mutable Judy* m_array;    // Judy array
   mutable JudySlot* m_last; // last found value in judy array

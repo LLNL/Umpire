@@ -108,7 +108,6 @@ class DynamicPool : public AllocationStrategy
      */
     std::size_t getBlocksInPool() const noexcept;
 
-    // TODO Can this method possibly be noexcept? It uses map::insert, which throws if there is an error...
     void coalesce();
 
   private:
@@ -119,6 +118,8 @@ class DynamicPool : public AllocationStrategy
 
     void insertUsed(Pointer addr, std::size_t bytes, bool is_head);
     void insertFree(Pointer addr, std::size_t bytes, bool is_head);
+
+    SizeMap::const_iterator findFreeChunk(std::size_t bytes) const;
 
     void doCoalesce();
     std::size_t doRelease();
