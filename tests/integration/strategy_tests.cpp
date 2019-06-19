@@ -188,12 +188,15 @@ TEST(MonotonicStrategy, Host)
       "host_monotonic_pool", 65536, rm.getAllocator("HOST"));
 
   void* alloc = allocator.allocate(100);
+  void* alloc2 = allocator.allocate(100);
 
+  ASSERT_EQ(static_cast<char*>(alloc2) - static_cast<char*>(alloc), 100);
   ASSERT_GE(allocator.getCurrentSize(), 100);
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
 
+  allocator.deallocate(alloc2);
   allocator.deallocate(alloc);
 }
 
