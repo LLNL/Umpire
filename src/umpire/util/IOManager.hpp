@@ -23,7 +23,7 @@ namespace util {
 
 class IOManager {
 public:
-  static void initialize();
+  static void initialize(bool enable_log, bool enable_replay);
 
   static void finalize();
 

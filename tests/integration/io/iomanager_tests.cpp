@@ -14,9 +14,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/config.hpp"
 
-#include "umpire/Umpire.hpp"
+#include "umpire/util/MPI.hpp"
 #include "umpire/util/IOManager.hpp"
-#include "umpire/ResourceManager.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
@@ -30,13 +29,12 @@ int main(int argc, char** argv) {
   (void) argv;
 #endif
 
-  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::util::MPI::initialize();
+  umpire::util::IOManager::initialize(true, true);
 
   umpire::log << "testing log stream" << std::endl;
   umpire::replay << "testing replay stream" << std::endl;
   umpire::error << "testing error stream" << std::endl;
-
-  (void) rm;
 
 #if defined(UMPIRE_ENABLE_MPI)
   MPI_Finalize();
