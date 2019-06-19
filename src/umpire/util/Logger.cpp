@@ -30,7 +30,6 @@ namespace util {
 
 static const char* env_name = "UMPIRE_LOG_LEVEL";
 static message::Level defaultLevel = message::Info;
-Logger* Logger::s_Logger = nullptr;
 
 static const std::string MessageLevelName[ message::Num_Levels ] = {
   "ERROR",
@@ -44,10 +43,20 @@ Logger::Logger() noexcept
   // by default, all message streams are disabled
   for ( int i=0 ; i < message::Num_Levels ; ++i )
     m_isEnabled[ i ] = false;
-}
 
-Logger::~Logger() noexcept
-{
+  message::Level level = defaultLevel;
+  char* enval = getenv(env_name);
+
+  if ( enval != NULL ) {
+    for ( int i = 0; i < message::Num_Levels; ++i ) {
+      if ( strcasecmp( enval, MessageLevelName[ i ].c_str() ) == 0 ) {
+        level = (message::Level)i;
+        break;
+      }
+    }
+  }
+
+  setLoggingMsgLevel(level);
 }
 
 void Logger::setLoggingMsgLevel( message::Level level ) noexcept
@@ -71,39 +80,11 @@ void Logger::logMessage( message::Level level,
     << std::endl;
 }
 
-void Logger::initialize()
-{
-  if ( s_Logger != nullptr )
-    return;
-
-  message::Level level = defaultLevel;
-  char* enval = getenv(env_name);
-
-  if ( enval != NULL ) {
-    for ( int i = 0; i < message::Num_Levels; ++i ) {
-      if ( strcasecmp( enval, MessageLevelName[ i ].c_str() ) == 0 ) {
-        level = (message::Level)i;
-        break;
-      }
-    }
-  }
-
-  s_Logger = new Logger();
-  s_Logger->setLoggingMsgLevel(level);
-}
-
-void Logger::finalize()
-{
-  delete s_Logger;
-  s_Logger = nullptr;
-}
-
 Logger* Logger::getActiveLogger()
 {
-  if ( s_Logger == nullptr )
-    Logger::initialize();
+  static Logger logger;
 
-  return s_Logger;
+  return &logger;
 }
 
 } /* namespace util */

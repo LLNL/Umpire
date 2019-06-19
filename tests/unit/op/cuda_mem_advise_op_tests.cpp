@@ -97,6 +97,7 @@ TEST(CudaAdvisePreferredLocation, Apply)
       1024*sizeof(float)));
 
   allocator.deallocate(data);
+  delete record;
 }
 
 TEST(CudaAdvisePreferredLocation, ApplyHost)

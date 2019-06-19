@@ -18,6 +18,8 @@
 
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
 
+#include "umpire/util/make_unique.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -32,7 +34,7 @@ CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -44,7 +46,7 @@ CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return new resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>(Platform::cuda, "PINNED", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(Platform::cuda, "PINNED", id, traits);
 }
 
 } // end of namespace resource
