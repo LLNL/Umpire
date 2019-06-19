@@ -72,6 +72,9 @@ and a dynamic pool for those that are larger.
 
 ### Fixed
 
+- Fixed bug in monotonic pool allocator causing it to always return
+  the same allocation.
+
 - Enabled pedantic compiler warnings and fixed errors.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
