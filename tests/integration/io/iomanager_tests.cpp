@@ -14,13 +14,14 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/config.hpp"
 
-#include "umpire/Umpire.hpp"
+#include "umpire/util/MPI.hpp"
 #include "umpire/util/IOManager.hpp"
-#include "umpire/ResourceManager.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
 #endif
+
+#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
 int main(int argc, char** argv) {
 #if defined(UMPIRE_ENABLE_MPI)
@@ -30,13 +31,36 @@ int main(int argc, char** argv) {
   (void) argv;
 #endif
 
-  auto& rm = umpire::ResourceManager::getInstance();
+  cxxopts::Options options(argv[0], "Replay an umpire session from a file");
+
+  options
+    .add_options()
+    (  "l, enable-logging"
+     , "Enable logging output"
+    )
+    (  "r, enable-replay"
+     , "Enable replay output"
+    );
+
+  auto result = options.parse(argc, argv);
+
+  bool enable_logging = false;
+  bool enable_replay = false;
+
+  if (result.count("enable-logging")) {
+    enable_logging = true;
+  }
+
+  if (result.count("enable-replay")) {
+    enable_replay = true;
+  }
+
+  umpire::util::MPI::initialize();
+  umpire::util::IOManager::initialize(enable_logging, enable_replay);
 
   umpire::log << "testing log stream" << std::endl;
   umpire::replay << "testing replay stream" << std::endl;
   umpire::error << "testing error stream" << std::endl;
-
-  (void) rm;
 
 #if defined(UMPIRE_ENABLE_MPI)
   MPI_Finalize();

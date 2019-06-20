@@ -84,8 +84,14 @@ ResourceManager::ResourceManager() :
 {
   UMPIRE_LOG(Debug, "() entering");
 
+  const char* env_enable_replay{getenv("UMPIRE_REPLAY")};
+  bool enable_replay{(env_enable_replay != nullptr)};
+
+  const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
+  bool enable_log{(env_enable_log != nullptr)};
+
   util::MPI::initialize();
-  util::IOManager::initialize();
+  util::IOManager::initialize(enable_log, enable_replay);
 
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();

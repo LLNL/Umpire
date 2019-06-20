@@ -23,6 +23,7 @@
 #include <ostream>
 #include <fstream>
 #include <sstream>
+#include <stdlib.h>   // for getenv()
 
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
 #include <filesystem>
@@ -74,7 +75,9 @@ IOManager::setOutputDir(const std::string& dir)
 }
 
 void
-IOManager::initialize()
+IOManager::initialize(
+    bool enable_log,
+    bool enable_replay)
 {
   if (!s_initialized) {
     auto output_dir = std::getenv("UMPIRE_OUTPUT_DIR");
@@ -107,15 +110,19 @@ IOManager::initialize()
 
       if (!std::filesystem::exists(root_io_dir_path))
       {
-        std::filesystem::create_directories(root_io_dir_path);
+        if (enable_log || enable_replay) {
+          std::filesystem::create_directories(root_io_dir_path);
+        }
       }
 #else
       struct stat info;
       if ( stat( s_root_io_dir.c_str(), &info ) )
       {
-        if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
-        {
-          UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
+        if (enable_log || enable_replay) {
+          if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
+          {
+            UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
+          }
         }
       }
       else if ( !(S_ISDIR(info.st_mode)) )
@@ -125,20 +132,24 @@ IOManager::initialize()
 #endif
     }
 
-    s_log_ofstream = new std::ofstream(s_log_filename);
+    if (enable_log) {
+      s_log_ofstream = new std::ofstream(s_log_filename);
 
-    if (*s_log_ofstream) {
-      log_buffer.setFileStream(s_log_ofstream);
-    } else {
-      UMPIRE_ERROR("Couldn't open log file:" << s_log_filename);
+      if (*s_log_ofstream) {
+        log_buffer.setFileStream(s_log_ofstream);
+      } else {
+        UMPIRE_ERROR("Couldn't open log file:" << s_log_filename);
+      }
     }
 
-    s_replay_ofstream = new std::ofstream(s_replay_filename);
+    if (enable_replay) {
+      s_replay_ofstream = new std::ofstream(s_replay_filename);
 
-    if (*s_replay_ofstream) {
-      replay_buffer.setFileStream(s_replay_ofstream);
-    } else {
-      UMPIRE_ERROR("Couldn't open replay file:" << s_log_filename);
+      if (*s_replay_ofstream) {
+        replay_buffer.setFileStream(s_replay_ofstream);
+      } else {
+        UMPIRE_ERROR("Couldn't open replay file:" << s_log_filename);
+      }
     }
 
     s_initialized = true;
