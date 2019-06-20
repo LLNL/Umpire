@@ -56,8 +56,9 @@ def run_io_test(test_env, file_uid):
             env=dict(os.environ, **test_env),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE)
-
+    pid = test_program.pid
     test_program.wait()
+
 
     output = test_program.stdout
     error = test_program.stderr
@@ -65,11 +66,11 @@ def run_io_test(test_env, file_uid):
     check_output('stdout', output, 'testing log stream')
     check_output('stderr', error, 'testing error stream')
 
-    output_filename = 'umpire_io_tests.0.{uid}.log'.format(uid=file_uid)
-    replay_filename = 'umpire_io_tests.0.{uid}.replay'.format(uid=file_uid)
+    output_filename = 'umpire_io_tests.0.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
+    replay_filename = 'umpire_io_tests.0.{pid}.{uid}.replay'.format(uid=file_uid, pid=pid)
     if 'UMPIRE_OUTPUT_DIR' in test_env.keys():
-        output_filename = '{dir}/umpire_io_tests.0.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid)
-        replay_filename = '{dir}/umpire_io_tests.0.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid)
+        output_filename = '{dir}/umpire_io_tests.0.{pid}.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
+        replay_filename = '{dir}/umpire_io_tests.0.{pid}.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
 
     check_file_exists(output_filename)
     check_file_exists(replay_filename)
@@ -88,6 +89,6 @@ if __name__ == '__main__':
     print("{BLUE}[--------]{END}".format(**formatters))
     run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
     run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
-    run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 1)
+    run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0)
     print("{BLUE}[--------]{END}".format(**formatters))
     sys.exit(errors)

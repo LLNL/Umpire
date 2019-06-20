@@ -64,6 +64,8 @@ and a dynamic pool for those that are larger.
 
 - Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
 
+- Add PID to filenames for log and replay output.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
@@ -73,6 +75,9 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Fixed bug in replay where it was not correctly replaying AllocationAdvisor
+  operations.
 
 - Fixed bug in monotonic pool allocator causing it to always return
   the same allocation.

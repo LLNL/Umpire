@@ -33,6 +33,13 @@
 #include <dirent.h>
 #endif
 
+#if !defined(_MSC_VER)
+#include <unistd.h>   // getpid()
+#else
+#include <process.h>
+#define getpid _getpid
+#endif
+
 namespace umpire {
 
 static util::OutputBuffer log_buffer;
@@ -86,10 +93,11 @@ IOManager::initialize(
     }
 
     auto rank = MPI::getRank();
+    int pid{getpid()};
 
-    s_log_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "log");
-    s_replay_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "replay");
-    s_error_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, "error");
+    s_log_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, pid, "log");
+    s_replay_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, pid, "replay");
+    s_error_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, pid, "error");
     s_error_filename = "";
 
     log_buffer.setConsoleStream(&std::cout);
@@ -153,6 +161,7 @@ IOManager::makeUniqueFilename(
     const std::string& base_dir,
     const std::string& name, 
     int rank,
+    int pid,
     const std::string& extension)
 {
   int unique_id = -1;
@@ -163,7 +172,7 @@ IOManager::makeUniqueFilename(
     ss.str("");
     ss.clear();
     unique_id++;
-    ss << base_dir << "/" << name << "." << rank << "." << unique_id << "." << extension;
+    ss << base_dir << "/" << name << "." << rank << "." << pid << "." << unique_id << "." << extension;
     filename = ss.str();
   } while (fileExists(filename));
 

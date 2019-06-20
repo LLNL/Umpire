@@ -19,15 +19,16 @@ output is written:
 
 The values of these variables are used to construct unique filenames for
 output. The extension ``.log`` is used for logging output, and ``.replay`` for
-replay output. The filenames additionally contain two integers, one
-corresponding to the rank of the process, and one that is used to make multiple
-files with the same basename and rank unique. This ensures that multiple runs
-with the same IO configuration do not overwrite files.
+replay output. The filenames additionally contain three integers, one
+corresponding to the rank of the process, one corresponding to the process ID,
+and one that is used to make multiple files with the same basename and rank
+unique. This ensures that multiple runs with the same IO configuration do not
+overwrite files.
 
 The format of the filenames is:
 
 .. code-block:: bash
 
-    <UMPIRE_OUTPUT_BASENAME>.<RANK>.<UID>.<log|replay>
+    <UMPIRE_OUTPUT_BASENAME>.<RANK>.<PID>.<UID>.<log|replay>
 
 If Umpire is compiled without MPI support, then rank will always be 0.

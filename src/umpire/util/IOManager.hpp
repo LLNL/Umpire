@@ -31,6 +31,7 @@ public:
       const std::string& base_dir,
       const std::string& name, 
       int rank,
+      int pid,
       const std::string& extension);
 
   static bool fileExists(const std::string& file);
