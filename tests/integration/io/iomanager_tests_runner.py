@@ -52,8 +52,8 @@ def check_file_not_exists(filename):
 
     global errors
 
-    print("{BLUE}[RUN     ]{END} Checking {myfile} doesnt exist".format(myfile=filename, **formatters))
-    if (os.path.isfile(filename)):
+    print("{BLUE}[RUN     ]{END} Checking {myfile} doesn't exist".format(myfile=filename, **formatters))
+    if (not os.path.isfile(filename)):
         print("{BLUE}[      OK]{END} {myfile} doesn't exist".format(myfile=filename, **formatters))
     else:
         print("{RED}[   ERROR]{END} {myfile} found".format(myfile=filename, **formatters))
@@ -74,7 +74,8 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
     test_program = subprocess.Popen(cmd_args,
             env=dict(os.environ, **test_env),
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
+            stderr=subprocess.PIPE,
+            shell=False)
     pid = test_program.pid
     test_program.wait()
 
@@ -116,8 +117,7 @@ if __name__ == '__main__':
     print("{BLUE}[--------]{END}".format(**formatters))
     run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, True)
     run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, True)
-    run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 1, True, True)
-    run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_log_tests'}, 0, True, True)
+    run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, True)
 
     run_io_test({'UMPIRE_OUTPUT_DIR': './optional_io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, False, False)
     run_io_test({'UMPIRE_OUTPUT_DIR': './optional_io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, False)
