@@ -374,7 +374,7 @@ class Replay {
         replay_out() << "<" << type << ">" ;
 
         if ( type == "umpire::strategy::AllocationAdvisor" ) {
-          const int numargs = m_json["payload"]["args"].size();
+          const int numargs = static_cast<int>(m_json["payload"]["args"].size());
           const std::string& base_allocator_name = m_json["payload"]["args"][0];
           const std::string& advice_operation = m_json["payload"]["args"][1];
           const std::string& last_arg = m_json["payload"]["args"][numargs-1];
