@@ -66,6 +66,8 @@ and a dynamic pool for those that are larger.
 
 - Add PID to filenames for log and replay output.
 
+- Switch to SPDX licensing.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
