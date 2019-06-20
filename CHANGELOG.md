@@ -76,6 +76,9 @@ and a dynamic pool for those that are larger.
 
 ### Fixed
 
+- Fixed bug in replay where it was not correctly replaying AllocationAdvisor
+  operations.
+
 - Fixed bug in monotonic pool allocator causing it to always return
   the same allocation.
 
