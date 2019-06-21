@@ -44,23 +44,22 @@ class DynamicPool : public AllocationStrategy
     using Pointer = void*;
 
     /*!
-     * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
+     * \brief Callback heuristic to trigger coalesce of free blocks in pool.
      *
      * The registered heuristic callback function will be called immediately
      * after a deallocation() has completed from the pool.
      */
-    using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool& )>;
+    using CoalesceHeuristic = std::function<bool (const strategy::DynamicPool&)>;
 
     /*!
      * \brief Construct a new DynamicPool.
      *
-     * \param name Name of this instance of the DynamicPool.
-     * \param id Id of this instance of the DynamicPool.
-     * \param initial_alloc_size The minimum size of the first allocation
-     *                           the pool will make.
-     * \param min_alloc_size The minimum size of all future allocations.
-     * \param align_bytes Number of bytes with which to align allocation sizes.
-     * \param coalesce_heuristic Heuristic callback function.
+     * \param name Name of this instance of the DynamicPool
+     * \param id Unique identifier for this instance
+     * \param initial_alloc_bytes Size the pool initially allocates
+     * \param min_alloc_bytes The minimum size of all future allocations
+     * \param align_bytes Number of bytes with which to align allocation sizes
+     * \param coalesce_heuristic Heuristic callback function
      */
     DynamicPool(
         const std::string& name,
@@ -69,45 +68,57 @@ class DynamicPool : public AllocationStrategy
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
         const int align_bytes = 16,
-        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
+        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100))
+      noexcept;
 
+    /*!
+     * \brief Destructs the DynamicPool.
+     */
     ~DynamicPool();
 
     void* allocate(std::size_t bytes) override;
-
     void deallocate(void* ptr) override;
-
     void release() override;
 
     std::size_t getCurrentSize() const noexcept override;
     std::size_t getActualSize() const noexcept override;
     std::size_t getHighWatermark() const noexcept override;
 
-    std::size_t getFreeBlocks() const;
-    std::size_t getInUseBlocks() const;
-
     Platform getPlatform() noexcept override;
 
     /*!
-     * \brief Return a lower bound number of bytes that may be
-     * released back to resource.
+     * \brief Returns the number of bytes of unallocated data held by this pool
+     * that could be immediately released back to the resource.
      *
-     * A memory pool has a set of blocks that have no allocations
-     * against them.  If the size of the set is greater than one, then
-     * the pool will have a number of bytes that may be released back to
-     * the resource or coalesced into a larger block.
+     * A memory pool has a set of blocks that are not leased out to the
+     * application as allocations. Allocations from the resource begin as a
+     * single chunk, but these could be split, and only the first chunk can be
+     * deallocated back to the resource immediately.
      *
-     * \return The total number of bytes that are releasable
+     * \return The total number of bytes that are immediately releasable.
      */
     std::size_t getReleasableSize() const noexcept;
 
     /*!
-     * \brief Retrn the number of memory blocks that the pool holds.
-     *
-     * \return The total number of blocks that are allocated by the pool
+     * \brief Return the number of free memory blocks that the pools holds.
+     */
+    std::size_t getFreeBlocks() const noexcept;
+
+    /*!
+     * \brief Return the number of used memory blocks that the pools holds.
+     */
+    std::size_t getInUseBlocks() const noexcept;
+
+    /*!
+     * \brief Return the number of memory blocks -- both leased to application
+     * and internal free memory -- that the pool holds.
      */
     std::size_t getBlocksInPool() const noexcept;
 
+    /*!
+     * \brief Merge as many free records as possible, release all possible free
+     * blocks, then reallocate a chunk to keep the actual size the same.
+     */
     void coalesce();
 
   private:
@@ -116,10 +127,15 @@ class DynamicPool : public AllocationStrategy
     using AddressMap = util::MemoryMap<SizePair>;
     using SizeMap = std::multimap<std::size_t, AddressPair>;
 
+    // Insert a block to the used map
     void insertUsed(Pointer addr, std::size_t bytes, bool is_head);
+
+    // Insert a block to the free map
     void insertFree(Pointer addr, std::size_t bytes, bool is_head);
 
-    SizeMap::const_iterator findFreeChunk(std::size_t bytes) const;
+    // find a free block with length <= bytes as close to bytes in length as
+    // possible.
+    SizeMap::const_iterator findFreeBlock(std::size_t bytes) const;
 
     void doCoalesce();
     std::size_t doRelease();
@@ -127,7 +143,7 @@ class DynamicPool : public AllocationStrategy
     strategy::AllocationStrategy* m_allocator;
     const std::size_t m_min_alloc_bytes;
     const int m_align_bytes;
-    Coalesce_Heuristic m_do_coalesce;
+    CoalesceHeuristic m_coalesce_heuristic;
     AddressMap m_used_map;
     SizeMap m_free_map;
     std::size_t m_curr_bytes;

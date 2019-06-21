@@ -31,7 +31,7 @@ MixedPool::MixedPool(const std::string& name, int id,
                      const std::size_t dynamic_initial_alloc_size,
                      const std::size_t dynamic_min_alloc_size,
                      const int dynamic_align_bytes,
-                     DynamicPool::Coalesce_Heuristic coalesce_heuristic) noexcept :
+                     DynamicPool::CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy(name, id),
   m_map(),
   m_fixed_pool_map(),
