@@ -94,3 +94,4 @@ install(TARGETS
   ARCHIVE DESTINATION lib)
 
 add_subdirectory(judy)
+add_subdirectory(backtrace)

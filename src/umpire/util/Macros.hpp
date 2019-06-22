@@ -14,6 +14,8 @@
 #include "umpire/util/statistic_helper.hpp"
 #endif
 
+#include "umpire/tpl/backtrace/BackTrace.hpp"
+
 #include <sstream>
 #include <iostream>
 #include <mutex>
@@ -88,9 +90,11 @@
 
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
-  UMPIRE_LOG(Error, msg);                                          \
+  UMPIRE_LOG(Error, msg                                            \
+      << std::endl << umpire::util::BackTrace::Backtrace());       \
   std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << " " << msg;               \
+  umpire_oss_error << " " << __func__ << " "                       \
+    << msg << std::endl << umpire::util::BackTrace::Backtrace();   \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
