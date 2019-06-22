@@ -38,6 +38,7 @@ option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_TOOLS "Enable Umpire development tools" On)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
+option(ENABLE_BACKTRACE "Build Umpire with backtrace error reporting" Off)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 

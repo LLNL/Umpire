@@ -23,7 +23,7 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
 
   if (NOT SLIC_LIBRARY)
     message(FATAL_ERROR "Could not find SLIC library, make sure SLIC_LIBRARY_PATH is set properly")
-  endif()
+  endif ()
 
   find_library( SLIC_UTIL_LIBRARY
     libaxom_utils.a
@@ -32,7 +32,7 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
 
   if (NOT SLIC_UTIL_LIBRARY)
     message(FATAL_ERROR "Could not find Axom Utility Library for SLIC, make sure SLIC_LIBRARY_PATH is set properly")
-  endif()
+  endif ()
 
   find_path( SLIC_INCLUDE_DIR
     slic/slic.hpp
@@ -41,10 +41,20 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
 
   if (NOT SLIC_INCLUDE_DIR)
     message(FATAL_ERROR "Could not find SLIC include directory, make sure SLIC_INCLUDE_PATH is set properly")
-  endif()
+  endif ()
 
   blt_register_library( NAME slic
                         INCLUDES ${SLIC_INCLUDE_DIR}
                         LIBRARIES ${SLIC_LIBRARY} ${SLIC_UTIL_LIBRARY}
                       )
+endif ()
+
+if (ENABLE_BACKTRACE)
+  if (NOT CMAKE_DL_LIBS)
+    message(STATUS "CMAKE_DL_LIBS not set and will not be included")
+  endif ()
+
+  blt_register_library( NAME backtrace
+      LIBRARIES ${CMAKE_DL_LIBS}
+    )
 endif ()

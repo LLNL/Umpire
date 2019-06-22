@@ -67,7 +67,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends umpire_tpl_judy umpire_tpl_backtrace)
+set (umpire_util_depends umpire_tpl_judy)
 
 if (ENABLE_NUMA)
   set (umpire_util_depends
@@ -85,6 +85,12 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
   set (umpire_util_depends
     ${umpire_util_depends}
     slic)
+endif()
+
+if (ENABLE_BACKTRACE)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    umpire_tpl_backtrace)
 endif()
 
 if (ENABLE_MPI)

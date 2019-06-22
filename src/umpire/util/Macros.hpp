@@ -88,6 +88,7 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
+#ifdef UMPIRE_ENABLE_BACKTRACE
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
   UMPIRE_LOG(Error, msg                                            \
@@ -99,6 +100,17 @@
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
 }
+#else
+#define UMPIRE_ERROR( msg )                                        \
+{                                                                  \
+  UMPIRE_LOG(Error, msg);                                          \
+  std::ostringstream umpire_oss_error;                             \
+  umpire_oss_error << " " << __func__ << " " << msg;               \
+  throw umpire::util::Exception( umpire_oss_error.str(),           \
+                                 std::string(__FILE__),            \
+                                 __LINE__);                        \
+}
+#endif // UMPIRE_ENABLE_BACKTRACE
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 

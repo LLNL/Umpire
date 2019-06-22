@@ -30,6 +30,7 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
       ``ENABLE_C``                 Off      Build the C API
       ``ENABLE_FORTRAN``           Off      Build the Fortran API
+      ``ENABLE_BACKTRACE``         Off      Enable error logging of backtrace
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
@@ -82,3 +83,7 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_FORTRAN``
   Build the Fortran API.
+
+* ``ENABLE_BACKTRACE``
+  When enabled, Umpire error information will include a runtime backtrace
+  of the caller causing the error condition.
