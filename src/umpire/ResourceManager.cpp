@@ -275,34 +275,6 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
-  m_memory_resources[resource::Device] = registry.makeMemoryResource("DEVICE", getNextId());
-#endif
-
-#if defined(UMPIRE_ENABLE_PINNED)
-  m_memory_resources[resource::Pinned] = registry.makeMemoryResource("PINNED", getNextId());
-#endif
-
-#if defined(UMPIRE_ENABLE_UM)
-  m_memory_resources[resource::Unified] = registry.makeMemoryResource("UM", getNextId());
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-  m_memory_resources[resource::Constant] = registry.makeMemoryResource("DEVICE_CONST", getNextId());
-#endif
-
-  /*
-   * Construct default allocators for each resource
-   */
-  auto host_allocator = m_memory_resources[resource::Host];
-  m_allocators_by_name["HOST"] = host_allocator;
-  m_allocators_by_id[host_allocator->getId()] = host_allocator;
-
-  m_default_allocator = host_allocator;
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-  auto device_allocator = m_memory_resources[resource::Device];
-  m_allocators_by_name["DEVICE"] = device_allocator;
-  m_allocators_by_id[device_allocator->getId()] = device_allocator;
 #endif
 
 #if defined(UMPIRE_ENABLE_PINNED)
