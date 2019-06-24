@@ -50,11 +50,7 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
 endif ()
 
 if (ENABLE_BACKTRACE)
-  if (NOT CMAKE_DL_LIBS)
-    message(STATUS "CMAKE_DL_LIBS not set and will not be included")
-  endif ()
-
-  blt_register_library( NAME backtrace
+  blt_register_library( NAME backtrace_symbols
       LIBRARIES ${CMAKE_DL_LIBS}
     )
 endif ()

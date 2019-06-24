@@ -90,7 +90,8 @@ endif()
 if (ENABLE_BACKTRACE)
   set (umpire_util_depends
     ${umpire_util_depends}
-    umpire_tpl_backtrace)
+    umpire_tpl_backtrace
+    backtrace_symbols)
 endif()
 
 if (ENABLE_MPI)
