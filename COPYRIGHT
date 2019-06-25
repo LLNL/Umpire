@@ -1,0 +1,51 @@
+Intellectual Property Notice
+------------------------------
+
+Umpire is licensed under the MIT license,
+(MIT or https://opensource.org/licenses/MIT).
+
+See the files LICENSE and RELEASE for details.
+
+Copyrights and patents in the Umpire project are retained by contributors.  No
+copyright assignment is required to contribute to Umpire.
+
+
+SPDX usage
+------------
+
+Individual files contain SPDX tags instead of the full license text.
+This enables machine processing of license information based on the SPDX
+License Identifiers that are available here: https://spdx.org/licenses/
+
+Files that are licensed as MIT contain the following
+text in the license header:
+
+    SPDX-License-Identifier: (MIT)
+
+
+External Packages
+-------------------
+Umpire has some external dependencies, some of which are included as Git
+submodules and others are bundled in the RAJA repository. These packages are
+covered by various permissive licenses. A summary listing follows. See the
+license included with each package for full details.
+
+PackageName: BLT
+PackageHomePage: https://github.com/LLNL/blt/
+PackageLicenseDeclared: BSD-3-Clause
+
+PackageName: cxxopts
+PackageHomePage: https://github.com/LLNL/cxxopts
+PackageLicenseDeclared: MIT
+
+PackageName: json
+PackageHomePage: https://github.com/nlohmann/json
+PackageLicenseDeclared: MIT
+
+PackageName: judy
+PackageHomePage: https://github.com/mpictor/judy-template
+PackageLicenseDeclared: Public Domain
+
+PackageName: conduit
+PackageHomePage: https://github.com/LLNL/conduit/
+PackageLicenseDeclared: BSD-3-Clause

@@ -1,17 +1,9 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 replay_tests_dir=$1
 tools_dir=$2
@@ -31,7 +23,7 @@ fi
 #
 # Now replay from the activity captured in the replay_test1.csv file
 #
-$replayprogram -i umpire.0.0.replay -t replay.out
+$replayprogram -i umpire.0.*.0.replay -t replay.out
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $replayprogram"
     exit 1
