@@ -160,7 +160,10 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance();
 
   {
-    std::unique_ptr<strategy::AllocationStrategy> host_allocator{registry.makeMemoryResource("HOST", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy> 
+      host_allocator{
+        new strategy::ZeroByteHandler("HOST",getNextId(),
+            registry.makeMemoryResource("HOST", getNextId()))};
     int id{host_allocator->getId()};
     m_allocators_by_name["HOST"]  = host_allocator.get();
     m_memory_resources[resource::Host] = host_allocator.get();
