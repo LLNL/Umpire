@@ -67,9 +67,8 @@ class DynamicPool : public AllocationStrategy
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        const int align_bytes = 16,
-        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100))
-      noexcept;
+        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100),
+        const int align_bytes = 16) noexcept;
 
     /*!
      * \brief Destructs the DynamicPool.
