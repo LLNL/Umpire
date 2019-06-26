@@ -1,16 +1,8 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 
 cmake_policy(SET CMP0025 NEW)
@@ -36,7 +28,7 @@ option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
-option(ENABLE_TOOLS "Enable Umpire development tools" On)
+option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_BACKTRACE "Build Umpire with backtrace error reporting" Off)
 

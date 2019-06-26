@@ -37,6 +37,8 @@ and a dynamic pool for those that are larger.
 
 ### Changed
 
+- Builds are no longer building tools by default (ENABLE_TOOLS=Off).
+
 - Replay uses JSON format for its I/O.
 
 - OpenMP is off by default.
