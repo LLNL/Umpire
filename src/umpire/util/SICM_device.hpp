@@ -20,9 +20,7 @@
 #include <functional>
 #include <vector>
 
-extern "C" {
 #include <sicm_low.h>
-}
 
 namespace umpire {
 namespace sicm {

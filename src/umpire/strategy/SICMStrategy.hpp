@@ -19,9 +19,7 @@
 
 #include "umpire/Allocator.hpp"
 
-extern "C" {
 #include <sicm_low.h>
-}
 
 namespace umpire {
 

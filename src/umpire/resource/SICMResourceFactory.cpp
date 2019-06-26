@@ -23,10 +23,7 @@
 
 #include <numa.h>
 
-extern "C"
-{
 #include <sicm_low.h>
-}
 
 namespace umpire {
 namespace resource {

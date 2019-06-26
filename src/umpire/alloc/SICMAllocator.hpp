@@ -24,10 +24,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/SICM_device.hpp"
 
-extern "C"
-{
 #include <sicm_low.h>
-}
 
 namespace umpire {
 namespace alloc {

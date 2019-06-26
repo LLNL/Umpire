@@ -19,9 +19,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
-extern "C" {
 #include <sicm_low.h>
-}
 
 namespace umpire {
 namespace op {

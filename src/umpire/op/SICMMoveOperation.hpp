@@ -17,9 +17,7 @@
 
 #include "umpire/op/MemoryOperation.hpp"
 
-extern "C" {
 #include <sicm_low.h>
-}
 
 namespace umpire {
 namespace op {
