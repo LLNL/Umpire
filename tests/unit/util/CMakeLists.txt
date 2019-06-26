@@ -1,16 +1,8 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (util_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/util)
 
@@ -33,6 +25,16 @@ blt_add_executable(
 blt_add_test(
   NAME allocation_map_tests
   COMMAND allocation_map_tests)
+
+blt_add_executable(
+  NAME output_buffer_tests
+  SOURCES output_buffer_tests.cpp
+  DEPENDS_ON umpire gtest
+  OUTPUT_DIR ${util_dir})
+
+blt_add_test(
+  NAME output_buffer_tests
+  COMMAND output_buffer_tests)
 
 blt_add_executable(
   NAME memory_map_tests

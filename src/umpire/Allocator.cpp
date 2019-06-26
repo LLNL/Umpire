@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 
@@ -31,7 +23,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept:
 }
 
 void*
-Allocator::allocate(size_t bytes)
+Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
@@ -74,26 +66,26 @@ Allocator::release()
   m_allocator->release();
 }
 
-size_t
+std::size_t
 Allocator::getSize(void* ptr) const
 {
   UMPIRE_LOG(Debug, "(" << ptr << ")");
   return ResourceManager::getInstance().getSize(ptr);
 }
 
-size_t
+std::size_t
 Allocator::getHighWatermark() const noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
-size_t
+std::size_t
 Allocator::getCurrentSize() const noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
-size_t
+std::size_t
 Allocator::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();

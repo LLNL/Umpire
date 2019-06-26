@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
@@ -43,8 +35,9 @@ std::function<bool(const strategy::DynamicPool&)> heuristic_percent_releasable( 
   float f = (float)((float)percentage / (float)100.0);
 
   return [=] (const strategy::DynamicPool& pool) {
-      const long threshold = f * pool.getActualSize();
-      return (pool.getReleasableSize() >= threshold);
+    // Calculate threshold in bytes from the percentage
+    const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+    return (pool.getReleasableSize() >= threshold);
   };
 }
 

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HostResourceFactory.hpp"
 
@@ -22,6 +14,7 @@
 #endif
 
 #include "umpire/util/detect_vendor.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
@@ -36,7 +29,7 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -51,8 +44,8 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   // mib[0] = CTL_HW;
   // mib[1] = HW_MEMSIZE;
 
-  // size_t mem_size;
-  // size_t returnSize = sizeof(mem_size);
+  // std::size_t mem_size;
+  // std::size_t returnSize = sizeof(mem_size);
   // sysctl(mib, 2, &physicalMem, &returnSize, NULL, 0);
 
   traits.unified = false;
@@ -62,7 +55,7 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new DefaultMemoryResource<HostAllocator>(Platform::cpu, "HOST", id, traits);
+  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::cpu, "HOST", id, traits);
 }
 
 } // end of namespace resource

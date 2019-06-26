@@ -29,11 +29,19 @@ and a dynamic pool for those that are larger.
 
 - Support for AMD's HIP.
 
+- GCC 4.9 build to Travis CI.
+
+- Added a new IOManager that stores logging and replay output to files.
+
 ### Changed
+
+- Builds are no longer building tools by default (ENABLE_TOOLS=Off).
 
 - Replay uses JSON format for its I/O.
 
 - OpenMP is off by default.
+
+- CUDA is off by default.
 
 - Switched template parameters to runtime constructor arguments in `FixedPool`.
 
@@ -52,6 +60,16 @@ and a dynamic pool for those that are larger.
 
 - Added Debug and RelWithDebInfo builds to Travis CI.
 
+- Use unique_ptr internally to ensure cleanup at end of program.
+
+- Use RAII locks with `std::lock_guard`.
+
+- Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
+
+- Add PID to filenames for log and replay output.
+
+- Switch to SPDX licensing.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
@@ -61,6 +79,14 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Fixed bug in replay where it was not correctly replaying AllocationAdvisor
+  operations.
+
+- Fixed bug in monotonic pool allocator causing it to always return
+  the same allocation.
+
+- Enabled pedantic compiler warnings and fixed errors.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives
@@ -83,6 +109,10 @@ and a dynamic pool for those that are larger.
 
 - Fix CodeCov reporting by explicitly downloading older version of upload
   script.
+
+- Fix error where the MemoryMap.inl was not installed.
+
+- Replay and logging files only created when logging/replay are enabled.
 
 ## [0.3.5] - 2019-06-11
 

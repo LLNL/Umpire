@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -31,7 +23,7 @@ double* move_data(double* source_data, const std::string& destination)
 }
 
 int main(int, char**) {
-  constexpr size_t SIZE = 1024;
+  constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -45,7 +37,7 @@ int main(int, char**) {
 
   std::cout << "Filling with 0.0...";
 
-  for (size_t i = 0; i < SIZE; i++) {
+  for (std::size_t i = 0; i < SIZE; i++) {
     data[i] = 0.0;
   }
 

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/DynamicPool.hpp"
@@ -143,6 +135,8 @@ void DynamicPool::splitBlock(struct Block *&curr, struct Block *&prev, const std
 void DynamicPool::releaseBlock(struct Block *curr, struct Block *prev) {
   assert(curr != nullptr);
 
+  UMPIRE_LOG(Debug, "(" << curr << ", " << prev << ")");
+
   if (prev) prev->next = curr->next;
   else usedBlocks = curr->next;
 
@@ -179,6 +173,7 @@ void DynamicPool::releaseBlock(struct Block *curr, struct Block *prev) {
 }
 
 std::size_t DynamicPool::freeReleasedBlocks() {
+  UMPIRE_LOG(Debug, "()");
   // Release the unused blocks
   struct Block *curr = freeBlocks;
   struct Block *prev = nullptr;
@@ -221,6 +216,7 @@ void DynamicPool::coalesceFreeBlocks(std::size_t size) {
 }
 
 void DynamicPool::freeAllBlocks() {
+  UMPIRE_LOG(Debug, "()");
   // Release the used blocks
   while(usedBlocks) {
     releaseBlock(usedBlocks, nullptr);
@@ -252,10 +248,14 @@ DynamicPool::DynamicPool(
 {
 }
 
-DynamicPool::~DynamicPool() { freeAllBlocks(); }
+DynamicPool::~DynamicPool()
+{ 
+  UMPIRE_LOG(Debug, "()");
+  freeAllBlocks(); 
+}
 
 void*
-DynamicPool::allocate(size_t bytes)
+DynamicPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
@@ -310,34 +310,34 @@ DynamicPool::deallocate(void* ptr)
   }
 }
 
-long DynamicPool::getCurrentSize() const noexcept
+std::size_t DynamicPool::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << allocBytes);
   return allocBytes;
 }
 
-long DynamicPool::getActualSize() const noexcept
+std::size_t DynamicPool::getActualSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << totalBytes);
   return totalBytes;
 }
 
-long DynamicPool::getHighWatermark() const noexcept
+std::size_t DynamicPool::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << highWatermark);
   return highWatermark;
 }
 
-long DynamicPool::getBlocksInPool() const noexcept
+std::size_t DynamicPool::getBlocksInPool() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << totalBlocks);
   return totalBlocks;
 }
 
-long DynamicPool::getReleasableSize() const noexcept
+std::size_t DynamicPool::getReleasableSize() const noexcept
 {
-  long nblocks = 0;
-  long nbytes = 0;
+  std::size_t nblocks = 0;
+  std::size_t nbytes = 0;
   for (struct Block *temp = freeBlocks; temp; temp = temp->next) {
     if ( temp->size == temp->blockSize ) {
       nbytes += temp->blockSize;
@@ -345,12 +345,12 @@ long DynamicPool::getReleasableSize() const noexcept
     }
   }
 
-  const long sparse_block_size = nblocks > 1 ? nbytes : 0;
+  const std::size_t sparse_block_size = nblocks > 1 ? nbytes : 0;
   UMPIRE_LOG(Debug, "() returning " << sparse_block_size);
   return sparse_block_size;
 }
 
-long DynamicPool::getFreeBlocks() const
+std::size_t DynamicPool::getFreeBlocks() const
 {
   std::size_t nb = 0;
   for (struct Block *temp = freeBlocks; temp; temp = temp->next)
@@ -359,7 +359,7 @@ long DynamicPool::getFreeBlocks() const
   return nb;
 }
 
-long DynamicPool::getInUseBlocks() const
+std::size_t DynamicPool::getInUseBlocks() const
 {
   std::size_t nb = 0;
   for (struct Block *temp = usedBlocks; temp; temp = temp->next) nb++;

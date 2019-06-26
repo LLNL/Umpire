@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 // FixedMallocPool follows the algorithm presented in
@@ -36,18 +28,18 @@ FixedMallocPool::addr_from_index(const FixedMallocPool::Pool& p, unsigned int i)
 inline unsigned int
 FixedMallocPool::index_from_addr(const FixedMallocPool::Pool& p, const unsigned char* ptr) const
 {
-  return static_cast<unsigned int>(ptr - p.data) / m_obj_bytes;
+  return static_cast<unsigned int>((ptr - p.data) / m_obj_bytes);
 }
 
-FixedMallocPool::Pool::Pool(const size_t object_bytes,
-                            const size_t objects_per_pool) :
+FixedMallocPool::Pool::Pool(const std::size_t object_bytes,
+                            const std::size_t objects_per_pool) :
   data(static_cast<unsigned char*>(std::malloc(object_bytes * objects_per_pool))),
   next(data),
   num_initialized(0),
   num_free(objects_per_pool) {}
 
-FixedMallocPool::FixedMallocPool(const size_t object_bytes,
-                                 const size_t objects_per_pool) :
+FixedMallocPool::FixedMallocPool(const std::size_t object_bytes,
+                                 const std::size_t objects_per_pool) :
   m_obj_bytes(object_bytes),
   m_obj_per_pool(objects_per_pool),
   m_data_bytes(m_obj_bytes * m_obj_per_pool),
@@ -87,7 +79,7 @@ FixedMallocPool::allocInPool(Pool& p) noexcept
 }
 
 void*
-FixedMallocPool::allocate(size_t bytes)
+FixedMallocPool::allocate(std::size_t bytes)
 {
   void* ptr = nullptr;
 
@@ -120,7 +112,7 @@ FixedMallocPool::deallocate(void* ptr)
         p.next = reinterpret_cast<unsigned char*>(ptr);
       }
       else {
-        *reinterpret_cast<unsigned int*>(ptr) = m_obj_per_pool;
+        *reinterpret_cast<std::size_t*>(ptr) = m_obj_per_pool;
         p.next = reinterpret_cast<unsigned char*>(ptr);
       }
       ++p.num_free;
@@ -131,7 +123,7 @@ FixedMallocPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
-size_t
+std::size_t
 FixedMallocPool::numPools() const noexcept
 {
   return m_pool.size();

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/FixedPool.hpp"
@@ -41,24 +33,24 @@ static int find_first_set(int i)
 namespace umpire {
 namespace strategy {
 
-static constexpr size_t bits_per_int = sizeof(int) * 8;
+static constexpr std::size_t bits_per_int = sizeof(int) * 8;
 
 FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
-                      const size_t object_bytes, const size_t objects_per_pool,
-                      const size_t avail_bytes) :
+                      const std::size_t object_bytes, const std::size_t objects_per_pool,
+                      const std::size_t avail_bytes) :
   strategy(allocation_strategy),
   data(reinterpret_cast<char*>(strategy->allocate(object_bytes * objects_per_pool))),
   avail(reinterpret_cast<int*>(std::malloc(avail_bytes))),
   num_avail(objects_per_pool)
 {
   // Set all bits to 1
-  const unsigned char not_zero = ~0;
+  const unsigned char not_zero = static_cast<unsigned char>(~0);
   std::memset(avail, not_zero, avail_bytes);
 }
 
 FixedPool::FixedPool(const std::string& name, int id,
-                     Allocator allocator, const size_t object_bytes,
-                     const size_t objects_per_pool) :
+                     Allocator allocator, const std::size_t object_bytes,
+                     const std::size_t objects_per_pool) :
   AllocationStrategy(name, id),
   m_strategy(allocator.getAllocationStrategy()),
   m_obj_bytes(object_bytes),
@@ -95,7 +87,7 @@ FixedPool::allocInPool(Pool& p)
     // Return the index of the first 1 bit
     const int bit_index = find_first_set(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
-      const size_t index = int_index * bits_per_int + bit_index;
+      const std::size_t index = int_index * bits_per_int + bit_index;
       if (index < m_obj_per_pool) {
         // Flip bit 1 -> 0
         p.avail[int_index] ^= 1 << bit_index;
@@ -110,7 +102,7 @@ FixedPool::allocInPool(Pool& p)
 }
 
 void*
-FixedPool::allocate(size_t bytes)
+FixedPool::allocate(std::size_t bytes)
 {
   // Check that bytes passed matches m_obj_bytes or bytes was not passed (default = 0)
   UMPIRE_ASSERT(!bytes || bytes == m_obj_bytes);
@@ -144,8 +136,8 @@ FixedPool::deallocate(void* ptr)
     const char* t_ptr = reinterpret_cast<char*>(ptr);
     const ptrdiff_t offset = t_ptr - p.data;
     if ((offset >= 0) && (offset < static_cast<ptrdiff_t>(m_data_bytes))) {
-      const size_t alloc_index = offset / m_obj_bytes;
-      const size_t int_index   = alloc_index / bits_per_int;
+      const std::size_t alloc_index = offset / m_obj_bytes;
+      const std::size_t int_index   = alloc_index / bits_per_int;
       const short  bit_index   = alloc_index % bits_per_int;
 
       UMPIRE_ASSERT(! (p.avail[int_index] & (1 << bit_index)));
@@ -163,21 +155,21 @@ FixedPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
-long
+std::size_t
 FixedPool::getCurrentSize() const noexcept
 {
   return m_current_bytes;
 }
 
-long
+std::size_t
 FixedPool::getActualSize() const noexcept
 {
-  const int avail_bytes = m_obj_per_pool/bits_per_int + 1;
+  const std::size_t avail_bytes = m_obj_per_pool/bits_per_int + 1;
   return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes + sizeof(Pool))
     + sizeof(FixedPool);
 }
 
-long
+std::size_t
 FixedPool::getHighWatermark() const noexcept
 {
   return m_highwatermark;
@@ -189,7 +181,7 @@ FixedPool::getPlatform() noexcept
   return m_strategy->getPlatform();
 }
 
-size_t
+std::size_t
 FixedPool::numPools() const noexcept
 {
   return m_pool.size();

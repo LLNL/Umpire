@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <vector>
@@ -92,7 +84,7 @@ public:
         , 512             // smallest fixed block size (Bytes)
         , 1*1024          // largest fixed block size 1KiB
         , 4 * 1024 * 1024 // max fixed pool size
-        , 12.0            // size multiplier
+        , 12              // size multiplier
         //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
         //, 1 * 1024 * 1024   // dynamic pool min allocation size
         //, heuristic75         // coallesce heuristic
@@ -105,7 +97,7 @@ public:
         , 512             // smallest fixed block size (Bytes)
         , 1*1024          // largest fixed block size 1KiB
         , 4 * 1024 * 1024 // max fixed pool size
-        , 12.0            // size multiplier
+        , 12              // size multiplier
         , 256 * 1024 * 1024 // dynamic pool min initial allocation size
         //, 1 * 1024 * 1024   // dynamic pool min allocation size
         //, heuristic75         // coallesce heuristic
@@ -118,7 +110,7 @@ public:
         , 512             // smallest fixed block size (Bytes)
         , 1*1024          // largest fixed block size 1KiB
         , 4 * 1024 * 1024 // max fixed pool size
-        , 12.0            // size multiplier
+        , 12              // size multiplier
         , 256 * 1024 * 1024 // dynamic pool min initial allocation size
         , 1 * 1024 * 1024   // dynamic pool min allocation size
         //, heuristic75         // coallesce heuristic

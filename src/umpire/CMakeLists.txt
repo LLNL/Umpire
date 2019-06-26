@@ -1,16 +1,8 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_headers
   Allocator.hpp
@@ -80,6 +72,7 @@ set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_HCC ${ENABLE_HCC})
+set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
 
 if (ENABLE_CUDA OR ENABLE_HCC OR ENABLE_HIP)

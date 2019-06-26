@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_MemoryMap_INL
 #define UMPIRE_MemoryMap_INL
@@ -59,7 +51,7 @@ MemoryMap<V>::~MemoryMap()
 template <typename V>
 template <typename... Args>
 std::pair<typename MemoryMap<V>::Iterator, bool>
-MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
+MemoryMap<V>::get(Key ptr, Args&&... args) noexcept
 {
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
@@ -82,7 +74,7 @@ MemoryMap<V>::get(void* ptr, Args&&... args) noexcept
 }
 
 template <typename V>
-typename MemoryMap<V>::Iterator MemoryMap<V>::insert(void* ptr, const Value& val)
+typename MemoryMap<V>::Iterator MemoryMap<V>::insert(Key ptr, const Value& val)
 {
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
@@ -109,7 +101,7 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::insert(void* ptr, const Value& val
 
 template <typename V>
 typename MemoryMap<V>::Key
-MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
+MemoryMap<V>::doFindOrBefore(Key ptr) const noexcept
 {
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
@@ -132,7 +124,7 @@ MemoryMap<V>::doFindOrBefore(void* ptr) const noexcept
 }
 
 template <typename V>
-typename MemoryMap<V>::Iterator MemoryMap<V>::findOrBefore(void* ptr) noexcept
+typename MemoryMap<V>::Iterator MemoryMap<V>::findOrBefore(Key ptr) noexcept
 {
   ptr = doFindOrBefore(ptr);
   return Iterator{this, ptr};
@@ -140,15 +132,17 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::findOrBefore(void* ptr) noexcept
 
 template <typename V>
 typename MemoryMap<V>::ConstIterator
-MemoryMap<V>::findOrBefore(void* ptr) const noexcept
+MemoryMap<V>::findOrBefore(Key ptr) const noexcept
 {
   ptr = doFindOrBefore(ptr);
   return ConstIterator{this, ptr};
 }
 
 template <typename V>
-typename MemoryMap<V>::Iterator MemoryMap<V>::find(void* ptr) noexcept
+typename MemoryMap<V>::Iterator MemoryMap<V>::find(Key ptr) noexcept
 {
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Find the ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -157,8 +151,10 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::find(void* ptr) noexcept
 
 template <typename V>
 typename MemoryMap<V>::ConstIterator
-MemoryMap<V>::find(void* ptr) const noexcept
+MemoryMap<V>::find(Key ptr) const noexcept
 {
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+
   // Find the ptr and update m_oper
   m_last = judy_slot(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
@@ -166,7 +162,7 @@ MemoryMap<V>::find(void* ptr) const noexcept
 }
 
 template <typename V>
-void MemoryMap<V>::remove(void* ptr)
+void MemoryMap<V>::erase(Key ptr)
 {
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
@@ -183,23 +179,34 @@ void MemoryMap<V>::remove(void* ptr)
 }
 
 template <typename V>
+void MemoryMap<V>::erase(Iterator iter)
+{
+  erase(iter->first);
+}
+
+template <typename V>
+void MemoryMap<V>::erase(ConstIterator iter)
+{
+  erase(iter->first);
+}
+
+template <typename V>
 void MemoryMap<V>::clear() noexcept
 {
   // Loop over the level 0 tree
   Key key{0};
-  while((m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0)))
+  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0); m_last; m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0))
     removeLast();
 
   m_size = 0;
 }
 
 template <typename V>
-size_t MemoryMap<V>::size() const noexcept
+std::size_t MemoryMap<V>::size() const noexcept
 {
   return m_size;
 }
 
-// Iterator
 template <typename V>
 void MemoryMap<V>::removeLast()
 {
@@ -282,7 +289,7 @@ MemoryMap<V>::Iterator_<Const>::operator++()
     judy_slot(m_map->m_array, reinterpret_cast<const unsigned char*>(&m_pair.first), judy_max);
   }
   m_map->m_last = judy_nxt(m_map->m_array);
-  m_map->m_oper = true;
+  m_map->m_oper = reinterpret_cast<uintptr_t>(this);
 
   if (!m_map->m_last) {
     // Reached end

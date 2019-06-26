@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_FixedMallocPool_HPP
 #define UMPIRE_FixedMallocPool_HPP
@@ -33,23 +25,23 @@ namespace util {
 class FixedMallocPool
 {
 public:
-  FixedMallocPool(const size_t object_bytes,
-                  const size_t objects_per_pool = 1024*1024);
+  FixedMallocPool(const std::size_t object_bytes,
+                  const std::size_t objects_per_pool = 1024*1024);
 
   ~FixedMallocPool();
 
-  void* allocate(size_t bytes = 0);
+  void* allocate(std::size_t bytes = 0);
   void deallocate(void* ptr);
 
-  size_t numPools() const noexcept;
+  std::size_t numPools() const noexcept;
 
 private:
   struct Pool {
     unsigned char* data;
     unsigned char* next;
     unsigned int num_initialized;
-    unsigned int num_free;
-    Pool(const size_t object_bytes, const size_t objects_per_pool);
+    std::size_t num_free;
+    Pool(const std::size_t object_bytes, const std::size_t objects_per_pool);
   };
 
   void newPool();
@@ -58,9 +50,9 @@ private:
   unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
   unsigned int index_from_addr(const Pool& p, const unsigned char* ptr) const;
 
-  const size_t m_obj_bytes;
-  const size_t m_obj_per_pool;
-  const size_t m_data_bytes;
+  const std::size_t m_obj_bytes;
+  const std::size_t m_obj_per_pool;
+  const std::size_t m_data_bytes;
   std::vector<Pool> m_pool;
   // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
   // ever reduced in size, then .data has to be manually deallocated

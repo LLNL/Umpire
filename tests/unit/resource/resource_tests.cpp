@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
@@ -19,7 +11,7 @@
 
 struct TestAllocator
 {
-  void* allocate(size_t bytes)
+  void* allocate(std::size_t bytes)
   {
     return ::malloc(bytes);
   }
@@ -42,6 +34,8 @@ TEST(DefaultMemoryResource, AllocateDeallocate)
   auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
   ASSERT_NE(pointer, nullptr);
+
+  alloc->deallocate(pointer);
 }
 
 TEST(DefaultMemoryResource, GetSize)

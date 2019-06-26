@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/AllocationMap.hpp"
 
@@ -55,7 +47,7 @@ class AllocationMapTest : public ::testing::Test {
     umpire::util::AllocationMap map;
 
     double* data;
-    size_t size;
+    std::size_t size;
     umpire::util::AllocationRecord record;
 };
 
@@ -171,18 +163,18 @@ TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
     map.insert(data, another_record);
   );
 
-  size_t size = 0;
+  std::size_t sz = 0;
   auto iter = map.begin(), end = map.end();
-  while (iter != end) { ++size; ++iter; }
-  ASSERT_EQ(size, 3);
+  while (iter != end) { ++sz; ++iter; }
+  ASSERT_EQ(sz, 3);
 }
 
 TEST_F(AllocationMapTest, RegisterNoneIteratorSize)
 {
-  size_t size = 0;
+  std::size_t sz = 0;
   auto iter = map.begin(), end = map.end();
-  while (iter != end) { ++size; ++iter; }
-  ASSERT_EQ(size, 0);
+  while (iter != end) { ++sz; ++iter; }
+  ASSERT_EQ(sz, 0);
 }
 
 TEST_F(AllocationMapTest, FindMultiple)

@@ -374,33 +374,112 @@ class Replay {
         replay_out() << "<" << type << ">" ;
 
         if ( type == "umpire::strategy::AllocationAdvisor" ) {
+          const int numargs = static_cast<int>(m_json["payload"]["args"].size());
           const std::string& base_allocator_name = m_json["payload"]["args"][0];
           const std::string& advice_operation = m_json["payload"]["args"][1];
+          const std::string& last_arg = m_json["payload"]["args"][numargs-1];
 
-          // Now grab the optional fields
-          if (m_json["payload"]["args"].size() >= 3) {
-            const std::string& accessing_allocator_name = m_json["payload"]["args"][2];
-
-            replay_out()
-              << "(" << allocator_name
-              << ", getAllocator(" << base_allocator_name << ")"
-              << ", " << advice_operation
-              << ", getAllocator(" << accessing_allocator_name << ")"
-              << ")";
-
-            if ( introspection )  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>( allocator_name, m_rm.getAllocator(base_allocator_name), advice_operation, m_rm.getAllocator(accessing_allocator_name));
-            else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(allocator_name, m_rm.getAllocator(base_allocator_name), advice_operation, m_rm.getAllocator(accessing_allocator_name));
+          //
+          // The last argument to this constructor will either be a string or
+          // will be an integer.  If it is an integer, we assume that it is the
+          // optional device_id argument.
+          //
+          int device_id = -1;   // Use default argument if negative
+          if (last_arg.find_first_not_of( "0123456789" ) == std::string::npos) {
+            std::stringstream ss(last_arg);
+            ss >> device_id;
           }
-          else {
 
-            replay_out()
-              << "(" << allocator_name
-              << ", getAllocator(" << base_allocator_name << ")"
-              << ", " << advice_operation
-              << ")";
+          if (device_id >= 0) { // Optional device ID specified
+            switch ( numargs ) {
+            case 3:
+              replay_out()
+                << "(" << allocator_name
+                << ", getAllocator(" << base_allocator_name << ")"
+                << ", " << advice_operation << ", " << device_id << ")";
 
-            if ( introspection )  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>( allocator_name, m_rm.getAllocator(base_allocator_name), advice_operation);
-            else                  m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(allocator_name, m_rm.getAllocator(base_allocator_name), advice_operation);
+              if ( introspection )
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
+                  ( allocator_name, m_rm.getAllocator(base_allocator_name), advice_operation, device_id);
+              else
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
+                  (allocator_name, m_rm.getAllocator(base_allocator_name), advice_operation, device_id);
+              break;
+            case 4:
+              const std::string& accessing_allocator_name = m_json["payload"]["args"][2];
+
+              replay_out()
+                << "(" << allocator_name
+                << ", getAllocator(" << base_allocator_name << ")"
+                << ", " << advice_operation
+                << ", getAllocator(" << accessing_allocator_name << ")"
+                << ", " << device_id << ")";
+
+              if ( introspection )
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
+                  (   allocator_name
+                    , m_rm.getAllocator(base_allocator_name)
+                    , advice_operation
+                    , m_rm.getAllocator(accessing_allocator_name)
+                    , device_id
+                  );
+              else
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
+                  (   allocator_name
+                    , m_rm.getAllocator(base_allocator_name)
+                    , advice_operation
+                    , m_rm.getAllocator(accessing_allocator_name)
+                    , device_id
+                  );
+              break;
+            }
+          }
+          else { // Use default device_id
+            switch ( numargs ) {
+            case 2:
+              replay_out()
+                << "(" << allocator_name
+                << ", getAllocator(" << base_allocator_name << ")"
+                << ", " << advice_operation << ")";
+
+              if ( introspection )
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
+                  (   allocator_name
+                    , m_rm.getAllocator(base_allocator_name)
+                    , advice_operation
+                    , device_id);
+              else
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
+                  (   allocator_name
+                    , m_rm.getAllocator(base_allocator_name)
+                    , advice_operation
+                  );
+              break;
+            case 3:
+              const std::string& accessing_allocator_name = m_json["payload"]["args"][2];
+
+              replay_out()
+                << "(" << allocator_name
+                << ", getAllocator(" << base_allocator_name << ")"
+                << ", " << advice_operation
+                << ", getAllocator(" << accessing_allocator_name << "))";
+
+              if ( introspection )
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
+                  (   allocator_name
+                    , m_rm.getAllocator(base_allocator_name)
+                    , advice_operation
+                    , m_rm.getAllocator(accessing_allocator_name)
+                  );
+              else
+                m_rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
+                  (   allocator_name
+                    , m_rm.getAllocator(base_allocator_name)
+                    , advice_operation
+                    , m_rm.getAllocator(accessing_allocator_name)
+                  );
+              break;
+            }
           }
         }
         else if ( type == "umpire::strategy::DynamicPool" ) {
@@ -514,7 +593,7 @@ class Replay {
           std::size_t smallest_fixed_blocksize;
           std::size_t largest_fixed_blocksize;
           std::size_t max_fixed_blocksize;
-          float size_multiplier;
+          std::size_t size_multiplier;
           std::size_t dynamic_min_initial_alloc_size;
           std::size_t dynamic_min_alloc_size;
 

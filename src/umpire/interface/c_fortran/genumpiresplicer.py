@@ -1,16 +1,8 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 from __future__ import print_function
 
@@ -62,7 +54,7 @@ subroutine allocator_allocate_{name}_array_{dim}d(this, array, dims)
       type(C_PTR) :: data_ptr
 
       {c_type} :: size_type
-      {c_size_t} :: num_bytes
+      integer(C_SIZE_T) :: num_bytes
 
       num_bytes = product(dims) * sizeof(size_type)
       data_ptr = this%allocate_pointer(num_bytes)

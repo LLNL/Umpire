@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 
@@ -62,7 +54,7 @@ class OperationTest :
     float* dest_array;
     float* check_array;
 
-    const size_t m_size = 1024;
+    const std::size_t m_size = 1024;
 
     umpire::Allocator* source_allocator;
     umpire::Allocator* dest_allocator;
@@ -93,15 +85,15 @@ class CopyTest :
 TEST_P(CopyTest, Copy) {
     auto& rm = umpire::ResourceManager::getInstance();
 
-    for (size_t i = 0; i < m_size; i++) {
-      source_array[i] = i;
+    for (std::size_t i = 0; i < m_size; i++) {
+      source_array[i] = static_cast<float>(i);
     }
 
     rm.copy(dest_array, source_array);
 
     rm.copy(check_array, dest_array);
 
-    for (size_t i = 0; i < m_size; i++) {
+    for (std::size_t i = 0; i < m_size; i++) {
       ASSERT_FLOAT_EQ(source_array[i], check_array[i]);
     }
 }
@@ -110,7 +102,7 @@ TEST_P(CopyTest, Single)
 {
     auto& rm = umpire::ResourceManager::getInstance();
 
-    check_array[10] = 3.14;
+    check_array[10] = 3.14f;
 
     rm.copy(&dest_array[11], &check_array[10], sizeof(float));
     rm.copy(&check_array[0], &dest_array[11], sizeof(float));
@@ -121,9 +113,9 @@ TEST_P(CopyTest, Single)
 TEST_P(CopyTest, Offset) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  for (size_t i = 0; i < m_size; ++i)
+  for (std::size_t i = 0; i < m_size; ++i)
   {
-    source_array[i] = i;
+    source_array[i] = static_cast<float>(i);
   }
 
   rm.copy(dest_array, source_array);
@@ -131,11 +123,11 @@ TEST_P(CopyTest, Offset) {
   rm.copy(check_array, dest_array);
   rm.copy(check_array, dest_array + m_size / 2);
 
-  for (size_t i = 0; i < m_size / 2; ++i) {
+  for (std::size_t i = 0; i < m_size / 2; ++i) {
     ASSERT_EQ(i + m_size / 2, check_array[i]);
   }
 
-  for (size_t i = m_size / 2; i < m_size; ++i) {
+  for (std::size_t i = m_size / 2; i < m_size; ++i) {
     ASSERT_EQ(i, check_array[i]);
   }
 }
@@ -175,7 +167,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(zero_copy_sources),
       ::testing::ValuesIn(zero_copy_dests)
-));
+),);
 
 const std::string copy_sources[] = {
   "HOST"
@@ -220,7 +212,7 @@ TEST_P(MemsetTest, Memset) {
 
   rm.copy(check_array, source_array);
 
-  for (size_t i = 0; i < m_size; i++) {
+  for (std::size_t i = 0; i < m_size; i++) {
     ASSERT_EQ(0, check_array[i]);
   }
 }
@@ -235,11 +227,11 @@ TEST_P(MemsetTest, Offset) {
 
   char * check_chars = reinterpret_cast<char*>(check_array);
 
-  for (size_t i = 0; i < m_size / 2 * sizeof(float); ++i) {
+  for (std::size_t i = 0; i < m_size / 2 * sizeof(float); ++i) {
     ASSERT_EQ(1, check_chars[i]);
   }
 
-  for (size_t i = m_size / 2 * sizeof(float); i < m_size * sizeof(float); ++i) {
+  for (std::size_t i = m_size / 2 * sizeof(float); i < m_size * sizeof(float); ++i) {
     ASSERT_EQ(2, check_chars[i]);
   }
 }
@@ -295,7 +287,7 @@ TEST_P(ReallocateTest, Reallocate)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
-  const size_t reallocated_size = (m_size/2);
+  const std::size_t reallocated_size = (m_size/2);
 
   rm.memset(source_array, 0);
 
@@ -309,7 +301,7 @@ TEST_P(ReallocateTest, Reallocate)
 
   rm.copy(check_array, source_array, reallocated_size*sizeof(float));
 
-  for (size_t i = 0; i < reallocated_size; i++) {
+  for (std::size_t i = 0; i < reallocated_size; i++) {
     ASSERT_FLOAT_EQ(check_array[i], 0);
   }
 }
@@ -318,7 +310,7 @@ TEST_P(ReallocateTest, ReallocateLarger)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
-  const size_t reallocated_size = (m_size+50);
+  const std::size_t reallocated_size = (m_size+50);
 
   rm.memset(source_array, 1);
 
@@ -341,11 +333,11 @@ TEST_P(ReallocateTest, ReallocateLarger)
       reallocated_size*sizeof(float));
 
   char * check_interrogator = reinterpret_cast<char*>(check_array);
-  for (size_t i = 0; i < m_size * sizeof(float) / sizeof(char); i++) {
+  for (std::size_t i = 0; i < m_size * sizeof(float) / sizeof(char); i++) {
     ASSERT_EQ(check_interrogator[i], 1);
   }
 
-  for (size_t i = m_size * sizeof(float) / sizeof(char); i < reallocated_size * sizeof(float) / sizeof(char); i++) {
+  for (std::size_t i = m_size * sizeof(float) / sizeof(char); i < reallocated_size * sizeof(float) / sizeof(char); i++) {
     ASSERT_EQ(check_interrogator[i], 2);
   }
 }
@@ -356,7 +348,7 @@ TEST_P(ReallocateTest, RealocateNull)
 
   rm.setDefaultAllocator(*source_allocator);
 
-  const size_t reallocated_size = (m_size+50);
+  const std::size_t reallocated_size = (m_size+50);
 
   void* null_array = nullptr;
 
@@ -376,7 +368,7 @@ TEST_P(ReallocateTest, ReallocateNullWithAllocator)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
-  const size_t reallocated_size = (m_size+50);
+  const std::size_t reallocated_size = (m_size+50);
 
   void* null_array = nullptr;
 
@@ -395,7 +387,7 @@ TEST_P(ReallocateTest, ReallocateWithAllocator)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
-  const size_t reallocated_size = (m_size+50);
+  const std::size_t reallocated_size = (m_size+50);
 
   float* reallocated_array =
     static_cast<float*>(
@@ -456,8 +448,8 @@ TEST_P(MoveTest, Move)
   auto& rm = umpire::ResourceManager::getInstance();
 
   // this works because source should always be host!
-  for (size_t i = 0; i < m_size; i++) {
-    source_array[i] = i;
+  for (std::size_t i = 0; i < m_size; i++) {
+    source_array[i] = static_cast<float>(i);
   }
 
   float* moved_array = static_cast<float*>(rm.move(source_array, *dest_allocator));
@@ -469,8 +461,8 @@ TEST_P(MoveTest, Move)
 
   rm.copy(check_array, moved_array);
 
-  for (size_t i = 0; i < m_size; i++) {
-    ASSERT_FLOAT_EQ(check_array[i], i);
+  for (std::size_t i = 0; i < m_size; i++) {
+    ASSERT_FLOAT_EQ(check_array[i], static_cast<float>(i));
   }
 
   dest_allocator->deallocate(moved_array);
@@ -603,6 +595,6 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(advice_sources),
       ::testing::ValuesIn(advice_dests)
-));
+),);
 
 #endif

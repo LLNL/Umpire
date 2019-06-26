@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/MemoryMap.hpp"
 
@@ -18,10 +10,10 @@
 
 using Map = umpire::util::MemoryMap<int>;
 
-static size_t size_by_iterator(Map& map)
+static std::size_t size_by_iterator(Map& map)
 {
   auto iter = map.begin(), end = map.end();
-  size_t size = 0;
+  std::size_t size = 0;
   while (iter != end) { ++size; ++iter; }
   return size;
 }
@@ -106,7 +98,7 @@ TEST_F(MemoryMapTest, findOrBefore)
     EXPECT_EQ(iter->first, a);
   }
 
-  map.remove(a);
+  map.erase(a);
   {
     auto iter = map.findOrBefore(static_cast<char*>(a) + 10);
     EXPECT_EQ(iter, map.begin());
@@ -116,12 +108,23 @@ TEST_F(MemoryMapTest, findOrBefore)
   ASSERT_EQ(map.size(), 0);
 }
 
-TEST_F(MemoryMapTest, remove)
+TEST_F(MemoryMapTest, erase)
 {
   map.insert(a, 1);
 
-  ASSERT_NO_THROW(map.remove(a));
-  ASSERT_ANY_THROW(map.remove(a));
+  ASSERT_NO_THROW(map.erase(a));
+  ASSERT_ANY_THROW(map.erase(a));
+  ASSERT_EQ(map.size(), 0);
+}
+
+TEST_F(MemoryMapTest, removeLast)
+{
+  map.insert(a, 1);
+
+  map.begin();
+
+  ASSERT_NO_THROW(map.removeLast());
+  ASSERT_ANY_THROW(map.erase(a));
   ASSERT_EQ(map.size(), 0);
 }
 
@@ -131,7 +134,7 @@ TEST_F(MemoryMapTest, clear)
   map.insert(b, 2);
   map.insert(c, 3);
 
-  ASSERT_NO_THROW(map.remove(a));
+  ASSERT_NO_THROW(map.erase(a));
 
   map.clear();
   ASSERT_EQ(map.size(), 0);

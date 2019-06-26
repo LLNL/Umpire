@@ -50,6 +50,7 @@ declarations:
         F_derived_name: UmpireAllocator
 
       declarations:
+        - decl: ~Allocator() +name(delete)
         - decl: void* allocate(size_t bytes)
           format:
             F_name_function: allocate_pointer

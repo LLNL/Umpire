@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 
@@ -39,9 +31,9 @@ class AllocatorTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorTest, AllocateDeallocateBig)
@@ -92,7 +84,7 @@ TEST_P(AllocatorTest, DeallocateNullptr)
 
 TEST_P(AllocatorTest, GetSize)
 {
-  const size_t size = m_big*sizeof(double);
+  const std::size_t size = m_big*sizeof(double);
 
   double* data = static_cast<double*>(
     m_allocator->allocate(size));
@@ -212,9 +204,9 @@ class AllocatorByResourceTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorByResourceTest, AllocateDeallocate)

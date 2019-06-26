@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_MonotonicAllocationStrategy_HPP
 #define UMPIRE_MonotonicAllocationStrategy_HPP
@@ -32,22 +24,25 @@ class MonotonicAllocationStrategy :
     MonotonicAllocationStrategy(
         const std::string& name,
         int id,
-        size_t capacity,
+        std::size_t capacity,
         Allocator allocator);
 
-    void* allocate(size_t bytes);
+    ~MonotonicAllocationStrategy();
+
+    void* allocate(std::size_t bytes);
+
     void deallocate(void* ptr);
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
 
   private:
     void* m_block;
 
-    size_t m_size;
-    size_t m_capacity;
+    std::size_t m_size;
+    std::size_t m_capacity;
 
     strategy::AllocationStrategy* m_allocator;
 };
