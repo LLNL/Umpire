@@ -30,5 +30,6 @@ RUN cd build && make -j 16
 FROM axom/compilers:rocm AS hip
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
-RUN mkdir build && cd build && cmake -DHIP_HCC_FLAGS="--amdgpu-target=gfx900" -DENABLE_HIP=On -DENABLE_CUDA=Off -DENABLE_OPENMP=Off ..
-RUN cd build && set HCC_AMDGPU_TARGET=gfx900 && make VERBOSE=1 
+ENV HCC_AMDGPU_TARGET=gfx900
+RUN mkdir build && cd build && cmake -DENABLE_HIP=On -DENABLE_CUDA=Off -DENABLE_OPENMP=Off ..
+RUN cd build && make VERBOSE=1

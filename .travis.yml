@@ -66,10 +66,17 @@ matrix:
       - IMG=rocm
       - CMAKE_EXTRA_FLAGS="-C ../host-configs/rocm.cmake -DCMAKE_CXX_COMPILER=/opt/rocm/bin/hcc -DENABLE_HCC=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_BENCHMARKS=Off -DENABLE_WARNINGS_AS_ERRORS=Off"
       - DO_TEST=no
+  - compiler: hip
+    env:
+      - COMPILER=g++
+      - IMG=rocm
+      - HCC_AMDGPU_TARGET=gfx900
+      - CMAKE_EXTRA_FLAGS="-DENABLE_HIP=On -DENABLE_OPENMP=Off -DENABLE_CUDA=Off -DENABLE_WARNINGS_AS_ERRORS=Off"
+      - DO_TEST=no
 
 script:
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
-- docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_MEMCHECK -e CMAKE_EXTRA_FLAGS -e GTEST_COLOR axom/compilers:$IMG ./scripts/travis/build_and_test.sh
+- docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_MEMCHECK -e CMAKE_EXTRA_FLAGS -e GTEST_COLOR -e HCC_AMDGPU_TARGET axom/compilers:$IMG ./scripts/travis/build_and_test.sh
 
 after_success:
 - if [[ "${CMAKE_EXTRA_FLAGS}" == *"ENABLE_COVERAGE"* ]] ; then bash <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/0b376529f626b50b7d4a9fb734e0e50d28b9b91e/codecov) >& /dev/null; fi
