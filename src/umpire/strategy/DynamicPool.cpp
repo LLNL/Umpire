@@ -23,7 +23,7 @@
 #include <algorithm>
 #include <tuple>
 
-static std::size_t round_up(std::size_t num, std::size_t factor)
+inline static std::size_t round_up(std::size_t num, std::size_t factor)
 {
   return num + factor - 1 - (num - 1) % factor;
 }
