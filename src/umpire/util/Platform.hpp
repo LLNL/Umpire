@@ -10,6 +10,7 @@
 namespace umpire {
 
 enum class Platform {
+  none,
   cpu,
   cuda,
   rocm,

@@ -12,6 +12,8 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 
+#include "umpire/resource/NullMemoryResourceFactory.hpp"
+
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -41,6 +43,7 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
@@ -90,6 +93,9 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
       util::make_unique<resource::HostResourceFactory>());
+
+  registry.registerMemoryResource(
+      util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
@@ -163,6 +169,16 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(host_allocator));
   }
 
+  {
+    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("NULL", getNextId())};
+    int id{allocator->getId()};
+    m_allocators_by_name["NULL"]  = allocator.get();
+    m_memory_resources[resource::Host] = allocator.get();
+    m_default_allocator = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
+
 #if defined(UMPIRE_ENABLE_CUDA)
   int count;
   auto error = ::cudaGetDeviceCount(&count);
@@ -224,6 +240,20 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
 #endif
+
+  {
+    std::unique_ptr<strategy::AllocationStrategy> allocator{
+      new strategy::FixedPool{"__umpire_0_byte_pool",
+        getNextId(),
+        Allocator{m_allocators_by_name["NULL"]},
+        1}
+    };
+
+    int id{allocator->getId()};
+    m_allocators_by_name["__umpire_0_byte_pool"] = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
 
   UMPIRE_LOG(Debug, "() leaving");
 }
@@ -634,6 +664,12 @@ ResourceManager::getAllocatorInformation() const noexcept
   }
 
   return info.str();
+}
+
+strategy::AllocationStrategy*
+ResourceManager::getZeroByteAllocator()
+{
+  return m_allocators_by_name["__umpire_0_byte_pool"];
 }
 
 } // end of namespace umpire

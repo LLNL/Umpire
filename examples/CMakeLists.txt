@@ -61,3 +61,8 @@ endif()
 add_subdirectory(tutorial)
 
 add_subdirectory(cookbook)
+
+blt_add_executable(
+  NAME scratch
+  SOURCES scratch.cpp
+  DEPENDS_ON ${example_depends})

@@ -19,6 +19,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
+#include "umpire/strategy/ZeroByteHandler.hpp"
 
 namespace umpire {
 
@@ -58,12 +59,22 @@ Allocator ResourceManager::makeAllocator(
   }
 
   if (!introspection) {
-    allocator.reset(new Strategy(name, getNextId(), std::forward<Args>(args)...));
+    allocator.reset(
+            new strategy::ZeroByteHandler(name, getNextId(), 
+              std::move(std::unique_ptr<strategy::AllocationStrategy>(
+                  new Strategy(name, getNextId(), std::forward<Args>(args)...)))));
+
   } else {
-    std::stringstream base_name;
-    base_name << name << "_base";
-    std::unique_ptr<strategy::AllocationStrategy> base_allocator{new Strategy(base_name.str(), getNextId(), std::forward<Args>(args)...)};
-    allocator.reset(new umpire::strategy::AllocationTracker(name, getNextId(), std::move(base_allocator)));
+    allocator.reset(
+            new umpire::strategy::AllocationTracker(
+              name, 
+              getNextId(), 
+              std::move(std::unique_ptr<strategy::AllocationStrategy>(
+                  new strategy::ZeroByteHandler(
+                    name, 
+                    getNextId(), 
+                    std::move(std::unique_ptr<strategy::AllocationStrategy>(
+                        new Strategy(name, getNextId(), std::forward<Args>(args)...))))))));
   }
 
 #if defined(_MSC_VER)
