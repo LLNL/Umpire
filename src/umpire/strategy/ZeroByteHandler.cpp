@@ -14,10 +14,8 @@ namespace umpire {
 namespace strategy {
 
 ZeroByteHandler::ZeroByteHandler(
-  const std::string& name,
-  int id,
   std::unique_ptr<AllocationStrategy>&& allocator) noexcept :
-AllocationStrategy(name, id),
+AllocationStrategy(allocator->getName(), allocator->getId()),
 m_allocator(std::move(allocator))
 {
 }

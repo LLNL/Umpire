@@ -20,8 +20,6 @@ class ZeroByteHandler :
 {
   public:
     ZeroByteHandler(
-        const std::string& name,
-        int id,
         std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
     void* allocate(std::size_t bytes);

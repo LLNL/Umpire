@@ -19,7 +19,9 @@ set (umpire_util_headers
   OutputBuffer.hpp
   Platform.hpp
   allocation_statistics.hpp
-  detect_vendor.hpp)
+  detect_vendor.hpp
+  make_unique.hpp
+  wrap_allocator.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers

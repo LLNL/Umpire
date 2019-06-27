@@ -43,10 +43,12 @@
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
+#include "umpire/strategy/ZeroByteHandler.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/IOManager.hpp"
@@ -160,10 +162,17 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance();
 
   {
+
+
     std::unique_ptr<strategy::AllocationStrategy> 
       host_allocator{
-        new strategy::ZeroByteHandler("HOST",getNextId(),
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
             registry.makeMemoryResource("HOST", getNextId()))};
+
+    //    new strategy::ZeroByteHandler("HOST",getNextId(),
+    //        registry.makeMemoryResource("HOST", getNextId()))};
     int id{host_allocator->getId()};
     m_allocators_by_name["HOST"]  = host_allocator.get();
     m_memory_resources[resource::Host] = host_allocator.get();

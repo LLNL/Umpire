@@ -21,6 +21,9 @@
 #include "umpire/strategy/AllocationTracker.hpp"
 #include "umpire/strategy/ZeroByteHandler.hpp"
 
+#include "umpire/util/make_unique.hpp"
+#include "umpire/util/wrap_allocator.hpp"
+
 namespace umpire {
 
 template <typename Strategy,
@@ -59,22 +62,14 @@ Allocator ResourceManager::makeAllocator(
   }
 
   if (!introspection) {
-    allocator.reset(
-            new strategy::ZeroByteHandler(name, getNextId(), 
-              std::move(std::unique_ptr<strategy::AllocationStrategy>(
-                  new Strategy(name, getNextId(), std::forward<Args>(args)...)))));
+    allocator = 
+      util::wrap_allocator<strategy::ZeroByteHandler>(
+            util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...));
 
   } else {
-    allocator.reset(
-            new umpire::strategy::AllocationTracker(
-              name, 
-              getNextId(), 
-              std::move(std::unique_ptr<strategy::AllocationStrategy>(
-                  new strategy::ZeroByteHandler(
-                    name, 
-                    getNextId(), 
-                    std::move(std::unique_ptr<strategy::AllocationStrategy>(
-                        new Strategy(name, getNextId(), std::forward<Args>(args)...))))))));
+    allocator = 
+      util::wrap_allocator<strategy::AllocationTracker, strategy::ZeroByteHandler>(
+            util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...));
   }
 
 #if defined(_MSC_VER)
