@@ -185,8 +185,6 @@ ResourceManager::initialize()
 
     int id{allocator->getId()};
     m_allocators_by_name["NULL"]  = allocator.get();
-    m_memory_resources[resource::Host] = allocator.get();
-    m_default_allocator = allocator.get();
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
