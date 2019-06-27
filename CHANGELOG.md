@@ -33,7 +33,11 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- Added HIP build to Travis CI.
+
 ### Changed
+
+- Builds are no longer building tools by default (ENABLE_TOOLS=Off).
 
 - Replay uses JSON format for its I/O.
 

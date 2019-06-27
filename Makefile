@@ -26,6 +26,13 @@ else
 	DOCKER_BUILDKIT=1 docker build --target hcc --no-cache .
 endif
 
+hip:
+ifeq ($(DEBUG),1)
+	DOCKER_BUILDKIT=1 docker build --target hip --no-cache --progress plain .
+else
+	DOCKER_BUILDKIT=1 docker build --target hip --no-cache .
+endif
+
 help:
 	@echo 'usage: make [variable] [target]'
 	@echo ''
@@ -33,9 +40,10 @@ help:
 	@echo ''
 	@echo 'target:'
 	@echo '    gcc                            build with GCC 8'
-	@echo '    clang                          build with Clang 6'
+	@echo '    clang                          build with clang 6'
 	@echo '    nvcc                           build with CUDA 9'
-	@echo '    hcc                            build with Hcc'
+	@echo '    hcc                            build with hcc'
+	@echo '    hip                            build with HIP'
 	@echo ''
 	@echo 'variable:'
 	@echo '    DEBUG                          display all output if set to 1'
