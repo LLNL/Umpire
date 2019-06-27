@@ -54,6 +54,8 @@ class FixedPool : public AllocationStrategy
     std::size_t getActualSize() const noexcept override final;
     Platform getPlatform() noexcept override final;
 
+    bool pointerIsFromPool(void* ptr) const noexcept;
+
     std::size_t numPools() const noexcept;
 
   private:

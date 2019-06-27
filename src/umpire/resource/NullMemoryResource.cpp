@@ -25,7 +25,8 @@ NullMemoryResource::NullMemoryResource(
     int id,
     MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
-  m_platform(platform)
+  m_platform{platform},
+  m_size_map{}
 {
 }
 
@@ -36,6 +37,9 @@ void* NullMemoryResource::allocate(std::size_t bytes)
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");
 
+  m_size_map.insert(ptr, bytes);
+
+
   return ptr;
 }
 
@@ -44,7 +48,13 @@ void NullMemoryResource::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  munmap(ptr, 4096);
+  auto iter = m_size_map.find(ptr);
+  auto size = iter->second;
+
+  m_size_map.erase(ptr);
+
+  munmap(ptr, *size);
+
 }
 
 std::size_t NullMemoryResource::getCurrentSize() const noexcept

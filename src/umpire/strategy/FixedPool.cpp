@@ -187,5 +187,19 @@ FixedPool::numPools() const noexcept
   return m_pool.size();
 }
 
+bool 
+FixedPool::pointerIsFromPool(void* ptr) const noexcept
+{
+  for (auto& p : m_pool) {
+    const char* t_ptr = reinterpret_cast<char*>(ptr);
+    const ptrdiff_t offset = t_ptr - p.data;
+    if ((offset >= 0) && (offset < static_cast<ptrdiff_t>(m_data_bytes))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 } // end of namespace strategy
 } // end of namespace umpire

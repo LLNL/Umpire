@@ -162,8 +162,6 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance();
 
   {
-
-
     std::unique_ptr<strategy::AllocationStrategy> 
       host_allocator{
         util::wrap_allocator<
@@ -171,8 +169,6 @@ ResourceManager::initialize()
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("HOST", getNextId()))};
 
-    //    new strategy::ZeroByteHandler("HOST",getNextId(),
-    //        registry.makeMemoryResource("HOST", getNextId()))};
     int id{host_allocator->getId()};
     m_allocators_by_name["HOST"]  = host_allocator.get();
     m_memory_resources[resource::Host] = host_allocator.get();
@@ -182,7 +178,11 @@ ResourceManager::initialize()
   }
 
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("NULL", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{
+        //util::wrap_allocator<strategy::AllocationTracker>(
+          registry.makeMemoryResource("NULL", getNextId())};
+
     int id{allocator->getId()};
     m_allocators_by_name["NULL"]  = allocator.get();
     m_memory_resources[resource::Host] = allocator.get();
@@ -211,7 +211,13 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("DEVICE", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{util::wrap_allocator<
+        strategy::AllocationTracker,
+        strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("DEVICE", getNextId()))};
+
+
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE"] = allocator.get();
     m_memory_resources[resource::Device] = allocator.get();
@@ -222,7 +228,12 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_PINNED)
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("PINNED", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{util::wrap_allocator<
+        strategy::AllocationTracker,
+        strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("PINNED", getNextId()))};
+
     int id{allocator->getId()};
     m_allocators_by_name["PINNED"] = allocator.get();
     m_memory_resources[resource::Pinned] = allocator.get();
@@ -233,7 +244,12 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_UM)
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("UM", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{util::wrap_allocator<
+        strategy::AllocationTracker,
+        strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("UM", getNextId()))};
+
     int id{allocator->getId()};
     m_allocators_by_name["UM"] = allocator.get();
     m_memory_resources[resource::Unified] = allocator.get();
@@ -244,7 +260,12 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{registry.makeMemoryResource("DEVICE_CONST", getNextId())};
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{util::wrap_allocator<
+        strategy::AllocationTracker,
+        strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("DEVICE_CONST", getNextId()))};
+
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE_CONST"] = allocator.get();
     m_memory_resources[resource::Constant] = allocator.get();

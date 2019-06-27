@@ -10,6 +10,7 @@
 #include "umpire/resource/MemoryResource.hpp"
 
 #include "umpire/util/Platform.hpp"
+#include "umpire/util/MemoryMap.hpp"
 
 namespace umpire {
 namespace resource {
@@ -30,6 +31,10 @@ class NullMemoryResource :
 
   protected:
     Platform m_platform;
+
+  private:
+    util::MemoryMap<size_t> m_size_map;
+
 };
 
 } // end of namespace resource

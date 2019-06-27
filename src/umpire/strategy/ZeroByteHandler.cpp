@@ -10,6 +10,8 @@
 
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/FixedPool.hpp"
+
 namespace umpire {
 namespace strategy {
 
@@ -35,16 +37,14 @@ ZeroByteHandler::allocate(std::size_t bytes)
 void
 ZeroByteHandler::deallocate(void* ptr)
 {
-  try {
+  auto& rm = ResourceManager::getInstance();
+  auto zero_pool = dynamic_cast<FixedPool*>(rm.getZeroByteAllocator());
+
+  if (zero_pool->pointerIsFromPool(ptr)) {
+    UMPIRE_LOG(Debug, "Deallocating 0 bytes for" << m_allocator->getName());
+    zero_pool->deallocate(ptr);
+  } else {
     m_allocator->deallocate(ptr);
-  } catch (...) {
-    try {
-      UMPIRE_LOG(Debug, "Deallocating 0 bytes for" << m_allocator->getName());
-      auto& rm = ResourceManager::getInstance();
-      return rm.getZeroByteAllocator()->deallocate(ptr);
-    } catch (...) {
-      throw;
-    }
   }
 }
 
