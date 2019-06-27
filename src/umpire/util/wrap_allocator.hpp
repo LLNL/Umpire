@@ -7,35 +7,35 @@
 #ifndef UMPIRE_wrap_allocator_HPP
 #define UMPIRE_wrap_allocator_HPP
 
-#include "umpire/util/make_unique.hpp"
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace util {
 
-template <typename Base, typename Strategy, typename... Strategies>
-std::unique_ptr<Base>
-do_wrap(std::unique_ptr<Base>&& strategy)
-{
-  return std::unique_ptr<Base>(new Strategy(do_wrap<Base, Strategies...>(std::move(strategy))));
-  //return util::do_wrap<Base, Strategies...>(std::unique_ptr<Base>{new Strategy(std::move(strategy))});
-}
-
 template <typename Base>
 std::unique_ptr<Base>
-do_wrap(std::unique_ptr<Base>&& strategy)
+do_wrap(std::unique_ptr<Base>&& allocator)
 {
-  return std::move(strategy);
+  return std::move(allocator);
 }
 
+
+template <typename Base, typename Strategy, typename... Strategies>
+std::unique_ptr<Base>
+do_wrap(std::unique_ptr<Base>&& allocator)
+{
+  return std::unique_ptr<Base>(new Strategy(umpire::util::do_wrap<Base, Strategies...>(std::move(allocator))));
+  //return util::do_wrap<Base, Strategies...>(std::unique_ptr<Base>{new Strategy(std::move(strategy))});
+}
 
 template<typename... Strategies>
 std::unique_ptr<strategy::AllocationStrategy>
 wrap_allocator(std::unique_ptr<strategy::AllocationStrategy>&& allocator)
 {
-  return do_wrap<strategy::AllocationStrategy, Strategies...>(
+  return umpire::util::do_wrap<
+    umpire::strategy::AllocationStrategy, Strategies...>(
       std::move(allocator));
 }
 
