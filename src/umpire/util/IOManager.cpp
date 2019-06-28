@@ -60,6 +60,7 @@ static std::string makeUniqueFilename(
   const std::string& base_dir,
   const std::string& name,
   int rank,
+  int pid,
   const std::string& extension);
 
 static inline bool fileExists(const std::string& file);
@@ -161,7 +162,7 @@ IOManager::initialize(
 }
 
 static std::string
-IOManager::makeUniqueFilename(
+makeUniqueFilename(
     const std::string& base_dir,
     const std::string& name,
     int rank,
