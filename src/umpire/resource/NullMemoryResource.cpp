@@ -14,7 +14,11 @@
 #include <memory>
 #include <sstream>
 
+#if !defined(_MSC_VER)
 #include <sys/mman.h>
+#else
+#include <windows.h>
+#endif
 
 namespace umpire {
 namespace resource {
@@ -32,7 +36,11 @@ NullMemoryResource::NullMemoryResource(
 
 void* NullMemoryResource::allocate(std::size_t bytes)
 {
+#if !defined(_MSC_VER)
   void* ptr{mmap(NULL, bytes, PROT_NONE, (MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE), -1, 0)};
+#else
+  void* ptr{VirtualAlloc(NULL, bytes, MEM_RESERVE, PAGE_NOACCESS)};
+#endif
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");
@@ -53,8 +61,11 @@ void NullMemoryResource::deallocate(void* ptr)
 
   m_size_map.erase(ptr);
 
+#if !defined(_MSC_VER)
   munmap(ptr, *size);
-
+#else
+  VirtualFree(ptr, *size, MEM_RELEASE);
+#endif
 }
 
 std::size_t NullMemoryResource::getCurrentSize() const noexcept
