@@ -33,7 +33,11 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- Added HIP build to Travis CI.
+
 ### Changed
+
+- Builds are no longer building tools by default (ENABLE_TOOLS=Off).
 
 - Replay uses JSON format for its I/O.
 
@@ -64,6 +68,10 @@ and a dynamic pool for those that are larger.
 
 - Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
 
+- Add PID to filenames for log and replay output.
+
+- Switch to SPDX licensing.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
@@ -73,6 +81,9 @@ and a dynamic pool for those that are larger.
 - Deprecated and unused `replay_allocation_map` tool.
 
 ### Fixed
+
+- Fixed bug in replay where it was not correctly replaying AllocationAdvisor
+  operations.
 
 - Fixed bug in monotonic pool allocator causing it to always return
   the same allocation.
@@ -102,6 +113,8 @@ and a dynamic pool for those that are larger.
   script.
 
 - Fix error where the MemoryMap.inl was not installed.
+
+- Replay and logging files only created when logging/replay are enabled.
 
 ## [0.3.5] - 2019-06-11
 

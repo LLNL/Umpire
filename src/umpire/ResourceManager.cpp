@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/config.hpp"
 
@@ -84,8 +76,14 @@ ResourceManager::ResourceManager() :
 {
   UMPIRE_LOG(Debug, "() entering");
 
+  const char* env_enable_replay{getenv("UMPIRE_REPLAY")};
+  bool enable_replay{(env_enable_replay != nullptr)};
+
+  const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
+  bool enable_log{(env_enable_log != nullptr)};
+
   util::MPI::initialize();
-  util::IOManager::initialize();
+  util::IOManager::initialize(enable_log, enable_replay);
 
   resource::MemoryResourceRegistry& registry =
     resource::MemoryResourceRegistry::getInstance();
@@ -117,13 +115,13 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_HIP)
   registry.registerMemoryResource(
-    new resource::HipDeviceResourceFactory());
+    util::make_unique<resource::HipDeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::HipPinnedMemoryResourceFactory());
+    util::make_unique<resource::HipPinnedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::HipConstantMemoryResourceFactory());
+    util::make_unique<resource::HipConstantMemoryResourceFactory>());
 #endif
 
   initialize();
