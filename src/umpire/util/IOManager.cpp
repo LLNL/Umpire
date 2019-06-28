@@ -44,8 +44,8 @@ std::ostream error(&error_buffer);
 
 namespace util {
 
-std::string IOManager::s_root_io_dir = "./";
-std::string IOManager::s_file_basename = "umpire";
+std::string IOManager::s_root_io_dir;
+std::string IOManager::s_file_basename;
 
 std::string IOManager::s_log_filename;
 std::string IOManager::s_replay_filename;
@@ -55,6 +55,15 @@ std::ofstream* IOManager::s_log_ofstream;
 std::ofstream* IOManager::s_replay_ofstream;
 
 bool IOManager::s_initialized = false;
+
+static std::string makeUniqueFilename(
+  const std::string& base_dir,
+  const std::string& name,
+  int rank,
+  const std::string& extension);
+
+static inline bool fileExists(const std::string& file);
+
 
 void
 IOManager::setOutputDir(const std::string& dir)
@@ -70,6 +79,9 @@ void
 IOManager::initialize()
 {
   if (!s_initialized) {
+    s_root_io_dir = "./";
+    s_file_basename = "umpire";
+
     auto output_dir = std::getenv("UMPIRE_OUTPUT_DIR");
 
     if (output_dir) {
@@ -137,12 +149,10 @@ IOManager::initialize()
   }
 }
 
-std::string
-IOManager::makeUniqueFilename(
-    const std::string& base_dir,
-    const std::string& name, 
-    int rank,
-    const std::string& extension)
+static std::string makeUniqueFilename(const std::string& base_dir,
+                                      const std::string& name,
+                                      int rank,
+                                      const std::string& extension)
 {
   int unique_id = -1;
   std::stringstream ss;
@@ -159,8 +169,7 @@ IOManager::makeUniqueFilename(
   return filename;
 }
 
-inline bool 
-IOManager::fileExists(const std::string& path)
+static inline bool fileExists(const std::string& path)
 {
   std::ifstream ifile(path.c_str());
   return ifile.good();
