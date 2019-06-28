@@ -50,7 +50,7 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
 
 FixedPool::FixedPool(const std::string& name, int id,
                      Allocator allocator, const std::size_t object_bytes,
-                     const std::size_t objects_per_pool) :
+                     const std::size_t objects_per_pool) noexcept :
   AllocationStrategy(name, id),
   m_strategy(allocator.getAllocationStrategy()),
   m_obj_bytes(object_bytes),
@@ -66,9 +66,12 @@ FixedPool::FixedPool(const std::string& name, int id,
 
 FixedPool::~FixedPool()
 {
-  for (auto& a : m_pool) {
-    a.strategy->deallocate(a.data);
-    std::free(a.avail);
+  for (auto& p : m_pool) {
+    if (p.num_avail != m_obj_per_pool) {
+      UMPIRE_LOG(Debug, "Did not release all memory");
+    }
+    p.strategy->deallocate(p.data);
+    std::free(p.avail);
   }
 }
 
