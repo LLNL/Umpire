@@ -9,6 +9,7 @@
 #include "umpire/resource/HipConstantMemoryResource.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
@@ -24,7 +25,7 @@ HipConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& na
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 HipConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -37,7 +38,7 @@ HipConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(na
 
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return new resource::HipConstantMemoryResource("DEVICE_CONST", id, traits);
+  return util::make_unique<resource::HipConstantMemoryResource>("DEVICE_CONST", id, traits);
 }
 
 } // end of namespace resource

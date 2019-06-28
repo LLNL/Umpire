@@ -123,13 +123,13 @@ ResourceManager::ResourceManager() :
 
 #if defined(UMPIRE_ENABLE_HIP)
   registry.registerMemoryResource(
-    new resource::HipDeviceResourceFactory());
+    util::make_unique<resource::HipDeviceResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::HipPinnedMemoryResourceFactory());
+    util::make_unique<resource::HipPinnedMemoryResourceFactory>());
 
   registry.registerMemoryResource(
-    new resource::HipConstantMemoryResourceFactory());
+    util::make_unique<resource::HipConstantMemoryResourceFactory>());
 #endif
 
   initialize();

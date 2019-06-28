@@ -20,9 +20,9 @@ namespace resource {
 class HipDeviceResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name) noexcept;
+  bool isValidMemoryResourceFor(const std::string& name) noexcept override;
 
-  resource::MemoryResource* create(const std::string& name, int id);
+  std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id) override;
 };
 
 } // end of namespace resource
