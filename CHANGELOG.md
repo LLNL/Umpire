@@ -31,12 +31,11 @@ and a dynamic pool for those that are larger.
 
 - GCC 4.9 build to Travis CI.
 
-- Added a new IOManager that stores logging and replay output to files.
-
 - `DynamicPool` constructor has a new alignment argument.
 
 - Added HIP build to Travis CI.
 
+- Added a new IOManager that stores logging and replay output to files.
 
 ### Changed
 
