@@ -14,7 +14,7 @@ replayprogram=$tools_dir/replay
 # The following program will generate a CSV file of Umpire activity that
 # may be replayed.
 #
-UMPIRE_REPLAY="On" $testprogram
+UMPIRE_REPLAY=On $testprogram
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $testprogram"
     exit 1
@@ -35,6 +35,7 @@ fi
 #
 diff replay.out $replay_tests_dir/test_output.good
 if [ $? -ne 0 ]; then
+    /bin/rm -f replay.out umpire*replay umpire*log
     echo "Diff failed"
     exit 1
 fi
