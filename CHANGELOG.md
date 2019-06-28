@@ -31,9 +31,9 @@ and a dynamic pool for those that are larger.
 
 - GCC 4.9 build to Travis CI.
 
-- Added a new IOManager that stores logging and replay output to files.
-
 - Added HIP build to Travis CI.
+
+- Added a new IOManager that stores logging and replay output to files.
 
 ### Changed
 
