@@ -1,3 +1,9 @@
+##############################################################################
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
 from __future__ import print_function
 
 types = (
@@ -48,8 +54,11 @@ subroutine allocator_allocate_{name}_array_{dim}d(this, array, dims)
       type(C_PTR) :: data_ptr
 
       {c_type} :: size_type
+      integer(C_SIZE_T) :: num_bytes
 
-      data_ptr = this%allocate_pointer(product(dims) * sizeof(size_type))
+      num_bytes = product(dims) * sizeof(size_type)
+      data_ptr = this%allocate_pointer(num_bytes)
+
       call c_f_pointer(data_ptr, array, dims)
 end subroutine allocator_allocate_{name}_array_{dim}d
 

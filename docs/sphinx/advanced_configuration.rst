@@ -17,35 +17,42 @@ Here is a summary of the configuration options, their default value, and meaning
       ===========================  ======== ===============================================================================
       Variable                     Default  Meaning
       ===========================  ======== ===============================================================================
-      ``ENABLE_CUDA``              On       Enable CUDA support
-      ``ENABLE_NUMA``              Off      Enable NUMA support
+      ``ENABLE_CUDA``              Off      Enable CUDA support
+      ``ENABLE_HIP``               Off      Enable HIP support
       ``ENABLE_HCC``               Off      Enable HCC support
+      ``ENABLE_NUMA``              Off      Enable NUMA support
       ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
       ``ENABLE_SLIC``              Off      Enable SLIC logging
-      ``ENABLE_TOOLS``             On       Enable tools like replay
+      ``ENABLE_TOOLS``             Off      Enable tools like replay
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
-      ``ENABLE_C``             Off      Build the C API
-      ``ENABLE_FORTRAN``       Off      Build the Fortran API
+      ``ENABLE_C``                 Off      Build the C API
+      ``ENABLE_FORTRAN``           Off      Build the Fortran API
       ===========================  ======== ===============================================================================
 
 These arguments are explained in more detail below:
 
 * ``ENABLE_CUDA``
-  This option enables support for NVIDIA GPUs. If Umpire is built without CUDA
-  or HCC support, then only the ``HOST`` allocator is available for use.
+  This option enables support for NVIDIA GPUs using the CUDA programming model.
+  If Umpire is built without CUDA, HCC, or HIP support, then only the ``HOST``
+  allocator is available for use.
+
+* ``ENABLE_HIP``
+  This option enables support for AMD GPUs using the ROCm stack and HIP
+  programming model. If Umpire is built without CUDA, HCC, or HIP support,
+  then only the ``HOST`` allocator is available for use.
+
+* ``ENABLE_HCC``
+  This option enables support for AMD GPUs using the ROCm stack and HCC
+  programming model. If Umpire is built without CUDA, HCC, or HIP support,
+  then only the ``HOST`` allocator is available for use.
 
 * ``ENABLE_NUMA``
   This option enables support for NUMA. The
   :class:`umpire::strategy::NumaPolicy` is available when built with this
   option, which may be used to locate the allocation to a specific node.
-
-* ``ENABLE_HCC``
-  This option enables support for AMD GPUs using the ROCm stack and HCC
-  programming model. If Umpire is built without CUDA or HCC support, then only
-  the ``HOST`` allocator is available for use.
 
 * ``ENABLE_STATISTICS``
   This option enables collection of memory statistics. If Umpire is built with

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
@@ -29,7 +21,7 @@ void allocate_and_deallocate(const char* resource)
   double* data = (double*) umpire_allocator_allocate(&allocator, SIZE*sizeof(double));
 
 
-  printf("Allocated %lu bytes using the %s allocator...", 
+  printf("Allocated %lu bytes using the %s allocator...",
       (SIZE*sizeof(double)), umpire_allocator_get_name(&allocator));
 
   umpire_allocator_deallocate(&allocator, data);
@@ -44,6 +36,10 @@ int main()
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("UM");
+  allocate_and_deallocate("PINNED");
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+  allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("PINNED");
 #endif
 

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_MemoryResourceRegistry_HPP
 #define UMPIRE_MemoryResourceRegistry_HPP
@@ -19,7 +11,7 @@
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
 #include <memory>
-#include <list>
+#include <vector>
 
 namespace umpire {
 namespace resource {
@@ -28,17 +20,19 @@ class MemoryResourceRegistry {
   public:
     static MemoryResourceRegistry& getInstance() noexcept;
 
-    resource::MemoryResource* makeMemoryResource(const std::string& name, int id);
+    std::unique_ptr<resource::MemoryResource>
+    makeMemoryResource(const std::string& name, int id);
 
-    void registerMemoryResource(MemoryResourceFactory* factory);
+    void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 
-  protected:
-    MemoryResourceRegistry() noexcept;
+    MemoryResourceRegistry(const MemoryResourceRegistry&) = delete;
+    MemoryResourceRegistry& operator=(const MemoryResourceRegistry&) = delete;
+    ~MemoryResourceRegistry() = default;
 
   private:
-    static MemoryResourceRegistry* s_allocator_registry_instance;
+    MemoryResourceRegistry() noexcept;
 
-    std::list<MemoryResourceFactory*> m_allocator_factories;
+    std::vector<std::unique_ptr<MemoryResourceFactory> > m_allocator_factories;
 };
 
 } // end of namespace resource

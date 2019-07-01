@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 #include <string>
@@ -123,7 +115,7 @@ TEST_P(StrategyTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices));
+INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices),);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 TEST(SimpoolStrategy, Device)
@@ -188,12 +180,15 @@ TEST(MonotonicStrategy, Host)
       "host_monotonic_pool", 65536, rm.getAllocator("HOST"));
 
   void* alloc = allocator.allocate(100);
+  void* alloc2 = allocator.allocate(100);
 
+  ASSERT_EQ(static_cast<char*>(alloc2) - static_cast<char*>(alloc), 100);
   ASSERT_GE(allocator.getCurrentSize(), 100);
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
 
+  allocator.deallocate(alloc2);
   allocator.deallocate(alloc);
 }
 
@@ -319,10 +314,10 @@ TEST(MixedPool, Host)
   auto allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
       "host_mixed_pool", rm.getAllocator("HOST"));
 
-  const size_t max_power = 9;
+  const std::size_t max_power = 9;
   void* alloc[max_power];
-  size_t size = 4, total_size = 0;
-  for (size_t i = 0; i < max_power; ++i) {
+  std::size_t size = 4, total_size = 0;
+  for (std::size_t i = 0; i < max_power; ++i) {
     alloc[i] = allocator.allocate(size);
     total_size += size;
     size *= 4;
@@ -334,7 +329,7 @@ TEST(MixedPool, Host)
   ASSERT_GE(allocator.getHighWatermark(), total_size);
   ASSERT_EQ(allocator.getName(), "host_mixed_pool");
 
-  for (size_t i = 0; i < max_power; ++i)
+  for (std::size_t i = 0; i < max_power; ++i)
     allocator.deallocate(alloc[i]);
 }
 
@@ -348,7 +343,7 @@ TEST(ThreadSafeAllocator, Host)
 
 #pragma omp parallel
   {
-    const size_t size = 1024*omp_get_thread_num();
+    const std::size_t size = 1024*omp_get_thread_num();
 
     double* thread_data = static_cast<double*>(
      allocator.allocate(size*sizeof(double)));
@@ -585,7 +580,7 @@ TEST(NumaPolicyTest, EdgeCases) {
                  "numa_alloc", -1, rm.getAllocator("HOST")),
                umpire::util::Exception);
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   const int numa_node = umpire::numa::preferred_node();
 
   // Only works with HOST allocators

@@ -1,21 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 
 #include "umpire/config.hpp"
 
+#include "umpire/Umpire.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
@@ -38,9 +31,9 @@ class AllocatorTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorTest, AllocateDeallocateBig)
@@ -67,6 +60,7 @@ TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
   if (m_allocator->getPlatform() == umpire::Platform::cuda ||
+      m_allocator->getPlatform() == umpire::Platform::hip  ||
       m_allocator->getPlatform() == umpire::Platform::rocm) {
     SUCCEED();
   } else {
@@ -83,16 +77,14 @@ TEST_P(AllocatorTest, DeallocateNullptr)
 {
   double* data = nullptr;
 
-  ASSERT_NO_THROW(
-  m_allocator->deallocate(data);
-  );
+  ASSERT_NO_THROW(m_allocator->deallocate(data));
 
   SUCCEED();
 }
 
 TEST_P(AllocatorTest, GetSize)
 {
-  const size_t size = m_big*sizeof(double);
+  const std::size_t size = m_big*sizeof(double);
 
   double* data = static_cast<double*>(
     m_allocator->allocate(size));
@@ -125,6 +117,18 @@ TEST_P(AllocatorTest, GetById)
       umpire::util::Exception);
 }
 
+TEST_P(AllocatorTest, get_allocator_records)
+{
+  double* data = static_cast<double*>(
+    m_allocator->allocate(m_small*sizeof(double)));
+
+  auto records = umpire::get_allocator_records(*m_allocator);
+
+  ASSERT_EQ(records.size(), 1);
+
+  m_allocator->deallocate(data);
+}
+
 const std::string allocator_strings[] = {
   "HOST"
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -133,7 +137,7 @@ const std::string allocator_strings[] = {
 #if defined(UMPIRE_ENABLE_UM)
   , "UM"
 #endif
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   , "DEVICE_CONST"
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
@@ -144,14 +148,15 @@ const std::string allocator_strings[] = {
 INSTANTIATE_TEST_CASE_P(
     Allocators,
     AllocatorTest,
-    ::testing::ValuesIn(allocator_strings)
-);
+    ::testing::ValuesIn(allocator_strings),);
 
 TEST(Allocator, isRegistered)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_TRUE(rm.isAllocatorRegistered("HOST"));
+  for(const std::string & allocator_string : allocator_strings) {
+      ASSERT_TRUE(rm.isAllocatorRegistered(allocator_string));
+  }
   ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
 }
 
@@ -199,9 +204,9 @@ class AllocatorByResourceTest :
 
   umpire::Allocator* m_allocator;
 
-  const size_t m_big = 64;
-  const size_t m_small = 8;
-  const size_t m_nothing = 0;
+  const std::size_t m_big = 64;
+  const std::size_t m_small = 8;
+  const std::size_t m_nothing = 0;
 };
 
 TEST_P(AllocatorByResourceTest, AllocateDeallocate)
@@ -226,8 +231,8 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
   );
 
   ASSERT_THROW(
-      m_allocator->deallocate(data),
-      umpire::util::Exception
+    m_allocator->deallocate(data),
+    umpire::util::Exception
   );
 }
 
@@ -242,7 +247,7 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 #if defined(UMPIRE_ENABLE_PINNED)
   , umpire::resource::Pinned
 #endif
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   , umpire::resource::Constant
 #endif
 };
@@ -250,7 +255,7 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 INSTANTIATE_TEST_CASE_P(
     Resources,
     AllocatorByResourceTest,
-    ::testing::ValuesIn(resource_types));
+    ::testing::ValuesIn(resource_types),);
 
 TEST(Allocation, DeallocateDifferent)
 {
@@ -265,6 +270,10 @@ TEST(Allocation, DeallocateDifferent)
   ASSERT_THROW(
     alloc_two.deallocate(data),
     umpire::util::Exception);
+
+  ASSERT_NO_THROW(
+    alloc_one.deallocate(data)
+  );
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -280,5 +289,8 @@ TEST(Allocator, DeallocateDifferentCuda)
     alloc_dev.deallocate(data),
     umpire::util::Exception);
 
+  ASSERT_NO_THROW(
+    alloc_um.deallocate(data)
+  );
 }
 #endif

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <string>
@@ -24,12 +16,14 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
+#include "umpire/util/FixedMallocPool.hpp"
+
 class allocatorBenchmark : public ::benchmark::Fixture {
 public:
   using ::benchmark::Fixture::SetUp;
   using ::benchmark::Fixture::TearDown;
 
-  allocatorBenchmark() : max_allocations(100000) { 
+  allocatorBenchmark() : max_allocations(100000) {
     allocations = new void*[max_allocations];
   }
   virtual ~allocatorBenchmark() {
@@ -262,11 +256,35 @@ class FixedPoolDevice : public ::FixedPool {
 BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st)   { deallocation(st); }
 
+class FixedMallocPool : public ::allocatorBenchmark {
+  public:
+  using allocatorBenchmark::SetUp;
+  using allocatorBenchmark::TearDown;
+
+  void SetUp(const ::benchmark::State&) override final {
+    pool = new umpire::util::FixedMallocPool(8);
+  }
+  void TearDown(const ::benchmark::State&) override final {
+    delete pool;
+  }
+
+  virtual void* allocate( uint64_t nbytes ) override final { return pool->allocate(nbytes); }
+  virtual void deallocate( void* ptr ) override final { pool->deallocate(ptr); }
+  private:
+  umpire::util::FixedMallocPool *pool;
+};
+
+BENCHMARK_DEFINE_F(FixedMallocPool, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedMallocPool, deallocate)(benchmark::State &st)   { deallocation(st); }
+
+
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
 BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedMallocPool, allocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedMallocPool, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(Host, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(Host, deallocate)->Range(RangeLow, RangeHi);
 // BENCHMARK_REGISTER_F(PoolHost, allocate)->Range(RangeLow, RangeHi);
@@ -292,6 +310,18 @@ BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, allocate)->Arg(RangeLow);
 BENCHMARK_REGISTER_F(FixedPoolUM, deallocate)->Arg(RangeLow);
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+BENCHMARK_REGISTER_F(Device, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Device, deallocate)->Range(RangeLow, RangeHi);
+//BENCHMARK_REGISTER_F(PoolDevice, allocate)->Range(RangeLow, RangeHi);
+//BENCHMARK_REGISTER_F(PoolDevice, deallocate)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(Device, largeAllocDealloc)->Arg(1)->Arg(2)->Arg(4)->Arg(8)->Arg(9)->Arg(10)->Arg(11)->Arg(12)->Arg(13);
+
+BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(RangeLow);
+BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(RangeLow);
 #endif
 
 

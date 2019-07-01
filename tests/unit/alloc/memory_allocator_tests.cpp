@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/config.hpp"
 
@@ -27,6 +19,11 @@ using namespace umpire::alloc;
 #if defined(UMPIRE_ENABLE_HCC)
 #include "umpire/alloc/AmAllocAllocator.hpp"
 #include "umpire/alloc/AmPinnedAllocator.hpp"
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+#include "umpire/alloc/HipMallocAllocator.hpp"
+#include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
 #include "gtest/gtest.h"
@@ -49,12 +46,17 @@ REGISTER_TYPED_TEST_CASE_P(
     MemoryAllocatorTest,
     Allocate);
 
+using test_types = ::testing::Types<
+    MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
-using test_types = ::testing::Types<MallocAllocator, CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator>;
-#elif defined(UMPIRE_ENABLE_HCC)
-using test_types = ::testing::Types<MallocAllocator, AmAllocAllocator, AmPinnedAllocator>;
-#else
-using test_types = ::testing::Types<MallocAllocator>;
+    , CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
 #endif
+#if defined(UMPIRE_ENABLE_HCC)
+    , AmAllocAllocator, AmPinnedAllocator
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+    , HipMallocAllocator, HipPinnedAllocator
+#endif
+>;
 
 INSTANTIATE_TYPED_TEST_CASE_P(Default, MemoryAllocatorTest, test_types);

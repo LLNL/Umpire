@@ -1,22 +1,16 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
 
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
+
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
@@ -32,7 +26,7 @@ CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -44,7 +38,7 @@ CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return new resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>(Platform::cuda, "PINNED", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(Platform::cuda, "PINNED", id, traits);
 }
 
 } // end of namespace resource

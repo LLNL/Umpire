@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_DefaultMemoryResource_INL
 #define UMPIRE_DefaultMemoryResource_INL
@@ -37,7 +29,7 @@ DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, cons
 }
 
 template<typename _allocator>
-void* DefaultMemoryResource<_allocator>::allocate(size_t bytes)
+void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
 
@@ -56,22 +48,19 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  auto record = deregisterAllocation(ptr);
-
-  UMPIRE_CHECK_ALLOCATOR(record, getName());
-
+  deregisterAllocation(ptr, this);
   m_allocator.deallocate(ptr);
 }
 
 template<typename _allocator>
-long DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
+std::size_t DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
 template<typename _allocator>
-long DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
+std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
   return m_high_watermark;

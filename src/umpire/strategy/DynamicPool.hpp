@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_DynamicPool_HPP
 #define UMPIRE_DynamicPool_HPP
@@ -21,10 +13,9 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
 
 #include "umpire/Allocator.hpp"
-
-#include "umpire/tpl/simpool/DynamicSizePool.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -70,15 +61,20 @@ class DynamicPool :
         const std::size_t min_alloc_size = (1 * 1024 *1024),
         Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
-    void* allocate(size_t bytes) override;
+    ~DynamicPool();
+
+    void* allocate(std::size_t bytes) override;
 
     void deallocate(void* ptr) override;
 
     void release() override;
 
-    long getCurrentSize() const noexcept override;
-    long getActualSize() const noexcept override;
-    long getHighWatermark() const noexcept override;
+    std::size_t getCurrentSize() const noexcept override;
+    std::size_t getActualSize() const noexcept override;
+    std::size_t getHighWatermark() const noexcept override;
+
+    std::size_t getFreeBlocks() const;
+    std::size_t getInUseBlocks() const;
 
     Platform getPlatform() noexcept override;
 
@@ -92,22 +88,72 @@ class DynamicPool :
      *
      * \return The total number of bytes that are releasable
      */
-    long getReleasableSize() const noexcept;
+    std::size_t getReleasableSize() const noexcept;
 
     /*!
      * \brief Get the number of memory blocks that the pools has
      *
      * \return The total number of blocks that are allocated by the pool
      */
-    long getBlocksInPool() const noexcept;
+    std::size_t getBlocksInPool() const noexcept;
 
     void coalesce() noexcept;
 
   private:
-    DynamicSizePool<>* dpa;
+  struct Block
+  {
+    char *data;
+    std::size_t size;
+    std::size_t blockSize;
+    Block *next;
+  };
 
-    strategy::AllocationStrategy* m_allocator;
-    Coalesce_Heuristic do_coalesce;
+  // Allocator for the underlying data
+  umpire::util::FixedMallocPool blockPool;
+
+  // Start of the nodes of used and free block lists
+  struct Block *usedBlocks;
+  struct Block *freeBlocks;
+
+  // Total blocks in the pool
+  std::size_t totalBlocks;
+
+  // Total size allocated (bytes)
+  std::size_t totalBytes;
+
+  // Allocated size (bytes)
+  std::size_t allocBytes;
+
+  // Minimum size of initial allocation
+  std::size_t minInitialBytes;
+
+  // Minimum size for allocations
+  std::size_t minBytes;
+
+  // High water mark of allocations
+  std::size_t highWatermark;
+
+  // Pointer to our allocator's allocation strategy
+  strategy::AllocationStrategy* m_allocator;
+
+  // Heuristic to use for coalescing
+  Coalesce_Heuristic do_coalesce;
+
+  // Search the list of free blocks and return a usable one if that exists, else NULL
+  void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size);
+
+  // Allocate a new block and add it to the list of free blocks
+  void allocateBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
+
+  void splitBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
+
+  void releaseBlock(struct Block *curr, struct Block *prev);
+
+  std::size_t freeReleasedBlocks();
+
+  void coalesceFreeBlocks(std::size_t size);
+
+  void freeAllBlocks();
 };
 
 } // end of namespace strategy

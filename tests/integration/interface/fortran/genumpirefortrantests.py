@@ -1,3 +1,9 @@
+##############################################################################
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
 from __future__ import print_function
 
 types = (
@@ -52,6 +58,7 @@ module umpire_fortran_generated_tests
         call allocator%deallocate(array)
         call assert_true(.not. associated(array))
 
+        call allocator%delete()
       end subroutine test_allocate_{name}_{alloc_lower}_array_{dim}d
 
     """.format(

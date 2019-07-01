@@ -1,27 +1,25 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
-  allocation_statistics.hpp
-  detect_vendor.hpp
   Exception.hpp
+  FixedMallocPool.hpp
+  IOManager.hpp
   Logger.hpp
+  MPI.hpp
   Macros.hpp
   MemoryResourceTraits.hpp
-  Platform.hpp)
+  MemoryMap.hpp
+  MemoryMap.inl
+  OutputBuffer.hpp
+  Platform.hpp
+  allocation_statistics.hpp
+  detect_vendor.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -39,10 +37,14 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
-  allocation_statistics.cpp
-  detect_vendor.cpp
   Exception.cpp
-  Logger.cpp)
+  FixedMallocPool.cpp
+  IOManager.cpp
+  Logger.cpp
+  MPI.cpp
+  OutputBuffer.cpp
+  allocation_statistics.cpp
+  detect_vendor.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources
@@ -57,7 +59,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends)
+set (umpire_util_depends umpire_tpl_judy)
 
 if (ENABLE_NUMA)
   set (umpire_util_depends
@@ -76,6 +78,12 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
     ${umpire_util_depends}
     slic)
 endif()
+
+if (ENABLE_MPI)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    mpi)
+endif ()
 
 blt_add_library(
   NAME umpire_util

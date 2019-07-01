@@ -1,3 +1,9 @@
+##############################################################################
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
 from __future__ import print_function
 
 ops = [
@@ -47,6 +53,12 @@ module umpire_fortran_op_tests
         call rm%{op}(dest, source)
 
         call assert_true(.true.)
+
+        call source_allocator%deallocate_pointer(source)
+        call dest_allocator%deallocate_pointer(dest)
+
+        call source_allocator%delete()
+        call dest_allocator%delete()
       end subroutine test_{op}_{source}_{dest}
 
     """.format(
