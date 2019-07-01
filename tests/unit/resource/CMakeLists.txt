@@ -15,7 +15,7 @@ endif()
 blt_add_executable(
   NAME null_resource_tests
   SOURCES null_resource_tests.cpp
-  DEPENDS_ON ${resource_depends}
+  DEPENDS_ON umpire gtest
   OUTPUT_DIR ${resource_dir})
 
 blt_add_test(
