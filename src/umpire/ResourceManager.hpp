@@ -260,7 +260,7 @@ class ResourceManager {
     friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
 };
 
-} // end of namespace umpire
+} // end namespace umpire
 
 #include "umpire/ResourceManager.inl"
 

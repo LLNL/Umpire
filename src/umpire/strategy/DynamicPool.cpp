@@ -108,11 +108,12 @@ void* DynamicPool::allocate(std::size_t bytes)
     insertUsed(ptr, actual_bytes, is_head);
 
     // Remove the entry from the free map
+    const std::size_t free_size = iter->first;
     m_free_map.erase(iter);
 
     m_curr_bytes += actual_bytes;
 
-    const int64_t left_bytes{static_cast<int64_t>(iter->first - actual_bytes)};
+    const int64_t left_bytes{static_cast<int64_t>(free_size - actual_bytes)};
     if (left_bytes > m_align_bytes) {
       insertFree(static_cast<unsigned char*>(ptr) + actual_bytes, left_bytes, false);
     }
@@ -250,20 +251,22 @@ void DynamicPool::doCoalesce()
   // this map is iterated over from low to high in terms of key = pointer address.
   // Colaesce these...
 
-  auto it = free_pointer_map.rbegin();
-  auto next_it = it; next_it++;
-  auto end = free_pointer_map.rend();
+  auto it = free_pointer_map.begin();
+  auto next_it = free_pointer_map.begin(); ++next_it;
+  auto end = free_pointer_map.end();
 
   while (next_it != end) {
-    const bool contiguous{static_cast<unsigned char*>(next_it->first) + next_it->second.first == it->first};
-    const bool was_head{it->second.second};
-    if (contiguous && !was_head) {
-      next_it->second.first += it->second.first;
-      // The std::next(it).base() is needed because it is a reverse iterator
-      free_pointer_map.erase(std::next(it).base());
+    // Check if we can merge *it and *next_it
+    const bool is_head{it->second.second};
+    const bool contiguous{
+      static_cast<void*>(static_cast<unsigned char*>(it->first) + it->second.first) == next_it->first};
+    if (is_head && contiguous) {
+      it->second.first += next_it->second.first;
+      next_it = free_pointer_map.erase(next_it);
+    } else {
+      ++it;
+      ++next_it;
     }
-    it = next_it;
-    ++next_it;
   }
 
   // Now the external map may have shrunk, so rebuild the original map
@@ -286,9 +289,10 @@ std::size_t DynamicPool::doRelease()
 
   std::size_t released_bytes{0};
 
-  for (auto it = m_free_map.cbegin(), next_it = it; it != m_free_map.cend(); it = next_it) {
-    ++next_it;
+  auto it = m_free_map.cbegin();
+  auto end = m_free_map.cend();
 
+  while (it != end) {
     std::size_t bytes{it->first};
     Pointer ptr;
     bool is_head;
@@ -297,7 +301,9 @@ std::size_t DynamicPool::doRelease()
       released_bytes += bytes;
       m_actual_bytes -= bytes;
       m_allocator->deallocate(ptr);
-      m_free_map.erase(it);
+      it = m_free_map.erase(it);
+    } else {
+      ++it;
     }
   }
 
