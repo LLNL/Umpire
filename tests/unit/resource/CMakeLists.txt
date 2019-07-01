@@ -12,6 +12,17 @@ if (ENABLE_HIP)
   set (resource_depends ${resource_depends} hip_runtime)
 endif()
 
+blt_add_executable(
+  NAME null_resource_tests
+  SOURCES null_resource_tests.cpp
+  DEPENDS_ON ${resource_depends}
+  OUTPUT_DIR ${resource_dir})
+
+blt_add_test(
+  NAME null_resource_tests
+  COMMAND null_resource_tests)
+
+
 if (ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
