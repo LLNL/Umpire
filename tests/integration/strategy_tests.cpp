@@ -399,7 +399,7 @@ TEST(DynamicPool, coalesce)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_dyn_pool_for_coalesce", rm.getAllocator("HOST"));
+    "host_dyn_pool_for_coalesce", rm.getAllocator("HOST"));
 
   auto strategy = alloc.getAllocationStrategy();
   auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
@@ -414,12 +414,11 @@ TEST(DynamicPool, coalesce)
   void* ptr_two = alloc.allocate(1024);
 
   ASSERT_GT(dynamic_pool->getBlocksInPool(), 2);
-
   alloc.deallocate(ptr_two);
 
   dynamic_pool->coalesce();
 
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
 
   alloc.deallocate(ptr_one);
 
