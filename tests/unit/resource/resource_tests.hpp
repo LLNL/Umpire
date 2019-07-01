@@ -75,6 +75,9 @@ TYPED_TEST_P(ResourceTest, getPlatform)
 TYPED_TEST_P(ResourceTest, getTraits)
 {
   auto traits = this->memory_resource->getTraits();
+
+  UMPIRE_USE_VAR(traits);
+
   SUCCEED();
 }
 
