@@ -11,10 +11,6 @@ if (ENABLE_SICM)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     SICMAllocator.hpp)
-
-  set (umpire_alloc_sources
-    ${umpire_alloc_sources}
-    SICMAllocator.cpp)
 endif()
 
 if (ENABLE_NUMA)

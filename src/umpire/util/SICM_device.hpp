@@ -17,25 +17,18 @@
 
 #include "umpire/util/Platform.hpp"
 
-#include <functional>
-#include <vector>
+#include <memory>
 
 #include <sicm_low.h>
+
+std::ostream& operator<<(std::ostream& stream, const sicm_device_list& device_list);
 
 namespace umpire {
 namespace sicm {
 
 // gets set of devices suitable for a given platform
 // returns device indicies, not numa nodes
-std::vector<unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform);
-
-// get the device index that works best when running on a given CPU
-unsigned int best_device(const int running_at,
-                         const std::size_t size,
-                         const std::vector <unsigned int>& allowed_devices,
-                         const sicm_device_list& devs);
-
-typedef std::function<decltype(best_device)> device_chooser_t;
+std::shared_ptr<sicm_device_list> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform, int page_size);
 
 } // end namespace sicm
 } // end namespace umpire

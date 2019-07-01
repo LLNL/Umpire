@@ -18,6 +18,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 
 #include "umpire/Allocator.hpp"
+#include "umpire/util/SICM_device.hpp"
 
 #include <sicm_low.h>
 
@@ -39,7 +40,7 @@ class SICMStrategy :
     SICMStrategy(
         const std::string& name,
         int id,
-        std::size_t device_index,
+        sicm_device_list devices,
         std::size_t max_size = 0);
 
     ~SICMStrategy();
@@ -52,7 +53,7 @@ class SICMStrategy :
 
     Platform getPlatform() noexcept;
 
-    std::size_t getDeviceIndex() const noexcept;
+    sicm_arena getArena() const noexcept;
 
   private:
     std::size_t m_index;

@@ -36,9 +36,13 @@ int main(int, char**) {
     UMPIRE_ERROR("SICM did not detect any devices");
   }
 
+  sicm_device_list src_list;
+  src_list.count = 1;
+  src_list.devices = &devs.devices[0];
+
   // Create an allocator on the first SICM device
   auto sicm_src_alloc = rm.makeAllocator<umpire::strategy::SICMStrategy>(
-    "sicm_src_alloc", 0);
+    "sicm_src_alloc", src_list);
 
   // Create an allocation on that device
   void* src_ptr = sicm_src_alloc.allocate(alloc_size);
@@ -48,11 +52,15 @@ int main(int, char**) {
 
   if ((devs.count / 3) > 1) {                    // want at least 2 NUMA nodes
     const unsigned int dst_dev = devs.count - 3; // destination page size must be the same, so pick device + offset 0 on the NUMA node
-    const int dst_node = devs.devices[dst_dev].node;
+    const int dst_node = devs.devices[dst_dev]->node;
+
+    sicm_device_list dst_list;
+    dst_list.count = 1;
+    dst_list.devices = &devs.devices[dst_dev];
 
     // Create an allocator on another SICM device
     auto sicm_dst_alloc = rm.makeAllocator<umpire::strategy::SICMStrategy>(
-        "sicm_dst_alloc", dst_dev);
+        "sicm_dst_alloc", dst_list);
 
     // Move the entire arena
     void* dst_ptr = rm.move(src_ptr, sicm_dst_alloc);
@@ -85,8 +93,8 @@ int main(int, char**) {
 
   // Clean up by deallocating from the original allocator, since the
   // allocation record is still associated with that allocator
-  sicm_src_alloc.deallocate(src_ptr);
   sicm_src_alloc.deallocate(src_ptr2);
+  sicm_src_alloc.deallocate(src_ptr);
 
   sicm_fini();
 

@@ -31,15 +31,14 @@ class SICMResourceFactory :
   public MemoryResourceFactory
 {
 public:
-  SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices, const sicm::device_chooser_t& chooser);
+  SICMResourceFactory(const std::string& name, const std::shared_ptr<sicm_device_list>& devices);
 
 private:
   bool isValidMemoryResourceFor(const std::string& name) noexcept;
     std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id);
 
   const std::string replacement;
-  const std::vector<unsigned int> devices;
-  const sicm::device_chooser_t chooser;
+  const std::shared_ptr<sicm_device_list> devices;
 };
 
 } // end of namespace resource

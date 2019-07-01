@@ -13,51 +13,64 @@
 // Please also see the LICENSE file for MIT license.
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/SICM_device.hpp"
-
 #include "umpire/util/Macros.hpp"
+
+#include <vector>
+
+std::ostream& operator<<(std::ostream& stream, const sicm_device_list& device_list) {
+  stream << device_list.count << " SICM devices:";
+  for(unsigned int i = 0; i < device_list.count; i++) {
+    stream << " {"
+           << sicm_device_tag_str(device_list.devices[i]->tag) << ", "
+           << device_list.devices[i]->node
+           << "}";
+  }
+
+  return stream << "\n";
+}
 
 namespace umpire {
 namespace sicm {
 
-std::vector<unsigned int> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform) {
-    std::vector<unsigned int> devices;
-    switch (platform) {
-        case umpire::Platform::cpu:
-            for(unsigned int i = 0; i < devs.count; i++) {
-                switch (devs.devices[i].tag) {
-                    case SICM_DRAM:
-                    case SICM_KNL_HBM:
-                        devices.push_back(i);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            break;
+std::shared_ptr<sicm_device_list> get_devices(const struct sicm_device_list& devs, const umpire::Platform& platform, int page_size) {
+  std::vector<unsigned int> indicies;
+  page_size >>= 10; // page_size in SICM is in units of 1K
+  switch (platform) {
+    case umpire::Platform::cpu:
+      for(unsigned int i = 0; i < devs.count; i++) {
+        if ((devs.devices[i]->tag == SICM_DRAM) &&
+            (devs.devices[i]->data.dram.page_size == page_size)) {
+          indicies.push_back(i);
+        }
+        else if ((devs.devices[i]->tag == SICM_KNL_HBM) &&
+                 (devs.devices[i]->data.knl_hbm.page_size == page_size)) {
+          indicies.push_back(i);
+        }
+      }
+      break;
 #if defined(UMPIRE_ENABLE_CUDA)
-        case umpire::Platform::cuda:
-            for(unsigned int i = 0; i < devs.count; i++) {
-                if (devs.devices[i].tag == SICM_POWERPC_HBM) {
-                    devices.push_back(i);
-                }
-            }
-            break;
+    case umpire::Platform::cuda:
+      for(unsigned int i = 0; i < devs.count; i++) {
+        if ((devs.devices[i]->tag == SICM_POWERPC_HBM) &&
+            (devs.devices[i]->data.powerpc_hbm.page_size == page_size)) {
+          indicies.push_back(i);
+        }
+      }
+      break;
 #endif
-        default:
-            break;
-    }
+    default:
+        break;
+  }
 
-    return devices;
-}
+  // copy pointers into this device list
+  std::shared_ptr<sicm_device_list> found(new sicm_device_list, [](sicm_device_list* ptr){ sicm_device_list_free(ptr); delete ptr; });
+  found->count = indicies.size();
+  found->devices = static_cast<sicm_device**>(calloc(indicies.size(), sizeof(sicm_device*)));
+  for(decltype(indicies)::size_type i = 0; i < indicies.size(); i++) {
+    found->devices[i] = devs.devices[indicies[i]];
+  }
 
-unsigned int best_device(const int UMPIRE_UNUSED_ARG(running_at),
-                         const std::size_t UMPIRE_UNUSED_ARG(size),
-                         const std::vector <unsigned int>& allowed_devices,
-                         const sicm_device_list& UMPIRE_UNUSED_ARG(devs)) {
-    static std::size_t index = 0;
-    const unsigned int dev = allowed_devices[index % allowed_devices.size()];
-    index = (index + 1) % allowed_devices.size();
-    return dev;
+  return found;
 }
 
 } // end namespace sicm

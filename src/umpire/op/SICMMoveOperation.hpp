@@ -28,8 +28,6 @@ namespace op {
 class SICMMoveOperation :
   public MemoryOperation {
  public:
-  ~SICMMoveOperation();
-
   /*!
    * \copybrief MemoryOperation::transform
    *

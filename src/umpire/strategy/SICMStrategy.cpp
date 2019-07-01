@@ -28,19 +28,18 @@ sicm_device_list SICMStrategy::m_devices = sicm_init();
 SICMStrategy::SICMStrategy(
     const std::string& name,
     int id,
-    std::size_t device_index,
+    sicm_device_list devices,
     std::size_t max_size) :
   AllocationStrategy(name, id),
-  m_index(device_index),
   m_max_size(max_size),
   m_arena(nullptr)
 {
-  if (device_index >= m_devices.count) {
+  if (!devices.count || !devices.devices) {
     sicm_fini();
-    UMPIRE_ERROR("SICMStrategy error: Device index too large");
+    UMPIRE_ERROR("SICMStrategy error: No devices specified");
   }
 
-  m_arena = sicm_arena_create(m_max_size, &m_devices.devices[m_index]);
+  m_arena = sicm_arena_create(m_max_size, static_cast<sicm_arena_flags>(0), &devices);
 }
 
 SICMStrategy::~SICMStrategy() {
@@ -82,10 +81,10 @@ SICMStrategy::getPlatform() noexcept
   return Platform::sicm;
 }
 
-std::size_t
-SICMStrategy::getDeviceIndex() const noexcept
+sicm_arena
+SICMStrategy::getArena() const noexcept
 {
-  return m_index;
+  return m_arena;
 }
 
 } // end of namespace strategy

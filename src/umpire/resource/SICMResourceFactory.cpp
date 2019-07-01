@@ -28,10 +28,9 @@
 namespace umpire {
 namespace resource {
 
-SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::vector<unsigned int>& devices, const sicm::device_chooser_t& chooser)
+SICMResourceFactory::SICMResourceFactory(const std::string& name, const std::shared_ptr<sicm_device_list>& devices)
   : replacement(name),
-    devices(devices),
-    chooser(chooser)
+    devices(devices)
 {
 }
 
@@ -51,7 +50,7 @@ SICMResourceFactory::create(const std::string& name, int id)
 
   const sicm_device_list devs = sicm_init();
   for(unsigned int i = 0; i < devs.count; i += 3) {
-    traits.size += numa_node_size(devs.devices[i].node, nullptr);
+    traits.size += numa_node_size(devs.devices[i]->node, nullptr);
   }
   sicm_fini();
 
@@ -59,7 +58,7 @@ SICMResourceFactory::create(const std::string& name, int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<DefaultMemoryResource<alloc::SICMAllocator>>(Platform::sicm, name, id, traits, name, devices, chooser);
+  return util::make_unique<DefaultMemoryResource<alloc::SICMAllocator>>(Platform::sicm, name, id, traits, name, devices.get());
 }
 
 } // end of namespace resource

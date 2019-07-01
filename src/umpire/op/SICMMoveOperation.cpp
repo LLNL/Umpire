@@ -28,12 +28,6 @@
 namespace umpire {
 namespace op {
 
-sicm_device_list SICMMoveOperation::m_devices = sicm_init();
-
-SICMMoveOperation::~SICMMoveOperation() {
-    sicm_fini();
-}
-
 void SICMMoveOperation::transform(
     void* src_ptr,
     void** dst_ptr,
@@ -45,41 +39,17 @@ void SICMMoveOperation::transform(
       static_cast<strategy::SICMStrategy *>(
           static_cast<strategy::AllocationStrategy*>(
               static_cast<strategy::AllocationTracker *>(dst_allocation->strategy)->getAllocationStrategy()));
-  sicm_arena sa = sicm_arena_lookup(src_ptr);
+  const sicm_arena sa = sicm_arena_lookup(src_ptr);
+  sicm_device_list dst_devices = sicm_arena_get_devices(dst_allocator->getArena());
+  const int rc = sicm_arena_set_devices(sa, &dst_devices);
+  sicm_device_list_free(&dst_devices);
 
-  const int rc = sicm_arena_set_device(sa, &m_devices.devices[dst_allocator->getDeviceIndex()]);
   if (rc != 0) {
     sicm_fini();
     UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
   }
 
   *dst_ptr = src_ptr;
-
-  // find the arena the src_ptr was at and move the record to the new device
-  {
-    std::lock_guard <std::mutex> lock(alloc::SICMAllocator::arena_mutex);
-    bool found = false;
-    for(std::pair <const unsigned int, std::list <sicm_arena> > & device : alloc::SICMAllocator::arenas) {
-      for(std::list <sicm_arena>::const_iterator it = device.second.begin(); it != device.second.end(); it++) {
-        if (*it == sa) {
-          device.second.erase(it);
-          found = true;
-          break;
-        }
-      }
-
-      if (found) {
-        break;
-      }
-    }
-
-    if (found) {
-      alloc::SICMAllocator::arenas[dst_allocator->getDeviceIndex()].push_back(sa);
-    }
-    else {
-      // is this an error?
-    }
-  }
 
   UMPIRE_USE_VAR(length); // length is not detected as being used
 
