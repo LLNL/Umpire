@@ -40,38 +40,23 @@ if (ENABLE_HIP)
     HipPinnedAllocator.hpp)
 endif ()
 
-if ("${umpire_alloc_sources}" STREQUAL "")
-  blt_add_library(
-    NAME umpire_alloc
-    HEADERS ${umpire_alloc_headers})
+blt_add_library(
+  NAME umpire_alloc
+  HEADERS ${umpire_alloc_headers})
 
-  target_include_directories(
-    umpire_alloc
-    INTERFACE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
+target_include_directories(
+  umpire_alloc
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
-  install(TARGETS
-    umpire_alloc
-    EXPORT umpire-targets
-    RUNTIME DESTINATION lib
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib)
-else()
-  blt_add_library(
-    NAME umpire_alloc
-    HEADERS ${umpire_alloc_headers}
-    SOURCES ${umpire_alloc_sources}
-    OBJECT TRUE)
-
-  target_include_directories(
-    umpire_alloc
-    PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
-endif()
+install(TARGETS
+  umpire_alloc
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
 
 install(FILES
   ${umpire_alloc_headers}
