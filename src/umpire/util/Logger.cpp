@@ -8,14 +8,9 @@
 #include "umpire/util/Logger.hpp"
 #include "umpire/util/IOManager.hpp"
 
-#if !defined(_MSC_VER)
-#include <strings.h>  // for strcasecmp()
-#else
-#define strcasecmp _stricmp
-#endif
-
-#include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
+#include <cstdlib>    // for getenv()
+#include <cctype>     // for std::toupper
+#include <algorithm>  // for std::equal
 
 namespace umpire {
 namespace util {
@@ -23,26 +18,31 @@ namespace util {
 static const char* env_name = "UMPIRE_LOG_LEVEL";
 static message::Level defaultLevel = message::Info;
 
-static const std::string MessageLevelName[ message::Num_Levels ] = {
+static const char* MessageLevelName[message::Num_Levels] = {
   "ERROR",
   "WARNING",
   "INFO",
   "DEBUG"
 };
 
-Logger::Logger() noexcept
-{
+static int case_insensitive_match(const std::string s1, const std::string s2) {
+  return (s1.size() == s2.size()) &&
+          std::equal(s1.begin(), s2.end(), s2.begin(), [] (char c1, char c2) {
+            return (c1 == c2 || std::toupper(c1) == std::toupper(c2));
+          });
+}
+
+Logger::Logger() noexcept :
   // by default, all message streams are disabled
-  for ( int i=0 ; i < message::Num_Levels ; ++i )
-    m_isEnabled[ i ] = false;
+  m_is_enabled{false, false, false, false}
+{
+  message::Level level{defaultLevel};
+  const char* enval = getenv(env_name);
 
-  message::Level level = defaultLevel;
-  char* enval = getenv(env_name);
-
-  if ( enval != NULL ) {
-    for ( int i = 0; i < message::Num_Levels; ++i ) {
-      if ( strcasecmp( enval, MessageLevelName[ i ].c_str() ) == 0 ) {
-        level = (message::Level)i;
+  if (enval) {
+    for (int i = 0; i < message::Num_Levels; ++i) {
+      if (case_insensitive_match(enval, MessageLevelName[i])) {
+        level = static_cast<message::Level>(i);
         break;
       }
     }
@@ -53,8 +53,8 @@ Logger::Logger() noexcept
 
 void Logger::setLoggingMsgLevel( message::Level level ) noexcept
 {
-  for ( int i=0 ; i < message::Num_Levels ; ++i )
-    m_isEnabled[ i ] = (i<= level) ? true : false;
+  for (int i=0; i < message::Num_Levels; ++i)
+    m_is_enabled[i] = (i<=level);
 }
 
 void Logger::logMessage( message::Level level,
@@ -62,11 +62,10 @@ void Logger::logMessage( message::Level level,
                          const std::string& fileName,
                          int line ) noexcept
 {
-  if ( !logLevelEnabled( level ) )
-    return;   /* short-circuit */
+  if (!logLevelEnabled(level)) return;
 
   umpire::log
-    << "[" << MessageLevelName[ level ] << "]"
+    << "[" << MessageLevelName[level] << "]"
     << "[" << fileName  << ":" << line << "]:"
     << message
     << std::endl;
@@ -75,9 +74,8 @@ void Logger::logMessage( message::Level level,
 Logger* Logger::getActiveLogger()
 {
   static Logger logger;
-
   return &logger;
 }
 
-} /* namespace util */
-} /* namespace umpire */
+} // end namespace util
+} // end namespace umpire

@@ -4,11 +4,10 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <cassert>
-#include <memory>
+#include <functional>
+#include <algorithm>
+#include <random>
+
 #include "benchmark/benchmark.h"
 
 #include "umpire/config.hpp"
@@ -37,7 +36,7 @@
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
-static const std::size_t max_allocations = 100000;
+static const std::size_t Max_Allocations = 100000;
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -62,17 +61,17 @@ public:
     std::size_t i = 0;
 
     while (st.KeepRunning()) {
-      if (i == max_allocations) {
+      if (i == Max_Allocations) {
         st.PauseTiming();
-        for (std::size_t j = 0; j < max_allocations; j++)
-          deallocate(allocations[j]);
+        for (std::size_t j = 0; j < Max_Allocations; j++)
+          deallocate(m_allocations[j]);
         i = 0;
         st.ResumeTiming();
       }
-      allocations[i++] = allocate(size);
+      m_allocations[i++] = allocate(size);
     }
     for (std::size_t j = 0; j < i; j++)
-      deallocate(allocations[j]);
+      deallocate(m_allocations[j]);
   }
 
   void deallocation(benchmark::State &st) {
@@ -80,20 +79,20 @@ public:
     std::size_t i = 0;
 
     while (st.KeepRunning()) {
-      if (i == 0 || i == max_allocations) {
+      if (i == 0 || i == Max_Allocations) {
         st.PauseTiming();
-        for (std::size_t j = 0; j < max_allocations; j++)
-          allocations[j] = allocate(size);
+        for (std::size_t j = 0; j < Max_Allocations; j++)
+          m_allocations[j] = allocate(size);
         i = 0;
         st.ResumeTiming();
       }
-      deallocate(allocations[i++]);
+      deallocate(m_allocations[i++]);
     }
-    for (std::size_t j = i; j < max_allocations; j++)
-      deallocate(allocations[j]);
+    for (std::size_t j = i; j < Max_Allocations; j++)
+      deallocate(m_allocations[j]);
   }
 
-  void* allocations[max_allocations];
+  void* m_allocations[Max_Allocations];
 };
 
 template <typename Alloc>
@@ -101,101 +100,99 @@ class ResourceAllocator : public AllocatorBenchmark
 {
 public:
   ResourceAllocator() : m_alloc{} {}
-  virtual void* allocate(std::size_t nbytes) { return m_alloc.allocate(nbytes); }
-  virtual void deallocate(void* ptr) { m_alloc.deallocate(ptr); }
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc.allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc.deallocate(ptr); }
 private:
   Alloc m_alloc;
 };
 
 class Malloc : public ResourceAllocator<umpire::alloc::MallocAllocator> {};
 BENCHMARK_DEFINE_F(Malloc, malloc)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(Malloc, free)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
 
 #if defined(UMPIRE_ENABLE_CUDA)
 class CudaMalloc : public ResourceAllocator<umpire::alloc::CudaMallocAllocator> {};
 BENCHMARK_DEFINE_F(CudaMalloc, cudaMalloc)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(CudaMalloc, cudaMalloc)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(CudaMalloc, cudaFree)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(CudaMalloc, cudaFree)->Range(RangeLow, RangeHi);
 
 class CudaMallocManaged : public ResourceAllocator<umpire::alloc::CudaMallocAllocator> {};
 BENCHMARK_DEFINE_F(CudaMallocManaged, cudaMallocManaged)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(CudaMallocManaged, cudaMallocManaged)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(CudaMallocManaged, cudaFree)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(CudaMallocManaged, cudaFree)->Range(RangeLow, RangeHi);
 
 class CudaPinned : public ResourceAllocator<umpire::alloc::CudaPinnedAllocator> {};
 BENCHMARK_DEFINE_F(CudaPinned, cudaMallocHost)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(CudaPinned, cudaMallocHost)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(CudaPinned, cudaFreeHost)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
 class HipMalloc : public ResourceAllocator<umpire::alloc::HipMallocAllocator> {};
 BENCHMARK_DEFINE_F(HipMalloc, hipMalloc)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(HipMalloc, hipFree)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(HipMalloc, hipFree)->Range(RangeLow, RangeHi);
 
 class HipPinned : public ResourceAllocator<umpire::alloc::HipPinnedAllocator> {};
 BENCHMARK_DEFINE_F(HipPinned, hipMallocHost)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(HipPinned, hipFreeHost)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->Range(RangeLow, RangeHi);
 #endif
 
 template <umpire::resource::MemoryResourceType Resource>
 class MemoryResourceAllocator : public AllocatorBenchmark
 {
 public:
-  MemoryResourceAllocator() :
-    m_alloc{umpire::ResourceManager::getInstance().getAllocator(Resource)} {}
-  virtual void* allocate(std::size_t nbytes) { return m_alloc.allocate(nbytes); }
-  virtual void deallocate(void* ptr) { m_alloc.deallocate(ptr); }
+  MemoryResourceAllocator() = default;
+
+  void SetUp(const ::benchmark::State&) override final {
+    m_alloc = new umpire::Allocator{umpire::ResourceManager::getInstance().getAllocator(Resource)};
+  }
+
+  void TearDown(const ::benchmark::State&) override final { delete m_alloc; }
+
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
 private:
-  umpire::Allocator m_alloc;
+  umpire::Allocator* m_alloc;
 };
 
 class HostResource : public MemoryResourceAllocator<umpire::resource::Host> {};
 BENCHMARK_DEFINE_F(HostResource, allocate)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(HostResource, allocate)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(HostResource, deallocate)(benchmark::State &st) { deallocation(st); }
-BENCHMARK_REGISTER_F(HostResource, deallocate)->Range(RangeLow, RangeHi);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 class DeviceResource : public MemoryResourceAllocator<umpire::resource::Device> {};
 BENCHMARK_DEFINE_F(DeviceResource, allocate)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(DeviceResource, allocate)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(DeviceResource, deallocate)(benchmark::State &st)   { deallocation(st); }
-BENCHMARK_REGISTER_F(DeviceResource, deallocate)->Range(RangeLow, RangeHi);
 
-class DeviceResource : public MemoryResourceAllocator<umpire::resource::Pinned> {};
-BENCHMARK_DEFINE_F(DeviceResource, allocate)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(DeviceResource, allocate)->Range(RangeLow, RangeHi);
-
-BENCHMARK_DEFINE_F(DeviceResource, deallocate)(benchmark::State &st) { deallocation(st); }
-BENCHMARK_REGISTER_F(DeviceResource, deallocate)->Range(RangeLow, RangeHi);
+class DevicePinnedResource : public MemoryResourceAllocator<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(DevicePinnedResource, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(DevicePinnedResource, deallocate)(benchmark::State &st) { deallocation(st); }
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
 class UnifiedResource : public MemoryResourceAllocator<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(UnifiedResource, allocate)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(UnifiedResource, allocate)->Range(RangeLow, RangeHi);
-
 BENCHMARK_DEFINE_F(UnifiedResource, deallocate)(benchmark::State &st) { deallocation(st); }
-BENCHMARK_REGISTER_F(UnifiedResource, deallocate)->Range(RangeLow, RangeHi);
 #endif
+
+class FixedMallocPool : public AllocatorBenchmark {
+public:
+  using AllocatorBenchmark::SetUp;
+  using AllocatorBenchmark::TearDown;
+
+  void SetUp(const ::benchmark::State&) override final {
+    m_alloc = new umpire::util::FixedMallocPool(8);
+  }
+  void TearDown(const ::benchmark::State&) override final {
+    delete m_alloc;
+  }
+
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+
+private:
+  umpire::util::FixedMallocPool* m_alloc;
+};
+
+BENCHMARK_DEFINE_F(FixedMallocPool, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedMallocPool, deallocate)(benchmark::State &st) { deallocation(st); }
 
 static int namecnt = 0;   // Used to generate unique name per iteration
 template <umpire::resource::MemoryResourceType Resource>
@@ -206,7 +203,7 @@ public:
 
   FixedPool() : m_alloc{nullptr} {}
 
-  void SetUp(const ::benchmark::State& st) {
+  void SetUp(const ::benchmark::State& st) override final {
     auto& rm = umpire::ResourceManager::getInstance();
     auto bytes = static_cast<std::size_t>(st.range(0));
 
@@ -218,10 +215,10 @@ public:
         ss.str(), rm.getAllocator(Resource), bytes, 128 * sizeof(int) * 8)};
   }
 
-  void TearDown(const ::benchmark::State&) { delete m_alloc; }
+  void TearDown(const ::benchmark::State&) override final { delete m_alloc; }
 
-  virtual void* allocate(std::size_t nbytes) { return m_alloc->allocate(nbytes); }
-  virtual void deallocate(void* ptr) { m_alloc->deallocate(ptr); }
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
 
 private:
   umpire::Allocator* m_alloc;
@@ -229,9 +226,189 @@ private:
 
 class FixedPoolHost : public FixedPool<umpire::resource::Host> {};
 BENCHMARK_DEFINE_F(FixedPoolHost, allocate)(benchmark::State &st) { allocation(st); }
-BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(256);
-
 BENCHMARK_DEFINE_F(FixedPoolHost, deallocate)(benchmark::State &st) { deallocation(st); }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+class FixedPoolDevice : public FixedPool<umpire::resource::Device> {};
+BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st) { deallocation(st); }
+#endif
+
+class AllocatorRandomSizeBenchmark : public benchmark::Fixture {
+public:
+  using ::benchmark::Fixture::SetUp;
+  using ::benchmark::Fixture::TearDown;
+
+  void SetUp(benchmark::State& st) {
+    const int range_lo = static_cast<int>(st.range(0));
+    const int range_hi = static_cast<int>(st.range(1));
+
+    std::default_random_engine generator;
+    generator.seed(0);
+
+    std::uniform_int_distribution<int> distribution{range_lo, range_hi};
+
+    auto random_number = std::bind(distribution, generator);
+
+    std::generate(m_allocations, m_allocations + Max_Allocations,
+                  [&random_number] () { return reinterpret_cast<void*>(random_number()); });
+
+    setUpPool();
+  }
+
+  virtual void* allocate(std::size_t nbytes) = 0;
+  virtual void deallocate(void* ptr) = 0;
+  virtual void setUpPool() = 0;
+
+  void allocation(benchmark::State &st) {
+    std::size_t i = 0;
+
+    while (st.KeepRunning()) {
+      if (i == Max_Allocations) {
+        st.PauseTiming();
+        for (std::size_t j = 0; j < Max_Allocations; j++) {
+          const int bytes{*reinterpret_cast<int*>(m_allocations[j])};
+          deallocate(m_allocations[j]);
+          m_allocations[j] = reinterpret_cast<int*>(bytes);
+        }
+        i = 0;
+        st.ResumeTiming();
+      }
+      {
+        const long bytes{reinterpret_cast<long>(m_allocations[i])};
+        m_allocations[i] = allocate(bytes);
+        *reinterpret_cast<int*>(m_allocations[i]) = bytes;
+      }
+      ++i;
+    }
+    for (std::size_t j = 0; j < i; j++) {
+      deallocate(m_allocations[j]);
+    }
+  }
+
+  void deallocation(benchmark::State &st) {
+    std::size_t i = 0;
+
+    while (st.KeepRunning()) {
+      if (i == 0 || i == Max_Allocations) {
+        st.PauseTiming();
+        for (std::size_t j = 0; j < Max_Allocations; j++) {
+          const long bytes{reinterpret_cast<long>(m_allocations[j])};
+          m_allocations[j] = allocate(bytes);
+          *reinterpret_cast<int*>(m_allocations[j]) = bytes;
+        }
+        i = 0;
+        st.ResumeTiming();
+      }
+      {
+        const int bytes{*reinterpret_cast<int*>(m_allocations[i])};
+        deallocate(m_allocations[i]);
+        m_allocations[i] = reinterpret_cast<int*>(bytes);
+      }
+      ++i;
+    }
+    for (std::size_t j = i; j < Max_Allocations; j++) {
+      deallocate(m_allocations[j]);
+    }
+  }
+
+  void* m_allocations[Max_Allocations];
+};
+
+template <umpire::resource::MemoryResourceType Resource>
+class DynamicPool : public AllocatorRandomSizeBenchmark {
+public:
+  using AllocatorRandomSizeBenchmark::SetUp;
+  using AllocatorRandomSizeBenchmark::TearDown;
+
+  DynamicPool() : m_alloc{nullptr} {}
+
+  void TearDown(const ::benchmark::State&) override final { delete m_alloc; }
+
+  virtual void setUpPool() final {
+    auto& rm = umpire::ResourceManager::getInstance();
+
+    std::stringstream ss;
+    ss << "dynamic_pool-" << Resource << "." << namecnt;
+    ++namecnt;
+
+    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::DynamicPool>(
+        ss.str(), rm.getAllocator(Resource))};
+  }
+
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+
+private:
+  umpire::Allocator* m_alloc;
+};
+
+class DynamicPoolHost : public DynamicPool<umpire::resource::Host> {};
+BENCHMARK_DEFINE_F(DynamicPoolHost, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate)(benchmark::State &st) { deallocation(st); }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+class DynamicPoolDevice : public DynamicPool<umpire::resource::Device> {};
+BENCHMARK_DEFINE_F(DynamicPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate)(benchmark::State &st) { deallocation(st); }
+#endif
+
+
+// Base allocators
+BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+
+#if defined(UMPIRE_ENABLE_CUDA)
+BENCHMARK_REGISTER_F(CudaMalloc, cudaMalloc)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMalloc, cudaFree)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(CudaMallocManaged, cudaMallocManaged)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMallocManaged, cudaFree)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(CudaPinned, cudaMallocHost)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->Range(RangeLow, RangeHi);
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMalloc, hipFree)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->Range(RangeLow, RangeHi);
+#endif
+
+// Resources
+BENCHMARK_REGISTER_F(HostResource, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HostResource, deallocate)->Range(RangeLow, RangeHi);
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_REGISTER_F(DeviceResource, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DeviceResource, deallocate)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(DevicePinnedResource, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DevicePinnedResource, deallocate)->Range(RangeLow, RangeHi);
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+BENCHMARK_REGISTER_F(UnifiedResource, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(UnifiedResource, deallocate)->Range(RangeLow, RangeHi);
+#endif
+
+
+// FixedPool
+BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(256);
 BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(256);
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(256);
+BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(256);
+#endif
+
+// DynamicPool
+BENCHMARK_REGISTER_F(DynamicPoolHost, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate)->Args({16, 1024});
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_REGISTER_F(DynamicPoolDevice, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate)->Args({16, 1024});
+#endif
 
 BENCHMARK_MAIN()
