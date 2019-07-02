@@ -50,8 +50,8 @@ class DynamicPool : public AllocationStrategy
      * \param id Unique identifier for this instance
      * \param initial_alloc_bytes Size the pool initially allocates
      * \param min_alloc_bytes The minimum size of all future allocations
-     * \param align_bytes Number of bytes with which to align allocation sizes
      * \param coalesce_heuristic Heuristic callback function
+     * \param align_bytes Number of bytes with which to align allocation sizes
      */
     DynamicPool(
         const std::string& name,
