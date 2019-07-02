@@ -14,7 +14,7 @@
 #include "umpire/Allocator.hpp"
 
 #include <map>
-#include <utility>
+#include <tuple>
 
 namespace umpire {
 namespace strategy {
@@ -113,16 +113,16 @@ class DynamicPool : public AllocationStrategy
     void coalesce();
 
   private:
-    using SizePair = std::pair<std::size_t, bool>;
-    using AddressPair = std::pair<Pointer, bool>;
-    using AddressMap = util::MemoryMap<SizePair>;
-    using SizeMap = std::multimap<std::size_t, AddressPair>;
+    using SizeTuple = std::tuple<std::size_t, bool, std::size_t>;
+    using AddressTuple = std::tuple<Pointer, bool, std::size_t>;
+    using AddressMap = util::MemoryMap<SizeTuple>;
+    using SizeMap = std::multimap<std::size_t, AddressTuple>;
 
     // Insert a block to the used map
-    void insertUsed(Pointer addr, std::size_t bytes, bool is_head);
+    void insertUsed(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
 
     // Insert a block to the free map
-    void insertFree(Pointer addr, std::size_t bytes, bool is_head);
+    void insertFree(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
 
     // find a free block with length <= bytes as close to bytes in length as
     // possible.

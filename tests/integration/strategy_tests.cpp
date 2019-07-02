@@ -418,7 +418,7 @@ TEST(DynamicPool, coalesce)
 
   dynamic_pool->coalesce();
 
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
 
   alloc.deallocate(ptr_one);
 
@@ -512,12 +512,13 @@ TEST(HeuristicTest, EdgeCases_100)
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
-  void* alloc1 = nullptr;
+  void* alloc1{nullptr};
   ASSERT_NO_THROW({ alloc1 = alloc.allocate(16); });
   ASSERT_EQ(alloc.getActualSize(), initial_size);
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
+  ASSERT_NO_THROW(dynamic_pool->coalesce());
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
@@ -526,13 +527,13 @@ TEST(HeuristicTest, EdgeCases_100)
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
-  void* alloc2 = nullptr;
+  void* alloc2{nullptr};
   ASSERT_NO_THROW({ alloc2 = alloc.allocate(initial_size); });
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
   ASSERT_EQ(alloc.getActualSize(), 2*initial_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
-  void* alloc3 = nullptr;
+  void* alloc3{nullptr};
   ASSERT_NO_THROW({ alloc3 = alloc.allocate(initial_size); });
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
@@ -608,7 +609,7 @@ TEST(HeuristicTest, EdgeCases_0)
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size + 16);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
