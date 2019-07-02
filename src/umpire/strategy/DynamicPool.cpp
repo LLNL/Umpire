@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <tuple>
+#include <sstream>
 
 inline static std::size_t round_up(std::size_t num, std::size_t factor)
 {
@@ -46,9 +47,23 @@ DynamicPool::DynamicPool(const std::string& name,
 
 DynamicPool::~DynamicPool()
 {
-  // Warn if blocks are still in use
+  // Error if blocks are still in use
+  std::size_t num_heads = 0;
+  for (auto& rec : m_used_map) {
+    std::size_t bytes;
+    bool is_head;
+    if (rec.second) {
+      std::tie(bytes, is_head) = *rec.second;
+      if (is_head) ++num_heads;
+    }
+  }
   if (m_used_map.size() > 0) {
-    UMPIRE_LOG(Debug, "Not all used blocks have deallocated. This will cause a leak.");
+    std::stringstream ss;
+    ss << "Pointers still in use at destruction time.";
+    if (num_heads > 0) {
+      ss << " This will cause " << num_heads << " leak(s).";
+    }
+    UMPIRE_LOG(Error, ss.str());
   }
 
   // Free any unused blocks
