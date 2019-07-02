@@ -69,12 +69,13 @@ DynamicPool::~DynamicPool()
 
   // Free any unused blocks
   for (auto& rec : m_free_map) {
+    const std::size_t bytes{rec.first};
     void* addr;
     bool is_head;
     std::size_t whole_bytes;
     std::tie(addr, is_head, whole_bytes) = rec.second;
-    // Deallocate if this is a head
-    if (is_head && whole_bytes) m_allocator->deallocate(addr);
+    // Deallocate if this is a whole block
+    if (is_head && bytes == whole_bytes) m_allocator->deallocate(addr);
   }
 }
 
