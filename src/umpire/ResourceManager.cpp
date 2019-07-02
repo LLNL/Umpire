@@ -111,7 +111,7 @@ ResourceManager::ResourceManager() :
   std::shared_ptr<sicm_device_list> host_devices = sicm::get_devices(devs, Platform::cpu, page_size);
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("HOST", host_devices));
+    util::make_unique<resource::SICMResourceFactory>("HOST",         host_devices));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::HostResourceFactory>());
@@ -122,16 +122,16 @@ ResourceManager::ResourceManager() :
   std::shared_ptr<sicm_device_list> cuda_devices = sicm::get_devices(devs, Platform::cuda, page_size);
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("DEVICE",   cuda_devices));
+    util::make_unique<resource::SICMResourceFactory>("DEVICE",       cuda_devices));
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("UM",       cuda_devices));
+    util::make_unique<resource::SICMResourceFactory>("UM",           cuda_devices));
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("PINNED",   cuda_devices));
+    util::make_unique<resource::SICMResourceFactory>("PINNED",       cuda_devices));
 
   registry.registerMemoryResource(
-    util::make_unique<resource::SICMResourceFactory>("CONSTANT", cuda_devices));
+    util::make_unique<resource::SICMResourceFactory>("DEVICE_CONST", cuda_devices));
 #else
   registry.registerMemoryResource(
     util::make_unique<resource::CudaDeviceResourceFactory>());
