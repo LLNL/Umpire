@@ -46,6 +46,11 @@ DynamicPool::DynamicPool(const std::string& name,
 
 DynamicPool::~DynamicPool()
 {
+  // Warn if blocks are still in use
+  if (m_used_map.size() > 0) {
+    UMPIRE_LOG(Debug, "Not all used blocks have deallocated. This will cause a leak.");
+  }
+
   // Free any unused blocks
   for (auto& rec : m_free_map) {
     void* addr;
