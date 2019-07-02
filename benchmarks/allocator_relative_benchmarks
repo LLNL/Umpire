@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+import re
+import argparse
+from subprocess import check_output
+from collections import OrderedDict
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Output relative benchmark results.')
+    parser.add_argument('-d', '--device', type=str, nargs='?', default='cuda', help='Device type for benchmarks [ cuda | hip ]')
+    parser.add_argument('-r', '--resources', type=str, nargs='+', default=[], help='Resources [ Host | Device | DevicePinned | Unified ]')
+    parser.add_argument('-p', '--pools', type=str, nargs='*', default=[], help='Pools [ FixedPool | DynamicPool ]')
+    args = parser.parse_args()
+
+    resource_map = {'Host' : 'Malloc',
+                    'Unified' : 'CudaMallocManaged',
+                    'Device' : '{:s}Malloc'.format(args.device),
+                    'DevicePinned' : '{:s}Pinned'.format(args.device.title())}
+
+    device_allocate_map = {'allocate' : '{:s}Malloc'.format(args.device), 'deallocate' : '{:s}Free'.format(args.device)}
+    variant_map = {'Host' : {'allocate' : 'malloc', 'deallocate' : 'free'},
+                   'Unified' : {'allocate' : 'cudaMallocManaged', 'deallocate' : 'cudaFree'},
+                   'Device' : device_allocate_map,
+                   'DevicePinned' : {k : '{:s}Host'.format(v) for k, v in device_allocate_map.iteritems()}}
+
+    # Create regexp string
+    tests = []
+
+    for r in args.resources:
+        tests.append(resource_map[r])
+        tests.append('{:s}Resource'.format(r))
+
+    for p in args.pools:
+        tests += ['{:s}{:s}'.format(p, r) for r in args.resources]
+
+    # Run tests
+    output = check_output(['./bin/benchmarks/allocator_benchmarks', '--benchmark_color=false', '--benchmark_filter={:s}'.format('|'.join(tests))])
+
+    results_map = {}
+    def add_to_results(name, variant, time, iters, size=None):
+        # Create if not already there.
+        # NOTE: Time is given in nanoseconds by default, unless
+        # changed in the source code, so the unit is consistent.
+        if name not in results_map:
+            results_map[name] = OrderedDict()
+        if variant not in results_map[name]:
+            results_map[name][variant] = OrderedDict()
+        if size not in results_map[name][variant]:
+            results_map[name][variant][size] = OrderedDict()
+        results_map[name][variant][size] = {'time' : time, 'iters' : iters}
+
+    # Add all lines
+    for l in output.split('\n'):
+        m = re.match(r'(?P<name>[^/]+)/(?P<variant>[^/]+)/(?P<size>[^\s]+)\s+(?P<ns>\d+)\s+ns\s+\d+\s+ns\s+(?P<iters>\d+)$', l)
+        if m is not None:
+            add_to_results(m.group('name'), m.group('variant'), int(m.group('ns')), int(m.group('iters')), size=m.group('size'))
+
+    relative_results_map = {}
+
+    # Resources
+    for r in args.resources:
+        name = '{:s}Resource'.format(r)
+        relative_results_map[name] = results_map[name]
+        base_name = resource_map[r]
+        for variant in relative_results_map[name]:
+            resource_variant = variant_map[r][variant]
+            for size in relative_results_map[name][variant]:
+                time = float(relative_results_map[name][variant][size]['time'])
+                if results_map[base_name][resource_variant][size]:
+                    base_time = float(results_map[base_name][resource_variant][size]['time'])
+                    relative_results_map[name][variant][size]['relative'] = time / base_time
+
+    # Pools
+    for p in args.pools:
+        for r in args.resources:
+            name = '{:s}{:s}'.format(p, r)
+            base_name = resource_map[r]
+            if name in results_map:
+                relative_results_map[name] = results_map[name]
+                for variant in relative_results_map[name]:
+                    base_variant = variant_map[r][variant]
+                    base_size = next(iter(results_map[base_name][base_variant]))
+                    for size in relative_results_map[name][variant]:
+                        time = float(relative_results_map[name][variant][size]['time'])
+                        if results_map[base_name][base_variant][base_size]:
+                            base_time = float(results_map[base_name][base_variant][base_size]['time'])
+                            relative_results_map[name][variant][size]['relative'] = time / base_time
+
+    # Print
+    for name in relative_results_map:
+        for variant in relative_results_map[name]:
+            for size in relative_results_map[name][variant]:
+                print('{:s} {:s} {:s} {:f}'.format(name, variant, size, relative_results_map[name][variant][size]['relative']))

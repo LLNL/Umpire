@@ -38,6 +38,8 @@ blt_add_executable(
   DEPENDS_ON ${benchmark_depends}
   OUTPUT_DIR ${UMPIRE_BENCHMARKS_OUTPUT_DIR})
 
+configure_file(allocator_relative_benchmarks allocator_relative_benchmarks COPYONLY)
+
 blt_add_executable(
   NAME debuglog_benchmarks
   SOURCES debuglog_benchmarks.cpp
