@@ -48,6 +48,9 @@ DynamicPool::DynamicPool(const std::string& name,
 
 DynamicPool::~DynamicPool()
 {
+  // Coalesce to get whole blocks if possible
+  doCoalesce();
+
   // Error if blocks are still in use
   std::size_t num_heads = 0;
   for (auto& rec : m_used_map) {
