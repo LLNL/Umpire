@@ -78,25 +78,15 @@ deallocate MONOTONIC 1024(24)
 deallocate host_slot_pool(25)
 deallocate thread_safe_allocator(26)
 deallocate host_mixedpool_default(27)
-coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec1(28)
-coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec2(29)
-coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec3(30)
-coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec4(31)
-coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec5(32)
-coalesce internal_dynamic_pool
 deallocate host_mixedpool_spec6(33)
-coalesce internal_dynamic_pool
 deallocate host_dyn_pool_defaults(34)
-coalesce host_dyn_pool_defaults
 deallocate host_dyn_pool_spec1(35)
-coalesce host_dyn_pool_spec1
 deallocate host_dyn_pool_spec2(36)
-coalesce host_dyn_pool_spec2
 deallocate MONOTONIC 1024(37)
 deallocate host_slot_pool(38)
 deallocate thread_safe_allocator(39)

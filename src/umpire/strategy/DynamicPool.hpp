@@ -14,7 +14,7 @@
 #include "umpire/Allocator.hpp"
 
 #include <map>
-#include <utility>
+#include <tuple>
 
 namespace umpire {
 namespace strategy {
@@ -50,15 +50,15 @@ class DynamicPool : public AllocationStrategy
      * \param id Unique identifier for this instance
      * \param initial_alloc_bytes Size the pool initially allocates
      * \param min_alloc_bytes The minimum size of all future allocations
-     * \param align_bytes Number of bytes with which to align allocation sizes
      * \param coalesce_heuristic Heuristic callback function
+     * \param align_bytes Number of bytes with which to align allocation sizes
      */
     DynamicPool(
         const std::string& name,
         int id,
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024),
+        const std::size_t min_alloc_size = (1 * 1024 * 1024),
         CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100),
         const int align_bytes = 16) noexcept;
 
@@ -113,16 +113,16 @@ class DynamicPool : public AllocationStrategy
     void coalesce();
 
   private:
-    using SizePair = std::pair<std::size_t, bool>;
-    using AddressPair = std::pair<Pointer, bool>;
-    using AddressMap = util::MemoryMap<SizePair>;
-    using SizeMap = std::multimap<std::size_t, AddressPair>;
+    using SizeTuple = std::tuple<std::size_t, bool, std::size_t>;
+    using AddressTuple = std::tuple<Pointer, bool, std::size_t>;
+    using AddressMap = util::MemoryMap<SizeTuple>;
+    using SizeMap = std::multimap<std::size_t, AddressTuple>;
 
     // Insert a block to the used map
-    void insertUsed(Pointer addr, std::size_t bytes, bool is_head);
+    void insertUsed(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
 
     // Insert a block to the free map
-    void insertFree(Pointer addr, std::size_t bytes, bool is_head);
+    void insertFree(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
 
     // find a free block with length <= bytes as close to bytes in length as
     // possible.
