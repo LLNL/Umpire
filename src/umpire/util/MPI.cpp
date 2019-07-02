@@ -19,24 +19,22 @@ namespace util {
 
 int MPI::s_rank = -1;
 int MPI::s_world_size = -1;
-bool MPI::s_initialized = false;
+int MPI::s_initialized = 0;
 
 void 
 MPI::initialize()
 {
-  if (!s_initialized) {
 #if !defined(UMPIRE_ENABLE_MPI)
     s_rank = 0;
     s_world_size = 1;
+    s_initialized = 1;
 #else
-    MPI_Comm_rank(MPI_COMM_WORLD, &s_rank);
-    MPI_Comm_size(MPI_COMM_WORLD, &s_world_size);
-#endif
-
-    s_initialized = true;
-  } else {
-    UMPIRE_ERROR("umpire::MPI already initialized, cannot call initialize() again!");
+  MPI_Initialized(&s_initialized);
+  if (s_initialized) {
+     MPI_Comm_rank(MPI_COMM_WORLD, &s_rank);
+     MPI_Comm_size(MPI_COMM_WORLD, &s_world_size);
   }
+#endif
 }
 
 void

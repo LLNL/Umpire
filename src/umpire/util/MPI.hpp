@@ -25,7 +25,7 @@ private:
   static int s_rank;
   static int s_world_size;
 
-  static bool s_initialized;
+  static int s_initialized;
 };
 
 } // end of namespace util
