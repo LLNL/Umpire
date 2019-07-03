@@ -5,15 +5,21 @@ from subprocess import check_output
 from collections import OrderedDict
 
 if __name__ == '__main__':
+    all_resources = ('Host', 'Device', 'DevicePinned', 'Unified')
+    all_pools = ('FixedPool', 'DynamicPool')
+    all_devices = ('cuda', 'hip')
+
     parser = argparse.ArgumentParser(description='Output relative benchmark results.')
-    parser.add_argument('-d', '--device', type=str, nargs='?', default='cuda', help='Device type for benchmarks [ cuda | hip ]')
-    parser.add_argument('-r', '--resources', type=str, nargs='+', default=[], help='Resources [ Host | Device | DevicePinned | Unified ]')
-    parser.add_argument('-p', '--pools', type=str, nargs='*', default=[], help='Pools [ FixedPool | DynamicPool ]')
+    parser.add_argument('-d', '--device', type=str, nargs='?', default='cuda', help='Device type for benchmarks [ {:s} ]'.format(' | '.join(all_devices)))
+    parser.add_argument('-r', '--resources', type=str, nargs='+', default=[], help='Resources [ {:s} ]'.format(' | '.join(all_resources)))
+    parser.add_argument('-p', '--pools', type=str, nargs='*', default=[], help='Pools [ {:s} ]'.format(' | '.join(all_pools)))
+    parser.add_argument('-i', '--input', type=str, nargs='?', default=None, help='Input log file to process')
+    parser.add_argument('-l', '--log', type=str, nargs='?', default=None, help='Output log file')
     args = parser.parse_args()
 
     resource_map = {'Host' : 'Malloc',
                     'Unified' : 'CudaMallocManaged',
-                    'Device' : '{:s}Malloc'.format(args.device),
+                    'Device' : '{:s}Malloc'.format(args.device.title()),
                     'DevicePinned' : '{:s}Pinned'.format(args.device.title())}
 
     device_allocate_map = {'allocate' : '{:s}Malloc'.format(args.device), 'deallocate' : '{:s}Free'.format(args.device)}
@@ -33,7 +39,15 @@ if __name__ == '__main__':
         tests += ['{:s}{:s}'.format(p, r) for r in args.resources]
 
     # Run tests
-    output = check_output(['./bin/benchmarks/allocator_benchmarks', '--benchmark_color=false', '--benchmark_filter={:s}'.format('|'.join(tests))])
+    if args.input is not None:
+        with open(args.input, mode='r') as f:
+            test_output = f.read()
+    else:
+        test_output = check_output(['./bin/benchmarks/allocator_benchmarks', '--benchmark_color=false', '--benchmark_filter={:s}'.format('|'.join(tests))])
+
+    if args.log is not None:
+        with open(args.log, mode='w') as f:
+            f.write(output)
 
     results_map = {}
     def add_to_results(name, variant, time, iters, size=None):
@@ -49,44 +63,55 @@ if __name__ == '__main__':
         results_map[name][variant][size] = {'time' : time, 'iters' : iters}
 
     # Add all lines
-    for l in output.split('\n'):
+    for l in test_output.split('\n'):
         m = re.match(r'(?P<name>[^/]+)/(?P<variant>[^/]+)/(?P<size>[^\s]+)\s+(?P<ns>\d+)\s+ns\s+\d+\s+ns\s+(?P<iters>\d+)$', l)
         if m is not None:
             add_to_results(m.group('name'), m.group('variant'), int(m.group('ns')), int(m.group('iters')), size=m.group('size'))
 
-    relative_results_map = {}
+    relative_results_map = OrderedDict()
+
+    def make_relative_map(full_resource, resource, base_resource, use_first_size=False):
+        relative_results_map = OrderedDict()
+
+        if full_resource not in results_map:
+            print('Could not find {:s}'.format(full_resource))
+            return relative_results_map
+
+        for variant in results_map[full_resource]:
+            base_variant = variant_map[resource][variant]
+            relative_results_map[variant] = OrderedDict()
+
+            if variant not in results_map[full_resource]:
+                print('Could not find {:s} in results_map[{:s}]'.format(variant, full_resource))
+                continue
+
+            for size in results_map[full_resource][variant]:
+                time = float(results_map[full_resource][variant][size]['time'])
+
+                this_size = size
+                if use_first_size:
+                    this_size = next(iter(results_map[base_resource][base_variant]))
+
+                if this_size in results_map[base_resource][base_variant]:
+                    base_time = float(results_map[base_resource][base_variant][this_size]['time'])
+                    relative_results_map[variant][size] = base_time / time
+        return relative_results_map
+
 
     # Resources
-    for r in args.resources:
+    for r in all_resources:
         name = '{:s}Resource'.format(r)
-        relative_results_map[name] = results_map[name]
-        base_name = resource_map[r]
-        for variant in relative_results_map[name]:
-            resource_variant = variant_map[r][variant]
-            for size in relative_results_map[name][variant]:
-                time = float(relative_results_map[name][variant][size]['time'])
-                if results_map[base_name][resource_variant][size]:
-                    base_time = float(results_map[base_name][resource_variant][size]['time'])
-                    relative_results_map[name][variant][size]['relative'] = time / base_time
+        if resource_map[r] in results_map:
+            relative_results_map[name] = make_relative_map(name, r, resource_map[r])
 
     # Pools
     for p in args.pools:
         for r in args.resources:
             name = '{:s}{:s}'.format(p, r)
-            base_name = resource_map[r]
-            if name in results_map:
-                relative_results_map[name] = results_map[name]
-                for variant in relative_results_map[name]:
-                    base_variant = variant_map[r][variant]
-                    base_size = next(iter(results_map[base_name][base_variant]))
-                    for size in relative_results_map[name][variant]:
-                        time = float(relative_results_map[name][variant][size]['time'])
-                        if results_map[base_name][base_variant][base_size]:
-                            base_time = float(results_map[base_name][base_variant][base_size]['time'])
-                            relative_results_map[name][variant][size]['relative'] = time / base_time
+            relative_results_map[name] = make_relative_map(name, r, resource_map[r], use_first_size=True)
 
     # Print
     for name in relative_results_map:
         for variant in relative_results_map[name]:
             for size in relative_results_map[name][variant]:
-                print('{:s} {:s} {:s} {:f}'.format(name, variant, size, relative_results_map[name][variant][size]['relative']))
+                print('{:s} {:s} {:s} {:f}'.format(name, variant, size, relative_results_map[name][variant][size]))
