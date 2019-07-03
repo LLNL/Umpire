@@ -36,6 +36,8 @@
 static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
+static const bool Introspection = true;
+
 static const std::size_t Max_Allocations = 100000;
 static const std::size_t Num_Random = 1000;
 
@@ -212,7 +214,7 @@ public:
     ss << "fixed_pool-" << Resource << "-" << bytes << "." << namecnt;
     ++namecnt;
 
-    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::FixedPool>(
+    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::FixedPool, Introspection>(
         ss.str(), rm.getAllocator(Resource), bytes, 128 * sizeof(int) * 8)};
   }
 
@@ -233,6 +235,16 @@ BENCHMARK_DEFINE_F(FixedPoolHost, deallocate)(benchmark::State &st) { deallocati
 class FixedPoolDevice : public FixedPool<umpire::resource::Device> {};
 BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate)(benchmark::State &st) { deallocation(st); }
+
+class FixedPoolDevicePinned : public FixedPool<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(FixedPoolDevicePinned, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate)(benchmark::State &st) { deallocation(st); }
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+class FixedPoolUnified : public FixedPool<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(FixedPoolUnified, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate)(benchmark::State &st) { deallocation(st); }
 #endif
 
 class AllocatorRandomSizeBenchmark : public benchmark::Fixture {
@@ -326,7 +338,7 @@ public:
     ss << "dynamic_pool-" << Resource << "." << namecnt;
     ++namecnt;
 
-    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::DynamicPool>(
+    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::DynamicPool, Introspection>(
         ss.str(), rm.getAllocator(Resource))};
   }
 
@@ -345,8 +357,19 @@ BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate)(benchmark::State &st) { dealloca
 class DynamicPoolDevice : public DynamicPool<umpire::resource::Device> {};
 BENCHMARK_DEFINE_F(DynamicPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
 BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate)(benchmark::State &st) { deallocation(st); }
+
+class DynamicPoolDevicePinned : public DynamicPool<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate)(benchmark::State &st) { deallocation(st); }
 #endif
 
+#if defined(UMPIRE_ENABLE_CUDA)
+class DynamicPoolUnified : public DynamicPool<umpire::resource::Unified> {};
+BENCHMARK_DEFINE_F(DynamicPoolUnified, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate)(benchmark::State &st) { deallocation(st); }
+#endif
+
+// Register all the benchmarks
 
 // Base allocators
 BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
@@ -388,6 +411,7 @@ BENCHMARK_REGISTER_F(UnifiedResource, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(UnifiedResource, deallocate)->Range(RangeLow, RangeHi);
 #endif
 
+// Pools
 
 // FixedPool
 BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(256);
@@ -395,6 +419,14 @@ BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(256);
 #if defined(UMPIRE_ENABLE_DEVICE)
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->Arg(256);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->Arg(256);
+
+BENCHMARK_REGISTER_F(FixedPoolDevicePinned, allocate)->Arg(256);
+BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate)->Arg(256);
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+BENCHMARK_REGISTER_F(FixedPoolUnified, allocate)->Arg(256);
+BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate)->Arg(256);
 #endif
 
 // DynamicPool
@@ -403,6 +435,15 @@ BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate)->Args({16, 1024});
 #if defined(UMPIRE_ENABLE_DEVICE)
 BENCHMARK_REGISTER_F(DynamicPoolDevice, allocate)->Args({16, 1024});
 BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate)->Args({16, 1024});
+
+BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate)->Args({16, 1024});
 #endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate)->Args({16, 1024});
+#endif
+
 
 BENCHMARK_MAIN()
