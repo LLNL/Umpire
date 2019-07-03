@@ -37,6 +37,7 @@ static const int RangeLow = 4;
 static const int RangeHi = 1024;
 
 static const std::size_t Max_Allocations = 100000;
+static const std::size_t Num_Random = 1000;
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -240,18 +241,18 @@ public:
   using ::benchmark::Fixture::TearDown;
 
   void SetUp(benchmark::State& st) {
-    const int range_lo = static_cast<int>(st.range(0));
-    const int range_hi = static_cast<int>(st.range(1));
+    const std::size_t range_lo = static_cast<int>(st.range(0));
+    const std::size_t range_hi = static_cast<int>(st.range(1));
 
     std::default_random_engine generator;
     generator.seed(0);
 
-    std::uniform_int_distribution<int> distribution{range_lo, range_hi};
+    std::uniform_int_distribution<std::size_t> distribution{range_lo, range_hi};
 
     auto random_number = std::bind(distribution, generator);
 
-    std::generate(m_allocations, m_allocations + Max_Allocations,
-                  [&random_number] () { return reinterpret_cast<void*>(random_number()); });
+    std::generate(m_bytes, m_bytes + Num_Random,
+                  [&random_number] () { return random_number(); });
 
     setUpPool();
   }
@@ -267,17 +268,13 @@ public:
       if (i == Max_Allocations) {
         st.PauseTiming();
         for (std::size_t j = 0; j < Max_Allocations; j++) {
-          const int bytes{*reinterpret_cast<int*>(m_allocations[j])};
           deallocate(m_allocations[j]);
-          m_allocations[j] = reinterpret_cast<int*>(bytes);
         }
         i = 0;
         st.ResumeTiming();
       }
       {
-        const long bytes{reinterpret_cast<long>(m_allocations[i])};
-        m_allocations[i] = allocate(bytes);
-        *reinterpret_cast<int*>(m_allocations[i]) = bytes;
+        m_allocations[i] = allocate(m_bytes[i % Num_Random]);
       }
       ++i;
     }
@@ -293,17 +290,13 @@ public:
       if (i == 0 || i == Max_Allocations) {
         st.PauseTiming();
         for (std::size_t j = 0; j < Max_Allocations; j++) {
-          const long bytes{reinterpret_cast<long>(m_allocations[j])};
-          m_allocations[j] = allocate(bytes);
-          *reinterpret_cast<int*>(m_allocations[j]) = bytes;
+          m_allocations[j] = allocate(m_bytes[j % Num_Random]);
         }
         i = 0;
         st.ResumeTiming();
       }
       {
-        const int bytes{*reinterpret_cast<int*>(m_allocations[i])};
         deallocate(m_allocations[i]);
-        m_allocations[i] = reinterpret_cast<int*>(bytes);
       }
       ++i;
     }
@@ -313,6 +306,7 @@ public:
   }
 
   void* m_allocations[Max_Allocations];
+  std::size_t m_bytes[Num_Random];
 };
 
 template <umpire::resource::MemoryResourceType Resource>
