@@ -35,6 +35,8 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- Support for tracked 0-byte allocations across all memory types.
+
 ### Changed
 
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).
