@@ -12,10 +12,6 @@
 
 #include "resource_tests.hpp"
 
-#include<stdio.h>
-#include<signal.h>
-#include<unistd.h>
-
 TYPED_TEST_P(ResourceTest, AccessNullResource)
 {
   char* data = (char*) this->memory_resource->allocate(16);
