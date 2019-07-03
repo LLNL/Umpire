@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
     if args.log is not None:
         with open(args.log, mode='w') as f:
-            f.write(output)
+            f.write(test_output)
 
     results_map = {}
     def add_to_results(name, variant, time, iters, size=None):
