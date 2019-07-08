@@ -186,9 +186,10 @@ public:
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
-    , const std::size_t min_initial_alloc_size
+    , const std::size_t initial_alloc_size
     , const std::size_t min_alloc_size
-    , umpire::strategy::DynamicPool::Coalesce_Heuristic /* h_fun */
+    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , int alignment
   )
   {
     if (introspection) {
@@ -198,7 +199,54 @@ public:
         rm.makeAllocator<umpire::strategy::DynamicPool, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , min_initial_alloc_size
+            , initial_alloc_size
+            , min_alloc_size
+            , umpire::strategy::heuristic_percent_releasable(0)
+            , alignment
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+    else {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::DynamicPool, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , initial_alloc_size
+            , min_alloc_size
+            , umpire::strategy::heuristic_percent_releasable(0)
+            , alignment
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+  }
+
+  void bld_dynamicpool(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t initial_alloc_size
+    , const std::size_t min_alloc_size
+    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  )
+  {
+    if (introspection) {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::DynamicPool, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , initial_alloc_size
             , min_alloc_size
             , umpire::strategy::heuristic_percent_releasable(0)
           );
@@ -215,7 +263,7 @@ public:
         rm.makeAllocator<umpire::strategy::DynamicPool, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , min_initial_alloc_size
+            , initial_alloc_size
             , min_alloc_size
             , umpire::strategy::heuristic_percent_releasable(0)
           );
@@ -231,7 +279,7 @@ public:
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
-    , const std::size_t min_initial_alloc_size
+    , const std::size_t initial_alloc_size
   )
   {
     if (introspection) {
@@ -241,7 +289,7 @@ public:
         rm.makeAllocator<umpire::strategy::DynamicPool, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , min_initial_alloc_size
+            , initial_alloc_size
           );
 
         auto allocator = new umpire::Allocator(
@@ -256,7 +304,7 @@ public:
         rm.makeAllocator<umpire::strategy::DynamicPool, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , min_initial_alloc_size
+            , initial_alloc_size
           );
 
         auto allocator = new umpire::Allocator(
@@ -463,9 +511,10 @@ public:
     , const std::size_t largest_fixed_blocksize
     , const std::size_t max_fixed_blocksize
     , const std::size_t size_multiplier
-    , const std::size_t dynamic_min_initial_alloc_size
-    , const std::size_t dynamic_min_alloc_size
-    , umpire::strategy::DynamicPool::Coalesce_Heuristic /* h_fun */
+    , const std::size_t dynamic_initial_alloc_bytes
+    , const std::size_t dynamic_min_alloc_bytes
+    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , int alignment
   )
   {
     if (introspection) {
@@ -480,8 +529,69 @@ public:
             , largest_fixed_blocksize
             , max_fixed_blocksize
             , size_multiplier
-            , dynamic_min_initial_alloc_size
-            , dynamic_min_alloc_size
+            , dynamic_initial_alloc_bytes
+            , dynamic_min_alloc_bytes
+            , umpire::strategy::heuristic_percent_releasable(0)
+            , alignment
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+    else {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::MixedPool, false>
+          (   
+              allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , smallest_fixed_blocksize
+            , largest_fixed_blocksize
+            , max_fixed_blocksize
+            , size_multiplier
+            , dynamic_initial_alloc_bytes
+            , dynamic_min_alloc_bytes
+            , umpire::strategy::heuristic_percent_releasable(0)
+            , alignment
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+  }
+
+  void bld_mixedpool(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t smallest_fixed_blocksize
+    , const std::size_t largest_fixed_blocksize
+    , const std::size_t max_fixed_blocksize
+    , const std::size_t size_multiplier
+    , const std::size_t dynamic_initial_alloc_bytes
+    , const std::size_t dynamic_min_alloc_bytes
+    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  )
+  {
+    if (introspection) {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::MixedPool, true>
+          (   
+              allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , smallest_fixed_blocksize
+            , largest_fixed_blocksize
+            , max_fixed_blocksize
+            , size_multiplier
+            , dynamic_initial_alloc_bytes
+            , dynamic_min_alloc_bytes
             , umpire::strategy::heuristic_percent_releasable(0)
           );
 
@@ -502,8 +612,8 @@ public:
             , largest_fixed_blocksize
             , max_fixed_blocksize
             , size_multiplier
-            , dynamic_min_initial_alloc_size
-            , dynamic_min_alloc_size
+            , dynamic_initial_alloc_bytes
+            , dynamic_min_alloc_bytes
             , umpire::strategy::heuristic_percent_releasable(0)
           );
 
@@ -522,7 +632,7 @@ public:
     , const std::size_t largest_fixed_blocksize
     , const std::size_t max_fixed_blocksize
     , const std::size_t size_multiplier
-    , const std::size_t dynamic_min_initial_alloc_size
+    , const std::size_t dynamic_initial_alloc_bytes
   )
   {
     if (introspection) {
@@ -537,7 +647,7 @@ public:
             , largest_fixed_blocksize
             , max_fixed_blocksize
             , size_multiplier
-            , dynamic_min_initial_alloc_size
+            , dynamic_initial_alloc_bytes
           );
 
         auto allocator = new umpire::Allocator(
@@ -557,7 +667,7 @@ public:
             , largest_fixed_blocksize
             , max_fixed_blocksize
             , size_multiplier
-            , dynamic_min_initial_alloc_size
+            , dynamic_initial_alloc_bytes
           );
 
         auto allocator = new umpire::Allocator(
@@ -930,9 +1040,10 @@ class OperationManager {
           const bool introspection
         , const std::string& allocator_name
         , const std::string& base_allocator_name
-        , const std::size_t min_initial_alloc_size
+        , const std::size_t initial_alloc_size
         , const std::size_t min_alloc_size
-        , umpire::strategy::DynamicPool::Coalesce_Heuristic /* h_fun */
+        , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+        , int alignment
     ) {
       m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
 
@@ -940,7 +1051,30 @@ class OperationManager {
                   introspection
                 , allocator_name
                 , base_allocator_name
-                , min_initial_alloc_size
+                , initial_alloc_size
+                , min_alloc_size
+                , umpire::strategy::heuristic_percent_releasable(0)
+                , alignment
+      );
+
+      operations.push_back(m_cont_op);
+    }
+
+    void bld_dynamicpool(
+          const bool introspection
+        , const std::string& allocator_name
+        , const std::string& base_allocator_name
+        , const std::size_t initial_alloc_size
+        , const std::size_t min_alloc_size
+        , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    ) {
+      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+
+      m_cont_op->bld_dynamicpool(
+                  introspection
+                , allocator_name
+                , base_allocator_name
+                , initial_alloc_size
                 , min_alloc_size
                 , umpire::strategy::heuristic_percent_releasable(0)
       );
@@ -952,7 +1086,7 @@ class OperationManager {
           const bool introspection
         , const std::string& allocator_name
         , const std::string& base_allocator_name
-        , const std::size_t min_initial_alloc_size
+        , const std::size_t initial_alloc_size
     ) {
       m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
 
@@ -960,7 +1094,7 @@ class OperationManager {
                   introspection
                 , allocator_name
                 , base_allocator_name
-                , min_initial_alloc_size
+                , initial_alloc_size
       );
 
       operations.push_back(m_cont_op);
@@ -1064,9 +1198,10 @@ class OperationManager {
       , const std::size_t largest_fixed_blocksize
       , const std::size_t max_fixed_blocksize
       , const std::size_t size_multiplier
-      , const std::size_t dynamic_min_initial_alloc_size
-      , const std::size_t dynamic_min_alloc_size
-      , umpire::strategy::DynamicPool::Coalesce_Heuristic /* h_fun */
+      , const std::size_t dynamic_initial_alloc_bytes
+      , const std::size_t dynamic_min_alloc_bytes
+      , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+      , int alignment
     )
     {
       m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
@@ -1079,8 +1214,40 @@ class OperationManager {
                 , largest_fixed_blocksize
                 , max_fixed_blocksize
                 , size_multiplier
-                , dynamic_min_initial_alloc_size
-                , dynamic_min_alloc_size
+                , dynamic_initial_alloc_bytes
+                , dynamic_min_alloc_bytes
+                , umpire::strategy::heuristic_percent_releasable(0)
+                , alignment
+      );
+
+      operations.push_back(m_cont_op);
+    }
+
+    void bld_mixedpool(
+        const bool introspection
+      , const std::string& allocator_name
+      , const std::string& base_allocator_name
+      , const std::size_t smallest_fixed_blocksize
+      , const std::size_t largest_fixed_blocksize
+      , const std::size_t max_fixed_blocksize
+      , const std::size_t size_multiplier
+      , const std::size_t dynamic_initial_alloc_bytes
+      , const std::size_t dynamic_min_alloc_bytes
+      , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    )
+    {
+      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+
+      m_cont_op->bld_mixedpool(
+                  introspection
+                , allocator_name
+                , base_allocator_name
+                , smallest_fixed_blocksize
+                , largest_fixed_blocksize
+                , max_fixed_blocksize
+                , size_multiplier
+                , dynamic_initial_alloc_bytes
+                , dynamic_min_alloc_bytes
                 , umpire::strategy::heuristic_percent_releasable(0)
       );
 
@@ -1095,7 +1262,7 @@ class OperationManager {
       , const std::size_t largest_fixed_blocksize
       , const std::size_t max_fixed_blocksize
       , const std::size_t size_multiplier
-      , const std::size_t dynamic_min_initial_alloc_size
+      , const std::size_t dynamic_initial_alloc_bytes
     )
     {
       m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
@@ -1108,7 +1275,7 @@ class OperationManager {
                 , largest_fixed_blocksize
                 , max_fixed_blocksize
                 , size_multiplier
-                , dynamic_min_initial_alloc_size
+                , dynamic_initial_alloc_bytes
       );
 
       operations.push_back(m_cont_op);

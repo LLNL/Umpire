@@ -13,6 +13,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/SizeLimiter.hpp"
 
 class AllocatorTest :
   public ::testing::TestWithParam< std::string >
@@ -262,8 +263,8 @@ TEST(Allocation, DeallocateDifferent)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc_one  = rm.getAllocator("HOST");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "POOL_different_deallocate", alloc_one);
+  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+    "Limiter", alloc_one, 1024);
 
   double* data = static_cast<double*>(alloc_one.allocate(1024*sizeof(double)));
 

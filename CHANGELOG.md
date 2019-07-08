@@ -33,6 +33,8 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- `DynamicPool` constructor has a new alignment argument.
+
 - Added HIP build to Travis CI.
 
 ### Changed
@@ -71,6 +73,8 @@ and a dynamic pool for those that are larger.
 - Use RAII locks with `std::lock_guard`.
 
 - Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
+
+- `DynamicPool` uses maps underneath for improved performance.
 
 - Add PID to filenames for log and replay output.
 
