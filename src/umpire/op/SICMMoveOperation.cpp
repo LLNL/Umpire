@@ -45,7 +45,6 @@ void SICMMoveOperation::transform(
   sicm_device_list_free(&dst_devices);
 
   if (rc != 0) {
-    sicm_fini();
     UMPIRE_ERROR("SICMMoveOperation error: " << strerror(-rc));
   }
 
