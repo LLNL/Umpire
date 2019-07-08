@@ -13,8 +13,7 @@ endif()
 
 set (replay_util_headers
   ./util/OperationManager.hpp
-  ./util/Replay.hpp
-  ./util/ReplayDiff.hpp)
+  ./util/Replay.hpp)
 
 blt_add_library(
   NAME replay_util_lib
