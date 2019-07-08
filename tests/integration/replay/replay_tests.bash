@@ -8,36 +8,27 @@
 replay_tests_dir=$1
 tools_dir=$2
 testprogram=$replay_tests_dir/replay_tests
-replayprogram=$tools_dir/replay
+diffprogram=$tools_dir/replaydiff
 
 #
 # The following program will generate a CSV file of Umpire activity that
 # may be replayed.
 #
+echo UMPIRE_REPLAY="On" $testprogram
 UMPIRE_REPLAY="On" $testprogram
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $testprogram"
     exit 1
 fi
 
-#
-# Now replay from the activity captured in the replay_test1.csv file
-#
-$replayprogram -i umpire.0.*.0.replay -t replay.out
-if [ $? -ne 0 ]; then
-    echo "Failed: Unable to run $replayprogram"
-    exit 1
-fi
-
-#
-# Now, compare the results being careful to allow for different object
-# references (everything else should be the same).
-#
-diff replay.out $replay_tests_dir/test_output.good
+echo $diffprogram $replay_tests_dir/test_output.good umpire.0.*.0.replay
+$diffprogram $replay_tests_dir/test_output.good umpire.0.*.0.replay
 if [ $? -ne 0 ]; then
     echo "Diff failed"
+    /bin/rm -f replay.out umpire*replay umpire*log
     exit 1
 fi
 
+pwd
 /bin/rm -f replay.out umpire*replay umpire*log
 exit 0
