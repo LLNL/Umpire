@@ -180,6 +180,90 @@ public:
   }
 
   //
+  // FixedPool
+  //
+  void bld_fixedpool(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t object_bytes
+    , const std::size_t objects_per_pool
+  )
+  {
+    if (introspection) {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::FixedPool, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , object_bytes
+            , objects_per_pool
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+    else {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::FixedPool, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , object_bytes
+            , objects_per_pool
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+  }
+
+  void bld_fixedpool(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t object_bytes
+  )
+  {
+    if (introspection) {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::FixedPool, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , object_bytes
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+    else {
+      op = [=]() {
+        auto& rm = umpire::ResourceManager::getInstance();
+
+        rm.makeAllocator<umpire::strategy::FixedPool, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , object_bytes
+          );
+
+        auto allocator = new umpire::Allocator(
+                                rm.getAllocator(allocator_name));
+        this->m_alloc_array.push_back(allocator);
+      };
+    }
+  }
+
+  //
   // DynamicPool
   //
   void bld_dynamicpool(
@@ -1030,6 +1114,49 @@ class OperationManager {
       m_cont_op->bld_advisor(
           introspection, allocator_name, base_allocator_name,
           advice_operation, accessing_allocator_name);
+      operations.push_back(m_cont_op);
+    }
+
+    //
+    // FixedPool
+    //
+    void bld_fixedpool(
+        const bool introspection
+      , const std::string& allocator_name
+      , const std::string& base_allocator_name
+      , const std::size_t object_bytes
+      , const std::size_t objects_per_pool
+    )
+    {
+      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+
+      m_cont_op->bld_fixedpool(
+                  introspection
+                , allocator_name
+                , base_allocator_name
+                , object_bytes
+                , objects_per_pool
+      );
+
+      operations.push_back(m_cont_op);
+    }
+
+    void bld_fixedpool(
+        const bool introspection
+      , const std::string& allocator_name
+      , const std::string& base_allocator_name
+      , const std::size_t object_bytes
+    )
+    {
+      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+
+      m_cont_op->bld_fixedpool(
+                  introspection
+                , allocator_name
+                , base_allocator_name
+                , object_bytes
+      );
+
       operations.push_back(m_cont_op);
     }
 

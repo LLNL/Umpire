@@ -415,11 +415,44 @@ class Replay {
           );
         }
         else if ( type == "umpire::strategy::FixedPool" ) {
-          //
-          // Need to skip FixedPool for now since I haven't figured out how to
-          // dynamically parse/creat the data type parameter
-          //
-          return;
+          const std::string& base_allocator_name = m_json["payload"]["args"][0];
+
+          std::size_t object_bytes;
+          std::size_t objects_per_pool;
+
+          get_from_string(m_json["payload"]["args"][1], object_bytes);
+
+          // Now grab the optional fields
+          if (m_json["payload"]["args"].size() >= 3) {
+            get_from_string(m_json["payload"]["args"][2], objects_per_pool);
+
+            compare_ss << introspection 
+              << " " << allocator_name 
+              << " " << base_allocator_name
+              << " " << object_bytes 
+              << " " << objects_per_pool 
+            ;
+            m_operation_mgr.bld_fixedpool(
+                  introspection
+                , allocator_name
+                , base_allocator_name
+                , object_bytes
+                , objects_per_pool
+            );
+          }
+          else {
+            compare_ss << introspection 
+              << " " << allocator_name 
+              << " " << base_allocator_name
+              << " " << object_bytes 
+            ;
+            m_operation_mgr.bld_fixedpool(
+                  introspection
+                , allocator_name
+                , base_allocator_name
+                , object_bytes
+            );
+          }
         }
         else if ( type == "umpire::strategy::MixedPool" ) {
           const std::string& base_allocator_name = m_json["payload"]["args"][0];
