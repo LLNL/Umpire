@@ -34,9 +34,12 @@ endif()
 if (ENABLE_PEDANTIC_WARNINGS)
   blt_append_custom_compiler_flag(
     FLAGS_VAR UMPIRE_PEDANTIC_FLAG
-    DEFAULT  "-Wpedantic"
-    MSVC "/Wall /WX"
+    DEFAULT  ""
+    GNU "-Wpedantic"
+    CLANG "-Wpedantic"
     INTEL "-Wall -Wcheck -wd2259"
+    XL "-Wpedantic"
+    MSVC "/Wall /WX"
   )
 
   set(CMAKE_CXX_FLAGS "${UMPIRE_PEDANTIC_FLAG} ${CMAKE_CXX_FLAGS}")
