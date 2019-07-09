@@ -181,10 +181,10 @@ ResourceManager::initialize()
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{
         //util::wrap_allocator<strategy::AllocationTracker>(
-          registry.makeMemoryResource("NULL", getNextId())};
+          registry.makeMemoryResource("__umpire_internal_null", getNextId())};
 
     int id{allocator->getId()};
-    m_allocators_by_name["NULL"]  = allocator.get();
+    m_allocators_by_name["__umpire_internal_null"]  = allocator.get();
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
@@ -274,14 +274,14 @@ ResourceManager::initialize()
 
   {
     std::unique_ptr<strategy::AllocationStrategy> allocator{
-      new strategy::FixedPool{"__umpire_0_byte_pool",
+      new strategy::FixedPool{"__umpire_internal_0_byte_pool",
         getNextId(),
-        Allocator{m_allocators_by_name["NULL"]},
+        Allocator{m_allocators_by_name["__umpire_internal_null"]},
         1}
     };
 
     int id{allocator->getId()};
-    m_allocators_by_name["__umpire_0_byte_pool"] = allocator.get();
+    m_allocators_by_name["__umpire_internal_0_byte_pool"] = allocator.get();
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
@@ -700,7 +700,7 @@ ResourceManager::getAllocatorInformation() const noexcept
 strategy::AllocationStrategy*
 ResourceManager::getZeroByteAllocator()
 {
-  return m_allocators_by_name["__umpire_0_byte_pool"];
+  return m_allocators_by_name["__umpire_internal_0_byte_pool"];
 }
 
 } // end of namespace umpire
