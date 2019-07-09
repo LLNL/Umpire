@@ -96,7 +96,8 @@ and a dynamic pool for those that are larger.
 - Fixed bug in monotonic pool allocator causing it to always return
   the same allocation.
 
-- Enabled pedantic compiler warnings and fixed errors.
+- Enabled pedantic compiler warnings and fixed errors for GNU, CLANG, INTEL,
+  XL, and MSVC compilers.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives
@@ -123,6 +124,8 @@ and a dynamic pool for those that are larger.
 - Fix error where the MemoryMap.inl was not installed.
 
 - Replay and logging files only created when logging/replay are enabled.
+
+- 2019-07-09: Build error with NUMA.
 
 ## [0.3.5] - 2019-06-11
 
