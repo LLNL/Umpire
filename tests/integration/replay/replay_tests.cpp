@@ -271,21 +271,21 @@ public:
         , 32                // object_bytes
         //, 1024              // objects_per_pool                        
     );
-    allocatorNames.push_back("host_fixed_pool_spec0");
+    FixedAllocatorNames.push_back("host_fixed_pool_spec0");
 
     rm.makeAllocator<umpire::strategy::FixedPool>(
           "host_fixed_pool_spec1", rm.getAllocator("HOST")
         , 32                // object_bytes
         , 1024              // objects_per_pool                        
     );
-    allocatorNames.push_back("host_fixed_pool_spec1");
+    FixedAllocatorNames.push_back("host_fixed_pool_spec1");
 
     rm.makeAllocator<umpire::strategy::FixedPool, false>(
           "host_fixed_pool_nointro_spec1", rm.getAllocator("HOST")
         , 32                // object_bytes
         , 1024              // objects_per_pool                        
     );
-    allocatorNames.push_back("host_fixed_pool_nointro_spec1");
+    FixedAllocatorNames.push_back("host_fixed_pool_nointro_spec1");
   }
 
   ~replayTest( void )
@@ -317,6 +317,13 @@ public:
       }
     }
 
+    for ( int i = 0; i < testAllocations; ++i ) {
+      for ( auto n : FixedAllocatorNames ) {
+        auto alloc = rm.getAllocator(n);
+        allocations.push_back( std::make_pair(alloc.allocate(32), n) );
+      }
+    }
+
     dynamic_pool->coalesce();
 
     for ( auto ptr : allocations ) {
@@ -331,6 +338,7 @@ private:
   const int testAllocations;
   std::size_t allocationSize;
   std::vector<std::string> allocatorNames;
+  std::vector<std::string> FixedAllocatorNames;
   std::vector<std::pair<void*, std::string>> allocations;
 };
 
