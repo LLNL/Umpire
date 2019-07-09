@@ -22,7 +22,7 @@
 
 class Operation {
 public:
-  using AllocationOpMap = std::unordered_map<uint64_t, Operation*>;
+ using AllocationOpMap = std::unordered_map<uint64_t, Operation*>;
   std::function<void ()> op;
 
   Operation(
@@ -41,12 +41,13 @@ public:
   //
   // AllocationAdvisor
   //
+
+  template <typename... Args>
   void bld_advisor(
       const bool introspection,
       const std::string& allocator_name,
       const std::string& base_allocator_name,
-      const std::string& advice_operation,
-      const int device_id
+      Args&&... args
   )
   {
     if (introspection) {
@@ -55,7 +56,7 @@ public:
 
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
           ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, device_id);
+            std::forward<Args>(args)...);
 
         auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
@@ -67,7 +68,7 @@ public:
 
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
           ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, device_id);
+            std::forward<Args>(args)...);
 
         auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
@@ -75,13 +76,14 @@ public:
     }
   }
 
+  template <typename... Args>
   void bld_advisor(
       const bool introspection,
       const std::string& allocator_name,
       const std::string& base_allocator_name,
       const std::string& advice_operation,
       const std::string& accessing_allocator_name,
-      const int device_id
+      Args&&... args
   )
   {
     if (introspection) {
@@ -90,7 +92,8 @@ public:
 
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
           ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, rm.getAllocator(accessing_allocator_name), device_id);
+            advice_operation, rm.getAllocator(accessing_allocator_name), 
+            std::forward<Args>(args)...);
 
         auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
@@ -102,74 +105,8 @@ public:
 
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
           ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, rm.getAllocator(accessing_allocator_name), device_id);
-
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_advisor(
-      const bool introspection,
-      const std::string& allocator_name,
-      const std::string& base_allocator_name,
-      const std::string& advice_operation
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation);
-
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation);
-
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_advisor(
-      const bool introspection,
-      const std::string& allocator_name,
-      const std::string& base_allocator_name,
-      const std::string& advice_operation,
-      const std::string& accessing_allocator_name
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, rm.getAllocator(accessing_allocator_name));
-
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, rm.getAllocator(accessing_allocator_name));
+            advice_operation, rm.getAllocator(accessing_allocator_name),
+            std::forward<Args>(args)...);
 
         auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
