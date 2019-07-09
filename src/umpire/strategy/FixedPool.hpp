@@ -42,7 +42,7 @@ class FixedPool : public AllocationStrategy
      */
     FixedPool(const std::string& name, int id,
               Allocator allocator, const std::size_t object_bytes,
-              const std::size_t objects_per_pool = 64 * sizeof(int) * 8);
+              const std::size_t objects_per_pool = 64 * sizeof(int) * 8) noexcept;
 
     ~FixedPool();
 
