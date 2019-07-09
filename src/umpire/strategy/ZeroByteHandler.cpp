@@ -10,25 +10,27 @@
 
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/strategy/FixedPool.hpp"
-
 namespace umpire {
 namespace strategy {
 
 ZeroByteHandler::ZeroByteHandler(
   std::unique_ptr<AllocationStrategy>&& allocator) noexcept :
 AllocationStrategy(allocator->getName(), allocator->getId()),
-m_allocator(std::move(allocator))
+m_allocator(std::move(allocator)),
+m_zero_byte_pool(nullptr)
 {
 }
 
 void*
 ZeroByteHandler::allocate(std::size_t bytes)
 {
+  if (!m_zero_byte_pool)
+    m_zero_byte_pool = 
+      static_cast<FixedPool*>(ResourceManager::getInstance().getZeroByteAllocator());
+
   if (0 == bytes) {
     UMPIRE_LOG(Debug, "Allocating 0 bytes for" << m_allocator->getName());
-    auto& rm = ResourceManager::getInstance();
-    return rm.getZeroByteAllocator()->allocate(1);
+    return m_zero_byte_pool->allocate(1);
   } else {
     return m_allocator->allocate(bytes);
   }
@@ -37,12 +39,9 @@ ZeroByteHandler::allocate(std::size_t bytes)
 void
 ZeroByteHandler::deallocate(void* ptr)
 {
-  auto& rm = ResourceManager::getInstance();
-  auto zero_pool = dynamic_cast<FixedPool*>(rm.getZeroByteAllocator());
-
-  if (zero_pool->pointerIsFromPool(ptr)) {
+  if (m_zero_byte_pool->pointerIsFromPool(ptr)) {
     UMPIRE_LOG(Debug, "Deallocating 0 bytes for" << m_allocator->getName());
-    zero_pool->deallocate(ptr);
+    m_zero_byte_pool->deallocate(ptr);
   } else {
     m_allocator->deallocate(ptr);
   }

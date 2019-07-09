@@ -10,6 +10,8 @@
 #include <memory>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/FixedPool.hpp"
+
 #include "umpire/Allocator.hpp"
 
 namespace umpire {
@@ -38,7 +40,7 @@ class ZeroByteHandler :
 
   private:
     std::unique_ptr<strategy::AllocationStrategy> m_allocator;
-
+    FixedPool* m_zero_byte_pool;
 };
 
 } // end of namespace umpire
