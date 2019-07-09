@@ -25,8 +25,8 @@ static cxxopts::ParseResult parse(int argc, char* argv[])
       (  "h, help"
        , "Print help"
       )
-      (  "v, verbose"
-       , "Display statistics"
+      (  "t, time"
+       , "Display replay times"
       )
       (  "i, infile"
        , "Input file created by Umpire library with UMPIRE_REPLAY=On"

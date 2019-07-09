@@ -40,7 +40,7 @@ and a dynamic pool for those that are larger.
 ### Changed
 
 - Replay program refactored to speed up running of the operations being
-  replayed.  New `--verbose` option added to replay to display operation
+  replayed.  New `--time` option added to replay to display operation
   timing information.
 
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).
