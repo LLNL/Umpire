@@ -267,7 +267,7 @@ class ResourceManager {
     friend strategy::ZeroByteHandler;
 };
 
-} // end of namespace umpire
+} // end namespace umpire
 
 #include "umpire/ResourceManager.inl"
 

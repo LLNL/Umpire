@@ -485,35 +485,53 @@ class Replay {
         else if ( type == "umpire::strategy::DynamicPool" ) {
           const std::string& base_allocator_name = m_json["payload"]["args"][0];
 
-          std::size_t min_initial_alloc_size;
+          std::size_t initial_alloc_size;
           std::size_t min_alloc_size;
+          int alignment;
 
           // Now grab the optional fields
-          if (m_json["payload"]["args"].size() >= 3) {
-            get_from_string(m_json["payload"]["args"][1], min_initial_alloc_size);
+          if (m_json["payload"]["args"].size() >= 4) {
+            get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
+            get_from_string(m_json["payload"]["args"][2], min_alloc_size);
+            get_from_string(m_json["payload"]["args"][3], alignment);
+
+            replay_out()
+              << "(" << allocator_name
+              << ", getAllocator(" << base_allocator_name << ")"
+              << ", " << initial_alloc_size
+              << ", " << min_alloc_size
+              << ", " << alignment
+              << ")";
+
+            // NOTE Replay cannot handle user heuristics, so set to umpire::strategy::heuristic_percent_releasable(0) to turn it off
+            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0), alignment);
+            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0), alignment);
+          }
+          else if (m_json["payload"]["args"].size() >= 3) {
+            get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
             get_from_string(m_json["payload"]["args"][2], min_alloc_size);
 
             replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
-              << ", " << min_initial_alloc_size
+              << ", " << initial_alloc_size
               << ", " << min_alloc_size
               << ")";
 
-            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
-            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size, min_alloc_size, umpire::strategy::heuristic_percent_releasable(0));
+            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), initial_alloc_size, min_alloc_size);
+            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), initial_alloc_size, min_alloc_size);
           }
           else if (m_json["payload"]["args"].size() >= 2) {
-            get_from_string(m_json["payload"]["args"][1], min_initial_alloc_size);
+            get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
 
             replay_out()
               << "(" << allocator_name
               << ", getAllocator(" << base_allocator_name << ")"
-              << ", " << min_initial_alloc_size
+              << ", " << initial_alloc_size
               << ")";
 
-            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size);
-            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), min_initial_alloc_size);
+            if ( introspection )  m_rm.makeAllocator<umpire::strategy::DynamicPool, true>(allocator_name, m_rm.getAllocator(base_allocator_name), initial_alloc_size);
+            else                  m_rm.makeAllocator<umpire::strategy::DynamicPool, false>(allocator_name, m_rm.getAllocator(base_allocator_name), initial_alloc_size);
           }
           else {
             replay_out()
@@ -594,17 +612,19 @@ class Replay {
           std::size_t largest_fixed_blocksize;
           std::size_t max_fixed_blocksize;
           std::size_t size_multiplier;
-          std::size_t dynamic_min_initial_alloc_size;
-          std::size_t dynamic_min_alloc_size;
+          std::size_t dynamic_initial_alloc_bytes;
+          std::size_t dynamic_min_alloc_bytes;
+          int dynamic_align_bytes;
 
           // Now grab the optional fields
-          if (m_json["payload"]["args"].size() >= 7) {
+          if (m_json["payload"]["args"].size() >= 8) {
             get_from_string(m_json["payload"]["args"][1], smallest_fixed_blocksize);
             get_from_string(m_json["payload"]["args"][2], largest_fixed_blocksize);
             get_from_string(m_json["payload"]["args"][3], max_fixed_blocksize);
             get_from_string(m_json["payload"]["args"][4], size_multiplier);
-            get_from_string(m_json["payload"]["args"][5], dynamic_min_initial_alloc_size);
-            get_from_string(m_json["payload"]["args"][6], dynamic_min_alloc_size);
+            get_from_string(m_json["payload"]["args"][5], dynamic_initial_alloc_bytes);
+            get_from_string(m_json["payload"]["args"][6], dynamic_min_alloc_bytes);
+            get_from_string(m_json["payload"]["args"][7], dynamic_align_bytes);
 
             replay_out()
               << "(" << allocator_name
@@ -613,8 +633,9 @@ class Replay {
               << ", " << largest_fixed_blocksize
               << ", " << max_fixed_blocksize
               << ", " << size_multiplier
-              << ", " << dynamic_min_initial_alloc_size
-              << ", " << dynamic_min_alloc_size
+              << ", " << dynamic_initial_alloc_bytes
+              << ", " << dynamic_min_alloc_bytes
+              << ", " << dynamic_align_bytes
               << ")";
 
             if ( introspection )
@@ -624,9 +645,10 @@ class Replay {
                      , largest_fixed_blocksize
                      , max_fixed_blocksize
                      , size_multiplier
-                     , dynamic_min_initial_alloc_size
-                     , dynamic_min_alloc_size
+                     , dynamic_initial_alloc_bytes
+                     , dynamic_min_alloc_bytes
                      , umpire::strategy::heuristic_percent_releasable(0)
+                     , dynamic_align_bytes
                  );
             else
               m_rm.makeAllocator<umpire::strategy::MixedPool, false>
@@ -635,9 +657,50 @@ class Replay {
                      , largest_fixed_blocksize
                      , max_fixed_blocksize
                      , size_multiplier
-                     , dynamic_min_initial_alloc_size
-                     , dynamic_min_initial_alloc_size
+                     , dynamic_initial_alloc_bytes
+                     , dynamic_min_alloc_bytes
                      , umpire::strategy::heuristic_percent_releasable(0)
+                     , dynamic_align_bytes
+                 );
+          }
+          else if (m_json["payload"]["args"].size() >= 7) {
+            get_from_string(m_json["payload"]["args"][1], smallest_fixed_blocksize);
+            get_from_string(m_json["payload"]["args"][2], largest_fixed_blocksize);
+            get_from_string(m_json["payload"]["args"][3], max_fixed_blocksize);
+            get_from_string(m_json["payload"]["args"][4], size_multiplier);
+            get_from_string(m_json["payload"]["args"][5], dynamic_initial_alloc_bytes);
+            get_from_string(m_json["payload"]["args"][6], dynamic_min_alloc_bytes);
+
+            replay_out()
+              << "(" << allocator_name
+              << ", getAllocator(" << base_allocator_name << ")"
+              << ", " << smallest_fixed_blocksize
+              << ", " << largest_fixed_blocksize
+              << ", " << max_fixed_blocksize
+              << ", " << size_multiplier
+              << ", " << dynamic_initial_alloc_bytes
+              << ", " << dynamic_min_alloc_bytes
+              << ")";
+
+            if ( introspection )
+              m_rm.makeAllocator<umpire::strategy::MixedPool, true>
+                   (allocator_name, m_rm.getAllocator(base_allocator_name)
+                     , smallest_fixed_blocksize
+                     , largest_fixed_blocksize
+                     , max_fixed_blocksize
+                     , size_multiplier
+                     , dynamic_initial_alloc_bytes
+                     , dynamic_min_alloc_bytes
+                 );
+            else
+              m_rm.makeAllocator<umpire::strategy::MixedPool, false>
+                   (allocator_name, m_rm.getAllocator(base_allocator_name)
+                     , smallest_fixed_blocksize
+                     , largest_fixed_blocksize
+                     , max_fixed_blocksize
+                     , size_multiplier
+                     , dynamic_initial_alloc_bytes
+                     , dynamic_min_alloc_bytes
                  );
           }
           else if (m_json["payload"]["args"].size() >= 6) {
@@ -645,7 +708,7 @@ class Replay {
             get_from_string(m_json["payload"]["args"][2], largest_fixed_blocksize);
             get_from_string(m_json["payload"]["args"][3], max_fixed_blocksize);
             get_from_string(m_json["payload"]["args"][4], size_multiplier);
-            get_from_string(m_json["payload"]["args"][5], dynamic_min_initial_alloc_size);
+            get_from_string(m_json["payload"]["args"][5], dynamic_initial_alloc_bytes);
 
             replay_out()
               << "(" << allocator_name
@@ -654,7 +717,7 @@ class Replay {
               << ", " << largest_fixed_blocksize
               << ", " << max_fixed_blocksize
               << ", " << size_multiplier
-              << ", " << dynamic_min_initial_alloc_size
+              << ", " << dynamic_initial_alloc_bytes
               << ")";
 
             if ( introspection )
@@ -664,7 +727,7 @@ class Replay {
                      , largest_fixed_blocksize
                      , max_fixed_blocksize
                      , size_multiplier
-                     , dynamic_min_initial_alloc_size
+                     , dynamic_initial_alloc_bytes
                  );
             else
               m_rm.makeAllocator<umpire::strategy::MixedPool, false>
@@ -673,7 +736,7 @@ class Replay {
                      , largest_fixed_blocksize
                      , max_fixed_blocksize
                      , size_multiplier
-                     , dynamic_min_initial_alloc_size
+                     , dynamic_initial_alloc_bytes
                  );
           }
           else if (m_json["payload"]["args"].size() >= 5) {

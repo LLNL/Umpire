@@ -119,16 +119,16 @@ public:
     allocatorNames.push_back("host_mixedpool_spec6");
 
     rm.makeAllocator<umpire::strategy::DynamicPool>(
-        "host_simpool_defaults", rm.getAllocator("HOST"));
-    allocatorNames.push_back("host_simpool_defaults");
+        "host_dyn_pool_defaults", rm.getAllocator("HOST"));
+    allocatorNames.push_back("host_dyn_pool_defaults");
 
     rm.makeAllocator<umpire::strategy::DynamicPool>(
-        "host_simpool_spec1", rm.getAllocator("HOST"), 9876, 1234);
-    allocatorNames.push_back("host_simpool_spec1");
+        "host_dyn_pool_spec1", rm.getAllocator("HOST"), 9876, 1234);
+    allocatorNames.push_back("host_dyn_pool_spec1");
 
     rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-        "host_simpool_spec2", rm.getAllocator("HOST"), 9876, 1234);
-    allocatorNames.push_back("host_simpool_spec2");
+        "host_dyn_pool_spec2", rm.getAllocator("HOST"), 9876, 1234);
+    allocatorNames.push_back("host_dyn_pool_spec2");
 
     rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
@@ -163,12 +163,13 @@ public:
   void runTest()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    auto pooled_allocator = rm.getAllocator("host_simpool_spec1");
+
+    auto pooled_allocator = rm.getAllocator("host_dyn_pool_spec1");
     auto dynamic_pool = 
       umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pooled_allocator);
 
     if (! dynamic_pool ) {
-      std::cerr << "host_simpool_spec1 is not a dynamic pool!\n";
+      std::cerr << "host_dyn_pool_spec1 is not a dynamic pool!\n";
       exit(1);
     }
 

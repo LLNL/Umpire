@@ -51,52 +51,52 @@ MemoryMap<V>::~MemoryMap()
 template <typename V>
 template <typename... Args>
 std::pair<typename MemoryMap<V>::Iterator, bool>
-MemoryMap<V>::get(Key ptr, Args&&... args) noexcept
+MemoryMap<V>::doInsert(Key ptr, Args&&... args) noexcept
 {
-  UMPIRE_LOG(Debug, "ptr = " << ptr);
-
   // Find the ptr and update m_oper
   m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
   m_oper = reinterpret_cast<uintptr_t>(this);
   UMPIRE_ASSERT(m_last);
 
   auto pval = reinterpret_cast<Value**>(m_last);
+  const bool not_found{!(*pval)};
 
-  const bool found{*pval != nullptr};
-
-  if (!found) {
+  if (not_found) {
     // Create it and increment size
-    (*pval) = new (m_pool.allocate()) Value{args...};
+    (*pval) = new (m_pool.allocate()) Value{std::forward<Args>(args)...};
     ++m_size;
   }
 
-  return std::make_pair(Iterator{this, ptr}, found);
+  return std::make_pair(Iterator{this, ptr}, not_found);
 }
 
 template <typename V>
-typename MemoryMap<V>::Iterator MemoryMap<V>::insert(Key ptr, const Value& val)
+std::pair<typename MemoryMap<V>::Iterator, bool>
+MemoryMap<V>::insert(Key ptr, const Value& val) noexcept
 {
   UMPIRE_LOG(Debug, "ptr = " << ptr);
 
-  // Insert the ptr (cell) and update m_oper
-  m_last = judy_cell(m_array, reinterpret_cast<unsigned char*>(&ptr), judy_max);
-  m_oper = reinterpret_cast<uintptr_t>(this);
-  UMPIRE_ASSERT(m_last);
+  auto it_pair = doInsert(ptr, val);
+  it_pair.second = !it_pair.second;
 
-  auto pval = reinterpret_cast<Value**>(m_last);
+  return it_pair;
+}
 
-  // There should not already be a record here
-  if (*pval) {
-    UMPIRE_ERROR("Trying to insert at" << ptr << "but already exists");
-  }
+template <typename V>
+template <typename P>
+std::pair<typename MemoryMap<V>::Iterator, bool>
+MemoryMap<V>::insert(P&& pair) noexcept
+{
+  return insert(pair.first, pair.second);
+}
 
-  // Create it
-  (*pval) = new (m_pool.allocate()) Value{val};
-
-  // Increment size
-  ++m_size;
-
-  return Iterator{this, ptr};
+template <typename V>
+template <typename... Args>
+std::pair<typename MemoryMap<V>::Iterator, bool>
+MemoryMap<V>::insert(Key ptr, Args&&... args) noexcept
+{
+  UMPIRE_LOG(Debug, "ptr = " << ptr);
+  return doInsert(ptr, std::forward<Args>(args)...);
 }
 
 template <typename V>

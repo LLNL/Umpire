@@ -577,16 +577,14 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
       auto src_alloc_record = m_allocations.find(ptr);
 
-      const std::size_t size = src_alloc_record->m_size;
-      util::AllocationRecord dst_alloc_record;
-      dst_alloc_record.m_size = src_alloc_record->m_size;
-      dst_alloc_record.m_strategy = numa_alloc;
+      const std::size_t size{src_alloc_record->size};
+      util::AllocationRecord dst_alloc_record{nullptr, size, numa_alloc};
 
       void *ret = nullptr;
       if (size > 0) {
         auto op = op_registry.find("MOVE",
-                                   src_alloc_record->m_strategy,
-                                   dst_alloc_record.m_strategy);
+                                   src_alloc_record->strategy,
+                                   dst_alloc_record.strategy);
 
         op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
         if (ret != ptr) {
@@ -606,9 +604,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
     UMPIRE_ERROR("Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->ptr);
   }
 
-  std::size_t size = alloc_record->size;
-  void* dst_ptr = allocator.allocate(size);
-
+  void* dst_ptr{allocator.allocate(alloc_record->size)};
   copy(dst_ptr, ptr);
 
   deallocate(ptr);

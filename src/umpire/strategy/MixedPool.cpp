@@ -20,17 +20,19 @@ MixedPool::MixedPool(const std::string& name, int id,
                      std::size_t largest_fixed_blocksize,
                      std::size_t max_fixed_pool_size,
                      std::size_t size_multiplier,
-                     std::size_t dynamic_min_initial_alloc_size,
-                     std::size_t dynamic_min_alloc_size,
-                     DynamicPool::Coalesce_Heuristic coalesce_heuristic) noexcept :
+                     const std::size_t dynamic_initial_alloc_size,
+                     const std::size_t dynamic_min_alloc_size,
+                     DynamicPool::CoalesceHeuristic coalesce_heuristic,
+                     const int dynamic_align_bytes) noexcept :
   AllocationStrategy(name, id),
   m_map(),
   m_fixed_pool_map(),
   m_fixed_pool(),
   m_dynamic_pool("internal_dynamic_pool", -1, allocator,
-                 dynamic_min_initial_alloc_size,
+                 dynamic_initial_alloc_size,
                  dynamic_min_alloc_size,
-                 coalesce_heuristic),
+                 coalesce_heuristic,
+                 dynamic_align_bytes),
   m_allocator(allocator.getAllocationStrategy())
 {
   std::size_t obj_bytes = smallest_fixed_blocksize;
