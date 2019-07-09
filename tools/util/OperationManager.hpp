@@ -41,7 +41,6 @@ public:
   //
   // AllocationAdvisor
   //
-
   template <typename... Args>
   void bld_advisor(
       const bool introspection,
@@ -117,12 +116,12 @@ public:
   //
   // FixedPool
   //
+  template<typename... Args>
   void bld_fixedpool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
-    , const std::size_t object_bytes
-    , const std::size_t objects_per_pool
+    , Args&&... args
   )
   {
     if (introspection) {
@@ -130,14 +129,9 @@ public:
         auto& rm = umpire::ResourceManager::getInstance();
 
         rm.makeAllocator<umpire::strategy::FixedPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , object_bytes
-            , objects_per_pool
-          );
+          (allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -146,53 +140,9 @@ public:
         auto& rm = umpire::ResourceManager::getInstance();
 
         rm.makeAllocator<umpire::strategy::FixedPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , object_bytes
-            , objects_per_pool
-          );
+          (allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_fixedpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , const std::size_t object_bytes
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::FixedPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , object_bytes
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::FixedPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , object_bytes
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -293,12 +243,12 @@ public:
       };
     }
   }
-
+  template <typename... Args>
   void bld_dynamicpool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
-    , const std::size_t initial_alloc_size
+    , Args&&... args
   )
   {
     if (introspection) {
@@ -308,7 +258,7 @@ public:
         rm.makeAllocator<umpire::strategy::DynamicPool, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , initial_alloc_size
+            , std::forward<Args>(args)...
           );
 
         auto allocator = new umpire::Allocator(
@@ -323,43 +273,7 @@ public:
         rm.makeAllocator<umpire::strategy::DynamicPool, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , initial_alloc_size
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_dynamicpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
           );
 
         auto allocator = new umpire::Allocator(
@@ -386,8 +300,7 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -401,8 +314,7 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -425,8 +337,7 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -440,8 +351,7 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -464,8 +374,7 @@ public:
             , size_limit
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -479,8 +388,7 @@ public:
             , size_limit
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -643,15 +551,12 @@ public:
     }
   }
 
+  template <typename... Args>
   void bld_mixedpool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
-    , const std::size_t smallest_fixed_blocksize
-    , const std::size_t largest_fixed_blocksize
-    , const std::size_t max_fixed_blocksize
-    , const std::size_t size_multiplier
-    , const std::size_t dynamic_initial_alloc_bytes
+    , Args&&... args
   )
   {
     if (introspection) {
@@ -659,18 +564,12 @@ public:
         auto& rm = umpire::ResourceManager::getInstance();
 
         rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
+          (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-            , dynamic_initial_alloc_bytes
+            , std::forward<Args>(args)...
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
@@ -679,238 +578,12 @@ public:
         auto& rm = umpire::ResourceManager::getInstance();
 
         rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
+          (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-            , dynamic_initial_alloc_bytes
+            , std::forward<Args>(args)...
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_mixedpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , const std::size_t smallest_fixed_blocksize
-    , const std::size_t largest_fixed_blocksize
-    , const std::size_t max_fixed_blocksize
-    , const std::size_t size_multiplier
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_mixedpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , const std::size_t smallest_fixed_blocksize
-    , const std::size_t largest_fixed_blocksize
-    , const std::size_t max_fixed_blocksize
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_mixedpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , const std::size_t smallest_fixed_blocksize
-    , const std::size_t largest_fixed_blocksize
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_mixedpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , const std::size_t smallest_fixed_blocksize
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-  }
-
-  void bld_mixedpool(
-      const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-  )
-  {
-    if (introspection) {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
-      };
-    }
-    else {
-      op = [=]() {
-        auto& rm = umpire::ResourceManager::getInstance();
-
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-          );
-
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
+        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
         this->m_alloc_array.push_back(allocator);
       };
     }
