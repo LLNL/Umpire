@@ -20,11 +20,9 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-using AllocationFromLog = uint64_t;
-
 class Operation {
 public:
-  using AllocationOpMap = std::unordered_map<AllocationFromLog, Operation*>;
+  using AllocationOpMap = std::unordered_map<uint64_t, Operation*>;
   std::function<void ()> op;
 
   Operation(
@@ -992,12 +990,12 @@ public:
     };
   }
 
-  void bld_allocate_cont( AllocationFromLog allocation_from_log )
+  void bld_allocate_cont( uint64_t allocation_from_log )
   {
     m_alloc_operations[allocation_from_log] = this;
   }
 
-  void bld_deallocate( int allocator_num, AllocationFromLog allocation_from_log )
+  void bld_deallocate( int allocator_num, uint64_t allocation_from_log )
   {
     auto alloc_op = m_alloc_operations[allocation_from_log];
 
