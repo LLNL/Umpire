@@ -120,6 +120,8 @@ and a dynamic pool for those that are larger.
 
 - Replay and logging files only created when logging/replay are enabled.
 
+- 2019-07-09: Build error with NUMA.
+
 ## [0.3.5] - 2019-06-11
 
 ### Fixed
