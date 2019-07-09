@@ -37,6 +37,8 @@ and a dynamic pool for those that are larger.
 
 - Added HIP build to Travis CI.
 
+- Note about submodule sync to README.md.
+
 ### Changed
 
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).
