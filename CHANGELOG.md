@@ -76,6 +76,8 @@ and a dynamic pool for those that are larger.
 
 - Switch to SPDX licensing.
 
+- Cleaned benchmark code.
+
 ### Removed
 
 - `ENABLE_ASSERTS` option removed. `UMPIRE_ASSERT` should still be used.
@@ -119,6 +121,8 @@ and a dynamic pool for those that are larger.
 - Fix error where the MemoryMap.inl was not installed.
 
 - Replay and logging files only created when logging/replay are enabled.
+
+- Issues relating to static initialization of Logger.
 
 ## [0.3.5] - 2019-06-11
 
