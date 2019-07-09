@@ -34,6 +34,13 @@ The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/tutorial.html) pr
 
 If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
 
+## Submodules
+
+If you see the following error, do not despair. Simply run `git submodule sync && git submodule update --init --recursive`
+
+    fatal: reference is not a tree: git_hash
+    Unable to checkout 'git_hash' in submodule path 'src/umpire/tpl/cxxopts'
+
 # Getting Involved
 
 Umpire is an open-source project, and we welcome contributions from the community.
