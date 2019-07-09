@@ -401,11 +401,9 @@ TEST(DynamicPool, coalesce)
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
     "host_dyn_pool_for_coalesce", rm.getAllocator("HOST"));
 
-  auto strategy = alloc.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-  if (tracker) strategy = tracker->getAllocationStrategy();
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
   ASSERT_NE(dynamic_pool, nullptr);
 
   const std::size_t initial_bytes{dynamic_pool->getActualSize()};
