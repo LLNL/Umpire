@@ -24,12 +24,11 @@ m_zero_byte_pool(nullptr)
 void*
 ZeroByteHandler::allocate(std::size_t bytes)
 {
-  if (!m_zero_byte_pool)
-    m_zero_byte_pool = 
-      static_cast<FixedPool*>(ResourceManager::getInstance().getZeroByteAllocator());
-
   if (0 == bytes) {
     UMPIRE_LOG(Debug, "Allocating 0 bytes for" << m_allocator->getName());
+    if (!m_zero_byte_pool)
+      m_zero_byte_pool = 
+        static_cast<FixedPool*>(ResourceManager::getInstance().getZeroByteAllocator());
     return m_zero_byte_pool->allocate(1);
   } else {
     return m_allocator->allocate(bytes);
@@ -39,6 +38,10 @@ ZeroByteHandler::allocate(std::size_t bytes)
 void
 ZeroByteHandler::deallocate(void* ptr)
 {
+  if (!m_zero_byte_pool)
+    m_zero_byte_pool = 
+      static_cast<FixedPool*>(ResourceManager::getInstance().getZeroByteAllocator());
+
   if (m_zero_byte_pool->pointerIsFromPool(ptr)) {
     UMPIRE_LOG(Debug, "Deallocating 0 bytes for" << m_allocator->getName());
     m_zero_byte_pool->deallocate(ptr);
