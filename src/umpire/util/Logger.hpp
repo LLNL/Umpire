@@ -21,24 +21,17 @@ enum Level {
 
   Num_Levels
 };
-
-static const std::string MessageLevelName[ Level::Num_Levels ] = {
-  "ERROR",
-  "WARNING",
-  "INFO",
-  "DEBUG"
-};
-} /* namespace messge */
+} // end namespace message
 
 class Logger {
   public:
 
-  void setLoggingMsgLevel( message::Level level ) noexcept;
+  void setLoggingMsgLevel(message::Level level) noexcept;
 
-  void logMessage( message::Level level,
-                   const std::string& message,
-                   const std::string& fileName,
-                   int line ) noexcept;
+  void logMessage(message::Level level,
+                  const std::string& message,
+                  const std::string& fileName,
+                  int line) noexcept;
 
   static void initialize();
 
@@ -46,9 +39,9 @@ class Logger {
 
   static Logger* getActiveLogger();
 
-  inline bool logLevelEnabled( message::Level level )
+  inline bool logLevelEnabled(message::Level level)
   {
-    if ( level < 0 || level >= message::Num_Levels || m_isEnabled[ level ] == false  )
+    if ( level < 0 || level >= message::Num_Levels || m_is_enabled[ level ] == false  )
       return false;
     else
       return true;
@@ -61,10 +54,10 @@ class Logger {
 private:
   Logger() noexcept;
 
-  bool m_isEnabled[ message::Num_Levels ];
+  bool m_is_enabled[message::Num_Levels];
 };
 
-} /* namespace util */
-} /* namespace umpire */
+} // end namespace util
+} // end namespace umpire
 
-#endif /* UMPIRE_Logger_HPP */
+#endif // UMPIRE_Logger_HPP
