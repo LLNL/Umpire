@@ -76,7 +76,7 @@ and a dynamic pool for those that are larger.
 
 - Switch to SPDX licensing.
 
-- Cleaned benchmark code.
+- Cleaned allocator benchmark code and now use random sizes for DynamicPools.
 
 ### Removed
 
