@@ -94,7 +94,8 @@ and a dynamic pool for those that are larger.
 - Fixed bug in monotonic pool allocator causing it to always return
   the same allocation.
 
-- Enabled pedantic compiler warnings and fixed errors.
+- Enabled pedantic compiler warnings and fixed errors for GNU, CLANG, INTEL,
+  XL, and MSVC compilers.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives
