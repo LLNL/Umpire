@@ -27,7 +27,6 @@ std::unique_ptr<Base>
 do_wrap(std::unique_ptr<Base>&& allocator)
 {
   return std::unique_ptr<Base>(new Strategy(umpire::util::do_wrap<Base, Strategies...>(std::move(allocator))));
-  //return util::do_wrap<Base, Strategies...>(std::unique_ptr<Base>{new Strategy(std::move(strategy))});
 }
 
 template<typename... Strategies>
