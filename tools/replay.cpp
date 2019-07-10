@@ -73,20 +73,20 @@ int main(int ac, char* av[])
   std::chrono::duration<double> time_span;
 
   t1 = std::chrono::high_resolution_clock::now();
-    Replay replay(input_file_name);
-    replay.build();
+  Replay replay(input_file_name);
+  replay.build();
   t2 = std::chrono::high_resolution_clock::now();
 
-  if (result.count("verbose")) {
+  if (result.count("time")) {
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Parsing replay log took " << time_span.count() << " seconds." << std::endl;
   }
 
   t1 = std::chrono::high_resolution_clock::now();
-    replay.run();
+  replay.run();
   t2 = std::chrono::high_resolution_clock::now();
 
-  if (result.count("verbose")) {
+  if (result.count("time")) {
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
   }

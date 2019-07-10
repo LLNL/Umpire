@@ -72,7 +72,7 @@ class Replay {
           exit (1);
         }
         compare_ss << std::endl;
-        std::cout << compare_ss.str();
+        // std::cout << compare_ss.str();
       }
     }
 
