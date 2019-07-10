@@ -261,6 +261,9 @@ class ResourceManager {
 
     std::mutex m_mutex;
 
+    static const std::string s_null_resource_name;
+    static const std::string s_zero_byte_pool_name;
+
     // Methods that need access to m_allocations to print/filter records
     friend void print_allocator_records(Allocator, std::ostream&);
     friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
