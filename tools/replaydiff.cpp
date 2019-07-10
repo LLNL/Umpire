@@ -14,64 +14,67 @@
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "util/Replay.hpp"
 
-static std::vector<std::string> positional;
+struct CommandLineOptions {
+  std::vector<std::string> positional_args;
 
-static cxxopts::ParseResult parse(int argc, char* argv[])
-{
-  try
+  cxxopts::ParseResult parse(int argc, char* argv[])
   {
-    cxxopts::Options options(argv[0], 
-      "Compare two replay result files created by Umpire library with UMPIRE_REPLAY=On"
-    );
-
-    options
-      .add_options()
-      (  "h, help"
-       , "Print help"
-      )
-    ;
-
-    options.add_options()
-      ("positional", "Positional parameters",
-        cxxopts::value<std::vector<std::string>>(positional))
-    ;
-
-    std::vector<std::string> pos_names = {"positional"};
-
-    options.parse_positional(pos_names.begin(), pos_names.end());
-
-    auto result = options.parse(argc, argv);
-
-    if (result.count("help"))
+    try
     {
-      // You can output our default, unnamed group and our HiddenGroup
-      // of help with the following line:
-      //
-      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
-      //
-      std::cout << options.help({""}) << std::endl;
-      exit(0);
-    }
+      cxxopts::Options options(argv[0], 
+        "Compare two replay result files created by Umpire library with UMPIRE_REPLAY=On"
+      );
 
-    if (positional.size() != 2) {
-      std::cout << options.help({""}) << std::endl;
+      options
+        .add_options()
+        (  "h, help"
+         , "Print help"
+        )
+      ;
+
+      options.add_options()
+        ("positional_args", "Positional parameters",
+          cxxopts::value<std::vector<std::string>>(positional_args))
+      ;
+
+      std::vector<std::string> pos_names = {"positional_args"};
+
+      options.parse_positional(pos_names.begin(), pos_names.end());
+
+      auto result = options.parse(argc, argv);
+
+      if (result.count("help"))
+      {
+        // You can output our default, unnamed group and our HiddenGroup
+        // of help with the following line:
+        //
+        //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
+        //
+        std::cout << options.help({""}) << std::endl;
+        exit(0);
+      }
+
+      if (positional_args.size() != 2) {
+        std::cout << options.help({""}) << std::endl;
+        exit(1);
+      }
+
+      return result;
+    } catch (const cxxopts::OptionException& e)
+    {
+      std::cout << "error parsing options: " << e.what() << std::endl;
       exit(1);
     }
-
-    return result;
-  } catch (const cxxopts::OptionException& e)
-  {
-    std::cout << "error parsing options: " << e.what() << std::endl;
-    exit(1);
   }
-}
+};
 
 int main(int ac, char* av[])
 {
-  auto result = parse(ac, av);
+  CommandLineOptions cl_opts;
+  auto result = cl_opts.parse(ac, av);
 
-  const std::string& left_filename = positional[0];
-  const std::string& right_filename = positional[1];
+  const std::string& left_filename = cl_opts.positional_args[0];
+  const std::string& right_filename = cl_opts.positional_args[1];
 
   Replay left(left_filename);
   Replay right(right_filename);

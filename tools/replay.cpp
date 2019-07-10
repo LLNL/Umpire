@@ -14,50 +14,53 @@
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "util/Replay.hpp"
 
-static cxxopts::ParseResult parse(int argc, char* argv[])
-{
-  try
+struct CommandLineOptions {
+  cxxopts::ParseResult parse(int argc, char* argv[])
   {
-    cxxopts::Options options(argv[0], "Replay an umpire session from a file");
-
-    options
-      .add_options()
-      (  "h, help"
-       , "Print help"
-      )
-      (  "t, time"
-       , "Display replay times"
-      )
-      (  "i, infile"
-       , "Input file created by Umpire library with UMPIRE_REPLAY=On"
-       , cxxopts::value<std::string>(), "FILE"
-      )
-    ;
-
-    auto result = options.parse(argc, argv);
-
-    if (result.count("help"))
+    try
     {
-      // You can output our default, unnamed group and our HiddenGroup
-      // of help with the following line:
-      //
-      //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
-      //
-      std::cout << options.help({""}) << std::endl;
-      exit(0);
-    }
+      cxxopts::Options options(argv[0], "Replay an umpire session from a file");
 
-    return result;
-  } catch (const cxxopts::OptionException& e)
-  {
-    std::cout << "error parsing options: " << e.what() << std::endl;
-    exit(1);
+      options
+        .add_options()
+        (  "h, help"
+         , "Print help"
+        )
+        (  "t, time"
+         , "Display replay times"
+        )
+        (  "i, infile"
+         , "Input file created by Umpire library with UMPIRE_REPLAY=On"
+         , cxxopts::value<std::string>(), "FILE"
+        )
+      ;
+
+      auto result = options.parse(argc, argv);
+
+      if (result.count("help"))
+      {
+        // You can output our default, unnamed group and our HiddenGroup
+        // of help with the following line:
+        //
+        //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
+        //
+        std::cout << options.help({""}) << std::endl;
+        exit(0);
+      }
+
+      return result;
+    } catch (const cxxopts::OptionException& e)
+    {
+      std::cout << "error parsing options: " << e.what() << std::endl;
+      exit(1);
+    }
   }
-}
+};
 
 int main(int ac, char* av[])
 {
-  auto result = parse(ac, av);
+  CommandLineOptions cl_opts;
+  auto result = cl_opts.parse(ac, av);
 
   if ( ! result.count("infile") ) {
     std::cerr << "No input file specified\n";
