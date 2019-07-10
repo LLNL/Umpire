@@ -37,6 +37,8 @@ and a dynamic pool for those that are larger.
 
 - Added HIP build to Travis CI.
 
+- Support for tracked 0-byte allocations across all memory types.
+
 ### Changed
 
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).
@@ -75,6 +77,8 @@ and a dynamic pool for those that are larger.
 - Add PID to filenames for log and replay output.
 
 - Switch to SPDX licensing.
+
+- Cleaned allocator benchmark code and now use random sizes for DynamicPools.
 
 ### Removed
 
@@ -122,6 +126,8 @@ and a dynamic pool for those that are larger.
 - Replay and logging files only created when logging/replay are enabled.
 
 - 2019-07-09: Build error with NUMA.
+
+- Issues relating to static initialization of Logger.
 
 ## [0.3.5] - 2019-06-11
 

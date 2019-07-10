@@ -42,7 +42,7 @@ class FixedPool : public AllocationStrategy
      */
     FixedPool(const std::string& name, int id,
               Allocator allocator, const std::size_t object_bytes,
-              const std::size_t objects_per_pool = 64 * sizeof(int) * 8);
+              const std::size_t objects_per_pool = 64 * sizeof(int) * 8) noexcept;
 
     ~FixedPool();
 
@@ -53,6 +53,8 @@ class FixedPool : public AllocationStrategy
     std::size_t getHighWatermark() const noexcept override final;
     std::size_t getActualSize() const noexcept override final;
     Platform getPlatform() noexcept override final;
+
+    bool pointerIsFromPool(void* ptr) const noexcept;
 
     std::size_t numPools() const noexcept;
 
