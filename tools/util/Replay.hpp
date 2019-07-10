@@ -11,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-#include "util/OperationManager.hpp"
+#include "util/ReplayOperationManager.hpp"
 #include "umpire/tpl/json/json.hpp"
 
 class Replay {
@@ -162,7 +162,7 @@ class Replay {
     AllocatorIndex m_num_allocators;
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
-    OperationManager m_operation_mgr;
+    ReplayOperationManager m_operation_mgr;
     uint64_t m_op_seq;
     std::stringstream compare_ss;
 

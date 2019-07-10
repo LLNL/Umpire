@@ -12,7 +12,7 @@ if (ENABLE_HIP)
 endif()
 
 set (replay_util_headers
-  ./util/OperationManager.hpp
+  ./util/ReplayOperationManager.hpp
   ./util/Replay.hpp)
 
 blt_add_library(
