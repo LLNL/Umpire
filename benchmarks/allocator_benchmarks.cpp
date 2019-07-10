@@ -141,6 +141,9 @@ template <umpire::resource::MemoryResourceType Resource>
 class MemoryResourceAllocator : public AllocatorBenchmark
 {
 public:
+  using ::benchmark::Fixture::SetUp;
+  using ::benchmark::Fixture::TearDown;
+
   MemoryResourceAllocator() = default;
 
   void SetUp(const ::benchmark::State&) override final {
