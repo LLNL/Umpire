@@ -621,13 +621,8 @@ public:
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
       auto alloc = rm.getAllocator(allocator_name);
-      auto strategy = alloc.getAllocationStrategy();
-      auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-      if (tracker)
-        strategy = tracker->getAllocationStrategy();
-
-      auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+      auto dynamic_pool =
+        umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
       if (dynamic_pool)
         dynamic_pool->coalesce();

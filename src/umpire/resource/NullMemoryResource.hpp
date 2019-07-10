@@ -4,29 +4,22 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DefaultMemoryResource_HPP
-#define UMPIRE_DefaultMemoryResource_HPP
+#ifndef UMPIRE_NullMemoryResource_HPP
+#define UMPIRE_NullMemoryResource_HPP
 
 #include "umpire/resource/MemoryResource.hpp"
 
-#include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
-
-#include "umpire/strategy/mixins/Inspector.hpp"
+#include "umpire/util/MemoryMap.hpp"
 
 namespace umpire {
 namespace resource {
 
-  /*!
-   * \brief Concrete MemoryResource object that uses the template _allocator to
-   * allocate and deallocate memory.
-   */
-template <typename _allocator>
-class DefaultMemoryResource :
+class NullMemoryResource :
   public MemoryResource
 {
   public: 
-    DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+    NullMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
@@ -37,14 +30,14 @@ class DefaultMemoryResource :
     Platform getPlatform() noexcept;
 
   protected:
-    _allocator m_allocator;
-
     Platform m_platform;
+
+  private:
+    util::MemoryMap<size_t> m_size_map;
+
 };
 
 } // end of namespace resource
 } // end of namespace umpire
 
-#include "umpire/resource/DefaultMemoryResource.inl"
-
-#endif // UMPIRE_DefaultMemoryResource_HPP
+#endif // UMPIRE_NullMemoryResource_HPP

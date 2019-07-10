@@ -19,6 +19,7 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 class replayTest {
 public:
@@ -295,15 +296,10 @@ public:
   void runTest()
   {
     auto& rm = umpire::ResourceManager::getInstance();
+
     auto pooled_allocator = rm.getAllocator("host_dyn_pool_spec1");
-    auto strategy = pooled_allocator.getAllocationStrategy();
-    auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-    if (tracker) {
-      strategy = tracker->getAllocationStrategy();
-    }
-
-    auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+    auto dynamic_pool = 
+      umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pooled_allocator);
 
     if (! dynamic_pool ) {
       std::cerr << "host_dyn_pool_spec1 is not a dynamic pool!\n";

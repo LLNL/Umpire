@@ -15,7 +15,8 @@ set (umpire_strategy_headers
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   SizeLimiter.hpp
-  ThreadSafeAllocator.hpp)
+  ThreadSafeAllocator.hpp
+  ZeroByteHandler.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_headers
@@ -38,7 +39,8 @@ set (umpire_strategy_sources
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
   SizeLimiter.cpp
-  ThreadSafeAllocator.cpp)
+  ThreadSafeAllocator.cpp
+  ZeroByteHandler.cpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_sources
