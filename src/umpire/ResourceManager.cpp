@@ -91,7 +91,6 @@ ResourceManager::ResourceManager() :
   const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
   bool enable_log{(env_enable_log != nullptr)};
 
-  util::MPI::initialize();
   util::IOManager::initialize(enable_log, enable_replay);
 
   resource::MemoryResourceRegistry& registry =

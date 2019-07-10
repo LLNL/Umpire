@@ -80,12 +80,12 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
 
     check_output('stderr', error, 'testing error stream')
 
-    output_filename = 'umpire_io_tests.0.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
-    replay_filename = 'umpire_io_tests.0.{pid}.{uid}.replay'.format(uid=file_uid, pid=pid)
+    output_filename = 'umpire_io_tests.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
+    replay_filename = 'umpire_io_tests.{pid}.{uid}.replay'.format(uid=file_uid, pid=pid)
 
     if 'UMPIRE_OUTPUT_DIR' in test_env.keys():
-        output_filename = '{dir}/umpire_io_tests.0.{pid}.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
-        replay_filename = '{dir}/umpire_io_tests.0.{pid}.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
+        output_filename = '{dir}/umpire_io_tests.{pid}.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
+        replay_filename = '{dir}/umpire_io_tests.{pid}.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
 
     if expect_logging:
         check_file_exists(output_filename)
