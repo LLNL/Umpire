@@ -37,6 +37,8 @@ and a dynamic pool for those that are larger.
 
 - Added HIP build to Travis CI.
 
+- Support for tracked 0-byte allocations across all memory types.
+
 ### Changed
 
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).

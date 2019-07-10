@@ -12,10 +12,8 @@ namespace umpire {
 namespace strategy {
 
 AllocationTracker::AllocationTracker(
-  const std::string& name,
-  int id,
   std::unique_ptr<AllocationStrategy>&& allocator) noexcept :
-AllocationStrategy(name, id),
+AllocationStrategy(allocator->getName(), allocator->getId()),
 mixins::Inspector(),
 m_allocator(std::move(allocator))
 {
@@ -26,6 +24,8 @@ AllocationTracker::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
 
+  UMPIRE_LOG(Debug, "Tracking " << ptr << " bytes for" << m_allocator->getName());
+
   registerAllocation(ptr, bytes, this);
 
   return ptr;
@@ -34,6 +34,8 @@ AllocationTracker::allocate(std::size_t bytes)
 void
 AllocationTracker::deallocate(void* ptr)
 {
+  UMPIRE_LOG(Debug, "Untracking " << ptr << " bytes for" << m_allocator->getName());
+
   deregisterAllocation(ptr, this);
   m_allocator->deallocate(ptr);
 }

@@ -4,24 +4,24 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_AllocationTracker_HPP
-#define UMPIRE_AllocationTracker_HPP
+#ifndef UMPIRE_ZeroByteHandler_HPP
+#define UMPIRE_ZeroByteHandler_HPP
 
 #include <memory>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/FixedPool.hpp"
+
 #include "umpire/Allocator.hpp"
-#include "umpire/strategy/mixins/Inspector.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class AllocationTracker :
-  public AllocationStrategy,
-  private mixins::Inspector
+class ZeroByteHandler :
+  public AllocationStrategy
 {
   public:
-    AllocationTracker(
+    ZeroByteHandler(
         std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
     void* allocate(std::size_t bytes);
@@ -40,10 +40,10 @@ class AllocationTracker :
 
   private:
     std::unique_ptr<strategy::AllocationStrategy> m_allocator;
-
+    FixedPool* m_zero_byte_pool;
 };
 
 } // end of namespace umpire
 } // end of namespace strategy
 
-#endif // UMPIRE_AllocationTracker_HPP
+#endif // UMPIRE_ZeroByteHandler_HPP
