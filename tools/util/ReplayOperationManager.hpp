@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef REPLAY_OperationManager_HPP
-#define REPLAY_OperationManager_HPP
+#ifndef REPLAY_ReplayOperationManager_HPP
+#define REPLAY_ReplayOperationManager_HPP
 
 #include <iostream>
 #include <cstdint>
@@ -20,12 +20,12 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-class Operation {
+class ReplayOperation {
 public:
- using AllocationOpMap = std::unordered_map<uint64_t, Operation*>;
+ using AllocationOpMap = std::unordered_map<uint64_t, ReplayOperation*>;
   std::function<void ()> op;
 
-  Operation(
+  ReplayOperation(
       std::vector<umpire::Allocator*>& alloc_array,
       AllocationOpMap& alloc_operations
   ) :   m_alloc_array(alloc_array)
@@ -649,12 +649,12 @@ private:
   void* m_allocation_ptr;
 };
 
-class OperationManager {
+class ReplayOperationManager {
   public:
-    OperationManager( void ) {
+    ReplayOperationManager( void ) {
     }
 
-    ~OperationManager() { }
+    ~ReplayOperationManager() { }
 
     void run() {
       for (auto op : operations) {
@@ -672,7 +672,7 @@ class OperationManager {
         const std::string& advice_operation,
         const int device_id
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_advisor(
           introspection, allocator_name, base_allocator_name,
@@ -688,7 +688,7 @@ class OperationManager {
         const std::string& accessing_allocator_name,
         const int device_id
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_advisor(
           introspection, allocator_name, base_allocator_name,
@@ -702,7 +702,7 @@ class OperationManager {
         const std::string& base_allocator_name,
         const std::string& advice_operation
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_advisor(
           introspection, allocator_name, base_allocator_name,
@@ -717,7 +717,7 @@ class OperationManager {
         const std::string& advice_operation,
         const std::string& accessing_allocator_name
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_advisor(
           introspection, allocator_name, base_allocator_name,
@@ -736,7 +736,7 @@ class OperationManager {
       , const std::size_t objects_per_pool
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_fixedpool(
                   introspection
@@ -756,7 +756,7 @@ class OperationManager {
       , const std::size_t object_bytes
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_fixedpool(
                   introspection
@@ -780,7 +780,7 @@ class OperationManager {
         , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
         , int alignment
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_dynamicpool(
                   introspection
@@ -803,7 +803,7 @@ class OperationManager {
         , const std::size_t min_alloc_size
         , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_dynamicpool(
                   introspection
@@ -823,7 +823,7 @@ class OperationManager {
         , const std::string& base_allocator_name
         , const std::size_t initial_alloc_size
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_dynamicpool(
                   introspection
@@ -840,7 +840,7 @@ class OperationManager {
         , const std::string& allocator_name
         , const std::string& base_allocator_name
     ) {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_dynamicpool(
                   introspection
@@ -858,7 +858,7 @@ class OperationManager {
       , const std::string& base_allocator_name
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_monotonic(
                   introspection
@@ -877,7 +877,7 @@ class OperationManager {
       , const std::string& base_allocator_name
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_slotpool(
                   introspection
@@ -896,7 +896,7 @@ class OperationManager {
       , const std::size_t size_limit
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_limiter(
                   introspection
@@ -914,7 +914,7 @@ class OperationManager {
       , const std::string& base_allocator_name
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_threadsafe(
                   introspection
@@ -939,7 +939,7 @@ class OperationManager {
       , int alignment
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -971,7 +971,7 @@ class OperationManager {
       , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1000,7 +1000,7 @@ class OperationManager {
       , const std::size_t dynamic_initial_alloc_bytes
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1026,7 +1026,7 @@ class OperationManager {
       , const std::size_t size_multiplier
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1050,7 +1050,7 @@ class OperationManager {
       , const std::size_t max_fixed_blocksize
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1072,7 +1072,7 @@ class OperationManager {
       , const std::size_t largest_fixed_blocksize
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1092,7 +1092,7 @@ class OperationManager {
       , const std::size_t smallest_fixed_blocksize
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1110,7 +1110,7 @@ class OperationManager {
       , const std::string& base_allocator_name
     )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
       m_cont_op->bld_mixedpool(
                   introspection
@@ -1131,7 +1131,7 @@ class OperationManager {
     //
     void bld_allocate( int allocator_num, std::size_t size )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
       m_cont_op->bld_allocate(allocator_num, size);
       operations.push_back(m_cont_op);
     }
@@ -1143,30 +1143,30 @@ class OperationManager {
 
     void bld_deallocate( int allocator_num, uint64_t allocation_from_log )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
       m_cont_op->bld_deallocate(allocator_num, allocation_from_log);
       operations.push_back(m_cont_op);
     }
 
     void bld_coalesce( const std::string& allocator_name )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
       m_cont_op->bld_coalesce(allocator_name);
       operations.push_back(m_cont_op);
     }
 
     void bld_release( int allocator_num )
     {
-      m_cont_op = new Operation(m_allocator_array, m_alloc_operations);
+      m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
       m_cont_op->bld_release(allocator_num);
       operations.push_back(m_cont_op);
     }
 
   private:
     std::vector<umpire::Allocator*> m_allocator_array;
-    Operation::AllocationOpMap m_alloc_operations;
-    Operation* m_cont_op;
-    std::vector<Operation*> operations;
+    ReplayOperation::AllocationOpMap m_alloc_operations;
+    ReplayOperation* m_cont_op;
+    std::vector<ReplayOperation*> operations;
 };
 
-#endif // REPLAY_OperationManager_HPP
+#endif // REPLAY_ReplayOperationManager_HPP
