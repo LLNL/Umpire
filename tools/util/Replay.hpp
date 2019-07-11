@@ -242,6 +242,10 @@ class Replay {
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, accessing_allocator_name, device_id);
               break;
+            default:
+              std::cerr << "Invalid number of arguments (" << numargs
+                << " for " << type << " operation.  Stopping" << std::endl;
+              exit(1);
             }
           }
           else { // Use default device_id
@@ -269,6 +273,10 @@ class Replay {
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, accessing_allocator_name);
               break;
+            default:
+              std::cerr << "Invalid number of arguments (" << numargs
+                << " for " << type << " operation.  Stopping" << std::endl;
+              exit(1);
             }
           }
         }
