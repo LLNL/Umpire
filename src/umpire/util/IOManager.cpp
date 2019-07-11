@@ -64,6 +64,7 @@ static std::string makeUniqueFilename(
 
 static inline bool fileExists(const std::string& file);
 
+static inline bool directoryExists(const std::string& file);
 
 void
 IOManager::setOutputDir(const std::string& dir)
@@ -107,7 +108,7 @@ IOManager::initialize(
     replay_buffer.setConsoleStream(nullptr);
     error_buffer.setConsoleStream(&std::cerr);
 
-    if (s_root_io_dir.compare("./") != 0) {
+    if (!directoryExists(s_root_io_dir)) {
       if (MPI::isInitialized()) {
         auto rank = MPI::getRank();
         if (rank == 0) {
@@ -195,6 +196,21 @@ static inline bool fileExists(const std::string& path)
 {
   std::ifstream ifile(path.c_str());
   return ifile.good();
+}
+
+static inline bool directoryExists(const std::string& path)
+{
+#if defined(UMPIRE_ENABLE_FILESYSTEM)
+  std::filesystem::path fspath_path(path);
+  return std::filesystem::exists(fspath_path);
+#else
+  struct stat info;
+  if ( stat( path.c_str(), &info) ) {
+    return false;
+  } else {
+    return S_ISDIR(info.st_mode);
+  }
+#endif
 }
 
 } // end of namespace util
