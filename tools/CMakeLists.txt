@@ -5,29 +5,13 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set (tools_depends umpire umpire_tpl_cxxopts umpire_tpl_json replay_util_lib)
+add_subdirectory(util)
+
+set (tools_depends umpire umpire_tpl_cxxopts umpire_tpl_json replay_util)
 
 if (ENABLE_HIP)
   set (tools_depends ${tools_depends} hip_runtime)
 endif()
-
-set (replay_util_headers
-  ./util/ReplayOperationManager.hpp
-  ./util/Replay.hpp)
-
-blt_add_library(
-  NAME replay_util_lib
-  HEADERS ${replay_util_headers})
-
-target_link_libraries(replay_util_lib INTERFACE)
-
-target_include_directories(
-  replay_util_lib
-  INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/tools>
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
 
 blt_add_executable(
   NAME replay
@@ -42,3 +26,4 @@ blt_add_executable(
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
 
 install(FILES plot_allocations DESTINATION bin)
+

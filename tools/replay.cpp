@@ -12,7 +12,7 @@
 #include <chrono>
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
-#include "util/Replay.hpp"
+#include "util/ReplayInterpreter.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -50,8 +50,8 @@ int main(int argc, char* argv[])
   std::chrono::duration<double> time_span;
 
   t1 = std::chrono::high_resolution_clock::now();
-  Replay replay(input_file_name);
-  replay.build();
+  ReplayInterpreter replay(input_file_name);
+  replay.buildOperations();
   t2 = std::chrono::high_resolution_clock::now();
 
   if (command_line_args.count("time")) {
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
   }
 
   t1 = std::chrono::high_resolution_clock::now();
-  replay.run();
+  replay.runOperations();
   t2 = std::chrono::high_resolution_clock::now();
 
   if (command_line_args.count("time")) {

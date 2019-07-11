@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
-#include "util/Replay.hpp"
+#include "util/ReplayInterpreter.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -50,15 +50,15 @@ int main(int argc, char* argv[])
   const std::string& left_filename = positional_args[0];
   const std::string& right_filename = positional_args[1];
 
-  Replay left(left_filename);
-  Replay right(right_filename);
+  ReplayInterpreter left(left_filename);
+  ReplayInterpreter right(right_filename);
 
   while (1) {
     std::string left_raw, left_sym;
     std::string right_raw, right_sym;
 
-    int left_rval = left.symbol_op(left_raw, left_sym);
-    int right_rval = right.symbol_op(right_raw, right_sym);
+    int left_rval = left.getSymbolicOperation(left_raw, left_sym);
+    int right_rval = right.getSymbolicOperation(right_raw, right_sym);
 
     if (!left_rval && !right_rval) {
       break;  // Both at EOF, we are done
