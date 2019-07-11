@@ -11,6 +11,7 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Exception.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #include <iostream>
 
@@ -21,7 +22,7 @@ int main(int, char**) {
       "pool", rm.getAllocator("HOST"));
 
   auto dynamic_pool =
-    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
 
   if (dynamic_pool) {
     dynamic_pool->coalesce();
