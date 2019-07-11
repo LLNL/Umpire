@@ -224,7 +224,7 @@ class Replay {
                 << " " << advice_operation 
                 << " " << device_id
               ;
-              m_operation_mgr.bld_advisor(
+              m_operation_mgr.makeAdvisor(
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, device_id);
               break;
@@ -238,7 +238,7 @@ class Replay {
                 << " " << accessing_allocator_name 
                 << " " << device_id
               ;
-              m_operation_mgr.bld_advisor(
+              m_operation_mgr.makeAdvisor(
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, accessing_allocator_name, device_id);
               break;
@@ -252,7 +252,7 @@ class Replay {
                 << " " << base_allocator_name
                 << " " << advice_operation 
               ;
-              m_operation_mgr.bld_advisor(
+              m_operation_mgr.makeAdvisor(
                   introspection, allocator_name, base_allocator_name,
                   advice_operation);
               break;
@@ -265,7 +265,7 @@ class Replay {
                 << " " << advice_operation 
                 << " " << accessing_allocator_name 
               ;
-              m_operation_mgr.bld_advisor(
+              m_operation_mgr.makeAdvisor(
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, accessing_allocator_name);
               break;
@@ -292,7 +292,7 @@ class Replay {
               << " " << min_alloc_size 
               << " " << alignment 
             ;
-            m_operation_mgr.bld_dynamicpool(
+            m_operation_mgr.makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -312,7 +312,7 @@ class Replay {
               << " " << initial_alloc_size 
               << " " << min_alloc_size 
             ;
-            m_operation_mgr.bld_dynamicpool(
+            m_operation_mgr.makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -329,7 +329,7 @@ class Replay {
               << " " << base_allocator_name
               << " " << initial_alloc_size 
             ;
-            m_operation_mgr.bld_dynamicpool(
+            m_operation_mgr.makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -341,7 +341,7 @@ class Replay {
               << " " << allocator_name 
               << " " << base_allocator_name
             ;
-            m_operation_mgr.bld_dynamicpool(
+            m_operation_mgr.makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -359,7 +359,7 @@ class Replay {
             << " " << capacity
             << " " << base_allocator_name
           ;
-          m_operation_mgr.bld_monotonic(
+          m_operation_mgr.makeMonotonicAllocator(
                 introspection
               , allocator_name
               , capacity
@@ -377,7 +377,7 @@ class Replay {
             << " " << slots
             << " " << base_allocator_name
           ;
-          m_operation_mgr.bld_slotpool(
+          m_operation_mgr.makeSlotPool(
                 introspection
               , allocator_name
               , slots
@@ -394,7 +394,7 @@ class Replay {
             << " " << base_allocator_name
             << " " << size_limit
           ;
-          m_operation_mgr.bld_limiter(
+          m_operation_mgr.makeSizeLimiter(
                 introspection
               , allocator_name
               , base_allocator_name
@@ -408,7 +408,7 @@ class Replay {
             << " " << allocator_name 
             << " " << base_allocator_name
           ;
-          m_operation_mgr.bld_threadsafe(
+          m_operation_mgr.makeThreadSafeAllocator(
                 introspection
               , allocator_name
               , base_allocator_name
@@ -432,7 +432,7 @@ class Replay {
               << " " << object_bytes 
               << " " << objects_per_pool 
             ;
-            m_operation_mgr.bld_fixedpool(
+            m_operation_mgr.makeFixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -446,7 +446,7 @@ class Replay {
               << " " << base_allocator_name
               << " " << object_bytes 
             ;
-            m_operation_mgr.bld_fixedpool(
+            m_operation_mgr.makeFixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -486,7 +486,7 @@ class Replay {
                 << " " << dynamic_align_bytes
             ;
 
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
               , largest_fixed_blocksize
@@ -517,7 +517,7 @@ class Replay {
                 << " " << dynamic_min_alloc_bytes
             ;
 
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
               , largest_fixed_blocksize
@@ -544,7 +544,7 @@ class Replay {
                 << " " << size_multiplier
                 << " " << dynamic_initial_alloc_bytes
             ;
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
               , largest_fixed_blocksize
@@ -567,7 +567,7 @@ class Replay {
                 << " " << max_fixed_blocksize
                 << " " << size_multiplier
             ;
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
               , largest_fixed_blocksize
@@ -587,7 +587,7 @@ class Replay {
                 << " " << largest_fixed_blocksize
                 << " " << max_fixed_blocksize
             ;
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
               , largest_fixed_blocksize
@@ -604,7 +604,7 @@ class Replay {
                 << " " << smallest_fixed_blocksize
                 << " " << largest_fixed_blocksize
             ;
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
               , largest_fixed_blocksize
@@ -618,7 +618,7 @@ class Replay {
                 << " " << base_allocator_name
                 << " " << smallest_fixed_blocksize
             ;
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
               , smallest_fixed_blocksize
             );
@@ -628,7 +628,7 @@ class Replay {
                 << " " << allocator_name
                 << " " << base_allocator_name
             ;
-            m_operation_mgr.bld_mixedpool(
+            m_operation_mgr.makeMixedPool(
                 introspection, allocator_name, base_allocator_name
             );
           }
@@ -645,7 +645,7 @@ class Replay {
         m_allocator_indices[obj_p] = m_num_allocators++;
         compare_ss << m_allocator_indices[obj_p];
 
-        m_operation_mgr.bld_allocator_cont();
+        m_operation_mgr.makeAllocatorCont();
       }
     }
 
@@ -674,7 +674,7 @@ class Replay {
         const std::size_t alloc_size = m_json["payload"]["size"];
 
         compare_ss << allocator_number << " " << alloc_size;
-        m_operation_mgr.bld_allocate(allocator_number, alloc_size);
+        m_operation_mgr.makeAllocate(allocator_number, alloc_size);
       }
       else {
         const std::string memory_str = m_json["result"]["memory_ptr"];
@@ -682,7 +682,7 @@ class Replay {
 
         compare_ss << m_op_seq;
         m_allocation_id[memory_ptr] = m_op_seq;
-        m_operation_mgr.bld_allocate_cont(memory_ptr);
+        m_operation_mgr.makeAllocateCont(memory_ptr);
       }
     }
 
@@ -704,7 +704,7 @@ class Replay {
 
       compare_ss << allocator_number << " " << m_allocation_id[memory_ptr];
 
-      m_operation_mgr.bld_deallocate(allocator_number, memory_ptr);
+      m_operation_mgr.makeDeallocate(allocator_number, memory_ptr);
     }
 
     void replay_coalesce( void )
@@ -713,7 +713,7 @@ class Replay {
       strip_off_base(allocator_name);
 
       compare_ss << allocator_name;
-      m_operation_mgr.bld_coalesce(allocator_name);
+      m_operation_mgr.makeCoalesce(allocator_name);
     }
 
     void replay_release( void )
@@ -729,7 +729,7 @@ class Replay {
 
       const AllocatorIndex& allocator_number = n_iter->second;
       compare_ss << allocator_number;
-      m_operation_mgr.bld_release(allocator_number);
+      m_operation_mgr.makeRelease(allocator_number);
     }
 };
 #endif // REPLAY_Replay_HPP

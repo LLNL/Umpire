@@ -42,7 +42,7 @@ public:
   // AllocationAdvisor
   //
   template <typename... Args>
-  void bld_advisor(
+  void makeAdvisor(
       const bool introspection,
       const std::string& allocator_name,
       const std::string& base_allocator_name,
@@ -76,7 +76,7 @@ public:
   }
 
   template <typename... Args>
-  void bld_advisor(
+  void makeAdvisor(
       const bool introspection,
       const std::string& allocator_name,
       const std::string& base_allocator_name,
@@ -117,7 +117,7 @@ public:
   // FixedPool
   //
   template<typename... Args>
-  void bld_fixedpool(
+  void makeFixedPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -151,7 +151,7 @@ public:
   //
   // DynamicPool
   //
-  void bld_dynamicpool(
+  void makeDynamicPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -199,7 +199,7 @@ public:
     }
   }
 
-  void bld_dynamicpool(
+  void makeDynamicPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -244,7 +244,7 @@ public:
     }
   }
   template <typename... Args>
-  void bld_dynamicpool(
+  void makeDynamicPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -283,7 +283,7 @@ public:
     }
   }
 
-  void bld_monotonic(
+  void makeMonotonicAllocator(
       const bool introspection
     , const std::string& allocator_name
     , const std::size_t capacity
@@ -320,7 +320,7 @@ public:
     }
   }
 
-  void bld_slotpool(
+  void makeSlotPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::size_t slots
@@ -357,7 +357,7 @@ public:
     }
   }
 
-  void bld_limiter(
+  void makeSizeLimiter(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -394,7 +394,7 @@ public:
     }
   }
 
-  void bld_threadsafe(
+  void makeThreadSafeAllocator(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -430,7 +430,7 @@ public:
     }
   }
 
-  void bld_mixedpool(
+  void makeMixedPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -492,7 +492,7 @@ public:
     }
   }
 
-  void bld_mixedpool(
+  void makeMixedPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -552,7 +552,7 @@ public:
   }
 
   template <typename... Args>
-  void bld_mixedpool(
+  void makeMixedPool(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -589,23 +589,23 @@ public:
     }
   }
 
-  void bld_allocator_cont( void )
+  void makeAllocatorCont( void )
   {
   }
 
-  void bld_allocate( int allocator_num, std::size_t size )
+  void makeAllocate( int allocator_num, std::size_t size )
   {
     op = [=]() {
       this->m_allocation_ptr = this->m_alloc_array[allocator_num]->allocate(size);
     };
   }
 
-  void bld_allocate_cont( uint64_t allocation_from_log )
+  void makeAllocateCont( uint64_t allocation_from_log )
   {
     m_alloc_operations[allocation_from_log] = this;
   }
 
-  void bld_deallocate( int allocator_num, uint64_t allocation_from_log )
+  void makeDeallocate( int allocator_num, uint64_t allocation_from_log )
   {
     auto alloc_op = m_alloc_operations[allocation_from_log];
 
@@ -614,7 +614,7 @@ public:
     };
   }
 
-  void bld_coalesce(
+  void makeCoalesce(
     const std::string& allocator_name
   )
   {
@@ -631,7 +631,7 @@ public:
     };
   }
 
-  void bld_release( int allocator_num )
+  void makeRelease( int allocator_num )
   {
     op = [=]() {
       this->m_alloc_array[allocator_num]->release();
@@ -660,7 +660,7 @@ class ReplayOperationManager {
     //
     // AllocationAdvisor
     //
-    void bld_advisor(
+    void makeAdvisor(
         const bool introspection,
         const std::string& allocator_name,
         const std::string& base_allocator_name,
@@ -669,13 +669,13 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_advisor(
+      m_cont_op->makeAdvisor(
           introspection, allocator_name, base_allocator_name,
           advice_operation, device_id);
       operations.push_back(m_cont_op);
     }
 
-    void bld_advisor(
+    void makeAdvisor(
         const bool introspection,
         const std::string& allocator_name,
         const std::string& base_allocator_name,
@@ -685,13 +685,13 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_advisor(
+      m_cont_op->makeAdvisor(
           introspection, allocator_name, base_allocator_name,
           advice_operation, accessing_allocator_name, device_id);
       operations.push_back(m_cont_op);
     }
 
-    void bld_advisor(
+    void makeAdvisor(
         const bool introspection,
         const std::string& allocator_name,
         const std::string& base_allocator_name,
@@ -699,13 +699,13 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_advisor(
+      m_cont_op->makeAdvisor(
           introspection, allocator_name, base_allocator_name,
           advice_operation);
       operations.push_back(m_cont_op);
     }
 
-    void bld_advisor(
+    void makeAdvisor(
         const bool introspection,
         const std::string& allocator_name,
         const std::string& base_allocator_name,
@@ -714,7 +714,7 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_advisor(
+      m_cont_op->makeAdvisor(
           introspection, allocator_name, base_allocator_name,
           advice_operation, accessing_allocator_name);
       operations.push_back(m_cont_op);
@@ -723,7 +723,7 @@ class ReplayOperationManager {
     //
     // FixedPool
     //
-    void bld_fixedpool(
+    void makeFixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -733,7 +733,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_fixedpool(
+      m_cont_op->makeFixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -744,7 +744,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_fixedpool(
+    void makeFixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -753,7 +753,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_fixedpool(
+      m_cont_op->makeFixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -766,7 +766,7 @@ class ReplayOperationManager {
     //
     // Dynamic Pool
     //
-    void bld_dynamicpool(
+    void makeDynamicPool(
           const bool introspection
         , const std::string& allocator_name
         , const std::string& base_allocator_name
@@ -777,7 +777,7 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_dynamicpool(
+      m_cont_op->makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -790,7 +790,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_dynamicpool(
+    void makeDynamicPool(
           const bool introspection
         , const std::string& allocator_name
         , const std::string& base_allocator_name
@@ -800,7 +800,7 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_dynamicpool(
+      m_cont_op->makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -812,7 +812,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_dynamicpool(
+    void makeDynamicPool(
           const bool introspection
         , const std::string& allocator_name
         , const std::string& base_allocator_name
@@ -820,7 +820,7 @@ class ReplayOperationManager {
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_dynamicpool(
+      m_cont_op->makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -830,14 +830,14 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_dynamicpool(
+    void makeDynamicPool(
           const bool introspection
         , const std::string& allocator_name
         , const std::string& base_allocator_name
     ) {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_dynamicpool(
+      m_cont_op->makeDynamicPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -846,7 +846,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_monotonic(
+    void makeMonotonicAllocator(
         const bool introspection
       , const std::string& allocator_name
       , const std::size_t capacity
@@ -855,7 +855,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_monotonic(
+      m_cont_op->makeMonotonicAllocator(
                   introspection
                 , allocator_name
                 , capacity
@@ -865,7 +865,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_slotpool(
+    void makeSlotPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::size_t slots
@@ -874,7 +874,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_slotpool(
+      m_cont_op->makeSlotPool(
                   introspection
                 , allocator_name
                 , slots
@@ -884,7 +884,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_limiter(
+    void makeSizeLimiter(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -893,7 +893,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_limiter(
+      m_cont_op->makeSizeLimiter(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -903,7 +903,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_threadsafe(
+    void makeThreadSafeAllocator(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -911,7 +911,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_threadsafe(
+      m_cont_op->makeThreadSafeAllocator(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -920,7 +920,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -936,7 +936,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -953,7 +953,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -968,7 +968,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -984,7 +984,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -997,7 +997,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -1011,7 +1011,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -1023,7 +1023,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -1036,7 +1036,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -1047,7 +1047,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -1059,7 +1059,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -1069,7 +1069,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -1080,7 +1080,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -1089,7 +1089,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -1099,7 +1099,7 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_mixedpool(
+    void makeMixedPool(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -1107,7 +1107,7 @@ class ReplayOperationManager {
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
 
-      m_cont_op->bld_mixedpool(
+      m_cont_op->makeMixedPool(
                   introspection
                 , allocator_name
                 , base_allocator_name
@@ -1116,44 +1116,44 @@ class ReplayOperationManager {
       operations.push_back(m_cont_op);
     }
 
-    void bld_allocator_cont( void )
+    void makeAllocatorCont( void )
     {
-      m_cont_op->bld_allocator_cont();
+      m_cont_op->makeAllocatorCont();
     }
 
     //
     // Allocate/Deallocate
     //
-    void bld_allocate( int allocator_num, std::size_t size )
+    void makeAllocate( int allocator_num, std::size_t size )
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
-      m_cont_op->bld_allocate(allocator_num, size);
+      m_cont_op->makeAllocate(allocator_num, size);
       operations.push_back(m_cont_op);
     }
 
-    void bld_allocate_cont( uint64_t allocation_from_log )
+    void makeAllocateCont( uint64_t allocation_from_log )
     {
-      m_cont_op->bld_allocate_cont(allocation_from_log);
+      m_cont_op->makeAllocateCont(allocation_from_log);
     }
 
-    void bld_deallocate( int allocator_num, uint64_t allocation_from_log )
+    void makeDeallocate( int allocator_num, uint64_t allocation_from_log )
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
-      m_cont_op->bld_deallocate(allocator_num, allocation_from_log);
+      m_cont_op->makeDeallocate(allocator_num, allocation_from_log);
       operations.push_back(m_cont_op);
     }
 
-    void bld_coalesce( const std::string& allocator_name )
+    void makeCoalesce( const std::string& allocator_name )
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
-      m_cont_op->bld_coalesce(allocator_name);
+      m_cont_op->makeCoalesce(allocator_name);
       operations.push_back(m_cont_op);
     }
 
-    void bld_release( int allocator_num )
+    void makeRelease( int allocator_num )
     {
       m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
-      m_cont_op->bld_release(allocator_num);
+      m_cont_op->makeRelease(allocator_num);
       operations.push_back(m_cont_op);
     }
 
