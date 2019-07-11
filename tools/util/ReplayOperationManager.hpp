@@ -53,24 +53,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            std::forward<Args>(args)...);
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            std::forward<Args>(args)...);
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
   }
@@ -89,26 +91,30 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, rm.getAllocator(accessing_allocator_name), 
-            std::forward<Args>(args)...);
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , advice_operation
+              , rm.getAllocator(accessing_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-          ( allocator_name, rm.getAllocator(base_allocator_name),
-            advice_operation, rm.getAllocator(accessing_allocator_name),
-            std::forward<Args>(args)...);
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , advice_operation
+              , rm.getAllocator(accessing_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
   }
@@ -128,22 +134,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::FixedPool, true>
-          (allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args)...);
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::FixedPool, true>
+            (  allocator_name
+             , rm.getAllocator(base_allocator_name)
+             , std::forward<Args>(args)...
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::FixedPool, false>
-          (allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args)...);
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::FixedPool, false>
+            (  allocator_name
+             , rm.getAllocator(base_allocator_name)
+             , std::forward<Args>(args)...
+            )
+        );
       };
     }
   }
@@ -165,34 +175,32 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , initial_alloc_size
-            , min_alloc_size
-            , umpire::strategy::heuristic_percent_releasable(0)
-            , alignment
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::DynamicPool, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , initial_alloc_size
+              , min_alloc_size
+              , umpire::strategy::heuristic_percent_releasable(0)
+              , alignment
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , initial_alloc_size
-            , min_alloc_size
-            , umpire::strategy::heuristic_percent_releasable(0)
-            , alignment
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::DynamicPool, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , initial_alloc_size
+              , min_alloc_size
+              , umpire::strategy::heuristic_percent_releasable(0)
+              , alignment
+            )
+        );
       };
     }
   }
@@ -210,32 +218,30 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , initial_alloc_size
-            , min_alloc_size
-            , umpire::strategy::heuristic_percent_releasable(0)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::DynamicPool, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , initial_alloc_size
+              , min_alloc_size
+              , umpire::strategy::heuristic_percent_releasable(0)
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , initial_alloc_size
-            , min_alloc_size
-            , umpire::strategy::heuristic_percent_releasable(0)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::DynamicPool, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , initial_alloc_size
+              , min_alloc_size
+              , umpire::strategy::heuristic_percent_releasable(0)
+            )
+        );
       };
     }
   }
@@ -251,28 +257,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args)...
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::DynamicPool, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args)...
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::DynamicPool, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
   }
@@ -288,28 +292,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>
-          (   allocator_name
-            , capacity
-            , rm.getAllocator(base_allocator_name)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>
+            (   allocator_name
+              , capacity
+              , rm.getAllocator(base_allocator_name)
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>
-          (   allocator_name
-            , capacity
-            , rm.getAllocator(base_allocator_name)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>
+            (   allocator_name
+              , capacity
+              , rm.getAllocator(base_allocator_name)
+            )
+        );
       };
     }
   }
@@ -325,28 +327,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::SlotPool, true>
-          (   allocator_name
-            , slots
-            , rm.getAllocator(base_allocator_name)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::SlotPool, true>
+            (   allocator_name
+              , slots
+              , rm.getAllocator(base_allocator_name)
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::SlotPool, false>
-          (   allocator_name
-            , slots
-            , rm.getAllocator(base_allocator_name)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::SlotPool, false>
+            (   allocator_name
+              , slots
+              , rm.getAllocator(base_allocator_name)
+            )
+        );
       };
     }
   }
@@ -362,28 +362,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::SizeLimiter, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , size_limit
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::SizeLimiter, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , size_limit
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::SizeLimiter, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , size_limit
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::SizeLimiter, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , size_limit
+            )
+        );
       };
     }
   }
@@ -398,26 +396,24 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+            )
+        );
       };
     }
   }
@@ -440,44 +436,40 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-            , dynamic_initial_alloc_bytes
-            , dynamic_min_alloc_bytes
-            , umpire::strategy::heuristic_percent_releasable(0)
-            , alignment
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MixedPool, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , smallest_fixed_blocksize
+              , largest_fixed_blocksize
+              , max_fixed_blocksize
+              , size_multiplier
+              , dynamic_initial_alloc_bytes
+              , dynamic_min_alloc_bytes
+              , umpire::strategy::heuristic_percent_releasable(0)
+              , alignment
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-            , dynamic_initial_alloc_bytes
-            , dynamic_min_alloc_bytes
-            , umpire::strategy::heuristic_percent_releasable(0)
-            , alignment
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MixedPool, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , smallest_fixed_blocksize
+              , largest_fixed_blocksize
+              , max_fixed_blocksize
+              , size_multiplier
+              , dynamic_initial_alloc_bytes
+              , dynamic_min_alloc_bytes
+              , umpire::strategy::heuristic_percent_releasable(0)
+              , alignment
+            )
+        );
       };
     }
   }
@@ -499,42 +491,38 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-            , dynamic_initial_alloc_bytes
-            , dynamic_min_alloc_bytes
-            , umpire::strategy::heuristic_percent_releasable(0)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MixedPool, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , smallest_fixed_blocksize
+              , largest_fixed_blocksize
+              , max_fixed_blocksize
+              , size_multiplier
+              , dynamic_initial_alloc_bytes
+              , dynamic_min_alloc_bytes
+              , umpire::strategy::heuristic_percent_releasable(0)
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   
-              allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , smallest_fixed_blocksize
-            , largest_fixed_blocksize
-            , max_fixed_blocksize
-            , size_multiplier
-            , dynamic_initial_alloc_bytes
-            , dynamic_min_alloc_bytes
-            , umpire::strategy::heuristic_percent_releasable(0)
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MixedPool, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , smallest_fixed_blocksize
+              , largest_fixed_blocksize
+              , max_fixed_blocksize
+              , size_multiplier
+              , dynamic_initial_alloc_bytes
+              , dynamic_min_alloc_bytes
+              , umpire::strategy::heuristic_percent_releasable(0)
+            )
+        );
       };
     }
   }
@@ -551,28 +539,26 @@ public:
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MixedPool, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args)...
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MixedPool, true>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
     else {
       op = [=]() {
         auto& rm = umpire::ResourceManager::getInstance();
 
-        rm.makeAllocator<umpire::strategy::MixedPool, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args)...
-          );
-
         this->m_alloc_array.push_back(
-            umpire::Allocator(rm.getAllocator(allocator_name)));
+          rm.makeAllocator<umpire::strategy::MixedPool, false>
+            (   allocator_name
+              , rm.getAllocator(base_allocator_name)
+              , std::forward<Args>(args)...
+            )
+        );
       };
     }
   }
