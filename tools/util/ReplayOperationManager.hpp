@@ -26,7 +26,7 @@ public:
   std::function<void ()> op;
 
   ReplayOperation(
-      std::vector<umpire::Allocator*>& alloc_array,
+      std::vector<umpire::Allocator>& alloc_array,
       AllocationOpMap& alloc_operations
   ) :   m_alloc_array(alloc_array)
       , m_alloc_operations(alloc_operations)
@@ -57,8 +57,8 @@ public:
           ( allocator_name, rm.getAllocator(base_allocator_name),
             std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -69,8 +69,8 @@ public:
           ( allocator_name, rm.getAllocator(base_allocator_name),
             std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -94,8 +94,8 @@ public:
             advice_operation, rm.getAllocator(accessing_allocator_name), 
             std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -107,8 +107,8 @@ public:
             advice_operation, rm.getAllocator(accessing_allocator_name),
             std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -131,8 +131,8 @@ public:
         rm.makeAllocator<umpire::strategy::FixedPool, true>
           (allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -142,8 +142,8 @@ public:
         rm.makeAllocator<umpire::strategy::FixedPool, false>
           (allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args)...);
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -174,9 +174,8 @@ public:
             , alignment
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -192,9 +191,8 @@ public:
             , alignment
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -220,9 +218,8 @@ public:
             , umpire::strategy::heuristic_percent_releasable(0)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -237,9 +234,8 @@ public:
             , umpire::strategy::heuristic_percent_releasable(0)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -261,9 +257,8 @@ public:
             , std::forward<Args>(args)...
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -276,9 +271,8 @@ public:
             , std::forward<Args>(args)...
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -300,8 +294,8 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -314,8 +308,8 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -337,8 +331,8 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -351,8 +345,8 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -374,8 +368,8 @@ public:
             , size_limit
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -388,8 +382,8 @@ public:
             , size_limit
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -409,9 +403,8 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -423,9 +416,8 @@ public:
             , rm.getAllocator(base_allocator_name)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -462,9 +454,8 @@ public:
             , alignment
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -485,9 +476,8 @@ public:
             , alignment
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -522,9 +512,8 @@ public:
             , umpire::strategy::heuristic_percent_releasable(0)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -544,9 +533,8 @@ public:
             , umpire::strategy::heuristic_percent_releasable(0)
           );
 
-        auto allocator = new umpire::Allocator(
-                                rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -569,8 +557,8 @@ public:
             , std::forward<Args>(args)...
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
     else {
@@ -583,8 +571,8 @@ public:
             , std::forward<Args>(args)...
           );
 
-        auto allocator = new umpire::Allocator(rm.getAllocator(allocator_name));
-        this->m_alloc_array.push_back(allocator);
+        this->m_alloc_array.push_back(
+            umpire::Allocator(rm.getAllocator(allocator_name)));
       };
     }
   }
@@ -596,7 +584,7 @@ public:
   void makeAllocate( int allocator_num, std::size_t size )
   {
     op = [=]() {
-      this->m_allocation_ptr = this->m_alloc_array[allocator_num]->allocate(size);
+      this->m_allocation_ptr = this->m_alloc_array[allocator_num].allocate(size);
     };
   }
 
@@ -610,7 +598,7 @@ public:
     auto alloc_op = m_alloc_operations[allocation_from_log];
 
     op = [=]() {
-      this->m_alloc_array[allocator_num]->deallocate(alloc_op->m_allocation_ptr);
+      this->m_alloc_array[allocator_num].deallocate(alloc_op->m_allocation_ptr);
     };
   }
 
@@ -634,12 +622,12 @@ public:
   void makeRelease( int allocator_num )
   {
     op = [=]() {
-      this->m_alloc_array[allocator_num]->release();
+      this->m_alloc_array[allocator_num].release();
     };
   }
 
 private:
-  std::vector<umpire::Allocator*>& m_alloc_array;
+  std::vector<umpire::Allocator>& m_alloc_array;
   AllocationOpMap& m_alloc_operations;
   void* m_allocation_ptr;
 };
@@ -1158,7 +1146,7 @@ class ReplayOperationManager {
     }
 
   private:
-    std::vector<umpire::Allocator*> m_allocator_array;
+    std::vector<umpire::Allocator> m_allocator_array;
     ReplayOperation::AllocationOpMap m_alloc_operations;
     ReplayOperation* m_cont_op;
     std::vector<ReplayOperation*> operations;
