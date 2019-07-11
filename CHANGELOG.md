@@ -43,6 +43,10 @@ and a dynamic pool for those that are larger.
 
 ### Changed
 
+- Replay program refactored to speed up running of the operations being
+  replayed.  New `--time` option added to replay to display operation
+  timing information.
+
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).
 
 - Replay uses JSON format for its I/O.
