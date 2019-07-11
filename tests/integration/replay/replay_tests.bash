@@ -21,8 +21,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-echo $diffprogram $replay_tests_dir/test_output.good umpire.0.*.0.replay
-$diffprogram $replay_tests_dir/test_output.good umpire.0.*.0.replay
+echo $diffprogram $replay_tests_dir/test_output.good umpire.*.0.replay
+$diffprogram $replay_tests_dir/test_output.good umpire.*.0.replay
 if [ $? -ne 0 ]; then
     /bin/rm -f replay.out umpire*replay umpire*log
     echo "Diff failed"
@@ -32,3 +32,4 @@ fi
 
 /bin/rm -f replay.out umpire*replay umpire*log
 exit 0
+

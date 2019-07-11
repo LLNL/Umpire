@@ -33,6 +33,8 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- Added MPI-awareness to output for both logging and replay.
+
 - `DynamicPool` constructor has a new alignment argument.
 
 - Added HIP build to Travis CI.
