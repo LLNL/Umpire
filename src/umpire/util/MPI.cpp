@@ -6,10 +6,11 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/config.hpp"
 
-#include "umpire/util/MPI.hpp" 
-
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
+
+
+#include "umpire/util/MPI.hpp" 
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
@@ -22,6 +23,9 @@ int MPI::s_rank = -1;
 int MPI::s_world_size = -1;
 bool MPI::s_initialized = false;
 int MPI::s_mpi_init_called = 0;
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm MPI::s_communicator = MPI_COMM_NULL;
+#endif
 
 void 
 MPI::initialize(
