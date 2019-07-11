@@ -23,7 +23,7 @@ fi
 #
 # Now replay from the activity captured in the replay_test1.csv file
 #
-$replayprogram -i umpire.0.*.0.replay -t replay.out
+$replayprogram -i umpire.*.0.replay -t replay.out
 if [ $? -ne 0 ]; then
     echo "Failed: Unable to run $replayprogram"
     exit 1
