@@ -14,70 +14,45 @@
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "util/Replay.hpp"
 
-struct CommandLineOptions {
+int main(int argc, char* argv[])
+{
   std::vector<std::string> positional_args;
 
-  cxxopts::ParseResult parse(int argc, char* argv[])
-  {
-    try
-    {
-      cxxopts::Options options(argv[0], 
-        "Compare two replay result files created by Umpire library with UMPIRE_REPLAY=On"
-      );
+  cxxopts::Options options(argv[0], "Compare two replay result files created"
+    " by Umpire library with UMPIRE_REPLAY=On");
+  options
+    .positional_help("replay_file_1 replay_file_2")
+    .show_positional_help();
 
-      options
-        .add_options()
-        (  "h, help"
-         , "Print help"
-        )
-      ;
+  options.add_options()
+    ("h, help", "Print help");
 
-      options.add_options()
-        ("positional_args", "Positional parameters",
-          cxxopts::value<std::vector<std::string>>(positional_args))
-      ;
+  options.add_options()
+    ("positional_args", "Positional parameters",
+        cxxopts::value<std::vector<std::string>>(positional_args));
 
-      std::vector<std::string> pos_names = {"positional_args"};
+  std::vector<std::string> pos_names = {"positional_args"};
 
-      options.parse_positional(pos_names.begin(), pos_names.end());
+  options.parse_positional(pos_names.begin(), pos_names.end());
 
-      auto result = options.parse(argc, argv);
+  auto command_line_args = options.parse(argc, argv);
 
-      if (result.count("help"))
-      {
-        // You can output our default, unnamed group and our HiddenGroup
-        // of help with the following line:
-        //
-        //     std::cout << options.help({"", "HiddenGroup"}) << std::endl;
-        //
-        std::cout << options.help({""}) << std::endl;
-        exit(0);
-      }
-
-      if (positional_args.size() != 2) {
-        std::cout << options.help({""}) << std::endl;
-        exit(1);
-      }
-
-      return result;
-    } catch (const cxxopts::OptionException& e)
-    {
-      std::cout << "error parsing options: " << e.what() << std::endl;
-      exit(1);
-    }
+  if (command_line_args.count("help")) {
+    std::cout << options.help({""}) << std::endl;
+    exit(0);
   }
-};
 
-int main(int ac, char* av[])
-{
-  CommandLineOptions cl_opts;
-  auto result = cl_opts.parse(ac, av);
+  if (positional_args.size() != 2) {
+    std::cout << options.help({""}) << std::endl;
+    exit(1);
+  }
 
-  const std::string& left_filename = cl_opts.positional_args[0];
-  const std::string& right_filename = cl_opts.positional_args[1];
+  const std::string& left_filename = positional_args[0];
+  const std::string& right_filename = positional_args[1];
 
   Replay left(left_filename);
   Replay right(right_filename);
+
   while (1) {
     std::string left_raw, left_sym;
     std::string right_raw, right_sym;
