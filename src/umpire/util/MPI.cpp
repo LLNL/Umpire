@@ -48,12 +48,6 @@ MPI::initialize(
       MPI_Comm_rank(s_communicator, &s_rank);
       MPI_Comm_size(s_communicator, &s_world_size);
       s_initialized = true;
-
-      UMPIRE_LOG(Info, "MPI rank: " << s_rank);
-      UMPIRE_LOG(Info, "MPI comm size: " << s_world_size);
-
-      UMPIRE_REPLAY("\"event\": \"mpi\", \"payload\": { \"rank\":" << s_rank
-          << ", \"size\":" << s_world_size << "}");
     }
 
 #endif
@@ -104,6 +98,20 @@ MPI::sync()
 #endif
   } else {
     UMPIRE_ERROR("Cannot call MPI::sync() before umpire::MPI is initialized");
+  }
+}
+
+void
+MPI::logMpiInfo()
+{
+  if (s_initialized) {
+#if defined(UMPIRE_ENABLE_MPI)
+    UMPIRE_LOG(Info, "MPI rank: " << s_rank);
+    UMPIRE_LOG(Info, "MPI comm size: " << s_world_size);
+
+    UMPIRE_REPLAY("\"event\": \"mpi\", \"payload\": { \"rank\":" << s_rank
+        << ", \"size\":" << s_world_size << "}");
+#endif
   }
 }
 

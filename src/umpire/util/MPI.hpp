@@ -29,6 +29,8 @@ public:
 
   static void sync();
 
+  static void logMpiInfo();
+
   static bool isInitialized();
 private:
   static int s_rank;

@@ -19,8 +19,14 @@ def check_output(name, file_object, expected):
 
     print("{BLUE}[RUN     ]{END} Checking for \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
-    contents = file_object.readline().rstrip()
-    if (contents != expected):
+
+    found = False
+
+    for line in file_object:
+        if (expected in line.rstrip()):
+            found = True
+
+    if (not found):
         print("{RED}[   ERROR]{END} Got {contents}".format(contents=contents, expected=expected, **formatters))
         errors = errors + 1
     else:

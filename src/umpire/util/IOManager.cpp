@@ -164,6 +164,8 @@ IOManager::initialize(
     }
 
     s_initialized = true;
+
+    MPI::logMpiInfo();
   }
 }
 
