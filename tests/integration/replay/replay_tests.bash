@@ -30,6 +30,5 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-pwd
 /bin/rm -f replay.out umpire*replay umpire*log
 exit 0
