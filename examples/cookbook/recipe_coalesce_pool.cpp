@@ -20,14 +20,8 @@ int main(int, char**) {
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "pool", rm.getAllocator("HOST"));
 
-  auto strategy = pool.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
-
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
   if (dynamic_pool) {
     dynamic_pool->coalesce();
