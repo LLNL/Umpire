@@ -9,6 +9,7 @@
 #include "umpire/util/MPI.hpp" 
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/Replay.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
