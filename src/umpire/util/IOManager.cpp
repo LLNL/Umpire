@@ -59,12 +59,12 @@ bool IOManager::s_initialized = false;
 static std::string makeUniqueFilename(
   const std::string& base_dir,
   const std::string& name,
-  int rank,
   int pid,
   const std::string& extension);
 
 static inline bool fileExists(const std::string& file);
 
+static inline bool directoryExists(const std::string& file);
 
 void
 IOManager::setOutputDir(const std::string& dir)
@@ -97,44 +97,51 @@ IOManager::initialize(
       s_file_basename = std::string(base_name);
     }
 
-    auto rank = MPI::getRank();
     int pid{getpid()};
 
-    s_log_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, pid, "log");
-    s_replay_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, pid, "replay");
-    s_error_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, rank, pid, "error");
+    s_log_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, pid, "log");
+    s_replay_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, pid, "replay");
+    s_error_filename = makeUniqueFilename(s_root_io_dir, s_file_basename, pid, "error");
     s_error_filename = "";
 
     log_buffer.setConsoleStream(&std::cout);
     replay_buffer.setConsoleStream(nullptr);
     error_buffer.setConsoleStream(&std::cerr);
 
-    if (rank == 0) {
+    if (!directoryExists(s_root_io_dir)) {
+      if (MPI::isInitialized()) {
+        auto rank = MPI::getRank();
+        if (rank == 0) {
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
-      std::filesystem::path root_io_dir_path(s_root_io_dir);
+          std::filesystem::path root_io_dir_path(s_root_io_dir);
 
-      if (!std::filesystem::exists(root_io_dir_path))
-      {
-        if (enable_log || enable_replay) {
-          std::filesystem::create_directories(root_io_dir_path);
-        }
-      }
-#else
-      struct stat info;
-      if ( stat( s_root_io_dir.c_str(), &info ) )
-      {
-        if (enable_log || enable_replay) {
-          if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
+          if (!std::filesystem::exists(root_io_dir_path))
           {
-            UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
+            if (enable_log || enable_replay) {
+              std::filesystem::create_directories(root_io_dir_path);
+            }
           }
-        }
-      }
-      else if ( !(S_ISDIR(info.st_mode)) )
-      {
-        UMPIRE_ERROR(s_root_io_dir << "exists and is not a directory");
-      }
+#else
+          struct stat info;
+          if ( stat( s_root_io_dir.c_str(), &info ) )
+          {
+            if (enable_log || enable_replay) {
+              if ( mkdir(s_root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) )
+              {
+                UMPIRE_ERROR("mkdir(" << s_root_io_dir << ") failed");
+              }
+            }
+          }
+          else if ( !(S_ISDIR(info.st_mode)) )
+          {
+            UMPIRE_ERROR(s_root_io_dir << "exists and is not a directory");
+          }
 #endif
+        }
+        MPI::sync();
+      }  else {
+        UMPIRE_ERROR("Cannot create output directory before MPI has been initialized. Please unset UMPIRE_IO_DIR in your environment");
+      }
     }
 
     if (enable_log) {
@@ -158,6 +165,8 @@ IOManager::initialize(
     }
 
     s_initialized = true;
+
+    MPI::logMpiInfo();
   }
 }
 
@@ -165,7 +174,6 @@ static std::string
 makeUniqueFilename(
     const std::string& base_dir,
     const std::string& name,
-    int rank,
     int pid,
     const std::string& extension)
 {
@@ -177,7 +185,7 @@ makeUniqueFilename(
     ss.str("");
     ss.clear();
     unique_id++;
-    ss << base_dir << "/" << name << "." << rank << "." << pid << "." << unique_id << "." << extension;
+    ss << base_dir << "/" << name << "." << pid << "." << unique_id << "." << extension;
     filename = ss.str();
   } while (fileExists(filename));
 
@@ -188,6 +196,21 @@ static inline bool fileExists(const std::string& path)
 {
   std::ifstream ifile(path.c_str());
   return ifile.good();
+}
+
+static inline bool directoryExists(const std::string& path)
+{
+#if defined(UMPIRE_ENABLE_FILESYSTEM)
+  std::filesystem::path fspath_path(path);
+  return std::filesystem::exists(fspath_path);
+#else
+  struct stat info;
+  if ( stat( path.c_str(), &info) ) {
+    return false;
+  } else {
+    return S_ISDIR(info.st_mode);
+  }
+#endif
 }
 
 } // end of namespace util
