@@ -217,6 +217,10 @@ class Replay {
 
           if (device_id >= 0) { // Optional device ID specified
             switch ( numargs ) {
+            default:
+              std::cerr << "Invalid number of arguments (" << numargs
+                << " for " << type << " operation.  Stopping" << std::endl;
+              exit(1);
             case 3:
               compare_ss << introspection 
                 << " " << allocator_name 
@@ -242,14 +246,14 @@ class Replay {
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, accessing_allocator_name, device_id);
               break;
-            default:
-              std::cerr << "Invalid number of arguments (" << numargs
-                << " for " << type << " operation.  Stopping" << std::endl;
-              exit(1);
             }
           }
           else { // Use default device_id
             switch ( numargs ) {
+            default:
+              std::cerr << "Invalid number of arguments (" << numargs
+                << " for " << type << " operation.  Stopping" << std::endl;
+              exit(1);
             case 2:
               compare_ss << introspection 
                 << " " << allocator_name 
@@ -273,10 +277,6 @@ class Replay {
                   introspection, allocator_name, base_allocator_name,
                   advice_operation, accessing_allocator_name);
               break;
-            default:
-              std::cerr << "Invalid number of arguments (" << numargs
-                << " for " << type << " operation.  Stopping" << std::endl;
-              exit(1);
             }
           }
         }
