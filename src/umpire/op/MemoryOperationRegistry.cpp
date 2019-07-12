@@ -163,6 +163,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
 #endif
+#endif
 
 #if defined(UMPIRE_ENABLE_HCC)
   registerOperation(
@@ -216,8 +217,6 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
-#endif
-
 #endif
 }
 
