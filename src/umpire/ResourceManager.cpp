@@ -154,7 +154,8 @@ ResourceManager::initialize()
 
   UMPIRE_LOG(Debug, "Umpire v" << UMPIRE_VERSION_MAJOR << "." <<
       UMPIRE_VERSION_MINOR << "." <<
-      UMPIRE_VERSION_PATCH);
+      UMPIRE_VERSION_PATCH << "." << 
+      UMPIRE_VERSION_RC);
 
   UMPIRE_REPLAY( "\"event\": \"version\", \"payload\": { \"major\":" << UMPIRE_VERSION_MAJOR
       << ", \"minor\":" << UMPIRE_VERSION_MINOR
