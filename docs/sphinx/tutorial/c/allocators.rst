@@ -14,12 +14,12 @@ As with the native C++ interface, all allocators are accessed via the
 ``umpire_resourcemanager`` type. To get an ``umpire_allocator``:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_allocator.c
-                    :lines: 22-26
+                    :lines: 14-18
 
 Once you have an ``umpire_allocator``, you can use it to allocate and
 deallocate memory:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_allocator.c
-                    :lines: 28-32
+                    :lines: 20-24
 
 In the next section, we will see how to allocate memory in different places.

@@ -13,12 +13,12 @@ All :class:`umpire::Allocator` s are created and managed by Umpire's
 :class:`umpire::ResourceManager`. To get an Allocator, you need to ask for one: 
 
 .. literalinclude:: ../../../examples/tutorial/tut_allocator.cpp
-                    :lines: 22-24
+                    :lines: 14-16
 
 Once you have an :class:`umpire::Allocator` you can use it to allocate and deallocate memory:
 
 .. literalinclude:: ../../../examples/tutorial/tut_allocator.cpp
-                    :lines: 26-32
+                    :lines: 18-24
 
 In the next section, we will see how to allocate memory using different
 resources.

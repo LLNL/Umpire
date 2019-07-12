@@ -28,19 +28,11 @@ and you can get them using the same
 example:
 
 .. literalinclude:: ../../../examples/tutorial/tut_resources.cpp
-                    :lines: 22-24
+                    :lines: 16
 
 Note that every allocator supports the same calls, no matter which resource it
 is for, this means we can run the same code for all the resources available in
-the system:
-
-.. literalinclude:: ../../../examples/tutorial/tut_resources.cpp 
-                    :lines: 18-35
-
-As you can see, we can call this function with any valid resource name:
-
-.. literalinclude:: ../../../examples/tutorial/tut_resources.cpp 
-                    :lines: 38-44
+the system.
 
 In the next example, we will learn how to move data between resources using
 operations.

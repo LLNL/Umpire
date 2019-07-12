@@ -18,14 +18,14 @@ introspection, you pass a boolean as the second template parameter to the
 :func:`umpire::ResourceManager::makeAllocator` method:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_no_introspection.cpp
-                    :lines: 32-34
+                    :lines: 24-26
 
 Remember that disabling introspection will stop tracking the size of
 allocations made from the pool, so the
 :func:`umpire::Allocator::getCurrentSize` method will return 0:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_no_introspection.cpp
-                    :lines: 39
+                    :lines: 31
 
 
 The complete example is included below:
