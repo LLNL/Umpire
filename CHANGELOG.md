@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [1.0.0] - 2019-07-12
+
+### Added
+
 - CI builds for Mac, Linux and Windows via Azure Pipelines
 
 - HCC stage in Docker file.

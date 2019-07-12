@@ -89,6 +89,12 @@ int get_patch_version()
   return UMPIRE_VERSION_PATCH;
 }
 
+inline
+std::string get_rc_version()
+{
+  return UMPIRE_VERSION_RC;
+}
+
 /*!
  * \brief Print the allocations from a specific allocator in a
  * human-readable format.

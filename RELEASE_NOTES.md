@@ -1,4 +1,4 @@
-# Unreleased
+# v1.0.0
 
 - Umpire is MPI-aware (outputs rank information to logs and replays) when
   configured with the option ENABLE_MPI=On
