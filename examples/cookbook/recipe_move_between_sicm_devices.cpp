@@ -20,9 +20,7 @@
 #include "umpire/util/numa.hpp"
 #include "umpire/util/Macros.hpp"
 
-extern "C" {
 #include "sicm_low.h"
-}
 
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
