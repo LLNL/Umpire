@@ -41,6 +41,9 @@ and a dynamic pool for those that are larger.
 
 - Support for tracked 0-byte allocations across all memory types.
 
+- RELEASE_NOTES file detailing the subset of changes that will impact users the
+  most.
+
 ### Changed
 
 - Replay program refactored to speed up running of the operations being
