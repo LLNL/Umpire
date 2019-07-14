@@ -19,15 +19,6 @@ public:
 
   static void finalize();
 
-  static std::string makeUniqueFilename(
-      const std::string& base_dir,
-      const std::string& name, 
-      int rank,
-      int pid,
-      const std::string& extension);
-
-  static bool fileExists(const std::string& file);
-
   static void setOutputDir(const std::string& dir);
 private:
   static std::string s_root_io_dir;
@@ -41,7 +32,7 @@ private:
   static std::ofstream* s_replay_ofstream;
 
   static bool s_initialized;
-  
+
 };
 
 } /* namespace util */

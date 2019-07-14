@@ -40,10 +40,10 @@ class MixedPool :
       std::size_t largest_fixed_blocksize = (1 << 17), // 1024K
       std::size_t max_fixed_pool_size = 1024*1024 * 2, // 2MB
       std::size_t size_multiplier = 10,                // 10x over previous size
-      std::size_t dynamic_min_initial_alloc_size = (512 * 1024 * 1024),
-      std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
-      DynamicPool::Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)
-      ) noexcept;
+      const std::size_t dynamic_min_initial_alloc_size = (512 * 1024 * 1024),
+      const std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
+      DynamicPool::CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100),
+      const int dynamic_align_bytes = 16) noexcept;
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;

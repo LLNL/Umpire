@@ -35,7 +35,7 @@ int main(int, char**)
    *  getAllocator function.
    */
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_simpool", rm.getAllocator("HOST"));
+      "host_dynamic_pool", rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));

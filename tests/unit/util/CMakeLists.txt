@@ -39,7 +39,7 @@ blt_add_test(
 blt_add_executable(
   NAME memory_map_tests
   SOURCES memory_map_tests.cpp
-  DEPENDS_ON umpire_util umpire_tpl_judy gtest
+  DEPENDS_ON umpire gtest
   OUTPUT_DIR ${util_dir})
 
 blt_add_test(

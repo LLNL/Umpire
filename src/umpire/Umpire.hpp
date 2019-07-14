@@ -22,6 +22,27 @@
 
 namespace umpire {
 
+inline void initialize(
+#if defined(UMPIRE_ENABLE_MPI)
+    MPI_Comm umpire_communicator
+#endif
+)
+{
+  static bool initialized = false;
+
+  if (!initialized) {
+#if defined(UMPIRE_ENABLE_MPI)
+    util::MPI::initialize(umpire_communicator);
+#else
+    util::MPI::initialize();
+#endif
+
+    initialized = true;
+  }
+}
+
+void finalize();
+
 /*!
  * \brief Allocate memory in the default space, with the default allocator.
  *

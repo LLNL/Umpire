@@ -35,7 +35,22 @@ and a dynamic pool for those that are larger.
 
 - Added a new IOManager that stores logging and replay output to files.
 
+- Added MPI-awareness to output for both logging and replay.
+
+- `DynamicPool` constructor has a new alignment argument.
+
+- Added HIP build to Travis CI.
+
+- Support for tracked 0-byte allocations across all memory types.
+
+- RELEASE_NOTES file detailing the subset of changes that will impact users the
+  most.
+
 ### Changed
+
+- Replay program refactored to speed up running of the operations being
+  replayed.  New `--time` option added to replay to display operation
+  timing information.
 
 - Builds are no longer building tools by default (ENABLE_TOOLS=Off).
 
@@ -68,9 +83,13 @@ and a dynamic pool for those that are larger.
 
 - Option ENABLE_WARNINGS_AS_ERRORS now turned off by default.
 
+- `DynamicPool` uses maps underneath for improved performance.
+
 - Add PID to filenames for log and replay output.
 
 - Switch to SPDX licensing.
+
+- Cleaned allocator benchmark code and now use random sizes for DynamicPools.
 
 ### Removed
 
@@ -88,7 +107,8 @@ and a dynamic pool for those that are larger.
 - Fixed bug in monotonic pool allocator causing it to always return
   the same allocation.
 
-- Enabled pedantic compiler warnings and fixed errors.
+- Enabled pedantic compiler warnings and fixed errors for GNU, CLANG, INTEL,
+  XL, and MSVC compilers.
 
 - YAML file for ReadTheDocs to read in that will cause it to use
   Python 3.7 so that it quits producing build failures when it receives
@@ -115,6 +135,10 @@ and a dynamic pool for those that are larger.
 - Fix error where the MemoryMap.inl was not installed.
 
 - Replay and logging files only created when logging/replay are enabled.
+
+- 2019-07-09: Build error with NUMA.
+
+- Issues relating to static initialization of Logger.
 
 ## [0.3.5] - 2019-06-11
 

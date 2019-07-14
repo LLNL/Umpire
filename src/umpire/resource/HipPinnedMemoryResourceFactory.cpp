@@ -10,6 +10,8 @@
 
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 
+#include "umpire/util/make_unique.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -24,7 +26,7 @@ HipPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name
   }
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 HipPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -36,7 +38,7 @@ HipPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return new resource::DefaultMemoryResource<alloc::HipPinnedAllocator>(Platform::hip, "PINNED", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::HipPinnedAllocator>>(Platform::hip, "PINNED", id, traits);
 }
 
 } // end of namespace resource

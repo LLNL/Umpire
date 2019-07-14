@@ -22,6 +22,10 @@
 
 namespace umpire {
 
+namespace strategy {
+  class ZeroByteHandler;
+}
+
 /*!
  * \brief
  */
@@ -241,6 +245,8 @@ class ResourceManager {
 
     std::string getAllocatorInformation() const noexcept;
 
+    strategy::AllocationStrategy* getZeroByteAllocator();
+
     util::AllocationMap m_allocations;
 
     std::list<std::unique_ptr<strategy::AllocationStrategy> > m_allocators;
@@ -255,12 +261,16 @@ class ResourceManager {
 
     std::mutex m_mutex;
 
+    static const std::string s_null_resource_name;
+    static const std::string s_zero_byte_pool_name;
+
     // Methods that need access to m_allocations to print/filter records
     friend void print_allocator_records(Allocator, std::ostream&);
     friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
+    friend strategy::ZeroByteHandler;
 };
 
-} // end of namespace umpire
+} // end namespace umpire
 
 #include "umpire/ResourceManager.inl"
 

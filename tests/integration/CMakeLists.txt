@@ -126,7 +126,9 @@ blt_add_test(
 #   NAME memory_resource_traits_tests
 #   COMMAND memory_resource_traits_tests)
 
-add_subdirectory(replay)
+if (ENABLE_TOOLS)
+  add_subdirectory(replay)
+endif()
 
 if (ENABLE_C OR ENABLE_FORTRAN)
   add_subdirectory(interface)
