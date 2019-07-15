@@ -235,10 +235,6 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
 
-#if defined(UMPIRE_ENABLE_SICM)
-  m_memory_resources[resource::SICM] = registry.makeMemoryResource("SICM", getNextId());
-#endif
-
 #if defined(UMPIRE_ENABLE_CUDA)
   int count;
   auto error = ::cudaGetDeviceCount(&count);
