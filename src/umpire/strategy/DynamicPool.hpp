@@ -118,18 +118,36 @@ class DynamicPool : public AllocationStrategy
     using AddressMap = util::MemoryMap<SizeTuple>;
     using SizeMap = std::multimap<std::size_t, AddressTuple>;
 
-    // Insert a block to the used map
-    void insertUsed(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
+    /*!
+     * \brief Insert a block to the used map.
+     */
+    void insertUsed(Pointer addr, std::size_t bytes, bool is_head,
+                    std::size_t whole_bytes);
 
-    // Insert a block to the free map
-    void insertFree(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
+    /*!
+     * \brief Insert a block to the free map.
+     */
+    void insertFree(Pointer addr, std::size_t bytes, bool is_head,
+                    std::size_t whole_bytes);
 
-    // find a free block with length <= bytes as close to bytes in length as
-    // possible.
+    /*!
+     * \brief Find a free block with (length <= bytes) as close to bytes in
+     * length as possible.
+     */
     SizeMap::const_iterator findFreeBlock(std::size_t bytes) const;
 
-    void doCoalesce();
-    std::size_t doRelease();
+    /*!
+     * \brief Merge all contiguous blocks in m_free_map.
+     *
+     * NOTE This method is rather expensive, but critical to avoid pool growth
+     */
+    void mergeFreeBlocks();
+
+    /*!
+     * \brief Release blocks from m_free_map that have is_head = true and return
+     * the amount of memory released.
+     */
+    std::size_t releaseFreeBlocks();
 
     strategy::AllocationStrategy* m_allocator;
     const std::size_t m_min_alloc_bytes;
