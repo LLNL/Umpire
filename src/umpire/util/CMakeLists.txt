@@ -9,7 +9,7 @@ set (umpire_util_headers
   AllocationRecord.hpp
   Exception.hpp
   FixedMallocPool.hpp
-  IOManager.hpp
+  io.hpp
   Logger.hpp
   MPI.hpp
   Macros.hpp
@@ -41,7 +41,7 @@ set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
   FixedMallocPool.cpp
-  IOManager.cpp
+  io.cpp
   Logger.cpp
   MPI.cpp
   OutputBuffer.cpp

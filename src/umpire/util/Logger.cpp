@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/util/Logger.hpp"
-#include "umpire/util/IOManager.hpp"
+#include "umpire/util/io.hpp"
 
 #include <cstdlib>    // for getenv()
 #include <cctype>     // for std::toupper
