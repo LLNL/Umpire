@@ -82,7 +82,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
     if (MPI::isInitialized()) {
       if (MPI::getRank() == 0) {
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
-        std::filesystem::path root_io_dir_path{s_root_io_dir};
+        std::filesystem::path root_io_dir_path{root_io_dir};
 
         if (!std::filesystem::exists(root_io_dir_path) &&
             (enable_log || enable_replay)) {
