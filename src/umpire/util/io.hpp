@@ -21,7 +21,7 @@ namespace util {
 
 /*!
  * \brief Initialize the streams. This method is called when ResourceManger is
- * initialized. Do not call this as a user.
+ * initialized. Do not call this manually.
  */
 void initialize_io(const bool enable_log, const bool enable_replay);
 
