@@ -20,8 +20,8 @@ extern std::ostream error;
 namespace util {
 
 /*!
- * \brief Initialize the streams. This method is called when ResourceManger is initialized.
- * Do not call this as a user.
+ * \brief Initialize the streams. This method is called when ResourceManger is
+ * initialized. Do not call this as a user.
  */
 void initialize_io(const bool enable_log, const bool enable_replay);
 
