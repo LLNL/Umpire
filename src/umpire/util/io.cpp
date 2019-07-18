@@ -33,13 +33,9 @@
 
 namespace umpire {
 
-static util::OutputBuffer s_log_buffer;
-static util::OutputBuffer s_replay_buffer;
-static util::OutputBuffer s_error_buffer;
-
-std::ostream log{&s_log_buffer};
-std::ostream replay{&s_replay_buffer};
-std::ostream error{&s_error_buffer};
+std::ostream log{std::cout.rdbuf()};
+std::ostream replay{nullptr};
+std::ostream error{std::cerr.rdbuf()};
 
 namespace util {
 
@@ -55,9 +51,17 @@ static inline bool directory_exists(const std::string& file);
 
 void initialize_io(const bool enable_log, const bool enable_replay)
 {
+  static util::OutputBuffer s_log_buffer;
+  static util::OutputBuffer s_replay_buffer;
+  static util::OutputBuffer s_error_buffer;
+
   s_log_buffer.setConsoleStream(&std::cout);
   s_replay_buffer.setConsoleStream(nullptr);
   s_error_buffer.setConsoleStream(&std::cerr);
+
+  log.rdbuf(&s_log_buffer);
+  replay.rdbuf(&s_replay_buffer);
+  error.rdbuf(&s_error_buffer);
 
   std::string root_io_dir{"./"};
   const char* output_dir{std::getenv("UMPIRE_OUTPUT_DIR")};

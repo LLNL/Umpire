@@ -25,7 +25,6 @@ namespace util {
  */
 void initialize_io(const bool enable_log, const bool enable_replay);
 
-
 } // end namespace util
 } // end namespace umpire
 
