@@ -11,7 +11,6 @@
 #include "umpire/util/OutputBuffer.hpp"
 
 #include <string>
-#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <ostream>
@@ -44,15 +43,15 @@ std::ostream error{&s_error_buffer};
 
 namespace util {
 
-static std::string makeUniqueFilename(
+static std::string make_unique_filename(
   const std::string& base_dir,
   const std::string& name,
   const int pid,
   const std::string& extension);
 
-static inline bool fileExists(const std::string& file);
+static inline bool file_exists(const std::string& file);
 
-static inline bool directoryExists(const std::string& file);
+static inline bool directory_exists(const std::string& file);
 
 void initialize_io(const bool enable_log, const bool enable_replay)
 {
@@ -71,15 +70,15 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   const int pid{getpid()};
 
   const std::string log_filename{
-    makeUniqueFilename(root_io_dir, file_basename, pid, "log")};
+    make_unique_filename(root_io_dir, file_basename, pid, "log")};
 
   const std::string replay_filename{
-    makeUniqueFilename(root_io_dir, file_basename, pid, "replay")};
+    make_unique_filename(root_io_dir, file_basename, pid, "replay")};
 
   const std::string error_filename{
-    makeUniqueFilename(root_io_dir, file_basename, pid, "error")};
+    make_unique_filename(root_io_dir, file_basename, pid, "error")};
 
-  if (!directoryExists(root_io_dir)) {
+  if (!directory_exists(root_io_dir)) {
     if (MPI::isInitialized()) {
       if (MPI::getRank() == 0) {
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
@@ -138,34 +137,32 @@ void initialize_io(const bool enable_log, const bool enable_replay)
 
 
 static std::string
-makeUniqueFilename(
+make_unique_filename(
     const std::string& base_dir,
     const std::string& name,
     const int pid,
     const std::string& extension)
 {
-  int unique_id = -1;
-  std::stringstream ss;
+  int unique_id{0};
   std::string filename;
 
   do {
-    ss.str("");
-    ss.clear();
-    unique_id++;
-    ss << base_dir << "/" << name << "." << pid << "." << unique_id << "." << extension;
-    filename = ss.str();
-  } while (fileExists(filename));
+    filename = base_dir + "/" + name +
+      "." + std::to_string(pid) +
+      "." + std::to_string(unique_id++) +
+      "." + extension;
+  } while (file_exists(filename));
 
   return filename;
 }
 
-static inline bool fileExists(const std::string& path)
+static inline bool file_exists(const std::string& path)
 {
   std::ifstream ifile(path.c_str());
   return ifile.good();
 }
 
-static inline bool directoryExists(const std::string& path)
+static inline bool directory_exists(const std::string& path)
 {
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
   std::filesystem::path fspath_path(path);

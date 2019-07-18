@@ -11,6 +11,12 @@
 #include <ostream>
 
 namespace umpire {
+
+// Output streams
+extern std::ostream log;
+extern std::ostream replay;
+extern std::ostream error;
+
 namespace util {
 
 /*!
@@ -19,12 +25,8 @@ namespace util {
  */
 void initialize_io(const bool enable_log, const bool enable_replay);
 
+
 } // end namespace util
-
-extern std::ostream log;
-extern std::ostream replay;
-extern std::ostream error;
-
 } // end namespace umpire
 
 #endif // UMPIRE_IOManager_HPP
