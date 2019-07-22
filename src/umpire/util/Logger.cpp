@@ -64,7 +64,7 @@ void Logger::logMessage( message::Level level,
 {
   if (!logLevelEnabled(level)) return;
 
-  umpire::log
+  umpire::log()
     << "[" << MessageLevelName[level] << "]"
     << "[" << fileName  << ":" << line << "]:"
     << message

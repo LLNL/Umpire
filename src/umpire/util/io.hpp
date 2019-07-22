@@ -13,9 +13,9 @@
 namespace umpire {
 
 // Output streams
-extern std::ostream log;
-extern std::ostream replay;
-extern std::ostream error;
+std::ostream& log();
+std::ostream& replay();
+std::ostream& error();
 
 namespace util {
 

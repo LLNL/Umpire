@@ -53,9 +53,9 @@ int main(int argc, char** argv) {
 
   umpire::util::initialize_io(enable_logging, enable_replay);
 
-  umpire::log << "testing log stream" << std::endl;
-  umpire::replay << "testing replay stream" << std::endl;
-  umpire::error << "testing error stream" << std::endl;
+  umpire::log() << "testing log stream" << std::endl;
+  umpire::replay() << "testing replay stream" << std::endl;
+  umpire::error() << "testing error stream" << std::endl;
 
 #if defined(UMPIRE_ENABLE_MPI)
   MPI_Finalize();
