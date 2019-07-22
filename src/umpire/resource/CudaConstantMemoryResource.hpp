@@ -13,8 +13,7 @@
 #include "umpire/util/Platform.hpp"
 
 #include <cuda_runtime_api.h>
-
-__constant__ char umpire_internal_device_constant_memory[64*1024];
+#include <mutex>
 
 namespace umpire {
 namespace resource {
@@ -42,6 +41,8 @@ class CudaConstantMemoryResource :
 
     std::size_t m_offset;
     void* m_ptr;
+
+    std::mutex m_mutex;
 };
 
 } // end of namespace resource

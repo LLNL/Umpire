@@ -21,6 +21,8 @@
 #include <memory>
 #include <sstream>
 
+__constant__ static char s_umpire_internal_device_constant_memory[64*1024];
+
 namespace umpire {
 namespace resource {
 
@@ -32,7 +34,7 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
   m_offset(0),
   m_ptr(nullptr)
 {
-  cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, umpire_internal_device_constant_memory);
+  cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, s_umpire_internal_device_constant_memory);
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR("cudaGetSymbolAddress failed with error: " << cudaGetErrorString(error));
@@ -41,6 +43,8 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
 
 void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;
 
@@ -64,6 +68,8 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 
 void CudaConstantMemoryResource::deallocate(void* ptr)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);

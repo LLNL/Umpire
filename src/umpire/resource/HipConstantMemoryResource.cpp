@@ -13,6 +13,8 @@
 #include <memory>
 #include <sstream>
 
+__constant__ static char s_umpire_internal_device_constant_memory[64*1024];
+
 namespace umpire {
 namespace resource {
 
@@ -22,11 +24,13 @@ HipConstantMemoryResource::HipConstantMemoryResource(const std::string& name, in
   m_highwatermark(0l),
   m_platform(Platform::hip),
   m_offset(0),
-  m_ptr(umpire_internal_device_constant_memory){}
+  m_ptr(s_umpire_internal_device_constant_memory) {}
 
 
 void* HipConstantMemoryResource::allocate(std::size_t bytes)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;
 
@@ -50,6 +54,8 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
 
 void HipConstantMemoryResource::deallocate(void* ptr)
 {
+  std::lock_guard<std::mutex> lock(m_mutex);
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
