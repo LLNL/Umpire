@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/config.hpp"
+#include "umpire/util/io.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/OutputBuffer.hpp"
@@ -33,9 +34,23 @@
 
 namespace umpire {
 
-std::ostream log{std::cout.rdbuf()};
-std::ostream replay{nullptr};
-std::ostream error{std::cerr.rdbuf()};
+std::ostream& log()
+{
+  static std::ostream out{std::cout.rdbuf()};
+  return out;
+}
+
+std::ostream& replay()
+{
+  static std::ostream out{nullptr};
+  return out;
+}
+
+std::ostream& error()
+{
+  static std::ostream out{std::cerr.rdbuf()};
+  return out;
+}
 
 namespace util {
 
@@ -59,9 +74,9 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   s_replay_buffer.setConsoleStream(nullptr);
   s_error_buffer.setConsoleStream(&std::cerr);
 
-  log.rdbuf(&s_log_buffer);
-  replay.rdbuf(&s_replay_buffer);
-  error.rdbuf(&s_error_buffer);
+  log().rdbuf(&s_log_buffer);
+  replay().rdbuf(&s_replay_buffer);
+  error().rdbuf(&s_error_buffer);
 
   std::string root_io_dir{"./"};
   const char* output_dir{std::getenv("UMPIRE_OUTPUT_DIR")};

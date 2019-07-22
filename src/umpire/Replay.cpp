@@ -43,7 +43,7 @@ void Replay::logMessage( const std::string& message )
   if ( !replayEnabled )
     return;   /* short-circuit */
 
-  umpire::replay << message;
+  umpire::replay() << message;
 }
 
 bool Replay::replayLoggingEnabled()
