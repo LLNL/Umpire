@@ -111,6 +111,16 @@ blt_add_test(
   NAME free_functions_integration_tests
   COMMAND free_functions_integration_tests)
 
+blt_add_executable(
+  NAME static_initialization_test
+  SOURCES static_initialization_test.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${integration_dir})
+
+blt_add_test(
+  NAME static_initialization_test
+  COMMAND static_initialization_test)
+
 # blt_add_executable(
 #   NAME memory_resource_traits_tests
 #   SOURCES memory_resource_traits_tests.cpp
