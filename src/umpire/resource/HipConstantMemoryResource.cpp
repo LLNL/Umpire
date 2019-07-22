@@ -30,7 +30,7 @@ HipConstantMemoryResource::HipConstantMemoryResource(const std::string& name, in
 
 void* HipConstantMemoryResource::allocate(std::size_t bytes)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock{m_mutex};
 
   char* ptr{static_cast<char*>(m_ptr) + m_offset};
   m_offset += bytes;
@@ -55,7 +55,7 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
 
 void HipConstantMemoryResource::deallocate(void* ptr)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock{m_mutex};
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 

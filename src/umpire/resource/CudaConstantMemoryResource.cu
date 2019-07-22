@@ -39,7 +39,7 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
 
 void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock{m_mutex};
 
   if (!m_initialized) {
     cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, s_umpire_internal_device_constant_memory);
@@ -74,7 +74,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 
 void CudaConstantMemoryResource::deallocate(void* ptr)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
+  std::lock_guard<std::mutex> lock{m_mutex};
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
