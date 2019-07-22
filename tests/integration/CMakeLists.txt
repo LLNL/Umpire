@@ -116,7 +116,7 @@ set(static_initialization_test_depends umpire)
 if (ENABLE_HIP)
   set (static_initialization_test_depends
       ${static_initialization_test_depends}
-      hip)
+      hip_runtime)
 endif()
 
 blt_add_executable(
