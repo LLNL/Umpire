@@ -599,6 +599,12 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
   return dst_ptr;
 }
 
+#if defined(UMPIRE_ENABLE_SICM)
+static strategy::SICMStrategy* cast_as_sicm_strategy(Allocator& allocator) {
+  return util::unwrap_allocator<strategy::SICMStrategy>(allocator);
+}
+#endif
+
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
@@ -614,7 +620,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
 #if defined(UMPIRE_ENABLE_SICM)
   {
     // short circuit if allocator is SICM
-    auto sicm_alloc = static_cast<strategy::SICMStrategy *>(allocator.m_allocator);
+    auto sicm_alloc = cast_as_sicm_strategy(allocator);
 
     if (sicm_alloc) {
       auto& op_registry = op::MemoryOperationRegistry::getInstance();

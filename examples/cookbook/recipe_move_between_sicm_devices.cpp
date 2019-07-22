@@ -48,8 +48,8 @@ int main(int, char**) {
   // Create another allocation on that device
   void* src_ptr2 = sicm_src_alloc.allocate(alloc_size);
 
-  if ((devs.count / 3) > 1) {                    // want at least 2 NUMA nodes
-    const unsigned int dst_dev = devs.count - 3; // destination page size must be the same, so pick device + offset 0 on the NUMA node
+  if ((devs.count / 3) > 1) {       // want at least 2 NUMA nodes
+    const unsigned int dst_dev = 3; // destination page size must be the same, so pick device + offset 0 on the NUMA node
     const int dst_node = devs.devices[dst_dev]->node;
 
     sicm_device_list dst_list;

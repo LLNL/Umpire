@@ -18,11 +18,22 @@
 #include <vector>
 
 std::ostream& operator<<(std::ostream& stream, const sicm_device_list& device_list) {
+  static const std::string units[] = {"K", "M", "G", "T"};
+
   stream << device_list.count << " SICM devices:";
   for(unsigned int i = 0; i < device_list.count; i++) {
+    std::size_t unit = 0;
+    std::size_t page_size = device_list.devices[i]->page_size;
+
+    while (page_size >= 1024) {
+      page_size >>= 10;
+      unit++;
+    }
+
     stream << " {"
            << sicm_device_tag_str(device_list.devices[i]->tag) << ", "
-           << device_list.devices[i]->node
+           << device_list.devices[i]->node << ", "
+           << page_size << units[unit] << "B"
            << "}";
   }
 
@@ -39,11 +50,11 @@ std::shared_ptr<sicm_device_list> get_devices(const struct sicm_device_list& dev
     case umpire::Platform::cpu:
       for(unsigned int i = 0; i < devs.count; i++) {
         if ((devs.devices[i]->tag == SICM_DRAM) &&
-            (devs.devices[i]->data.dram.page_size == page_size)) {
+            (devs.devices[i]->page_size == page_size)) {
           indicies.push_back(i);
         }
         else if ((devs.devices[i]->tag == SICM_KNL_HBM) &&
-                 (devs.devices[i]->data.knl_hbm.page_size == page_size)) {
+                 (devs.devices[i]->page_size == page_size)) {
           indicies.push_back(i);
         }
       }
@@ -52,7 +63,7 @@ std::shared_ptr<sicm_device_list> get_devices(const struct sicm_device_list& dev
     case umpire::Platform::cuda:
       for(unsigned int i = 0; i < devs.count; i++) {
         if ((devs.devices[i]->tag == SICM_POWERPC_HBM) &&
-            (devs.devices[i]->data.powerpc_hbm.page_size == page_size)) {
+            (devs.devices[i]->page_size == page_size)) {
           indicies.push_back(i);
         }
       }

@@ -35,10 +35,7 @@ void SICMMoveOperation::transform(
     util::AllocationRecord *dst_allocation,
     size_t length)
 {
-  auto dst_allocator =
-      static_cast<strategy::SICMStrategy *>(
-          static_cast<strategy::AllocationStrategy*>(
-              static_cast<strategy::AllocationTracker *>(dst_allocation->strategy)->getAllocationStrategy()));
+  auto dst_allocator = static_cast<strategy::SICMStrategy *>(dst_allocation->strategy);
   const sicm_arena sa = sicm_arena_lookup(src_ptr);
   sicm_device_list dst_devices = sicm_arena_get_devices(dst_allocator->getArena());
   const int rc = sicm_arena_set_devices(sa, &dst_devices);
