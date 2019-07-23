@@ -42,7 +42,7 @@ echo "Testing..."
 if [[ $HOSTNAME == *manta* ]]; then
   bsub -x -n 1 -G guests -Ip ctest --output-on-failure -T Test
 elif [[ $HOSTNAME == *ansel* ]]; then
-  bsub -nnodes 1 -core_isolation 2 -alloc_flags smt1 cpublink autonumaoff -Is -XF -W 10 -q pdebug lrun -1 ctest --output-on-failure -T Test
+  lalloc 1 lrun -n 1 ctest --output-on-failure -T Test
 else
   srun -ppdebug -t 5 -N 1 ctest --output-on-failure -T Test
 fi
