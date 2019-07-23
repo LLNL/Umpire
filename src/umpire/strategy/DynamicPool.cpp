@@ -51,23 +51,13 @@ DynamicPool::~DynamicPool()
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
 
-  // Error if blocks are still in use
-  std::size_t num_heads = 0;
-  for (auto& rec : m_used_map) {
-    std::size_t bytes, whole_bytes;
-    bool is_head;
-    if (rec.second) {
-      std::tie(bytes, is_head, whole_bytes) = *rec.second;
-      if (is_head) ++num_heads;
-    }
-  }
+  // Warning if blocks are still in use
   if (m_used_map.size() > 0) {
     std::stringstream ss;
-    ss << "Pointers still in use at destruction time.";
-    if (num_heads > 0) {
-      ss << " This will cause " << num_heads << " leak(s).";
-    }
-    UMPIRE_LOG(Error, ss.str());
+    ss << "The following addresses have not been deallocated:";
+    for (auto& rec : m_used_map) ss << " " << rec.first;
+    ss << ". This will cause memory leak(s)";
+    UMPIRE_LOG(Warning, ss.str());
   }
 
   // Free any unused blocks
