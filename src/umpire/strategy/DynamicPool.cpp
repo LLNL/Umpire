@@ -53,10 +53,19 @@ DynamicPool::~DynamicPool()
 
   // Warning if blocks are still in use
   if (m_used_map.size() > 0) {
+    const std::size_t max_addr{25};
     std::stringstream ss;
-    ss << "The following addresses have not been deallocated:";
-    for (auto& rec : m_used_map) ss << " " << rec.first;
-    ss << ". This will cause memory leak(s)";
+    ss << "There are " << m_used_map.size() << " addresses";
+    ss << " not deallocated at destruction. This will cause leak(s).";
+    if (m_used_map.size() <= max_addr)
+      ss << "Addresses:";
+    else
+      ss << "First " << max_addr << " addresses:";
+    auto iter = m_used_map.begin();
+    auto end = m_used_map.end();
+    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
+      ss << " " << iter->first;
+    }
     UMPIRE_LOG(Warning, ss.str());
   }
 
@@ -265,9 +274,9 @@ Platform DynamicPool::getPlatform() noexcept
 
 void DynamicPool::mergeFreeBlocks()
 {
-  using PointerMap = std::map<Pointer, SizeTuple>;
-
   if (m_free_map.size() < 2) return;
+
+  using PointerMap = std::map<Pointer, SizeTuple>;
 
   // Make a free block map from pointers -> size pairs
   PointerMap free_pointer_map;
