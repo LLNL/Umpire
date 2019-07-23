@@ -51,23 +51,23 @@ DynamicPool::~DynamicPool()
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
 
-  // Error if blocks are still in use
-  std::size_t num_heads = 0;
-  for (auto& rec : m_used_map) {
-    std::size_t bytes, whole_bytes;
-    bool is_head;
-    if (rec.second) {
-      std::tie(bytes, is_head, whole_bytes) = *rec.second;
-      if (is_head) ++num_heads;
-    }
-  }
+  // Warning if blocks are still in use
   if (m_used_map.size() > 0) {
+    const std::size_t max_addr{25};
     std::stringstream ss;
-    ss << "Pointers still in use at destruction time.";
-    if (num_heads > 0) {
-      ss << " This will cause " << num_heads << " leak(s).";
+    ss << "There are " << m_used_map.size() << " addresses";
+    ss << " not deallocated at destruction. This will cause leak(s). ";
+    if (m_used_map.size() <= max_addr)
+      ss << "Addresses:";
+    else
+      ss << "First " << max_addr << " addresses:";
+    auto iter = m_used_map.begin();
+    auto end = m_used_map.end();
+    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
+      if (i % 5 == 0) ss << "\n\t";
+      ss << " " << iter->first;
     }
-    UMPIRE_LOG(Error, ss.str());
+    UMPIRE_LOG(Warning, ss.str());
   }
 
   // Free any unused blocks
@@ -275,6 +275,8 @@ Platform DynamicPool::getPlatform() noexcept
 
 void DynamicPool::mergeFreeBlocks()
 {
+  if (m_free_map.size() < 2) return;
+
   using PointerMap = std::map<Pointer, SizeTuple>;
 
   // Make a free block map from pointers -> size pairs
@@ -289,8 +291,6 @@ void DynamicPool::mergeFreeBlocks()
     free_pointer_map.insert(
       std::make_pair(ptr, std::make_tuple(bytes, is_head, whole_bytes)));
   }
-
-  if (free_pointer_map.size() < 2) return;
 
   // this map is iterated over from low to high in terms of key = pointer address.
   // Colaesce these...
