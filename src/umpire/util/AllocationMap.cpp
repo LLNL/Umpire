@@ -17,45 +17,45 @@
 namespace umpire {
 namespace util {
 
-static umpire::util::FixedMallocPool block_pool(sizeof(RecordList::Block<AllocationRecord>));
-
 // Record List
-RecordList::RecordList(AllocationRecord record)
-  : m_tail{nullptr}, m_length{0}
+AllocationMap::RecordList::RecordList(AllocationMap& map, AllocationRecord record) :
+  m_map{map},
+  m_tail{nullptr},
+  m_length{0}
 {
   push_back(record);
 }
 
-RecordList::~RecordList()
+AllocationMap::RecordList::~RecordList()
 {
-  BlockType* curr = m_tail;
+  RecordBlock* curr = m_tail;
   while (curr) {
-    BlockType* prev = curr->prev;
-    block_pool.deallocate(curr);
+    RecordBlock* prev = curr->prev;
+    m_map.m_block_pool.deallocate(curr);
     curr = prev;
   }
 }
 
-void RecordList::push_back(const AllocationRecord& rec)
+void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 {
-  BlockType* curr = static_cast<BlockType*>(block_pool.allocate());
+  RecordBlock* curr = static_cast<RecordBlock*>(m_map.m_block_pool.allocate());
   curr->prev = m_tail;
   curr->rec = rec;
   m_tail = curr;
   m_length++;
 }
 
-AllocationRecord RecordList::pop_back()
+AllocationRecord AllocationMap::RecordList::pop_back()
 {
   if (m_length == 0) {
     UMPIRE_ERROR("pop_back() called, but m_length == 0");
   }
 
   const AllocationRecord ret = m_tail->rec;
-  BlockType* prev = m_tail->prev;
+  RecordBlock* prev = m_tail->prev;
 
   // Deallocate and move tail pointer
-  block_pool.deallocate(m_tail);
+  m_map.m_block_pool.deallocate(m_tail);
   m_tail = prev;
 
   // Reduce size
@@ -64,76 +64,79 @@ AllocationRecord RecordList::pop_back()
   return ret;
 }
 
-RecordList::ConstIterator RecordList::begin() const
+AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::begin() const
 {
-  return RecordList::ConstIterator{this, iterator_begin{}};
+  return AllocationMap::RecordList::ConstIterator{this, iterator_begin{}};
 }
 
-RecordList::ConstIterator RecordList::end() const
+AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::end() const
 {
-  return RecordList::ConstIterator{this, iterator_end{}};
+  return AllocationMap::RecordList::ConstIterator{this, iterator_end{}};
 }
 
-std::size_t RecordList::size() const { return m_length; }
-bool RecordList::empty() const { return size() == 0; }
-AllocationRecord* RecordList::back() { return &m_tail->rec; }
-const AllocationRecord* RecordList::back() const { return &m_tail->rec; }
+std::size_t AllocationMap::RecordList::size() const { return m_length; }
+bool AllocationMap::RecordList::empty() const { return size() == 0; }
+AllocationRecord* AllocationMap::RecordList::back() { return &m_tail->rec; }
+const AllocationRecord* AllocationMap::RecordList::back() const { return &m_tail->rec; }
 
-RecordList::ConstIterator::ConstIterator()
+AllocationMap::RecordList::ConstIterator::ConstIterator()
   : m_list(nullptr), m_curr(nullptr)
 {
 }
 
-RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_begin)
+AllocationMap::RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_begin)
   : m_list(list), m_curr(m_list->m_tail)
 {
 }
 
-RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_end)
+AllocationMap::RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_end)
   : m_list(list), m_curr(nullptr)
 {
 }
 
 const AllocationRecord&
-RecordList::ConstIterator::operator*()
+AllocationMap::RecordList::ConstIterator::operator*()
 {
   return *operator->();
 }
 
 const AllocationRecord*
-RecordList::ConstIterator::operator->()
+AllocationMap::RecordList::ConstIterator::operator->()
 {
   if (!m_curr) UMPIRE_ERROR("Cannot dereference nullptr");
   return &m_curr->rec;
 }
 
-RecordList::ConstIterator& RecordList::ConstIterator::operator++()
+AllocationMap::RecordList::ConstIterator& AllocationMap::RecordList::ConstIterator::operator++()
 {
   if (!m_curr) UMPIRE_ERROR("Cannot dereference nullptr");
   m_curr = m_curr->prev;
   return *this;
 }
 
-RecordList::ConstIterator RecordList::ConstIterator::operator++(int)
+AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::ConstIterator::operator++(int)
 {
   ConstIterator tmp{*this};
   this->operator++();
   return tmp;
 }
 
-bool RecordList::ConstIterator::operator==(const RecordList::ConstIterator& other) const
+bool AllocationMap::RecordList::ConstIterator::operator==(const AllocationMap::RecordList::ConstIterator& other) const
 {
   return m_list == other.m_list && m_curr == other.m_curr;
 }
 
-bool RecordList::ConstIterator::operator!=(const RecordList::ConstIterator& other) const
+bool AllocationMap::RecordList::ConstIterator::operator!=(const AllocationMap::RecordList::ConstIterator& other) const
 {
   return !(*this == other);
 }
 
 // AllocationMap
 AllocationMap::AllocationMap() :
-  m_map{}, m_size{0}, m_mutex{}
+  m_block_pool{sizeof(RecordList::RecordBlock)},
+  m_map{},
+  m_size{0},
+  m_mutex{}
 {
 }
 
@@ -143,7 +146,7 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
 
-  auto pair = m_map.insert(ptr, record);
+  auto pair = m_map.insert(ptr, *this, record);
 
   Map::Iterator it{pair.first};
   const bool inserted{pair.second};

@@ -277,6 +277,8 @@ void DynamicPool::mergeFreeBlocks()
 {
   using PointerMap = std::map<Pointer, SizeTuple>;
 
+  if (m_free_map.size() < 2) return;
+
   // Make a free block map from pointers -> size pairs
   PointerMap free_pointer_map;
 
@@ -289,8 +291,6 @@ void DynamicPool::mergeFreeBlocks()
     free_pointer_map.insert(
       std::make_pair(ptr, std::make_tuple(bytes, is_head, whole_bytes)));
   }
-
-  if (free_pointer_map.size() < 2) return;
 
   // this map is iterated over from low to high in terms of key = pointer address.
   // Colaesce these...
