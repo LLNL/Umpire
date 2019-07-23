@@ -1,25 +1,27 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
   Exception.hpp
+  FixedMallocPool.hpp
+  IOManager.hpp
   Logger.hpp
+  MPI.hpp
   Macros.hpp
+  MemoryResourceTraits.hpp
+  MemoryMap.hpp
+  MemoryMap.inl
+  OutputBuffer.hpp
   Platform.hpp
-  Replay.hpp)
+  allocation_statistics.hpp
+  detect_vendor.hpp
+  make_unique.hpp
+  wrap_allocator.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -27,22 +29,45 @@ if (ENABLE_STATISTICS)
     statistic_helper.hpp
     Statistic.hpp
     StatisticsDatabase.hpp)
-endif()
+endif ()
+
+if (ENABLE_NUMA)
+  set (umpire_util_headers
+    ${umpire_util_headers}
+    numa.hpp)
+endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
+  FixedMallocPool.cpp
+  IOManager.cpp
   Logger.cpp
-  Replay.cpp)
+  MPI.cpp
+  OutputBuffer.cpp
+  allocation_statistics.cpp
+  detect_vendor.cpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_sources
     ${umpire_util_sources}
     Statistic.cpp
     StatisticsDatabase.cpp)
-endif()
+endif ()
+
+if (ENABLE_NUMA)
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    numa.cpp)
+endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
+
+if (ENABLE_NUMA)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    numa)
+endif ()
 
 if (ENABLE_STATISTICS)
   set (umpire_util_depends
@@ -56,20 +81,18 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
     slic)
 endif()
 
+if (ENABLE_MPI)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    mpi)
+endif ()
+
 blt_add_library(
   NAME umpire_util
   HEADERS ${umpire_util_headers}
   SOURCES ${umpire_util_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/util
   DEPENDS_ON ${umpire_util_depends}
-)
-
-if (CMAKE_CXX_COMPILER_ID MATCHES Clang)
-  target_compile_options(
-    umpire_util
-    PRIVATE
-    -Os)
-endif()
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_util
@@ -81,11 +104,3 @@ target_include_directories(
 install(FILES
   ${umpire_util_headers}
   DESTINATION include/umpire/util)
-
-install(TARGETS
-  umpire_util
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-

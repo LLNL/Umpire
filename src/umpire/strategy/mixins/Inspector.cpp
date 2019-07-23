@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/mixins/Inspector.hpp"
 
@@ -27,11 +19,11 @@ Inspector::Inspector() :
 }
 
 
-void 
+void
 Inspector::registerAllocation(
-    void* ptr, 
-    size_t size, 
-    std::shared_ptr<AllocationStrategy> strategy)
+    void* ptr,
+    std::size_t size,
+    strategy::AllocationStrategy* strategy)
 {
   m_current_size += size;
 
@@ -39,21 +31,23 @@ Inspector::registerAllocation(
     m_high_watermark = m_current_size;
   }
 
-  auto record = new umpire::util::AllocationRecord{
-    ptr,
-    size,
-    strategy};
-
-  ResourceManager::getInstance().registerAllocation(ptr, record);
+  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, strategy});
 }
 
-void 
-Inspector::deregisterAllocation(void* ptr)
+util::AllocationRecord
+Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strategy)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
-  m_current_size -= record->m_size;
-  delete record;
+  if (record.strategy == strategy) {
+    m_current_size -= record.size;
+  } else {
+    // Re-register the pointer and throw an error
+    ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy});
+    UMPIRE_ERROR(ptr << " was not allocated by " << strategy->getName());
+  }
+
+  return record;
 }
 
 } // end of namespace mixins

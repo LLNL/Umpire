@@ -1,4 +1,4 @@
-.. _tutorial::
+.. _tutorial:
 
 ===============
 Umpire Tutorial
@@ -25,6 +25,7 @@ sections.
 
 .. toctree::
    :maxdepth: 1
+   :caption: Tutorial
 
    tutorial/allocators.rst
    tutorial/resources.rst
@@ -32,3 +33,32 @@ sections.
    tutorial/dynamic_pool.rst
    tutorial/introspection.rst
    tutorial/typed_allocators.rst
+   tutorial/replay.rst
+
+We also have a tutorial for the C interface to Umpire. Complete example
+listings are available, and will be compiled if you have configured Umpire with
+``-DENABLE_C=On``. 
+
+The C tutorial assumes an understanding of C, and it would be useful to have
+some knowledge of C++ to understand how the C API maps to the native C++
+classes that Umpire provides.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: C API Tutorial
+
+   tutorial/c/allocators.rst
+   tutorial/c/resources.rst
+   tutorial/c/pools.rst
+
+Finally, we have a tutorial for Umpire's FORTRAN API. These examples will be
+compiled when configuring with ``-DENABLE_FORTRAN=On``. The FORTRAN tutorial
+assumes an understanding of FORTRAN. Familiarity with the FORTRAN's ISO C
+bindings can be useful for understanding why the interface looks the way it
+does.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: FORTRAN API Tutorial
+
+   tutorial/fortran/allocators.rst

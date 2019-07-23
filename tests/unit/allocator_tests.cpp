@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 #include "gtest/gtest.h"
@@ -29,10 +21,10 @@ class MockAllocationStrategy : public umpire::strategy::AllocationStrategy
     {
     }
 
-    MOCK_METHOD1(allocate, void*(size_t bytes));
+    MOCK_METHOD1(allocate, void*(std::size_t bytes));
     MOCK_METHOD1(deallocate, void(void* ptr));
-    MOCK_METHOD0(getCurrentSize, long() noexcept);
-    MOCK_METHOD0(getHighWatermark, long() noexcept);
+    MOCK_METHOD0(getCurrentSize, long() const noexcept);
+    MOCK_METHOD0(getHighWatermark, long() const noexcept);
     MOCK_METHOD0(getPlatform, umpire::Platform() noexcept);
 };
 
@@ -62,7 +54,7 @@ protected:
     free(data);
   }
 
-  std::shared_ptr<MockAllocationStrategy> m_strategy;
+  strategy::AllocationStrategy* m_strategy;
   umpire::Allocator m_allocator;
   void* data;
 };

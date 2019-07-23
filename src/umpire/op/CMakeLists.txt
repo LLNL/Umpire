@@ -1,16 +1,8 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_op_headers
   GenericReallocateOperation.hpp
@@ -28,8 +20,21 @@ set (umpire_op_sources
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 
-set (umpire_op_depends
-  umpire_util)
+set (umpire_op_depends)
+
+if (ENABLE_NUMA)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    NumaMoveOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    NumaMoveOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    umpire_strategy)
+endif ()
 
 if (ENABLE_CUDA)
   set (umpire_op_headers
@@ -57,7 +62,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_ROCM)
+if (ENABLE_HCC)
   set (umpire_op_headers
     ${umpire_op_headers}
     RocmCopyOperation.hpp
@@ -73,14 +78,32 @@ if (ENABLE_ROCM)
     rocm)
 endif ()
 
+if (ENABLE_HIP)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    HipCopyOperation.hpp
+    HipCopyFromOperation.hpp
+    HipCopyToOperation.hpp
+    HipMemsetOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    HipCopyOperation.cpp
+    HipCopyFromOperation.cpp
+    HipCopyToOperation.cpp
+    HipMemsetOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    hip_runtime)
+endif ()
 
 blt_add_library(
   NAME umpire_op
   HEADERS ${umpire_op_headers}
   SOURCES ${umpire_op_sources}
-  HEADERS_OUTPUT_SUBDIR umpire/op
   DEPENDS_ON ${umpire_op_depends}
-)
+  OBJECT TRUE)
 
 target_include_directories(
   umpire_op
@@ -92,10 +115,3 @@ target_include_directories(
 install(FILES
   ${umpire_op_headers}
   DESTINATION include/umpire/op)
-
-install(TARGETS
-  umpire_op
-  EXPORT umpire-targets
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/HostReallocateOperation.hpp"
 
@@ -18,6 +10,8 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+
+#include "umpire/strategy/mixins/Inspector.hpp"
 
 namespace umpire {
 namespace op {
@@ -27,13 +21,21 @@ void HostReallocateOperation::transform(
     void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord *dst_allocation,
-    size_t length)
+    std::size_t length)
 {
-  auto allocator = dst_allocation->m_strategy;
+  auto allocator = dst_allocation->strategy;
 
-  ResourceManager::getInstance().deregisterAllocation(src_ptr);
-
+  auto old_record = ResourceManager::getInstance().deregisterAllocation(src_ptr);
   *dst_ptr = ::realloc(src_ptr, length);
+
+  if (!*dst_ptr) {
+    UMPIRE_ERROR("::realloc(src_ptr=" << src_ptr <<
+                 ", old_length=" << old_record.size <<
+                 ", length=" << length << ") failed");
+  }
+
+  ResourceManager::getInstance().registerAllocation(
+     *dst_ptr, {*dst_ptr, length, allocator});
 
   UMPIRE_RECORD_STATISTIC(
       "HostReallocate",
@@ -41,10 +43,6 @@ void HostReallocateOperation::transform(
       "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "reallocate");
-
-  ResourceManager::getInstance().registerAllocation(
-      *dst_ptr,
-      new util::AllocationRecord{*dst_ptr, length, allocator});
 }
 
 } // end of namespace op

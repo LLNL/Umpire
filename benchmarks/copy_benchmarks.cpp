@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
@@ -55,5 +47,10 @@ BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string(
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("UM"))->Range(4, 4096);
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("DEVICE"))->Range(4, 4096);
 #endif
+#if defined(UMPIRE_ENABLE_HIP)
+BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("DEVICE"))->Range(4, 4096);
+BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::string("HOST"))->Range(4, 4096);
+BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
+#endif
 
-BENCHMARK_MAIN();
+BENCHMARK_MAIN()

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_Allocator_HPP
 #define UMPIRE_Allocator_HPP
@@ -19,6 +11,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <ostream>
 
 #include "umpire/util/Platform.hpp"
 
@@ -57,7 +50,7 @@ class Allocator {
      *
      * \return Pointer to start of the allocation.
      */
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
 
     /*!
      * \brief Free the memory at ptr.
@@ -71,13 +64,18 @@ class Allocator {
     void deallocate(void* ptr);
 
     /*!
+     * \brief Release any and all unused memory held by this Allocator.
+     */
+    void release();
+
+    /*!
      * \brief Return number of bytes allocated for allocation
      *
      * \param ptr Pointer to allocation in question
      *
      * \return number of bytes allocated for ptr
      */
-    size_t getSize(void* ptr);
+    std::size_t getSize(void* ptr) const;
 
     /*!
      * \brief Return the memory high watermark for this Allocator.
@@ -88,7 +86,7 @@ class Allocator {
      *
      * \return Memory high watermark.
      */
-    size_t getHighWatermark() noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     /*!
      * \brief Return the current size of this Allocator.
@@ -98,7 +96,7 @@ class Allocator {
      *
      * \return current size of Allocator.
      */
-    size_t getCurrentSize() noexcept;
+    std::size_t getCurrentSize() const noexcept;
 
     /*!
      * \brief Return the actual size of this Allocator.
@@ -110,7 +108,7 @@ class Allocator {
      *
      * \return actual size of Allocator.
      */
-    size_t getActualSize() noexcept;
+    std::size_t getActualSize() const noexcept;
 
     /*!
      * \brief Get the name of this Allocator.
@@ -122,7 +120,7 @@ class Allocator {
      *
      * \return name of Allocator.
      */
-    std::string getName() noexcept;
+    const std::string& getName() const noexcept;
 
     /*!
      * \brief Get the integer ID of this Allocator.
@@ -135,7 +133,7 @@ class Allocator {
      *
      * \return integer id of Allocator.
      */
-    int getId() noexcept;
+    int getId() const noexcept;
 
     /*!
      * \brief Get the AllocationStrategy object used by this Allocator.
@@ -144,7 +142,7 @@ class Allocator {
      *
      * \return Pointer to the AllocationStrategy.
      */
-    std::shared_ptr<umpire::strategy::AllocationStrategy> getAllocationStrategy() noexcept;
+    strategy::AllocationStrategy* getAllocationStrategy() noexcept;
 
     /*!
      * \brief Get the Platform object appropriate for this Allocator.
@@ -154,6 +152,8 @@ class Allocator {
     Platform getPlatform() noexcept;
 
     Allocator() = default;
+    
+    friend std::ostream& operator<<(std::ostream&, const Allocator&);
 
   private:
     /*!
@@ -165,13 +165,13 @@ class Allocator {
      * \param allocator Pointer to the AllocationStrategy object to use for
      * Allocations.
      */
-    Allocator(std::shared_ptr<strategy::AllocationStrategy> allocator) noexcept;
+    Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
 
     /*!
      * \brief Pointer to the AllocationStrategy used by this Allocator.
      */
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    umpire::strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace umpire

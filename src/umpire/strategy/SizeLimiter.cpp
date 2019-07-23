@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/SizeLimiter.hpp"
@@ -24,7 +16,7 @@ SizeLimiter::SizeLimiter(
     const std::string& name,
     int id,
     Allocator allocator,
-    size_t size_limit) :
+    std::size_t size_limit) :
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
   m_size_limit(size_limit),
@@ -32,7 +24,7 @@ SizeLimiter::SizeLimiter(
 {
 }
 
-void* SizeLimiter::allocate(size_t bytes)
+void* SizeLimiter::allocate(std::size_t bytes)
 {
   m_total_size += bytes;
 
@@ -52,12 +44,12 @@ void SizeLimiter::deallocate(void* ptr)
 
 }
 
-long SizeLimiter::getCurrentSize() noexcept
+std::size_t SizeLimiter::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-long SizeLimiter::getHighWatermark() noexcept
+std::size_t SizeLimiter::getHighWatermark() const noexcept
 {
   return 0;
 }

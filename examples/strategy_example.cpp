@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
@@ -25,7 +17,7 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
+  for (auto s : rm.getAllocatorNames()){
     std::cout << s << "  ";
   }
   std::cout << std::endl;
@@ -43,7 +35,7 @@ int main(int, char**)
    *  getAllocator function.
    */
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_simpool", rm.getAllocator("HOST"));
+      "host_dynamic_pool", rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
@@ -51,7 +43,7 @@ int main(int, char**)
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 4096", 4096, rm.getAllocator("HOST"));
 
-  auto slot_alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
+  alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
       "host_slot_pool", 64, rm.getAllocator("HOST"));
 
   /*
@@ -82,7 +74,7 @@ int main(int, char**)
   std::cout << "Size: " << alloc.getSize(test) << std::endl;
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAvailableAllocators()){
+  for (auto s : rm.getAllocatorNames()){
     std::cout << s << ", ";
   }
   std::cout << std::endl;

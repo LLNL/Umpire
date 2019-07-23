@@ -1,6 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
+//
+// SPDX-License-Identifier: (MIT)
+//////////////////////////////////////////////////////////////////////////////
 // wrapUmpire.cpp
 // This is generated code, do not edit
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -13,8 +19,8 @@
 // For details, see https://github.com/LLNL/Umpire
 // Please also see the LICENSE file for MIT license.
 #include <stdlib.h>
-#include <string>
 #include "typesUmpire.h"
+#include "umpire/Allocator.hpp"
 
 // splicer begin CXX_definitions
 // splicer end CXX_definitions
@@ -34,9 +40,10 @@ void umpire_SHROUD_memory_destructor(UMP_SHROUD_capsule_data *cap)
         // Nothing to delete
         break;
     }
-    case 1:   // new_string
+    case 1:   // umpire::Allocator
     {
-        std::string *cxx_ptr = reinterpret_cast<std::string *>(ptr);
+        umpire::Allocator *cxx_ptr = 
+            reinterpret_cast<umpire::Allocator *>(ptr);
         delete cxx_ptr;
         break;
     }

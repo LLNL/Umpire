@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_AllocationStrategy_HPP
 #define UMPIRE_AllocationStrategy_HPP
@@ -20,6 +12,7 @@
 #include <string>
 #include <memory>
 #include <cstddef>
+#include <ostream>
 
 namespace umpire {
 namespace strategy {
@@ -28,8 +21,7 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy :
-  public std::enable_shared_from_this<AllocationStrategy>
+class AllocationStrategy 
 {
   public:
     /*!
@@ -52,7 +44,7 @@ class AllocationStrategy :
      *
      * \return Pointer to start of allocated bytes.
      */
-    virtual void* allocate(size_t bytes) = 0;
+    virtual void* allocate(std::size_t bytes) = 0;
 
     /*!
      * \brief Free the memory at ptr.
@@ -62,6 +54,11 @@ class AllocationStrategy :
     virtual void deallocate(void* ptr) = 0;
 
     /*!
+     * \brief Release any and all unused memory held by this AllocationStrategy
+     */
+    virtual void release();
+
+    /*!
      * \brief Get current (total) size of the allocated memory.
      *
      * This is the total size of all allocation currently 'live' that have been
@@ -69,7 +66,7 @@ class AllocationStrategy :
      *
      * \return Current total size of allocations.
      */
-    virtual long getCurrentSize() noexcept = 0;
+    virtual std::size_t getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Get the high watermark of the total allocated size.
@@ -77,7 +74,7 @@ class AllocationStrategy :
      * This is equivalent to the highest observed value of getCurrentSize.
      * \return High watermark allocation size.
      */
-    virtual long getHighWatermark() noexcept = 0;
+    virtual std::size_t getHighWatermark() const noexcept = 0;
 
     /*!
      * \brief Get the current amount of memory allocated by this allocator.
@@ -87,7 +84,7 @@ class AllocationStrategy :
      *
      * \return The total size of all the memory this object has allocated.
      */
-    virtual long getActualSize() noexcept;
+    virtual std::size_t getActualSize() const noexcept;
 
     /*!
      * \brief Get the platform associated with this AllocationStrategy.
@@ -104,7 +101,7 @@ class AllocationStrategy :
      *
      * \return The name of this AllocationStrategy.
      */
-    std::string getName() noexcept;
+    const std::string& getName() noexcept;
 
 
     /*!
@@ -113,6 +110,8 @@ class AllocationStrategy :
      * \return The id of this AllocationStrategy.
      */
     int getId() noexcept;
+
+    friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
 
   protected:
     std::string m_name;

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/GenericReallocateOperation.hpp"
 
@@ -30,13 +22,13 @@ void GenericReallocateOperation::transform(
     void** dst_ptr,
     util::AllocationRecord *src_allocation,
     util::AllocationRecord *dst_allocation,
-    size_t length)
+    std::size_t length)
 {
-  auto allocator = dst_allocation->m_strategy;
+  auto allocator = dst_allocation->strategy;
   *dst_ptr = allocator->allocate(length);
 
-  size_t old_size = src_allocation->m_size;
-  size_t copy_size = ( old_size > length ) ? length : old_size;
+  std::size_t old_size = src_allocation->size;
+  std::size_t copy_size = ( old_size > length ) ? length : old_size;
 
   ResourceManager::getInstance().copy(*dst_ptr, src_ptr, copy_size);
 
@@ -46,7 +38,7 @@ void GenericReallocateOperation::transform(
       "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "reallocate");
-  
+
   allocator->deallocate(src_ptr);
 }
 

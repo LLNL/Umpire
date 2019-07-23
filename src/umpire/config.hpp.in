@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -16,15 +16,20 @@
 #define UMPIRE_config_HPP
 
 #cmakedefine UMPIRE_ENABLE_CUDA
+#cmakedefine UMPIRE_ENABLE_NUMA
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
-#cmakedefine UMPIRE_ENABLE_ASSERTS
 #cmakedefine UMPIRE_ENABLE_STATISTICS
-#cmakedefine UMPIRE_ENABLE_ROCM
+#cmakedefine UMPIRE_ENABLE_HCC
+#cmakedefine UMPIRE_ENABLE_HIP
 
 #cmakedefine UMPIRE_ENABLE_DEVICE
 #cmakedefine UMPIRE_ENABLE_PINNED
 #cmakedefine UMPIRE_ENABLE_UM
+
+#cmakedefine UMPIRE_ENABLE_MPI
+
+#cmakedefine UMPIRE_ENABLE_FILESYSTEM
 
 constexpr int UMPIRE_VERSION_MAJOR = @Umpire_VERSION_MAJOR@;
 constexpr int UMPIRE_VERSION_MINOR = @Umpire_VERSION_MINOR@;

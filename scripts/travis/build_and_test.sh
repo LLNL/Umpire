@@ -1,17 +1,9 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 
 env
@@ -34,7 +26,18 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
       or_die make -j 3 VERBOSE=1
     fi
     if [[ "${DO_TEST}" == "yes" ]] ; then
-      or_die ctest -V
+      or_die ctest -T test --output-on-failure -V
+    fi
+    if [[ "${DO_MEMCHECK}" == "yes" ]] ; then
+      regex="^Memory Leak - [1-9]+"
+      while read -r line; do
+          if [[ "$line" =~ $regex ]]; then
+            echo "Found leaks: $line"
+            cat Testing/Temporary/MemoryChecker.*.log
+            exit 1
+          fi
+      done < <(ctest -E replay\|io -T memcheck)
+      echo "No leaks detected!"
     fi
 fi
 

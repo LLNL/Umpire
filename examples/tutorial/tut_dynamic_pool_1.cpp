@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -19,13 +11,13 @@
 
 void allocate_and_deallocate_pool(const std::string& resource)
 {
-  constexpr size_t SIZE = 1024;
+  constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator(resource);
 
-  auto pooled_allocator = 
+  auto pooled_allocator =
     rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
                                                     allocator);
 
@@ -46,6 +38,10 @@ int main(int, char**) {
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate_pool("DEVICE");
   allocate_and_deallocate_pool("UM");
+  allocate_and_deallocate_pool("PINNED");
+#endif
+#if defined(UMPIRE_ENABLE_HIP)
+  allocate_and_deallocate_pool("DEVICE");
   allocate_and_deallocate_pool("PINNED");
 #endif
 

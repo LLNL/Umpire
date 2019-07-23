@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 // Produced at the Lawrence Livermore National Laboratory
 //
 // Created by David Beckingsale, david@llnl.gov
@@ -39,7 +39,7 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
   }
 }
 
-void* CudaConstantMemoryResource::allocate(size_t bytes)
+void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 {
   char* ptr = static_cast<char*>(m_ptr) + m_offset;
   m_offset += bytes;
@@ -51,8 +51,7 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
     UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
-  ResourceManager::getInstance().registerAllocation(
-      ret, new util::AllocationRecord{ret, bytes, this->shared_from_this()});
+  ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
@@ -67,26 +66,28 @@ void CudaConstantMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record->m_size;
+  auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
+  m_current_size -= record.size;
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
+  if (record.strategy != this) {
+    UMPIRE_ERROR(ptr << " was not allocated by " << getName());
+  }
+
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record.size))
       == static_cast<char*>(ptr)) {
-    m_offset -= record->m_size;
+    m_offset -= record.size;
   } else {
     UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
   }
-
-  delete record;
 }
 
-long CudaConstantMemoryResource::getCurrentSize() noexcept
+std::size_t CudaConstantMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long CudaConstantMemoryResource::getHighWatermark() noexcept
+std::size_t CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;

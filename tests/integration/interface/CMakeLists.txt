@@ -1,24 +1,17 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
+set (interface_dir ${UMPIRE_TESTS_OUTPUT_DIR}/integration/interface)
 
-if (ENABLE_C_API)
+if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp
     DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+    OUTPUT_DIR ${interface_dir})
 
   target_include_directories(
     allocator_c_tests
@@ -33,7 +26,7 @@ if (ENABLE_C_API)
     NAME operation_c_tests
     SOURCES operation_c_tests.cpp
     DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${UMPIRE_TEST_OUTPUT_DIR})
+    OUTPUT_DIR ${interface_dir})
 
   target_include_directories(
     operation_c_tests
@@ -44,17 +37,7 @@ if (ENABLE_C_API)
     NAME operation_c_tests
     COMMAND operation_c_tests)
 
-  if (ENABLE_FORTRAN_API)
-    blt_add_executable(
-      NAME fortran_interface_tests
-      SOURCES umpire_fortran_interface.f
-      DEPENDS_ON fruit umpire
-    )
-
-    set_source_files_properties(
-      umpire_fortran_interface.f
-      PROPERTIES
-      Fortran_FORMAT FREE)
+  if (ENABLE_FORTRAN)
+    add_subdirectory(fortran)
   endif()
 endif()
-

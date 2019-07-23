@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
@@ -24,7 +16,7 @@ namespace strategy {
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
     const std::string& name,
     int id,
-    size_t capacity,
+    std::size_t capacity,
     Allocator allocator) :
   AllocationStrategy(name, id),
   m_size(0),
@@ -34,14 +26,19 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
   m_block = m_allocator->allocate(m_capacity);
 }
 
-void*
-MonotonicAllocationStrategy::allocate(size_t bytes)
+MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
 {
-  void* ret = static_cast<char*>(m_block) + bytes;
+  m_allocator->deallocate(m_block);
+}
+
+void*
+MonotonicAllocationStrategy::allocate(std::size_t bytes)
+{
+  void* ret = static_cast<char*>(m_block) + m_size;
   m_size += bytes;
 
   if (m_size > m_capacity) {
-    UMPIRE_ERROR("MonoticAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
+    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
@@ -51,19 +48,17 @@ MonotonicAllocationStrategy::allocate(size_t bytes)
 
 void
 MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
-{
-  UMPIRE_LOG(Info, "() doesn't do anything");
-}
+{}
 
-long
-MonotonicAllocationStrategy::getCurrentSize() noexcept
+std::size_t
+MonotonicAllocationStrategy::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_size);
   return m_size;
 }
 
-long
-MonotonicAllocationStrategy::getHighWatermark() noexcept
+std::size_t
+MonotonicAllocationStrategy::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_capacity);
   return m_capacity;

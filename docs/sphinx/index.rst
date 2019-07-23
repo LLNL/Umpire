@@ -28,6 +28,7 @@ Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
   :caption: Reference
 
   advanced_configuration
+  cookbook
   features
   code_documentation
   api/api

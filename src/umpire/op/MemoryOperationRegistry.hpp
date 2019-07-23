@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_OperationRegistry_HPP
 #define UMPIRE_OperationRegistry_HPP
@@ -82,8 +74,8 @@ class MemoryOperationRegistry {
      */
     std::shared_ptr<umpire::op::MemoryOperation> find(
         const std::string& name,
-        std::shared_ptr<strategy::AllocationStrategy>& source_allocator,
-        std::shared_ptr<strategy::AllocationStrategy>& dst_allocator);
+        strategy::AllocationStrategy* source_allocator,
+        strategy::AllocationStrategy* dst_allocator);
 
     /*!
      * \brief Add a new MemoryOperation to the registry
@@ -100,14 +92,14 @@ class MemoryOperationRegistry {
       std::pair<Platform, Platform> platforms,
       std::shared_ptr<MemoryOperation>&& operation) noexcept;
 
-  protected:
-    MemoryOperationRegistry() noexcept;
     MemoryOperationRegistry (const MemoryOperationRegistry&) = delete;
     MemoryOperationRegistry& operator= (const MemoryOperationRegistry&) = delete;
+    ~MemoryOperationRegistry() = default;
+
+  protected:
+    MemoryOperationRegistry() noexcept;
 
   private:
-    static MemoryOperationRegistry* s_memory_operation_registry_instance;
-
     /*
      * Doubly-nested unordered_map that stores MemoryOperations by first name,
      * then by Platform pair.

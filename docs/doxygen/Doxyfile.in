@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -505,9 +505,7 @@ EXCLUDE_SYMLINKS       = NO
 # against the file with absolute path, so to exclude all test directories 
 # for example use the pattern */test/*
 
-EXCLUDE_PATTERNS       = */tpl/simpool/* \
-                         */tpl/judy/* \
-                         */tpl/conduit/* 
+EXCLUDE_PATTERNS       = */tpl/*
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
@@ -1030,7 +1028,6 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = UMPIRE_ENABLE_CUDA \
                          UMPIRE_ENABLE_SLIC \
                          UMPIRE_ENABLE_LOGGING \
-                         UMPIRE_ENABLE_ASSERTS \
                          UMPIRE_ENABLE_STATISTICS \
                          DOXYGEN_SKIP_THIS
 

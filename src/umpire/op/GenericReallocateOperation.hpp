@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_GenericReallocateOperation_HPP
 #define UMPIRE_GenericReallocateOperation_HPP
@@ -23,7 +15,7 @@ namespace op {
 /*!
  * Generic reallocate operation to work on any src_ptr location.
  */
-class GenericReallocateOperation : 
+class GenericReallocateOperation :
   public MemoryOperation {
  public:
    /*!
@@ -40,11 +32,10 @@ class GenericReallocateOperation :
       void** dst_ptr,
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
-      size_t length);
+      std::size_t length);
 };
 
 } // end of naemspace op
 } // end of namespace umpire
 
 #endif // UMPIRE_GenericReallocateOperation_HPP
-

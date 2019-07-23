@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_AllocationAdvisor_HPP
 #define UMPIRE_AllocationAdvisor_HPP
@@ -46,26 +38,28 @@ class AllocationAdvisor :
         const std::string& name,
         int id,
         Allocator allocator,
-        const std::string& advice_operation);
+        const std::string& advice_operation,
+        int device_id = 0);
 
       AllocationAdvisor(
         const std::string& name,
         int id,
         Allocator allocator,
         const std::string& advice_operation,
-        Allocator accessing_allocator);
+        Allocator accessing_allocator,
+        int device_id = 0);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() noexcept;
-    long getHighWatermark() noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
   private:
     std::shared_ptr<op::MemoryOperation> m_advice_operation;
 
-    std::shared_ptr<umpire::strategy::AllocationStrategy> m_allocator;
+    strategy::AllocationStrategy* m_allocator;
 
     int m_device;
 };

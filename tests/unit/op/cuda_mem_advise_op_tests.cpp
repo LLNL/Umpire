@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 
@@ -19,20 +11,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-
-class CudaAdviseOpTest : public ::testing::Test {
-  protected:
-    virtual void SetUp() {
-      auto& rm = umpire::ResourceManager::getInstance();
-      auto allocator = rm.getAllocator("UM");
-      auto strategy = allocator.getAllocationStrategy();
-    }
-
-    virtual void TearDown() {
-    }
-
-    umpire::util::AllocationRecord* record;
-};
 
 TEST(CudaAdviseAccessedBy, Find)
 {
@@ -111,6 +89,7 @@ TEST(CudaAdvisePreferredLocation, Apply)
       1024*sizeof(float)));
 
   allocator.deallocate(data);
+  delete record;
 }
 
 TEST(CudaAdvisePreferredLocation, ApplyHost)

@@ -1,21 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
 
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/AmPinnedAllocator.hpp"
+
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
@@ -31,7 +25,7 @@ RocmPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
   }
 }
 
-std::shared_ptr<MemoryResource>
+std::unique_ptr<resource::MemoryResource>
 RocmPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
   MemoryResourceTraits traits;
@@ -41,7 +35,7 @@ RocmPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return std::make_shared<resource::DefaultMemoryResource<alloc::AmPinnedAllocator> >(Platform::rocm, "PINNED", id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::AmPinnedAllocator>>(Platform::rocm, "PINNED", id, traits);
 }
 
 } // end of namespace resource
