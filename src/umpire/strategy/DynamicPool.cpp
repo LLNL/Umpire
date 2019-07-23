@@ -56,7 +56,7 @@ DynamicPool::~DynamicPool()
     const std::size_t max_addr{25};
     std::stringstream ss;
     ss << "There are " << m_used_map.size() << " addresses";
-    ss << " not deallocated at destruction. This will cause leak(s).";
+    ss << " not deallocated at destruction. This will cause leak(s). ";
     if (m_used_map.size() <= max_addr)
       ss << "Addresses:";
     else
@@ -64,6 +64,7 @@ DynamicPool::~DynamicPool()
     auto iter = m_used_map.begin();
     auto end = m_used_map.end();
     for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
+      if (i % 5 == 0) ss << "\n\t";
       ss << " " << iter->first;
     }
     UMPIRE_LOG(Warning, ss.str());
