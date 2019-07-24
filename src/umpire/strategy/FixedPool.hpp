@@ -76,8 +76,9 @@ class FixedPool : public AllocationStrategy
     std::size_t m_obj_bytes;
     std::size_t m_obj_per_pool;
     std::size_t m_data_bytes;
-    std::size_t m_avail_length;
+    std::size_t m_avail_bytes;
     std::size_t m_current_bytes;
+    std::size_t m_actual_bytes;
     std::size_t m_highwatermark;
     std::vector<Pool> m_pool;
     // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is

@@ -24,34 +24,34 @@ MixedPool::MixedPool(const std::string& name, int id,
                      const std::size_t dynamic_min_alloc_size,
                      DynamicPool::CoalesceHeuristic dynamic_coalesce_heuristic,
                      const int dynamic_align_bytes) noexcept :
-  AllocationStrategy(name, id),
-  m_map(),
-  m_fixed_pool_map(),
-  m_fixed_pool(),
-  m_dynamic_pool("internal_dynamic_pool", -1, allocator,
+  AllocationStrategy{name, id},
+  m_map{},
+  m_fixed_pool_map{},
+  m_fixed_pool{},
+  m_dynamic_pool{"internal_dynamic_pool", -1, allocator,
                  dynamic_initial_alloc_size,
                  dynamic_min_alloc_size,
                  dynamic_coalesce_heuristic,
-                 dynamic_align_bytes),
-  m_allocator(allocator.getAllocationStrategy())
+                 dynamic_align_bytes},
+  m_allocator{allocator.getAllocationStrategy()}
 {
   std::size_t obj_size{smallest_fixed_obj_size};
   while (obj_size <= largest_fixed_obj_size) {
     const std::size_t obj_per_pool{
       std::min(64 * sizeof(int) * 8, max_initial_fixed_pool_size / obj_size)};
+    std::cout << obj_per_pool << " " << obj_per_pool * obj_size << " " << obj_size << " " << largest_fixed_obj_size << std::endl;
     if (obj_per_pool > 1) {
       m_fixed_pool.emplace_back(
         "internal_fixed_pool", -1, allocator, obj_size, obj_per_pool);
       m_fixed_pool_map.push_back(obj_size);
-    }
-    else {
+    } else {
       break;
     }
     obj_size *= fixed_size_multiplier;
   }
 
   if (m_fixed_pool.size() == 0) {
-    UMPIRE_LOG(Debug, "Mixed Pool is reverting to a dynamic pool only");
+    UMPIRE_LOG(Debug, "Mixed Pool is reverting to a dynamic pool");
   }
 }
 

@@ -40,7 +40,7 @@ DynamicPool::DynamicPool(const std::string& name,
   m_free_map{},
   m_curr_bytes{0},
   m_actual_bytes{initial_alloc_bytes},
-  m_highwatermark{initial_alloc_bytes}
+  m_highwatermark{0}
 {
   insertFree(m_allocator->allocate(initial_alloc_bytes),
              initial_alloc_bytes, true, initial_alloc_bytes);
