@@ -24,7 +24,7 @@ AllocationTracker::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
 
-  UMPIRE_LOG(Debug, "Tracking " << ptr << " bytes for" << m_allocator->getName());
+  UMPIRE_LOG(Debug, "Tracking " << ptr << " bytes for " << m_allocator->getName());
 
   registerAllocation(ptr, bytes, this);
 

@@ -147,7 +147,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
     if (s_replay_ofstream) {
       s_replay_buffer.setFileStream(&s_replay_ofstream);
     } else {
-      UMPIRE_ERROR("Couldn't open replay file:" << log_filename);
+      UMPIRE_ERROR("Couldn't open replay file:" << replay_filename);
     }
   }
 
