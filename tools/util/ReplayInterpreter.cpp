@@ -123,7 +123,7 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
     }
     else {
       std::cerr << "Unknown Replay (" << m_json["event"] << ")\n";
-      return -1;
+      exit(1);
     }
 
     compare_ss << std::endl;
@@ -618,7 +618,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
     }
     else {
       std::cerr << "Unknown class (" << type << "), skipping.\n";
-      return;
+      exit(1);
     }
   }
   else {
@@ -640,7 +640,7 @@ void ReplayInterpreter::replay_allocate( void )
 
   if ( n_iter == m_allocator_indices.end() ) {
     std::cerr << "Unknown allocator " << (void*)alloc_obj_p << std::endl;
-    return;           // Just skip unknown allocators
+    exit(1);
   }
 
   const AllocatorIndex& allocator_number = n_iter->second;
@@ -677,7 +677,7 @@ void ReplayInterpreter::replay_deallocate( void )
 
   if ( n_iter == m_allocator_indices.end() ) {
     std::cout << "Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " deallocation ignored" <<  std::endl;
-    return;           // Just skip unknown allocators
+    exit(1);
   }
 
   const AllocatorIndex& allocator_number = n_iter->second;
@@ -707,7 +707,7 @@ void ReplayInterpreter::replay_release( void )
 
   if ( n_iter == m_allocator_indices.end() ) {
     std::cout << "Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " release ignored" <<  std::endl;
-    return;
+    exit(1);
   }
 
   const AllocatorIndex& allocator_number = n_iter->second;
