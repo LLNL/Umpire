@@ -67,6 +67,8 @@ class DynamicPool : public AllocationStrategy
      */
     ~DynamicPool();
 
+    DynamicPool(const DynamicPool&) = delete;
+
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
     void release() override;

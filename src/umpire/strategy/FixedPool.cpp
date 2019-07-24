@@ -52,15 +52,16 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
 FixedPool::FixedPool(const std::string& name, int id,
                      Allocator allocator, const std::size_t object_bytes,
                      const std::size_t objects_per_pool) noexcept :
-  AllocationStrategy(name, id),
-  m_strategy(allocator.getAllocationStrategy()),
-  m_obj_bytes(object_bytes),
-  m_obj_per_pool(objects_per_pool),
-  m_data_bytes(m_obj_bytes * m_obj_per_pool),
-  m_avail_length(objects_per_pool/bits_per_int + 1),
-  m_current_bytes(0),
-  m_highwatermark(0),
-  m_pool()
+  AllocationStrategy{name, id},
+  m_strategy{allocator.getAllocationStrategy()},
+  m_obj_bytes{object_bytes},
+  m_obj_per_pool{objects_per_pool},
+  m_data_bytes{m_obj_bytes * m_obj_per_pool},
+  m_avail_bytes{objects_per_pool/bits_per_int + 1},
+  m_current_bytes{0},
+  m_actual_bytes{0},
+  m_highwatermark{0},
+  m_pool{}
 {
   newPool();
 }
@@ -71,7 +72,7 @@ FixedPool::~FixedPool()
 
   for (auto& p : m_pool) {
     if (m_obj_per_pool != p.num_avail) {
-      for (unsigned int int_index = 0; int_index < m_avail_length; ++int_index)
+      for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index)
         for (unsigned int bit_index = 0; bit_index < bits_per_int; ++bit_index) {
           if (!(p.avail[int_index] & 1 << bit_index)) {
             const std::size_t index{int_index * bits_per_int + bit_index};
@@ -107,7 +108,8 @@ FixedPool::~FixedPool()
 void
 FixedPool::newPool()
 {
-  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool, m_avail_length * sizeof(int));
+  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool, m_avail_bytes * sizeof(int));
+  m_actual_bytes += m_avail_bytes + m_data_bytes;
 }
 
 void*
@@ -115,7 +117,7 @@ FixedPool::allocInPool(Pool& p)
 {
   if (!p.num_avail) return nullptr;
 
-  for (unsigned int int_index = 0; int_index < m_avail_length; ++int_index) {
+  for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index) {
     // Return the index of the first 1 bit
     const int bit_index = find_first_set(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
@@ -196,9 +198,7 @@ FixedPool::getCurrentSize() const noexcept
 std::size_t
 FixedPool::getActualSize() const noexcept
 {
-  const std::size_t avail_bytes = m_obj_per_pool/bits_per_int + 1;
-  return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes + sizeof(Pool))
-    + sizeof(FixedPool);
+  return m_actual_bytes;
 }
 
 std::size_t
