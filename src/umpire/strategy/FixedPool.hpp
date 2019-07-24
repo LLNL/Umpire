@@ -46,6 +46,8 @@ class FixedPool : public AllocationStrategy
 
     ~FixedPool();
 
+    FixedPool(const FixedPool&) = delete;
+
     void* allocate(std::size_t bytes = 0) override final;
     void deallocate(void* ptr) override final;
 

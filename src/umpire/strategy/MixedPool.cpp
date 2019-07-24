@@ -7,6 +7,7 @@
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/strategy/MixedPool.hpp"
+#include "umpire/util/make_unique.hpp"
 
 #include <cstdint>
 #include <algorithm>
@@ -39,11 +40,9 @@ MixedPool::MixedPool(const std::string& name, int id,
   while (obj_size <= largest_fixed_obj_size) {
     const std::size_t obj_per_pool{
       std::min(64 * sizeof(int) * 8, max_initial_fixed_pool_size / obj_size)};
-    std::cout << obj_per_pool << " " << obj_per_pool * obj_size << " " << obj_size << " " << largest_fixed_obj_size << std::endl;
     if (obj_per_pool > 1) {
-      m_fixed_pool.emplace_back(
-        "internal_fixed_pool", -1, allocator, obj_size, obj_per_pool);
-      m_fixed_pool_map.push_back(obj_size);
+      m_fixed_pool.emplace_back(util::make_unique<FixedPool>("internal_fixed_pool", -1, allocator, obj_size, obj_per_pool));
+      m_fixed_pool_map.emplace_back(obj_size);
     } else {
       break;
     }
@@ -68,7 +67,7 @@ void* MixedPool::allocate(std::size_t bytes)
 
   if (static_cast<std::size_t>(index) < m_fixed_pool.size()) {
     // allocate in fixed pool
-    mem = m_fixed_pool[index].allocate();
+    mem = m_fixed_pool[index]->allocate();
     m_map[reinterpret_cast<uintptr_t>(mem)] = index;
   }
   else {
@@ -88,7 +87,7 @@ void MixedPool::deallocate(void* ptr)
       m_dynamic_pool.deallocate(ptr);
     }
     else {
-      m_fixed_pool[index].deallocate(ptr);
+      m_fixed_pool[index]->deallocate(ptr);
     }
   }
 }
@@ -101,7 +100,7 @@ void MixedPool::release()
 std::size_t MixedPool::getCurrentSize() const noexcept
 {
   std::size_t size = 0;
-  for (auto& fp : m_fixed_pool) size += fp.getCurrentSize();
+  for (auto& fp : m_fixed_pool) size += fp->getCurrentSize();
   size += m_dynamic_pool.getCurrentSize();
   return size;
 }
@@ -109,7 +108,7 @@ std::size_t MixedPool::getCurrentSize() const noexcept
 std::size_t MixedPool::getActualSize() const noexcept
 {
   std::size_t size = 0;
-  for (auto& fp : m_fixed_pool) size += fp.getActualSize();
+  for (auto& fp : m_fixed_pool) size += fp->getActualSize();
   size += m_dynamic_pool.getActualSize();
   return size;
 }
@@ -117,7 +116,7 @@ std::size_t MixedPool::getActualSize() const noexcept
 std::size_t MixedPool::getHighWatermark() const noexcept
 {
   std::size_t size = 0;
-  for (auto& fp : m_fixed_pool) size += fp.getHighWatermark();
+  for (auto& fp : m_fixed_pool) size += fp->getHighWatermark();
   size += m_dynamic_pool.getHighWatermark();
   return size;
 }

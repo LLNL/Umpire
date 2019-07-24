@@ -76,7 +76,7 @@ class MixedPool :
     using IntMap = std::map<uintptr_t, int>;
     IntMap m_map;
     std::vector<std::size_t> m_fixed_pool_map;
-    std::vector<FixedPool> m_fixed_pool;
+    std::vector<std::unique_ptr<FixedPool>> m_fixed_pool;
     DynamicPool m_dynamic_pool;
     AllocationStrategy* m_allocator;
 };
