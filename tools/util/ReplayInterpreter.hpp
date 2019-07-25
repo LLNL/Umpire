@@ -49,6 +49,7 @@ class ReplayInterpreter {
 
     void strip_off_base(std::string& s);
     void replay_makeAllocator( void );
+    void replay_makeMemoryResource( void );
     void replay_allocate( void );
     void replay_deallocate( void );
     void replay_coalesce( void );
