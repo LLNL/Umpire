@@ -20,10 +20,21 @@
 
 ReplayOperation::ReplayOperation(
     std::vector<umpire::Allocator>& alloc_array,
-    AllocationOpMap& alloc_operations
+    AllocationOpMap& alloc_operations,
+    std::vector<std::string>& resource_names
 ) :   m_alloc_array(alloc_array)
     , m_alloc_operations(alloc_operations)
+    , m_resource_names(resource_names)
 {
+}
+
+void ReplayOperation::makeMemoryResources( void )
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  for ( auto resource_name : m_resource_names ) {
+    m_alloc_array.push_back(rm.getAllocator(resource_name));
+  }
 }
 
 void ReplayOperation::runOperations()
@@ -421,9 +432,18 @@ ReplayOperationManager::~ReplayOperationManager() { }
 
 void ReplayOperationManager::runOperations()
 {
+  ReplayOperation m_op(m_allocator_array, m_alloc_operations, m_resource_names);
+
+  m_op.makeMemoryResources();
+
   for (auto op : operations) {
     op->runOperations();
   }
+}
+
+void ReplayOperationManager::makeMemoryResource( const std::string& resource_name )
+{
+  m_resource_names.push_back(resource_name);
 }
 
 //
@@ -436,7 +456,7 @@ void ReplayOperationManager::makeAdvisor(
     const std::string& advice_operation,
     const int device_id
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
@@ -452,7 +472,7 @@ void ReplayOperationManager::makeAdvisor(
     const std::string& accessing_allocator_name,
     const int device_id
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
@@ -466,7 +486,7 @@ void ReplayOperationManager::makeAdvisor(
     const std::string& base_allocator_name,
     const std::string& advice_operation
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
@@ -481,7 +501,7 @@ void ReplayOperationManager::makeAdvisor(
     const std::string& advice_operation,
     const std::string& accessing_allocator_name
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
@@ -500,7 +520,7 @@ void ReplayOperationManager::makeFixedPool(
   , const std::size_t objects_per_pool
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeFixedPool(
               introspection
@@ -520,7 +540,7 @@ void ReplayOperationManager::makeFixedPool(
   , const std::size_t object_bytes
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeFixedPool(
               introspection
@@ -544,7 +564,7 @@ void ReplayOperationManager::makeDynamicPool(
     , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
     , int alignment
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeDynamicPool(
               introspection
@@ -567,7 +587,7 @@ void ReplayOperationManager::makeDynamicPool(
     , const std::size_t min_alloc_size
     , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeDynamicPool(
               introspection
@@ -587,7 +607,7 @@ void ReplayOperationManager::makeDynamicPool(
     , const std::string& base_allocator_name
     , const std::size_t initial_alloc_size
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeDynamicPool(
               introspection
@@ -604,7 +624,7 @@ void ReplayOperationManager::makeDynamicPool(
     , const std::string& allocator_name
     , const std::string& base_allocator_name
 ) {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeDynamicPool(
               introspection
@@ -622,7 +642,7 @@ void ReplayOperationManager::makeMonotonicAllocator(
   , const std::string& base_allocator_name
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMonotonicAllocator(
               introspection
@@ -641,7 +661,7 @@ void ReplayOperationManager::makeSlotPool(
   , const std::string& base_allocator_name
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeSlotPool(
               introspection
@@ -660,7 +680,7 @@ void ReplayOperationManager::makeSizeLimiter(
   , const std::size_t size_limit
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeSizeLimiter(
               introspection
@@ -678,7 +698,7 @@ void ReplayOperationManager::makeThreadSafeAllocator(
   , const std::string& base_allocator_name
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeThreadSafeAllocator(
               introspection
@@ -703,7 +723,7 @@ void ReplayOperationManager::makeMixedPool(
   , int alignment
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -735,7 +755,7 @@ void ReplayOperationManager::makeMixedPool(
   , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -764,7 +784,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t dynamic_initial_alloc_bytes
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -790,7 +810,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t size_multiplier
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -814,7 +834,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t max_fixed_blocksize
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -836,7 +856,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t largest_fixed_blocksize
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -856,7 +876,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t smallest_fixed_blocksize
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -874,7 +894,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::string& base_allocator_name
 )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
 
   m_cont_op->makeMixedPool(
               introspection
@@ -895,7 +915,7 @@ void ReplayOperationManager::makeAllocatorCont( void )
 //
 void ReplayOperationManager::makeAllocate( int allocator_num, std::size_t size )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
   m_cont_op->makeAllocate(allocator_num, size);
   operations.push_back(m_cont_op);
 }
@@ -907,21 +927,21 @@ void ReplayOperationManager::makeAllocateCont( uint64_t allocation_from_log )
 
 void ReplayOperationManager::makeDeallocate( int allocator_num, uint64_t allocation_from_log )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
   m_cont_op->makeDeallocate(allocator_num, allocation_from_log);
   operations.push_back(m_cont_op);
 }
 
 void ReplayOperationManager::makeCoalesce( const std::string& allocator_name )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
   m_cont_op->makeCoalesce(allocator_name);
   operations.push_back(m_cont_op);
 }
 
 void ReplayOperationManager::makeRelease( int allocator_num )
 {
-  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations);
+  m_cont_op = new ReplayOperation(m_allocator_array, m_alloc_operations, m_resource_names);
   m_cont_op->makeRelease(allocator_num);
   operations.push_back(m_cont_op);
 }

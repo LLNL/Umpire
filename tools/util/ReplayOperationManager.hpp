@@ -27,8 +27,11 @@ public:
 
   ReplayOperation(
       std::vector<umpire::Allocator>& alloc_array,
-      AllocationOpMap& alloc_operations
+      AllocationOpMap& alloc_operations,
+      std::vector<std::string>& m_resource_names
   );
+
+  void makeMemoryResources( void );
 
   void runOperations();
 
@@ -164,6 +167,7 @@ private:
   std::vector<umpire::Allocator>& m_alloc_array;
   AllocationOpMap& m_alloc_operations;
   void* m_allocation_ptr;
+  std::vector<std::string>& m_resource_names;
 };
 
 class ReplayOperationManager {
@@ -173,6 +177,8 @@ public:
   ~ReplayOperationManager();
 
   void runOperations();
+
+  void makeMemoryResource( const std::string& resource_name );
 
   //
   // AllocationAdvisor
@@ -383,6 +389,7 @@ private:
   ReplayOperation::AllocationOpMap m_alloc_operations;
   ReplayOperation* m_cont_op;
   std::vector<ReplayOperation*> operations;
+  std::vector<std::string> m_resource_names;
 };
 
 #include "util/ReplayOperationManager.inl"

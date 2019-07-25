@@ -37,7 +37,7 @@ void ReplayInterpreter::buildOperations(void)
       replay_makeAllocator();
     }
     else if ( m_json["event"] == "makeMemoryResource" ) {
-      ;
+      replay_makeMemoryResource();
     }
     else if ( m_json["event"] == "allocate" ) {
       replay_allocate();
@@ -95,7 +95,7 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
       replay_makeAllocator();
     }
     else if ( m_json["event"] == "makeMemoryResource" ) {
-      ;
+      replay_makeMemoryResource();
     }
     else if ( m_json["event"] == "allocate" ) {
       replay_allocate();
@@ -158,6 +158,19 @@ void ReplayInterpreter::strip_off_base(std::string& s)
       s.erase(s.length() - base.length(), base.length());
     }
   }
+}
+
+void ReplayInterpreter::replay_makeMemoryResource( void )
+{
+  const std::string& allocator_name = m_json["payload"]["name"];
+  const std::string& obj_s = m_json["result"];
+  const uint64_t obj_p = std::stoul(obj_s, nullptr, 0);
+
+  m_allocator_indices[obj_p] = m_num_allocators++;
+  compare_ss  << allocator_name
+              << " " << m_allocator_indices[obj_p];
+
+  m_operation_mgr.makeMemoryResource(allocator_name);
 }
 
 void ReplayInterpreter::replay_makeAllocator( void )
