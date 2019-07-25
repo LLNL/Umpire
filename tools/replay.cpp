@@ -13,6 +13,7 @@
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "util/ReplayInterpreter.hpp"
+#include "util/ReplayMacros.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -39,10 +40,9 @@ int main(int argc, char* argv[])
     exit(0);
   }
 
-  if ( ! command_line_args.count("infile") ) {
-    std::cerr << "No input file specified\n";
-    exit(1);
-  }
+  if ( ! command_line_args.count("infile") )
+    REPLAY_ERROR("No input file specified");
+
   std::string input_file_name = command_line_args["infile"].as<std::string>();
 
   std::chrono::high_resolution_clock::time_point t1;

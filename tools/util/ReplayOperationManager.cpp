@@ -16,6 +16,7 @@
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "util/ReplayMacros.hpp"
 #include "util/ReplayOperationManager.hpp"
 
 ReplayOperation::ReplayOperation(
@@ -414,7 +415,7 @@ void ReplayOperation::makeCoalesce(
     if (dynamic_pool)
       dynamic_pool->coalesce();
     else
-      std::cerr << allocator_name << " is not a dynamic pool, skipping\n";
+      REPLAY_ERROR(allocator_name << " is not a dynamic pool, skipping");
   };
 }
 
