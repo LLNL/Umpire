@@ -20,15 +20,17 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+class ReplayOperationManager;
 class ReplayOperation {
 public:
   using AllocationOpMap = std::unordered_map<uint64_t, ReplayOperation*>;
   std::function<void ()> op;
 
   ReplayOperation(
-      std::vector<umpire::Allocator>& alloc_array,
-      AllocationOpMap& alloc_operations
+      ReplayOperationManager& my_manager
   );
+
+  void makeMemoryResources( void );
 
   void runOperations();
 
@@ -161,18 +163,22 @@ public:
   void makeRelease(int allocator_num);
 
 private:
-  std::vector<umpire::Allocator>& m_alloc_array;
-  AllocationOpMap& m_alloc_operations;
+  ReplayOperationManager& m_my_manager;
   void* m_allocation_ptr;
 };
 
 class ReplayOperationManager {
+
+  friend ReplayOperation;
+
 public:
   ReplayOperationManager( void );
 
   ~ReplayOperationManager();
 
   void runOperations();
+
+  void makeMemoryResource( const std::string& resource_name );
 
   //
   // AllocationAdvisor
@@ -383,6 +389,7 @@ private:
   ReplayOperation::AllocationOpMap m_alloc_operations;
   ReplayOperation* m_cont_op;
   std::vector<ReplayOperation*> operations;
+  std::vector<std::string> m_resource_names;
 };
 
 #include "util/ReplayOperationManager.inl"

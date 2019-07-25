@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+#include "umpire/config.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/op/MemoryOperation.hpp"
@@ -26,6 +27,17 @@ public:
   replayTest() : testAllocations(3), allocationSize(16)
   {
     auto& rm = umpire::ResourceManager::getInstance();
+
+    allocatorNames.push_back("HOST");
+#if defined(UMPIRE_ENABLE_DEVICE)
+    allocatorNames.push_back("DEVICE");
+#endif
+#if defined(UMPIRE_ENABLE_UM)
+    allocatorNames.push_back("UM");
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+    allocatorNames.push_back("PINNED");
+#endif
 
     rm.makeAllocator<umpire::strategy::MixedPool>(
           "host_mixedpool_default"

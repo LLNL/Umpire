@@ -9,6 +9,7 @@
 #include <string>
 
 #include "util/ReplayInterpreter.hpp"
+#include "util/ReplayMacros.hpp"
 #include "util/ReplayOperationManager.hpp"
 #include "umpire/tpl/json/json.hpp"
 
@@ -37,7 +38,7 @@ void ReplayInterpreter::buildOperations(void)
       replay_makeAllocator();
     }
     else if ( m_json["event"] == "makeMemoryResource" ) {
-      ;
+      replay_makeMemoryResource();
     }
     else if ( m_json["event"] == "allocate" ) {
       replay_allocate();
@@ -55,20 +56,19 @@ void ReplayInterpreter::buildOperations(void)
       if (   m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR
           || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
           || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
-        std::cerr << "Warning, version mismatch:\n"
+
+        REPLAY_ERROR("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
           << m_json["payload"]["major"] << "."
           << m_json["payload"]["minor"]  << "."
-          << m_json["payload"]["patch"]  << std::endl;
+          << m_json["payload"]["patch"]);
       }
     }
     else {
-      std::cerr << "Unknown Replay (" << m_json["event"] << ")\n";
-      exit (1);
+      REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
     }
     compare_ss << std::endl;
-    // std::cout << compare_ss.str();
   }
 }
 
@@ -95,7 +95,7 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
       replay_makeAllocator();
     }
     else if ( m_json["event"] == "makeMemoryResource" ) {
-      ;
+      replay_makeMemoryResource();
     }
     else if ( m_json["event"] == "allocate" ) {
       replay_allocate();
@@ -113,17 +113,17 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
       if (   m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR
           || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
           || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
-        std::cerr << "Warning, version mismatch:\n"
+
+        REPLAY_ERROR("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
           << m_json["payload"]["major"] << "."
           << m_json["payload"]["minor"]  << "."
-          << m_json["payload"]["patch"]  << std::endl;
+          << m_json["payload"]["patch"]);
       }
     }
     else {
-      std::cerr << "Unknown Replay (" << m_json["event"] << ")\n";
-      return -1;
+      REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
     }
 
     compare_ss << std::endl;
@@ -137,10 +137,8 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
 ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
     m_input_file(in_file_name), m_num_allocators(0), m_op_seq(0)
 {
-  if ( ! m_input_file.is_open() ) {
-    std::cerr << "Unable to open input file " << in_file_name << std::endl;
-    exit (1);
-  }
+  if ( ! m_input_file.is_open() )
+    REPLAY_ERROR("Unable to open input file " << in_file_name);
 }
 
 template <typename T> void get_from_string( const std::string& s, T& val )
@@ -158,6 +156,19 @@ void ReplayInterpreter::strip_off_base(std::string& s)
       s.erase(s.length() - base.length(), base.length());
     }
   }
+}
+
+void ReplayInterpreter::replay_makeMemoryResource( void )
+{
+  const std::string& allocator_name = m_json["payload"]["name"];
+  const std::string& obj_s = m_json["result"];
+  const uint64_t obj_p = std::stoul(obj_s, nullptr, 0);
+
+  m_allocator_indices[obj_p] = m_num_allocators++;
+  compare_ss  << allocator_name
+              << " " << m_allocator_indices[obj_p];
+
+  m_operation_mgr.makeMemoryResource(allocator_name);
 }
 
 void ReplayInterpreter::replay_makeAllocator( void )
@@ -193,9 +204,8 @@ void ReplayInterpreter::replay_makeAllocator( void )
       if (device_id >= 0) { // Optional device ID specified
         switch ( numargs ) {
         default:
-          std::cerr << "Invalid number of arguments (" << numargs
-            << " for " << type << " operation.  Stopping" << std::endl;
-          exit(1);
+          REPLAY_ERROR("Invalid number of arguments (" << numargs
+            << " for " << type << " operation.  Stopping");
         case 3:
           compare_ss << introspection 
             << " " << allocator_name 
@@ -226,9 +236,8 @@ void ReplayInterpreter::replay_makeAllocator( void )
       else { // Use default device_id
         switch ( numargs ) {
         default:
-          std::cerr << "Invalid number of arguments (" << numargs
-            << " for " << type << " operation.  Stopping" << std::endl;
-          exit(1);
+          REPLAY_ERROR("Invalid number of arguments (" << numargs
+            << " for " << type << " operation.  Stopping");
         case 2:
           compare_ss << introspection 
             << " " << allocator_name 
@@ -617,8 +626,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
       }
     }
     else {
-      std::cerr << "Unknown class (" << type << "), skipping.\n";
-      return;
+      REPLAY_ERROR("Unknown class (" << type << "), skipping.");
     }
   }
   else {
@@ -638,10 +646,8 @@ void ReplayInterpreter::replay_allocate( void )
   const uint64_t alloc_obj_p = std::stoul(alloc_obj_s, nullptr, 0);
   auto n_iter = m_allocator_indices.find(alloc_obj_p);
 
-  if ( n_iter == m_allocator_indices.end() ) {
-    std::cerr << "Unknown allocator " << (void*)alloc_obj_p << std::endl;
-    return;           // Just skip unknown allocators
-  }
+  if ( n_iter == m_allocator_indices.end() )
+    REPLAY_ERROR("Unknown allocator " << (void*)alloc_obj_p);
 
   const AllocatorIndex& allocator_number = n_iter->second;
 
@@ -675,10 +681,8 @@ void ReplayInterpreter::replay_deallocate( void )
   const uint64_t alloc_obj_p = std::stoul(alloc_obj_s, nullptr, 0);
   auto n_iter = m_allocator_indices.find(alloc_obj_p);
 
-  if ( n_iter == m_allocator_indices.end() ) {
-    std::cout << "Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " deallocation ignored" <<  std::endl;
-    return;           // Just skip unknown allocators
-  }
+  if ( n_iter == m_allocator_indices.end() )
+    REPLAY_ERROR("Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " deallocation ignored");
 
   const AllocatorIndex& allocator_number = n_iter->second;
 
@@ -705,10 +709,8 @@ void ReplayInterpreter::replay_release( void )
   const uint64_t alloc_obj_p = std::stoul(alloc_obj_s, nullptr, 0);
   auto n_iter = m_allocator_indices.find(alloc_obj_p);
 
-  if ( n_iter == m_allocator_indices.end() ) {
-    std::cout << "Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " release ignored" <<  std::endl;
-    return;
-  }
+  if ( n_iter == m_allocator_indices.end() )
+    REPLAY_ERROR("Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " release ignored");
 
   const AllocatorIndex& allocator_number = n_iter->second;
   compare_ss << allocator_number;

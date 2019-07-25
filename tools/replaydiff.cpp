@@ -76,6 +76,10 @@ int main(int argc, char* argv[])
       std::cerr << "Miscompare:" << std::endl;
       std::cerr << left_raw << std::endl;
       std::cerr << right_raw << std::endl;
+
+      std::cerr << left_sym << std::endl;
+      std::cerr << right_sym << std::endl;
+
       return -2;
     }
     // std::cout << "OK: " << left_sym;

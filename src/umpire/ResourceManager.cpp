@@ -172,6 +172,12 @@ ResourceManager::initialize()
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("HOST", getNextId()))};
 
+    UMPIRE_REPLAY(
+         "\"event\": \"makeMemoryResource\""
+      << ", \"payload\": { \"name\": \"" << "HOST" << "\" }"
+      << ", \"result\": \"" << host_allocator.get() << "\""
+    );
+
     int id{host_allocator->getId()};
     m_allocators_by_name["HOST"]  = host_allocator.get();
     m_memory_resources[resource::Host] = host_allocator.get();
@@ -217,6 +223,11 @@ ResourceManager::initialize()
         strategy::AllocationTracker,
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("DEVICE", getNextId()))};
+    UMPIRE_REPLAY(
+         "\"event\": \"makeMemoryResource\""
+      << ", \"payload\": { \"name\": \"" << "DEVICE" << "\" }"
+      << ", \"result\": \"" << allocator.get() << "\""
+    );
 
 
     int id{allocator->getId()};
@@ -234,6 +245,11 @@ ResourceManager::initialize()
         strategy::AllocationTracker,
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("PINNED", getNextId()))};
+    UMPIRE_REPLAY(
+         "\"event\": \"makeMemoryResource\""
+      << ", \"payload\": { \"name\": \"" << "PINNED" << "\" }"
+      << ", \"result\": \"" << allocator.get() << "\""
+    );
 
     int id{allocator->getId()};
     m_allocators_by_name["PINNED"] = allocator.get();
@@ -250,6 +266,11 @@ ResourceManager::initialize()
         strategy::AllocationTracker,
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("UM", getNextId()))};
+    UMPIRE_REPLAY(
+         "\"event\": \"makeMemoryResource\""
+      << ", \"payload\": { \"name\": \"" << "UM" << "\" }"
+      << ", \"result\": \"" << allocator.get() << "\""
+    );
 
     int id{allocator->getId()};
     m_allocators_by_name["UM"] = allocator.get();
@@ -266,6 +287,11 @@ ResourceManager::initialize()
         strategy::AllocationTracker,
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("DEVICE_CONST", getNextId()))};
+    UMPIRE_REPLAY(
+         "\"event\": \"makeMemoryResource\""
+      << ", \"payload\": { \"name\": \"" << "DEVICE_CONST" << "\" }"
+      << ", \"result\": \"" << allocator.get() << "\""
+    );
 
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE_CONST"] = allocator.get();
