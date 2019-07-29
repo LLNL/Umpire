@@ -93,9 +93,7 @@
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
   umpire_oss_error << " " << __func__ << " " << msg;               \
-  umpire::log().flush();                                           \
-  umpire::replay().flush();                                        \
-  umpire::error().flush();                                         \
+  umpire::util::io_flush();                                        \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \

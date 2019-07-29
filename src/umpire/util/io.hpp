@@ -25,6 +25,13 @@ namespace util {
  */
 void initialize_io(const bool enable_log, const bool enable_replay);
 
+/*!
+ * \brief Synchronize all stream buffers to their respective output sequences.
+ * This function is usually called by exception generating code like
+ * UMPIRE_ERROR.
+ */
+void io_flush( void );
+
 } // end namespace util
 } // end namespace umpire
 

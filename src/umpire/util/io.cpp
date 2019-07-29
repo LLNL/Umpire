@@ -154,6 +154,13 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   MPI::logMpiInfo();
 }
 
+void io_flush( void )
+{
+  log().flush();
+  replay().flush();
+  error().flush();
+}
+
 
 static std::string
 make_unique_filename(
