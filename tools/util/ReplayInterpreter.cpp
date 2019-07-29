@@ -11,11 +11,59 @@
 #include "util/ReplayInterpreter.hpp"
 #include "util/ReplayMacros.hpp"
 #include "util/ReplayOperationManager.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/tpl/json/json.hpp"
+#include "umpire/util/AllocationRecord.hpp"
 
 void ReplayInterpreter::runOperations(void)
 {
   m_operation_mgr.runOperations();
+}
+
+void ReplayInterpreter::buildAllocMapOperations(void)
+{
+  while ( std::getline(m_input_file, m_line) ) {
+    const std::string header("{ \"kind\":\"replay\", \"uid\":");
+    auto header_len = header.size();
+
+    if ( m_line.size() <= header_len || m_line.substr(0, header_len) != header.substr(0, header_len) )
+      continue;
+
+    m_json.clear();
+    m_json = nlohmann::json::parse(m_line);
+
+    if (   m_json["event"] == "makeAllocator"
+        || m_json["event"] == "makeMemoryResource"
+        || m_json["event"] == "allocate"
+        || m_json["event"] == "deallocate"
+        || m_json["event"] == "coalesce"
+        || m_json["event"] == "release"
+        || m_json["event"] == "version"
+    ) {
+      continue;
+    }
+
+    ++m_op_seq;
+    compare_ss.str("");
+    compare_ss << m_json["event"] << " ";
+
+    if ( m_json["event"] == "allocation_map_insert" ) {
+      replay_makeAllocationMapInsert();
+    }
+    else if ( m_json["event"] == "allocation_map_find" ) {
+      replay_makeAllocationMapFind();
+    }
+    else if ( m_json["event"] == "allocation_map_remove" ) {
+      replay_makeAllocationMapRemove();
+    }
+    else if ( m_json["event"] == "allocation_map_clear" ) {
+      replay_makeAllocationMapClear();
+    }
+    else {
+      REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
+    }
+    compare_ss << std::endl;
+  }
 }
 
 void ReplayInterpreter::buildOperations(void)
@@ -29,6 +77,14 @@ void ReplayInterpreter::buildOperations(void)
 
     m_json.clear();
     m_json = nlohmann::json::parse(m_line);
+
+    if (   m_json["event"] == "allocation_map_insert" 
+        || m_json["event"] == "allocation_map_find"
+        || m_json["event"] == "allocation_map_remove"
+        || m_json["event"] == "allocation_map_clear"
+    ) {
+      continue;
+    }
 
     ++m_op_seq;
     compare_ss.str("");
@@ -86,6 +142,14 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
 
     m_json.clear();
     m_json = nlohmann::json::parse(m_line);
+
+    if (   m_json["event"] == "allocation_map_insert" 
+        || m_json["event"] == "allocation_map_find"
+        || m_json["event"] == "allocation_map_remove"
+        || m_json["event"] == "allocation_map_clear"
+    ) {
+      continue;
+    }
 
     ++m_op_seq;
     compare_ss.str("");
@@ -716,3 +780,41 @@ void ReplayInterpreter::replay_release( void )
   compare_ss << allocator_number;
   m_operation_mgr.makeRelease(allocator_number);
 }
+
+void ReplayInterpreter::replay_makeAllocationMapInsert( void )
+{
+  const std::string key_s = m_json["payload"]["ptr"];
+  void* key = reinterpret_cast<void*>(std::stoul(key_s, nullptr, 0));
+  const std::string rec_ptr_s = m_json["payload"]["record_ptr"];
+  const std::string rec_size_s = m_json["payload"]["record_size"];
+  const std::string rec_strategy_s = m_json["payload"]["record_strategy"];
+
+  umpire::util::AllocationRecord arec;
+  arec.ptr = reinterpret_cast<void*>(std::stoul(rec_ptr_s, nullptr, 0));
+  arec.size = reinterpret_cast<std::size_t>(std::stoul(rec_size_s, nullptr, 0));
+  arec.strategy = reinterpret_cast<umpire::strategy::AllocationStrategy*>(std::stoul(rec_strategy_s, nullptr, 0));
+
+  m_operation_mgr.makeAllocationMapInsert(key, arec);
+}
+
+void ReplayInterpreter::replay_makeAllocationMapFind( void )
+{
+  const std::string key_s = m_json["payload"]["ptr"];
+  void* key = reinterpret_cast<void*>(std::stoul(key_s, nullptr, 0));
+
+  m_operation_mgr.makeAllocationMapFind(key);
+}
+
+void ReplayInterpreter::replay_makeAllocationMapRemove( void )
+{
+  const std::string key_s = m_json["payload"]["ptr"];
+  void* key = reinterpret_cast<void*>(std::stoul(key_s, nullptr, 0));
+
+  m_operation_mgr.makeAllocationMapRemove(key);
+}
+
+void ReplayInterpreter::replay_makeAllocationMapClear( void )
+{
+  m_operation_mgr.makeAllocationMapClear();
+}
+

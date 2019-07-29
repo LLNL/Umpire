@@ -15,6 +15,8 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/util/AllocationMap.hpp"
+#include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "util/ReplayMacros.hpp"
 #include "util/ReplayOperationManager.hpp"
@@ -419,6 +421,34 @@ void ReplayOperation::makeRelease( int allocator_num )
 {
   op = [=]() {
     this->m_my_manager.m_allocator_array[allocator_num].release();
+  };
+}
+
+void ReplayOperation::makeAllocationMapInsert(void* key, umpire::util::AllocationRecord rec)
+{
+  op = [=]() {
+    this->m_my_manager.m_allocation_map.insert(key, rec);
+  };
+}
+
+void ReplayOperation::makeAllocationMapFind(void* key)
+{
+  op = [=]() {
+    this->m_my_manager.m_allocation_map.find(key);
+  };
+}
+
+void ReplayOperation::makeAllocationMapRemove(void* key)
+{
+  op = [=]() {
+    this->m_my_manager.m_allocation_map.remove(key);
+  };
+}
+
+void ReplayOperation::makeAllocationMapClear(void)
+{
+  op = [=]() {
+    this->m_my_manager.m_allocation_map.clear();
   };
 }
 
@@ -942,3 +972,32 @@ void ReplayOperationManager::makeRelease( int allocator_num )
   m_cont_op->makeRelease(allocator_num);
   operations.push_back(m_cont_op);
 }
+
+void ReplayOperationManager::makeAllocationMapInsert(void* key, umpire::util::AllocationRecord rec)
+{
+  m_cont_op = new ReplayOperation(*this);
+  m_cont_op->makeAllocationMapInsert(key, rec);
+  operations.push_back(m_cont_op);
+}
+
+void ReplayOperationManager::makeAllocationMapFind(void* key)
+{
+  m_cont_op = new ReplayOperation(*this);
+  m_cont_op->makeAllocationMapFind(key);
+  operations.push_back(m_cont_op);
+}
+
+void ReplayOperationManager::makeAllocationMapRemove(void* key)
+{
+  m_cont_op = new ReplayOperation(*this);
+  m_cont_op->makeAllocationMapRemove(key);
+  operations.push_back(m_cont_op);
+}
+
+void ReplayOperationManager::makeAllocationMapClear(void)
+{
+  m_cont_op = new ReplayOperation(*this);
+  m_cont_op->makeAllocationMapClear();
+  operations.push_back(m_cont_op);
+}
+
