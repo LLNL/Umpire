@@ -24,6 +24,9 @@ int main(int argc, char* argv[])
     (  "h, help"
      , "Print help"
     )
+    (  "a, allocation_map"
+     , "Replay allocation map"
+    )
     (  "t, time"
      , "Display replay times"
     )
@@ -51,7 +54,14 @@ int main(int argc, char* argv[])
 
   t1 = std::chrono::high_resolution_clock::now();
   ReplayInterpreter replay(input_file_name);
-  replay.buildOperations();
+
+  if (command_line_args.count("allocation_map")) {
+    replay.buildAllocMapOperations();
+  }
+  else {
+    replay.buildOperations();
+  }
+
   t2 = std::chrono::high_resolution_clock::now();
 
   if (command_line_args.count("time")) {

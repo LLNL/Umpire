@@ -17,6 +17,7 @@
 class ReplayInterpreter {
   public:
     void buildOperations(void);
+    void buildAllocMapOperations(void);
     void runOperations(void);
 
     //
@@ -54,6 +55,10 @@ class ReplayInterpreter {
     void replay_deallocate( void );
     void replay_coalesce( void );
     void replay_release( void );
+    void replay_makeAllocationMapInsert( void );
+    void replay_makeAllocationMapFind( void );
+    void replay_makeAllocationMapRemove( void );
+    void replay_makeAllocationMapClear( void );
 };
 
 #include "util/ReplayInterpreter.inl"
