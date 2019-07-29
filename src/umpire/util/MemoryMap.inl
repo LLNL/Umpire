@@ -197,7 +197,9 @@ void MemoryMap<V>::clear() noexcept
 {
   // Loop over the level 0 tree
   Key key{0};
-  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0); m_last; m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0))
+  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0);
+      m_last;
+      m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0))
     removeLast();
 
   m_size = 0;
