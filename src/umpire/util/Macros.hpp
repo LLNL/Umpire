@@ -8,6 +8,7 @@
 #define UMPIRE_Macros_HPP
 
 #include "umpire/util/Exception.hpp"
+#include "umpire/util/io.hpp"
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
@@ -86,11 +87,15 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
+
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
   umpire_oss_error << " " << __func__ << " " << msg;               \
+  umpire::log().flush();                                           \
+  umpire::replay().flush();                                        \
+  umpire::error().flush();                                         \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
