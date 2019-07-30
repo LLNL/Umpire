@@ -10,6 +10,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/util/MemoryMap.hpp"
+#include "umpire/util/FixedMallocPoolAllocator.hpp"
 
 #include "umpire/Allocator.hpp"
 
@@ -116,7 +117,7 @@ class DynamicPool : public AllocationStrategy
     using SizeTuple = std::tuple<std::size_t, bool, std::size_t>;
     using AddressTuple = std::tuple<Pointer, bool, std::size_t>;
     using AddressMap = util::MemoryMap<SizeTuple>;
-    using SizeMap = std::multimap<std::size_t, AddressTuple>;
+  using SizeMap = std::multimap<std::size_t, AddressTuple, std::less<std::size_t>, util::FixedMallocPoolAllocator<std::pair<const std::size_t, AddressTuple>>>;
 
     // Insert a block to the used map
     void insertUsed(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);

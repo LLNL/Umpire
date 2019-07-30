@@ -8,6 +8,7 @@ set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
   Exception.hpp
+  FixedMallocPoolAllocator.hpp
   FixedMallocPool.hpp
   IOManager.hpp
   Logger.hpp

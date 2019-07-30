@@ -59,7 +59,7 @@ private:
   // to avoid a memory leak.
 };
 
-} // end namespace strategy
+} // end namespace util
 } // end namespace umpire
 
-#endif // UMPIRE_FixedPool_HPP
+#endif // UMPIRE_FixedMallocPool_HPP
