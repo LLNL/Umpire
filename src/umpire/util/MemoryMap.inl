@@ -15,7 +15,7 @@ namespace util {
 namespace {
 
 // Judy: number of Integers in a key
-static constexpr unsigned int judy_depth{1};
+static constexpr unsigned int judy_depth{sizeof(uintptr_t)/sizeof(int)};
 
 // Judy: max height of stack
 static constexpr unsigned int judy_max_levels{sizeof(uintptr_t)};
