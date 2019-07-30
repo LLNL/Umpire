@@ -44,6 +44,8 @@ and a dynamic pool for those that are larger.
 - RELEASE_NOTES file detailing the subset of changes that will impact users the
   most.
 
+- Added an STL allocator based on FixedMallocPool.
+
 ### Changed
 
 - Replay program refactored to speed up running of the operations being
