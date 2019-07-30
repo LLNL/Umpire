@@ -210,8 +210,11 @@ AllocationMap::find(void* ptr) const
   } else {
 #if !defined(NDEBUG)
     // use this from a debugger to dump the contents of the AllocationMap
-    printAll();
+    // printAll();
 #endif
+    char* cptr = reinterpret_cast<char*>(ptr);
+    auto tmp_record = doFindRecord(cptr-1);
+
     UMPIRE_ERROR("Allocation not mapped: " << ptr);
   }
 }
