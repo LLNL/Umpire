@@ -16,10 +16,24 @@ blt_add_test(
   NAME exception_tests
   COMMAND exception_tests)
 
+set (allocation_map_tests_depends
+  umpire gtest)
+
+if (ENABLE_CUDA)
+  set (allocation_map_tests_depends
+    ${allocation_map_tests_depends}
+    cuda_runtime)
+endif ()
+if (ENABLE_HIP)
+  set (allocation_map_tests_depends
+    ${allocation_map_tests_depends}
+    hip_runtime)
+endif ()
+
 blt_add_executable(
   NAME allocation_map_tests
   SOURCES allocation_map_tests.cpp
-  DEPENDS_ON umpire gtest
+  DEPENDS_ON ${allocation_map_tests_depends}
   OUTPUT_DIR ${util_dir})
 
 blt_add_test(

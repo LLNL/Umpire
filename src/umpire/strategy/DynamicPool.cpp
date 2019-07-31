@@ -114,21 +114,56 @@ DynamicPool::findFreeBlock(std::size_t bytes) const
   return iter;
 }
 
+void* DynamicPool::allocateFromResource(std::size_t bytes)
+{
+  void* ptr{nullptr};
+  try {
+    ptr = m_allocator->allocate(bytes);
+  } catch (...) {
+    UMPIRE_LOG(Error,
+               "\n\tMemory exhausted at allocation resource. "
+               "Attempting to give blocks back.\n\t"
+               << getCurrentSize() << " Allocated to pool, "
+               << getFreeBlocks() << " Free Blocks, "
+               << getInUseBlocks() << " Used Blocks\n"
+      );
+    releaseFreeBlocks();
+    UMPIRE_LOG(Error,
+               "\n\tMemory exhausted at allocation resource.  "
+               "\n\tRetrying allocation operation: "
+               << getCurrentSize() << " Bytes still allocated to pool, "
+               << getFreeBlocks() << " Free Blocks, "
+               << getInUseBlocks() << " Used Blocks\n"
+      );
+    try {
+      ptr = m_allocator->allocate(bytes);
+      UMPIRE_LOG(Error,
+                 "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
+        );
+    }
+    catch (...) {
+      UMPIRE_LOG(Error,
+                 "\n\tUnable to allocate from resource even after giving back free blocks.\n"
+                 "\tThrowing to let application know we have no more memory: "
+                 << getCurrentSize() << " Bytes still allocated to pool\n"
+                 << getFreeBlocks() << " Partially Free Blocks, "
+                 << getInUseBlocks() << " Used Blocks\n"
+        );
+      throw;
+    }
+  }
+  return ptr;
+}
+
 void* DynamicPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
-  const std::size_t actual_bytes = round_up(bytes, m_align_bytes);
+  const std::size_t rounded_bytes = round_up(bytes, m_align_bytes);
   Pointer ptr{nullptr};
 
   // Check if the previous block is a match
-  SizeMap::const_iterator iter{findFreeBlock(actual_bytes)};
-
-  // This is optional, but it might help the growth of the pool...
-  if (iter == m_free_map.end()) {
-    coalesce();
-    iter = findFreeBlock(actual_bytes);
-  }
+  const SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
 
   if (iter != m_free_map.end()) {
     // Found this acceptable address pair
@@ -137,47 +172,38 @@ void* DynamicPool::allocate(std::size_t bytes)
     std::tie(ptr, is_head, whole_bytes) = iter->second;
 
     // Add used map
-    insertUsed(ptr, actual_bytes, is_head, whole_bytes);
+    insertUsed(ptr, rounded_bytes, is_head, whole_bytes);
 
     // Remove the entry from the free map
     const std::size_t free_size = iter->first;
     m_free_map.erase(iter);
 
-    m_curr_bytes += actual_bytes;
+    m_curr_bytes += rounded_bytes;
 
     const int64_t left_bytes{static_cast<int64_t>(
-        free_size - actual_bytes)};
+        free_size - rounded_bytes)};
 
     if (left_bytes > m_align_bytes) {
-      insertFree(static_cast<unsigned char*>(ptr) + actual_bytes, left_bytes,
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
                  false, whole_bytes);
     }
   } else {
-    // Allocate new block -- note that this does not check whether alignment is met
-    if (actual_bytes > m_min_alloc_bytes) {
-      ptr = m_allocator->allocate(actual_bytes);
+    // Allocate new block -- note this does not check whether alignment is met
+    const std::size_t alloc_bytes{std::max(rounded_bytes, m_min_alloc_bytes)};
+    ptr = allocateFromResource(alloc_bytes);
 
-      // Add used
-      insertUsed(ptr, actual_bytes, true, actual_bytes);
+    // Add used
+    insertUsed(ptr, rounded_bytes, true, alloc_bytes);
+    m_actual_bytes += alloc_bytes;
+    m_curr_bytes += rounded_bytes;
 
-      m_actual_bytes += actual_bytes;
-      m_curr_bytes += actual_bytes;
-    } else {
-      ptr = m_allocator->allocate(m_min_alloc_bytes);
-      m_actual_bytes += m_min_alloc_bytes;
+    const int64_t left_bytes{static_cast<int64_t>(
+        m_min_alloc_bytes - rounded_bytes)};
 
-      // Add used
-      insertUsed(ptr, actual_bytes, true, m_min_alloc_bytes);
-      m_curr_bytes += actual_bytes;
-
-      // Add free
-      const int64_t left_bytes{static_cast<int64_t>(
-          m_min_alloc_bytes - actual_bytes)};
-
-      if (left_bytes > m_align_bytes)
-        insertFree(static_cast<unsigned char*>(ptr) + actual_bytes, left_bytes,
-                   false, m_min_alloc_bytes);
-    }
+    // Add free
+    if (left_bytes > m_align_bytes)
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
+                 false, alloc_bytes);
   }
 
   if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
