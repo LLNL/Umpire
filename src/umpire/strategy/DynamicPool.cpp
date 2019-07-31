@@ -15,7 +15,6 @@
 #include <cstdlib>
 #include <algorithm>
 #include <sstream>
-#include <new>
 
 inline static std::size_t round_up(std::size_t num, std::size_t factor)
 {
@@ -150,7 +149,7 @@ void* DynamicPool::allocateFromResource(std::size_t bytes)
                  << getFreeBlocks() << " Partially Free Blocks, "
                  << getInUseBlocks() << " Used Blocks\n"
         );
-      throw std::bad_alloc{};
+      throw;
     }
   }
   return ptr;
