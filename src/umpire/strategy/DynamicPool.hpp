@@ -121,6 +121,11 @@ class DynamicPool : public AllocationStrategy
     using SizeMap = std::multimap<std::size_t, AddressTuple>;
 
     /*!
+     * \brief Allocate from m_allocator.
+     */
+    void* allocateFromResource(std::size_t bytes);
+
+    /*!
      * \brief Insert a block to the used map.
      */
     void insertUsed(Pointer addr, std::size_t bytes, bool is_head,
