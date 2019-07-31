@@ -28,8 +28,9 @@
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 
 #include "umpire/util/FixedMallocPool.hpp"
 
@@ -372,6 +373,54 @@ BENCHMARK_DEFINE_F(DynamicPoolUnified, allocate)(benchmark::State &st) { allocat
 BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate)(benchmark::State &st) { deallocation(st); }
 #endif
 
+template <umpire::resource::MemoryResourceType Resource>
+class MixedPool : public AllocatorRandomSizeBenchmark {
+public:
+  using AllocatorRandomSizeBenchmark::SetUp;
+  using AllocatorRandomSizeBenchmark::TearDown;
+
+  MixedPool() : m_alloc{nullptr} {}
+
+  void TearDown(const ::benchmark::State&) override final { delete m_alloc; }
+
+  virtual void setUpPool() final {
+    auto& rm = umpire::ResourceManager::getInstance();
+
+    std::stringstream ss;
+    ss << "mixed_pool-" << Resource << "." << namecnt;
+    ++namecnt;
+
+    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::MixedPool, Introspection>(
+        ss.str(), rm.getAllocator(Resource))};
+  }
+
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+
+private:
+  umpire::Allocator* m_alloc;
+};
+
+class MixedPoolHost : public MixedPool<umpire::resource::Host> {};
+BENCHMARK_DEFINE_F(MixedPoolHost, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(MixedPoolHost, deallocate)(benchmark::State &st) { deallocation(st); }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+class MixedPoolDevice : public MixedPool<umpire::resource::Device> {};
+BENCHMARK_DEFINE_F(MixedPoolDevice, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(MixedPoolDevice, deallocate)(benchmark::State &st) { deallocation(st); }
+
+class MixedPoolDevicePinned : public MixedPool<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(MixedPoolDevicePinned, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate)(benchmark::State &st) { deallocation(st); }
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+class MixedPoolUnified : public MixedPool<umpire::resource::Unified> {};
+BENCHMARK_DEFINE_F(MixedPoolUnified, allocate)(benchmark::State &st) { allocation(st); }
+BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate)(benchmark::State &st) { deallocation(st); }
+#endif
+
 // Register all the benchmarks
 
 // Base allocators
@@ -446,6 +495,22 @@ BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate)->Args({16, 1024});
 #if defined(UMPIRE_ENABLE_CUDA)
 BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->Args({16, 1024});
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate)->Args({16, 1024});
+#endif
+
+// MixedPool
+BENCHMARK_REGISTER_F(MixedPoolHost, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(MixedPoolHost, deallocate)->Args({16, 1024});
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_REGISTER_F(MixedPoolDevice, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate)->Args({16, 1024});
+
+BENCHMARK_REGISTER_F(MixedPoolDevicePinned, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate)->Args({16, 1024});
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+BENCHMARK_REGISTER_F(MixedPoolUnified, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate)->Args({16, 1024});
 #endif
 
 
