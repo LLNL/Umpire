@@ -204,7 +204,7 @@ void* DynamicPool::allocate(std::size_t bytes)
     // Add free
     if (left_bytes > m_align_bytes)
       insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
-                 false, m_min_alloc_bytes);
+                 false, alloc_bytes);
   }
 
   if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
