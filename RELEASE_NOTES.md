@@ -19,3 +19,6 @@
   filenames can be controlled by the environment variable UMPIRE_OUTPUT_BASENAME
 
 - ENABLE_CUDA now set to Off by default.
+
+- Allocations for 0 bytes now always return a valid pointer that cannot be read
+  or written. These pointers can be deallocated.
