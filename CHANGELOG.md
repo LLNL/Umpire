@@ -150,6 +150,8 @@ and a dynamic pool for those that are larger.
 
 - Issues relating to static initialization of Logger.
 
+- Fixed Bamboo test script on BLUEOS systems.
+
 ## [0.3.5] - 2019-06-11
 
 ### Fixed
