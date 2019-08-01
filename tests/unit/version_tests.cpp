@@ -30,3 +30,10 @@ TEST(Version, PatchVersion)
       UMPIRE_VERSION_PATCH,
       umpire::get_patch_version());
 }
+
+TEST(Version, RcVersion)
+{
+  ASSERT_EQ(
+      UMPIRE_VERSION_RC,
+      umpire::get_rc_version());
+}
