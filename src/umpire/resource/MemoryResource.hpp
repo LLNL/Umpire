@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_MemoryResource_HPP
 #define UMPIRE_MemoryResource_HPP
@@ -54,7 +46,7 @@ class MemoryResource :
      *
      * \return Pointer to start of allocation.
      */
-    virtual void* allocate(size_t bytes) = 0;
+    virtual void* allocate(std::size_t bytes) = 0;
 
     /*!
      * \brief Free the memory at ptr.
@@ -74,7 +66,7 @@ class MemoryResource :
      *
      * \return current total size of active allocations in this MemoryResource.
      */
-    virtual long getCurrentSize() const noexcept = 0;
+    virtual std::size_t getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Return the memory high watermark for this MemoryResource.
@@ -85,7 +77,7 @@ class MemoryResource :
      *
      * \return Memory high watermark.
      */
-    virtual long getHighWatermark() const noexcept = 0;
+    virtual std::size_t getHighWatermark() const noexcept = 0;
 
 
     /*!

@@ -1,52 +1,60 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/Logger.hpp"
 
-#include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
-#include <strings.h>  // for strcasecmp()
+#include "umpire/util/Logger.hpp"
+#include "umpire/util/io.hpp"
+
+#include <cstdlib>    // for getenv()
+#include <cctype>     // for std::toupper
+#include <algorithm>  // for std::equal
 
 namespace umpire {
 namespace util {
 
 static const char* env_name = "UMPIRE_LOG_LEVEL";
 static message::Level defaultLevel = message::Info;
-Logger* Logger::s_Logger = nullptr;
 
-static const std::string MessageLevelName[ message::Num_Levels ] = {
+static const char* MessageLevelName[message::Num_Levels] = {
   "ERROR",
   "WARNING",
   "INFO",
   "DEBUG"
 };
 
-Logger::Logger() noexcept
-{
-  // by default, all message streams are disabled
-  for ( int i=0 ; i < message::Num_Levels ; ++i )
-    m_isEnabled[ i ] = false;
+static int case_insensitive_match(const std::string s1, const std::string s2) {
+  return (s1.size() == s2.size()) &&
+          std::equal(s1.begin(), s1.end(), s2.begin(), [] (char c1, char c2) {
+            return (std::toupper(c1) == std::toupper(c2));
+          });
 }
 
-Logger::~Logger() noexcept
+Logger::Logger() noexcept :
+  // by default, all message streams are disabled
+  m_is_enabled{false, false, false, false}
 {
+  message::Level level{defaultLevel};
+  const char* enval = getenv(env_name);
+
+  if (enval) {
+    for (int i = 0; i < message::Num_Levels; ++i) {
+      if (case_insensitive_match(enval, MessageLevelName[i])) {
+        level = static_cast<message::Level>(i);
+        break;
+      }
+    }
+  }
+
+  setLoggingMsgLevel(level);
 }
 
 void Logger::setLoggingMsgLevel( message::Level level ) noexcept
 {
-  for ( int i=0 ; i < message::Num_Levels ; ++i )
-    m_isEnabled[ i ] = (i<= level) ? true : false;
+  for (int i=0; i < message::Num_Levels; ++i)
+    m_is_enabled[i] = (i<=level);
 }
 
 void Logger::logMessage( message::Level level,
@@ -54,50 +62,20 @@ void Logger::logMessage( message::Level level,
                          const std::string& fileName,
                          int line ) noexcept
 {
-  if ( !logLevelEnabled( level ) )
-    return;   /* short-circuit */
+  if (!logLevelEnabled(level)) return;
 
-  std::cout
-    << "[" << MessageLevelName[ level ] << "]"
+  umpire::log()
+    << "[" << MessageLevelName[level] << "]"
     << "[" << fileName  << ":" << line << "]:"
     << message
     << std::endl;
 }
 
-void Logger::initialize()
-{
-  if ( s_Logger != nullptr )
-    return;
-
-  message::Level level = defaultLevel;
-  char* enval = getenv(env_name);
-
-  if ( enval != NULL ) {
-    for ( int i = 0; i < message::Num_Levels; ++i ) {
-      if ( strcasecmp( enval, MessageLevelName[ i ].c_str() ) == 0 ) {
-        level = (message::Level)i;
-        break;
-      }
-    }
-  }
-
-  s_Logger = new Logger();
-  s_Logger->setLoggingMsgLevel(level);
-}
-
-void Logger::finalize()
-{
-  delete s_Logger;
-  s_Logger = nullptr;
-}
-
 Logger* Logger::getActiveLogger()
 {
-  if ( s_Logger == nullptr )
-    Logger::initialize();
-
-  return s_Logger;
+  static Logger logger;
+  return &logger;
 }
 
-} /* namespace util */
-} /* namespace umpire */
+} // end namespace util
+} // end namespace umpire

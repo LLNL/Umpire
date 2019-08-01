@@ -1,0 +1,247 @@
+################################################################################
+# OS X suppressions
+################################################################################
+{
+   osx ostream put
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__cxa_get_globals
+   obj:/dev/ttys001
+   fun:_ZSt18uncaught_exceptionv
+   obj:/dev/ttys001
+   fun:_ZNSo3putEc
+}
+
+{
+   osx imageloader
+   Memcheck:Leak
+   match-leak-kinds: possible
+   fun:calloc
+   fun:map_images_nolock
+   fun:_ZN11objc_object21sidetable_retainCountEv
+   fun:_ZN4dyldL18notifyBatchPartialE17dyld_image_statesbPFPKcS0_jPK15dyld_image_infoEbb
+   fun:_ZN4dyld21registerObjCNotifiersEPFvjPKPKcPKPK11mach_headerEPFvS1_S6_ESC_
+   fun:_dyld_objc_notify_register
+   fun:_objc_init
+   fun:_os_object_init
+   fun:libdispatch_init
+   fun:libSystem_initializer
+   fun:_ZN16ImageLoaderMachO18doModInitFunctionsERKN11ImageLoader11LinkContextE
+   fun:_ZN16ImageLoaderMachO16doInitializationERKN11ImageLoader11LinkContextE
+}
+
+################################################################################
+# OpenMP suppressions
+################################################################################
+{
+   libomp
+   Memcheck:Leak
+   ...
+   obj:/*/libomp.so*
+   ...
+}
+
+{
+   libomp syscall
+   Memcheck:Param
+   sched_setaffinity(mask)
+   fun:syscall
+   obj:/*/libomp.so*
+   ...
+}
+
+# For blueos
+{
+   libxlsmp
+   Memcheck:Leak
+   ...
+   obj:/*/libxlsmp.so*
+   ...
+}
+
+{
+   libcuda malloc
+   Memcheck:Leak
+   fun:malloc
+   obj:/*/valgrind/*
+   obj:/*/libcuda.so*
+   ...
+}
+
+################################################################################
+# CUDA suppressions
+################################################################################
+{
+   libcuda realloc
+   Memcheck:Leak
+   fun:realloc
+   ...
+   obj:/*/valgrind/*
+   obj:/*/libcuda.so*
+   ...
+}
+
+{
+   libcuda calloc
+   Memcheck:Leak
+   fun:calloc
+   ...
+   obj:/*/libcuda.so*
+   ...
+}
+
+{
+   libcuda strdup malloc
+   Memcheck:Leak
+   fun:malloc
+   fun:strdup
+   obj:/*/libcuda.so*
+   ...
+}
+
+{
+   cudaGetSymbolAddress
+   Memcheck:Leak
+   ...
+   fun:cudaGetSymbolAddress
+   ...
+}
+
+{
+   cudaGetDeviceCount
+   Memcheck:Leak
+   ...
+   fun:cudaGetDeviceCount
+   ...
+}
+
+{
+   __cudaPushCallConfiguration malloc
+   Memcheck:Leak
+   fun:malloc
+   ...
+   fun:__cudaPushCallConfiguration
+   ...
+}
+
+{
+   cuinit
+   Memcheck:Leak
+   ...
+   fun:cuInit
+   ...
+}
+
+{
+   cuinit
+   Memcheck:Addr8
+   ...
+   fun:cuInit
+   ...
+}
+
+{
+   cuinit
+   Memcheck:Addr2
+   ...
+   fun:cuInit
+   ...
+}
+
+################################################################################
+# Docker suppressions
+################################################################################
+{
+   docker dl_init malloc
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   obj:/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25
+   fun:call_init.part.0
+   fun:call_init
+   fun:_dl_init
+   obj:/lib/x86_64-linux-gnu/ld-2.23.so
+}
+
+
+################################################################################
+# FORTRAN suppressions
+################################################################################
+{
+   fortran write decimal
+   Memcheck:Cond
+   fun:write_decimal.constprop.12
+   obj:*
+}
+
+
+
+################################################################################
+# Gtest Throw suppressions
+################################################################################
+{
+   sizelimiter throw
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__cxa_get_globals
+   obj:*
+   fun:__cxa_throw
+   obj:*
+   obj:*
+   fun:_ZN7testing8internalL19TearDownEnvironmentEPNS_11EnvironmentE
+   fun:_ZN6umpire8strategy11SizeLimiter8allocateEm
+   obj:*
+   obj:*
+   obj:/usr/local/Cellar/gcc/8.1.0/lib/gcc/8/libstdc++.6.dylib
+   obj:/usr/local/Cellar/gcc/8.1.0/lib/gcc/8/libstdc++.6.dylib
+}
+
+{
+   uncaught exception
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__cxa_get_globals
+   obj:/dev/ttys002
+   fun:_ZSt18uncaught_exceptionv
+   obj:/dev/ttys002
+   fun:_ZNSo3putEc
+}
+
+{
+   allocationmap throw
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__cxa_get_globals
+   obj:*
+   fun:__cxa_throw
+   obj:*
+   obj:*
+   fun:_ZN7testing8internalL19TearDownEnvironmentEPNS_11EnvironmentE
+   fun:_ZNK6umpire4util13AllocationMap4findEPv
+   obj:*
+   obj:/Users/beckingsale1/Projects/umpire/code/umpire/build/bin/tests/unit/resource_manager_tests
+   obj:/usr/local/Cellar/gcc/8.1.0/lib/gcc/8/libstdc++.6.dylib
+   obj:/usr/local/Cellar/gcc/8.1.0/lib/gcc/8/libstdc++.6.dylib
+}
+
+{
+   memorymap throw
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:__cxa_get_globals
+   obj:*
+   fun:__cxa_throw
+   obj:*
+   obj:*
+   fun:_ZN7testing8internalL19TearDownEnvironmentEPNS_11EnvironmentE
+   fun:_ZN6umpire4util9MemoryMapIiE6insertEPvRKi
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+}

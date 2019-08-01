@@ -1,29 +1,47 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_Umpire_HPP
 #define UMPIRE_Umpire_HPP
 
 #include "umpire/config.hpp"
 
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/io.hpp"
+
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/Allocator.hpp"
 
+#include "umpire/util/AllocationRecord.hpp"
+
 #include <iostream>
 
 namespace umpire {
+
+inline void initialize(
+#if defined(UMPIRE_ENABLE_MPI)
+    MPI_Comm umpire_communicator
+#endif
+)
+{
+  static bool initialized = false;
+
+  if (!initialized) {
+#if defined(UMPIRE_ENABLE_MPI)
+    util::MPI::initialize(umpire_communicator);
+#else
+    util::MPI::initialize();
+#endif
+
+    initialized = true;
+  }
+}
+
+void finalize();
 
 /*!
  * \brief Allocate memory in the default space, with the default allocator.
@@ -34,7 +52,7 @@ namespace umpire {
  * \param size Number of bytes to allocate.
  */
 inline
-void* malloc(size_t size)
+void* malloc(std::size_t size)
 {
   return ResourceManager::getInstance().getDefaultAllocator().allocate(size);
 }
@@ -71,13 +89,27 @@ int get_patch_version()
   return UMPIRE_VERSION_PATCH;
 }
 
+inline
+std::string get_rc_version()
+{
+  return UMPIRE_VERSION_RC;
+}
+
 /*!
- * \brief Print the allocations from a specific allocator
+ * \brief Print the allocations from a specific allocator in a
+ * human-readable format.
  *
  * \param allocator source Allocator.
  * \param os output stream
  */
 void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
+
+/*!
+ * \brief Returns vector of AllocationRecords created by the allocator.
+ *
+ * \param allocator source Allocator.
+ */
+std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
 
 } // end of namespace umpire
 

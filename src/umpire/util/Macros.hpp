@@ -1,22 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_Macros_HPP
 #define UMPIRE_Macros_HPP
 
 #include "umpire/util/Exception.hpp"
 #include "umpire/config.hpp"
+#include "umpire/util/io.hpp"
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 #include "umpire/util/statistic_helper.hpp"
@@ -25,13 +18,9 @@
 #include <sstream>
 #include <iostream>
 #include <mutex>
-
-#ifdef UMPIRE_ENABLE_ASSERTS
 #include <cassert>
+
 #define UMPIRE_ASSERT(condition) assert(condition)
-#else
-#define UMPIRE_ASSERT(condition) ((void)0)
-#endif // UMPIRE_ENABLE_ASSERTS
 
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
@@ -98,11 +87,13 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
+
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
   umpire_oss_error << " " << __func__ << " " << msg;               \
+  umpire::util::flush_files();                                     \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \
@@ -118,12 +109,5 @@
 #define UMPIRE_RECORD_STATISTIC(name, ...) ((void) 0)
 
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
-
-#define UMPIRE_LOCK \
-  if ( !m_mutex->try_lock() ) \
-    m_mutex->lock();
-
-#define UMPIRE_UNLOCK \
-  m_mutex->unlock();
 
 #endif // UMPIRE_Macros_HPP

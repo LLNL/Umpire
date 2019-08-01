@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_TypedAllocator_HPP
 #define UMPIRE_TypedAllocator_HPP
@@ -31,6 +23,9 @@ class TypedAllocator {
   public:
   typedef T value_type;
 
+  template <typename U>
+  friend class TypedAllocator;
+
   /*!
    *
    * \brief Construct a new TypedAllocator that will use allocator to allocate
@@ -38,7 +33,10 @@ class TypedAllocator {
    *
    * \param allocator Allocator to use for allocating memory.
    */
-  TypedAllocator(Allocator allocator);
+  explicit TypedAllocator(Allocator allocator);
+
+  template<typename U>
+  TypedAllocator(const TypedAllocator<U>& other);
 
   /*
    * \brief Allocate size objects of type T.
@@ -47,7 +45,7 @@ class TypedAllocator {
    *
    * \return Pointer to the start of the allocated memory.
    */
-  T* allocate(size_t size);
+  T* allocate(std::size_t size);
 
   /*!
    * \brief Deallocate ptr, the passed size is ignored.
@@ -55,7 +53,7 @@ class TypedAllocator {
    * \param ptr Pointer to deallocate
    * \param size Size of allocation (ignored).
    */
-  void deallocate(T* ptr, size_t size);
+  void deallocate(T* ptr, std::size_t size);
 
   private:
     umpire::Allocator m_allocator;

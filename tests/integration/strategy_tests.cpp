@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 #include <string>
@@ -26,6 +18,7 @@
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
@@ -38,8 +31,10 @@
 #include <omp.h>
 #endif
 
+static int alignment = 16;
+
 static int unique_pool_name = 0;
-static int initial_min_size = 1024;
+static int initial_size = 1024;
 static int subsequent_min_size = 512;
 
 const char* AllocationDevices[] = {
@@ -67,7 +62,7 @@ public:
     rm.makeAllocator<umpire::strategy::DynamicPool>
                   (  poolName.str()
                    , rm.getAllocator(allocatorName)
-                   , initial_min_size
+                   , initial_size
                    , subsequent_min_size);
 
     allocator = new umpire::Allocator(rm.getAllocator(poolName.str()));
@@ -95,16 +90,16 @@ TEST_P(StrategyTest, Sizes) {
   ASSERT_EQ(allocator->getSize(alloc), 100);
   ASSERT_GE(allocator->getCurrentSize(), 100);
   ASSERT_EQ(allocator->getHighWatermark(), 100);
-  ASSERT_GE(allocator->getActualSize(), initial_min_size);
+  ASSERT_GE(allocator->getActualSize(), initial_size);
 
   void* alloc2 = nullptr;
-  ASSERT_NO_THROW({ alloc2 = allocator->allocate(initial_min_size); });
+  ASSERT_NO_THROW({ alloc2 = allocator->allocate(initial_size); });
   ASSERT_NO_THROW({ allocator->deallocate(alloc); });
 
-  ASSERT_GE(allocator->getCurrentSize(), initial_min_size);
-  ASSERT_EQ(allocator->getHighWatermark(), initial_min_size+100);
-  ASSERT_GE(allocator->getActualSize(), initial_min_size+subsequent_min_size);
-  ASSERT_EQ(allocator->getSize(alloc2), initial_min_size);
+  ASSERT_GE(allocator->getCurrentSize(), initial_size);
+  ASSERT_EQ(allocator->getHighWatermark(), initial_size+100);
+  ASSERT_GE(allocator->getActualSize(), initial_size+subsequent_min_size);
+  ASSERT_EQ(allocator->getSize(alloc2), initial_size);
 
   ASSERT_NO_THROW({ allocator->deallocate(alloc2); });
 }
@@ -122,10 +117,10 @@ TEST_P(StrategyTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices));
+INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices),);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-TEST(SimpoolStrategy, Device)
+TEST(Strategy, Device)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -147,9 +142,9 @@ TEST(SimpoolStrategy, Device)
   }
 
   allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "device_simpool", rm.getAllocator("DEVICE"));
+      "device_dyn_pool", rm.getAllocator("DEVICE"));
 
-  ASSERT_EQ(allocator.getName(), "device_simpool");
+  ASSERT_EQ(allocator.getName(), "device_dyn_pool");
 
   ASSERT_NO_THROW( { alloc = allocator.allocate(100); } );
   ASSERT_GE(allocator.getCurrentSize(), 100);
@@ -187,12 +182,15 @@ TEST(MonotonicStrategy, Host)
       "host_monotonic_pool", 65536, rm.getAllocator("HOST"));
 
   void* alloc = allocator.allocate(100);
+  void* alloc2 = allocator.allocate(100);
 
+  ASSERT_EQ(static_cast<char*>(alloc2) - static_cast<char*>(alloc), 100);
   ASSERT_GE(allocator.getCurrentSize(), 100);
   ASSERT_EQ(allocator.getSize(alloc), 100);
   ASSERT_GE(allocator.getHighWatermark(), 100);
   ASSERT_EQ(allocator.getName(), "host_monotonic_pool");
 
+  allocator.deallocate(alloc2);
   allocator.deallocate(alloc);
 }
 
@@ -293,22 +291,48 @@ TEST(AllocationAdvisor, Host)
 
 TEST(FixedPool, Host)
 {
-  struct data { int _[100]; };
-
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool<data>>(
-      "host_fixed_pool", rm.getAllocator("HOST"));
+  const int data_size = 100 * sizeof(int);
 
-  void* alloc = allocator.allocate(sizeof(data));
+  auto allocator = rm.makeAllocator<umpire::strategy::FixedPool>(
+    "host_fixed_pool", rm.getAllocator("HOST"), data_size, 64);
 
-  ASSERT_GE(allocator.getCurrentSize(), sizeof(data));
-  ASSERT_GE(allocator.getActualSize(), sizeof(data)*64);
-  ASSERT_EQ(allocator.getSize(alloc), sizeof(data));
-  ASSERT_GE(allocator.getHighWatermark(), sizeof(data));
+  void* alloc = allocator.allocate(data_size);
+
+  ASSERT_EQ(allocator.getCurrentSize(), data_size);
+  ASSERT_GE(allocator.getActualSize(), data_size*64);
+  ASSERT_EQ(allocator.getSize(alloc), data_size);
+  ASSERT_GE(allocator.getHighWatermark(), data_size);
   ASSERT_EQ(allocator.getName(), "host_fixed_pool");
 
   allocator.deallocate(alloc);
+}
+
+TEST(MixedPool, Host)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
+      "host_mixed_pool", rm.getAllocator("HOST"));
+
+  const std::size_t max_power = 9;
+  void* alloc[max_power];
+  std::size_t size = 4, total_size = 0;
+  for (std::size_t i = 0; i < max_power; ++i) {
+    alloc[i] = allocator.allocate(size);
+    total_size += size;
+    size *= 4;
+  }
+
+  ASSERT_EQ(allocator.getCurrentSize(), total_size);
+  ASSERT_GT(allocator.getActualSize(), total_size);
+  ASSERT_EQ(allocator.getSize(alloc[max_power-1]), size/4);
+  ASSERT_GE(allocator.getHighWatermark(), total_size);
+  ASSERT_EQ(allocator.getName(), "host_mixed_pool");
+
+  for (std::size_t i = 0; i < max_power; ++i)
+    allocator.deallocate(alloc[i]);
 }
 
 #if defined(_OPENMP)
@@ -321,7 +345,7 @@ TEST(ThreadSafeAllocator, Host)
 
 #pragma omp parallel
   {
-    const size_t size = 1024*omp_get_thread_num();
+    const std::size_t size = 1024*omp_get_thread_num();
 
     double* thread_data = static_cast<double*>(
      allocator.allocate(size*sizeof(double)));
@@ -359,7 +383,7 @@ TEST(ReleaseTest, Works)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_simpool_for_release", rm.getAllocator("HOST"), 64, 64);
+      "host_dyn_pool_for_release", rm.getAllocator("HOST"), 64, 64);
 
   void* ptr_one = alloc.allocate(62);
   void* ptr_two = alloc.allocate(1024);
@@ -368,6 +392,41 @@ TEST(ReleaseTest, Works)
   EXPECT_NO_THROW(alloc.release());
 
   alloc.deallocate(ptr_one);
+}
+
+TEST(DynamicPool, coalesce)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+    "host_dyn_pool_for_coalesce", rm.getAllocator("HOST"));
+
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  const std::size_t initial_bytes{dynamic_pool->getActualSize()};
+
+  void* ptr_one = alloc.allocate(62);
+  void* ptr_two = alloc.allocate(1024);
+
+  ASSERT_GT(dynamic_pool->getBlocksInPool(), 2);
+  alloc.deallocate(ptr_two);
+
+  dynamic_pool->coalesce();
+
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+
+  alloc.deallocate(ptr_one);
+
+  dynamic_pool->coalesce();
+
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+
+  ASSERT_EQ(dynamic_pool->getCurrentSize(), 0);
+  ASSERT_EQ(dynamic_pool->getActualSize(), initial_bytes);
+  ASSERT_GE(dynamic_pool->getHighWatermark(), 62 + 1024);
 }
 
 TEST(HeuristicTest, OutOfBounds)
@@ -391,21 +450,14 @@ TEST(HeuristicTest, EdgeCases_75)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_75", rm.getAllocator("HOST"),
-      1024ul, 1024ul, h_fun);
+      1024ul, 1024ul, h_fun, alignment);
 
-  auto strategy = alloc.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
-
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+  auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 0);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 1024);
 
   void* a[4];
   for ( int i = 0; i < 4; ++i ) {
@@ -435,61 +487,55 @@ TEST(HeuristicTest, EdgeCases_100)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_100", rm.getAllocator("HOST"),
-      initial_min_size, subsequent_min_size, h_fun);
+      initial_size, subsequent_min_size, h_fun, alignment);
 
-  auto strategy = alloc.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
-
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+  auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 0);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  void* alloc1 = nullptr;
-  ASSERT_NO_THROW({ alloc1 = alloc.allocate(16); });
-  ASSERT_EQ(alloc.getActualSize(), initial_min_size);
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
+
+  void* alloc1{nullptr};
+  ASSERT_NO_THROW({ alloc1 = alloc.allocate(16); });
+  ASSERT_EQ(alloc.getActualSize(), initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
+  ASSERT_NO_THROW(dynamic_pool->coalesce());
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
   ASSERT_NO_THROW({ alloc1 = alloc.allocate(16); });
-  ASSERT_EQ(alloc.getActualSize(), initial_min_size);
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
-
-  void* alloc2 = nullptr;
-  ASSERT_NO_THROW({ alloc2 = alloc.allocate(initial_min_size); });
+  ASSERT_EQ(alloc.getActualSize(), initial_size);
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
-  ASSERT_EQ(alloc.getActualSize(), 2*initial_min_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
-  void* alloc3 = nullptr;
-  ASSERT_NO_THROW({ alloc3 = alloc.allocate(initial_min_size); });
+  void* alloc2{nullptr};
+  ASSERT_NO_THROW({ alloc2 = alloc.allocate(initial_size); });
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
+  ASSERT_EQ(alloc.getActualSize(), 2*initial_size);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+
+  void* alloc3{nullptr};
+  ASSERT_NO_THROW({ alloc3 = alloc.allocate(initial_size); });
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
   ASSERT_NO_THROW({ alloc.deallocate(alloc2); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
   ASSERT_NO_THROW({ alloc.deallocate(alloc3); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_min_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
 
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 3*initial_size);
 }
 
 TEST(HeuristicTest, EdgeCases_0)
@@ -500,54 +546,47 @@ TEST(HeuristicTest, EdgeCases_0)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_0", rm.getAllocator("HOST"),
-      initial_min_size, subsequent_min_size, h_fun);
+      initial_size, subsequent_min_size, h_fun, alignment);
 
-  auto strategy = alloc.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
-
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+  auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
   ASSERT_NE(dynamic_pool, nullptr);
 
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 0);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
   void* alloc1 = nullptr;
   ASSERT_NO_THROW({ alloc1 = alloc.allocate(16); });
-  ASSERT_EQ(alloc.getActualSize(), initial_min_size);
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+  ASSERT_EQ(alloc.getActualSize(), initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
   void* alloc2 = nullptr;
-  ASSERT_NO_THROW({ alloc2 = alloc.allocate(initial_min_size); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
-  ASSERT_EQ(alloc.getActualSize(), 2*initial_min_size);
+  ASSERT_NO_THROW({ alloc2 = alloc.allocate(initial_size); });
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
+  ASSERT_EQ(alloc.getActualSize(), 2*initial_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
   void* alloc3 = nullptr;
-  ASSERT_NO_THROW({ alloc3 = alloc.allocate(initial_min_size); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
+  ASSERT_NO_THROW({ alloc3 = alloc.allocate(initial_size); });
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
   ASSERT_NO_THROW({ alloc.deallocate(alloc3); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
   ASSERT_NO_THROW({ alloc.deallocate(alloc2); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_min_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
 
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(alloc.getActualSize(), 3*initial_min_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 3*initial_min_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -558,9 +597,9 @@ TEST(NumaPolicyTest, EdgeCases) {
                  "numa_alloc", -1, rm.getAllocator("HOST")),
                umpire::util::Exception);
 
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   const int numa_node = umpire::numa::preferred_node();
 
-#if defined(UMPIRE_ENABLE_CUDA)
   // Only works with HOST allocators
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
                  "numa_alloc", numa_node, rm.getAllocator("DEVICE")),

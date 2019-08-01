@@ -1,3 +1,9 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
+//
+// SPDX-License-Identifier: (MIT)
+//////////////////////////////////////////////////////////////////////////////
 // wrapAllocator.cpp
 // This is generated code, do not edit
 // Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
@@ -36,6 +42,17 @@ void umpire_ShroudCopyStringAndFree(UMP_SHROUD_array *data, char *c_var, size_t 
 
 // splicer begin class.Allocator.C_definitions
 // splicer end class.Allocator.C_definitions
+
+void umpire_allocator_delete(umpire_allocator * self)
+{
+// splicer begin class.Allocator.method.delete
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    delete SH_this;
+    self->addr = NULL;
+    return;
+// splicer end class.Allocator.method.delete
+}
 
 void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes)
 {

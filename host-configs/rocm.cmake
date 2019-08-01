@@ -1,16 +1,8 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 #cmake \
 #  -DCMAKE_BUILD_TYPE=Release \
@@ -24,6 +16,9 @@ set(ENABLE_HCC ON CACHE BOOL "")
 set(ENABLE_OPENMP OFF CACHE BOOL "")
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_GMOCK Off CACHE BOOL "")
+set(ENABLE_BENCHMARKS Off CACHE BOOL "")
+set(ENABLE_WARNINGS_AS_ERRORS Off CACHE BOOL "")
+set(ENABLE_TOOLS Off CACHE BOOL "")
 
 set(HCC_ROOT_DIR "/opt/rocm/" CACHE PATH "ROCm ROOT directory path")
 

@@ -6,4 +6,4 @@
 	url = https://github.com/LLNL/conduit.git
 [submodule "src/umpire/tpl/cxxopts"]
 	path = src/umpire/tpl/cxxopts
-	url = https://github.com/jarro2783/cxxopts.git
+	url = https://github.com/LLNL/cxxopts.git

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
@@ -20,16 +12,12 @@
 namespace umpire {
 namespace resource {
 
-MemoryResourceRegistry* MemoryResourceRegistry::s_allocator_registry_instance = nullptr;
-
 MemoryResourceRegistry&
 MemoryResourceRegistry::getInstance() noexcept
 {
-  if (!s_allocator_registry_instance) {
-    s_allocator_registry_instance = new MemoryResourceRegistry();
-  }
+  static MemoryResourceRegistry resource_registry;
 
-  return *s_allocator_registry_instance;
+  return resource_registry;
 }
 
 MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
@@ -38,18 +26,17 @@ MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
 }
 
 void
-MemoryResourceRegistry::registerMemoryResource(MemoryResourceFactory* factory)
+MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory)
 {
-  m_allocator_factories.push_front(factory);
+  m_allocator_factories.push_back(std::move(factory));
 }
 
-resource::MemoryResource*
+std::unique_ptr<resource::MemoryResource>
 MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
-  for (auto allocator_factory : m_allocator_factories) {
+  for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
       auto a = allocator_factory->create(name, id);
-      UMPIRE_REPLAY("makeMemoryResource," << name << "," << a);
       return a;
     }
   }

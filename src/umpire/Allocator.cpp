@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 
@@ -31,17 +23,17 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept:
 }
 
 void*
-Allocator::allocate(size_t bytes)
+Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY("allocate_attempt" << "," << bytes << "," << m_allocator);
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }");
 
   ret = m_allocator->allocate(bytes);
 
-  UMPIRE_REPLAY("allocate_success" << "," << bytes << "," << m_allocator << "," << ret);
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
   return ret;
@@ -50,7 +42,7 @@ Allocator::allocate(size_t bytes)
 void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY("deallocate," << ptr << "," << m_allocator);
+  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -67,33 +59,33 @@ Allocator::deallocate(void* ptr)
 void
 Allocator::release()
 {
-  UMPIRE_REPLAY("release," <<  m_allocator);
+  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \"" <<  m_allocator << "\" }");
 
   UMPIRE_LOG(Debug, "");
 
   m_allocator->release();
 }
 
-size_t
+std::size_t
 Allocator::getSize(void* ptr) const
 {
   UMPIRE_LOG(Debug, "(" << ptr << ")");
   return ResourceManager::getInstance().getSize(ptr);
 }
 
-size_t
+std::size_t
 Allocator::getHighWatermark() const noexcept
 {
   return m_allocator->getHighWatermark();
 }
 
-size_t
+std::size_t
 Allocator::getCurrentSize() const noexcept
 {
   return m_allocator->getCurrentSize();
 }
 
-size_t
+std::size_t
 Allocator::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();

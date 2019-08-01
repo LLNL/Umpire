@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
@@ -19,6 +11,7 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Exception.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #include <iostream>
 
@@ -28,14 +21,8 @@ int main(int, char**) {
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "pool", rm.getAllocator("HOST"));
 
-  auto strategy = pool.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker) {
-    strategy = tracker->getAllocationStrategy();
-  }
-
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
 
   if (dynamic_pool) {
     dynamic_pool->coalesce();

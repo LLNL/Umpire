@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_ResourceManager_HPP
 #define UMPIRE_ResourceManager_HPP
@@ -29,6 +21,10 @@
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
 namespace umpire {
+
+namespace strategy {
+  class ZeroByteHandler;
+}
 
 /*!
  * \brief
@@ -61,6 +57,8 @@ class ResourceManager {
      * \brief Get the Allocator with the given name.
      */
     Allocator getAllocator(const std::string& name);
+
+    Allocator getAllocator(const char* name);
 
     /*!
      * \brief Get the default Allocator for the given resource_type.
@@ -133,14 +131,14 @@ class ResourceManager {
     /*!
      * \brief register an allocation with the manager.
      */
-    void registerAllocation(void* ptr, util::AllocationRecord* record);
+    void registerAllocation(void* ptr, util::AllocationRecord record);
 
     /*!
      * \brief de-register the address ptr with the manager.
      *
      * \return the allocation record removed from the manager.
      */
-    util::AllocationRecord* deregisterAllocation(void* ptr);
+    util::AllocationRecord deregisterAllocation(void* ptr);
 
     /*!
      * \brief Find the allocation record associated with an address ptr.
@@ -167,7 +165,7 @@ class ResourceManager {
      * \param src_ptr Source pointer.
      * \param size Size in bytes.
      */
-    void copy(void* dst_ptr, void* src_ptr, size_t size=0);
+    void copy(void* dst_ptr, void* src_ptr, std::size_t size=0);
 
     /*!
      * \brief Set the first length bytes of ptr to the value val.
@@ -176,7 +174,7 @@ class ResourceManager {
      * \param val Value to set.
      * \param length Number of bytes to set to val.
      */
-    void memset(void* ptr, int val, size_t length=0);
+    void memset(void* ptr, int val, std::size_t length=0);
 
     /*!
      * \brief Reallocate src_ptr to size.
@@ -190,7 +188,7 @@ class ResourceManager {
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* src_ptr, size_t size);
+    void* reallocate(void* src_ptr, std::size_t size);
 
     /*!
      * \brief Reallocate src_ptr to size.
@@ -204,7 +202,7 @@ class ResourceManager {
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* src_ptr, size_t size, Allocator allocator);
+    void* reallocate(void* src_ptr, std::size_t size, Allocator allocator);
 
     /*!
      * \brief Move src_ptr to memory from allocator
@@ -230,15 +228,14 @@ class ResourceManager {
      *
      * \return Size of allocation in bytes.
      */
-    size_t getSize(void* ptr) const;
+    std::size_t getSize(void* ptr) const;
 
+    ~ResourceManager();
+    ResourceManager (const ResourceManager&) = delete;
+    ResourceManager& operator= (const ResourceManager&) = delete;
   private:
     ResourceManager();
 
-    ~ResourceManager() = default;
-
-    ResourceManager (const ResourceManager&) = delete;
-    ResourceManager& operator= (const ResourceManager&) = delete;
 
     strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
     strategy::AllocationStrategy* findAllocatorForId(int id);
@@ -248,25 +245,29 @@ class ResourceManager {
 
     std::string getAllocatorInformation() const noexcept;
 
-    static ResourceManager* s_resource_manager_instance;
-
-    std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
-    std::unordered_map<int, strategy::AllocationStrategy* > m_allocators_by_id;
+    strategy::AllocationStrategy* getZeroByteAllocator();
 
     util::AllocationMap m_allocations;
 
-    strategy::AllocationStrategy* m_default_allocator;
+    std::list<std::unique_ptr<strategy::AllocationStrategy> > m_allocators;
 
+    std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
+    std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
     std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash > m_memory_resources;
+
+    strategy::AllocationStrategy* m_default_allocator;
 
     int m_id;
 
-    std::mutex* m_mutex;
+    std::mutex m_mutex;
 
+    // Methods that need access to m_allocations to print/filter records
     friend void print_allocator_records(Allocator, std::ostream&);
+    friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
+    friend strategy::ZeroByteHandler;
 };
 
-} // end of namespace umpire
+} // end namespace umpire
 
 #include "umpire/ResourceManager.inl"
 

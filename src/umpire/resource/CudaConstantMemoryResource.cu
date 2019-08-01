@@ -21,38 +21,47 @@
 #include <memory>
 #include <sstream>
 
+__constant__ static char s_umpire_internal_device_constant_memory[64*1024];
+
 namespace umpire {
 namespace resource {
 
 CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
-  MemoryResource(name, id, traits),
-  m_current_size(0l),
-  m_highwatermark(0l),
-  m_platform(Platform::cuda),
-  m_offset(0),
-  m_ptr(nullptr)
+  MemoryResource{name, id, traits},
+  m_current_size{0},
+  m_highwatermark{0},
+  m_platform{Platform::cuda},
+  m_offset{0},
+  m_initialized{false},
+  m_ptr{nullptr}
 {
-  cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, umpire_internal_device_constant_memory);
-
-  if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetSymbolAddress failed with error: " << cudaGetErrorString(error));
-  }
 }
 
-void* CudaConstantMemoryResource::allocate(size_t bytes)
+void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 {
-  char* ptr = static_cast<char*>(m_ptr) + m_offset;
+  std::lock_guard<std::mutex> lock{m_mutex};
+
+  if (!m_initialized) {
+    cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, s_umpire_internal_device_constant_memory);
+
+    if (error != cudaSuccess) {
+      UMPIRE_ERROR("cudaGetSymbolAddress failed with error: " << cudaGetErrorString(error));
+    }
+
+    m_initialized = true;
+  }
+
+  char* ptr{static_cast<char*>(m_ptr) + m_offset};
   m_offset += bytes;
 
-  void* ret = static_cast<void*>(ptr);
+  void* ret{static_cast<void*>(ptr)};
 
   if (m_offset > 1024 * 64)
   {
     UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
-  ResourceManager::getInstance().registerAllocation(
-      ret, new util::AllocationRecord{ret, bytes, this});
+  ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
 
   m_current_size += bytes;
   if (m_current_size > m_highwatermark)
@@ -65,28 +74,32 @@ void* CudaConstantMemoryResource::allocate(size_t bytes)
 
 void CudaConstantMemoryResource::deallocate(void* ptr)
 {
+  std::lock_guard<std::mutex> lock{m_mutex};
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  util::AllocationRecord* record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record->m_size;
+  auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
+  m_current_size -= record.size;
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record->m_size))
+  if (record.strategy != this) {
+    UMPIRE_ERROR(ptr << " was not allocated by " << getName());
+  }
+
+  if ( (static_cast<char*>(m_ptr) + (m_offset - record.size))
       == static_cast<char*>(ptr)) {
-    m_offset -= record->m_size;
+    m_offset -= record.size;
   } else {
     UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
   }
-
-  delete record;
 }
 
-long CudaConstantMemoryResource::getCurrentSize() const noexcept
+std::size_t CudaConstantMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_size);
   return m_current_size;
 }
 
-long CudaConstantMemoryResource::getHighWatermark() const noexcept
+std::size_t CudaConstantMemoryResource::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;

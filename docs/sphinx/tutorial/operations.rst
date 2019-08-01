@@ -21,7 +21,7 @@ figuring out where the source and destination pointers were allocated, and
 selects the correct implementation to copy the data:
 
 .. literalinclude:: ../../../examples/tutorial/tut_copy.cpp
-                    :lines: 23-26
+                    :lines: 18
 
 This example allocates the destination data using any valid Allocator. 
 
@@ -34,7 +34,7 @@ If you want to move data to a new Allocator and deallocate the old copy, Umpire
 provides a :func:`umpire::ResourceManager::move` operation.
 
 .. literalinclude:: ../../../examples/tutorial/tut_move.cpp
-                    :lines: 25-26
+                    :lines: 17-18
 
 The move operation combines an allocation, a copy, and a deallocate into one
 function call, allowing you to move data without having to have the destination
@@ -51,7 +51,7 @@ most people know as a memset. Umpire provides a
 any allocation, regardless of where it came from:
 
 .. literalinclude:: ../../../examples/tutorial/tut_memset.cpp
-                    :lines: 40
+                    :lines: 36
 
 ----------
 Reallocate
@@ -63,7 +63,7 @@ however, you can be out of luck. Umpire provides a
 :func:`umpire::ResourceManager::reallocate` operation:
 
 .. literalinclude:: ../../../examples/tutorial/tut_reallocate.cpp
-                    :lines: 44
+                    :lines: 40
 
 This method returns a pointer to the reallocated data. Like all operations,
 this can be used regardless of the Allocator used for the source data.

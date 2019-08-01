@@ -1,28 +1,18 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_FixedPool_HPP
 #define UMPIRE_FixedPool_HPP
 
-#include <memory>
-#include <vector>
+#include "umpire/Allocator.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
-#include "umpire/Allocator.hpp"
-
-#include "umpire/tpl/simpool/StdAllocator.hpp"
+#include <cstddef>
+#include <vector>
 
 namespace umpire {
 namespace strategy {
@@ -31,64 +21,74 @@ namespace strategy {
  * \brief Pool for fixed size allocations
  *
  * This AllocationStrategy provides an efficient pool for fixed size
- * allocations of size T. Pools of NP objects of type T are constructed, and
- * used to quickly allocate and deallocate objects.
+ * allocations, and used to quickly allocate and deallocate objects.
  */
-template <typename T, int NP=64, typename IA=StdAllocator>
-class FixedPool
-  : public AllocationStrategy
+class FixedPool : public AllocationStrategy
 {
-
   public:
-    FixedPool(
-        const std::string& name,
-        int id,
-        Allocator allocator);
+    /*!
+     * \brief Constructs a FixedPool.
+     *
+     * \param name The allocator name for reference later in ResourceManager
+     * \param id The allocator id for reference later in ResourceManager
+     * \param allocator Used for data allocation. It uses std::malloc
+     * for internal tracking of these allocations.
+     * \param object_bytes The fixed size (in bytes) for each allocation
+     * \param objects_per_pool Number of objects in each sub-pool
+     * internally. Performance likely improves if this is large, at
+     * the cost of memory usage. This does not have to be a multiple
+     * of sizeof(int)*8, but it will also likely improve performance
+     * if so.
+     */
+    FixedPool(const std::string& name, int id,
+              Allocator allocator, const std::size_t object_bytes,
+              const std::size_t objects_per_pool = 64 * sizeof(int) * 8) noexcept;
 
     ~FixedPool();
 
-    void* allocate(size_t bytes);
+    FixedPool(const FixedPool&) = delete;
 
-    void deallocate(void* ptr);
+    void* allocate(std::size_t bytes = 0) override final;
+    void deallocate(void* ptr) override final;
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    std::size_t getCurrentSize() const noexcept override final;
+    std::size_t getHighWatermark() const noexcept override final;
+    std::size_t getActualSize() const noexcept override final;
+    Platform getPlatform() noexcept override final;
 
-    Platform getPlatform() noexcept;
+    bool pointerIsFromPool(void* ptr) const noexcept;
+
+    std::size_t numPools() const noexcept;
 
   private:
-    struct Pool
-    {
-      unsigned char *data;
-      unsigned int *avail;
-      unsigned int numAvail;
-      struct Pool* next;
+    struct Pool {
+      AllocationStrategy* strategy;
+      char* data;
+      int* avail;
+      std::size_t num_avail;
+      Pool(AllocationStrategy* allocation_strategy,
+           const std::size_t object_bytes, const std::size_t objects_per_pool,
+           const std::size_t avail_bytes);
     };
 
-    void newPool(struct Pool **pnew);
+    void newPool();
+    void* allocInPool(Pool& p);
 
-    T* allocInPool(struct Pool *p);
-
-    size_t numPools() const noexcept;
-
-
-    struct Pool *m_pool;
-    size_t m_num_per_pool;
-    size_t m_total_pool_size;
-
-    size_t m_num_blocks;
-
-
-    long m_highwatermark;
-    long m_current_size;
-
-    strategy::AllocationStrategy* m_allocator;
+    AllocationStrategy* m_strategy;
+    std::size_t m_obj_bytes;
+    std::size_t m_obj_per_pool;
+    std::size_t m_data_bytes;
+    std::size_t m_avail_bytes;
+    std::size_t m_current_bytes;
+    std::size_t m_actual_bytes;
+    std::size_t m_highwatermark;
+    std::vector<Pool> m_pool;
+    // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is
+    // ever reduced in size, then .data and .avail have to be manually
+    // deallocated to avoid a memory leak.
 };
 
-} // end of namespace strategy
+} // end namespace strategy
 } // end namespace umpire
-
-#include "umpire/strategy/FixedPool.inl"
 
 #endif // UMPIRE_FixedPool_HPP

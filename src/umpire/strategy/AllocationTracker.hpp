@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_AllocationTracker_HPP
 #define UMPIRE_AllocationTracker_HPP
@@ -30,26 +22,24 @@ class AllocationTracker :
 {
   public:
     AllocationTracker(
-        const std::string& name,
-        int id,
-        Allocator allocator) noexcept;
+        std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
 
     void deallocate(void* ptr);
 
     void release();
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
-    long getActualSize() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
+    std::size_t getActualSize() const noexcept;
 
     Platform getPlatform() noexcept;
 
     strategy::AllocationStrategy* getAllocationStrategy();
 
   private:
-    strategy::AllocationStrategy* m_allocator;
+    std::unique_ptr<strategy::AllocationStrategy> m_allocator;
 
 };
 

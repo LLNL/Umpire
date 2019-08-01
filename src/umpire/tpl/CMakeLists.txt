@@ -25,10 +25,10 @@ if (ENABLE_STATISTICS)
   set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
   set(ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
 
-  set (conduit_includes 
+  set (conduit_includes
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit> 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/c>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/python>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs/conduit>
@@ -43,6 +43,28 @@ if (ENABLE_STATISTICS)
 endif()
 
 #
+# Json
+set (json_headers
+  ./json/json.hpp )
+
+blt_add_library(
+  NAME umpire_tpl_json
+  HEADERS ${json_headers})
+
+target_link_libraries(umpire_tpl_json INTERFACE)
+
+install(FILES
+  ${json_headers}
+  DESTINATION include/umpire/tpl/json)
+
+install(TARGETS
+  umpire_tpl_json
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
+#
 # CXX Option Parsing Headers
 set (cxxopts_headers
   ./cxxopts/include/cxxopts.hpp )
@@ -52,6 +74,13 @@ blt_add_library(
   HEADERS ${cxxopts_headers})
 
 target_link_libraries(umpire_tpl_cxxopts INTERFACE)
+
+target_include_directories(
+  umpire_tpl_cxxopts
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 install(FILES
   ${cxxopts_headers}
@@ -64,5 +93,4 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-add_subdirectory(simpool)
 add_subdirectory(judy)

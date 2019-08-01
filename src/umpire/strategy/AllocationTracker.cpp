@@ -1,36 +1,30 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/AllocationTracker.hpp"
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
 
 AllocationTracker::AllocationTracker(
-  const std::string& name,
-  int id,
-  Allocator allocator) noexcept :
-AllocationStrategy(name, id),
+  std::unique_ptr<AllocationStrategy>&& allocator) noexcept :
+AllocationStrategy(allocator->getName(), allocator->getId()),
 mixins::Inspector(),
-m_allocator(allocator.getAllocationStrategy())
+m_allocator(std::move(allocator))
 {
 }
 
 void*
-AllocationTracker::allocate(size_t bytes)
+AllocationTracker::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
+
+  UMPIRE_LOG(Debug, "Tracking " << bytes << " bytes for " << m_allocator->getName());
 
   registerAllocation(ptr, bytes, this);
 
@@ -40,7 +34,9 @@ AllocationTracker::allocate(size_t bytes)
 void
 AllocationTracker::deallocate(void* ptr)
 {
-  deregisterAllocation(ptr);
+  UMPIRE_LOG(Debug, "Untracking address " << ptr << " for " << m_allocator->getName());
+
+  deregisterAllocation(ptr, this);
   m_allocator->deallocate(ptr);
 }
 
@@ -50,19 +46,19 @@ AllocationTracker::release()
   m_allocator->release();
 }
 
-long
+std::size_t
 AllocationTracker::getCurrentSize() const noexcept
 {
   return m_current_size;
 }
 
-long
+std::size_t
 AllocationTracker::getHighWatermark() const noexcept
 {
   return m_high_watermark;
 }
 
-long
+std::size_t
 AllocationTracker::getActualSize() const noexcept
 {
   return m_allocator->getActualSize();
@@ -74,10 +70,10 @@ AllocationTracker::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-strategy::AllocationStrategy* 
+strategy::AllocationStrategy*
 AllocationTracker::getAllocationStrategy()
 {
-  return m_allocator;
+  return m_allocator.get();
 }
 
 } // end of namespace umpire

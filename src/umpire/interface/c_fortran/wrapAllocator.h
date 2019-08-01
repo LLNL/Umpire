@@ -1,3 +1,9 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
+//
+// SPDX-License-Identifier: (MIT)
+//////////////////////////////////////////////////////////////////////////////
 // wrapAllocator.h
 // This is generated code, do not edit
 // Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
@@ -36,6 +42,8 @@ extern "C" {
 
 // splicer begin class.Allocator.C_declarations
 // splicer end class.Allocator.C_declarations
+
+void umpire_allocator_delete(umpire_allocator * self);
 
 void * umpire_allocator_allocate(umpire_allocator * self, size_t bytes);
 

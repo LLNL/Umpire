@@ -1,29 +1,22 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
 #
-# Created by David Beckingsale, david@llnl.gov
-# LLNL-CODE-747640
-#
-# All rights reserved.
-#
-# This file is part of Umpire.
-#
-# For details, see https://github.com/LLNL/Umpire
-# Please also see the LICENSE file for MIT license.
+# SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationStrategy.hpp
   AllocationTracker.hpp
+  DynamicPool.hpp
+  DynamicPoolHeuristic.hpp
+  FixedPool.hpp
+  MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   SizeLimiter.hpp
   ThreadSafeAllocator.hpp
-  DynamicPool.hpp
-  DynamicPoolHeuristic.hpp
-  FixedPool.hpp
-  FixedPool.inl)
+  ZeroByteHandler.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_headers
@@ -38,13 +31,16 @@ set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
   AllocationTracker.cpp
+  DynamicPool.cpp
+  DynamicPoolHeuristic.cpp
+  FixedPool.cpp
+  MixedPool.cpp
+  mixins/Inspector.cpp
   MonotonicAllocationStrategy.cpp
   SlotPool.cpp
   SizeLimiter.cpp
   ThreadSafeAllocator.cpp
-  DynamicPool.cpp
-  DynamicPoolHeuristic.cpp
-  mixins/Inspector.cpp)
+  ZeroByteHandler.cpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_sources

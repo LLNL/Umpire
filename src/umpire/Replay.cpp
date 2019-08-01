@@ -1,41 +1,41 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
+
+#if !defined(_MSC_VER)
 #include <strings.h>  // for strcasecmp()
 #include <unistd.h>   // getpid()
+#else
+#include <process.h>
+#define strcasecmp _stricmp
+#define getpid _getpid
+#endif
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
+#include "umpire/util/io.hpp"
+
 #include "umpire/Replay.hpp"
 
 namespace umpire {
-namespace replay {
 
 static const char* env_name = "UMPIRE_REPLAY";
-Replay* Replay::s_Replay = nullptr;
+int Replay::m_argument_number = 0;
 
-Replay::Replay(bool enable_replay) : replayEnabled(enable_replay), m_replayUid(getpid())
+Replay::Replay() : m_replayUid(getpid())
 {
-}
+  char* enval = getenv(env_name);
+  bool enable_replay = ( enval != NULL );
 
-Replay::~Replay()
-{
+  replayEnabled =  enable_replay;
 }
 
 void Replay::logMessage( const std::string& message )
@@ -43,7 +43,7 @@ void Replay::logMessage( const std::string& message )
   if ( !replayEnabled )
     return;   /* short-circuit */
 
-  std::cout << message;
+  umpire::replay() << message;
 }
 
 bool Replay::replayLoggingEnabled()
@@ -51,29 +51,11 @@ bool Replay::replayLoggingEnabled()
   return replayEnabled;
 }
 
-void Replay::initialize()
-{
-  if ( s_Replay != nullptr )
-    return;
-
-  char* enval = getenv(env_name);
-  bool enable_replay = ( enval != NULL );
-
-  s_Replay = new Replay(enable_replay);
-}
-
-void Replay::finalize()
-{
-  delete s_Replay;
-  s_Replay = nullptr;
-}
-
 Replay* Replay::getReplayLogger()
 {
-  if ( s_Replay == nullptr )
-    Replay::initialize();
+  static Replay replay_logger;
 
-  return s_Replay;
+  return &replay_logger;
 }
 
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
@@ -82,10 +64,9 @@ std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
 }
 
 std::ostream& operator<< (
-    std::ostream& out, 
-    umpire::strategy::DynamicPool::Coalesce_Heuristic& ) {
+    std::ostream& out,
+    umpire::strategy::DynamicPool::CoalesceHeuristic& ) {
   return out;
 }
 
-} /* namespace replay */
 } /* namespace umpire */

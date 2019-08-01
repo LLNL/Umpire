@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_Logger_HPP
 #define UMPIRE_Logger_HPP
@@ -29,24 +21,17 @@ enum Level {
 
   Num_Levels
 };
-
-static const std::string MessageLevelName[ Level::Num_Levels ] = {
-  "ERROR",
-  "WARNING",
-  "INFO",
-  "DEBUG"
-};
-} /* namespace messge */
+} // end namespace message
 
 class Logger {
   public:
 
-  void setLoggingMsgLevel( message::Level level ) noexcept;
+  void setLoggingMsgLevel(message::Level level) noexcept;
 
-  void logMessage( message::Level level,
-                   const std::string& message,
-                   const std::string& fileName,
-                   int line ) noexcept;
+  void logMessage(message::Level level,
+                  const std::string& message,
+                  const std::string& fileName,
+                  int line) noexcept;
 
   static void initialize();
 
@@ -54,25 +39,25 @@ class Logger {
 
   static Logger* getActiveLogger();
 
-  static Logger* getRootLogger();
-
-  inline bool logLevelEnabled( message::Level level )
+  inline bool logLevelEnabled(message::Level level)
   {
-    if ( level < 0 || level >= message::Num_Levels || m_isEnabled[ level ] == false  )
+    if ( level < 0 || level >= message::Num_Levels || m_is_enabled[ level ] == false  )
       return false;
     else
       return true;
   };
 
+  ~Logger() noexcept = default;
+  Logger(const Logger&) = delete;
+  Logger& operator=(const Logger&) = delete;
+
 private:
   Logger() noexcept;
-  ~Logger() noexcept;
 
-  bool m_isEnabled[ message::Num_Levels ];
-  static Logger* s_Logger;
+  bool m_is_enabled[message::Num_Levels];
 };
 
-} /* namespace util */
-} /* namespace umpire */
+} // end namespace util
+} // end namespace umpire
 
-#endif /* UMPIRE_Logger_HPP */
+#endif // UMPIRE_Logger_HPP

@@ -1,16 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
+// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
 //
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
+// SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #ifndef UMPIRE_SizeLimiter_HPP
 #define UMPIRE_SizeLimiter_HPP
@@ -39,20 +31,20 @@ class SizeLimiter :
         const std::string& name,
         int id,
         Allocator allocator,
-        size_t size_limit);
+        std::size_t size_limit);
 
-    void* allocate(size_t bytes);
+    void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
 
-    long getCurrentSize() const noexcept;
-    long getHighWatermark() const noexcept;
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
   private:
     strategy::AllocationStrategy* m_allocator;
 
-    size_t m_size_limit;
-    size_t m_total_size;
+    std::size_t m_size_limit;
+    std::size_t m_total_size;
 };
 
 } // end of namespace strategy
