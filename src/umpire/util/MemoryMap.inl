@@ -112,8 +112,10 @@ MemoryMap<V>::doFindOrBefore(Key ptr) const noexcept
   Key parent_ptr{0};
   judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
 
+  const Value* value{m_last ? reinterpret_cast<const Value*>(*m_last) : nullptr};
+
   // If the ptrs do not match, or the key does not exist, get the previous entry
-  if (parent_ptr != ptr || !m_last)
+  if (parent_ptr != ptr || !value)
   {
     m_last = judy_prv(m_array);
     judy_key(m_array, reinterpret_cast<unsigned char*>(&parent_ptr), judy_max);
@@ -195,7 +197,9 @@ void MemoryMap<V>::clear() noexcept
 {
   // Loop over the level 0 tree
   Key key{0};
-  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0); m_last; m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0))
+  for(m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0);
+      m_last;
+      m_last = judy_strt(m_array, reinterpret_cast<unsigned char*>(&key), 0))
     removeLast();
 
   m_size = 0;

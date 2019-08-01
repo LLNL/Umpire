@@ -27,19 +27,19 @@ can get them using the same ``umpire_resourcemanager_get_allocator_by_name``
 call you saw in the previous example:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp
-                    :lines: 24-25
+                    :lines: 15-19
 
 Note that every allocator supports the same calls, no matter which resource it
 is for, this means we can run the same code for all the resources available in
 the system:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp 
-                    :lines: 21-35
+                    :lines: 21-27
 
 As you can see, we can call this function with any valid resource name:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp 
-                    :lines: 40-46
+                    :lines: 34-44
 
 In the next example, we will learn how to move data between resources using
 operations.

@@ -11,7 +11,9 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 0.3.5)
+  VERSION 1.0.0)
+
+set(UMPIRE_VERSION_RC "")
 
 option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
 mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS)
