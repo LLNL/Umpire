@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed Bamboo test script on BLUEOS systems.
+
 ## [1.0.0] - 2019-07-12
 
 ### Added
@@ -149,8 +151,6 @@ and a dynamic pool for those that are larger.
 - 2019-07-09: Build error with NUMA.
 
 - Issues relating to static initialization of Logger.
-
-- Fixed Bamboo test script on BLUEOS systems.
 
 ## [0.3.5] - 2019-06-11
 
