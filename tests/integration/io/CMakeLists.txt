@@ -12,12 +12,14 @@ blt_add_executable(
   DEPENDS_ON umpire
   OUTPUT_DIR ${io_dir})
 
-include(FindPythonInterp)
+if (NOT C_COMPILER_FAMILY_IS_PGI)
+  include(FindPythonInterp)
 
-if (PYTHON_EXECUTABLE)
-  add_test(
-    NAME io_tests
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py WORKING_DIRECTORY ${io_dir})
+  if (PYTHON_EXECUTABLE)
+    add_test(
+      NAME io_tests
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py WORKING_DIRECTORY ${io_dir})
+  endif ()
 endif ()
 
 set (log_depends umpire)

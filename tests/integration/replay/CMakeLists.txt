@@ -31,10 +31,13 @@ if (BASH_PROGRAM)
     DEPENDS_ON ${replay_integration_tests_depends}
     OUTPUT_DIR ${replay_dir})
 
-  add_test(
-    NAME replay_tests
-    COMMAND ${BASH_PROGRAM}
-    ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+
+  if (NOT C_COMPILER_FAMILY_IS_PGI)
+    add_test(
+      NAME replay_tests
+      COMMAND ${BASH_PROGRAM}
+      ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+  endif()
 
 else()
 
