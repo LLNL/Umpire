@@ -39,9 +39,7 @@ trycmd "make VERBOSE=1 -j"
 # TODO (MJM) - I'm not sure how to obtain exit status for programs run under bsub and srun
 #
 echo "Testing..."
-if [[ $HOSTNAME == *manta* ]]; then
-  bsub -x -n 1 -G guests -Ip ctest --output-on-failure -T Test
-elif [[ $HOSTNAME == *ansel* ]]; then
+if [[ $HOSTNAME == *manta* ]] || [[ $HOSTNAME == *ansel* ]]; then
   lalloc 1 lrun -n 1 ctest --output-on-failure -T Test
 else
   srun -ppdebug -t 5 -N 1 ctest --output-on-failure -T Test

@@ -12,11 +12,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Use git commit hash as RC version in develop builds
+
 ### Removed
 
 ### Fixed
 
 - Fixed Bamboo test script on BLUEOS systems.
+
 
 ## [1.0.0] - 2019-07-12
 

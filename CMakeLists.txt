@@ -92,6 +92,11 @@ if (NOT BLT_LOADED)
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
 
+blt_git_hashcode (HASHCODE umpire_sha1
+                  RETURN_CODE rc
+                  SOURCE_DIR ${PROJECT_SOURCE_DIR})
+set (UMPIRE_VERSION_RC ${umpire_sha1})
+
 include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
