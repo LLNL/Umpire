@@ -12,9 +12,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Test for UMPIRE_LOG_LEVEL environment variable.
 
+- Analysis tool for plotting traces of allocators.
+
 ### Changed
 
-- Use git commit hash as RC version in develop builds
+- Use git commit hash as RC version in develop builds.
+
+- Moved `tools/plot_allocations` to `tools/analysis`.
 
 ### Removed
 
