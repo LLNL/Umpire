@@ -11,7 +11,9 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 0.3.5)
+  VERSION 1.0.0)
+
+set(UMPIRE_VERSION_RC "")
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")

@@ -111,6 +111,24 @@ blt_add_test(
   NAME free_functions_integration_tests
   COMMAND free_functions_integration_tests)
 
+set(static_initialization_test_depends umpire)
+
+if (ENABLE_HIP)
+  set (static_initialization_test_depends
+      ${static_initialization_test_depends}
+      hip_runtime)
+endif()
+
+blt_add_executable(
+  NAME static_initialization_test
+  SOURCES static_initialization_test.cpp
+  DEPENDS_ON ${static_initialization_test_depends}
+  OUTPUT_DIR ${integration_dir})
+
+blt_add_test(
+  NAME static_initialization_test
+  COMMAND static_initialization_test)
+
 # blt_add_executable(
 #   NAME memory_resource_traits_tests
 #   SOURCES memory_resource_traits_tests.cpp

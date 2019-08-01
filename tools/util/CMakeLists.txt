@@ -7,6 +7,7 @@
 set (replay_util_headers
   ReplayInterpreter.hpp
   ReplayInterpreter.inl
+  ReplayMacros.hpp
   ReplayOperationManager.hpp
   ReplayOperationManager.inl
 )

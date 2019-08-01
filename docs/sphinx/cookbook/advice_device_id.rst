@@ -17,7 +17,7 @@ By passing a specific device id when constructing an
 will be applied with respect to that device
 
 .. literalinclude:: ../../../examples/cookbook/recipe_advice_device_id.cpp
-                    :lines: 38-40
+                    :lines: 30-32
 
 The complete example is included below:
 

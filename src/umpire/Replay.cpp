@@ -21,7 +21,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
-#include "umpire/util/IOManager.hpp"
+#include "umpire/util/io.hpp"
 
 #include "umpire/Replay.hpp"
 
@@ -43,7 +43,7 @@ void Replay::logMessage( const std::string& message )
   if ( !replayEnabled )
     return;   /* short-circuit */
 
-  umpire::replay << message;
+  umpire::replay() << message;
 }
 
 bool Replay::replayLoggingEnabled()

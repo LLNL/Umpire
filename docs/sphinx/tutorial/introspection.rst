@@ -13,23 +13,23 @@ The :class:`umpire::ResourceManager` can be used to find the allocator
 associated with an address: 
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp
-                    :lines: 40
+                    :lines: 36
 
 Once you have this, it's easy to query things like the name of the Allocator:
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp
-                    :lines: 43
+                    :lines: 39
 
 You can also find out the associated :class:`umpire::Platform`, which can help
 you decide where to operate on this data:
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp
-                    :lines: 45
+                    :lines: 41
 
 You can also find out how big the allocation is, in case you forgot:
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp
-                    :lines: 48
+                    :lines: 44
 
 Remember that these functions will work on any allocation made using an
 Allocator or :class:`umpire::TypedAllocator`.

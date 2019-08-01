@@ -14,21 +14,21 @@ and then allocate a single word from this pool to ensure the initial block is
 never freed:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shrink.cpp
-                    :lines: 32-35
+                    :lines: 24-29
 
 To increase the pool size you can preallocate a large chunk and then
 immediately free it. The pool will retain this memory for use by later
 allocations:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shrink.cpp
-                    :lines: 48-49
+                    :lines: 40-41
 
 Assuming that there are no allocations left in the larger "chunk" of the pool,
 you can shrink the pool back down to the initial size by calling
 :func:`umpire::Allocator::release`:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shrink.cpp
-                    :lines: 58
+                    :lines: 50
 
 The complete example is included below:
 

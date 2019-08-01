@@ -14,14 +14,14 @@ However, when you call allocate, this argument is the number of objects you
 want to allocate, no the total number of bytes:
 
 .. literalinclude:: ../../../examples/tutorial/tut_typed_allocator.cpp
-                    :lines: 25-29
+                    :lines: 16-20
 
 To use this allocator with an STL object like a vector, you need to pass the
 type as a template parameter for the vector, and also pass the allocator to the
 vector when you construct it:
 
 .. literalinclude:: ../../../examples/tutorial/tut_typed_allocator.cpp
-                    :lines: 32-33
+                    :lines: 22-25
 
 One thing to remember is that whatever allocator you use with an STL object, it
 must be compatible with the inner workings of that object. For example, if you
