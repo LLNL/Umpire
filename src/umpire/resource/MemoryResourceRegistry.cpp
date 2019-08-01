@@ -37,11 +37,6 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
       auto a = allocator_factory->create(name, id);
-      UMPIRE_REPLAY(
-           "\"event\": \"makeMemoryResource\""
-        << ", \"payload\": { \"name\": \"" << name << "\" }"
-        << ", \"result\": \"" << a.get() << "\""
-      );
       return a;
     }
   }

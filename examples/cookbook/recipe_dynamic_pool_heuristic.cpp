@@ -41,13 +41,7 @@ int main(int, char**) {
   // Obtain a pointer to our specifi DynamicPool instance in order to see the
   // DynamicPool-specific statistics
   //
-  auto strategy = pooled_allocator.getAllocationStrategy();
-  auto tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(strategy);
-
-  if (tracker)
-    strategy = tracker->getAllocationStrategy();
-
-  auto dynamic_pool = dynamic_cast<umpire::strategy::DynamicPool*>(strategy);
+  auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pooled_allocator);
 
   void* a[4];
   for (int i = 0; i < 4; ++i)
