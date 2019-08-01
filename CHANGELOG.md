@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Test for UMPIRE_LOG_LEVEL environment variable.
+
 ### Changed
 
 - Use git commit hash as RC version in develop builds
