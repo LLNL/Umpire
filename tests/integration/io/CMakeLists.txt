@@ -19,3 +19,15 @@ if (PYTHON_EXECUTABLE)
     NAME io_tests
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py WORKING_DIRECTORY ${io_dir})
 endif ()
+
+blt_add_executable(
+  NAME log_tests
+  SOURCES log_tests.cpp
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${io_dir})
+
+if (PYTHON_EXECUTABLE)
+  add_test(
+    NAME log_tests
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/log_tests_runner.py WORKING_DIRECTORY ${io_dir})
+endif ()
