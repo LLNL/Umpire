@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Use git commit hash as RC version in develop builds
+
 ### Removed
 
 ### Fixed
