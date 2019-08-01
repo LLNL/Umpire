@@ -8,8 +8,8 @@
 #define UMPIRE_Macros_HPP
 
 #include "umpire/util/Exception.hpp"
-#include "umpire/util/io.hpp"
 #include "umpire/config.hpp"
+#include "umpire/util/io.hpp"
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 #include "umpire/util/statistic_helper.hpp"
@@ -93,7 +93,7 @@
   UMPIRE_LOG(Error, msg);                                          \
   std::ostringstream umpire_oss_error;                             \
   umpire_oss_error << " " << __func__ << " " << msg;               \
-  umpire::util::io_flush();                                        \
+  umpire::util::flush_files();                                     \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
                                  __LINE__);                        \

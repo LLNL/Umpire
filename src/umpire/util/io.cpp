@@ -154,7 +154,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   MPI::logMpiInfo();
 }
 
-void io_flush( void )
+void flush_files()
 {
   log().flush();
   replay().flush();
