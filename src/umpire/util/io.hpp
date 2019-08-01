@@ -30,7 +30,7 @@ void initialize_io(const bool enable_log, const bool enable_replay);
  * This function is usually called by exception generating code like
  * UMPIRE_ERROR.
  */
-void io_flush( void );
+void flush_files();
 
 } // end namespace util
 } // end namespace umpire
