@@ -50,7 +50,7 @@ class Allocator {
      *
      * \return Pointer to start of the allocation.
      */
-    void* allocate(std::size_t bytes);
+    inline void* allocate(std::size_t bytes);
 
     /*!
      * \brief Free the memory at ptr.
@@ -61,7 +61,7 @@ class Allocator {
      *
      * \param ptr Pointer to free (!nullptr)
      */
-    void deallocate(void* ptr);
+    inline void deallocate(void* ptr);
 
     /*!
      * \brief Release any and all unused memory held by this Allocator.
@@ -175,5 +175,7 @@ class Allocator {
 };
 
 } // end of namespace umpire
+
+#include "umpire/Allocator.inl"
 
 #endif // UMPIRE_Allocator_HPP
