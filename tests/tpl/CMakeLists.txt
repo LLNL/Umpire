@@ -22,6 +22,8 @@ blt_add_executable(
   DEPENDS_ON umpire_tpl_cxxopts gtest
   OUTPUT_DIR ${unit_dir})
 
-blt_add_test(
-  NAME cxxopts_smoke_tests
-  COMMAND cxxopts_smoke_tests)
+if (NOT C_COMPILER_FAMILY_IS_PGI)
+  blt_add_test(
+    NAME cxxopts_smoke_tests
+    COMMAND cxxopts_smoke_tests)
+endif()
