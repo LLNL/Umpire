@@ -18,6 +18,11 @@ set(UMPIRE_VERSION_RC "")
 option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
 mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS)
 
+if (ENABLE_DEVELOPER_DEFAULTS)
+  set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
+  set(ENABLE_TOOLS On CACHE BOOL "")
+endif ()
+
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
@@ -34,11 +39,6 @@ option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
-
-if (ENABLE_DEVELOPER_DEFAULTS)
-  set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
-  set(ENABLE_TOOLS On CACHE BOOL "")
-endif ()
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 
