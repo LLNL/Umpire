@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - ENABLE_DEVELOPER_DEFAULTS option to set default values during development.
 
+- Add unit tests for the DynamicPool.
+
 ### Changed
 
 - Adjust notifications for CI jobs
