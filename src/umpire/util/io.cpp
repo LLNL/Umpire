@@ -82,12 +82,14 @@ void initialize_io(const bool enable_log, const bool enable_replay)
 
   if (enable_log){
     const char* log_enval = std::getenv("UMPIRE_LOG_CFG");
-    auto json = nlohmann::json::parse(std::string{log_enval});
+    if (log_enval)
+      auto json = nlohmann::json::parse(std::string{log_enval});
   }
 
   if (enable_replay){
     const char* replay_enval = std::getenv("UMPIRE_REPLAY_CFG");
-    auto json = nlohmann::json::parse(std::string{replay_enval});
+    if (replay_enval)
+      auto json = nlohmann::json::parse(std::string{replay_enval});
   }
 
   std::string root_io_dir{"./"};
