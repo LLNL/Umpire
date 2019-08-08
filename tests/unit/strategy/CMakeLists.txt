@@ -19,11 +19,16 @@ blt_add_executable(
   DEPENDS_ON ${strategy_tests_depends}
   OUTPUT_DIR ${strategy_dir})
 
-target_include_directories(
-  memory_allocator_tests
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
-
 blt_add_test(
   NAME fixed_pool_tests
   COMMAND fixed_pool_tests)
+
+blt_add_executable(
+  NAME dynamic_pool_tests
+  SOURCES dynamic_pool_tests.cpp
+  DEPENDS_ON ${strategy_tests_depends}
+  OUTPUT_DIR ${strategy_dir})
+
+blt_add_test(
+  NAME dynamic_pool_tests
+  COMMAND dynamic_pool_tests)

@@ -14,6 +14,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Test for UMPIRE_LOG_LEVEL environment variable.
 
+- ENABLE_DEVELOPER_DEFAULTS option to set default values during development.
+
+- Add unit tests for the DynamicPool.
+
 ### Changed
 
 - Adjust notifications for CI jobs
@@ -23,7 +27,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
-- Fixed Bamboo test script on BLUEOS systems.
+- Fixed Bamboo test script and job launch on BLUEOS systems.
 
 
 ## [1.0.0] - 2019-07-12
