@@ -263,7 +263,9 @@ Platform DynamicPool::getPlatform() noexcept
 
 void DynamicPool::doCoalesce()
 {
-  using PointerMap = std::map<Pointer, SizeTuple>;
+  using PointerMap = std::map<Pointer, SizeTuple,
+                              std::less<Pointer>,
+                              util::FixedMallocPoolAllocator<std::pair<const Pointer, SizeTuple>>>;
 
   // Make a free block map from pointers -> size pairs
   PointerMap free_pointer_map;
