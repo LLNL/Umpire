@@ -32,6 +32,8 @@
 #define getpid _getpid
 #endif
 
+#include "umpire/tpl/json/json.hpp"
+
 namespace umpire {
 
 std::ostream& log()
@@ -77,6 +79,16 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   log().rdbuf(&s_log_buffer);
   replay().rdbuf(&s_replay_buffer);
   error().rdbuf(&s_error_buffer);
+
+  if (enable_log){
+    const char* log_enval = std::getenv("UMPIRE_LOG_CFG");
+    auto json = nlohmann::json::parse(std::string{log_enval});
+  }
+
+  if (enable_replay){
+    const char* replay_enval = std::getenv("UMPIRE_REPLAY_CFG");
+    auto json = nlohmann::json::parse(std::string{replay_enval});
+  }
 
   std::string root_io_dir{"./"};
   const char* output_dir{std::getenv("UMPIRE_OUTPUT_DIR")};

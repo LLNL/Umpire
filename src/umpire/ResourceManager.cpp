@@ -89,7 +89,21 @@ ResourceManager::ResourceManager() :
   const char* env_enable_log{getenv("UMPIRE_LOG_LEVEL")};
   const bool enable_log{env_enable_log != nullptr};
 
-  util::initialize_io(enable_log, enable_replay);
+  const char* env_enable_log_cfg{getenv("UMPIRE_LOG_CFG")};
+  const bool enable_log_cfg{env_enable_log_cfg != nullptr};
+
+  const char* env_enable_replay_cfg{getenv("UMPIRE_REPLAY_CFG")};
+  const bool enable_replay_cfg{env_enable_replay_cfg != nullptr};
+
+  util::initialize_io((enable_log || enable_log_cfg), (enable_replay || enable_replay_cfg));
+
+  if (enable_log) {
+    UMPIRE_LOG(Warning, "UMPIRE_LOG_LEVEL is deprecated, please use UMPIRE_LOG_CFG");
+  }
+  
+  if (enable_replay) {
+    UMPIRE_LOG(Warning, "UMPIRE_REPLAY is deprecated, please use UMPIRE_REPLAY_CFG");
+  }
 
   resource::MemoryResourceRegistry& registry{
     resource::MemoryResourceRegistry::getInstance()};

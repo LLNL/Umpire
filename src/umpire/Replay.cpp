@@ -22,18 +22,39 @@
 #include "umpire/strategy/DynamicPool.hpp"
 
 #include "umpire/util/io.hpp"
+#include "umpire/util/string_utils.hpp"
 
 #include "umpire/Replay.hpp"
 
-namespace umpire {
+#include "umpire/tpl/json/json.hpp"
 
-static const char* env_name = "UMPIRE_REPLAY";
+namespace umpire {
+  
 int Replay::m_argument_number = 0;
 
 Replay::Replay() : m_replayUid(getpid())
 {
+  static const char* env_name = "UMPIRE_REPLAY";
+  static const char* config_env_var = "UMPIRE_REPLAY_CFG";
+
   char* enval = getenv(env_name);
   bool enable_replay = ( enval != NULL );
+
+  const char* config_env = std::getenv(config_env_var);
+  if (config_env) {
+    auto json = nlohmann::json::parse(std::string{config_env});
+
+    std::string enabled = json["enabled"];
+    if (util::case_insensitive_match(enabled, "true")) {
+      enable_replay = true;
+    }
+
+    // TODO: remove once UMPIRE_REPLAY is deprecated
+    if (util::case_insensitive_match(enabled, "false")) {
+      std::cout << "disabling replay" << std::endl;
+      enable_replay = false;
+    }
+  }
 
   replayEnabled =  enable_replay;
 }
