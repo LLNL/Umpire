@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Test for UMPIRE_LOG_LEVEL environment variable.
 
+- ENABLE_DEVELOPER_DEFAULTS option to set default values during development.
+
 ### Changed
 
 - Adjust notifications for CI jobs
