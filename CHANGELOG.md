@@ -22,6 +22,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Adjust notifications for CI jobs
 - Use git commit hash as RC version in develop builds
+- Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library
 
 ### Removed
 
