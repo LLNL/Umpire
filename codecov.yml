@@ -1,6 +1,5 @@
 ignore:
   - "src/umpire/tpl/conduit"
-  - "src/umpire/tpl/judy"
   - "src/umpire/tpl/cxxopts"
   - "src/umpire/tpl/json"
   - "test"
