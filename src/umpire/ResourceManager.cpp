@@ -588,22 +588,16 @@ ResourceManager::move(void* ptr, Allocator allocator)
       util::AllocationRecord dst_alloc_record{
         nullptr, size, allocator.getAllocationStrategy()};
 
-      void *ret = nullptr;
       if (size > 0) {
         auto op = op_registry.find("MOVE",
                                    src_alloc_record->strategy,
                                    dst_alloc_record.strategy);
-
+        void *ret{nullptr};
         op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
-        if (ret != ptr) {
-          UMPIRE_ERROR("Numa move error");
-        }
-      }
-      else {
-        ret = ptr;
+        UMPIRE_ASSERT(ret == ptr);
       }
 
-      return ret;
+      return ptr;
     }
   }
 #endif
