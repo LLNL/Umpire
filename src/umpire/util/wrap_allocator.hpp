@@ -7,7 +7,10 @@
 #ifndef UMPIRE_wrap_allocator_HPP
 #define UMPIRE_wrap_allocator_HPP
 
+#include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/AllocationTracker.hpp"
+#include "umpire/strategy/ZeroByteHandler.hpp"
 
 #include "umpire/util/make_unique.hpp"
 
