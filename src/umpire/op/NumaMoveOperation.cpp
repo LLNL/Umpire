@@ -25,8 +25,9 @@ void NumaMoveOperation::transform(
     util::AllocationRecord* dst_allocation,
     std::size_t length)
 {
-  auto numa_allocator = util::unwrap_allocator<strategy::NumaPolicy>(
-    Allocator{dst_allocation->strategy});
+  auto numa_allocator =
+    util::unwrap_allocation_strategy<strategy::NumaPolicy>(
+      dst_allocation->strategy);
 
   *dst_ptr = src_ptr;
   numa::move_to_node(*dst_ptr, length, numa_allocator->getNode());
