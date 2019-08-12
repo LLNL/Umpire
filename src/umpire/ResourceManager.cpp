@@ -565,21 +565,8 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
 #if defined(UMPIRE_ENABLE_NUMA)
 static strategy::NumaPolicy* cast_as_numa_policy(Allocator& allocator) {
   strategy::NumaPolicy* numa_alloc;
-
-  numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
-    allocator.getAllocationStrategy());
-
-  // ... or an AllocationTracker wrapping a NumaPolicy
-  if (!numa_alloc) {
-    auto alloc_tracker = dynamic_cast<strategy::AllocationTracker*>(
-      allocator.getAllocationStrategy());
-    if (alloc_tracker) {
-      numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
-        alloc_tracker->getAllocationStrategy());
-    }
-  }
-
-  return numa_alloc;
+  auto base_allocator = util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
+  return dynamic_cast<strategy::NumaPolicy*>(base_allocator);
 }
 #endif
 
