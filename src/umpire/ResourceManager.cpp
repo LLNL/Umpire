@@ -585,7 +585,8 @@ ResourceManager::move(void* ptr, Allocator allocator)
       auto src_alloc_record = m_allocations.find(ptr);
 
       const std::size_t size{src_alloc_record->size};
-      util::AllocationRecord dst_alloc_record{nullptr, size, allocator->getAllocationStrategy()};
+      util::AllocationRecord dst_alloc_record{
+        nullptr, size, allocator.getAllocationStrategy()};
 
       void *ret = nullptr;
       if (size > 0) {
