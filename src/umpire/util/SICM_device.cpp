@@ -17,27 +17,31 @@
 
 #include <vector>
 
-std::ostream& operator<<(std::ostream& stream, const sicm_device_list& device_list) {
+std::ostream& operator<<(std::ostream& stream, const sicm_device& device) {
   static const std::string units[] = {"K", "M", "G", "T"};
 
-  stream << device_list.count << " SICM devices:";
-  for(unsigned int i = 0; i < device_list.count; i++) {
-    std::size_t unit = 0;
-    std::size_t page_size = device_list.devices[i]->page_size;
+  std::size_t unit = 0;
+  std::size_t page_size = device.page_size;
 
-    while (page_size >= 1024) {
-      page_size >>= 10;
-      unit++;
-    }
-
-    stream << " {"
-           << sicm_device_tag_str(device_list.devices[i]->tag) << ", "
-           << device_list.devices[i]->node << ", "
-           << page_size << units[unit] << "B"
-           << "}";
+  while (page_size >= 1024) {
+    page_size >>= 10;
+    unit++;
   }
 
-  return stream << "\n";
+  return stream << "{"
+                << sicm_device_tag_str(device.tag) << ", "
+                << device.node << ", "
+                << page_size << units[unit] << "B"
+                << "}";
+}
+
+std::ostream& operator<<(std::ostream& stream, const sicm_device_list& device_list) {
+  stream << device_list.count << " SICM devices:";
+  for(unsigned int i = 0; i < device_list.count; i++) {
+    stream << " " << *device_list.devices[i];
+  }
+
+  return stream;
 }
 
 namespace umpire {

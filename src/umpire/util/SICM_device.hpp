@@ -21,6 +21,7 @@
 
 #include <sicm_low.h>
 
+std::ostream& operator<<(std::ostream& stream, const sicm_device& device);
 std::ostream& operator<<(std::ostream& stream, const sicm_device_list& device_list);
 
 namespace umpire {
