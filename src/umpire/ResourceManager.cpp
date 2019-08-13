@@ -562,27 +562,6 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
   return dst_ptr;
 }
 
-#if defined(UMPIRE_ENABLE_NUMA)
-static strategy::NumaPolicy* cast_as_numa_policy(Allocator& allocator) {
-  strategy::NumaPolicy* numa_alloc;
-
-  numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
-    allocator.getAllocationStrategy());
-
-  // ... or an AllocationTracker wrapping a NumaPolicy
-  if (!numa_alloc) {
-    auto alloc_tracker = dynamic_cast<strategy::AllocationTracker*>(
-      allocator.getAllocationStrategy());
-    if (alloc_tracker) {
-      numa_alloc = dynamic_cast<strategy::NumaPolicy*>(
-        alloc_tracker->getAllocationStrategy());
-    }
-  }
-
-  return numa_alloc;
-}
-#endif
-
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
@@ -597,34 +576,28 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
 #if defined(UMPIRE_ENABLE_NUMA)
   {
-    // short circuit if allocator has a NumaPolicy
-    auto numa_alloc = cast_as_numa_policy(allocator);
+    auto base_strategy = util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
 
     // If found, use op::NumaMoveOperation to move in-place (same address returned)
-    if (numa_alloc) {
+    if (dynamic_cast<strategy::NumaPolicy*>(base_strategy)) {
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
       auto src_alloc_record = m_allocations.find(ptr);
 
       const std::size_t size{src_alloc_record->size};
-      util::AllocationRecord dst_alloc_record{nullptr, size, numa_alloc};
+      util::AllocationRecord dst_alloc_record{
+        nullptr, size, allocator.getAllocationStrategy()};
 
-      void *ret = nullptr;
       if (size > 0) {
         auto op = op_registry.find("MOVE",
                                    src_alloc_record->strategy,
                                    dst_alloc_record.strategy);
-
+        void *ret{nullptr};
         op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
-        if (ret != ptr) {
-          UMPIRE_ERROR("Numa move error");
-        }
-      }
-      else {
-        ret = ptr;
+        UMPIRE_ASSERT(ret == ptr);
       }
 
-      return ret;
+      return ptr;
     }
   }
 #endif
