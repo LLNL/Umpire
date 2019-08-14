@@ -33,17 +33,33 @@ class MixedPool :
   public AllocationStrategy
 {
   public:
+  /**
+   * \brief Creates a MixedPool of one or more fixed pools and a dynamic pool
+   * for large allocations.
+   *
+   * \param name Name of the pool
+   * \param id Unique identifier for lookup later in ResourceManager
+   * \param allocator Underlying allocator
+   * \param smallest_fixed_obj_size Smallest fixed pool object size in bytes
+   * \param largest_fixed_obj_size Largest fixed pool object size in bytes
+   * \param max_initial_fixed_pool_size Largest initial size of any fixed pool
+   * \param fixed_size_multiplier Fixed pool object size increase factor
+   * \param dynamic_initial_alloc_size Size the dynamic pool initially allocates
+   * \param dynamic_min_alloc_bytes Minimum size of all future allocations in the dynamic pool
+   * \param coalesce_heuristic Heuristic callback function (for the dynamic pool)
+   * \param dynamic_align_bytes Size with which to align allocations (for the dynamic pool)
+   */
     MixedPool(
       const std::string& name, int id,
       Allocator allocator,
-      std::size_t smallest_fixed_blocksize = (1 << 8), // 256B
-      std::size_t largest_fixed_blocksize = (1 << 17), // 1024K
-      std::size_t max_fixed_pool_size = 1024*1024 * 2, // 2MB
-      std::size_t size_multiplier = 10,                // 10x over previous size
-      std::size_t dynamic_min_initial_alloc_size = (512 * 1024 * 1024),
-      std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
-      DynamicPool::Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)
-      ) noexcept;
+      std::size_t smallest_fixed_obj_size = (1 << 8),          // 256B
+      std::size_t largest_fixed_obj_size = (1 << 17),          // 1024K
+      std::size_t max_initial_fixed_pool_size = 1024*1024 * 2, // 2MB
+      std::size_t fixed_size_multiplier = 16,                  // 16x over previous size
+      const std::size_t dynamic_initial_alloc_size = (512 * 1024 * 1024),
+      const std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
+      DynamicPool::CoalesceHeuristic dynamic_coalesce_heuristic = heuristic_percent_releasable(100),
+      const int dynamic_align_bytes = 16) noexcept;
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
@@ -60,7 +76,7 @@ class MixedPool :
     using IntMap = std::map<uintptr_t, int>;
     IntMap m_map;
     std::vector<std::size_t> m_fixed_pool_map;
-    std::vector<FixedPool> m_fixed_pool;
+    std::vector<std::unique_ptr<FixedPool>> m_fixed_pool;
     DynamicPool m_dynamic_pool;
     AllocationStrategy* m_allocator;
 };

@@ -22,7 +22,6 @@ namespace resource {
 template<typename _allocator>
 DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
-  umpire::strategy::mixins::Inspector(),
   m_allocator(),
   m_platform(platform)
 {
@@ -32,8 +31,6 @@ template<typename _allocator>
 void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
-
-  registerAllocation(ptr, bytes, this);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");
@@ -48,22 +45,21 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  deregisterAllocation(ptr, this);
   m_allocator.deallocate(ptr);
 }
 
 template<typename _allocator>
 std::size_t DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
 {
-  UMPIRE_LOG(Debug, "() returning " << m_current_size);
-  return m_current_size;
+  UMPIRE_LOG(Debug, "() returning " << 0);
+  return 0;
 }
 
 template<typename _allocator>
 std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
 {
-  UMPIRE_LOG(Debug, "() returning " << m_high_watermark);
-  return m_high_watermark;
+  UMPIRE_LOG(Debug, "() returning " << 0);
+  return 0;
 }
 
 template<typename _allocator>

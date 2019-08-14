@@ -30,7 +30,7 @@ cd ${BUILD_DIR}
 
 echo "Configuring..."
 
-trycmd "cmake -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../"
+trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../"
 
 echo "Building..."
 trycmd "make VERBOSE=1 -j"
@@ -39,8 +39,8 @@ trycmd "make VERBOSE=1 -j"
 # TODO (MJM) - I'm not sure how to obtain exit status for programs run under bsub and srun
 #
 echo "Testing..."
-if [[ $HOSTNAME == *manta* ]]; then
-  bsub -x -n 1 -G guests -Ip ctest --output-on-failure -T Test
+if [[ $HOSTNAME == *manta* ]] || [[ $HOSTNAME == *ansel* ]]; then
+  lalloc 1 ctest --output-on-failure -T Test
 else
   srun -ppdebug -t 5 -N 1 ctest --output-on-failure -T Test
 fi

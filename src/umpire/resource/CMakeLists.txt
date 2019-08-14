@@ -11,12 +11,17 @@ set (umpire_resource_headers
   MemoryResource.hpp
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
-  MemoryResourceTypes.hpp)
+  MemoryResourceTypes.hpp
+  NullMemoryResource.hpp
+  NullMemoryResourceFactory.hpp
+)
 
 set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
+  NullMemoryResource.cpp
+  NullMemoryResourceFactory.cpp
 )
 
 if (ENABLE_CUDA)

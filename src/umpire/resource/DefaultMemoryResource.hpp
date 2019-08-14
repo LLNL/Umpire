@@ -23,8 +23,7 @@ namespace resource {
    */
 template <typename _allocator>
 class DefaultMemoryResource :
-  public MemoryResource,
-  private umpire::strategy::mixins::Inspector
+  public MemoryResource
 {
   public: 
     DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);

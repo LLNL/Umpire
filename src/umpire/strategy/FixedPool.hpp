@@ -42,9 +42,11 @@ class FixedPool : public AllocationStrategy
      */
     FixedPool(const std::string& name, int id,
               Allocator allocator, const std::size_t object_bytes,
-              const std::size_t objects_per_pool = 64 * sizeof(int) * 8);
+              const std::size_t objects_per_pool = 64 * sizeof(int) * 8) noexcept;
 
     ~FixedPool();
+
+    FixedPool(const FixedPool&) = delete;
 
     void* allocate(std::size_t bytes = 0) override final;
     void deallocate(void* ptr) override final;
@@ -53,6 +55,8 @@ class FixedPool : public AllocationStrategy
     std::size_t getHighWatermark() const noexcept override final;
     std::size_t getActualSize() const noexcept override final;
     Platform getPlatform() noexcept override final;
+
+    bool pointerIsFromPool(void* ptr) const noexcept;
 
     std::size_t numPools() const noexcept;
 
@@ -74,8 +78,9 @@ class FixedPool : public AllocationStrategy
     std::size_t m_obj_bytes;
     std::size_t m_obj_per_pool;
     std::size_t m_data_bytes;
-    std::size_t m_avail_length;
+    std::size_t m_avail_bytes;
     std::size_t m_current_bytes;
+    std::size_t m_actual_bytes;
     std::size_t m_highwatermark;
     std::vector<Pool> m_pool;
     // NOTE: struct Pool lacks a non-trivial destructor. If m_pool is

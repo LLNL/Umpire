@@ -7,15 +7,14 @@
 #ifndef UMPIRE_DynamicPool_HPP
 #define UMPIRE_DynamicPool_HPP
 
-#include <memory>
-#include <vector>
-#include <functional>
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
+#include "umpire/util/MemoryMap.hpp"
 
 #include "umpire/Allocator.hpp"
+
+#include <map>
+#include <tuple>
 
 namespace umpire {
 namespace strategy {
@@ -31,129 +30,141 @@ namespace strategy {
  * and the minimum size controls the lower bound on all future chunk
  * allocations.
  */
-class DynamicPool :
-  public AllocationStrategy
+class DynamicPool : public AllocationStrategy
 {
   public:
+    using Pointer = void*;
+
     /*!
-     * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
+     * \brief Callback heuristic to trigger coalesce of free blocks in pool.
      *
      * The registered heuristic callback function will be called immediately
      * after a deallocation() has completed from the pool.
      */
-    using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPool& )>;
+    using CoalesceHeuristic = std::function<bool (const strategy::DynamicPool&)>;
 
     /*!
      * \brief Construct a new DynamicPool.
      *
-     * \param name Name of this instance of the DynamicPool.
-     * \param id Id of this instance of the DynamicPool.
-     * \param min_initial_alloc_size The minimum size of the first allocation
-     *                               the pool will make.
-     * \param min_alloc_size The minimum size of all future allocations.
-     * \param coalesce_heuristic Heuristic callback function.
+     * \param name Name of this instance of the DynamicPool
+     * \param id Unique identifier for this instance
+     * \param initial_alloc_bytes Size the pool initially allocates
+     * \param min_alloc_bytes The minimum size of all future allocations
+     * \param coalesce_heuristic Heuristic callback function
+     * \param align_bytes Number of bytes with which to align allocation sizes
      */
     DynamicPool(
         const std::string& name,
         int id,
         Allocator allocator,
-        const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024),
-        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
+        const std::size_t initial_alloc_size = (512 * 1024 * 1024),
+        const std::size_t min_alloc_size = (1 * 1024 * 1024),
+        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100),
+        const int align_bytes = 16) noexcept;
 
+    /*!
+     * \brief Destructs the DynamicPool.
+     */
     ~DynamicPool();
 
+    DynamicPool(const DynamicPool&) = delete;
+
     void* allocate(std::size_t bytes) override;
-
     void deallocate(void* ptr) override;
-
     void release() override;
 
     std::size_t getCurrentSize() const noexcept override;
     std::size_t getActualSize() const noexcept override;
     std::size_t getHighWatermark() const noexcept override;
 
-    std::size_t getFreeBlocks() const;
-    std::size_t getInUseBlocks() const;
-
     Platform getPlatform() noexcept override;
 
     /*!
-     * \brief Get the number of bytes that may be released back to resource
+     * \brief Returns the number of bytes of unallocated data held by this pool
+     * that could be immediately released back to the resource.
      *
-     * A memory pool has a set of blocks that have no allocations
-     * against them.  If the size of the set is greater than one, then
-     * the pool will have a number of bytes that may be released back to
-     * the resource or coalesced into a larger block.
+     * A memory pool has a set of blocks that are not leased out to the
+     * application as allocations. Allocations from the resource begin as a
+     * single chunk, but these could be split, and only the first chunk can be
+     * deallocated back to the resource immediately.
      *
-     * \return The total number of bytes that are releasable
+     * \return The total number of bytes that are immediately releasable.
      */
     std::size_t getReleasableSize() const noexcept;
 
     /*!
-     * \brief Get the number of memory blocks that the pools has
-     *
-     * \return The total number of blocks that are allocated by the pool
+     * \brief Return the number of free memory blocks that the pools holds.
+     */
+    std::size_t getFreeBlocks() const noexcept;
+
+    /*!
+     * \brief Return the number of used memory blocks that the pools holds.
+     */
+    std::size_t getInUseBlocks() const noexcept;
+
+    /*!
+     * \brief Return the number of memory blocks -- both leased to application
+     * and internal free memory -- that the pool holds.
      */
     std::size_t getBlocksInPool() const noexcept;
 
-    void coalesce() noexcept;
+    /*!
+     * \brief Merge as many free records as possible, release all possible free
+     * blocks, then reallocate a chunk to keep the actual size the same.
+     */
+    void coalesce();
 
   private:
-  struct Block
-  {
-    char *data;
-    std::size_t size;
-    std::size_t blockSize;
-    Block *next;
-  };
+    using SizeTuple = std::tuple<std::size_t, bool, std::size_t>;
+    using AddressTuple = std::tuple<Pointer, bool, std::size_t>;
+    using AddressMap = util::MemoryMap<SizeTuple>;
+    using SizeMap = std::multimap<std::size_t, AddressTuple>;
 
-  // Allocator for the underlying data
-  umpire::util::FixedMallocPool blockPool;
+    /*!
+     * \brief Allocate from m_allocator.
+     */
+    void* allocateFromResource(std::size_t bytes);
 
-  // Start of the nodes of used and free block lists
-  struct Block *usedBlocks;
-  struct Block *freeBlocks;
+    /*!
+     * \brief Insert a block to the used map.
+     */
+    void insertUsed(Pointer addr, std::size_t bytes, bool is_head,
+                    std::size_t whole_bytes);
 
-  // Total blocks in the pool
-  std::size_t totalBlocks;
+    /*!
+     * \brief Insert a block to the free map.
+     */
+    void insertFree(Pointer addr, std::size_t bytes, bool is_head,
+                    std::size_t whole_bytes);
 
-  // Total size allocated (bytes)
-  std::size_t totalBytes;
+    /*!
+     * \brief Find a free block with (length <= bytes) as close to bytes in
+     * length as possible.
+     */
+    SizeMap::const_iterator findFreeBlock(std::size_t bytes) const;
 
-  // Allocated size (bytes)
-  std::size_t allocBytes;
+    /*!
+     * \brief Merge all contiguous blocks in m_free_map.
+     *
+     * NOTE This method is rather expensive, but critical to avoid pool growth
+     */
+    void mergeFreeBlocks();
 
-  // Minimum size of initial allocation
-  std::size_t minInitialBytes;
+    /*!
+     * \brief Release blocks from m_free_map that have is_head = true and return
+     * the amount of memory released.
+     */
+    std::size_t releaseFreeBlocks();
 
-  // Minimum size for allocations
-  std::size_t minBytes;
-
-  // High water mark of allocations
-  std::size_t highWatermark;
-
-  // Pointer to our allocator's allocation strategy
-  strategy::AllocationStrategy* m_allocator;
-
-  // Heuristic to use for coalescing
-  Coalesce_Heuristic do_coalesce;
-
-  // Search the list of free blocks and return a usable one if that exists, else NULL
-  void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size);
-
-  // Allocate a new block and add it to the list of free blocks
-  void allocateBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
-
-  void splitBlock(struct Block *&curr, struct Block *&prev, const std::size_t size);
-
-  void releaseBlock(struct Block *curr, struct Block *prev);
-
-  std::size_t freeReleasedBlocks();
-
-  void coalesceFreeBlocks(std::size_t size);
-
-  void freeAllBlocks();
+    strategy::AllocationStrategy* m_allocator;
+    const std::size_t m_min_alloc_bytes;
+    const int m_align_bytes;
+    CoalesceHeuristic m_coalesce_heuristic;
+    AddressMap m_used_map;
+    SizeMap m_free_map;
+    std::size_t m_curr_bytes;
+    std::size_t m_actual_bytes;
+    std::size_t m_highwatermark;
 };
 
 } // end of namespace strategy

@@ -9,6 +9,7 @@
 
 #include "umpire/util/Macros.hpp"
 
+#include <sstream>
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
@@ -50,32 +51,65 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
 
 FixedPool::FixedPool(const std::string& name, int id,
                      Allocator allocator, const std::size_t object_bytes,
-                     const std::size_t objects_per_pool) :
-  AllocationStrategy(name, id),
-  m_strategy(allocator.getAllocationStrategy()),
-  m_obj_bytes(object_bytes),
-  m_obj_per_pool(objects_per_pool),
-  m_data_bytes(m_obj_bytes * m_obj_per_pool),
-  m_avail_length(objects_per_pool/bits_per_int + 1),
-  m_current_bytes(0),
-  m_highwatermark(0),
-  m_pool()
+                     const std::size_t objects_per_pool) noexcept :
+  AllocationStrategy{name, id},
+  m_strategy{allocator.getAllocationStrategy()},
+  m_obj_bytes{object_bytes},
+  m_obj_per_pool{objects_per_pool},
+  m_data_bytes{m_obj_bytes * m_obj_per_pool},
+  m_avail_bytes{objects_per_pool/bits_per_int + 1},
+  m_current_bytes{0},
+  m_actual_bytes{0},
+  m_highwatermark{0},
+  m_pool{}
 {
   newPool();
 }
 
 FixedPool::~FixedPool()
 {
-  for (auto& a : m_pool) {
-    a.strategy->deallocate(a.data);
-    std::free(a.avail);
+  std::vector<void*> leaked_addrs{};
+
+  for (auto& p : m_pool) {
+    if (m_obj_per_pool != p.num_avail) {
+      for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index)
+        for (unsigned int bit_index = 0; bit_index < bits_per_int; ++bit_index) {
+          if (!(p.avail[int_index] & 1 << bit_index)) {
+            const std::size_t index{int_index * bits_per_int + bit_index};
+            leaked_addrs.push_back(
+              static_cast<void*>(p.data + m_obj_bytes * index));
+          }
+        }
+    }
+  }
+
+  if (leaked_addrs.size() > 0) {
+    const std::size_t max_addr{25};
+    std::stringstream ss;
+    ss << "There are " << leaked_addrs.size() << " addresses";
+    ss << " not deallocated at destruction. This will cause leak(s). ";
+    if (leaked_addrs.size() <= max_addr)
+      ss << "Addresses:";
+    else
+      ss << "First " << max_addr << " addresses:";
+    for (std::size_t i = 0; i < std::min(max_addr, leaked_addrs.size()); ++i) {
+      if (i % 5 == 0) ss << "\n\t";
+      ss << " " << leaked_addrs[i];
+    }
+    UMPIRE_LOG(Warning, ss.str());
+  } else {
+    for (auto& p : m_pool) {
+      p.strategy->deallocate(p.data);
+      std::free(p.avail);
+    }
   }
 }
 
 void
 FixedPool::newPool()
 {
-  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool, m_avail_length * sizeof(int));
+  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool, m_avail_bytes * sizeof(int));
+  m_actual_bytes += m_avail_bytes + m_data_bytes;
 }
 
 void*
@@ -83,7 +117,7 @@ FixedPool::allocInPool(Pool& p)
 {
   if (!p.num_avail) return nullptr;
 
-  for (unsigned int int_index = 0; int_index < m_avail_length; ++int_index) {
+  for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index) {
     // Return the index of the first 1 bit
     const int bit_index = find_first_set(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
@@ -164,9 +198,7 @@ FixedPool::getCurrentSize() const noexcept
 std::size_t
 FixedPool::getActualSize() const noexcept
 {
-  const std::size_t avail_bytes = m_obj_per_pool/bits_per_int + 1;
-  return m_pool.size() * (m_obj_per_pool * m_obj_bytes + avail_bytes + sizeof(Pool))
-    + sizeof(FixedPool);
+  return m_actual_bytes;
 }
 
 std::size_t
@@ -185,6 +217,20 @@ std::size_t
 FixedPool::numPools() const noexcept
 {
   return m_pool.size();
+}
+
+bool
+FixedPool::pointerIsFromPool(void* ptr) const noexcept
+{
+  for (auto& p : m_pool) {
+    const char* t_ptr = reinterpret_cast<char*>(ptr);
+    const ptrdiff_t offset = t_ptr - p.data;
+    if ((offset >= 0) && (offset < static_cast<ptrdiff_t>(m_data_bytes))) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 } // end of namespace strategy

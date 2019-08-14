@@ -9,7 +9,7 @@ set (umpire_util_headers
   AllocationRecord.hpp
   Exception.hpp
   FixedMallocPool.hpp
-  IOManager.hpp
+  io.hpp
   Logger.hpp
   MPI.hpp
   Macros.hpp
@@ -19,7 +19,9 @@ set (umpire_util_headers
   OutputBuffer.hpp
   Platform.hpp
   allocation_statistics.hpp
-  detect_vendor.hpp)
+  detect_vendor.hpp
+  make_unique.hpp
+  wrap_allocator.hpp)
 
 if (ENABLE_STATISTICS)
   set (umpire_util_headers
@@ -39,7 +41,7 @@ set (umpire_util_sources
   AllocationMap.cpp
   Exception.cpp
   FixedMallocPool.cpp
-  IOManager.cpp
+  io.cpp
   Logger.cpp
   MPI.cpp
   OutputBuffer.cpp

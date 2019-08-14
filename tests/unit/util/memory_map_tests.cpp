@@ -35,36 +35,26 @@ class MemoryMapTest : public ::testing::Test {
     void* c;
 };
 
-
-TEST_F(MemoryMapTest, get)
-{
-  // Get should emplace an entry if it doens't already exist
-  Map::Iterator iter{map.end()};
-  bool found;
-
-  {
-    std::tie(iter, found) = map.get(a, 1);
-    EXPECT_EQ(iter, map.begin());
-    EXPECT_EQ(found, false);
-  }
-
-  {
-    std::tie(iter, found) = map.get(a, 1);
-    EXPECT_EQ(iter, map.begin());
-    EXPECT_EQ(found, true);
-  }
-
-  ASSERT_EQ(map.size(), 1);
-}
-
 TEST_F(MemoryMapTest, insert)
 {
+  Map::Iterator iter{map.end()};
+  bool inserted;
+
+  {
+    std::tie(iter, inserted) = map.insert(a, 1);
+    EXPECT_EQ(iter, map.begin());
+    EXPECT_EQ(inserted, true);
+  }
+
+  {
+    std::tie(iter, inserted) = map.insert(a, 1);
+    EXPECT_EQ(iter, map.begin());
+    EXPECT_EQ(inserted, false);
+  }
+
   EXPECT_NO_THROW({
-    map.insert(a, 1);
     map.insert(b, 2);
   });
-
-  EXPECT_THROW(map.insert(b, 2), umpire::util::Exception);
 
   ASSERT_EQ(map.size(), 2);
   ASSERT_EQ(size_by_iterator(map), 2);
@@ -144,7 +134,9 @@ TEST_F(MemoryMapTest, clear)
 
 TEST_F(MemoryMapTest, Iterator)
 {
-  auto ia = map.insert(a, 1);
+  Map::Iterator ia{map.end()};
+  bool inserted;
+  std::tie(ia, inserted) = map.insert(a, 1);
 
   auto begin = map.begin();
   ASSERT_EQ(begin->first, a);
@@ -154,7 +146,10 @@ TEST_F(MemoryMapTest, Iterator)
 
 TEST_F(MemoryMapTest, ordering)
 {
-  auto ia = map.insert(a, 1);
-  auto ib = map.insert(b, 2);
+  Map::Iterator ia{map.end()}, ib{map.end()};
+  bool inserted;
+  std::tie(ia, inserted) = map.insert(a, 1);
+  std::tie(ib, inserted) = map.insert(b, 2);
+
   ASSERT_EQ(++ia, ib);
 }

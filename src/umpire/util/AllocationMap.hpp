@@ -23,61 +23,62 @@
 namespace umpire {
 namespace util {
 
-class RecordList
-{
-public:
-  template <typename T>
-  struct Block
-  {
-    T rec;
-    Block* prev;
-  };
-
-  using BlockType = Block<AllocationRecord>;
-
-  // Iterator for RecordList
-  class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
-  {
-  public:
-    ConstIterator();
-    ConstIterator(const RecordList* list, iterator_begin);
-    ConstIterator(const RecordList* list, iterator_end);
-    ConstIterator(const ConstIterator&) = default;
-
-    const AllocationRecord& operator*();
-    const AllocationRecord* operator->();
-    ConstIterator& operator++();
-    ConstIterator operator++(int);
-
-    bool operator==(const ConstIterator& other) const;
-    bool operator!=(const ConstIterator& other) const;
-
-  private:
-    const RecordList *m_list;
-    BlockType* m_curr;
-  };
-
-  RecordList(AllocationRecord record);
-  ~RecordList();
-
-  void push_back(const AllocationRecord& rec);
-  AllocationRecord pop_back();
-
-  ConstIterator begin() const;
-  ConstIterator end() const;
-
-  std::size_t size() const;
-  bool empty() const;
-  AllocationRecord* back();
-  const AllocationRecord* back() const;
-
-private:
-  BlockType* m_tail;
-  std::size_t m_length;
-};
-
 class AllocationMap
 {
+  class RecordList
+  {
+  public:
+    template <typename T>
+    struct Block
+    {
+      T rec;
+      Block* prev;
+    };
+
+    using RecordBlock = Block<AllocationRecord>;
+
+    // Iterator for RecordList
+    class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+    {
+    public:
+      ConstIterator();
+      ConstIterator(const RecordList* list, iterator_begin);
+      ConstIterator(const RecordList* list, iterator_end);
+      ConstIterator(const ConstIterator&) = default;
+
+      const AllocationRecord& operator*();
+      const AllocationRecord* operator->();
+      ConstIterator& operator++();
+      ConstIterator operator++(int);
+
+      bool operator==(const ConstIterator& other) const;
+      bool operator!=(const ConstIterator& other) const;
+
+    private:
+      const RecordList *m_list;
+      RecordBlock* m_curr;
+    };
+
+    RecordList(AllocationMap& map, AllocationRecord record);
+    ~RecordList();
+
+    void push_back(const AllocationRecord& rec);
+    AllocationRecord pop_back();
+
+    ConstIterator begin() const;
+    ConstIterator end() const;
+
+    std::size_t size() const;
+    bool empty() const;
+    AllocationRecord* back();
+    const AllocationRecord* back() const;
+
+  private:
+    AllocationMap& m_map;
+    RecordBlock* m_tail;
+    std::size_t m_length;
+  };
+
 public:
   using Map = MemoryMap<RecordList>;
 
@@ -153,6 +154,10 @@ public:
 private:
   // Content of findRecord(void*) without the lock
   const AllocationRecord* doFindRecord(void* ptr) const noexcept;
+
+  // This block pool is used inside RecordList, but is needed here so its
+  // destruction is linked to that of AllocationMap
+  FixedMallocPool m_block_pool;
 
   Map m_map;
   std::size_t m_size;

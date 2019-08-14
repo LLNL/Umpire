@@ -19,9 +19,16 @@ def check_output(name, file_object, expected):
 
     print("{BLUE}[RUN     ]{END} Checking for \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
 
-    contents = file_object.readline().rstrip()
-    if (contents != expected):
-        print("{RED}[   ERROR]{END} Got {contents}".format(contents=contents, expected=expected, **formatters))
+
+    found = False
+
+    for line in file_object:
+        print(line)
+        if expected in line.rstrip():
+            found = True
+
+    if not found:
+        print("{RED}[   ERROR]{END} Got {contents}".format(contents=file_object.read(), expected=expected, **formatters))
         errors = errors + 1
     else:
         print("{BLUE}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
@@ -33,7 +40,7 @@ def check_file_exists(filename):
     global errors
 
     print("{BLUE}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
-    if (not os.path.isfile(filename)):
+    if not os.path.isfile(filename):
         print("{RED}[   ERROR]{END} {myfile} not found".format(myfile=filename, **formatters))
         errors += errors + 1
     else:
@@ -45,7 +52,7 @@ def check_file_not_exists(filename):
     global errors
 
     print("{BLUE}[RUN     ]{END} Checking {myfile} doesn't exist".format(myfile=filename, **formatters))
-    if (not os.path.isfile(filename)):
+    if not os.path.isfile(filename):
         print("{BLUE}[      OK]{END} {myfile} doesn't exist".format(myfile=filename, **formatters))
     else:
         print("{RED}[   ERROR]{END} {myfile} found".format(myfile=filename, **formatters))
@@ -56,7 +63,7 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
     import subprocess
     import os
 
-    cmd_args = ['./iomanager_tests']
+    cmd_args = ['./io_tests']
     if expect_logging:
         cmd_args.append('--enable-logging')
 
@@ -80,12 +87,12 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
 
     check_output('stderr', error, 'testing error stream')
 
-    output_filename = 'umpire_io_tests.0.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
-    replay_filename = 'umpire_io_tests.0.{pid}.{uid}.replay'.format(uid=file_uid, pid=pid)
+    output_filename = 'umpire_io_tests.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
+    replay_filename = 'umpire_io_tests.{pid}.{uid}.replay'.format(uid=file_uid, pid=pid)
 
     if 'UMPIRE_OUTPUT_DIR' in test_env.keys():
-        output_filename = '{dir}/umpire_io_tests.0.{pid}.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
-        replay_filename = '{dir}/umpire_io_tests.0.{pid}.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
+        output_filename = '{dir}/umpire_io_tests.{pid}.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
+        replay_filename = '{dir}/umpire_io_tests.{pid}.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
 
     if expect_logging:
         check_file_exists(output_filename)
