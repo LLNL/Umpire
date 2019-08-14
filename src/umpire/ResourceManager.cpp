@@ -599,12 +599,6 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
   return dst_ptr;
 }
 
-#if defined(UMPIRE_ENABLE_SICM)
-static strategy::SICMStrategy* cast_as_sicm_strategy(Allocator& allocator) {
-  return util::unwrap_allocator<strategy::SICMStrategy>(allocator);
-}
-#endif
-
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
@@ -619,35 +613,27 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
 #if defined(UMPIRE_ENABLE_SICM)
   {
-    // short circuit if allocator is SICM
-    auto sicm_alloc = cast_as_sicm_strategy(allocator);
+    auto base_strategy = util::unwrap_allocator<strategy::SICMStrategy>(allocator);
 
-    if (sicm_alloc) {
+    if (dynamic_cast<strategy::SICMStrategy*>(base_strategy)) {
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
       auto src_alloc_record = m_allocations.find(ptr);
 
       const size_t size = src_alloc_record->size;
-      util::AllocationRecord dst_alloc_record;
-      dst_alloc_record.size = src_alloc_record->size;
-      dst_alloc_record.strategy = sicm_alloc;
+      util::AllocationRecord dst_alloc_record{
+        nullptr, src_alloc_record->size, allocator.getAllocationStrategy()};
 
-      void *ret = nullptr;
       if (size > 0) {
         auto op = op_registry.find("MOVE",
                                    src_alloc_record->strategy,
                                    dst_alloc_record.strategy);
-
+        void *ret{nullptr};
         op->transform(ptr, &ret, src_alloc_record, &dst_alloc_record, size);
-        if (ret != ptr) {
-          UMPIRE_ERROR("SICM move error");
-        }
-      }
-      else {
-        ret = ptr;
+        UMPIRE_ASSERT(ret == ptr);
       }
 
-      return ret;
+      return ptr;
     }
   }
 #endif
