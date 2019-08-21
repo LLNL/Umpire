@@ -1,9 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
-// project contributors. See the COPYRIGHT file for details.
-//
-// SPDX-License-Identifier: (MIT)
-//////////////////////////////////////////////////////////////////////////////
 // wrapResourceManager.cpp
 // This is generated code, do not edit
 // Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
@@ -214,7 +208,7 @@ size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
 
 umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     umpire_resourcemanager * self, const char * name,
-    umpire_allocator allocator, int initial_size, int block,
+    umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.make_allocator_pool
@@ -234,7 +228,7 @@ umpire_allocator * umpire_resourcemanager_make_allocator_pool(
 
 umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
-    umpire_allocator allocator, int initial_size, int block,
+    umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv)
 {
 // splicer begin class.ResourceManager.method.make_allocator_bufferify_pool

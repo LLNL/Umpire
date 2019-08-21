@@ -1,9 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
-// project contributors. See the COPYRIGHT file for details.
-//
-// SPDX-License-Identifier: (MIT)
-//////////////////////////////////////////////////////////////////////////////
 // wrapAllocator.h
 // This is generated code, do not edit
 // Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
@@ -62,7 +56,7 @@ size_t umpire_allocator_get_actual_size(umpire_allocator * self);
 const char * umpire_allocator_get_name(umpire_allocator * self);
 
 void umpire_allocator_get_name_bufferify(umpire_allocator * self,
-    UMP_SHROUD_array *DSHF_rv);
+    umpire_SHROUD_array *DSHF_rv);
 
 size_t umpire_allocator_get_id(umpire_allocator * self);
 
