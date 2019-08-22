@@ -20,7 +20,7 @@ fi
 
 echo "Applying licenses to files"
 
-files_no_license=$(grep -L 'This file is part of Umpire.' \
+files_no_license=$(grep -L 'SPDX-License-Identifier' \
   benchmarks/**/*(^/) \
   cmake/**/*(^/) \
   docs/**/*~*rst(^/)\
