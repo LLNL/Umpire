@@ -111,7 +111,7 @@ declarations:
 
         - decl: size_t getSize(void* ptr)
 
-        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int initial_size, int block);
+        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
           cxx_template:
           - instantiation: <umpire::strategy::DynamicPool>
             format:
