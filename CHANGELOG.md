@@ -10,15 +10,36 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
-- MixedPool to `allocator_benchmarks.cpp`
+- Tests for CUDA and HIP replays.
+
+- Test for UMPIRE_LOG_LEVEL environment variable.
+
+- ENABLE_DEVELOPER_DEFAULTS option to set default values during development.
+
+- Add unit tests for the DynamicPool.
+
+- MixedPool to `allocator_benchmarks.cpp`.
 
 ### Changed
 
+- Adjust notifications for CI jobs.
+
+- Use git commit hash as RC version in develop builds.
+
+- Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
+
 ### Removed
+
+- Extraneous TODOs.
 
 ### Fixed
 
-- Fixed Bamboo test script on BLUEOS systems.
+- Bamboo test script and job launch on BLUEOS systems.
+
+- Issue with libNUMA integration and `ResourceManager::move()`.
+
+- Fix signature of C function `umpire_resourcemanager_make_allocator_pool` to
+  take size_t not int.
 
 ## [1.0.0] - 2019-07-12
 

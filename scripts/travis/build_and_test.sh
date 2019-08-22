@@ -36,7 +36,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
             cat Testing/Temporary/MemoryChecker.*.log
             exit 1
           fi
-      done < <(ctest -E replay\|io -T memcheck)
+      done < <(ctest -E replay\|io\|log -T memcheck)
       echo "No leaks detected!"
     fi
 fi

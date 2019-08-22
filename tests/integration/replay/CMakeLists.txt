@@ -17,10 +17,18 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_CUDA)
+  set(replay_file "test_output.cuda.good" )
+elseif (ENABLE_HIP)
+  set(replay_file "test_output.hip.good" )
+else()
+  set(replay_file "test_output.good" )
+endif()
+
 if (BASH_PROGRAM)
 
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/test_output.good"
+    "${CMAKE_CURRENT_SOURCE_DIR}/${replay_file}"
     "${replay_dir}/test_output.good"
     COPYONLY
   )
@@ -31,10 +39,12 @@ if (BASH_PROGRAM)
     DEPENDS_ON ${replay_integration_tests_depends}
     OUTPUT_DIR ${replay_dir})
 
-  add_test(
-    NAME replay_tests
-    COMMAND ${BASH_PROGRAM}
-    ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+  if (NOT C_COMPILER_FAMILY_IS_PGI)
+    add_test(
+      NAME replay_tests
+      COMMAND ${BASH_PROGRAM}
+      ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${replay_dir} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+  endif()
 
 else()
 
