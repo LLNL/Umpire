@@ -119,32 +119,21 @@ TEST_P(StrategyTest, Duplicate)
 
 INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices),);
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-TEST(Strategy, Device)
+TEST(DynamicPool, LimitedResource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.getAllocator("DEVICE");
-  void* alloc = nullptr;
+  const std::size_t max_mem{1024 * 1024 * 4};
 
-  // Determine how much memory we can allocate from device
-  std::size_t max_mem = 0;
-  const std::size_t OneGiB = 1 * 1024 * 1024 * 1024;
-  try {
-    while ( true ) {  // Will "catch" out when allocation fails
-      alloc = allocator.allocate(max_mem + OneGiB);
-      ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
-      max_mem += OneGiB;
-    }
-  }
-  catch (...) {
-    ASSERT_GT(max_mem, OneGiB);
-  }
+  auto limited_resource = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+    "limited_resource", rm.getAllocator("HOST"), max_mem);
 
-  allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "device_dyn_pool", rm.getAllocator("DEVICE"));
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+    "host_dyn_pool", limited_resource, 0, 1024);
 
-  ASSERT_EQ(allocator.getName(), "device_dyn_pool");
+  ASSERT_EQ(allocator.getName(), "host_dyn_pool");
+
+  void* alloc{nullptr};
 
   ASSERT_NO_THROW( { alloc = allocator.allocate(100); } );
   ASSERT_GE(allocator.getCurrentSize(), 100);
@@ -167,12 +156,11 @@ TEST(Strategy, Device)
   for (int i = 0; i < 16; ++i) {
     ASSERT_NO_THROW( { alloc1 = allocator.allocate(alloc_size); } );
     ASSERT_NO_THROW( { allocator.deallocate(alloc1); } );
-    alloc_size += 1024*1024;
+    alloc_size += 1024;
   }
 
   ASSERT_NO_THROW( { allocator.deallocate(alloc3); } );
 }
-#endif
 
 TEST(MonotonicStrategy, Host)
 {

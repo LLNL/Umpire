@@ -26,6 +26,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
 
+- Generalized Strategy.Device test for all resources.
+
 ### Removed
 
 ### Fixed
