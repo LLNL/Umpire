@@ -34,6 +34,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Issue with libNUMA integration and `ResourceManager::move()`.
 
+- Fix signature of C function `umpire_resourcemanager_make_allocator_pool` to
+  take size_t not int.
 
 ## [1.0.0] - 2019-07-12
 

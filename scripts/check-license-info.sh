@@ -15,7 +15,7 @@ RED="\033[1;31m"
 GREEN="\033[1;32m"
 NOCOLOR="\033[0m"
 
-files_no_license=$(grep -L 'This file is part of Umpire.' \
+files_no_license=$(grep -L 'SPDX-License-Identifier.' \
   benchmarks/**/*(^/) \
   cmake/**/*(^/) \
   docs/**/*~*rst(^/)\
