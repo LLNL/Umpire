@@ -18,6 +18,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Add unit tests for the DynamicPool.
 
+- Analysis tool for plotting traces of allocators.
+
 - MixedPool to `allocator_benchmarks.cpp`.
 
 ### Changed
@@ -27,6 +29,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Use git commit hash as RC version in develop builds.
 
 - Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
+
+- Moved `tools/plot_allocations` to `tools/analysis`.
 
 ### Removed
 
