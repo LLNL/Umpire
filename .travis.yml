@@ -6,59 +6,56 @@ env:
   - DO_BUILD=yes
   - DO_TEST=yes
   - GTEST_COLOR=1
+  - CMAKE_EXTRA_FLAGS="-DENABLE_DEVELOPER_DEFAULTS=On"
 matrix:
   include:
   - compiler: gcc4
     env:
     - COMPILER=g++
     - IMG=gcc-4
-    - CMAKE_EXTRA_FLAGS="-DENABLE_C=On -DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_C=On -DENABLE_DEVELOPER_DEFAULTS=On"
   - compiler: gcc5
     env:
     - COMPILER=g++
     - IMG=gcc-5
-    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On -DENABLE_C=On -DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
+    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_COVERAGE=On -DENABLE_C=On -DENABLE_DEVELOPER_DEFAULTS=On"
     - DO_MEMCHECK=yes
   - compiler: gcc6
     env:
     - COMPILER=g++
     - IMG=gcc-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_C=On -DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_C=On -DENABLE_DEVELOPER_DEFAULTS=On"
   - compiler: gcc7
     env:
     - COMPILER=g++
     - IMG=gcc-7
-    - CMAKE_EXTRA_FLAGS="-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
   - compiler: gcc8
     env:
     - COMPILER=g++
     - IMG=gcc-8
-    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
+    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=RelWithDebInfo -DENABLE_DEVELOPER_DEFAULTS=On"
   - compiler: clang4
     env:
     - COMPILER=clang++
     - IMG=clang-4
-    - CMAKE_EXTRA_FLAGS="-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
   - compiler: clang5
     env:
     - COMPILER=clang++
     - IMG=clang-5
-    - CMAKE_EXTRA_FLAGS="-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
   - compiler: clang6
     env:
     - COMPILER=clang++
     - IMG=clang-6
-    - CMAKE_EXTRA_FLAGS="-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
   - compiler: clang6-debug
     env:
     - COMPILER=clang++
     - IMG=clang-6
-    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On"
+    - CMAKE_EXTRA_FLAGS="-DCMAKE_BUILD_TYPE=Debug -DENABLE_DEVELOPER_DEFAULTS=On"
   - compiler: nvcc
     env:
     - COMPILER=g++
     - IMG=nvcc-9
-    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=On -DENABLE_WARNINGS_AS_ERRORS=On"
+    - CMAKE_EXTRA_FLAGS="-DENABLE_CUDA=On -DENABLE_DEVELOPER_DEFAULTS=On"
     - DO_TEST=no
   - compiler: hcc
     env:
@@ -80,3 +77,10 @@ script:
 
 after_success:
 - if [[ "${CMAKE_EXTRA_FLAGS}" == *"ENABLE_COVERAGE"* ]] ; then bash <(curl -s https://raw.githubusercontent.com/codecov/codecov-bash/0b376529f626b50b7d4a9fb734e0e50d28b9b91e/codecov) >& /dev/null; fi
+
+notifications:
+email:
+  recipients:
+    - umpire-dev@llnl.gov
+  on_success: never
+  on_failure: always
