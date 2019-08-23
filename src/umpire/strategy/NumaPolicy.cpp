@@ -39,8 +39,6 @@ NumaPolicy::NumaPolicy(
   if (std::find(host_nodes.begin(), host_nodes.end(),
                 m_node) == host_nodes.end()) {
     // This is a device node
-    // TODO: Could both these be enabled? If so, find a way to
-    // distinguish these at run-time.
 #if defined(UMPIRE_ENABLE_CUDA)
     m_platform = Platform::cuda;
 #elif defined(UMPIRE_ENABLE_HCC)
