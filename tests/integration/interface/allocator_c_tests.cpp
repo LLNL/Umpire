@@ -190,10 +190,23 @@ TEST_P(PoolAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_allocator, data);
 }
 
+const char* pool_names[] = {
+  "HOST"
+#if defined(UMPIRE_ENABLE_DEVICE)
+  , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
+  , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+  , "PINNED"
+#endif
+};
+
 INSTANTIATE_TEST_CASE_P(
     Pools,
     PoolAllocatorCTest,
-    ::testing::ValuesIn(allocator_names));
+    ::testing::ValuesIn(pool_names));
 
 //TEST(AllocatorC, RegisterAllocator)
 //{
