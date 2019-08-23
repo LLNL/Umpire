@@ -14,21 +14,21 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Test for UMPIRE_LOG_LEVEL environment variable.
 
-- Analysis tool for plotting traces of allocators.
-
-### Changed
-
-- Use git commit hash as RC version in develop builds.
-
-- Moved `tools/plot_allocations` to `tools/analysis`.
-
 - ENABLE_DEVELOPER_DEFAULTS option to set default values during development.
 
 - Add unit tests for the DynamicPool.
 
+- Analysis tool for plotting traces of allocators.
+
+### Changed
+
 - Adjust notifications for CI jobs.
 
+- Use git commit hash as RC version in develop builds.
+
 - Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
+
+- Moved `tools/plot_allocations` to `tools/analysis`.
 
 ### Removed
 
