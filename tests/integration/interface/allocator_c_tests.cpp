@@ -98,7 +98,7 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
   ASSERT_EQ(total_size, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
 
-  umpire_allocator_deallocate(&m_allocator, data_one);
+  umpire_allocator_deallocate(&m_allocator, data_three);
   ASSERT_EQ((2*m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
 
@@ -106,7 +106,7 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
   ASSERT_EQ((m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
 
-  umpire_allocator_deallocate(&m_allocator, data_three);
+  umpire_allocator_deallocate(&m_allocator, data_one);
   ASSERT_EQ(0, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
 }
@@ -190,10 +190,23 @@ TEST_P(PoolAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_allocator, data);
 }
 
+const char* pool_names[] = {
+  "HOST"
+#if defined(UMPIRE_ENABLE_DEVICE)
+  , "DEVICE"
+#endif
+#if defined(UMPIRE_ENABLE_UM)
+  , "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+  , "PINNED"
+#endif
+};
+
 INSTANTIATE_TEST_CASE_P(
     Pools,
     PoolAllocatorCTest,
-    ::testing::ValuesIn(allocator_names));
+    ::testing::ValuesIn(pool_names));
 
 //TEST(AllocatorC, RegisterAllocator)
 //{

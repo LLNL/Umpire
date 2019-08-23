@@ -18,6 +18,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Add unit tests for the DynamicPool.
 
+- Analysis tool for plotting traces of allocators.
+
 ### Changed
 
 - Adjust notifications for CI jobs.
@@ -28,7 +30,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Generalized Strategy.Device test for all resources.
 
+- Moved `tools/plot_allocations` to `tools/analysis`.
+
 ### Removed
+
+- Extraneous TODOs.
 
 ### Fixed
 

@@ -598,7 +598,6 @@ TEST(NumaPolicyTest, EdgeCases) {
 TEST(NumaPolicyTest, Location) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  // TODO Switch this to numa::get_allocatable_nodes() when the issue is fixed
   auto nodes = umpire::numa::get_host_nodes();
   for (auto n : nodes) {
     std::stringstream ss;
