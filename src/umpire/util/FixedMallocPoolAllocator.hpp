@@ -17,9 +17,17 @@ namespace util {
 
 template <class T>
 struct FixedMallocPoolAllocator {
+  template<class U>
+  friend struct FixedMallocPoolAllocator;
+
   using value_type = T;
 
   FixedMallocPoolAllocator() : m_pool{sizeof(T)} {}
+
+  template <class U>
+  FixedMallocPoolAllocator(const FixedMallocPoolAllocator<U>&) : m_pool{sizeof(T)} {
+    static_assert(sizeof(T) == sizeof(U), "Sizes do not match!");
+  }
 
   T* allocate(std::size_t n) {
     if(n > std::size_t(-1) / sizeof(T)) throw std::bad_alloc();
