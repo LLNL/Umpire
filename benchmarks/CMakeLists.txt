@@ -17,14 +17,12 @@ blt_add_executable(
   SOURCES allocator_stress_test.cpp
   DEPENDS_ON ${stress_test_depends}
   OUTPUT_DIR ${BENCHMARK_OUTPUT_DIRECTORY})
-list(APPEND umpire_benchmarks allocator_stress_test)
 
 blt_add_executable(
   NAME copy_stress_test
   SOURCES copy_stress_test.cpp
   DEPENDS_ON ${stress_test_depends}
   OUTPUT_DIR ${BENCHMARK_OUTPUT_DIRECTORY})
-list(APPEND umpire_benchmarks copy_stress_test)
 
 set (benchmark_depends gbenchmark umpire)
 
@@ -39,14 +37,12 @@ blt_add_executable(
   SOURCES allocator_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends}
   OUTPUT_DIR ${BENCHMARK_OUTPUT_DIRECTORY})
-list(APPEND umpire_benchmarks allocator_benchmarks)
 
 blt_add_executable(
   NAME debuglog_benchmarks
   SOURCES debuglog_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends}
   OUTPUT_DIR ${BENCHMARK_OUTPUT_DIRECTORY})
-list(APPEND umpire_benchmarks debuglog_benchmarks)
 
 blt_add_benchmark(
   NAME allocator_benchmarks
@@ -57,7 +53,6 @@ blt_add_executable(
   SOURCES copy_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends}
   OUTPUT_DIR ${BENCHMARK_OUTPUT_DIRECTORY})
-list(APPEND umpire_benchmarks copy_benchmarks)
 
 blt_add_benchmark(
   NAME copy_benchmarks
@@ -68,10 +63,7 @@ blt_add_executable(
   SOURCES inspector_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends}
   OUTPUT_DIR ${BENCHMARK_OUTPUT_DIRECTORY})
-list(APPEND umpire_benchmarks inspector_benchmarks)
 
 blt_add_benchmark(
   NAME inspector_benchmarks
   COMMAND inspector_benchmarks)
-
-install(TARGETS ${umpire_benchmarks} DESTINATION ${UMPIRE_BENCHMARK_INSTALL_DIRECTORY})
