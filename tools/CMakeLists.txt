@@ -26,7 +26,7 @@ set(replay_util_sources
 blt_add_executable(
   NAME replay
   SOURCES replay.cpp ${replay_util_sources}
-  INCLUDES ${replay_util_headers}
+  INCLUDES ${PROJECT_SOURCE_DIR}/tools
   DEPENDS_ON ${tools_depends}
   OUTPUT_DIR ${TOOL_OUTPUT_DIRECTORY})
 list(APPEND umpire_tools replay)
@@ -37,7 +37,7 @@ target_include_directories(replay
 blt_add_executable(
   NAME replaydiff
   SOURCES replaydiff.cpp ${replay_util_sources}
-  INCLUDES ${replay_util_headers}
+  INCLUDES ${PROJECT_SOURCE_DIR}/tools
   DEPENDS_ON ${tools_depends}
   OUTPUT_DIR ${TOOL_OUTPUT_DIRECTORY})
 list(APPEND umpire_tools replaydiff)
@@ -45,6 +45,8 @@ list(APPEND umpire_tools replaydiff)
 target_include_directories(replaydiff
   PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/tools>)
 
-add_subdirectory(analysis)
+install(
+  FILES analysis/plot_allocations analysis/plot_allocator_traces
+  DESTINATION ${UMPIRE_TOOL_INSTALL_DIRECTORY})
 
 install(TARGETS ${umpire_tools} DESTINATION ${UMPIRE_TOOL_INSTALL_DIRECTORY})

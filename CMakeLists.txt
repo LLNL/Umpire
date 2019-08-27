@@ -112,7 +112,6 @@ install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
-  set(UMPIRE_TEST_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/tests)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
