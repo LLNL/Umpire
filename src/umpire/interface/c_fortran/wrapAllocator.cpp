@@ -32,7 +32,7 @@ extern "C" {
 // helper function
 // Copy the char* or std::string in context into c_var.
 // Called by Fortran to deal with allocatable character.
-void umpire_ShroudCopyStringAndFree(UMP_SHROUD_array *data, char *c_var, size_t c_var_len) {
+void umpire_ShroudCopyStringAndFree(umpire_SHROUD_array *data, char *c_var, size_t c_var_len) {
     const char *cxx_var = data->addr.ccharp;
     size_t n = c_var_len;
     if (data->len < n) n = data->len;
@@ -136,7 +136,7 @@ const char * umpire_allocator_get_name(umpire_allocator * self)
 }
 
 void umpire_allocator_get_name_bufferify(umpire_allocator * self,
-    UMP_SHROUD_array *DSHF_rv)
+    umpire_SHROUD_array *DSHF_rv)
 {
 // splicer begin class.Allocator.method.get_name_bufferify
     umpire::Allocator *SH_this =

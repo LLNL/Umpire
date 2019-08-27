@@ -20,8 +20,8 @@ program umpire_f_pinned_pool
 
       pinned_pool = rm%make_allocator_pool("PINNED_POOL", &
                                            base_allocator, &
-                                           512*1024, &
-                                           1024)
+                                           512_8*1024_8, &
+                                           1024_8)
 
       call pinned_pool%allocate(array, [10])
 end program umpire_f_pinned_pool
