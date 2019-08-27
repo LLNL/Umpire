@@ -28,7 +28,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
 
-- Moved `tools/plot_allocations` to `tools/analysis`.
+- Moved `tools/plot_allocations` to `tools/analysis/plot_allocations`.
 
 ### Removed
 
