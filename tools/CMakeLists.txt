@@ -6,6 +6,7 @@
 ##############################################################################
 
 add_subdirectory(util)
+add_subdirectory(analysis)
 
 set (tools_depends umpire umpire_tpl_cxxopts umpire_tpl_json replay_util)
 
@@ -24,6 +25,3 @@ blt_add_executable(
   SOURCES replaydiff.cpp
   DEPENDS_ON ${tools_depends}
   OUTPUT_DIR ${UMPIRE_TOOLS_OUTPUT_DIR})
-
-install(FILES plot_allocations DESTINATION bin)
-
