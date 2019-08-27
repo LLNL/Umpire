@@ -4,18 +4,16 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (replay_util_headers
+set(replay_util_headers
   ReplayInterpreter.hpp
   ReplayInterpreter.inl
   ReplayMacros.hpp
   ReplayOperationManager.hpp
-  ReplayOperationManager.inl
-)
+  ReplayOperationManager.inl)
 
-set (replay_util_sources
+set(replay_util_sources
   ReplayInterpreter.cpp
-  ReplayOperationManager.cpp
-)
+  ReplayOperationManager.cpp)
 
 blt_add_library(
   NAME replay_util
@@ -30,4 +28,3 @@ target_include_directories(
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-

@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (resource_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/resource)
+set (resource_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/resource)
 
 set (resource_depends umpire gtest gmock)
 
@@ -16,7 +16,7 @@ blt_add_executable(
   NAME null_resource_tests
   SOURCES null_resource_tests.cpp
   DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${resource_dir})
+  OUTPUT_DIR ${resource_output_dir})
 
 blt_add_test(
   NAME null_resource_tests
@@ -28,7 +28,7 @@ if (ENABLE_GMOCK)
     NAME resource_tests
     SOURCES resource_tests.cpp
     DEPENDS_ON ${resource_depends}
-    OUTPUT_DIR ${resource_dir})
+    OUTPUT_DIR ${resource_output_dir})
 
   blt_add_test(
     NAME resource_tests

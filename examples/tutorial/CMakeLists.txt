@@ -4,7 +4,8 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (tutorial_dir ${UMPIRE_EXAMPLES_OUTPUT_DIR}/tutorial)
+set(tutorial_output_dir ${EXAMPLE_OUTPUT_DIRECTORY}/tutorial)
+set(tutorial_install_dir ${UMPIRE_EXAMPLE_INSTALL_DIRECTORY}/tutorial)
 
 set (tutorial_depends umpire)
 
@@ -18,67 +19,78 @@ blt_add_executable(
   NAME tut_allocator
   SOURCES tut_allocator.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_allocator)
 
 blt_add_executable(
   NAME tut_resources
   SOURCES tut_resources.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_resources)
 
 blt_add_executable(
   NAME tut_dynamic_pool_1
   SOURCES tut_dynamic_pool_1.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_dynamic_pool_1)
 
 blt_add_executable(
   NAME tut_dynamic_pool_2
   SOURCES tut_dynamic_pool_2.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_dynamic_pool_2)
 
 blt_add_executable(
   NAME tut_copy
   SOURCES tut_copy.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_copy)
 
 blt_add_executable(
   NAME tut_move
   SOURCES tut_move.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_move)
 
 blt_add_executable(
   NAME tut_memset
   SOURCES tut_memset.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_memset)
 
 blt_add_executable(
   NAME tut_reallocate
   SOURCES tut_reallocate.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_reallocate)
 
 blt_add_executable(
   NAME tut_typed_allocator
   SOURCES tut_typed_allocator.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_typed_allocator)
 
 blt_add_executable(
   NAME tut_introspection
   SOURCES tut_introspection.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_introspection)
 
 blt_add_executable(
   NAME tut_replay
   SOURCES tut_replay.cpp
   DEPENDS_ON ${tutorial_depends}
-  OUTPUT_DIR ${tutorial_dir})
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_replay)
 
 if (ENABLE_C)
   add_subdirectory(c)
@@ -87,3 +99,5 @@ endif ()
 if (ENABLE_FORTRAN)
   add_subdirectory(fortran)
 endif ()
+
+install(TARGETS ${umpire_tutorials} DESTINATION ${tutorial_install_dir})

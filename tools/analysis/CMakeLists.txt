@@ -5,5 +5,5 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-install(FILES plot_allocations DESTINATION ${UMPIRE_TOOLS_OUTPUT_DIR})
-install(FILES plot_allocator_traces DESTINATION ${UMPIRE_TOOLS_OUTPUT_DIR})
+install(FILES plot_allocations DESTINATION ${UMPIRE_TOOL_INSTALL_DIRECTORY})
+install(FILES plot_allocator_traces DESTINATION ${UMPIRE_TOOL_INSTALL_DIRECTORY})
