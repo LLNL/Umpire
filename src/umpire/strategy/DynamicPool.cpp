@@ -78,7 +78,12 @@ DynamicPool::~DynamicPool()
     std::size_t whole_bytes;
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
-    if (is_head && bytes == whole_bytes) m_allocator->deallocate(addr);
+    if (is_head && bytes == whole_bytes) deallocateFromStrategy(addr, bytes);
+  }
+
+  if (m_used_map.size() == 0) {
+    UMPIRE_ASSERT(m_curr_bytes == 0);
+    UMPIRE_ASSERT(m_actual_bytes == 0);
   }
 }
 
@@ -114,7 +119,7 @@ DynamicPool::findFreeBlock(std::size_t bytes) const
   return iter;
 }
 
-void* DynamicPool::allocateFromResource(std::size_t bytes)
+void* DynamicPool::allocateFromStrategy(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
@@ -159,6 +164,12 @@ void* DynamicPool::allocateFromResource(std::size_t bytes)
   return ptr;
 }
 
+void DynamicPool::deallocateFromStrategy(void* ptr, std::size_t bytes)
+{
+  m_actual_bytes -= bytes;
+  m_allocator->deallocate(ptr);
+}
+
 void* DynamicPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
@@ -194,7 +205,7 @@ void* DynamicPool::allocate(std::size_t bytes)
   } else {
     // Allocate new block -- note this does not check whether alignment is met
     const std::size_t alloc_bytes{std::max(rounded_bytes, m_min_alloc_bytes)};
-    ptr = allocateFromResource(alloc_bytes);
+    ptr = allocateFromStrategy(alloc_bytes);
 
     // Add used
     insertUsed(ptr, rounded_bytes, true, alloc_bytes);
@@ -232,9 +243,10 @@ void DynamicPool::deallocate(void* ptr)
     // Insert in free map
     insertFree(ptr, bytes, is_head, whole_bytes);
 
-    // remove from used map
+    // Remove from used map
     m_used_map.erase(iter);
 
+    // Update currentSize
     m_curr_bytes -= bytes;
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
@@ -378,8 +390,7 @@ std::size_t DynamicPool::releaseFreeBlocks()
     std::tie(ptr, is_head, whole_bytes) = it->second;
     if (is_head && bytes == whole_bytes) {
       released_bytes += bytes;
-      m_actual_bytes -= bytes;
-      m_allocator->deallocate(ptr);
+      deallocateFromStrategy(ptr, bytes);
       it = m_free_map.erase(it);
     } else {
       ++it;
@@ -404,7 +415,7 @@ void DynamicPool::coalesce()
 
     // If this removed anything from the map, re-allocate a single large chunk and insert to free map
     if (released_bytes > 0) {
-      const Pointer ptr{allocateFromResource(released_bytes)};
+      const Pointer ptr{allocateFromStrategy(released_bytes)};
       insertFree(ptr, released_bytes, true, released_bytes);
     }
   }
