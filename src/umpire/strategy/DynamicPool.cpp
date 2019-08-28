@@ -152,6 +152,10 @@ void* DynamicPool::allocateFromResource(std::size_t bytes)
       throw;
     }
   }
+
+  // Add to count
+  m_actual_bytes += bytes;
+
   return ptr;
 }
 
@@ -194,7 +198,6 @@ void* DynamicPool::allocate(std::size_t bytes)
 
     // Add used
     insertUsed(ptr, rounded_bytes, true, alloc_bytes);
-    m_actual_bytes += alloc_bytes;
     m_curr_bytes += rounded_bytes;
 
     const int64_t left_bytes{static_cast<int64_t>(
@@ -362,9 +365,6 @@ std::size_t DynamicPool::releaseFreeBlocks()
 {
   UMPIRE_LOG(Debug, "()");
 
-  // Coalesce first so that we are able to release the most memory possible
-  mergeFreeBlocks();
-
   std::size_t released_bytes{0};
 
   auto it = m_free_map.cbegin();
@@ -402,15 +402,10 @@ void DynamicPool::coalesce()
     const std::size_t released_bytes{releaseFreeBlocks()};
     // Deallocated and removed released_bytes from m_free_map
 
-    // If this removed anything from the map, re-allocate a single large chunk
+    // If this removed anything from the map, re-allocate a single large chunk and insert to free map
     if (released_bytes > 0) {
-      const std::size_t actual_bytes{round_up(released_bytes, m_align_bytes)};
-
-      const Pointer ptr{m_allocator->allocate(actual_bytes)};
-      m_actual_bytes += actual_bytes;
-
-      // Add used
-      insertFree(ptr, actual_bytes, true, actual_bytes);
+      const Pointer ptr{allocateFromResource(released_bytes)};
+      insertFree(ptr, released_bytes, true, released_bytes);
     }
   }
 }
