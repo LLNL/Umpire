@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-# TODO why do we need the tpl depends directly here?
-set(tools_depends umpire umpire_tpl_cxxopts umpire_tpl_json)
+set(tools_depends umpire)
 
 if (ENABLE_HIP)
   set(tools_depends ${tools_depends} hip_runtime)
