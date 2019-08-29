@@ -22,6 +22,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - MixedPool to `allocator_benchmarks.cpp`.
 
+- Add a basic GitLab pipeline testing builds on LC systems.
+
 ### Changed
 
 - Adjust notifications for CI jobs.
