@@ -132,7 +132,7 @@ void* DynamicPool::allocateFromStrategy(std::size_t bytes)
                << getFreeBlocks() << " Free Blocks, "
                << getInUseBlocks() << " Used Blocks\n"
       );
-    releaseFreeBlocks();
+    release();
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource.  "
                "\n\tRetrying allocation operation: "
