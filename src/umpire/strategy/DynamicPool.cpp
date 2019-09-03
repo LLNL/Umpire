@@ -354,6 +354,7 @@ void DynamicPool::mergeFreeBlocks()
     // Check if we can merge *it and *next_it
     const bool contiguous{this_addr + this_bytes == next_addr};
     if (contiguous && !next_is_head) {
+      UMPIRE_ASSERT(this_whole_bytes == next_whole_bytes);
       std::get<0>(it->second) += next_bytes;
       next_it = free_pointer_map.erase(next_it);
     } else {
