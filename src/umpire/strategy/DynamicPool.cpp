@@ -39,7 +39,7 @@ DynamicPool::DynamicPool(const std::string& name,
   m_used_map{},
   m_free_map{},
   m_curr_bytes{0},
-  m_actual_bytes{initial_alloc_bytes},
+  m_actual_bytes{round_up(initial_alloc_bytes, align_bytes)},
   m_highwatermark{0}
 {
   const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
@@ -189,7 +189,6 @@ void* DynamicPool::allocate(std::size_t bytes)
   } else {
     // Allocate new block -- note this does not check whether alignment is met
     const std::size_t alloc_bytes{std::max(rounded_bytes, m_min_alloc_bytes)};
-    std::cout << "Allocating " << alloc_bytes << " from resource for " << rounded_bytes << std::endl;
     ptr = allocateFromResource(alloc_bytes);
 
     // Add used
