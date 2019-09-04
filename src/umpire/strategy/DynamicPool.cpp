@@ -190,7 +190,7 @@ void* DynamicPool::allocate(std::size_t bytes)
     insertUsed(ptr, rounded_bytes, is_head, whole_bytes);
 
     // Remove the entry from the free map
-    const std::size_t free_size = iter->first;
+    const std::size_t free_size{iter->first};
     m_free_map.erase(iter);
 
     m_curr_bytes += rounded_bytes;
@@ -320,7 +320,7 @@ void DynamicPool::mergeFreeBlocks()
 
   using PointerMap = std::map<Pointer, SizeTuple>;
 
-  UMPIRE_REPLAY("() Free blocks before: " << getFreeBlocks());
+  UMPIRE_LOG(Debug, "() Free blocks before: " << getFreeBlocks());
 
   // Make a free block map from pointers -> size pairs
   PointerMap free_pointer_map;
@@ -375,7 +375,7 @@ void DynamicPool::mergeFreeBlocks()
     insertFree(ptr, bytes, is_head, whole_bytes);
   }
 
-  UMPIRE_REPLAY("() Free blocks after: " << getFreeBlocks());
+  UMPIRE_LOG(Debug, "() Free blocks after: " << getFreeBlocks());
 }
 
 std::size_t DynamicPool::releaseFreeBlocks()
