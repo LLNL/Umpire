@@ -1,3 +1,7 @@
+# v1.0.1
+
+- Fixed a bug in DynamicPool where memory could be leaked.
+
 # v1.0.0
 
 - Umpire is MPI-aware (outputs rank information to logs and replays) when
