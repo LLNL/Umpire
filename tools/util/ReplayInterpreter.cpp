@@ -113,12 +113,21 @@ void ReplayInterpreter::buildOperations(void)
           || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
           || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
 
-        REPLAY_ERROR("Warning, version mismatch:\n"
+        REPLAY_WARNING("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
           << m_json["payload"]["major"] << "."
           << m_json["payload"]["minor"]  << "."
           << m_json["payload"]["patch"]);
+
+        if (m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR) {
+          REPLAY_ERROR("Warning, major version mismatch:\n"
+            << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
+            << "  Log  version: "
+            << m_json["payload"]["major"] << "."
+            << m_json["payload"]["minor"]  << "."
+            << m_json["payload"]["patch"]);
+        }
       }
     }
     else {
@@ -178,12 +187,21 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
           || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
           || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
 
-        REPLAY_ERROR("Warning, version mismatch:\n"
+        REPLAY_WARNING("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
           << m_json["payload"]["major"] << "."
           << m_json["payload"]["minor"]  << "."
           << m_json["payload"]["patch"]);
+
+        if (m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR) {
+          REPLAY_ERROR("Warning, major version mismatch:\n"
+            << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
+            << "  Log  version: "
+            << m_json["payload"]["major"] << "."
+            << m_json["payload"]["minor"]  << "."
+            << m_json["payload"]["patch"]);
+        }
       }
     }
     else {
