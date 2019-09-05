@@ -163,7 +163,12 @@ void* DynamicPool::allocate(std::size_t bytes)
   Pointer ptr{nullptr};
 
   // Check if the previous block is a match
-  const SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
+  SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
+
+  if (iter == m_free_map.end()) {
+    mergeFreeBlocks();
+    iter = findFreeBlock(rounded_bytes);
+  }
 
   if (iter != m_free_map.end()) {
     // Found this acceptable address pair

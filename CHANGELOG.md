@@ -36,6 +36,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Moved `tools/plot_allocations` to `tools/analysis`.
 
+- DynamicPool will try and merge blocks before allocating more memory from the
+  underlying allocator.
+
 ### Removed
 
 - Extraneous TODOs.
