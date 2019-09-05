@@ -20,6 +20,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Analysis tool for plotting traces of allocators.
 
+- MixedPool to `allocator_benchmarks.cpp`.
+
 - Add a basic GitLab pipeline testing builds on LC systems.
 
 ### Changed
@@ -29,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Use git commit hash as RC version in develop builds.
 
 - Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
+
+- Generalized Strategy.Device test for all resources.
 
 - Moved `tools/plot_allocations` to `tools/analysis`.
 
