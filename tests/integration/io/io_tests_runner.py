@@ -82,9 +82,6 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
     output = test_program.stdout
     error = test_program.stderr
 
-    if expect_logging:
-        check_output('stdout', output, 'testing log stream')
-
     check_output('stderr', error, 'testing error stream')
 
     output_filename = 'umpire_io_tests.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
