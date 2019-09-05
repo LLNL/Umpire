@@ -10,6 +10,12 @@
 #include <cstdlib>
 #include <iostream>
 
+#define REPLAY_WARNING( msg )                                               \
+{                                                                           \
+  std::cout << std::string(__FILE__) << " " << __LINE__ << " " << __func__  \
+    << " " << msg << std::endl;                                             \
+}       
+
 #define REPLAY_ERROR( msg )                                                 \
 {                                                                           \
   std::cerr << std::string(__FILE__) << " " << __LINE__ << " " << __func__  \
