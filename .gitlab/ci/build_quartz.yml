@@ -29,7 +29,8 @@ release_resources_build_quartz:
     - quartz
   stage: release_resources
   script:
-    - scancel $(squeue -h --name=${BUILD_QUARTZ_ALLOC_NAME} --format=%A)
+    - export JOBID=$(squeue -h --name=${BUILD_QUARTZ_ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
   when: always
   except:
     - /_qnone/
