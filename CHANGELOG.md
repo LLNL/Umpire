@@ -49,6 +49,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fix signature of C function `umpire_resourcemanager_make_allocator_pool` to
   take size_t not int.
 
+- Restore getActualSize for all Allocator types
+
 ## [1.0.1] - 2019-09-04
 
 ### Fixed
