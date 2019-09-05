@@ -16,6 +16,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+## [1.0.1] - 2019-09-04
+
+### Fixed
+
+- Fixed a bug in DynamicPool where memory could be leaked when allocating a new
+  block using the "minimum size" for an allocation smaller than the block.
+
 ## [1.0.0] - 2019-07-12
 
 ### Added

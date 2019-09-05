@@ -389,10 +389,42 @@ TEST(ReleaseTest, Works)
   void* ptr_two = alloc.allocate(1024);
   alloc.deallocate(ptr_two);
 
+  ASSERT_EQ(alloc.getCurrentSize(), 62);
   EXPECT_NO_THROW(alloc.release());
 
+  ASSERT_LE(alloc.getActualSize(), 64);
+
   alloc.deallocate(ptr_one);
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+
+  EXPECT_NO_THROW(alloc.release());
+
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+  ASSERT_LE(alloc.getActualSize(), 0);
 }
+
+TEST(ReleaseTest, MissingBlocks)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_dyn_pool_for_release_2", rm.getAllocator("HOST"), 128, 64);
+
+  void* data_one = allocator.allocate(128);
+  void* data_two = allocator.allocate(44);
+
+  allocator.deallocate(data_one);
+  allocator.deallocate(data_two);
+
+  ASSERT_EQ(allocator.getCurrentSize(), 0);
+  ASSERT_GE(allocator.getActualSize(), 0);
+
+  allocator.release();
+
+  ASSERT_EQ(allocator.getCurrentSize(), 0);
+  ASSERT_EQ(allocator.getActualSize(), 0);
+}
+
 
 TEST(DynamicPool, coalesce)
 {
