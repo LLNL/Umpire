@@ -70,7 +70,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   static util::OutputBuffer s_replay_buffer;
   static util::OutputBuffer s_error_buffer;
 
-  s_log_buffer.setConsoleStream(&std::cout);
+  s_log_buffer.setConsoleStream(nullptr);
   s_replay_buffer.setConsoleStream(nullptr);
   s_error_buffer.setConsoleStream(&std::cerr);
 
