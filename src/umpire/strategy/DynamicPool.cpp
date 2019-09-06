@@ -163,12 +163,7 @@ void* DynamicPool::allocate(std::size_t bytes)
   Pointer ptr{nullptr};
 
   // Check if the previous block is a match
-  SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
-
-  if (iter == m_free_map.end()) {
-    mergeFreeBlocks();
-    iter = findFreeBlock(rounded_bytes);
-  }
+  const SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
 
   if (iter != m_free_map.end()) {
     // Found this acceptable address pair
@@ -239,6 +234,8 @@ void DynamicPool::deallocate(void* ptr)
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
+
+  mergeFreeBlocks();
 
   if (m_coalesce_heuristic(*this)) {
     UMPIRE_LOG(Debug, this
