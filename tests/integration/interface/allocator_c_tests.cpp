@@ -111,6 +111,26 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
 }
 
+TEST_P(AllocatorCTest, IsAllocator)
+{
+  umpire_resourcemanager rm;
+  umpire_resourcemanager_get_instance(&rm);
+  ASSERT_EQ(true, umpire_resourcemanager_is_allocator(&rm, GetParam()));
+}
+
+TEST_P(AllocatorCTest, HasAllocator)
+{
+  umpire_resourcemanager rm;
+  umpire_resourcemanager_get_instance(&rm);
+
+  double* data = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
+  ASSERT_NE(nullptr, data);
+
+  ASSERT_EQ(true, umpire_resourcemanager_has_allocator(&rm, (void*)data));
+  umpire_allocator_deallocate(&m_allocator, data);
+  ASSERT_EQ(false, umpire_resourcemanager_has_allocator(&rm, (void*)data));
+}
+
 const char* allocator_names[] = {
   "HOST"
 #if defined(UMPIRE_ENABLE_DEVICE)

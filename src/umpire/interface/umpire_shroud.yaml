@@ -83,9 +83,21 @@ declarations:
           format:
             function_suffix: _by_id
 
+        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
+          cxx_template:
+          - instantiation: <umpire::strategy::DynamicPool>
+            format:
+              template_suffix: _pool
+
+        - decl: void registerAllocator(const std::string& name, Allocator allocator)
+
         - decl: Allocator getAllocator(void* ptr)
           format:
             function_suffix: _for_ptr
+
+        - decl: bool isAllocator(const std::string& name)
+
+        - decl: bool hasAllocator(void* ptr)
 
         - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
           default_arg_suffix:
@@ -111,11 +123,6 @@ declarations:
 
         - decl: size_t getSize(void* ptr)
 
-        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
-          cxx_template:
-          - instantiation: <umpire::strategy::DynamicPool>
-            format:
-              template_suffix: _pool
 
 splicer_code:
   c:
@@ -125,6 +132,9 @@ splicer_code:
         - "#ifdef __cplusplus"
         - "#include <cstring>"
         - "#endif"
+      ResourceManager:
+        C_declarations:
+          - "#include <stdbool.h>"
 
 splicer:
   f:

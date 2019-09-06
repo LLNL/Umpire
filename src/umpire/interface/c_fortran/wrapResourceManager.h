@@ -38,6 +38,7 @@ extern "C" {
 #endif
 
 // splicer begin class.ResourceManager.C_declarations
+#include <stdbool.h>
 // splicer end class.ResourceManager.C_declarations
 
 umpire_resourcemanager * umpire_resourcemanager_get_instance(
@@ -55,9 +56,36 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
     umpire_resourcemanager * self, const int id,
     umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
+void umpire_resourcemanager_register_allocator(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator);
+
+void umpire_resourcemanager_register_allocator_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator);
+
 umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
     umpire_resourcemanager * self, void * ptr,
     umpire_allocator * SHC_rv);
+
+bool umpire_resourcemanager_is_allocator(umpire_resourcemanager * self,
+    const char * name);
+
+bool umpire_resourcemanager_is_allocator_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname);
+
+bool umpire_resourcemanager_has_allocator(umpire_resourcemanager * self,
+    void * ptr);
 
 void umpire_resourcemanager_copy_all(umpire_resourcemanager * self,
     void * src_ptr, void * dst_ptr);
@@ -87,16 +115,6 @@ void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
 
 size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
     void * ptr);
-
-umpire_allocator * umpire_resourcemanager_make_allocator_pool(
-    umpire_resourcemanager * self, const char * name,
-    umpire_allocator allocator, size_t initial_size, size_t block,
-    umpire_allocator * SHC_rv);
-
-umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
-    umpire_resourcemanager * self, const char * name, int Lname,
-    umpire_allocator allocator, size_t initial_size, size_t block,
-    umpire_allocator * SHC_rv);
 
 #ifdef __cplusplus
 }

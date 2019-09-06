@@ -11,16 +11,17 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
-#include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
@@ -155,6 +156,7 @@ using Strategies = ::testing::Types<
   umpire::strategy::FixedPool,
   umpire::strategy::MixedPool,
   umpire::strategy::MonotonicAllocationStrategy,
+  umpire::strategy::NamedAllocationStrategy,
   umpire::strategy::SizeLimiter,
   umpire::strategy::SlotPool,
   umpire::strategy::ThreadSafeAllocator>;
