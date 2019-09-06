@@ -34,6 +34,7 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
     if [[ "${DO_TEST}" == "yes" ]] ; then
       or_die ctest -T test --output-on-failure -V
     fi
+    free -h
     if [[ "${DO_MEMCHECK}" == "yes" ]] ; then
       regex="^Memory Leak - [1-9]+"
       while read -r line; do
