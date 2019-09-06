@@ -11,9 +11,17 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 1.0.0)
+  VERSION 1.0.1)
 
 set(UMPIRE_VERSION_RC "")
+
+option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
+mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS)
+
+if (ENABLE_DEVELOPER_DEFAULTS)
+  set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
+  set(ENABLE_TOOLS On CACHE BOOL "")
+endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
@@ -24,14 +32,13 @@ set(ENABLE_TESTS On CACHE BOOL "")
 set(ENABLE_BENCHMARKS On CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
 set(ENABLE_DOCS Off CACHE BOOL "")
-set(ENABLE_WARNINGS_AS_ERRORS Off CACHE BOOL "")
 option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
-option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
+option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 

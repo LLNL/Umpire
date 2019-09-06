@@ -119,32 +119,21 @@ TEST_P(StrategyTest, Duplicate)
 
 INSTANTIATE_TEST_CASE_P(Allocations, StrategyTest, ::testing::ValuesIn(AllocationDevices),);
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-TEST(Strategy, Device)
+TEST(DynamicPool, LimitedResource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto allocator = rm.getAllocator("DEVICE");
-  void* alloc = nullptr;
+  const std::size_t max_mem{1024 * 1024 * 4};
 
-  // Determine how much memory we can allocate from device
-  std::size_t max_mem = 0;
-  const std::size_t OneGiB = 1 * 1024 * 1024 * 1024;
-  try {
-    while ( true ) {  // Will "catch" out when allocation fails
-      alloc = allocator.allocate(max_mem + OneGiB);
-      ASSERT_NO_THROW( { allocator.deallocate(alloc); } );
-      max_mem += OneGiB;
-    }
-  }
-  catch (...) {
-    ASSERT_GT(max_mem, OneGiB);
-  }
+  auto limited_resource = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+    "limited_resource", rm.getAllocator("HOST"), max_mem);
 
-  allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "device_dyn_pool", rm.getAllocator("DEVICE"));
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+    "host_dyn_pool", limited_resource, 0, 1024);
 
-  ASSERT_EQ(allocator.getName(), "device_dyn_pool");
+  ASSERT_EQ(allocator.getName(), "host_dyn_pool");
+
+  void* alloc{nullptr};
 
   ASSERT_NO_THROW( { alloc = allocator.allocate(100); } );
   ASSERT_GE(allocator.getCurrentSize(), 100);
@@ -167,12 +156,11 @@ TEST(Strategy, Device)
   for (int i = 0; i < 16; ++i) {
     ASSERT_NO_THROW( { alloc1 = allocator.allocate(alloc_size); } );
     ASSERT_NO_THROW( { allocator.deallocate(alloc1); } );
-    alloc_size += 1024*1024;
+    alloc_size += 1024;
   }
 
   ASSERT_NO_THROW( { allocator.deallocate(alloc3); } );
 }
-#endif
 
 TEST(MonotonicStrategy, Host)
 {
@@ -389,10 +377,42 @@ TEST(ReleaseTest, Works)
   void* ptr_two = alloc.allocate(1024);
   alloc.deallocate(ptr_two);
 
+  ASSERT_EQ(alloc.getCurrentSize(), 62);
   EXPECT_NO_THROW(alloc.release());
 
+  ASSERT_LE(alloc.getActualSize(), 64);
+
   alloc.deallocate(ptr_one);
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+
+  EXPECT_NO_THROW(alloc.release());
+
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+  ASSERT_LE(alloc.getActualSize(), 0);
 }
+
+TEST(ReleaseTest, MissingBlocks)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      "host_dyn_pool_for_release_2", rm.getAllocator("HOST"), 128, 64);
+
+  void* data_one = allocator.allocate(128);
+  void* data_two = allocator.allocate(44);
+
+  allocator.deallocate(data_one);
+  allocator.deallocate(data_two);
+
+  ASSERT_EQ(allocator.getCurrentSize(), 0);
+  ASSERT_GE(allocator.getActualSize(), 0);
+
+  allocator.release();
+
+  ASSERT_EQ(allocator.getCurrentSize(), 0);
+  ASSERT_EQ(allocator.getActualSize(), 0);
+}
+
 
 TEST(DynamicPool, coalesce)
 {
@@ -610,7 +630,6 @@ TEST(NumaPolicyTest, EdgeCases) {
 TEST(NumaPolicyTest, Location) {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  // TODO Switch this to numa::get_allocatable_nodes() when the issue is fixed
   auto nodes = umpire::numa::get_host_nodes();
   for (auto n : nodes) {
     std::stringstream ss;
