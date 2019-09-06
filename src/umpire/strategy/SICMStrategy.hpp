@@ -56,7 +56,6 @@ class SICMStrategy :
     sicm_arena getArena() const noexcept;
 
   private:
-    std::size_t m_index;
     std::size_t m_max_size;
     sicm_arena m_arena;
 
