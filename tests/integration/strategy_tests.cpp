@@ -103,7 +103,7 @@ void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
             name, 
-            rm.getAllocator("DEVICE"),
+            rm.getAllocator("UM"),
             "READ_MOSTLY"));
 }
 #endif
