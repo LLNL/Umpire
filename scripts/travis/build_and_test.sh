@@ -31,10 +31,10 @@ if [[ "$DO_BUILD" == "yes" ]] ; then
     else
       or_die make -j 3 VERBOSE=1
     fi
+    free -h
     if [[ "${DO_TEST}" == "yes" ]] ; then
       or_die ctest -T test --output-on-failure -V
     fi
-    free -h
     if [[ "${DO_MEMCHECK}" == "yes" ]] ; then
       regex="^Memory Leak - [1-9]+"
       while read -r line; do
