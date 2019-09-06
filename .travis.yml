@@ -84,6 +84,7 @@ matrix:
     - CMAKE_EXTRA_FLAGS="-DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_SICM=On -DSICM_INCLUDE_PATH=/tmp/SICM/include -DSICM_LIBRARY_PATH=/tmp/SICM/lib -DJEMALLOC_LIBRARY_PATH=/tmp/jemalloc/lib"
 
 script:
+- docker run --rm free -h
 - docker run --rm --user='root' -v ${TRAVIS_BUILD_DIR}:/home/axom axom/compilers:$IMG chown -R axom /home/axom
 - docker run --rm  -v ${TRAVIS_BUILD_DIR}:/home/axom -e COMPILER -e BUILD_SICM -e DO_BUILD -e DO_TEST -e DO_MEMCHECK -e CMAKE_EXTRA_FLAGS -e GTEST_COLOR -e HCC_AMDGPU_TARGET axom/compilers:$IMG ./scripts/travis/build_and_test.sh
 
