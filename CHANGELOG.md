@@ -36,8 +36,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Moved `tools/plot_allocations` to `tools/analysis`.
 
-- DynamicPool will try and merge blocks before allocating more memory from the
-  underlying allocator.
+- DynamicPool will try and merge blocks after each deallocation of memory in the
+  pool.
+
+- Logging output no longer prints to stdout.
 
 ### Removed
 
@@ -51,6 +53,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fix signature of C function `umpire_resourcemanager_make_allocator_pool` to
   take size_t not int.
+
+- Restore getActualSize for all Allocator types
 
 ## [1.0.1] - 2019-09-04
 

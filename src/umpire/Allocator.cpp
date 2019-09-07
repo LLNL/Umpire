@@ -88,7 +88,8 @@ Allocator::getCurrentSize() const noexcept
 std::size_t
 Allocator::getActualSize() const noexcept
 {
-  return m_allocator->getActualSize();
+  return (m_allocator->getActualSize() > 0) ? 
+    m_allocator->getActualSize() : m_allocator->getCurrentSize();
 }
 
 const std::string&
