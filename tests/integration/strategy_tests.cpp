@@ -779,18 +779,27 @@ TEST(HeuristicTest, EdgeCases_0)
   // getBlocksInPool    == 1
   // getReleaseableSize == initial_size
   //
+
+  //
+  // After construction, we expect the pool to look like:
+  // getCurrentSize     == 0
+  // getActualSize      == 1*initial_size
+  // getBlocksInPool    == 1:
+  //    block #1 (Whole Block: free(initial_size))
+  // getReleaseableSize == 1*initial_size
+  //
   ASSERT_EQ(alloc.getCurrentSize(), 0);
   ASSERT_EQ(alloc.getActualSize(), initial_size);
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
   //
-  // After allocate(16), we expect the pool to look like:
+  // After alloc1=allocate(16), we expect the pool to look like:
   // getCurrentSize     == 16
-  // getActualSize      == initial_size
+  // getActualSize      == 1*initial_size
   // getBlocksInPool    == 2:
-  //    block #1 (16)
-  //    block #2 (free: initial_size-16)
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
   // getReleaseableSize == 0
   //
   void* alloc1 = nullptr;
@@ -801,13 +810,13 @@ TEST(HeuristicTest, EdgeCases_0)
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
   //
-  // After allocate(initial_size), we expect the pool to look like:
-  // getCurrentSize     == 16+initial_size
+  // After alloc2=allocate(initial_size), we expect the pool to look like:
+  // getCurrentSize     == 16+(1*initial_size)
   // getActualSize      == 2*initial_size
   // getBlocksInPool    == 3:
-  //    block #1 (16)
-  //    block #2 (free: initial_size-16)
-  //    block #3 (initial_size)
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  //    block #3 (Whole Block: alloc2(initial_size))
   // getReleaseableSize == 0
   //
   void* alloc2 = nullptr;
@@ -818,14 +827,14 @@ TEST(HeuristicTest, EdgeCases_0)
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
   //
-  // After allocate(initial_size), we expect the pool to look like:
+  // After alloc3=allocate(initial_size), we expect the pool to look like:
   // getCurrentSize     == 16+(2*initial_size)
   // getActualSize      == 3*initial_size
   // getBlocksInPool    == 4:
-  //    block #1 (16)
-  //    block #2 (free: initial_size-16)
-  //    block #3 (initial_size)
-  //    block #4 (initial_size)
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  //    block #3 (Whole Block: alloc2(initial_size))
+  //    block #4 (Whole Block: alloc3(initial_size))
   // getReleaseableSize == 0
   //
   void* alloc3 = nullptr;
@@ -844,7 +853,7 @@ TEST(HeuristicTest, EdgeCases_0)
   //    block #2 (Partial Block: free(initial_size-16))
   //    block #3 (Whole Block: alloc2(initial_size))
   //    block #4 (Whole Block: free(initial_size))
-  // getReleaseableSize == initial_size
+  // getReleaseableSize == 1*initial_size
   //
   ASSERT_NO_THROW({ alloc.deallocate(alloc3); });
   ASSERT_EQ(alloc.getCurrentSize(), 16+(1*initial_size));
