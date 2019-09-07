@@ -33,6 +33,7 @@ DynamicPool::DynamicPool(const std::string& name,
                          const int align_bytes) noexcept :
   AllocationStrategy(name, id),
   m_allocator{allocator.getAllocationStrategy()},
+  m_initial_alloc_bytes{round_up(initial_alloc_bytes, align_bytes)},
   m_min_alloc_bytes{round_up(min_alloc_bytes, align_bytes)},
   m_align_bytes{align_bytes},
   m_coalesce_heuristic{coalesce_heuristic},
@@ -188,7 +189,10 @@ void* DynamicPool::allocate(std::size_t bytes)
     }
   } else {
     // Allocate new block -- note this does not check whether alignment is met
-    const std::size_t alloc_bytes{std::max(rounded_bytes, m_min_alloc_bytes)};
+    const std::size_t min_block_size =
+      ( m_actual_bytes == 0 ) ? m_initial_alloc_bytes : m_min_alloc_bytes;
+
+    const std::size_t alloc_bytes{std::max(rounded_bytes, min_block_size)};
     ptr = allocateFromResource(alloc_bytes);
 
     // Add used
