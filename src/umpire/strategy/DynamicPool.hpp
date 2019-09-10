@@ -123,12 +123,12 @@ class DynamicPool : public AllocationStrategy
     /*!
      * \brief Allocate from m_allocator.
      */
-    void* allocateFromStrategy(std::size_t bytes);
+    void* allocateFromResource(std::size_t bytes);
 
     /*!
      * \brief Deallocate from m_allocator.
      */
-    void deallocateFromStrategy(void* ptr, std::size_t bytes);
+    void deallocateFromResource(void* ptr, std::size_t bytes);
 
     /*!
      * \brief Insert a block to the used map.
