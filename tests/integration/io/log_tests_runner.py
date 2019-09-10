@@ -63,8 +63,6 @@ def run_test():
 
     output = test_program.stdout
 
-    check_output('stdout', output, "initialize Umpire")
-
     output_filename = 'umpire.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
 
     check_file_exists(output_filename)
