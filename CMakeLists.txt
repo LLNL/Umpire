@@ -40,6 +40,9 @@ option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 
+# Set benchmark installation to OFF
+set(BENCHMARK_ENABLE_INSTALL OFF)
+
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 
 if (ENABLE_CUDA)
