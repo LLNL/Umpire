@@ -124,7 +124,12 @@ class DynamicPool : public AllocationStrategy
     /*!
      * \brief Allocate from m_allocator.
      */
-    void* allocateFromResource(std::size_t bytes);
+    void* allocateBlock(std::size_t bytes);
+
+    /*!
+     * \brief Deallocate from m_allocator.
+     */
+    void deallocateBlock(void* ptr, std::size_t bytes);
 
     /*!
      * \brief Insert a block to the used map.
@@ -158,6 +163,7 @@ class DynamicPool : public AllocationStrategy
     std::size_t releaseFreeBlocks();
 
     strategy::AllocationStrategy* m_allocator;
+    const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
     const int m_align_bytes;
     CoalesceHeuristic m_coalesce_heuristic;
