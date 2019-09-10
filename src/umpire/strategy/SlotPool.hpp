@@ -20,11 +20,13 @@ class SlotPool :
   public AllocationStrategy
 {
   public:
-      SlotPool(
-        const std::string& name,
-        int id,
-        std::size_t slots,
-        Allocator allocator);
+    SlotPool(
+      const std::string& name,
+      int id,
+      std::size_t slots,
+      Allocator allocator);
+
+    ~SlotPool();
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);

@@ -130,6 +130,28 @@ TEST_P(AllocatorTest, get_allocator_records)
   m_allocator->deallocate(data);
 }
 
+TEST_P(AllocatorTest, getCurrentSize)
+{
+  ASSERT_EQ(m_allocator->getCurrentSize(), 0);
+
+  void* data = m_allocator->allocate(128);
+
+  ASSERT_EQ(m_allocator->getCurrentSize(), 128);
+  
+  m_allocator->deallocate(data);
+}
+
+TEST_P(AllocatorTest, getActualSize)
+{
+  ASSERT_EQ(m_allocator->getActualSize(), 0);
+
+  void* data = m_allocator->allocate(128);
+
+  ASSERT_EQ(m_allocator->getActualSize(), 128);
+
+  m_allocator->deallocate(data);
+}
+
 const std::string allocator_strings[] = {
   "HOST"
 #if defined(UMPIRE_ENABLE_DEVICE)
