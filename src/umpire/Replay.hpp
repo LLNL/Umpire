@@ -12,11 +12,12 @@
 #include <sstream>
 #include <iostream>
 
-#include "umpire/Allocator.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
 namespace umpire {
+
+class Allocator;
+
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
 std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPool::CoalesceHeuristic& );
