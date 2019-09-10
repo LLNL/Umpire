@@ -11,12 +11,13 @@
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
-#include "umpire/Allocator.hpp"
-
 #include <map>
 #include <tuple>
 
 namespace umpire {
+
+class Allocator;
+
 namespace strategy {
 
 /*!
