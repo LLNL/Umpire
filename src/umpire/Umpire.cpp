@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <iterator>
 
-volatile int umpire_ver_1;
+volatile int umpire_ver_1_found;
 
 namespace umpire {
 
