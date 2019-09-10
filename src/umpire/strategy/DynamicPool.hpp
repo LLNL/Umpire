@@ -162,6 +162,7 @@ class DynamicPool : public AllocationStrategy
     std::size_t releaseFreeBlocks();
 
     strategy::AllocationStrategy* m_allocator;
+    const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
     const int m_align_bytes;
     CoalesceHeuristic m_coalesce_heuristic;

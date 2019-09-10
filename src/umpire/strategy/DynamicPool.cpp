@@ -33,17 +33,18 @@ DynamicPool::DynamicPool(const std::string& name,
                          const int align_bytes) noexcept :
   AllocationStrategy(name, id),
   m_allocator{allocator.getAllocationStrategy()},
-  m_min_alloc_bytes{min_alloc_bytes},
+  m_initial_alloc_bytes{round_up(initial_alloc_bytes, align_bytes)},
+  m_min_alloc_bytes{round_up(min_alloc_bytes, align_bytes)},
   m_align_bytes{align_bytes},
   m_coalesce_heuristic{coalesce_heuristic},
   m_used_map{},
   m_free_map{},
   m_curr_bytes{0},
-  m_actual_bytes{initial_alloc_bytes},
+  m_actual_bytes{round_up(initial_alloc_bytes, align_bytes)},
   m_highwatermark{0}
 {
-  insertFree(m_allocator->allocate(initial_alloc_bytes),
-             initial_alloc_bytes, true, initial_alloc_bytes);
+  const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
+  insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
 }
 
 DynamicPool::~DynamicPool()
@@ -195,27 +196,28 @@ void* DynamicPool::allocate(std::size_t bytes)
 
     m_curr_bytes += rounded_bytes;
 
-    const int64_t left_bytes{static_cast<int64_t>(
-        free_size - rounded_bytes)};
+    const std::size_t left_bytes{free_size - rounded_bytes};
 
-    if (left_bytes > m_align_bytes) {
+    if (left_bytes > 0) {
       insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
                  false, whole_bytes);
     }
   } else {
     // Allocate new block -- note this does not check whether alignment is met
-    const std::size_t alloc_bytes{std::max(rounded_bytes, m_min_alloc_bytes)};
+    const std::size_t min_block_size =
+      ( m_actual_bytes == 0 ) ? m_initial_alloc_bytes : m_min_alloc_bytes;
+
+    const std::size_t alloc_bytes{std::max(rounded_bytes, min_block_size)};
     ptr = allocateFromStrategy(alloc_bytes);
 
     // Add used
     insertUsed(ptr, rounded_bytes, true, alloc_bytes);
     m_curr_bytes += rounded_bytes;
 
-    const int64_t left_bytes{static_cast<int64_t>(
-        m_min_alloc_bytes - rounded_bytes)};
+    const std::size_t left_bytes{alloc_bytes - rounded_bytes};
 
     // Add free
-    if (left_bytes > m_align_bytes)
+    if (left_bytes > 0)
       insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
                  false, alloc_bytes);
   }
@@ -251,6 +253,8 @@ void DynamicPool::deallocate(void* ptr)
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
+
+  mergeFreeBlocks();
 
   if (m_coalesce_heuristic(*this)) {
     UMPIRE_LOG(Debug, this
