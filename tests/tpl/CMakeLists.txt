@@ -4,13 +4,13 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (unit_dir ${UMPIRE_TESTS_OUTPUT_DIR}/tpl)
+set (tpl_output_dir ${TEST_OUTPUT_DIRECTORY}/tpl)
 
 blt_add_executable(
   NAME judy_smoke_tests
   SOURCES judy_smoke_tests.cpp
   DEPENDS_ON umpire_tpl_judy gtest
-  OUTPUT_DIR ${unit_dir})
+  OUTPUT_DIR ${tpl_output_dir})
 
 blt_add_test(
   NAME judy_smoke_tests
@@ -20,7 +20,7 @@ blt_add_executable(
   NAME cxxopts_smoke_tests
   SOURCES cxxopts_smoke_tests.cpp
   DEPENDS_ON umpire_tpl_cxxopts gtest
-  OUTPUT_DIR ${unit_dir})
+  OUTPUT_DIR ${tpl_output_dir})
 
 if (NOT C_COMPILER_FAMILY_IS_PGI)
   blt_add_test(
