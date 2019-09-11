@@ -8,6 +8,7 @@
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
+#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
