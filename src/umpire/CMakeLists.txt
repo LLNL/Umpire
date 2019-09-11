@@ -6,6 +6,7 @@
 ##############################################################################
 set (umpire_headers
   Allocator.hpp
+  Allocator.inl
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl

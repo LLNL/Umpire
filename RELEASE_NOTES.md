@@ -1,3 +1,8 @@
+# v1.0.1
+
+- Fixed a bug in DynamicPool where memory could be leaked when allocating a new
+  block using the "minimum size" for an allocation smaller than the block.
+
 # v1.0.0
 
 - Umpire is MPI-aware (outputs rank information to logs and replays) when

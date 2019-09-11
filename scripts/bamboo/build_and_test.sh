@@ -30,7 +30,10 @@ cd ${BUILD_DIR}
 
 echo "Configuring..."
 
-trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../"
+trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
+	  -C ${UMPIRE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../"
 
 echo "Building..."
 trycmd "make VERBOSE=1 -j"

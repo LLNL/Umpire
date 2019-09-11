@@ -22,40 +22,6 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept:
 {
 }
 
-void*
-Allocator::allocate(std::size_t bytes)
-{
-  void* ret = nullptr;
-
-  UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }");
-
-  ret = m_allocator->allocate(bytes);
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
-
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
-  return ret;
-}
-
-void
-Allocator::deallocate(void* ptr)
-{
-  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
-
-  UMPIRE_LOG(Debug, "(" << ptr << ")");
-
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
-
-  if (!ptr) {
-    UMPIRE_LOG(Info, "Deallocating a null pointer");
-    return;
-  } else {
-    m_allocator->deallocate(ptr);
-  }
-}
-
 void
 Allocator::release()
 {
@@ -88,7 +54,8 @@ Allocator::getCurrentSize() const noexcept
 std::size_t
 Allocator::getActualSize() const noexcept
 {
-  return m_allocator->getActualSize();
+  return (m_allocator->getActualSize() > 0) ? 
+    m_allocator->getActualSize() : m_allocator->getCurrentSize();
 }
 
 const std::string&

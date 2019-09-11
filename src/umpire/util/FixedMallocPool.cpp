@@ -15,6 +15,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <algorithm>
+#include <cstddef>
 
 namespace umpire {
 namespace util {
