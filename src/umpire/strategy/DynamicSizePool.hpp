@@ -7,8 +7,8 @@
 #include <iostream>
 #include <sstream>
 
-#include "umpire/tpl/simpool/StdAllocator.hpp"
-#include "umpire/tpl/simpool/FixedSizePool.hpp"
+#include "umpire/strategy/StdAllocator.hpp"
+#include "umpire/strategy/FixedSizePool.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"

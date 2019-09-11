@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/DynamicPoolMap.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 #include "umpire/ResourceManager.hpp"
 

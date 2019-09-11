@@ -68,7 +68,7 @@ class DynamicPoolList :
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
+        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable_list(100)) noexcept;
 
     void* allocate(size_t bytes) override;
 

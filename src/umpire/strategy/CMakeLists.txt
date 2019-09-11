@@ -12,12 +12,14 @@ set (umpire_strategy_headers
   DynamicPoolHeuristic.hpp
   DynamicPoolList.hpp
   DynamicPoolMap.hpp
-  DynamicSizedPool.hpp
+  DynamicSizePool.hpp
   FixedPool.hpp
+  FixedSizePool.hpp
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   SizeLimiter.hpp
+  StdAllocator.hpp
   ThreadSafeAllocator.hpp
   ZeroByteHandler.hpp)
 

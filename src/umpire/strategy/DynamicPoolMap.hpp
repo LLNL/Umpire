@@ -8,7 +8,8 @@
 #define UMPIRE_DynamicPoolMap_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPoolMapHeuristic.hpp"
+#include "umpire/strategy/DynamicPoolHeuristic.hpp"
+
 #include "umpire/util/MemoryMap.hpp"
 
 #include "umpire/Allocator.hpp"
