@@ -8,9 +8,11 @@ set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationStrategy.hpp
   AllocationTracker.hpp
+  DynamicPool.hpp
+  DynamicPoolHeuristic.hpp
   DynamicPoolList.hpp
   DynamicPoolMap.hpp
-  DynamicPoolHeuristic.hpp
+  DynamicSizedPool.hpp
   FixedPool.hpp
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
