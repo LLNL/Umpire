@@ -4,11 +4,11 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DynamicPool_HPP
-#define UMPIRE_DynamicPool_HPP
+#ifndef UMPIRE_DynamicPoolMap_HPP
+#define UMPIRE_DynamicPoolMap_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPoolHeuristic.hpp"
+#include "umpire/strategy/DynamicPoolMapHeuristic.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
 #include "umpire/Allocator.hpp"
@@ -30,7 +30,7 @@ namespace strategy {
  * and the minimum size controls the lower bound on all future chunk
  * allocations.
  */
-class DynamicPool : public AllocationStrategy
+class DynamicPoolMap : public AllocationStrategy
 {
   public:
     using Pointer = void*;
@@ -41,19 +41,19 @@ class DynamicPool : public AllocationStrategy
      * The registered heuristic callback function will be called immediately
      * after a deallocation() has completed from the pool.
      */
-    using CoalesceHeuristic = std::function<bool (const strategy::DynamicPool&)>;
+    using CoalesceHeuristic = std::function<bool (const strategy::DynamicPoolMap&)>;
 
     /*!
-     * \brief Construct a new DynamicPool.
+     * \brief Construct a new DynamicPoolMap.
      *
-     * \param name Name of this instance of the DynamicPool
+     * \param name Name of this instance of the DynamicPoolMap
      * \param id Unique identifier for this instance
      * \param initial_alloc_bytes Size the pool initially allocates
      * \param min_alloc_bytes The minimum size of all future allocations
      * \param coalesce_heuristic Heuristic callback function
      * \param align_bytes Number of bytes with which to align allocation sizes
      */
-    DynamicPool(
+    DynamicPoolMap(
         const std::string& name,
         int id,
         Allocator allocator,
@@ -63,11 +63,11 @@ class DynamicPool : public AllocationStrategy
         const int align_bytes = 16) noexcept;
 
     /*!
-     * \brief Destructs the DynamicPool.
+     * \brief Destructs the DynamicPoolMap.
      */
-    ~DynamicPool();
+    ~DynamicPoolMap();
 
-    DynamicPool(const DynamicPool&) = delete;
+    DynamicPoolMap(const DynamicPoolMap&) = delete;
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
@@ -170,4 +170,4 @@ class DynamicPool : public AllocationStrategy
 } // end of namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_DynamicPool_HPP
+#endif // UMPIRE_DynamicPoolMap_HPP

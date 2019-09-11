@@ -8,7 +8,8 @@ set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationStrategy.hpp
   AllocationTracker.hpp
-  DynamicPool.hpp
+  DynamicPoolList.hpp
+  DynamicPoolMap.hpp
   DynamicPoolHeuristic.hpp
   FixedPool.hpp
   MixedPool.hpp
@@ -31,7 +32,8 @@ set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
   AllocationTracker.cpp
-  DynamicPool.cpp
+  DynamicPoolList.cpp
+  DynamicPoolMap.cpp
   DynamicPoolHeuristic.cpp
   FixedPool.cpp
   MixedPool.cpp
