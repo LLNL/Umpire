@@ -24,6 +24,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Add a basic GitLab pipeline testing builds on LC systems.
 
+- CI tests installation.
+
 ### Changed
 
 - Adjust notifications for CI jobs.
