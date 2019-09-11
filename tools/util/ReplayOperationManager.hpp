@@ -179,7 +179,7 @@ class ReplayOperationManager {
   friend ReplayOperation;
 
 public:
-  ReplayOperationManager( void );
+  ReplayOperationManager( bool run_ops_now );
 
   ~ReplayOperationManager();
 
@@ -397,12 +397,16 @@ public:
   void makeAllocationMapClear(void);
 
 private:
+  bool m_run_ops_now;
+  bool m_resources_allocated;
   std::vector<umpire::Allocator> m_allocator_array;
   ReplayOperation::AllocationOpMap m_alloc_operations;
   ReplayOperation* m_cont_op;
   std::vector<ReplayOperation*> operations;
   std::vector<std::string> m_resource_names;
   umpire::util::AllocationMap m_allocation_map;
+
+  void addOperation( ReplayOperation* op);
 };
 
 #include "util/ReplayOperationManager.inl"

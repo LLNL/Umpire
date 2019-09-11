@@ -34,6 +34,9 @@ int main(int argc, char* argv[])
      , "Input file created by Umpire library with UMPIRE_REPLAY=On"
      , cxxopts::value<std::string>(), "FILE"
     )
+    (  "l, largefile"
+     , "Run operations on the fly as they are interpreted"
+    )
   ;
 
   auto command_line_args = options.parse(argc, argv);

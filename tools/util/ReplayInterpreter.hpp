@@ -25,7 +25,7 @@ class ReplayInterpreter {
     //
     int getSymbolicOperation( std::string& raw_line, std::string& sym_line );
 
-    ReplayInterpreter( std::string in_file_name );
+    ReplayInterpreter( std::string in_file_name,  bool run_ops_immediately=false );
 
   private:
     using AllocatorIndex = int;
@@ -34,6 +34,7 @@ class ReplayInterpreter {
     using AllocatorIndexMap = std::unordered_map<AllocatorFromLog, AllocatorIndex>;
     using AllocationAllocatorMap = std::unordered_map<AllocationFromLog, AllocatorIndex>;
 
+    ReplayOperationManager* m_operation_mgr;
     std::ifstream m_input_file;
     std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::string m_line;
@@ -42,7 +43,6 @@ class ReplayInterpreter {
     AllocatorIndex m_num_allocators;
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
-    ReplayOperationManager m_operation_mgr;
     uint64_t m_op_seq;
     std::stringstream compare_ss;
 

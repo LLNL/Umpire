@@ -452,19 +452,43 @@ void ReplayOperation::makeAllocationMapClear(void)
   };
 }
 
-ReplayOperationManager::ReplayOperationManager( void ) {
+ReplayOperationManager::ReplayOperationManager( bool runOpsNow ) :
+    m_run_ops_now{runOpsNow}, m_resources_allocated{false}
+{
 }
 
 ReplayOperationManager::~ReplayOperationManager() { }
 
 void ReplayOperationManager::runOperations()
 {
-  ReplayOperation m_op(*this);
+  if ( ! m_run_ops_now ) {
+    if ( ! m_resources_allocated ) {
+      m_resources_allocated = true;
+      ReplayOperation resource_op(*this);
+      resource_op.makeMemoryResources();
+    }
 
-  m_op.makeMemoryResources();
+    for (auto op : operations) {
+      op->runOperations();
+    }
+  }
+}
 
-  for (auto op : operations) {
+void ReplayOperationManager::addOperation( ReplayOperation* op)
+{
+  if ( m_run_ops_now ) {
+    if ( ! m_resources_allocated ) {
+      m_resources_allocated = true;
+      ReplayOperation resource_op(*this);
+      resource_op.makeMemoryResources();
+    }
+
     op->runOperations();
+
+    delete op;
+  }
+  else {
+    operations.push_back(op);
   }
 }
 
@@ -488,7 +512,7 @@ void ReplayOperationManager::makeAdvisor(
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
       advice_operation, device_id);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAdvisor(
@@ -504,7 +528,7 @@ void ReplayOperationManager::makeAdvisor(
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
       advice_operation, accessing_allocator_name, device_id);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAdvisor(
@@ -518,7 +542,7 @@ void ReplayOperationManager::makeAdvisor(
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
       advice_operation);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAdvisor(
@@ -533,7 +557,7 @@ void ReplayOperationManager::makeAdvisor(
   m_cont_op->makeAdvisor(
       introspection, allocator_name, base_allocator_name,
       advice_operation, accessing_allocator_name);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 //
@@ -557,7 +581,7 @@ void ReplayOperationManager::makeFixedPool(
             , objects_per_pool
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeFixedPool(
@@ -576,7 +600,7 @@ void ReplayOperationManager::makeFixedPool(
             , object_bytes
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 //
@@ -603,7 +627,7 @@ void ReplayOperationManager::makeDynamicPool(
             , alignment
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeDynamicPool(
@@ -625,7 +649,7 @@ void ReplayOperationManager::makeDynamicPool(
             , umpire::strategy::heuristic_percent_releasable(0)
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeDynamicPool(
@@ -643,7 +667,7 @@ void ReplayOperationManager::makeDynamicPool(
             , initial_alloc_size
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeDynamicPool(
@@ -659,7 +683,7 @@ void ReplayOperationManager::makeDynamicPool(
             , base_allocator_name
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMonotonicAllocator(
@@ -678,7 +702,7 @@ void ReplayOperationManager::makeMonotonicAllocator(
             , base_allocator_name
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeSlotPool(
@@ -697,7 +721,7 @@ void ReplayOperationManager::makeSlotPool(
             , base_allocator_name
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeSizeLimiter(
@@ -716,7 +740,7 @@ void ReplayOperationManager::makeSizeLimiter(
             , size_limit
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeThreadSafeAllocator(
@@ -733,7 +757,7 @@ void ReplayOperationManager::makeThreadSafeAllocator(
             , base_allocator_name
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -766,7 +790,7 @@ void ReplayOperationManager::makeMixedPool(
             , alignment
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -797,7 +821,7 @@ void ReplayOperationManager::makeMixedPool(
             , umpire::strategy::heuristic_percent_releasable(0)
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -824,7 +848,7 @@ void ReplayOperationManager::makeMixedPool(
             , dynamic_initial_alloc_bytes
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -849,7 +873,7 @@ void ReplayOperationManager::makeMixedPool(
             , size_multiplier
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -872,7 +896,7 @@ void ReplayOperationManager::makeMixedPool(
             , max_fixed_blocksize
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -893,7 +917,7 @@ void ReplayOperationManager::makeMixedPool(
             , largest_fixed_blocksize
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -912,7 +936,7 @@ void ReplayOperationManager::makeMixedPool(
             , smallest_fixed_blocksize
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeMixedPool(
@@ -929,7 +953,7 @@ void ReplayOperationManager::makeMixedPool(
             , base_allocator_name
   );
 
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocatorCont( void )
@@ -944,7 +968,7 @@ void ReplayOperationManager::makeAllocate( int allocator_num, std::size_t size )
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeAllocate(allocator_num, size);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocateCont( uint64_t allocation_from_log )
@@ -956,48 +980,48 @@ void ReplayOperationManager::makeDeallocate( int allocator_num, uint64_t allocat
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeDeallocate(allocator_num, allocation_from_log);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeCoalesce( const std::string& allocator_name )
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeCoalesce(allocator_name);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeRelease( int allocator_num )
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeRelease(allocator_num);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocationMapInsert(void* key, umpire::util::AllocationRecord rec)
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeAllocationMapInsert(key, rec);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocationMapFind(void* key)
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeAllocationMapFind(key);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocationMapRemove(void* key)
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeAllocationMapRemove(key);
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocationMapClear(void)
 {
   m_cont_op = new ReplayOperation(*this);
   m_cont_op->makeAllocationMapClear();
-  operations.push_back(m_cont_op);
+  addOperation(m_cont_op);
 }
 

@@ -17,7 +17,7 @@
 
 void ReplayInterpreter::runOperations(void)
 {
-  m_operation_mgr.runOperations();
+  m_operation_mgr->runOperations();
 }
 
 void ReplayInterpreter::buildAllocMapOperations(void)
@@ -216,8 +216,11 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
   return 0;   // EOF
 }
 
-ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
-    m_input_file(in_file_name), m_num_allocators(0), m_op_seq(0)
+ReplayInterpreter::ReplayInterpreter( std::string in_file_name, bool run_ops_immediately ):
+    m_operation_mgr{new ReplayOperationManager{run_ops_immediately}}
+  , m_input_file{in_file_name}
+  , m_num_allocators{0}
+  , m_op_seq{0}
 {
   if ( ! m_input_file.is_open() )
     REPLAY_ERROR("Unable to open input file " << in_file_name);
@@ -250,7 +253,7 @@ void ReplayInterpreter::replay_makeMemoryResource( void )
   compare_ss  << allocator_name
               << " " << m_allocator_indices[obj_p];
 
-  m_operation_mgr.makeMemoryResource(allocator_name);
+  m_operation_mgr->makeMemoryResource(allocator_name);
 }
 
 void ReplayInterpreter::replay_makeAllocator( void )
@@ -295,7 +298,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << advice_operation 
             << " " << device_id
           ;
-          m_operation_mgr.makeAdvisor(
+          m_operation_mgr->makeAdvisor(
               introspection, allocator_name, base_allocator_name,
               advice_operation, device_id);
           break;
@@ -309,7 +312,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << accessing_allocator_name 
             << " " << device_id
           ;
-          m_operation_mgr.makeAdvisor(
+          m_operation_mgr->makeAdvisor(
               introspection, allocator_name, base_allocator_name,
               advice_operation, accessing_allocator_name, device_id);
           break;
@@ -326,7 +329,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << base_allocator_name
             << " " << advice_operation 
           ;
-          m_operation_mgr.makeAdvisor(
+          m_operation_mgr->makeAdvisor(
               introspection, allocator_name, base_allocator_name,
               advice_operation);
           break;
@@ -339,7 +342,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << advice_operation 
             << " " << accessing_allocator_name 
           ;
-          m_operation_mgr.makeAdvisor(
+          m_operation_mgr->makeAdvisor(
               introspection, allocator_name, base_allocator_name,
               advice_operation, accessing_allocator_name);
           break;
@@ -366,7 +369,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << min_alloc_size 
           << " " << alignment 
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr->makeDynamicPool(
               introspection
             , allocator_name
             , base_allocator_name
@@ -386,7 +389,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << initial_alloc_size 
           << " " << min_alloc_size 
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr->makeDynamicPool(
               introspection
             , allocator_name
             , base_allocator_name
@@ -403,7 +406,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << base_allocator_name
           << " " << initial_alloc_size 
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr->makeDynamicPool(
               introspection
             , allocator_name
             , base_allocator_name
@@ -415,7 +418,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << allocator_name 
           << " " << base_allocator_name
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr->makeDynamicPool(
               introspection
             , allocator_name
             , base_allocator_name
@@ -433,7 +436,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
         << " " << capacity
         << " " << base_allocator_name
       ;
-      m_operation_mgr.makeMonotonicAllocator(
+      m_operation_mgr->makeMonotonicAllocator(
             introspection
           , allocator_name
           , capacity
@@ -451,7 +454,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
         << " " << slots
         << " " << base_allocator_name
       ;
-      m_operation_mgr.makeSlotPool(
+      m_operation_mgr->makeSlotPool(
             introspection
           , allocator_name
           , slots
@@ -468,7 +471,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
         << " " << base_allocator_name
         << " " << size_limit
       ;
-      m_operation_mgr.makeSizeLimiter(
+      m_operation_mgr->makeSizeLimiter(
             introspection
           , allocator_name
           , base_allocator_name
@@ -482,7 +485,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
         << " " << allocator_name 
         << " " << base_allocator_name
       ;
-      m_operation_mgr.makeThreadSafeAllocator(
+      m_operation_mgr->makeThreadSafeAllocator(
             introspection
           , allocator_name
           , base_allocator_name
@@ -506,7 +509,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << object_bytes 
           << " " << objects_per_pool 
         ;
-        m_operation_mgr.makeFixedPool(
+        m_operation_mgr->makeFixedPool(
               introspection
             , allocator_name
             , base_allocator_name
@@ -520,7 +523,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << base_allocator_name
           << " " << object_bytes 
         ;
-        m_operation_mgr.makeFixedPool(
+        m_operation_mgr->makeFixedPool(
               introspection
             , allocator_name
             , base_allocator_name
@@ -560,7 +563,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << dynamic_align_bytes
         ;
 
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
           , largest_fixed_blocksize
@@ -591,7 +594,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << dynamic_min_alloc_bytes
         ;
 
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
           , largest_fixed_blocksize
@@ -618,7 +621,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << size_multiplier
             << " " << dynamic_initial_alloc_bytes
         ;
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
           , largest_fixed_blocksize
@@ -641,7 +644,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << max_fixed_blocksize
             << " " << size_multiplier
         ;
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
           , largest_fixed_blocksize
@@ -661,7 +664,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << largest_fixed_blocksize
             << " " << max_fixed_blocksize
         ;
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
           , largest_fixed_blocksize
@@ -678,7 +681,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << smallest_fixed_blocksize
             << " " << largest_fixed_blocksize
         ;
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
           , largest_fixed_blocksize
@@ -692,7 +695,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << base_allocator_name
             << " " << smallest_fixed_blocksize
         ;
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
           , smallest_fixed_blocksize
         );
@@ -702,7 +705,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << allocator_name
             << " " << base_allocator_name
         ;
-        m_operation_mgr.makeMixedPool(
+        m_operation_mgr->makeMixedPool(
             introspection, allocator_name, base_allocator_name
         );
       }
@@ -718,7 +721,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
     m_allocator_indices[obj_p] = m_num_allocators++;
     compare_ss << m_allocator_indices[obj_p];
 
-    m_operation_mgr.makeAllocatorCont();
+    m_operation_mgr->makeAllocatorCont();
   }
 }
 
@@ -745,7 +748,7 @@ void ReplayInterpreter::replay_allocate( void )
     const std::size_t alloc_size = m_json["payload"]["size"];
 
     compare_ss << allocator_number << " " << alloc_size;
-    m_operation_mgr.makeAllocate(allocator_number, alloc_size);
+    m_operation_mgr->makeAllocate(allocator_number, alloc_size);
   }
   else {
     const std::string memory_str = m_json["result"]["memory_ptr"];
@@ -753,7 +756,7 @@ void ReplayInterpreter::replay_allocate( void )
 
     compare_ss << m_op_seq;
     m_allocation_id[memory_ptr] = m_op_seq;
-    m_operation_mgr.makeAllocateCont(memory_ptr);
+    m_operation_mgr->makeAllocateCont(memory_ptr);
   }
 }
 
@@ -773,7 +776,7 @@ void ReplayInterpreter::replay_deallocate( void )
 
   compare_ss << allocator_number << " " << m_allocation_id[memory_ptr];
 
-  m_operation_mgr.makeDeallocate(allocator_number, memory_ptr);
+  m_operation_mgr->makeDeallocate(allocator_number, memory_ptr);
 }
 
 void ReplayInterpreter::replay_coalesce( void )
@@ -782,7 +785,7 @@ void ReplayInterpreter::replay_coalesce( void )
   strip_off_base(allocator_name);
 
   compare_ss << allocator_name;
-  m_operation_mgr.makeCoalesce(allocator_name);
+  m_operation_mgr->makeCoalesce(allocator_name);
 }
 
 void ReplayInterpreter::replay_release( void )
@@ -796,7 +799,7 @@ void ReplayInterpreter::replay_release( void )
 
   const AllocatorIndex& allocator_number = n_iter->second;
   compare_ss << allocator_number;
-  m_operation_mgr.makeRelease(allocator_number);
+  m_operation_mgr->makeRelease(allocator_number);
 }
 
 void ReplayInterpreter::replay_makeAllocationMapInsert( void )
@@ -812,7 +815,7 @@ void ReplayInterpreter::replay_makeAllocationMapInsert( void )
   arec.size = reinterpret_cast<std::size_t>(std::stoul(rec_size_s, nullptr, 0));
   arec.strategy = reinterpret_cast<umpire::strategy::AllocationStrategy*>(std::stoul(rec_strategy_s, nullptr, 0));
 
-  m_operation_mgr.makeAllocationMapInsert(key, arec);
+  m_operation_mgr->makeAllocationMapInsert(key, arec);
 }
 
 void ReplayInterpreter::replay_makeAllocationMapFind( void )
@@ -820,7 +823,7 @@ void ReplayInterpreter::replay_makeAllocationMapFind( void )
   const std::string key_s = m_json["payload"]["ptr"];
   void* key = reinterpret_cast<void*>(std::stoul(key_s, nullptr, 0));
 
-  m_operation_mgr.makeAllocationMapFind(key);
+  m_operation_mgr->makeAllocationMapFind(key);
 }
 
 void ReplayInterpreter::replay_makeAllocationMapRemove( void )
@@ -828,11 +831,11 @@ void ReplayInterpreter::replay_makeAllocationMapRemove( void )
   const std::string key_s = m_json["payload"]["ptr"];
   void* key = reinterpret_cast<void*>(std::stoul(key_s, nullptr, 0));
 
-  m_operation_mgr.makeAllocationMapRemove(key);
+  m_operation_mgr->makeAllocationMapRemove(key);
 }
 
 void ReplayInterpreter::replay_makeAllocationMapClear( void )
 {
-  m_operation_mgr.makeAllocationMapClear();
+  m_operation_mgr->makeAllocationMapClear();
 }
 
