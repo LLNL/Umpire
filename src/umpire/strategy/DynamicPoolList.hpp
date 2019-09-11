@@ -21,10 +21,10 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
+#include "umpire/strategy/DynamicSizePool.hpp"
 
 #include "umpire/Allocator.hpp"
 
-#include "umpire/tpl/simpool/DynamicSizePool.hpp"
 
 namespace umpire {
 namespace strategy {
