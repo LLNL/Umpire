@@ -878,17 +878,18 @@ TEST(HeuristicTest, EdgeCases_0)
   // After deallocate(alloc1), we expect the pool to look like:
   // getCurrentSize     == 0
   // getActualSize      == 3*initial_size
-  // getBlocksInPool    == 3:
-  //    block #1 (Whole Block: free(initial_size))
-  //    block #2 (Whole Block: free(initial_size))
+  // getBlocksInPool    == 4:
+  //    block #1 (Partial Block: free(16))
+  //    block #2 (Partial Block: free(initial_size-16))
   //    block #3 (Whole Block: free(initial_size))
-  // getReleaseableSize == 3*initial_size
+  //    block #4 (Whole Block: free(initial_size))
+  // getReleaseableSize == 2*initial_size
   //
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
   ASSERT_EQ(alloc.getCurrentSize(), 0);
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
 
   //
   // After release, we expect the pool to look like:
@@ -923,15 +924,16 @@ TEST(HeuristicTest, EdgeCases_0)
   // After deallocate(final_alloc), we expect the pool to look like:
   // getCurrentSize     == 0
   // getActualSize      == initial_size
-  // getBlocksInPool    == 1:
-  //    block #1 (Whole Block: free(initial_size))
-  // getReleaseableSize == 1*initial_size
+  // getBlocksInPool    == 2:
+  //    block #1 (Partial Block: free(16))
+  //    block #2 (Partial Block: free(initial_size))
+  // getReleaseableSize == 0*initial_size
   //
   ASSERT_NO_THROW({ alloc.deallocate(final_alloc); });
   ASSERT_EQ(alloc.getCurrentSize(), 0);
   ASSERT_EQ(alloc.getActualSize(), initial_size);
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)
