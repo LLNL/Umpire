@@ -12,18 +12,16 @@
 #include <stdio.h>
 #include "StdAllocator.hpp"
 
-namespace {
-  static int find_first_set(int i)
-  {
+inline int find_first_set(int i)
+{
 #if defined(_MSC_VER)
-    unsigned long bit;
-    unsigned long i_l = static_cast<unsigned long>(i);
-    _BitScanForward(&bit, i_l);
-    return static_cast<int>(bit);
+  unsigned long bit;
+  unsigned long i_l = static_cast<unsigned long>(i);
+  _BitScanForward(&bit, i_l);
+  return static_cast<int>(bit);
 #else
-    return ffs(i);
+  return ffs(i);
 #endif
-  }
 }
 
 template<class T, class MA, class IA = StdAllocator, int NP=(1<<6)>
