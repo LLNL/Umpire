@@ -5,12 +5,15 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/config.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/ResourceManager.hpp"
 
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+
+volatile int umpire_ver_1_found;
 
 namespace umpire {
 

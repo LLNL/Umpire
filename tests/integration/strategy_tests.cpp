@@ -774,41 +774,162 @@ TEST(HeuristicTest, EdgeCases_0)
 
   ASSERT_NE(dynamic_pool, nullptr);
 
+  //
+  // After construction, we expect the pool to look like:
+  // getCurrentSize     == 0
+  // getActualSize      == 1*initial_size
+  // getBlocksInPool    == 1:
+  //    block #1 (Whole Block: free(initial_size))
+  // getReleaseableSize == 1*initial_size
+  //
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+  ASSERT_EQ(alloc.getActualSize(), initial_size);
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
+  //
+  // After alloc1=allocate(16), we expect the pool to look like:
+  // getCurrentSize     == 16
+  // getActualSize      == 1*initial_size
+  // getBlocksInPool    == 2:
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  // getReleaseableSize == 0
+  //
   void* alloc1 = nullptr;
   ASSERT_NO_THROW({ alloc1 = alloc.allocate(16); });
+  ASSERT_EQ(alloc.getCurrentSize(), 16);
   ASSERT_EQ(alloc.getActualSize(), initial_size);
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
+  //
+  // After alloc2=allocate(initial_size), we expect the pool to look like:
+  // getCurrentSize     == 16+(1*initial_size)
+  // getActualSize      == 2*initial_size
+  // getBlocksInPool    == 3:
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  //    block #3 (Whole Block: alloc2(initial_size))
+  // getReleaseableSize == 0
+  //
   void* alloc2 = nullptr;
   ASSERT_NO_THROW({ alloc2 = alloc.allocate(initial_size); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
+  ASSERT_EQ(alloc.getCurrentSize(), 16+initial_size);
   ASSERT_EQ(alloc.getActualSize(), 2*initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
+  //
+  // After alloc3=allocate(initial_size), we expect the pool to look like:
+  // getCurrentSize     == 16+(2*initial_size)
+  // getActualSize      == 3*initial_size
+  // getBlocksInPool    == 4:
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  //    block #3 (Whole Block: alloc2(initial_size))
+  //    block #4 (Whole Block: alloc3(initial_size))
+  // getReleaseableSize == 0
+  //
   void* alloc3 = nullptr;
   ASSERT_NO_THROW({ alloc3 = alloc.allocate(initial_size); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getCurrentSize(), 16+(2*initial_size));
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
 
+  //
+  // After deallocate(alloc3), we expect the pool to look like:
+  // getCurrentSize     == 16+(1*initial_size)
+  // getActualSize      == 3*initial_size
+  // getBlocksInPool    == 3:
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  //    block #3 (Whole Block: alloc2(initial_size))
+  //    block #4 (Whole Block: free(initial_size))
+  // getReleaseableSize == 1*initial_size
+  //
   ASSERT_NO_THROW({ alloc.deallocate(alloc3); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getCurrentSize(), 16+(1*initial_size));
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 
+  //
+  // After deallocate(alloc2), we expect the pool to look like:
+  // getCurrentSize     == 16
+  // getActualSize      == 3*initial_size
+  // getBlocksInPool    == 3:
+  //    block #1 (Partial Block: alloc1(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  //    block #3 (Whole Block: free(initial_size))
+  //    block #4 (Whole Block: free(initial_size))
+  // getReleaseableSize == 2*initial_size
+  //
   ASSERT_NO_THROW({ alloc.deallocate(alloc2); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getCurrentSize(), 16);
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
 
+  //
+  // After deallocate(alloc1), we expect the pool to look like:
+  // getCurrentSize     == 0
+  // getActualSize      == 3*initial_size
+  // getBlocksInPool    == 3:
+  //    block #1 (Whole Block: free(initial_size))
+  //    block #2 (Whole Block: free(initial_size))
+  //    block #3 (Whole Block: free(initial_size))
+  // getReleaseableSize == 3*initial_size
+  //
   ASSERT_NO_THROW({ alloc.deallocate(alloc1); });
-  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
   ASSERT_EQ(alloc.getActualSize(), 3*initial_size);
-  ASSERT_EQ(dynamic_pool->getReleasableSize(), 2*initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 3*initial_size);
+
+  //
+  // After release, we expect the pool to look like:
+  // getCurrentSize     == 0
+  // getActualSize      == 0
+  // getBlocksInPool    == 0
+  // getReleaseableSize == 0
+  //
+  EXPECT_NO_THROW(alloc.release());
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+  ASSERT_EQ(alloc.getActualSize(), 0);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 0);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+
+  //
+  // final_alloc final_alloc=allocate(16), we expect the pool to look like:
+  // getCurrentSize     == 16
+  // getActualSize      == initial_size
+  // getBlocksInPool    == 2:
+  //    block #1 (Partial Block: final_alloc(16))
+  //    block #2 (Partial Block: free(initial_size-16))
+  // getReleaseableSize == 0
+  //
+  void* final_alloc = nullptr;
+  ASSERT_NO_THROW({ final_alloc = alloc.allocate(16); });
+  ASSERT_EQ(alloc.getCurrentSize(), 16);
+  ASSERT_EQ(alloc.getActualSize(), initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+
+  //
+  // After deallocate(final_alloc), we expect the pool to look like:
+  // getCurrentSize     == 0
+  // getActualSize      == initial_size
+  // getBlocksInPool    == 1:
+  //    block #1 (Whole Block: free(initial_size))
+  // getReleaseableSize == 1*initial_size
+  //
+  ASSERT_NO_THROW({ alloc.deallocate(final_alloc); });
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
+  ASSERT_EQ(alloc.getActualSize(), initial_size);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+  ASSERT_EQ(dynamic_pool->getReleasableSize(), initial_size);
 }
 
 #if defined(UMPIRE_ENABLE_NUMA)

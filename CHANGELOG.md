@@ -24,6 +24,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Add a basic GitLab pipeline testing builds on LC systems.
 
+- CI tests installation.
+
 ### Changed
 
 - Adjust notifications for CI jobs.
@@ -34,7 +36,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Generalized Strategy.Device test for all resources.
 
-- Moved `tools/plot_allocations` to `tools/analysis`.
+- Moved `tools/plot_allocations` to `tools/analysis/plot_allocations`.
+
+- DynamicPool will try and merge blocks after each deallocation of memory in the
+  pool.
 
 - Logging output no longer prints to stdout.
 
