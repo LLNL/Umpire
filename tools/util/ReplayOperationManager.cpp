@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <fstream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
@@ -20,6 +21,13 @@
 #include "umpire/ResourceManager.hpp"
 #include "util/ReplayMacros.hpp"
 #include "util/ReplayOperationManager.hpp"
+
+#if !defined(_MSC_VER)
+#include <unistd.h>   // getpid()
+#else
+#include <process.h>
+#define getpid _getpid
+#endif
 
 ReplayOperation::ReplayOperation(
     ReplayOperationManager& my_manager
@@ -463,8 +471,57 @@ void ReplayOperationManager::runOperations()
 
   m_op.makeMemoryResources();
 
+  auto& rm = umpire::ResourceManager::getInstance();
+
   for (auto op : operations) {
     op->runOperations();
+
+    for (const auto& alloc_name : rm.getAllocatorNames()) {
+      auto alloc = rm.getAllocator(alloc_name);
+
+      std::string cur_stat_name{alloc_name + " current_size"};
+      std::string actual_stat_name{alloc_name + " actual_size"};
+      std::string hwn_stat_name{alloc_name + " hwn"};
+      m_stat_series[cur_stat_name].push_back(
+          std::make_pair(
+            std::chrono::steady_clock::now(),
+            alloc.getCurrentSize()));
+
+      m_stat_series[actual_stat_name].push_back(
+          std::make_pair(
+            std::chrono::steady_clock::now(),
+            alloc.getActualSize()));
+
+      m_stat_series[hwn_stat_name].push_back(
+          std::make_pair(
+            std::chrono::steady_clock::now(),
+            alloc.getHighWatermark()));
+    }
+  }
+
+  dumpStats();
+}
+
+void ReplayOperationManager::dumpStats()
+{
+  std::ofstream file;
+  const int pid{getpid()};
+
+  const std::string filename{"replay" + std::to_string(pid) + ".ult"};
+  file.open(filename);
+
+  for (const auto& stat_series : m_stat_series) {
+    file << "# " << stat_series.first << std::endl;
+    for (const auto& entry : stat_series.second) {
+      std::chrono::steady_clock::time_point t;
+      std::size_t val;
+      std::tie(t, val) = entry;
+
+      file 
+        <<  std::chrono::duration_cast<std::chrono::nanoseconds>(
+            t.time_since_epoch()).count() 
+        << " " << val << std::endl;
+    }
   }
 }
 

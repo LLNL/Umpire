@@ -26,6 +26,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI tests installation.
 
+- Added statistic gathering capability to `replay`
+
 ### Changed
 
 - Adjust notifications for CI jobs.

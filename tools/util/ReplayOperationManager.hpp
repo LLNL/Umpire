@@ -185,6 +185,8 @@ public:
 
   void runOperations();
 
+  void dumpStats();
+
   void makeMemoryResource( const std::string& resource_name );
 
   //
@@ -403,6 +405,8 @@ private:
   std::vector<ReplayOperation*> operations;
   std::vector<std::string> m_resource_names;
   umpire::util::AllocationMap m_allocation_map;
+
+  std::map<std::string, std::vector< std::pair<std::chrono::steady_clock::time_point, std::size_t>>> m_stat_series;
 };
 
 #include "util/ReplayOperationManager.inl"
