@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #include "umpire/strategy/StdAllocator.hpp"
 #include "umpire/strategy/FixedSizePool.hpp"
