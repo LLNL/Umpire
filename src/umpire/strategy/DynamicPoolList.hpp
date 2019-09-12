@@ -23,10 +23,10 @@
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/DynamicSizePool.hpp"
 
-#include "umpire/Allocator.hpp"
-
-
 namespace umpire {
+
+class Allocator;
+
 namespace strategy {
 
 /*!
@@ -50,7 +50,7 @@ class DynamicPoolList :
      * The registered heuristic callback function will be called immediately
      * after a deallocation() has completed from the pool.
      */
-    using Coalesce_Heuristic = std::function<bool( const strategy::DynamicPoolList& )>;
+    using CoalesceHeuristic = std::function<bool( const strategy::DynamicPoolList& )>;
 
     /*!
      * \brief Construct a new DynamicPoolList.
@@ -68,7 +68,7 @@ class DynamicPoolList :
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        Coalesce_Heuristic coalesce_heuristic = heuristic_percent_releasable_list(100)) noexcept;
+        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable_list(100)) noexcept;
 
     void* allocate(size_t bytes) override;
 
@@ -107,7 +107,7 @@ class DynamicPoolList :
     DynamicSizePool<>* dpa;
 
     strategy::AllocationStrategy* m_allocator;
-    Coalesce_Heuristic do_coalesce;
+    CoalesceHeuristic do_coalesce;
 };
 
 } // end of namespace strategy

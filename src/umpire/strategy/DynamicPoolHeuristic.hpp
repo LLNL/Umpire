@@ -8,7 +8,6 @@
 #define UMPIRE_DynamicPoolHeuristic_HPP
 
 #include <functional>
-#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {

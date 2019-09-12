@@ -15,6 +15,8 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
@@ -152,6 +154,8 @@ using Strategies = ::testing::Types<
   umpire::strategy::AllocationAdvisor,
 #endif
   umpire::strategy::DynamicPool,
+  umpire::strategy::DynamicPoolList,
+  umpire::strategy::DynamicPoolMap,
   umpire::strategy::FixedPool,
   umpire::strategy::MixedPool,
   umpire::strategy::MonotonicAllocationStrategy,

@@ -14,6 +14,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/DynamicPoolList.hpp"
 
+#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -28,7 +29,7 @@ DynamicPoolList::DynamicPoolList(
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
     const std::size_t min_alloc_size,
-    Coalesce_Heuristic coalesce_heuristic) noexcept
+    CoalesceHeuristic coalesce_heuristic) noexcept
   :
   AllocationStrategy(name, id),
   dpa(nullptr),
