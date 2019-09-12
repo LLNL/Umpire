@@ -257,8 +257,6 @@ void DynamicPoolMap::deallocate(void* ptr)
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
 
-  mergeFreeBlocks();
-
   if (m_coalesce_heuristic(*this)) {
     UMPIRE_LOG(Debug, this
                << " heuristic function returned true, calling coalesce()");
