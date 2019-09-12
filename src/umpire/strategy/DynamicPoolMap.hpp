@@ -163,6 +163,8 @@ class DynamicPoolMap : public AllocationStrategy
      */
     std::size_t releaseFreeBlocks();
 
+    void do_coalesce();
+
     strategy::AllocationStrategy* m_allocator;
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;

@@ -260,7 +260,7 @@ void DynamicPoolMap::deallocate(void* ptr)
   if (m_coalesce_heuristic(*this)) {
     UMPIRE_LOG(Debug, this
                << " heuristic function returned true, calling coalesce()");
-    coalesce();
+    do_coalesce();
   }
 }
 
@@ -415,20 +415,7 @@ void DynamicPoolMap::coalesce()
   // Coalesce differs from release in that it puts back a single block of the size it released
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
-  mergeFreeBlocks();
-  // Now all possible the free blocks that could be merged have been
-
-  // Only release and create new block if more than one block is present
-  if (m_free_map.size() > 1) {
-    const std::size_t released_bytes{releaseFreeBlocks()};
-    // Deallocated and removed released_bytes from m_free_map
-
-    // If this removed anything from the map, re-allocate a single large chunk and insert to free map
-    if (released_bytes > 0) {
-      const Pointer ptr{allocateBlock(released_bytes)};
-      insertFree(ptr, released_bytes, true, released_bytes);
-    }
-  }
+  do_coalesce();
 }
 
 void DynamicPoolMap::release()
@@ -443,6 +430,24 @@ void DynamicPoolMap::release()
 
   // NOTE This differs from coalesce above in that it does not reallocate a
   // free block to keep actual size the same.
+}
+
+void DynamicPoolMap::do_coalesce()
+{
+  mergeFreeBlocks();
+  // Now all possible the free blocks that could be merged have been
+
+  // Only release and create new block if more than one block is present
+  if (m_free_map.size() > 1) {
+    const std::size_t released_bytes{releaseFreeBlocks()};
+    // Deallocated and removed released_bytes from m_free_map
+
+    // If this removed anything from the map, re-allocate a single large chunk and insert to free map
+    if (released_bytes > 0) {
+      const Pointer ptr{allocateBlock(released_bytes)};
+      insertFree(ptr, released_bytes, true, released_bytes);
+    }
+  }
 }
 
 } // end of namespace strategy

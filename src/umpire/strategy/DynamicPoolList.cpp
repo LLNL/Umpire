@@ -57,7 +57,7 @@ DynamicPoolList::deallocate(void* ptr)
   if ( do_coalesce(*this) ) {
     UMPIRE_LOG(Debug, "Heuristic returned true, "
         "performing coalesce operation for " << this << "\n");
-    coalesce();
+    dpa->coalesce();
   }
 }
 
@@ -116,7 +116,7 @@ DynamicPoolList::getPlatform() noexcept
 void
 DynamicPoolList::coalesce() noexcept
 {
-  UMPIRE_REPLAY( "coalesce," << getName());
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
   dpa->coalesce();
 }
 
