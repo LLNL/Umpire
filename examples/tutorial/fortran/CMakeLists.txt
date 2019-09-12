@@ -7,10 +7,9 @@
 blt_add_executable(
   NAME tut_allocator_f
   SOURCES tut_allocator.f
-  DEPENDS_ON
-    umpire
-  OUTPUT_DIR ${tutorial_dir}
-)
+  DEPENDS_ON umpire
+  OUTPUT_DIR ${tutorial_output_dir})
+list(APPEND umpire_tutorials tut_allocator_f)
 
 set_source_files_properties(
   tut_allocator.f
@@ -24,7 +23,7 @@ set_source_files_properties(
 #     umpire
 #   OUTPUT_DIR ${tutorial_dir}
 # )
-# 
+#
 # blt_add_executable(
 #   NAME tut_pool_f
 #   SOURCES tut_pool.f
