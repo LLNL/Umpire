@@ -8,11 +8,23 @@
 #define _FIXEDSIZEPOOL_HPP
 
 #include <cstring>
-#define  _XOPEN_SOURCE_EXTENDED 1
-#include <strings.h>
 #include <iostream>
 #include <stdio.h>
 #include "StdAllocator.hpp"
+
+namespace {
+  static int find_first_set(int i)
+  {
+#if defined(_MSC_VER)
+    unsigned long bit;
+    unsigned long i_l = static_cast<unsigned long>(i);
+    _BitScanForward(&bit, i_l);
+    return static_cast<int>(bit);
+#else
+    return ffs(i);
+#endif
+  }
+}
 
 template<class T, class MA, class IA = StdAllocator, int NP=(1<<6)>
 class FixedSizePool
@@ -48,7 +60,7 @@ protected:
     if (!p->numAvail) return NULL;
 
     for (int i = 0; i < NP; i++) {
-      const int bit = ffs(p->avail[i]) - 1;
+      const int bit = find_first_set(p->avail[i]) - 1;
       if (bit >= 0) {
         p->avail[i] ^= 1 << bit;
         p->numAvail--;
