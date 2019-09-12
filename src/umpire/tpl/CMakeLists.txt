@@ -93,4 +93,24 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
+set (influxdb_headers
+  influxdb/influxdb.hpp)
+
+blt_add_library(
+  NAME umpire_tpl_influxdb
+  HEADERS ${influxdb_headers})
+
+target_link_libraries(umpire_tpl_influxdb INTERFACE)
+
+install(FILES
+  ${influxdb_headers}
+  DESTINATION include/umpire/tpl/influxdb)
+
+install(TARGETS
+  umpire_tpl_influxdb
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
 add_subdirectory(judy)

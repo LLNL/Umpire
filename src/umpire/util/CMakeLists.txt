@@ -21,6 +21,7 @@ set (umpire_util_headers
   allocation_statistics.hpp
   detect_vendor.hpp
   make_unique.hpp
+  record_event.hpp
   wrap_allocator.hpp)
 
 if (ENABLE_STATISTICS)
@@ -61,7 +62,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends umpire_tpl_judy)
+set (umpire_util_depends umpire_tpl_judy umpire_tpl_influxdb)
 
 if (ENABLE_NUMA)
   set (umpire_util_depends

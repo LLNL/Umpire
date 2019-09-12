@@ -7,3 +7,6 @@
 [submodule "src/umpire/tpl/cxxopts"]
 	path = src/umpire/tpl/cxxopts
 	url = https://github.com/LLNL/cxxopts.git
+[submodule "src/umpire/tpl/influxdb"]
+	path = src/umpire/tpl/influxdb
+	url = https://github.com/orca-zhang/influxdb-cpp.git

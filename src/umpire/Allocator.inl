@@ -14,6 +14,8 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
 
+#include "umpire/util/record_event.hpp"
+
 namespace umpire {
 
 inline void*
@@ -32,6 +34,12 @@ Allocator::allocate(std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
+
+  util::record_event(util::event::allocate{}, getName(), bytes, ret);
+  util::record_event(util::event::current_size{}, getName(), getCurrentSize());
+  util::record_event(util::event::actual_size{}, getName(),  getActualSize());
+  util::record_event(util::event::hwm{}, getName(), getHighWatermark());
+
   return ret;
 }
 
@@ -43,6 +51,8 @@ Allocator::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
+
+  util::record_event(util::event::deallocate{}, getName(), ptr);
 
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer");
