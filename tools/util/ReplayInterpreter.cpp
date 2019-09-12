@@ -399,7 +399,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
         );
       }
     }
-    else if ( type == "umpire::strategy::DynamicPoolMap" ) {
+    else if ( type == "umpire::strategy::DynamicPool" || type == "umpire::strategy::DynamicPoolMap" ) {
       const std::string& base_allocator_name = m_json["payload"]["args"][0];
 
       std::size_t initial_alloc_size;
