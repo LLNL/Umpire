@@ -62,7 +62,7 @@ DynamicPoolList::release()
 std::size_t
 DynamicPoolList::getCurrentSize() const noexcept
 {
-  long CurrentSize = dpa->getCurrentSize();
+  std::size_t CurrentSize = dpa->getCurrentSize();
   UMPIRE_LOG(Debug, "() returning " << CurrentSize);
   return CurrentSize;
 }
@@ -70,7 +70,7 @@ DynamicPoolList::getCurrentSize() const noexcept
 std::size_t
 DynamicPoolList::getActualSize() const noexcept
 {
-  long ActualSize = dpa->getActualSize();
+  std::size_t ActualSize = dpa->getActualSize();
   UMPIRE_LOG(Debug, "() returning " << ActualSize);
   return ActualSize;
 }
@@ -78,7 +78,7 @@ DynamicPoolList::getActualSize() const noexcept
 std::size_t
 DynamicPoolList::getHighWatermark() const noexcept
 {
-  long HighWatermark = dpa->getHighWatermark();
+  std::size_t HighWatermark = dpa->getHighWatermark();
   UMPIRE_LOG(Debug, "() returning " << HighWatermark);
   return HighWatermark;
 }
@@ -86,7 +86,7 @@ DynamicPoolList::getHighWatermark() const noexcept
 std::size_t
 DynamicPoolList::getReleasableSize() const noexcept
 {
-  long SparseBlockSize = dpa->getReleasableSize();
+  std::size_t SparseBlockSize = dpa->getReleasableSize();
   UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);
   return SparseBlockSize;
 }
@@ -94,7 +94,7 @@ DynamicPoolList::getReleasableSize() const noexcept
 std::size_t
 DynamicPoolList::getBlocksInPool() const noexcept
 {
-  long BlocksInPool = dpa->getBlocksInPool();
+  std::size_t BlocksInPool = dpa->getBlocksInPool();
   UMPIRE_LOG(Debug, "() returning " << BlocksInPool);
   return BlocksInPool;
 }
