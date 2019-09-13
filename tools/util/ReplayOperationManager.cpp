@@ -44,13 +44,13 @@ void ReplayOperation::runOperations()
 //
 // DynamicPool
 //
-void ReplayOperation::makeDynamicPool(
+void ReplayOperation::makeDynamicPoolMap(
     const bool introspection
   , const std::string& allocator_name
   , const std::string& base_allocator_name
   , const std::size_t initial_alloc_size
   , const std::size_t min_alloc_size
-  , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   , int alignment
 )
 {
@@ -59,7 +59,7 @@ void ReplayOperation::makeDynamicPool(
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_my_manager.m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , initial_alloc_size
@@ -75,7 +75,7 @@ void ReplayOperation::makeDynamicPool(
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_my_manager.m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , initial_alloc_size
@@ -88,13 +88,13 @@ void ReplayOperation::makeDynamicPool(
   }
 }
 
-void ReplayOperation::makeDynamicPool(
+void ReplayOperation::makeDynamicPoolMap(
     const bool introspection
   , const std::string& allocator_name
   , const std::string& base_allocator_name
   , const std::size_t initial_alloc_size
   , const std::size_t min_alloc_size
-  , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
 )
 {
   if (introspection) {
@@ -102,7 +102,7 @@ void ReplayOperation::makeDynamicPool(
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_my_manager.m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , initial_alloc_size
@@ -117,12 +117,53 @@ void ReplayOperation::makeDynamicPool(
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_my_manager.m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , initial_alloc_size
             , min_alloc_size
             , umpire::strategy::heuristic_percent_releasable(0)
+          )
+      );
+    };
+  }
+}
+
+void ReplayOperation::makeDynamicPoolList(
+    const bool introspection
+  , const std::string& allocator_name
+  , const std::string& base_allocator_name
+  , const std::size_t initial_alloc_size
+  , const std::size_t min_alloc_size
+  , umpire::strategy::DynamicPoolList::CoalesceHeuristic /* h_fun */
+)
+{
+  if (introspection) {
+    op = [=]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , initial_alloc_size
+            , min_alloc_size
+            , umpire::strategy::heuristic_percent_releasable_list(0)
+          )
+      );
+    };
+  }
+  else {
+    op = [=]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , initial_alloc_size
+            , min_alloc_size
+            , umpire::strategy::heuristic_percent_releasable_list(0)
           )
       );
     };
@@ -276,7 +317,7 @@ void ReplayOperation::makeMixedPool(
   , const std::size_t size_multiplier
   , const std::size_t dynamic_initial_alloc_bytes
   , const std::size_t dynamic_min_alloc_bytes
-  , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   , int alignment
 )
 {
@@ -332,7 +373,7 @@ void ReplayOperation::makeMixedPool(
   , const std::size_t size_multiplier
   , const std::size_t dynamic_initial_alloc_bytes
   , const std::size_t dynamic_min_alloc_bytes
-  , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
 )
 {
   if (introspection) {
@@ -407,13 +448,17 @@ void ReplayOperation::makeCoalesce(
   op = [=]() {
     auto& rm = umpire::ResourceManager::getInstance();
     auto alloc = rm.getAllocator(allocator_name);
-    auto dynamic_pool =
-      umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
-    if (dynamic_pool)
+    try {
+      auto dynamic_pool =
+        umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(alloc);
       dynamic_pool->coalesce();
-    else
-      REPLAY_ERROR(allocator_name << " is not a dynamic pool, skipping");
+    }
+    catch(...) {
+      auto dynamic_pool =
+        umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(alloc);
+      dynamic_pool->coalesce();
+    }
   };
 }
 
@@ -582,18 +627,18 @@ void ReplayOperationManager::makeFixedPool(
 //
 // Dynamic Pool
 //
-void ReplayOperationManager::makeDynamicPool(
+void ReplayOperationManager::makeDynamicPoolMap(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
     , const std::size_t initial_alloc_size
     , const std::size_t min_alloc_size
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
     , int alignment
 ) {
   m_cont_op = new ReplayOperation(*this);
 
-  m_cont_op->makeDynamicPool(
+  m_cont_op->makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name
@@ -606,17 +651,17 @@ void ReplayOperationManager::makeDynamicPool(
   operations.push_back(m_cont_op);
 }
 
-void ReplayOperationManager::makeDynamicPool(
+void ReplayOperationManager::makeDynamicPoolMap(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
     , const std::size_t initial_alloc_size
     , const std::size_t min_alloc_size
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
 ) {
   m_cont_op = new ReplayOperation(*this);
 
-  m_cont_op->makeDynamicPool(
+  m_cont_op->makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name
@@ -628,7 +673,7 @@ void ReplayOperationManager::makeDynamicPool(
   operations.push_back(m_cont_op);
 }
 
-void ReplayOperationManager::makeDynamicPool(
+void ReplayOperationManager::makeDynamicPoolMap(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -636,7 +681,7 @@ void ReplayOperationManager::makeDynamicPool(
 ) {
   m_cont_op = new ReplayOperation(*this);
 
-  m_cont_op->makeDynamicPool(
+  m_cont_op->makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name
@@ -646,14 +691,70 @@ void ReplayOperationManager::makeDynamicPool(
   operations.push_back(m_cont_op);
 }
 
-void ReplayOperationManager::makeDynamicPool(
+void ReplayOperationManager::makeDynamicPoolMap(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
 ) {
   m_cont_op = new ReplayOperation(*this);
 
-  m_cont_op->makeDynamicPool(
+  m_cont_op->makeDynamicPoolMap(
+              introspection
+            , allocator_name
+            , base_allocator_name
+  );
+
+  operations.push_back(m_cont_op);
+}
+
+void ReplayOperationManager::makeDynamicPoolList(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t initial_alloc_size
+    , const std::size_t min_alloc_size
+    , umpire::strategy::DynamicPoolList::CoalesceHeuristic /* h_fun */
+) {
+  m_cont_op = new ReplayOperation(*this);
+
+  m_cont_op->makeDynamicPoolList(
+              introspection
+            , allocator_name
+            , base_allocator_name
+            , initial_alloc_size
+            , min_alloc_size
+            , umpire::strategy::heuristic_percent_releasable_list(0)
+  );
+
+  operations.push_back(m_cont_op);
+}
+
+void ReplayOperationManager::makeDynamicPoolList(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t initial_alloc_size
+) {
+  m_cont_op = new ReplayOperation(*this);
+
+  m_cont_op->makeDynamicPoolList(
+              introspection
+            , allocator_name
+            , base_allocator_name
+            , initial_alloc_size
+  );
+
+  operations.push_back(m_cont_op);
+}
+
+void ReplayOperationManager::makeDynamicPoolList(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+) {
+  m_cont_op = new ReplayOperation(*this);
+
+  m_cont_op->makeDynamicPoolList(
               introspection
             , allocator_name
             , base_allocator_name
@@ -746,7 +847,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t size_multiplier
   , const std::size_t dynamic_initial_alloc_bytes
   , const std::size_t dynamic_min_alloc_bytes
-  , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   , int alignment
 )
 {
@@ -779,7 +880,7 @@ void ReplayOperationManager::makeMixedPool(
   , const std::size_t size_multiplier
   , const std::size_t dynamic_initial_alloc_bytes
   , const std::size_t dynamic_min_alloc_bytes
-  , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+  , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
 )
 {
   m_cont_op = new ReplayOperation(*this);
