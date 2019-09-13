@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "StdAllocator.hpp"
 
-#if defined(MSC_VER)
+#if defined(_MSC_VER)
 #pragma warning( push )
 #pragma warning( disable: 4244 )
 #pragma warning( disable: 4245 )
@@ -166,7 +166,7 @@ public:
   std::size_t poolSize() const { return totalPoolSize; }
 };
 
-#if defined(MSC_VER)
+#if defined(_MSC_VER)
 #pragma warning( pop )
 #endif
 
