@@ -20,7 +20,6 @@
       - /_lnone/
     variables:
       - $UMPIRE_CI_LASSEN == "OFF"
-  allow_failure: true
 
 ####
 # Here are all lassen build jobs
@@ -44,21 +43,25 @@ build_lassen_clang_coral_2017_06_29:
   variables:
     COMPILER: "clang_coral_2017_06_29"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_clang_coral_2017_08_31:
   variables:
     COMPILER: "clang_coral_2017_08_31"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_clang_coral_2017_09_06:
   variables:
     COMPILER: "clang_coral_2017_09_06"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_clang_coral_2017_09_18:
   variables:
     COMPILER: "clang_coral_2017_09_18"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_nvcc_gcc_4_9_3:
   variables:
@@ -69,24 +72,29 @@ build_lassen_nvcc_clang_coral_2017_06_29:
   variables:
     COMPILER: "nvcc_clang_coral_2017_06_29"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_nvcc_clang_coral_2017_08_31:
   variables:
     COMPILER: "nvcc_clang_coral_2017_08_31"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_nvcc_clang_coral_2017_09_06:
   variables:
     COMPILER: "nvcc_clang_coral_2017_09_06"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_nvcc_clang_coral_2017_09_18:
   variables:
     COMPILER: "nvcc_clang_coral_2017_09_18"
   extends: .build_lassen
+  allow_failure: true
 
 build_lassen_nvcc_xl-beta-2017.09.13:
   variables:
     COMPILER: "nvcc_xl-beta-2017.09.13"
   extends: .build_lassen
+  allow_failure: true
 
