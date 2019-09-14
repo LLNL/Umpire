@@ -1,3 +1,13 @@
+# v1.1.0
+
+- Added symbol `umpire_ver_1_detected` to help detect version mismatches when
+  linking multiple libraries that all use Umpire.
+
+- Re-introduced pool algorithm used in pre-1.0.0 releases as `DynamicPoolList`,
+  and renamed current strategy to `DynamicPoolMap`. `DynamicPool` is now an
+  alias to `DynamicPoolMap`.
+
+
 # v1.0.1
 
 - Fixed a bug in DynamicPool where memory could be leaked when allocating a new
