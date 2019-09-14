@@ -7,7 +7,6 @@
   and renamed current strategy to `DynamicPoolMap`. `DynamicPool` is now an
   alias to `DynamicPoolMap`.
 
-
 # v1.0.1
 
 - Fixed a bug in DynamicPool where memory could be leaked when allocating a new
