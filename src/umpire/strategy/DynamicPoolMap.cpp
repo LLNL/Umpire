@@ -5,8 +5,10 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
+#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -24,7 +26,7 @@ inline static std::size_t round_up(std::size_t num, std::size_t factor)
 namespace umpire {
 namespace strategy {
 
-DynamicPool::DynamicPool(const std::string& name,
+DynamicPoolMap::DynamicPoolMap(const std::string& name,
                          int id,
                          Allocator allocator,
                          const std::size_t initial_alloc_bytes,
@@ -33,6 +35,7 @@ DynamicPool::DynamicPool(const std::string& name,
                          const int align_bytes) noexcept :
   AllocationStrategy(name, id),
   m_allocator{allocator.getAllocationStrategy()},
+  m_initial_alloc_bytes{round_up(initial_alloc_bytes, align_bytes)},
   m_min_alloc_bytes{round_up(min_alloc_bytes, align_bytes)},
   m_align_bytes{align_bytes},
   m_coalesce_heuristic{coalesce_heuristic},
@@ -46,7 +49,7 @@ DynamicPool::DynamicPool(const std::string& name,
   insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
 }
 
-DynamicPool::~DynamicPool()
+DynamicPoolMap::~DynamicPoolMap()
 {
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
@@ -78,26 +81,31 @@ DynamicPool::~DynamicPool()
     std::size_t whole_bytes;
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
-    if (is_head && bytes == whole_bytes) m_allocator->deallocate(addr);
+    if (is_head && bytes == whole_bytes) deallocateBlock(addr, bytes);
+  }
+
+  if (m_used_map.size() == 0) {
+    UMPIRE_ASSERT(m_curr_bytes == 0);
+    UMPIRE_ASSERT(m_actual_bytes == 0);
   }
 }
 
-void DynamicPool::insertUsed(Pointer addr, std::size_t bytes, bool is_head,
+void DynamicPoolMap::insertUsed(Pointer addr, std::size_t bytes, bool is_head,
                              std::size_t whole_bytes)
 {
   m_used_map.insert(std::make_pair(addr, std::make_tuple(bytes, is_head,
                                                          whole_bytes)));
 }
 
-void DynamicPool::insertFree(Pointer addr, std::size_t bytes, bool is_head,
+void DynamicPoolMap::insertFree(Pointer addr, std::size_t bytes, bool is_head,
                              std::size_t whole_bytes)
 {
   m_free_map.insert(std::make_pair(bytes, std::make_tuple(addr, is_head,
                                                           whole_bytes)));
 }
 
-DynamicPool::SizeMap::const_iterator
-DynamicPool::findFreeBlock(std::size_t bytes) const
+DynamicPoolMap::SizeMap::const_iterator
+DynamicPoolMap::findFreeBlock(std::size_t bytes) const
 {
   SizeMap::const_iterator iter{m_free_map.upper_bound(bytes)};
 
@@ -114,7 +122,7 @@ DynamicPool::findFreeBlock(std::size_t bytes) const
   return iter;
 }
 
-void* DynamicPool::allocateFromResource(std::size_t bytes)
+void* DynamicPool::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
@@ -127,6 +135,7 @@ void* DynamicPool::allocateFromResource(std::size_t bytes)
                << getFreeBlocks() << " Free Blocks, "
                << getInUseBlocks() << " Used Blocks\n"
       );
+    mergeFreeBlocks();
     releaseFreeBlocks();
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource.  "
@@ -152,7 +161,17 @@ void* DynamicPool::allocateFromResource(std::size_t bytes)
       throw;
     }
   }
+
+  // Add to count
+  m_actual_bytes += bytes;
+
   return ptr;
+}
+
+void DynamicPool::deallocateBlock(void* ptr, std::size_t bytes)
+{
+  m_actual_bytes -= bytes;
+  m_allocator->deallocate(ptr);
 }
 
 void* DynamicPool::allocate(std::size_t bytes)
@@ -175,7 +194,7 @@ void* DynamicPool::allocate(std::size_t bytes)
     insertUsed(ptr, rounded_bytes, is_head, whole_bytes);
 
     // Remove the entry from the free map
-    const std::size_t free_size = iter->first;
+    const std::size_t free_size{iter->first};
     m_free_map.erase(iter);
 
     m_curr_bytes += rounded_bytes;
@@ -188,12 +207,14 @@ void* DynamicPool::allocate(std::size_t bytes)
     }
   } else {
     // Allocate new block -- note this does not check whether alignment is met
-    const std::size_t alloc_bytes{std::max(rounded_bytes, m_min_alloc_bytes)};
-    ptr = allocateFromResource(alloc_bytes);
+    const std::size_t min_block_size =
+      ( m_actual_bytes == 0 ) ? m_initial_alloc_bytes : m_min_alloc_bytes;
+
+    const std::size_t alloc_bytes{std::max(rounded_bytes, min_block_size)};
+    ptr = allocateBlock(alloc_bytes);
 
     // Add used
     insertUsed(ptr, rounded_bytes, true, alloc_bytes);
-    m_actual_bytes += alloc_bytes;
     m_curr_bytes += rounded_bytes;
 
     const std::size_t left_bytes{alloc_bytes - rounded_bytes};
@@ -209,7 +230,7 @@ void* DynamicPool::allocate(std::size_t bytes)
   return ptr;
 }
 
-void DynamicPool::deallocate(void* ptr)
+void DynamicPoolMap::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_ASSERT(ptr);
@@ -227,9 +248,10 @@ void DynamicPool::deallocate(void* ptr)
     // Insert in free map
     insertFree(ptr, bytes, is_head, whole_bytes);
 
-    // remove from used map
+    // Remove from used map
     m_used_map.erase(iter);
 
+    // Update currentSize
     m_curr_bytes -= bytes;
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
@@ -238,46 +260,46 @@ void DynamicPool::deallocate(void* ptr)
   if (m_coalesce_heuristic(*this)) {
     UMPIRE_LOG(Debug, this
                << " heuristic function returned true, calling coalesce()");
-    coalesce();
+    do_coalesce();
   }
 }
 
-std::size_t DynamicPool::getCurrentSize() const noexcept
+std::size_t DynamicPoolMap::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_curr_bytes);
   return m_curr_bytes;
 }
 
-std::size_t DynamicPool::getActualSize() const noexcept
+std::size_t DynamicPoolMap::getActualSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_actual_bytes);
   return m_actual_bytes;
 }
 
-std::size_t DynamicPool::getHighWatermark() const noexcept
+std::size_t DynamicPoolMap::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
-std::size_t DynamicPool::getFreeBlocks() const noexcept
+std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
 {
   return m_free_map.size();
 }
 
-std::size_t DynamicPool::getInUseBlocks() const noexcept
+std::size_t DynamicPoolMap::getInUseBlocks() const noexcept
 {
   return m_used_map.size();
 }
 
-std::size_t DynamicPool::getBlocksInPool() const noexcept
+std::size_t DynamicPoolMap::getBlocksInPool() const noexcept
 {
   const std::size_t total_blocks{getFreeBlocks() + getInUseBlocks()};
   UMPIRE_LOG(Debug, "() returning " << total_blocks);
   return total_blocks;
 }
 
-std::size_t DynamicPool::getReleasableSize() const noexcept
+std::size_t DynamicPoolMap::getReleasableSize() const noexcept
 {
   std::size_t releasable_bytes{0};
   for (auto& rec : m_free_map) {
@@ -292,16 +314,18 @@ std::size_t DynamicPool::getReleasableSize() const noexcept
   return releasable_bytes;
 }
 
-Platform DynamicPool::getPlatform() noexcept
+Platform DynamicPoolMap::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }
 
-void DynamicPool::mergeFreeBlocks()
+void DynamicPoolMap::mergeFreeBlocks()
 {
   if (m_free_map.size() < 2) return;
 
   using PointerMap = std::map<Pointer, SizeTuple>;
+
+  UMPIRE_LOG(Debug, "() Free blocks before: " << getFreeBlocks());
 
   // Make a free block map from pointers -> size pairs
   PointerMap free_pointer_map;
@@ -337,6 +361,7 @@ void DynamicPool::mergeFreeBlocks()
     // Check if we can merge *it and *next_it
     const bool contiguous{this_addr + this_bytes == next_addr};
     if (contiguous && !next_is_head) {
+      UMPIRE_ASSERT(this_whole_bytes == next_whole_bytes);
       std::get<0>(it->second) += next_bytes;
       next_it = free_pointer_map.erase(next_it);
     } else {
@@ -354,14 +379,13 @@ void DynamicPool::mergeFreeBlocks()
     std::tie(bytes, is_head, whole_bytes) = rec.second;
     insertFree(ptr, bytes, is_head, whole_bytes);
   }
+
+  UMPIRE_LOG(Debug, "() Free blocks after: " << getFreeBlocks());
 }
 
-std::size_t DynamicPool::releaseFreeBlocks()
+std::size_t DynamicPoolMap::releaseFreeBlocks()
 {
   UMPIRE_LOG(Debug, "()");
-
-  // Coalesce first so that we are able to release the most memory possible
-  mergeFreeBlocks();
 
   std::size_t released_bytes{0};
 
@@ -376,8 +400,7 @@ std::size_t DynamicPool::releaseFreeBlocks()
     std::tie(ptr, is_head, whole_bytes) = it->second;
     if (is_head && bytes == whole_bytes) {
       released_bytes += bytes;
-      m_actual_bytes -= bytes;
-      m_allocator->deallocate(ptr);
+      deallocateBlock(ptr, bytes);
       it = m_free_map.erase(it);
     } else {
       ++it;
@@ -387,33 +410,15 @@ std::size_t DynamicPool::releaseFreeBlocks()
   return released_bytes;
 }
 
-void DynamicPool::coalesce()
+void DynamicPoolMap::coalesce()
 {
   // Coalesce differs from release in that it puts back a single block of the size it released
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
-  mergeFreeBlocks();
-  // Now all possible the free blocks that could be merged have been
-
-  // Only release and create new block if more than one block is present
-  if (m_free_map.size() > 1) {
-    const std::size_t released_bytes{releaseFreeBlocks()};
-    // Deallocated and removed released_bytes from m_free_map
-
-    // If this removed anything from the map, re-allocate a single large chunk
-    if (released_bytes > 0) {
-      const std::size_t actual_bytes{round_up(released_bytes, m_align_bytes)};
-
-      const Pointer ptr{m_allocator->allocate(actual_bytes)};
-      m_actual_bytes += actual_bytes;
-
-      // Add used
-      insertFree(ptr, actual_bytes, true, actual_bytes);
-    }
-  }
+  do_coalesce();
 }
 
-void DynamicPool::release()
+void DynamicPoolMap::release()
 {
   UMPIRE_LOG(Debug, "()");
 
@@ -425,6 +430,24 @@ void DynamicPool::release()
 
   // NOTE This differs from coalesce above in that it does not reallocate a
   // free block to keep actual size the same.
+}
+
+void DynamicPoolMap::do_coalesce()
+{
+  mergeFreeBlocks();
+  // Now all possible the free blocks that could be merged have been
+
+  // Only release and create new block if more than one block is present
+  if (m_free_map.size() > 1) {
+    const std::size_t released_bytes{releaseFreeBlocks()};
+    // Deallocated and removed released_bytes from m_free_map
+
+    // If this removed anything from the map, re-allocate a single large chunk and insert to free map
+    if (released_bytes > 0) {
+      const Pointer ptr{allocateBlock(released_bytes)};
+      insertFree(ptr, released_bytes, true, released_bytes);
+    }
+  }
 }
 
 } // end of namespace strategy

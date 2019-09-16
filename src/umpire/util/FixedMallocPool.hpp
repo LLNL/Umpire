@@ -7,8 +7,6 @@
 #ifndef UMPIRE_FixedMallocPool_HPP
 #define UMPIRE_FixedMallocPool_HPP
 
-#include "umpire/Allocator.hpp"
-
 #include <cstdlib>
 #include <vector>
 

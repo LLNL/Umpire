@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (alloc_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/alloc)
+set (alloc_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/alloc)
 
 set (memory_allocator_tests_depends
   umpire gtest)
@@ -24,7 +24,7 @@ blt_add_executable(
   NAME memory_allocator_tests
   SOURCES memory_allocator_tests.cpp
   DEPENDS_ON ${memory_allocator_tests_depends}
-  OUTPUT_DIR ${alloc_dir})
+  OUTPUT_DIR ${alloc_output_dir})
 
 target_include_directories(
   memory_allocator_tests

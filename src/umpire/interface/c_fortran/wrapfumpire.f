@@ -495,14 +495,14 @@ module umpire_mod
                 allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_pool")
-            use iso_c_binding, only : C_CHAR, C_INT, C_PTR
+            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
             type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
-            integer(C_INT), value, intent(IN) :: initial_size
-            integer(C_INT), value, intent(IN) :: block
+            integer(C_SIZE_T), value, intent(IN) :: initial_size
+            integer(C_SIZE_T), value, intent(IN) :: block
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_pool
@@ -511,15 +511,15 @@ module umpire_mod
                 name, Lname, allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_pool")
-            use iso_c_binding, only : C_CHAR, C_INT, C_PTR
+            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
             type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
             type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
-            integer(C_INT), value, intent(IN) :: initial_size
-            integer(C_INT), value, intent(IN) :: block
+            integer(C_SIZE_T), value, intent(IN) :: initial_size
+            integer(C_SIZE_T), value, intent(IN) :: block
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_pool
@@ -1443,12 +1443,12 @@ contains
     function resourcemanager_make_allocator_pool(obj, name, allocator, &
             initial_size, block) &
             result(SHT_rv)
-        use iso_c_binding, only : C_INT, C_PTR
+        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
         character(len=*), intent(IN) :: name
         type(UmpireAllocator), value, intent(IN) :: allocator
-        integer(C_INT), value, intent(IN) :: initial_size
-        integer(C_INT), value, intent(IN) :: block
+        integer(C_SIZE_T), value, intent(IN) :: initial_size
+        integer(C_SIZE_T), value, intent(IN) :: block
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
         ! splicer begin class.ResourceManager.method.make_allocator_pool

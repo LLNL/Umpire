@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+import json
+from sys import argv
+import matplotlib.pyplot as plt
+
+def create_trace(data):
+    resources = {}
+    trace = {}
+    ientry = 0
+    while ientry < len(data):
+        d = data[ientry]
+        event = d['event']
+        if event == 'makeMemoryResource':
+            name = d['payload']['name']
+            strategy = d['result']
+            resources[strategy] = {'name' : name, 'size' : 0.0, 'ptr_map' : {}}
+            trace[strategy] = {'timestamps' : [], 'sizes' : []}
+        elif event == 'makeAllocator' and 'result' in d:
+            name = d['payload']['allocator_name']
+            strategy = d['result']['allocator_ref']
+            resources[strategy] = {'name' : name, 'size' : 0.0, 'ptr_map' : {}}
+            trace[strategy] = {'timestamps' : [], 'sizes' : []}
+        elif event == 'allocate':
+            if data[ientry+1]['event'] != 'allocation_map_insert':
+                ientry += 1
+                continue
+            strategy = d['payload']['allocator_ref']
+            ptr = data[ientry+1]['payload']['ptr']
+            size = int(d['payload']['size'])
+            timestamp = int(d['timestamp'])
+            resources[strategy]['size'] += size
+            resources[strategy]['ptr_map'][ptr] = size
+            trace[strategy]['timestamps'].append(timestamp)
+            trace[strategy]['sizes'].append(resources[strategy]['size'])
+            ientry += 1
+        elif event == 'deallocate':
+            if data[ientry+1]['event'] != 'allocation_map_remove':
+                ientry += 1
+                continue
+            strategy = d['payload']['allocator_ref']
+            ptr = d['payload']['memory_ptr']
+            size = resources[strategy]['ptr_map'][ptr]
+            timestamp = int(d['timestamp'])
+            del resources[strategy]['ptr_map'][ptr]
+            resources[strategy]['size'] -= size
+            trace[strategy]['timestamps'].append(timestamp)
+            trace[strategy]['sizes'].append(resources[strategy]['size'])
+        ientry += 1
+
+    for strategy in trace:
+        if len(trace[strategy]['timestamps']) == 0: continue
+
+        extent = trace[strategy]['timestamps'][-1] - trace[strategy]['timestamps'][0]
+        first = trace[strategy]['timestamps'][0]
+        if extent == 0: continue
+        x = [float(t-first)/1e9 for t in trace[strategy]['timestamps']]
+        y = [float(s)/1e6 for s in trace[strategy]['sizes']]
+        plt.plot(x, y, label=resources[strategy]['name'])
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Allocated size [MB]')
+        plt.legend(loc='best')
+    plt.show()
+
+if __name__ == '__main__':
+    with open(argv[1], mode='r') as f:
+        data = [json.loads(l) for l in f]
+
+    create_trace(data)

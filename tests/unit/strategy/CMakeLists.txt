@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (strategy_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/strategy)
+set (strategy_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/strategy)
 
 set (strategy_tests_depends
   umpire gtest)
@@ -17,13 +17,18 @@ blt_add_executable(
   NAME fixed_pool_tests
   SOURCES fixed_pool_tests.cpp
   DEPENDS_ON ${strategy_tests_depends}
-  OUTPUT_DIR ${strategy_dir})
-
-target_include_directories(
-  memory_allocator_tests
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
+  OUTPUT_DIR ${strategy_output_dir})
 
 blt_add_test(
   NAME fixed_pool_tests
   COMMAND fixed_pool_tests)
+
+blt_add_executable(
+  NAME dynamic_pool_tests
+  SOURCES dynamic_pool_tests.cpp
+  DEPENDS_ON ${strategy_tests_depends}
+  OUTPUT_DIR ${strategy_output_dir})
+
+blt_add_test(
+  NAME dynamic_pool_tests
+  COMMAND dynamic_pool_tests)
