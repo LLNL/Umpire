@@ -43,6 +43,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Logging output no longer prints to stdout.
 
+- LC GitLab CI now using lassen by default instead of butte.
+
 ### Removed
 
 - Extraneous TODOs.
