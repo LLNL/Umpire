@@ -45,6 +45,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - DynamicPool is now an alias to DynamicPoolMap.
 
+- LC GitLab CI now using lassen by default instead of butte.
+
 ### Removed
 
 - Extraneous TODOs.
