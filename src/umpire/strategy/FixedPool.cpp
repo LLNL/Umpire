@@ -19,7 +19,10 @@
 #include <strings.h>
 #endif
 
-static int find_first_set(int i)
+namespace umpire {
+namespace strategy {
+
+inline int find_first_set(int i)
 {
 #if defined(_MSC_VER)
   unsigned long bit;
@@ -31,8 +34,6 @@ static int find_first_set(int i)
 #endif
 }
 
-namespace umpire {
-namespace strategy {
 
 static constexpr std::size_t bits_per_int = sizeof(int) * 8;
 

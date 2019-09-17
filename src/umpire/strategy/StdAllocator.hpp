@@ -4,17 +4,18 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DynamicPool_HPP
-#define UMPIRE_DynamicPool_HPP
+#ifndef _STDALLOCATOR_HPP
+#define _STDALLOCATOR_HPP
 
-#include "umpire/strategy/DynamicPoolMap.hpp"
+#include <cstdlib>
 
-namespace umpire {
-namespace strategy {
-
-using DynamicPool = DynamicPoolMap;
-
-} // end of namespace strategy
-} // end of namespace umpire
+struct StdAllocator
+{
+  static inline void* allocate(std::size_t size) { return std::malloc(size); }
+  static inline void  deallocate(void *ptr) { std::free(ptr); }
+};
 
 #endif
+
+
+

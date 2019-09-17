@@ -13,7 +13,7 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
@@ -58,7 +58,7 @@ class MixedPool :
       std::size_t fixed_size_multiplier = 16,                  // 16x over previous size
       const std::size_t dynamic_initial_alloc_size = (512 * 1024 * 1024),
       const std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
-      DynamicPool::CoalesceHeuristic dynamic_coalesce_heuristic = heuristic_percent_releasable(100),
+      DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic = heuristic_percent_releasable(100),
       const int dynamic_align_bytes = 16) noexcept;
 
     void* allocate(std::size_t bytes) override;
@@ -77,7 +77,7 @@ class MixedPool :
     IntMap m_map;
     std::vector<std::size_t> m_fixed_pool_map;
     std::vector<std::unique_ptr<FixedPool>> m_fixed_pool;
-    DynamicPool m_dynamic_pool;
+    DynamicPoolMap m_dynamic_pool;
     AllocationStrategy* m_allocator;
 };
 

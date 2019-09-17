@@ -10,11 +10,16 @@ set (umpire_strategy_headers
   AllocationTracker.hpp
   DynamicPool.hpp
   DynamicPoolHeuristic.hpp
+  DynamicPoolList.hpp
+  DynamicPoolMap.hpp
+  DynamicSizePool.hpp
   FixedPool.hpp
+  FixedSizePool.hpp
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   SizeLimiter.hpp
+  StdAllocator.hpp
   ThreadSafeAllocator.hpp
   ZeroByteHandler.hpp)
 
@@ -31,7 +36,8 @@ set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
   AllocationTracker.cpp
-  DynamicPool.cpp
+  DynamicPoolList.cpp
+  DynamicPoolMap.cpp
   DynamicPoolHeuristic.cpp
   FixedPool.cpp
   MixedPool.cpp
