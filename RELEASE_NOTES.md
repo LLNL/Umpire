@@ -1,3 +1,12 @@
+# v2.0.0
+
+- Moved implementation of allocate and deallocate out of inline function in
+  order to properly hide implementation details that cause compilation problems
+  for applications of Umpire.
+
+  Since this is a change in inline functions, we need to increase the major
+  release number as it breaks binary compatability with previous releases.
+
 # v1.1.0
 
 - Added symbol `umpire_ver_1_detected` to help detect version mismatches when
