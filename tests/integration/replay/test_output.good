@@ -1,4 +1,4 @@
-{ "kind":"replay", "uid":61689, "timestamp":1568324170024996000, "event": "version", "payload": { "major":1, "minor":0, "patch":1, "rc": "7028eba" } }
+{ "kind":"replay", "uid":61689, "timestamp":1568324170024996000, "event": "version", "payload": { "major":2, "minor":0, "patch":0, "rc": "0" } }
 { "kind":"replay", "uid":61689, "timestamp":1568324170025192000, "event": "makeMemoryResource", "payload": { "name": "HOST" }, "result": "0x7feee9402c80" }
 { "kind":"replay", "uid":61689, "timestamp":1568324170025286000, "event": "makeAllocator", "payload": { "type":"umpire::strategy::MixedPool", "with_introspection":true, "allocator_name":"host_mixedpool_default", "args": [ "HOST" ] } }
 { "kind":"replay", "uid":61689, "timestamp":1568324170025576000, "event": "allocation_map_insert", "payload": { "ptr": "0x109e52000", "record_ptr": "0x109e52000", "record_size": "536870912", "record_strategy": "0x7feee9402c80" } }

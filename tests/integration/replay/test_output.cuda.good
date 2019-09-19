@@ -1,4 +1,4 @@
-{ "kind":"replay", "uid":124865, "timestamp":1568313296616100944, "event": "version", "payload": { "major":1, "minor":0, "patch":1, "rc": "4541a8b" } }
+{ "kind":"replay", "uid":124865, "timestamp":1568313296616100944, "event": "version", "payload": { "major":2, "minor":0, "patch":0, "rc": "0" } }
 { "kind":"replay", "uid":124865, "timestamp":1568313296616150034, "event": "makeMemoryResource", "payload": { "name": "HOST" }, "result": "0x10263c10" }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697146405, "event": "makeMemoryResource", "payload": { "name": "DEVICE" }, "result": "0x102ea120" }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697177296, "event": "makeMemoryResource", "payload": { "name": "PINNED" }, "result": "0x102ea2a0" }
