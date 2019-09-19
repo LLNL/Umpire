@@ -32,7 +32,7 @@ Don't forget, these strategies can be created on top of any valid Allocator:
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
                     :lines: 36-46
 
-Most Umpire users will make alloctations that use the GPU via the
+Most Umpire users will make allocations that use the GPU via the
 :class:`umpire::strategy::DynamicPool`, to help mitigate the cost of allocating
 memory on these devices.
 
