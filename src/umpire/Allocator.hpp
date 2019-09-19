@@ -167,6 +167,15 @@ class Allocator {
      */
     Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
+    /*!
+     * \brief internal implementation of allocate
+     */
+    void* allocate_impl(std::size_t bytes);
+
+    /*!
+     * \brief internal implementation of deallocate
+     */
+    void deallocate_impl(void* ptr);
 
     /*!
      * \brief Pointer to the AllocationStrategy used by this Allocator.

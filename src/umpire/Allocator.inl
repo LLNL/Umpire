@@ -11,45 +11,20 @@
 
 #include "umpire/Allocator.hpp"
 
-#include "umpire/util/Macros.hpp"
-#include "umpire/Replay.hpp"
-
 namespace umpire {
 
-inline void*
+void*
 Allocator::allocate(std::size_t bytes)
 {
-  void* ret = nullptr;
-
   umpire_ver_1_found = 0;
 
-  UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }");
-
-  ret = m_allocator->allocate(bytes);
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
-
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
-  return ret;
+  return allocate_impl(bytes);
 }
 
-inline void
+void
 Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
-
-  UMPIRE_LOG(Debug, "(" << ptr << ")");
-
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
-
-  if (!ptr) {
-    UMPIRE_LOG(Info, "Deallocating a null pointer");
-    return;
-  } else {
-    m_allocator->deallocate(ptr);
-  }
+  deallocate_impl(ptr);
 }
 
 } // end of namespace umpire
