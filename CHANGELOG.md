@@ -6,6 +6,20 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Develop Branch]
+
+### Added
+
+### Changed
+
+- LC GitLab CI now using lassen by default instead of butte.
+
+### Removed
+
+### Fixed
+
+- Fixed PGI compiler failures
+
 ## [1.1.0] - 2019-09-14
 
 ### Added
