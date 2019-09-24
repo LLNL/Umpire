@@ -7,6 +7,8 @@
 #ifndef UMPIRE_MemoryResourceTypes_HPP
 #define UMPIRE_MemoryResourceTypes_HPP
 
+#include <string>
+
 namespace umpire {
 namespace resource {
 
@@ -19,7 +21,7 @@ struct MemoryResourceTypeHash
     }
 };
 
-
+// When this is updated, make sure to update the functions below
 enum MemoryResourceType {
   Host,
   Device,
@@ -27,6 +29,9 @@ enum MemoryResourceType {
   Pinned,
   Constant
 };
+
+std::string type_to_string(MemoryResourceType type);
+MemoryResourceType string_to_type(const std::string& string);
 
 } // end of namespace resource
 } // end of namespace umpire

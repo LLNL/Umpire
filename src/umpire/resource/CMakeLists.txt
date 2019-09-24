@@ -20,6 +20,7 @@ set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
+  MemoryResourceTypes.cpp
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
 )

@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - LC GitLab CI now using lassen by default instead of butte.
 
+- Lazy initialization of memory resources, so that users can add their own.
+
 ### Removed
 
 ### Fixed

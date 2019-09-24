@@ -41,7 +41,7 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
     }
   }
 
-  UMPIRE_ERROR("MemoryResource " << name << " not found");
+  return std::unique_ptr<resource::MemoryResource>{};
 }
 
 } // end of namespace resource

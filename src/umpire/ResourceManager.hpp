@@ -37,13 +37,6 @@ class ResourceManager {
     static ResourceManager& getInstance();
 
     /*!
-     * \brief Initialize the ResourceManager.
-     *
-     * This will create all registered MemoryResource objects
-     */
-    void initialize();
-
-    /*!
      * \brief Get the names of all available Allocator objects.
      */
     std::vector<std::string> getAllocatorNames() const noexcept;
@@ -239,7 +232,12 @@ class ResourceManager {
 
     strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
     strategy::AllocationStrategy* findAllocatorForId(int id);
-    strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
+
+    strategy::AllocationStrategy*
+    getAllocationStrategy(const std::string& name);
+
+    strategy::AllocationStrategy*
+    getAllocationStrategy(resource::MemoryResourceType resource_type);
 
     int getNextId() noexcept;
 
@@ -252,7 +250,7 @@ class ResourceManager {
     std::list<std::unique_ptr<strategy::AllocationStrategy> > m_allocators;
 
     std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
-    std::unordered_map<std::string, strategy::AllocationStrategy* > m_allocators_by_name;
+    std::unordered_map<std::string, strategy::AllocationStrategy*> m_allocators_by_name;
     std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash > m_memory_resources;
 
     strategy::AllocationStrategy* m_default_allocator;
