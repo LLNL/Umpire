@@ -67,7 +67,7 @@ def run_test():
 
     check_file_exists(output_filename)
     with open(output_filename) as output_file:
-        check_output(output_filename, output_file, 'initialize Umpire')
+        check_output(output_filename, output_file, 'ResourceManager Umpire')
 
 if __name__ == '__main__':
     import sys
