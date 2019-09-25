@@ -205,8 +205,8 @@ strategy::AllocationStrategy*
 ResourceManager::getAllocationStrategy(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
-  auto allocator = m_allocators_by_name.find(name);
-  if (allocator == m_allocators_by_name.end()) {
+  auto strategy = m_allocators_by_name.find(name);
+  if (strategy == m_allocators_by_name.end()) {
     // There's a chance that this is a resource that was not yet initialized
     resource::MemoryResourceRegistry& registry{
       resource::MemoryResourceRegistry::getInstance()};
@@ -232,7 +232,7 @@ ResourceManager::getAllocationStrategy(const std::string& name)
 
     return m_allocators_by_name[name];
   } else {
-    return allocator->second;
+    return strategy->second;
   }
 }
 
