@@ -26,13 +26,13 @@ MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
 }
 
 void
-MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory)
+MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory) noexcept
 {
   m_allocator_factories.push_back(std::move(factory));
 }
 
 std::unique_ptr<resource::MemoryResource>
-MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
+MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id) noexcept
 {
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {

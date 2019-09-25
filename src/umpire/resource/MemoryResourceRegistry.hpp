@@ -21,9 +21,9 @@ class MemoryResourceRegistry {
     static MemoryResourceRegistry& getInstance() noexcept;
 
     std::unique_ptr<resource::MemoryResource>
-    makeMemoryResource(const std::string& name, int id);
+    makeMemoryResource(const std::string& name, int id) noexcept;
 
-    void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
+    void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory) noexcept;
 
     MemoryResourceRegistry(const MemoryResourceRegistry&) = delete;
     MemoryResourceRegistry& operator=(const MemoryResourceRegistry&) = delete;
