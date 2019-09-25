@@ -42,6 +42,11 @@ class MemoryResourceFactory {
      * \param id ID of the MemoryResource.
      */
     virtual std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id) = 0;
+
+    /*!
+     * \brief Return the string handle for the resource.
+     */
+    virtual std::string handle() const noexcept = 0;
 };
 
 } // end of namespace strategy

@@ -22,7 +22,7 @@ namespace resource {
 bool
 HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name.compare("HOST") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -56,6 +56,11 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::cpu, "HOST", id, traits);
+}
+
+std::string HostResourceFactory::handle() const noexcept
+{
+  return "HOST";
 }
 
 } // end of namespace resource

@@ -19,7 +19,7 @@ bool
 HipPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("PINNED") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -39,6 +39,11 @@ HipPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
   return util::make_unique<resource::DefaultMemoryResource<alloc::HipPinnedAllocator>>(Platform::hip, "PINNED", id, traits);
+}
+
+std::string HipPinnedMemoryResourceFactory::handle() const noexcept
+{
+  return "PINNED";
 }
 
 } // end of namespace resource

@@ -18,7 +18,7 @@ bool
 NullMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("__umpire_internal_null") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -38,6 +38,11 @@ NullMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return util::make_unique<NullMemoryResource>(Platform::none, "__umpire_internal_null", id, traits);
+}
+
+std::string NullMemoryResourceFactory::handle() const noexcept
+{
+  return "__umpire_internal_null";
 }
 
 } // end of namespace resource

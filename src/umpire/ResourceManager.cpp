@@ -227,7 +227,9 @@ ResourceManager::getAllocationStrategy(const std::string& name)
       m_allocators_by_id[id] = allocator.get();
       m_allocators.emplace_front(std::move(allocator));
     } else {
-      UMPIRE_ERROR("Allocator does not exist and could not find an appropriate resource");
+      UMPIRE_ERROR("Allocator does not exist and could not find an appropriate resource. "
+                   << "\n\tAllocators: " << getAllocatorInformation()
+                   << "\n\t Resources: " << registry.getResourceInformation());
     }
 
     return m_allocators_by_name[name];

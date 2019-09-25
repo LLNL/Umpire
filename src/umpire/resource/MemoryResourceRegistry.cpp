@@ -9,6 +9,8 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
 
+#include <sstream>
+
 namespace umpire {
 namespace resource {
 
@@ -43,6 +45,18 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id) noex
 
   return std::unique_ptr<resource::MemoryResource>{};
 }
+
+std::string MemoryResourceRegistry::getResourceInformation() const noexcept
+{
+  std::ostringstream info;
+
+  for (auto const& allocator_factory : m_allocator_factories) {
+    info << allocator_factory->handle() << " ";
+  }
+
+  return info.str();
+}
+
 
 } // end of namespace resource
 } // end of namespace umpire

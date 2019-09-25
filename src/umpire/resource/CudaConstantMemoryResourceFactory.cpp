@@ -18,7 +18,7 @@ bool
 CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("DEVICE_CONST") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -39,6 +39,11 @@ CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(n
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return util::make_unique<resource::CudaConstantMemoryResource>("DEVICE_CONST", id, traits);
+}
+
+std::string CudaConstantMemoryResourceFactory::handle() const noexcept
+{
+  return "DEVICE_CONST";
 }
 
 } // end of namespace resource

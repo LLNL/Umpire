@@ -22,7 +22,7 @@ bool
 CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("UM") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -49,6 +49,11 @@ CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(na
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(Platform::cuda, "UM", id, traits);
+}
+
+std::string CudaUnifiedMemoryResourceFactory::handle() const noexcept
+{
+  return "UM";
 }
 
 } // end of namespace resource

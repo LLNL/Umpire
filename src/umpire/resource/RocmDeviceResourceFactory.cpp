@@ -18,7 +18,7 @@ bool
 RocmDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("DEVICE") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -36,6 +36,11 @@ RocmDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return util::make_unique<resource::DefaultMemoryResource<alloc::AmAllocAllocator>>(Platform::rocm, "DEVICE", id, traits);
+}
+
+std::string RocmDeviceResourceFactory::handle() const noexcept
+{
+  return "DEVICE";
 }
 
 } // end of namespace resource

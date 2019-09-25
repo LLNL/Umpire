@@ -19,7 +19,7 @@ bool
 CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("PINNED") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -39,6 +39,11 @@ CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
   return util::make_unique<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(Platform::cuda, "PINNED", id, traits);
+}
+
+std::string CudaPinnedMemoryResourceFactory::handle() const noexcept
+{
+  return "PINNED";
 }
 
 } // end of namespace resource

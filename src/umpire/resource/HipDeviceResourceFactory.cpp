@@ -21,7 +21,7 @@ bool
 HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("DEVICE") == 0) {
+  if (name.compare(handle()) == 0) {
     return true;
   } else {
     return false;
@@ -48,6 +48,11 @@ HipDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return util::make_unique<resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(Platform::hip, "DEVICE", id, traits);
+}
+
+std::string HipDeviceResourceFactory::handle() const noexcept
+{
+  return "DEVICE";
 }
 
 } // end of namespace resource

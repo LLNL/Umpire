@@ -24,6 +24,8 @@ class NullMemoryResourceFactory :
 
   std::unique_ptr<resource::MemoryResource>
   create(const std::string& name, int id) final override;
+
+  std::string handle() const noexcept final override;
 };
 
 } // end of namespace resource

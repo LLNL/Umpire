@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 namespace umpire {
 namespace resource {
@@ -24,6 +25,8 @@ class MemoryResourceRegistry {
     makeMemoryResource(const std::string& name, int id) noexcept;
 
     void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory) noexcept;
+
+    std::string getResourceInformation() const noexcept;
 
     MemoryResourceRegistry(const MemoryResourceRegistry&) = delete;
     MemoryResourceRegistry& operator=(const MemoryResourceRegistry&) = delete;
