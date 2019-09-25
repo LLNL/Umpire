@@ -159,8 +159,8 @@ ResourceManager::ResourceManager() :
   UMPIRE_REPLAY( "\"event\": \"version\", \"payload\": { \"major\":" << UMPIRE_VERSION_MAJOR
                  << ", \"minor\":" << UMPIRE_VERSION_MINOR
                  << ", \"patch\":" << UMPIRE_VERSION_PATCH
-                 << ", \"rc\": \"" << UMPIRE_VERSION_RC << "\"");
-
+                 << ", \"rc\": \"" << UMPIRE_VERSION_RC << "\""
+                 << " }");
   {
     {
       // Zero byte allocator
