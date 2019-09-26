@@ -36,13 +36,20 @@ AllocationAdvisor::AllocationAdvisor(
     Allocator accessing_allocator,
     int device_id) :
   AllocationStrategy(name, id),
-  m_allocator(allocator.getAllocationStrategy()),
-  m_device(device_id)
+  m_size_map{}
+  m_allocator{allocator.getAllocationStrategy()},
+  m_device{device_id}
 {
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  m_advice_operation = op_registry.find(
+  m_set_advice_operation = op_registry.find(
       advice_operation,
+      m_allocator,
+      m_allocator);
+
+  const std::string unset_operation = "UNSET_" + advice_operation;
+  m_unset_advice_operation = op_registry.find(
+      unset_operation,
       m_allocator,
       m_allocator);
 
@@ -59,17 +66,27 @@ void* AllocationAdvisor::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
 
-  m_advice_operation->apply(
+  m_set_advice_operation->apply(
       ptr,
       nullptr,
       m_device,
       bytes);
+
+  m_size_map[ptr] = bytes;
 
   return ptr;
 }
 
 void AllocationAdvisor::deallocate(void* ptr)
 {
+  auto bytes = m_size_map[ptr];
+
+  m_unset_advice_operation->apply(
+      ptr,
+      nullptr,
+      m_device,
+      bytes);
+
   m_allocator->deallocate(ptr);
 
 }

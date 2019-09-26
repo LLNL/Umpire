@@ -28,6 +28,9 @@
 #include "umpire/op/CudaAdviseAccessedByOperation.hpp"
 #include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetAccessedByOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetPreferredLocationOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetReadMostlyOperation.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)
@@ -137,6 +140,25 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
+  registerOperation(
+      "UNSET_ACCESSED_BY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseUnsetAccessedByOperation>());
+
+  registerOperation(
+      "UNSET_PREFERRED_LOCATION",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
+
+  registerOperation(
+      "UNSET_PREFERRED_LOCATION",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
+
+  registerOperation(
+      "UNSET_READ_MOSTLY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)
