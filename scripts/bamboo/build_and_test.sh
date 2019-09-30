@@ -23,13 +23,12 @@ export UMPIRE_DIR=$(git rev-parse --show-toplevel)
 export UMPIRE_DIR_BASE=$(basename $UMPIRE_DIR)
 export BUILD_DIR=../$UMPIRE_DIR_BASE.build-${SYS_TYPE}
 
-export COMPILER=${1:-gcc_4_9_3}
-export BUILD_TYPE=${2:-Release}
-
-echo "rm -rf ${BUILD_DIR} 2> /dev/null"
-# rm -rf ${BUILD_DIR} 2> /dev/null
+rm -rf ${BUILD_DIR} 2> /dev/null
 mkdir -p ${BUILD_DIR} 2> /dev/null
 cd ${BUILD_DIR}
+
+export COMPILER=${1:-gcc_4_9_3}
+export BUILD_TYPE=${2:-Release}
 
 echo "Configuring..."
 
