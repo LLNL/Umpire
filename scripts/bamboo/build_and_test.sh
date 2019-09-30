@@ -17,11 +17,10 @@ function trycmd
   fi
 }
 
-SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
+SCRIPTPATH="$( cd src/"$(dirname "$0")" ; pwd -P )"
 
-export UMPIRE_DIR=$(git rev-parse --show-toplevel)
-export UMPIRE_DIR_BASE=$(basename $UMPIRE_DIR)
-export BUILD_DIR=$UMPIRE_DIR_BASE.build-${SYS_TYPE}
+export UMPIRE_DIR="src"
+export BUILD_DIR=build-${SYS_TYPE}
 
 rm -rf ${BUILD_DIR} 2> /dev/null
 mkdir -p ${BUILD_DIR} 2> /dev/null
@@ -33,9 +32,9 @@ export BUILD_TYPE=${2:-Release}
 echo "Configuring..."
 
 trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-	  -C ${UMPIRE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -C ${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} src/$UMPIRE_DIR_BASE"
+	  -C ../${UMPIRE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -C ../${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../src"
 
 echo "Building..."
 trycmd "make VERBOSE=1 -j"
