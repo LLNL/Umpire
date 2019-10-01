@@ -65,6 +65,24 @@ if (ENABLE_STATISTICS)
   list(APPEND umpire_examples statistics_example)
 endif()
 
+if (ENABLE_CUDA)
+  blt_add_executable(
+    NAME device_allocator_example
+    SOURCES device-allocator.cpp
+    DEPENDS_ON umpire cuda
+  )
+
+  set_source_files_properties(
+    device-allocator.cpp
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  set_target_properties(
+    device_allocator_example
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  list(APPEND umpire_examples device_allocator_example)
+endif()
+
 install(TARGETS ${umpire_examples} DESTINATION ${UMPIRE_EXAMPLE_INSTALL_DIRECTORY})
 
 add_subdirectory(tutorial)

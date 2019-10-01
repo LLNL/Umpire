@@ -13,6 +13,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - `ENABLE_DEVICE_CONST` CMake option to control whether device constant memory
   is enabled. It is now disabled by default.
 
+- `DeviceAllocator` that provides a pool for allocations inside GPU kernels.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.
