@@ -17,7 +17,10 @@ function trycmd
   fi
 }
 
-export BUILD_DIR=build-${SYS_TYPE}
+BUILD_DIR="build-${SYS_TYPE}"
+SOURCE_DIR="$( cd "$(dirname "$0")" ; git rev-parse --show-toplevel )"
+
+echo "Cleaning out previous build..."
 
 rm -rf ${BUILD_DIR} 2> /dev/null
 mkdir -p ${BUILD_DIR} 2> /dev/null
@@ -29,8 +32,8 @@ export BUILD_TYPE=${2:-Release}
 echo "Configuring..."
 
 trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-	  -C ../src/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -C ../src/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -C ${SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -C ${SOURCE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
 	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../src"
 
 echo "Building..."
