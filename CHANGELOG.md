@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- DeviceAllocator that provides a pool for allocations inside GPU kernels.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.
