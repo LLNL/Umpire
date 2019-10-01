@@ -6,17 +6,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-function trycmd
-{
-  echo $1
-  $1
-
-  if [ $? -ne 0 ]; then
-    echo "Error"
-    exit -1
-  fi
-}
-
 function runjob
 {
   echo $1
@@ -28,16 +17,31 @@ function runjob
     cd ${BUILD_DIR}
 
     echo "Configuring..."
-    trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
+
+    cmake -DENABLE_DEVELOPER_DEFAULTS=On \
         -C ${SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
         -C ${SOURCE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-        -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ${SOURCE_DIR}"
+        -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ${SOURCE_DIR}
+
+    if [ $? -ne 0 ]; then
+      echo "Error"
+      exit -1
+    fi
 
     echo "Building..."
-    trycmd "make VERBOSE=1 -j"
+    make VERBOSE=1 -j
+
+    if [ $? -ne 0 ]; then
+      echo "Error"
+      exit -1
+    fi
 
     echo "Testing..."
-    trycmd "ctest --output-on-failure -T Test"
+    ctest --output-on-failure -T Test
+    if [ $? -ne 0 ]; then
+      echo "Error"
+      exit -1
+    fi
 EOF
 }
 
@@ -48,7 +52,14 @@ SOURCE_DIR="$( cd "$(dirname "$0")" ; git rev-parse --show-toplevel )"
 
 if [[ $HOSTNAME == *manta* ]] || [[ $HOSTNAME == *ansel* ]]; then
   runjob "lalloc 1 "
+  if [ $? -ne 0 ]; then
+    echo "Error"
+    exit -1
+  fi
 else
   runjob "srun -ppdebug -t 5 -N 1 "
+  if [ $? -ne 0 ]; then
+    echo "Error"
+    exit -1
+  fi
 fi
-
