@@ -17,16 +17,11 @@ function trycmd
   fi
 }
 
-BUILD_DIR=$1
-SOURCE_DIR=$2
-COMPILER=$3
-BUILD_TYPE=$4
-
 echo "Configuring..."
 trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-    -C ${SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-    -C ${SOURCE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ${SOURCE_DIR}"
+    -C ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
+    -C ${UMPIRE_SOURCE_DIR}/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
+    -DCMAKE_BUILD_TYPE=${UMPIRE_BUILD_TYPE} ${BUILD_OPTIONS} ${UMPIRE_SOURCE_DIR}"
 
 echo "Building..."
 trycmd "make VERBOSE=1 -j"
