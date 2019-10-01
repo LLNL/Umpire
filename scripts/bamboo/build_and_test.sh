@@ -22,17 +22,10 @@ function runjob
   echo $1
   
   $1 << EOF
-    BUILD_DIR="build-${SYS_TYPE}"
-    SOURCE_DIR="$( cd "$(dirname "$0")" ; git rev-parse --show-toplevel )"
-
     echo "Cleaning out previous build..."
-
     rm -rf ${BUILD_DIR} 2> /dev/null
     mkdir -p ${BUILD_DIR} 2> /dev/null
     cd ${BUILD_DIR}
-
-    export COMPILER=${1:-gcc_4_9_3}
-    export BUILD_TYPE=${2:-Release}
 
     echo "Configuring..."
     trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
@@ -47,6 +40,11 @@ function runjob
     trycmd "ctest --output-on-failure -T Test"
 EOF
 }
+
+export COMPILER=${1:-gcc_4_9_3}
+export BUILD_TYPE=${2:-Release}
+BUILD_DIR="build-${SYS_TYPE}"
+SOURCE_DIR="$( cd "$(dirname "$0")" ; git rev-parse --show-toplevel )"
 
 if [[ $HOSTNAME == *manta* ]] || [[ $HOSTNAME == *ansel* ]]; then
   runjob "lalloc 1 "
