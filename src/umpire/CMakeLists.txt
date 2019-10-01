@@ -6,6 +6,7 @@
 ##############################################################################
 set (umpire_headers
   Allocator.hpp
+  Allocator.inl
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
@@ -138,4 +139,4 @@ install(FILES
 
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
-  DESTINATION ${CMAKE_INSTALL_PREFIX})
+  DESTINATION ".")

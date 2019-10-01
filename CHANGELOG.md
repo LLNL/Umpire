@@ -6,7 +6,21 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [Develop Branch]
+
+### Added
+
+### Changed
+
+- LC GitLab CI now using lassen by default instead of butte.
+
+### Removed
+
+### Fixed
+
+- Fixed PGI compiler failures
+
+## [1.1.0] - 2019-09-14
 
 ### Added
 
@@ -18,6 +32,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Add unit tests for the DynamicPool.
 
+- Analysis tool for plotting traces of allocators.
+
+- MixedPool to `allocator_benchmarks.cpp`.
+
+- Add a basic GitLab pipeline testing builds on LC systems.
+
+- CI tests installation.
+
+- The DynamicPool algorithms from 1.0.1 and 0.3.5 are now both available under
+  different strategy names: DynamicPoolMap (1.0.1) and DynamicPoolList (0.3.5).
+
 ### Changed
 
 - Adjust notifications for CI jobs.
@@ -26,7 +51,19 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Update BLT submodule to fix warnings from CMake 3.14 and warnings from HIP library.
 
+- Generalized Strategy.Device test for all resources.
+
+- Moved `tools/plot_allocations` to `tools/analysis/plot_allocations`.
+
+- Logging output no longer prints to stdout.
+
+- DynamicPool is now an alias to DynamicPoolMap.
+
+- LC GitLab CI now using lassen by default instead of butte.
+
 ### Removed
+
+- Extraneous TODOs.
 
 ### Fixed
 
@@ -36,6 +73,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fix signature of C function `umpire_resourcemanager_make_allocator_pool` to
   take size_t not int.
+
+- Restore getActualSize for all Allocator types
+
+## [1.0.1] - 2019-09-04
+
+### Fixed
+
+- Fixed a bug in DynamicPool where memory could be leaked when allocating a new
+  block using the "minimum size" for an allocation smaller than the block.
 
 ## [1.0.0] - 2019-07-12
 

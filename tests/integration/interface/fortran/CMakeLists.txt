@@ -15,8 +15,7 @@ blt_add_executable(
   SOURCES allocator_fortran_tests.F
   DEFINES ${fortran_test_defines}
   DEPENDS_ON fruit umpire
-  OUTPUT_DIR ${interface_dir}
-)
+  OUTPUT_DIR ${interface_output_dir})
 
 set_source_files_properties(
   allocator_fortran_tests.F
@@ -32,8 +31,7 @@ blt_add_executable(
   SOURCES op_fortran_tests.F
   DEFINES ${fortran_test_defines}
   DEPENDS_ON fruit umpire
-  OUTPUT_DIR ${interface_dir}
-)
+  OUTPUT_DIR ${interface_output_dir})
 
 set_source_files_properties(
   op_fortran_tests.F

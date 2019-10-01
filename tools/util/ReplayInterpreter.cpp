@@ -113,12 +113,21 @@ void ReplayInterpreter::buildOperations(void)
           || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
           || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
 
-        REPLAY_ERROR("Warning, version mismatch:\n"
+        REPLAY_WARNING("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
           << m_json["payload"]["major"] << "."
           << m_json["payload"]["minor"]  << "."
           << m_json["payload"]["patch"]);
+
+        if (m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR) {
+          REPLAY_ERROR("Warning, major version mismatch:\n"
+            << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
+            << "  Log  version: "
+            << m_json["payload"]["major"] << "."
+            << m_json["payload"]["minor"]  << "."
+            << m_json["payload"]["patch"]);
+        }
       }
     }
     else {
@@ -178,12 +187,21 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
           || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
           || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
 
-        REPLAY_ERROR("Warning, version mismatch:\n"
+        REPLAY_WARNING("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
           << m_json["payload"]["major"] << "."
           << m_json["payload"]["minor"]  << "."
           << m_json["payload"]["patch"]);
+
+        if (m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR) {
+          REPLAY_ERROR("Warning, major version mismatch:\n"
+            << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
+            << "  Log  version: "
+            << m_json["payload"]["major"] << "."
+            << m_json["payload"]["minor"]  << "."
+            << m_json["payload"]["patch"]);
+        }
       }
     }
     else {
@@ -328,7 +346,60 @@ void ReplayInterpreter::replay_makeAllocator( void )
         }
       }
     }
-    else if ( type == "umpire::strategy::DynamicPool" ) {
+    else if ( type == "umpire::strategy::DynamicPoolList" ) {
+      const std::string& base_allocator_name = m_json["payload"]["args"][0];
+
+      std::size_t initial_alloc_size;
+      std::size_t min_alloc_size;
+
+      // Now grab the optional fields
+      if (m_json["payload"]["args"].size() >= 3) {
+        get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
+        get_from_string(m_json["payload"]["args"][2], min_alloc_size);
+
+        compare_ss << introspection 
+          << " " << allocator_name 
+          << " " << base_allocator_name
+          << " " << initial_alloc_size 
+          << " " << min_alloc_size 
+        ;
+        m_operation_mgr.makeDynamicPoolList(
+              introspection
+            , allocator_name
+            , base_allocator_name
+            , initial_alloc_size
+            , min_alloc_size
+            , umpire::strategy::heuristic_percent_releasable_list(0)
+        );
+      }
+      else if (m_json["payload"]["args"].size() == 2) {
+        get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
+
+        compare_ss << introspection 
+          << " " << allocator_name 
+          << " " << base_allocator_name
+          << " " << initial_alloc_size 
+        ;
+        m_operation_mgr.makeDynamicPoolList(
+              introspection
+            , allocator_name
+            , base_allocator_name
+            , initial_alloc_size
+        );
+      }
+      else {
+        compare_ss << introspection 
+          << " " << allocator_name 
+          << " " << base_allocator_name
+        ;
+        m_operation_mgr.makeDynamicPoolList(
+              introspection
+            , allocator_name
+            , base_allocator_name
+        );
+      }
+    }
+    else if ( type == "umpire::strategy::DynamicPool" || type == "umpire::strategy::DynamicPoolMap" ) {
       const std::string& base_allocator_name = m_json["payload"]["args"][0];
 
       std::size_t initial_alloc_size;
@@ -348,7 +419,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << min_alloc_size 
           << " " << alignment 
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr.makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name
@@ -368,7 +439,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << initial_alloc_size 
           << " " << min_alloc_size 
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr.makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name
@@ -385,7 +456,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << base_allocator_name
           << " " << initial_alloc_size 
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr.makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name
@@ -397,7 +468,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
           << " " << allocator_name 
           << " " << base_allocator_name
         ;
-        m_operation_mgr.makeDynamicPool(
+        m_operation_mgr.makeDynamicPoolMap(
               introspection
             , allocator_name
             , base_allocator_name

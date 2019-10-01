@@ -1,0 +1,14 @@
+on: push
+name: New workflow
+jobs:
+  staticAnalysis:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Static Analysis
+      uses: ./.github/actions/static-analysis
+    - name: Check CHANGELOG
+      uses: ./.github/actions/bin/diff-check
+      with:
+        args: CHANGELOG.md

@@ -68,27 +68,44 @@ public:
   //
   // DynamicPool
   //
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
     , const std::size_t initial_alloc_size
     , const std::size_t min_alloc_size
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
     , int alignment
   );
 
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
     , const std::size_t initial_alloc_size
     , const std::size_t min_alloc_size
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   );
 
   template <typename... Args>
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , Args&&... args
+  );
+
+  void makeDynamicPoolList(
+      const bool introspection
+    , const std::string& allocator_name
+    , const std::string& base_allocator_name
+    , const std::size_t initial_alloc_size
+    , const std::size_t min_alloc_size
+    , umpire::strategy::DynamicPoolList::CoalesceHeuristic /* h_fun */
+  );
+
+  template <typename... Args>
+  void makeDynamicPoolList(
       const bool introspection
     , const std::string& allocator_name
     , const std::string& base_allocator_name
@@ -132,7 +149,7 @@ public:
     , const std::size_t size_multiplier
     , const std::size_t dynamic_initial_alloc_bytes
     , const std::size_t dynamic_min_alloc_bytes
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
     , int alignment
   );
 
@@ -146,7 +163,7 @@ public:
     , const std::size_t size_multiplier
     , const std::size_t dynamic_initial_alloc_bytes
     , const std::size_t dynamic_min_alloc_bytes
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   );
 
   template <typename... Args>
@@ -243,33 +260,55 @@ public:
   //
   // Dynamic Pool
   //
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
       , const std::size_t initial_alloc_size
       , const std::size_t min_alloc_size
-      , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+      , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
       , int alignment
   );
   
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
       , const std::size_t initial_alloc_size
       , const std::size_t min_alloc_size
-      , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+      , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   );
   
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
       , const std::size_t initial_alloc_size
   );
  
-  void makeDynamicPool(
+  void makeDynamicPoolMap(
+        const bool introspection
+      , const std::string& allocator_name
+      , const std::string& base_allocator_name
+  );
+
+  void makeDynamicPoolList(
+        const bool introspection
+      , const std::string& allocator_name
+      , const std::string& base_allocator_name
+      , const std::size_t initial_alloc_size
+      , const std::size_t min_alloc_size
+      , umpire::strategy::DynamicPoolList::CoalesceHeuristic /* h_fun */
+  );
+  
+  void makeDynamicPoolList(
+        const bool introspection
+      , const std::string& allocator_name
+      , const std::string& base_allocator_name
+      , const std::size_t initial_alloc_size
+  );
+ 
+  void makeDynamicPoolList(
         const bool introspection
       , const std::string& allocator_name
       , const std::string& base_allocator_name
@@ -312,7 +351,7 @@ public:
     , const std::size_t size_multiplier
     , const std::size_t dynamic_initial_alloc_bytes
     , const std::size_t dynamic_min_alloc_bytes
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
     , int alignment
   );
 
@@ -326,7 +365,7 @@ public:
     , const std::size_t size_multiplier
     , const std::size_t dynamic_initial_alloc_bytes
     , const std::size_t dynamic_min_alloc_bytes
-    , umpire::strategy::DynamicPool::CoalesceHeuristic /* h_fun */
+    , umpire::strategy::DynamicPoolMap::CoalesceHeuristic /* h_fun */
   );
 
   void makeMixedPool(

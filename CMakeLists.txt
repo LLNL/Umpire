@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 1.0.0)
+  VERSION 1.1.0)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -39,6 +39,9 @@ option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
+
+# Set benchmark installation to OFF
+set(BENCHMARK_ENABLE_INSTALL OFF)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 
@@ -112,20 +115,20 @@ install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
-  set(UMPIRE_TESTS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tests)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
-  set(UMPIRE_BENCHMARKS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/benchmarks)
+  set(UMPIRE_BENCHMARK_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/benchmarks)
   add_subdirectory(benchmarks)
 endif ()
 if (ENABLE_EXAMPLES)
-  set(UMPIRE_EXAMPLES_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/examples)
+  set(UMPIRE_EXAMPLE_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/examples)
   add_subdirectory(examples)
 endif ()
 
 if (ENABLE_TOOLS)
-  set(UMPIRE_TOOLS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+  set(TOOL_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
+  set(UMPIRE_TOOL_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/tools)
   add_subdirectory(tools)
 endif ()
 
