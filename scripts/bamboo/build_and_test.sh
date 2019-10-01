@@ -17,9 +17,6 @@ function trycmd
   fi
 }
 
-SCRIPTPATH="$( cd src/"$(dirname "$0")" ; pwd -P )"
-
-export UMPIRE_DIR="src"
 export BUILD_DIR=build-${SYS_TYPE}
 
 rm -rf ${BUILD_DIR} 2> /dev/null
@@ -32,8 +29,8 @@ export BUILD_TYPE=${2:-Release}
 echo "Configuring..."
 
 trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-	  -C ../${UMPIRE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -C ../${UMPIRE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -C ../src/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+	  -C ../src/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
 	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../src"
 
 echo "Building..."
