@@ -17,34 +17,40 @@ function trycmd
   fi
 }
 
-BUILD_DIR="build-${SYS_TYPE}"
-SOURCE_DIR="$( cd "$(dirname "$0")" ; git rev-parse --show-toplevel )"
+function runjob
+{
+  echo $1
+  
+  $1 << EOF
+    BUILD_DIR="build-${SYS_TYPE}"
+    SOURCE_DIR="$( cd "$(dirname "$0")" ; git rev-parse --show-toplevel )"
 
-echo "Cleaning out previous build..."
+    echo "Cleaning out previous build..."
 
-rm -rf ${BUILD_DIR} 2> /dev/null
-mkdir -p ${BUILD_DIR} 2> /dev/null
-cd ${BUILD_DIR}
+    rm -rf ${BUILD_DIR} 2> /dev/null
+    mkdir -p ${BUILD_DIR} 2> /dev/null
+    cd ${BUILD_DIR}
 
-export COMPILER=${1:-gcc_4_9_3}
-export BUILD_TYPE=${2:-Release}
+    export COMPILER=${1:-gcc_4_9_3}
+    export BUILD_TYPE=${2:-Release}
 
-echo "Configuring..."
+    echo "Configuring..."
+    trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
+        -C ${SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+        -C ${SOURCE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
+        -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ${SOURCE_DIR}"
 
-trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-	  -C ${SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -C ${SOURCE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ${SOURCE_DIR}"
+    echo "Building..."
+    trycmd "make VERBOSE=1 -j"
 
-echo "Building..."
-trycmd "make VERBOSE=1 -j"
+    echo "Testing..."
+    trycmd "ctest --output-on-failure -T Test"
+EOF
+}
 
-#
-# TODO (MJM) - I'm not sure how to obtain exit status for programs run under bsub and srun
-#
-echo "Testing..."
 if [[ $HOSTNAME == *manta* ]] || [[ $HOSTNAME == *ansel* ]]; then
-  lalloc 1 ctest --output-on-failure -T Test
+  runjob "lalloc 1 "
 else
-  srun -ppdebug -t 5 -N 1 ctest --output-on-failure -T Test
+  runjob "srun -ppdebug -t 5 -N 1 "
 fi
+
