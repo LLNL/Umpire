@@ -34,7 +34,7 @@ echo "Configuring..."
 trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
 	  -C ${SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
 	  -C ${SOURCE_DIR}/host-configs/${SYS_TYPE}/${COMPILER}.cmake \
-	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ../src"
+	  -DCMAKE_BUILD_TYPE=${BUILD_TYPE} ${BUILD_OPTIONS} ${SOURCE_DIR}"
 
 echo "Building..."
 trycmd "make VERBOSE=1 -j"
