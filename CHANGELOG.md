@@ -10,9 +10,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- `ENABLE_DEVICE_CONST` CMake option to control whether device constant memory
+  is enabled. It is now disabled by default.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.
+
+- Constant device memory is disabled by default.
+
 
 ### Removed
 
