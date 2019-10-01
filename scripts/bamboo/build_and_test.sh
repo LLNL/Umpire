@@ -63,3 +63,5 @@ else
     exit -1
   fi
 fi
+
+sleep 60
