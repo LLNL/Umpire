@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
   }
 
   t1 = std::chrono::high_resolution_clock::now();
-  const bool print_statistics{command_line_args.count("stats")};
+  const bool print_statistics{command_line_args.count("stats") > 0};
   replay.runOperations(print_statistics);
   t2 = std::chrono::high_resolution_clock::now();
 
