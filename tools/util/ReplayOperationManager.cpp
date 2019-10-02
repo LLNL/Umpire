@@ -529,7 +529,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
 
         std::string cur_stat_name{alloc_name + " current_size"};
         std::string actual_stat_name{alloc_name + " actual_size"};
-        std::string hwn_stat_name{alloc_name + " hwn"};
+        std::string hwm_stat_name{alloc_name + " hwm"};
         
         m_stat_series[cur_stat_name].push_back(
             std::make_pair(
@@ -541,7 +541,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
               op_counter,
               alloc.getActualSize()));
 
-        m_stat_series[hwn_stat_name].push_back(
+        m_stat_series[hwm_stat_name].push_back(
             std::make_pair(
               op_counter,
               alloc.getHighWatermark()));
