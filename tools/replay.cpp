@@ -13,6 +13,7 @@
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "util/ReplayInterpreter.hpp"
+#include "util/ReplayMacros.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -22,6 +23,9 @@ int main(int argc, char* argv[])
     .add_options()
     (  "h, help"
      , "Print help"
+    )
+    (  "a, allocation_map"
+     , "Replay allocation map"
     )
     (  "t, time"
      , "Display replay times"
@@ -39,10 +43,9 @@ int main(int argc, char* argv[])
     exit(0);
   }
 
-  if ( ! command_line_args.count("infile") ) {
-    std::cerr << "No input file specified\n";
-    exit(1);
-  }
+  if ( ! command_line_args.count("infile") )
+    REPLAY_ERROR("No input file specified");
+
   std::string input_file_name = command_line_args["infile"].as<std::string>();
 
   std::chrono::high_resolution_clock::time_point t1;
@@ -51,7 +54,14 @@ int main(int argc, char* argv[])
 
   t1 = std::chrono::high_resolution_clock::now();
   ReplayInterpreter replay(input_file_name);
-  replay.buildOperations();
+
+  if (command_line_args.count("allocation_map")) {
+    replay.buildAllocMapOperations();
+  }
+  else {
+    replay.buildOperations();
+  }
+
   t2 = std::chrono::high_resolution_clock::now();
 
   if (command_line_args.count("time")) {

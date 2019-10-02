@@ -4,23 +4,37 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (util_dir ${UMPIRE_TESTS_OUTPUT_DIR}/unit/util)
+set (util_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/util)
 
 blt_add_executable(
   NAME exception_tests
   SOURCES exception_tests.cpp
   DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${util_dir})
+  OUTPUT_DIR ${util_output_dir})
 
 blt_add_test(
   NAME exception_tests
   COMMAND exception_tests)
 
+set (allocation_map_tests_depends
+  umpire gtest)
+
+if (ENABLE_CUDA)
+  set (allocation_map_tests_depends
+    ${allocation_map_tests_depends}
+    cuda_runtime)
+endif ()
+if (ENABLE_HIP)
+  set (allocation_map_tests_depends
+    ${allocation_map_tests_depends}
+    hip_runtime)
+endif ()
+
 blt_add_executable(
   NAME allocation_map_tests
   SOURCES allocation_map_tests.cpp
-  DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${util_dir})
+  DEPENDS_ON ${allocation_map_tests_depends}
+  OUTPUT_DIR ${util_output_dir})
 
 blt_add_test(
   NAME allocation_map_tests
@@ -30,7 +44,7 @@ blt_add_executable(
   NAME output_buffer_tests
   SOURCES output_buffer_tests.cpp
   DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${util_dir})
+  OUTPUT_DIR ${util_output_dir})
 
 blt_add_test(
   NAME output_buffer_tests
@@ -40,7 +54,7 @@ blt_add_executable(
   NAME memory_map_tests
   SOURCES memory_map_tests.cpp
   DEPENDS_ON umpire gtest
-  OUTPUT_DIR ${util_dir})
+  OUTPUT_DIR ${util_output_dir})
 
 blt_add_test(
   NAME memory_map_tests

@@ -23,11 +23,12 @@ def check_output(name, file_object, expected):
     found = False
 
     for line in file_object:
-        if (expected in line.rstrip()):
+        print(line)
+        if expected in line.rstrip():
             found = True
 
-    if (not found):
-        print("{RED}[   ERROR]{END} Got {contents}".format(contents=contents, expected=expected, **formatters))
+    if not found:
+        print("{RED}[   ERROR]{END} Got {contents}".format(contents=file_object.read(), expected=expected, **formatters))
         errors = errors + 1
     else:
         print("{BLUE}[      OK]{END} Found \"{expected}\" in {name}".format(name=name, expected=expected, **formatters))
@@ -39,7 +40,7 @@ def check_file_exists(filename):
     global errors
 
     print("{BLUE}[RUN     ]{END} Checking {myfile} exists".format(myfile=filename, **formatters))
-    if (not os.path.isfile(filename)):
+    if not os.path.isfile(filename):
         print("{RED}[   ERROR]{END} {myfile} not found".format(myfile=filename, **formatters))
         errors += errors + 1
     else:
@@ -51,7 +52,7 @@ def check_file_not_exists(filename):
     global errors
 
     print("{BLUE}[RUN     ]{END} Checking {myfile} doesn't exist".format(myfile=filename, **formatters))
-    if (not os.path.isfile(filename)):
+    if not os.path.isfile(filename):
         print("{BLUE}[      OK]{END} {myfile} doesn't exist".format(myfile=filename, **formatters))
     else:
         print("{RED}[   ERROR]{END} {myfile} found".format(myfile=filename, **formatters))
@@ -62,7 +63,7 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
     import subprocess
     import os
 
-    cmd_args = ['./iomanager_tests']
+    cmd_args = ['./io_tests']
     if expect_logging:
         cmd_args.append('--enable-logging')
 
@@ -80,9 +81,6 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
 
     output = test_program.stdout
     error = test_program.stderr
-
-    if expect_logging:
-        check_output('stdout', output, 'testing log stream')
 
     check_output('stderr', error, 'testing error stream')
 

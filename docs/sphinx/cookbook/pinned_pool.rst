@@ -12,7 +12,7 @@ Building the pool takes two steps: 1) getting a base "PINNED" allocator, and 2)
 creating the pool:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_pinned_pool.F
-                    :lines: 27-32
+                    :lines: 19-24
 
 The complete example is included below:
 

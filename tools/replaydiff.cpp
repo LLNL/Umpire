@@ -53,6 +53,7 @@ int main(int argc, char* argv[])
   ReplayInterpreter left(left_filename);
   ReplayInterpreter right(right_filename);
 
+  int lineno = 1;
   while (1) {
     std::string left_raw, left_sym;
     std::string right_raw, right_sym;
@@ -72,13 +73,20 @@ int main(int argc, char* argv[])
       return -1;
     }
 
+    // std::cerr << "Line: " << lineno << " " << left_raw << std::endl;
+    // std::cerr << "Line: " << lineno << " " << right_raw << std::endl;
+
     if (left_sym != right_sym) {
       std::cerr << "Miscompare:" << std::endl;
-      std::cerr << left_raw << std::endl;
-      std::cerr << right_raw << std::endl;
+      std::cerr << "Line: " << lineno << left_raw << std::endl;
+      std::cerr << "Line: " << lineno << right_raw << std::endl;
+
+      std::cerr << "Line: " << lineno << left_sym << std::endl;
+      std::cerr << "Line: " << lineno << right_sym << std::endl;
+
       return -2;
     }
-    // std::cout << "OK: " << left_sym;
+    ++lineno;
   }
 
   return 0;

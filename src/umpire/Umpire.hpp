@@ -10,7 +10,7 @@
 #include "umpire/config.hpp"
 
 #include "umpire/util/MPI.hpp"
-#include "umpire/util/IOManager.hpp"
+#include "umpire/util/io.hpp"
 
 #include "umpire/ResourceManager.hpp"
 
@@ -87,6 +87,12 @@ inline
 int get_patch_version()
 {
   return UMPIRE_VERSION_PATCH;
+}
+
+inline
+std::string get_rc_version()
+{
+  return UMPIRE_VERSION_RC;
 }
 
 /*!

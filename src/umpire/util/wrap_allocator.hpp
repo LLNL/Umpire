@@ -7,7 +7,10 @@
 #ifndef UMPIRE_wrap_allocator_HPP
 #define UMPIRE_wrap_allocator_HPP
 
+#include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/AllocationTracker.hpp"
+#include "umpire/strategy/ZeroByteHandler.hpp"
 
 #include "umpire/util/make_unique.hpp"
 
@@ -40,13 +43,12 @@ wrap_allocator(std::unique_ptr<strategy::AllocationStrategy>&& allocator)
 
 template<typename Strategy>
 Strategy*
-unwrap_allocator(Allocator allocator)
+unwrap_allocation_strategy(strategy::AllocationStrategy* base_strategy)
 {
   umpire::strategy::ZeroByteHandler* zero{nullptr};
   umpire::strategy::AllocationTracker* tracker{nullptr};
   Strategy* strategy{nullptr};
 
-  auto base_strategy = allocator.getAllocationStrategy();
   tracker = dynamic_cast<umpire::strategy::AllocationTracker*>(base_strategy);
 
   if (tracker) {
@@ -66,10 +68,17 @@ unwrap_allocator(Allocator allocator)
   }
 
   if (!strategy) {
-    UMPIRE_ERROR("Couldn't unwrap " << allocator.getName() << " to " << typeid(Strategy).name());
+    UMPIRE_ERROR("Couldn't unwrap " << base_strategy->getName() << " to " << typeid(Strategy).name());
   }
 
   return strategy;
+}
+
+template<typename Strategy>
+Strategy*
+unwrap_allocator(Allocator allocator)
+{
+  return unwrap_allocation_strategy<Strategy>(allocator.getAllocationStrategy());
 }
 
 } // end of namespace util

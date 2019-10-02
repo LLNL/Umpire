@@ -2,13 +2,13 @@ strategy:
   matrix:
     linux:
       imageName: 'ubuntu-16.04'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
     windows:
       imageName: 'windows-2019'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_BENCHMARKS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=Off -DENABLE_TOOLS=Off -DENABLE_BENCHMARKS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
     mac:
       imageName: 'macos-10.13'
-      CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=On -DENABLE_TOOLS=On'
+      CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
 
 pool:
   vmImage: $(imageName)
@@ -16,6 +16,7 @@ pool:
 variables:
   DO_BUILD: 'yes'
   DO_TEST: 'yes'
+  DO_INSTALL: 'yes'
   COMPILER: 'g++'
 
 steps:
@@ -45,7 +46,7 @@ steps:
   condition: eq( variables['Agent.OS'], 'Darwin')
 - script:  |
    docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
-   docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
+   docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_INSTALL -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
   condition: eq( variables['Agent.OS'], 'Linux')
   displayName: 'Linux (Docker) Build & Test'
 - task: VSTest@2

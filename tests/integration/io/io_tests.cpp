@@ -9,7 +9,7 @@
 #include "umpire/Umpire.hpp"
 
 #include "umpire/util/MPI.hpp"
-#include "umpire/util/IOManager.hpp"
+#include "umpire/util/io.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
@@ -51,11 +51,11 @@ int main(int argc, char** argv) {
     enable_replay = true;
   }
 
-  umpire::util::IOManager::initialize(enable_logging, enable_replay);
+  umpire::util::initialize_io(enable_logging, enable_replay);
 
-  umpire::log << "testing log stream" << std::endl;
-  umpire::replay << "testing replay stream" << std::endl;
-  umpire::error << "testing error stream" << std::endl;
+  umpire::log() << "testing log stream" << std::endl;
+  umpire::replay() << "testing replay stream" << std::endl;
+  umpire::error() << "testing error stream" << std::endl;
 
 #if defined(UMPIRE_ENABLE_MPI)
   MPI_Finalize();

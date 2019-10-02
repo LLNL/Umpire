@@ -35,7 +35,7 @@ void ReplayOperation::makeAdvisor(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
@@ -48,7 +48,7 @@ void ReplayOperation::makeAdvisor(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
@@ -73,7 +73,7 @@ void ReplayOperation::makeAdvisor(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
@@ -88,7 +88,7 @@ void ReplayOperation::makeAdvisor(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
@@ -116,7 +116,7 @@ void ReplayOperation::makeFixedPool(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::FixedPool, true>
           (  allocator_name
            , rm.getAllocator(base_allocator_name)
@@ -129,7 +129,7 @@ void ReplayOperation::makeFixedPool(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::FixedPool, false>
           (  allocator_name
            , rm.getAllocator(base_allocator_name)
@@ -144,7 +144,7 @@ void ReplayOperation::makeFixedPool(
 // DynamicPool
 //
 template <typename... Args>
-void ReplayOperation::makeDynamicPool(
+void ReplayOperation::makeDynamicPoolMap(
     const bool introspection
   , const std::string& allocator_name
   , const std::string& base_allocator_name
@@ -155,8 +155,8 @@ void ReplayOperation::makeDynamicPool(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , std::forward<Args>(args)...
@@ -168,8 +168,44 @@ void ReplayOperation::makeDynamicPool(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
+          )
+      );
+    };
+  }
+}
+
+template <typename... Args>
+void ReplayOperation::makeDynamicPoolList(
+    const bool introspection
+  , const std::string& allocator_name
+  , const std::string& base_allocator_name
+  , Args&&... args
+)
+{
+  if (introspection) {
+    op = [=]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
+          )
+      );
+    };
+  }
+  else {
+    op = [=]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , std::forward<Args>(args)...
@@ -191,7 +227,7 @@ void ReplayOperation::makeMixedPool(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::MixedPool, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
@@ -204,7 +240,7 @@ void ReplayOperation::makeMixedPool(
     op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_alloc_array.push_back(
+      this->m_my_manager.m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::MixedPool, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)

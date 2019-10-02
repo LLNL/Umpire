@@ -16,14 +16,14 @@ As with the native C++ interface, all allocators are accessed via the
 ``UmpireResourceManager`` type. To get an ``UmpireAllocator``:
 
 .. literalinclude:: ../../../../examples/tutorial/fortran/tut_allocator.f
-                    :lines: 25-26
+                    :lines: 17-18
 
 In this example we fetch the allocator by id, using 0 means you will always get
 a host allocator. Once you have an ``UmpireAllocator``, you can use it to allocate and
 deallocate memory:
 
 .. literalinclude:: ../../../../examples/tutorial/fortran/tut_allocator.f
-                    :lines: 28-34
+                    :lines: 20-24
 
 In this case, we allocate a one-dimensional array using the generic
 ``allocate`` function.

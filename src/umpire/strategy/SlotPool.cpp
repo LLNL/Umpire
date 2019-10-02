@@ -34,6 +34,22 @@ SlotPool::SlotPool(
   }
 }
 
+SlotPool::~SlotPool()
+{
+
+  for (std::size_t i = 0; i < m_slots; ++i) {
+    if (m_pointers[i]) {
+      m_allocator->deallocate(m_pointers[i]);
+      m_pointers[i] = nullptr;
+      m_lengths[i] = 0;
+    }
+  }
+
+  delete[] m_lengths;
+  delete[] m_pointers;
+}
+
+
 void*
 SlotPool::allocate(std::size_t bytes)
 {
