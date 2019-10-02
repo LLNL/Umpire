@@ -18,7 +18,10 @@ allocate_resources_build_quartz:
   script:
     - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${BUILD_QUARTZ_ALLOC_NAME}
   except:
-    - /_qnone/
+    refs:
+      - /_qnone/
+    variables:
+      - $UMPIRE_CI_QUARTZ == "OFF"
 
 ####
 # In post-build phase, deallocate resources
@@ -43,7 +46,7 @@ release_resources_build_quartz:
     - shell
     - quartz
   stage: build
-  extends: .build_quartz_script
+  extends: .build_toss_3_x86_64_ib_script
   except:
     - /_qnone/
 

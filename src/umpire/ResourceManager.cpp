@@ -24,7 +24,9 @@
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 #include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
+#if defined(UMPIRE_ENABLE_CONST)
 #include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
+#endif
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)
@@ -37,7 +39,9 @@
 
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 #include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
+#if defined(UMPIRE_ENABLE_CONST)
 #include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
+#endif
 #endif
 
 #include "umpire/op/MemoryOperationRegistry.hpp"
@@ -110,8 +114,10 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
 
+#if defined(UMPIRE_ENABLE_CONST)
   registry.registerMemoryResource(
     util::make_unique<resource::CudaConstantMemoryResourceFactory>());
+#endif
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)
@@ -129,8 +135,10 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     util::make_unique<resource::HipPinnedMemoryResourceFactory>());
 
+#if defined(UMPIRE_ENABLE_CONST)
   registry.registerMemoryResource(
     util::make_unique<resource::HipConstantMemoryResourceFactory>());
+#endif
 #endif
 
   initialize();
@@ -280,7 +288,7 @@ ResourceManager::initialize()
   }
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_CONST)
   {
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{util::wrap_allocator<

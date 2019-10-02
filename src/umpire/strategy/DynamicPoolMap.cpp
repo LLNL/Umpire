@@ -5,8 +5,10 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
+#include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
@@ -24,7 +26,7 @@ inline static std::size_t round_up(std::size_t num, std::size_t factor)
 namespace umpire {
 namespace strategy {
 
-DynamicPool::DynamicPool(const std::string& name,
+DynamicPoolMap::DynamicPoolMap(const std::string& name,
                          int id,
                          Allocator allocator,
                          const std::size_t initial_alloc_bytes,
@@ -47,7 +49,7 @@ DynamicPool::DynamicPool(const std::string& name,
   insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
 }
 
-DynamicPool::~DynamicPool()
+DynamicPoolMap::~DynamicPoolMap()
 {
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
@@ -88,22 +90,22 @@ DynamicPool::~DynamicPool()
   }
 }
 
-void DynamicPool::insertUsed(Pointer addr, std::size_t bytes, bool is_head,
+void DynamicPoolMap::insertUsed(Pointer addr, std::size_t bytes, bool is_head,
                              std::size_t whole_bytes)
 {
   m_used_map.insert(std::make_pair(addr, std::make_tuple(bytes, is_head,
                                                          whole_bytes)));
 }
 
-void DynamicPool::insertFree(Pointer addr, std::size_t bytes, bool is_head,
+void DynamicPoolMap::insertFree(Pointer addr, std::size_t bytes, bool is_head,
                              std::size_t whole_bytes)
 {
   m_free_map.insert(std::make_pair(bytes, std::make_tuple(addr, is_head,
                                                           whole_bytes)));
 }
 
-DynamicPool::SizeMap::const_iterator
-DynamicPool::findFreeBlock(std::size_t bytes) const
+DynamicPoolMap::SizeMap::const_iterator
+DynamicPoolMap::findFreeBlock(std::size_t bytes) const
 {
   SizeMap::const_iterator iter{m_free_map.upper_bound(bytes)};
 
@@ -228,7 +230,7 @@ void* DynamicPool::allocate(std::size_t bytes)
   return ptr;
 }
 
-void DynamicPool::deallocate(void* ptr)
+void DynamicPoolMap::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_ASSERT(ptr);
@@ -255,51 +257,49 @@ void DynamicPool::deallocate(void* ptr)
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
 
-  mergeFreeBlocks();
-
   if (m_coalesce_heuristic(*this)) {
     UMPIRE_LOG(Debug, this
                << " heuristic function returned true, calling coalesce()");
-    coalesce();
+    do_coalesce();
   }
 }
 
-std::size_t DynamicPool::getCurrentSize() const noexcept
+std::size_t DynamicPoolMap::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_curr_bytes);
   return m_curr_bytes;
 }
 
-std::size_t DynamicPool::getActualSize() const noexcept
+std::size_t DynamicPoolMap::getActualSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_actual_bytes);
   return m_actual_bytes;
 }
 
-std::size_t DynamicPool::getHighWatermark() const noexcept
+std::size_t DynamicPoolMap::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
   return m_highwatermark;
 }
 
-std::size_t DynamicPool::getFreeBlocks() const noexcept
+std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
 {
   return m_free_map.size();
 }
 
-std::size_t DynamicPool::getInUseBlocks() const noexcept
+std::size_t DynamicPoolMap::getInUseBlocks() const noexcept
 {
   return m_used_map.size();
 }
 
-std::size_t DynamicPool::getBlocksInPool() const noexcept
+std::size_t DynamicPoolMap::getBlocksInPool() const noexcept
 {
   const std::size_t total_blocks{getFreeBlocks() + getInUseBlocks()};
   UMPIRE_LOG(Debug, "() returning " << total_blocks);
   return total_blocks;
 }
 
-std::size_t DynamicPool::getReleasableSize() const noexcept
+std::size_t DynamicPoolMap::getReleasableSize() const noexcept
 {
   std::size_t releasable_bytes{0};
   for (auto& rec : m_free_map) {
@@ -314,12 +314,12 @@ std::size_t DynamicPool::getReleasableSize() const noexcept
   return releasable_bytes;
 }
 
-Platform DynamicPool::getPlatform() noexcept
+Platform DynamicPoolMap::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }
 
-void DynamicPool::mergeFreeBlocks()
+void DynamicPoolMap::mergeFreeBlocks()
 {
   if (m_free_map.size() < 2) return;
 
@@ -383,7 +383,7 @@ void DynamicPool::mergeFreeBlocks()
   UMPIRE_LOG(Debug, "() Free blocks after: " << getFreeBlocks());
 }
 
-std::size_t DynamicPool::releaseFreeBlocks()
+std::size_t DynamicPoolMap::releaseFreeBlocks()
 {
   UMPIRE_LOG(Debug, "()");
 
@@ -410,11 +410,30 @@ std::size_t DynamicPool::releaseFreeBlocks()
   return released_bytes;
 }
 
-void DynamicPool::coalesce()
+void DynamicPoolMap::coalesce()
 {
   // Coalesce differs from release in that it puts back a single block of the size it released
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
+  do_coalesce();
+}
+
+void DynamicPoolMap::release()
+{
+  UMPIRE_LOG(Debug, "()");
+
+  // Coalesce first so that we are able to release the most memory possible
+  mergeFreeBlocks();
+
+  // Free any blocks with is_head
+  releaseFreeBlocks();
+
+  // NOTE This differs from coalesce above in that it does not reallocate a
+  // free block to keep actual size the same.
+}
+
+void DynamicPoolMap::do_coalesce()
+{
   mergeFreeBlocks();
   // Now all possible the free blocks that could be merged have been
 
@@ -429,20 +448,6 @@ void DynamicPool::coalesce()
       insertFree(ptr, released_bytes, true, released_bytes);
     }
   }
-}
-
-void DynamicPool::release()
-{
-  UMPIRE_LOG(Debug, "()");
-
-  // Coalesce first so that we are able to release the most memory possible
-  mergeFreeBlocks();
-
-  // Free any blocks with is_head
-  releaseFreeBlocks();
-
-  // NOTE This differs from coalesce above in that it does not reallocate a
-  // free block to keep actual size the same.
 }
 
 } // end of namespace strategy
