@@ -34,6 +34,10 @@ int main(int argc, char* argv[])
      , "Input file created by Umpire library with UMPIRE_REPLAY=On"
      , cxxopts::value<std::string>(), "FILE"
     )
+    (
+      "s, stats"
+      , "Dump ULTRA file containing memory usage stats for each Allocator"
+    )
   ;
 
   auto command_line_args = options.parse(argc, argv);
@@ -70,7 +74,8 @@ int main(int argc, char* argv[])
   }
 
   t1 = std::chrono::high_resolution_clock::now();
-  replay.runOperations();
+  const bool print_statistics{command_line_args.count("stats")};
+  replay.runOperations(print_statistics);
   t2 = std::chrono::high_resolution_clock::now();
 
   if (command_line_args.count("time")) {

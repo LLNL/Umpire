@@ -200,7 +200,7 @@ public:
 
   ~ReplayOperationManager();
 
-  void runOperations();
+  void runOperations(bool gather_statistics);
 
   void dumpStats();
 
@@ -445,7 +445,7 @@ private:
   std::vector<std::string> m_resource_names;
   umpire::util::AllocationMap m_allocation_map;
 
-  std::map<std::string, std::vector< std::pair<std::chrono::steady_clock::time_point, std::size_t>>> m_stat_series;
+  std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;
 };
 
 #include "util/ReplayOperationManager.inl"
