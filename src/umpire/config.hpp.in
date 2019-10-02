@@ -28,6 +28,7 @@
 #cmakedefine UMPIRE_ENABLE_DEVICE
 #cmakedefine UMPIRE_ENABLE_PINNED
 #cmakedefine UMPIRE_ENABLE_UM
+#cmakedefine UMPIRE_ENABLE_CONST
 
 #cmakedefine UMPIRE_ENABLE_MPI
 

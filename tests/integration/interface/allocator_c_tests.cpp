@@ -139,7 +139,7 @@ const char* allocator_names[] = {
 #if defined(UMPIRE_ENABLE_UM)
   , "UM"
 #endif
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_CONST)
   , "DEVICE_CONST"
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)

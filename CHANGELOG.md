@@ -6,7 +6,29 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [Develop Branch]
+
+### Added
+
+- `ENABLE_DEVICE_CONST` CMake option to control whether device constant memory
+  is enabled. It is now disabled by default.
+
+- `DeviceAllocator` that provides a pool for allocations inside GPU kernels.
+
+### Changed
+
+- LC GitLab CI now using lassen by default instead of butte.
+
+- Constant device memory is disabled by default.
+
+
+### Removed
+
+### Fixed
+
+- Fixed PGI compiler failures
+
+## [1.1.0] - 2019-09-14
 
 ### Added
 
@@ -26,6 +48,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI tests installation.
 
+- The DynamicPool algorithms from 1.0.1 and 0.3.5 are now both available under
+  different strategy names: DynamicPoolMap (1.0.1) and DynamicPoolList (0.3.5).
+
 ### Changed
 
 - Adjust notifications for CI jobs.
@@ -38,10 +63,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Moved `tools/plot_allocations` to `tools/analysis/plot_allocations`.
 
-- DynamicPool will try and merge blocks after each deallocation of memory in the
-  pool.
-
 - Logging output no longer prints to stdout.
+
+- DynamicPool is now an alias to DynamicPoolMap.
+
+- LC GitLab CI now using lassen by default instead of butte.
 
 ### Removed
 

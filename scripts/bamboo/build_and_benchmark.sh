@@ -10,8 +10,12 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 . ${SCRIPTPATH}/build_and_test.sh
 
+#
+# The remainder of this script assumes that build_and_test.sh places us in the
+# build directory (this assumption is not new, I am just documenting it now).
+#
 echo "Benchmarking..."
-COMMIT=`git rev-parse --short HEAD`
+COMMIT="$( cd "$(dirname "$0")" ; git rev-parse --short HEAD )"
 DATE=`date +%Y-%m-%d`
 BENCHMARK_OUTPUT_NAME="${COMMIT}_${COMPILER}_${SYS_TYPE}_${DATE}"
 

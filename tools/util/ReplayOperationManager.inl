@@ -144,7 +144,7 @@ void ReplayOperation::makeFixedPool(
 // DynamicPool
 //
 template <typename... Args>
-void ReplayOperation::makeDynamicPool(
+void ReplayOperation::makeDynamicPoolMap(
     const bool introspection
   , const std::string& allocator_name
   , const std::string& base_allocator_name
@@ -156,7 +156,7 @@ void ReplayOperation::makeDynamicPool(
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_my_manager.m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, true>
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , std::forward<Args>(args)...
@@ -169,7 +169,43 @@ void ReplayOperation::makeDynamicPool(
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_my_manager.m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::DynamicPool, false>
+        rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
+          )
+      );
+    };
+  }
+}
+
+template <typename... Args>
+void ReplayOperation::makeDynamicPoolList(
+    const bool introspection
+  , const std::string& allocator_name
+  , const std::string& base_allocator_name
+  , Args&&... args
+)
+{
+  if (introspection) {
+    op = [=]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
+          )
+      );
+    };
+  }
+  else {
+    op = [=]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_my_manager.m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , std::forward<Args>(args)...
