@@ -24,6 +24,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Constant device memory is disabled by default.
 
+- Udpate nlohmann/json to 3.7.0 (#7476f5ee)
+
 
 ### Removed
 
