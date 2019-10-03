@@ -36,7 +36,7 @@ AllocationAdvisor::AllocationAdvisor(
     Allocator accessing_allocator,
     int device_id) :
   AllocationStrategy(name, id),
-  m_size_map{}
+  m_size_map{},
   m_allocator{allocator.getAllocationStrategy()},
   m_device{device_id}
 {
@@ -65,22 +65,20 @@ AllocationAdvisor::AllocationAdvisor(
 void* AllocationAdvisor::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
-
   m_set_advice_operation->apply(
       ptr,
       nullptr,
       m_device,
       bytes);
 
-  m_size_map[ptr] = bytes;
+  m_size_map[reinterpret_cast<uintptr_t>(ptr)] = bytes;
 
   return ptr;
 }
 
 void AllocationAdvisor::deallocate(void* ptr)
 {
-  auto bytes = m_size_map[ptr];
-
+  auto bytes = m_size_map[reinterpret_cast<uintptr_t>(ptr)];
   m_unset_advice_operation->apply(
       ptr,
       nullptr,
