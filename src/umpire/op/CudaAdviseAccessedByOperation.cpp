@@ -24,10 +24,10 @@ CudaAdviseAccessedByOperation::apply(
   cudaError_t error;
 
   cudaDeviceProp properties;
-  error = ::cudaGetDeviceProperties(&properties, device);
+  error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << 0 << "),"
         << " failed with error: "
         << cudaGetErrorString(error));
   }
