@@ -15,9 +15,9 @@
 #include "umpire/tpl/json/json.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
-void ReplayInterpreter::runOperations(void)
+void ReplayInterpreter::runOperations(bool gather_statistics)
 {
-  m_operation_mgr.runOperations();
+  m_operation_mgr.runOperations(gather_statistics);
 }
 
 void ReplayInterpreter::buildAllocMapOperations(void)
