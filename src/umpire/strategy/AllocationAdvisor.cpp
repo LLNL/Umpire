@@ -78,7 +78,8 @@ void* AllocationAdvisor::allocate(std::size_t bytes)
 
 void AllocationAdvisor::deallocate(void* ptr)
 {
-  auto bytes = m_size_map[reinterpret_cast<uintptr_t>(ptr)];
+  auto bytes{m_size_map[reinterpret_cast<uintptr_t>(ptr)]};
+
   m_unset_advice_operation->apply(
       ptr,
       nullptr,
@@ -86,7 +87,6 @@ void AllocationAdvisor::deallocate(void* ptr)
       bytes);
 
   m_allocator->deallocate(ptr);
-
 }
 
 std::size_t AllocationAdvisor::getCurrentSize() const noexcept
