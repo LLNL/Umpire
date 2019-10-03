@@ -17,6 +17,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added statistic gathering capability to `replay`
 
+- Added "unset" operations for removing CUDA memory advice.
 
 ### Changed
 
@@ -24,6 +25,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Constant device memory is disabled by default.
 
+- AllocationAdvisor will "unset" advice upon deallocation.
 
 ### Removed
 
