@@ -94,3 +94,14 @@ install(TARGETS
   ARCHIVE DESTINATION lib)
 
 add_subdirectory(judy)
+
+if (DEFINED camp_DIR)
+  find_package(camp REQUIRED)
+
+  blt_register_library(
+    NAME camp
+    INCLUDES ${CAMP_INCLUDE_DIRS}
+    LIBRARIES camp)
+else ()
+  add_subdirectory(camp)
+endif()
