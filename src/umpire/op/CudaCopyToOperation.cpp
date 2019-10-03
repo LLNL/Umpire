@@ -39,5 +39,40 @@ void CudaCopyToOperation::transform(
       "event", "copy");
 }
 
+camp::devices::Event CudaCopyToOperation::transform(
+    void* src_ptr,
+    void** dst_ptr,
+    umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
+    std::size_t length,
+    camp::devices::Context& ctx)
+{
+
+  auto device = ctx.get<camp::devices::Cuda>();
+  auto stream = device.get_stream();
+
+  cudaError_t error =
+    ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyHostToDevice, stream);
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaMemcpyAsync( dest_ptr = " << *dst_ptr
+      << ", src_ptr = " << src_ptr
+      << ", length = " << length
+      << ", cudaMemcpyHostToDevice "
+      << ", stream = " << stream 
+      << ") failed with error: "
+      << cudaGetErrorString(error));
+  }
+
+  UMPIRE_RECORD_STATISTIC(
+      "CudaCopyToOperation",
+      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "size", length,
+      "event", "copy");
+
+  return ctx.get_event();
+}
+
 } // end of namespace op
 } // end of namespace umpire

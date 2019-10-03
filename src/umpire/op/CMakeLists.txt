@@ -20,7 +20,7 @@ set (umpire_op_sources
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 
-set (umpire_op_depends)
+set (umpire_op_depends camp)
 
 if (ENABLE_NUMA)
   set (umpire_op_headers

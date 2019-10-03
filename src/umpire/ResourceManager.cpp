@@ -493,6 +493,37 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
+camp::devices::Event 
+ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::devices::Context& ctx, std::size_t size)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
+
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
+
+  if (size == 0) {
+    size = src_size;
+  }
+
+  if (size > dst_size) {
+    UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
+  }
+
+  auto op = op_registry.find(
+      "COPY",
+      src_alloc_record->strategy,
+      dst_alloc_record->strategy);
+
+  return op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
+}
+
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");

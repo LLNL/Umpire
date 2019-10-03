@@ -20,6 +20,8 @@
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
+#include "camp/device.hpp"
+
 namespace umpire {
 
 namespace strategy {
@@ -166,6 +168,8 @@ class ResourceManager {
      * \param size Size in bytes.
      */
     void copy(void* dst_ptr, void* src_ptr, std::size_t size=0);
+
+    camp::devices::Event copy(void* dst_ptr, void* src_ptr, camp::devices::Context& ctx, std::size_t size=0);
 
     /*!
      * \brief Set the first length bytes of ptr to the value val.
