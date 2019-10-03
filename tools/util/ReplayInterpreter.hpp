@@ -18,7 +18,7 @@ class ReplayInterpreter {
   public:
     void buildOperations(void);
     void buildAllocMapOperations(void);
-    void runOperations(void);
+    void runOperations(bool gather_statistics);
 
     //
     // Return: > 0 success, 0 eof, < 0 error
