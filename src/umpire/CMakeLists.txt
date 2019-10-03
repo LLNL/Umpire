@@ -50,6 +50,20 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   endif ()
 endif ()
 
+if (ENABLE_CUDA)
+  set(umpire_headers
+    ${umpire_headers}
+    DeviceAllocator.hpp)
+
+  set(umpire_sources
+    ${umpire_sources}
+    DeviceAllocator.cpp)
+
+  set_source_files_properties(DeviceAllocator.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
+endif()
+
 add_subdirectory(tpl)
 
 add_subdirectory(resource)
@@ -67,6 +81,9 @@ blt_add_library(
   SOURCES ${umpire_sources} ${umpire_interface_sources}
   DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
 
+set_target_properties(umpire PROPERTIES
+  CUDA_SEPARABLE_COMPILATION On)
+
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
@@ -75,6 +92,7 @@ set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_HCC ${ENABLE_HCC})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
+set(UMPIRE_ENABLE_CONST ${ENABLE_DEVICE_CONST})
 
 if (ENABLE_CUDA OR ENABLE_HCC OR ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
