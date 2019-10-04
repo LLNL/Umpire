@@ -31,6 +31,15 @@ class CudaCopyOperation : public MemoryOperation {
       umpire::util::AllocationRecord *src_allocation,
       umpire::util::AllocationRecord *dst_allocation,
       std::size_t length);
+
+  camp::devices::Event 
+  transform(
+      void* src_ptr,
+      void** dst_ptr,
+      util::AllocationRecord *src_allocation,
+      util::AllocationRecord *dst_allocation,
+      std::size_t length,
+      camp::devices::Context& ctx);
 };
 
 } // end of namespace op
