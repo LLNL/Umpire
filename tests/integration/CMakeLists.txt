@@ -144,6 +144,10 @@ blt_add_test(
 #   NAME memory_resource_traits_tests
 #   COMMAND memory_resource_traits_tests)
 
+if (ENABLE_BACKTRACE)
+  add_subdirectory(backtrace)
+endif()
+
 if (ENABLE_TOOLS)
   add_subdirectory(replay)
 endif()
