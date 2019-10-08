@@ -22,6 +22,9 @@ if (NOT C_COMPILER_FAMILY_IS_PGI)
   if (PYTHON_EXECUTABLE)
     add_test(
       NAME backtrace_tests
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/backtrace_tests_runner.py WORKING_DIRECTORY ${backtrace_output_dir})
+      COMMAND ${PYTHON_EXECUTABLE}
+        ${CMAKE_CURRENT_SOURCE_DIR}/backtrace_tests_runner.py
+        ${CMAKE_CURRENT_SOURCE_DIR}/backtrace.good
+        WORKING_DIRECTORY ${backtrace_output_dir})
   endif ()
 endif ()

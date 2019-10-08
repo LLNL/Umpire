@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include <iostream>
+
 #include "BacktraceTest.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
@@ -30,6 +32,10 @@ void BacktraceTest::level2()
 void BacktraceTest::level3()
 {
   auto& rm = umpire::ResourceManager::getInstance();
+  try {
   auto alloc = rm.getAllocator("NoneExistantAllocatorName");
   UMPIRE_USE_VAR(alloc);
+  } catch(const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+  }
 }
