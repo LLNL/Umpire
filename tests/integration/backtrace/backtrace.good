@@ -7,6 +7,3 @@
 6           0x1004c598 BacktraceTest::level1() + 40
 7           0x1004c548 BacktraceTest::run() + 40
 8           0x1004c4d4 main + 68
-9       0x2000003a5100 /lib64/libc.so.6(+0x25100) [0x2000003a5100]
-10      0x2000003a52f4 __libc_start_main + 196
-
