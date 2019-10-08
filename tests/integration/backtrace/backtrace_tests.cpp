@@ -4,13 +4,21 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "BacktraceTest.hpp"
+#include <iostream>
+
+#include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
-int main(int UMPIRE_UNUSED_ARG(argc), char** UMPIRE_UNUSED_ARG(argv)) {
-  BacktraceTest test;
+int main(int UMPIRE_UNUSED_ARG(argc), char** UMPIRE_UNUSED_ARG(argv))
+{
+  auto& rm = umpire::ResourceManager::getInstance();
 
-  test.run();
+  try {
+    auto alloc = rm.getAllocator("NoneExistantAllocatorName");
+    UMPIRE_USE_VAR(alloc);
+  } catch(const std::exception& e) {
+    std::cerr << e.what() << std::endl;
+  }
 
   return 0;
 }

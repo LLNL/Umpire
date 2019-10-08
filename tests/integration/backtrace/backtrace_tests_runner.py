@@ -11,6 +11,10 @@ import os
 
 errors = 0
 
+def print_output(output):
+    for line in output:
+        print line
+
 def compare(good_output, test_output):
     global errors
 
@@ -18,22 +22,28 @@ def compare(good_output, test_output):
     for good_line in good_output[1:]:
         good_words = good_line.split()
         test_words = test_output[index].split()
-        index = index + 1
         if len(good_words) >= 2:
             if good_words[2].split('(')[0] != test_words[2].split('(')[0]:
                 print 'MISCOMPARE LINE: {} "{}" != "{}"'.format(index+1, good_words[2].split('(')[0], test_words[2].split('(')[0])
                 errors = -1
+            else:
+                print 'SUCCESS Line #{}: "{}" == "{}"'.format(index+1, good_words[2].split('(')[0], test_words[2].split('(')[0])
+
+        index = index + 1
 
 def run_test():
     test_output=subprocess.check_output("./backtrace_tests; exit 0",
             stderr=subprocess.STDOUT,
             shell=True).splitlines()
 
-    good_output_file = sys.argv[1]
-    with open(good_output_file, 'r') as good_file:
-        good_output = good_file.read().splitlines()
+    if len(sys.argv) >= 2:
+        good_output_file = sys.argv[1]
+        with open(good_output_file, 'r') as good_file:
+            good_output = good_file.read().splitlines()
 
-    compare(good_output, test_output)
+        compare(good_output, test_output)
+    else:
+        print_output(test_output)
 
 if __name__ == '__main__':
     run_test()

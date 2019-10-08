@@ -8,17 +8,13 @@ set (backtrace_output_dir ${TEST_OUTPUT_DIRECTORY})
 
 blt_add_executable(
   NAME backtrace_tests
-  SOURCES backtrace_tests.cpp BacktraceTest.hpp BacktraceTest.cpp
+  SOURCES backtrace_tests.cpp
   DEPENDS_ON umpire
   OUTPUT_DIR ${backtrace_output_dir})
 
 blt_add_target_link_flags(
   TO backtrace_tests
   FLAGS "-rdynamic")
-
-blt_add_target_compile_flags(
-  TO backtrace_tests
-  FLAGS "-O0")
 
 if (NOT C_COMPILER_FAMILY_IS_PGI)
   include(FindPythonInterp)

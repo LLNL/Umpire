@@ -1,9 +1,5 @@
 ! Umpire Exception [/g/g0/martymcf/.sessions/rzansel/src/umpire/src/umpire/ResourceManager.cpp:336]:  getAllocationStrategy Allocator "NoneExistantAllocatorName" not found. Available allocators: [__umpire_internal_0_byte_pool,2] [__umpire_internal_null,1] [HOST,0] 
-1           0x1004ed18 umpire::ResourceManager::getAllocationStrategy(std::string const&) + 1496
-2           0x1004f26c umpire::ResourceManager::getAllocator(std::string const&) + 508
-3           0x1004f32c umpire::ResourceManager::getAllocator(char const*) + 108
-4           0x1004c64c BacktraceTest::level3() + 60
-5           0x1004c5e8 BacktraceTest::level2() + 40
-6           0x1004c598 BacktraceTest::level1() + 40
-7           0x1004c548 BacktraceTest::run() + 40
-8           0x1004c4d4 main + 68
+1           0x10011fc0 umpire::ResourceManager::getAllocationStrategy(std::string const&) + 2144
+2           0x10012b9c umpire::ResourceManager::getAllocator(std::string const&) + 460
+3           0x10012e98 umpire::ResourceManager::getAllocator(char const*) + 56
+4           0x1000de4c main + 76
