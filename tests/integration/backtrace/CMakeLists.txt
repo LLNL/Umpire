@@ -16,6 +16,10 @@ blt_add_target_link_flags(
   TO backtrace_tests
   FLAGS "-rdynamic")
 
+blt_add_target_compile_flags(
+  TO backtrace_tests
+  FLAGS "-O0")
+
 if (NOT C_COMPILER_FAMILY_IS_PGI)
   include(FindPythonInterp)
 
