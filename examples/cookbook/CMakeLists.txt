@@ -58,6 +58,13 @@ if (ENABLE_CUDA)
     OUTPUT_DIR ${cookbook_output_dir})
   list(APPEND umpire_cookbooks recipe_move_to_managed)
 
+  blt_add_executable(
+    NAME recipe_memprefetch_pool
+    SOURCES recipe_memprefetch_pool.cpp
+    DEPENDS_ON ${cookbook_depends}
+    OUTPUT_DIR ${cookbook_output_dir})
+  list(APPEND umpire_cookbooks recipe_memprefetch_pool)
+
   if (ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
