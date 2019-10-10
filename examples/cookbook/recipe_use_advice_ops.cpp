@@ -19,15 +19,15 @@ int main(int, char**) {
   auto& ops = umpire::op::MemoryOperationRegistry::getInstance();
 
   auto allocator = rm.getAllocator("UM");
-  auto set_advice_op = op_registry.find(
+  auto set_advice_op = ops.find(
       "READ_MOSTLY",
-      m_allocator,
-      m_allocator);
+      allocator.getAllocationStrategy(),
+      allocator.getAllocationStrategy());
 
-  auto unset_advice_op = op_registry.find(
+  auto unset_advice_op = ops.find(
       "UNSET_READ_MOSTLY",
-      m_allocator,
-      m_allocator);
+      allocator.getAllocationStrategy(),
+      allocator.getAllocationStrategy());
 
   constexpr size_t size = 1024*sizeof(double);
   double* data = static_cast<double*>(allocator.allocate(size));
