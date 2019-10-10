@@ -25,5 +25,9 @@ int main(int, char**) {
   void* data_two = pool.allocate(4096);
   void* data_three = pool.allocate(1040);
 
+  pool.deallocate(data_one);
+  pool.deallocate(data_two);
+  pool.deallocate(data_three);
+
   return 0;
 }
