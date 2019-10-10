@@ -57,10 +57,7 @@ class AllocationAdvisor :
 
     Platform getPlatform() noexcept;
   private:
-    std::map<uintptr_t, size_t> m_size_map;
-
-    std::shared_ptr<op::MemoryOperation> m_set_advice_operation;
-    std::shared_ptr<op::MemoryOperation> m_unset_advice_operation;
+    std::shared_ptr<op::MemoryOperation> m_advice_operation;
 
     strategy::AllocationStrategy* m_allocator;
 
