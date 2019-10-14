@@ -83,6 +83,11 @@ if (ENABLE_CUDA)
   list(APPEND umpire_examples device_allocator_example)
 endif()
 
+blt_add_executable(
+  NAME out_of_bounds
+  SOURCES out_of_bounds.cpp
+  DEPENDS_ON ${example_depends})
+
 install(TARGETS ${umpire_examples} DESTINATION ${UMPIRE_EXAMPLE_INSTALL_DIRECTORY})
 
 add_subdirectory(tutorial)
