@@ -1,23 +1,9 @@
-//////////////////////////////////////////////////////////////////////////////
+// typesUmpire.h
+// This is generated code, do not edit
 // Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
-//////////////////////////////////////////////////////////////////////////////
-// typesUmpire.h
-// This is generated code, do not edit
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
-//
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
 // For C users and C++ implementation
 
 #ifndef TYPESUMPIRE_H
@@ -42,17 +28,29 @@ struct s_umpire_allocator {
 };
 typedef struct s_umpire_allocator umpire_allocator;
 
-struct s_umpire_dynamicpool {
-    void *addr;     /* address of C++ memory */
-    int idtor;      /* index of destructor */
-};
-typedef struct s_umpire_dynamicpool umpire_dynamicpool;
-
 struct s_umpire_resourcemanager {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
 };
 typedef struct s_umpire_resourcemanager umpire_resourcemanager;
+
+struct s_umpire_strategy_allocationadvisor {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_allocationadvisor umpire_strategy_allocationadvisor;
+
+struct s_umpire_strategy_dynamicpool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_dynamicpool umpire_strategy_dynamicpool;
+
+struct s_umpire_strategy_namedallocationstrategy {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_namedallocationstrategy umpire_strategy_namedallocationstrategy;
 
 struct s_umpire_SHROUD_array {
     umpire_SHROUD_capsule_data cxx;      /* address of C++ memory */

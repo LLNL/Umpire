@@ -1,28 +1,17 @@
-//////////////////////////////////////////////////////////////////////////////
+// wrapResourceManager.cpp
+// This is generated code, do not edit
 // Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
-//////////////////////////////////////////////////////////////////////////////
-// wrapResourceManager.cpp
-// This is generated code, do not edit
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
-//
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
 #include "wrapResourceManager.h"
-#include <stdlib.h>
 #include <string>
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+
+#include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 
 // splicer begin class.ResourceManager.CXX_definitions
 // splicer end class.ResourceManager.CXX_definitions
@@ -91,12 +80,12 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
 // splicer end class.ResourceManager.method.get_allocator_by_id
 }
 
-umpire_allocator * umpire_resourcemanager_make_allocator_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_0_pool(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.make_allocator_pool
+// splicer begin class.ResourceManager.method.make_allocator_0_pool
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
@@ -108,15 +97,15 @@ umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
     SHC_rv->idtor = 1;
     return SHC_rv;
-// splicer end class.ResourceManager.method.make_allocator_pool
+// splicer end class.ResourceManager.method.make_allocator_0_pool
 }
 
-umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_0_bufferify_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv)
 {
-// splicer begin class.ResourceManager.method.make_allocator_bufferify_pool
+// splicer begin class.ResourceManager.method.make_allocator_0_bufferify_pool
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
@@ -128,7 +117,91 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     SHC_rv->addr = static_cast<void *>(SHCXX_rv);
     SHC_rv->idtor = 1;
     return SHC_rv;
-// splicer end class.ResourceManager.method.make_allocator_bufferify_pool
+// splicer end class.ResourceManager.method.make_allocator_0_bufferify_pool
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_1_advisor(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, const char * advice_op, int device_id,
+    umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_1_advisor
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    const std::string SH_advice_op(advice_op);
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::AllocationAdvisor>(
+        SH_name, *SHCXX_allocator, SH_advice_op, device_id);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_1_advisor
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_1_bufferify_advisor(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, const char * advice_op, int Ladvice_op,
+    int device_id, umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_1_bufferify_advisor
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    const std::string SH_advice_op(advice_op, Ladvice_op);
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::AllocationAdvisor>(
+        SH_name, *SHCXX_allocator, SH_advice_op, device_id);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_1_bufferify_advisor
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_2_named(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_2_named
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+        SH_name, *SHCXX_allocator);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_2_named
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_2_bufferify_named(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_2_bufferify_named
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+        SH_name, *SHCXX_allocator);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_2_bufferify_named
 }
 
 void umpire_resourcemanager_register_allocator(
