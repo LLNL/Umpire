@@ -52,6 +52,12 @@ declarations:
           wrap_c: false
           wrap_fortran: false
 
+      - decl: class FixedPool
+        cxx_header: umpire/strategy/FixedPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
   - decl: class Allocator
     cxx_header: umpire/Allocator.hpp
     format:
@@ -111,6 +117,13 @@ declarations:
           format:
             template_suffix: _named
             function_suffix: ""
+
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
+        cxx_template:
+          - instantiation: <umpire::strategy::FixedPool>
+            format:
+              template_suffix: _fixed_pool
+              function_suffix: ""
 
       - decl: void registerAllocator(const std::string& name, Allocator allocator)
 

@@ -11,6 +11,7 @@
 
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
 
 // splicer begin class.ResourceManager.CXX_definitions
@@ -202,6 +203,46 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_named(
     SHC_rv->idtor = 1;
     return SHC_rv;
 // splicer end class.ResourceManager.method.make_allocator_bufferify_named
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_fixed_pool
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool>(
+        SH_name, *SHCXX_allocator, object_size);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_fixed_pool
+}
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_fixed_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv)
+{
+// splicer begin class.ResourceManager.method.make_allocator_bufferify_fixed_pool
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
+    const std::string SH_name(name, Lname);
+    umpire::Allocator * SHCXX_allocator =
+        static_cast<umpire::Allocator *>(allocator.addr);
+    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::FixedPool>(
+        SH_name, *SHCXX_allocator, object_size);
+    SHC_rv->addr = static_cast<void *>(SHCXX_rv);
+    SHC_rv->idtor = 1;
+    return SHC_rv;
+// splicer end class.ResourceManager.method.make_allocator_bufferify_fixed_pool
 }
 
 void umpire_resourcemanager_register_allocator(

@@ -38,6 +38,16 @@ declarations:
         f_derived_type: dynamicpool
         f_capsule_data_type: SHROUD_strategy_dynamicpool_capsule
         f_to_c: "{f_var}%cxxmem"
+    - type: FixedPool
+      fields:
+        base: shadow
+        impl_header: umpire/strategy/FixedPool.hpp
+        cxx_type: umpire::strategy::FixedPool
+        c_type: umpire_strategy_fixedpool
+        f_module_name: umpire_strategy_mod
+        f_derived_type: fixedpool
+        f_capsule_data_type: SHROUD_strategy_fixedpool_capsule
+        f_to_c: "{f_var}%cxxmem"
     - type: NamedAllocationStrategy
       fields:
         base: shadow

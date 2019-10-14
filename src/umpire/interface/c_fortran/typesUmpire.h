@@ -46,6 +46,12 @@ struct s_umpire_strategy_dynamicpool {
 };
 typedef struct s_umpire_strategy_dynamicpool umpire_strategy_dynamicpool;
 
+struct s_umpire_strategy_fixedpool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_fixedpool umpire_strategy_fixedpool;
+
 struct s_umpire_strategy_namedallocationstrategy {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
