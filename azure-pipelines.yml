@@ -32,7 +32,7 @@ jobs:
     inputs:
       testResultsFormat: 'cTest'
       testResultsFiles: '**/Test.xml'
-- job: Linux Docker
+- job: Linux
   strategy:
     matrix: 
       gcc5: 
