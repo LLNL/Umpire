@@ -31,57 +31,6 @@ module umpire_mod
         integer(C_SIZE_T) :: size = 0_C_SIZE_T ! size of data in cxx
     end type SHROUD_array
 
-    type, bind(C) :: SHROUD_strategy_dynamicpool_capsule
-        type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
-        integer(C_INT) :: idtor = 0       ! index of destructor
-    end type SHROUD_strategy_dynamicpool_capsule
-
-    type dynamicpool
-        type(SHROUD_strategy_dynamicpool_capsule) :: cxxmem
-        ! splicer begin class.DynamicPool.component_part
-        ! splicer end class.DynamicPool.component_part
-    contains
-        procedure :: get_instance => strategy_dynamicpool_get_instance
-        procedure :: set_instance => strategy_dynamicpool_set_instance
-        procedure :: associated => strategy_dynamicpool_associated
-        ! splicer begin class.DynamicPool.type_bound_procedure_part
-        ! splicer end class.DynamicPool.type_bound_procedure_part
-    end type dynamicpool
-
-    type, bind(C) :: SHROUD_strategy_allocationadvisor_capsule
-        type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
-        integer(C_INT) :: idtor = 0       ! index of destructor
-    end type SHROUD_strategy_allocationadvisor_capsule
-
-    type allocationadvisor
-        type(SHROUD_strategy_allocationadvisor_capsule) :: cxxmem
-        ! splicer begin class.AllocationAdvisor.component_part
-        ! splicer end class.AllocationAdvisor.component_part
-    contains
-        procedure :: get_instance => strategy_allocationadvisor_get_instance
-        procedure :: set_instance => strategy_allocationadvisor_set_instance
-        procedure :: associated => strategy_allocationadvisor_associated
-        ! splicer begin class.AllocationAdvisor.type_bound_procedure_part
-        ! splicer end class.AllocationAdvisor.type_bound_procedure_part
-    end type allocationadvisor
-
-    type, bind(C) :: SHROUD_strategy_namedallocationstrategy_capsule
-        type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
-        integer(C_INT) :: idtor = 0       ! index of destructor
-    end type SHROUD_strategy_namedallocationstrategy_capsule
-
-    type namedallocationstrategy
-        type(SHROUD_strategy_namedallocationstrategy_capsule) :: cxxmem
-        ! splicer begin class.NamedAllocationStrategy.component_part
-        ! splicer end class.NamedAllocationStrategy.component_part
-    contains
-        procedure :: get_instance => strategy_namedallocationstrategy_get_instance
-        procedure :: set_instance => strategy_namedallocationstrategy_set_instance
-        procedure :: associated => strategy_namedallocationstrategy_associated
-        ! splicer begin class.NamedAllocationStrategy.type_bound_procedure_part
-        ! splicer end class.NamedAllocationStrategy.type_bound_procedure_part
-    end type namedallocationstrategy
-
     type, bind(C) :: SHROUD_allocator_capsule
         type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
         integer(C_INT) :: idtor = 0       ! index of destructor
@@ -191,9 +140,9 @@ module umpire_mod
         procedure, nopass :: get_instance => resourcemanager_get_instance
         procedure :: get_allocator_by_name => resourcemanager_get_allocator_by_name
         procedure :: get_allocator_by_id => resourcemanager_get_allocator_by_id
-        procedure :: make_allocator_0_pool => resourcemanager_make_allocator_0_pool
-        procedure :: make_allocator_1_advisor => resourcemanager_make_allocator_1_advisor
-        procedure :: make_allocator_2_named => resourcemanager_make_allocator_2_named
+        procedure :: make_allocator_pool => resourcemanager_make_allocator_pool
+        procedure :: make_allocator_advisor => resourcemanager_make_allocator_advisor
+        procedure :: make_allocator_named => resourcemanager_make_allocator_named
         procedure :: register_allocator => resourcemanager_register_allocator
         procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
         procedure :: is_allocator => resourcemanager_is_allocator
@@ -211,8 +160,8 @@ module umpire_mod
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
             get_allocator_by_id, get_allocator_for_ptr
-        generic :: make_allocator => make_allocator_0_pool,  &
-            make_allocator_1_advisor, make_allocator_2_named
+        generic :: make_allocator => make_allocator_pool,  &
+            make_allocator_advisor, make_allocator_named
         generic :: memset => memset_all, memset_with_size
         generic :: reallocate => reallocate_default,  &
             reallocate_with_allocator
@@ -221,31 +170,16 @@ module umpire_mod
     end type UmpireResourceManager
 
     interface operator (.eq.)
-        module procedure strategy_dynamicpool_eq
-        module procedure strategy_allocationadvisor_eq
-        module procedure strategy_namedallocationstrategy_eq
         module procedure allocator_eq
         module procedure resourcemanager_eq
     end interface
 
     interface operator (.ne.)
-        module procedure strategy_dynamicpool_ne
-        module procedure strategy_allocationadvisor_ne
-        module procedure strategy_namedallocationstrategy_ne
         module procedure allocator_ne
         module procedure resourcemanager_ne
     end interface
 
     interface
-
-        ! splicer begin class.DynamicPool.additional_interfaces
-        ! splicer end class.DynamicPool.additional_interfaces
-
-        ! splicer begin class.AllocationAdvisor.additional_interfaces
-        ! splicer end class.AllocationAdvisor.additional_interfaces
-
-        ! splicer begin class.NamedAllocationStrategy.additional_interfaces
-        ! splicer end class.NamedAllocationStrategy.additional_interfaces
 
         subroutine c_allocator_delete(self) &
                 bind(C, name="umpire_allocator_delete")
@@ -403,10 +337,10 @@ module umpire_mod
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_id
 
-        function c_resourcemanager_make_allocator_0_pool(self, name, &
+        function c_resourcemanager_make_allocator_pool(self, name, &
                 allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_0_pool")
+                bind(C, name="umpire_resourcemanager_make_allocator_pool")
             use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -417,12 +351,12 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_0_pool
+        end function c_resourcemanager_make_allocator_pool
 
-        function c_resourcemanager_make_allocator_0_bufferify_pool(self, &
+        function c_resourcemanager_make_allocator_bufferify_pool(self, &
                 name, Lname, allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_0_bufferify_pool")
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_pool")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -434,12 +368,12 @@ module umpire_mod
             integer(C_SIZE_T), value, intent(IN) :: block
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_0_bufferify_pool
+        end function c_resourcemanager_make_allocator_bufferify_pool
 
-        function c_resourcemanager_make_allocator_1_advisor(self, name, &
+        function c_resourcemanager_make_allocator_advisor(self, name, &
                 allocator, advice_op, device_id, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_1_advisor")
+                bind(C, name="umpire_resourcemanager_make_allocator_advisor")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -450,13 +384,13 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: device_id
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_1_advisor
+        end function c_resourcemanager_make_allocator_advisor
 
-        function c_resourcemanager_make_allocator_1_bufferify_advisor( &
+        function c_resourcemanager_make_allocator_bufferify_advisor( &
                 self, name, Lname, allocator, advice_op, Ladvice_op, &
                 device_id, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_1_bufferify_advisor")
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_advisor")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -469,12 +403,12 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: device_id
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_1_bufferify_advisor
+        end function c_resourcemanager_make_allocator_bufferify_advisor
 
-        function c_resourcemanager_make_allocator_2_named(self, name, &
+        function c_resourcemanager_make_allocator_named(self, name, &
                 allocator, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_2_named")
+                bind(C, name="umpire_resourcemanager_make_allocator_named")
             use iso_c_binding, only : C_CHAR, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -483,12 +417,12 @@ module umpire_mod
             type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_2_named
+        end function c_resourcemanager_make_allocator_named
 
-        function c_resourcemanager_make_allocator_2_bufferify_named( &
-                self, name, Lname, allocator, SHT_crv) &
+        function c_resourcemanager_make_allocator_bufferify_named(self, &
+                name, Lname, allocator, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_2_bufferify_named")
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_named")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
             import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
@@ -498,7 +432,7 @@ module umpire_mod
             type(SHROUD_allocator_capsule), value, intent(IN) :: allocator
             type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_2_bufferify_named
+        end function c_resourcemanager_make_allocator_bufferify_named
 
         subroutine c_resourcemanager_register_allocator(self, name, &
                 allocator) &
@@ -695,84 +629,6 @@ module umpire_mod
     end interface
 
 contains
-
-    ! Return pointer to C++ memory.
-    function strategy_dynamicpool_get_instance(obj) result (cxxptr)
-        use iso_c_binding, only: C_PTR
-        class(dynamicpool), intent(IN) :: obj
-        type(C_PTR) :: cxxptr
-        cxxptr = obj%cxxmem%addr
-    end function strategy_dynamicpool_get_instance
-
-    subroutine strategy_dynamicpool_set_instance(obj, cxxmem)
-        use iso_c_binding, only: C_PTR
-        class(dynamicpool), intent(INOUT) :: obj
-        type(C_PTR), intent(IN) :: cxxmem
-        obj%cxxmem%addr = cxxmem
-        obj%cxxmem%idtor = 0
-    end subroutine strategy_dynamicpool_set_instance
-
-    function strategy_dynamicpool_associated(obj) result (rv)
-        use iso_c_binding, only: c_associated
-        class(dynamicpool), intent(IN) :: obj
-        logical rv
-        rv = c_associated(obj%cxxmem%addr)
-    end function strategy_dynamicpool_associated
-
-    ! splicer begin class.DynamicPool.additional_functions
-    ! splicer end class.DynamicPool.additional_functions
-
-    ! Return pointer to C++ memory.
-    function strategy_allocationadvisor_get_instance(obj) result (cxxptr)
-        use iso_c_binding, only: C_PTR
-        class(allocationadvisor), intent(IN) :: obj
-        type(C_PTR) :: cxxptr
-        cxxptr = obj%cxxmem%addr
-    end function strategy_allocationadvisor_get_instance
-
-    subroutine strategy_allocationadvisor_set_instance(obj, cxxmem)
-        use iso_c_binding, only: C_PTR
-        class(allocationadvisor), intent(INOUT) :: obj
-        type(C_PTR), intent(IN) :: cxxmem
-        obj%cxxmem%addr = cxxmem
-        obj%cxxmem%idtor = 0
-    end subroutine strategy_allocationadvisor_set_instance
-
-    function strategy_allocationadvisor_associated(obj) result (rv)
-        use iso_c_binding, only: c_associated
-        class(allocationadvisor), intent(IN) :: obj
-        logical rv
-        rv = c_associated(obj%cxxmem%addr)
-    end function strategy_allocationadvisor_associated
-
-    ! splicer begin class.AllocationAdvisor.additional_functions
-    ! splicer end class.AllocationAdvisor.additional_functions
-
-    ! Return pointer to C++ memory.
-    function strategy_namedallocationstrategy_get_instance(obj) result (cxxptr)
-        use iso_c_binding, only: C_PTR
-        class(namedallocationstrategy), intent(IN) :: obj
-        type(C_PTR) :: cxxptr
-        cxxptr = obj%cxxmem%addr
-    end function strategy_namedallocationstrategy_get_instance
-
-    subroutine strategy_namedallocationstrategy_set_instance(obj, cxxmem)
-        use iso_c_binding, only: C_PTR
-        class(namedallocationstrategy), intent(INOUT) :: obj
-        type(C_PTR), intent(IN) :: cxxmem
-        obj%cxxmem%addr = cxxmem
-        obj%cxxmem%idtor = 0
-    end subroutine strategy_namedallocationstrategy_set_instance
-
-    function strategy_namedallocationstrategy_associated(obj) result (rv)
-        use iso_c_binding, only: c_associated
-        class(namedallocationstrategy), intent(IN) :: obj
-        logical rv
-        rv = c_associated(obj%cxxmem%addr)
-    end function strategy_namedallocationstrategy_associated
-
-    ! splicer begin class.NamedAllocationStrategy.additional_functions
-    ! splicer end class.NamedAllocationStrategy.additional_functions
 
     subroutine allocator_delete(obj)
         class(UmpireAllocator) :: obj
@@ -1526,7 +1382,7 @@ contains
         ! splicer end class.ResourceManager.method.get_allocator_by_id
     end function resourcemanager_get_allocator_by_id
 
-    function resourcemanager_make_allocator_0_pool(obj, name, allocator, &
+    function resourcemanager_make_allocator_pool(obj, name, allocator, &
             initial_size, block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
@@ -1537,14 +1393,14 @@ contains
         integer(C_SIZE_T), value, intent(IN) :: block
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_0_pool
-        SHT_prv = c_resourcemanager_make_allocator_0_bufferify_pool(obj%cxxmem, &
+        ! splicer begin class.ResourceManager.method.make_allocator_pool
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_0_pool
-    end function resourcemanager_make_allocator_0_pool
+        ! splicer end class.ResourceManager.method.make_allocator_pool
+    end function resourcemanager_make_allocator_pool
 
-    function resourcemanager_make_allocator_1_advisor(obj, name, &
+    function resourcemanager_make_allocator_advisor(obj, name, &
             allocator, advice_op, device_id) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR
@@ -1555,16 +1411,15 @@ contains
         integer(C_INT), value, intent(IN) :: device_id
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_1_advisor
-        SHT_prv = c_resourcemanager_make_allocator_1_bufferify_advisor(obj%cxxmem, &
+        ! splicer begin class.ResourceManager.method.make_allocator_advisor
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_advisor(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             advice_op, len_trim(advice_op, kind=C_INT), device_id, &
             SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_1_advisor
-    end function resourcemanager_make_allocator_1_advisor
+        ! splicer end class.ResourceManager.method.make_allocator_advisor
+    end function resourcemanager_make_allocator_advisor
 
-    function resourcemanager_make_allocator_2_named(obj, name, &
-            allocator) &
+    function resourcemanager_make_allocator_named(obj, name, allocator) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR
         class(UmpireResourceManager) :: obj
@@ -1572,12 +1427,12 @@ contains
         type(UmpireAllocator), value, intent(IN) :: allocator
         type(C_PTR) :: SHT_prv
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_2_named
-        SHT_prv = c_resourcemanager_make_allocator_2_bufferify_named(obj%cxxmem, &
+        ! splicer begin class.ResourceManager.method.make_allocator_named
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_named(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_2_named
-    end function resourcemanager_make_allocator_2_named
+        ! splicer end class.ResourceManager.method.make_allocator_named
+    end function resourcemanager_make_allocator_named
 
     subroutine resourcemanager_register_allocator(obj, name, allocator)
         use iso_c_binding, only : C_INT
@@ -1744,72 +1599,6 @@ contains
 
     ! splicer begin additional_functions
     ! splicer end additional_functions
-
-    function strategy_dynamicpool_eq(a,b) result (rv)
-        use iso_c_binding, only: c_associated
-        type(dynamicpool), intent(IN) ::a,b
-        logical :: rv
-        if (c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
-            rv = .true.
-        else
-            rv = .false.
-        endif
-    end function strategy_dynamicpool_eq
-
-    function strategy_dynamicpool_ne(a,b) result (rv)
-        use iso_c_binding, only: c_associated
-        type(dynamicpool), intent(IN) ::a,b
-        logical :: rv
-        if (.not. c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
-            rv = .true.
-        else
-            rv = .false.
-        endif
-    end function strategy_dynamicpool_ne
-
-    function strategy_allocationadvisor_eq(a,b) result (rv)
-        use iso_c_binding, only: c_associated
-        type(allocationadvisor), intent(IN) ::a,b
-        logical :: rv
-        if (c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
-            rv = .true.
-        else
-            rv = .false.
-        endif
-    end function strategy_allocationadvisor_eq
-
-    function strategy_allocationadvisor_ne(a,b) result (rv)
-        use iso_c_binding, only: c_associated
-        type(allocationadvisor), intent(IN) ::a,b
-        logical :: rv
-        if (.not. c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
-            rv = .true.
-        else
-            rv = .false.
-        endif
-    end function strategy_allocationadvisor_ne
-
-    function strategy_namedallocationstrategy_eq(a,b) result (rv)
-        use iso_c_binding, only: c_associated
-        type(namedallocationstrategy), intent(IN) ::a,b
-        logical :: rv
-        if (c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
-            rv = .true.
-        else
-            rv = .false.
-        endif
-    end function strategy_namedallocationstrategy_eq
-
-    function strategy_namedallocationstrategy_ne(a,b) result (rv)
-        use iso_c_binding, only: c_associated
-        type(namedallocationstrategy), intent(IN) ::a,b
-        logical :: rv
-        if (.not. c_associated(a%cxxmem%addr, b%cxxmem%addr)) then
-            rv = .true.
-        else
-            rv = .false.
-        endif
-    end function strategy_namedallocationstrategy_ne
 
     function allocator_eq(a,b) result (rv)
         use iso_c_binding, only: c_associated

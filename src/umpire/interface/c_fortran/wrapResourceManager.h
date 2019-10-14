@@ -46,31 +46,31 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
     umpire_resourcemanager * self, const int id,
     umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_allocator_0_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_allocator_0_bufferify_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_allocator_1_advisor(
+umpire_allocator * umpire_resourcemanager_make_allocator_advisor(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, const char * advice_op, int device_id,
     umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_allocator_1_bufferify_advisor(
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_advisor(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, const char * advice_op, int Ladvice_op,
     int device_id, umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_allocator_2_named(
+umpire_allocator * umpire_resourcemanager_make_allocator_named(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, umpire_allocator * SHC_rv);
 
-umpire_allocator * umpire_resourcemanager_make_allocator_2_bufferify_named(
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_named(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, umpire_allocator * SHC_rv);
 
