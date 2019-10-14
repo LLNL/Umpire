@@ -32,7 +32,7 @@ jobs:
     inputs:
       testResultsFormat: 'cTest'
       testResultsFiles: '**/Test.xml'
-- job: Linux
+- job: Docker
   strategy:
     matrix: 
       gcc5: 
@@ -47,8 +47,8 @@ jobs:
         docker_target: clang4
       clang5:
         docker_target: clang5
-      clang7:
-        docker_target: clang6
+      clang6:
+        docker_target: clang
       nvcc:
         docker_target: nvcc
       hip:
