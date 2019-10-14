@@ -7,7 +7,7 @@ variables:
 jobs:
 - job: Windows
   pool:
-    imageName: 'windows-2019'
+    vmImage: 'windows-2019'
   variables:
     CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=Off -DENABLE_TOOLS=Off -DENABLE_BENCHMARKS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
   steps:
@@ -54,7 +54,7 @@ jobs:
       hip:
         docker_target: hip
   pool:
-    imageName: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
   variables:
     DOCKER_BUILDKIT: '1'
     CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
@@ -80,7 +80,7 @@ jobs:
       testResultsFiles: '**/Test.xml'
 - job: Mac 
   pool:
-    imageName: 'macos-10.13'
+    vmImage: 'macOS-latest'
   variables:
     CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
   steps:
