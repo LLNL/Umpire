@@ -7,6 +7,7 @@
 #include <iostream>
 #include <cstdint>
 #include <vector>
+#include <fstream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
@@ -20,6 +21,13 @@
 #include "umpire/ResourceManager.hpp"
 #include "util/ReplayMacros.hpp"
 #include "util/ReplayOperationManager.hpp"
+
+#if !defined(_MSC_VER)
+#include <unistd.h>   // getpid()
+#else
+#include <process.h>
+#define getpid _getpid
+#endif
 
 ReplayOperation::ReplayOperation(
     ReplayOperationManager& my_manager
@@ -502,14 +510,72 @@ ReplayOperationManager::ReplayOperationManager( void ) {
 
 ReplayOperationManager::~ReplayOperationManager() { }
 
-void ReplayOperationManager::runOperations()
+void ReplayOperationManager::runOperations(bool gather_statistics)
 {
+  std::size_t op_counter{0};
+
   ReplayOperation m_op(*this);
 
   m_op.makeMemoryResources();
 
+  auto& rm = umpire::ResourceManager::getInstance();
+
   for (auto op : operations) {
     op->runOperations();
+
+    if (gather_statistics) {
+      for (const auto& alloc_name : rm.getAllocatorNames()) {
+        auto alloc = rm.getAllocator(alloc_name);
+
+        std::string cur_stat_name{alloc_name + " current_size"};
+        std::string actual_stat_name{alloc_name + " actual_size"};
+        std::string hwm_stat_name{alloc_name + " hwm"};
+        
+        m_stat_series[cur_stat_name].push_back(
+            std::make_pair(
+              op_counter,
+              alloc.getCurrentSize()));
+
+        m_stat_series[actual_stat_name].push_back(
+            std::make_pair(
+              op_counter,
+              alloc.getActualSize()));
+
+        m_stat_series[hwm_stat_name].push_back(
+            std::make_pair(
+              op_counter,
+              alloc.getHighWatermark()));
+      }
+
+    }
+
+    op_counter++;
+  }
+
+  if (gather_statistics) {
+    dumpStats();
+  }
+}
+
+void ReplayOperationManager::dumpStats()
+{
+  std::ofstream file;
+  const int pid{getpid()};
+
+  const std::string filename{"replay" + std::to_string(pid) + ".ult"};
+  file.open(filename);
+
+  for (const auto& stat_series : m_stat_series) {
+    file << "# " << stat_series.first << std::endl;
+    for (const auto& entry : stat_series.second) {
+      int t;
+      std::size_t val;
+      std::tie(t, val) = entry;
+
+      file 
+        <<  t
+        << " " << val << std::endl;
+    }
   }
 }
 
