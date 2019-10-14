@@ -44,6 +44,7 @@
 #endif
 #endif
 
+#include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
@@ -707,6 +708,20 @@ strategy::AllocationStrategy*
 ResourceManager::getZeroByteAllocator()
 {
   return m_allocators_by_name[s_zero_byte_pool_name];
+}
+
+std::shared_ptr<op::MemoryOperation>
+ResourceManager::getOperation(
+    const std::string& operation_name,
+    Allocator src_allocator,
+    Allocator dst_allocator)
+{
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  return op_registry.find(
+      operation_name,
+      src_allocator.getAllocationStrategy(),
+      dst_allocator.getAllocationStrategy());
 }
 
 } // end of namespace umpire
