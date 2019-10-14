@@ -33,19 +33,47 @@ jobs:
       testResultsFormat: 'cTest'
       testResultsFiles: '**/Test.xml'
 - job: Linux Docker
+  strategy:
+    matrix: 
+      gcc5: 
+        docker_target: gcc5
+      gcc6:
+        docker_target: gcc6
+      gcc7:
+        docker_target: gcc7
+      gcc8:
+        docker_target: gcc
+      clang4:
+        docker_target: clang4
+      clang5:
+        docker_target: clang5
+      clang7:
+        docker_target: clang6
+      nvcc:
+        docker_target: nvcc
+      hip:
+        docker_target: hip
   pool:
     imageName: 'ubuntu-16.04'
   variables:
+    DOCKER_BUILDKIT: '1'
     CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
   steps:
   - checkout: self
     clean: boolean
     submodules: recursive
-  - script:  |
-     docker run --rm --user='root' -v `pwd`:/home/axom axom/compilers:gcc-6 chown -R axom /home/axom
-     docker run --rm  -v `pwd`:/home/axom -e COMPILER -e DO_BUILD -e DO_TEST -e DO_INSTALL -e CMAKE_EXTRA_FLAGS axom/compilers:gcc-6 ./scripts/travis/build_and_test.sh
-    condition: eq( variables['Agent.OS'], 'Linux')
-    displayName: 'Linux (Docker) Build & Test'
+  - task: Docker@1
+    inputs:
+      command: build
+      dockerFile: Dockerfile
+      arguments: '--target $(docker_target)'
+  - script: |
+      CID=$(docker create llnl/umpire:$(Build.BuildId))
+      echo ${CID}
+      docker cp ${CID}:/home/axom/workspace/build local-build
+      docker rm ${CID}
+    displayName: 'Copy test artifacts'
+    condition: ne( variables['docker_target'], 'nvcc')
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'cTest'
