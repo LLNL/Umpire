@@ -56,6 +56,16 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_list_pool(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_list_pool(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, size_t initial_size, size_t block,
+    umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_advisor(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, const char * advice_op, int device_id,
