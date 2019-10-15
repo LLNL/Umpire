@@ -104,6 +104,8 @@ declarations:
           function_suffix: _by_id
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
+        options:
+          F_create_generic: False
         cxx_template:
         - instantiation: <umpire::strategy::DynamicPool>
           format:
@@ -115,6 +117,8 @@ declarations:
             function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, const std::string& advice_op, int device_id);
+        options:
+          F_create_generic: False
         cxx_template:
         - instantiation: <umpire::strategy::AllocationAdvisor>
           format:
@@ -122,6 +126,8 @@ declarations:
             function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator);
+        options:
+          F_create_generic: False
         cxx_template:
         - instantiation: <umpire::strategy::NamedAllocationStrategy>
           format:
@@ -129,6 +135,8 @@ declarations:
             function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
+        options:
+          F_create_generic: False
         cxx_template:
           - instantiation: <umpire::strategy::FixedPool>
             format:

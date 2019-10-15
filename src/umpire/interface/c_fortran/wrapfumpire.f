@@ -162,9 +162,6 @@ module umpire_mod
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
             get_allocator_by_id, get_allocator_for_ptr
-        generic :: make_allocator => make_allocator_pool,  &
-            make_allocator_list_pool, make_allocator_advisor,  &
-            make_allocator_named, make_allocator_fixed_pool
         generic :: memset => memset_all, memset_with_size
         generic :: reallocate => reallocate_default,  &
             reallocate_with_allocator
