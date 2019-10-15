@@ -17,6 +17,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added statistic gathering capability to `replay`
 
+- Extended C/Fortran API with more allocation strategies.
+
+- NamedAllocator that allows creating a new allocator that passes allocations
+  through to underlying strategy
 
 ### Changed
 
