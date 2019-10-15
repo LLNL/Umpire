@@ -79,14 +79,14 @@ if (ENABLE_CUDA)
       Fortran_FORMAT FREE)
 
     blt_add_executable(
-      NAME recipe_memprefetch_pool
-      SOURCES recipe_memprefetch_pool.F
+      NAME recipe_prefetch_pool
+      SOURCES recipe_prefetch_pool.F
       DEPENDS_ON ${cookbook_depends}
       OUTPUT_DIR ${cookbook_output_dir})
-    list(APPEND umpire_cookbooks recipe_memprefetch_pool)
+    list(APPEND umpire_cookbooks recipe_prefetch_pool)
 
     set_source_files_properties(
-      recipe_memprefetch_pool.F
+      recipe_prefetch_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
   endif ()

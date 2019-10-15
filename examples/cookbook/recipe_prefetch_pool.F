@@ -12,13 +12,13 @@ program umpire_f_pinned_pool
 
       integer(C_INT), pointer, dimension(:) :: array(:)
       type(UmpireAllocator) base_allocator
-      type(UmpireAllocator) prefetch_pool
+      type(UmpireAllocator) prefetch_allocator
       type(UmpireResourceManager) rm
 
       rm = rm%get_instance()
       base_allocator = rm%get_allocator_by_name("UM")
 
-      prefetch_allocator = rm%make_allocator_pool("prefetcher", &
+      prefetch_allocator = rm%make_allocator_prefetcher("prefetcher", &
                                            base_allocator, 0)
 
       call prefetch_allocator%allocate(array, [10])
