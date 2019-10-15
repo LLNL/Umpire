@@ -228,6 +228,69 @@ INSTANTIATE_TEST_CASE_P(
     PoolAllocatorCTest,
     ::testing::ValuesIn(pool_names));
 
+class ListPoolAllocatorCTest :
+  public ::testing::TestWithParam< const char* >
+{
+  public:
+  virtual void SetUp()
+  {
+    std::string pool_name = std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
+
+    umpire_resourcemanager rm;
+    umpire_resourcemanager_get_instance(&rm);
+    umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);;
+    umpire_resourcemanager_make_allocator_list_pool(
+        &rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
+  }
+
+  virtual void TearDown()
+  {
+    umpire_allocator_delete(&m_allocator);
+    umpire_allocator_delete(&m_pool);
+  }
+
+  umpire_allocator m_allocator;
+  umpire_allocator m_pool;
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+  const std::size_t m_pool_init = 4294967296 + 64;
+#else
+  const std::size_t m_pool_init = 1024 * 1024 * 64;
+#endif
+  const std::size_t m_big = 1024 * 1024;
+  const std::size_t m_small = 64;
+  const std::size_t m_nothing = 0;
+};
+
+TEST_P(ListPoolAllocatorCTest, AllocateDeallocateBig)
+{
+  double* data = (double*) umpire_allocator_allocate(&m_pool, m_big*sizeof(double));
+  ASSERT_NE(nullptr, data);
+
+  umpire_allocator_deallocate(&m_pool, data);
+}
+
+TEST_P(ListPoolAllocatorCTest, AllocateDeallocateSmall)
+{
+  double* data = (double*) umpire_allocator_allocate(&m_pool, m_small*sizeof(double));
+  ASSERT_NE(nullptr, data);
+
+  umpire_allocator_deallocate(&m_pool, data);
+}
+
+TEST_P(ListPoolAllocatorCTest, AllocateDeallocateNothing)
+{
+  double* data = (double*) umpire_allocator_allocate(&m_pool, m_nothing*sizeof(double));
+  ASSERT_NE(nullptr, data);
+
+  umpire_allocator_deallocate(&m_pool, data);
+}
+
+INSTANTIATE_TEST_CASE_P(
+    ListPools,
+    ListPoolAllocatorCTest,
+    ::testing::ValuesIn(pool_names));
+
 class FixedPoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
 {
