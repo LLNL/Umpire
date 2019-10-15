@@ -40,6 +40,12 @@ struct s_umpire_strategy_allocationadvisor {
 };
 typedef struct s_umpire_strategy_allocationadvisor umpire_strategy_allocationadvisor;
 
+struct s_umpire_strategy_allocationprefetcher {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_allocationprefetcher umpire_strategy_allocationprefetcher;
+
 struct s_umpire_strategy_dynamicpool {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
