@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+message(STATUS "Setting C standard to 99")
+set(CMAKE_C_STANDARD 99)
+
 message(STATUS "Checking for std::filesystem")
 
 include(CheckCXXSourceCompiles)

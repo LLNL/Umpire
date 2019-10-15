@@ -1,25 +1,12 @@
-//////////////////////////////////////////////////////////////////////////////
+// wrapAllocator.cpp
+// This is generated code, do not edit
 // Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
-//////////////////////////////////////////////////////////////////////////////
-// wrapAllocator.cpp
-// This is generated code, do not edit
-// Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-// Produced at the Lawrence Livermore National Laboratory
-//
-// Created by David Beckingsale, david@llnl.gov
-// LLNL-CODE-747640
-//
-// All rights reserved.
-//
-// This file is part of Umpire.
-//
-// For details, see https://github.com/LLNL/Umpire
-// Please also see the LICENSE file for MIT license.
 #include "wrapAllocator.h"
 #include <cstddef>
+#include <cstring>
 #include <string>
 #include "umpire/Allocator.hpp"
 
@@ -36,7 +23,7 @@ void umpire_ShroudCopyStringAndFree(umpire_SHROUD_array *data, char *c_var, size
     const char *cxx_var = data->addr.ccharp;
     size_t n = c_var_len;
     if (data->len < n) n = data->len;
-    strncpy(c_var, cxx_var, n);
+    std::strncpy(c_var, cxx_var, n);
     umpire_SHROUD_memory_destructor(&data->cxx); // delete data->cxx.addr
 }
 

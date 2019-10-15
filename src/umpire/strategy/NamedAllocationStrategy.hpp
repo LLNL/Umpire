@@ -4,33 +4,32 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_DefaultAllocationStrategy_HPP
-#define UMPIRE_DefaultAllocationStrategy_HPP
+#ifndef UMPIRE_NamedAllocationStrategy_HPP
+#define UMPIRE_NamedAllocationStrategy_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+
+#include "umpire/Allocator.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class DefaultAllocationStrategy :
+class NamedAllocationStrategy :
   public AllocationStrategy
 {
   public:
-    DefaultAllocationStrategy(strategy::AllocationStrategy* allocator);
+    NamedAllocationStrategy(
+        const std::string& name,
+        int id,
+        Allocator allocator); 
 
-    void* allocate(std::size_t bytes);
+    void* allocate(std::size_t bytes) override;
+    void deallocate(void* ptr) override;
 
-    /*!
-     * \brief Free the memory at ptr.
-     *
-     * \param ptr Pointer to free.
-     */
-    void deallocate(void* ptr);
+    std::size_t getCurrentSize() const noexcept override;
+    std::size_t getHighWatermark() const noexcept override;
 
-    long getCurrentSize() const;
-    long getHighWatermark() const;
-
-    Platform getPlatform();
+    Platform getPlatform() noexcept override;
 
   protected:
     strategy::AllocationStrategy* m_allocator;
