@@ -3,6 +3,7 @@
 { "kind":"replay", "uid":124865, "timestamp":1568313296697146405, "event": "makeMemoryResource", "payload": { "name": "DEVICE" }, "result": "0x102ea120" }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697177296, "event": "makeMemoryResource", "payload": { "name": "PINNED" }, "result": "0x102ea2a0" }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697798230, "event": "makeMemoryResource", "payload": { "name": "UM" }, "result": "0x102ea450" }
+{ "kind":"replay", "uid":124865, "timestamp":1568313296697810977, "event": "makeMemoryResource", "payload": { "name": "DEVICE_CONST" }, "result": "0x102ea650" }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697842159, "event": "makeAllocator", "payload": { "type":"umpire::strategy::MixedPool", "with_introspection":true, "allocator_name":"host_mixedpool_default", "args": [ "HOST" ] } }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697895993, "event": "allocation_map_insert", "payload": { "ptr": "0x100020000010", "record_ptr": "0x100020000010", "record_size": "536870912", "record_strategy": "0x10263c10" } }
 { "kind":"replay", "uid":124865, "timestamp":1568313296697920708, "event": "allocation_map_insert", "payload": { "ptr": "0x10000d270010", "record_ptr": "0x10000d270010", "record_size": "524288", "record_strategy": "0x10263c10" } }
