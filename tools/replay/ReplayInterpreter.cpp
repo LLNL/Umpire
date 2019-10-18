@@ -43,9 +43,7 @@ void ReplayInterpreter::buildAllocMapOperations(void)
       continue;
     }
 
-    ++m_op_seq;
-    compare_ss.str("");
-    compare_ss << m_json["event"] << " ";
+    ++m_op_count;
 
     if ( m_json["event"] == "allocation_map_insert" ) {
       replay_makeAllocationMapInsert();
@@ -62,11 +60,10 @@ void ReplayInterpreter::buildAllocMapOperations(void)
     else {
       REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
     }
-    compare_ss << std::endl;
   }
 }
 
-void ReplayInterpreter::buildOperations(void)
+void ReplayInterpreter::buildOperations()
 {
   while ( std::getline(m_input_file, m_line) ) {
     const std::string header("{ \"kind\":\"replay\", \"uid\":");
@@ -86,9 +83,7 @@ void ReplayInterpreter::buildOperations(void)
       continue;
     }
 
-    ++m_op_seq;
-    compare_ss.str("");
-    compare_ss << m_json["event"] << " ";
+    ++m_op_count;
 
     if ( m_json["event"] == "makeAllocator" ) {
       replay_makeAllocator();
@@ -133,18 +128,21 @@ void ReplayInterpreter::buildOperations(void)
     else {
       REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
     }
-    compare_ss << std::endl;
   }
 }
 
-//
-// Return: > 0 success, 0 eof, < 0 error
-//
-int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string& sym_line )
+void ReplayInterpreter::compile()
 {
+  const std::string header { "{ \"kind\":\"replay\", \"uid\":" };
+  auto const header_len = header.size();
+
+  m_input_file.seekg (0, m_input_file.end);
+  auto const filesize = m_input_file.tellg();
+  m_input_file.seekg(0, m_input_file.beg);
+  int last_percent_displayed = -1;
+
   while ( std::getline(m_input_file, m_line) ) {
-    const std::string header("{ \"kind\":\"replay\", \"uid\":");
-    auto header_len = header.size();
+    ++m_line_count;
 
     if ( m_line.size() <= header_len || m_line.substr(0, header_len) != header.substr(0, header_len) )
       continue;
@@ -160,7 +158,90 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
       continue;
     }
 
-    ++m_op_seq;
+    ++m_op_count;
+
+    const double fsize = static_cast<double>(filesize);
+    const double offset = static_cast<double>(m_input_file.tellg());
+    int percent = static_cast<int>(100.0 * offset/fsize);
+    if (percent > last_percent_displayed) {
+      last_percent_displayed = percent;
+      std::cout << percent << "%\r" << std::flush;
+    }
+
+    if ( m_json["event"] == "makeAllocator" ) {
+      replay_makeAllocator();
+    }
+    else if ( m_json["event"] == "makeMemoryResource" ) {
+      replay_makeMemoryResource();
+    }
+    else if ( m_json["event"] == "allocate" ) {
+      replay_allocate();
+    }
+    else if ( m_json["event"] == "deallocate" ) {
+      replay_deallocate();
+    }
+    else if ( m_json["event"] == "coalesce" ) {
+      replay_coalesce();
+    }
+    else if ( m_json["event"] == "release" ) {
+      replay_release();
+    }
+    else if ( m_json["event"] == "version" ) {
+      if (   m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR
+          || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
+          || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
+
+        REPLAY_WARNING("Warning, version mismatch:\n"
+          << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
+          << "  Log  version: "
+          << m_json["payload"]["major"] << "."
+          << m_json["payload"]["minor"]  << "."
+          << m_json["payload"]["patch"]);
+
+        if (m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR) {
+          REPLAY_ERROR("Warning, major version mismatch:\n"
+            << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
+            << "  Log  version: "
+            << m_json["payload"]["major"] << "."
+            << m_json["payload"]["minor"]  << "."
+            << m_json["payload"]["patch"]);
+        }
+      }
+    }
+    else {
+      REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
+    }
+  }
+  std::cout << std::endl;
+}
+
+//
+// Return: > 0 success, 0 eof, < 0 error
+//
+int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string& sym_line )
+{
+  const std::string header { "{ \"kind\":\"replay\", \"uid\":" };
+  auto const header_len = header.size();
+
+  while ( std::getline(m_input_file, m_line) ) {
+
+    ++m_op_count;
+
+    if ( m_line.size() <= header_len || m_line.substr(0, header_len) != header.substr(0, header_len) )
+      continue;
+
+    m_json.clear();
+    m_json = nlohmann::json::parse(m_line);
+
+    if (   m_json["event"] == "allocation_map_insert" 
+        || m_json["event"] == "allocation_map_find"
+        || m_json["event"] == "allocation_map_remove"
+        || m_json["event"] == "allocation_map_clear"
+    ) {
+      continue;
+    }
+
+    ++m_op_count;
     compare_ss.str("");
     compare_ss << m_json["event"] << " ";
 
@@ -217,7 +298,8 @@ int ReplayInterpreter::getSymbolicOperation( std::string& raw_line, std::string&
 }
 
 ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
-    m_input_file(in_file_name), m_num_allocators(0), m_op_seq(0)
+    m_input_file_name{in_file_name}, m_input_file{in_file_name},
+    m_num_allocators{0}, m_op_count{0}, m_line_count{0}
 {
   if ( ! m_input_file.is_open() )
     REPLAY_ERROR("Unable to open input file " << in_file_name);
@@ -804,8 +886,8 @@ void ReplayInterpreter::replay_allocate( void )
     const std::string memory_str = m_json["result"]["memory_ptr"];
     const uint64_t memory_ptr = std::stoul(memory_str, nullptr, 0);
 
-    compare_ss << m_op_seq;
-    m_allocation_id[memory_ptr] = m_op_seq;
+    compare_ss << m_op_count;
+    m_allocation_id[memory_ptr] = m_op_count;
     m_operation_mgr.makeAllocateCont(memory_ptr);
   }
 }
