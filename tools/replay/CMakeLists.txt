@@ -24,14 +24,14 @@ set(replay_sources
 
 blt_add_executable(
   NAME replay
-  SOURCES replay.cpp ${replay_sources} ${replay_headers}
+  SOURCES replay.cpp ${replay_sources}
   DEPENDS_ON ${tools_depends}
   OUTPUT_DIR ${TOOL_OUTPUT_DIRECTORY})
 list(APPEND replay_tools replay)
 
 blt_add_executable(
   NAME replaydiff
-  SOURCES replaydiff.cpp ${replay_sources} ${replay_headers}
+  SOURCES replaydiff.cpp ${replay_sources}
   DEPENDS_ON ${tools_depends}
   OUTPUT_DIR ${TOOL_OUTPUT_DIRECTORY})
 list(APPEND replay_tools replaydiff)
