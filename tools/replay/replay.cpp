@@ -12,8 +12,8 @@
 #include <chrono>
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
-#include "util/ReplayInterpreter.hpp"
-#include "util/ReplayMacros.hpp"
+#include "ReplayInterpreter.hpp"
+#include "ReplayMacros.hpp"
 
 int main(int argc, char* argv[])
 {

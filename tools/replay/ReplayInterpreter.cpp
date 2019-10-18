@@ -8,9 +8,9 @@
 #include <sstream>
 #include <string>
 
-#include "util/ReplayInterpreter.hpp"
-#include "util/ReplayMacros.hpp"
-#include "util/ReplayOperationManager.hpp"
+#include "ReplayInterpreter.hpp"
+#include "ReplayMacros.hpp"
+#include "ReplayOperationManager.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/tpl/json/json.hpp"
 #include "umpire/util/AllocationRecord.hpp"

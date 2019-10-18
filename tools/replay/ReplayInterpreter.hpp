@@ -11,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-#include "util/ReplayOperationManager.hpp"
+#include "ReplayOperationManager.hpp"
 #include "umpire/tpl/json/json.hpp"
 
 class ReplayInterpreter {
@@ -61,6 +61,6 @@ class ReplayInterpreter {
     void replay_makeAllocationMapClear( void );
 };
 
-#include "util/ReplayInterpreter.inl"
+#include "ReplayInterpreter.inl"
 
 #endif // REPLAY_ReplayInterpreter_HPP
