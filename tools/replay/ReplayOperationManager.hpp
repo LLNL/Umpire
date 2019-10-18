@@ -448,6 +448,6 @@ private:
   std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;
 };
 
-#include "util/ReplayOperationManager.inl"
+#include "ReplayOperationManager.inl"
 
 #endif // REPLAY_ReplayOperationManager_HPP

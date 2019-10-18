@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
-#include "util/ReplayInterpreter.hpp"
+#include "ReplayInterpreter.hpp"
 
 int main(int argc, char* argv[])
 {
