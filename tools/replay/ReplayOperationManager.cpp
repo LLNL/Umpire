@@ -19,8 +19,8 @@
 #include "umpire/util/AllocationMap.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "util/ReplayMacros.hpp"
-#include "util/ReplayOperationManager.hpp"
+#include "ReplayMacros.hpp"
+#include "ReplayOperationManager.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>   // getpid()

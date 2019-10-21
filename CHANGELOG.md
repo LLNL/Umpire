@@ -28,6 +28,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Constant device memory is disabled by default.
 
+- `CMAKE_C_STANDARD` is only overridden if it's less than c99.
 
 ### Removed
 
