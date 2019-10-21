@@ -19,13 +19,18 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added "unset" operations for removing CUDA memory advice.
 
+- Extended C/Fortran API with more allocation strategies.
+
+- NamedAllocator that allows creating a new allocator that passes allocations
+  through to underlying strategy
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.
 
 - Constant device memory is disabled by default.
 
-- AllocationAdvisor will "unset" advice upon deallocation.
+- `CMAKE_C_STANDARD` is only overridden if it's less than c99.
 
 ### Removed
 
