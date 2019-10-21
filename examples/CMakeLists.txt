@@ -76,7 +76,7 @@ if (ENABLE_CUDA)
   list(APPEND umpire_examples device_allocator_example)
 endif()
 
-install(TARGETS ${umpire_examples} DESTINATION ${UMPIRE_EXAMPLE_INSTALL_DIRECTORY})
+install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
 
 add_subdirectory(tutorial)
 
