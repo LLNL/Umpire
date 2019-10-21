@@ -4,8 +4,6 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (unit_output_dir ${TEST_OUTPUT_DIRECTORY}/unit)
-
 set (unit_depends umpire gtest)
 
 if (ENABLE_HIP)
@@ -15,8 +13,7 @@ endif()
 blt_add_executable(
   NAME resource_manager_tests
   SOURCES resource_manager_tests.cpp
-  DEPENDS_ON ${unit_depends}
-  OUTPUT_DIR ${unit_output_dir})
+  DEPENDS_ON ${unit_depends})
 
 blt_add_test(
   NAME resource_manager_tests
@@ -25,8 +22,7 @@ blt_add_test(
 blt_add_executable(
   NAME version_tests
   SOURCES version_tests.cpp
-  DEPENDS_ON ${unit_depends}
-  OUTPUT_DIR ${unit_output_dir})
+  DEPENDS_ON ${unit_depends})
 
 blt_add_test(
   NAME version_tests
