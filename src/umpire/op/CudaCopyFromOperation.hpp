@@ -33,14 +33,14 @@ class CudaCopyFromOperation :
       util::AllocationRecord *dst_allocation,
       std::size_t length);
 
-  camp::devices::Event 
+  camp::resources::Event 
   transform(
       void* src_ptr,
       void** dst_ptr,
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
       std::size_t length,
-      camp::devices::Context& ctx);
+      camp::resources::Context& ctx);
 };
 
 } // end of namespace op

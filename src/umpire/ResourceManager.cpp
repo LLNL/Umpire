@@ -493,8 +493,8 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
-camp::devices::Event 
-ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::devices::Context& ctx, std::size_t size)
+camp::resources::Event 
+ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Context& ctx, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
 

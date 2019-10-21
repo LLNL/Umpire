@@ -599,7 +599,7 @@ INSTANTIATE_TEST_CASE_P(
 
 TEST(AsyncTest, Copy)
 {
-  auto context = camp::devices::Context{camp::devices::Cuda{}};
+  auto context = camp::resources::Context{camp::resources::Cuda{}};
   auto& rm = umpire::ResourceManager::getInstance();
 
   constexpr std::size_t size = 1024;

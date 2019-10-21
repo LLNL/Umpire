@@ -22,14 +22,14 @@ MemoryOperation::transform(
   UMPIRE_ERROR("MemoryOperation::transform() is not implemented");
 }
 
-camp::devices::Event
+camp::resources::Event
 MemoryOperation::transform(
     void* UMPIRE_UNUSED_ARG(src_ptr),
     void** UMPIRE_UNUSED_ARG(dst_ptr),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t UMPIRE_UNUSED_ARG(length),
-    camp::devices::Context& ctx)
+    camp::resources::Context& ctx)
 {
   UMPIRE_ERROR("MemoryOperation::transform() is not implemented");
 }

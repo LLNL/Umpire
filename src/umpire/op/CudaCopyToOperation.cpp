@@ -39,16 +39,16 @@ void CudaCopyToOperation::transform(
       "event", "copy");
 }
 
-camp::devices::Event CudaCopyToOperation::transform(
+camp::resources::Event CudaCopyToOperation::transform(
     void* src_ptr,
     void** dst_ptr,
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t length,
-    camp::devices::Context& ctx)
+    camp::resources::Context& ctx)
 {
 
-  auto device = ctx.get<camp::devices::Cuda>();
+  auto device = ctx.get<camp::resources::Cuda>();
   auto stream = device.get_stream();
 
   cudaError_t error =
