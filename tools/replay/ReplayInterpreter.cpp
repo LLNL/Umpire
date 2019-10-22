@@ -351,7 +351,7 @@ void ReplayInterpreter::replay_makeAllocator( void )
     if ( type == "umpire::strategy::AllocationAdvisor" ) {
       const int numargs = static_cast<int>(m_json["payload"]["args"].size());
       const std::string& base_allocator_name = m_json["payload"]["args"][0];
-      const std::string& advice_operation = m_json["payload"]["args"][1];
+      const std::string advice_operation {m_json["payload"]["args"][1]};
       const std::string& last_arg = m_json["payload"]["args"][numargs-1];
 
       //
@@ -366,6 +366,8 @@ void ReplayInterpreter::replay_makeAllocator( void )
       }
 
       if (device_id >= 0) { // Optional device ID specified
+        const int id{device_id};
+
         switch ( numargs ) {
         default:
           REPLAY_ERROR("Invalid number of arguments (" << numargs
@@ -375,12 +377,13 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << allocator_name 
             << " " << base_allocator_name
             << " " << advice_operation 
-            << " " << device_id
-          ;
+            << " " << id;
+
           m_operation_mgr.makeAdvisor(
               introspection, allocator_name, base_allocator_name,
-              advice_operation, device_id);
+              advice_operation, id);
           break;
+
         case 4:
           const std::string& accessing_allocator_name = m_json["payload"]["args"][2];
 
@@ -389,11 +392,11 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << base_allocator_name
             << " " << advice_operation 
             << " " << accessing_allocator_name 
-            << " " << device_id
+            << " " << id
           ;
           m_operation_mgr.makeAdvisor(
               introspection, allocator_name, base_allocator_name,
-              advice_operation, accessing_allocator_name, device_id);
+              advice_operation, accessing_allocator_name, id);
           break;
         }
       }
@@ -431,13 +434,15 @@ void ReplayInterpreter::replay_makeAllocator( void )
     else if ( type == "umpire::strategy::DynamicPoolList" ) {
       const std::string& base_allocator_name = m_json["payload"]["args"][0];
 
-      std::size_t initial_alloc_size;
-      std::size_t min_alloc_size;
-
       // Now grab the optional fields
       if (m_json["payload"]["args"].size() >= 3) {
-        get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
-        get_from_string(m_json["payload"]["args"][2], min_alloc_size);
+        std::size_t val;
+
+        get_from_string(m_json["payload"]["args"][1], val);
+        const std::size_t initial_alloc_size {val};
+
+        get_from_string(m_json["payload"]["args"][2], val);
+        const std::size_t min_alloc_size {val};
 
         compare_ss << introspection 
           << " " << allocator_name 
@@ -451,11 +456,16 @@ void ReplayInterpreter::replay_makeAllocator( void )
             , base_allocator_name
             , initial_alloc_size
             , min_alloc_size
-            , umpire::strategy::heuristic_percent_releasable_list(0)
+            //, umpire::strategy::heuristic_percent_releasable_list(0)
         );
       }
       else if (m_json["payload"]["args"].size() == 2) {
-        get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
+        //
+        // TODO: Figure out a better way to do the following const stuf
+        //
+        std::size_t val;
+        get_from_string(m_json["payload"]["args"][1], val);
+        const std::size_t initial_alloc_size {val};
 
         compare_ss << introspection 
           << " " << allocator_name 
