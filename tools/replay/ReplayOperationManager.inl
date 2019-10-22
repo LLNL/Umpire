@@ -120,7 +120,7 @@ void ReplayOperationManager::makeDynamicPoolMap(
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -133,7 +133,7 @@ void ReplayOperationManager::makeDynamicPoolMap(
     };
   }
   else {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -160,7 +160,7 @@ void ReplayOperationManager::makeDynamicPoolList(
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -173,7 +173,7 @@ void ReplayOperationManager::makeDynamicPoolList(
     };
   }
   else {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -203,7 +203,7 @@ void ReplayOperationManager::makeFixedPool(
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -216,7 +216,7 @@ void ReplayOperationManager::makeFixedPool(
     };
   }
   else {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -243,7 +243,7 @@ void ReplayOperationManager::makeMixedPool(
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -256,7 +256,7 @@ void ReplayOperationManager::makeMixedPool(
     };
   }
   else {
-    m_cont_op->op = [=]() {
+    m_cont_op->op = [&]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
