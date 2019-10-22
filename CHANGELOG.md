@@ -32,6 +32,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `CMAKE_C_STANDARD` is only overridden if it's less than c99.
 
+- Build and install all binaries in the `bin` directory.
+
 ### Removed
 
 ### Fixed
