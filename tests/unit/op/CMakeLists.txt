@@ -4,14 +4,11 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (op_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/op)
-
 if (ENABLE_CUDA)
   blt_add_executable(
     NAME cuda_mem_advise_op_tests
     SOURCES cuda_mem_advise_op_tests.cpp
-    DEPENDS_ON umpire cuda_runtime gtest gmock
-    OUTPUT_DIR ${op_output_dir})
+    DEPENDS_ON umpire cuda_runtime gtest gmock)
 
   blt_add_test(
     NAME cuda_mem_advise_op_tests

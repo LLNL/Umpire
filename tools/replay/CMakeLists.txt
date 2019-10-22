@@ -25,15 +25,13 @@ set(replay_sources
 blt_add_executable(
   NAME replay
   SOURCES replay.cpp ${replay_sources}
-  DEPENDS_ON ${tools_depends}
-  OUTPUT_DIR ${TOOL_OUTPUT_DIRECTORY})
+  DEPENDS_ON ${tools_depends})
 list(APPEND replay_tools replay)
 
 blt_add_executable(
   NAME replaydiff
   SOURCES replaydiff.cpp ${replay_sources}
-  DEPENDS_ON ${tools_depends}
-  OUTPUT_DIR ${TOOL_OUTPUT_DIRECTORY})
+  DEPENDS_ON ${tools_depends})
 list(APPEND replay_tools replaydiff)
 
-install(TARGETS ${replay_tools} DESTINATION ${UMPIRE_TOOL_INSTALL_DIRECTORY})
+install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)
