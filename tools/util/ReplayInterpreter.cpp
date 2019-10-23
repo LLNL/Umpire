@@ -15,6 +15,10 @@
 #include "umpire/tpl/json/json.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
+#if !defined(_MSC_VER)
+#include <cxxabi.h>
+#endif
+
 void ReplayInterpreter::runOperations(bool gather_statistics)
 {
   m_operation_mgr.runOperations(gather_statistics);
@@ -264,7 +268,26 @@ void ReplayInterpreter::replay_makeAllocator( void )
   //
   if ( m_json["result"].is_null() ) {
     const bool introspection = m_json["payload"]["with_introspection"];
-    const std::string type = m_json["payload"]["type"];
+    const std::string mangled_type = m_json["payload"]["type"];
+
+    std::string type_str{m_json["payload"]["type"]};
+    std::string type_str_prefix{type_str.substr(0, 2)};
+
+    const char* mangled_type_c = 
+      (type_str_prefix == "_Z") ? type_str.c_str() : (std::string{"_Z"} + type_str).c_str();
+
+    auto result = abi::__cxa_demangle(
+        mangled_type_c, 
+        nullptr,
+        nullptr,
+        nullptr);
+    const std::string type{result};
+
+    ::free(result);
+
+    if (!result) {
+        REPLAY_ERROR("Failed to demangle strategy type. Mangled type: " << type_str);
+    }
 
     if ( type == "umpire::strategy::AllocationAdvisor" ) {
       const int numargs = static_cast<int>(m_json["payload"]["args"].size());
