@@ -4,6 +4,11 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+if((NOT DEFINED CMAKE_C_STANDARD) OR (CMAKE_C_STANDARD VERSION_EQUAL 90))
+    message(STATUS "Setting C standard to 99")
+    set(CMAKE_C_STANDARD 99)
+endif()
+
 message(STATUS "Checking for std::filesystem")
 
 include(CheckCXXSourceCompiles)

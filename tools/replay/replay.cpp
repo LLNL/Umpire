@@ -12,8 +12,8 @@
 #include <chrono>
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
-#include "util/ReplayInterpreter.hpp"
-#include "util/ReplayMacros.hpp"
+#include "ReplayInterpreter.hpp"
+#include "ReplayMacros.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -33,6 +33,9 @@ int main(int argc, char* argv[])
     (  "i, infile"
      , "Input file created by Umpire library with UMPIRE_REPLAY=On"
      , cxxopts::value<std::string>(), "FILE"
+    )
+    (  "c, compile"
+     , "Compile input file to binary format for faster replays"
     )
     (
       "s, stats"
@@ -59,7 +62,10 @@ int main(int argc, char* argv[])
   t1 = std::chrono::high_resolution_clock::now();
   ReplayInterpreter replay(input_file_name);
 
-  if (command_line_args.count("allocation_map")) {
+  if (command_line_args.count("compile")) {
+    replay.compile();
+  }
+  else if (command_line_args.count("allocation_map")) {
     replay.buildAllocMapOperations();
   }
   else {

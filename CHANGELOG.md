@@ -17,6 +17,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added statistic gathering capability to `replay`
 
+- Extended C/Fortran API with more allocation strategies.
+
+- NamedAllocator that allows creating a new allocator that passes allocations
+  through to underlying strategy
 
 ### Changed
 
@@ -24,6 +28,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Constant device memory is disabled by default.
 
+- `CMAKE_C_STANDARD` is only overridden if it's less than c99.
+
+- Build and install all binaries in the `bin` directory.
+
+- Refactored replay tool implementation in preparation for addition of
+  capability to compile replays.
 
 ### Removed
 
