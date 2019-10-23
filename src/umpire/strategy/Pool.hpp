@@ -49,9 +49,12 @@ class Pool :
     Platform getPlatform() noexcept override;
   private:
     struct Chunk {
+      Chunk(void* ptr, std::size_t s, std::size_t cs) :
+        data{ptr}, size{s}, chunk_size{cs} {}
+
       void* data;
       std::size_t size;
-      std::size_t chunkSize;
+      std::size_t chunk_size;
       bool free{true};
       Chunk* prev{nullptr};
       Chunk* next{nullptr};
