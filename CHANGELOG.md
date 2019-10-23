@@ -30,7 +30,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `CMAKE_C_STANDARD` is only overridden if it's less than c99.
 
+- Build and install all binaries in the `bin` directory.
+
+- Refactored replay tool implementation in preparation for addition of
+  capability to compile replays.
+
+- Replay logs now contain mangled symbols, and these are demangled by the
+  `replay` tool.
+
 ### Removed
+
+- Usage of `__cxa_demangle` in core Umpire library.
 
 ### Fixed
 

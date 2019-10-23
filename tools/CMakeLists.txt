@@ -7,6 +7,6 @@
 
 install(
   FILES analysis/plot_allocations analysis/plot_allocator_traces
-  DESTINATION ${UMPIRE_TOOL_INSTALL_DIRECTORY})
+  DESTINATION bin)
 
 add_subdirectory(replay)

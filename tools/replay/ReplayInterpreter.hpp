@@ -16,8 +16,9 @@
 
 class ReplayInterpreter {
   public:
-    void buildOperations(void);
-    void buildAllocMapOperations(void);
+    void buildOperations();
+    void buildAllocMapOperations();
+    void compile();
     void runOperations(bool gather_statistics);
 
     //
@@ -34,6 +35,7 @@ class ReplayInterpreter {
     using AllocatorIndexMap = std::unordered_map<AllocatorFromLog, AllocatorIndex>;
     using AllocationAllocatorMap = std::unordered_map<AllocationFromLog, AllocatorIndex>;
 
+    std::string m_input_file_name;
     std::ifstream m_input_file;
     std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::string m_line;
@@ -43,7 +45,8 @@ class ReplayInterpreter {
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
     ReplayOperationManager m_operation_mgr;
-    uint64_t m_op_seq;
+    uint64_t m_op_count;
+    uint64_t m_line_count;
     std::stringstream compare_ss;
 
     template <typename T> void get_from_string( const std::string& s, T& val );
