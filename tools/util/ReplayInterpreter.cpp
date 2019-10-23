@@ -282,12 +282,10 @@ void ReplayInterpreter::replay_makeAllocator( void )
         nullptr,
         nullptr);
     const std::string type{result};
-
-    ::free(result);
-
     if (!result) {
         REPLAY_ERROR("Failed to demangle strategy type. Mangled type: " << type_str);
     }
+    ::free(result);
 
     if ( type == "umpire::strategy::AllocationAdvisor" ) {
       const int numargs = static_cast<int>(m_json["payload"]["args"].size());
