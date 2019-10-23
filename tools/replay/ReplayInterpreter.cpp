@@ -582,8 +582,60 @@ void ReplayInterpreter::replay_makeAllocator( void )
             , base_allocator_name
         );
       }
-    }
-    else if ( type == "umpire::strategy::MonotonicAllocationStrategy" ) {
+    } else if ( type == "umpire::strategy::Pool" ) {
+      const std::string& base_allocator_name{m_json["payload"]["args"][0]};
+
+      std::size_t initial_alloc_size;
+      std::size_t min_alloc_size;
+
+      if (m_json["payload"]["args"].size() >= 3) {
+        get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
+        get_from_string(m_json["payload"]["args"][2], min_alloc_size);
+
+        compare_ss << introspection 
+          << " " << allocator_name 
+          << " " << base_allocator_name
+          << " " << initial_alloc_size 
+          << " " << min_alloc_size 
+        ;
+        m_operation_mgr.makePool(
+              introspection
+            , allocator_name
+            , base_allocator_name
+            , initial_alloc_size
+            , min_alloc_size
+        );
+      }
+      else if (m_json["payload"]["args"].size() == 2) {
+        get_from_string(m_json["payload"]["args"][1], initial_alloc_size);
+
+        compare_ss << introspection 
+          << " " << allocator_name 
+          << " " << base_allocator_name
+          << " " << initial_alloc_size 
+        ;
+        m_operation_mgr.makePool(
+              introspection
+            , allocator_name
+            , base_allocator_name
+            , initial_alloc_size
+        );
+      } else {
+        compare_ss << introspection 
+          << " " << allocator_name 
+          << " " << base_allocator_name
+        ;
+        m_operation_mgr.makePool(
+              introspection
+            , allocator_name
+            , base_allocator_name
+        );
+      }
+
+
+
+
+    } else if ( type == "umpire::strategy::MonotonicAllocationStrategy" ) {
       const std::string& base_allocator_name{m_json["payload"]["args"][1]};
 
       std::size_t capacity;

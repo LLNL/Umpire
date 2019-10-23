@@ -84,6 +84,14 @@ public:
     , Args&&... args
   );
 
+  template <typename... Args>
+  void makePool(
+      const bool introspection,
+      const std::string& allocator_name,
+      const std::string& base_allocator_name,
+      Args&&... args);
+
+
   void makeMonotonicAllocator(
       const bool introspection
     , const std::string& allocator_name

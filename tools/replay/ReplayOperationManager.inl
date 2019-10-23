@@ -17,6 +17,7 @@
 #include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/Pool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
@@ -178,6 +179,46 @@ void ReplayOperationManager::makeDynamicPoolList(
 
       this->m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
+          )
+      );
+    };
+  }
+
+  operations.push_back(m_cont_op);
+}
+
+template <typename... Args>
+void ReplayOperationManager::makePool(
+    const bool introspection
+  , const std::string& allocator_name
+  , const std::string& base_allocator_name
+  , Args&&... args
+)
+{
+  m_cont_op = new ReplayOperation;
+
+  if (introspection) {
+    m_cont_op->op = [&]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::Pool, true>
+          (   allocator_name
+            , rm.getAllocator(base_allocator_name)
+            , std::forward<Args>(args)...
+          )
+      );
+    };
+  }
+  else {
+    m_cont_op->op = [&]() {
+      auto& rm = umpire::ResourceManager::getInstance();
+
+      this->m_allocator_array.push_back(
+        rm.makeAllocator<umpire::strategy::Pool, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
             , std::forward<Args>(args)...
