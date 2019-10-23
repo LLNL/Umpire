@@ -1,0 +1,2 @@
+cd /tmp && git clone --recursive https://github.com/LLNL/Umpire.git
+cd /tmp/Umpire && mkdir build && cd build && cmake -DBUILD_SHARED_LIBS=On -DCMAKE_INSTALL_PREFIX=${HOME} .. && make -j install

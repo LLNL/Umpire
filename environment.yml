@@ -1,0 +1,6 @@
+name: umpire
+channels:
+  - conda-forge
+dependencies:
+  - xeus-cling=0.7.1
+  - notebook
