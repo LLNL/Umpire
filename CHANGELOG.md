@@ -32,6 +32,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Build and install all binaries in the `bin` directory.
 
+- Refactored replay tool implementation in preparation for addition of
+  capability to compile replays.
+
 ### Removed
 
 ### Fixed
