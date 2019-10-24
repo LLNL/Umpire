@@ -66,41 +66,6 @@ public:
       Args&&... args
   );
 
-  void makeMonotonicAllocator(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::size_t capacity
-    , const std::string base_allocator_name
-  );
-  
-  void makeSlotPool(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::size_t slots
-    , const std::string base_allocator_name
-  );
-
-  void makeSizeLimiter(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::string base_allocator_name
-    , const std::size_t size_limit
-  );
-
-  void makeThreadSafeAllocator(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::string base_allocator_name
-  );
-
-  template <typename... Args>
-  void makeMixedPool(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::string base_allocator_name
-    , Args&&... args
-  );
-
   void makeAllocatorCont( void );
 
   //
