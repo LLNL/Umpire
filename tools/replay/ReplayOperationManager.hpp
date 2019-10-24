@@ -40,89 +40,89 @@ public:
 
   void dumpStats();
 
-  void makeMemoryResource( const std::string& resource_name );
+  void makeMemoryResource( const std::string resource_name );
 
   template<typename Strategy, bool Introspection, typename... Args>
   void makeAllocator(
       const std::string allocator_name
     , const std::string base_allocator_name
-    , Args&&... args);
+    , Args... args);
 
   template<typename... Args>
   void makeFixedPool(
       const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , Args&&... args
+    , const std::string allocator_name
+    , const std::string base_allocator_name
+    , Args... args
   );
 
   template <typename... Args>
   void makeAdvisor(
       const bool introspection,
-      const std::string& allocator_name,
-      const std::string& base_allocator_name,
-      Args&&... args
+      const std::string allocator_name,
+      const std::string base_allocator_name,
+      Args... args
   );
 
   template <typename... Args>
   void makeAdvisor(
       const bool introspection,
-      const std::string& allocator_name,
-      const std::string& base_allocator_name,
-      const std::string& advice_operation,
-      const std::string& accessing_allocator_name,
-      Args&&... args
+      const std::string allocator_name,
+      const std::string base_allocator_name,
+      const std::string advice_operation,
+      const std::string accessing_allocator_name,
+      Args... args
   );
 
   template <typename... Args>
   void makeDynamicPoolMap(
       const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , Args&&... args
+    , const std::string allocator_name
+    , const std::string base_allocator_name
+    , Args... args
   );
 
   template <typename... Args>
   void makeDynamicPoolList(
       const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , Args&&... args
+    , const std::string allocator_name
+    , const std::string base_allocator_name
+    , Args... args
   );
 
   void makeMonotonicAllocator(
       const bool introspection
-    , const std::string& allocator_name
+    , const std::string allocator_name
     , const std::size_t capacity
-    , const std::string& base_allocator_name
+    , const std::string base_allocator_name
   );
   
   void makeSlotPool(
       const bool introspection
-    , const std::string& allocator_name
+    , const std::string allocator_name
     , const std::size_t slots
-    , const std::string& base_allocator_name
+    , const std::string base_allocator_name
   );
 
   void makeSizeLimiter(
       const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
+    , const std::string allocator_name
+    , const std::string base_allocator_name
     , const std::size_t size_limit
   );
 
   void makeThreadSafeAllocator(
       const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
+    , const std::string allocator_name
+    , const std::string base_allocator_name
   );
 
   template <typename... Args>
   void makeMixedPool(
       const bool introspection
-    , const std::string& allocator_name
-    , const std::string& base_allocator_name
-    , Args&&... args
+    , const std::string allocator_name
+    , const std::string base_allocator_name
+    , Args... args
   );
 
   void makeAllocatorCont( void );
@@ -133,7 +133,7 @@ public:
   void makeAllocate( int allocator_num, std::size_t size );
   void makeAllocateCont( uint64_t allocation_from_log );
   void makeDeallocate( int allocator_num, uint64_t allocation_from_log );
-  void makeCoalesce( const std::string& allocator_name );
+  void makeCoalesce( const std::string allocator_name );
   void makeRelease( int allocator_num );
 
   void makeAllocationMapInsert(void* key, umpire::util::AllocationRecord rec);

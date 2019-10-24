@@ -31,8 +31,8 @@
 
 void ReplayOperationManager::makeSizeLimiter(
     const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
+  , const std::string allocator_name
+  , const std::string base_allocator_name
   , const std::size_t size_limit
 )
 {
@@ -155,16 +155,16 @@ void ReplayOperationManager::dumpStats()
   }
 }
 
-void ReplayOperationManager::makeMemoryResource( const std::string& resource_name )
+void ReplayOperationManager::makeMemoryResource( const std::string resource_name )
 {
   m_resource_names.push_back(resource_name);
 }
 
 void ReplayOperationManager::makeMonotonicAllocator(
     const bool introspection
-  , const std::string& allocator_name
+  , const std::string allocator_name
   , const std::size_t capacity
-  , const std::string& base_allocator_name
+  , const std::string base_allocator_name
 )
 {
   m_cont_op = new ReplayOperation;
@@ -201,9 +201,9 @@ void ReplayOperationManager::makeMonotonicAllocator(
 
 void ReplayOperationManager::makeSlotPool(
     const bool introspection
-  , const std::string& allocator_name
+  , const std::string allocator_name
   , const std::size_t slots
-  , const std::string& base_allocator_name
+  , const std::string base_allocator_name
 )
 {
   m_cont_op = new ReplayOperation;
@@ -240,8 +240,8 @@ void ReplayOperationManager::makeSlotPool(
 
 void ReplayOperationManager::makeThreadSafeAllocator(
     const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
+  , const std::string allocator_name
+  , const std::string base_allocator_name
 )
 {
   m_cont_op = new ReplayOperation;
@@ -290,7 +290,7 @@ void ReplayOperationManager::makeDeallocate( int allocator_num, uint64_t allocat
   operations.push_back(m_cont_op);
 }
 
-void ReplayOperationManager::makeCoalesce( const std::string& allocator_name )
+void ReplayOperationManager::makeCoalesce( const std::string allocator_name )
 {
   m_cont_op = new ReplayOperation;
 

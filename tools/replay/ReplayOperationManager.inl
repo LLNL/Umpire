@@ -25,7 +25,7 @@ void
 ReplayOperationManager::makeAllocator(
     const std::string allocator_name
   , const std::string base_allocator_name
-  , Args&&... args)
+  , Args... args)
 {
   m_cont_op = new ReplayOperation;
   m_cont_op->op = [=]() {
@@ -34,7 +34,7 @@ ReplayOperationManager::makeAllocator(
         rm.makeAllocator<Strategy, Introspection>(
           allocator_name,
           rm.getAllocator(base_allocator_name),
-          args...));
+          std::forward<Args>(args)...));
   };
   operations.push_back(m_cont_op);
 }
@@ -46,9 +46,9 @@ ReplayOperationManager::makeAllocator(
 template <typename... Args>
 void ReplayOperationManager::makeAdvisor(
     const bool introspection,
-    const std::string& allocator_name,
-    const std::string& base_allocator_name,
-    Args&& ... args
+    const std::string allocator_name,
+    const std::string base_allocator_name,
+    Args... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -86,11 +86,11 @@ void ReplayOperationManager::makeAdvisor(
 template <typename... Args>
 void ReplayOperationManager::makeAdvisor(
     const bool introspection,
-    const std::string& allocator_name,
-    const std::string& base_allocator_name,
-    const std::string& advice_operation,
-    const std::string& accessing_allocator_name,
-    Args&& ... args
+    const std::string allocator_name,
+    const std::string base_allocator_name,
+    const std::string advice_operation,
+    const std::string accessing_allocator_name,
+    Args... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -132,15 +132,15 @@ void ReplayOperationManager::makeAdvisor(
 template <typename... Args>
 void ReplayOperationManager::makeDynamicPoolMap(
     const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
-  , Args&&... args
+  , const std::string allocator_name
+  , const std::string base_allocator_name
+  , Args... args
 )
 {
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -153,7 +153,7 @@ void ReplayOperationManager::makeDynamicPoolMap(
     };
   }
   else {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -172,15 +172,15 @@ void ReplayOperationManager::makeDynamicPoolMap(
 template <typename... Args>
 void ReplayOperationManager::makeDynamicPoolList(
     const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
-  , Args&&... args
+  , const std::string allocator_name
+  , const std::string base_allocator_name
+  , Args... args
 )
 {
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -193,7 +193,7 @@ void ReplayOperationManager::makeDynamicPoolList(
     };
   }
   else {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -215,15 +215,15 @@ void ReplayOperationManager::makeDynamicPoolList(
 template<typename... Args>
 void ReplayOperationManager::makeFixedPool(
     const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
-  , Args&&... args
+  , const std::string allocator_name
+  , const std::string base_allocator_name
+  , Args... args
 )
 {
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -236,7 +236,7 @@ void ReplayOperationManager::makeFixedPool(
     };
   }
   else {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -255,15 +255,15 @@ void ReplayOperationManager::makeFixedPool(
 template <typename... Args>
 void ReplayOperationManager::makeMixedPool(
     const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
-  , Args&&... args
+  , const std::string allocator_name
+  , const std::string base_allocator_name
+  , Args... args
 )
 {
   m_cont_op = new ReplayOperation;
 
   if (introspection) {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
@@ -276,7 +276,7 @@ void ReplayOperationManager::makeMixedPool(
     };
   }
   else {
-    m_cont_op->op = [&]() {
+    m_cont_op->op = [=]() {
       auto& rm = umpire::ResourceManager::getInstance();
 
       this->m_allocator_array.push_back(
