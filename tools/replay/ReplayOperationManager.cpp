@@ -70,10 +70,11 @@ void ReplayOperationManager::makeSizeLimiter(
 
 void ReplayOperationManager::makeAllocate( int allocator_num, std::size_t size )
 {
-  m_cont_op = new ReplayOperation;
-  m_cont_op->op = [=]() {
-    m_cont_op->m_allocation_ptr = this->m_allocator_array[allocator_num].allocate(size);
+  auto alloc_op = new ReplayOperation;
+  alloc_op->op = [=]() {
+    alloc_op->m_allocation_ptr = this->m_allocator_array[allocator_num].allocate(size);
   };
+  m_cont_op = alloc_op;
   operations.push_back(m_cont_op);
 }
 
