@@ -133,8 +133,8 @@ void StrategyTest<umpire::strategy::SlotPool>::SetUp()
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::SlotPool>(
             name, 
-            8,
-            rm.getAllocator("HOST")));
+            rm.getAllocator("HOST"),
+            8));
 }
 
 template<>
@@ -146,8 +146,8 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
             name, 
-            1024,
-            rm.getAllocator("HOST")));
+            rm.getAllocator("HOST"),
+            1024));
 }
 
 using Strategies = ::testing::Types<
@@ -442,7 +442,7 @@ TEST(MonotonicStrategy, Host)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "host_monotonic_pool", 65536, rm.getAllocator("HOST"));
+      "host_monotonic_pool", rm.getAllocator("HOST"), 65536);
 
   void* alloc = allocator.allocate(100);
   void* alloc2 = allocator.allocate(100);
@@ -463,7 +463,7 @@ TEST(MonotonicStrategy, Device)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "device_monotonic_pool", 65536, rm.getAllocator("DEVICE"));
+      "device_monotonic_pool", rm.getAllocator("DEVICE"), 65536);
 
   void* alloc = allocator.allocate(100);
 
@@ -482,7 +482,7 @@ TEST(MonotonicStrategy, UM)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "um_monotonic_pool", 65536, rm.getAllocator("UM"));
+      "um_monotonic_pool", rm.getAllocator("UM"), 65536);
 
   void* alloc = allocator.allocate(100);
 
@@ -828,7 +828,7 @@ TEST(HeuristicTest, EdgeCases_75)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_75", rm.getAllocator("HOST"),
-      1024ul, 1024ul, h_fun, alignment);
+      1024ul, 1024ul, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
@@ -865,7 +865,7 @@ TEST(HeuristicTest, EdgeCases_100)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_100", rm.getAllocator("HOST"),
-      initial_size, subsequent_min_size, h_fun, alignment);
+      initial_size, subsequent_min_size, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
@@ -924,7 +924,7 @@ TEST(HeuristicTest, EdgeCases_0)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_0", rm.getAllocator("HOST"),
-      initial_size, subsequent_min_size, h_fun, alignment);
+      initial_size, subsequent_min_size, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
@@ -1272,7 +1272,7 @@ TEST(NumaPolicyTest, EdgeCases) {
 
   // Only works with HOST allocators
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
-                 "numa_alloc", numa_node, rm.getAllocator("DEVICE")),
+                 "numa_alloc", rm.getAllocator("DEVICE"), numa_node),
                umpire::util::Exception);
 #endif
 }
@@ -1286,7 +1286,7 @@ TEST(NumaPolicyTest, Location) {
     ss << "numa_alloc_" << n;
 
     auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      ss.str(), n, rm.getAllocator("HOST"));
+      ss.str(), rm.getAllocator("HOST"), n);
 
     void* ptr = alloc.allocate(10 * umpire::get_page_size());
 

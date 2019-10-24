@@ -176,8 +176,8 @@ void ReplayOperationManager::makeMonotonicAllocator(
       this->m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>
           (   allocator_name
-            , capacity
             , rm.getAllocator(base_allocator_name)
+            , capacity
           )
       );
     };
@@ -189,8 +189,8 @@ void ReplayOperationManager::makeMonotonicAllocator(
       this->m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>
           (   allocator_name
-            , capacity
             , rm.getAllocator(base_allocator_name)
+            , capacity
           )
       );
     };
@@ -215,8 +215,8 @@ void ReplayOperationManager::makeSlotPool(
       this->m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::SlotPool, true>
           (   allocator_name
-            , slots
             , rm.getAllocator(base_allocator_name)
+            , slots
           )
       );
     };
@@ -228,8 +228,8 @@ void ReplayOperationManager::makeSlotPool(
       this->m_allocator_array.push_back(
         rm.makeAllocator<umpire::strategy::SlotPool, false>
           (   allocator_name
-            , slots
             , rm.getAllocator(base_allocator_name)
+            , slots
           )
       );
     };

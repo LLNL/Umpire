@@ -20,6 +20,26 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+template<typename Strategy, bool Introspection, typename... Args>
+void 
+ReplayOperationManager::makeAllocator(
+    const std::string allocator_name
+  , const std::string base_allocator_name
+  , Args&&... args)
+{
+  m_cont_op = new ReplayOperation;
+  m_cont_op->op = [=]() {
+    auto& rm = umpire::ResourceManager::getInstance();
+    this->m_allocator_array.push_back(
+        rm.makeAllocator<Strategy, Introspection>(
+          allocator_name,
+          rm.getAllocator(base_allocator_name),
+          args...));
+  };
+  operations.push_back(m_cont_op);
+}
+
+
 //
 // AllocationAdvisor
 //

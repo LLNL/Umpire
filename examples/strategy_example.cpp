@@ -38,13 +38,13 @@ int main(int, char**)
       "host_dynamic_pool", rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "MONOTONIC 1024", 1024, rm.getAllocator("HOST"));
+      "MONOTONIC 1024", rm.getAllocator("HOST"), 1024);
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "MONOTONIC 4096", 4096, rm.getAllocator("HOST"));
+      "MONOTONIC 4096", rm.getAllocator("HOST"), 4096);
 
   alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
-      "host_slot_pool", 64, rm.getAllocator("HOST"));
+      "host_slot_pool", rm.getAllocator("HOST"), 64);
 
   /*
    * Get the previously created POOL allocator.

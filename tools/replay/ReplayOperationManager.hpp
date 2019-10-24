@@ -42,6 +42,12 @@ public:
 
   void makeMemoryResource( const std::string& resource_name );
 
+  template<typename Strategy, bool Introspection, typename... Args>
+  void makeAllocator(
+      const std::string allocator_name
+    , const std::string base_allocator_name
+    , Args&&... args);
+
   template<typename... Args>
   void makeFixedPool(
       const bool introspection
