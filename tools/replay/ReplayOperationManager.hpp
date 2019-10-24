@@ -48,14 +48,6 @@ public:
     , const std::string base_allocator_name
     , Args&&... args);
 
-  template<typename... Args>
-  void makeFixedPool(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::string base_allocator_name
-    , Args&&... args
-  );
-
   template <typename... Args>
   void makeAdvisor(
       const bool introspection,
@@ -72,22 +64,6 @@ public:
       const std::string advice_operation,
       const std::string accessing_allocator_name,
       Args&&... args
-  );
-
-  template <typename... Args>
-  void makeDynamicPoolMap(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::string base_allocator_name
-    , Args&&... args
-  );
-
-  template <typename... Args>
-  void makeDynamicPoolList(
-      const bool introspection
-    , const std::string allocator_name
-    , const std::string base_allocator_name
-    , Args&&... args
   );
 
   void makeMonotonicAllocator(
