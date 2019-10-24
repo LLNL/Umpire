@@ -106,4 +106,12 @@ if (NOT TARGET camp)
   else ()
     add_subdirectory(camp)
   endif()
+
+  if(ENABLE_CUDA)
+    blt_register_library(
+      NAME camp
+      DEPENDS_ON cuda_runtime
+      LIBRARIES camp
+      DEFINES CAMP_HAVE_CUDA)
+  endif()
 endif ()
