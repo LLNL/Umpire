@@ -20,7 +20,7 @@
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
-#include "camp/resources.hpp"
+#include "camp/contexts.hpp"
 
 namespace umpire {
 

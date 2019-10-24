@@ -11,7 +11,7 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
-#include "camp/resources.hpp"
+#include "camp/contexts.hpp"
 
 namespace umpire {
 namespace op {
