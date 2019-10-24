@@ -23,8 +23,10 @@ CudaMemPrefetchOperation::apply(
   int device{value};
   cudaError_t error;
 
-  // Use GPU 0 for sync if device is CPU
-  int gpu = (device != cudaCpuDeviceId) ? device : 0;
+  // Use current device for properties if device is CPU
+  int current_device;
+  cudaGetDevice(&current_device);
+  int gpu = (device != cudaCpuDeviceId) ? device : current_device;
 
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
@@ -49,13 +51,6 @@ CudaMemPrefetchOperation::apply(
         << ") failed with error: "
         << cudaGetErrorString(error));
     }
-
-    // Synchronize the appropriate device
-    int current_device;
-    cudaGetDevice(&current_device);
-    cudaSetDevice(gpu);
-    cudaDeviceSynchronize();
-    cudaSetDevice(current_device);
   }
 }
 
