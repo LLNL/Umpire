@@ -25,7 +25,7 @@ void
 ReplayOperationManager::makeAllocator(
     const std::string allocator_name
   , const std::string base_allocator_name
-  , Args... args)
+  , Args&&... args)
 {
   m_cont_op = new ReplayOperation;
   m_cont_op->op = [=]() {
@@ -34,7 +34,7 @@ ReplayOperationManager::makeAllocator(
         rm.makeAllocator<Strategy, Introspection>(
           allocator_name,
           rm.getAllocator(base_allocator_name),
-          std::forward<Args>(args)...));
+          args...));
   };
   operations.push_back(m_cont_op);
 }
@@ -48,7 +48,7 @@ void ReplayOperationManager::makeAdvisor(
     const bool introspection,
     const std::string allocator_name,
     const std::string base_allocator_name,
-    Args... args
+    Args&&... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -90,7 +90,7 @@ void ReplayOperationManager::makeAdvisor(
     const std::string base_allocator_name,
     const std::string advice_operation,
     const std::string accessing_allocator_name,
-    Args... args
+    Args&&... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -134,7 +134,7 @@ void ReplayOperationManager::makeDynamicPoolMap(
     const bool introspection
   , const std::string allocator_name
   , const std::string base_allocator_name
-  , Args... args
+  , Args&&... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -174,7 +174,7 @@ void ReplayOperationManager::makeDynamicPoolList(
     const bool introspection
   , const std::string allocator_name
   , const std::string base_allocator_name
-  , Args... args
+  , Args&&... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -217,7 +217,7 @@ void ReplayOperationManager::makeFixedPool(
     const bool introspection
   , const std::string allocator_name
   , const std::string base_allocator_name
-  , Args... args
+  , Args&&... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -257,7 +257,7 @@ void ReplayOperationManager::makeMixedPool(
     const bool introspection
   , const std::string allocator_name
   , const std::string base_allocator_name
-  , Args... args
+  , Args&&... args
 )
 {
   m_cont_op = new ReplayOperation;
@@ -270,7 +270,7 @@ void ReplayOperationManager::makeMixedPool(
         rm.makeAllocator<umpire::strategy::MixedPool, true>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args)...
+            , (args)...
           )
       );
     };
@@ -283,7 +283,7 @@ void ReplayOperationManager::makeMixedPool(
         rm.makeAllocator<umpire::strategy::MixedPool, false>
           (   allocator_name
             , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args)...
+            , (args)...
           )
       );
     };

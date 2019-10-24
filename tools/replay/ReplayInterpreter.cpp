@@ -619,10 +619,10 @@ void ReplayInterpreter::replay_makeAllocator( void )
       }
     }
     else if ( type == "umpire::strategy::MonotonicAllocationStrategy" ) {
-      const std::string base_allocator_name{m_json["payload"]["args"][1]};
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       std::size_t capacity;
-      get_from_string(m_json["payload"]["args"][0], capacity);
+      get_from_string(m_json["payload"]["args"][1], capacity);
 
       compare_ss << introspection 
         << " " << allocator_name 
@@ -637,10 +637,10 @@ void ReplayInterpreter::replay_makeAllocator( void )
       );
     }
     else if ( type == "umpire::strategy::SlotPool" ) {
-      const std::string base_allocator_name{m_json["payload"]["args"][1]};
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       std::size_t slots;
-      get_from_string(m_json["payload"]["args"][0], slots);
+      get_from_string(m_json["payload"]["args"][1], slots);
 
       compare_ss << introspection 
         << " " << allocator_name 
@@ -690,11 +690,10 @@ void ReplayInterpreter::replay_makeAllocator( void )
       std::size_t object_bytes;
       get_from_string(m_json["payload"]["args"][1], object_bytes);
 
-      std::size_t objects_per_pool;
-      get_from_string(m_json["payload"]["args"][2], objects_per_pool);
-
       // Now grab the optional fields
       if (m_json["payload"]["args"].size() >= 3) {
+        std::size_t objects_per_pool;
+        get_from_string(m_json["payload"]["args"][2], objects_per_pool);
 
         compare_ss << introspection 
           << " " << allocator_name 
