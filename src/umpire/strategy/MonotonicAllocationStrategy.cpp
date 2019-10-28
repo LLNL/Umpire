@@ -16,8 +16,8 @@ namespace strategy {
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
     const std::string& name,
     int id,
-    std::size_t capacity,
-    Allocator allocator) :
+    Allocator allocator,
+    std::size_t capacity) :
   AllocationStrategy(name, id),
   m_size(0),
   m_capacity(capacity),
