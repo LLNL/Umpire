@@ -23,8 +23,8 @@ class SlotPool :
     SlotPool(
       const std::string& name,
       int id,
-      std::size_t slots,
-      Allocator allocator);
+      Allocator allocator,
+      std::size_t slots);
 
     ~SlotPool();
 
