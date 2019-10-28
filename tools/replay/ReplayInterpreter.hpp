@@ -49,6 +49,10 @@ class ReplayInterpreter {
     uint64_t m_line_count;
     std::stringstream compare_ss;
 
+    int m_log_version_major;
+    int m_log_version_minor;
+    int m_log_version_patch;
+
     template <typename T> void get_from_string( const std::string& s, T& val );
 
     void strip_off_base(std::string& s);
