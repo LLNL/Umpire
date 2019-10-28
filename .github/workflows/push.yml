@@ -1,5 +1,5 @@
 on: push
-name: New workflow
+name: Code checks
 jobs:
   staticAnalysis:
     name: Static Analysis
