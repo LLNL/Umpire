@@ -110,24 +110,28 @@ void ReplayInterpreter::buildOperations()
       replay_release();
     }
     else if ( m_json["event"] == "version" ) {
-      if (   m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR
-          || m_json["payload"]["minor"] != UMPIRE_VERSION_MINOR
-          || m_json["payload"]["patch"] != UMPIRE_VERSION_PATCH ) {
+      m_log_version_major = m_json["payload"]["major"];
+      m_log_version_minor = m_json["payload"]["minor"];
+      m_log_version_patch = m_json["payload"]["patch"];
+
+      if (   m_log_version_major != UMPIRE_VERSION_MAJOR
+          || m_log_version_minor != UMPIRE_VERSION_MINOR
+          || m_log_version_patch != UMPIRE_VERSION_PATCH ) {
 
         REPLAY_WARNING("Warning, version mismatch:\n"
           << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
           << "  Log  version: "
-          << m_json["payload"]["major"] << "."
-          << m_json["payload"]["minor"]  << "."
-          << m_json["payload"]["patch"]);
+          << m_log_version_major << "."
+          << m_log_version_minor  << "."
+          << m_log_version_patch);
 
         if (m_json["payload"]["major"] != UMPIRE_VERSION_MAJOR) {
-          REPLAY_ERROR("Warning, major version mismatch:\n"
+          REPLAY_WARNING("Warning, major version mismatch - attempting replay anyway...\n"
             << "  Tool version: " << UMPIRE_VERSION_MAJOR << "." << UMPIRE_VERSION_MINOR << "." << UMPIRE_VERSION_PATCH << std::endl
             << "  Log  version: "
-            << m_json["payload"]["major"] << "."
-            << m_json["payload"]["minor"]  << "."
-            << m_json["payload"]["patch"]);
+            << m_log_version_major << "."
+            << m_log_version_minor  << "."
+            << m_log_version_patch);
         }
       }
     }
@@ -353,22 +357,27 @@ void ReplayInterpreter::replay_makeAllocator( void )
   if ( m_json["result"].is_null() ) {
     const bool introspection{m_json["payload"]["with_introspection"]};
     const std::string raw_mangled_type{m_json["payload"]["type"]};
-    const std::string type_prefix{raw_mangled_type.substr(0, 2)};
 
-    // Add _Z so that we can demangle the external symbol
-    const std::string mangled_type = 
-      (type_prefix == "_Z") ? raw_mangled_type : std::string{"_Z"} + raw_mangled_type;
+    if (m_log_version_major >= 2) {
+      const std::string type_prefix{raw_mangled_type.substr(0, 2)};
 
-    auto result = abi::__cxa_demangle(
-        mangled_type.c_str(),
-        nullptr,
-        nullptr,
-        nullptr);
-    if (!result) {
-        REPLAY_ERROR("Failed to demangle strategy type. Mangled type: " << mangled_type);
+      // Add _Z so that we can demangle the external symbol
+      const std::string mangled_type = 
+        (type_prefix == "_Z") ? raw_mangled_type : std::string{"_Z"} + raw_mangled_type;
+
+      auto result = abi::__cxa_demangle(
+          mangled_type.c_str(),
+          nullptr,
+          nullptr,
+          nullptr);
+      if (!result) {
+          REPLAY_ERROR("Failed to demangle strategy type. Mangled type: " << mangled_type);
+      }
+      type = std::string{result};
+      ::free(result);
+    } else {
+      type = raw_mangled_type;
     }
-    const std::string type{result};
-    ::free(result);
 
     if ( type == "umpire::strategy::AllocationAdvisor" ) {
       const int numargs{static_cast<int>(m_json["payload"]["args"].size())};
