@@ -18,6 +18,12 @@ namespace umpire {
 
 class Allocator;
 
+namespace util {
+
+class FixedMallocPool;
+
+}
+
 namespace strategy {
 
 class Pool : 
@@ -52,9 +58,9 @@ class Pool :
       Chunk(void* ptr, std::size_t s, std::size_t cs) :
         data{ptr}, size{s}, chunk_size{cs} {}
 
-      void* data;
-      std::size_t size;
-      std::size_t chunk_size;
+      void* data{nullptr};
+      std::size_t size{0};
+      std::size_t chunk_size{0};
       bool free{true};
       Chunk* prev{nullptr};
       Chunk* next{nullptr};
@@ -62,6 +68,8 @@ class Pool :
 
     std::map<void*, Chunk*> m_pointer_map;
     std::multimap<std::size_t, Chunk*> m_size_map;
+
+    util::FixedMallocPool m_chunk_pool;
 
     strategy::AllocationStrategy* m_allocator;
 

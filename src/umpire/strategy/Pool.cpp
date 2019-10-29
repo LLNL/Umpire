@@ -7,6 +7,8 @@
 
 #include "umpire/strategy/Pool.hpp"
 
+#include "umpire/util/FixedMallocPool.hpp"
+
 #include "umpire/Allocator.hpp"
 
 namespace umpire {
@@ -22,13 +24,17 @@ Pool::Pool(
   AllocationStrategy{name, id},
   m_pointer_map{},
   m_size_map{},
+  m_chunk_pool{sizeof(Chunk)},
   m_allocator{allocator.getAllocationStrategy()},
   m_initial_alloc_bytes{initial_alloc_size},
   m_min_alloc_bytes{min_alloc_size},
   m_align_bytes{align_bytes}
 {
   void* ptr{m_allocator->allocate(initial_alloc_size)};
-  auto chunk{new Chunk(ptr, initial_alloc_size, initial_alloc_size)};
+  m_actual_bytes += initial_alloc_size;
+
+  void* chunk_storage{m_chunk_pool.allocate()};
+  auto chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, initial_alloc_size)};
 
   m_size_map.insert(std::make_pair(initial_alloc_size, chunk));
 }
@@ -49,28 +55,49 @@ Pool::allocate(std::size_t bytes)
   if (best == m_size_map.end()) {
     std::size_t size{ (bytes > m_min_alloc_bytes) ? bytes : m_min_alloc_bytes};
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
-    void* ret{m_allocator->allocate(size)};
-    chunk = new Chunk{ret, size, size};
+
+    void* ret{nullptr};
+    try {
+      ret = m_allocator->allocate(size);
+      m_actual_bytes += size;
+    } catch (...) {
+      UMPIRE_LOG(Debug, "Caught error allocating");
+    }
+    void* chunk_storage{m_chunk_pool.allocate()};
+    chunk = new (chunk_storage) Chunk{ret, size, size};
   } else {
-    UMPIRE_LOG(Debug, "Found chunk");
     chunk = (*best).second;
     m_size_map.erase(best);
   }
 
+  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size << " for allocation of size " << bytes);
+
   void* ret = chunk->data;
   m_pointer_map[ret] = chunk;
+
   chunk->free = false;
 
   if (bytes != chunk->size) {
     std::size_t remaining{chunk->size - bytes};
     UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << bytes << " and " << remaining);
-    auto split_chunk{new Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
+
+    void* chunk_storage{m_chunk_pool.allocate()};
+    auto split_chunk{
+      new (chunk_storage) Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
+
+    auto old_next = chunk->next;
     chunk->next = split_chunk;
     split_chunk->prev = chunk;
+    split_chunk->next = old_next;
+
+    if (split_chunk->next)
+      split_chunk->next->prev = split_chunk;
+
     chunk->size = bytes;
     m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
+  m_curr_bytes += bytes;
   return ret;
 }
 
@@ -80,14 +107,21 @@ Pool::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
   auto chunk = m_pointer_map[ptr];
   chunk->free = true;
+  m_curr_bytes -= chunk->size;
+
+  UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
   if (chunk->prev && chunk->prev->free == true)
   {
     auto prev = chunk->prev;
+    UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
     auto range = m_size_map.equal_range(prev->size);
+    UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
     for ( auto i = range.first; i != range.second; )
     {
+      UMPIRE_LOG(Debug, "Found " << i->second << " for size " << prev->size); 
       if (i->second->data == prev->data) {
+        UMPIRE_LOG(Debug, "Removing " << i->second); 
         m_size_map.erase(i);
         break;
       }
@@ -96,12 +130,15 @@ Pool::deallocate(void* ptr)
 
     prev->size += chunk->size;
     prev->next = chunk->next;
-    prev->next->prev = prev;
+
+    if (prev->next)
+      prev->next->prev = prev;
 
     UMPIRE_LOG(Debug, "Merging with prev" << prev << " and " << chunk);
     UMPIRE_LOG(Debug, "New size: " << prev->size);
 
-    delete chunk;
+    m_chunk_pool.deallocate(chunk);
+    //delete chunk;
     chunk = prev;
   }
 
@@ -110,22 +147,30 @@ Pool::deallocate(void* ptr)
     auto next = chunk->next;
     chunk->size += next->size;
     chunk->next = next->next;
+    if (chunk->next)
+      chunk->next->prev = chunk;
 
     UMPIRE_LOG(Debug, "Merging with next" << chunk << " and " << next);
     UMPIRE_LOG(Debug, "New size: " << chunk->size);
 
+    UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
     auto range = m_size_map.equal_range(next->size);
+    UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
     for ( auto i = range.first; i != range.second; )
     {
+      UMPIRE_LOG(Debug, "Found " << i->second << " for size " << next->size); 
       if (i->second->data == next->data) {
+        UMPIRE_LOG(Debug, "Removing " << i->second); 
         m_size_map.erase(i);
         break;
       }
       ++i;
     }
-    delete next;
+    m_chunk_pool.deallocate(next);
+    //delete next;
   }
 
+  UMPIRE_LOG(Debug, "Inserting chunk " << chunk << " with size " << chunk->size);
   m_size_map.insert(std::make_pair(chunk->size, chunk));
   m_pointer_map.erase(ptr);
 }
@@ -143,7 +188,8 @@ void Pool::release()
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
       m_allocator->deallocate(chunk->data);
-      delete chunk;
+      m_chunk_pool.deallocate(chunk);
+      //delete chunk;
       pair = m_size_map.erase(pair);
     } else {
       ++pair;
