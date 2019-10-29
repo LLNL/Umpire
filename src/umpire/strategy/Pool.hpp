@@ -11,9 +11,12 @@
 
 #include "umpire/util/MemoryMap.hpp"
 
+#include "tsl/robin_map.h"
+
 #include <unordered_map>
 #include <map>
 #include <tuple>
+
 
 namespace umpire {
 
@@ -68,7 +71,7 @@ class Pool :
       std::multimap<std::size_t, Chunk*>::iterator size_map_it;
     };
 
-    using PointerMap = std::map<void*, Chunk*>;
+    using PointerMap = tsl::robin_map<void*, Chunk*>;
     using SizeMap = std::multimap<std::size_t, Chunk*>;
 
     PointerMap m_pointer_map;

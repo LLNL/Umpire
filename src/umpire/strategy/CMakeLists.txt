@@ -58,7 +58,7 @@ if (ENABLE_NUMA)
     NumaPolicy.cpp)
 endif ()
 
-set(umpire_strategy_depends)
+set(umpire_strategy_depends tsl::robin_map)
 
 if (ENABLE_CUDA)
   set(umpire_strategy_depends

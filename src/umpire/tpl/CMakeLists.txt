@@ -94,3 +94,5 @@ install(TARGETS
   ARCHIVE DESTINATION lib)
 
 add_subdirectory(judy)
+
+add_subdirectory(tsl-robin-map)

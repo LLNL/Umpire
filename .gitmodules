@@ -4,3 +4,6 @@
 [submodule "src/umpire/tpl/conduit"]
 	path = src/umpire/tpl/conduit
 	url = https://github.com/LLNL/conduit.git
+[submodule "src/umpire/tpl/tsl-robin-map"]
+	path = src/umpire/tpl/tsl-robin-map
+	url = https://github.com/Tessil/robin-map.git
