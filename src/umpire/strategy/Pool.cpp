@@ -35,8 +35,7 @@ Pool::Pool(
 
   void* chunk_storage{m_chunk_pool.allocate()};
   auto chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, initial_alloc_size)};
-
-  m_size_map.insert(std::make_pair(initial_alloc_size, chunk));
+  chunk->size_map_it = m_size_map.insert(std::make_pair(initial_alloc_size, chunk));
 }
 
 Pool::~Pool()
@@ -94,7 +93,7 @@ Pool::allocate(std::size_t bytes)
       split_chunk->next->prev = split_chunk;
 
     chunk->size = bytes;
-    m_size_map.insert(std::make_pair(remaining, split_chunk));
+    split_chunk->size_map_it = m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
   m_curr_bytes += bytes;
@@ -115,18 +114,21 @@ Pool::deallocate(void* ptr)
   {
     auto prev = chunk->prev;
     UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
-    auto range = m_size_map.equal_range(prev->size);
-    UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
-    for ( auto i = range.first; i != range.second; )
-    {
-      UMPIRE_LOG(Debug, "Found " << i->second << " for size " << prev->size); 
-      if (i->second->data == prev->data) {
-        UMPIRE_LOG(Debug, "Removing " << i->second); 
-        m_size_map.erase(i);
-        break;
-      }
-      ++i;
-    }
+
+    m_size_map.erase(prev->size_map_it);
+
+    // auto range = m_size_map.equal_range(prev->size);
+    // UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
+    // for ( auto i = range.first; i != range.second; )
+    // {
+    //   UMPIRE_LOG(Debug, "Found " << i->second << " for size " << prev->size); 
+    //   if (i->second->data == prev->data) {
+    //     UMPIRE_LOG(Debug, "Removing " << i->second); 
+    //     m_size_map.erase(i);
+    //     break;
+    //   }
+    //   ++i;
+    // }
 
     prev->size += chunk->size;
     prev->next = chunk->next;
@@ -154,24 +156,26 @@ Pool::deallocate(void* ptr)
     UMPIRE_LOG(Debug, "New size: " << chunk->size);
 
     UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
-    auto range = m_size_map.equal_range(next->size);
-    UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
-    for ( auto i = range.first; i != range.second; )
-    {
-      UMPIRE_LOG(Debug, "Found " << i->second << " for size " << next->size); 
-      if (i->second->data == next->data) {
-        UMPIRE_LOG(Debug, "Removing " << i->second); 
-        m_size_map.erase(i);
-        break;
-      }
-      ++i;
-    }
+    m_size_map.erase(next->size_map_it);
+
+    // auto range = m_size_map.equal_range(next->size);
+    // UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
+    // for ( auto i = range.first; i != range.second; )
+    // {
+    //   UMPIRE_LOG(Debug, "Found " << i->second << " for size " << next->size); 
+    //   if (i->second->data == next->data) {
+    //     UMPIRE_LOG(Debug, "Removing " << i->second); 
+    //     m_size_map.erase(i);
+    //     break;
+    //   }
+    //   ++i;
+    // }
     m_chunk_pool.deallocate(next);
     //delete next;
   }
 
   UMPIRE_LOG(Debug, "Inserting chunk " << chunk << " with size " << chunk->size);
-  m_size_map.insert(std::make_pair(chunk->size, chunk));
+  chunk->size_map_it = m_size_map.insert(std::make_pair(chunk->size, chunk));
   m_pointer_map.erase(ptr);
 }
 

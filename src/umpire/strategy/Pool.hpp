@@ -11,6 +11,7 @@
 
 #include "umpire/util/MemoryMap.hpp"
 
+#include <unordered_map>
 #include <map>
 #include <tuple>
 
@@ -64,10 +65,14 @@ class Pool :
       bool free{true};
       Chunk* prev{nullptr};
       Chunk* next{nullptr};
+      std::multimap<std::size_t, Chunk*>::iterator size_map_it;
     };
 
-    std::map<void*, Chunk*> m_pointer_map;
-    std::multimap<std::size_t, Chunk*> m_size_map;
+    using PointerMap = std::map<void*, Chunk*>;
+    using SizeMap = std::multimap<std::size_t, Chunk*>;
+
+    PointerMap m_pointer_map;
+    SizeMap m_size_map;
 
     util::FixedMallocPool m_chunk_pool;
 
