@@ -17,6 +17,8 @@
 #include <map>
 #include <tuple>
 
+#include "umpire/util/size_map.hpp"
+
 
 namespace umpire {
 
@@ -68,11 +70,12 @@ class Pool :
       bool free{true};
       Chunk* prev{nullptr};
       Chunk* next{nullptr};
-      std::multimap<std::size_t, Chunk*>::iterator size_map_it;
+      umpire::util::size_map<std::size_t, Chunk*, 30>::iterator size_map_it;
     };
 
     using PointerMap = tsl::robin_map<void*, Chunk*>;
-    using SizeMap = std::multimap<std::size_t, Chunk*>;
+
+    using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
 
     PointerMap m_pointer_map;
     SizeMap m_size_map;
