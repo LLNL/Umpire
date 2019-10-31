@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <list>
+#include <vector>
 
 #include <algorithm>
 
@@ -31,7 +32,7 @@ class size_map
     public std::iterator<std::bidirectional_iterator_tag, Value>
   {
     using Bin = std::size_t;
-    using Index = typename std::list<Value>::iterator;
+    using Index = typename std::vector<Value>::iterator;
     using Map = size_map<Key, Value, Bins>;
 
   public: 
@@ -174,8 +175,8 @@ class size_map
   }
 
   private:
-  std::list<Value> entries[Bins];
-  std::list<Value> overflow;
+  std::vector<Value> entries[Bins];
+  std::vector<Value> overflow;
 };
 
 }
