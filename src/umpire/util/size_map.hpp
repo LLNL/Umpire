@@ -11,7 +11,6 @@
 
 #include <cmath>
 #include <list>
-#include <vector>
 
 #include <algorithm>
 
@@ -175,8 +174,8 @@ class size_map
   }
 
   private:
-  std::vector<Value> entries[Bins];
-  std::vector<Value> overflow;
+  std::list<Value> entries[Bins];
+  std::list<Value> overflow;
 };
 
 }

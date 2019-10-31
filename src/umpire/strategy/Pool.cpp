@@ -48,7 +48,7 @@ Pool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
 
-  auto best = m_size_map.lower_bound(bytes);
+  const auto& best = m_size_map.lower_bound(bytes);
   //const auto& best = m_size_map.lower_bound(bytes);
 
   Chunk* chunk{nullptr};
@@ -68,7 +68,7 @@ Pool::allocate(std::size_t bytes)
     chunk = new (chunk_storage) Chunk{ret, size, size};
     //chunk = new  Chunk{ret, size, size};
   } else {
-    chunk = *best; //(*best).second;
+    chunk = (*best).second;
     m_size_map.erase(best);
   }
 
@@ -164,7 +164,7 @@ void Pool::release()
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end(); )
   {
-    auto chunk = (*pair);//.second;
+    auto chunk = (*pair).second;
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
     if ( (chunk-> size == chunk->chunk_size) 
         && chunk->free) {

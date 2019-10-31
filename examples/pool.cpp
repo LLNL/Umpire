@@ -10,42 +10,47 @@
 #include <iostream>
 #include <random>
 
-int main() {
-  //constexpr int ALLOCATIONS{1024};
+static void *randomize_buffer[13<<20];
 
+void randomize_one_size_class(size_t size, umpire::Allocator& alloc) {
+  int count = (100<<20) / size;
+  if (count * sizeof(randomize_buffer[0]) > sizeof(randomize_buffer)) {
+    abort();
+  }
+  for (int i = 0; i < count; i++) {
+    randomize_buffer[i] = alloc.allocate(size);
+  }
+  std::random_shuffle(randomize_buffer, randomize_buffer + count);
+  for (int i = 0; i < count; i++) {
+    alloc.deallocate(randomize_buffer[i]);
+  }
+}
+
+int main() {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.makeAllocator<umpire::strategy::Pool>(
       "POOL", rm.getAllocator("HOST"), 512, 128);
 
-  std::vector<void*> data;
-
-  data.push_back(alloc.allocate(128));
-  data.push_back(alloc.allocate(128));
-  data.push_back(alloc.allocate(128));
-
-  alloc.deallocate(data[1]);
-  alloc.deallocate(data[2]);
-
-  data.push_back(alloc.allocate(256));
-
-  alloc.deallocate(data[0]);
-  alloc.deallocate(data[3]);
+  randomize_one_size_class(8, alloc);
+  //int i = 4 << 10;
+  //for (i = 16; i < 256; i += 16) {
+  //  randomize_one_size_class(i, alloc);
+  //}
+  //for (; i < 512; i += 32) {
+  //  randomize_one_size_class(i, alloc);
+  //}
+  //for (; i < 1024; i += 64) {
+  //  randomize_one_size_class(i, alloc);
+  //}
+  //for (; i < (4 << 10); i += 128) {
+  //  randomize_one_size_class(i, alloc);
+  //}
+  // for (; i < (32 << 10); i += 1024) {
+  //   randomize_one_size_class(i, alloc);
+  // }
 
   alloc.release();
-
-  // std::mt19937 gen(12345678);
-  // std::uniform_int_distribution<std::size_t> dist(64, 4096);
-
-  // void* allocations[ALLOCATIONS];
-
-  // for (int i = 0; i < ALLOCATIONS; i++) {
-  //   std::size_t size = dist(gen);
-  //   allocations[i] = alloc.allocate(size);
-  // }
-  // for (int i = 0; i < ALLOCATIONS; i++) {
-  //   alloc.deallocate(allocations[i]);
-  // }
 
   return 0;
 }
