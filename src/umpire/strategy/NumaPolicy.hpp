@@ -31,8 +31,8 @@ class NumaPolicy :
     NumaPolicy(
         const std::string& name,
         int id,
-        int numa_node,
-        Allocator allocator);
+        Allocator allocator
+        int numa_node);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);

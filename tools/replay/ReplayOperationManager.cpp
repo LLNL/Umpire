@@ -12,10 +12,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
-#include "umpire/strategy/MixedPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/AllocationMap.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -29,51 +25,13 @@
 #define getpid _getpid
 #endif
 
-void ReplayOperationManager::makeSizeLimiter(
-    const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
-  , const std::size_t size_limit
-)
-{
-  m_cont_op = new ReplayOperation;
-
-  if (introspection) {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::SizeLimiter, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , size_limit
-          )
-      );
-    };
-  }
-  else {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::SizeLimiter, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , size_limit
-          )
-      );
-    };
-  }
-
-  operations.push_back(m_cont_op);
-}
-
 void ReplayOperationManager::makeAllocate( int allocator_num, std::size_t size )
 {
-  m_cont_op = new ReplayOperation;
-  m_cont_op->op = [=]() {
-    m_cont_op->m_allocation_ptr = this->m_allocator_array[allocator_num].allocate(size);
+  auto alloc_op = new ReplayOperation;
+  alloc_op->op = [=]() {
+    alloc_op->m_allocation_ptr = this->m_allocator_array[allocator_num].allocate(size);
   };
+  m_cont_op = alloc_op;
   operations.push_back(m_cont_op);
 }
 
@@ -155,123 +113,9 @@ void ReplayOperationManager::dumpStats()
   }
 }
 
-void ReplayOperationManager::makeMemoryResource( const std::string& resource_name )
+void ReplayOperationManager::makeMemoryResource( const std::string resource_name )
 {
   m_resource_names.push_back(resource_name);
-}
-
-void ReplayOperationManager::makeMonotonicAllocator(
-    const bool introspection
-  , const std::string& allocator_name
-  , const std::size_t capacity
-  , const std::string& base_allocator_name
-)
-{
-  m_cont_op = new ReplayOperation;
-
-  if (introspection) {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>
-          (   allocator_name
-            , capacity
-            , rm.getAllocator(base_allocator_name)
-          )
-      );
-    };
-  }
-  else {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>
-          (   allocator_name
-            , capacity
-            , rm.getAllocator(base_allocator_name)
-          )
-      );
-    };
-  }
-
-  operations.push_back(m_cont_op);
-}
-
-void ReplayOperationManager::makeSlotPool(
-    const bool introspection
-  , const std::string& allocator_name
-  , const std::size_t slots
-  , const std::string& base_allocator_name
-)
-{
-  m_cont_op = new ReplayOperation;
-
-  if (introspection) {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::SlotPool, true>
-          (   allocator_name
-            , slots
-            , rm.getAllocator(base_allocator_name)
-          )
-      );
-    };
-  }
-  else {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::SlotPool, false>
-          (   allocator_name
-            , slots
-            , rm.getAllocator(base_allocator_name)
-          )
-      );
-    };
-  }
-
-  operations.push_back(m_cont_op);
-}
-
-void ReplayOperationManager::makeThreadSafeAllocator(
-    const bool introspection
-  , const std::string& allocator_name
-  , const std::string& base_allocator_name
-)
-{
-  m_cont_op = new ReplayOperation;
-
-  if (introspection) {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-          )
-      );
-    };
-  }
-  else {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-          )
-      );
-    };
-  }
-
-  operations.push_back(m_cont_op);
 }
 
 void ReplayOperationManager::makeAllocatorCont( void )
@@ -290,7 +134,7 @@ void ReplayOperationManager::makeDeallocate( int allocator_num, uint64_t allocat
   operations.push_back(m_cont_op);
 }
 
-void ReplayOperationManager::makeCoalesce( const std::string& allocator_name )
+void ReplayOperationManager::makeCoalesce( const std::string allocator_name )
 {
   m_cont_op = new ReplayOperation;
 
