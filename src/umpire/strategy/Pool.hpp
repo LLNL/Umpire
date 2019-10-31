@@ -12,8 +12,8 @@
 #include "umpire/util/MemoryMap.hpp"
 
 #include "tsl/robin_map.h"
+#include "absl/container/btree_map.h"
 
-#include <unordered_map>
 #include <map>
 #include <tuple>
 
@@ -60,6 +60,12 @@ class Pool :
 
     Platform getPlatform() noexcept override;
   private:
+    struct Chunk;
+
+    using PointerMap = tsl::robin_map<void*, Chunk*>;
+    //using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
+    using SizeMap = std::multimap<std::size_t, Chunk*>;
+
     struct Chunk {
       Chunk(void* ptr, std::size_t s, std::size_t cs) :
         data{ptr}, size{s}, chunk_size{cs} {}
@@ -70,12 +76,9 @@ class Pool :
       bool free{true};
       Chunk* prev{nullptr};
       Chunk* next{nullptr};
-      umpire::util::size_map<std::size_t, Chunk*, 30>::iterator size_map_it;
+      SizeMap::iterator size_map_it;
     };
 
-    using PointerMap = tsl::robin_map<void*, Chunk*>;
-
-    using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
 
     PointerMap m_pointer_map;
     SizeMap m_size_map;

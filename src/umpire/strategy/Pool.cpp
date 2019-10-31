@@ -122,19 +122,6 @@ Pool::deallocate(void* ptr)
 
     m_size_map.erase(prev->size_map_it);
 
-    // auto range = m_size_map.equal_range(prev->size);
-    // UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
-    // for ( auto i = range.first; i != range.second; )
-    // {
-    //   UMPIRE_LOG(Debug, "Found " << i->second << " for size " << prev->size); 
-    //   if (i->second->data == prev->data) {
-    //     UMPIRE_LOG(Debug, "Removing " << i->second); 
-    //     m_size_map.erase(i);
-    //     break;
-    //   }
-    //   ++i;
-    // }
-
     prev->size += chunk->size;
     prev->next = chunk->next;
 
@@ -145,7 +132,6 @@ Pool::deallocate(void* ptr)
     UMPIRE_LOG(Debug, "New size: " << prev->size);
 
     m_chunk_pool.deallocate(chunk);
-    // delete chunk;
     chunk = prev;
   }
 
@@ -163,20 +149,7 @@ Pool::deallocate(void* ptr)
     UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
     m_size_map.erase(next->size_map_it);
 
-    // auto range = m_size_map.equal_range(next->size);
-    // UMPIRE_LOG(Debug, "Found " << std::distance(range.first, range.second) << " entries");
-    // for ( auto i = range.first; i != range.second; )
-    // {
-    //   UMPIRE_LOG(Debug, "Found " << i->second << " for size " << next->size); 
-    //   if (i->second->data == next->data) {
-    //     UMPIRE_LOG(Debug, "Removing " << i->second); 
-    //     m_size_map.erase(i);
-    //     break;
-    //   }
-    //   ++i;
-    // }
     m_chunk_pool.deallocate(next);
-    //delete next;
   }
 
   UMPIRE_LOG(Debug, "Inserting chunk " << chunk << " with size " << chunk->size);
