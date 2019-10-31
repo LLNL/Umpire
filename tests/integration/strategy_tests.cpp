@@ -36,6 +36,8 @@
 #include <omp.h>
 #endif
 
+#include <thread>
+
 static int alignment = 16;
 
 static int unique_strategy_id = 0;
