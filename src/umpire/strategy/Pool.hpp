@@ -19,9 +19,6 @@ namespace umpire {
 
 class Allocator;
 
-template<typename T>
-class TypedAllocator;
-
 namespace util {
 
 class FixedMallocPool;
@@ -71,15 +68,11 @@ class Pool :
           pool{new util::FixedMallocPool{sizeof(Value)}} {}
 
         Value* allocate(std::size_t n) {
-          if (n > 1) 
-            std::cerr << "N is greater than 1!!!!!" << std::endl;
           return static_cast<Value*>(pool->allocate(n));
         }
 
-        void deallocate(Value* data, std::size_t n)
+        void deallocate(Value* data, std::size_t)
         {
-          if (n > 1) 
-            std::cerr << "N is greater than 1!!!!!" << std::endl;
           pool->deallocate(data);
         }
 
@@ -117,7 +110,6 @@ class Pool :
     std::size_t m_curr_bytes{0};
     std::size_t m_actual_bytes{0};
     std::size_t m_highwatermark{0};
-
 };
 
 } // end of namespace strategy
