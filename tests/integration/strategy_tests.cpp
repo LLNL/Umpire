@@ -598,8 +598,42 @@ TEST(MixedPool, Host)
     allocator.deallocate(alloc[i]);
 }
 
+TEST(ThreadSafeAllocator, HostStdThread)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator", rm.getAllocator("HOST"));
+
+  constexpr int N = 16;
+  std::vector<void*> thread_allocs{N};
+  std::vector<std::thread> threads;
+
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    threads.push_back(
+        std::thread([=, &allocator, &thread_allocs] { thread_allocs[i] = allocator.allocate(1024); }));
+  }
+
+  for (auto& t : threads) {
+    t.join();
+  }
+
+  for (auto alloc : thread_allocs)
+  {
+    ASSERT_NE(alloc, nullptr);
+  }
+
+  ASSERT_NO_THROW({
+    for (auto alloc : thread_allocs)
+    {
+      allocator.deallocate(alloc);
+    }
+  });
+}
+
 #if defined(_OPENMP)
-TEST(ThreadSafeAllocator, Host)
+TEST(ThreadSafeAllocator, HostOpenMP)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -618,8 +652,66 @@ TEST(ThreadSafeAllocator, Host)
 
   SUCCEED();
 }
-
 #endif
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+TEST(ThreadSafeAllocator, DeviceStdThread)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator", rm.getAllocator("DEVICE"));
+
+  constexpr int N = 16;
+  std::vector<void*> thread_allocs{N};
+  std::vector<std::thread> threads;
+
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    threads.push_back(
+        std::thread([=, &allocator, &thread_allocs] { thread_allocs[i] = allocator.allocate(1024); }));
+  }
+
+  for (auto& t : threads) {
+    t.join();
+  }
+
+  for (auto alloc : thread_allocs)
+  {
+    ASSERT_NE(alloc, nullptr);
+  }
+
+  ASSERT_NO_THROW({
+    for (auto alloc : thread_allocs)
+    {
+      allocator.deallocate(alloc);
+    }
+  });
+}
+
+#if defined(_OPENMP)
+TEST(ThreadSafeAllocator, DeviceOpenMP)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator", rm.getAllocator("DEVICE"));
+
+#pragma omp parallel
+  {
+    const std::size_t size = 1024*omp_get_thread_num();
+
+    double* thread_data = static_cast<double*>(
+     allocator.allocate(size*sizeof(double)));
+
+    allocator.deallocate(thread_data);
+  }
+
+  SUCCEED();
+}
+#endif
+#endif // defined(UMPIRE_ENABLE_DEVICE)
+
 
 TEST(SizeLimiter, Host)
 {
