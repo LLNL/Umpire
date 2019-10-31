@@ -8,17 +8,11 @@
 #define UMPIRE_PoolMap_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "umpire/util/MemoryMap.hpp"
-
-#include "tsl/robin_map.h"
-#include "absl/container/btree_map.h"
+#include "umpire/util/size_map.hpp"
 
 #include <map>
 #include <tuple>
-
-#include "umpire/util/size_map.hpp"
-
 
 namespace umpire {
 
@@ -62,7 +56,7 @@ class Pool :
   private:
     struct Chunk;
 
-    using PointerMap = tsl::robin_map<void*, Chunk*>;
+    using PointerMap = std::map<void*, Chunk*>;
     //using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
     using SizeMap = std::multimap<std::size_t, Chunk*>;
 
@@ -78,7 +72,6 @@ class Pool :
       Chunk* next{nullptr};
       SizeMap::iterator size_map_it;
     };
-
 
     PointerMap m_pointer_map;
     SizeMap m_size_map;
