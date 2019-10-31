@@ -672,7 +672,7 @@ TEST(ThreadSafeAllocator, DeviceStdThread)
   {
     threads.push_back(
         std::thread([=, &allocator, &thread_allocs] {
-            for ( j = 0; j < N; ++j)
+            for ( int j = 0; j < N; ++j)
             {
                 thread_allocs[i] = allocator.allocate(1024);
                 ASSERT_NE(thread_allocs[i]);
