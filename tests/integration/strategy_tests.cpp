@@ -605,7 +605,7 @@ TEST(ThreadSafeAllocator, HostStdThread)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("HOST"));
+      "thread_safe_allocator_host_std", rm.getAllocator("HOST"));
 
   constexpr int N = 16;
   std::vector<void*> thread_allocs{N};
@@ -614,7 +614,15 @@ TEST(ThreadSafeAllocator, HostStdThread)
   for (std::size_t i = 0; i < N; ++i)
   {
     threads.push_back(
-        std::thread([=, &allocator, &thread_allocs] { thread_allocs[i] = allocator.allocate(1024); }));
+        std::thread([=, &allocator, &thread_allocs] {
+          for ( int j = 0; j < N; ++j) { 
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+            allocator.deallocate(thread_allocs[i]);
+            ASSERT_THROW(allocator.deallocate(thread_allocs[i]), umpire::util::Exception);
+            thread_allocs[i] = allocator.allocate(1024);
+          }
+    }));
   }
 
   for (auto& t : threads) {
@@ -640,7 +648,7 @@ TEST(ThreadSafeAllocator, HostOpenMP)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("HOST"));
+      "thread_safe_allocator_host_omp", rm.getAllocator("HOST"));
 
 #pragma omp parallel
   {
@@ -662,7 +670,7 @@ TEST(ThreadSafeAllocator, DeviceStdThread)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("DEVICE"));
+      "thread_safe_allocator_device_std", rm.getAllocator("DEVICE"));
 
   constexpr int N = 16;
   std::vector<void*> thread_allocs{N};
@@ -672,16 +680,14 @@ TEST(ThreadSafeAllocator, DeviceStdThread)
   {
     threads.push_back(
         std::thread([=, &allocator, &thread_allocs] {
-            for ( int j = 0; j < N; ++j)
-            {
-                thread_allocs[i] = allocator.allocate(1024);
-                ASSERT_NE(thread_allocs[i], nullptr);
-                allocator.deallocate(thread_allocs[i]);
-                ASSERT_THROW(allocator.deallocate(thread_allocs[i]), umpire::util::Exception);
-                thread_allocs[i] = allocator.allocate(1024);
-            }
-            }
-        ));
+          for ( int j = 0; j < N; ++j) { 
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+            allocator.deallocate(thread_allocs[i]);
+            ASSERT_THROW(allocator.deallocate(thread_allocs[i]), umpire::util::Exception);
+            thread_allocs[i] = allocator.allocate(1024);
+          }
+    }));
   }
 
   for (auto& t : threads) {
@@ -707,7 +713,7 @@ TEST(ThreadSafeAllocator, DeviceOpenMP)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("DEVICE"));
+      "thread_safe_allocator_device_omp", rm.getAllocator("DEVICE"));
 
 #pragma omp parallel
   {
