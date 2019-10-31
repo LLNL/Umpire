@@ -671,7 +671,15 @@ TEST(ThreadSafeAllocator, DeviceStdThread)
   for (std::size_t i = 0; i < N; ++i)
   {
     threads.push_back(
-        std::thread([=, &allocator, &thread_allocs] { thread_allocs[i] = allocator.allocate(1024); }));
+        std::thread([=, &allocator, &thread_allocs] {
+            for ( j = 0; j < N; ++j)
+            {
+                thread_allocs[i] = allocator.allocate(1024);
+                ASSERT_NE(thread_allocs[i]);
+                allocator.deallocate(thread_allocs[i]);
+                ASSERT_THROW({ allocator.deallocate(thread_allocs[i]); });
+                thread_allocs[i] = allocator.allocate(1024);
+        }));
   }
 
   for (auto& t : threads) {
