@@ -79,7 +79,8 @@ class Pool :
       util::FixedMallocPool* pool;
     };
 
-    using PointerMap = std::unordered_map<void*, Chunk*>;
+    //using PointerMap = std::unordered_map<void*, Chunk*>;
+    using PointerMap = util::MemoryMap<Chunk*>;
     //using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
     using SizeMap = std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 

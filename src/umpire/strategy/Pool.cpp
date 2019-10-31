@@ -75,7 +75,7 @@ Pool::allocate(std::size_t bytes)
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size << " for allocation of size " << bytes);
 
   void* ret = chunk->data;
-  m_pointer_map[ret] = chunk;
+  m_pointer_map.insert(std::make_pair(ret, chunk));
 
   chunk->free = false;
 
@@ -109,7 +109,7 @@ void
 Pool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
-  auto chunk = m_pointer_map[ptr];
+  auto chunk = *(*m_pointer_map.find(ptr)).second;
   chunk->free = true;
   m_curr_bytes -= chunk->size;
 

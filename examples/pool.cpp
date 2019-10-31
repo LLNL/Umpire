@@ -12,25 +12,28 @@
 
 static void *randomize_buffer[13<<20];
 
-void randomize_one_size_class(size_t size, umpire::Allocator& alloc) {
-  int count = (100<<20) / size;
-  if (count * sizeof(randomize_buffer[0]) > sizeof(randomize_buffer)) {
-    abort();
-  }
-  for (int i = 0; i < count; i++) {
-    randomize_buffer[i] = alloc.allocate(size);
-  }
-  std::random_shuffle(randomize_buffer, randomize_buffer + count);
-  for (int i = 0; i < count; i++) {
-    alloc.deallocate(randomize_buffer[i]);
+void randomize_one_size_class(size_t, umpire::Allocator& alloc) {
+  std::mt19937 gen(12345678);
+  std::uniform_int_distribution<std::size_t> dist(64, 1024*1024);
+
+  constexpr std::size_t count = 13<<20;
+
+  for (std::size_t repeat = 0; repeat < 10; repeat++) {
+    for (std::size_t i = 0; i < count; i++) {
+      randomize_buffer[i] = alloc.allocate(dist(gen));
+    }
+    std::random_shuffle(randomize_buffer, randomize_buffer + count);
+    for (std::size_t i = 0; i < count; i++) {
+      alloc.deallocate(randomize_buffer[i]);
+    }
   }
 }
 
 int main() {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto alloc = rm.makeAllocator<umpire::strategy::Pool>(
-      "POOL", rm.getAllocator("HOST"), 512, 128);
+  auto alloc = rm.makeAllocator<umpire::strategy::Pool, false>(
+      "POOL", rm.getAllocator("HOST"));
 
   randomize_one_size_class(8, alloc);
   //int i = 4 << 10;
