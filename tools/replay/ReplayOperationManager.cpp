@@ -12,7 +12,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
-#include "umpire/util/AllocationMap.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
@@ -163,48 +162,6 @@ void ReplayOperationManager::makeRelease( int allocator_num )
 
   m_cont_op->op = [=]() {
     this->m_allocator_array[allocator_num].release();
-  };
-
-  operations.push_back(m_cont_op);
-}
-
-void ReplayOperationManager::makeAllocationMapInsert(void* key, umpire::util::AllocationRecord rec)
-{
-  m_cont_op = new ReplayOperation;
-
-  m_cont_op->op = [=]() {
-    this->m_allocation_map.insert(key, rec);
-  };
-
-  operations.push_back(m_cont_op);
-}
-
-void ReplayOperationManager::makeAllocationMapFind(void* key)
-{
-  m_cont_op = new ReplayOperation;
-  m_cont_op->op = [=]() {
-    this->m_allocation_map.find(key);
-  };
-  operations.push_back(m_cont_op);
-}
-
-void ReplayOperationManager::makeAllocationMapRemove(void* key)
-{
-  m_cont_op = new ReplayOperation;
-
-  m_cont_op->op = [=]() {
-    this->m_allocation_map.remove(key);
-  };
-
-  operations.push_back(m_cont_op);
-}
-
-void ReplayOperationManager::makeAllocationMapClear(void)
-{
-  m_cont_op = new ReplayOperation;
-
-  m_cont_op->op = [=]() {
-    this->m_allocation_map.clear();
   };
 
   operations.push_back(m_cont_op);

@@ -18,7 +18,6 @@
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
-#include "umpire/util/AllocationMap.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
 
@@ -77,18 +76,12 @@ public:
   void makeCoalesce( const std::string allocator_name );
   void makeRelease( int allocator_num );
 
-  void makeAllocationMapInsert(void* key, umpire::util::AllocationRecord rec);
-  void makeAllocationMapFind(void* key);
-  void makeAllocationMapRemove(void* key);
-  void makeAllocationMapClear(void);
-
 private:
   std::vector<umpire::Allocator> m_allocator_array;
   AllocationOpMap m_alloc_operations;
   ReplayOperation* m_cont_op;
   std::vector<ReplayOperation*> operations;
   std::vector<std::string> m_resource_names;
-  umpire::util::AllocationMap m_allocation_map;
 
   std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;
 };
