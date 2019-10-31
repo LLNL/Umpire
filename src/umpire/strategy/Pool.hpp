@@ -18,6 +18,9 @@ namespace umpire {
 
 class Allocator;
 
+template<typename T>
+class TypedAllocator;
+
 namespace util {
 
 class FixedMallocPool;
@@ -56,9 +59,35 @@ class Pool :
   private:
     struct Chunk;
 
+    template <typename Value>
+    class pool_allocator {
+      public:
+        using value_type = Value;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
+
+        pool_allocator() :
+          pool{new util::FixedMallocPool{sizeof(Value)}} {}
+
+        Value* allocate(std::size_t n) {
+          if (n > 1) 
+            std::cerr << "N is greater than 1!!!!!" << std::endl;
+          return static_cast<Value*>(pool->allocate(n));
+        }
+
+        void deallocate(Value* data, std::size_t n)
+        {
+          if (n > 1) 
+            std::cerr << "N is greater than 1!!!!!" << std::endl;
+          pool->deallocate(data);
+        }
+
+      util::FixedMallocPool* pool;
+    };
+
     using PointerMap = std::map<void*, Chunk*>;
     //using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
-    using SizeMap = std::multimap<std::size_t, Chunk*>;
+    using SizeMap = std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
     struct Chunk {
       Chunk(void* ptr, std::size_t s, std::size_t cs) :
