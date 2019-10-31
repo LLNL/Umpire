@@ -34,7 +34,7 @@ Pool::Pool(
   m_actual_bytes += initial_alloc_size;
 
   void* chunk_storage{m_chunk_pool.allocate()};
-  auto chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, initial_alloc_size)};
+  Chunk* chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, initial_alloc_size)};
   //auto chunk{new Chunk(ptr, initial_alloc_size, initial_alloc_size)};
   chunk->size_map_it = m_size_map.insert(std::make_pair(initial_alloc_size, chunk));
 }
@@ -84,7 +84,7 @@ Pool::allocate(std::size_t bytes)
     UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << bytes << " and " << remaining);
 
     void* chunk_storage{m_chunk_pool.allocate()};
-    auto split_chunk{
+    Chunk* split_chunk{
       new (chunk_storage) Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
     //auto split_chunk{
     //  new  Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};

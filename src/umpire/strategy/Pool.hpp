@@ -12,6 +12,7 @@
 #include "umpire/util/size_map.hpp"
 
 #include <map>
+#include <unordered_map>
 #include <tuple>
 
 namespace umpire {
@@ -56,7 +57,7 @@ class Pool :
   private:
     struct Chunk;
 
-    using PointerMap = std::map<void*, Chunk*>;
+    using PointerMap = std::unordered_map<void*, Chunk*>;
     //using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
     using SizeMap = std::multimap<std::size_t, Chunk*>;
 
