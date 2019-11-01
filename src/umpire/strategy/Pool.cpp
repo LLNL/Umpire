@@ -35,7 +35,6 @@ Pool::Pool(
 
   void* chunk_storage{m_chunk_pool.allocate()};
   Chunk* chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, initial_alloc_size)};
-  //auto chunk{new Chunk(ptr, initial_alloc_size, initial_alloc_size)};
   chunk->size_map_it = m_size_map.insert(std::make_pair(initial_alloc_size, chunk));
 }
 
@@ -49,7 +48,6 @@ Pool::allocate(std::size_t bytes)
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
 
   const auto& best = m_size_map.lower_bound(bytes);
-  //const auto& best = m_size_map.lower_bound(bytes);
 
   Chunk* chunk{nullptr};
 
@@ -66,13 +64,14 @@ Pool::allocate(std::size_t bytes)
     }
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
-    //chunk = new  Chunk{ret, size, size};
   } else {
     chunk = (*best).second;
     m_size_map.erase(best);
   }
 
-  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size << " for allocation of size " << bytes);
+  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " 
+      << chunk->data << " and size " << chunk->size 
+      << " for allocation of size " << bytes);
 
   void* ret = chunk->data;
   m_pointer_map.insert(std::make_pair(ret, chunk));
@@ -81,13 +80,13 @@ Pool::allocate(std::size_t bytes)
 
   if (bytes != chunk->size) {
     std::size_t remaining{chunk->size - bytes};
-    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << bytes << " and " << remaining);
+    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " 
+        << bytes << " and " << remaining);
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{
-      new (chunk_storage) Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
-    //auto split_chunk{
-    //  new  Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
+      new (chunk_storage) 
+        Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
 
     auto old_next = chunk->next;
     chunk->next = split_chunk;
@@ -98,7 +97,8 @@ Pool::allocate(std::size_t bytes)
       split_chunk->next->prev = split_chunk;
 
     chunk->size = bytes;
-    split_chunk->size_map_it = m_size_map.insert(std::make_pair(remaining, split_chunk));
+    split_chunk->size_map_it = 
+      m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
   m_curr_bytes += bytes;
@@ -152,7 +152,9 @@ Pool::deallocate(void* ptr)
     m_chunk_pool.deallocate(next);
   }
 
-  UMPIRE_LOG(Debug, "Inserting chunk " << chunk << " with size " << chunk->size);
+  UMPIRE_LOG(Debug, "Inserting chunk " << chunk 
+      << " with size " << chunk->size);
+
   chunk->size_map_it = m_size_map.insert(std::make_pair(chunk->size, chunk));
   m_pointer_map.erase(ptr);
 }
@@ -171,7 +173,6 @@ void Pool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
       m_allocator->deallocate(chunk->data);
       m_chunk_pool.deallocate(chunk);
-      //delete chunk;
       pair = m_size_map.erase(pair);
     } else {
       ++pair;
