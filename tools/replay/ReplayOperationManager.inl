@@ -40,9 +40,8 @@ ReplayOperationManager::makeAllocator(
 //
 // AllocationAdvisor
 //
-template <typename... Args>
+template<typename Strategy, bool Introspection, typename... Args>
 void ReplayOperationManager::makeAdvisor(
-    const bool introspection,
     const std::string allocator_name,
     const std::string base_allocator_name,
     Args&&... args
@@ -50,39 +49,20 @@ void ReplayOperationManager::makeAdvisor(
 {
   m_cont_op = new ReplayOperation;
 
-  if (introspection) {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
+  m_cont_op->op = [=]() {
+    auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args) ...
-          )
-      );
-    };
-  }
-  else {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , std::forward<Args>(args) ...
-          )
-      );
-    };
-  }
+    this->m_allocator_array.push_back(
+      rm.makeAllocator<Strategy, Introspection> (
+        allocator_name, rm.getAllocator(base_allocator_name), std::forward<Args>(args) ...)
+    );
+  };
 
   operations.push_back(m_cont_op);
 }
 
-template <typename... Args>
+template<typename Strategy, bool Introspection, typename... Args>
 void ReplayOperationManager::makeAdvisor(
-    const bool introspection,
     const std::string allocator_name,
     const std::string base_allocator_name,
     const std::string advice_operation,
@@ -92,36 +72,19 @@ void ReplayOperationManager::makeAdvisor(
 {
   m_cont_op = new ReplayOperation;
 
-  if (introspection) {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
+  m_cont_op->op = [=]() {
+    auto& rm = umpire::ResourceManager::getInstance();
 
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , advice_operation
-            , rm.getAllocator(accessing_allocator_name)
-            , std::forward<Args>(args)...
-          )
-      );
-    };
-  }
-  else {
-    m_cont_op->op = [=]() {
-      auto& rm = umpire::ResourceManager::getInstance();
-
-      this->m_allocator_array.push_back(
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-          (   allocator_name
-            , rm.getAllocator(base_allocator_name)
-            , advice_operation
-            , rm.getAllocator(accessing_allocator_name)
-            , std::forward<Args>(args)...
-          )
-      );
-    };
-  }
+    this->m_allocator_array.push_back(
+      rm.makeAllocator<Strategy, Introspection>
+        (   allocator_name
+          , rm.getAllocator(base_allocator_name)
+          , advice_operation
+          , rm.getAllocator(accessing_allocator_name)
+          , std::forward<Args>(args)...
+        )
+    );
+  };
 
   operations.push_back(m_cont_op);
 }

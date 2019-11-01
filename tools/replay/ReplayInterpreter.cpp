@@ -287,9 +287,12 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << advice_operation 
             << " " << id;
 
-          m_operation_mgr.makeAdvisor(
-              introspection, allocator_name, base_allocator_name,
-              advice_operation, id);
+          if (introspection) {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, true>(allocator_name, base_allocator_name, advice_operation, id);
+          }
+          else {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, false>(allocator_name, base_allocator_name, advice_operation, id);
+          }
           break;
 
         case 4:
@@ -302,9 +305,17 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << accessing_allocator_name 
             << " " << id
           ;
-          m_operation_mgr.makeAdvisor(
-              introspection, allocator_name, base_allocator_name,
-              advice_operation, accessing_allocator_name, id);
+          if (introspection) {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, true>
+               (  allocator_name
+                , base_allocator_name
+                , advice_operation
+                , accessing_allocator_name
+                , id);
+          }
+          else {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, false>(allocator_name, base_allocator_name, advice_operation, accessing_allocator_name, id);
+          }
           break;
         }
       }
@@ -319,9 +330,12 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << base_allocator_name
             << " " << advice_operation 
           ;
-          m_operation_mgr.makeAdvisor(
-              introspection, allocator_name, base_allocator_name,
-              advice_operation);
+          if (introspection) {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, true>(allocator_name, base_allocator_name, advice_operation);
+          }
+          else {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, false>(allocator_name, base_allocator_name, advice_operation);
+          }
           break;
         case 3:
           const std::string accessing_allocator_name{m_json["payload"]["args"][2]};
@@ -332,9 +346,12 @@ void ReplayInterpreter::replay_makeAllocator( void )
             << " " << advice_operation 
             << " " << accessing_allocator_name 
           ;
-          m_operation_mgr.makeAdvisor(
-              introspection, allocator_name, base_allocator_name,
-              advice_operation, accessing_allocator_name);
+          if (introspection) {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, true>(allocator_name, base_allocator_name, advice_operation, accessing_allocator_name);
+          }
+          else {
+            m_operation_mgr.makeAdvisor<umpire::strategy::AllocationAdvisor, false>(allocator_name, base_allocator_name, advice_operation, accessing_allocator_name);
+          }
           break;
         }
       }

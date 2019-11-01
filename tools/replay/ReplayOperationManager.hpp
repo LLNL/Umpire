@@ -47,17 +47,15 @@ public:
     , const std::string base_allocator_name
     , Args&&... args);
 
-  template <typename... Args>
+  template<typename Strategy, bool Introspection, typename... Args>
   void makeAdvisor(
-      const bool introspection,
       const std::string allocator_name,
       const std::string base_allocator_name,
       Args&&... args
   );
 
-  template <typename... Args>
+  template<typename Strategy, bool Introspection, typename... Args>
   void makeAdvisor(
-      const bool introspection,
       const std::string allocator_name,
       const std::string base_allocator_name,
       const std::string advice_operation,
