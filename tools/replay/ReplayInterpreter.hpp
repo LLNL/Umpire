@@ -17,7 +17,6 @@
 class ReplayInterpreter {
   public:
     void buildOperations();
-    void compile();
     void runOperations(bool gather_statistics);
 
     //
@@ -40,12 +39,11 @@ class ReplayInterpreter {
     std::string m_line;
     nlohmann::json m_json;
     std::vector<std::string> m_row;
-    AllocatorIndex m_num_allocators;
+    AllocatorIndex m_num_allocators{0};
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
     ReplayOperationManager m_operation_mgr;
-    uint64_t m_op_count;
-    uint64_t m_line_count;
+    uint64_t m_op_count{0};
     std::stringstream compare_ss;
 
     int m_log_version_major;
