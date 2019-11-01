@@ -482,6 +482,20 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
     size = src_size;
   }
 
+  UMPIRE_REPLAY( 
+      R"( "event": "copy", "payload": { "src": )"
+      << src_ptr
+      << R"(, "dest": )"
+      << dst_ptr
+      << R"( "size": )"
+      << size
+      << R"(, "src_allocator_ref": )"
+      << src_alloc_record->strategy
+      << R"(, "dst_allocator_ref": )"
+      << dst_alloc_record->strategy
+      << R"( } )"
+  );
+
   if (size > dst_size) {
     UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
   }
@@ -508,6 +522,18 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     length = size;
   }
 
+  UMPIRE_REPLAY( 
+      R"( "event": "memset", "payload": { "ptr": )"
+      << ptr
+      << R"( "value": )"
+      << value
+      << R"( "size": )"
+      << size
+      << R"(, "allocator_ref": )"
+      << alloc_record->strategy
+      << R"( } )"
+  );
+
   if (length > size) {
     UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
   }
@@ -523,6 +549,14 @@ void*
 ResourceManager::reallocate(void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
+
+  UMPIRE_REPLAY( 
+      R"( "event": "reallocate", "payload": { "ptr": )"
+      << src_ptr
+      << R"( "size": )"
+      << size
+      << R"( } )"
+  );
 
   void* dst_ptr = nullptr;
 
@@ -553,6 +587,16 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
+  UMPIRE_REPLAY( 
+      R"( "event": "reallocate", "payload": { "ptr": )"
+      << src_ptr
+      << R"( "size": )"
+      << size
+      << R"( "allocator": )"
+      << allocator.getName()
+      << R"( } )"
+  );
+
   void* dst_ptr = nullptr;
 
   if (!src_ptr) {
@@ -574,6 +618,14 @@ void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+
+  UMPIRE_REPLAY( 
+      R"( "event": "move", "payload": { "ptr": )"
+      << ptr
+      << R"( "allocator": )"
+      << allocator.getName()
+      << R"( } )"
+  );
 
   auto alloc_record = m_allocations.find(ptr);
 
