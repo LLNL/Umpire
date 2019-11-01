@@ -109,7 +109,7 @@ void
 Pool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
-  auto chunk = *(*m_pointer_map.find(ptr)).second;
+  auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
   m_curr_bytes -= chunk->size;
 
