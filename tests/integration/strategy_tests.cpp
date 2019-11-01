@@ -619,8 +619,8 @@ TEST(ThreadSafeAllocator, HostStdThread)
             thread_allocs[i] = allocator.allocate(1024);
             ASSERT_NE(thread_allocs[i], nullptr);
             allocator.deallocate(thread_allocs[i]);
-            ASSERT_THROW(allocator.deallocate(thread_allocs[i]), umpire::util::Exception);
             thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
           }
     }));
   }
@@ -684,8 +684,8 @@ TEST(ThreadSafeAllocator, DeviceStdThread)
             thread_allocs[i] = allocator.allocate(1024);
             ASSERT_NE(thread_allocs[i], nullptr);
             allocator.deallocate(thread_allocs[i]);
-            ASSERT_THROW(allocator.deallocate(thread_allocs[i]), umpire::util::Exception);
             thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
           }
     }));
   }
