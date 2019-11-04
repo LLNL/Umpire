@@ -483,17 +483,17 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   }
 
   UMPIRE_REPLAY( 
-      R"( "event": "copy", "payload": { "src": )"
+      R"( "event": "copy", "payload": { "src": ")"
       << src_ptr
-      << R"(, "dest": )"
+      << R"(", "dest": ")"
       << dst_ptr
-      << R"( "size": )"
+      << R"(",  "size": )"
       << size
-      << R"(, "src_allocator_ref": )"
+      << R"(, "src_allocator_ref": ")"
       << src_alloc_record->strategy
-      << R"(, "dst_allocator_ref": )"
+      << R"(", "dst_allocator_ref": ")"
       << dst_alloc_record->strategy
-      << R"( } )"
+      << R"(" } )"
   );
 
   if (size > dst_size) {
@@ -523,15 +523,15 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
   }
 
   UMPIRE_REPLAY( 
-      R"( "event": "memset", "payload": { "ptr": )"
+      R"( "event": "memset", "payload": { "ptr": ")"
       << ptr
-      << R"( "value": )"
+      << R"(", "value": )"
       << value
-      << R"( "size": )"
+      << R"(, "size": )"
       << size
-      << R"(, "allocator_ref": )"
+      << R"(, "allocator_ref": ")"
       << alloc_record->strategy
-      << R"( } )"
+      << R"(" })"
   );
 
   if (length > size) {
@@ -551,11 +551,11 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size)
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
   UMPIRE_REPLAY( 
-      R"( "event": "reallocate", "payload": { "ptr": )"
+      R"( "event": "reallocate", "payload": { "ptr": ")"
       << src_ptr
-      << R"( "size": )"
+      << R"(", "size": )"
       << size
-      << R"( } )"
+      << R"( })"
   );
 
   void* dst_ptr = nullptr;
@@ -588,13 +588,13 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
   UMPIRE_REPLAY( 
-      R"( "event": "reallocate", "payload": { "ptr": )"
+      R"( "event": "reallocate", "payload": { "ptr": ")"
       << src_ptr
-      << R"( "size": )"
+      << R"(", "size": )"
       << size
-      << R"( "allocator": )"
-      << allocator.getName()
-      << R"( } )"
+      << R"( "allocator_ref": ")"
+      << allocator.getAllocationStrategy()
+      << R"(" } )"
   );
 
   void* dst_ptr = nullptr;
@@ -620,11 +620,11 @@ ResourceManager::move(void* ptr, Allocator allocator)
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
 
   UMPIRE_REPLAY( 
-      R"( "event": "move", "payload": { "ptr": )"
+      R"( "event": "move", "payload": { "ptr": ")"
       << ptr
-      << R"( "allocator": )"
-      << allocator.getName()
-      << R"( } )"
+      << R"(", "allocator_ref": ")"
+      << allocator.getAllocationStrateyg()
+      << R"(" })"
   );
 
   auto alloc_record = m_allocations.find(ptr);
@@ -657,6 +657,14 @@ ResourceManager::move(void* ptr, Allocator allocator)
         UMPIRE_ASSERT(ret == ptr);
       }
 
+      UMPIRE_REPLAY( 
+          R"( "event": "move", "payload": { "ptr": ")"
+          << ptr
+          << R"(", "allocator": ")"
+          << allocator.getAllocationStrategy()
+          << R"(" }, "result": { "ptr": ")"
+          << ptr
+          << R"(" })";
       return ptr;
     }
   }
@@ -668,6 +676,15 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
   void* dst_ptr{allocator.allocate(alloc_record->size)};
   copy(dst_ptr, ptr);
+
+  UMPIRE_REPLAY( 
+      R"( "event": "move", "payload": { "ptr": ")"
+      << ptr
+      << R"(", "allocator": ")"
+      << allocator.getAllocationStrategy()
+      << R"(" }, "result": { "ptr": ")"
+      << dst_ptr
+      << R"(" })";
 
   deallocate(ptr);
 
