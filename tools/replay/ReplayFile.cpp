@@ -68,12 +68,9 @@ ReplayFile::~ReplayFile()
     munmap(m_op_tables, max_file_size);
     m_op_tables = nullptr;
 
-    if (m_compile_needed == true) {
-      std::cout << "Truncating file to: " << actual_size << std::endl;
-      if (ftruncate(m_fd, actual_size) < 0) {
+    if (m_compile_needed == true)
+      if (ftruncate(m_fd, actual_size) < 0)
         REPLAY_ERROR( "Failed to truncate file size for " << m_bin_file_name);
-      }
-    }
 
     close(m_fd);
   }

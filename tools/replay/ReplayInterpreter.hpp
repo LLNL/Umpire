@@ -18,14 +18,12 @@ class ReplayInterpreter {
   public:
     void buildOperations();
     void runOperations(bool gather_statistics);
-
-    //
-    // Return: > 0 success, 0 eof, < 0 error
-    //
-    int getSymbolicOperation( std::string& raw_line, std::string& sym_line );
+    bool compareOperations(ReplayInterpreter& rh);
 
     ReplayInterpreter( std::string in_file_name );
     ~ReplayInterpreter();
+
+    ReplayFile* m_ops{nullptr};
 
   private:
     using AllocatorIndex = int;
@@ -36,7 +34,6 @@ class ReplayInterpreter {
 
     std::string m_input_file_name;
     std::ifstream m_input_file;
-    ReplayFile* m_ops{nullptr};
     std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;
@@ -44,8 +41,6 @@ class ReplayInterpreter {
     std::vector<std::string> m_row;
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
-
-    std::stringstream compare_ss;
 
     int m_log_version_major;
     int m_log_version_minor;

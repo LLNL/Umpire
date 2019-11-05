@@ -122,12 +122,54 @@ void ReplayInterpreter::buildOperations()
   m_ops = new ReplayFile{m_input_file_name};
 }
 
-//
-// Return: > 0 success, 0 eof, < 0 error
-//
-int ReplayInterpreter::getSymbolicOperation( std::string& , std::string& )
+#include <strings.h>
+
+bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
 {
-  return 0;   // EOF
+  bool rval = true;
+
+  if (m_ops->getOperationsTable()->version != rh.m_ops->getOperationsTable()->version) {
+    std::cerr << "Number of version mismatch: "
+        << m_ops->getOperationsTable()->version 
+        << " != " << rh.m_ops->getOperationsTable()->version
+        << std::endl;
+    rval = false;
+  }
+
+  if (m_ops->getOperationsTable()->num_allocators != rh.m_ops->getOperationsTable()->num_allocators) {
+    std::cerr << "Number of allocators mismatch: "
+        << m_ops->getOperationsTable()->num_allocators 
+        << " != " << rh.m_ops->getOperationsTable()->num_allocators
+        << std::endl;
+    rval = false;
+  }
+
+  if (m_ops->getOperationsTable()->num_operations != rh.m_ops->getOperationsTable()->num_operations) {
+    std::cerr << "Number of operations mismatch: "
+        << m_ops->getOperationsTable()->num_operations 
+        << " != " << rh.m_ops->getOperationsTable()->num_operations
+        << std::endl;
+    rval = false;
+  }
+
+  if ( rval != false ) {
+    if (bcmp(   m_ops->getOperationsTable()->allocators
+              , rh.m_ops->getOperationsTable()->allocators
+              , rh.m_ops->getOperationsTable()->num_allocators * sizeof(ReplayFile::AllocatorTableEntry)))
+    {
+      std::cerr << "AllocatorTable data miscompare" << std::endl;
+      rval = false;
+    }
+    if (bcmp(   m_ops->getOperationsTable()->ops
+              , rh.m_ops->getOperationsTable()->ops
+              , rh.m_ops->getOperationsTable()->num_operations * sizeof(ReplayFile::Operation)))
+    {
+      std::cerr << "Operations table data miscompare" << std::endl;
+      rval = false;
+    }
+  }
+
+  return rval;
 }
 
 template <typename T> void get_from_string( const std::string& s, T& val )
