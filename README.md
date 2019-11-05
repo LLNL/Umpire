@@ -17,7 +17,7 @@ Then, make sure that you have a modern compiler loaded, and the configuration is
 simple as:
 
     $ mkdir build && cd build
-    $ cmake
+    $ cmake ..
 
 CMake will provide output about which compiler is being used. Once CMake has
 completed, Umpire can be built with Make:
