@@ -145,7 +145,7 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
 
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   op->type = ReplayFile::otype::ALLOCATOR_CREATION;
-  op->allocator_idx = hdr->num_allocators;
+  op->allocator_table_index = hdr->num_allocators;
   m_allocator_index[allocator_name] = hdr->num_allocators;
 
   hdr->num_allocators++;
@@ -379,7 +379,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
     ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
     op->type = ReplayFile::otype::ALLOCATOR_CREATION;
-    op->allocator_idx = hdr->num_allocators;
+    op->allocator_table_index = hdr->num_allocators;
 
     m_allocator_index[allocator_name] = hdr->num_allocators;
 
@@ -415,7 +415,7 @@ void ReplayInterpreter::replay_compileAllocate( void )
     const std::size_t alloc_size{m_json["payload"]["size"]};
 
     op->type = ReplayFile::otype::ALLOCATE;
-    op->allocator_idx = allocator_number;
+    op->allocator_table_index = allocator_number;
     op->argv.allocate.size = alloc_size;
   }
   else {
@@ -443,12 +443,13 @@ void ReplayInterpreter::replay_compileDeallocate( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   op->type = ReplayFile::otype::DEALLOCATE;
-  op->allocator_idx = allocator_number;
+  op->allocator_table_index = allocator_number;
 
   const std::string memory_str{m_json["payload"]["memory_ptr"]};
   const uint64_t memory_ptr{std::stoul(memory_str, nullptr, 0)};
 
-  op->argv.deallocate.allocation_idx = m_allocation_id[memory_ptr];
+  op->argv.deallocate.allocation_op_idx = m_allocation_id[memory_ptr];
+  hdr->num_operations++;
 }
 
 void ReplayInterpreter::replay_compileCoalesce( void )
@@ -459,7 +460,7 @@ void ReplayInterpreter::replay_compileCoalesce( void )
   ReplayFile::Header* hdr = m_ops.getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   op->type = ReplayFile::otype::COALESCE;
-  op->allocator_idx = m_allocator_index[allocator_name];
+  op->allocator_table_index = m_allocator_index[allocator_name];
   hdr->num_operations++;
 }
 
@@ -475,7 +476,7 @@ void ReplayInterpreter::replay_compileRelease( void )
   ReplayFile::Header* hdr = m_ops.getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   op->type = ReplayFile::otype::RELEASE;
-  op->allocator_idx = allocator_number;
+  op->allocator_table_index = allocator_number;
   hdr->num_operations++;
 }
 

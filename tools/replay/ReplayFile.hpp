@@ -86,7 +86,7 @@ public:
 
   struct Operation {
     otype type;
-    int allocator_idx;
+    int allocator_table_index;
 
     union {
       struct {
@@ -94,7 +94,7 @@ public:
         void* ptr;
       } allocate;
       struct {
-        int allocation_idx;   // Index to actual allocation operation to get ptr
+        int allocation_op_idx;   // Index to actual allocation operation to get ptr
       } deallocate ;
     } argv ;
   };
@@ -112,15 +112,16 @@ public:
     ReplayFile::Header* getOperationsTable();
 
     void copyString(std::string source, char (&dest)[max_name_length]);
+    bool compileNeeded() { return m_compile_needed; }
 
   private:
     const std::string m_bin_suffix{".replaybin"};
-    static const std::size_t GByte{static_cast<std::size_t>(1024 * 1024 * 1024)};
-    static const std::size_t max_file_size{static_cast<std::size_t>(64) * GByte};
     Header* m_op_tables{nullptr};
     const std::string m_in_file_name;
     const std::string m_bin_file_name;
     int m_fd;
+    bool m_compile_needed{false};
+    off_t max_file_size{0};
 };
 
 #endif // REPLAY_ReplayFile_HPP
