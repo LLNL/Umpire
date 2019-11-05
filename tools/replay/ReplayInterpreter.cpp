@@ -18,15 +18,36 @@
 #include <cxxabi.h>
 #endif
 
+ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
+    m_input_file_name{in_file_name}, m_input_file{in_file_name}
+{
+  if ( ! m_input_file.is_open() )
+    REPLAY_ERROR("Unable to open input file " << in_file_name);
+
+  m_ops = new ReplayFile{m_input_file_name};
+}
+
+ReplayInterpreter::~ReplayInterpreter()
+{
+  if (m_ops != nullptr) {
+    delete m_ops;
+    m_ops = nullptr;
+  }
+}
+
 void ReplayInterpreter::runOperations(bool gather_statistics)
 {
-  ReplayOperationManager m_operation_mgr{m_ops.getOperationsTable()};
+  ReplayOperationManager m_operation_mgr{m_ops->getOperationsTable()};
 
   m_operation_mgr.runOperations(gather_statistics);
 }
 
 void ReplayInterpreter::buildOperations()
 {
+  if (! m_ops->compileNeeded() ) {
+    return;
+  }
+
   while ( std::getline(m_input_file, m_line) ) {
     const std::string header("{ \"kind\":\"replay\", \"uid\":");
     auto const header_len(header.size());
@@ -93,6 +114,12 @@ void ReplayInterpreter::buildOperations()
       REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
     }
   }
+
+  //
+  // Flush operations to compile file and read back in read-only (PRIVATE) mode
+  //
+  delete m_ops;
+  m_ops = new ReplayFile{m_input_file_name};
 }
 
 //
@@ -101,13 +128,6 @@ void ReplayInterpreter::buildOperations()
 int ReplayInterpreter::getSymbolicOperation( std::string& , std::string& )
 {
   return 0;   // EOF
-}
-
-ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
-    m_input_file_name{in_file_name}, m_input_file{in_file_name}, m_ops{in_file_name}
-{
-  if ( ! m_input_file.is_open() )
-    REPLAY_ERROR("Unable to open input file " << in_file_name);
 }
 
 template <typename T> void get_from_string( const std::string& s, T& val )
@@ -132,7 +152,7 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
   const std::string allocator_name{m_json["payload"]["name"]};
   const std::string obj_s{m_json["result"]};
   const uint64_t obj_p{std::stoul(obj_s, nullptr, 0)};
-  ReplayFile::Header* hdr = m_ops.getOperationsTable();
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
   m_allocator_indices[obj_p] = hdr->num_allocators;
 
@@ -141,7 +161,7 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
   alloc->type = ReplayFile::rtype::MEMORY_RESOURCE;
   alloc->introspection = false;
   alloc->argc = 0;
-  m_ops.copyString(allocator_name, alloc->name);
+  m_ops->copyString(allocator_name, alloc->name);
 
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   op->type = ReplayFile::otype::ALLOCATOR_CREATION;
@@ -154,14 +174,14 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
 
 void ReplayInterpreter::replay_compileAllocator( void )
 {
-  ReplayFile::Header* hdr = m_ops.getOperationsTable();
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
   ReplayFile::AllocatorTableEntry* alloc = 
-            & (m_ops.getOperationsTable()->allocators[hdr->num_allocators]);
+            & (m_ops->getOperationsTable()->allocators[hdr->num_allocators]);
 
   const std::string allocator_name{m_json["payload"]["allocator_name"]};
 
-  m_ops.copyString(allocator_name, alloc->name);
+  m_ops->copyString(allocator_name, alloc->name);
 
   if ( m_json["result"].is_null() ) {
     const bool introspection{m_json["payload"]["with_introspection"]};
@@ -204,8 +224,8 @@ void ReplayInterpreter::replay_compileAllocator( void )
       }
 
       alloc->type = ReplayFile::rtype::ALLOCATION_ADVISOR;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
-      m_ops.copyString(advice_operation, alloc->argv.advisor.advice);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(advice_operation, alloc->argv.advisor.advice);
       alloc->argv.advisor.device_id = device_id;
 
       if (device_id >= 0) { // Optional device ID specified
@@ -217,7 +237,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
           break;
         case 4:
           const std::string accessing_allocator_name{m_json["payload"]["args"][2]};
-          m_ops.copyString(accessing_allocator_name, alloc->argv.advisor.accessing_allocator);
+          m_ops->copyString(accessing_allocator_name, alloc->argv.advisor.accessing_allocator);
           break;
         }
       }
@@ -230,7 +250,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
           break;
         case 3:
           const std::string accessing_allocator_name{m_json["payload"]["args"][2]};
-          m_ops.copyString(accessing_allocator_name, alloc->argv.advisor.accessing_allocator);
+          m_ops->copyString(accessing_allocator_name, alloc->argv.advisor.accessing_allocator);
           break;
         }
       }
@@ -239,7 +259,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::DYNAMIC_POOL_LIST;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
 
       // Now grab the optional fields
       if (alloc->argc >= 3) {
@@ -257,7 +277,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::DYNAMIC_POOL_MAP;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
 
       if (alloc->argc >= 4) {
         get_from_string(m_json["payload"]["args"][1],
@@ -280,7 +300,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::MONOTONIC;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
 
       get_from_string(m_json["payload"]["args"][1], 
                       alloc->argv.monotonic_pool.capacity);
@@ -289,27 +309,27 @@ void ReplayInterpreter::replay_compileAllocator( void )
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::SLOT_POOL;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
       get_from_string(m_json["payload"]["args"][1], alloc->argv.slot_pool.slots);
     }
     else if ( type == "umpire::strategy::SizeLimiter" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::SIZE_LIMITER;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
       get_from_string(m_json["payload"]["args"][1], alloc->argv.size_limiter.size_limit);
     }
     else if ( type == "umpire::strategy::ThreadSafeAllocator" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::THREADSAFE_ALLOCATOR;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
     }
     else if ( type == "umpire::strategy::FixedPool" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::FIXED_POOL;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
       get_from_string(m_json["payload"]["args"][1], alloc->argv.fixed_pool.object_bytes);
 
       // Now grab the optional fields
@@ -321,7 +341,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::MIXED_POOL;
-      m_ops.copyString(base_allocator_name, alloc->base_name);
+      m_ops->copyString(base_allocator_name, alloc->base_name);
 
       // Now grab the optional fields
       if (alloc->argc >= 8) {
@@ -399,7 +419,7 @@ void ReplayInterpreter::replay_compileAllocate( void )
 
   const AllocatorIndex& allocator_number{n_iter->second};
 
-  ReplayFile::Header* hdr = m_ops.getOperationsTable();
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   //
@@ -439,7 +459,7 @@ void ReplayInterpreter::replay_compileDeallocate( void )
 
   const AllocatorIndex& allocator_number{n_iter->second};
 
-  ReplayFile::Header* hdr = m_ops.getOperationsTable();
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   op->type = ReplayFile::otype::DEALLOCATE;
@@ -457,7 +477,7 @@ void ReplayInterpreter::replay_compileCoalesce( void )
   std::string allocator_name{m_json["payload"]["allocator_name"]};
   strip_off_base(allocator_name);
 
-  ReplayFile::Header* hdr = m_ops.getOperationsTable();
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   op->type = ReplayFile::otype::COALESCE;
   op->allocator_table_index = m_allocator_index[allocator_name];
@@ -473,7 +493,7 @@ void ReplayInterpreter::replay_compileRelease( void )
     REPLAY_ERROR("Unable to find allocator for: " << m_json["payload"]["memory_ptr"] << " release ignored");
   const AllocatorIndex& allocator_number{n_iter->second};
 
-  ReplayFile::Header* hdr = m_ops.getOperationsTable();
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   op->type = ReplayFile::otype::RELEASE;
   op->allocator_table_index = allocator_number;

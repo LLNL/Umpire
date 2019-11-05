@@ -12,7 +12,6 @@
 #include <string>
 
 #include "ReplayOperationManager.hpp"
-#include "ReplayFile.hpp"
 #include "umpire/tpl/json/json.hpp"
 
 class ReplayInterpreter {
@@ -26,6 +25,7 @@ class ReplayInterpreter {
     int getSymbolicOperation( std::string& raw_line, std::string& sym_line );
 
     ReplayInterpreter( std::string in_file_name );
+    ~ReplayInterpreter();
 
   private:
     using AllocatorIndex = int;
@@ -36,7 +36,7 @@ class ReplayInterpreter {
 
     std::string m_input_file_name;
     std::ifstream m_input_file;
-    ReplayFile m_ops;
+    ReplayFile* m_ops{nullptr};
     std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
     std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;

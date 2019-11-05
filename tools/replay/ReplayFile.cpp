@@ -44,7 +44,6 @@ ReplayFile::ReplayFile( std::string in_file_name )
   const int prot = PROT_READ|PROT_WRITE;
 
   if (sbuf.st_size < max_file_size) {
-    std::cout << "Compilation Needed: " << sbuf.st_size << " < " << max_file_size << std::endl;
     m_compile_needed = true;
     flags = MAP_SHARED;   // Writes will make it to backing store
 
