@@ -12,6 +12,7 @@
 #include <string>
 
 #include "ReplayOperationManager.hpp"
+#include "ReplayFile.hpp"
 #include "umpire/tpl/json/json.hpp"
 
 class ReplayInterpreter {
@@ -35,15 +36,15 @@ class ReplayInterpreter {
 
     std::string m_input_file_name;
     std::ifstream m_input_file;
+    ReplayFile m_ops;
     std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
+    std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;
     nlohmann::json m_json;
     std::vector<std::string> m_row;
-    AllocatorIndex m_num_allocators{0};
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
-    ReplayOperationManager m_operation_mgr;
-    uint64_t m_op_count{0};
+
     std::stringstream compare_ss;
 
     int m_log_version_major;
@@ -53,12 +54,12 @@ class ReplayInterpreter {
     template <typename T> void get_from_string( const std::string& s, T& val );
 
     void strip_off_base(std::string& s);
-    void replay_makeAllocator( void );
-    void replay_makeMemoryResource( void );
-    void replay_allocate( void );
-    void replay_deallocate( void );
-    void replay_coalesce( void );
-    void replay_release( void );
+    void replay_compileMemoryResource( void );
+    void replay_compileAllocator( void );
+    void replay_compileAllocate( void );
+    void replay_compileDeallocate( void );
+    void replay_compileCoalesce( void );
+    void replay_compileRelease( void );
 };
 
 #include "ReplayInterpreter.inl"

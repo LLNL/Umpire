@@ -16,11 +16,12 @@ set(replay_headers
   ReplayInterpreter.inl
   ReplayMacros.hpp
   ReplayOperationManager.hpp
-  ReplayOperationManager.inl)
+  ReplayFile.hpp)
 
 set(replay_sources
   ReplayInterpreter.cpp
-  ReplayOperationManager.cpp)
+  ReplayOperationManager.cpp
+  ReplayFile.cpp)
 
 blt_add_executable(
   NAME replay
