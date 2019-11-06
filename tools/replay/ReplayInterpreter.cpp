@@ -53,6 +53,12 @@ void ReplayInterpreter::buildOperations()
 
   memset(hdr, 0, sizeof(ReplayFile::Header));
 
+  // Get the input file size
+  m_input_file.seekg(0, std::ios::end);
+  auto filesize = m_input_file.tellg();
+  m_input_file.seekg(0, std::ios::beg);
+  int percent_complete = 0;
+
   while ( std::getline(m_input_file, m_line) ) {
     const std::string header("{ \"kind\":\"replay\", \"uid\":");
     auto const header_len(header.size());
@@ -118,7 +124,23 @@ void ReplayInterpreter::buildOperations()
     else {
       REPLAY_ERROR("Unknown Replay (" << m_json["event"] << ")");
     }
+
+    //
+    // Report progress in parsing file
+    //
+    auto current_pos = m_input_file.tellg();
+    double numerator = static_cast<double>(current_pos);
+    double denominator = static_cast<double>(filesize);
+    double percentage = (numerator / denominator) * 100.0;
+    int wholepercentage = percentage;
+
+    if (wholepercentage != percent_complete) {
+      percent_complete = wholepercentage;
+      std::cout << percent_complete << "%\r" << std::flush;
+    }
   }
+
+  std::cout << std::endl;
 
   //
   // Flush operations to compile file and read back in read-only (PRIVATE) mode
