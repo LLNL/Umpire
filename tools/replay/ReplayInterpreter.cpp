@@ -51,7 +51,7 @@ void ReplayInterpreter::buildOperations()
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
-  memset(hdr, 0, sizeof(ReplayFile::Header));
+  memset(static_cast<void*>(hdr), 0, sizeof(ReplayFile::Header));
 
   while ( std::getline(m_input_file, m_line) ) {
     const std::string header("{ \"kind\":\"replay\", \"uid\":");
