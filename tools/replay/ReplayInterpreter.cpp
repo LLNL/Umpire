@@ -51,7 +51,7 @@ void ReplayInterpreter::buildOperations()
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
-  memset(hdr, 0, sizeof(ReplayFile::Header));
+  memset(static_cast<void*>(hdr), 0, sizeof(ReplayFile::Header));
 
   // Get the input file size
   m_input_file.seekg(0, std::ios::end);
