@@ -7,6 +7,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
+
 
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
@@ -44,9 +46,12 @@ void ReplayInterpreter::runOperations(bool gather_statistics)
 
 void ReplayInterpreter::buildOperations()
 {
-  if (! m_ops->compileNeeded() ) {
+  if (! m_ops->compileNeeded() )
     return;
-  }
+
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
+
+  memset(hdr, 0, sizeof(ReplayFile::Header));
 
   while ( std::getline(m_input_file, m_line) ) {
     const std::string header("{ \"kind\":\"replay\", \"uid\":");
@@ -122,8 +127,6 @@ void ReplayInterpreter::buildOperations()
   m_ops = new ReplayFile{m_input_file_name};
 }
 
-#include <strings.h>
-
 bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
 {
   bool rval = true;
@@ -153,13 +156,28 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
   }
 
   if ( rval != false ) {
-    if (bcmp(   m_ops->getOperationsTable()->allocators
-              , rh.m_ops->getOperationsTable()->allocators
-              , rh.m_ops->getOperationsTable()->num_allocators * sizeof(ReplayFile::AllocatorTableEntry)))
-    {
-      std::cerr << "AllocatorTable data miscompare" << std::endl;
-      rval = false;
+    for ( std::size_t i = 0; i < rh.m_ops->getOperationsTable()->num_allocators; ++i) {
+      if (bcmp(   &m_ops->getOperationsTable()->allocators[i]
+                , &rh.m_ops->getOperationsTable()->allocators[i]
+                , sizeof(ReplayFile::AllocatorTableEntry)))
+      {
+        std::cerr << "AllocatorTable data miscompare at index " << i 
+          << ", sizeof Entry is: " << sizeof(ReplayFile::AllocatorTableEntry)
+          << std::endl;
+
+        unsigned char* lhs = (unsigned char*)(&m_ops->getOperationsTable()->allocators[i]);
+        unsigned char* rhs = (unsigned char*)(&rh.m_ops->getOperationsTable()->allocators[i]);
+
+        for ( std::size_t j = 0; j < sizeof(ReplayFile::AllocatorTableEntry); ++j ) {
+          if (lhs[j] != rhs[j]) {
+            std::cerr << j << ": " << (unsigned int)lhs[j] << " ~= " << (unsigned int)rhs[j] << std::endl;
+          }
+        }
+
+        rval = false;
+      }
     }
+
     if (bcmp(   m_ops->getOperationsTable()->ops
               , rh.m_ops->getOperationsTable()->ops
               , rh.m_ops->getOperationsTable()->num_operations * sizeof(ReplayFile::Operation)))
@@ -206,10 +224,11 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
   m_ops->copyString(allocator_name, alloc->name);
 
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+
+  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::ALLOCATOR_CREATION;
   op->allocator_table_index = hdr->num_allocators;
   m_allocator_index[allocator_name] = hdr->num_allocators;
-
   hdr->num_allocators++;
   hdr->num_operations++;
 }
@@ -223,12 +242,12 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
   const std::string allocator_name{m_json["payload"]["allocator_name"]};
 
-  m_ops->copyString(allocator_name, alloc->name);
-
   if ( m_json["result"].is_null() ) {
     const bool introspection{m_json["payload"]["with_introspection"]};
     const std::string raw_mangled_type{m_json["payload"]["type"]};
 
+    //memset(alloc, 0, sizeof(*alloc));
+    m_ops->copyString(allocator_name, alloc->name);
     alloc->introspection = introspection;
     alloc->argc = static_cast<int>(m_json["payload"]["args"].size());
 
@@ -305,6 +324,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
       // Now grab the optional fields
       if (alloc->argc >= 3) {
+        alloc->argc = 3;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1],
                         alloc->argv.dynamic_pool_list.initial_alloc_size);
         get_from_string(m_json["payload"]["args"][2],
@@ -322,6 +342,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
       m_ops->copyString(base_allocator_name, alloc->base_name);
 
       if (alloc->argc >= 4) {
+        alloc->argc = 4;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1],
                         alloc->argv.dynamic_pool_map.initial_alloc_size);
         get_from_string(m_json["payload"]["args"][2],
@@ -330,6 +351,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
                         alloc->argv.dynamic_pool_map.alignment);
       }
       else if (alloc->argc >= 3) {
+        alloc->argc = 3;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.dynamic_pool_map.initial_alloc_size);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.dynamic_pool_map.min_alloc_size);
       }
@@ -375,7 +397,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
       get_from_string(m_json["payload"]["args"][1], alloc->argv.fixed_pool.object_bytes);
 
       // Now grab the optional fields
-      if (alloc->argc >= 3) {
+      if (alloc->argc == 3) {
         get_from_string(m_json["payload"]["args"][2], alloc->argv.fixed_pool.objects_per_pool);
       }
     }
@@ -387,6 +409,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
       // Now grab the optional fields
       if (alloc->argc >= 8) {
+        alloc->argc = 8;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.mixed_pool.largest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][3], alloc->argv.mixed_pool.max_fixed_blocksize);
@@ -396,6 +419,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
         get_from_string(m_json["payload"]["args"][7], alloc->argv.mixed_pool.dynamic_align_bytes);
       }
       else if (alloc->argc >= 7) {
+        alloc->argc = 7;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.mixed_pool.largest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][3], alloc->argv.mixed_pool.max_fixed_blocksize);
@@ -404,6 +428,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
         get_from_string(m_json["payload"]["args"][6], alloc->argv.mixed_pool.dynamic_min_alloc_bytes);
       }
       else if (alloc->argc >= 6) {
+        alloc->argc = 6;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.mixed_pool.largest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][3], alloc->argv.mixed_pool.max_fixed_blocksize);
@@ -411,21 +436,25 @@ void ReplayInterpreter::replay_compileAllocator( void )
         get_from_string(m_json["payload"]["args"][5], alloc->argv.mixed_pool.dynamic_initial_alloc_bytes);
       }
       else if (alloc->argc >= 5) {
+        alloc->argc = 5;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.mixed_pool.largest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][3], alloc->argv.mixed_pool.max_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][4], alloc->argv.mixed_pool.size_multiplier);
       }
       else if (alloc->argc >= 4) {
+        alloc->argc = 4;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.mixed_pool.largest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][3], alloc->argv.mixed_pool.max_fixed_blocksize);
       }
       else if (alloc->argc >= 3) {
+        alloc->argc = 3;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
         get_from_string(m_json["payload"]["args"][2], alloc->argv.mixed_pool.largest_fixed_blocksize);
       }
       else if (alloc->argc >= 2) {
+        alloc->argc = 2;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1], alloc->argv.mixed_pool.smallest_fixed_blocksize);
       }
     }
@@ -440,6 +469,9 @@ void ReplayInterpreter::replay_compileAllocator( void )
     m_allocator_indices[obj_p] = hdr->num_allocators;
 
     ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+
+    memset(op, 0, sizeof(*op));
+
     op->type = ReplayFile::otype::ALLOCATOR_CREATION;
     op->allocator_table_index = hdr->num_allocators;
 
@@ -476,6 +508,8 @@ void ReplayInterpreter::replay_compileAllocate( void )
   if ( m_json["result"].is_null() ) {
     const std::size_t alloc_size{m_json["payload"]["size"]};
 
+    memset(op, 0, sizeof(*op));
+
     op->type = ReplayFile::otype::ALLOCATE;
     op->allocator_table_index = allocator_number;
     op->argv.allocate.size = alloc_size;
@@ -485,7 +519,6 @@ void ReplayInterpreter::replay_compileAllocate( void )
     const uint64_t memory_ptr{std::stoul(memory_str, nullptr, 0)};
 
     m_allocation_id[memory_ptr] = hdr->num_operations;
-    op->argv.allocate.ptr = nullptr;
     hdr->num_operations++;
   }
 }
@@ -504,6 +537,7 @@ void ReplayInterpreter::replay_compileDeallocate( void )
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
+  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::DEALLOCATE;
   op->allocator_table_index = allocator_number;
 
@@ -521,6 +555,7 @@ void ReplayInterpreter::replay_compileCoalesce( void )
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::COALESCE;
   op->allocator_table_index = m_allocator_index[allocator_name];
   hdr->num_operations++;
@@ -537,6 +572,7 @@ void ReplayInterpreter::replay_compileRelease( void )
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::RELEASE;
   op->allocator_table_index = allocator_number;
   hdr->num_operations++;
