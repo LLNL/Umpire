@@ -25,6 +25,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - ThreadSafeAllocator added for C/Fortran API. Available using
   UmpireResourceManage `make_allocator_thread_safe` function.
 
+- Replay logs now contain information about operations. These are not yet
+  replayed.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.
