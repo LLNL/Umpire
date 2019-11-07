@@ -22,6 +22,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - NamedAllocator that allows creating a new allocator that passes allocations
   through to underlying strategy
 
+- ThreadSafeAllocator added for C/Fortran API. Available using
+  UmpireResourceManage `make_allocator_thread_safe` function.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.

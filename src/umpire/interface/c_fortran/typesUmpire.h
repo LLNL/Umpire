@@ -70,6 +70,12 @@ struct s_umpire_strategy_namedallocationstrategy {
 };
 typedef struct s_umpire_strategy_namedallocationstrategy umpire_strategy_namedallocationstrategy;
 
+struct s_umpire_strategy_threadsafeallocator {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_threadsafeallocator umpire_strategy_threadsafeallocator;
+
 struct s_umpire_SHROUD_array {
     umpire_SHROUD_capsule_data cxx;      /* address of C++ memory */
     union {

@@ -128,4 +128,16 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_mixed_pool)
 
+if (ENABLE_FORTRAN)
+  blt_add_executable(
+    NAME recipe_thread_safe
+    SOURCES recipe_thread_safe.F
+    DEPENDS_ON ${cookbook_depends})
+
+  set_source_files_properties(
+    recipe_thread_safe.F
+    PROPERTIES
+    Fortran_FORMAT FREE)
+endif ()
+
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)

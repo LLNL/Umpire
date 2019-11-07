@@ -70,6 +70,12 @@ declarations:
           wrap_c: false
           wrap_fortran: false
 
+      - decl: class ThreadSafeAllocator
+        cxx_header: umpire/strategy/ThreadSafeAllocator.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
   - decl: class Allocator
     cxx_header: umpire/Allocator.hpp
     format:
@@ -138,6 +144,10 @@ declarations:
         - instantiation: <umpire::strategy::NamedAllocationStrategy>
           format:
             template_suffix: _named
+            function_suffix: ""
+        - instantiation: <umpire::strategy::ThreadSafeAllocator>
+          format:
+            template_suffix: _thread_safe
             function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
