@@ -482,11 +482,15 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
     size = src_size;
   }
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
       R"( "event": "copy", "payload": { "src": ")"
       << src_ptr
+      << R"(", src_offset: ")"
+      << src_offset
       << R"(", "dest": ")"
       << dst_ptr
+      << R"(", dst_offset: ")"
+      << dst_offset
       << R"(",  "size": )"
       << size
       << R"(, "src_allocator_ref": ")"
@@ -550,7 +554,7 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
       R"( "event": "reallocate", "payload": { "ptr": ")"
       << src_ptr
       << R"(", "size": )"
@@ -587,7 +591,7 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
       R"( "event": "reallocate", "payload": { "ptr": ")"
       << src_ptr
       << R"(", "size": )"
@@ -619,11 +623,11 @@ ResourceManager::move(void* ptr, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
       R"( "event": "move", "payload": { "ptr": ")"
       << ptr
       << R"(", "allocator_ref": ")"
-      << allocator.getAllocationStrateyg()
+      << allocator.getAllocationStrategy()
       << R"(" })"
   );
 
@@ -664,7 +668,8 @@ ResourceManager::move(void* ptr, Allocator allocator)
           << allocator.getAllocationStrategy()
           << R"(" }, "result": { "ptr": ")"
           << ptr
-          << R"(" })";
+          << R"(" })"
+      );
       return ptr;
     }
   }
@@ -684,7 +689,8 @@ ResourceManager::move(void* ptr, Allocator allocator)
       << allocator.getAllocationStrategy()
       << R"(" }, "result": { "ptr": ")"
       << dst_ptr
-      << R"(" })";
+      << R"(" })"
+  );
 
   deallocate(ptr);
 
