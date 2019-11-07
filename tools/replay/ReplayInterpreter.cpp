@@ -49,6 +49,7 @@ void ReplayInterpreter::buildOperations()
   if (! m_ops->compileNeeded() )
     return;
 
+  std::cout << "Compiling replay file" << std::endl;
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
   memset(static_cast<void*>(hdr), 0, sizeof(ReplayFile::Header));
@@ -146,6 +147,7 @@ void ReplayInterpreter::buildOperations()
   // Flush operations to compile file and read back in read-only (PRIVATE) mode
   //
   delete m_ops;
+  std::cout << "Compilation completed successfully" << std::endl;
   m_ops = new ReplayFile{m_input_file_name};
 }
 
