@@ -41,6 +41,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay logs now contain mangled symbols, and these are demangled by the
   `replay` tool.
 
+- Replay tool changed to create a binary index file of the operations from
+  the original json file that may be used (and reused) for quicker replays.
+
 ### Removed
 
 - Usage of `__cxa_demangle` in core Umpire library.
