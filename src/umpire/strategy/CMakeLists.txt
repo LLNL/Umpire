@@ -6,6 +6,7 @@
 ##############################################################################
 set (umpire_strategy_headers
   AllocationAdvisor.hpp
+  AllocationPrefetcher.hpp
   AllocationStrategy.hpp
   AllocationTracker.hpp
   DynamicPool.hpp
@@ -36,6 +37,7 @@ set (umpire_strategy_mixin_headers
 set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
+  AllocationPrefetcher.cpp
   AllocationTracker.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp
