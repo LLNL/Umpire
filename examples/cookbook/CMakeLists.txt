@@ -49,6 +49,13 @@ if (ENABLE_CUDA)
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_move_to_managed)
 
+  blt_add_executable(
+    NAME recipe_memprefetch_pool
+    SOURCES recipe_memprefetch_pool.cpp
+    DEPENDS_ON ${cookbook_depends}
+    OUTPUT_DIR ${cookbook_output_dir})
+  list(APPEND umpire_cookbooks recipe_memprefetch_pool)
+
   if (ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
@@ -58,6 +65,18 @@ if (ENABLE_CUDA)
 
     set_source_files_properties(
       recipe_pinned_pool.F
+      PROPERTIES
+      Fortran_FORMAT FREE)
+
+    blt_add_executable(
+      NAME recipe_prefetch_pool
+      SOURCES recipe_prefetch_pool.F
+      DEPENDS_ON ${cookbook_depends}
+      OUTPUT_DIR ${cookbook_output_dir})
+    list(APPEND umpire_cookbooks recipe_prefetch_pool)
+
+    set_source_files_properties(
+      recipe_prefetch_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
   endif ()
