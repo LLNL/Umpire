@@ -142,5 +142,10 @@ install(FILES
   DESTINATION include/umpire/interface/c_fortran)
 
 install(DIRECTORY
+  ${CMAKE_Fortran_MODULE_DIRECTORY}/
+  DESTINATION include/umpire 
+  FILES_MATCHING PATTERN "*.mod")
+
+install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ".")
