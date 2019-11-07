@@ -18,6 +18,16 @@ declarations:
         f_derived_type: allocationadvisor
         f_capsule_data_type: SHROUD_strategy_allocationadvisor_capsule
         f_to_c: "{f_var}%cxxmem"
+    - type: AllocationPrefetcher
+      fields:
+        base: shadow
+        impl_header: umpire/strategy/AllocationPrefetcher.hpp
+        cxx_type: umpire::strategy::AllocationPrefetcher
+        c_type: umpire_strategy_allocationprefetcher
+        f_module_name: umpire_strategy_mod
+        f_derived_type: allocationprefetcher
+        f_capsule_data_type: SHROUD_strategy_allocationprefetcher_capsule
+        f_to_c: "{f_var}%cxxmem"
     - type: Allocator
       fields:
         base: shadow
