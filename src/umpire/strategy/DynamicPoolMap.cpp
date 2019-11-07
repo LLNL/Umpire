@@ -31,8 +31,8 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
                          Allocator allocator,
                          const std::size_t initial_alloc_bytes,
                          const std::size_t min_alloc_bytes,
-                         CoalesceHeuristic coalesce_heuristic,
-                         const int align_bytes) noexcept :
+                         const std::size_t align_bytes,
+                         CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy(name, id),
   m_allocator{allocator.getAllocationStrategy()},
   m_initial_alloc_bytes{round_up(initial_alloc_bytes, align_bytes)},

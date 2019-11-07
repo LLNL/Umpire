@@ -15,8 +15,8 @@ namespace strategy {
 SlotPool::SlotPool(
     const std::string& name,
     int id,
-    std::size_t slots,
-    Allocator allocator) :
+    Allocator allocator,
+    std::size_t slots):
   AllocationStrategy(name, id),
   m_current_size(0),
   m_highwatermark(0),

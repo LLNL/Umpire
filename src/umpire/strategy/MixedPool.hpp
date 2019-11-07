@@ -58,8 +58,8 @@ class MixedPool :
       std::size_t fixed_size_multiplier = 16,                  // 16x over previous size
       const std::size_t dynamic_initial_alloc_size = (512 * 1024 * 1024),
       const std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
-      DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic = heuristic_percent_releasable(100),
-      const int dynamic_align_bytes = 16) noexcept;
+      const std::size_t dynamic_align_bytes = 16,
+      DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;

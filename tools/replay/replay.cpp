@@ -34,6 +34,9 @@ int main(int argc, char* argv[])
      , "Input file created by Umpire library with UMPIRE_REPLAY=On"
      , cxxopts::value<std::string>(), "FILE"
     )
+    (  "c, compile"
+     , "Compile input file to binary format for faster replays"
+    )
     (
       "s, stats"
       , "Dump ULTRA file containing memory usage stats for each Allocator"
@@ -59,7 +62,10 @@ int main(int argc, char* argv[])
   t1 = std::chrono::high_resolution_clock::now();
   ReplayInterpreter replay(input_file_name);
 
-  if (command_line_args.count("allocation_map")) {
+  if (command_line_args.count("compile")) {
+    replay.compile();
+  }
+  else if (command_line_args.count("allocation_map")) {
     replay.buildAllocMapOperations();
   }
   else {

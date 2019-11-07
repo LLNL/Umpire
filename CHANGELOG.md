@@ -24,6 +24,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - NamedAllocator that allows creating a new allocator that passes allocations
   through to underlying strategy
 
+- ThreadSafeAllocator added for C/Fortran API. Available using
+  UmpireResourceManage `make_allocator_thread_safe` function.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte.
@@ -34,11 +37,22 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Build and install all binaries in the `bin` directory.
 
+- Refactored replay tool implementation in preparation for addition of
+  capability to compile replays.
+
+- Replay logs now contain mangled symbols, and these are demangled by the
+  `replay` tool.
+
 ### Removed
+
+- Usage of `__cxa_demangle` in core Umpire library.
 
 ### Fixed
 
 - Fixed PGI compiler failures
+
+- Fixed replay test the replay tool as well as validate the output from
+  running umpire with REPLAY turned on.
 
 ## [1.1.0] - 2019-09-14
 
