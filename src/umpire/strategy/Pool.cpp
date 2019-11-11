@@ -30,12 +30,12 @@ Pool::Pool(
   m_min_alloc_bytes{min_alloc_size},
   m_align_bytes{align_bytes}
 {
-  void* ptr{m_allocator->allocate(initial_alloc_size)};
-  m_actual_bytes += initial_alloc_size;
+  void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
+  m_actual_bytes += m_initial_alloc_bytes;
 
   void* chunk_storage{m_chunk_pool.allocate()};
-  Chunk* chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, initial_alloc_size)};
-  chunk->size_map_it = m_size_map.insert(std::make_pair(initial_alloc_size, chunk));
+  Chunk* chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, m_initial_alloc_bytes)};
+  chunk->size_map_it = m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
 }
 
 Pool::~Pool()
@@ -183,19 +183,19 @@ void Pool::release()
 std::size_t 
 Pool::getCurrentSize() const noexcept
 {
-  return 0;
+  return m_curr_bytes;
 }
 
 std::size_t 
 Pool::getActualSize() const noexcept
 {
-  return 0;
+  return m_actual_bytes;
 }
 
 std::size_t 
 Pool::getHighWatermark() const noexcept
 {
-  return 0;
+  return m_highwatermark;
 }
 
 Platform 
