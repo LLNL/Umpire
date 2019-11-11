@@ -106,7 +106,7 @@ class Pool :
 
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
-    const int m_align_bytes;
+    //const int m_align_bytes;
 
     std::size_t m_curr_bytes{0};
     std::size_t m_actual_bytes{0};

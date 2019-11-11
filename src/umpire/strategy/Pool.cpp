@@ -20,15 +20,15 @@ Pool::Pool(
     Allocator allocator,
     const std::size_t initial_alloc_size,
     const std::size_t min_alloc_size,
-    const int align_bytes) noexcept :
+    const int) noexcept :
   AllocationStrategy{name, id},
   m_pointer_map{},
   m_size_map{},
   m_chunk_pool{sizeof(Chunk)},
   m_allocator{allocator.getAllocationStrategy()},
   m_initial_alloc_bytes{initial_alloc_size},
-  m_min_alloc_bytes{min_alloc_size},
-  m_align_bytes{align_bytes}
+  m_min_alloc_bytes{min_alloc_size}
+  //m_align_bytes{align_bytes}
 {
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
   m_actual_bytes += m_initial_alloc_bytes;
