@@ -30,7 +30,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
-- LC GitLab CI now using lassen by default instead of butte.
+- LC GitLab CI now using lassen by default instead of butte. Build and test
+  split in pairs of jobs for quartz, optimized with `needs` and
+  `git_strategy` features.
 
 - Constant device memory is disabled by default.
 
