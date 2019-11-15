@@ -6,6 +6,7 @@
 ##############################################################################
 set (umpire_strategy_headers
   AllocationAdvisor.hpp
+  AllocationPrefetcher.hpp
   AllocationStrategy.hpp
   AllocationTracker.hpp
   DynamicPool.hpp
@@ -16,6 +17,7 @@ set (umpire_strategy_headers
   FixedPool.hpp
   FixedSizePool.hpp
   MixedPool.hpp
+  NamedAllocationStrategy.hpp
   MonotonicAllocationStrategy.hpp
   SlotPool.hpp
   SizeLimiter.hpp
@@ -35,6 +37,7 @@ set (umpire_strategy_mixin_headers
 set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
+  AllocationPrefetcher.cpp
   AllocationTracker.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp
@@ -43,6 +46,7 @@ set (umpire_strategy_sources
   MixedPool.cpp
   mixins/Inspector.cpp
   MonotonicAllocationStrategy.cpp
+  NamedAllocationStrategy.cpp
   SlotPool.cpp
   SizeLimiter.cpp
   ThreadSafeAllocator.cpp

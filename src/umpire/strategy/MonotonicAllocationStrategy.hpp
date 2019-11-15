@@ -24,8 +24,8 @@ class MonotonicAllocationStrategy :
     MonotonicAllocationStrategy(
         const std::string& name,
         int id,
-        std::size_t capacity,
-        Allocator allocator);
+        Allocator allocator,
+        std::size_t capacity);
 
     ~MonotonicAllocationStrategy();
 

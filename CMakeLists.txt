@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 1.1.0)
+  VERSION 2.0.0)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -21,6 +21,7 @@ mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS)
 if (ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
   set(ENABLE_TOOLS On CACHE BOOL "")
+  set(ENABLE_DEVICE_CONST On CACHE BOOL "")
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
@@ -119,17 +120,13 @@ if (ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 if (ENABLE_BENCHMARKS)
-  set(UMPIRE_BENCHMARK_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/benchmarks)
   add_subdirectory(benchmarks)
 endif ()
 if (ENABLE_EXAMPLES)
-  set(UMPIRE_EXAMPLE_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/examples)
   add_subdirectory(examples)
 endif ()
 
 if (ENABLE_TOOLS)
-  set(TOOL_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/tools)
-  set(UMPIRE_TOOL_INSTALL_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin/tools)
   add_subdirectory(tools)
 endif ()
 

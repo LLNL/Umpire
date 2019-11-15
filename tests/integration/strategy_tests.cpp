@@ -11,18 +11,19 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
-#include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
-#include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
@@ -34,6 +35,8 @@
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
+
+#include <thread>
 
 static int alignment = 16;
 
@@ -132,8 +135,8 @@ void StrategyTest<umpire::strategy::SlotPool>::SetUp()
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::SlotPool>(
             name, 
-            8,
-            rm.getAllocator("HOST")));
+            rm.getAllocator("HOST"),
+            8));
 }
 
 template<>
@@ -145,8 +148,8 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
             name, 
-            1024,
-            rm.getAllocator("HOST")));
+            rm.getAllocator("HOST"),
+            1024));
 }
 
 using Strategies = ::testing::Types<
@@ -159,6 +162,7 @@ using Strategies = ::testing::Types<
   umpire::strategy::FixedPool,
   umpire::strategy::MixedPool,
   umpire::strategy::MonotonicAllocationStrategy,
+  umpire::strategy::NamedAllocationStrategy,
   umpire::strategy::SizeLimiter,
   umpire::strategy::SlotPool,
   umpire::strategy::ThreadSafeAllocator>;
@@ -440,7 +444,7 @@ TEST(MonotonicStrategy, Host)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "host_monotonic_pool", 65536, rm.getAllocator("HOST"));
+      "host_monotonic_pool", rm.getAllocator("HOST"), 65536);
 
   void* alloc = allocator.allocate(100);
   void* alloc2 = allocator.allocate(100);
@@ -461,7 +465,7 @@ TEST(MonotonicStrategy, Device)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "device_monotonic_pool", 65536, rm.getAllocator("DEVICE"));
+      "device_monotonic_pool", rm.getAllocator("DEVICE"), 65536);
 
   void* alloc = allocator.allocate(100);
 
@@ -480,7 +484,7 @@ TEST(MonotonicStrategy, UM)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "um_monotonic_pool", 65536, rm.getAllocator("UM"));
+      "um_monotonic_pool", rm.getAllocator("UM"), 65536);
 
   void* alloc = allocator.allocate(100);
 
@@ -596,13 +600,55 @@ TEST(MixedPool, Host)
     allocator.deallocate(alloc[i]);
 }
 
-#if defined(_OPENMP)
-TEST(ThreadSafeAllocator, Host)
+TEST(ThreadSafeAllocator, HostStdThread)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("HOST"));
+      "thread_safe_allocator_host_std", rm.getAllocator("HOST"));
+
+  constexpr int N = 16;
+  std::vector<void*> thread_allocs{N};
+  std::vector<std::thread> threads;
+
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    threads.push_back(
+        std::thread([=, &allocator, &thread_allocs] {
+          for ( int j = 0; j < N; ++j) { 
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+            allocator.deallocate(thread_allocs[i]);
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+          }
+    }));
+  }
+
+  for (auto& t : threads) {
+    t.join();
+  }
+
+  for (auto alloc : thread_allocs)
+  {
+    ASSERT_NE(alloc, nullptr);
+  }
+
+  ASSERT_NO_THROW({
+    for (auto alloc : thread_allocs)
+    {
+      allocator.deallocate(alloc);
+    }
+  });
+}
+
+#if defined(_OPENMP)
+TEST(ThreadSafeAllocator, HostOpenMP)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator_host_omp", rm.getAllocator("HOST"));
 
 #pragma omp parallel
   {
@@ -616,8 +662,74 @@ TEST(ThreadSafeAllocator, Host)
 
   SUCCEED();
 }
-
 #endif
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+TEST(ThreadSafeAllocator, DeviceStdThread)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator_device_std", rm.getAllocator("DEVICE"));
+
+  constexpr int N = 16;
+  std::vector<void*> thread_allocs{N};
+  std::vector<std::thread> threads;
+
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    threads.push_back(
+        std::thread([=, &allocator, &thread_allocs] {
+          for ( int j = 0; j < N; ++j) { 
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+            allocator.deallocate(thread_allocs[i]);
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+          }
+    }));
+  }
+
+  for (auto& t : threads) {
+    t.join();
+  }
+
+  for (auto alloc : thread_allocs)
+  {
+    ASSERT_NE(alloc, nullptr);
+  }
+
+  ASSERT_NO_THROW({
+    for (auto alloc : thread_allocs)
+    {
+      allocator.deallocate(alloc);
+    }
+  });
+}
+
+#if defined(_OPENMP)
+TEST(ThreadSafeAllocator, DeviceOpenMP)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator_device_omp", rm.getAllocator("DEVICE"));
+
+#pragma omp parallel
+  {
+    const std::size_t size = 1024*omp_get_thread_num();
+
+    double* thread_data = static_cast<double*>(
+     allocator.allocate(size*sizeof(double)));
+
+    allocator.deallocate(thread_data);
+  }
+
+  SUCCEED();
+}
+#endif
+#endif // defined(UMPIRE_ENABLE_DEVICE)
+
 
 TEST(SizeLimiter, Host)
 {
@@ -826,7 +938,7 @@ TEST(HeuristicTest, EdgeCases_75)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_75", rm.getAllocator("HOST"),
-      1024ul, 1024ul, h_fun, alignment);
+      1024ul, 1024ul, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
@@ -863,7 +975,7 @@ TEST(HeuristicTest, EdgeCases_100)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_100", rm.getAllocator("HOST"),
-      initial_size, subsequent_min_size, h_fun, alignment);
+      initial_size, subsequent_min_size, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
@@ -922,7 +1034,7 @@ TEST(HeuristicTest, EdgeCases_0)
 
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dyn_pool_h_0", rm.getAllocator("HOST"),
-      initial_size, subsequent_min_size, h_fun, alignment);
+      initial_size, subsequent_min_size, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
 
@@ -1270,7 +1382,7 @@ TEST(NumaPolicyTest, EdgeCases) {
 
   // Only works with HOST allocators
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
-                 "numa_alloc", numa_node, rm.getAllocator("DEVICE")),
+                 "numa_alloc", rm.getAllocator("DEVICE"), numa_node),
                umpire::util::Exception);
 #endif
 }
@@ -1284,7 +1396,7 @@ TEST(NumaPolicyTest, Location) {
     ss << "numa_alloc_" << n;
 
     auto alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      ss.str(), n, rm.getAllocator("HOST"));
+      ss.str(), rm.getAllocator("HOST"), n);
 
     void* ptr = alloc.allocate(10 * umpire::get_page_size());
 

@@ -12,8 +12,8 @@
 #include <chrono>
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
-#include "util/ReplayInterpreter.hpp"
-#include "util/ReplayMacros.hpp"
+#include "ReplayInterpreter.hpp"
+#include "ReplayMacros.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -59,12 +59,7 @@ int main(int argc, char* argv[])
   t1 = std::chrono::high_resolution_clock::now();
   ReplayInterpreter replay(input_file_name);
 
-  if (command_line_args.count("allocation_map")) {
-    replay.buildAllocMapOperations();
-  }
-  else {
-    replay.buildOperations();
-  }
+  replay.buildOperations();
 
   t2 = std::chrono::high_resolution_clock::now();
 
