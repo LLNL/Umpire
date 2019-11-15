@@ -44,6 +44,16 @@ MemoryOperation::apply(
   UMPIRE_ERROR("MemoryOperation::apply() is not implemented");
 }
 
+camp::resources::Event
+MemoryOperation::apply(
+    void* UMPIRE_UNUSED_ARG(src_ptr),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    int UMPIRE_UNUSED_ARG(val),
+    std::size_t UMPIRE_UNUSED_ARG(length),
+    camp::resources::Context& UMPIRE_UNUSED_ARG(ctx))
+{
+  UMPIRE_ERROR("MemoryOperation::apply() is not implemented");
+}
 
 
 } // end of namespace op

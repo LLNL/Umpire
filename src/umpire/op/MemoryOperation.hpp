@@ -68,6 +68,13 @@ class MemoryOperation {
         util::AllocationRecord *src_allocation,
         int val,
         std::size_t length);
+
+    virtual camp::resources::Event apply(
+        void* src_ptr,
+        util::AllocationRecord *src_allocation,
+        int val,
+        std::size_t length,
+        camp::resources::Context& ctx);
 };
 
 } // end of namespace op
