@@ -38,6 +38,10 @@ int main(int argc, char* argv[])
       "s, stats"
       , "Dump ULTRA file containing memory usage stats for each Allocator"
     )
+    (
+      "info"
+      , "Display information about the replay file"
+    )
   ;
 
   auto command_line_args = options.parse(argc, argv);
@@ -66,6 +70,10 @@ int main(int argc, char* argv[])
   if (command_line_args.count("time")) {
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Parsing replay log took " << time_span.count() << " seconds." << std::endl;
+  }
+
+  if (command_line_args.count("info")) {
+    replay.printInfo();
   }
 
   t1 = std::chrono::high_resolution_clock::now();

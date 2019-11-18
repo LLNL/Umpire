@@ -28,6 +28,7 @@ public:
   ~ReplayOperationManager();
 
   void runOperations(bool gather_statistics);
+  void printInfo();
 
 private:
   std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;

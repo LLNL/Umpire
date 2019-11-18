@@ -37,6 +37,13 @@ ReplayInterpreter::~ReplayInterpreter()
   }
 }
 
+void ReplayInterpreter::printInfo()
+{
+  ReplayOperationManager m_operation_mgr{m_ops->getOperationsTable()};
+
+  m_operation_mgr.printInfo();
+}
+
 void ReplayInterpreter::runOperations(bool gather_statistics)
 {
   ReplayOperationManager m_operation_mgr{m_ops->getOperationsTable()};

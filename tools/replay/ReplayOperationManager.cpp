@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <vector>
 #include <fstream>
@@ -30,6 +31,286 @@ ReplayOperationManager::ReplayOperationManager( ReplayFile::Header* Operations )
 }
 
 ReplayOperationManager::~ReplayOperationManager() { }
+
+void ReplayOperationManager::printInfo()
+{
+  std::cout << m_ops_table->num_allocators << " Allocators:" << std::endl;
+
+  for ( std::size_t n{0}; n < m_ops_table->num_allocators; ++n) {
+    auto alloc = &m_ops_table->allocators[n];
+
+    std::cout
+      << std::setw(6) << std::setfill(' ') << "#"
+      << std::setw(2) << std::setfill('0') << n << "  ";
+
+    switch (alloc->type) {
+    case ReplayFile::rtype::MEMORY_RESOURCE:
+      std::cout << "makeMemoryResource(\"" << m_ops_table->allocators[n].name << "\")";
+      break;
+
+    case ReplayFile::rtype::ALLOCATION_ADVISOR:
+      if (alloc->argv.advisor.device_id >= 0) { // Optional device ID specified
+        switch ( alloc->argc ) {
+        default:
+          break;
+        case 3:
+          std::cout
+            << "<umpire::strategy::AllocationAdvisor, "
+            << (alloc->introspection == true ? "true" : "false") << ">"
+            << "( \"" << alloc->name << "\""
+            << ", \"" << alloc->base_name << "\""
+            << ", \"" << alloc->argv.advisor.advice << "\""
+            << ", " << alloc->argv.advisor.device_id << " )";
+          break;
+        case 4:
+          std::cout
+            << "<umpire::strategy::AllocationAdvisor, "
+            << (alloc->introspection == true ? "true" : "false") << ">"
+            << "( "
+            << "\"" << alloc->name << "\", "
+            << "\"" << alloc->base_name << "\", "
+            << "\"" << alloc->argv.advisor.advice << "\", "
+            << "\"" << alloc->argv.advisor.accessing_allocator << "\", "
+            << alloc->argv.advisor.device_id
+            << " )";
+          break;
+        }
+      }
+      else { // Use default device_id
+        switch ( alloc->argc ) {
+        default:
+          REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        case 2:
+          std::cout
+            << "<umpire::strategy::AllocationAdvisor, "
+            << (alloc->introspection == true ? "true" : "false") << ">"
+            << "( "
+            << "\"" << alloc->name << "\", "
+            << "\"" << alloc->base_name << "\", "
+            << "\"" << alloc->argv.advisor.advice << "\""
+            << " )";
+          break;
+        case 3:
+          std::cout
+            << "<umpire::strategy::AllocationAdvisor, "
+            << (alloc->introspection == true ? "true" : "false") << ">"
+            "( "
+            << "\"" << alloc->name << "\", "
+            << "\"" << alloc->base_name << "\", "
+            << "\"" << alloc->argv.advisor.advice << "\", "
+            << "\"" << alloc->argv.advisor.accessing_allocator << "\""
+            << " )";
+          break;
+        }
+      }
+      break;
+
+    case ReplayFile::rtype::DYNAMIC_POOL_LIST:
+      if (alloc->argc >= 3) {
+        std::cout << "<umpire::strategy::DynamicPoolList, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.dynamic_pool_list.initial_alloc_size
+          << ", "
+          << alloc->argv.dynamic_pool_list.min_alloc_size
+          << " )";
+      }
+      else if (alloc->argc == 2) {
+        std::cout << "<umpire::strategy::DynamicPoolList, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.dynamic_pool_list.initial_alloc_size
+          << " )";
+      }
+      else {
+        std::cout << "<umpire::strategy::DynamicPoolList, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\""
+          << " )";
+      }
+      break;
+
+    case ReplayFile::rtype::DYNAMIC_POOL_MAP:
+      if (alloc->argc >= 4) {
+        std::cout << "<umpire::strategy::DynamicPoolMap, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.dynamic_pool_map.initial_alloc_size
+          << ", "
+          << alloc->argv.dynamic_pool_map.min_alloc_size
+          << ", "
+          << alloc->argv.dynamic_pool_map.alignment
+          << " )";
+      }
+      else if (alloc->argc >= 3) {
+        std::cout << "<umpire::strategy::DynamicPoolMap, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.dynamic_pool_map.initial_alloc_size
+          << ", "
+          << alloc->argv.dynamic_pool_map.min_alloc_size
+          << " )";
+      }
+      else if (alloc->argc == 2) {
+        std::cout << "<umpire::strategy::DynamicPoolMap, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.dynamic_pool_map.initial_alloc_size
+          << " )";
+      }
+      else {
+        std::cout << "<umpire::strategy::DynamicPoolMap, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\""
+          << " )";
+      }
+      break;
+
+    case ReplayFile::rtype::MONOTONIC:
+      std::cout << "<umpire::strategy::MonotonicAllocationStrategy, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        "( "
+        << "\"" << alloc->name << "\", "
+        << "\"" << alloc->base_name << "\", "
+        << alloc->argv.monotonic_pool.capacity
+        << " )";
+      break;
+
+    case ReplayFile::rtype::SLOT_POOL:
+      std::cout << "<umpire::strategy::SlotPool, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        "( "
+        << "\"" << alloc->name << "\", "
+        << "\"" << alloc->base_name << "\", "
+        << alloc->argv.slot_pool.slots
+        << " )";
+      break;
+
+    case ReplayFile::rtype::SIZE_LIMITER:
+      std::cout << "<umpire::strategy::SizeLimiter, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        "( "
+        << "\"" << alloc->name << "\", "
+        << "\"" << alloc->base_name << "\", "
+        << alloc->argv.size_limiter.size_limit
+        << " )";
+      break;
+
+    case ReplayFile::rtype::THREADSAFE_ALLOCATOR:
+      std::cout << "<umpire::strategy::ThreadSafeAllocator, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        "( "
+        << "\"" << alloc->name << "\", "
+        << "\"" << alloc->base_name << "\""
+        << " )";
+      break;
+
+    case ReplayFile::rtype::FIXED_POOL:
+      if (alloc->argc >= 3) {
+        std::cout << "<umpire::strategy::FixedPool, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.fixed_pool.object_bytes
+          << ", "
+          << alloc->argv.fixed_pool.objects_per_pool
+          << " )";
+      }
+      else {
+        std::cout << "<umpire::strategy::FixedPool, "
+          << (alloc->introspection == true ? "true" : "false") << ">"
+          "( "
+          << "\"" << alloc->name << "\", "
+          << "\"" << alloc->base_name << "\", "
+          << alloc->argv.fixed_pool.object_bytes
+          << " )";
+      }
+      break;
+
+    case ReplayFile::rtype::MIXED_POOL:
+      std::cout << "<umpire::strategy::MixedPool, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( "
+        << "\"" << alloc->name << "\", "
+        << "\"" << alloc->base_name << "\", ";
+
+      if (alloc->argc >= 8) {
+        std::cout
+          << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier
+          << ", " << alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
+          << ", " << alloc->argv.mixed_pool.dynamic_min_alloc_bytes
+          << ", " << alloc->argv.mixed_pool.dynamic_align_bytes;
+      }
+      else if (alloc->argc >= 7) {
+        std::cout
+          << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier
+          << ", " << alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
+          << ", " << alloc->argv.mixed_pool.dynamic_min_alloc_bytes;
+      }
+      else if (alloc->argc >= 6) {
+        std::cout
+          << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier
+          << ", " << alloc->argv.mixed_pool.dynamic_initial_alloc_bytes;
+      }
+      else if (alloc->argc >= 5) {
+        std::cout
+          << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier;
+      }
+      else if (alloc->argc >= 4) {
+        std::cout
+          << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize;
+      }
+      else if (alloc->argc >= 3) {
+        std::cout
+          << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize;
+      }
+      else if (alloc->argc >= 2) {
+        std::cout << alloc->argv.mixed_pool.smallest_fixed_blocksize;
+      }
+
+      std::cout << " )";
+      break;
+
+    default:
+      REPLAY_ERROR("Unknown allocator type: " << alloc->type);
+      break;
+    }
+
+    std::cout << std::endl;
+  }
+
+  std::cout << m_ops_table->num_operations << " Operations" << std::endl;
+}
 
 void ReplayOperationManager::runOperations(bool gather_statistics)
 {

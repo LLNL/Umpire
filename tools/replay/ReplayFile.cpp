@@ -39,12 +39,25 @@ ReplayFile::ReplayFile( std::string in_file_name )
   if (fstat(m_fd, &sbuf))
     REPLAY_ERROR( "Unable to determine size of: " << m_bin_file_name);
 
+  m_compile_needed = true;
+
   if (sbuf.st_size > static_cast<off_t>(sizeof(Header))) {
-    m_compile_needed = false;
-    flags = MAP_PRIVATE;  // Writes won't make it to backing store
+    int version;
+    if (read(m_fd, &version, sizeof(version)) != sizeof(version)) {
+      REPLAY_ERROR( "Unable to determine file version of: " << m_bin_file_name);
+    }
+
+    if (version == header_version) {
+      m_compile_needed = false;
+      flags = MAP_PRIVATE;  // Writes won't make it to backing store
+    }
+    else {
+      std::cout << "Version mismatch: " << version << " != " << header_version
+        << ", Recompiling" << std::endl;
+    }
   }
-  else {
-    m_compile_needed = true;
+
+  if (m_compile_needed) {
     flags = MAP_SHARED;   // Writes will make it to backing store
 
     if (lseek(m_fd, max_file_size-1, SEEK_SET) < 0)
@@ -55,6 +68,7 @@ ReplayFile::ReplayFile( std::string in_file_name )
   }
 
   m_op_tables = static_cast<ReplayFile::Header*>(mmap(nullptr, max_file_size, prot, flags, m_fd, 0));
+  m_op_tables->version = header_version;
 
   if (m_op_tables == MAP_FAILED)
     REPLAY_ERROR( "Unable to mmap to: " << m_bin_file_name );

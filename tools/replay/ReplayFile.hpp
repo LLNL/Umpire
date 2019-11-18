@@ -26,8 +26,8 @@ public:
     , MIXED_POOL
   };
 
-  static const std::size_t max_allocators{128};
-  static const std::size_t max_name_length{128};
+  static const std::size_t max_allocators{512};
+  static const std::size_t max_name_length{256};
 
   struct AllocatorTableEntry {
     rtype type;
@@ -99,8 +99,9 @@ public:
     } argv ;
   };
 
+  const int header_version = 1;
   struct Header {
-    int version{1};
+    int version{2};
     std::size_t num_allocators{0};
     std::size_t num_operations{0};
     AllocatorTableEntry allocators[max_allocators];
