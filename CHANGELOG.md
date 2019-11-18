@@ -28,6 +28,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay logs now contain information about operations. These are not yet
   replayed.
 
+- Replay now can display information allocators used in a replay session.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte. Build and test
