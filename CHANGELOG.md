@@ -66,6 +66,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed compilation errors when `-DENABLE_NUMA=On`.
 
+- LC Gitlab CI now releases quartz resources as soon as possible.
+
 ## [1.1.0] - 2019-09-14
 
 ### Added
