@@ -14,6 +14,7 @@
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
@@ -68,6 +69,11 @@ public:
         testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"with_id", base_alloc, "READ_MOSTLY", device_id);
         testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"with_accessing_and_default_id", base_alloc, "READ_MOSTLY", accessing_alloc);
         testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"with_accessing_and_id", base_alloc, "PREFERRED_LOCATION", accessing_alloc, device_id);
+
+        name = basename + "_AllocationPrefetcher";
+        testAllocator<umpire::strategy::AllocationPrefetcher, true>(name, base_alloc);
+        name = basename + "_AllocationPrefetcher_no_introspection";
+        testAllocator<umpire::strategy::AllocationPrefetcher, false>(name, base_alloc);
       }
 #endif // defined(UMPIRE_ENABLE_CUDA)
 

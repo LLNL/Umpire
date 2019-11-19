@@ -12,6 +12,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -82,10 +83,16 @@ void ReplayOperationManager::printInfo()
       }
       break;
 
+    case ReplayFile::rtype::ALLOCATION_PREFETCHER:
+      std::cout << "<umpire::strategy::AllocationPrefetcher, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\"" << ", \"" << alloc->base_name << "\" )";
+      break;
+
     case ReplayFile::rtype::DYNAMIC_POOL_LIST:
       std::cout << "<umpire::strategy::DynamicPoolList, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( " << "\"" << alloc->name << "\""
+        << "( " << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\"";
 
       switch ( alloc->argc ) {
@@ -109,7 +116,7 @@ void ReplayOperationManager::printInfo()
     case ReplayFile::rtype::DYNAMIC_POOL_MAP:
       std::cout << "<umpire::strategy::DynamicPoolMap, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( " << "\"" << alloc->name << "\""
+        << "( " << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\"";
 
       switch ( alloc->argc ) {
@@ -203,7 +210,7 @@ void ReplayOperationManager::printInfo()
     case ReplayFile::rtype::MONOTONIC:
       std::cout << "<umpire::strategy::MonotonicAllocationStrategy, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( " << "\"" << alloc->name << "\""
+        << "( " << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\""
         << ", " << alloc->argv.monotonic_pool.capacity << " )";
 
@@ -212,7 +219,7 @@ void ReplayOperationManager::printInfo()
     case ReplayFile::rtype::SLOT_POOL:
       std::cout << "<umpire::strategy::SlotPool, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( " << "\"" << alloc->name << "\""
+        << "( " << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\""
         << ", " << alloc->argv.slot_pool.slots << " )";
       break;
@@ -220,7 +227,7 @@ void ReplayOperationManager::printInfo()
     case ReplayFile::rtype::SIZE_LIMITER:
       std::cout << "<umpire::strategy::SizeLimiter, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( " << "\"" << alloc->name << "\""
+        << "( " << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\""
         << ", " << alloc->argv.size_limiter.size_limit << " )";
       break;
@@ -228,14 +235,14 @@ void ReplayOperationManager::printInfo()
     case ReplayFile::rtype::THREADSAFE_ALLOCATOR:
       std::cout << "<umpire::strategy::ThreadSafeAllocator, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( " << "\"" << alloc->name << "\""
+        << "( " << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\"" << " )";
       break;
 
     case ReplayFile::rtype::FIXED_POOL:
       std::cout << "<umpire::strategy::FixedPool, "
         << (alloc->introspection == true ? "true" : "false") << ">"
-        "( "
+        << "( "
         << "\"" << alloc->name << "\""
         << ", \"" << alloc->base_name << "\""
         << ", " << alloc->argv.fixed_pool.object_bytes;
@@ -435,6 +442,25 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
         }
         break;
       }
+    }
+    break;
+
+  case ReplayFile::rtype::ALLOCATION_PREFETCHER:
+    if (alloc->introspection) {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::AllocationPrefetcher, true>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+          )
+      );
+    }
+    else {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::AllocationPrefetcher, false>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+          )
+      );
     }
     break;
 

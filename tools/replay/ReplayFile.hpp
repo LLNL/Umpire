@@ -24,6 +24,7 @@ public:
     , THREADSAFE_ALLOCATOR
     , FIXED_POOL
     , MIXED_POOL
+    , ALLOCATION_PREFETCHER
   };
 
   static const std::size_t max_allocators{512};
@@ -40,29 +41,29 @@ public:
         int device_id;
         char advice[max_name_length];
         char accessing_allocator[max_name_length];
-      } advisor ;
+      } advisor;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
-      } dynamic_pool_list ;
+      } dynamic_pool_list;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
         int alignment;
-      } dynamic_pool_map ;
+      } dynamic_pool_map;
       struct {
         std::size_t capacity;
-      } monotonic_pool ;
+      } monotonic_pool;
       struct {
         std::size_t slots;
-      } slot_pool ;
+      } slot_pool;
       struct {
         std::size_t size_limit;
-      } size_limiter ;
+      } size_limiter;
       struct {
         std::size_t object_bytes;
         std::size_t objects_per_pool;
-      } fixed_pool ;
+      } fixed_pool;
       struct {
         std::size_t smallest_fixed_blocksize;
         std::size_t largest_fixed_blocksize;
@@ -71,7 +72,7 @@ public:
         std::size_t dynamic_initial_alloc_bytes;
         std::size_t dynamic_min_alloc_bytes;
         std::size_t dynamic_align_bytes;
-      } mixed_pool ;
+      } mixed_pool;
     } argv;
     umpire::Allocator* allocator{nullptr};
   };

@@ -343,6 +343,13 @@ void ReplayInterpreter::replay_compileAllocator( void )
         }
       }
     }
+    // (umpire::strategy::AllocationPrefetcher), skipping.
+    else if ( type == "umpire::strategy::AllocationPrefetcher" ) {
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
+
+      alloc->type = ReplayFile::rtype::ALLOCATION_PREFETCHER;
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+    }
     else if ( type == "umpire::strategy::DynamicPoolList" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
