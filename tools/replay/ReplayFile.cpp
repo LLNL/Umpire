@@ -17,77 +17,55 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-ReplayFile::ReplayFile( std::string in_file_name )
-  : m_in_file_name{in_file_name}, m_bin_file_name{m_in_file_name + m_bin_suffix}
+ReplayFile::ReplayFile( std::string input_filename, std::string binary_filename )
+  : m_input_filename{input_filename}, m_binary_filename{binary_filename}
 {
-  struct stat sbuf;
   const int prot = PROT_READ|PROT_WRITE;
   int flags;
 
-  if (stat(m_in_file_name.c_str(), &sbuf))
-      REPLAY_ERROR( "Unable to open " << m_in_file_name );
-
-  max_file_size = sizeof(ReplayFile::Header) + sbuf.st_size;
-
-  m_fd = open(  m_bin_file_name.c_str()
-              , O_CREAT | O_RDWR
-              , static_cast<mode_t>(0660));
+  m_fd = open(m_binary_filename.c_str(), O_CREAT | O_RDWR, static_cast<mode_t>(0660));
 
   if (m_fd < 0)
-    REPLAY_ERROR( "Unable to create: " << m_bin_file_name );
+    REPLAY_ERROR( "Unable to create: " << m_binary_filename );
 
-  if (fstat(m_fd, &sbuf))
-    REPLAY_ERROR( "Unable to determine size of: " << m_bin_file_name);
+  checkHeader();
 
-  m_compile_needed = true;
-
-  if (sbuf.st_size > static_cast<off_t>(sizeof(Header))) {
-    int version;
-    if (read(m_fd, &version, sizeof(version)) != sizeof(version)) {
-      REPLAY_ERROR( "Unable to determine file version of: " << m_bin_file_name);
-    }
-
-    if (version == header_version) {
-      m_compile_needed = false;
-      flags = MAP_PRIVATE;  // Writes won't make it to backing store
-    }
-    else {
-      std::cout << "Version mismatch: " << version << " != " << header_version
-        << ", Recompiling" << std::endl;
-    }
-  }
-
-  if (m_compile_needed) {
+  if ( compileNeeded() ) {
     flags = MAP_SHARED;   // Writes will make it to backing store
 
     if (lseek(m_fd, max_file_size-1, SEEK_SET) < 0)
-      REPLAY_ERROR("lseek failed on " << m_bin_file_name);
+      REPLAY_ERROR("lseek failed on " << m_binary_filename);
 
     if (write(m_fd, "", 1) < 0)
-      REPLAY_ERROR("write failed to " << m_bin_file_name);
+      REPLAY_ERROR("write failed to " << m_binary_filename);
+  }
+  else {
+    flags = MAP_PRIVATE | MAP_POPULATE;
   }
 
   m_op_tables = static_cast<ReplayFile::Header*>(mmap(nullptr, max_file_size, prot, flags, m_fd, 0));
-  m_op_tables->version = header_version;
-
   if (m_op_tables == MAP_FAILED)
-    REPLAY_ERROR( "Unable to mmap to: " << m_bin_file_name );
+    REPLAY_ERROR( "Unable to mmap to: " << m_binary_filename );
+
+  m_op_tables->m.magic = REPLAY_MAGIC;
+  m_op_tables->m.version = REPLAY_VERSION;
 }
 
 ReplayFile::~ReplayFile()
 {
   if (m_op_tables != nullptr && m_op_tables != MAP_FAILED ) {
-    off_t actual_size = sizeof(Header) + (m_op_tables->num_operations * sizeof(Operation));
+    if ( compileNeeded() ) {
+      off_t actual_size = sizeof(Header) + (m_op_tables->num_operations * sizeof(Operation));
+
+      if (ftruncate(m_fd, actual_size) < 0)
+        REPLAY_ERROR( "Failed to truncate file size for " << m_binary_filename);
+    }
 
     munmap(m_op_tables, max_file_size);
     m_op_tables = nullptr;
-
-    if (m_compile_needed == true)
-      if (ftruncate(m_fd, actual_size) < 0)
-        REPLAY_ERROR( "Failed to truncate file size for " << m_bin_file_name);
-
-    close(m_fd);
   }
+
+  close(m_fd);
 }
 
 ReplayFile::Header* ReplayFile::getOperationsTable()
@@ -99,5 +77,33 @@ void ReplayFile::copyString(std::string source, char (&dest)[max_name_length])
 {
   strncpy( dest, source.c_str(), source.length() );
   dest[source.length()] = '\0';
+}
+
+void ReplayFile::checkHeader()
+{
+  struct stat sbuf;
+  Header::Magic m;
+
+  if (read(m_fd, &m, sizeof(m)) == sizeof(m)) {
+    if (m.magic == REPLAY_MAGIC) {
+      if (m.version == REPLAY_VERSION) {
+        m_compile_needed = false;
+
+        if (stat(m_binary_filename.c_str(), &sbuf))
+          REPLAY_ERROR( "Unable to open " << m_binary_filename );
+
+        max_file_size = sbuf.st_size;
+        return;
+      }
+    }
+  }
+
+  m_compile_needed = true;
+
+  if (stat(m_input_filename.c_str(), &sbuf))
+    REPLAY_ERROR( "Unable to open " << m_input_filename );
+
+  max_file_size = sizeof(ReplayFile::Header) + sbuf.st_size;
+
 }
 
