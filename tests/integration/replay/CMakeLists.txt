@@ -15,13 +15,21 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
-if (ENABLE_CUDA)
-  set(replay_file "test_output.cuda.good" )
-elseif (ENABLE_HIP)
-  set(replay_file "test_output.hip.good" )
-else()
-  set(replay_file "test_output.good" )
+set(replay_file "test_output" )
+
+if (ENABLE_NUMA)
+  set(replay_file "${replay_file}.numa" )
 endif()
+
+if (ENABLE_CUDA)
+  set(replay_file "${replay_file}.cuda" )
+elseif (ENABLE_HIP)
+  set(replay_file "${replay_file}.hip" )
+endif()
+
+set(replay_file "${replay_file}.good" )
+
+message(STATUS "Using ${replay_file} as good replay test data")
 
 if (BASH_PROGRAM)
 
