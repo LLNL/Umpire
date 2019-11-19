@@ -40,7 +40,7 @@ ReplayFile::ReplayFile( std::string input_filename, std::string binary_filename 
       REPLAY_ERROR("write failed to " << m_binary_filename);
   }
   else {
-    flags = MAP_PRIVATE | MAP_POPULATE;
+    flags = MAP_PRIVATE;
   }
 
   m_op_tables = static_cast<ReplayFile::Header*>(mmap(nullptr, max_file_size, prot, flags, m_fd, 0));
