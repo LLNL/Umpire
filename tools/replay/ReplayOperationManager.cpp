@@ -13,8 +13,10 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
+#include "umpire/strategy/NumaPolicy.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/numa.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
@@ -87,6 +89,14 @@ void ReplayOperationManager::printInfo()
       std::cout << "<umpire::strategy::AllocationPrefetcher, "
         << (alloc->introspection == true ? "true" : "false") << ">"
         << "( " << "\"" << alloc->name << "\"" << ", \"" << alloc->base_name << "\" )";
+      break;
+
+    case ReplayFile::rtype::NUMA_POLICY:
+      std::cout << "<umpire::strategy::NumaPolicy, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", " << alloc->argv.numa.node << " )";
       break;
 
     case ReplayFile::rtype::DYNAMIC_POOL_LIST:
@@ -459,6 +469,27 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
         rm.makeAllocator<umpire::strategy::AllocationPrefetcher, false>
           (   alloc->name
             , rm.getAllocator(alloc->base_name)
+          )
+      );
+    }
+    break;
+
+  case ReplayFile::rtype::NUMA_POLICY:
+    if (alloc->introspection) {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::NumaPolicy, true>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+            , alloc->argv.numa.node
+          )
+      );
+    }
+    else {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::NumaPolicy, false>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+            , alloc->argv.numa.node
           )
       );
     }

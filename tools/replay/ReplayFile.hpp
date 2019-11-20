@@ -25,6 +25,7 @@ public:
     , FIXED_POOL
     , MIXED_POOL
     , ALLOCATION_PREFETCHER
+    , NUMA_POLICY
   };
 
   static const std::size_t max_allocators{512};
@@ -42,6 +43,9 @@ public:
         char advice[max_name_length];
         char accessing_allocator[max_name_length];
       } advisor;
+      struct {
+        int node;
+      } numa;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;

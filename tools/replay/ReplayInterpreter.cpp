@@ -343,17 +343,25 @@ void ReplayInterpreter::replay_compileAllocator( void )
         }
       }
     }
-    // (umpire::strategy::AllocationPrefetcher), skipping.
     else if ( type == "umpire::strategy::AllocationPrefetcher" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::ALLOCATION_PREFETCHER;
       m_ops->copyString(base_allocator_name, alloc->base_name);
     }
+    else if ( type == "umpire::strategy::NumaPolicy" ) {
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
+
+      alloc->type = ReplayFile::rtype::NUMA_POLICY;
+      get_from_string(m_json["payload"]["args"][1], alloc->argv.numa.node);
+
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+    }
     else if ( type == "umpire::strategy::DynamicPoolList" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::DYNAMIC_POOL_LIST;
+
       m_ops->copyString(base_allocator_name, alloc->base_name);
 
       // Now grab the optional fields

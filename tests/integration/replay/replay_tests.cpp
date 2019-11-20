@@ -25,6 +25,11 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#include "umpire/util/numa.hpp"
+#endif
+
 class replayTest {
 public:
   replayTest() : test_allocations(3), allocation_size(32) { }
@@ -53,6 +58,17 @@ public:
       auto base_alloc = rm.getAllocator(basename);
 
       testAllocation(basename);
+
+#if defined(UMPIRE_ENABLE_NUMA)
+      if ( basename == "HOST" ) {
+        auto nodes = umpire::numa::get_host_nodes();
+
+        name = basename + "_NumaPolicy";
+        testAllocator<umpire::strategy::NumaPolicy, true>(name, rm.getAllocator("HOST"), nodes[0]);
+        name = basename + "_NumaPolicy_no_introspection";
+        testAllocator<umpire::strategy::NumaPolicy, false>(name, rm.getAllocator("HOST"), nodes[0]);
+      }
+#endif // defined(UMPIRE_ENABLE_NUMA)
 
 #if defined(UMPIRE_ENABLE_CUDA)
       if ( basename == "UM" ) {
