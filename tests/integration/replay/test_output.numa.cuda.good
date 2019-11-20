@@ -1,0 +1,822 @@
+{ "kind":"replay", "uid":72620, "timestamp":1572294984135008391, "event": "version", "payload": { "major":2, "minor":0, "patch":0, "rc": "7897c07" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984135036216, "event": "makeMemoryResource", "payload": { "name": "HOST" }, "result": "0x101f2b80" }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984383326370, "event": "makeMemoryResource", "payload": { "name": "DEVICE" }, "result": "0x10278df0" }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984383356042, "event": "makeMemoryResource", "payload": { "name": "PINNED" }, "result": "0x10278fb0" }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384596740, "event": "makeMemoryResource", "payload": { "name": "UM" }, "result": "0x10279160" }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384612845, "event": "makeMemoryResource", "payload": { "name": "DEVICE_CONST" }, "result": "0x102793c0" }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384642309, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_default", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384680872, "event": "allocation_map_insert", "payload": { "ptr": "0x200020000010", "record_ptr": "0x200020000010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384704338, "event": "allocation_map_insert", "payload": { "ptr": "0x20000d2c0010", "record_ptr": "0x20000d2c0010", "record_size": "524288", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384726122, "event": "allocation_map_insert", "payload": { "ptr": "0x20000d350010", "record_ptr": "0x20000d350010", "record_size": "2097152", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384747119, "event": "allocation_map_insert", "payload": { "ptr": "0x20000d560010", "record_ptr": "0x20000d560010", "record_size": "2097152", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384758289, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_default", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x1028a010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384773198, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec1", "args": [ "HOST", "512" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384819447, "event": "allocation_map_insert", "payload": { "ptr": "0x200040010010", "record_ptr": "0x200040010010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384838116, "event": "allocation_map_insert", "payload": { "ptr": "0x20000ef80010", "record_ptr": "0x20000ef80010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384856605, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f090010", "record_ptr": "0x20000f090010", "record_size": "2097152", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384874935, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f2a0010", "record_ptr": "0x20000f2a0010", "record_size": "2097152", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384885636, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec1", "args": [ "HOST", "512" ] }, "result": { "allocator_ref":"0x1029a880" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384901260, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec2", "args": [ "HOST", "512", "1024" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384942153, "event": "allocation_map_insert", "payload": { "ptr": "0x200061830010", "record_ptr": "0x200061830010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384960688, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f4b0010", "record_ptr": "0x20000f4b0010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384971507, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec2", "args": [ "HOST", "512", "1024" ] }, "result": { "allocator_ref":"0x1029ac70" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984384989741, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec3", "args": [ "HOST", "512", "1024", "4194304" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385030677, "event": "allocation_map_insert", "payload": { "ptr": "0x200083050010", "record_ptr": "0x200083050010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385048807, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f5c0010", "record_ptr": "0x20000f5c0010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385059451, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec3", "args": [ "HOST", "512", "1024", "4194304" ] }, "result": { "allocator_ref":"0x102aafc0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385080550, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec4", "args": [ "HOST", "512", "1024", "4194304", "12" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385131345, "event": "allocation_map_insert", "payload": { "ptr": "0x2000a4870010", "record_ptr": "0x2000a4870010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385149841, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f6d0010", "record_ptr": "0x20000f6d0010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385160198, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec4", "args": [ "HOST", "512", "1024", "4194304", "12" ] }, "result": { "allocator_ref":"0x102ab1d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385181890, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec5", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385225025, "event": "allocation_map_insert", "payload": { "ptr": "0x2000c6090010", "record_ptr": "0x2000c6090010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385244630, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f7e0010", "record_ptr": "0x20000f7e0010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385255260, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec5", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456" ] }, "result": { "allocator_ref":"0x102cbeb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385279096, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec6", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385351968, "event": "allocation_map_insert", "payload": { "ptr": "0x2000d78b0010", "record_ptr": "0x2000d78b0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385370381, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f8f0010", "record_ptr": "0x20000f8f0010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385380898, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec6", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x102cc350" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385405394, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec7", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385455653, "event": "allocation_map_insert", "payload": { "ptr": "0x2000e90d0010", "record_ptr": "0x2000e90d0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385473852, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fa00010", "record_ptr": "0x20000fa00010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385484238, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec7", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x102ecd40" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385511817, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec8", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385557485, "event": "allocation_map_insert", "payload": { "ptr": "0x2000fa8f0010", "record_ptr": "0x2000fa8f0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385575704, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fb10010", "record_ptr": "0x20000fb10010", "record_size": "1048576", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385586129, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9MixedPoolE", "with_introspection":true, "allocator_name":"host_mixedpool_spec8", "args": [ "HOST", "512", "1024", "4194304", "12", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x102ed0d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385616452, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec0", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385652642, "event": "allocation_map_insert", "payload": { "ptr": "0x20010c110010", "record_ptr": "0x20010c110010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385663343, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec0", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x102ed2b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385676405, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec1", "args": [ "HOST", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385711761, "event": "allocation_map_insert", "payload": { "ptr": "0x20012d930010", "record_ptr": "0x20012d930010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385721667, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec1", "args": [ "HOST", "268435456" ] }, "result": { "allocator_ref":"0x102ed360" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385736178, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec2", "args": [ "HOST", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385779770, "event": "allocation_map_insert", "payload": { "ptr": "0x20013f150010", "record_ptr": "0x20013f150010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385789895, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec2", "args": [ "HOST", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x1032deb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385807533, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385849273, "event": "allocation_map_insert", "payload": { "ptr": "0x200150970010", "record_ptr": "0x200150970010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385859242, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x1032dc80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385879530, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385921072, "event": "allocation_map_insert", "payload": { "ptr": "0x200162190010", "record_ptr": "0x200162190010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385931106, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x1035e290" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385950787, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec0", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385981044, "event": "allocation_map_insert", "payload": { "ptr": "0x2001739b0010", "record_ptr": "0x2001739b0010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984385990747, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec0", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x1035e2d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386003482, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec1", "args": [ "HOST", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386035581, "event": "allocation_map_insert", "payload": { "ptr": "0x2001951d0010", "record_ptr": "0x2001951d0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386050336, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec1", "args": [ "HOST", "268435456" ] }, "result": { "allocator_ref":"0x1035e6c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386069835, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec2", "args": [ "HOST", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386111955, "event": "allocation_map_insert", "payload": { "ptr": "0x2001a69f0010", "record_ptr": "0x2001a69f0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386121757, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec2", "args": [ "HOST", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x1035e4f0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386139696, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386176474, "event": "allocation_map_insert", "payload": { "ptr": "0x2001b8210010", "record_ptr": "0x2001b8210010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386185933, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x102ab080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386204754, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386244761, "event": "allocation_map_insert", "payload": { "ptr": "0x2001c9a30010", "record_ptr": "0x2001c9a30010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386254352, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_nointro_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x1039f930" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386274306, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec0", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386310762, "event": "allocation_map_insert", "payload": { "ptr": "0x2001db250010", "record_ptr": "0x2001db250010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386322576, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec0", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x1039f7a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386335183, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec1", "args": [ "HOST", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386368803, "event": "allocation_map_insert", "payload": { "ptr": "0x2001fca70010", "record_ptr": "0x2001fca70010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386379002, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec1", "args": [ "HOST", "268435456" ] }, "result": { "allocator_ref":"0x1039f580" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386393538, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec2", "args": [ "HOST", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386428937, "event": "allocation_map_insert", "payload": { "ptr": "0x20020e290010", "record_ptr": "0x20020e290010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386440445, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec2", "args": [ "HOST", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x1039f0a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386463260, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386505919, "event": "allocation_map_insert", "payload": { "ptr": "0x20021fab0010", "record_ptr": "0x20021fab0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386516268, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x1039f260" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386535371, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386577065, "event": "allocation_map_insert", "payload": { "ptr": "0x2002312d0010", "record_ptr": "0x2002312d0010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386588537, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":true, "allocator_name":"host_dyn_pool_map_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x103dfdf0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386607917, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec0", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386643958, "event": "allocation_map_insert", "payload": { "ptr": "0x200242af0010", "record_ptr": "0x200242af0010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386653802, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec0", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x103dffc0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386666895, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec1", "args": [ "HOST", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386702628, "event": "allocation_map_insert", "payload": { "ptr": "0x200264310010", "record_ptr": "0x200264310010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386712311, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec1", "args": [ "HOST", "268435456" ] }, "result": { "allocator_ref":"0x104205f0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386731404, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec2", "args": [ "HOST", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386775231, "event": "allocation_map_insert", "payload": { "ptr": "0x200275b30010", "record_ptr": "0x200275b30010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386786881, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec2", "args": [ "HOST", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x10420670" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386803574, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386842982, "event": "allocation_map_insert", "payload": { "ptr": "0x200287350010", "record_ptr": "0x200287350010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386852759, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec3", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x104208d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386873065, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386911503, "event": "allocation_map_insert", "payload": { "ptr": "0x200298b70010", "record_ptr": "0x200298b70010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386921227, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy14DynamicPoolMapE", "with_introspection":false, "allocator_name":"host_dyn_pool_map_nointro_spec4", "args": [ "HOST", "268435456", "1048576", "128" ] }, "result": { "allocator_ref":"0x10450e10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386943123, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec0", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386962810, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec0", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x10451050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386975345, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec1", "args": [ "HOST", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984386998008, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec1", "args": [ "HOST", "268435456" ] }, "result": { "allocator_ref":"0x104516c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387013130, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec2", "args": [ "HOST", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387035170, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec2", "args": [ "HOST", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x104515a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387051289, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec3", "args": [ "HOST", "268435456", "1048576", "" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387076413, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":true, "allocator_name":"host_dyn_pool_list_spec3", "args": [ "HOST", "268435456", "1048576", "" ] }, "result": { "allocator_ref":"0x104820c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387094000, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec0", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387114257, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec0", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x10481fd0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387127030, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec1", "args": [ "HOST", "268435456" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387147252, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec1", "args": [ "HOST", "268435456" ] }, "result": { "allocator_ref":"0x10481e60" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387162250, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec2", "args": [ "HOST", "268435456", "1048576" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387183505, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec2", "args": [ "HOST", "268435456", "1048576" ] }, "result": { "allocator_ref":"0x104b2480" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387199887, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec3", "args": [ "HOST", "268435456", "1048576", "" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387225640, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy15DynamicPoolListE", "with_introspection":false, "allocator_name":"host_dyn_pool_list_nointro_spec3", "args": [ "HOST", "268435456", "1048576", "" ] }, "result": { "allocator_ref":"0x104c2e40" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387244512, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy27MonotonicAllocationStrategyE", "with_introspection":true, "allocator_name":"MONOTONIC 1024", "args": [ "HOST", "1024" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387256471, "event": "allocation_map_insert", "payload": { "ptr": "0x104c26b0", "record_ptr": "0x104c26b0", "record_size": "1024", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387265814, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy27MonotonicAllocationStrategyE", "with_introspection":true, "allocator_name":"MONOTONIC 1024", "args": [ "HOST", "1024" ] }, "result": { "allocator_ref":"0x104c2ac0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387284175, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy8SlotPoolE", "with_introspection":true, "allocator_name":"host_slot_pool", "args": [ "HOST", "64" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387299457, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy8SlotPoolE", "with_introspection":true, "allocator_name":"host_slot_pool", "args": [ "HOST", "64" ] }, "result": { "allocator_ref":"0x104d34d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387314576, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy19ThreadSafeAllocatorE", "with_introspection":true, "allocator_name":"thread_safe_allocator", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387326025, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy19ThreadSafeAllocatorE", "with_introspection":true, "allocator_name":"thread_safe_allocator", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x104d36a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387345729, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9FixedPoolE", "with_introspection":true, "allocator_name":"host_fixed_pool_spec0", "args": [ "HOST", "32" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387364916, "event": "allocation_map_insert", "payload": { "ptr": "0x104d3e80", "record_ptr": "0x104d3e80", "record_size": "65536", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387373917, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9FixedPoolE", "with_introspection":true, "allocator_name":"host_fixed_pool_spec0", "args": [ "HOST", "32" ] }, "result": { "allocator_ref":"0x1035e300" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387389101, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9FixedPoolE", "with_introspection":true, "allocator_name":"host_fixed_pool_spec1", "args": [ "HOST", "32", "1024" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387402973, "event": "allocation_map_insert", "payload": { "ptr": "0x104e3f10", "record_ptr": "0x104e3f10", "record_size": "32768", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387411748, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9FixedPoolE", "with_introspection":true, "allocator_name":"host_fixed_pool_spec1", "args": [ "HOST", "32", "1024" ] }, "result": { "allocator_ref":"0x104ebfe0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387427662, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9FixedPoolE", "with_introspection":false, "allocator_name":"host_fixed_pool_nointro_spec1", "args": [ "HOST", "32", "1024" ] } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387449667, "event": "allocation_map_insert", "payload": { "ptr": "0x104ec910", "record_ptr": "0x104ec910", "record_size": "32768", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387458116, "event": "makeAllocator", "payload": { "type":"N6umpire8strategy9FixedPoolE", "with_introspection":false, "allocator_name":"host_fixed_pool_nointro_spec1", "args": [ "HOST", "32", "1024" ] }, "result": { "allocator_ref":"0x104ec3a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387477787, "event": "allocate", "payload": { "allocator_ref": "0x101f2b80", "size": 17 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387483288, "event": "allocation_map_insert", "payload": { "ptr": "0x104ec500", "record_ptr": "0x104ec500", "record_size": "17", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387490169, "event": "allocate", "payload": { "allocator_ref": "0x101f2b80", "size": 17 }, "result": { "memory_ptr": "0x104ec500" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984387497962, "event": "allocate", "payload": { "allocator_ref": "0x10278df0", "size": 18 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984544816860, "event": "allocation_map_insert", "payload": { "ptr": "0x2002d3400000", "record_ptr": "0x2002d3400000", "record_size": "18", "record_strategy": "0x10278df0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984544837352, "event": "allocate", "payload": { "allocator_ref": "0x10278df0", "size": 18 }, "result": { "memory_ptr": "0x2002d3400000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984544851636, "event": "allocate", "payload": { "allocator_ref": "0x10279160", "size": 19 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984544920120, "event": "allocation_map_insert", "payload": { "ptr": "0x2002e0000000", "record_ptr": "0x2002e0000000", "record_size": "19", "record_strategy": "0x10279160" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984544928124, "event": "allocate", "payload": { "allocator_ref": "0x10279160", "size": 19 }, "result": { "memory_ptr": "0x2002e0000000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984544936262, "event": "allocate", "payload": { "allocator_ref": "0x10278fb0", "size": 20 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545481863, "event": "allocation_map_insert", "payload": { "ptr": "0x2002d3600000", "record_ptr": "0x2002d3600000", "record_size": "20", "record_strategy": "0x10278fb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545491148, "event": "allocate", "payload": { "allocator_ref": "0x10278fb0", "size": 20 }, "result": { "memory_ptr": "0x2002d3600000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545498638, "event": "allocate", "payload": { "allocator_ref": "0x1028a010", "size": 21 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545513071, "event": "allocation_map_insert", "payload": { "ptr": "0x20000d2c0010", "record_ptr": "0x20000d2c0010", "record_size": "21", "record_strategy": "0x1028a010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545520447, "event": "allocate", "payload": { "allocator_ref": "0x1028a010", "size": 21 }, "result": { "memory_ptr": "0x20000d2c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545528447, "event": "allocate", "payload": { "allocator_ref": "0x1029a880", "size": 22 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545534906, "event": "allocation_map_insert", "payload": { "ptr": "0x20000ef80010", "record_ptr": "0x20000ef80010", "record_size": "22", "record_strategy": "0x1029a880" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545541693, "event": "allocate", "payload": { "allocator_ref": "0x1029a880", "size": 22 }, "result": { "memory_ptr": "0x20000ef80010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545548316, "event": "allocate", "payload": { "allocator_ref": "0x1029ac70", "size": 23 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545554634, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f4b0010", "record_ptr": "0x20000f4b0010", "record_size": "23", "record_strategy": "0x1029ac70" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545561370, "event": "allocate", "payload": { "allocator_ref": "0x1029ac70", "size": 23 }, "result": { "memory_ptr": "0x20000f4b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545567918, "event": "allocate", "payload": { "allocator_ref": "0x102aafc0", "size": 24 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545574215, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f5c0010", "record_ptr": "0x20000f5c0010", "record_size": "24", "record_strategy": "0x102aafc0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545580877, "event": "allocate", "payload": { "allocator_ref": "0x102aafc0", "size": 24 }, "result": { "memory_ptr": "0x20000f5c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545587250, "event": "allocate", "payload": { "allocator_ref": "0x102ab1d0", "size": 25 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545593374, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f6d0010", "record_ptr": "0x20000f6d0010", "record_size": "25", "record_strategy": "0x102ab1d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545608985, "event": "allocate", "payload": { "allocator_ref": "0x102ab1d0", "size": 25 }, "result": { "memory_ptr": "0x20000f6d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545616428, "event": "allocate", "payload": { "allocator_ref": "0x102cbeb0", "size": 26 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545622614, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f7e0010", "record_ptr": "0x20000f7e0010", "record_size": "26", "record_strategy": "0x102cbeb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545629432, "event": "allocate", "payload": { "allocator_ref": "0x102cbeb0", "size": 26 }, "result": { "memory_ptr": "0x20000f7e0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545635842, "event": "allocate", "payload": { "allocator_ref": "0x102cc350", "size": 27 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545641816, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f8f0010", "record_ptr": "0x20000f8f0010", "record_size": "27", "record_strategy": "0x102cc350" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545648413, "event": "allocate", "payload": { "allocator_ref": "0x102cc350", "size": 27 }, "result": { "memory_ptr": "0x20000f8f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545654864, "event": "allocate", "payload": { "allocator_ref": "0x102ecd40", "size": 28 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545661067, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fa00010", "record_ptr": "0x20000fa00010", "record_size": "28", "record_strategy": "0x102ecd40" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545667680, "event": "allocate", "payload": { "allocator_ref": "0x102ecd40", "size": 28 }, "result": { "memory_ptr": "0x20000fa00010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545674012, "event": "allocate", "payload": { "allocator_ref": "0x102ed0d0", "size": 29 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545679930, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fb10010", "record_ptr": "0x20000fb10010", "record_size": "29", "record_strategy": "0x102ed0d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545686416, "event": "allocate", "payload": { "allocator_ref": "0x102ed0d0", "size": 29 }, "result": { "memory_ptr": "0x20000fb10010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545692800, "event": "allocate", "payload": { "allocator_ref": "0x102ed2b0", "size": 30 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545709300, "event": "allocation_map_insert", "payload": { "ptr": "0x20010c110010", "record_ptr": "0x20010c110010", "record_size": "30", "record_strategy": "0x102ed2b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545716030, "event": "allocate", "payload": { "allocator_ref": "0x102ed2b0", "size": 30 }, "result": { "memory_ptr": "0x20010c110010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545722498, "event": "allocate", "payload": { "allocator_ref": "0x102ed360", "size": 31 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545730026, "event": "allocation_map_insert", "payload": { "ptr": "0x20012d930010", "record_ptr": "0x20012d930010", "record_size": "31", "record_strategy": "0x102ed360" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545736705, "event": "allocate", "payload": { "allocator_ref": "0x102ed360", "size": 31 }, "result": { "memory_ptr": "0x20012d930010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545743027, "event": "allocate", "payload": { "allocator_ref": "0x1032deb0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545750347, "event": "allocation_map_insert", "payload": { "ptr": "0x20013f150010", "record_ptr": "0x20013f150010", "record_size": "32", "record_strategy": "0x1032deb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545756864, "event": "allocate", "payload": { "allocator_ref": "0x1032deb0", "size": 32 }, "result": { "memory_ptr": "0x20013f150010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545763136, "event": "allocate", "payload": { "allocator_ref": "0x1032dc80", "size": 33 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545770434, "event": "allocation_map_insert", "payload": { "ptr": "0x200150970010", "record_ptr": "0x200150970010", "record_size": "33", "record_strategy": "0x1032dc80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545777020, "event": "allocate", "payload": { "allocator_ref": "0x1032dc80", "size": 33 }, "result": { "memory_ptr": "0x200150970010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545784777, "event": "allocate", "payload": { "allocator_ref": "0x1035e290", "size": 34 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545792078, "event": "allocation_map_insert", "payload": { "ptr": "0x200162190010", "record_ptr": "0x200162190010", "record_size": "34", "record_strategy": "0x1035e290" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545798701, "event": "allocate", "payload": { "allocator_ref": "0x1035e290", "size": 34 }, "result": { "memory_ptr": "0x200162190010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545805232, "event": "allocate", "payload": { "allocator_ref": "0x1035e2d0", "size": 35 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545812013, "event": "allocate", "payload": { "allocator_ref": "0x1035e2d0", "size": 35 }, "result": { "memory_ptr": "0x2001739b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545818362, "event": "allocate", "payload": { "allocator_ref": "0x1035e6c0", "size": 36 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545825440, "event": "allocate", "payload": { "allocator_ref": "0x1035e6c0", "size": 36 }, "result": { "memory_ptr": "0x2001951d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545831658, "event": "allocate", "payload": { "allocator_ref": "0x1035e4f0", "size": 37 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545838580, "event": "allocate", "payload": { "allocator_ref": "0x1035e4f0", "size": 37 }, "result": { "memory_ptr": "0x2001a69f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545844894, "event": "allocate", "payload": { "allocator_ref": "0x102ab080", "size": 38 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545851955, "event": "allocate", "payload": { "allocator_ref": "0x102ab080", "size": 38 }, "result": { "memory_ptr": "0x2001b8210010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545858187, "event": "allocate", "payload": { "allocator_ref": "0x1039f930", "size": 39 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545865212, "event": "allocate", "payload": { "allocator_ref": "0x1039f930", "size": 39 }, "result": { "memory_ptr": "0x2001c9a30010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545871493, "event": "allocate", "payload": { "allocator_ref": "0x1039f7a0", "size": 40 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545878549, "event": "allocation_map_insert", "payload": { "ptr": "0x2001db250010", "record_ptr": "0x2001db250010", "record_size": "40", "record_strategy": "0x1039f7a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545885209, "event": "allocate", "payload": { "allocator_ref": "0x1039f7a0", "size": 40 }, "result": { "memory_ptr": "0x2001db250010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545891775, "event": "allocate", "payload": { "allocator_ref": "0x1039f580", "size": 41 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545898959, "event": "allocation_map_insert", "payload": { "ptr": "0x2001fca70010", "record_ptr": "0x2001fca70010", "record_size": "41", "record_strategy": "0x1039f580" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545905507, "event": "allocate", "payload": { "allocator_ref": "0x1039f580", "size": 41 }, "result": { "memory_ptr": "0x2001fca70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545912027, "event": "allocate", "payload": { "allocator_ref": "0x1039f0a0", "size": 42 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545923050, "event": "allocation_map_insert", "payload": { "ptr": "0x20020e290010", "record_ptr": "0x20020e290010", "record_size": "42", "record_strategy": "0x1039f0a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545929733, "event": "allocate", "payload": { "allocator_ref": "0x1039f0a0", "size": 42 }, "result": { "memory_ptr": "0x20020e290010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545936065, "event": "allocate", "payload": { "allocator_ref": "0x1039f260", "size": 43 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545943387, "event": "allocation_map_insert", "payload": { "ptr": "0x20021fab0010", "record_ptr": "0x20021fab0010", "record_size": "43", "record_strategy": "0x1039f260" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545950008, "event": "allocate", "payload": { "allocator_ref": "0x1039f260", "size": 43 }, "result": { "memory_ptr": "0x20021fab0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545956365, "event": "allocate", "payload": { "allocator_ref": "0x103dfdf0", "size": 44 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545963325, "event": "allocation_map_insert", "payload": { "ptr": "0x2002312d0010", "record_ptr": "0x2002312d0010", "record_size": "44", "record_strategy": "0x103dfdf0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545969831, "event": "allocate", "payload": { "allocator_ref": "0x103dfdf0", "size": 44 }, "result": { "memory_ptr": "0x2002312d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545976108, "event": "allocate", "payload": { "allocator_ref": "0x103dffc0", "size": 45 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545983034, "event": "allocate", "payload": { "allocator_ref": "0x103dffc0", "size": 45 }, "result": { "memory_ptr": "0x200242af0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545989406, "event": "allocate", "payload": { "allocator_ref": "0x104205f0", "size": 46 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984545996414, "event": "allocate", "payload": { "allocator_ref": "0x104205f0", "size": 46 }, "result": { "memory_ptr": "0x200264310010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546002629, "event": "allocate", "payload": { "allocator_ref": "0x10420670", "size": 47 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546009470, "event": "allocate", "payload": { "allocator_ref": "0x10420670", "size": 47 }, "result": { "memory_ptr": "0x200275b30010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546015827, "event": "allocate", "payload": { "allocator_ref": "0x104208d0", "size": 48 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546022509, "event": "allocate", "payload": { "allocator_ref": "0x104208d0", "size": 48 }, "result": { "memory_ptr": "0x200287350010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546028948, "event": "allocate", "payload": { "allocator_ref": "0x10450e10", "size": 49 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546036034, "event": "allocate", "payload": { "allocator_ref": "0x10450e10", "size": 49 }, "result": { "memory_ptr": "0x200298b70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546044926, "event": "allocate", "payload": { "allocator_ref": "0x10451050", "size": 50 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546059937, "event": "allocation_map_insert", "payload": { "ptr": "0x200300000010", "record_ptr": "0x200300000010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546068068, "event": "allocation_map_insert", "payload": { "ptr": "0x200300000010", "record_ptr": "0x200300000010", "record_size": "50", "record_strategy": "0x10451050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546074569, "event": "allocate", "payload": { "allocator_ref": "0x10451050", "size": 50 }, "result": { "memory_ptr": "0x200300000010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546080962, "event": "allocate", "payload": { "allocator_ref": "0x104516c0", "size": 51 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546092750, "event": "allocation_map_insert", "payload": { "ptr": "0x200320010010", "record_ptr": "0x200320010010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546100389, "event": "allocation_map_insert", "payload": { "ptr": "0x200320010010", "record_ptr": "0x200320010010", "record_size": "51", "record_strategy": "0x104516c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546106867, "event": "allocate", "payload": { "allocator_ref": "0x104516c0", "size": 51 }, "result": { "memory_ptr": "0x200320010010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546120644, "event": "allocate", "payload": { "allocator_ref": "0x104515a0", "size": 52 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546132954, "event": "allocation_map_insert", "payload": { "ptr": "0x200330020010", "record_ptr": "0x200330020010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546140516, "event": "allocation_map_insert", "payload": { "ptr": "0x200330020010", "record_ptr": "0x200330020010", "record_size": "52", "record_strategy": "0x104515a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546146969, "event": "allocate", "payload": { "allocator_ref": "0x104515a0", "size": 52 }, "result": { "memory_ptr": "0x200330020010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546153531, "event": "allocate", "payload": { "allocator_ref": "0x104820c0", "size": 53 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546164884, "event": "allocation_map_insert", "payload": { "ptr": "0x200340030010", "record_ptr": "0x200340030010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546172290, "event": "allocation_map_insert", "payload": { "ptr": "0x200340030010", "record_ptr": "0x200340030010", "record_size": "53", "record_strategy": "0x104820c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546178683, "event": "allocate", "payload": { "allocator_ref": "0x104820c0", "size": 53 }, "result": { "memory_ptr": "0x200340030010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546185544, "event": "allocate", "payload": { "allocator_ref": "0x10481fd0", "size": 54 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546196901, "event": "allocation_map_insert", "payload": { "ptr": "0x200350040010", "record_ptr": "0x200350040010", "record_size": "536870912", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546204062, "event": "allocate", "payload": { "allocator_ref": "0x10481fd0", "size": 54 }, "result": { "memory_ptr": "0x200350040010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546210556, "event": "allocate", "payload": { "allocator_ref": "0x10481e60", "size": 55 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546221587, "event": "allocation_map_insert", "payload": { "ptr": "0x200370050010", "record_ptr": "0x200370050010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546228981, "event": "allocate", "payload": { "allocator_ref": "0x10481e60", "size": 55 }, "result": { "memory_ptr": "0x200370050010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546235264, "event": "allocate", "payload": { "allocator_ref": "0x104b2480", "size": 56 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546245993, "event": "allocation_map_insert", "payload": { "ptr": "0x200380060010", "record_ptr": "0x200380060010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546253080, "event": "allocate", "payload": { "allocator_ref": "0x104b2480", "size": 56 }, "result": { "memory_ptr": "0x200380060010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546259535, "event": "allocate", "payload": { "allocator_ref": "0x104c2e40", "size": 57 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546275706, "event": "allocation_map_insert", "payload": { "ptr": "0x200390070010", "record_ptr": "0x200390070010", "record_size": "268435456", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546285409, "event": "allocate", "payload": { "allocator_ref": "0x104c2e40", "size": 57 }, "result": { "memory_ptr": "0x200390070010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546293788, "event": "allocate", "payload": { "allocator_ref": "0x104c2ac0", "size": 58 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546299201, "event": "allocation_map_insert", "payload": { "ptr": "0x104c26b0", "record_ptr": "0x104c26b0", "record_size": "58", "record_strategy": "0x104c2ac0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546305826, "event": "allocate", "payload": { "allocator_ref": "0x104c2ac0", "size": 58 }, "result": { "memory_ptr": "0x104c26b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546312019, "event": "allocate", "payload": { "allocator_ref": "0x104d34d0", "size": 59 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546317939, "event": "allocation_map_insert", "payload": { "ptr": "0x10420a20", "record_ptr": "0x10420a20", "record_size": "59", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546324808, "event": "allocation_map_insert", "payload": { "ptr": "0x10420a20", "record_ptr": "0x10420a20", "record_size": "59", "record_strategy": "0x104d34d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546331259, "event": "allocate", "payload": { "allocator_ref": "0x104d34d0", "size": 59 }, "result": { "memory_ptr": "0x10420a20" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546337446, "event": "allocate", "payload": { "allocator_ref": "0x104d36a0", "size": 60 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546343090, "event": "allocation_map_insert", "payload": { "ptr": "0x102ed860", "record_ptr": "0x102ed860", "record_size": "60", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546349836, "event": "allocation_map_insert", "payload": { "ptr": "0x102ed860", "record_ptr": "0x102ed860", "record_size": "60", "record_strategy": "0x104d36a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546356119, "event": "allocate", "payload": { "allocator_ref": "0x104d36a0", "size": 60 }, "result": { "memory_ptr": "0x102ed860" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546362471, "event": "allocate", "payload": { "allocator_ref": "0x101f2b80", "size": 61 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546367701, "event": "allocation_map_insert", "payload": { "ptr": "0x10bccb10", "record_ptr": "0x10bccb10", "record_size": "61", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546374324, "event": "allocate", "payload": { "allocator_ref": "0x101f2b80", "size": 61 }, "result": { "memory_ptr": "0x10bccb10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546380579, "event": "allocate", "payload": { "allocator_ref": "0x10278df0", "size": 62 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546397133, "event": "allocation_map_insert", "payload": { "ptr": "0x2002d3400200", "record_ptr": "0x2002d3400200", "record_size": "62", "record_strategy": "0x10278df0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546404295, "event": "allocate", "payload": { "allocator_ref": "0x10278df0", "size": 62 }, "result": { "memory_ptr": "0x2002d3400200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546410781, "event": "allocate", "payload": { "allocator_ref": "0x10279160", "size": 63 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546427226, "event": "allocation_map_insert", "payload": { "ptr": "0x2002e0000200", "record_ptr": "0x2002e0000200", "record_size": "63", "record_strategy": "0x10279160" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546434185, "event": "allocate", "payload": { "allocator_ref": "0x10279160", "size": 63 }, "result": { "memory_ptr": "0x2002e0000200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546440405, "event": "allocate", "payload": { "allocator_ref": "0x10278fb0", "size": 64 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546456241, "event": "allocation_map_insert", "payload": { "ptr": "0x2002d3600200", "record_ptr": "0x2002d3600200", "record_size": "64", "record_strategy": "0x10278fb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546463346, "event": "allocate", "payload": { "allocator_ref": "0x10278fb0", "size": 64 }, "result": { "memory_ptr": "0x2002d3600200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546469701, "event": "allocate", "payload": { "allocator_ref": "0x1028a010", "size": 65 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546476337, "event": "allocation_map_insert", "payload": { "ptr": "0x20000d2c0110", "record_ptr": "0x20000d2c0110", "record_size": "65", "record_strategy": "0x1028a010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546483499, "event": "allocate", "payload": { "allocator_ref": "0x1028a010", "size": 65 }, "result": { "memory_ptr": "0x20000d2c0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546489681, "event": "allocate", "payload": { "allocator_ref": "0x1029a880", "size": 66 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546495993, "event": "allocation_map_insert", "payload": { "ptr": "0x20000ef80210", "record_ptr": "0x20000ef80210", "record_size": "66", "record_strategy": "0x1029a880" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546502844, "event": "allocate", "payload": { "allocator_ref": "0x1029a880", "size": 66 }, "result": { "memory_ptr": "0x20000ef80210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546509073, "event": "allocate", "payload": { "allocator_ref": "0x1029ac70", "size": 67 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546515141, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f4b0210", "record_ptr": "0x20000f4b0210", "record_size": "67", "record_strategy": "0x1029ac70" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546521974, "event": "allocate", "payload": { "allocator_ref": "0x1029ac70", "size": 67 }, "result": { "memory_ptr": "0x20000f4b0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546528171, "event": "allocate", "payload": { "allocator_ref": "0x102aafc0", "size": 68 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546534191, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f5c0210", "record_ptr": "0x20000f5c0210", "record_size": "68", "record_strategy": "0x102aafc0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546541230, "event": "allocate", "payload": { "allocator_ref": "0x102aafc0", "size": 68 }, "result": { "memory_ptr": "0x20000f5c0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546547460, "event": "allocate", "payload": { "allocator_ref": "0x102ab1d0", "size": 69 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546553483, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f6d0210", "record_ptr": "0x20000f6d0210", "record_size": "69", "record_strategy": "0x102ab1d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546560321, "event": "allocate", "payload": { "allocator_ref": "0x102ab1d0", "size": 69 }, "result": { "memory_ptr": "0x20000f6d0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546566541, "event": "allocate", "payload": { "allocator_ref": "0x102cbeb0", "size": 70 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546572668, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f7e0210", "record_ptr": "0x20000f7e0210", "record_size": "70", "record_strategy": "0x102cbeb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546579470, "event": "allocate", "payload": { "allocator_ref": "0x102cbeb0", "size": 70 }, "result": { "memory_ptr": "0x20000f7e0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546589538, "event": "allocate", "payload": { "allocator_ref": "0x102cc350", "size": 71 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546595679, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f8f0210", "record_ptr": "0x20000f8f0210", "record_size": "71", "record_strategy": "0x102cc350" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546602575, "event": "allocate", "payload": { "allocator_ref": "0x102cc350", "size": 71 }, "result": { "memory_ptr": "0x20000f8f0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546608868, "event": "allocate", "payload": { "allocator_ref": "0x102ecd40", "size": 72 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546614985, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fa00210", "record_ptr": "0x20000fa00210", "record_size": "72", "record_strategy": "0x102ecd40" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546621840, "event": "allocate", "payload": { "allocator_ref": "0x102ecd40", "size": 72 }, "result": { "memory_ptr": "0x20000fa00210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546628041, "event": "allocate", "payload": { "allocator_ref": "0x102ed0d0", "size": 73 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546634044, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fb10210", "record_ptr": "0x20000fb10210", "record_size": "73", "record_strategy": "0x102ed0d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546640888, "event": "allocate", "payload": { "allocator_ref": "0x102ed0d0", "size": 73 }, "result": { "memory_ptr": "0x20000fb10210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546647421, "event": "allocate", "payload": { "allocator_ref": "0x102ed2b0", "size": 74 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546654940, "event": "allocation_map_insert", "payload": { "ptr": "0x20010c110030", "record_ptr": "0x20010c110030", "record_size": "74", "record_strategy": "0x102ed2b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546661743, "event": "allocate", "payload": { "allocator_ref": "0x102ed2b0", "size": 74 }, "result": { "memory_ptr": "0x20010c110030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546667947, "event": "allocate", "payload": { "allocator_ref": "0x102ed360", "size": 75 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546674935, "event": "allocation_map_insert", "payload": { "ptr": "0x20012d930030", "record_ptr": "0x20012d930030", "record_size": "75", "record_strategy": "0x102ed360" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546681789, "event": "allocate", "payload": { "allocator_ref": "0x102ed360", "size": 75 }, "result": { "memory_ptr": "0x20012d930030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546687984, "event": "allocate", "payload": { "allocator_ref": "0x1032deb0", "size": 76 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546694892, "event": "allocation_map_insert", "payload": { "ptr": "0x20013f150030", "record_ptr": "0x20013f150030", "record_size": "76", "record_strategy": "0x1032deb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546701825, "event": "allocate", "payload": { "allocator_ref": "0x1032deb0", "size": 76 }, "result": { "memory_ptr": "0x20013f150030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546708003, "event": "allocate", "payload": { "allocator_ref": "0x1032dc80", "size": 77 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546714934, "event": "allocation_map_insert", "payload": { "ptr": "0x200150970090", "record_ptr": "0x200150970090", "record_size": "77", "record_strategy": "0x1032dc80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546721820, "event": "allocate", "payload": { "allocator_ref": "0x1032dc80", "size": 77 }, "result": { "memory_ptr": "0x200150970090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546728012, "event": "allocate", "payload": { "allocator_ref": "0x1035e290", "size": 78 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546735017, "event": "allocation_map_insert", "payload": { "ptr": "0x200162190090", "record_ptr": "0x200162190090", "record_size": "78", "record_strategy": "0x1035e290" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546741814, "event": "allocate", "payload": { "allocator_ref": "0x1035e290", "size": 78 }, "result": { "memory_ptr": "0x200162190090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546748005, "event": "allocate", "payload": { "allocator_ref": "0x1035e2d0", "size": 79 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546754749, "event": "allocate", "payload": { "allocator_ref": "0x1035e2d0", "size": 79 }, "result": { "memory_ptr": "0x2001739b0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546760921, "event": "allocate", "payload": { "allocator_ref": "0x1035e6c0", "size": 80 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546767569, "event": "allocate", "payload": { "allocator_ref": "0x1035e6c0", "size": 80 }, "result": { "memory_ptr": "0x2001951d0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546773703, "event": "allocate", "payload": { "allocator_ref": "0x1035e4f0", "size": 81 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546780373, "event": "allocate", "payload": { "allocator_ref": "0x1035e4f0", "size": 81 }, "result": { "memory_ptr": "0x2001a69f0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546791298, "event": "allocate", "payload": { "allocator_ref": "0x102ab080", "size": 82 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546798284, "event": "allocate", "payload": { "allocator_ref": "0x102ab080", "size": 82 }, "result": { "memory_ptr": "0x2001b8210090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546804483, "event": "allocate", "payload": { "allocator_ref": "0x1039f930", "size": 83 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546811165, "event": "allocate", "payload": { "allocator_ref": "0x1039f930", "size": 83 }, "result": { "memory_ptr": "0x2001c9a30090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546817368, "event": "allocate", "payload": { "allocator_ref": "0x1039f7a0", "size": 84 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546824248, "event": "allocation_map_insert", "payload": { "ptr": "0x2001db250040", "record_ptr": "0x2001db250040", "record_size": "84", "record_strategy": "0x1039f7a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546831088, "event": "allocate", "payload": { "allocator_ref": "0x1039f7a0", "size": 84 }, "result": { "memory_ptr": "0x2001db250040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546837367, "event": "allocate", "payload": { "allocator_ref": "0x1039f580", "size": 85 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546844302, "event": "allocation_map_insert", "payload": { "ptr": "0x2001fca70040", "record_ptr": "0x2001fca70040", "record_size": "85", "record_strategy": "0x1039f580" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546851025, "event": "allocate", "payload": { "allocator_ref": "0x1039f580", "size": 85 }, "result": { "memory_ptr": "0x2001fca70040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546857179, "event": "allocate", "payload": { "allocator_ref": "0x1039f0a0", "size": 86 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546864049, "event": "allocation_map_insert", "payload": { "ptr": "0x20020e290040", "record_ptr": "0x20020e290040", "record_size": "86", "record_strategy": "0x1039f0a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546870854, "event": "allocate", "payload": { "allocator_ref": "0x1039f0a0", "size": 86 }, "result": { "memory_ptr": "0x20020e290040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546877043, "event": "allocate", "payload": { "allocator_ref": "0x1039f260", "size": 87 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546883990, "event": "allocation_map_insert", "payload": { "ptr": "0x20021fab0090", "record_ptr": "0x20021fab0090", "record_size": "87", "record_strategy": "0x1039f260" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546899921, "event": "allocate", "payload": { "allocator_ref": "0x1039f260", "size": 87 }, "result": { "memory_ptr": "0x20021fab0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546906550, "event": "allocate", "payload": { "allocator_ref": "0x103dfdf0", "size": 88 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546913557, "event": "allocation_map_insert", "payload": { "ptr": "0x2002312d0090", "record_ptr": "0x2002312d0090", "record_size": "88", "record_strategy": "0x103dfdf0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546920383, "event": "allocate", "payload": { "allocator_ref": "0x103dfdf0", "size": 88 }, "result": { "memory_ptr": "0x2002312d0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546926639, "event": "allocate", "payload": { "allocator_ref": "0x103dffc0", "size": 89 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546933393, "event": "allocate", "payload": { "allocator_ref": "0x103dffc0", "size": 89 }, "result": { "memory_ptr": "0x200242af0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546939476, "event": "allocate", "payload": { "allocator_ref": "0x104205f0", "size": 90 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546946103, "event": "allocate", "payload": { "allocator_ref": "0x104205f0", "size": 90 }, "result": { "memory_ptr": "0x200264310040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546952325, "event": "allocate", "payload": { "allocator_ref": "0x10420670", "size": 91 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546958995, "event": "allocate", "payload": { "allocator_ref": "0x10420670", "size": 91 }, "result": { "memory_ptr": "0x200275b30040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546965264, "event": "allocate", "payload": { "allocator_ref": "0x104208d0", "size": 92 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546971950, "event": "allocate", "payload": { "allocator_ref": "0x104208d0", "size": 92 }, "result": { "memory_ptr": "0x200287350090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546978235, "event": "allocate", "payload": { "allocator_ref": "0x10450e10", "size": 93 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546984873, "event": "allocate", "payload": { "allocator_ref": "0x10450e10", "size": 93 }, "result": { "memory_ptr": "0x200298b70090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546991058, "event": "allocate", "payload": { "allocator_ref": "0x10451050", "size": 94 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984546996488, "event": "allocation_map_insert", "payload": { "ptr": "0x200300000050", "record_ptr": "0x200300000050", "record_size": "94", "record_strategy": "0x10451050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547003179, "event": "allocate", "payload": { "allocator_ref": "0x10451050", "size": 94 }, "result": { "memory_ptr": "0x200300000050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547009319, "event": "allocate", "payload": { "allocator_ref": "0x104516c0", "size": 95 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547014677, "event": "allocation_map_insert", "payload": { "ptr": "0x200320010050", "record_ptr": "0x200320010050", "record_size": "95", "record_strategy": "0x104516c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547021338, "event": "allocate", "payload": { "allocator_ref": "0x104516c0", "size": 95 }, "result": { "memory_ptr": "0x200320010050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547027450, "event": "allocate", "payload": { "allocator_ref": "0x104515a0", "size": 96 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547032690, "event": "allocation_map_insert", "payload": { "ptr": "0x200330020050", "record_ptr": "0x200330020050", "record_size": "96", "record_strategy": "0x104515a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547039709, "event": "allocate", "payload": { "allocator_ref": "0x104515a0", "size": 96 }, "result": { "memory_ptr": "0x200330020050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547046056, "event": "allocate", "payload": { "allocator_ref": "0x104820c0", "size": 97 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547051300, "event": "allocation_map_insert", "payload": { "ptr": "0x200340030050", "record_ptr": "0x200340030050", "record_size": "97", "record_strategy": "0x104820c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547058185, "event": "allocate", "payload": { "allocator_ref": "0x104820c0", "size": 97 }, "result": { "memory_ptr": "0x200340030050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547064495, "event": "allocate", "payload": { "allocator_ref": "0x10481fd0", "size": 98 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547069509, "event": "allocate", "payload": { "allocator_ref": "0x10481fd0", "size": 98 }, "result": { "memory_ptr": "0x200350040050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547075684, "event": "allocate", "payload": { "allocator_ref": "0x10481e60", "size": 99 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547080721, "event": "allocate", "payload": { "allocator_ref": "0x10481e60", "size": 99 }, "result": { "memory_ptr": "0x200370050050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547086834, "event": "allocate", "payload": { "allocator_ref": "0x104b2480", "size": 100 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547092066, "event": "allocate", "payload": { "allocator_ref": "0x104b2480", "size": 100 }, "result": { "memory_ptr": "0x200380060050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547098410, "event": "allocate", "payload": { "allocator_ref": "0x104c2e40", "size": 101 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547103451, "event": "allocate", "payload": { "allocator_ref": "0x104c2e40", "size": 101 }, "result": { "memory_ptr": "0x200390070050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547109827, "event": "allocate", "payload": { "allocator_ref": "0x104c2ac0", "size": 102 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547115042, "event": "allocation_map_insert", "payload": { "ptr": "0x104c26ea", "record_ptr": "0x104c26ea", "record_size": "102", "record_strategy": "0x104c2ac0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547121671, "event": "allocate", "payload": { "allocator_ref": "0x104c2ac0", "size": 102 }, "result": { "memory_ptr": "0x104c26ea" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547127758, "event": "allocate", "payload": { "allocator_ref": "0x104d34d0", "size": 103 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547133227, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcc3e0", "record_ptr": "0x10bcc3e0", "record_size": "103", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547140225, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcc3e0", "record_ptr": "0x10bcc3e0", "record_size": "103", "record_strategy": "0x104d34d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547146568, "event": "allocate", "payload": { "allocator_ref": "0x104d34d0", "size": 103 }, "result": { "memory_ptr": "0x10bcc3e0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547152818, "event": "allocate", "payload": { "allocator_ref": "0x104d36a0", "size": 104 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547158234, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcce60", "record_ptr": "0x10bcce60", "record_size": "104", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547165079, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcce60", "record_ptr": "0x10bcce60", "record_size": "104", "record_strategy": "0x104d36a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547171397, "event": "allocate", "payload": { "allocator_ref": "0x104d36a0", "size": 104 }, "result": { "memory_ptr": "0x10bcce60" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547177733, "event": "allocate", "payload": { "allocator_ref": "0x101f2b80", "size": 105 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547186526, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcced0", "record_ptr": "0x10bcced0", "record_size": "105", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547195480, "event": "allocate", "payload": { "allocator_ref": "0x101f2b80", "size": 105 }, "result": { "memory_ptr": "0x10bcced0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547203623, "event": "allocate", "payload": { "allocator_ref": "0x10278df0", "size": 106 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547219202, "event": "allocation_map_insert", "payload": { "ptr": "0x2002d3400400", "record_ptr": "0x2002d3400400", "record_size": "106", "record_strategy": "0x10278df0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547226208, "event": "allocate", "payload": { "allocator_ref": "0x10278df0", "size": 106 }, "result": { "memory_ptr": "0x2002d3400400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547232575, "event": "allocate", "payload": { "allocator_ref": "0x10279160", "size": 107 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547248346, "event": "allocation_map_insert", "payload": { "ptr": "0x2002e0000400", "record_ptr": "0x2002e0000400", "record_size": "107", "record_strategy": "0x10279160" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547255310, "event": "allocate", "payload": { "allocator_ref": "0x10279160", "size": 107 }, "result": { "memory_ptr": "0x2002e0000400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547261716, "event": "allocate", "payload": { "allocator_ref": "0x10278fb0", "size": 108 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547276831, "event": "allocation_map_insert", "payload": { "ptr": "0x2002d3600400", "record_ptr": "0x2002d3600400", "record_size": "108", "record_strategy": "0x10278fb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547283840, "event": "allocate", "payload": { "allocator_ref": "0x10278fb0", "size": 108 }, "result": { "memory_ptr": "0x2002d3600400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547290223, "event": "allocate", "payload": { "allocator_ref": "0x1028a010", "size": 109 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547296697, "event": "allocation_map_insert", "payload": { "ptr": "0x20000d2c0210", "record_ptr": "0x20000d2c0210", "record_size": "109", "record_strategy": "0x1028a010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547303715, "event": "allocate", "payload": { "allocator_ref": "0x1028a010", "size": 109 }, "result": { "memory_ptr": "0x20000d2c0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547309902, "event": "allocate", "payload": { "allocator_ref": "0x1029a880", "size": 110 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547316044, "event": "allocation_map_insert", "payload": { "ptr": "0x20000ef80410", "record_ptr": "0x20000ef80410", "record_size": "110", "record_strategy": "0x1029a880" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547323042, "event": "allocate", "payload": { "allocator_ref": "0x1029a880", "size": 110 }, "result": { "memory_ptr": "0x20000ef80410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547329354, "event": "allocate", "payload": { "allocator_ref": "0x1029ac70", "size": 111 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547335583, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f4b0410", "record_ptr": "0x20000f4b0410", "record_size": "111", "record_strategy": "0x1029ac70" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547342453, "event": "allocate", "payload": { "allocator_ref": "0x1029ac70", "size": 111 }, "result": { "memory_ptr": "0x20000f4b0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547348658, "event": "allocate", "payload": { "allocator_ref": "0x102aafc0", "size": 112 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547354787, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f5c0410", "record_ptr": "0x20000f5c0410", "record_size": "112", "record_strategy": "0x102aafc0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547361753, "event": "allocate", "payload": { "allocator_ref": "0x102aafc0", "size": 112 }, "result": { "memory_ptr": "0x20000f5c0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547367929, "event": "allocate", "payload": { "allocator_ref": "0x102ab1d0", "size": 113 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547374087, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f6d0410", "record_ptr": "0x20000f6d0410", "record_size": "113", "record_strategy": "0x102ab1d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547381020, "event": "allocate", "payload": { "allocator_ref": "0x102ab1d0", "size": 113 }, "result": { "memory_ptr": "0x20000f6d0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547387223, "event": "allocate", "payload": { "allocator_ref": "0x102cbeb0", "size": 114 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547393438, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f7e0410", "record_ptr": "0x20000f7e0410", "record_size": "114", "record_strategy": "0x102cbeb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547400465, "event": "allocate", "payload": { "allocator_ref": "0x102cbeb0", "size": 114 }, "result": { "memory_ptr": "0x20000f7e0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547406734, "event": "allocate", "payload": { "allocator_ref": "0x102cc350", "size": 115 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547412927, "event": "allocation_map_insert", "payload": { "ptr": "0x20000f8f0410", "record_ptr": "0x20000f8f0410", "record_size": "115", "record_strategy": "0x102cc350" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547419870, "event": "allocate", "payload": { "allocator_ref": "0x102cc350", "size": 115 }, "result": { "memory_ptr": "0x20000f8f0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547426017, "event": "allocate", "payload": { "allocator_ref": "0x102ecd40", "size": 116 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547432231, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fa00410", "record_ptr": "0x20000fa00410", "record_size": "116", "record_strategy": "0x102ecd40" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547439299, "event": "allocate", "payload": { "allocator_ref": "0x102ecd40", "size": 116 }, "result": { "memory_ptr": "0x20000fa00410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547445578, "event": "allocate", "payload": { "allocator_ref": "0x102ed0d0", "size": 117 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547451682, "event": "allocation_map_insert", "payload": { "ptr": "0x20000fb10410", "record_ptr": "0x20000fb10410", "record_size": "117", "record_strategy": "0x102ed0d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547458586, "event": "allocate", "payload": { "allocator_ref": "0x102ed0d0", "size": 117 }, "result": { "memory_ptr": "0x20000fb10410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547464818, "event": "allocate", "payload": { "allocator_ref": "0x102ed2b0", "size": 118 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547472257, "event": "allocation_map_insert", "payload": { "ptr": "0x20010c110080", "record_ptr": "0x20010c110080", "record_size": "118", "record_strategy": "0x102ed2b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547479120, "event": "allocate", "payload": { "allocator_ref": "0x102ed2b0", "size": 118 }, "result": { "memory_ptr": "0x20010c110080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547485352, "event": "allocate", "payload": { "allocator_ref": "0x102ed360", "size": 119 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547492538, "event": "allocation_map_insert", "payload": { "ptr": "0x20012d930080", "record_ptr": "0x20012d930080", "record_size": "119", "record_strategy": "0x102ed360" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547503090, "event": "allocate", "payload": { "allocator_ref": "0x102ed360", "size": 119 }, "result": { "memory_ptr": "0x20012d930080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547509357, "event": "allocate", "payload": { "allocator_ref": "0x1032deb0", "size": 120 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547516545, "event": "allocation_map_insert", "payload": { "ptr": "0x20013f150080", "record_ptr": "0x20013f150080", "record_size": "120", "record_strategy": "0x1032deb0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547523804, "event": "allocate", "payload": { "allocator_ref": "0x1032deb0", "size": 120 }, "result": { "memory_ptr": "0x20013f150080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547530151, "event": "allocate", "payload": { "allocator_ref": "0x1032dc80", "size": 121 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547537202, "event": "allocation_map_insert", "payload": { "ptr": "0x200150970110", "record_ptr": "0x200150970110", "record_size": "121", "record_strategy": "0x1032dc80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547544217, "event": "allocate", "payload": { "allocator_ref": "0x1032dc80", "size": 121 }, "result": { "memory_ptr": "0x200150970110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547550368, "event": "allocate", "payload": { "allocator_ref": "0x1035e290", "size": 122 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547557313, "event": "allocation_map_insert", "payload": { "ptr": "0x200162190110", "record_ptr": "0x200162190110", "record_size": "122", "record_strategy": "0x1035e290" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547564228, "event": "allocate", "payload": { "allocator_ref": "0x1035e290", "size": 122 }, "result": { "memory_ptr": "0x200162190110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547570449, "event": "allocate", "payload": { "allocator_ref": "0x1035e2d0", "size": 123 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547577117, "event": "allocate", "payload": { "allocator_ref": "0x1035e2d0", "size": 123 }, "result": { "memory_ptr": "0x2001739b0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547583284, "event": "allocate", "payload": { "allocator_ref": "0x1035e6c0", "size": 124 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547590069, "event": "allocate", "payload": { "allocator_ref": "0x1035e6c0", "size": 124 }, "result": { "memory_ptr": "0x2001951d0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547596186, "event": "allocate", "payload": { "allocator_ref": "0x1035e4f0", "size": 125 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547602924, "event": "allocate", "payload": { "allocator_ref": "0x1035e4f0", "size": 125 }, "result": { "memory_ptr": "0x2001a69f00a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547609125, "event": "allocate", "payload": { "allocator_ref": "0x102ab080", "size": 126 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547615763, "event": "allocate", "payload": { "allocator_ref": "0x102ab080", "size": 126 }, "result": { "memory_ptr": "0x2001b8210110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547622043, "event": "allocate", "payload": { "allocator_ref": "0x1039f930", "size": 127 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547628829, "event": "allocate", "payload": { "allocator_ref": "0x1039f930", "size": 127 }, "result": { "memory_ptr": "0x2001c9a30110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547635046, "event": "allocate", "payload": { "allocator_ref": "0x1039f7a0", "size": 128 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547641985, "event": "allocation_map_insert", "payload": { "ptr": "0x2001db2500a0", "record_ptr": "0x2001db2500a0", "record_size": "128", "record_strategy": "0x1039f7a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547648909, "event": "allocate", "payload": { "allocator_ref": "0x1039f7a0", "size": 128 }, "result": { "memory_ptr": "0x2001db2500a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547655317, "event": "allocate", "payload": { "allocator_ref": "0x1039f580", "size": 129 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547662141, "event": "allocation_map_insert", "payload": { "ptr": "0x2001fca700a0", "record_ptr": "0x2001fca700a0", "record_size": "129", "record_strategy": "0x1039f580" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547669097, "event": "allocate", "payload": { "allocator_ref": "0x1039f580", "size": 129 }, "result": { "memory_ptr": "0x2001fca700a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547675343, "event": "allocate", "payload": { "allocator_ref": "0x1039f0a0", "size": 130 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547682419, "event": "allocation_map_insert", "payload": { "ptr": "0x20020e2900a0", "record_ptr": "0x20020e2900a0", "record_size": "130", "record_strategy": "0x1039f0a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547689310, "event": "allocate", "payload": { "allocator_ref": "0x1039f0a0", "size": 130 }, "result": { "memory_ptr": "0x20020e2900a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547695503, "event": "allocate", "payload": { "allocator_ref": "0x1039f260", "size": 131 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547702543, "event": "allocation_map_insert", "payload": { "ptr": "0x20021fab0110", "record_ptr": "0x20021fab0110", "record_size": "131", "record_strategy": "0x1039f260" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547709615, "event": "allocate", "payload": { "allocator_ref": "0x1039f260", "size": 131 }, "result": { "memory_ptr": "0x20021fab0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547715859, "event": "allocate", "payload": { "allocator_ref": "0x103dfdf0", "size": 132 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547722816, "event": "allocation_map_insert", "payload": { "ptr": "0x2002312d0110", "record_ptr": "0x2002312d0110", "record_size": "132", "record_strategy": "0x103dfdf0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547729824, "event": "allocate", "payload": { "allocator_ref": "0x103dfdf0", "size": 132 }, "result": { "memory_ptr": "0x2002312d0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547736093, "event": "allocate", "payload": { "allocator_ref": "0x103dffc0", "size": 133 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547742894, "event": "allocate", "payload": { "allocator_ref": "0x103dffc0", "size": 133 }, "result": { "memory_ptr": "0x200242af00a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547749048, "event": "allocate", "payload": { "allocator_ref": "0x104205f0", "size": 134 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547755846, "event": "allocate", "payload": { "allocator_ref": "0x104205f0", "size": 134 }, "result": { "memory_ptr": "0x2002643100a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547761983, "event": "allocate", "payload": { "allocator_ref": "0x10420670", "size": 135 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547768670, "event": "allocate", "payload": { "allocator_ref": "0x10420670", "size": 135 }, "result": { "memory_ptr": "0x200275b300a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547775056, "event": "allocate", "payload": { "allocator_ref": "0x104208d0", "size": 136 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547781863, "event": "allocate", "payload": { "allocator_ref": "0x104208d0", "size": 136 }, "result": { "memory_ptr": "0x200287350110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547788224, "event": "allocate", "payload": { "allocator_ref": "0x10450e10", "size": 137 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547795081, "event": "allocate", "payload": { "allocator_ref": "0x10450e10", "size": 137 }, "result": { "memory_ptr": "0x200298b70110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547801231, "event": "allocate", "payload": { "allocator_ref": "0x10451050", "size": 138 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547809953, "event": "allocation_map_insert", "payload": { "ptr": "0x2003000000b0", "record_ptr": "0x2003000000b0", "record_size": "138", "record_strategy": "0x10451050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547816942, "event": "allocate", "payload": { "allocator_ref": "0x10451050", "size": 138 }, "result": { "memory_ptr": "0x2003000000b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547823117, "event": "allocate", "payload": { "allocator_ref": "0x104516c0", "size": 139 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547828295, "event": "allocation_map_insert", "payload": { "ptr": "0x2003200100b0", "record_ptr": "0x2003200100b0", "record_size": "139", "record_strategy": "0x104516c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547834999, "event": "allocate", "payload": { "allocator_ref": "0x104516c0", "size": 139 }, "result": { "memory_ptr": "0x2003200100b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547841105, "event": "allocate", "payload": { "allocator_ref": "0x104515a0", "size": 140 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547846382, "event": "allocation_map_insert", "payload": { "ptr": "0x2003300200b0", "record_ptr": "0x2003300200b0", "record_size": "140", "record_strategy": "0x104515a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547853229, "event": "allocate", "payload": { "allocator_ref": "0x104515a0", "size": 140 }, "result": { "memory_ptr": "0x2003300200b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547859526, "event": "allocate", "payload": { "allocator_ref": "0x104820c0", "size": 141 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547864783, "event": "allocation_map_insert", "payload": { "ptr": "0x2003400300c0", "record_ptr": "0x2003400300c0", "record_size": "141", "record_strategy": "0x104820c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547871557, "event": "allocate", "payload": { "allocator_ref": "0x104820c0", "size": 141 }, "result": { "memory_ptr": "0x2003400300c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547877986, "event": "allocate", "payload": { "allocator_ref": "0x10481fd0", "size": 142 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547883076, "event": "allocate", "payload": { "allocator_ref": "0x10481fd0", "size": 142 }, "result": { "memory_ptr": "0x2003500400c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547889263, "event": "allocate", "payload": { "allocator_ref": "0x10481e60", "size": 143 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547894380, "event": "allocate", "payload": { "allocator_ref": "0x10481e60", "size": 143 }, "result": { "memory_ptr": "0x2003700500c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547900534, "event": "allocate", "payload": { "allocator_ref": "0x104b2480", "size": 144 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547905657, "event": "allocate", "payload": { "allocator_ref": "0x104b2480", "size": 144 }, "result": { "memory_ptr": "0x2003800600c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547911903, "event": "allocate", "payload": { "allocator_ref": "0x104c2e40", "size": 145 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547916987, "event": "allocate", "payload": { "allocator_ref": "0x104c2e40", "size": 145 }, "result": { "memory_ptr": "0x2003900700c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547931092, "event": "allocate", "payload": { "allocator_ref": "0x104c2ac0", "size": 146 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547936302, "event": "allocation_map_insert", "payload": { "ptr": "0x104c2750", "record_ptr": "0x104c2750", "record_size": "146", "record_strategy": "0x104c2ac0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547943058, "event": "allocate", "payload": { "allocator_ref": "0x104c2ac0", "size": 146 }, "result": { "memory_ptr": "0x104c2750" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547949278, "event": "allocate", "payload": { "allocator_ref": "0x104d34d0", "size": 147 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547954804, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcf120", "record_ptr": "0x10bcf120", "record_size": "147", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547961629, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcf120", "record_ptr": "0x10bcf120", "record_size": "147", "record_strategy": "0x104d34d0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547967955, "event": "allocate", "payload": { "allocator_ref": "0x104d34d0", "size": 147 }, "result": { "memory_ptr": "0x10bcf120" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547974186, "event": "allocate", "payload": { "allocator_ref": "0x104d36a0", "size": 148 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547979603, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcf1c0", "record_ptr": "0x10bcf1c0", "record_size": "148", "record_strategy": "0x101f2b80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547986285, "event": "allocation_map_insert", "payload": { "ptr": "0x10bcf1c0", "record_ptr": "0x10bcf1c0", "record_size": "148", "record_strategy": "0x104d36a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547992578, "event": "allocate", "payload": { "allocator_ref": "0x104d36a0", "size": 148 }, "result": { "memory_ptr": "0x10bcf1c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984547998853, "event": "allocate", "payload": { "allocator_ref": "0x1035e300", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548004202, "event": "allocation_map_insert", "payload": { "ptr": "0x104d3e80", "record_ptr": "0x104d3e80", "record_size": "32", "record_strategy": "0x1035e300" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548010684, "event": "allocate", "payload": { "allocator_ref": "0x1035e300", "size": 32 }, "result": { "memory_ptr": "0x104d3e80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548016748, "event": "allocate", "payload": { "allocator_ref": "0x104ebfe0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548022250, "event": "allocation_map_insert", "payload": { "ptr": "0x104e3f10", "record_ptr": "0x104e3f10", "record_size": "32", "record_strategy": "0x104ebfe0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548028584, "event": "allocate", "payload": { "allocator_ref": "0x104ebfe0", "size": 32 }, "result": { "memory_ptr": "0x104e3f10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548034746, "event": "allocate", "payload": { "allocator_ref": "0x104ec3a0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548039802, "event": "allocate", "payload": { "allocator_ref": "0x104ec3a0", "size": 32 }, "result": { "memory_ptr": "0x104ec910" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548045997, "event": "allocate", "payload": { "allocator_ref": "0x1035e300", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548051138, "event": "allocation_map_insert", "payload": { "ptr": "0x104d3ea0", "record_ptr": "0x104d3ea0", "record_size": "32", "record_strategy": "0x1035e300" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548057768, "event": "allocate", "payload": { "allocator_ref": "0x1035e300", "size": 32 }, "result": { "memory_ptr": "0x104d3ea0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548063921, "event": "allocate", "payload": { "allocator_ref": "0x104ebfe0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548069127, "event": "allocation_map_insert", "payload": { "ptr": "0x104e3f30", "record_ptr": "0x104e3f30", "record_size": "32", "record_strategy": "0x104ebfe0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548075737, "event": "allocate", "payload": { "allocator_ref": "0x104ebfe0", "size": 32 }, "result": { "memory_ptr": "0x104e3f30" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548085162, "event": "allocate", "payload": { "allocator_ref": "0x104ec3a0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548090181, "event": "allocate", "payload": { "allocator_ref": "0x104ec3a0", "size": 32 }, "result": { "memory_ptr": "0x104ec930" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548096400, "event": "allocate", "payload": { "allocator_ref": "0x1035e300", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548101626, "event": "allocation_map_insert", "payload": { "ptr": "0x104d3ec0", "record_ptr": "0x104d3ec0", "record_size": "32", "record_strategy": "0x1035e300" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548108319, "event": "allocate", "payload": { "allocator_ref": "0x1035e300", "size": 32 }, "result": { "memory_ptr": "0x104d3ec0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548114407, "event": "allocate", "payload": { "allocator_ref": "0x104ebfe0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548119465, "event": "allocation_map_insert", "payload": { "ptr": "0x104e3f50", "record_ptr": "0x104e3f50", "record_size": "32", "record_strategy": "0x104ebfe0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548125930, "event": "allocate", "payload": { "allocator_ref": "0x104ebfe0", "size": 32 }, "result": { "memory_ptr": "0x104e3f50" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548131988, "event": "allocate", "payload": { "allocator_ref": "0x104ec3a0", "size": 32 } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548137000, "event": "allocate", "payload": { "allocator_ref": "0x104ec3a0", "size": 32 }, "result": { "memory_ptr": "0x104ec950" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548142632, "event": "coalesce", "payload": { "allocator_name": "host_dyn_pool_spec1" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548148761, "event": "deallocate", "payload": { "allocator_ref": "0x101f2b80", "memory_ptr": "0x104ec500" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548154591, "event": "allocation_map_remove", "payload": { "ptr": "0x104ec500" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548165106, "event": "deallocate", "payload": { "allocator_ref": "0x10278df0", "memory_ptr": "0x2002d3400000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548170448, "event": "allocation_map_remove", "payload": { "ptr": "0x2002d3400000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548195666, "event": "deallocate", "payload": { "allocator_ref": "0x10279160", "memory_ptr": "0x2002e0000000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548201451, "event": "allocation_map_remove", "payload": { "ptr": "0x2002e0000000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548243291, "event": "deallocate", "payload": { "allocator_ref": "0x10278fb0", "memory_ptr": "0x2002d3600000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548249337, "event": "allocation_map_remove", "payload": { "ptr": "0x2002d3600000" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548270678, "event": "deallocate", "payload": { "allocator_ref": "0x1028a010", "memory_ptr": "0x20000d2c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548276428, "event": "allocation_map_remove", "payload": { "ptr": "0x20000d2c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548284301, "event": "deallocate", "payload": { "allocator_ref": "0x1029a880", "memory_ptr": "0x20000ef80010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548289666, "event": "allocation_map_remove", "payload": { "ptr": "0x20000ef80010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548297006, "event": "deallocate", "payload": { "allocator_ref": "0x1029ac70", "memory_ptr": "0x20000f4b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548302287, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f4b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548309525, "event": "deallocate", "payload": { "allocator_ref": "0x102aafc0", "memory_ptr": "0x20000f5c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548314862, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f5c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548321885, "event": "deallocate", "payload": { "allocator_ref": "0x102ab1d0", "memory_ptr": "0x20000f6d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548327251, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f6d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548334514, "event": "deallocate", "payload": { "allocator_ref": "0x102cbeb0", "memory_ptr": "0x20000f7e0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548339848, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f7e0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548346992, "event": "deallocate", "payload": { "allocator_ref": "0x102cc350", "memory_ptr": "0x20000f8f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548352291, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f8f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548359445, "event": "deallocate", "payload": { "allocator_ref": "0x102ecd40", "memory_ptr": "0x20000fa00010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548364821, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fa00010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548371843, "event": "deallocate", "payload": { "allocator_ref": "0x102ed0d0", "memory_ptr": "0x20000fb10010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548377079, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fb10010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548384077, "event": "deallocate", "payload": { "allocator_ref": "0x102ed2b0", "memory_ptr": "0x20010c110010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548389486, "event": "allocation_map_remove", "payload": { "ptr": "0x20010c110010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548399510, "event": "deallocate", "payload": { "allocator_ref": "0x102ed360", "memory_ptr": "0x20012d930010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548404855, "event": "allocation_map_remove", "payload": { "ptr": "0x20012d930010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548413407, "event": "deallocate", "payload": { "allocator_ref": "0x1032deb0", "memory_ptr": "0x20013f150010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548418737, "event": "allocation_map_remove", "payload": { "ptr": "0x20013f150010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548427077, "event": "deallocate", "payload": { "allocator_ref": "0x1032dc80", "memory_ptr": "0x200150970010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548432432, "event": "allocation_map_remove", "payload": { "ptr": "0x200150970010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548440707, "event": "deallocate", "payload": { "allocator_ref": "0x1035e290", "memory_ptr": "0x200162190010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548446014, "event": "allocation_map_remove", "payload": { "ptr": "0x200162190010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548454978, "event": "deallocate", "payload": { "allocator_ref": "0x1035e2d0", "memory_ptr": "0x2001739b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548462993, "event": "deallocate", "payload": { "allocator_ref": "0x1035e6c0", "memory_ptr": "0x2001951d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548470929, "event": "deallocate", "payload": { "allocator_ref": "0x1035e4f0", "memory_ptr": "0x2001a69f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548478755, "event": "deallocate", "payload": { "allocator_ref": "0x102ab080", "memory_ptr": "0x2001b8210010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548486704, "event": "deallocate", "payload": { "allocator_ref": "0x1039f930", "memory_ptr": "0x2001c9a30010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548499035, "event": "deallocate", "payload": { "allocator_ref": "0x1039f7a0", "memory_ptr": "0x2001db250010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548504363, "event": "allocation_map_remove", "payload": { "ptr": "0x2001db250010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548512839, "event": "deallocate", "payload": { "allocator_ref": "0x1039f580", "memory_ptr": "0x2001fca70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548518150, "event": "allocation_map_remove", "payload": { "ptr": "0x2001fca70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548526274, "event": "deallocate", "payload": { "allocator_ref": "0x1039f0a0", "memory_ptr": "0x20020e290010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548531553, "event": "allocation_map_remove", "payload": { "ptr": "0x20020e290010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548539664, "event": "deallocate", "payload": { "allocator_ref": "0x1039f260", "memory_ptr": "0x20021fab0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548544914, "event": "allocation_map_remove", "payload": { "ptr": "0x20021fab0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548553125, "event": "deallocate", "payload": { "allocator_ref": "0x103dfdf0", "memory_ptr": "0x2002312d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548558433, "event": "allocation_map_remove", "payload": { "ptr": "0x2002312d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548566913, "event": "deallocate", "payload": { "allocator_ref": "0x103dffc0", "memory_ptr": "0x200242af0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548574837, "event": "deallocate", "payload": { "allocator_ref": "0x104205f0", "memory_ptr": "0x200264310010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548582796, "event": "deallocate", "payload": { "allocator_ref": "0x10420670", "memory_ptr": "0x200275b30010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548590766, "event": "deallocate", "payload": { "allocator_ref": "0x104208d0", "memory_ptr": "0x200287350010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548598774, "event": "deallocate", "payload": { "allocator_ref": "0x10450e10", "memory_ptr": "0x200298b70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548607055, "event": "deallocate", "payload": { "allocator_ref": "0x10451050", "memory_ptr": "0x200300000010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548612380, "event": "allocation_map_remove", "payload": { "ptr": "0x200300000010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548620400, "event": "deallocate", "payload": { "allocator_ref": "0x104516c0", "memory_ptr": "0x200320010010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548625694, "event": "allocation_map_remove", "payload": { "ptr": "0x200320010010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548632686, "event": "deallocate", "payload": { "allocator_ref": "0x104515a0", "memory_ptr": "0x200330020010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548637954, "event": "allocation_map_remove", "payload": { "ptr": "0x200330020010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548644901, "event": "deallocate", "payload": { "allocator_ref": "0x104820c0", "memory_ptr": "0x200340030010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548650067, "event": "allocation_map_remove", "payload": { "ptr": "0x200340030010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548657572, "event": "deallocate", "payload": { "allocator_ref": "0x10481fd0", "memory_ptr": "0x200350040010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548664322, "event": "deallocate", "payload": { "allocator_ref": "0x10481e60", "memory_ptr": "0x200370050010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548670980, "event": "deallocate", "payload": { "allocator_ref": "0x104b2480", "memory_ptr": "0x200380060010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548677798, "event": "deallocate", "payload": { "allocator_ref": "0x104c2e40", "memory_ptr": "0x200390070010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548684698, "event": "deallocate", "payload": { "allocator_ref": "0x104c2ac0", "memory_ptr": "0x104c26b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548689862, "event": "allocation_map_remove", "payload": { "ptr": "0x104c26b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548696530, "event": "deallocate", "payload": { "allocator_ref": "0x104d34d0", "memory_ptr": "0x10420a20" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548701711, "event": "allocation_map_remove", "payload": { "ptr": "0x10420a20" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548708664, "event": "deallocate", "payload": { "allocator_ref": "0x104d36a0", "memory_ptr": "0x102ed860" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548713898, "event": "allocation_map_remove", "payload": { "ptr": "0x102ed860" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548720128, "event": "allocation_map_remove", "payload": { "ptr": "0x102ed860" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548726739, "event": "deallocate", "payload": { "allocator_ref": "0x101f2b80", "memory_ptr": "0x10bccb10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548731937, "event": "allocation_map_remove", "payload": { "ptr": "0x10bccb10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548738300, "event": "deallocate", "payload": { "allocator_ref": "0x10278df0", "memory_ptr": "0x2002d3400200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548743581, "event": "allocation_map_remove", "payload": { "ptr": "0x2002d3400200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548763363, "event": "deallocate", "payload": { "allocator_ref": "0x10279160", "memory_ptr": "0x2002e0000200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548769072, "event": "allocation_map_remove", "payload": { "ptr": "0x2002e0000200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548804557, "event": "deallocate", "payload": { "allocator_ref": "0x10278fb0", "memory_ptr": "0x2002d3600200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548810633, "event": "allocation_map_remove", "payload": { "ptr": "0x2002d3600200" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548830708, "event": "deallocate", "payload": { "allocator_ref": "0x1028a010", "memory_ptr": "0x20000d2c0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548836382, "event": "allocation_map_remove", "payload": { "ptr": "0x20000d2c0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548843641, "event": "deallocate", "payload": { "allocator_ref": "0x1029a880", "memory_ptr": "0x20000ef80210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548848862, "event": "allocation_map_remove", "payload": { "ptr": "0x20000ef80210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548855942, "event": "deallocate", "payload": { "allocator_ref": "0x1029ac70", "memory_ptr": "0x20000f4b0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548861289, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f4b0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548868205, "event": "deallocate", "payload": { "allocator_ref": "0x102aafc0", "memory_ptr": "0x20000f5c0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548873496, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f5c0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548880451, "event": "deallocate", "payload": { "allocator_ref": "0x102ab1d0", "memory_ptr": "0x20000f6d0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548885681, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f6d0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548892722, "event": "deallocate", "payload": { "allocator_ref": "0x102cbeb0", "memory_ptr": "0x20000f7e0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548901688, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f7e0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548908719, "event": "deallocate", "payload": { "allocator_ref": "0x102cc350", "memory_ptr": "0x20000f8f0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548913924, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f8f0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548920904, "event": "deallocate", "payload": { "allocator_ref": "0x102ecd40", "memory_ptr": "0x20000fa00210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548926087, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fa00210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548933159, "event": "deallocate", "payload": { "allocator_ref": "0x102ed0d0", "memory_ptr": "0x20000fb10210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548938491, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fb10210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548945571, "event": "deallocate", "payload": { "allocator_ref": "0x102ed2b0", "memory_ptr": "0x20010c110030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548950786, "event": "allocation_map_remove", "payload": { "ptr": "0x20010c110030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548959508, "event": "deallocate", "payload": { "allocator_ref": "0x102ed360", "memory_ptr": "0x20012d930030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548964717, "event": "allocation_map_remove", "payload": { "ptr": "0x20012d930030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548973056, "event": "deallocate", "payload": { "allocator_ref": "0x1032deb0", "memory_ptr": "0x20013f150030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548978308, "event": "allocation_map_remove", "payload": { "ptr": "0x20013f150030" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548986511, "event": "deallocate", "payload": { "allocator_ref": "0x1032dc80", "memory_ptr": "0x200150970090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548991796, "event": "allocation_map_remove", "payload": { "ptr": "0x200150970090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984548999989, "event": "deallocate", "payload": { "allocator_ref": "0x1035e290", "memory_ptr": "0x200162190090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549005180, "event": "allocation_map_remove", "payload": { "ptr": "0x200162190090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549013860, "event": "deallocate", "payload": { "allocator_ref": "0x1035e2d0", "memory_ptr": "0x2001739b0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549021367, "event": "deallocate", "payload": { "allocator_ref": "0x1035e6c0", "memory_ptr": "0x2001951d0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549028832, "event": "deallocate", "payload": { "allocator_ref": "0x1035e4f0", "memory_ptr": "0x2001a69f0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549036304, "event": "deallocate", "payload": { "allocator_ref": "0x102ab080", "memory_ptr": "0x2001b8210090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549043724, "event": "deallocate", "payload": { "allocator_ref": "0x1039f930", "memory_ptr": "0x2001c9a30090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549051786, "event": "deallocate", "payload": { "allocator_ref": "0x1039f7a0", "memory_ptr": "0x2001db250040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549057071, "event": "allocation_map_remove", "payload": { "ptr": "0x2001db250040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549065364, "event": "deallocate", "payload": { "allocator_ref": "0x1039f580", "memory_ptr": "0x2001fca70040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549070578, "event": "allocation_map_remove", "payload": { "ptr": "0x2001fca70040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549078582, "event": "deallocate", "payload": { "allocator_ref": "0x1039f0a0", "memory_ptr": "0x20020e290040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549083783, "event": "allocation_map_remove", "payload": { "ptr": "0x20020e290040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549091937, "event": "deallocate", "payload": { "allocator_ref": "0x1039f260", "memory_ptr": "0x20021fab0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549097224, "event": "allocation_map_remove", "payload": { "ptr": "0x20021fab0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549105296, "event": "deallocate", "payload": { "allocator_ref": "0x103dfdf0", "memory_ptr": "0x2002312d0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549110543, "event": "allocation_map_remove", "payload": { "ptr": "0x2002312d0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549119268, "event": "deallocate", "payload": { "allocator_ref": "0x103dffc0", "memory_ptr": "0x200242af0040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549126742, "event": "deallocate", "payload": { "allocator_ref": "0x104205f0", "memory_ptr": "0x200264310040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549134341, "event": "deallocate", "payload": { "allocator_ref": "0x10420670", "memory_ptr": "0x200275b30040" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549141874, "event": "deallocate", "payload": { "allocator_ref": "0x104208d0", "memory_ptr": "0x200287350090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549149317, "event": "deallocate", "payload": { "allocator_ref": "0x10450e10", "memory_ptr": "0x200298b70090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549157303, "event": "deallocate", "payload": { "allocator_ref": "0x10451050", "memory_ptr": "0x200300000050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549162534, "event": "allocation_map_remove", "payload": { "ptr": "0x200300000050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549169405, "event": "deallocate", "payload": { "allocator_ref": "0x104516c0", "memory_ptr": "0x200320010050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549174670, "event": "allocation_map_remove", "payload": { "ptr": "0x200320010050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549181449, "event": "deallocate", "payload": { "allocator_ref": "0x104515a0", "memory_ptr": "0x200330020050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549186619, "event": "allocation_map_remove", "payload": { "ptr": "0x200330020050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549193374, "event": "deallocate", "payload": { "allocator_ref": "0x104820c0", "memory_ptr": "0x200340030050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549198628, "event": "allocation_map_remove", "payload": { "ptr": "0x200340030050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549205645, "event": "deallocate", "payload": { "allocator_ref": "0x10481fd0", "memory_ptr": "0x200350040050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549211760, "event": "deallocate", "payload": { "allocator_ref": "0x10481e60", "memory_ptr": "0x200370050050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549217850, "event": "deallocate", "payload": { "allocator_ref": "0x104b2480", "memory_ptr": "0x200380060050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549224069, "event": "deallocate", "payload": { "allocator_ref": "0x104c2e40", "memory_ptr": "0x200390070050" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549230406, "event": "deallocate", "payload": { "allocator_ref": "0x104c2ac0", "memory_ptr": "0x104c26ea" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549235642, "event": "allocation_map_remove", "payload": { "ptr": "0x104c26ea" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549242164, "event": "deallocate", "payload": { "allocator_ref": "0x104d34d0", "memory_ptr": "0x10bcc3e0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549250859, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcc3e0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549257200, "event": "deallocate", "payload": { "allocator_ref": "0x104d36a0", "memory_ptr": "0x10bcce60" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549262313, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcce60" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549267829, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcce60" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549274506, "event": "deallocate", "payload": { "allocator_ref": "0x101f2b80", "memory_ptr": "0x10bcced0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549279738, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcced0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549286127, "event": "deallocate", "payload": { "allocator_ref": "0x10278df0", "memory_ptr": "0x2002d3400400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549291437, "event": "allocation_map_remove", "payload": { "ptr": "0x2002d3400400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549621811, "event": "deallocate", "payload": { "allocator_ref": "0x10279160", "memory_ptr": "0x2002e0000400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549628881, "event": "allocation_map_remove", "payload": { "ptr": "0x2002e0000400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549705699, "event": "deallocate", "payload": { "allocator_ref": "0x10278fb0", "memory_ptr": "0x2002d3600400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984549711847, "event": "allocation_map_remove", "payload": { "ptr": "0x2002d3600400" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550057711, "event": "deallocate", "payload": { "allocator_ref": "0x1028a010", "memory_ptr": "0x20000d2c0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550064758, "event": "allocation_map_remove", "payload": { "ptr": "0x20000d2c0210" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550072781, "event": "deallocate", "payload": { "allocator_ref": "0x1029a880", "memory_ptr": "0x20000ef80410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550078152, "event": "allocation_map_remove", "payload": { "ptr": "0x20000ef80410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550085421, "event": "deallocate", "payload": { "allocator_ref": "0x1029ac70", "memory_ptr": "0x20000f4b0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550090782, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f4b0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550097723, "event": "deallocate", "payload": { "allocator_ref": "0x102aafc0", "memory_ptr": "0x20000f5c0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550103059, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f5c0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550110055, "event": "deallocate", "payload": { "allocator_ref": "0x102ab1d0", "memory_ptr": "0x20000f6d0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550115340, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f6d0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550122230, "event": "deallocate", "payload": { "allocator_ref": "0x102cbeb0", "memory_ptr": "0x20000f7e0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550127574, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f7e0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550134566, "event": "deallocate", "payload": { "allocator_ref": "0x102cc350", "memory_ptr": "0x20000f8f0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550139794, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f8f0410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550146796, "event": "deallocate", "payload": { "allocator_ref": "0x102ecd40", "memory_ptr": "0x20000fa00410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550152024, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fa00410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550159051, "event": "deallocate", "payload": { "allocator_ref": "0x102ed0d0", "memory_ptr": "0x20000fb10410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550164307, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fb10410" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550171203, "event": "deallocate", "payload": { "allocator_ref": "0x102ed2b0", "memory_ptr": "0x20010c110080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550176404, "event": "allocation_map_remove", "payload": { "ptr": "0x20010c110080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550186183, "event": "deallocate", "payload": { "allocator_ref": "0x102ed360", "memory_ptr": "0x20012d930080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550191644, "event": "allocation_map_remove", "payload": { "ptr": "0x20012d930080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550200649, "event": "deallocate", "payload": { "allocator_ref": "0x1032deb0", "memory_ptr": "0x20013f150080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550206083, "event": "allocation_map_remove", "payload": { "ptr": "0x20013f150080" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550215133, "event": "deallocate", "payload": { "allocator_ref": "0x1032dc80", "memory_ptr": "0x200150970110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550220418, "event": "allocation_map_remove", "payload": { "ptr": "0x200150970110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550229289, "event": "deallocate", "payload": { "allocator_ref": "0x1035e290", "memory_ptr": "0x200162190110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550234744, "event": "allocation_map_remove", "payload": { "ptr": "0x200162190110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550243776, "event": "deallocate", "payload": { "allocator_ref": "0x1035e2d0", "memory_ptr": "0x2001739b0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550252063, "event": "deallocate", "payload": { "allocator_ref": "0x1035e6c0", "memory_ptr": "0x2001951d0090" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550260284, "event": "deallocate", "payload": { "allocator_ref": "0x1035e4f0", "memory_ptr": "0x2001a69f00a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550268352, "event": "deallocate", "payload": { "allocator_ref": "0x102ab080", "memory_ptr": "0x2001b8210110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550276609, "event": "deallocate", "payload": { "allocator_ref": "0x1039f930", "memory_ptr": "0x2001c9a30110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550284912, "event": "deallocate", "payload": { "allocator_ref": "0x1039f7a0", "memory_ptr": "0x2001db2500a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550290105, "event": "allocation_map_remove", "payload": { "ptr": "0x2001db2500a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550299126, "event": "deallocate", "payload": { "allocator_ref": "0x1039f580", "memory_ptr": "0x2001fca700a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550304520, "event": "allocation_map_remove", "payload": { "ptr": "0x2001fca700a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550313366, "event": "deallocate", "payload": { "allocator_ref": "0x1039f0a0", "memory_ptr": "0x20020e2900a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550318592, "event": "allocation_map_remove", "payload": { "ptr": "0x20020e2900a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550327264, "event": "deallocate", "payload": { "allocator_ref": "0x1039f260", "memory_ptr": "0x20021fab0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550332545, "event": "allocation_map_remove", "payload": { "ptr": "0x20021fab0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550349833, "event": "deallocate", "payload": { "allocator_ref": "0x103dfdf0", "memory_ptr": "0x2002312d0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550355218, "event": "allocation_map_remove", "payload": { "ptr": "0x2002312d0110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550364039, "event": "deallocate", "payload": { "allocator_ref": "0x103dffc0", "memory_ptr": "0x200242af00a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550372121, "event": "deallocate", "payload": { "allocator_ref": "0x104205f0", "memory_ptr": "0x2002643100a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550380211, "event": "deallocate", "payload": { "allocator_ref": "0x10420670", "memory_ptr": "0x200275b300a0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550388531, "event": "deallocate", "payload": { "allocator_ref": "0x104208d0", "memory_ptr": "0x200287350110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550396806, "event": "deallocate", "payload": { "allocator_ref": "0x10450e10", "memory_ptr": "0x200298b70110" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550404905, "event": "deallocate", "payload": { "allocator_ref": "0x10451050", "memory_ptr": "0x2003000000b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550410114, "event": "allocation_map_remove", "payload": { "ptr": "0x2003000000b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550417207, "event": "deallocate", "payload": { "allocator_ref": "0x104516c0", "memory_ptr": "0x2003200100b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550422533, "event": "allocation_map_remove", "payload": { "ptr": "0x2003200100b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550429516, "event": "deallocate", "payload": { "allocator_ref": "0x104515a0", "memory_ptr": "0x2003300200b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550434781, "event": "allocation_map_remove", "payload": { "ptr": "0x2003300200b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550441615, "event": "deallocate", "payload": { "allocator_ref": "0x104820c0", "memory_ptr": "0x2003400300c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550446777, "event": "allocation_map_remove", "payload": { "ptr": "0x2003400300c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550453854, "event": "deallocate", "payload": { "allocator_ref": "0x10481fd0", "memory_ptr": "0x2003500400c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550460182, "event": "deallocate", "payload": { "allocator_ref": "0x10481e60", "memory_ptr": "0x2003700500c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550466596, "event": "deallocate", "payload": { "allocator_ref": "0x104b2480", "memory_ptr": "0x2003800600c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550472969, "event": "deallocate", "payload": { "allocator_ref": "0x104c2e40", "memory_ptr": "0x2003900700c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550479387, "event": "deallocate", "payload": { "allocator_ref": "0x104c2ac0", "memory_ptr": "0x104c2750" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550484582, "event": "allocation_map_remove", "payload": { "ptr": "0x104c2750" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550491146, "event": "deallocate", "payload": { "allocator_ref": "0x104d34d0", "memory_ptr": "0x10bcf120" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550496286, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcf120" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550502532, "event": "deallocate", "payload": { "allocator_ref": "0x104d36a0", "memory_ptr": "0x10bcf1c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550507663, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcf1c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550513264, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcf1c0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550520055, "event": "deallocate", "payload": { "allocator_ref": "0x1035e300", "memory_ptr": "0x104d3e80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550525203, "event": "allocation_map_remove", "payload": { "ptr": "0x104d3e80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550532143, "event": "deallocate", "payload": { "allocator_ref": "0x104ebfe0", "memory_ptr": "0x104e3f10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550537324, "event": "allocation_map_remove", "payload": { "ptr": "0x104e3f10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550544025, "event": "deallocate", "payload": { "allocator_ref": "0x104ec3a0", "memory_ptr": "0x104ec910" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550550380, "event": "deallocate", "payload": { "allocator_ref": "0x1035e300", "memory_ptr": "0x104d3ea0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550555651, "event": "allocation_map_remove", "payload": { "ptr": "0x104d3ea0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550562097, "event": "deallocate", "payload": { "allocator_ref": "0x104ebfe0", "memory_ptr": "0x104e3f30" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550567309, "event": "allocation_map_remove", "payload": { "ptr": "0x104e3f30" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550573752, "event": "deallocate", "payload": { "allocator_ref": "0x104ec3a0", "memory_ptr": "0x104ec930" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550579670, "event": "deallocate", "payload": { "allocator_ref": "0x1035e300", "memory_ptr": "0x104d3ec0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550584848, "event": "allocation_map_remove", "payload": { "ptr": "0x104d3ec0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550591222, "event": "deallocate", "payload": { "allocator_ref": "0x104ebfe0", "memory_ptr": "0x104e3f50" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550596353, "event": "allocation_map_remove", "payload": { "ptr": "0x104e3f50" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550602849, "event": "deallocate", "payload": { "allocator_ref": "0x104ec3a0", "memory_ptr": "0x104ec950" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550608360, "event": "coalesce", "payload": { "allocator_name": "host_dyn_pool_spec1" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550623674, "event": "release", "payload": { "allocator_ref": "0x102ed360" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550629610, "event": "allocation_map_remove", "payload": { "ptr": "0x20012d930010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550703376, "event": "allocation_map_remove", "payload": { "ptr": "0x104ec910" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550711569, "event": "allocation_map_remove", "payload": { "ptr": "0x104e3f10" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550718649, "event": "allocation_map_remove", "payload": { "ptr": "0x104d3e80" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550728481, "event": "allocation_map_remove", "payload": { "ptr": "0x10420a20" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550736336, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcc3e0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550742158, "event": "allocation_map_remove", "payload": { "ptr": "0x10bcf120" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550750648, "event": "allocation_map_remove", "payload": { "ptr": "0x104c26b0" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550769593, "event": "allocation_map_remove", "payload": { "ptr": "0x200298b70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550865423, "event": "allocation_map_remove", "payload": { "ptr": "0x200287350010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984550965605, "event": "allocation_map_remove", "payload": { "ptr": "0x200275b30010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551065130, "event": "allocation_map_remove", "payload": { "ptr": "0x200264310010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551169056, "event": "allocation_map_remove", "payload": { "ptr": "0x200242af0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551269845, "event": "allocation_map_remove", "payload": { "ptr": "0x2002312d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551369148, "event": "allocation_map_remove", "payload": { "ptr": "0x20021fab0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551467891, "event": "allocation_map_remove", "payload": { "ptr": "0x20020e290010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551567526, "event": "allocation_map_remove", "payload": { "ptr": "0x2001fca70010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551667036, "event": "allocation_map_remove", "payload": { "ptr": "0x2001db250010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551767780, "event": "allocation_map_remove", "payload": { "ptr": "0x2001c9a30010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551865989, "event": "allocation_map_remove", "payload": { "ptr": "0x2001b8210010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984551956130, "event": "allocation_map_remove", "payload": { "ptr": "0x2001a69f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552048094, "event": "allocation_map_remove", "payload": { "ptr": "0x2001951d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552146336, "event": "allocation_map_remove", "payload": { "ptr": "0x2001739b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552247155, "event": "allocation_map_remove", "payload": { "ptr": "0x200162190010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552346282, "event": "allocation_map_remove", "payload": { "ptr": "0x200150970010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552445546, "event": "allocation_map_remove", "payload": { "ptr": "0x20013f150010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552577056, "event": "allocation_map_remove", "payload": { "ptr": "0x20010c110010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552671932, "event": "allocation_map_remove", "payload": { "ptr": "0x2000fa8f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552764641, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fb10010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552819354, "event": "allocation_map_remove", "payload": { "ptr": "0x2000e90d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552911380, "event": "allocation_map_remove", "payload": { "ptr": "0x20000fa00010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984552951554, "event": "allocation_map_remove", "payload": { "ptr": "0x2000d78b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553043396, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f8f0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553086238, "event": "allocation_map_remove", "payload": { "ptr": "0x2000c6090010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553178026, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f7e0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553227383, "event": "allocation_map_remove", "payload": { "ptr": "0x2000a4870010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553321507, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f6d0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553355627, "event": "allocation_map_remove", "payload": { "ptr": "0x200083050010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553449137, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f5c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553497862, "event": "allocation_map_remove", "payload": { "ptr": "0x200061830010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553592108, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f4b0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553625535, "event": "allocation_map_remove", "payload": { "ptr": "0x200040010010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553723343, "event": "allocation_map_remove", "payload": { "ptr": "0x20000ef80010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553772051, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f090010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553819873, "event": "allocation_map_remove", "payload": { "ptr": "0x20000f2a0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553859569, "event": "allocation_map_remove", "payload": { "ptr": "0x200020000010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553948780, "event": "allocation_map_remove", "payload": { "ptr": "0x20000d2c0010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984553980845, "event": "allocation_map_remove", "payload": { "ptr": "0x20000d350010" } }
+{ "kind":"replay", "uid":72620, "timestamp":1572294984554028711, "event": "allocation_map_remove", "payload": { "ptr": "0x20000d560010" } }
