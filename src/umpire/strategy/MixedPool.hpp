@@ -46,8 +46,8 @@ class MixedPool :
    * \param fixed_size_multiplier Fixed pool object size increase factor
    * \param dynamic_initial_alloc_size Size the dynamic pool initially allocates
    * \param dynamic_min_alloc_bytes Minimum size of all future allocations in the dynamic pool
-   * \param coalesce_heuristic Heuristic callback function (for the dynamic pool)
    * \param dynamic_align_bytes Size with which to align allocations (for the dynamic pool)
+   * \param coalesce_heuristic Heuristic callback function (for the dynamic pool)
    */
     MixedPool(
       const std::string& name, int id,

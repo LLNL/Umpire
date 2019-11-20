@@ -24,10 +24,12 @@ public:
     , THREADSAFE_ALLOCATOR
     , FIXED_POOL
     , MIXED_POOL
+    , ALLOCATION_PREFETCHER
+    , NUMA_POLICY
   };
 
-  static const std::size_t max_allocators{128};
-  static const std::size_t max_name_length{128};
+  static const std::size_t max_allocators{512};
+  static const std::size_t max_name_length{256};
 
   struct AllocatorTableEntry {
     rtype type;
@@ -40,29 +42,32 @@ public:
         int device_id;
         char advice[max_name_length];
         char accessing_allocator[max_name_length];
-      }advisor ;
+      } advisor;
+      struct {
+        int node;
+      } numa;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
-      }dynamic_pool_list ;
+      } dynamic_pool_list;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
         int alignment;
-      }dynamic_pool_map ;
+      } dynamic_pool_map;
       struct {
         std::size_t capacity;
-      }monotonic_pool ;
+      } monotonic_pool;
       struct {
         std::size_t slots;
-      }slot_pool ;
+      } slot_pool;
       struct {
         std::size_t size_limit;
-      }size_limiter ;
+      } size_limiter;
       struct {
         std::size_t object_bytes;
         std::size_t objects_per_pool;
-      }fixed_pool ;
+      } fixed_pool;
       struct {
         std::size_t smallest_fixed_blocksize;
         std::size_t largest_fixed_blocksize;
@@ -71,7 +76,7 @@ public:
         std::size_t dynamic_initial_alloc_bytes;
         std::size_t dynamic_min_alloc_bytes;
         std::size_t dynamic_align_bytes;
-      }mixed_pool ;
+      } mixed_pool;
     } argv;
     umpire::Allocator* allocator{nullptr};
   };
@@ -99,15 +104,30 @@ public:
     } argv ;
   };
 
+  const uint64_t REPLAY_MAGIC =
+    static_cast<uint64_t>(
+            static_cast<uint64_t>(0x7f) << 48
+          | static_cast<uint64_t>('R') << 40
+          | static_cast<uint64_t>('E') << 32
+          | static_cast<uint64_t>('P') << 24
+          | static_cast<uint64_t>('L') << 16
+          | static_cast<uint64_t>('A') << 8
+          | static_cast<uint64_t>('Y'));
+
+  const uint64_t REPLAY_VERSION = 3;
+
   struct Header {
-    int version{1};
-    std::size_t num_allocators{0};
-    std::size_t num_operations{0};
+    struct Magic {
+      uint64_t magic;
+      uint64_t version;
+    } m;
+    std::size_t num_allocators;
+    std::size_t num_operations;
     AllocatorTableEntry allocators[max_allocators];
     Operation ops[1];
   };
 
-  ReplayFile( std::string in_file_name );
+  ReplayFile( std::string input_filename, std::string binary_filename );
   ~ReplayFile( );
   ReplayFile::Header* getOperationsTable();
 
@@ -115,13 +135,14 @@ public:
   bool compileNeeded() { return m_compile_needed; }
 
 private:
-  const std::string m_bin_suffix{".replaybin"};
   Header* m_op_tables{nullptr};
-  const std::string m_in_file_name;
-  const std::string m_bin_file_name;
+  const std::string m_input_filename;
+  const std::string m_binary_filename;
   int m_fd;
   bool m_compile_needed{false};
   off_t max_file_size{0};
+
+  void checkHeader();
 };
 
 #endif // REPLAY_ReplayFile_HPP
