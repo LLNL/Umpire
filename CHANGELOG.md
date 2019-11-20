@@ -64,6 +64,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed replay test the replay tool as well as validate the output from
   running umpire with REPLAY turned on.
 
+- Fixed compilation errors when `-DENABLE_NUMA=On`.
+
 ## [1.1.0] - 2019-09-14
 
 ### Added
