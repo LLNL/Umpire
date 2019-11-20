@@ -30,6 +30,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Replay now can display information allocators used in a replay session.
 
+- Replay now can replay `NUMA` and `AllocationPreference` allocations.
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte. Build and test

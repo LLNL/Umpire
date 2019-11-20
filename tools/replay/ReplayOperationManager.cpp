@@ -497,6 +497,12 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           )
       );
     }
+#else
+    std::cerr
+      << "Warning, NUMA policy operation found and skipped, consider building"
+      << std::endl
+      << "version of replay with -DENABLE_NUMA=On."
+      << std::end;
 #endif // defined(UMPIRE_ENABLE_NUMA)
     break;
 
