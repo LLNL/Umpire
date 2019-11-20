@@ -1374,7 +1374,7 @@ TEST(NumaPolicyTest, EdgeCases) {
   auto& rm = umpire::ResourceManager::getInstance();
 
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
-                 "numa_alloc", -1, rm.getAllocator("HOST")),
+                 "numa_alloc", rm.getAllocator("HOST"), -1),
                umpire::util::Exception);
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)

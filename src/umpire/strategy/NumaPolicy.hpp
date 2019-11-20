@@ -29,10 +29,10 @@ class NumaPolicy :
 {
   public:
     NumaPolicy(
-        const std::string& name,
-        int id,
-        Allocator allocator
-        int numa_node);
+          const std::string& name
+        , int id
+        , Allocator allocator
+        , int numa_node);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
