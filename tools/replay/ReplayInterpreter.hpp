@@ -18,6 +18,7 @@ class ReplayInterpreter {
   public:
     void buildOperations();
     void runOperations(bool gather_statistics);
+    void printInfo();
     bool compareOperations(ReplayInterpreter& rh);
 
     ReplayInterpreter( std::string in_file_name );

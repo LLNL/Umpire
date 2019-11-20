@@ -5,17 +5,24 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <iomanip>
 #include <cstdint>
 #include <vector>
 #include <fstream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
+
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#include "umpire/util/numa.hpp"
+#endif // defined(UMPIRE_ENABLE_NUMA)
 
 #if !defined(_MSC_VER)
 #include <unistd.h>   // getpid()
@@ -30,6 +37,251 @@ ReplayOperationManager::ReplayOperationManager( ReplayFile::Header* Operations )
 }
 
 ReplayOperationManager::~ReplayOperationManager() { }
+
+void ReplayOperationManager::printInfo()
+{
+  std::cout << m_ops_table->num_allocators << " Allocators:" << std::endl;
+
+  for ( std::size_t n{0}; n < m_ops_table->num_allocators; ++n) {
+    auto alloc = &m_ops_table->allocators[n];
+
+    std::cout
+      << std::setw(6) << std::setfill(' ') << "#"
+      << std::setw(2) << std::setfill('0') << n << "  ";
+
+    switch (alloc->type) {
+    case ReplayFile::rtype::MEMORY_RESOURCE:
+      std::cout << "makeMemoryResource(\"" << m_ops_table->allocators[n].name << "\")";
+      break;
+
+    case ReplayFile::rtype::ALLOCATION_ADVISOR:
+      std::cout << "<umpire::strategy::AllocationAdvisor, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( \"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", \"" << alloc->argv.advisor.advice << "\"";
+
+      if (alloc->argv.advisor.device_id >= 0) { // Optional device ID specified
+        switch ( alloc->argc ) {
+        default:
+          REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+          break;
+        case 3:
+          std::cout << ", " << alloc->argv.advisor.device_id << " )";
+          break;
+        case 4:
+          std::cout << ", \"" << alloc->argv.advisor.accessing_allocator << "\"" << ", " << alloc->argv.advisor.device_id << " )";
+          break;
+        }
+      }
+      else { // Use default device_id
+        switch ( alloc->argc ) {
+        default:
+          REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        case 2:
+          std::cout << " )";
+          break;
+        case 3:
+          std::cout << ", \"" << alloc->argv.advisor.accessing_allocator << "\" )";
+          break;
+        }
+      }
+      break;
+
+    case ReplayFile::rtype::ALLOCATION_PREFETCHER:
+      std::cout << "<umpire::strategy::AllocationPrefetcher, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\"" << ", \"" << alloc->base_name << "\" )";
+      break;
+
+    case ReplayFile::rtype::NUMA_POLICY:
+      std::cout << "<umpire::strategy::NumaPolicy, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", " << alloc->argv.numa.node << " )";
+      break;
+
+    case ReplayFile::rtype::DYNAMIC_POOL_LIST:
+      std::cout << "<umpire::strategy::DynamicPoolList, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\"";
+
+      switch ( alloc->argc ) {
+      default:
+        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        break;
+      case 3:
+        std::cout << ", " << alloc->argv.dynamic_pool_list.initial_alloc_size
+          << ", " << alloc->argv.dynamic_pool_list.min_alloc_size;
+        break;
+      case 2:
+        std::cout << ", " << alloc->argv.dynamic_pool_list.initial_alloc_size;
+        break;
+      case 1:
+        break;
+      }
+      std::cout << " )";
+
+      break;
+
+    case ReplayFile::rtype::DYNAMIC_POOL_MAP:
+      std::cout << "<umpire::strategy::DynamicPoolMap, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\"";
+
+      switch ( alloc->argc ) {
+      default:
+        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        break;
+      case 4:
+        std::cout << ", " << alloc->argv.dynamic_pool_map.initial_alloc_size
+          << ", " << alloc->argv.dynamic_pool_map.min_alloc_size
+          << ", " << alloc->argv.dynamic_pool_map.alignment;
+        break;
+      case 3:
+        std::cout << ", " << alloc->argv.dynamic_pool_map.initial_alloc_size
+          << ", " << alloc->argv.dynamic_pool_map.min_alloc_size;
+        break;
+      case 2:
+        std::cout << ", " << alloc->argv.dynamic_pool_map.initial_alloc_size;
+        break;
+      case 1:
+        break;
+      }
+
+      std::cout << " )";
+      break;
+
+    case ReplayFile::rtype::MIXED_POOL:
+      std::cout << "<umpire::strategy::MixedPool, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\"";
+
+      switch ( alloc->argc ) {
+      default:
+        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        break;
+      case 8:
+        std::cout
+          << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier
+          << ", " << alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
+          << ", " << alloc->argv.mixed_pool.dynamic_min_alloc_bytes
+          << ", " << alloc->argv.mixed_pool.dynamic_align_bytes;
+        break;
+      case 7:
+        std::cout
+          << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier
+          << ", " << alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
+          << ", " << alloc->argv.mixed_pool.dynamic_min_alloc_bytes;
+        break;
+      case 6:
+        std::cout
+          << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier
+          << ", " << alloc->argv.mixed_pool.dynamic_initial_alloc_bytes;
+        break;
+      case 5:
+        std::cout
+          << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.size_multiplier;
+        break;
+      case 4:
+        std::cout
+          << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.max_fixed_blocksize;
+        break;
+      case 3:
+        std::cout
+          << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize
+          << ", " << alloc->argv.mixed_pool.largest_fixed_blocksize;
+        break;
+      case 2:
+        std::cout << ", " << alloc->argv.mixed_pool.smallest_fixed_blocksize;
+        break;
+      case 1:
+        break;
+      }
+
+      std::cout << " )";
+      break;
+
+    case ReplayFile::rtype::MONOTONIC:
+      std::cout << "<umpire::strategy::MonotonicAllocationStrategy, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", " << alloc->argv.monotonic_pool.capacity << " )";
+
+      break;
+
+    case ReplayFile::rtype::SLOT_POOL:
+      std::cout << "<umpire::strategy::SlotPool, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", " << alloc->argv.slot_pool.slots << " )";
+      break;
+
+    case ReplayFile::rtype::SIZE_LIMITER:
+      std::cout << "<umpire::strategy::SizeLimiter, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", " << alloc->argv.size_limiter.size_limit << " )";
+      break;
+
+    case ReplayFile::rtype::THREADSAFE_ALLOCATOR:
+      std::cout << "<umpire::strategy::ThreadSafeAllocator, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\"" << " )";
+      break;
+
+    case ReplayFile::rtype::FIXED_POOL:
+      std::cout << "<umpire::strategy::FixedPool, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( "
+        << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\""
+        << ", " << alloc->argv.fixed_pool.object_bytes;
+
+      switch ( alloc->argc ) {
+      default:
+        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        break;
+      case 3:
+        std::cout << ", " << alloc->argv.fixed_pool.objects_per_pool << " )";
+        break;
+      case 2:
+        std::cout << " )";
+        break;
+      }
+      break;
+
+    default:
+      REPLAY_ERROR("Unknown allocator type: " << alloc->type);
+      break;
+    }
+
+    std::cout << std::endl;
+  }
+  std::cout << m_ops_table->num_operations << " Operations" << std::endl;
+}
 
 void ReplayOperationManager::runOperations(bool gather_statistics)
 {
@@ -204,6 +456,54 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
         break;
       }
     }
+    break;
+
+  case ReplayFile::rtype::ALLOCATION_PREFETCHER:
+    if (alloc->introspection) {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::AllocationPrefetcher, true>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+          )
+      );
+    }
+    else {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::AllocationPrefetcher, false>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+          )
+      );
+    }
+    break;
+
+  case ReplayFile::rtype::NUMA_POLICY:
+#if defined(UMPIRE_ENABLE_NUMA)
+    if (alloc->introspection) {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::NumaPolicy, true>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+            , alloc->argv.numa.node
+          )
+      );
+    }
+    else {
+      alloc->allocator = new umpire::Allocator(
+        rm.makeAllocator<umpire::strategy::NumaPolicy, false>
+          (   alloc->name
+            , rm.getAllocator(alloc->base_name)
+            , alloc->argv.numa.node
+          )
+      );
+    }
+#else
+    std::cerr
+      << "Warning, NUMA policy operation found and skipped, consider building"
+      << std::endl
+      << "version of replay with -DENABLE_NUMA=On."
+      << std::endl;
+#endif // defined(UMPIRE_ENABLE_NUMA)
     break;
 
   case ReplayFile::rtype::DYNAMIC_POOL_LIST:
