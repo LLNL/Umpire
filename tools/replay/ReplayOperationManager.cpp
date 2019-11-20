@@ -13,13 +13,16 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
-#include "umpire/strategy/NumaPolicy.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/numa.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
+
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#include "umpire/util/numa.hpp"
+#endif // defined(UMPIRE_ENABLE_NUMA)
 
 #if !defined(_MSC_VER)
 #include <unistd.h>   // getpid()
@@ -475,6 +478,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     break;
 
   case ReplayFile::rtype::NUMA_POLICY:
+#if defined(UMPIRE_ENABLE_NUMA)
     if (alloc->introspection) {
       alloc->allocator = new umpire::Allocator(
         rm.makeAllocator<umpire::strategy::NumaPolicy, true>
@@ -493,6 +497,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           )
       );
     }
+#endif // defined(UMPIRE_ENABLE_NUMA)
     break;
 
   case ReplayFile::rtype::DYNAMIC_POOL_LIST:
