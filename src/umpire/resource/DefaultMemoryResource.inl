@@ -28,6 +28,14 @@ DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, cons
 }
 
 template<typename _allocator>
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, _allocator&& alloc) :
+  MemoryResource(name, id, traits),
+  m_allocator(alloc),
+  m_platform(platform)
+{
+}
+
+template<typename _allocator>
 void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
