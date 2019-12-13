@@ -14,6 +14,7 @@
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
@@ -24,501 +25,207 @@
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
-class replayTest {
-public:
-  replayTest() : testAllocations(3), allocationSize(16)
-  {
-    auto& rm = umpire::ResourceManager::getInstance();
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#include "umpire/util/numa.hpp"
+#endif
 
-    allocatorNames.push_back("HOST");
+namespace replay_test {
+
+const int test_allocations{3};
+const std::size_t allocation_size{32};
+
+void testAllocation(std::string name)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.getAllocator(name);
+
+  for ( int i = 0; i < test_allocations; ++i ) {
+    auto ptr = alloc.allocate( allocation_size );
+    alloc.deallocate( ptr );
+  }
+
+  try {
+    auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
+
+    dynamic_pool->coalesce();
+    alloc.release();
+  }
+  catch ( ... ) {
+  }
+}
+
+template <typename Strategy, bool intro, typename... Args>
+void testAllocator(std::string name, Args&&... args)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  rm.makeAllocator<Strategy, intro>(name, args...);
+  testAllocation(name);
+}
+
+static void runTest()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  std::vector<std::string> allocators{
+      "HOST" 
 #if defined(UMPIRE_ENABLE_DEVICE)
-    allocatorNames.push_back("DEVICE");
+    , "DEVICE"
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-    allocatorNames.push_back("UM");
+    , "UM"
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-    allocatorNames.push_back("PINNED");
+    , "PINNED"
 #endif
+  };
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_default"
-        , rm.getAllocator("HOST")
-        //, 512             // smallest fixed block size (Bytes)
-        //, 1*1024          // largest fixed block size 1KiB
-        //, 4 * 1024 * 1024 // max fixed pool size
-        //, 12.0            // size multiplier
-        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
-        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_default");
+  for ( auto basename : allocators ) {
+    std::string name;
+    auto base_alloc = rm.getAllocator(basename);
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec1"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        //, 1*1024          // largest fixed block size 1KiB
-        //, 4 * 1024 * 1024 // max fixed pool size
-        //, 12.0            // size multiplier
-        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
-        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_spec1");
+    testAllocation(basename);
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec2"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        //, 4 * 1024 * 1024 // max fixed pool size
-        //, 12.0            // size multiplier
-        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
-        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_spec2");
+#if defined(UMPIRE_ENABLE_NUMA)
+    if ( basename == "HOST" ) {
+      auto nodes = umpire::numa::get_host_nodes();
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec3"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        , 4 * 1024 * 1024 // max fixed pool size
-        //, 12.0            // size multiplier
-        //, (256 * 1024 * 1204) // dynamic pool min initial allocation size
-        //, (1 * 1024 * 1024)   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_spec3");
+      name = basename + "_NumaPolicy";
+      testAllocator<umpire::strategy::NumaPolicy, true>(name, rm.getAllocator("HOST"), nodes[0]);
+      name = basename + "_NumaPolicy_no_introspection";
+      testAllocator<umpire::strategy::NumaPolicy, false>(name, rm.getAllocator("HOST"), nodes[0]);
+    }
+#endif // defined(UMPIRE_ENABLE_NUMA)
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec4"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        , 4 * 1024 * 1024 // max fixed pool size
-        , 12              // size multiplier
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_spec4");
+#if defined(UMPIRE_ENABLE_CUDA)
+    if ( basename == "UM" ) {
+      auto device_id = 1;   // device_id
+      auto accessing_alloc = rm.getAllocator("HOST");
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec5"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        , 4 * 1024 * 1024 // max fixed pool size
-        , 12              // size multiplier
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_spec5");
+      name = basename + "_AllocationAdvisor_spec_";
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name+"default_id", base_alloc, "READ_MOSTLY");
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name+"with_id", base_alloc, "READ_MOSTLY", device_id);
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name+"with_accessing_and_default_id", base_alloc, "READ_MOSTLY", accessing_alloc);
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name+"with_accessing_and_id", base_alloc, "PREFERRED_LOCATION", accessing_alloc, device_id);
+      name = basename + "_AllocationAdvisor_no_introspection_spec_";
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"default_id", base_alloc, "READ_MOSTLY");
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"with_id", base_alloc, "READ_MOSTLY", device_id);
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"with_accessing_and_default_id", base_alloc, "READ_MOSTLY", accessing_alloc);
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name+"with_accessing_and_id", base_alloc, "PREFERRED_LOCATION", accessing_alloc, device_id);
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec6"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        , 4 * 1024 * 1024 // max fixed pool size
-        , 12              // size multiplier
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        // , umpire::strategy::heuristic_percent_releasable(75)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_mixedpool_spec6");
+      name = basename + "_AllocationPrefetcher";
+      testAllocator<umpire::strategy::AllocationPrefetcher, true>(name, base_alloc);
+      name = basename + "_AllocationPrefetcher_no_introspection";
+      testAllocator<umpire::strategy::AllocationPrefetcher, false>(name, base_alloc);
+    }
+#endif // defined(UMPIRE_ENABLE_CUDA)
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec7"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        , 4 * 1024 * 1024 // max fixed pool size
-        , 12              // size multiplier
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        //, umpire::strategy::heuristic_percent_releasable(75)
-    );
-    allocatorNames.push_back("host_mixedpool_spec7");
+    auto mpa1 = 512;                // Smallest fixed pool object size in bytes
+    auto mpa2 = 1*1024;             // Largest fixed pool object size in bytes
+    auto mpa3 = 8 * 1024;           // Largest initial size of any fixed pool
+    auto mpa4 = 12;                 // Fixed pool object size increase factor
+    auto mpa5 = 256 * 1024;         // Size the dynamic pool initially allocates
+    auto mpa6 = 1 * 1024 * 1024;    // Minimum size of all future allocations in the dynamic pool
+    auto mpa7 = 128;                // Size with which to align allocations
+    auto mpa8 = umpire::strategy::heuristic_percent_releasable(75); // Heuristic
+    name = basename + "_MixedPool_spec_";
+    testAllocator<umpire::strategy::MixedPool, true>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"1", base_alloc , mpa1);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"2", base_alloc, mpa1, mpa2);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"3", base_alloc, mpa1, mpa2, mpa3);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"4", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"5", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"6", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5, mpa6);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"7", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5, mpa6, mpa7);
+    testAllocator<umpire::strategy::MixedPool, true>(name+"8", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5, mpa6, mpa7, mpa8);
+    name = basename + "_MixedPool_no_instrospection_spec_";
+    testAllocator<umpire::strategy::MixedPool, false>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"1", base_alloc , mpa1);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"2", base_alloc, mpa1, mpa2);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"3", base_alloc, mpa1, mpa2, mpa3);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"4", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"5", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"6", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5, mpa6);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"7", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5, mpa6, mpa7);
+    testAllocator<umpire::strategy::MixedPool, false>(name+"8", base_alloc, mpa1, mpa2, mpa3, mpa4, mpa5, mpa6, mpa7, mpa8);
 
-    rm.makeAllocator<umpire::strategy::MixedPool>(
-          "host_mixedpool_spec8"
-        , rm.getAllocator("HOST")
-        , 512             // smallest fixed block size (Bytes)
-        , 1*1024          // largest fixed block size 1KiB
-        , 4 * 1024 * 1024 // max fixed pool size
-        , 12              // size multiplier
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        , umpire::strategy::heuristic_percent_releasable(75)
-    );
-    allocatorNames.push_back("host_mixedpool_spec8");
+    auto dpa1 = 16 * 1024;         // min initial allocation size
+    auto dpa2 = 1 * 1024;          // min allocation size
+    auto dpa3 = 128;               // byte alignment
+    auto dpa4 = umpire::strategy::heuristic_percent_releasable(50);
+    name = basename + "_DynamicPool_spec_";
+    testAllocator<umpire::strategy::DynamicPool, true>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::DynamicPool, true>(name+"1", base_alloc, dpa1);
+    testAllocator<umpire::strategy::DynamicPool, true>(name+"2", base_alloc, dpa1, dpa2);
+    testAllocator<umpire::strategy::DynamicPool, true>(name+"3", base_alloc, dpa1, dpa2, dpa3);
+    testAllocator<umpire::strategy::DynamicPool, true>(name+"4", base_alloc, dpa1, dpa2, dpa3, dpa4);
+    name = basename + "_DynamicPool_no_instrospection_spec_";
+    testAllocator<umpire::strategy::DynamicPool, false>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::DynamicPool, false>(name+"1", base_alloc, dpa1);
+    testAllocator<umpire::strategy::DynamicPool, false>(name+"2", base_alloc, dpa1, dpa2);
+    testAllocator<umpire::strategy::DynamicPool, false>(name+"3", base_alloc, dpa1, dpa2, dpa3);
+    testAllocator<umpire::strategy::DynamicPool, false>(name+"4", base_alloc, dpa1, dpa2, dpa3, dpa4);
 
-    //
-    // DynamicPool
-    //
-    rm.makeAllocator<umpire::strategy::DynamicPool>(
-          "host_dyn_pool_spec0", rm.getAllocator("HOST")
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_spec0");
+    name = basename + "_DynamicPoolMap_spec_";
+    testAllocator<umpire::strategy::DynamicPoolMap, true>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::DynamicPoolMap, true>(name+"1", base_alloc, dpa1);
+    testAllocator<umpire::strategy::DynamicPoolMap, true>(name+"2", base_alloc, dpa1, dpa2);
+    testAllocator<umpire::strategy::DynamicPoolMap, true>(name+"3", base_alloc, dpa1, dpa2, dpa3);
+    testAllocator<umpire::strategy::DynamicPoolMap, true>(name+"4", base_alloc, dpa1, dpa2, dpa3, dpa4);
+    name = basename + "_DynamicPoolMap_no_instrospection_spec_";
+    testAllocator<umpire::strategy::DynamicPoolMap, false>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::DynamicPoolMap, false>(name+"1", base_alloc, dpa1);
+    testAllocator<umpire::strategy::DynamicPoolMap, false>(name+"2", base_alloc, dpa1, dpa2);
+    testAllocator<umpire::strategy::DynamicPoolMap, false>(name+"3", base_alloc, dpa1, dpa2, dpa3);
+    testAllocator<umpire::strategy::DynamicPoolMap, false>(name+"4", base_alloc, dpa1, dpa2, dpa3, dpa4);
 
-    rm.makeAllocator<umpire::strategy::DynamicPool>(
-          "host_dyn_pool_spec1", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_spec1");
+    auto lpa1 = dpa1;
+    auto lpa2 = dpa2;
+    auto lpa3 = umpire::strategy::heuristic_percent_releasable_list(50);
+    name = basename + "_DynamicPoolList_spec_";
+    testAllocator<umpire::strategy::DynamicPoolList, true>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::DynamicPoolList, true>(name+"1", base_alloc, lpa1);
+    testAllocator<umpire::strategy::DynamicPoolList, true>(name+"2", base_alloc, lpa1, lpa2);
+    testAllocator<umpire::strategy::DynamicPoolList, true>(name+"3", base_alloc, lpa1, lpa2, lpa3);
+    name = basename + "_DynamicPoolList_no_instrospection_spec_";
+    testAllocator<umpire::strategy::DynamicPoolList, false>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::DynamicPoolList, false>(name+"1", base_alloc, lpa1);
+    testAllocator<umpire::strategy::DynamicPoolList, false>(name+"2", base_alloc, lpa1, lpa2);
+    testAllocator<umpire::strategy::DynamicPoolList, false>(name+"3", base_alloc, lpa1, lpa2, lpa3);
 
-    rm.makeAllocator<umpire::strategy::DynamicPool>(
-          "host_dyn_pool_spec2", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_spec2");
+    auto ma1 = 1024; // Capacity
+    name = basename + "_MonotonicAllocationStrategy_spec_";
+    testAllocator<umpire::strategy::MonotonicAllocationStrategy, true>(name, base_alloc, ma1);
+    name = basename + "_MonotonicAllocationStrategy_no_instrospection_spec_";
+    testAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(name, base_alloc, ma1);
 
-    rm.makeAllocator<umpire::strategy::DynamicPool>(
-          "host_dyn_pool_spec3", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        //, umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_spec3");
+    auto sa1 = 64;  // Slots
+    name = basename + "_SlotPool_spec_";
+    testAllocator<umpire::strategy::SlotPool, true>(name, base_alloc, sa1);
+    name = basename + "_SlotPool_no_instrospection_spec_";
+    testAllocator<umpire::strategy::SlotPool, false>(name, base_alloc, sa1);
 
-    rm.makeAllocator<umpire::strategy::DynamicPool>(
-          "host_dyn_pool_spec4", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        , umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_spec4");
+    name = basename + "_ThreadSafeAllocator_spec_";
+    testAllocator<umpire::strategy::ThreadSafeAllocator, true>(name, base_alloc);
+    name = basename + "_ThreadSafeAllocator_no_instrospection_spec_";
+    testAllocator<umpire::strategy::ThreadSafeAllocator, false>(name, base_alloc);
 
-    rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-          "host_dyn_pool_nointro_spec0", rm.getAllocator("HOST")
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_nointro_spec0");
-
-    rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-          "host_dyn_pool_nointro_spec1", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_nointro_spec1");
-
-    rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-          "host_dyn_pool_nointro_spec2", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_nointro_spec2");
-
-    rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-          "host_dyn_pool_nointro_spec3", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        //, umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_nointro_spec3");
-
-    rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-          "host_dyn_pool_nointro_spec4", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        , umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_nointro_spec4");
-
-
-    //
-    // DynamicPoolMap
-    //
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-          "host_dyn_pool_map_spec0", rm.getAllocator("HOST")
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_map_spec0");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-          "host_dyn_pool_map_spec1", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_map_spec1");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-          "host_dyn_pool_map_spec2", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_map_spec2");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-          "host_dyn_pool_map_spec3", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        //, umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_map_spec3");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-          "host_dyn_pool_map_spec4", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        , umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_map_spec4");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>(
-          "host_dyn_pool_map_nointro_spec0", rm.getAllocator("HOST")
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_map_nointro_spec0");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>(
-          "host_dyn_pool_map_nointro_spec1", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_map_nointro_spec1");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>(
-          "host_dyn_pool_map_nointro_spec2", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable(50)
-        //, 128                 // byte alignment
-    );
-    allocatorNames.push_back("host_dyn_pool_map_nointro_spec2");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>(
-          "host_dyn_pool_map_nointro_spec3", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        //, umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_map_nointro_spec3");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>(
-          "host_dyn_pool_map_nointro_spec4", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , 128                 // byte alignment
-        , umpire::strategy::heuristic_percent_releasable(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_map_nointro_spec4");
-
-    //
-    // DynamicPoolList
-    //
-    rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-          "host_dyn_pool_list_spec0", rm.getAllocator("HOST")
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_spec0");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-          "host_dyn_pool_list_spec1", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_spec1");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-          "host_dyn_pool_list_spec2", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_spec2");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-          "host_dyn_pool_list_spec3", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_spec3");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
-          "host_dyn_pool_list_nointro_spec0", rm.getAllocator("HOST")
-        //, 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_nointro_spec0");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
-          "host_dyn_pool_list_nointro_spec1", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        //, 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_nointro_spec1");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
-          "host_dyn_pool_list_nointro_spec2", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        //, umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_nointro_spec2");
-
-    rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
-          "host_dyn_pool_list_nointro_spec3", rm.getAllocator("HOST")
-        , 256 * 1024 * 1024 // dynamic pool min initial allocation size
-        , 1 * 1024 * 1024   // dynamic pool min allocation size
-        , umpire::strategy::heuristic_percent_releasable_list(50)
-    );
-    allocatorNames.push_back("host_dyn_pool_list_nointro_spec3");
-
-    //
-    // Monotonic Allocation
-    //
-    rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "MONOTONIC 1024", rm.getAllocator("HOST"), 1024);
-    allocatorNames.push_back("MONOTONIC 1024");
-
-    //
-    // Slot
-    //
-    rm.makeAllocator<umpire::strategy::SlotPool>(
-      "host_slot_pool", rm.getAllocator("HOST"), 64);
-    allocatorNames.push_back("host_slot_pool");
-
-    rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("HOST"));
-    allocatorNames.push_back("thread_safe_allocator");
-
-    //
-    // Fixed
-    //
-    rm.makeAllocator<umpire::strategy::FixedPool>(
-          "host_fixed_pool_spec0", rm.getAllocator("HOST")
-        , 32                // object_bytes
-        //, 1024              // objects_per_pool                        
-    );
-    FixedAllocatorNames.push_back("host_fixed_pool_spec0");
-
-    rm.makeAllocator<umpire::strategy::FixedPool>(
-          "host_fixed_pool_spec1", rm.getAllocator("HOST")
-        , 32                // object_bytes
-        , 1024              // objects_per_pool                        
-    );
-    FixedAllocatorNames.push_back("host_fixed_pool_spec1");
-
-    rm.makeAllocator<umpire::strategy::FixedPool, false>(
-          "host_fixed_pool_nointro_spec1", rm.getAllocator("HOST")
-        , 32                // object_bytes
-        , 1024              // objects_per_pool                        
-    );
-    FixedAllocatorNames.push_back("host_fixed_pool_nointro_spec1");
+    auto fpa1 = allocation_size; // object_bytes
+    auto fpa2 = 1024; // objects_per_pool                        
+    name = basename + "_FixedPool_spec_";
+    testAllocator<umpire::strategy::FixedPool, true>(name+"1", base_alloc, fpa1);
+    testAllocator<umpire::strategy::FixedPool, true>(name+"2", base_alloc, fpa1, fpa2);
+    name = basename + "_FixedPool_no_instrospection_spec_";
+    testAllocator<umpire::strategy::FixedPool, false>(name+"1", base_alloc, fpa1);
+    testAllocator<umpire::strategy::FixedPool, false>(name+"2", base_alloc, fpa1, fpa2);
   }
+}
 
-  ~replayTest( void )
-  {
-  }
-
-  void runTest()
-  {
-    auto& rm = umpire::ResourceManager::getInstance();
-
-    auto pooled_allocator = rm.getAllocator("host_dyn_pool_spec1");
-    auto dynamic_pool = 
-      umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pooled_allocator);
-
-    if (! dynamic_pool ) {
-      std::cerr << "host_dyn_pool_spec1 is not a dynamic pool!\n";
-      exit(1);
-    }
-
-    for ( int i = 0; i < testAllocations; ++i ) {
-      for ( auto n : allocatorNames ) {
-        auto alloc = rm.getAllocator(n);
-        allocations.push_back( std::make_pair(alloc.allocate( ++allocationSize ), n) );
-      }
-    }
-
-    for ( int i = 0; i < testAllocations; ++i ) {
-      for ( auto n : FixedAllocatorNames ) {
-        auto alloc = rm.getAllocator(n);
-        allocations.push_back( std::make_pair(alloc.allocate(32), n) );
-      }
-    }
-
-    dynamic_pool->coalesce();
-
-    for ( auto ptr : allocations ) {
-      auto alloc = rm.getAllocator(ptr.second);
-      alloc.deallocate( ptr.first );
-    }
-
-    dynamic_pool->coalesce();
-    pooled_allocator.release();
-  }
-private:
-  const int testAllocations;
-  std::size_t allocationSize;
-  std::vector<std::string> allocatorNames;
-  std::vector<std::string> FixedAllocatorNames;
-  std::vector<std::pair<void*, std::string>> allocations;
-};
-
+} // namespace replay_test
 
 int main(int , char** )
 {
-  replayTest test;
-
-  test.runTest();
+  replay_test::runTest();
 
   return 0;
 }

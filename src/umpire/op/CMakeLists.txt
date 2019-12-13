@@ -48,7 +48,8 @@ if (ENABLE_CUDA)
     CudaCopyOperation.hpp
     CudaCopyFromOperation.hpp
     CudaCopyToOperation.hpp
-    CudaMemsetOperation.hpp)
+    CudaMemsetOperation.hpp
+    CudaMemPrefetchOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
@@ -61,7 +62,8 @@ if (ENABLE_CUDA)
     CudaCopyOperation.cpp
     CudaCopyFromOperation.cpp
     CudaCopyToOperation.cpp
-    CudaMemsetOperation.cpp)
+    CudaMemsetOperation.cpp
+    CudaMemPrefetchOperation.cpp)
 
   set (umpire_op_depends
     ${umpire_op_depends}

@@ -17,16 +17,14 @@
 class ReplayInterpreter {
   public:
     void buildOperations();
-    void buildAllocMapOperations();
-    void compile();
     void runOperations(bool gather_statistics);
-
-    //
-    // Return: > 0 success, 0 eof, < 0 error
-    //
-    int getSymbolicOperation( std::string& raw_line, std::string& sym_line );
+    void printInfo();
+    bool compareOperations(ReplayInterpreter& rh);
 
     ReplayInterpreter( std::string in_file_name );
+    ~ReplayInterpreter();
+
+    ReplayFile* m_ops{nullptr};
 
   private:
     using AllocatorIndex = int;
@@ -38,16 +36,12 @@ class ReplayInterpreter {
     std::string m_input_file_name;
     std::ifstream m_input_file;
     std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
+    std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;
     nlohmann::json m_json;
     std::vector<std::string> m_row;
-    AllocatorIndex m_num_allocators;
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
-    ReplayOperationManager m_operation_mgr;
-    uint64_t m_op_count;
-    uint64_t m_line_count;
-    std::stringstream compare_ss;
 
     int m_log_version_major;
     int m_log_version_minor;
@@ -56,16 +50,12 @@ class ReplayInterpreter {
     template <typename T> void get_from_string( const std::string& s, T& val );
 
     void strip_off_base(std::string& s);
-    void replay_makeAllocator( void );
-    void replay_makeMemoryResource( void );
-    void replay_allocate( void );
-    void replay_deallocate( void );
-    void replay_coalesce( void );
-    void replay_release( void );
-    void replay_makeAllocationMapInsert( void );
-    void replay_makeAllocationMapFind( void );
-    void replay_makeAllocationMapRemove( void );
-    void replay_makeAllocationMapClear( void );
+    void replay_compileMemoryResource( void );
+    void replay_compileAllocator( void );
+    void replay_compileAllocate( void );
+    void replay_compileDeallocate( void );
+    void replay_compileCoalesce( void );
+    void replay_compileRelease( void );
 };
 
 #include "ReplayInterpreter.inl"

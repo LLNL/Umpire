@@ -24,6 +24,7 @@
 #include "umpire/op/CudaCopyOperation.hpp"
 
 #include "umpire/op/CudaMemsetOperation.hpp"
+#include "umpire/op/CudaMemPrefetchOperation.hpp"
 
 #include "umpire/op/CudaAdviseAccessedByOperation.hpp"
 #include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
@@ -159,6 +160,11 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "UNSET_READ_MOSTLY",
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
+
+    registerOperation(
+      "PREFETCH",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaMemPrefetchOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HCC)

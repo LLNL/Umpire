@@ -4,35 +4,31 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_NumaPolicy_HPP
-#define UMPIRE_NumaPolicy_HPP
+#ifndef UMPIRE_AllocationPrefetcher_HPP
+#define UMPIRE_AllocationPrefetcher_HPP
 
-#include <vector>
+#include <memory>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
-
 namespace strategy {
 
 /*!
- * \brief Use NUMA interface to locate memory to a specific NUMA node.
  *
- * This AllocationStrategy provides a method of ensuring memory sits
- * on a specific NUMA node. This can be used either for optimization,
- * or for moving memory between the host and devices.
+ * \brief Apply the appropriate "PREFETCH" operation to every allocation.
  */
-class NumaPolicy :
+class AllocationPrefetcher :
   public AllocationStrategy
 {
   public:
-    NumaPolicy(
-          const std::string& name
-        , int id
-        , Allocator allocator
-        , int numa_node);
+      AllocationPrefetcher(
+        const std::string& name,
+        int id,
+        Allocator allocator,
+        int device_id = 0);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
@@ -41,16 +37,13 @@ class NumaPolicy :
     std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
-
-    int getNode() const noexcept;
-
   private:
+    std::shared_ptr<op::MemoryOperation> m_prefetch_operation;
     strategy::AllocationStrategy* m_allocator;
-    Platform m_platform;
-    int m_node;
+    int m_device;
 };
 
 } // end of namespace strategy
-} // end of namespace umpire
+} // end namespace umpire
 
-#endif // UMPIRE_NumaPolicy_HPP
+#endif // UMPIRE_AllocationPrefetcher_HPP

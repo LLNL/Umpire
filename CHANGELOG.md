@@ -27,9 +27,18 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - ThreadSafeAllocator added for C/Fortran API. Available using
   UmpireResourceManage `make_allocator_thread_safe` function.
 
+- Replay logs now contain information about operations. These are not yet
+  replayed.
+
+- Replay now can display information allocators used in a replay session.
+
+- Replay now can replay `NUMA` and `AllocationPreference` allocations.
+
 ### Changed
 
-- LC GitLab CI now using lassen by default instead of butte.
+- LC GitLab CI now using lassen by default instead of butte. Build and test
+  split in pairs of jobs for quartz, optimized with `needs` and
+  `git_strategy` features.
 
 - Constant device memory is disabled by default.
 
@@ -43,6 +52,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay logs now contain mangled symbols, and these are demangled by the
   `replay` tool.
 
+- Replay tool changed to create a binary index file of the operations from
+  the original json file that may be used (and reused) for quicker replays.
+
 ### Removed
 
 - Usage of `__cxa_demangle` in core Umpire library.
@@ -53,6 +65,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed replay test the replay tool as well as validate the output from
   running umpire with REPLAY turned on.
+
+- Fixed compilation errors when `-DENABLE_NUMA=On`.
 
 ## [1.1.0] - 2019-09-14
 

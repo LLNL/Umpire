@@ -50,43 +50,15 @@ int main(int argc, char* argv[])
   const std::string& left_filename = positional_args[0];
   const std::string& right_filename = positional_args[1];
 
-  ReplayInterpreter left(left_filename);
-  ReplayInterpreter right(right_filename);
+  ReplayInterpreter left{left_filename};
+  ReplayInterpreter right{right_filename};
 
-  int lineno = 1;
-  while (1) {
-    std::string left_raw, left_sym;
-    std::string right_raw, right_sym;
+  left.buildOperations();
+  right.buildOperations();
 
-    int left_rval = left.getSymbolicOperation(left_raw, left_sym);
-    int right_rval = right.getSymbolicOperation(right_raw, right_sym);
-
-    if (!left_rval && !right_rval) {
-      break;  // Both at EOF, we are done
-    }
-    else if (!left_rval || !right_rval) {
-      std::cerr << "Size mismatch" << std::endl;
-      return -1;
-    }
-    else if (left_rval != right_rval) {
-      std::cerr << "Error in reading input from one of the compared files" << std::endl;
-      return -1;
-    }
-
-    // std::cerr << "Line: " << lineno << " " << left_raw << std::endl;
-    // std::cerr << "Line: " << lineno << " " << right_raw << std::endl;
-
-    if (left_sym != right_sym) {
-      std::cerr << "Miscompare:" << std::endl;
-      std::cerr << "Line: " << lineno << left_raw << std::endl;
-      std::cerr << "Line: " << lineno << right_raw << std::endl;
-
-      std::cerr << "Line: " << lineno << left_sym << std::endl;
-      std::cerr << "Line: " << lineno << right_sym << std::endl;
-
-      return -2;
-    }
-    ++lineno;
+  if (left.compareOperations(right) == false) {
+    std::cerr << "Miscompare:" << std::endl;
+    return -2;
   }
 
   return 0;
