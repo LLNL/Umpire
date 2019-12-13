@@ -50,6 +50,13 @@ if (ENABLE_CUDA)
   list(APPEND umpire_cookbooks recipe_move_to_managed)
 
   blt_add_executable(
+    NAME recipe_use_advice_ops
+    SOURCES recipe_use_advice_ops.cpp
+    DEPENDS_ON ${cookbook_depends}
+    OUTPUT_DIR ${cookbook_output_dir})
+  list(APPEND umpire_cookbooks recipe_use_advice_ops)
+
+  blt_add_executable(
     NAME recipe_memprefetch_pool
     SOURCES recipe_memprefetch_pool.cpp
     DEPENDS_ON ${cookbook_depends}
