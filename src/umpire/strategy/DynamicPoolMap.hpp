@@ -111,6 +111,15 @@ class DynamicPoolMap : public AllocationStrategy
     std::size_t getBlocksInPool() const noexcept;
 
     /*!
+     * \brief Get the largest allocatable number of bytes from pool before
+     * the pool will grow.
+     *
+     * return The largest number of bytes that may be allocated without 
+     * causing pool growth
+     */
+    std::size_t getLargestAvailableBlock() noexcept;
+
+    /*!
      * \brief Merge as many free records as possible, release all possible free
      * blocks, then reallocate a chunk to keep the actual size the same.
      */

@@ -343,6 +343,14 @@ public:
     return totalBlocks;
   }
 
+  std::size_t getLargestAvailableBlock() const {
+    std::size_t largest_block{0};
+    for (struct Block *temp = freeBlocks; temp; temp = temp->next)
+      if ( temp->size > largest_block )
+        largest_block = temp->size;
+    return largest_block;
+  }
+
   std::size_t getReleasableSize() const {
     std::size_t nblocks = 0;
     std::size_t nbytes = 0;
