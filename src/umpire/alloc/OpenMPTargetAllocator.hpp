@@ -7,7 +7,7 @@
 #ifndef UMPIRE_OpenMPTargetAllocator_HPP
 #define UMPIRE_OpenMPTargetAllocator_HPP
 
-#include "omp.h""
+#include "omp.h"
 
 namespace umpire {
 namespace alloc {
