@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/CudaAdviseAccessedByOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetAccessedByOperation.hpp"
 
 #include <cuda_runtime_api.h>
 
@@ -14,7 +14,7 @@ namespace umpire {
 namespace op {
 
 void
-CudaAdviseAccessedByOperation::apply(
+CudaAdviseUnsetAccessedByOperation::apply(
     void* src_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     int val,
@@ -35,12 +35,12 @@ CudaAdviseAccessedByOperation::apply(
   if (properties.managedMemory == 1
       && properties.concurrentManagedAccess == 1) {
     error =
-      ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, device);
+      ::cudaMemAdvise(src_ptr, length, cudaMemAdviseUnsetAccessedBy, device);
 
     if (error != cudaSuccess) {
       UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
         << ", length = " << length
-        << ", cudaMemAdviseSetAccessedBy, " << device << ") failed with error: "
+        << ", cudaMemAdviseSetUnsetAccessedBy, " << device << ") failed with error: "
         << cudaGetErrorString(error));
     }
   }

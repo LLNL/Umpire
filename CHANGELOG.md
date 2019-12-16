@@ -17,6 +17,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added statistic gathering capability to `replay`
 
+- Added "unset" operations for removing CUDA memory advice.
+
 - Extended C/Fortran API with more allocation strategies.
 
 - NamedAllocator that allows creating a new allocator that passes allocations

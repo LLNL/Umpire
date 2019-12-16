@@ -22,6 +22,10 @@
 
 namespace umpire {
 
+namespace op {
+  class MemoryOperation;
+}
+
 namespace strategy {
   class ZeroByteHandler;
 }
@@ -229,6 +233,11 @@ class ResourceManager {
      * \return Size of allocation in bytes.
      */
     std::size_t getSize(void* ptr) const;
+
+    std::shared_ptr<op::MemoryOperation> getOperation(
+        const std::string& operation_name,
+        Allocator src_allocator,
+        Allocator dst_allocator);
 
     ~ResourceManager();
     ResourceManager (const ResourceManager&) = delete;
