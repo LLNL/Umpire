@@ -89,11 +89,11 @@ endif ()
 if (ENABLE_OPENMP_TARGET)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    OpenMPTargetResourceFactory.hpp)
+    OpenMPTargetMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    OpenMPTargetResourceFactory.cpp)
+    OpenMPTargetMemoryResourceFactory.cpp)
 
   set (umpire_resource_depends
     ${umpire_resource_depends}
