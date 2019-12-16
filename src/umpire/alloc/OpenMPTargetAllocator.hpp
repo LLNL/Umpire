@@ -27,11 +27,11 @@ struct OpenMPTargetAllocator
    */
   void* allocate(std::size_t bytes)
   {
-    void* ret = openmp_target_alloc(bytes, device);
+    void* ret = omp_target_alloc(bytes, device);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if  (ret == nullptr) {
-      UMPIRE_ERROR("openmp_target_alloc( bytes = " << bytes << ", device = " << Device << " ) failed");
+      UMPIRE_ERROR("omp_target_alloc( bytes = " << bytes << ", device = " << Device << " ) failed");
     } else {
       return ret;
     }
@@ -47,7 +47,7 @@ struct OpenMPTargetAllocator
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-    openmp_target_free(ptr, device);
+    omp_target_free(ptr, device);
   }
 
   int device;
