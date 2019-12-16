@@ -117,6 +117,12 @@ blt_add_executable(
 list(APPEND umpire_cookbooks recipe_coalesce_pool)
 
 blt_add_executable(
+  NAME recipe_get_largest_available_block_in_pool
+  SOURCES recipe_get_largest_available_block_in_pool.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_get_largest_available_block_in_pool)
+
+blt_add_executable(
   NAME recipe_plot_allocations
   SOURCES recipe_plot_allocations.cpp
   DEPENDS_ON ${cookbook_depends})
