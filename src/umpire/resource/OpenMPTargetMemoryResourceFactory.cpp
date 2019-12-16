@@ -6,6 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 
+#include "umpire/alloc/OpenMPTargetAllocator.hpp"
+
 namespace umpire {
 namespace resource {
 
