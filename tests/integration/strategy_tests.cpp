@@ -845,6 +845,79 @@ TEST(DynamicPoolListReleaseTest, MissingBlocks)
   ASSERT_EQ(allocator.getActualSize(), 0);
 }
 
+TEST(DynamicPoolList, largestavailable)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  const int num_allocs = 1024;
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
+    "host_dyn_pool_list_for_largestavailable", rm.getAllocator("HOST"),
+    num_allocs * 1024);
+
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(alloc);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  alloc.deallocate(alloc.allocate(1024));
+
+  ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), num_allocs * 1024);
+
+  void* ptrs[num_allocs];
+
+  for ( int i{0}; i < num_allocs; ++i ) {
+    ptrs[i] = alloc.allocate(1024);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), ( (num_allocs-(i+1)) * 1024) );
+  }
+
+  for ( int i{0}; i < num_allocs; i += 2 ) {
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), 1024);
+  }
+
+  for ( int i{1}; i < num_allocs; i += 2 ) {
+    const int largest_block = ((i+2) < num_allocs) ? (i+2) * 1024 : (i+1) * 1024;
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
+  }
+}
+
+TEST(DynamicPoolMap, largestavailable)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  const int num_allocs = 1024;
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
+    "host_dyn_pool_map_for_largestavailable", rm.getAllocator("HOST"),
+    num_allocs * 1024);
+
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(alloc);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  alloc.deallocate(alloc.allocate(1024));
+
+  ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), num_allocs * 1024);
+
+  void* ptrs[num_allocs];
+
+  for ( int i{0}; i < num_allocs; ++i ) {
+    ptrs[i] = alloc.allocate(1024);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), ( (num_allocs-(i+1)) * 1024) );
+  }
+
+  for ( int i{0}; i < num_allocs; i += 2 ) {
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), 1024);
+  }
+
+  for ( int i{1}; i < num_allocs; i += 2 ) {
+    const int largest_block = ((i+2) < num_allocs) ? (i+2) * 1024 : (i+1) * 1024;
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
+  }
+}
 
 TEST(DynamicPoolMap, coalesce)
 {

@@ -99,6 +99,14 @@ DynamicPoolList::getBlocksInPool() const noexcept
   return BlocksInPool;
 }
 
+std::size_t 
+DynamicPoolList::getLargestAvailableBlock() const noexcept
+{
+  std::size_t LargestAvailableBlock = dpa->getLargestAvailableBlock();
+  UMPIRE_LOG(Debug, "() returning " << LargestAvailableBlock);
+  return LargestAvailableBlock;
+}
+
 Platform
 DynamicPoolList::getPlatform() noexcept
 {

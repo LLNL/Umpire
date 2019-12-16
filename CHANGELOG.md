@@ -34,6 +34,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Replay now can replay `NUMA` and `AllocationPreference` allocations.
 
+- Added `getLargestAvailableBlock` metric to dynamic list and map pools
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte. Build and test

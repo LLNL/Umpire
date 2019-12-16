@@ -299,6 +299,21 @@ std::size_t DynamicPoolMap::getBlocksInPool() const noexcept
   return total_blocks;
 }
 
+std::size_t DynamicPoolMap::getLargestAvailableBlock() noexcept
+{
+  std::size_t largest_block{0};
+
+  mergeFreeBlocks();
+
+  for (auto& rec : m_free_map) {
+    const std::size_t bytes{rec.first};
+    if (bytes > largest_block) largest_block = bytes;
+  }
+
+  UMPIRE_LOG(Debug, "() returning " << largest_block);
+  return largest_block;
+}
+
 std::size_t DynamicPoolMap::getReleasableSize() const noexcept
 {
   std::size_t releasable_bytes{0};
