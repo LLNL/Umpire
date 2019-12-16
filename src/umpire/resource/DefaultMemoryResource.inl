@@ -28,7 +28,7 @@ DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, cons
 }
 
 template<typename _allocator>
-DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, _allocator&& alloc) :
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, _allocator alloc) :
   MemoryResource(name, id, traits),
   m_allocator(alloc),
   m_platform(platform)
