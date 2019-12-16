@@ -1,8 +1,8 @@
-.. _coalesce_pool:
+.. _get_largest_available_block_in_pool:
 
-======================
-Coalescing Pool Memory
-======================
+=========================================================
+Determining the Largest Block of Available Memory in Pool
+=========================================================
 
 The :class:`umpire::strategy::DynamicPool` provides a
 :func:`umpire::strategy::DynamicPool::getLargestAvailableBlock` that may be
