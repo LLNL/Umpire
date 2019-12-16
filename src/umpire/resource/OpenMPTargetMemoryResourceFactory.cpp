@@ -7,6 +7,9 @@
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 
 #include "umpire/alloc/OpenMPTargetAllocator.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
