@@ -20,13 +20,13 @@ namespace resource {
 class OpenMPTargetResourceFactory :
   public MemoryResourceFactory
 {
-  OpenMPTargetResourceFactory(int device);
+  public:
+    OpenMPTargetResourceFactory(int device);
 
-  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
+    bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
 
-  std::unique_ptr<resource::MemoryResource>
-  create(const std::string& name, int id) final override;
-
+    std::unique_ptr<resource::MemoryResource>
+    create(const std::string& name, int id) final override;
   private:
     int m_device;
 };
