@@ -42,9 +42,5 @@ OpenMPTargetResourceFactory::create(const std::string& name, int id)
   return util::make_unique<DefaultMemoryResource<alloc::OpenMPTargetAllocator>>(Platform::omp, "DEVICE", id, traits, alloc);
 }
 
-};
-
 } // end of namespace resource
 } // end of namespace umpire
-
-#endif // UMPIRE_OpenMPTargetResourceFactory_HPP
