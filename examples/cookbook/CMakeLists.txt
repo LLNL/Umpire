@@ -149,12 +149,12 @@ list(APPEND umpire_cookbooks recipe_mixed_pool)
 
 if (ENABLE_FORTRAN)
   blt_add_executable(
-    NAME recipe_thread_safe
-    SOURCES recipe_thread_safe.F
+    NAME recipe_thread_safe_F
+    SOURCES recipe_thread_safe_F.F
     DEPENDS_ON ${cookbook_depends})
 
   set_source_files_properties(
-    recipe_thread_safe.F
+    recipe_thread_safe_F.F
     PROPERTIES
     Fortran_FORMAT FREE)
 endif ()
