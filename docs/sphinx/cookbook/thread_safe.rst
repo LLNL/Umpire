@@ -1,8 +1,8 @@
-.. _thread_safe_allocator::
+.. _thread_safety::
 
-======================
-Thread Safe Allocation
-======================
+=====================
+Thread Safe Allocator
+=====================
 
 If you want thread-safe access to allocations that come from a particular
 :class:`umpire::Allocator`, you can create an instance of a

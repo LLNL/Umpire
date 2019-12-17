@@ -27,3 +27,4 @@ that have introspection disabled for improved performance, and applying CUDA
    cookbook/pinned_pool.rst
    cookbook/plot_allocations.rst
    cookbook/mixed_pool.rst
+   cookbook/thread_safe.rst
