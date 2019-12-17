@@ -36,6 +36,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added `getLargestAvailableBlock` metric to dynamic list and map pools
 
+- Added documentation and recipe for `ThreadSafeAllocator`
+
+
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte. Build and test

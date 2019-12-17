@@ -25,3 +25,5 @@ Provided Strategies
 .. doxygenclass:: umpire::strategy::MonotonicAllocationStrategy
 
 .. doxygenclass:: umpire::strategy::SlotPool
+
+.. doxygenclass:: umpire::strategy::ThreadSafeAllocator
