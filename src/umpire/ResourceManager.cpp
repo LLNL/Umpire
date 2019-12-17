@@ -45,6 +45,7 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include <omp.h>
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 #endif
 
