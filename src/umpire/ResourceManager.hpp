@@ -183,11 +183,21 @@ class ResourceManager {
     /*!
      * \brief Reallocate src_ptr to size.
      *
-     * If src_ptr is null, then the default allocator will be used to allocate
-     * data.
-     *
      * \param src_ptr Source pointer to reallocate.
      * \param size New size of pointer.
+     *
+     * If src_ptr is nullptr, then the default allocator will be used to
+     * allocate data. The default allocator may be set with a call to
+     * setDefaultAllocator(Allocator allocator).
+     *
+     * NOTE 1: This is not thread safe
+     * NOTE 2: If the allocator for which src_ptr is intended is different from
+     *         the default allocator, then all subsequent reallocate calls will
+     *         result in allocations from the default allocator which may not be
+     *         the intended behavior.
+     *
+     * If size is 0, then the src_ptr will be deallocated if it is not a
+     * nullptr, and a zero-byte allocation will be returned.
      *
      * \return Reallocated pointer.
      *
@@ -197,11 +207,14 @@ class ResourceManager {
     /*!
      * \brief Reallocate src_ptr to size.
      *
-     * If src_ptr is null, then allocator will be used to allocate the data.
-     *
      * \param src_ptr Source pointer to reallocate.
      * \param size New size of pointer.
      * \param allocator Allocator to use if src_ptr is null.
+     *
+     * If src_ptr is null, then allocator will be used to allocate the data.
+     *
+     * If size is 0, then the src_ptr will be deallocated if it is not a
+     * nullptr, and a zero-byte allocation will be returned.
      *
      * \return Reallocated pointer.
      *
@@ -244,7 +257,6 @@ class ResourceManager {
     ResourceManager& operator= (const ResourceManager&) = delete;
   private:
     ResourceManager();
-
 
     strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
     strategy::AllocationStrategy* findAllocatorForId(int id);

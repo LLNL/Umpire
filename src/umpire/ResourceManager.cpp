@@ -565,7 +565,10 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size)
 
   void* dst_ptr = nullptr;
 
-  if (!src_ptr) {
+  if (!src_ptr || size == 0) {
+    if (src_ptr)
+      m_default_allocator->deallocate(src_ptr);
+
     dst_ptr = m_default_allocator->allocate(size);
   } else {
     auto& op_registry = op::MemoryOperationRegistry::getInstance();
@@ -604,7 +607,10 @@ ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator
 
   void* dst_ptr = nullptr;
 
-  if (!src_ptr) {
+  if (!src_ptr || size == 0) {
+    if (src_ptr)
+      allocator.deallocate(src_ptr);
+
     dst_ptr = allocator.allocate(size);
   } else {
     auto alloc_record = m_allocations.find(src_ptr);
