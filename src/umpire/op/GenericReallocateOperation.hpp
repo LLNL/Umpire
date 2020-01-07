@@ -13,7 +13,7 @@ namespace umpire {
 namespace op {
 
 /*!
- * Generic reallocate operation to work on any src_ptr location.
+ * Generic reallocate operation to work on any current_ptr location.
  */
 class GenericReallocateOperation :
   public MemoryOperation {
@@ -23,16 +23,16 @@ class GenericReallocateOperation :
     *
     * This operation relies on ResourceManager::copy,
     * AllocationStrategy::allocate and AllocationStrategy::deallocate to
-    * implement a reallocate operation that can work for any src_ptr location.
+    * implement a reallocate operation that can work for any current_ptr location.
     *
     * \copydetails MemoryOperation::transform
     */
   void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      util::AllocationRecord *src_allocation,
-      util::AllocationRecord *dst_allocation,
-      std::size_t length);
+      void* current_ptr,
+      void** new_ptr,
+      util::AllocationRecord *current_allocation,
+      util::AllocationRecord *new_allocation,
+      std::size_t new_size);
 };
 
 } // end of naemspace op

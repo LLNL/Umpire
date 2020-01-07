@@ -181,45 +181,46 @@ class ResourceManager {
     void memset(void* ptr, int val, std::size_t length=0);
 
     /*!
-     * \brief Reallocate src_ptr to size.
+     * \brief Reallocate current_ptr to new_size.
      *
-     * \param src_ptr Source pointer to reallocate.
-     * \param size New size of pointer.
+     * \param current_ptr Source pointer to reallocate.
+     * \param new_size New size of pointer.
      *
-     * If src_ptr is nullptr, then the default allocator will be used to
+     * If current_ptr is nullptr, then the default allocator will be used to
      * allocate data. The default allocator may be set with a call to
      * setDefaultAllocator(Allocator allocator).
      *
      * NOTE 1: This is not thread safe
-     * NOTE 2: If the allocator for which src_ptr is intended is different from
-     *         the default allocator, then all subsequent reallocate calls will
-     *         result in allocations from the default allocator which may not be
-     *         the intended behavior.
+     * NOTE 2: If the allocator for which current_ptr is intended is different
+     *         from the default allocator, then all subsequent reallocate calls
+     *         will result in allocations from the default allocator which may
+     *         not be the intended behavior.
      *
-     * If size is 0, then the src_ptr will be deallocated if it is not a
-     * nullptr, and a zero-byte allocation will be returned.
+     * If new_size is 0, then the current_ptr will be deallocated if it is not
+     * a nullptr, and a zero-byte allocation will be returned.
      *
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* src_ptr, std::size_t size);
+    void* reallocate(void* current_ptr, std::size_t new_size);
 
     /*!
-     * \brief Reallocate src_ptr to size.
+     * \brief Reallocate current_ptr to new_size.
      *
-     * \param src_ptr Source pointer to reallocate.
-     * \param size New size of pointer.
-     * \param allocator Allocator to use if src_ptr is null.
+     * \param current_ptr Source pointer to reallocate.
+     * \param new_size New size of pointer.
+     * \param allocator Allocator to use if current_ptr is null.
      *
-     * If src_ptr is null, then allocator will be used to allocate the data.
+     * If current_ptr is null, then allocator will be used to allocate the
+     * data.
      *
-     * If size is 0, then the src_ptr will be deallocated if it is not a
-     * nullptr, and a zero-byte allocation will be returned.
+     * If new_size is 0, then the current_ptr will be deallocated if it is not
+     * a nullptr, and a zero-byte allocation will be returned.
      *
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* src_ptr, std::size_t size, Allocator allocator);
+    void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
 
     /*!
      * \brief Move src_ptr to memory from allocator
