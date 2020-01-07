@@ -396,7 +396,7 @@ TEST_P(ReallocateTest, ReallocateNullZero)
   ASSERT_EQ(   source_allocator->getSize(reallocated_array)
              , reallocated_size_1*sizeof(float));
 
-  // valid ptr, non-zero increment
+  // valid ptr (size > 0), non-zero increment
   reallocated_array =
     static_cast<float*>(
       rm.reallocate(   static_cast<void*>(reallocated_array)
@@ -405,7 +405,7 @@ TEST_P(ReallocateTest, ReallocateNullZero)
   ASSERT_EQ(   source_allocator->getSize(reallocated_array)
              , reallocated_size_2*sizeof(float));
 
-  // valid ptr, non-zero decrement
+  // valid ptr (size > 0), non-zero decrement
   reallocated_array =
     static_cast<float*>(
       rm.reallocate(   static_cast<void*>(reallocated_array)
@@ -414,7 +414,7 @@ TEST_P(ReallocateTest, ReallocateNullZero)
   ASSERT_EQ(   source_allocator->getSize(reallocated_array)
              , reallocated_size_1*sizeof(float));
 
-  // valid ptr, zero size
+  // valid ptr (size > 0), zero size
   reallocated_array =
     static_cast<float*>(
       rm.reallocate(   static_cast<void*>(reallocated_array)
@@ -422,6 +422,15 @@ TEST_P(ReallocateTest, ReallocateNullZero)
 
   ASSERT_EQ(   source_allocator->getSize(reallocated_array)
              , reallocated_zero_size*sizeof(float));
+
+  // valid ptr (size == 0), non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             ,  reallocated_size_1*sizeof(float));
 
   rm.deallocate(reallocated_array);
   rm.setDefaultAllocator(rm.getAllocator("HOST"));
