@@ -17,31 +17,45 @@ namespace umpire {
 namespace op {
 
 void HostReallocateOperation::transform(
-    void* src_ptr,
-    void** dst_ptr,
-    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-    util::AllocationRecord *dst_allocation,
-    std::size_t length)
+    void* current_ptr,
+    void** new_ptr,
+    util::AllocationRecord* current_allocation,
+    util::AllocationRecord* new_allocation,
+    std::size_t new_size)
 {
-  auto allocator = dst_allocation->strategy;
+  auto allocator = new_allocation->strategy;
+  const std::size_t old_size = current_allocation->size;
 
-  auto old_record = ResourceManager::getInstance().deregisterAllocation(src_ptr);
-  *dst_ptr = ::realloc(src_ptr, length);
+  //
+  // Since Umpire implements its own semantics for zero-length allocations, we
+  // cannot simply call ::realloc() with a pointer to a zero-length allocation.
+  //
+  if ( old_size == 0 ) {
+    *new_ptr = allocator->allocate(new_size);
+    const std::size_t copy_size = ( old_size > new_size ) ? new_size : old_size;
 
-  if (!*dst_ptr) {
-    UMPIRE_ERROR("::realloc(src_ptr=" << src_ptr <<
-                 ", old_length=" << old_record.size <<
-                 ", length=" << length << ") failed");
+    ResourceManager::getInstance().copy(*new_ptr, current_ptr, copy_size);
+    allocator->deallocate(current_ptr);
   }
+  else {
+    auto old_record = ResourceManager::getInstance().deregisterAllocation(current_ptr);
+    *new_ptr = ::realloc(current_ptr, new_size);
 
-  ResourceManager::getInstance().registerAllocation(
-     *dst_ptr, {*dst_ptr, length, allocator});
+    if (!*new_ptr) {
+      UMPIRE_ERROR("::realloc(current_ptr=" << current_ptr <<
+                   ", old_size=" << old_record.size <<
+                   ", new_size=" << new_size << ") failed");
+    }
+
+    ResourceManager::getInstance().registerAllocation(
+       *new_ptr, {*new_ptr, new_size, allocator});
+  }
 
   UMPIRE_RECORD_STATISTIC(
       "HostReallocate",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
-      "size", length,
+      "current_ptr", reinterpret_cast<uintptr_t>(current_ptr),
+      "new_ptr", reinterpret_cast<uintptr_t>(*new_ptr),
+      "size", new_size,
       "event", "reallocate");
 }
 
