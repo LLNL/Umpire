@@ -70,6 +70,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed compilation errors when `-DENABLE_NUMA=On`.
 
+- Fixed reallocate to properly handle case where size == 0
+
 ## [1.1.0] - 2019-09-14
 
 ### Added
