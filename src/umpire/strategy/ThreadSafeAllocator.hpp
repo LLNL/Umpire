@@ -15,6 +15,13 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ *
+ * \brief Make an Allocator thread safe
+ *
+ * Using this AllocationStrategy will make the provided allocator thread-safe
+ * by syncronizing access to the allocators interface.
+ */
 class ThreadSafeAllocator :
   public AllocationStrategy
 {

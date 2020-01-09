@@ -136,6 +136,12 @@ blt_add_executable(
 list(APPEND umpire_cookbooks recipe_plot_allocations)
 
 blt_add_executable(
+  NAME recipe_thread_safe
+  SOURCES recipe_thread_safe.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_thread_safe)
+
+blt_add_executable(
   NAME recipe_mixed_pool
   SOURCES recipe_mixed_pool.cpp
   DEPENDS_ON ${cookbook_depends})
@@ -143,7 +149,7 @@ list(APPEND umpire_cookbooks recipe_mixed_pool)
 
 if (ENABLE_FORTRAN)
   blt_add_executable(
-    NAME recipe_thread_safe
+    NAME recipe_thread_safe_F
     SOURCES recipe_thread_safe.F
     DEPENDS_ON ${cookbook_depends})
 
