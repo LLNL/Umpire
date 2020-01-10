@@ -150,7 +150,7 @@ const char* allocator_names[] = {
 INSTANTIATE_TEST_CASE_P(
     Allocators,
     AllocatorCTest,
-    ::testing::ValuesIn(allocator_names));
+    ::testing::ValuesIn(allocator_names),);
 
 class PoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -226,7 +226,7 @@ const char* pool_names[] = {
 INSTANTIATE_TEST_CASE_P(
     Pools,
     PoolAllocatorCTest,
-    ::testing::ValuesIn(pool_names));
+    ::testing::ValuesIn(pool_names),);
 
 class ListPoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -289,7 +289,7 @@ TEST_P(ListPoolAllocatorCTest, AllocateDeallocateNothing)
 INSTANTIATE_TEST_CASE_P(
     ListPools,
     ListPoolAllocatorCTest,
-    ::testing::ValuesIn(pool_names));
+    ::testing::ValuesIn(pool_names),);
 
 class FixedPoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -339,7 +339,7 @@ TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateNothing)
 INSTANTIATE_TEST_CASE_P(
     FixedPools,
     FixedPoolAllocatorCTest,
-    ::testing::ValuesIn(pool_names));
+    ::testing::ValuesIn(pool_names),);
 
 class NamedAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -397,4 +397,4 @@ TEST_P(NamedAllocatorCTest, AllocateDeallocateNothing)
 INSTANTIATE_TEST_CASE_P(
     Nameds,
     NamedAllocatorCTest,
-    ::testing::ValuesIn(pool_names));
+    ::testing::ValuesIn(pool_names),);

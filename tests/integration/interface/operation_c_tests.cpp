@@ -128,7 +128,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(copy_sources),
       ::testing::ValuesIn(copy_dests)
-));
+),);
 
 class MemsetTest :
   public OperationTest
@@ -171,7 +171,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(memset_sources),
       ::testing::ValuesIn(memset_dests)
-));
+),);
 
 class ReallocateTest :
   public OperationTest
@@ -275,7 +275,7 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Combine(
       ::testing::ValuesIn(reallocate_sources),
       ::testing::ValuesIn(reallocate_dests)
-));
+),);
 
 // class MoveTest :
 //   public OperationTest
@@ -337,7 +337,7 @@ INSTANTIATE_TEST_CASE_P(
 //     ::testing::Combine(
 //       ::testing::ValuesIn(move_sources),
 //       ::testing::ValuesIn(move_dests)
-// ));
+// ),);
 //
 // #if defined(UMPIRE_ENABLE_CUDA)
 // class AdviceTest :
@@ -435,6 +435,6 @@ INSTANTIATE_TEST_CASE_P(
 //     ::testing::Combine(
 //       ::testing::ValuesIn(advice_sources),
 //       ::testing::ValuesIn(advice_dests)
-// ));
+// ),);
 //
 // #endif

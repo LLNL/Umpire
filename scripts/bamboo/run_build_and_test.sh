@@ -17,6 +17,8 @@ function trycmd
   fi
 }
 
+module list
+
 if [ -f ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake ]; then
   echo "Configuring..."
   trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
