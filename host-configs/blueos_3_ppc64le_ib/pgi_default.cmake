@@ -4,7 +4,3 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set(CMAKE_CXX_COMPILER "g++" CACHE PATH "")
-set(CMAKE_C_COMPILER "gcc" CACHE PATH "")
-set(CMAKE_Fortran_COMPILER "gfortran" CACHE PATH "")
-

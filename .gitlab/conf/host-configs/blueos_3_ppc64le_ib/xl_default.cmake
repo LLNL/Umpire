@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set(CMAKE_CXX_COMPILER "/usr/tce/packages/xl/xl-2019.08.20/bin/xlc++" CACHE PATH "")
-set(CMAKE_C_COMPILER "/usr/tce/packages/xl/xl-2019.08.20/bin/xlc" CACHE PATH "")
-set(CMAKE_Fortran_COMPILER "/usr/tce/packages/xl/xl-2019.08.20/bin/xlf2003" CACHE PATH "")
+set(CMAKE_CXX_COMPILER "xlc++" CACHE PATH "")
+set(CMAKE_C_COMPILER "xlc" CACHE PATH "")
+set(CMAKE_Fortran_COMPILER "xlf2003" CACHE PATH "")
 
