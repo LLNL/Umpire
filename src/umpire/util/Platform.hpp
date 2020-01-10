@@ -13,7 +13,6 @@ enum class Platform {
   none,
   cpu,
   cuda,
-  rocm,
   hip
 };
 
