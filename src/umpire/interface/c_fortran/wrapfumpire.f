@@ -1,11 +1,11 @@
 ! wrapfumpire.f
 ! This is generated code, do not edit
-!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 ! project contributors. See the COPYRIGHT file for details.
 !
 ! SPDX-License-Identifier: (MIT)
-!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !>
 !! \file wrapfumpire.f
 !! \brief Shroud generated wrapper for umpire namespace
