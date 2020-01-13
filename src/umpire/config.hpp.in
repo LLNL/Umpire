@@ -22,7 +22,6 @@
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_STATISTICS
-#cmakedefine UMPIRE_ENABLE_HCC
 #cmakedefine UMPIRE_ENABLE_HIP
 
 #cmakedefine UMPIRE_ENABLE_DEVICE
