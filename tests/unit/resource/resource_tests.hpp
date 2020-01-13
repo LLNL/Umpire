@@ -38,7 +38,7 @@ class ResourceTest :
     Resource* memory_resource;
 };
 
-TYPED_TEST_CASE_P(ResourceTest);
+TYPED_TEST_SUITE_P(ResourceTest);
 
 TYPED_TEST_P(ResourceTest, Constructor)
 {
