@@ -22,10 +22,15 @@ echo "Applying licenses to files"
 
 for d in benchmarks cmake docs examples host-configs scripts src tests CMakeLists.txt umpire-config.cmake.in; do
   for x in `grep -lr 'SPDX-License-Identifier' $d --exclude-dir=tpl --exclude-dir=blt --exclude=.gitmodules --exclude=.gitignore`; do
-    $LIC_CMD -f ~/umpire-license.txt $x
+    if [ $x != scripts/umpire-license.txt ]; then
+      $LIC_CMD -f scripts/umpire-license.txt $x
+    fi
   done
 done
 
+#
+# Remove the files with "~" appended to them
+#
 git clean -fd -q
 
 echo "${GREEN} [Ok] License text applied. ${NOCOLOR}"
