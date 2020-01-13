@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [2.0.0] - 2020-01-13
+
+### Added
+
 - `ENABLE_DEVICE_CONST` CMake option to control whether device constant memory
   is enabled. It is now disabled by default.
 
