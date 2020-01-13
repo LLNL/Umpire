@@ -60,6 +60,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay tool changed to create a binary index file of the operations from
   the original json file that may be used (and reused) for quicker replays.
 
+- Update BLT to version 0.3.0
+
 ### Removed
 
 - Usage of `__cxa_demangle` in core Umpire library.

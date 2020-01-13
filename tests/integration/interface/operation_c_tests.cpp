@@ -122,13 +122,12 @@ const char* copy_dests[] = {
 };
 
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Copies,
     CopyTest,
     ::testing::Combine(
       ::testing::ValuesIn(copy_sources),
-      ::testing::ValuesIn(copy_dests)
-),);
+      ::testing::ValuesIn(copy_dests)));
 
 class MemsetTest :
   public OperationTest
@@ -165,13 +164,12 @@ const char* memset_dests[] = {
   "HOST"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Sets,
     MemsetTest,
     ::testing::Combine(
       ::testing::ValuesIn(memset_sources),
-      ::testing::ValuesIn(memset_dests)
-),);
+      ::testing::ValuesIn(memset_dests)));
 
 class ReallocateTest :
   public OperationTest
@@ -269,13 +267,12 @@ const char* reallocate_dests[] = {
   "HOST"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Reallocate,
     ReallocateTest,
     ::testing::Combine(
       ::testing::ValuesIn(reallocate_sources),
-      ::testing::ValuesIn(reallocate_dests)
-),);
+      ::testing::ValuesIn(reallocate_dests)));
 
 // class MoveTest :
 //   public OperationTest

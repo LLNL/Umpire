@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
-#include "benchmark/benchmark_api.h"
+#include "benchmark/benchmark.h"
 
 #include "umpire/util/Macros.hpp"
 
@@ -19,4 +19,4 @@ static void benchmark_DebugLogger(benchmark::State& state) {
 // Register the function as a benchmark
 BENCHMARK(benchmark_DebugLogger);
 
-BENCHMARK_MAIN()
+BENCHMARK_MAIN();

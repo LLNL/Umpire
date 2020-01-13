@@ -527,4 +527,4 @@ BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate)->Args({16, 1024});
 #endif
 
 
-BENCHMARK_MAIN()
+BENCHMARK_MAIN();
