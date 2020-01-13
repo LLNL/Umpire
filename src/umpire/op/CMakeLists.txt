@@ -70,22 +70,6 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HCC)
-  set (umpire_op_headers
-    ${umpire_op_headers}
-    RocmCopyOperation.hpp
-    RocmMemsetOperation.hpp)
-
-  set (umpire_op_sources
-    ${umpire_op_sources}
-    RocmCopyOperation.cpp
-    RocmMemsetOperation.cpp)
-
-  set (umpire_op_depends
-    ${umpire_op_depends}
-    rocm)
-endif ()
-
 if (ENABLE_HIP)
   set (umpire_op_headers
     ${umpire_op_headers}

@@ -50,22 +50,6 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HCC)
-  set (umpire_resource_headers
-    ${umpire_resource_headers}
-    RocmDeviceResourceFactory.hpp
-    RocmPinnedMemoryResourceFactory.hpp)
-
-  set (umpire_resource_sources
-    ${umpire_resource_sources}
-    RocmDeviceResourceFactory.cpp
-    RocmPinnedMemoryResourceFactory.cpp)
-
-  set (umpire_resource_depends
-    ${umpire_resource_depends}
-    rocm)
-endif ()
-
 if (ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}

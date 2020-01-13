@@ -41,8 +41,8 @@ NumaPolicy::NumaPolicy(
     // This is a device node
 #if defined(UMPIRE_ENABLE_CUDA)
     m_platform = Platform::cuda;
-#elif defined(UMPIRE_ENABLE_HCC)
-    m_platform = Platform::rocm;
+#elif defined(UMPIRE_ENABLE_HIP)
+    m_platform = Platform::hip;
 #else
     UMPIRE_ERROR("Could not determine device platform.");
 #endif

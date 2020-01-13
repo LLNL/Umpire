@@ -16,11 +16,6 @@ using namespace umpire::alloc;
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
 #endif
 
-#if defined(UMPIRE_ENABLE_HCC)
-#include "umpire/alloc/AmAllocAllocator.hpp"
-#include "umpire/alloc/AmPinnedAllocator.hpp"
-#endif
-
 #if defined(UMPIRE_ENABLE_HIP)
 #include "umpire/alloc/HipMallocAllocator.hpp"
 #include "umpire/alloc/HipPinnedAllocator.hpp"
@@ -50,9 +45,6 @@ using test_types = ::testing::Types<
     MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
     , CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
-#endif
-#if defined(UMPIRE_ENABLE_HCC)
-    , AmAllocAllocator, AmPinnedAllocator
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
     , HipMallocAllocator, HipPinnedAllocator

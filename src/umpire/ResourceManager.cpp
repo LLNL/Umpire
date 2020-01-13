@@ -29,11 +29,6 @@
 #endif
 #endif
 
-#if defined(UMPIRE_ENABLE_HCC)
-#include "umpire/resource/RocmDeviceResourceFactory.hpp"
-#include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
-#endif
-
 #if defined(UMPIRE_ENABLE_HIP)
 #include <hip/hip_runtime.h>
 
@@ -119,14 +114,6 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     util::make_unique<resource::CudaConstantMemoryResourceFactory>());
 #endif
-#endif
-
-#if defined(UMPIRE_ENABLE_HCC)
-  registry.registerMemoryResource(
-    util::make_unique<resource::RocmDeviceResourceFactory>());
-
-  registry.registerMemoryResource(
-    util::make_unique<resource::RocmPinnedMemoryResourceFactory>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
