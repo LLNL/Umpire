@@ -88,7 +88,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Umpire'
-copyright = u'2017, David Beckingsale'
+copyright = u'2016-20, Lawrence Livermore National Security, LLC and Umpire project contributors'
 author = u'David Beckingsale'
 
 # The version info for the project you're documenting, acts as replacement for
