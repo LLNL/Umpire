@@ -1,17 +1,14 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (interface_output_dir ${TEST_OUTPUT_DIRECTORY}/integration/interface)
-
 if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c_tests
     SOURCES allocator_c_tests.cpp
-    DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${interface_output_dir})
+    DEPENDS_ON umpire gtest)
 
   target_include_directories(
     allocator_c_tests
@@ -25,8 +22,7 @@ if (ENABLE_C)
   blt_add_executable(
     NAME operation_c_tests
     SOURCES operation_c_tests.cpp
-    DEPENDS_ON umpire gtest
-    OUTPUT_DIR ${interface_output_dir})
+    DEPENDS_ON umpire gtest)
 
   target_include_directories(
     operation_c_tests

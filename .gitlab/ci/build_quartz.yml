@@ -10,23 +10,33 @@
 
 ####
 # In pre-build phase, allocate a node for builds
-allocate_resources_build_quartz:
+.quartz_common:
   tags:
     - shell
     - quartz
+  except:
+    refs:
+      - /_qnone/
+    variables:
+      - $UMPIRE_CI_QUARTZ == "OFF"
+
+####
+# In pre-build phase, allocate a node for builds
+allocate_resources_build_quartz:
+  variables:
+    GIT_STRATEGY: none
+  extends: .quartz_common
   stage: allocate_resources
   script:
     - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${BUILD_QUARTZ_ALLOC_NAME}
-  except:
-    - /_qnone/
 
 ####
 # In post-build phase, deallocate resources
 # Note : make sure this is run even on build phase failure
 release_resources_build_quartz:
-  tags:
-    - shell
-    - quartz
+  variables:
+    GIT_STRATEGY: none
+  extends: .quartz_common
   stage: release_resources
   script:
     - export JOBID=$(squeue -h --name=${BUILD_QUARTZ_ALLOC_NAME} --format=%A)
@@ -43,7 +53,20 @@ release_resources_build_quartz:
     - shell
     - quartz
   stage: build
-  extends: .build_quartz_script
+  extends: .build_toss_3_x86_64_ib_script
+  except:
+    - /_qnone/
+
+####
+# Generic qwartz job, extending test script
+.test_quartz:
+  variables:
+    CLUSTER: "toss_3_x86_64_ib"
+  tags:
+    - shell
+    - quartz
+  stage: test
+  extends: .test_toss_3_x86_64_ib_script
   except:
     - /_qnone/
 
@@ -107,4 +130,79 @@ build_quartz_pgi_18_5:
   variables:
     COMPILER: "pgi_18_5"
   extends: .build_quartz
+  allow_failure: true
+
+
+
+
+####
+# Here are all quartz tests jobs
+
+test_quartz_clang_3_9_1:
+  variables:
+    COMPILER: "clang_3_9_1"
+  extends: .test_quartz
+  needs: ["build_quartz_clang_3_9_1"]
+
+test_quartz_gcc_4_9_3:
+  variables:
+    COMPILER: "gcc_4_9_3"
+  extends: .test_quartz
+  needs: ["build_quartz_gcc_4_9_3"]
+
+test_quartz_clang_4_0_0:
+  variables:
+    COMPILER: "clang_4_0_0"
+  extends: .test_quartz
+  needs: ["build_quartz_clang_4_0_0"]
+
+test_quartz_cudatoolkit_9_1:
+  variables:
+    COMPILER: "cudatoolkit_9_1"
+  extends: .test_quartz
+  needs: ["build_quartz_cudatoolkit_9_1"]
+
+test_quartz_gcc_6_1_0:
+  variables:
+    COMPILER: "gcc_6_1_0"
+  extends: .test_quartz
+  needs: ["build_quartz_gcc_6_1_0"]
+
+test_quartz_gcc_7_1_0:
+  variables:
+    COMPILER: "gcc_7_1_0"
+  extends: .test_quartz
+  needs: ["build_quartz_gcc_7_1_0"]
+
+test_quartz_icpc_16_0_4:
+  variables:
+    COMPILER: "icpc_16_0_4"
+  extends: .test_quartz
+  needs: ["build_quartz_icpc_16_0_4"]
+  allow_failure: true
+
+test_quartz_icpc_17_0_2:
+  variables:
+    COMPILER: "icpc_17_0_2"
+  extends: .test_quartz
+  needs: ["build_quartz_icpc_17_0_2"]
+
+test_quartz_icpc_18_0_0:
+  variables:
+    COMPILER: "icpc_18_0_0"
+  extends: .test_quartz
+  needs: ["build_quartz_icpc_18_0_0"]
+
+test_quartz_pgi_17_10:
+  variables:
+    COMPILER: "pgi_17_10"
+  extends: .test_quartz
+  needs: ["build_quartz_pgi_17_10"]
+  allow_failure: true
+
+test_quartz_pgi_18_5:
+  variables:
+    COMPILER: "pgi_18_5"
+  extends: .test_quartz
+  needs: ["build_quartz_pgi_18_5"]
   allow_failure: true

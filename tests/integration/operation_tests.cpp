@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -362,6 +362,144 @@ TEST_P(ReallocateTest, RealocateNull)
 
   rm.deallocate(reallocated_array);
   rm.setDefaultAllocator(rm.getAllocator("HOST"));
+}
+
+TEST_P(ReallocateTest, ReallocateNullZero)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  rm.setDefaultAllocator(*source_allocator);
+  // nullptr, zero size
+  const std::size_t reallocated_zero_size{0};
+  const std::size_t reallocated_size_1{m_size+50};
+  const std::size_t reallocated_size_2{m_size+100};
+
+  float* reallocated_array{nullptr};
+
+  // nullptr, zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float) ));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+  rm.deallocate(reallocated_array);
+  reallocated_array = nullptr;
+
+  // nullptr, non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr (size > 0), non-zero increment
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_2*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_2*sizeof(float));
+
+  // valid ptr (size > 0), non-zero decrement
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr (size > 0), zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+
+  // valid ptr (size == 0), non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             ,  reallocated_size_1*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+  rm.setDefaultAllocator(rm.getAllocator("HOST"));
+}
+
+TEST_P(ReallocateTest, ReallocateNullZeroWithAllocator)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  // nullptr, zero size
+  const std::size_t reallocated_zero_size{0};
+  const std::size_t reallocated_size_1{m_size+50};
+  const std::size_t reallocated_size_2{m_size+100};
+
+  float* reallocated_array{nullptr};
+
+  // nullptr, zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+  rm.deallocate(reallocated_array);
+  reallocated_array = nullptr;
+
+  // nullptr, non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr, non-zero increment
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_2*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_2*sizeof(float));
+
+  // valid ptr, non-zero decrement
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr, zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+
+  rm.deallocate(reallocated_array);
 }
 
 TEST_P(ReallocateTest, ReallocateNullWithAllocator)

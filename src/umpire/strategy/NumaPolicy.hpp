@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -29,10 +29,10 @@ class NumaPolicy :
 {
   public:
     NumaPolicy(
-        const std::string& name,
-        int id,
-        int numa_node,
-        Allocator allocator);
+          const std::string& name
+        , int id
+        , Allocator allocator
+        , int numa_node);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);

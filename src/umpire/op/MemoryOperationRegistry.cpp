@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -24,15 +24,14 @@
 #include "umpire/op/CudaCopyOperation.hpp"
 
 #include "umpire/op/CudaMemsetOperation.hpp"
+#include "umpire/op/CudaMemPrefetchOperation.hpp"
 
 #include "umpire/op/CudaAdviseAccessedByOperation.hpp"
 #include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
 #include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
-#endif
-
-#if defined(UMPIRE_ENABLE_HCC)
-#include "umpire/op/RocmCopyOperation.hpp"
-#include "umpire/op/RocmMemsetOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetAccessedByOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetPreferredLocationOperation.hpp"
+#include "umpire/op/CudaAdviseUnsetReadMostlyOperation.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -88,7 +87,6 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "MOVE",
       std::make_pair(Platform::cuda, Platform::cpu),
       std::make_shared<NumaMoveOperation>());
-// NOTE: Add cpu<->rocm pairs here when needed
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -137,33 +135,30 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::cuda, Platform::cuda),
       std::make_shared<CudaAdviseReadMostlyOperation>());
 
-#endif
-
-#if defined(UMPIRE_ENABLE_HCC)
   registerOperation(
-      "COPY",
-      std::make_pair(Platform::rocm, Platform::cpu),
-      std::make_shared<RocmCopyOperation>());
+      "UNSET_ACCESSED_BY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseUnsetAccessedByOperation>());
 
   registerOperation(
-      "COPY",
-      std::make_pair(Platform::cpu, Platform::rocm),
-      std::make_shared<RocmCopyOperation>());
+      "UNSET_PREFERRED_LOCATION",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
   registerOperation(
-      "COPY",
-      std::make_pair(Platform::rocm, Platform::rocm),
-      std::make_shared<RocmCopyOperation>());
+      "UNSET_PREFERRED_LOCATION",
+      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
   registerOperation(
-      "MEMSET",
-      std::make_pair(Platform::rocm, Platform::rocm),
-      std::make_shared<RocmMemsetOperation>());
+      "UNSET_READ_MOSTLY",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
 
-  registerOperation(
-      "REALLOCATE",
-      std::make_pair(Platform::rocm, Platform::rocm),
-      std::make_shared<GenericReallocateOperation>());
+    registerOperation(
+      "PREFETCH",
+      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_shared<CudaMemPrefetchOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)

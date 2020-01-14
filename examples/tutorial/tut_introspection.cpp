@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,12 +15,12 @@ int main(int, char**) {
   const std::string destinations[] = {
     "HOST"
 #if defined(UMPIRE_ENABLE_CUDA)
-      , "DEVCIE"
+      , "DEVICE"
       , "UM"
       , "PINNED"
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
-      , "DEVCIE"
+      , "DEVICE"
       , "PINNED"
 #endif
   };

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -61,8 +61,8 @@ class DynamicPoolMap : public AllocationStrategy
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 * 1024),
-        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100),
-        const int align_bytes = 16) noexcept;
+        const std::size_t align_bytes = 16,
+        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
     /*!
      * \brief Destructs the DynamicPoolMap.
@@ -109,6 +109,15 @@ class DynamicPoolMap : public AllocationStrategy
      * and internal free memory -- that the pool holds.
      */
     std::size_t getBlocksInPool() const noexcept;
+
+    /*!
+     * \brief Get the largest allocatable number of bytes from pool before
+     * the pool will grow.
+     *
+     * return The largest number of bytes that may be allocated without 
+     * causing pool growth
+     */
+    std::size_t getLargestAvailableBlock() noexcept;
 
     /*!
      * \brief Merge as many free records as possible, release all possible free
@@ -168,7 +177,7 @@ class DynamicPoolMap : public AllocationStrategy
     strategy::AllocationStrategy* m_allocator;
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
-    const int m_align_bytes;
+    const std::size_t m_align_bytes;
     CoalesceHeuristic m_coalesce_heuristic;
     AddressMap m_used_map;
     SizeMap m_free_map;

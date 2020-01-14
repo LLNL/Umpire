@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,8 +23,8 @@ class SlotPool :
     SlotPool(
       const std::string& name,
       int id,
-      std::size_t slots,
-      Allocator allocator);
+      Allocator allocator,
+      std::size_t slots);
 
     ~SlotPool();
 

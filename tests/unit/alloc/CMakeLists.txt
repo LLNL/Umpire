@@ -1,11 +1,9 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (alloc_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/alloc)
-
 set (memory_allocator_tests_depends
   umpire gtest)
 
@@ -23,8 +21,7 @@ endif ()
 blt_add_executable(
   NAME memory_allocator_tests
   SOURCES memory_allocator_tests.cpp
-  DEPENDS_ON ${memory_allocator_tests_depends}
-  OUTPUT_DIR ${alloc_output_dir})
+  DEPENDS_ON ${memory_allocator_tests_depends})
 
 target_include_directories(
   memory_allocator_tests

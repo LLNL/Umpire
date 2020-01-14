@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,8 +23,8 @@ MixedPool::MixedPool(const std::string& name, int id,
                      std::size_t fixed_size_multiplier,
                      const std::size_t dynamic_initial_alloc_size,
                      const std::size_t dynamic_min_alloc_size,
-                     DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic,
-                     const int dynamic_align_bytes) noexcept :
+                     const std::size_t dynamic_align_bytes,
+                     DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic) noexcept :
   AllocationStrategy{name, id},
   m_map{},
   m_fixed_pool_map{},
@@ -32,8 +32,8 @@ MixedPool::MixedPool(const std::string& name, int id,
   m_dynamic_pool{"internal_dynamic_pool", -1, allocator,
                  dynamic_initial_alloc_size,
                  dynamic_min_alloc_size,
-                 dynamic_coalesce_heuristic,
-                 dynamic_align_bytes},
+                 dynamic_align_bytes,
+                 dynamic_coalesce_heuristic},
   m_allocator{allocator.getAllocationStrategy()}
 {
   std::size_t obj_size{smallest_fixed_obj_size};

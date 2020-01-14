@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2020, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -14,117 +14,194 @@
 ##############################################################################
 
 copyright:
-  - Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
-  - Produced at the Lawrence Livermore National Laboratory
-  - 
-  - Created by David Beckingsale, david@llnl.gov
-  - LLNL-CODE-747640
-  - 
-  - All rights reserved.
-  - 
-  - This file is part of Umpire. 
-  - 
-  - For details, see https://github.com/LLNL/Umpire
-  - Please also see the LICENSE file for MIT license.
-
+  - Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+  - project contributors. See the COPYRIGHT file for details.
+  -
+  - "SPDX-License-Identifier: (MIT)"
 
 library: Umpire
+namespace: umpire
 
 options:
   F_module_per_class: False
+  C_API_case: lower
 
 format:
   C_prefix: umpire_
 
 declarations:
-- decl: namespace umpire
-  declarations:
-    - decl: namespace strategy
-      cxx_header: umpire/strategy/DynamicPool.hpp
-      declarations:
-        - decl: class DynamicPool
+  - decl: namespace strategy
+    options:
+      flatten_namespace: True
+    declarations:
+      - decl: class DynamicPool
+        cxx_header: umpire/strategy/DynamicPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
 
-    - decl: class Allocator
-      cxx_header: umpire/Allocator.hpp
-      format:
-        F_derived_name: UmpireAllocator
+      - decl: class DynamicPoolList
+        cxx_header: umpire/strategy/DynamicPoolList.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
 
-      declarations:
-        - decl: ~Allocator() +name(delete)
-        - decl: void* allocate(size_t bytes)
+      - decl: class AllocationAdvisor
+        cxx_header: umpire/strategy/AllocationAdvisor.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class NamedAllocationStrategy
+        cxx_header: umpire/strategy/NamedAllocationStrategy.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class FixedPool
+        cxx_header: umpire/strategy/FixedPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class AllocationPrefetcher
+        cxx_header: umpire/strategy/AllocationPrefetcher.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class ThreadSafeAllocator
+        cxx_header: umpire/strategy/ThreadSafeAllocator.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+  - decl: class Allocator
+    cxx_header: umpire/Allocator.hpp
+    format:
+      F_derived_name: UmpireAllocator
+
+    declarations:
+      - decl: ~Allocator() +name(delete)
+      - decl: void* allocate(size_t bytes)
+        format:
+          F_name_function: allocate_pointer
+      - decl: void deallocate (void* ptr)
+        format:
+          F_name_function: deallocate_pointer
+      - decl: void release()
+      - decl: size_t getSize(void* ptr)
+      - decl: size_t getHighWatermark()
+      - decl: size_t getCurrentSize()
+      - decl: size_t getActualSize()
+      - decl: const std::string& getName() +pure
+      - decl: size_t getId()
+
+  - decl: class ResourceManager
+    cxx_header: umpire/ResourceManager.hpp
+    format:
+      F_derived_name: UmpireResourceManager
+      F_name_instance_set:
+      F_name_instance_get:
+
+    declarations:
+      - decl: static ResourceManager& getInstance()
+
+      - decl: Allocator getAllocator(const std::string& name)
+        format:
+          function_suffix: _by_name
+
+      - decl: Allocator getAllocator(const int id)
+        format:
+          function_suffix: _by_id
+
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
+        options:
+          F_create_generic: False
+        cxx_template:
+        - instantiation: <umpire::strategy::DynamicPool>
           format:
-            F_name_function: allocate_pointer
-        - decl: void deallocate (void* ptr)
+            template_suffix: _pool
+            function_suffix: ""
+        - instantiation: <umpire::strategy::DynamicPoolList>
           format:
-            F_name_function: deallocate_pointer
-        - decl: void release()
-        - decl: size_t getSize(void* ptr)
-        - decl: size_t getHighWatermark()
-        - decl: size_t getCurrentSize()
-        - decl: size_t getActualSize()
-        - decl: const std::string& getName() +pure
-        - decl: size_t getId()
+            template_suffix: _list_pool
+            function_suffix: ""
 
-    - decl: class ResourceManager
-      cxx_header: umpire/ResourceManager.hpp
-      format:
-        F_derived_name: UmpireResourceManager
-        F_name_instance_set:
-        F_name_instance_get:
-
-      declarations:
-        - decl: static ResourceManager& getInstance()
-
-        - decl: Allocator getAllocator(const std::string& name)
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, const std::string& advice_op, int device_id);
+        options:
+          F_create_generic: False
+        cxx_template:
+        - instantiation: <umpire::strategy::AllocationAdvisor>
           format:
-            function_suffix: _by_name
- 
-        - decl: Allocator getAllocator(const int id)
+            template_suffix: _advisor
+            function_suffix: ""
+
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator);
+        options:
+          F_create_generic: False
+        cxx_template:
+        - instantiation: <umpire::strategy::NamedAllocationStrategy>
           format:
-            function_suffix: _by_id
-
-        - decl: Allocator getAllocator(void* ptr)
+            template_suffix: _named
+            function_suffix: ""
+        - instantiation: <umpire::strategy::ThreadSafeAllocator>
           format:
-            function_suffix: _for_ptr
+            template_suffix: _thread_safe
+            function_suffix: ""
 
-        - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
-          default_arg_suffix:
-            - _all
-            - _with_size
-
-        - decl: void memset(void* ptr, int val, size_t length=0)
-          default_arg_suffix:
-            - _all
-            - _with_size
-
-        - decl: void* reallocate(void* src_ptr, size_t size)
-          format:
-            function_suffix: _default
-
-        - decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
-          format:
-            function_suffix: _with_allocator
-
-        - decl: void* move(void* src_ptr, Allocator allocator)
-
-        - decl: void deallocate(void* ptr)
-
-        - decl: size_t getSize(void* ptr)
-
-        - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t initial_size, size_t block);
-          cxx_template:
-          - instantiation: <umpire::strategy::DynamicPool>
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::FixedPool>
             format:
-              template_suffix: _pool
+              template_suffix: _fixed_pool
+              function_suffix: ""
 
-splicer_code:
-  c:
-    class:
-      Allocator:
-        CXX_declarations:
-        - "#ifdef __cplusplus"
-        - "#include <cstring>"
-        - "#endif"
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int device_id);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::AllocationPrefetcher>
+            format:
+              template_suffix: _prefetcher
+              function_suffix: ""
+
+
+      - decl: void registerAllocator(const std::string& name, Allocator allocator)
+
+      - decl: Allocator getAllocator(void* ptr)
+        format:
+          function_suffix: _for_ptr
+
+      - decl: bool isAllocator(const std::string& name)
+
+      - decl: bool hasAllocator(void* ptr)
+
+      - decl: void copy(void* src_ptr, void* dst_ptr, size_t size=0)
+        default_arg_suffix:
+          - _all
+          - _with_size
+
+      - decl: void memset(void* ptr, int val, size_t length=0)
+        default_arg_suffix:
+          - _all
+          - _with_size
+
+      - decl: void* reallocate(void* src_ptr, size_t size)
+        format:
+          function_suffix: _default
+
+      - decl: void* reallocate(void* src_ptr, size_t size, Allocator allocator)
+        format:
+          function_suffix: _with_allocator
+
+      - decl: void* move(void* src_ptr, Allocator allocator)
+
+      - decl: void deallocate(void* ptr)
+
+      - decl: size_t getSize(void* ptr)
 
 splicer:
   f:

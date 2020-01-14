@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -127,7 +127,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
       MPI::sync();
     } else {
       UMPIRE_ERROR("Cannot create output directory before MPI has been initialized. "
-                   "Please unset UMPIRE_IO_DIR in your environment");
+                   "Please unset UMPIRE_OUTPUT_DIR in your environment");
     }
   }
 

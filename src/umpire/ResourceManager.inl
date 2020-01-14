@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,11 +10,6 @@
 #include "umpire/ResourceManager.hpp"
 
 #include <sstream>
-
-#if !defined(_MSC_VER)
-#include <cxxabi.h>
-#endif
-
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
@@ -37,8 +32,6 @@ Allocator ResourceManager::makeAllocator(
   std::unique_ptr<strategy::AllocationStrategy> allocator;
 
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
-
-#if defined(_MSC_VER)
   UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()
       << "\", \"with_introspection\":" << (introspection ? "true" : "false")
@@ -47,16 +40,6 @@ Allocator ResourceManager::makeAllocator(
       << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
       << " ] }"
       );
-#else
-  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-      << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-      << "\", \"with_introspection\":" << (introspection ? "true" : "false")
-      << ", \"allocator_name\":\"" << name << "\""
-      << ", \"args\": [ "
-      << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
-      << " ] }"
-      );
-#endif
   if (isAllocator(name)) {
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
@@ -72,7 +55,6 @@ Allocator ResourceManager::makeAllocator(
             util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...));
   }
 
-#if defined(_MSC_VER)
   UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()
       << "\", \"with_introspection\":" << (introspection ? "true" : "false")
@@ -82,17 +64,6 @@ Allocator ResourceManager::makeAllocator(
       << " ] }"
       << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }"
       );
-#else
-  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-      << abi::__cxa_demangle(typeid(Strategy).name(),nullptr,nullptr,nullptr)
-      << "\", \"with_introspection\":" << (introspection ? "true" : "false")
-      << ", \"allocator_name\":\"" << name << "\""
-      << ", \"args\": [ "
-      << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
-      << " ] }"
-      << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }"
-      );
-#endif
 
   m_allocators_by_name[name] = allocator.get();
   m_allocators_by_id[allocator->getId()] = allocator.get();
