@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -89,11 +89,10 @@ set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
-set(UMPIRE_ENABLE_HCC ${ENABLE_HCC})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
 
-if (ENABLE_CUDA OR ENABLE_HCC OR ENABLE_HIP)
+if (ENABLE_CUDA OR ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
   if (ENABLE_DEVICE_CONST)

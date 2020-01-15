@@ -18,6 +18,7 @@ class ReplayInterpreter {
   public:
     void buildOperations();
     void runOperations(bool gather_statistics);
+    void printInfo();
     bool compareOperations(ReplayInterpreter& rh);
 
     ReplayInterpreter( std::string in_file_name );
@@ -55,6 +56,7 @@ class ReplayInterpreter {
     void replay_compileDeallocate( void );
     void replay_compileCoalesce( void );
     void replay_compileRelease( void );
+    void printAllocators(ReplayFile* optable);
 };
 
 #include "ReplayInterpreter.inl"

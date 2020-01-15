@@ -26,7 +26,7 @@ ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
   if ( ! m_input_file.is_open() )
     REPLAY_ERROR("Unable to open input file " << in_file_name);
 
-  m_ops = new ReplayFile{m_input_file_name};
+  m_ops = new ReplayFile{m_input_file_name, m_input_file_name + ".bin" };
 }
 
 ReplayInterpreter::~ReplayInterpreter()
@@ -35,6 +35,13 @@ ReplayInterpreter::~ReplayInterpreter()
     delete m_ops;
     m_ops = nullptr;
   }
+}
+
+void ReplayInterpreter::printInfo()
+{
+  ReplayOperationManager m_operation_mgr{m_ops->getOperationsTable()};
+
+  m_operation_mgr.printInfo();
 }
 
 void ReplayInterpreter::runOperations(bool gather_statistics)
@@ -49,10 +56,10 @@ void ReplayInterpreter::buildOperations()
   if (! m_ops->compileNeeded() )
     return;
 
-  std::cout << "Compiling replay file" << std::endl;
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
-  memset(static_cast<void*>(hdr), 0, sizeof(ReplayFile::Header));
+  hdr->num_allocators = 0;
+  hdr->num_operations = 0;
 
   // Get the input file size
   m_input_file.seekg(0, std::ios::end);
@@ -140,25 +147,51 @@ void ReplayInterpreter::buildOperations()
       std::cout << percent_complete << "%\r" << std::flush;
     }
   }
-
-  std::cout << std::endl;
+  std::cout << percent_complete << "%100 - Compilation complete" << std::endl;
 
   //
   // Flush operations to compile file and read back in read-only (PRIVATE) mode
   //
   delete m_ops;
-  std::cout << "Compilation completed successfully" << std::endl;
-  m_ops = new ReplayFile{m_input_file_name};
+  m_ops = new ReplayFile{m_input_file_name, m_input_file_name + ".bin"};
+}
+
+void ReplayInterpreter::printAllocators(ReplayFile* rf)
+{
+  auto optable = rf->getOperationsTable();
+  std::cerr << rf->m_input_filename << std::endl;
+  for (std::size_t i{0}; i < optable->num_allocators; ++i) {
+    switch (optable->allocators[i].type) {
+      default: std::cerr << "?? "; break;
+      case ReplayFile::MEMORY_RESOURCE: std::cerr << " MEMORY_RESOURCE "; break;
+      case ReplayFile::ALLOCATION_ADVISOR: std::cerr << " ALLOCATION_ADVISOR "; break;
+      case ReplayFile::DYNAMIC_POOL_LIST: std::cerr << " DYNAMIC_POOL_LIST "; break;
+      case ReplayFile::DYNAMIC_POOL_MAP: std::cerr << " DYNAMIC_POOL_MAP "; break;
+      case ReplayFile::MONOTONIC: std::cerr << " MONOTONIC "; break;
+      case ReplayFile::SLOT_POOL: std::cerr << " SLOT_POOL "; break;
+      case ReplayFile::SIZE_LIMITER: std::cerr << " SIZE_LIMITER "; break;
+      case ReplayFile::THREADSAFE_ALLOCATOR: std::cerr << " THREADSAFE_ALLOCATOR "; break;
+      case ReplayFile::FIXED_POOL: std::cerr << " FIXED_POOL "; break;
+      case ReplayFile::MIXED_POOL: std::cerr << " MIXED_POOL "; break;
+      case ReplayFile::ALLOCATION_PREFETCHER: std::cerr << " ALLOCATION_PREFETCHER "; break;
+      case ReplayFile::NUMA_POLICY: std::cerr << " NUMA_POLICY "; break;
+    }
+
+    std::cerr
+      << optable->allocators[i].base_name << ", "
+      << optable->allocators[i].name << std::endl;
+  }
+  std::cerr << std::endl;
 }
 
 bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
 {
   bool rval = true;
 
-  if (m_ops->getOperationsTable()->version != rh.m_ops->getOperationsTable()->version) {
+  if (m_ops->getOperationsTable()->m.version != rh.m_ops->getOperationsTable()->m.version) {
     std::cerr << "Number of version mismatch: "
-        << m_ops->getOperationsTable()->version 
-        << " != " << rh.m_ops->getOperationsTable()->version
+        << m_ops->getOperationsTable()->m.version 
+        << " != " << rh.m_ops->getOperationsTable()->m.version
         << std::endl;
     rval = false;
   }
@@ -168,6 +201,8 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
         << m_ops->getOperationsTable()->num_allocators 
         << " != " << rh.m_ops->getOperationsTable()->num_allocators
         << std::endl;
+    printAllocators(m_ops);
+    printAllocators(rh.m_ops);
     rval = false;
   }
 
@@ -249,7 +284,6 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
 
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
-  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::ALLOCATOR_CREATION;
   op->allocator_table_index = hdr->num_allocators;
   m_allocator_index[allocator_name] = hdr->num_allocators;
@@ -270,7 +304,6 @@ void ReplayInterpreter::replay_compileAllocator( void )
     const bool introspection{m_json["payload"]["with_introspection"]};
     const std::string raw_mangled_type{m_json["payload"]["type"]};
 
-    //memset(alloc, 0, sizeof(*alloc));
     m_ops->copyString(allocator_name, alloc->name);
     alloc->introspection = introspection;
     alloc->argc = static_cast<int>(m_json["payload"]["args"].size());
@@ -340,10 +373,25 @@ void ReplayInterpreter::replay_compileAllocator( void )
         }
       }
     }
+    else if ( type == "umpire::strategy::AllocationPrefetcher" ) {
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
+
+      alloc->type = ReplayFile::rtype::ALLOCATION_PREFETCHER;
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+    }
+    else if ( type == "umpire::strategy::NumaPolicy" ) {
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
+
+      alloc->type = ReplayFile::rtype::NUMA_POLICY;
+      get_from_string(m_json["payload"]["args"][1], alloc->argv.numa.node);
+
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+    }
     else if ( type == "umpire::strategy::DynamicPoolList" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::DYNAMIC_POOL_LIST;
+
       m_ops->copyString(base_allocator_name, alloc->base_name);
 
       // Now grab the optional fields
@@ -494,8 +542,6 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
     ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
-    memset(op, 0, sizeof(*op));
-
     op->type = ReplayFile::otype::ALLOCATOR_CREATION;
     op->allocator_table_index = hdr->num_allocators;
 
@@ -532,8 +578,6 @@ void ReplayInterpreter::replay_compileAllocate( void )
   if ( m_json["result"].is_null() ) {
     const std::size_t alloc_size{m_json["payload"]["size"]};
 
-    memset(op, 0, sizeof(*op));
-
     op->type = ReplayFile::otype::ALLOCATE;
     op->allocator_table_index = allocator_number;
     op->argv.allocate.size = alloc_size;
@@ -561,7 +605,6 @@ void ReplayInterpreter::replay_compileDeallocate( void )
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
-  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::DEALLOCATE;
   op->allocator_table_index = allocator_number;
 
@@ -579,7 +622,6 @@ void ReplayInterpreter::replay_compileCoalesce( void )
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
-  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::COALESCE;
   op->allocator_table_index = m_allocator_index[allocator_name];
   hdr->num_operations++;
@@ -596,7 +638,6 @@ void ReplayInterpreter::replay_compileRelease( void )
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
-  memset(op, 0, sizeof(*op));
   op->type = ReplayFile::otype::RELEASE;
   op->allocator_table_index = allocator_number;
   hdr->num_operations++;

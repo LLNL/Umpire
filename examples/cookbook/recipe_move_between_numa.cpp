@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -32,7 +32,7 @@ int main(int, char**) {
 
   // Create an allocator on the first NUMA node
   auto host_src_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-    "host_numa_src_alloc", host_nodes[0], rm.getAllocator("HOST"));
+    "host_numa_src_alloc", rm.getAllocator("HOST"), host_nodes[0]);
 
   // Create an allocation on that node
   void* src_ptr = host_src_alloc.allocate(alloc_size);
@@ -40,7 +40,7 @@ int main(int, char**) {
   if (host_nodes.size() > 1) {
     // Create an allocator on another host NUMA node.
     auto host_dst_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      "host_numa_dst_alloc", host_nodes[1], rm.getAllocator("HOST"));
+      "host_numa_dst_alloc", rm.getAllocator("HOST"), host_nodes[1]);
 
     // Move the memory
     void* dst_ptr = rm.move(src_ptr, host_dst_alloc);
@@ -68,7 +68,7 @@ int main(int, char**) {
     // this still requires using the "HOST" allocator. The allocations
     // are moved after the address space is reserved.
     auto device_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      "device_numa_src_alloc", device_nodes[0], rm.getAllocator("HOST"));
+      "device_numa_src_alloc", rm.getAllocator("HOST"), device_nodes[0]);
 
     // Move the memory
     void* dst_ptr = rm.move(src_ptr, device_alloc);

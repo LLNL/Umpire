@@ -10,12 +10,24 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [2.0.0] - 2020-01-13
+
+### Added
+
 - `ENABLE_DEVICE_CONST` CMake option to control whether device constant memory
   is enabled. It is now disabled by default.
 
 - `DeviceAllocator` that provides a pool for allocations inside GPU kernels.
 
 - Added statistic gathering capability to `replay`
+
+- Added "unset" operations for removing CUDA memory advice.
 
 - Extended C/Fortran API with more allocation strategies.
 
@@ -27,6 +39,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Replay logs now contain information about operations. These are not yet
   replayed.
+
+- Replay now can display information allocators used in a replay session.
+
+- Replay now can replay `NUMA` and `AllocationPreference` allocations.
+
+- Added `getLargestAvailableBlock` metric to dynamic list and map pools
+
+- Added documentation and recipe for `ThreadSafeAllocator`
+
 
 ### Changed
 
@@ -49,6 +70,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay tool changed to create a binary index file of the operations from
   the original json file that may be used (and reused) for quicker replays.
 
+- `UMPIRE_VERSION_X` are now defined as macros, rather than constexpr variables
+
 ### Removed
 
 - Usage of `__cxa_demangle` in core Umpire library.
@@ -59,6 +82,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed replay test the replay tool as well as validate the output from
   running umpire with REPLAY turned on.
+
+- Fixed compilation errors when `-DENABLE_NUMA=On`.
+
+- Fixed reallocate to properly handle case where size == 0
 
 ## [1.1.0] - 2019-09-14
 

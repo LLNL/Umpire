@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -14,11 +14,6 @@ using namespace umpire::alloc;
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
-#endif
-
-#if defined(UMPIRE_ENABLE_HCC)
-#include "umpire/alloc/AmAllocAllocator.hpp"
-#include "umpire/alloc/AmPinnedAllocator.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -50,9 +45,6 @@ using test_types = ::testing::Types<
     MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
     , CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
-#endif
-#if defined(UMPIRE_ENABLE_HCC)
-    , AmAllocAllocator, AmPinnedAllocator
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
     , HipMallocAllocator, HipPinnedAllocator

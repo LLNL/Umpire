@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -27,7 +27,7 @@ CudaAdviseAccessedByOperation::apply(
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << 0 << "),"
         << " failed with error: "
         << cudaGetErrorString(error));
   }
