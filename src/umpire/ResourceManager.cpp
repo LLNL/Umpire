@@ -540,75 +540,73 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 void*
 ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
-
-  UMPIRE_REPLAY(
-      R"( "event": "reallocate", "payload": { "ptr": ")"
-      << current_ptr
-      << R"(", "size": )"
-      << new_size
-      << R"( })"
-  );
-
-  void* new_ptr;
-
-  if ( current_ptr == nullptr || new_size == 0 ) {
-    if (current_ptr != nullptr )
-      m_default_allocator->deallocate(current_ptr);
-
-    new_ptr = m_default_allocator->allocate(new_size);
-  } else {
-    auto& op_registry = op::MemoryOperationRegistry::getInstance();
-
-    auto alloc_record = m_allocations.find(current_ptr);
-
-    if (current_ptr != alloc_record->ptr) {
-      UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr="
-          << current_ptr << ", base=" << alloc_record->ptr);
-    }
-
-    auto op = op_registry.find("REALLOCATE",
-        alloc_record->strategy,
-        alloc_record->strategy);
-
-    op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
-  }
-
-  return new_ptr;
+  return reallocate(current_ptr, new_size, Allocator(m_default_allocator));
 }
 
 void*
 ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator allocator)
 {
-  UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ")");
+  UMPIRE_LOG(Debug,
+      "(current_ptr=" << current_ptr
+        << ", new_size=" << new_size
+        << ", with Allocator " << allocator.getName() << ")" );
 
   UMPIRE_REPLAY(
-      R"( "event": "reallocate", "payload": { "ptr": ")"
-      << current_ptr
-      << R"(", "size": )"
-      << new_size
-      << R"( "allocator_ref": ")"
-      << allocator.getAllocationStrategy()
+      R"( "event": "reallocate", "payload": { "ptr": ")" << current_ptr
+      << R"(", "size": )" << new_size
+      << R"( "allocator_ref": ")" << allocator.getAllocationStrategy()
       << R"(" } )"
   );
 
   void* new_ptr;
 
-  if (!current_ptr || new_size == 0) {
-    if (current_ptr)
-      allocator.deallocate(current_ptr);
-
+  //
+  // If this is a brand new allocation, no reallocation necessary, just allocate
+  //
+  if ( current_ptr == nullptr ) {
     new_ptr = allocator.allocate(new_size);
-  } else {
+  }
+  else {
     auto alloc_record = m_allocations.find(current_ptr);
+    auto alloc = Allocator(alloc_record->strategy);
 
+#ifdef TAKEN_OUT_AND_NEED_TO_DISCUSS
     if ( alloc_record->strategy != allocator.getAllocationStrategy() ) {
       UMPIRE_ERROR("Cannot reallocate " << current_ptr
+          << " from: " << alloc.getName()
           << " with Allocator " << allocator.getName());
     }
+#endif
 
-    new_ptr = reallocate(current_ptr, new_size);
+    //
+    // Special case 0-byte size here
+    //
+    if ( new_size == 0 ) {
+      alloc.deallocate(current_ptr);
+      new_ptr = alloc.allocate(new_size);
+    }
+    else {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      if (current_ptr != alloc_record->ptr) {
+        UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr="
+            << current_ptr << ", base=" << alloc_record->ptr);
+      }
+
+      auto op = op_registry.find("REALLOCATE", alloc_record->strategy, alloc_record->strategy);
+
+      op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
+    }
   }
+
+  UMPIRE_REPLAY(
+      R"( "event": "reallocate", "payload": { "ptr": ")" << current_ptr
+      << R"(", "size": )" << new_size
+      << R"( "allocator_ref": ")" << allocator.getAllocationStrategy()
+      << R"(" } )"
+      << R"( ", "result": { "memory_ptr": ")" << new_ptr
+      << R"(" } )"
+  );
 
   return new_ptr;
 }
