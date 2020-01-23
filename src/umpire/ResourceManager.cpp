@@ -540,7 +540,17 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 void*
 ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
-  return reallocate(current_ptr, new_size, Allocator(m_default_allocator));
+  Allocator allocator;
+
+  if ( current_ptr != nullptr ) {
+    auto alloc_record = m_allocations.find(current_ptr);
+    allocator = Allocator(alloc_record->strategy);
+  }
+  else {
+    allocator = Allocator(m_default_allocator);
+  }
+
+  return reallocate(current_ptr, new_size, allocator);
 }
 
 void*
@@ -570,13 +580,11 @@ ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator a
     auto alloc_record = m_allocations.find(current_ptr);
     auto alloc = Allocator(alloc_record->strategy);
 
-#ifdef TAKEN_OUT_AND_NEED_TO_DISCUSS
     if ( alloc_record->strategy != allocator.getAllocationStrategy() ) {
       UMPIRE_ERROR("Cannot reallocate " << current_ptr
           << " from: " << alloc.getName()
           << " with Allocator " << allocator.getName());
     }
-#endif
 
     //
     // Special case 0-byte size here

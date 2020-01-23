@@ -621,14 +621,10 @@ TEST_P(ReallocateTest, ReallocateWithAllocatorFail)
   if (source_allocator->getId() == dest_allocator->getId()) {
     SUCCEED();
   } else {
-#ifdef TAKEN_OUT_AND_NEED_TO_DISCUSS
     umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
     ASSERT_THROW(
         rm.reallocate(source_array, m_size, *dest_allocator),
         umpire::util::Exception);
-#else
-    SUCCEED();
-#endif
   }
 }
 
