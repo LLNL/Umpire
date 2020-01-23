@@ -16,6 +16,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed reallocate corner case of reallocating a zero-sized allocation from a
+  previously allocated zero-sized allocation.
+
 ## [2.0.0] - 2020-01-13
 
 ### Added
