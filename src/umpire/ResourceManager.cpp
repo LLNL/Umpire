@@ -540,17 +540,17 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 void*
 ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
-  Allocator allocator;
+  strategy::AllocationStrategy* strategy;
 
   if ( current_ptr != nullptr ) {
     auto alloc_record = m_allocations.find(current_ptr);
-    allocator = Allocator(alloc_record->strategy);
+    strategy = alloc_record->strategy;
   }
   else {
-    allocator = Allocator(m_default_allocator);
+    strategy = m_default_allocator;
   }
 
-  return reallocate(current_ptr, new_size, allocator);
+  return reallocate(current_ptr, new_size, Allocator(strategy));
 }
 
 void*
