@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,28 +18,28 @@ namespace umpire {
 namespace op {
 
 void GenericReallocateOperation::transform(
-    void* src_ptr,
-    void** dst_ptr,
-    util::AllocationRecord *src_allocation,
-    util::AllocationRecord *dst_allocation,
-    std::size_t length)
+    void* current_ptr,
+    void** new_ptr,
+    util::AllocationRecord *current_allocation,
+    util::AllocationRecord *new_allocation,
+    std::size_t new_size)
 {
-  auto allocator = dst_allocation->strategy;
-  *dst_ptr = allocator->allocate(length);
+  auto allocator = new_allocation->strategy;
+  *new_ptr = allocator->allocate(new_size);
 
-  std::size_t old_size = src_allocation->size;
-  std::size_t copy_size = ( old_size > length ) ? length : old_size;
+  const std::size_t old_size = current_allocation->size;
+  const std::size_t copy_size = ( old_size > new_size ) ? new_size : old_size;
 
-  ResourceManager::getInstance().copy(*dst_ptr, src_ptr, copy_size);
+  ResourceManager::getInstance().copy(*new_ptr, current_ptr, copy_size);
 
   UMPIRE_RECORD_STATISTIC(
       "GenericReallocate",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
-      "size", length,
+      "current_ptr", reinterpret_cast<uintptr_t>(current_ptr),
+      "new_ptr", reinterpret_cast<uintptr_t>(*new_ptr),
+      "new_size", new_size,
       "event", "reallocate");
 
-  allocator->deallocate(src_ptr);
+  allocator->deallocate(current_ptr);
 }
 
 } // end of namespace op

@@ -156,6 +156,34 @@ void ReplayInterpreter::buildOperations()
   m_ops = new ReplayFile{m_input_file_name, m_input_file_name + ".bin"};
 }
 
+void ReplayInterpreter::printAllocators(ReplayFile* rf)
+{
+  auto optable = rf->getOperationsTable();
+  std::cerr << rf->m_input_filename << std::endl;
+  for (std::size_t i{0}; i < optable->num_allocators; ++i) {
+    switch (optable->allocators[i].type) {
+      default: std::cerr << "?? "; break;
+      case ReplayFile::MEMORY_RESOURCE: std::cerr << " MEMORY_RESOURCE "; break;
+      case ReplayFile::ALLOCATION_ADVISOR: std::cerr << " ALLOCATION_ADVISOR "; break;
+      case ReplayFile::DYNAMIC_POOL_LIST: std::cerr << " DYNAMIC_POOL_LIST "; break;
+      case ReplayFile::DYNAMIC_POOL_MAP: std::cerr << " DYNAMIC_POOL_MAP "; break;
+      case ReplayFile::MONOTONIC: std::cerr << " MONOTONIC "; break;
+      case ReplayFile::SLOT_POOL: std::cerr << " SLOT_POOL "; break;
+      case ReplayFile::SIZE_LIMITER: std::cerr << " SIZE_LIMITER "; break;
+      case ReplayFile::THREADSAFE_ALLOCATOR: std::cerr << " THREADSAFE_ALLOCATOR "; break;
+      case ReplayFile::FIXED_POOL: std::cerr << " FIXED_POOL "; break;
+      case ReplayFile::MIXED_POOL: std::cerr << " MIXED_POOL "; break;
+      case ReplayFile::ALLOCATION_PREFETCHER: std::cerr << " ALLOCATION_PREFETCHER "; break;
+      case ReplayFile::NUMA_POLICY: std::cerr << " NUMA_POLICY "; break;
+    }
+
+    std::cerr
+      << optable->allocators[i].base_name << ", "
+      << optable->allocators[i].name << std::endl;
+  }
+  std::cerr << std::endl;
+}
+
 bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
 {
   bool rval = true;
@@ -173,6 +201,8 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
         << m_ops->getOperationsTable()->num_allocators 
         << " != " << rh.m_ops->getOperationsTable()->num_allocators
         << std::endl;
+    printAllocators(m_ops);
+    printAllocators(rh.m_ops);
     rval = false;
   }
 

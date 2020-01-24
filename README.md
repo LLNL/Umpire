@@ -59,6 +59,12 @@ Thanks to all of Umpire's
 
 Umpire was created by David Beckingsale (david@llnl.gov).
 
+## Citing Umpire
+
+If you are referencing Umpire in a publication, please use the following citation:
+
+- D. Beckingsale, M. Mcfadden, J. Dahm, R. Pankajakshan and R. Hornung, ["Umpire: Application-Focused Management and Coordination of Complex Hierarchical Memory,"](https://ieeexplore.ieee.org/document/8907404) in IBM Journal of Research and Development. 2019. doi: 10.1147/JRD.2019.2954403
+
 # Release
 
 Umpire is released under an MIT license. For more details, please see the

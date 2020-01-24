@@ -133,10 +133,10 @@ public:
 
   void copyString(std::string source, char (&dest)[max_name_length]);
   bool compileNeeded() { return m_compile_needed; }
+  const std::string m_input_filename;
 
 private:
   Header* m_op_tables{nullptr};
-  const std::string m_input_filename;
   const std::string m_binary_filename;
   int m_fd;
   bool m_compile_needed{false};
