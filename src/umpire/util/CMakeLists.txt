@@ -87,6 +87,13 @@ if (ENABLE_MPI)
     mpi)
 endif ()
 
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    openmp)
+endif ()
+
+
 blt_add_library(
   NAME umpire_util
   HEADERS ${umpire_util_headers}
