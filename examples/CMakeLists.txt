@@ -12,6 +12,12 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (example_depends
+      ${example_depends}
+      openmp)
+endif()
+
 blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx

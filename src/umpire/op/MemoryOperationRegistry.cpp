@@ -44,6 +44,12 @@
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include <omp.h>
+#include "umpire/op/OpenMPTargetCopyOperation.hpp"
+#include "umpire/op/OpenMPTargetMemsetOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -196,7 +202,36 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
+#endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  int host{omp_get_initial_device()};
+  int device{omp_get_default_device()};
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cpu, Platform::omp),
+      std::make_shared<OpenMPTargetCopyOperation>(host, device));
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::omp, Platform::cpu),
+      std::make_shared<OpenMPTargetCopyOperation>(device, host));
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::omp, Platform::omp),
+      std::make_shared<OpenMPTargetCopyOperation>(device, device));
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::omp, Platform::omp),
+      std::make_shared<OpenMPTargetMemsetOperation>(device));
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::omp, Platform::omp),
+      std::make_shared<GenericReallocateOperation>());
 #endif
 }
 

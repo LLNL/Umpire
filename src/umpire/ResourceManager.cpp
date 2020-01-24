@@ -147,7 +147,7 @@ ResourceManager::ResourceManager() :
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  auto device = omp_get_default_device();
+  int device{omp_get_default_device()};
   registry.registerMemoryResource(
     util::make_unique<resource::OpenMPTargetResourceFactory>(device));
 #endif
@@ -320,26 +320,26 @@ ResourceManager::initialize()
   }
 #endif
 
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  {
-    std::unique_ptr<strategy::AllocationStrategy>
-      allocator{util::wrap_allocator<
-        strategy::AllocationTracker,
-        strategy::ZeroByteHandler>(
-            registry.makeMemoryResource("DEVICE", getNextId()))};
-    UMPIRE_REPLAY(
-         "\"event\": \"makeMemoryResource\""
-      << ", \"payload\": { \"name\": \"" << "DEVICE_CONST" << "\" }"
-      << ", \"result\": \"" << allocator.get() << "\""
-    );
-
-    int id{allocator->getId()};
-    m_allocators_by_name["DEVICE"] = allocator.get();
-    m_memory_resources[resource::Device] = allocator.get();
-    m_allocators_by_id[id] = allocator.get();
-    m_allocators.emplace_front(std::move(allocator));
-  }
-#endif
+// #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+//   {
+//     std::unique_ptr<strategy::AllocationStrategy>
+//       allocator{util::wrap_allocator<
+//         strategy::AllocationTracker,
+//         strategy::ZeroByteHandler>(
+//             registry.makeMemoryResource("DEVICE", getNextId()))};
+//     UMPIRE_REPLAY(
+//          "\"event\": \"makeMemoryResource\""
+//       << ", \"payload\": { \"name\": \"" << "DEVICE_CONST" << "\" }"
+//       << ", \"result\": \"" << allocator.get() << "\""
+//     );
+// 
+//     int id{allocator->getId()};
+//     m_allocators_by_name["DEVICE"] = allocator.get();
+//     m_memory_resources[resource::Device] = allocator.get();
+//     m_allocators_by_id[id] = allocator.get();
+//     m_allocators.emplace_front(std::move(allocator));
+//   }
+// #endif
 
   {
     std::unique_ptr<strategy::AllocationStrategy> allocator{

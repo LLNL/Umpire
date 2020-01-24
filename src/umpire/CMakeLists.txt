@@ -75,11 +75,25 @@ if (SHROUD_FOUND)
   add_subdirectory(interface)
 endif ()
 
+set (umpire_depends
+  umpire_resource
+  umpire_strategy
+  umpire_alloc
+  umpire_op
+  umpire_util
+  umpire_tpl_judy)
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_depends
+    ${umpire_depends}
+    openmp)
+endif ()
+  
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  DEPENDS_ON umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
+  DEPENDS_ON ${umpire_depends})
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)

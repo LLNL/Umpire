@@ -18,6 +18,12 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
+if (ENABLE_OPENMP_TARGET)
+  set (allocator_integration_tests_depends
+    ${allocator_integration_tests_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME allocator_integration_tests
   SOURCES allocator_integration_tests.cpp
@@ -35,7 +41,7 @@ blt_add_test(
 set (strategy_test_depends
   umpire gtest)
 
-if (ENABLE_OPENMP)
+if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
   set (strategy_test_depends
     ${strategy_test_depends}
     openmp)
@@ -68,6 +74,12 @@ if (ENABLE_HIP)
   set (operation_test_depends ${operation_test_depends} hip)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (operation_test_depends
+    ${operation_test_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
@@ -91,6 +103,12 @@ if (ENABLE_HIP)
       hip)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (free_functions_integration_tests_depends
+      ${free_functions_integration_tests_depends}
+      openmp)
+endif()
+
 blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
@@ -112,6 +130,12 @@ if (ENABLE_HIP)
       ${static_initialization_test_depends}
       hip_runtime)
 endif()
+
+if (ENABLE_OPENMP_TARGET)
+  set (static_initialization_test_depends
+      ${static_initialization_test_depends}
+      openmp)
+endif ()
 
 blt_add_executable(
   NAME static_initialization_test

@@ -12,6 +12,12 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (stress_test_depends
+      ${stress_test_depends}
+      openmp)
+endif()
+
 blt_add_executable(
   NAME allocator_stress_test
   SOURCES allocator_stress_test.cpp
@@ -28,6 +34,12 @@ if (ENABLE_HIP)
   set (benchmark_depends
       ${benchmark_depends}
       hip_runtime)
+endif()
+
+if (ENABLE_OPENMP_TARGET)
+  set (benchmark_depends
+      ${benchmark_depends}
+      openmp)
 endif()
 
 blt_add_executable(

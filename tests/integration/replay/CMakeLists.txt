@@ -15,6 +15,12 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (replay_integration_tests_depends
+      ${replay_integration_tests_depends}
+      openmp)
+endif()
+
 set(replay_file "test_output" )
 
 if (ENABLE_NUMA)
