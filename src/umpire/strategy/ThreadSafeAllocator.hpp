@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,6 +15,13 @@
 namespace umpire {
 namespace strategy {
 
+/*!
+ *
+ * \brief Make an Allocator thread safe
+ *
+ * Using this AllocationStrategy will make the provided allocator thread-safe
+ * by syncronizing access to the allocators interface.
+ */
 class ThreadSafeAllocator :
   public AllocationStrategy
 {

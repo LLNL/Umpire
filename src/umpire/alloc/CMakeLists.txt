@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -19,12 +19,6 @@ if (ENABLE_CUDA)
     CudaMallocAllocator.hpp
     CudaMallocManagedAllocator.hpp
     CudaPinnedAllocator.hpp)
-endif ()
-
-if (ENABLE_HCC)
-  set (umpire_alloc_headers
-    ${umpire_alloc_headers}
-    AmAllocAllocator.hpp)
 endif ()
 
 if (ENABLE_HIP)

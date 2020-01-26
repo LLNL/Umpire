@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -71,6 +71,14 @@ if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
   NUMA support unavailable. \
   Please re-configure with ENABLE_NUMA=Off (default value)")
 endif ()
+
+if (ENABLE_CUDA)
+  if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+      set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
+    endif ()
+  endif ()
+endif()
 
 ################################
 # BLT
