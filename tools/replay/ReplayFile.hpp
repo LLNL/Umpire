@@ -87,21 +87,16 @@ public:
     , DEALLOCATE
     , COALESCE
     , RELEASE
+    , REALLOCATE
   };
 
   struct Operation {
     otype type;
-    int allocator_table_index;
-
-    union {
-      struct {
-        std::size_t size;
-        void* ptr;
-      } allocate;
-      struct {
-        int allocation_op_idx;   // Index to actual allocation operation to get ptr
-      } deallocate ;
-    } argv ;
+    int allocator_table_index;      // Location of allocator object
+    std::size_t previous_op_idx;    // Previous allocation operation (for realloc)
+    std::size_t allocation_op_idx;  // Index of allocation operation (for [dr]eallocate)
+    std::size_t size;               // Size of allocation
+    void* ptr;                      // Pointer to allocated memory
   };
 
   const uint64_t REPLAY_MAGIC =
@@ -114,7 +109,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 3;
+  const uint64_t REPLAY_VERSION = 4;
 
   struct Header {
     struct Magic {

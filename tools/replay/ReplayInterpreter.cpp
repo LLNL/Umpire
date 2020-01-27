@@ -580,7 +580,7 @@ void ReplayInterpreter::replay_compileAllocate( void )
 
     op->type = ReplayFile::otype::ALLOCATE;
     op->allocator_table_index = allocator_number;
-    op->argv.allocate.size = alloc_size;
+    op->size = alloc_size;
   }
   else {
     const std::string memory_str{m_json["result"]["memory_ptr"]};
@@ -611,7 +611,7 @@ void ReplayInterpreter::replay_compileDeallocate( void )
   const std::string memory_str{m_json["payload"]["memory_ptr"]};
   const uint64_t memory_ptr{std::stoul(memory_str, nullptr, 0)};
 
-  op->argv.deallocate.allocation_op_idx = m_allocation_id[memory_ptr];
+  op->allocation_op_idx = m_allocation_id[memory_ptr];
   hdr->num_operations++;
 }
 

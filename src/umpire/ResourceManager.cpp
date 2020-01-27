@@ -562,9 +562,9 @@ ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator a
         << ", with Allocator " << allocator.getName() << ")" );
 
   UMPIRE_REPLAY(
-      R"( "event": "reallocate", "payload": { "ptr": ")" << current_ptr
-      << R"(", "size": )" << new_size
-      << R"( "allocator_ref": ")" << allocator.getAllocationStrategy()
+         R"( "event": "reallocate", "payload": { "ptr": ")" << current_ptr
+      << R"(" , "size": ")" << new_size
+      << R"(" , "allocator_ref": ")" << allocator.getAllocationStrategy()
       << R"(" } )"
   );
 
@@ -608,12 +608,13 @@ ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator a
   }
 
   UMPIRE_REPLAY(
-      R"( "event": "reallocate", "payload": { "ptr": ")" << current_ptr
-      << R"(", "size": )" << new_size
-      << R"( "allocator_ref": ")" << allocator.getAllocationStrategy()
+         R"( "event": "reallocate", "payload": { "ptr": ")" << current_ptr
+      << R"(", "size": ")" << new_size
+      << R"(", "allocator_ref": ")" << allocator.getAllocationStrategy()
       << R"(" } )"
-      << R"( ", "result": { "memory_ptr": ")" << new_ptr
+      << R"(, "result": { "memory_ptr": ")" << new_ptr
       << R"(" } )"
+      
   );
 
   return new_ptr;

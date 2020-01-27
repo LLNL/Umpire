@@ -995,13 +995,13 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 void ReplayOperationManager::makeAllocate(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->allocator_table_index];
-  op->argv.allocate.ptr = alloc->allocator->allocate(op->argv.allocate.size);
+  op->ptr = alloc->allocator->allocate(op->size);
 }
 
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->allocator_table_index];
-  auto ptr = m_ops_table->ops[op->argv.deallocate.allocation_op_idx].argv.allocate.ptr;
+  auto ptr = m_ops_table->ops[op->allocation_op_idx].ptr;
   alloc->allocator->deallocate(ptr);
 }
 
