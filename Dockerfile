@@ -68,10 +68,3 @@ WORKDIR /home/axom/workspace
 ENV HCC_AMDGPU_TARGET=gfx900
 RUN mkdir build && cd build && cmake -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On ..
 RUN cd build && make VERBOSE=1
-
-FROM axom/compilers:rocm AS hcc
-ENV GTEST_COLOR=1
-COPY --chown=axom:axom . /home/axom/workspace
-WORKDIR /home/axom/workspace
-RUN mkdir build && cd build && cmake -DENABLE_DEVELOPER_DEFAULTS=On -C ../host-configs/rocm.cmake ..
-RUN cd build && make -j 16

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -87,11 +87,20 @@ class DynamicPoolList :
     std::size_t getReleasableSize() const noexcept;
 
     /*!
-     * \brief Get the number of memory blocks that the pools has
+     * \brief Get the number of memory blocks that the pool has
      *
      * \return The total number of blocks that are allocated by the pool
      */
     std::size_t getBlocksInPool() const noexcept;
+
+    /*!
+     * \brief Get the largest allocatable number of bytes from pool before
+     * the pool will grow.
+     *
+     * return The largest number of bytes that may be allocated without 
+     * causing pool growth
+     */
+    std::size_t getLargestAvailableBlock() const noexcept;
 
     void coalesce() noexcept;
 

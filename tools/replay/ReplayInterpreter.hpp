@@ -56,6 +56,7 @@ class ReplayInterpreter {
     void replay_compileDeallocate( void );
     void replay_compileCoalesce( void );
     void replay_compileRelease( void );
+    void printAllocators(ReplayFile* optable);
 };
 
 #include "ReplayInterpreter.inl"

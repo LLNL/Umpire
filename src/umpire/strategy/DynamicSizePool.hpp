@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -341,6 +341,14 @@ public:
 
   std::size_t getBlocksInPool() const {
     return totalBlocks;
+  }
+
+  std::size_t getLargestAvailableBlock() const {
+    std::size_t largest_block{0};
+    for (struct Block *temp = freeBlocks; temp; temp = temp->next)
+      if ( temp->size > largest_block )
+        largest_block = temp->size;
+    return largest_block;
   }
 
   std::size_t getReleasableSize() const {

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -26,11 +26,11 @@ class HostReallocateOperation :
    * \copydetails MemoryOperation::transform
    */
   void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      util::AllocationRecord *src_allocation,
-      util::AllocationRecord *dst_allocation,
-      std::size_t length);
+      void* current_ptr,
+      void** new_ptr,
+      util::AllocationRecord *current_allocation,
+      util::AllocationRecord *new_allocation,
+      std::size_t new_size);
 };
 
 } // end of naemspace op
