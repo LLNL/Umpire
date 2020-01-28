@@ -88,6 +88,7 @@ public:
     , COALESCE
     , RELEASE
     , REALLOCATE
+    , SETDEFAULTALLOCATOR
   };
 
   struct Operation {

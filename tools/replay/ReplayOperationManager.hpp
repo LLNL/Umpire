@@ -37,6 +37,8 @@ private:
   void makeAllocator(ReplayFile::Operation* op);
   void makeAllocate(ReplayFile::Operation* op);
   void makeDeallocate(ReplayFile::Operation* op);
+  void makeSetDefaultAllocator(ReplayFile::Operation* op);
+  void makeReallocate(ReplayFile::Operation* op);
   void makeCoalesce(ReplayFile::Operation* op);
   void makeRelease(ReplayFile::Operation* op);
   void dumpStats();

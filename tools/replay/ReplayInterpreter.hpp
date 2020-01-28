@@ -42,6 +42,7 @@ class ReplayInterpreter {
     std::vector<std::string> m_row;
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
+    bool m_replaying_reallocate{false};
 
     int m_log_version_major;
     int m_log_version_minor;
@@ -51,11 +52,14 @@ class ReplayInterpreter {
 
     void strip_off_base(std::string& s);
     void replay_compileMemoryResource( void );
+    void replay_compileSetDefaultAllocator( void );
     void replay_compileAllocator( void );
+    void replay_compileReallocate( void );
     void replay_compileAllocate( void );
     void replay_compileDeallocate( void );
     void replay_compileCoalesce( void );
     void replay_compileRelease( void );
+    void replay_compileCopy( void );
     void printAllocators(ReplayFile* optable);
 };
 

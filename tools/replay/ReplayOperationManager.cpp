@@ -280,7 +280,7 @@ void ReplayOperationManager::printInfo()
 
     std::cout << std::endl;
   }
-  std::cout << m_ops_table->num_operations << " Operations" << std::endl;
+  std::cout << m_ops_table->num_operations-1 << " Operations" << std::endl;
 }
 
 void ReplayOperationManager::runOperations(bool gather_statistics)
@@ -288,13 +288,19 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
 
-  for ( auto op = &m_ops_table->ops[0];
+  for ( auto op = &m_ops_table->ops[1];
         op < &m_ops_table->ops[m_ops_table->num_operations];
         ++op)
   {
     switch (op->type) {
       case ReplayFile::otype::ALLOCATOR_CREATION:
         makeAllocator(op);
+        break;
+      case ReplayFile::otype::SETDEFAULTALLOCATOR:
+        makeSetDefaultAllocator(op);
+        break;
+      case ReplayFile::otype::REALLOCATE:
+        makeReallocate(op);
         break;
       case ReplayFile::otype::ALLOCATE:
         makeAllocate(op);
@@ -995,7 +1001,22 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 void ReplayOperationManager::makeAllocate(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+
   op->ptr = alloc->allocator->allocate(op->size);
+}
+
+void ReplayOperationManager::makeSetDefaultAllocator(ReplayFile::Operation* op)
+{
+  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto& rm = umpire::ResourceManager::getInstance();
+  rm.setDefaultAllocator(*(alloc->allocator));
+}
+
+void ReplayOperationManager::makeReallocate(ReplayFile::Operation* op)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto ptr = m_ops_table->ops[op->previous_op_idx].ptr;
+  op->ptr = rm.reallocate(ptr, op->size);
 }
 
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
