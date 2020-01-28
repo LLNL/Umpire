@@ -89,6 +89,7 @@ public:
     , RELEASE
     , REALLOCATE
     , SETDEFAULTALLOCATOR
+    , REALLOCATE_EX
   };
 
   struct Operation {
@@ -110,7 +111,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 4;
+  const uint64_t REPLAY_VERSION = 5;
 
   struct Header {
     struct Magic {

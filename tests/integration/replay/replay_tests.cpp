@@ -41,6 +41,9 @@ void testReallocation(std::string name)
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator(name);
 
+  //
+  // Test by using 100% reallocate
+  //
   for ( std::size_t size = 0 ; size <= MAX_ALLOCATION_SIZE ; size = size * 2 + 1 ) {
     auto default_alloc = rm.getDefaultAllocator();
 
@@ -60,6 +63,9 @@ void testReallocation(std::string name)
     alloc.deallocate( buffer );
   }
 
+  //
+  // Test with first allocation being from normal allocate
+  //
   for ( std::size_t size = 0 ; size <= MAX_ALLOCATION_SIZE ; size = size * 2 + 1 ) {
     int buffer_size = size;
     int* buffer = static_cast<int*>(alloc.allocate(buffer_size*sizeof(*buffer)));
@@ -69,6 +75,22 @@ void testReallocation(std::string name)
 
     buffer_size /= 5; // Reallocate to a smaller size.
     buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer)));
+
+    alloc.deallocate( buffer );
+  }
+
+  //
+  // Test using specific allocator for reallocate
+  //
+  for ( std::size_t size = 0 ; size <= MAX_ALLOCATION_SIZE ; size = size * 2 + 1 ) {
+    int buffer_size = size;
+    int* buffer = static_cast<int*>(alloc.allocate(buffer_size*sizeof(*buffer)));
+
+    buffer_size *= 3; // Reallocate to a larger size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer), alloc));
+
+    buffer_size /= 5; // Reallocate to a smaller size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer), alloc));
 
     alloc.deallocate( buffer );
   }

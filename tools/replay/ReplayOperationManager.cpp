@@ -302,6 +302,9 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
       case ReplayFile::otype::REALLOCATE:
         makeReallocate(op);
         break;
+      case ReplayFile::otype::REALLOCATE_EX:
+        makeReallocate_ex(op);
+        break;
       case ReplayFile::otype::ALLOCATE:
         makeAllocate(op);
         break;
@@ -1017,6 +1020,14 @@ void ReplayOperationManager::makeReallocate(ReplayFile::Operation* op)
   auto& rm = umpire::ResourceManager::getInstance();
   auto ptr = m_ops_table->ops[op->previous_op_idx].ptr;
   op->ptr = rm.reallocate(ptr, op->size);
+}
+
+void ReplayOperationManager::makeReallocate_ex(ReplayFile::Operation* op)
+{
+  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto ptr = m_ops_table->ops[op->previous_op_idx].ptr;
+  op->ptr = rm.reallocate(ptr, op->size, *(alloc->allocator));
 }
 
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)

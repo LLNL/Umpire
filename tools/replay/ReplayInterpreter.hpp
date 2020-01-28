@@ -55,6 +55,7 @@ class ReplayInterpreter {
     void replay_compileSetDefaultAllocator( void );
     void replay_compileAllocator( void );
     void replay_compileReallocate( void );
+    void replay_compileReallocate_ex( void );
     void replay_compileAllocate( void );
     void replay_compileDeallocate( void );
     void replay_compileCoalesce( void );

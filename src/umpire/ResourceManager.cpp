@@ -555,7 +555,7 @@ ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator a
        R"( "event": "reallocate_ex", "payload": {)"
     << R"( "ptr": ")" << current_ptr << R"(")"
     << R"(, "size": )" << new_size
-    << R"(", "allocator_ref": ")" << alloc.getAllocationStrategy() << R"(" } )");
+    << R"(, "allocator_ref": ")" << alloc.getAllocationStrategy() << R"(" } )");
 
   void* new_ptr{reallocate_impl(current_ptr, new_size, alloc)};
 
@@ -563,7 +563,7 @@ ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator a
        R"( "event": "reallocate_ex", "payload": {)"
     << R"( "ptr": ")" << current_ptr << R"(")"
     << R"(, "size": )" << new_size
-    << R"(", "allocator_ref": ")" << alloc.getAllocationStrategy() << R"(" } )"
+    << R"(, "allocator_ref": ")" << alloc.getAllocationStrategy() << R"(" } )"
     << R"(, "result": { "memory_ptr": ")" << new_ptr << R"(" } )");
 
   return new_ptr;
