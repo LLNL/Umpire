@@ -96,9 +96,9 @@ public:
 
   struct Operation {
     otype       op_type;
+    int         op_allocator;
     void*       op_allocated_ptr;
     std::size_t op_size;            // Size of allocation/operation
-    int         op_allocators[2];   // 0-src, 1-dst
     std::size_t op_offsets[2];      // 0-src, 1-dst
     std::size_t op_alloc_ops[2];    // 0-src, 1-dst/prev
   };
@@ -113,7 +113,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 6;
+  const uint64_t REPLAY_VERSION = 8;
 
   struct Header {
     struct Magic {
