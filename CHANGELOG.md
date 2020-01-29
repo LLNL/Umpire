@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- LC Gitlab CI now releases quartz resources as soon as possible.
+
 ### Removed
 
 ### Fixed
@@ -52,7 +54,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added `getLargestAvailableBlock` metric to dynamic list and map pools
 
 - Added documentation and recipe for `ThreadSafeAllocator`
-
 
 ### Changed
 
