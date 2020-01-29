@@ -35,6 +35,25 @@ namespace replay_test {
 const int TEST_ALLOCATIONS{3};
 const std::size_t ALLOCATION_SIZE{32};
 
+void testCopy(std::string name)
+{
+  constexpr std::size_t MAX_ALLOCATION_SIZE = 128;
+  constexpr std::size_t OFFSET = 12;
+  constexpr std::size_t COPYAMOUNT = 64;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto dst_allocator = rm.getAllocator(name);
+  auto src_allocator = rm.getAllocator("HOST");
+
+  char* src_buffer = static_cast<char*>(src_allocator.allocate(MAX_ALLOCATION_SIZE));
+  char* dst_buffer = static_cast<char*>(dst_allocator.allocate(MAX_ALLOCATION_SIZE));
+
+  rm.copy(dst_buffer, src_buffer+OFFSET, COPYAMOUNT);
+
+  src_allocator.deallocate(src_buffer);
+  dst_allocator.deallocate(dst_buffer);
+}
+
 void testReallocation(std::string name)
 {
   constexpr std::size_t MAX_ALLOCATION_SIZE = 32;
@@ -142,6 +161,7 @@ static void runTest()
   };
 
   for ( auto basename : allocators ) {
+    testCopy(basename);
     testAllocation(basename);
     testReallocation(basename);
 

@@ -61,6 +61,8 @@ class ReplayInterpreter {
     void replay_compileCoalesce( void );
     void replay_compileRelease( void );
     void replay_compileCopy( void );
+    int getAllocatorIndex(std::string ref_s);
+    uint64_t getPointer(std::string ptr_name);
     void printAllocators(ReplayFile* optable);
 };
 

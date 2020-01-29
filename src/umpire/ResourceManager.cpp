@@ -466,9 +466,9 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   UMPIRE_REPLAY(
     R"( "event": "copy", "payload": {)"
     << R"( "src": ")"                << src_ptr                    << R"(")"
-    << R"(, "src_offset": ")"        << src_offset                 << R"(")"
+    << R"(, "src_offset": )"         << src_offset
     << R"(, "dest": ")"              << dst_ptr                    << R"(")"
-    << R"(, "dst_offset": ")"        << dst_offset                 << R"(")"
+    << R"(, "dst_offset": )"         << dst_offset
     << R"(, "size": )"               << size
     << R"(, "src_allocator_ref": ")" << src_alloc_record->strategy << R"(")"
     << R"(, "dst_allocator_ref": ")" << dst_alloc_record->strategy << R"(")"

@@ -292,12 +292,15 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
         op < &m_ops_table->ops[m_ops_table->num_operations];
         ++op)
   {
-    switch (op->type) {
+    switch (op->op_type) {
       case ReplayFile::otype::ALLOCATOR_CREATION:
         makeAllocator(op);
         break;
       case ReplayFile::otype::SETDEFAULTALLOCATOR:
         makeSetDefaultAllocator(op);
+        break;
+      case ReplayFile::otype::COPY:
+        makeCopy(op);
         break;
       case ReplayFile::otype::REALLOCATE:
         makeReallocate(op);
@@ -318,7 +321,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
         makeRelease(op);
         break;
       default:
-        REPLAY_ERROR("Unknown operation type: " << op->type);
+        REPLAY_ERROR("Unknown operation type: " << op->op_type);
         break;
     }
 
@@ -356,7 +359,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
 
 void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
   auto& rm = umpire::ResourceManager::getInstance();
 
   switch (alloc->type) {
@@ -996,21 +999,21 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     break;
 
   default:
-    REPLAY_ERROR("Unknown operation type: " << op->type);
+    REPLAY_ERROR("Unknown operation type: " << op->op_type);
     break;
   }
 }
 
 void ReplayOperationManager::makeAllocate(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
 
-  op->ptr = alloc->allocator->allocate(op->size);
+  op->op_allocated_ptr = alloc->allocator->allocate(op->op_size);
 }
 
 void ReplayOperationManager::makeSetDefaultAllocator(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
   auto& rm = umpire::ResourceManager::getInstance();
   rm.setDefaultAllocator(*(alloc->allocator));
 }
@@ -1018,28 +1021,40 @@ void ReplayOperationManager::makeSetDefaultAllocator(ReplayFile::Operation* op)
 void ReplayOperationManager::makeReallocate(ReplayFile::Operation* op)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto ptr = m_ops_table->ops[op->previous_op_idx].ptr;
-  op->ptr = rm.reallocate(ptr, op->size);
+  auto ptr = m_ops_table->ops[op->op_alloc_ops[1]].op_allocated_ptr;
+  op->op_allocated_ptr = rm.reallocate(ptr, op->op_size);
 }
 
 void ReplayOperationManager::makeReallocate_ex(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
   auto& rm = umpire::ResourceManager::getInstance();
-  auto ptr = m_ops_table->ops[op->previous_op_idx].ptr;
-  op->ptr = rm.reallocate(ptr, op->size, *(alloc->allocator));
+  auto ptr = m_ops_table->ops[op->op_alloc_ops[1]].op_allocated_ptr;
+  op->op_allocated_ptr = rm.reallocate(ptr, op->op_size, *(alloc->allocator));
+}
+
+void ReplayOperationManager::makeCopy(ReplayFile::Operation* op)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  char* src_ptr = static_cast<char*>(m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr);
+  char* dst_ptr = static_cast<char*>(m_ops_table->ops[op->op_alloc_ops[1]].op_allocated_ptr);
+  auto src_off = op->op_offsets[0];
+  auto dst_off = op->op_offsets[1];
+  auto size = op->op_size;
+
+  rm.copy(dst_ptr+dst_off, src_ptr+src_off, size);
 }
 
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
-  auto ptr = m_ops_table->ops[op->allocation_op_idx].ptr;
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
+  auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
   alloc->allocator->deallocate(ptr);
 }
 
 void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
 
   try {
     auto dynamic_pool =
@@ -1055,7 +1070,7 @@ void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
 
 void ReplayOperationManager::makeRelease(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->allocator_table_index];
+  auto alloc = &m_ops_table->allocators[op->op_allocators[0]];
   alloc->allocator->release();
 }
 

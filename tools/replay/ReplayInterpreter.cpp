@@ -61,7 +61,7 @@ void ReplayInterpreter::buildOperations()
   hdr->num_allocators = 0;
   ReplayFile::Operation* op = &hdr->ops[0];
   memset(op, 0, sizeof(*op));
-  op->type = ReplayFile::otype::ALLOCATE;
+  op->op_type = ReplayFile::otype::ALLOCATE;
   hdr->num_operations = 1;
 
   // Get the input file size
@@ -259,20 +259,20 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
       {
         std::cerr << "Operations table data miscompare at operation #" << i << std::endl;
         std::cerr << "    LHS: "
-          << "type=" << m_ops->getOperationsTable()->ops[i].type
-          << ", allocator_table_index=" << m_ops->getOperationsTable()->ops[i].allocator_table_index
-          << ", previous_op_idx=" << m_ops->getOperationsTable()->ops[i].previous_op_idx
-          << ", allocation_op_idx=" << m_ops->getOperationsTable()->ops[i].allocation_op_idx
-          << ", size=" << m_ops->getOperationsTable()->ops[i].size
-          << ", ptr=" << m_ops->getOperationsTable()->ops[i].ptr
+          << "type=" << m_ops->getOperationsTable()->ops[i].op_type
+          << ", op_allocators[0]=" << m_ops->getOperationsTable()->ops[i].op_allocators[0]
+          << ", op_alloc_ops[1]=" << m_ops->getOperationsTable()->ops[i].op_alloc_ops[1]
+          << ", op_alloc_ops[0]=" << m_ops->getOperationsTable()->ops[i].op_alloc_ops[0]
+          << ", size=" << m_ops->getOperationsTable()->ops[i].op_size
+          << ", op_allocated_ptr=" << m_ops->getOperationsTable()->ops[i].op_allocated_ptr
           << std::endl;
         std::cerr << "    RHS: "
-          << "type=" << rh.m_ops->getOperationsTable()->ops[i].type
-          << ", allocator_table_index=" << rh.m_ops->getOperationsTable()->ops[i].allocator_table_index
-          << ", previous_op_idx=" << rh.m_ops->getOperationsTable()->ops[i].previous_op_idx
-          << ", allocation_op_idx=" << rh.m_ops->getOperationsTable()->ops[i].allocation_op_idx
-          << ", size=" << rh.m_ops->getOperationsTable()->ops[i].size
-          << ", ptr=" << rh.m_ops->getOperationsTable()->ops[i].ptr
+          << "type=" << rh.m_ops->getOperationsTable()->ops[i].op_type
+          << ", op_allocators[0]=" << rh.m_ops->getOperationsTable()->ops[i].op_allocators[0]
+          << ", op_alloc_ops[1]=" << rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[1]
+          << ", op_alloc_ops[0]=" << rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[0]
+          << ", size=" << rh.m_ops->getOperationsTable()->ops[i].op_size
+          << ", op_allocated_ptr=" << rh.m_ops->getOperationsTable()->ops[i].op_allocated_ptr
           << std::endl;
 
         rval = false;
@@ -319,8 +319,8 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   memset(op, 0, sizeof(*op));
 
-  op->type = ReplayFile::otype::ALLOCATOR_CREATION;
-  op->allocator_table_index = hdr->num_allocators;
+  op->op_type = ReplayFile::otype::ALLOCATOR_CREATION;
+  op->op_allocators[0] = hdr->num_allocators;
   m_allocator_index[allocator_name] = hdr->num_allocators;
   hdr->num_allocators++;
   hdr->num_operations++;
@@ -578,8 +578,8 @@ void ReplayInterpreter::replay_compileAllocator( void )
     ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
     memset(op, 0, sizeof(*op));
 
-    op->type = ReplayFile::otype::ALLOCATOR_CREATION;
-    op->allocator_table_index = hdr->num_allocators;
+    op->op_type = ReplayFile::otype::ALLOCATOR_CREATION;
+    op->op_allocators[0] = hdr->num_allocators;
 
     m_allocator_index[allocator_name] = hdr->num_allocators;
 
@@ -618,9 +618,9 @@ void ReplayInterpreter::replay_compileAllocate( void )
     const std::size_t alloc_size{m_json["payload"]["size"]};
     memset(op, 0, sizeof(*op));
 
-    op->type = ReplayFile::otype::ALLOCATE;
-    op->allocator_table_index = allocator_number;
-    op->size = alloc_size;
+    op->op_type = ReplayFile::otype::ALLOCATE;
+    op->op_allocators[0] = allocator_number;
+    op->op_size = alloc_size;
   }
   else {
     const std::string memory_str{m_json["result"]["memory_ptr"]};
@@ -646,15 +646,52 @@ void ReplayInterpreter::replay_compileSetDefaultAllocator( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   memset(op, 0, sizeof(*op));
 
-  op->type = ReplayFile::otype::SETDEFAULTALLOCATOR;
-  op->allocator_table_index = allocator_number;
+  op->op_type = ReplayFile::otype::SETDEFAULTALLOCATOR;
+  op->op_allocators[0] = allocator_number;
   hdr->num_operations++;
+}
+
+int ReplayInterpreter::getAllocatorIndex(std::string ref_s)
+{
+  const uint64_t ref_p{std::stoul(ref_s, nullptr, 0)};
+  auto n_iter(m_allocator_indices.find(ref_p));
+
+  if ( n_iter == m_allocator_indices.end() )
+    REPLAY_ERROR("Unable to find allocator: " << ref_s);
+
+  return n_iter->second;
+}
+
+uint64_t ReplayInterpreter::getPointer(std::string ptr_name)
+{
+  const uint64_t ptr{std::stoul(ptr_name, nullptr, 0)};
+
+  return ptr;
 }
 
 void ReplayInterpreter::replay_compileCopy( void )
 {
   if (m_replaying_reallocate)
     return;
+
+  ReplayFile::Header* hdr = m_ops->getOperationsTable();
+  ReplayFile::Operation* op = &hdr->ops[hdr->num_operations++];
+  memset(op, 0, sizeof(*op));
+
+  uint64_t src_ptr{ getPointer(std::string{m_json["payload"]["src"]}) };
+  uint64_t dst_ptr{ getPointer(std::string{m_json["payload"]["dest"]}) };
+  uint64_t src_off{m_json["payload"]["src_offset"]};
+  uint64_t dst_off{m_json["payload"]["dst_offset"]};
+
+  src_ptr -= src_off;
+  dst_ptr -= dst_off;
+
+  op->op_type = ReplayFile::otype::COPY;
+  op->op_size = m_json["payload"]["size"];
+  op->op_offsets[0] = m_json["payload"]["src_offset"];
+  op->op_offsets[1] = m_json["payload"]["dst_offset"];
+  op->op_alloc_ops[0] = m_allocation_id[src_ptr];
+  op->op_alloc_ops[1] = m_allocation_id[dst_ptr];
 }
 
 void ReplayInterpreter::replay_compileReallocate( void )
@@ -670,9 +707,9 @@ void ReplayInterpreter::replay_compileReallocate( void )
 
   if ( m_json["result"].is_null() ) {
     memset(op, 0, sizeof(*op));
-    op->type = ReplayFile::otype::REALLOCATE;
-    op->previous_op_idx = (ptr == 0) ? 0 : m_allocation_id[ptr];
-    op->size = alloc_size;
+    op->op_type = ReplayFile::otype::REALLOCATE;
+    op->op_alloc_ops[1] = (ptr == 0) ? 0 : m_allocation_id[ptr];
+    op->op_size = alloc_size;
   }
   else {
     const std::string memory_str{m_json["result"]["memory_ptr"]};
@@ -706,10 +743,10 @@ void ReplayInterpreter::replay_compileReallocate_ex( void )
 
   if ( m_json["result"].is_null() ) {
     memset(op, 0, sizeof(*op));
-    op->type = ReplayFile::otype::REALLOCATE_EX;
-    op->previous_op_idx = (ptr == 0) ? 0 : m_allocation_id[ptr];
-    op->size = alloc_size;
-    op->allocator_table_index = allocator_number;
+    op->op_type = ReplayFile::otype::REALLOCATE_EX;
+    op->op_alloc_ops[1] = (ptr == 0) ? 0 : m_allocation_id[ptr];
+    op->op_size = alloc_size;
+    op->op_allocators[0] = allocator_number;
   }
   else {
     const std::string memory_str{m_json["result"]["memory_ptr"]};
@@ -739,13 +776,13 @@ void ReplayInterpreter::replay_compileDeallocate( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
   memset(op, 0, sizeof(*op));
 
-  op->type = ReplayFile::otype::DEALLOCATE;
-  op->allocator_table_index = allocator_number;
+  op->op_type = ReplayFile::otype::DEALLOCATE;
+  op->op_allocators[0] = allocator_number;
 
   const std::string memory_str{m_json["payload"]["memory_ptr"]};
   const uint64_t memory_ptr{std::stoul(memory_str, nullptr, 0)};
 
-  op->allocation_op_idx = m_allocation_id[memory_ptr];
+  op->op_alloc_ops[0] = m_allocation_id[memory_ptr];
   hdr->num_operations++;
 }
 
@@ -758,8 +795,8 @@ void ReplayInterpreter::replay_compileCoalesce( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   memset(op, 0, sizeof(*op));
-  op->type = ReplayFile::otype::COALESCE;
-  op->allocator_table_index = m_allocator_index[allocator_name];
+  op->op_type = ReplayFile::otype::COALESCE;
+  op->op_allocators[0] = m_allocator_index[allocator_name];
   hdr->num_operations++;
 }
 
@@ -776,8 +813,8 @@ void ReplayInterpreter::replay_compileRelease( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   memset(op, 0, sizeof(*op));
-  op->type = ReplayFile::otype::RELEASE;
-  op->allocator_table_index = allocator_number;
+  op->op_type = ReplayFile::otype::RELEASE;
+  op->op_allocators[0] = allocator_number;
   hdr->num_operations++;
 }
 
