@@ -44,6 +44,17 @@ release_resources_build_quartz:
   when: always
   except:
     - /_qnone/
+  needs: ["test_quartz_clang_3_9_1",
+          "test_quartz_gcc_4_9_3",
+          "test_quartz_clang_4_0_0",
+          "test_quartz_cudatoolkit_9_1",
+          "test_quartz_gcc_6_1_0",
+          "test_quartz_gcc_7_1_0",
+          "test_quartz_icpc_16_0_4",
+          "test_quartz_icpc_17_0_2",
+          "test_quartz_icpc_18_0_0",
+          "test_quartz_pgi_17_10",
+          "test_quartz_pgi_18_5"]
 
 ####
 # Generic qwartz job, extending build script
@@ -69,7 +80,6 @@ release_resources_build_quartz:
   extends: .test_toss_3_x86_64_ib_script
   except:
     - /_qnone/
-
 
 ####
 # Here are all quartz build jobs
