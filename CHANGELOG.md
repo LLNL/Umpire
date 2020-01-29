@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added replay support for reallocate operations.
+
 ### Changed
 
 - LC Gitlab CI now releases quartz resources as soon as possible.

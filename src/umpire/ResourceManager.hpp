@@ -269,6 +269,8 @@ class ResourceManager {
 
     strategy::AllocationStrategy* getZeroByteAllocator();
 
+    void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator);
+
     util::AllocationMap m_allocations;
 
     std::list<std::unique_ptr<strategy::AllocationStrategy> > m_allocators;
