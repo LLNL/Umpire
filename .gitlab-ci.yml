@@ -35,6 +35,10 @@ start:
   script:
     - echo "Creating a reference job for dag execution (needs keyword)"
 
+.advanced_pipeline:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $UMPIRE_ALL_TARGETS == "ON"' #run only if ...
+
 # This is not a job, but contains project specific build commands
 # If an allocation exist with the name defined in this pipeline, the job will use it
 .build_toss_3_x86_64_ib_script:
@@ -59,7 +63,6 @@ start:
 
 .build_blueos_3_ppc64le_ib_p9_script:
   extends: .build_blueos_3_ppc64le_ib_script
-
 
 # This is where jobs are included
 include:
