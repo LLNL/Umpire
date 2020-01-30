@@ -36,7 +36,7 @@ cd ${BUILD_DIRECTORY}
 if [[ "${1}" != "--test-only" ]]
 then
     cmake \
-      -C ${PROJECT_DIRECTORY}/.gitlab/radiuss-ci/gitlab/conf/${CCONF} \
+      -C ${PROJECT_DIRECTORY}/.radiuss-ci/gitlab/conf/${CCONF} \
       -C ${PROJECT_DIRECTORY}/${CCONF} \
       ${PROJECT_DIRECTORY}
     cmake --build . -j 4
