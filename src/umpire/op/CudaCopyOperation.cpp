@@ -46,7 +46,7 @@ CudaCopyOperation::transform(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t length,
-    camp::resources::Context& ctx)
+    camp::resources::Resource& ctx)
 {
   auto device = ctx.get<camp::resources::Cuda>();
   auto stream = device.get_stream();

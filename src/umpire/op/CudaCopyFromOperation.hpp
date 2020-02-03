@@ -40,7 +40,7 @@ class CudaCopyFromOperation :
       util::AllocationRecord *src_allocation,
       util::AllocationRecord *dst_allocation,
       std::size_t length,
-      camp::resources::Context& ctx);
+      camp::resources::Resource& ctx);
 };
 
 } // end of namespace op

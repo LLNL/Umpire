@@ -45,7 +45,7 @@ camp::resources::Event CudaCopyToOperation::transform(
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t length,
-    camp::resources::Context& ctx)
+    camp::resources::Resource& ctx)
 {
 
   auto device = ctx.get<camp::resources::Cuda>();

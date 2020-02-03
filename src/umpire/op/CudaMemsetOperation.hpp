@@ -35,7 +35,7 @@ class CudaMemsetOperation : public MemoryOperation {
       util::AllocationRecord* ptr,
       int value,
       std::size_t length,
-      camp::resources::Context& ctx);
+      camp::resources::Resource& ctx);
 };
 
 } // end of naemspace op

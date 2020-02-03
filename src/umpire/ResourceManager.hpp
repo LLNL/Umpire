@@ -20,7 +20,7 @@
 
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
-#include "camp/contexts.hpp"
+#include "camp/resource.hpp"
 
 namespace umpire {
 
@@ -173,7 +173,7 @@ class ResourceManager {
      */
     void copy(void* dst_ptr, void* src_ptr, std::size_t size=0);
 
-    camp::resources::Event copy(void* dst_ptr, void* src_ptr, camp::resources::Context& ctx, std::size_t size=0);
+    camp::resources::Event copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size=0);
 
     /*!
      * \brief Set the first length bytes of ptr to the value val.

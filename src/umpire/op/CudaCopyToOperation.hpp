@@ -38,7 +38,7 @@ class CudaCopyToOperation : public MemoryOperation {
       umpire::util::AllocationRecord *src_allocation,
       umpire::util::AllocationRecord *dst_allocation,
       std::size_t length,
-      camp::resources::Context& ctx);
+      camp::resources::Resource& ctx);
 };
 
 } // end of namespace op
