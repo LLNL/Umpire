@@ -13,12 +13,13 @@
   tags:
     - shell
     - butte
-  stage: build
+  stage: b_build_and_test
   extends: .build_blueos_3_ppc64le_ib_script
   only:
     variables:
       - $UMPIRE_CI_BUTTE == "ON"
   allow_failure: true
+  needs: ["start"]
 
 ####
 # Here are all butte build jobs

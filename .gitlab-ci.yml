@@ -18,10 +18,22 @@ after_script:
 
 # There are no tests for now
 stages:
-  - allocate_resources
-  - build
-  - test
-  - release_resources
+  - start
+  - q_allocate_resources
+  - q_build
+  - q_test
+  - q_release_resources
+  - l_build_and_test
+  - b_build_and_test
+
+start:
+  variables:
+    GIT_STRATEGY: none
+  stage: start
+  tags:
+    - shell
+  script:
+    - echo "Creating a reference job for dag execution (needs keyword)"
 
 # This is not a job, but contains project specific build commands
 # If an allocation exist with the name defined in this pipeline, the job will use it
@@ -52,7 +64,7 @@ stages:
 # This is where jobs are included
 include:
   - local: .gitlab/ci/build_quartz.yml
-  - local: .gitlab/ci/build_butte.yml
   - local: .gitlab/ci/build_lassen.yml
+  - local: .gitlab/ci/build_butte.yml
 
 

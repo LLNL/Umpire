@@ -13,13 +13,14 @@
   tags:
     - shell
     - lassen
-  stage: build
+  stage: l_build_and_test
   extends: .build_blueos_3_ppc64le_ib_p9_script
   except:
     refs:
       - /_lnone/
     variables:
       - $UMPIRE_CI_LASSEN == "OFF"
+  needs: ["start"]
 
 ####
 # Here are all lassen build jobs
