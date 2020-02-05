@@ -813,7 +813,7 @@ INSTANTIATE_TEST_CASE_P(
 
 TEST(AsyncTest, Copy)
 {
-  auto context = camp::resources::Context{camp::resources::Cuda{}};
+  auto resource = camp::resources::Resource{camp::resources::Cuda{}};
   auto& rm = umpire::ResourceManager::getInstance();
 
   constexpr std::size_t size = 1024;
@@ -833,8 +833,8 @@ TEST(AsyncTest, Copy)
     source_array[i] = static_cast<float>(i);
   }
 
-  auto event = rm.copy(dest_array, source_array, context);
-  event = rm.copy(check_array, dest_array, context);
+  auto event = rm.copy(dest_array, source_array, resource);
+  event = rm.copy(check_array, dest_array, resource);
 
   event.wait();
 
