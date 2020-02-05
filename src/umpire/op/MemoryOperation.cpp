@@ -29,7 +29,7 @@ MemoryOperation::transform(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t UMPIRE_UNUSED_ARG(length),
-    camp::resources::Context& UMPIRE_UNUSED_ARG(ctx))
+    camp::resources::Resource& UMPIRE_UNUSED_ARG(ctx))
 {
   UMPIRE_ERROR("MemoryOperation::transform() is not implemented");
 }
@@ -50,7 +50,7 @@ MemoryOperation::apply(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     int UMPIRE_UNUSED_ARG(val),
     std::size_t UMPIRE_UNUSED_ARG(length),
-    camp::resources::Context& UMPIRE_UNUSED_ARG(ctx))
+    camp::resources::Resource& UMPIRE_UNUSED_ARG(ctx))
 {
   UMPIRE_ERROR("MemoryOperation::apply() is not implemented");
 }
