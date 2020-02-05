@@ -13,58 +13,61 @@
   tags:
     - shell
     - lassen
-  stage: build
+  stage: l_build_and_test
   extends: .build_blueos_3_ppc64le_ib_p9_script
-  except:
-    refs:
-      - /_lnone/
-    variables:
-      - $UMPIRE_CI_LASSEN == "OFF"
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /_lnone/ || $UMPIRE_CI_LASSEN == "OFF"' #run except if ...
+      when: never
+    - when: on_success
+  needs: ["start"]
+
+.build_lassen_advanced:
+  extends: [.build_lassen, .advanced_pipeline]
 
 ####
 # Here are all lassen build jobs
 
-build_lassen_clang_3_9_1:
+build_lassen_clang_3_9_1_advanced:
   variables:
     COMPILER: "clang_3_9_1"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
 
-build_lassen_gcc_4_9_3:
-  variables:
-    COMPILER: "gcc_4_9_3"
-  extends: .build_lassen
-
-build_lassen_gcc_8_3_1:
-  variables:
-    COMPILER: "gcc_8_3_1"
-  extends: .build_lassen
-
-build_lassen_clang_4_0_0:
+build_lassen_clang_4_0_0_advanced:
   variables:
     COMPILER: "clang_4_0_0"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
 
 build_lassen_clang_9_0_0:
   variables:
     COMPILER: "clang_9_0_0"
   extends: .build_lassen
 
-build_lassen_clang_coral_2017_06_29:
+build_lassen_gcc_4_9_3_advanced:
+  variables:
+    COMPILER: "gcc_4_9_3"
+  extends: .build_lassen_advanced
+
+build_lassen_gcc_8_3_1:
+  variables:
+    COMPILER: "gcc_8_3_1"
+  extends: .build_lassen
+
+build_lassen_clang_coral_2017_06_29_advanced:
   variables:
     COMPILER: "clang_coral_2017_06_29"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
-build_lassen_clang_coral_2017_08_31:
+build_lassen_clang_coral_2017_08_31_advanced:
   variables:
     COMPILER: "clang_coral_2017_08_31"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
-build_lassen_clang_coral_2017_09_06:
+build_lassen_clang_coral_2017_09_06_advanced:
   variables:
     COMPILER: "clang_coral_2017_09_06"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
 build_lassen_clang_coral_2017_09_18:
@@ -78,22 +81,22 @@ build_lassen_nvcc_gcc_4_9_3:
     COMPILER: "nvcc_gcc_4_9_3"
   extends: .build_lassen
 
-build_lassen_nvcc_clang_coral_2017_06_29:
+build_lassen_nvcc_clang_coral_2017_06_29_advanced:
   variables:
     COMPILER: "nvcc_clang_coral_2017_06_29"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
-build_lassen_nvcc_clang_coral_2017_08_31:
+build_lassen_nvcc_clang_coral_2017_08_31_advanced:
   variables:
     COMPILER: "nvcc_clang_coral_2017_08_31"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
-build_lassen_nvcc_clang_coral_2017_09_06:
+build_lassen_nvcc_clang_coral_2017_09_06_advanced:
   variables:
     COMPILER: "nvcc_clang_coral_2017_09_06"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
 build_lassen_nvcc_clang_coral_2017_09_18:
@@ -102,10 +105,10 @@ build_lassen_nvcc_clang_coral_2017_09_18:
   extends: .build_lassen
   allow_failure: true
 
-build_lassen_nvcc_xl-beta-2017.09.13:
+build_lassen_nvcc_xl-beta-2017.09.13_advanced:
   variables:
     COMPILER: "nvcc_xl-beta-2017.09.13"
-  extends: .build_lassen
+  extends: .build_lassen_advanced
   allow_failure: true
 
 build_lassen_nvcc_xl-beta-2019.08.20:
