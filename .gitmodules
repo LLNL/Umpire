@@ -4,3 +4,7 @@
 [submodule "src/umpire/tpl/conduit"]
 	path = src/umpire/tpl/conduit
 	url = https://github.com/LLNL/conduit.git
+[submodule ".gitlab/radiuss-ci"]
+	path = .radiuss-ci
+	url = https://github.com/LLNL/radiuss-ci
+	branch = feature/umpire-ci
