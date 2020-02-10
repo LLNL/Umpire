@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -32,16 +32,96 @@
 
 namespace replay_test {
 
-const int test_allocations{3};
-const std::size_t allocation_size{32};
+const int TEST_ALLOCATIONS{3};
+const std::size_t ALLOCATION_SIZE{32};
+
+void testCopy(std::string name)
+{
+  constexpr std::size_t MAX_ALLOCATION_SIZE = 128;
+  constexpr std::size_t OFFSET = 12;
+  constexpr std::size_t COPYAMOUNT = 64;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto dst_allocator = rm.getAllocator(name);
+  auto src_allocator = rm.getAllocator("HOST");
+
+  char* src_buffer = static_cast<char*>(src_allocator.allocate(MAX_ALLOCATION_SIZE));
+  char* dst_buffer = static_cast<char*>(dst_allocator.allocate(MAX_ALLOCATION_SIZE));
+
+  rm.copy(dst_buffer, src_buffer+OFFSET, COPYAMOUNT);
+
+  src_allocator.deallocate(src_buffer);
+  dst_allocator.deallocate(dst_buffer);
+}
+
+void testReallocation(std::string name)
+{
+  constexpr std::size_t MAX_ALLOCATION_SIZE = 32;
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.getAllocator(name);
+
+  //
+  // Test by using 100% reallocate
+  //
+  for ( std::size_t size = 0 ; size <= MAX_ALLOCATION_SIZE ; size = size * 2 + 1 ) {
+    auto default_alloc = rm.getDefaultAllocator();
+
+    int buffer_size = size;
+
+    rm.setDefaultAllocator(alloc);
+    int* buffer = static_cast<int*>(rm.reallocate(nullptr, buffer_size*sizeof(*buffer)));
+
+    rm.setDefaultAllocator(default_alloc);
+
+    buffer_size *= 3;   // Reallocate to a larger size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer)));
+
+    buffer_size /= 5;   // Reallocate to a smaller size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer)));
+
+    alloc.deallocate( buffer );
+  }
+
+  //
+  // Test with first allocation being from normal allocate
+  //
+  for ( std::size_t size = 0 ; size <= MAX_ALLOCATION_SIZE ; size = size * 2 + 1 ) {
+    int buffer_size = size;
+    int* buffer = static_cast<int*>(alloc.allocate(buffer_size*sizeof(*buffer)));
+
+    buffer_size *= 3; // Reallocate to a larger size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer)));
+
+    buffer_size /= 5; // Reallocate to a smaller size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer)));
+
+    alloc.deallocate( buffer );
+  }
+
+  //
+  // Test using specific allocator for reallocate
+  //
+  for ( std::size_t size = 0 ; size <= MAX_ALLOCATION_SIZE ; size = size * 2 + 1 ) {
+    int buffer_size = size;
+    int* buffer = static_cast<int*>(alloc.allocate(buffer_size*sizeof(*buffer)));
+
+    buffer_size *= 3; // Reallocate to a larger size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer), alloc));
+
+    buffer_size /= 5; // Reallocate to a smaller size.
+    buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size*sizeof(*buffer), alloc));
+
+    alloc.deallocate( buffer );
+  }
+}
 
 void testAllocation(std::string name)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator(name);
 
-  for ( int i = 0; i < test_allocations; ++i ) {
-    auto ptr = alloc.allocate( allocation_size );
+  for ( int i = 0; i < TEST_ALLOCATIONS; ++i ) {
+    auto ptr = alloc.allocate( ALLOCATION_SIZE );
     alloc.deallocate( ptr );
   }
 
@@ -81,10 +161,12 @@ static void runTest()
   };
 
   for ( auto basename : allocators ) {
-    std::string name;
-    auto base_alloc = rm.getAllocator(basename);
-
+    testCopy(basename);
     testAllocation(basename);
+    testReallocation(basename);
+
+    auto base_alloc = rm.getAllocator(basename);
+    std::string name;
 
 #if defined(UMPIRE_ENABLE_NUMA)
     if ( basename == "HOST" ) {
@@ -210,7 +292,7 @@ static void runTest()
     name = basename + "_ThreadSafeAllocator_no_instrospection_spec_";
     testAllocator<umpire::strategy::ThreadSafeAllocator, false>(name, base_alloc);
 
-    auto fpa1 = allocation_size; // object_bytes
+    auto fpa1 = ALLOCATION_SIZE; // object_bytes
     auto fpa2 = 1024; // objects_per_pool                        
     name = basename + "_FixedPool_spec_";
     testAllocator<umpire::strategy::FixedPool, true>(name+"1", base_alloc, fpa1);

@@ -10,6 +10,39 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+- LC Gitlab CI runs only a subset of targets on PRs, and all of them on master
+  and develop branch.
+  
+- Update BLT to version 0.3.0
+
+### Removed
+
+### Fixed
+
+
+## [2.1.0] - 2020-01-30
+
+### Added
+
+- Added replay support for reallocate operations.
+
+### Changed
+
+- LC Gitlab CI now releases quartz resources as soon as possible.
+
+### Removed
+
+### Fixed
+
+- Fixed reallocate corner case of reallocating a zero-sized allocation from a
+  previously allocated zero-sized allocation.
+
+## [2.0.0] - 2020-01-13
+
+### Added
+
 - `ENABLE_DEVICE_CONST` CMake option to control whether device constant memory
   is enabled. It is now disabled by default.
 
@@ -38,7 +71,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added documentation and recipe for `ThreadSafeAllocator`
 
-
 ### Changed
 
 - LC GitLab CI now using lassen by default instead of butte. Build and test
@@ -60,7 +92,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay tool changed to create a binary index file of the operations from
   the original json file that may be used (and reused) for quicker replays.
 
-- Update BLT to version 0.3.0
+- `UMPIRE_VERSION_X` are now defined as macros, rather than constexpr variables
 
 ### Removed
 

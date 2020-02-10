@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -268,6 +268,8 @@ class ResourceManager {
     std::string getAllocatorInformation() const noexcept;
 
     strategy::AllocationStrategy* getZeroByteAllocator();
+
+    void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator);
 
     util::AllocationMap m_allocations;
 

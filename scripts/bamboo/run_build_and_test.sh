@@ -1,6 +1,6 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -22,7 +22,7 @@ module list
 if [ -f ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake ]; then
   echo "Configuring..."
   trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-    -C ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
+    -C ${UMPIRE_SOURCE_DIR}/.radiuss-ci/gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
     -C ${UMPIRE_SOURCE_DIR}/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
     -DCMAKE_BUILD_TYPE=${UMPIRE_BUILD_TYPE} ${BUILD_OPTIONS} ${UMPIRE_SOURCE_DIR}"
 

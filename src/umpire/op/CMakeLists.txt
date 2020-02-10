@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -68,22 +68,6 @@ if (ENABLE_CUDA)
   set (umpire_op_depends
     ${umpire_op_depends}
     cuda_runtime)
-endif ()
-
-if (ENABLE_HCC)
-  set (umpire_op_headers
-    ${umpire_op_headers}
-    RocmCopyOperation.hpp
-    RocmMemsetOperation.hpp)
-
-  set (umpire_op_sources
-    ${umpire_op_sources}
-    RocmCopyOperation.cpp
-    RocmMemsetOperation.cpp)
-
-  set (umpire_op_depends
-    ${umpire_op_depends}
-    rocm)
 endif ()
 
 if (ENABLE_HIP)

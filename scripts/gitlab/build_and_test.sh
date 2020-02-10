@@ -1,6 +1,6 @@
 #!/bin/bash
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -36,7 +36,7 @@ cd ${BUILD_DIRECTORY}
 if [[ "${1}" != "--test-only" ]]
 then
     cmake \
-      -C ${PROJECT_DIRECTORY}/.gitlab/conf/${CCONF} \
+      -C ${PROJECT_DIRECTORY}/.radiuss-ci/gitlab/conf/${CCONF} \
       -C ${PROJECT_DIRECTORY}/${CCONF} \
       ${PROJECT_DIRECTORY}
     cmake --build . -j 4

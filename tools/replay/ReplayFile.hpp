@@ -84,24 +84,23 @@ public:
   enum otype {
       ALLOCATOR_CREATION = 1
     , ALLOCATE
-    , DEALLOCATE
     , COALESCE
+    , COPY
+    , MOVE
+    , DEALLOCATE
+    , REALLOCATE
+    , REALLOCATE_EX
     , RELEASE
+    , SETDEFAULTALLOCATOR
   };
 
   struct Operation {
-    otype type;
-    int allocator_table_index;
-
-    union {
-      struct {
-        std::size_t size;
-        void* ptr;
-      } allocate;
-      struct {
-        int allocation_op_idx;   // Index to actual allocation operation to get ptr
-      } deallocate ;
-    } argv ;
+    otype       op_type;
+    int         op_allocator;
+    void*       op_allocated_ptr;
+    std::size_t op_size;            // Size of allocation/operation
+    std::size_t op_offsets[2];      // 0-src, 1-dst
+    std::size_t op_alloc_ops[2];    // 0-src, 1-dst/prev
   };
 
   const uint64_t REPLAY_MAGIC =
@@ -114,7 +113,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 3;
+  const uint64_t REPLAY_VERSION = 8;
 
   struct Header {
     struct Magic {
@@ -133,10 +132,10 @@ public:
 
   void copyString(std::string source, char (&dest)[max_name_length]);
   bool compileNeeded() { return m_compile_needed; }
+  const std::string m_input_filename;
 
 private:
   Header* m_op_tables{nullptr};
-  const std::string m_input_filename;
   const std::string m_binary_filename;
   int m_fd;
   bool m_compile_needed{false};
