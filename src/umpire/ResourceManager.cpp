@@ -223,6 +223,7 @@ ResourceManager::initialize()
 
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE"] = allocator.get();
+    m_allocators_by_name["DEVICE_0"] = allocator.get();
     m_memory_resources[resource::Device] = allocator.get();
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
