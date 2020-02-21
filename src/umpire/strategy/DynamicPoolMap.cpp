@@ -334,6 +334,12 @@ Platform DynamicPoolMap::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+DynamicPoolMap::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 void DynamicPoolMap::mergeFreeBlocks()
 {
   if (m_free_map.size() < 2) return;

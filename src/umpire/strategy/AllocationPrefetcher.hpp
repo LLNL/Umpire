@@ -37,6 +37,8 @@ class AllocationPrefetcher :
     std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
+
+    MemoryResourceTraits getTraits() const noexcept;
   private:
     std::shared_ptr<op::MemoryOperation> m_prefetch_operation;
     strategy::AllocationStrategy* m_allocator;

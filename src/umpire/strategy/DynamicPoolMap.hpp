@@ -81,6 +81,9 @@ class DynamicPoolMap : public AllocationStrategy
 
     Platform getPlatform() noexcept override;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
+
     /*!
      * \brief Returns the number of bytes of unallocated data held by this pool
      * that could be immediately released back to the resource.

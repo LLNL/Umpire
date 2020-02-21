@@ -104,6 +104,8 @@ class DynamicPoolList :
 
     void coalesce() noexcept;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
   private:
     DynamicSizePool<>* dpa;
 
