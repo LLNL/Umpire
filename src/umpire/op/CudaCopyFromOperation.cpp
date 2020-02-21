@@ -25,8 +25,10 @@ void CudaCopyFromOperation::transform(
   int old_device;
   cudaGetDevice(&old_device);
   cudaSetDevice(device);
+
   cudaError_t error =
     ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost);
+
   cudaSetDevice(old_device);
 
   if (error != cudaSuccess) {

@@ -61,6 +61,8 @@ CudaDeviceResourceFactory::getDefaultTraits()
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
+  traits.id = 0;
+
   return traits;
 }
 
