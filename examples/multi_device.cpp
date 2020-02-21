@@ -10,7 +10,9 @@
 
 __global__
 void touch_data(double* data, int len) {
-  int id = threadIdx.x;
+
+  int id = blockIdx.x * blockDim.x + threadIdx.x;
+
   if (id < len) {
     data[id] = id*1024;
   }
@@ -42,13 +44,11 @@ int main(int, char**)
   touch_data<<<NUM_BLOCKS, BLOCK_SIZE>>>(a, 4096);
   cudaDeviceSynchronize();
 
-  cudaSetDevice(1);
-  touch_data<<<NUM_BLOCKS, BLOCK_SIZE>>>(b, 4096);
-  cudaDeviceSynchronize();
+  rm.copy(b, a);
 
-  a = static_cast<double*>(rm.move(a, rm.getAllocator("HOST")));
-  std::cout << "a[256]= " << a[256] << std::endl;
+  b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
+  std::cout << "a[256]= " << b[256] << std::endl;
 
-  //pool0.deallocate(a);
-  pool1.deallocate(b);
+  rm.deallocate(a);
+  rm.deallocate(b);
 }
