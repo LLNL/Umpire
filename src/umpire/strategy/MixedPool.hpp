@@ -72,6 +72,9 @@ class MixedPool :
 
     Platform getPlatform() noexcept override;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
+
   private:
     using IntMap = std::map<uintptr_t, int>;
     IntMap m_map;

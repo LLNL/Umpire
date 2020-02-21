@@ -35,6 +35,9 @@ class SlotPool :
     std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
+
+    MemoryResourceTraits getTraits() const noexcept;
+
   private:
     void init();
 

@@ -36,6 +36,8 @@ class ZeroByteHandler :
 
     Platform getPlatform() noexcept;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
     strategy::AllocationStrategy* getAllocationStrategy();
 
   private:

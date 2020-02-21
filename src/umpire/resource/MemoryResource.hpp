@@ -90,7 +90,7 @@ class MemoryResource :
      */
     virtual Platform getPlatform() noexcept = 0;
 
-    MemoryResourceTraits getTraits();
+    MemoryResourceTraits getTraits() const noexcept override;
   protected:
     MemoryResourceTraits m_traits;
 };

@@ -42,6 +42,8 @@ class NumaPolicy :
 
     Platform getPlatform() noexcept;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
     int getNode() const noexcept;
 
   private:

@@ -38,6 +38,8 @@ class MonotonicAllocationStrategy :
 
     Platform getPlatform() noexcept;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
   private:
     void* m_block;
 

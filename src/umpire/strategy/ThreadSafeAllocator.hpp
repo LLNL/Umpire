@@ -39,6 +39,8 @@ class ThreadSafeAllocator :
 
     Platform getPlatform() noexcept;
 
+    MemoryResourceTraits getTraits() const noexcept;
+
   protected:
     strategy::AllocationStrategy* m_allocator;
 
