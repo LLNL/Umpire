@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -16,8 +16,8 @@ namespace strategy {
 MonotonicAllocationStrategy::MonotonicAllocationStrategy(
     const std::string& name,
     int id,
-    std::size_t capacity,
-    Allocator allocator) :
+    Allocator allocator,
+    std::size_t capacity) :
   AllocationStrategy(name, id),
   m_size(0),
   m_capacity(capacity),

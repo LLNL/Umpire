@@ -19,7 +19,6 @@ Here is a summary of the configuration options, their default value, and meaning
       ===========================  ======== ===============================================================================
       ``ENABLE_CUDA``              Off      Enable CUDA support
       ``ENABLE_HIP``               Off      Enable HIP support
-      ``ENABLE_HCC``               Off      Enable HCC support
       ``ENABLE_NUMA``              Off      Enable NUMA support
       ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
@@ -37,17 +36,12 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_CUDA``
   This option enables support for NVIDIA GPUs using the CUDA programming model.
-  If Umpire is built without CUDA, HCC, or HIP support, then only the ``HOST``
+  If Umpire is built without CUDA or HIP support, then only the ``HOST``
   allocator is available for use.
 
 * ``ENABLE_HIP``
   This option enables support for AMD GPUs using the ROCm stack and HIP
-  programming model. If Umpire is built without CUDA, HCC, or HIP support,
-  then only the ``HOST`` allocator is available for use.
-
-* ``ENABLE_HCC``
-  This option enables support for AMD GPUs using the ROCm stack and HCC
-  programming model. If Umpire is built without CUDA, HCC, or HIP support,
+  programming model. If Umpire is built without CUDA or HIP support,
   then only the ``HOST`` allocator is available for use.
 
 * ``ENABLE_NUMA``

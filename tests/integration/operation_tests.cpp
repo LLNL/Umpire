@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -283,6 +283,83 @@ class ReallocateTest :
 {
 };
 
+// This value is such that the 64Kb limit on device constant memory is not hit
+// in check_alloc_realloc_free when reallocating to 3 * SIZE.
+constexpr int SIZE = 5345;
+
+TEST_P(ReallocateTest, ReallocateSweep)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+  const bool hostAccessible = source_allocator->getId() == rm.getAllocator("HOST").getId();
+
+  for ( int size = 0 ; size <= SIZE ; size = size * 2 + 1 ) {
+    int buffer_size = size;
+    int* buffer = nullptr;
+
+    ASSERT_NO_THROW({
+      buffer = static_cast<int*>(
+          source_allocator->allocate(buffer_size*sizeof(*buffer)));
+    });
+
+    ASSERT_EQ(source_allocator->getId(), rm.getAllocator(buffer).getId());
+
+    if ( hostAccessible ) {
+      // Populate the buffer.
+      for ( int i = 0 ; i < buffer_size ; ++i ) {
+        buffer[ i ] = i;
+      }
+
+      // Check the values.
+      for ( int i = 0 ; i < buffer_size ; ++i ) {
+        ASSERT_EQ( buffer[ i ], i );
+      }
+    }
+
+    // Reallocate to a larger size.
+    buffer_size *= 3;
+    ASSERT_NO_THROW({
+      buffer = static_cast<int*>(rm.reallocate( buffer, buffer_size*sizeof(*buffer) ));
+    });
+    if (buffer_size > 0) {
+      ASSERT_EQ(source_allocator->getId(), rm.getAllocator(buffer).getId());
+    }
+
+    if ( hostAccessible ) {
+      // Populate the new values.
+      for ( int i = size ; i < buffer_size ; ++i ) {
+        buffer[ i ] = i;
+      }
+
+      // Check all the values.
+      for ( int i = 0 ; i < buffer_size ; ++i ) {
+        EXPECT_EQ( buffer[ i ], i );
+      }
+    }
+
+    // Reallocate to a smaller size.
+    buffer_size /= 5;
+    ASSERT_NO_THROW({
+      buffer = static_cast<int*>(rm.reallocate( buffer, buffer_size*sizeof(*buffer) ));
+    });
+    if (buffer_size > 0) {
+      ASSERT_EQ(source_allocator->getId(), rm.getAllocator(buffer).getId());
+    }
+
+    if ( hostAccessible ) {
+      // Check all the values.
+      for ( int i = 0 ; i < buffer_size ; ++i ) {
+        EXPECT_EQ( buffer[ i ], i );
+      }
+    }
+
+    // Free
+    ASSERT_NO_THROW({
+      source_allocator->deallocate( buffer );
+    });
+    //EXPECT_TRUE( buffer == nullptr );
+  }
+}
+
 TEST_P(ReallocateTest, Reallocate)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
@@ -364,6 +441,144 @@ TEST_P(ReallocateTest, RealocateNull)
   rm.setDefaultAllocator(rm.getAllocator("HOST"));
 }
 
+TEST_P(ReallocateTest, ReallocateNullZero)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  rm.setDefaultAllocator(*source_allocator);
+  // nullptr, zero size
+  const std::size_t reallocated_zero_size{0};
+  const std::size_t reallocated_size_1{m_size+50};
+  const std::size_t reallocated_size_2{m_size+100};
+
+  float* reallocated_array{nullptr};
+
+  // nullptr, zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float) ));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+  rm.deallocate(reallocated_array);
+  reallocated_array = nullptr;
+
+  // nullptr, non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr (size > 0), non-zero increment
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_2*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_2*sizeof(float));
+
+  // valid ptr (size > 0), non-zero decrement
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr (size > 0), zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+
+  // valid ptr (size == 0), non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             ,  reallocated_size_1*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+  rm.setDefaultAllocator(rm.getAllocator("HOST"));
+}
+
+TEST_P(ReallocateTest, ReallocateNullZeroWithAllocator)
+{
+  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
+
+  // nullptr, zero size
+  const std::size_t reallocated_zero_size{0};
+  const std::size_t reallocated_size_1{m_size+50};
+  const std::size_t reallocated_size_2{m_size+100};
+
+  float* reallocated_array{nullptr};
+
+  // nullptr, zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+  rm.deallocate(reallocated_array);
+  reallocated_array = nullptr;
+
+  // nullptr, non-zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr, non-zero increment
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_2*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_2*sizeof(float));
+
+  // valid ptr, non-zero decrement
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_size_1*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_size_1*sizeof(float));
+
+  // valid ptr, zero size
+  reallocated_array =
+    static_cast<float*>(
+      rm.reallocate(   static_cast<void*>(reallocated_array)
+                    ,  reallocated_zero_size*sizeof(float)
+                    , *source_allocator));
+
+  ASSERT_EQ(   source_allocator->getSize(reallocated_array)
+             , reallocated_zero_size*sizeof(float));
+
+  rm.deallocate(reallocated_array);
+}
+
 TEST_P(ReallocateTest, ReallocateNullWithAllocator)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
@@ -403,11 +618,10 @@ TEST_P(ReallocateTest, ReallocateWithAllocator)
 
 TEST_P(ReallocateTest, ReallocateWithAllocatorFail)
 {
-  umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
-
   if (source_allocator->getId() == dest_allocator->getId()) {
     SUCCEED();
   } else {
+    umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
     ASSERT_THROW(
         rm.reallocate(source_array, m_size, *dest_allocator),
         umpire::util::Exception);

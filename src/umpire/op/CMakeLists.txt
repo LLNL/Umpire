@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -40,42 +40,34 @@ if (ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
     CudaAdviseAccessedByOperation.hpp
+    CudaAdviseUnsetAccessedByOperation.hpp
     CudaAdvisePreferredLocationOperation.hpp
+    CudaAdviseUnsetPreferredLocationOperation.hpp
     CudaAdviseReadMostlyOperation.hpp
+    CudaAdviseUnsetReadMostlyOperation.hpp
     CudaCopyOperation.hpp
     CudaCopyFromOperation.hpp
     CudaCopyToOperation.hpp
-    CudaMemsetOperation.hpp)
+    CudaMemsetOperation.hpp
+    CudaMemPrefetchOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
     CudaAdviseAccessedByOperation.cpp
+    CudaAdviseUnsetAccessedByOperation.cpp
     CudaAdvisePreferredLocationOperation.cpp
+    CudaAdviseUnsetPreferredLocationOperation.cpp
     CudaAdviseReadMostlyOperation.cpp
+    CudaAdviseUnsetReadMostlyOperation.cpp
     CudaCopyOperation.cpp
     CudaCopyFromOperation.cpp
     CudaCopyToOperation.cpp
-    CudaMemsetOperation.cpp)
+    CudaMemsetOperation.cpp
+    CudaMemPrefetchOperation.cpp)
 
   set (umpire_op_depends
     ${umpire_op_depends}
     cuda_runtime)
-endif ()
-
-if (ENABLE_HCC)
-  set (umpire_op_headers
-    ${umpire_op_headers}
-    RocmCopyOperation.hpp
-    RocmMemsetOperation.hpp)
-
-  set (umpire_op_sources
-    ${umpire_op_sources}
-    RocmCopyOperation.cpp
-    RocmMemsetOperation.cpp)
-
-  set (umpire_op_depends
-    ${umpire_op_depends}
-    rocm)
 endif ()
 
 if (ENABLE_HIP)

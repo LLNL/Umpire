@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -29,11 +29,6 @@
 #endif
 #endif
 
-#if defined(UMPIRE_ENABLE_HCC)
-#include "umpire/resource/RocmDeviceResourceFactory.hpp"
-#include "umpire/resource/RocmPinnedMemoryResourceFactory.hpp"
-#endif
-
 #if defined(UMPIRE_ENABLE_HIP)
 #include <hip/hip_runtime.h>
 
@@ -44,6 +39,7 @@
 #endif
 #endif
 
+#include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/AllocationTracker.hpp"
@@ -120,14 +116,6 @@ ResourceManager::ResourceManager() :
 #endif
 #endif
 
-#if defined(UMPIRE_ENABLE_HCC)
-  registry.registerMemoryResource(
-    util::make_unique<resource::RocmDeviceResourceFactory>());
-
-  registry.registerMemoryResource(
-    util::make_unique<resource::RocmPinnedMemoryResourceFactory>());
-#endif
-
 #if defined(UMPIRE_ENABLE_HIP)
   registry.registerMemoryResource(
     util::make_unique<resource::HipDeviceResourceFactory>());
@@ -163,11 +151,11 @@ ResourceManager::initialize()
       UMPIRE_VERSION_PATCH << "." <<
       UMPIRE_VERSION_RC);
 
-  UMPIRE_REPLAY( "\"event\": \"version\", \"payload\": { \"major\":" << UMPIRE_VERSION_MAJOR
-      << ", \"minor\":" << UMPIRE_VERSION_MINOR
-      << ", \"patch\":" << UMPIRE_VERSION_PATCH
-      << ", \"rc\": \"" << UMPIRE_VERSION_RC << "\""
-      << " }");
+  UMPIRE_REPLAY(
+      R"( "event": "version", "payload": { "major": )" << UMPIRE_VERSION_MAJOR
+      << R"(, "minor": )" << UMPIRE_VERSION_MINOR
+      << R"(, "patch": )" << UMPIRE_VERSION_PATCH
+      << R"(, "rc": ")" << UMPIRE_VERSION_RC << R"(" })");
 
   resource::MemoryResourceRegistry& registry{
     resource::MemoryResourceRegistry::getInstance()};
@@ -181,10 +169,8 @@ ResourceManager::initialize()
             registry.makeMemoryResource("HOST", getNextId()))};
 
     UMPIRE_REPLAY(
-         "\"event\": \"makeMemoryResource\""
-      << ", \"payload\": { \"name\": \"" << "HOST" << "\" }"
-      << ", \"result\": \"" << host_allocator.get() << "\""
-    );
+      R"( "event": "makeMemoryResource", "payload": { "name": "HOST" })"
+      << R"(, "result": ")" << host_allocator.get() << R"(")");
 
     int id{host_allocator->getId()};
     m_allocators_by_name["HOST"]  = host_allocator.get();
@@ -232,11 +218,8 @@ ResourceManager::initialize()
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("DEVICE", getNextId()))};
     UMPIRE_REPLAY(
-         "\"event\": \"makeMemoryResource\""
-      << ", \"payload\": { \"name\": \"" << "DEVICE" << "\" }"
-      << ", \"result\": \"" << allocator.get() << "\""
-    );
-
+      R"( "event": "makeMemoryResource", "payload": { "name": "DEVICE" })"
+      << R"(, "result": ")" << allocator.get() << R"(")");
 
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE"] = allocator.get();
@@ -254,10 +237,8 @@ ResourceManager::initialize()
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("PINNED", getNextId()))};
     UMPIRE_REPLAY(
-         "\"event\": \"makeMemoryResource\""
-      << ", \"payload\": { \"name\": \"" << "PINNED" << "\" }"
-      << ", \"result\": \"" << allocator.get() << "\""
-    );
+      R"( "event": "makeMemoryResource", "payload": { "name": "PINNED" })"
+      << R"(, "result": ")" << allocator.get() << R"(")");
 
     int id{allocator->getId()};
     m_allocators_by_name["PINNED"] = allocator.get();
@@ -269,22 +250,27 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_UM)
   {
+#if defined(UMPIRE_ENABLE_HIP)
+    // associate "DEVICE" allocator with "UM" name
+    auto allocator{m_memory_resources[resource::Device]};
+    m_allocators_by_name["UM"] = allocator;
+    m_memory_resources[resource::Unified] = allocator;
+#else
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{util::wrap_allocator<
         strategy::AllocationTracker,
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("UM", getNextId()))};
     UMPIRE_REPLAY(
-         "\"event\": \"makeMemoryResource\""
-      << ", \"payload\": { \"name\": \"" << "UM" << "\" }"
-      << ", \"result\": \"" << allocator.get() << "\""
-    );
+      R"( "event": "makeMemoryResource", "payload": { "name": "UM" })"
+      << R"(, "result": ")" << allocator.get() << R"(")");
 
     int id{allocator->getId()};
     m_allocators_by_name["UM"] = allocator.get();
     m_memory_resources[resource::Unified] = allocator.get();
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
+#endif
   }
 #endif
 
@@ -296,10 +282,8 @@ ResourceManager::initialize()
         strategy::ZeroByteHandler>(
             registry.makeMemoryResource("DEVICE_CONST", getNextId()))};
     UMPIRE_REPLAY(
-         "\"event\": \"makeMemoryResource\""
-      << ", \"payload\": { \"name\": \"" << "DEVICE_CONST" << "\" }"
-      << ", \"result\": \"" << allocator.get() << "\""
-    );
+      R"( "event": "makeMemoryResource", "payload": { "name": "DEVICE_CONST" })"
+      << R"(, "result": ")" << allocator.get() << R"(")");
 
     int id{allocator->getId()};
     m_allocators_by_name["DEVICE_CONST"] = allocator.get();
@@ -397,6 +381,10 @@ ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 {
   UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");
 
+  UMPIRE_REPLAY(
+    R"( "event": "setDefaultAllocator", "payload": { "allocator_ref": ")"
+    << allocator.getAllocationStrategy() << R"(" })");
+
   m_default_allocator = allocator.getAllocationStrategy();
 }
 
@@ -482,6 +470,17 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
     size = src_size;
   }
 
+  UMPIRE_REPLAY(
+    R"( "event": "copy", "payload": {)"
+    << R"( "src": ")"                << src_ptr                    << R"(")"
+    << R"(, "src_offset": )"         << src_offset
+    << R"(, "dest": ")"              << dst_ptr                    << R"(")"
+    << R"(, "dst_offset": )"         << dst_offset
+    << R"(, "size": )"               << size
+    << R"(, "src_allocator_ref": ")" << src_alloc_record->strategy << R"(")"
+    << R"(, "dst_allocator_ref": ")" << dst_alloc_record->strategy << R"(")"
+    << R"( } )");
+
   if (size > dst_size) {
     UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
   }
@@ -508,6 +507,14 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     length = size;
   }
 
+  UMPIRE_REPLAY( 
+       R"( "event": "memset", "payload": { )"
+    << R"( "ptr": ")"            << ptr                   << R"(")"
+    << R"(, "value": )"          << value
+    << R"(, "size": )"           << size
+    << R"(, "allocator_ref": ")" << alloc_record->strategy << R"(")"
+    << R"( })");
+
   if (length > size) {
     UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
   }
@@ -520,60 +527,114 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 }
 
 void*
-ResourceManager::reallocate(void* src_ptr, std::size_t size)
+ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
-  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
+  strategy::AllocationStrategy* strategy;
 
-  void* dst_ptr = nullptr;
+  UMPIRE_REPLAY(
+       R"( "event": "reallocate", "payload": {)"
+    << R"( "ptr": ")" << current_ptr << R"(")"
+    << R"(, "size": )" << new_size << R"( } )");
 
-  if (!src_ptr) {
-    dst_ptr = m_default_allocator->allocate(size);
-  } else {
-    auto& op_registry = op::MemoryOperationRegistry::getInstance();
-
-    auto alloc_record = m_allocations.find(src_ptr);
-
-    if (src_ptr != alloc_record->ptr) {
-      UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr=" << src_ptr << ", base=" << alloc_record->ptr);
-    }
-
-    auto op = op_registry.find("REALLOCATE",
-        alloc_record->strategy,
-        alloc_record->strategy);
-
-
-    op->transform(src_ptr, &dst_ptr, alloc_record, alloc_record, size);
+  if ( current_ptr != nullptr ) {
+    auto alloc_record = m_allocations.find(current_ptr);
+    strategy = alloc_record->strategy;
+  }
+  else {
+    strategy = m_default_allocator;
   }
 
-  return dst_ptr;
+  void* new_ptr{reallocate_impl(current_ptr, new_size, Allocator(strategy))};
+
+  UMPIRE_REPLAY(
+       R"( "event": "reallocate", "payload": {)"
+    << R"( "ptr": ")" << current_ptr << R"(")"
+    << R"(, "size": )" << new_size << R"( })"
+    << R"(, "result": { "memory_ptr": ")" << new_ptr << R"(" } )");
+
+  return new_ptr;
 }
 
 void*
-ResourceManager::reallocate(void* src_ptr, std::size_t size, Allocator allocator)
+ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc)
 {
-  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", size=" << size << ")");
+  UMPIRE_REPLAY(
+       R"( "event": "reallocate_ex", "payload": {)"
+    << R"( "ptr": ")" << current_ptr << R"(")"
+    << R"(, "size": )" << new_size
+    << R"(, "allocator_ref": ")" << alloc.getAllocationStrategy() << R"(" } )");
 
-  void* dst_ptr = nullptr;
+  void* new_ptr{reallocate_impl(current_ptr, new_size, alloc)};
 
-  if (!src_ptr) {
-    dst_ptr = allocator.allocate(size);
-  } else {
-    auto alloc_record = m_allocations.find(src_ptr);
+  UMPIRE_REPLAY(
+       R"( "event": "reallocate_ex", "payload": {)"
+    << R"( "ptr": ")" << current_ptr << R"(")"
+    << R"(, "size": )" << new_size
+    << R"(, "allocator_ref": ")" << alloc.getAllocationStrategy() << R"(" } )"
+    << R"(, "result": { "memory_ptr": ")" << new_ptr << R"(" } )");
 
-    if (alloc_record->strategy == allocator.getAllocationStrategy()) {
-      dst_ptr = reallocate(src_ptr, size);
-    } else {
-      UMPIRE_ERROR("Cannot reallocate " << src_ptr << " with Allocator " << allocator.getName());
+  return new_ptr;
+}
+
+void*
+ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator)
+{
+  UMPIRE_LOG(Debug,
+      "(current_ptr=" << current_ptr
+        << ", new_size=" << new_size
+        << ", with Allocator " << allocator.getName() << ")" );
+
+  void* new_ptr;
+
+  //
+  // If this is a brand new allocation, no reallocation necessary, just allocate
+  //
+  if ( current_ptr == nullptr ) {
+    new_ptr = allocator.allocate(new_size);
+  }
+  else {
+    auto alloc_record = m_allocations.find(current_ptr);
+    auto alloc = Allocator(alloc_record->strategy);
+
+    if ( alloc_record->strategy != allocator.getAllocationStrategy() ) {
+      UMPIRE_ERROR("Cannot reallocate " << current_ptr
+          << " from: " << alloc.getName()
+          << " with Allocator " << allocator.getName());
+    }
+
+    //
+    // Special case 0-byte size here
+    //
+    if ( new_size == 0 ) {
+      alloc.deallocate(current_ptr);
+      new_ptr = alloc.allocate(new_size);
+    }
+    else {
+      auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+      if (current_ptr != alloc_record->ptr) {
+        UMPIRE_ERROR("Cannot reallocate an offset ptr (ptr="
+            << current_ptr << ", base=" << alloc_record->ptr);
+      }
+
+      auto op = op_registry.find("REALLOCATE", alloc_record->strategy, alloc_record->strategy);
+
+      op->transform(current_ptr, &new_ptr, alloc_record, alloc_record, new_size);
     }
   }
 
-  return dst_ptr;
+  return new_ptr;
 }
 
 void*
 ResourceManager::move(void* ptr, Allocator allocator)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << ptr << ", allocator=" << allocator.getName() << ")");
+
+  UMPIRE_REPLAY(
+    R"( "event": "move", "payload": {")"
+    << R"( "ptr": ")" << ptr << R"(")"
+    << R"(, "allocator_ref": ")" << allocator.getAllocationStrategy() << R"(" })");
 
   auto alloc_record = m_allocations.find(ptr);
 
@@ -605,6 +666,11 @@ ResourceManager::move(void* ptr, Allocator allocator)
         UMPIRE_ASSERT(ret == ptr);
       }
 
+      UMPIRE_REPLAY( 
+        R"( "event": "move", "payload": {)"
+        << R"( "ptr": ")" << ptr << R"(")"
+        << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
+        << R"(, "result": { "ptr": ")" << ptr << R"(" })");
       return ptr;
     }
   }
@@ -616,6 +682,13 @@ ResourceManager::move(void* ptr, Allocator allocator)
 
   void* dst_ptr{allocator.allocate(alloc_record->size)};
   copy(dst_ptr, ptr);
+
+  UMPIRE_REPLAY( 
+    R"( "event": "move", "payload": {)"
+    << R"( "ptr": ")" << ptr << R"(")"
+    << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
+    << R"(, "result": { "ptr": ")" << dst_ptr << R"(" })"
+  );
 
   deallocate(ptr);
 
@@ -707,6 +780,20 @@ strategy::AllocationStrategy*
 ResourceManager::getZeroByteAllocator()
 {
   return m_allocators_by_name[s_zero_byte_pool_name];
+}
+
+std::shared_ptr<op::MemoryOperation>
+ResourceManager::getOperation(
+    const std::string& operation_name,
+    Allocator src_allocator,
+    Allocator dst_allocator)
+{
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  return op_registry.find(
+      operation_name,
+      src_allocator.getAllocationStrategy(),
+      dst_allocator.getAllocationStrategy());
 }
 
 } // end of namespace umpire

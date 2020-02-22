@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,8 +36,8 @@ AllocationAdvisor::AllocationAdvisor(
     Allocator accessing_allocator,
     int device_id) :
   AllocationStrategy(name, id),
-  m_allocator(allocator.getAllocationStrategy()),
-  m_device(device_id)
+  m_allocator{allocator.getAllocationStrategy()},
+  m_device{device_id}
 {
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
@@ -58,7 +58,6 @@ AllocationAdvisor::AllocationAdvisor(
 void* AllocationAdvisor::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator->allocate(bytes);
-
   m_advice_operation->apply(
       ptr,
       nullptr,
@@ -71,7 +70,6 @@ void* AllocationAdvisor::allocate(std::size_t bytes)
 void AllocationAdvisor::deallocate(void* ptr)
 {
   m_allocator->deallocate(ptr);
-
 }
 
 std::size_t AllocationAdvisor::getCurrentSize() const noexcept

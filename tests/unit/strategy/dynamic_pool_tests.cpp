@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -30,7 +30,7 @@ TEST(DynamicPoolTest, Construction) {
 
   {
     umpire::strategy::DynamicPool pool{"DynamicPool", 0, alloc,
-                                       SIZE*SIZE, SIZE, umpire::strategy::heuristic_percent_releasable(100), 16};
+                                       SIZE*SIZE, SIZE, 16, umpire::strategy::heuristic_percent_releasable(100)};
 
     // Pool should pre-allocate exactly this amount of memory (assuming alignment fits)
     EXPECT_EQ(pool.getActualSize(), SIZE*SIZE);

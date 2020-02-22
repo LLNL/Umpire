@@ -1,11 +1,9 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (strategy_output_dir ${TEST_OUTPUT_DIRECTORY}/unit/strategy)
-
 set (strategy_tests_depends
   umpire gtest)
 
@@ -16,8 +14,7 @@ endif()
 blt_add_executable(
   NAME fixed_pool_tests
   SOURCES fixed_pool_tests.cpp
-  DEPENDS_ON ${strategy_tests_depends}
-  OUTPUT_DIR ${strategy_output_dir})
+  DEPENDS_ON ${strategy_tests_depends})
 
 blt_add_test(
   NAME fixed_pool_tests
@@ -26,8 +23,7 @@ blt_add_test(
 blt_add_executable(
   NAME dynamic_pool_tests
   SOURCES dynamic_pool_tests.cpp
-  DEPENDS_ON ${strategy_tests_depends}
-  OUTPUT_DIR ${strategy_output_dir})
+  DEPENDS_ON ${strategy_tests_depends})
 
 blt_add_test(
   NAME dynamic_pool_tests

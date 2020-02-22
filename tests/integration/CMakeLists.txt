@@ -1,11 +1,9 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (integration_output_dir ${TEST_OUTPUT_DIRECTORY}/integration)
-
 set (allocator_integration_tests_depends
   umpire gtest)
 
@@ -23,8 +21,7 @@ endif ()
 blt_add_executable(
   NAME allocator_integration_tests
   SOURCES allocator_integration_tests.cpp
-  DEPENDS_ON ${allocator_integration_tests_depends}
-  OUTPUT_DIR ${integration_output_dir})
+  DEPENDS_ON ${allocator_integration_tests_depends})
 
 target_include_directories(
   allocator_integration_tests
@@ -53,8 +50,7 @@ endif()
 blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
-  DEPENDS_ON ${strategy_test_depends}
-  OUTPUT_DIR ${integration_output_dir})
+  DEPENDS_ON ${strategy_test_depends})
 
 target_include_directories(
   strategy_tests
@@ -75,8 +71,7 @@ endif()
 blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
-  DEPENDS_ON ${operation_test_depends}
-  OUTPUT_DIR ${integration_output_dir})
+  DEPENDS_ON ${operation_test_depends})
 
 target_include_directories(
   operation_tests
@@ -99,8 +94,7 @@ endif()
 blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
-  DEPENDS_ON ${free_functions_integration_tests_depends}
-  OUTPUT_DIR ${integration_output_dir})
+  DEPENDS_ON ${free_functions_integration_tests_depends})
 
 target_include_directories(
   free_functions_integration_tests
@@ -122,8 +116,7 @@ endif()
 blt_add_executable(
   NAME static_initialization_test
   SOURCES static_initialization_test.cpp
-  DEPENDS_ON ${static_initialization_test_depends}
-  OUTPUT_DIR ${integration_output_dir})
+  DEPENDS_ON ${static_initialization_test_depends})
 
 blt_add_test(
   NAME static_initialization_test

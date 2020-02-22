@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -21,7 +21,7 @@ Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
-  umpire_ver_1_found = 0;
+  umpire_ver_2_found = 0;
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
