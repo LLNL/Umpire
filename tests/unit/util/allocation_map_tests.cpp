@@ -34,7 +34,7 @@ class AllocationMapTest : public ::testing::Test {
     AllocationMapTest()
       : data(new double[15]),
         size(15*sizeof(double)),
-        record({data, size, nullptr}) {}
+        record({data, size, nullptr, umpire::util::Backtrace{}}) {}
 
     virtual ~AllocationMapTest() {
       delete[] data;
@@ -136,7 +136,7 @@ TEST_F(AllocationMapTest, RemoveAndUse)
 
 TEST_F(AllocationMapTest, RegisterMultiple)
 {
-  umpire::util::AllocationRecord next_record{data, 1, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr, umpire::util::Backtrace{}};
 
   ASSERT_NO_THROW(
     map.insert(data, record);
@@ -154,8 +154,8 @@ TEST_F(AllocationMapTest, RegisterNone)
 
 TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
 {
-  umpire::util::AllocationRecord next_record{data, 1, nullptr};
-  umpire::util::AllocationRecord another_record{data + 10, 5, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr, umpire::util::Backtrace{}};
+  umpire::util::AllocationRecord another_record{data + 10, 5, nullptr, umpire::util::Backtrace{}};
 
   ASSERT_NO_THROW(
     map.insert(data, record);
@@ -179,7 +179,7 @@ TEST_F(AllocationMapTest, RegisterNoneIteratorSize)
 
 TEST_F(AllocationMapTest, FindMultiple)
 {
-  umpire::util::AllocationRecord next_record{data, 1, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr, umpire::util::Backtrace{}};
 
   EXPECT_NO_THROW({
     map.insert(data, record);
@@ -200,10 +200,10 @@ TEST_F(AllocationMapTest, FindMultiple)
 
 TEST_F(AllocationMapTest, Print)
 {
-  umpire::util::AllocationRecord next_record{data, 1, nullptr};
+  umpire::util::AllocationRecord next_record{data, 1, nullptr, umpire::util::Backtrace{}};
 
   auto extra_data = new double[10];
-  umpire::util::AllocationRecord extra_record{extra_data, 10, nullptr};
+  umpire::util::AllocationRecord extra_record{extra_data, 10, nullptr, umpire::util::Backtrace{}};
 
   map.insert(data, record);
   map.insert(data, next_record);

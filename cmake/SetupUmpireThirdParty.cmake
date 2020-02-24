@@ -48,3 +48,7 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
                         LIBRARIES ${SLIC_LIBRARY} ${SLIC_UTIL_LIBRARY}
                       )
 endif ()
+
+blt_register_library( NAME backtrace_symbols
+    LIBRARIES ${CMAKE_DL_LIBS}
+    )
