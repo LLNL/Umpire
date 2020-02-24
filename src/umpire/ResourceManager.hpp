@@ -253,6 +253,8 @@ class ResourceManager {
         Allocator src_allocator,
         Allocator dst_allocator);
 
+    int getNumDevices() const;
+
     ~ResourceManager();
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
