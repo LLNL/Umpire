@@ -163,7 +163,7 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
     }
   }
 
-  POISON_MEMORY_IF_CPU(m_allocator, ptr, bytes);
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
 
   // Add to count
   m_actual_bytes += bytes;
@@ -230,7 +230,7 @@ void* DynamicPool::allocate(std::size_t bytes)
 
   if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
 
-  UNPOISON_MEMORY_IF_CPU(m_allocator, ptr, bytes);
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
 }
 
@@ -258,7 +258,7 @@ void DynamicPoolMap::deallocate(void* ptr)
     // Update currentSize
     m_curr_bytes -= bytes;
 
-    POISON_MEMORY_IF_CPU(m_allocator, ptr, bytes);
+    UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }

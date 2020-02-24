@@ -7,23 +7,26 @@
 #ifndef UMPIRE_memory_sanitizers_HPP
 #define UMPIRE_memory_sanitizers_HPP
 
-#if defined(__clang__)
+#include "umpire/config.hpp"
+
+#if defined(__clang__) && defined(UMPIRE_ENABLE_SANITIZERS)
+
 #include <sanitizer/asan_interface.h>
 
-#define POISON_MEMORY_IF_CPU(allocator, ptr, size) \
+#define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size) \
   if (allocator->getPlatform() == umpire::Platform::cpu) {\
     ASAN_POISON_MEMORY_REGION((ptr), (size));\
   }
 
-#define UNPOISON_MEMORY_IF_CPU(allocator, ptr, size) \
+#define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size) \
   if (allocator->getPlatform() == umpire::Platform::cpu) {\
     ASAN_UNPOISON_MEMORY_REGION((ptr), (size));\
   }
 
 #else
 
-#define POISON_MEMORY_IF_CPU(allocator, ptr, size)
-#define UNPOISON_MEMORY_IF_CPU(allocator, ptr, size)
+#define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)
+#define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size)
 
 #endif
 

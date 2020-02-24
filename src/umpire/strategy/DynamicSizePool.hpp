@@ -131,7 +131,7 @@ protected:
       }
     }
 
-    POISON_MEMORY_IF_CPU(allocator, data, sizeToAlloc);
+    UMPIRE_POISON_MEMORY_REGION(allocator, data, sizeToAlloc);
 
     totalBlocks += 1;
     totalBytes += sizeToAlloc;
@@ -311,7 +311,7 @@ public:
     if ( allocBytes > highWatermark )
       highWatermark = allocBytes;
 
-    UNPOISON_MEMORY_IF_CPU(allocator, usedBlocks->data, size);
+    UMPIRE_UNPOISON_MEMORY_REGION(allocator, usedBlocks->data, size);
 
     // Return the new pointer
     return usedBlocks->data;
@@ -330,7 +330,7 @@ public:
     // Remove from allocBytes
     allocBytes -= curr->size;
 
-    POISON_MEMORY_IF_CPU(allocator, ptr, curr->size);
+    UMPIRE_POISON_MEMORY_REGION(allocator, ptr, curr->size);
 
     // Release it
     releaseBlock(curr, prev);
