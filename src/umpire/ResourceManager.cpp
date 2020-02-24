@@ -230,11 +230,21 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_CUDA)
     for (int device = 1; device < device_count; device++) {
+      cudaDeviceEnablePeerAccess(device, 0);
+    }
+
+    for (int device = 1; device < device_count; device++) {
       MemoryResourceTraits traits;
 
       int current_device;
       cudaGetDevice(&current_device);
       cudaSetDevice(device);
+
+      for (int other_device = 0; other_device < device_count; other_device++) {
+        if (device != other_device) {
+          cudaDeviceEnablePeerAccess(other_device, 0);
+        }
+      }
 
       cudaDeviceProp properties;
       auto error = ::cudaGetDeviceProperties(&properties, 0);
@@ -838,6 +848,18 @@ ResourceManager::getOperation(
       operation_name,
       src_allocator.getAllocationStrategy(),
       dst_allocator.getAllocationStrategy());
+}
+
+int
+ResourceManager::getNumDevices() const
+{
+  int device_count{0};
+#if defined(UMPIRE_ENABLE_CUDA)
+  ::cudaGetDeviceCount(&device_count);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipGetDeviceCount(&device_count);
+#endif
+  return device_count;
 }
 
 } // end of namespace umpire
