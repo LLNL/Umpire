@@ -45,6 +45,8 @@ MemoryResourceTraits
 AllocationStrategy::getTraits() const noexcept
 {
   UMPIRE_LOG(Error, "AllocationStrategy::getTraits() not implemented");
+
+  return MemoryResourceTraits{};
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)
