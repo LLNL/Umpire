@@ -24,6 +24,10 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples strategy_example)
 
+blt_add_target_link_flags(
+  TO strategy_example
+  FLAGS "-rdynamic")
+
 blt_add_executable(
   NAME allocator
   SOURCES allocator.cxx

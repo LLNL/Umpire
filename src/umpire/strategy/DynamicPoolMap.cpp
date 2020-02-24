@@ -13,6 +13,7 @@
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
+#include "umpire/util/Backtrace.hpp"
 
 #include <cstdlib>
 #include <algorithm>
@@ -61,15 +62,17 @@ DynamicPoolMap::~DynamicPoolMap()
     ss << "There are " << m_used_map.size() << " addresses";
     ss << " not deallocated at destruction. This will cause leak(s). ";
     if (m_used_map.size() <= max_addr)
-      ss << "Addresses:";
+      ss << "Addresses:" << std::endl;
     else
-      ss << "First " << max_addr << " addresses:";
+      ss << "First " << max_addr << " addresses:" << std::endl;
     auto iter = m_used_map.begin();
     auto end = m_used_map.end();
     for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
-      if (i % 5 == 0) ss << "\n\t";
-      ss << " " << iter->first;
+      ss << iter->first << std::endl
+        << ResourceManager::getInstance().findAllocationRecord(iter->first)->allocationBacktrace
+        << std::endl;
     }
+    std::cout << ss.str() << std::endl;
     UMPIRE_LOG(Warning, ss.str());
   }
 

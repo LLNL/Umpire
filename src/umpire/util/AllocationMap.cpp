@@ -175,6 +175,8 @@ AllocationMap::AllocationMap() :
 void
 AllocationMap::insert(void* ptr, AllocationRecord record)
 {
+  record.allocationBacktrace.getBacktrace();
+
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
