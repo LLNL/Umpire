@@ -18,7 +18,7 @@ bool
 HipConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("DEVICE_CONST") == 0) {
+  if (name.find("DEVICE_CONST") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -26,7 +26,20 @@ HipConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& na
 }
 
 std::unique_ptr<resource::MemoryResource>
-HipConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+HipConstantMemoryResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits())
+
+}
+
+std::unique_ptr<resource::MemoryResource>
+HipConstantMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<resource::HipConstantMemoryResource>(name, id, traits);
+}
+
+MemoryResourceTraits
+HipConstantMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -38,7 +51,7 @@ HipConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(na
 
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<resource::HipConstantMemoryResource>("DEVICE_CONST", id, traits);
+  return traits;
 }
 
 } // end of namespace resource
