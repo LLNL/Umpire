@@ -250,6 +250,12 @@ ResourceManager::initialize()
 
 #if defined(UMPIRE_ENABLE_UM)
   {
+#if defined(UMPIRE_ENABLE_HIP)
+    // associate "DEVICE" allocator with "UM" name
+    auto allocator{m_memory_resources[resource::Device]};
+    m_allocators_by_name["UM"] = allocator;
+    m_memory_resources[resource::Unified] = allocator;
+#else
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{util::wrap_allocator<
         strategy::AllocationTracker,
@@ -264,6 +270,7 @@ ResourceManager::initialize()
     m_memory_resources[resource::Unified] = allocator.get();
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
+#endif
   }
 #endif
 
