@@ -19,7 +19,7 @@ bool
 HipPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("PINNED") == 0) {
+  if (name.find("PINNED") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -27,7 +27,20 @@ HipPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name
 }
 
 std::unique_ptr<resource::MemoryResource>
-HipPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+HipPinnedMemoryResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+HipPinnedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<resource::DefaultMemoryResource<alloc::HipPinnedAllocator>>(Platform::hip, name, id, traits);
+}
+
+
+MemoryResourceTraits
+HipPinnedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -38,7 +51,7 @@ HipPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return util::make_unique<resource::DefaultMemoryResource<alloc::HipPinnedAllocator>>(Platform::hip, "PINNED", id, traits);
+  return traits;
 }
 
 } // end of namespace resource
