@@ -28,8 +28,7 @@ HipConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& na
 std::unique_ptr<resource::MemoryResource>
 HipConstantMemoryResourceFactory::create(const std::string& name, int id)
 {
-  return create(name, id, getDefaultTraits())
-
+  return create(name, id, getDefaultTraits());
 }
 
 std::unique_ptr<resource::MemoryResource>
