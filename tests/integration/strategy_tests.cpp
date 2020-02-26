@@ -167,7 +167,7 @@ using Strategies = ::testing::Types<
   umpire::strategy::SlotPool,
   umpire::strategy::ThreadSafeAllocator>;
 
-TYPED_TEST_CASE(StrategyTest, Strategies);
+TYPED_TEST_SUITE(StrategyTest, Strategies,);
 
 TYPED_TEST(StrategyTest, AllocateDeallocateBig)
 {
@@ -325,7 +325,7 @@ TEST_P(DynamicPoolTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, DynamicPoolTest, ::testing::ValuesIn(AllocationDevices),);
+INSTANTIATE_TEST_SUITE_P(Allocations, DynamicPoolTest, ::testing::ValuesIn(AllocationDevices));
 
 class DynamicPoolListTest :
   public ::testing::TestWithParam<const char*>
@@ -394,7 +394,7 @@ TEST_P(DynamicPoolListTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, DynamicPoolListTest, ::testing::ValuesIn(AllocationDevices),);
+INSTANTIATE_TEST_SUITE_P(Allocations, DynamicPoolListTest, ::testing::ValuesIn(AllocationDevices));
 
 TEST(DynamicPool, LimitedResource)
 {
