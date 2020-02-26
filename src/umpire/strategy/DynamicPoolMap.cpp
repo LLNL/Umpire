@@ -72,7 +72,7 @@ DynamicPoolMap::~DynamicPoolMap()
         << ResourceManager::getInstance().findAllocationRecord(iter->first)->allocationBacktrace
         << std::endl;
     }
-    std::cout << ss.str() << std::endl;
+    // std::cout << ss.str() << std::endl;
     UMPIRE_LOG(Warning, ss.str());
   }
 
@@ -466,6 +466,30 @@ void DynamicPoolMap::do_coalesce()
       insertFree(ptr, released_bytes, true, released_bytes);
     }
   }
+}
+
+std::string DynamicPoolMap::getAllocationBacktraces() noexcept
+{
+  std::stringstream ss;
+
+  if (m_used_map.size() > 0) {
+    const std::size_t max_addr{25};
+    ss << "There are " << m_used_map.size() << " addresses";
+    ss << " not deallocated at destruction. This will cause leak(s). ";
+    if (m_used_map.size() <= max_addr)
+      ss << "Addresses:" << std::endl;
+    else
+      ss << "First " << max_addr << " addresses:" << std::endl;
+    auto iter = m_used_map.begin();
+    auto end = m_used_map.end();
+    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
+      ss << iter->first << std::endl
+        << ResourceManager::getInstance().findAllocationRecord(iter->first)->allocationBacktrace
+        << std::endl;
+    }
+  }
+
+  return ss.str();
 }
 
 } // end of namespace strategy

@@ -16,12 +16,31 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dynamic_pool", rm.getAllocator("HOST"));
 
-  auto test = alloc.allocate(24);
-  test = alloc.allocate(64);
-  test = alloc.allocate(128);
+  auto alloc1 = pool.allocate(24);
+  auto alloc2 = pool.allocate(64);
+  auto alloc3 = pool.allocate(128);
 
-  return (test == nullptr) ? 1 : 0;
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
+
+  auto msg = dynamic_pool->getAllocationBacktraces();
+
+  if (! msg.empty() )
+    std::cout << msg << std::endl;
+
+  pool.deallocate(alloc1);
+  pool.deallocate(alloc2);
+  pool.deallocate(alloc3);
+
+  msg = dynamic_pool->getAllocationBacktraces();
+
+  if (! msg.empty() )
+    std::cout << msg << std::endl;
+  else
+    std::cout << "Pool is Empty" << std::endl;
+
+  return 0;
 }
