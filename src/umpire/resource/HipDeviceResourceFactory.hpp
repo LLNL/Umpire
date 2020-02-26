@@ -29,7 +29,7 @@ class HipDeviceResourceFactory :
   create(const std::string& name, int id, MemoryResourceTraits traits) final override;
 
   MemoryResourceTraits
-  getDefaultTraits() final override;;
+  getDefaultTraits() final override;
 };
 
 } // end of namespace resource
