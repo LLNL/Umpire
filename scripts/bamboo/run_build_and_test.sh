@@ -19,7 +19,7 @@ function trycmd
 
 module list
 
-if [ -f ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake ]; then
+if [ -f ${UMPIRE_SOURCE_DIR}/.radiuss-ci/gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake ]; then
   echo "Configuring..."
   trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
     -C ${UMPIRE_SOURCE_DIR}/.radiuss-ci/gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
