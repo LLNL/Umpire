@@ -167,7 +167,7 @@ using Strategies = ::testing::Types<
   umpire::strategy::SlotPool,
   umpire::strategy::ThreadSafeAllocator>;
 
-TYPED_TEST_SUITE(StrategyTest, Strategies);
+TYPED_TEST_SUITE(StrategyTest, Strategies,);
 
 TYPED_TEST(StrategyTest, AllocateDeallocateBig)
 {

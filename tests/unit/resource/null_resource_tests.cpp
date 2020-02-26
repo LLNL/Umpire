@@ -25,4 +25,4 @@ REGISTER_TYPED_TEST_SUITE_P(
     ResourceTest,
     Constructor, Allocate, getCurrentSize, getHighWatermark, getPlatform, getTraits, AccessNullResource);
 
-INSTANTIATE_TYPED_TEST_SUITE_P(Null, ResourceTest, umpire::resource::NullMemoryResource);
+INSTANTIATE_TYPED_TEST_SUITE_P(Null, ResourceTest, umpire::resource::NullMemoryResource,);

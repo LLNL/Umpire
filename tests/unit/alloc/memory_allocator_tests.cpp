@@ -51,4 +51,4 @@ using test_types = ::testing::Types<
 #endif
 >;
 
-INSTANTIATE_TYPED_TEST_SUITE_P(Default, MemoryAllocatorTest, test_types);
+INSTANTIATE_TYPED_TEST_SUITE_P(Default, MemoryAllocatorTest, test_types,);
