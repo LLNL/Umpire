@@ -35,7 +35,7 @@ HipDeviceResourceFactory::create(const std::string& name, int id)
 }
 
 std::unique_ptr<resource::MemoryResource>
-HipDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id, MemoryResourceTraits traits)
+HipDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
   return util::make_unique<resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(Platform::hip, name, id, traits);
 }
