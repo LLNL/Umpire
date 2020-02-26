@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
-#include "benchmark/benchmark_api.h"
+#include "benchmark/benchmark.h"
 
 #include "umpire/config.hpp"
 
@@ -53,4 +53,4 @@ BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::strin
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
 #endif
 
-BENCHMARK_MAIN()
+BENCHMARK_MAIN();
