@@ -17,6 +17,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - LC Gitlab CI runs only a subset of targets on PRs, and all of them on master
   and develop branch.
+  
+- Update BLT to version 0.3.0
 
 ### Removed
 
