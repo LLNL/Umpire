@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2018-2019, Lawrence Livermore National Security, LLC.
+# Copyright (c) 2018-2020, Lawrence Livermore National Security, LLC.
 # Produced at the Lawrence Livermore National Laboratory
 #
 # Created by David Beckingsale, david@llnl.gov
@@ -14,7 +14,7 @@
 ##############################################################################
 
 copyright:
-  - Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+  - Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
   - project contributors. See the COPYRIGHT file for details.
   -
   - "SPDX-License-Identifier: (MIT)"
@@ -60,6 +60,18 @@ declarations:
 
       - decl: class FixedPool
         cxx_header: umpire/strategy/FixedPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class AllocationPrefetcher
+        cxx_header: umpire/strategy/AllocationPrefetcher.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
+      - decl: class ThreadSafeAllocator
+        cxx_header: umpire/strategy/ThreadSafeAllocator.hpp
         options:
           wrap_c: false
           wrap_fortran: false
@@ -133,6 +145,10 @@ declarations:
           format:
             template_suffix: _named
             function_suffix: ""
+        - instantiation: <umpire::strategy::ThreadSafeAllocator>
+          format:
+            template_suffix: _thread_safe
+            function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, size_t object_size);
         options:
@@ -142,6 +158,16 @@ declarations:
             format:
               template_suffix: _fixed_pool
               function_suffix: ""
+
+      - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, int device_id);
+        options:
+          F_create_generic: False
+        cxx_template:
+          - instantiation: <umpire::strategy::AllocationPrefetcher>
+            format:
+              template_suffix: _prefetcher
+              function_suffix: ""
+
 
       - decl: void registerAllocator(const std::string& name, Allocator allocator)
 

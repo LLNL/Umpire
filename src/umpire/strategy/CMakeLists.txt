@@ -1,11 +1,12 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_strategy_headers
   AllocationAdvisor.hpp
+  AllocationPrefetcher.hpp
   AllocationStrategy.hpp
   AllocationTracker.hpp
   DynamicPool.hpp
@@ -37,6 +38,7 @@ set (umpire_strategy_mixin_headers
 set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationStrategy.cpp
+  AllocationPrefetcher.cpp
   AllocationTracker.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp

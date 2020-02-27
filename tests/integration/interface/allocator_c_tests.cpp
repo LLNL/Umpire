@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -147,7 +147,7 @@ const char* allocator_names[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Allocators,
     AllocatorCTest,
     ::testing::ValuesIn(allocator_names));
@@ -223,7 +223,7 @@ const char* pool_names[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Pools,
     PoolAllocatorCTest,
     ::testing::ValuesIn(pool_names));
@@ -286,7 +286,7 @@ TEST_P(ListPoolAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ListPools,
     ListPoolAllocatorCTest,
     ::testing::ValuesIn(pool_names));
@@ -336,7 +336,7 @@ TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     FixedPools,
     FixedPoolAllocatorCTest,
     ::testing::ValuesIn(pool_names));
@@ -394,7 +394,7 @@ TEST_P(NamedAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_named_allocator, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Nameds,
     NamedAllocatorCTest,
     ::testing::ValuesIn(pool_names));

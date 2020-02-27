@@ -1,3 +1,9 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
+//
+// SPDX-License-Identifier: (MIT)
+//////////////////////////////////////////////////////////////////////////////
 // wrapResourceManager.h
 // This is generated code, do not edit
 // Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
@@ -84,6 +90,14 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_named(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, umpire_allocator * SHC_rv);
 
+umpire_allocator * umpire_resourcemanager_make_allocator_thread_safe(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_thread_safe(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, umpire_allocator * SHC_rv);
+
 umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t object_size,
@@ -92,6 +106,16 @@ umpire_allocator * umpire_resourcemanager_make_allocator_fixed_pool(
 umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_fixed_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t object_size,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_prefetcher(
+    umpire_resourcemanager * self, const char * name,
+    umpire_allocator allocator, int device_id,
+    umpire_allocator * SHC_rv);
+
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_prefetcher(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator, int device_id,
     umpire_allocator * SHC_rv);
 
 void umpire_resourcemanager_register_allocator(

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -96,4 +96,4 @@ BENCHMARK_F(InspectorDeregister, remove)(benchmark::State &st)
   }
 }
 
-BENCHMARK_MAIN()
+BENCHMARK_MAIN();

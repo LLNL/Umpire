@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -35,6 +35,8 @@
 #if defined(_OPENMP)
 #include <omp.h>
 #endif
+
+#include <thread>
 
 static int alignment = 16;
 
@@ -165,7 +167,7 @@ using Strategies = ::testing::Types<
   umpire::strategy::SlotPool,
   umpire::strategy::ThreadSafeAllocator>;
 
-TYPED_TEST_CASE(StrategyTest, Strategies);
+TYPED_TEST_SUITE(StrategyTest, Strategies,);
 
 TYPED_TEST(StrategyTest, AllocateDeallocateBig)
 {
@@ -323,7 +325,7 @@ TEST_P(DynamicPoolTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, DynamicPoolTest, ::testing::ValuesIn(AllocationDevices),);
+INSTANTIATE_TEST_SUITE_P(Allocations, DynamicPoolTest, ::testing::ValuesIn(AllocationDevices));
 
 class DynamicPoolListTest :
   public ::testing::TestWithParam<const char*>
@@ -392,7 +394,7 @@ TEST_P(DynamicPoolListTest, Duplicate)
         poolName.str(), rm.getAllocator(allocatorName)));
 }
 
-INSTANTIATE_TEST_CASE_P(Allocations, DynamicPoolListTest, ::testing::ValuesIn(AllocationDevices),);
+INSTANTIATE_TEST_SUITE_P(Allocations, DynamicPoolListTest, ::testing::ValuesIn(AllocationDevices));
 
 TEST(DynamicPool, LimitedResource)
 {
@@ -598,13 +600,55 @@ TEST(MixedPool, Host)
     allocator.deallocate(alloc[i]);
 }
 
-#if defined(_OPENMP)
-TEST(ThreadSafeAllocator, Host)
+TEST(ThreadSafeAllocator, HostStdThread)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
-      "thread_safe_allocator", rm.getAllocator("HOST"));
+      "thread_safe_allocator_host_std", rm.getAllocator("HOST"));
+
+  constexpr int N = 16;
+  std::vector<void*> thread_allocs{N};
+  std::vector<std::thread> threads;
+
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    threads.push_back(
+        std::thread([=, &allocator, &thread_allocs] {
+          for ( int j = 0; j < N; ++j) { 
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+            allocator.deallocate(thread_allocs[i]);
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+          }
+    }));
+  }
+
+  for (auto& t : threads) {
+    t.join();
+  }
+
+  for (auto alloc : thread_allocs)
+  {
+    ASSERT_NE(alloc, nullptr);
+  }
+
+  ASSERT_NO_THROW({
+    for (auto alloc : thread_allocs)
+    {
+      allocator.deallocate(alloc);
+    }
+  });
+}
+
+#if defined(_OPENMP)
+TEST(ThreadSafeAllocator, HostOpenMP)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator_host_omp", rm.getAllocator("HOST"));
 
 #pragma omp parallel
   {
@@ -618,8 +662,74 @@ TEST(ThreadSafeAllocator, Host)
 
   SUCCEED();
 }
-
 #endif
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+TEST(ThreadSafeAllocator, DeviceStdThread)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator_device_std", rm.getAllocator("DEVICE"));
+
+  constexpr int N = 16;
+  std::vector<void*> thread_allocs{N};
+  std::vector<std::thread> threads;
+
+  for (std::size_t i = 0; i < N; ++i)
+  {
+    threads.push_back(
+        std::thread([=, &allocator, &thread_allocs] {
+          for ( int j = 0; j < N; ++j) { 
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+            allocator.deallocate(thread_allocs[i]);
+            thread_allocs[i] = allocator.allocate(1024);
+            ASSERT_NE(thread_allocs[i], nullptr);
+          }
+    }));
+  }
+
+  for (auto& t : threads) {
+    t.join();
+  }
+
+  for (auto alloc : thread_allocs)
+  {
+    ASSERT_NE(alloc, nullptr);
+  }
+
+  ASSERT_NO_THROW({
+    for (auto alloc : thread_allocs)
+    {
+      allocator.deallocate(alloc);
+    }
+  });
+}
+
+#if defined(_OPENMP)
+TEST(ThreadSafeAllocator, DeviceOpenMP)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto allocator = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
+      "thread_safe_allocator_device_omp", rm.getAllocator("DEVICE"));
+
+#pragma omp parallel
+  {
+    const std::size_t size = 1024*omp_get_thread_num();
+
+    double* thread_data = static_cast<double*>(
+     allocator.allocate(size*sizeof(double)));
+
+    allocator.deallocate(thread_data);
+  }
+
+  SUCCEED();
+}
+#endif
+#endif // defined(UMPIRE_ENABLE_DEVICE)
+
 
 TEST(SizeLimiter, Host)
 {
@@ -735,6 +845,79 @@ TEST(DynamicPoolListReleaseTest, MissingBlocks)
   ASSERT_EQ(allocator.getActualSize(), 0);
 }
 
+TEST(DynamicPoolList, largestavailable)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  const int num_allocs = 1024;
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
+    "host_dyn_pool_list_for_largestavailable", rm.getAllocator("HOST"),
+    num_allocs * 1024);
+
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(alloc);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  alloc.deallocate(alloc.allocate(1024));
+
+  ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), num_allocs * 1024);
+
+  void* ptrs[num_allocs];
+
+  for ( int i{0}; i < num_allocs; ++i ) {
+    ptrs[i] = alloc.allocate(1024);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), ( (num_allocs-(i+1)) * 1024) );
+  }
+
+  for ( int i{0}; i < num_allocs; i += 2 ) {
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), 1024);
+  }
+
+  for ( int i{1}; i < num_allocs; i += 2 ) {
+    const int largest_block = ((i+2) < num_allocs) ? (i+2) * 1024 : (i+1) * 1024;
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
+  }
+}
+
+TEST(DynamicPoolMap, largestavailable)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  const int num_allocs = 1024;
+
+  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
+    "host_dyn_pool_map_for_largestavailable", rm.getAllocator("HOST"),
+    num_allocs * 1024);
+
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(alloc);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  alloc.deallocate(alloc.allocate(1024));
+
+  ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), num_allocs * 1024);
+
+  void* ptrs[num_allocs];
+
+  for ( int i{0}; i < num_allocs; ++i ) {
+    ptrs[i] = alloc.allocate(1024);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), ( (num_allocs-(i+1)) * 1024) );
+  }
+
+  for ( int i{0}; i < num_allocs; i += 2 ) {
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), 1024);
+  }
+
+  for ( int i{1}; i < num_allocs; i += 2 ) {
+    const int largest_block = ((i+2) < num_allocs) ? (i+2) * 1024 : (i+1) * 1024;
+    alloc.deallocate(ptrs[i]);
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
+  }
+}
 
 TEST(DynamicPoolMap, coalesce)
 {
@@ -1264,7 +1447,7 @@ TEST(NumaPolicyTest, EdgeCases) {
   auto& rm = umpire::ResourceManager::getInstance();
 
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>(
-                 "numa_alloc", -1, rm.getAllocator("HOST")),
+                 "numa_alloc", rm.getAllocator("HOST"), -1),
                umpire::util::Exception);
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)

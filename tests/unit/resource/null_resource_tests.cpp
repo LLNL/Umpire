@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -21,8 +21,8 @@ TYPED_TEST_P(ResourceTest, AccessNullResource)
   EXPECT_DEATH_IF_SUPPORTED(data[0] = 0, ".*");
 }
 
-REGISTER_TYPED_TEST_CASE_P(
+REGISTER_TYPED_TEST_SUITE_P(
     ResourceTest,
     Constructor, Allocate, getCurrentSize, getHighWatermark, getPlatform, getTraits, AccessNullResource);
 
-INSTANTIATE_TYPED_TEST_CASE_P(Null, ResourceTest, umpire::resource::NullMemoryResource);
+INSTANTIATE_TYPED_TEST_SUITE_P(Null, ResourceTest, umpire::resource::NullMemoryResource,);

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -38,7 +38,7 @@ class ResourceTest :
     Resource* memory_resource;
 };
 
-TYPED_TEST_CASE_P(ResourceTest);
+TYPED_TEST_SUITE_P(ResourceTest);
 
 TYPED_TEST_P(ResourceTest, Constructor)
 {

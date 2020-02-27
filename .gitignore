@@ -1,2 +1,5 @@
-build-*
+*build*
+*install*
 *.swp
+CMakeFiles
+*.tar.gz

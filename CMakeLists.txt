@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2.0.0)
+  VERSION 2.1.0)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -71,6 +71,14 @@ if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
   Please re-configure with ENABLE_NUMA=Off (default value)")
 endif ()
 
+if (ENABLE_CUDA)
+  if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+      set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
+    endif ()
+  endif ()
+endif()
+
 ################################
 # BLT
 ################################
@@ -95,10 +103,12 @@ if (NOT BLT_LOADED)
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
 
-blt_git_hashcode (HASHCODE umpire_sha1
-                  RETURN_CODE rc
-                  SOURCE_DIR ${PROJECT_SOURCE_DIR})
-set (UMPIRE_VERSION_RC ${umpire_sha1})
+if (Git_FOUND)
+  blt_git_hashcode (HASHCODE umpire_sha1
+                    RETURN_CODE rc
+                    SOURCE_DIR ${PROJECT_SOURCE_DIR})
+  set (UMPIRE_VERSION_RC ${umpire_sha1})
+endif ()
 
 include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)

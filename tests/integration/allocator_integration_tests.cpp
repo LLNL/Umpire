@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -61,8 +61,7 @@ TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
   if (m_allocator->getPlatform() == umpire::Platform::cuda ||
-      m_allocator->getPlatform() == umpire::Platform::hip  ||
-      m_allocator->getPlatform() == umpire::Platform::rocm) {
+      m_allocator->getPlatform() == umpire::Platform::hip) {
     SUCCEED();
   } else {
     double* data = static_cast<double*>(
@@ -168,10 +167,10 @@ const std::string allocator_strings[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Allocators,
     AllocatorTest,
-    ::testing::ValuesIn(allocator_strings),);
+    ::testing::ValuesIn(allocator_strings));
 
 TEST(Allocator, isRegistered)
 {
@@ -275,10 +274,10 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Resources,
     AllocatorByResourceTest,
-    ::testing::ValuesIn(resource_types),);
+    ::testing::ValuesIn(resource_types));
 
 TEST(Allocation, DeallocateDifferent)
 {

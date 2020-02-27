@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -89,13 +89,13 @@ set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
-set(UMPIRE_ENABLE_HCC ${ENABLE_HCC})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
 
-if (ENABLE_CUDA OR ENABLE_HCC OR ENABLE_HIP)
+if (ENABLE_CUDA OR ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
+  set(UMPIRE_ENABLE_UM On)
   if (ENABLE_DEVICE_CONST)
     set(UMPIRE_ENABLE_CONST On)
   endif()
@@ -103,11 +103,6 @@ else ()
   set(UMPIRE_ENABLE_DEVICE Off)
   set(UMPIRE_ENABLE_PINNED Off)
   set(UMPIRE_ENABLE_CONST Off)
-endif()
-
-if (ENABLE_CUDA)
-  set(UMPIRE_ENABLE_UM On)
-else ()
   set(UMPIRE_ENABLE_UM Off)
 endif()
 
@@ -140,6 +135,11 @@ install(FILES
 install(FILES
   ${umpire_interface_c_fortran_headers}
   DESTINATION include/umpire/interface/c_fortran)
+
+install(DIRECTORY
+  ${CMAKE_Fortran_MODULE_DIRECTORY}/
+  DESTINATION include/umpire 
+  FILES_MATCHING PATTERN "*.mod")
 
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include

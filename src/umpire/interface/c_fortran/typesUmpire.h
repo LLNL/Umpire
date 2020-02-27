@@ -1,3 +1,9 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// project contributors. See the COPYRIGHT file for details.
+//
+// SPDX-License-Identifier: (MIT)
+//////////////////////////////////////////////////////////////////////////////
 // typesUmpire.h
 // This is generated code, do not edit
 // Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
@@ -40,6 +46,12 @@ struct s_umpire_strategy_allocationadvisor {
 };
 typedef struct s_umpire_strategy_allocationadvisor umpire_strategy_allocationadvisor;
 
+struct s_umpire_strategy_allocationprefetcher {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_allocationprefetcher umpire_strategy_allocationprefetcher;
+
 struct s_umpire_strategy_dynamicpool {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
@@ -63,6 +75,12 @@ struct s_umpire_strategy_namedallocationstrategy {
     int idtor;      /* index of destructor */
 };
 typedef struct s_umpire_strategy_namedallocationstrategy umpire_strategy_namedallocationstrategy;
+
+struct s_umpire_strategy_threadsafeallocator {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_threadsafeallocator umpire_strategy_threadsafeallocator;
 
 struct s_umpire_SHROUD_array {
     umpire_SHROUD_capsule_data cxx;      /* address of C++ memory */

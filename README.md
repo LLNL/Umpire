@@ -17,7 +17,7 @@ Then, make sure that you have a modern compiler loaded, and the configuration is
 simple as:
 
     $ mkdir build && cd build
-    $ cmake
+    $ cmake ..
 
 CMake will provide output about which compiler is being used. Once CMake has
 completed, Umpire can be built with Make:
@@ -58,6 +58,12 @@ Thanks to all of Umpire's
 [contributors](https://github.com/LLNL/Umpire/graphs/contributors).
 
 Umpire was created by David Beckingsale (david@llnl.gov).
+
+## Citing Umpire
+
+If you are referencing Umpire in a publication, please use the following citation:
+
+- D. Beckingsale, M. Mcfadden, J. Dahm, R. Pankajakshan and R. Hornung, ["Umpire: Application-Focused Management and Coordination of Complex Hierarchical Memory,"](https://ieeexplore.ieee.org/document/8907404) in IBM Journal of Research and Development. 2019. doi: 10.1147/JRD.2019.2954403
 
 # Release
 

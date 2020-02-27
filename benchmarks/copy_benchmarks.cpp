@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
-#include "benchmark/benchmark_api.h"
+#include "benchmark/benchmark.h"
 
 #include "umpire/config.hpp"
 
@@ -53,4 +53,4 @@ BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::strin
 BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
 #endif
 
-BENCHMARK_MAIN()
+BENCHMARK_MAIN();

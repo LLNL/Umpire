@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -97,6 +97,14 @@ DynamicPoolList::getBlocksInPool() const noexcept
   std::size_t BlocksInPool = dpa->getBlocksInPool();
   UMPIRE_LOG(Debug, "() returning " << BlocksInPool);
   return BlocksInPool;
+}
+
+std::size_t 
+DynamicPoolList::getLargestAvailableBlock() const noexcept
+{
+  std::size_t LargestAvailableBlock = dpa->getLargestAvailableBlock();
+  UMPIRE_LOG(Debug, "() returning " << LargestAvailableBlock);
+  return LargestAvailableBlock;
 }
 
 Platform
