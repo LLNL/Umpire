@@ -338,7 +338,9 @@ AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
         ss << iter->size <<
           " [ " << reinterpret_cast<void*>(iter->ptr) <<
           " -- " << reinterpret_cast<void*>(end_ptr) <<
-          " ] " << std::endl;
+          " ] " << std::endl
+          << iter->allocationBacktrace
+          << std::endl;
       }
       ++iter;
     }

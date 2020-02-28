@@ -57,23 +57,9 @@ DynamicPoolMap::~DynamicPoolMap()
 
   // Warning if blocks are still in use
   if (m_used_map.size() > 0) {
-    const std::size_t max_addr{25};
-    std::stringstream ss;
-    ss << "There are " << m_used_map.size() << " addresses";
-    ss << " not deallocated at destruction. This will cause leak(s). ";
-    if (m_used_map.size() <= max_addr)
-      ss << "Addresses:" << std::endl;
-    else
-      ss << "First " << max_addr << " addresses:" << std::endl;
-    auto iter = m_used_map.begin();
-    auto end = m_used_map.end();
-    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
-      ss << iter->first << std::endl
-        << ResourceManager::getInstance().findAllocationRecord(iter->first)->allocationBacktrace
-        << std::endl;
-    }
-    // std::cout << ss.str() << std::endl;
-    UMPIRE_LOG(Warning, ss.str());
+    auto s = DynamicPoolMap::getAllocationBacktraces();
+    // std::cout << s << std::endl;
+    UMPIRE_LOG(Warning, s);
   }
 
   // Free any unused blocks
@@ -473,18 +459,18 @@ std::string DynamicPoolMap::getAllocationBacktraces() noexcept
   std::stringstream ss;
 
   if (m_used_map.size() > 0) {
-    const std::size_t max_addr{25};
-    ss << "There are " << m_used_map.size() << " addresses";
-    ss << " not deallocated at destruction. This will cause leak(s). ";
-    if (m_used_map.size() <= max_addr)
-      ss << "Addresses:" << std::endl;
-    else
-      ss << "First " << max_addr << " addresses:" << std::endl;
-    auto iter = m_used_map.begin();
-    auto end = m_used_map.end();
-    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
-      ss << iter->first << std::endl
-        << ResourceManager::getInstance().findAllocationRecord(iter->first)->allocationBacktrace
+    ss << "There are " << m_used_map.size() << " addresses"
+       << " not deallocated at destruction. This will cause leak(s). "
+       << std::endl;
+
+    for (auto iter : m_used_map) {
+      auto ar = ResourceManager::getInstance().findAllocationRecord(iter.first);
+      ss << "strategy=" << ar->strategy->getName()
+        << ", base=" << iter.first
+        << ", ptr=" << ar->ptr
+        << ", size=" << ar->size
+        << std::endl
+        << ar->allocationBacktrace
         << std::endl;
     }
   }
