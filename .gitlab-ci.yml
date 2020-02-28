@@ -33,13 +33,18 @@ variables:
   UMPIRE_ALLOC_NAME: umpire_ci_${CI_PIPELINE_ID}
   BUILD_ROOT: ${CI_BUILDS_DIR}/umpire_${CI_COMMIT_REF_SLUG}_${CI_PIPELINE_ID}
 
+# This defines the default behavior, may be overridden it.
 before_script:
   - date
 
 after_script:
   - date
 
-# There are no tests for now
+# Normally, stages are blocking in Gitlab. However, using the keyword "needs" we
+# can express dependencies between job that break the ordering of stages, in
+# favor of a DAG.
+# In practice q_*, l_* and b_* stages are independently run as soon as start is
+# complete.
 stages:
   - start
   - q_allocate_resources
@@ -49,6 +54,9 @@ stages:
   - l_build_and_test
   - b_build_and_test
 
+# The start job is actually a dumb one, which serves as a reference to start
+# q_allocate_resources, l_build_and_test and b_build_and_test simultaneously.
+# Note: "GIT_STRATEGY: none" tells GitLab not to clone umpire for this job.
 start:
   variables:
     GIT_STRATEGY: none
@@ -58,12 +66,15 @@ start:
   script:
     - echo "Creating a reference job for dag execution (needs keyword)"
 
+# This is the rules that drives the activation of "advanced" jobs. All advanced
+# jobs will share this through a template mechanism.
 .advanced_pipeline:
   rules:
     - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $UMPIRE_ALL_TARGETS == "ON"' #run only if ...
 
-# This is not a job, but contains project specific build commands
-# If an allocation exist with the name defined in this pipeline, the job will use it
+# These are also templates (.name) that define project specific build commands.
+# If an allocation exist with the name defined in this pipeline, the job will
+# use it (slurm specific).
 .build_toss_3_x86_64_ib_script:
   script:
     - echo ${UMPIRE_ALLOC_NAME}
@@ -71,7 +82,6 @@ start:
     - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 -n 1 -c 4 scripts/gitlab/build_and_test.sh --build-only
 
-# This is not a job, but contains project specific build commands
 .test_toss_3_x86_64_ib_script:
   script:
     - echo ${UMPIRE_ALLOC_NAME}
@@ -79,13 +89,15 @@ start:
     - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 -n 1 -c 4 scripts/gitlab/build_and_test.sh --test-only
 
-# Butte uses a very different job allocation system, building on login nodes is recommended
+# Lassen and Butte use a different job scheduler (spectrum lsf) that does not
+# allow pre-allocation the same way slurm does.
 .build_blueos_3_ppc64le_ib_script:
   script:
     - lalloc 1 scripts/gitlab/build_and_test.sh
 
 .build_blueos_3_ppc64le_ib_p9_script:
   extends: .build_blueos_3_ppc64le_ib_script
+
 
 # This is where jobs are included
 include:

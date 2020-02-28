@@ -21,6 +21,8 @@
     - when: on_success
   needs: ["start"]
 
+# Note: .build_lassen_advanced inherits from .build_lassen and .advanced_pileline.
+# In particular, the rules section will be merged. Careful when changing rules.
 .build_lassen_advanced:
   extends: [.build_lassen, .advanced_pipeline]
 

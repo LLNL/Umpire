@@ -45,7 +45,7 @@ release_resources_build_quartz:
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
 
 ####
-# Generic qwartz job, extending build script
+# Generic qwartz build job, extending build script
 .build_quartz:
   stage: q_build
   extends: [.quartz_common, .build_toss_3_x86_64_ib_script]
@@ -54,7 +54,7 @@ release_resources_build_quartz:
   extends: [.build_quartz, .advanced_pipeline]
 
 ####
-# Generic qwartz job, extending test script
+# Generic qwartz test job, extending test script
 .test_quartz:
   stage: q_test
   extends: [.quartz_common, .test_toss_3_x86_64_ib_script]
@@ -122,8 +122,6 @@ build_quartz_pgi_18_5:
     COMPILER: "pgi_18_5"
   extends: .build_quartz
   allow_failure: true
-
-
 
 
 ####
