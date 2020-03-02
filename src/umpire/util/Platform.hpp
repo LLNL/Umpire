@@ -13,7 +13,8 @@ enum class Platform {
   none,
   cpu,
   cuda,
-  hip
+  hip,
+  sycl
 };
 
 } // end of namespace umpire
