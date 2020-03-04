@@ -70,6 +70,26 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
+if (ENABLE_SYCL)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    SyclDeviceMemoryResource.hpp    
+    SyclDeviceResourceFactory.hpp
+    SyclUnifiedMemoryResourceFactory.hpp
+    )
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    SyclDeviceMemoryResource.cpp    
+    SyclDeviceResourceFactory.cpp
+    SyclUnifiedMemoryResourceFactory.cpp
+    )
+
+  set(umpire_resource_depends
+    ${umpire_resource_depends}
+    sycl_runtime)
+endif ()
+
 blt_add_library(
   NAME umpire_resource
   HEADERS ${umpire_resource_headers}
