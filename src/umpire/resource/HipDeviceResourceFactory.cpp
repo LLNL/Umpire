@@ -31,7 +31,7 @@ HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 std::unique_ptr<resource::MemoryResource>
 HipDeviceResourceFactory::create(const std::string& name, int id)
 {
-  return create(name, id, getDefaultTraits())
+  return create(name, id, getDefaultTraits());
 }
 
 std::unique_ptr<resource::MemoryResource>
