@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-add_subdirectory(tpl)
-add_subdirectory(unit)
-add_subdirectory(integration)
-add_subdirectory(tools)
+
+if (ENABLE_SANITIZERS)
+    add_subdirectory(sanitizers)
+endif ()
