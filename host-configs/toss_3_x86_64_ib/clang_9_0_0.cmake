@@ -4,5 +4,3 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-
-set(ENABLE_BENCHMARKS Off CACHE BOOL "")
