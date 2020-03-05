@@ -176,11 +176,12 @@ test_quartz_icpc_17_0_2_advanced:
   extends: .test_quartz_advanced
   needs: ["build_quartz_icpc_17_0_2_advanced"]
 
-test_quartz_icpc_18_0_0:
-  variables:
-    COMPILER: "icpc_18_0_0"
-  extends: .test_quartz
-  needs: ["build_quartz_icpc_18_0_0"]
+# No more Intel 18
+# test_quartz_icpc_18_0_0:
+#   variables:
+#     COMPILER: "icpc_18_0_0"
+#   extends: .test_quartz
+#   needs: ["build_quartz_icpc_18_0_0"]
 
 test_quartz_pgi_17_10_advanced:
   variables:

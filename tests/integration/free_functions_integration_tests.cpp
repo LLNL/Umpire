@@ -64,7 +64,7 @@ const std::string allocators[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
   FreeFunctions,
   FreeFunctionsTest,
-  ::testing::ValuesIn(allocators),);
+  ::testing::ValuesIn(allocators));

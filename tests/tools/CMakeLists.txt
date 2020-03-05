@@ -5,4 +5,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set(ENABLE_BENCHMARKS Off CACHE BOOL "")
+if (ENABLE_SANITIZERS)
+    add_subdirectory(sanitizers)
+endif ()

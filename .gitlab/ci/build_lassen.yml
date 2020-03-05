@@ -29,6 +29,11 @@
 ####
 # Here are all lassen build jobs
 
+build_lassen_gcc_default:
+  variables:
+    COMPILER: "gcc_default"
+  extends: .build_lassen
+
 build_lassen_clang_3_9_1_advanced:
   variables:
     COMPILER: "clang_3_9_1"
@@ -43,11 +48,6 @@ build_lassen_clang_9_0_0:
   variables:
     COMPILER: "clang_9_0_0"
   extends: .build_lassen
-
-build_lassen_gcc_4_9_3_advanced:
-  variables:
-    COMPILER: "gcc_4_9_3"
-  extends: .build_lassen_advanced
 
 build_lassen_gcc_8_3_1:
   variables:
