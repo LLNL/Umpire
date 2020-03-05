@@ -19,6 +19,7 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/memory_sanitizers.hpp"
 
 template <class IA = StdAllocator>
 class DynamicSizePool
@@ -129,6 +130,8 @@ protected:
         throw;
       }
     }
+
+    UMPIRE_POISON_MEMORY_REGION(allocator, data, sizeToAlloc);
 
     totalBlocks += 1;
     totalBytes += sizeToAlloc;
@@ -308,6 +311,8 @@ public:
     if ( allocBytes > highWatermark )
       highWatermark = allocBytes;
 
+    UMPIRE_UNPOISON_MEMORY_REGION(allocator, usedBlocks->data, size);
+
     // Return the new pointer
     return usedBlocks->data;
   }
@@ -325,8 +330,11 @@ public:
     // Remove from allocBytes
     allocBytes -= curr->size;
 
+    UMPIRE_POISON_MEMORY_REGION(allocator, ptr, curr->size);
+
     // Release it
     releaseBlock(curr, prev);
+
   }
 
   std::size_t getCurrentSize() const { return allocBytes; }

@@ -12,6 +12,7 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/Replay.hpp"
 
 #include <cstdlib>
@@ -162,6 +163,8 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
     }
   }
 
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
+
   // Add to count
   m_actual_bytes += bytes;
 
@@ -227,6 +230,7 @@ void* DynamicPool::allocate(std::size_t bytes)
 
   if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
 
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
 }
 
@@ -253,6 +257,8 @@ void DynamicPoolMap::deallocate(void* ptr)
 
     // Update currentSize
     m_curr_bytes -= bytes;
+
+    UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
