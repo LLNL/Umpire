@@ -31,7 +31,9 @@ struct SyclMallocAllocator {
   void* allocate(std::size_t size, const cl::sycl::queue& queue_t)
   {
     void* ptr = cl::sycl::malloc_device(size, queue_t);
+
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
+
     if (ptr == nullptr) {
       UMPIRE_ERROR("SYCL malloc_device( bytes = " << size << " ) failed with error!");
     } else {
@@ -50,6 +52,7 @@ struct SyclMallocAllocator {
   void deallocate(void* ptr, const cl::sycl::queue& queue_t)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+
     cl::sycl::free(ptr, queue_t);
   }
 };
