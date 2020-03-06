@@ -29,8 +29,7 @@ SyclDeviceMemoryResource::SyclDeviceMemoryResource(
 
 void* SyclDeviceMemoryResource::allocate(std::size_t bytes)
 {
-  cl::sycl::gpu_selector gpuSelect;
-  cl::sycl::device sycl_device(gpuSelect);
+  cl::sycl::device sycl_device(m_traits.deviceID);
   cl::sycl::queue sycl_queue(sycl_device);
   
   void* ptr = m_allocator.allocate(bytes, sycl_queue);
@@ -41,13 +40,16 @@ void* SyclDeviceMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-  void SyclDeviceMemoryResource::deallocate(void* ptr)
+void SyclDeviceMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  m_allocator.deallocate(ptr, queue_t);
+  cl::sycl::device sycl_device(m_traits.deviceID);
+  cl::sycl::queue sycl_queue(sycl_device);
+
+  m_allocator.deallocate(ptr, sycl_queue);
 }
 
 std::size_t SyclDeviceMemoryResource::getCurrentSize() const noexcept
