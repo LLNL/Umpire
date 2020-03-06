@@ -47,25 +47,21 @@ MemoryResourceTraits
 SyclUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
-  
-  auto platforms = platform::get_platforms();
-  for (auto &platform : platforms) {
-    auto devices = platform.get_devices();
-    for (auto &device : devices) {
-      const std::string deviceName = device.get_info<info::device::name>();
-      if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
-        traits.unified = dev.get_info<info::device::host_unified_memory>();        
-        traits.size = dev.get_info<info::device::global_mem_size>(); // in bytes
-        traits.id = dev.get(); // equivalent to cl_device_id
-        traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
 
-        break;
-      }
-    }
+  cl::sycl::gpu_selector gpuSelect;
+  cl::sycl::device sycl_device(gpuSelect);
+  const std::string deviceName = sycl_device.get_info<cl::sycl::info::device::name>();
+  if (sycl_device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
+    traits.size = sycl_device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
+    traits.unified = sycl_device.get_info<cl::sycl::info::device::host_unified_memory>();
+
+    traits.id = 0;
+    traits.deviceID = sycl_device.get();
+
+    traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
+    traits.kind = MemoryResourceTraits::memory_type::GDDR;
+    traits.used_for = MemoryResourceTraits::optimized_for::any;
   }
-
-  traits.kind = MemoryResourceTraits::memory_type::GDDR; // todo: check this?
-  traits.used_for = MemoryResourceTraits::optimized_for::any; 
 
   return traits;
 }

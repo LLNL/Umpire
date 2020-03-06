@@ -38,7 +38,7 @@ SyclDeviceResourceFactory::create(const std::string& name, int id)
 std::unique_ptr<resource::MemoryResource>
 SyclDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return 
+  return
     util::make_unique<resource::SyclDeviceMemoryResource>(Platform::sycl, name, id, traits);
 }
 
@@ -52,28 +52,15 @@ SyclDeviceResourceFactory::getDefaultTraits()
   const std::string deviceName = sycl_device.get_info<cl::sycl::info::device::name>();
   if (sycl_device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
     traits.size = sycl_device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
+    traits.unified = false;
+
+    traits.id = 0;
+    traits.deviceID = sycl_device.get();
+
+    traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
+    traits.kind = MemoryResourceTraits::memory_type::GDDR;
+    traits.used_for = MemoryResourceTraits::optimized_for::any;
   }
-  
-  
-  // auto platforms = platform::get_platforms();
-  // for (auto &platform : platforms) {
-  //   auto devices = platform.get_devices();
-  //   for (auto &device : devices) {
-  //     const std::string deviceName = device.get_info<info::device::name>();
-  //     if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
-  //       traits.size = dev.get_info<info::device::global_mem_size>(); // in bytes
-  //       break;
-  //     }
-  //   }
-  // }
-
-  
-  traits.id = 0; // todo: needed for multi-GPU per node case
-  traits.unified = false;
-
-  traits.vendor = MemoryResourceTraits::vendor_type::INTEL;  
-  traits.kind = MemoryResourceTraits::memory_type::GDDR; // todo: need to check this
-  traits.used_for = MemoryResourceTraits::optimized_for::any;
 
   return traits;
 }
