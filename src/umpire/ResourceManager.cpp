@@ -245,9 +245,9 @@ ResourceManager::initialize()
     }
   }
 
-  // if (error != SyclSuccess) {
-  //   UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
-  // }
+  if (device_count == 0) {
+    UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -386,20 +386,19 @@ ResourceManager::initialize()
 
         const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
         if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
-          cl::sycl::device sycl_device(device);
 
           traits.unified  = false;
-          traits.size     = sycl_device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
+          traits.size     = device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
 
           traits.vendor   = MemoryResourceTraits::vendor_type::INTEL;
           traits.kind     = MemoryResourceTraits::memory_type::GDDR;
           traits.used_for = MemoryResourceTraits::optimized_for::any;
           traits.id       = dev_cnt;
+          traits.deviceID = device.get();
 
           std::string name = "DEVICE_" + std::to_string(dev_cnt);
 
           if (dev_cnt != 0) {
-            // check the below
             std::unique_ptr<strategy::AllocationStrategy>
               allocator{util::wrap_allocator<
                         strategy::AllocationTracker,
