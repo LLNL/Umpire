@@ -90,6 +90,28 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
+if (ENABLE_SYCL)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    SyclCopyOperation.hpp    
+    SyclCopyFromOperation.hpp
+    SyclCopyToOperation.hpp
+    SyclMemsetOperation.hpp
+    SyclMemPrefetchOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    SyclCopyOperation.cpp    
+    SyclCopyFromOperation.cpp
+    SyclCopyToOperation.cpp
+    SyclMemsetOperation.cpp
+    SyclMemPrefetchOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    sycl_runtime)
+endif ()
+
 blt_add_library(
   NAME umpire_op
   HEADERS ${umpire_op_headers}
