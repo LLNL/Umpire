@@ -44,7 +44,7 @@
 
 #include "umpire/resource/SyclDeviceResourceFactory.hpp"
 #if defined(UMPIRE_ENABLE_CONST)
-#include "umpire/resource/SyclConstantMemoryResourceFactory.hpp"
+//#include "umpire/resource/SyclConstantMemoryResourceFactory.hpp"
 #endif
 #endif
 
