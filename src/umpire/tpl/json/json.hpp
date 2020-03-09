@@ -506,8 +506,10 @@ class other_error : public exception
         #else
             #define JSON_NODISCARD [[nodiscard]]
         #endif
-    #elif __has_cpp_attribute(gnu::warn_unused_result)
-        #define JSON_NODISCARD [[gnu::warn_unused_result]]
+    #elif !defined(__PGIC__)
+      #if __has_cpp_attribute(gnu::warn_unused_result)
+          #define JSON_NODISCARD [[gnu::warn_unused_result]]
+      #endif
     #else
         #define JSON_NODISCARD
     #endif
