@@ -15,6 +15,7 @@
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_HIP
+#cmakedefine UMPIRE_ENABLE_SYCL
 
 #cmakedefine UMPIRE_ENABLE_DEVICE
 #cmakedefine UMPIRE_ENABLE_PINNED
