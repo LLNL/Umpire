@@ -15,9 +15,16 @@ namespace resource {
 class HipPinnedMemoryResourceFactory :
   public MemoryResourceFactory
 {
-  bool isValidMemoryResourceFor(const std::string& name) noexcept override;
+  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
 
-  std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id) override;
+  std::unique_ptr<resource::MemoryResource>
+  create(const std::string& name, int id) final override;
+
+  std::unique_ptr<resource::MemoryResource>
+  create(const std::string& name, int id, MemoryResourceTraits traits) final override;
+
+  MemoryResourceTraits
+  getDefaultTraits() final override;
 };
 
 } // end of namespace resource

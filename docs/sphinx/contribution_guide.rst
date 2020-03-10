@@ -92,11 +92,12 @@ tests and reviews, it will be merged into Umpire.
 Tests
 ^^^^^
 
-Umpire uses Bamboo for continuous integration tests. Our tests are automatically
-run against every new pull request, and passing all tests is a requirement for
-merging your PR. If you are developing a bugfix or a new feature, please add a
-test that checks the correctness of your new code. Umpire is used on a wide
-variety of systems with a number of configurations, and adding new tests helps
-ensure that all features work as expected across these environments.
+Umpire uses Bamboo and Gitlab for continuous integration tests. Our tests are
+automatically run against every new pull request, and passing all tests is a
+requirement for merging your PR. If you are developing a bugfix or a new
+feature, please add a test that checks the correctness of your new code. Umpire
+is used on a wide variety of systems with a number of configurations, and adding
+new tests helps ensure that all features work as expected across these
+environments.
 
 Umpire's tests are all in the ``test`` directory and are split up by component.

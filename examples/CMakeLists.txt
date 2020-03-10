@@ -50,6 +50,12 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples size_limiter)
 
+blt_add_executable(
+  NAME use_after_free
+  SOURCES use_after_free.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples use_after_free)
+
 if (ENABLE_STATISTICS)
   blt_add_executable(
     NAME statistics_example

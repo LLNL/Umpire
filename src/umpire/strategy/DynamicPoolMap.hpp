@@ -81,7 +81,7 @@ class DynamicPoolMap : public AllocationStrategy
 
     Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept;
+    MemoryResourceTraits getTraits() const noexcept override;
 
 
     /*!

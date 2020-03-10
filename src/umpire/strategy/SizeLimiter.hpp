@@ -33,15 +33,15 @@ class SizeLimiter :
         Allocator allocator,
         std::size_t size_limit);
 
-    void* allocate(std::size_t bytes);
-    void deallocate(void* ptr);
+    void* allocate(std::size_t bytes) override;
+    void deallocate(void* ptr) override;
 
-    std::size_t getCurrentSize() const noexcept;
-    std::size_t getHighWatermark() const noexcept;
+    std::size_t getCurrentSize() const noexcept override;
+    std::size_t getHighWatermark() const noexcept override;
 
-    Platform getPlatform() noexcept;
+    Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept;
+    MemoryResourceTraits getTraits() const noexcept override;
 
   private:
     strategy::AllocationStrategy* m_allocator;

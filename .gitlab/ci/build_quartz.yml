@@ -29,7 +29,7 @@ allocate_resources_build_quartz:
   extends: .quartz_common
   stage: q_allocate_resources
   script:
-    - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${BUILD_QUARTZ_ALLOC_NAME}
+    - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${UMPIRE_ALLOC_NAME}
   needs: ["start"]
 
 ####
@@ -41,11 +41,11 @@ release_resources_build_quartz:
   extends: .quartz_common
   stage: q_release_resources
   script:
-    - export JOBID=$(squeue -h --name=${BUILD_QUARTZ_ALLOC_NAME} --format=%A)
+    - export JOBID=$(squeue -h --name=${UMPIRE_ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
 
 ####
-# Generic qwartz job, extending build script
+# Generic qwartz build job, extending build script
 .build_quartz:
   stage: q_build
   extends: [.quartz_common, .build_toss_3_x86_64_ib_script]
@@ -54,7 +54,7 @@ release_resources_build_quartz:
   extends: [.build_quartz, .advanced_pipeline]
 
 ####
-# Generic qwartz job, extending test script
+# Generic qwartz test job, extending test script
 .test_quartz:
   stage: q_test
   extends: [.quartz_common, .test_toss_3_x86_64_ib_script]
@@ -106,11 +106,6 @@ build_quartz_icpc_17_0_2_advanced:
     COMPILER: "icpc_17_0_2"
   extends: .build_quartz_advanced
 
-build_quartz_icpc_18_0_0:
-  variables:
-    COMPILER: "icpc_18_0_0"
-  extends: .build_quartz
-
 build_quartz_pgi_17_10_advanced:
   variables:
     COMPILER: "pgi_17_10"
@@ -122,8 +117,6 @@ build_quartz_pgi_18_5:
     COMPILER: "pgi_18_5"
   extends: .build_quartz
   allow_failure: true
-
-
 
 
 ####
@@ -177,12 +170,6 @@ test_quartz_icpc_17_0_2_advanced:
     COMPILER: "icpc_17_0_2"
   extends: .test_quartz_advanced
   needs: ["build_quartz_icpc_17_0_2_advanced"]
-
-test_quartz_icpc_18_0_0:
-  variables:
-    COMPILER: "icpc_18_0_0"
-  extends: .test_quartz
-  needs: ["build_quartz_icpc_18_0_0"]
 
 test_quartz_pgi_17_10_advanced:
   variables:

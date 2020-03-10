@@ -167,10 +167,10 @@ const std::string allocator_strings[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Allocators,
     AllocatorTest,
-    ::testing::ValuesIn(allocator_strings),);
+    ::testing::ValuesIn(allocator_strings));
 
 TEST(Allocator, isRegistered)
 {
@@ -274,10 +274,10 @@ const umpire::resource::MemoryResourceType resource_types[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Resources,
     AllocatorByResourceTest,
-    ::testing::ValuesIn(resource_types),);
+    ::testing::ValuesIn(resource_types));
 
 TEST(Allocation, DeallocateDifferent)
 {
