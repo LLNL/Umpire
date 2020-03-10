@@ -405,7 +405,7 @@ ResourceManager::initialize()
                         strategy::ZeroByteHandler>(
                                                    registry.makeMemoryResource(name, getNextId(), traits))};
             UMPIRE_REPLAY(
-                          R"( "event": "makeMemoryResource", "payload": { "name": << ")" << name <<R"( "})"
+                          R"( "event": "makeMemoryResource", "payload": { "name": << ")" << name <<R"("})"
                           << R"(, "result": ")" << allocator.get() << R"(")");
 
             int id{allocator->getId()};
