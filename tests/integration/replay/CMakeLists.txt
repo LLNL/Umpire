@@ -16,12 +16,16 @@ if (ENABLE_HIP)
 endif()
 
 set(replay_file "test_output" )
+set(sys_type $ENV{SYS_TYPE})
 
 if (ENABLE_NUMA)
   set(replay_file "${replay_file}.numa" )
 endif()
 
 if (ENABLE_CUDA)
+  if (sys_type)
+    set(replay_file "${replay_file}.${sys_type}")
+  endif ()
   set(replay_file "${replay_file}.cuda" )
 elseif (ENABLE_HIP)
   set(replay_file "${replay_file}.hip" )
