@@ -5,42 +5,92 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
+###############################################################################
+# General GitLab pipelines configurations for supercomputers and Linux clusters
+# at Lawrence Livermore National Laboratory (LLNL).
+#
+# This entire pipeline is LLNL-specific
+# #############################################################################
+
+# We define the following GitLab pipeline variables:
+#
+# GIT_SUBMODULE_STRATEGY:
+# Tells Gitlab to recursively update the submodules when cloning umpire
+#
+# UMPIRE_ALLOC_NAME:
+# On LLNL's quartz, this pipeline creates only one allocation shared among jobs
+# in order to save time and resources. This allocation has to be uniquely named
+# so that we are sure to retrieve it.
+#
+# BUILD_ROOT:
+# The path to the shared resources between all jobs. The BUILD_ROOT is unique to
+# the pipeline, preventing any form of concurrency with other pipelines. This
+# also means that the BUILD_ROOT directory will never be cleaned.
+# TODO: add a clean-up mechanism
+
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-  BUILD_QUARTZ_ALLOC_NAME: umpire_ci_$CI_COMMIT_SHORT_SHA
-  BUILD_ROOT: $CI_BUILDS_DIR/umpire_$CI_COMMIT_REF_SLUG
+  UMPIRE_ALLOC_NAME: umpire_ci_${CI_PIPELINE_ID}
+  BUILD_ROOT: ${CI_BUILDS_DIR}/umpire_${CI_COMMIT_REF_SLUG}_${CI_PIPELINE_ID}
 
+# This defines the default behavior, may be overridden it.
 before_script:
   - date
 
 after_script:
   - date
 
-# There are no tests for now
+# Normally, stages are blocking in Gitlab. However, using the keyword "needs" we
+# can express dependencies between job that break the ordering of stages, in
+# favor of a DAG.
+# In practice q_*, l_* and b_* stages are independently run as soon as start is
+# complete.
 stages:
-  - allocate_resources
-  - build
-  - test
-  - release_resources
+  - start
+  - q_allocate_resources
+  - q_build
+  - q_test
+  - q_release_resources
+  - l_build_and_test
+  - b_build_and_test
 
-# This is not a job, but contains project specific build commands
-# If an allocation exist with the name defined in this pipeline, the job will use it
+# The start job is actually a dumb one, which serves as a reference to start
+# q_allocate_resources, l_build_and_test and b_build_and_test simultaneously.
+# Note: "GIT_STRATEGY: none" tells GitLab not to clone umpire for this job.
+start:
+  variables:
+    GIT_STRATEGY: none
+  stage: start
+  tags:
+    - shell
+  script:
+    - echo "Creating a reference job for dag execution (needs keyword)"
+
+# This is the rules that drives the activation of "advanced" jobs. All advanced
+# jobs will share this through a template mechanism.
+.advanced_pipeline:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $UMPIRE_ALL_TARGETS == "ON"' #run only if ...
+
+# These are also templates (.name) that define project specific build commands.
+# If an allocation exist with the name defined in this pipeline, the job will
+# use it (slurm specific).
 .build_toss_3_x86_64_ib_script:
   script:
-    - echo ${BUILD_QUARTZ_ALLOC_NAME}
-    - export JOBID=$(squeue -h --name=${BUILD_QUARTZ_ALLOC_NAME} --format=%A)
+    - echo ${UMPIRE_ALLOC_NAME}
+    - export JOBID=$(squeue -h --name=${UMPIRE_ALLOC_NAME} --format=%A)
     - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 -n 1 -c 4 scripts/gitlab/build_and_test.sh --build-only
 
-# This is not a job, but contains project specific build commands
 .test_toss_3_x86_64_ib_script:
   script:
-    - echo ${BUILD_QUARTZ_ALLOC_NAME}
-    - export JOBID=$(squeue -h --name=${BUILD_QUARTZ_ALLOC_NAME} --format=%A)
+    - echo ${UMPIRE_ALLOC_NAME}
+    - export JOBID=$(squeue -h --name=${UMPIRE_ALLOC_NAME} --format=%A)
     - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 -n 1 -c 4 scripts/gitlab/build_and_test.sh --test-only
 
-# Butte uses a very different job allocation system, building on login nodes is recommended
+# Lassen and Butte use a different job scheduler (spectrum lsf) that does not
+# allow pre-allocation the same way slurm does.
 .build_blueos_3_ppc64le_ib_script:
   script:
     - lalloc 1 scripts/gitlab/build_and_test.sh
@@ -52,7 +102,7 @@ stages:
 # This is where jobs are included
 include:
   - local: .gitlab/ci/build_quartz.yml
-  - local: .gitlab/ci/build_butte.yml
   - local: .gitlab/ci/build_lassen.yml
+  - local: .gitlab/ci/build_butte.yml
 
 

@@ -126,5 +126,11 @@ Platform MixedPool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+MixedPool::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 }
 }

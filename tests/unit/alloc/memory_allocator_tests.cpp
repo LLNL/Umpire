@@ -27,7 +27,7 @@ template <typename T>
 class MemoryAllocatorTest : public ::testing::Test {
 };
 
-TYPED_TEST_CASE_P(MemoryAllocatorTest);
+TYPED_TEST_SUITE_P(MemoryAllocatorTest);
 
 TYPED_TEST_P(MemoryAllocatorTest, Allocate) {
   TypeParam allocator;
@@ -37,7 +37,7 @@ TYPED_TEST_P(MemoryAllocatorTest, Allocate) {
   allocator.deallocate(allocation);
 }
 
-REGISTER_TYPED_TEST_CASE_P(
+REGISTER_TYPED_TEST_SUITE_P(
     MemoryAllocatorTest,
     Allocate);
 
@@ -51,4 +51,4 @@ using test_types = ::testing::Types<
 #endif
 >;
 
-INSTANTIATE_TYPED_TEST_CASE_P(Default, MemoryAllocatorTest, test_types);
+INSTANTIATE_TYPED_TEST_SUITE_P(Default, MemoryAllocatorTest, test_types,);

@@ -19,7 +19,7 @@ bool
 CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("PINNED") == 0) {
+  if (name.find("PINNED") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -27,7 +27,19 @@ CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& nam
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaPinnedMemoryResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+CudaPinnedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(Platform::cuda, name, id, traits);
+}
+
+MemoryResourceTraits
+CudaPinnedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -38,7 +50,7 @@ CudaPinnedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(nam
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
 
-  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(Platform::cuda, "PINNED", id, traits);
+  return traits;
 }
 
 } // end of namespace resource

@@ -51,6 +51,12 @@ blt_add_library(
   NAME umpire_tpl_json
   HEADERS ${json_headers})
 
+if (C_COMPILER_FAMILY_IS_PGI)
+  target_compile_options(
+    umpire_tpl_json
+    INTERFACE
+    --diag_suppress186)
+endif ()
 target_link_libraries(umpire_tpl_json INTERFACE)
 
 install(FILES

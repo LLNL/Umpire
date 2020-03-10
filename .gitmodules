@@ -7,3 +7,7 @@
 [submodule "src/umpire/tpl/camp"]
 	path = src/umpire/tpl/camp
 	url = https://github.com/LLNL/camp.git
+[submodule ".radiuss-ci"]
+	path = .radiuss-ci
+	url = https://github.com/LLNL/radiuss-ci
+	branch = feature/umpire-ci

@@ -19,13 +19,13 @@
 #endif
 
 class OperationTest :
-  public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
+  public ::testing::TestWithParam< std::tuple<std::string, std::string> >
 {
   public:
     void SetUp() override {
       auto& rm = umpire::ResourceManager::getInstance();
-      source_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<0>(GetParam())));
-      dest_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<1>(GetParam())));
+      source_allocator = new umpire::Allocator(rm.getAllocator(std::get<0>(GetParam())));
+      dest_allocator = new umpire::Allocator(rm.getAllocator(std::get<1>(GetParam())));
 
       source_array = static_cast<float*>(source_allocator->allocate(m_size*sizeof(float)));
       dest_array = static_cast<float*>(dest_allocator->allocate(m_size*sizeof(float)));
@@ -161,13 +161,12 @@ const std::string zero_copy_dests[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ZeroCopies,
     ZeroCopyTest,
     ::testing::Combine(
       ::testing::ValuesIn(zero_copy_sources),
-      ::testing::ValuesIn(zero_copy_dests)
-),);
+      ::testing::ValuesIn(zero_copy_dests)));
 
 const std::string copy_sources[] = {
   "HOST"
@@ -193,12 +192,12 @@ const std::string copy_dests[] = {
 };
 
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Copies,
     CopyTest,
     ::testing::Combine(
       ::testing::ValuesIn(copy_sources),
-      ::testing::ValuesIn(copy_dests)),);
+      ::testing::ValuesIn(copy_dests)));
 
 class MemsetTest :
   public OperationTest
@@ -271,12 +270,12 @@ const std::string memset_dests[] = {
   "HOST"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Sets,
     MemsetTest,
     ::testing::Combine(
       ::testing::ValuesIn(memset_sources),
-      ::testing::ValuesIn(memset_dests)),);
+      ::testing::ValuesIn(memset_dests)));
 
 class ReallocateTest :
   public OperationTest
@@ -645,12 +644,12 @@ const std::string reallocate_dests[] = {
   "HOST"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Reallocate,
     ReallocateTest,
     ::testing::Combine(
       ::testing::ValuesIn(reallocate_sources),
-      ::testing::ValuesIn(reallocate_dests)),);
+      ::testing::ValuesIn(reallocate_dests)));
 
 class MoveTest :
   public OperationTest
@@ -706,12 +705,12 @@ const std::string move_dests[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Move,
     MoveTest,
     ::testing::Combine(
       ::testing::ValuesIn(move_sources),
-      ::testing::ValuesIn(move_dests)),);
+      ::testing::ValuesIn(move_dests)));
 
 #if defined(UMPIRE_ENABLE_CUDA)
 class AdviceTest :
@@ -803,13 +802,12 @@ const std::string advice_dests[] = {
   , "DEVICE"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Advice,
     AdviceTest,
     ::testing::Combine(
       ::testing::ValuesIn(advice_sources),
-      ::testing::ValuesIn(advice_dests)
-),);
+      ::testing::ValuesIn(advice_dests)));
 
 TEST(AsyncTest, Copy)
 {

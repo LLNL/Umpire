@@ -46,7 +46,7 @@ class MemoryResource :
      *
      * \return Pointer to start of allocation.
      */
-    virtual void* allocate(std::size_t bytes) = 0;
+    virtual void* allocate(std::size_t bytes) override = 0;
 
     /*!
      * \brief Free the memory at ptr.
@@ -56,7 +56,7 @@ class MemoryResource :
      *
      * \param ptr Pointer to free.
      */
-    virtual void deallocate(void* ptr) = 0;
+    virtual void deallocate(void* ptr) override = 0;
 
     /*!
      * \brief Return the current size of this MemoryResource.
@@ -66,7 +66,7 @@ class MemoryResource :
      *
      * \return current total size of active allocations in this MemoryResource.
      */
-    virtual std::size_t getCurrentSize() const noexcept = 0;
+    virtual std::size_t getCurrentSize() const noexcept override = 0;
 
     /*!
      * \brief Return the memory high watermark for this MemoryResource.
@@ -77,7 +77,7 @@ class MemoryResource :
      *
      * \return Memory high watermark.
      */
-    virtual std::size_t getHighWatermark() const noexcept = 0;
+    virtual std::size_t getHighWatermark() const noexcept override = 0;
 
 
     /*!
@@ -88,9 +88,9 @@ class MemoryResource :
      *
      * \return Platform associated with this MemoryResource.
      */
-    virtual Platform getPlatform() noexcept = 0;
+    virtual Platform getPlatform() noexcept override = 0;
 
-    MemoryResourceTraits getTraits();
+    MemoryResourceTraits getTraits() const noexcept override;
   protected:
     MemoryResourceTraits m_traits;
 };

@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 
+#include "umpire/resource/CudaDeviceMemoryResource.hpp"
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 
@@ -21,7 +22,7 @@ bool
 CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("DEVICE") == 0) {
+  if (name.find("DEVICE") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -29,7 +30,20 @@ CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaDeviceResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+CudaDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return 
+    util::make_unique<resource::CudaDeviceMemoryResource>(Platform::cuda, name, id, traits);
+}
+
+MemoryResourceTraits
+CudaDeviceResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -47,7 +61,9 @@ CudaDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocAllocator> >(Platform::cuda, "DEVICE", id, traits);
+  traits.id = 0;
+
+  return traits;
 }
 
 } // end of namespace resource

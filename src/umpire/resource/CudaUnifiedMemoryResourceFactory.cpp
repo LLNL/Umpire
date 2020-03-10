@@ -22,7 +22,7 @@ bool
 CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("UM") == 0) {
+  if (name.find("UM") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -30,7 +30,19 @@ CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& na
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(Platform::cuda, name, id, traits);
+}
+
+MemoryResourceTraits
+CudaUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -48,7 +60,7 @@ CudaUnifiedMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(na
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(Platform::cuda, "UM", id, traits);
+  return traits;
 }
 
 } // end of namespace resource
