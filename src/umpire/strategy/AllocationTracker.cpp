@@ -70,6 +70,12 @@ AllocationTracker::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+AllocationTracker::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 strategy::AllocationStrategy*
 AllocationTracker::getAllocationStrategy()
 {

@@ -24,17 +24,19 @@ class ZeroByteHandler :
     ZeroByteHandler(
         std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
-    void* allocate(std::size_t bytes);
+    void* allocate(std::size_t bytes) override;
 
-    void deallocate(void* ptr);
+    void deallocate(void* ptr) override;
 
-    void release();
+    void release() override;
 
-    std::size_t getCurrentSize() const noexcept;
-    std::size_t getHighWatermark() const noexcept;
-    std::size_t getActualSize() const noexcept;
+    std::size_t getCurrentSize() const noexcept override;
+    std::size_t getHighWatermark() const noexcept override;
+    std::size_t getActualSize() const noexcept override;
 
-    Platform getPlatform() noexcept;
+    Platform getPlatform() noexcept override;
+
+    MemoryResourceTraits getTraits() const noexcept override;
 
     strategy::AllocationStrategy* getAllocationStrategy();
 

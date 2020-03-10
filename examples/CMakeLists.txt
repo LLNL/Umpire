@@ -80,6 +80,21 @@ if (ENABLE_CUDA)
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   list(APPEND umpire_examples device_allocator_example)
+
+  blt_add_executable(
+    NAME multi_device
+    SOURCES multi_device.cpp
+    DEPENDS_ON umpire cuda)
+
+  set_source_files_properties(
+    multi_device.cpp
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  set_target_properties(
+    multi_device
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  list(APPEND umpire_examples multi_device)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
