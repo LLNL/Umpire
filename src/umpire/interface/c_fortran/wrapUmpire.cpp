@@ -1,15 +1,10 @@
-//////////////////////////////////////////////////////////////////////////////
+// wrapUmpire.cpp
+// This is generated code, do not edit
 // Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
-//////////////////////////////////////////////////////////////////////////////
-// wrapUmpire.cpp
-// This is generated code, do not edit
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
-// project contributors. See the COPYRIGHT file for details.
-//
-// SPDX-License-Identifier: (MIT)
+#include "wrapUmpire.h"
 #include <cstdlib>
 #include "typesUmpire.h"
 
@@ -22,6 +17,13 @@ extern "C" {
 
 // splicer begin C_definitions
 // splicer end C_definitions
+
+int umpire_get_invalid_allocator_id()
+{
+// splicer begin function.get_invalid_allocator_id
+    return umpire::invalid_allocator_id;
+// splicer end function.get_invalid_allocator_id
+}
 
 // Release library allocated memory.
 void umpire_SHROUD_memory_destructor(umpire_SHROUD_capsule_data *cap)

@@ -398,3 +398,10 @@ INSTANTIATE_TEST_SUITE_P(
     Nameds,
     NamedAllocatorCTest,
     ::testing::ValuesIn(pool_names));
+
+TEST(Allocators, GetInvalidId)
+{
+  int id = umpire_get_invalid_allocator_id();
+
+  ASSERT_NE(0, id);
+}
