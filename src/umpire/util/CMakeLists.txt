@@ -21,6 +21,7 @@ set (umpire_util_headers
   allocation_statistics.hpp
   detect_vendor.hpp
   make_unique.hpp
+  memory_sanitizers.hpp
   wrap_allocator.hpp)
 
 if (ENABLE_STATISTICS)

@@ -10,7 +10,30 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Add support for multiple CUDA devices. These devices are detected and
+  registered as "DEVICE_N", where N is the device number.
+
 ### Changed
+
+- LC Gitlab CI runs only a subset of targets on PRs, and all of them on master
+  and develop branch.
+  
+- Update BLT to version 0.3.0
+
+### Removed
+
+### Fixed
+
+
+## [2.1.0] - 2020-01-30
+
+### Added
+
+- Added replay support for reallocate operations.
+
+### Changed
+
+- LC Gitlab CI now releases quartz resources as soon as possible.
 
 ### Removed
 
@@ -50,7 +73,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added `getLargestAvailableBlock` metric to dynamic list and map pools
 
 - Added documentation and recipe for `ThreadSafeAllocator`
-
 
 ### Changed
 

@@ -22,6 +22,13 @@ if (ENABLE_OPENMP_TARGET)
 endif()
 
 set(replay_file "test_output" )
+set(sys_type $ENV{SYS_TYPE})
+
+if (ENABLE_NUMA OR ENABLE_CUDA)
+  if (sys_type)
+    set(replay_file "${replay_file}.${sys_type}")
+  endif ()
+endif ()
 
 if (ENABLE_NUMA)
   set(replay_file "${replay_file}.numa" )

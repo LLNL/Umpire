@@ -253,6 +253,8 @@ class ResourceManager {
         Allocator src_allocator,
         Allocator dst_allocator);
 
+    int getNumDevices() const;
+
     ~ResourceManager();
     ResourceManager (const ResourceManager&) = delete;
     ResourceManager& operator= (const ResourceManager&) = delete;
@@ -268,6 +270,8 @@ class ResourceManager {
     std::string getAllocatorInformation() const noexcept;
 
     strategy::AllocationStrategy* getZeroByteAllocator();
+
+    void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator);
 
     util::AllocationMap m_allocations;
 

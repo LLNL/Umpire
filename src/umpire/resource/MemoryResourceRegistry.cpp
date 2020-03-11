@@ -44,5 +44,18 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
   UMPIRE_ERROR("MemoryResource " << name << " not found");
 }
 
+std::unique_ptr<resource::MemoryResource>
+MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  for (auto const& allocator_factory : m_allocator_factories) {
+    if (allocator_factory->isValidMemoryResourceFor(name)) {
+      auto a = allocator_factory->create(name, id, traits);
+      return a;
+    }
+  }
+
+  UMPIRE_ERROR("MemoryResource " << name << " not found");
+}
+
 } // end of namespace resource
 } // end of namespace umpire

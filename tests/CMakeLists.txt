@@ -7,3 +7,4 @@
 add_subdirectory(tpl)
 add_subdirectory(unit)
 add_subdirectory(integration)
+add_subdirectory(tools)
