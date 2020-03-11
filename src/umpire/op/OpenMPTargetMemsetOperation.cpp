@@ -25,12 +25,12 @@ void OpenMPTargetMemsetOperation::apply(
     int val,
     std::size_t length)
 {
-  char* data_ptr = static_cast<char*>(src_ptr);
+  unsigned char* data_ptr{static_cast<unsigned char*>(src_ptr)};
 
 #pragma omp target is_device_ptr(data_ptr) device(m_device_id)
 #pragma omp teams distribute parallel for schedule(static, 1)
   for (int i{0}; i < length; ++i ) {
-    data_ptr[i] = val;
+    data_ptr[i] = static_cast<unsigned char>(val);
   }
 
   UMPIRE_RECORD_STATISTIC(
