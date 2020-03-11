@@ -71,3 +71,12 @@ TEST(ResourceManager, getAllocatorById)
       rm.getAllocator(-4),
       umpire::util::Exception);
 }
+
+TEST(ResourceManager, getAllocatorInvalidId)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  ASSERT_THROW(
+      rm.getAllocator(umpire::invalid_allocator_id),
+      umpire::util::Exception);
+}
