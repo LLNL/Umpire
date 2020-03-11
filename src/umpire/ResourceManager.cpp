@@ -409,6 +409,10 @@ ResourceManager::getAllocator(int id)
 {
   UMPIRE_LOG(Debug, "(\"" << id << "\")");
 
+  if (id == umpire::invalid_allocator_id) {
+    UMPIRE_ERROR("Passed umpire::invalid_allocator_id");
+  }
+
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
     UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: "
