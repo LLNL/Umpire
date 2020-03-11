@@ -25,7 +25,7 @@ fi
 # Assert that build directory exist (mainly for --test-only mode)
 if [[ ! -d ${BUILD_DIRECTORY} ]]
 then
-    echo "Build directory not found : $(pwd)/${BUILD_DIRECTORY}"
+    echo "Build directory not found : ${BUILD_DIRECTORY}"
     exit 1
 fi
 
