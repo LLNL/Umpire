@@ -32,7 +32,8 @@ if (ENABLE_SYCL)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     SyclMallocAllocator.hpp
-    SyclMallocManagedAllocator.hpp)
+    SyclMallocManagedAllocator.hpp
+    SyclPinnedAllocator.hpp)
 endif ()
 
 blt_add_library(

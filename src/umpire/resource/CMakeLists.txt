@@ -73,15 +73,17 @@ endif ()
 if (ENABLE_SYCL)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    SyclDeviceMemoryResource.hpp    
+    SyclDeviceMemoryResource.hpp
     SyclDeviceResourceFactory.hpp
+    SyclPinnedMemoryResourceFactory.hpp
     SyclUnifiedMemoryResourceFactory.hpp
     )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    SyclDeviceMemoryResource.cpp    
+    SyclDeviceMemoryResource.cpp
     SyclDeviceResourceFactory.cpp
+    SyclPinnedMemoryResourceFactory.cpp
     SyclUnifiedMemoryResourceFactory.cpp
     )
 

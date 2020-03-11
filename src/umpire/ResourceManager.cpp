@@ -43,9 +43,8 @@
 #include <CL/sycl.hpp>
 
 #include "umpire/resource/SyclDeviceResourceFactory.hpp"
-#if defined(UMPIRE_ENABLE_CONST)
-//#include "umpire/resource/SyclConstantMemoryResourceFactory.hpp"
-#endif
+#include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
 #endif
 
 #include "umpire/op/MemoryOperation.hpp"
@@ -142,13 +141,11 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     util::make_unique<resource::SyclDeviceResourceFactory>());
 
-  // registry.registerMemoryResource(
-  //   util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
-
-// #if defined(UMPIRE_ENABLE_CONST)
-//   registry.registerMemoryResource(
-//     util::make_unique<resource::SyclConstantMemoryResourceFactory>());
-// #endif
+  registry.registerMemoryResource(
+    util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
+  
+  registry.registerMemoryResource(
+    util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
 #endif
 
   initialize();
