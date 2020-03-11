@@ -738,14 +738,6 @@ module umpire_mod
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
 
-        function get_invalid_allocator_id() &
-                result(SHT_rv) &
-                bind(C, name="umpire_get_invalid_allocator_id")
-            use iso_c_binding, only : C_INT
-            implicit none
-            integer(C_INT) :: SHT_rv
-        end function get_invalid_allocator_id
-
         ! splicer begin additional_interfaces
         ! splicer end additional_interfaces
     end interface

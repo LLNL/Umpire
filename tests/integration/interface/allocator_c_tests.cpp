@@ -401,7 +401,9 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST(Allocators, GetInvalidId)
 {
-  int id = umpire_get_invalid_allocator_id();
+  int id = UMPIRE_INVALID_ALLOCATOR_ID;
+  int cpp_id = umpire::invalid_allocator_id;
 
-  ASSERT_NE(0, id);
+  ASSERT_EQ(0xDEADBEEF, id);
+  ASSERT_EQ(id, cpp_id);
 }

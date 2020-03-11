@@ -203,13 +203,6 @@ declarations:
 
       - decl: size_t getSize(void* ptr)
 
-
-  - decl: int get_invalid_allocator_id()
-    cxx_header: umpire/config.hpp
-    format:
-      C_code: return umpire::invalid_allocator_id;
-
-
 splicer:
   f:
   - c_fortran/genfumpiresplicer.f

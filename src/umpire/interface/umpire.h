@@ -9,7 +9,8 @@
 
 #include "umpire/interface/c_fortran/shroudrt.hpp"
 
-#include "umpire/interface/c_fortran/wrapUmpire.h"
+#define UMPIRE_INVALID_ALLOCATOR_ID 0xDEADBEEF
+
 #include "umpire/interface/c_fortran/wrapAllocator.h"
 #include "umpire/interface/c_fortran/wrapResourceManager.h"
 
