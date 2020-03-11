@@ -94,16 +94,14 @@ if (ENABLE_SYCL)
   set (umpire_op_headers
     ${umpire_op_headers}
     SyclCopyOperation.hpp    
-    SyclCopyFromOperation.hpp
-    SyclCopyToOperation.hpp
+    SyclCopyFromToOperation.hpp
     SyclMemsetOperation.hpp
     SyclMemPrefetchOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
     SyclCopyOperation.cpp    
-    SyclCopyFromOperation.cpp
-    SyclCopyToOperation.cpp
+    SyclCopyFromToOperation.cpp
     SyclMemsetOperation.cpp
     SyclMemPrefetchOperation.cpp)
 

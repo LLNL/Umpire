@@ -42,6 +42,14 @@
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_SYCL)
+#include "umpire/op/SyclCopyFromToOperation.hpp"
+#include "umpire/op/SyclCopyOperation.hpp"
+
+#include "umpire/op/SyclMemsetOperation.hpp"
+#include "umpire/op/SyclMemPrefetchOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -187,6 +195,38 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
 
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::cpu, Platform::sycl),
+      std::make_shared<SyclCopyFromToOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sycl, Platform::cpu),
+      std::make_shared<SyclCopyFromToOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<GenericReallocateOperation>());
+
+  registerOperation(
+      "PREFETCH",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclMemPrefetchOperation>());
 #endif
 }
 

@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/SyclCopyFromOperation.hpp"
+#include "umpire/op/SyclCopyFromToOperation.hpp"
 
 #include <CL/sycl.hpp>
 
@@ -14,7 +14,7 @@
 namespace umpire {
 namespace op {
 
-void SyclCopyFromOperation::transform(
+void SyclCopyFromToOperation::transform(
     void* src_ptr,
     void** dst_ptr,
     util::AllocationRecord* src_allocation,
@@ -30,7 +30,7 @@ void SyclCopyFromOperation::transform(
   sycl_queue.wait_and_throw();
 
   UMPIRE_RECORD_STATISTIC(
-      "SyclCopyFromOperation",
+      "SyclCopyFromToOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
       "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
       "size", length,
