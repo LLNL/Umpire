@@ -19,7 +19,48 @@ class AllocatorTest;
 
 namespace umpire {
 
+template<class T>
+class allocator {
+  public:
+  using value_type = T;
+  using pointer = typename std::pointer_traits<
+    decltype(std::declval<memory_type*>()->allocate(0, 0))>::template rebind<value_type>;
+  using difference_type = typename std::pointer_traits<pointer>::difference_type;
+  using size_type =  std::make_unsigned_t<difference_type>;
+
+  allocator() = default;
+  allocator(memory_type* mp) : mp_{mp}{}
+  allocator(allocator const& o) : mp_{o.mp_}, ctor_{o.ctor_}{}
+
+  allocator& operator=(allocator const&) = default;
+  bool operator==(allocator const& o) const{return mp_ == o.mp_;}
+  bool operator!=(allocator const& o) const{return mp_ != o.mp_;}
+
+  pointer allocate(size_type n){
+    return static_cast<pointer>(
+        mp_->allocate(n*sizeof(value_type), alignof(T)));
+  }
+
+  void deallocate(pointer p, size_type n){
+    mp_->deallocate(p, n*sizeof(value_type));
+  }
+
+  template<class... Args>
+  void construct(pointer p, Args&&... args){
+    allocator_traits<Constructor>::construct(ctor_, p, std::forward<Args>(args)...);
+  }
+
+  decltype(auto) destroy(pointer p){
+    allocator_traits<Constructor>::destroy(ctor_, p);
+  }
+
+  private:
+  memory_type* mp_;
+};
+
 class ResourceManager;
+
+
 
 /*!
  * \brief Provides a unified interface to allocate and free data.
