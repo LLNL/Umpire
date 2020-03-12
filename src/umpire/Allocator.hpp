@@ -50,7 +50,7 @@ class Allocator {
      *
      * \return Pointer to start of the allocation.
      */
-    inline void* allocate(std::size_t bytes);
+    UMPIRESHAREDDLL_API inline void* allocate(std::size_t bytes);
 
     /*!
      * \brief Free the memory at ptr.
@@ -61,12 +61,12 @@ class Allocator {
      *
      * \param ptr Pointer to free (!nullptr)
      */
-    inline void deallocate(void* ptr);
+    UMPIRESHAREDDLL_API inline void deallocate(void* ptr);
 
     /*!
      * \brief Release any and all unused memory held by this Allocator.
      */
-    void release();
+    UMPIRESHAREDDLL_API void release();
 
     /*!
      * \brief Return number of bytes allocated for allocation
@@ -75,7 +75,7 @@ class Allocator {
      *
      * \return number of bytes allocated for ptr
      */
-    std::size_t getSize(void* ptr) const;
+    UMPIRESHAREDDLL_API std::size_t getSize(void* ptr) const;
 
     /*!
      * \brief Return the memory high watermark for this Allocator.
@@ -86,7 +86,7 @@ class Allocator {
      *
      * \return Memory high watermark.
      */
-    std::size_t getHighWatermark() const noexcept;
+    UMPIRESHAREDDLL_API std::size_t getHighWatermark() const noexcept;
 
     /*!
      * \brief Return the current size of this Allocator.
@@ -96,7 +96,7 @@ class Allocator {
      *
      * \return current size of Allocator.
      */
-    std::size_t getCurrentSize() const noexcept;
+    UMPIRESHAREDDLL_API std::size_t getCurrentSize() const noexcept;
 
     /*!
      * \brief Return the actual size of this Allocator.
@@ -108,7 +108,7 @@ class Allocator {
      *
      * \return actual size of Allocator.
      */
-    std::size_t getActualSize() const noexcept;
+    UMPIRESHAREDDLL_API std::size_t getActualSize() const noexcept;
 
     /*!
      * \brief Get the name of this Allocator.
@@ -120,7 +120,7 @@ class Allocator {
      *
      * \return name of Allocator.
      */
-    const std::string& getName() const noexcept;
+    UMPIRESHAREDDLL_API const std::string& getName() const noexcept;
 
     /*!
      * \brief Get the integer ID of this Allocator.
@@ -133,7 +133,7 @@ class Allocator {
      *
      * \return integer id of Allocator.
      */
-    int getId() const noexcept;
+    UMPIRESHAREDDLL_API int getId() const noexcept;
 
     /*!
      * \brief Get the AllocationStrategy object used by this Allocator.
@@ -142,14 +142,14 @@ class Allocator {
      *
      * \return Pointer to the AllocationStrategy.
      */
-    strategy::AllocationStrategy* getAllocationStrategy() noexcept;
+    UMPIRESHAREDDLL_API strategy::AllocationStrategy* getAllocationStrategy() noexcept;
 
     /*!
      * \brief Get the Platform object appropriate for this Allocator.
      *
      * \return Platform for this Allocator.
      */
-    Platform getPlatform() noexcept;
+    UMPIRESHAREDDLL_API Platform getPlatform() noexcept;
 
     Allocator() = default;
     
@@ -165,8 +165,17 @@ class Allocator {
      * \param allocator Pointer to the AllocationStrategy object to use for
      * Allocations.
      */
-    Allocator(strategy::AllocationStrategy* allocator) noexcept;
+    UMPIRESHAREDDLL_API Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
+    /*!
+     * \brief internal implementation of allocate
+     */
+	UMPIRESHAREDDLL_API void* allocate_impl(std::size_t bytes);
+
+    /*!
+     * \brief internal implementation of deallocate
+     */
+	UMPIRESHAREDDLL_API void deallocate_impl(void* ptr);
 
     /*!
      * \brief Pointer to the AllocationStrategy used by this Allocator.

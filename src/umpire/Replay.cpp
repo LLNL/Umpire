@@ -8,13 +8,11 @@
 #include <iostream>   // for std::cout, std::cerr
 #include <stdlib.h>   // for getenv()
 
-#if !defined(_MSC_VER)
-#include <strings.h>  // for strcasecmp()
-#include <unistd.h>   // getpid()
-#else
+#if defined(_WIN32) || defined(_WIN64)
 #include <process.h>
-#define strcasecmp _stricmp
 #define getpid _getpid
+#else
+  #include <unistd.h>   // getpid()
 #endif
 
 #include "umpire/Allocator.hpp"

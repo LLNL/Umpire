@@ -8,6 +8,7 @@
 #define UMPIRE_Logger_HPP
 
 #include <string>
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace util {
@@ -28,7 +29,7 @@ class Logger {
 
   void setLoggingMsgLevel(message::Level level) noexcept;
 
-  void logMessage(message::Level level,
+  UMPIRESHAREDDLL_API void logMessage(message::Level level,
                   const std::string& message,
                   const std::string& fileName,
                   int line) noexcept;
@@ -37,7 +38,7 @@ class Logger {
 
   static void finalize();
 
-  static Logger* getActiveLogger();
+  UMPIRESHAREDDLL_API static Logger* getActiveLogger();
 
   inline bool logLevelEnabled(message::Level level)
   {

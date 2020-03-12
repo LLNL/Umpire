@@ -33,9 +33,9 @@ class AllocationStrategy
      * \param name The name of this AllocationStrategy object.
      * \param id The id of this AllocationStrategy object.
      */
-    AllocationStrategy(const std::string& name, int id) noexcept;
+    UMPIRESHAREDDLL_API AllocationStrategy(const std::string& name, int id) noexcept;
 
-    virtual ~AllocationStrategy() = default;
+    UMPIRESHAREDDLL_API virtual ~AllocationStrategy() = default;
 
     /*!
      * \brief Allocate bytes of memory.
@@ -44,19 +44,19 @@ class AllocationStrategy
      *
      * \return Pointer to start of allocated bytes.
      */
-    virtual void* allocate(std::size_t bytes) = 0;
+    UMPIRESHAREDDLL_API virtual void* allocate(std::size_t bytes) = 0;
 
     /*!
      * \brief Free the memory at ptr.
      *
      * \param ptr Pointer to free.
      */
-    virtual void deallocate(void* ptr) = 0;
+    UMPIRESHAREDDLL_API virtual void deallocate(void* ptr) = 0;
 
     /*!
      * \brief Release any and all unused memory held by this AllocationStrategy
      */
-    virtual void release();
+    UMPIRESHAREDDLL_API virtual void release();
 
     /*!
      * \brief Get current (total) size of the allocated memory.
@@ -66,7 +66,7 @@ class AllocationStrategy
      *
      * \return Current total size of allocations.
      */
-    virtual std::size_t getCurrentSize() const noexcept = 0;
+    UMPIRESHAREDDLL_API virtual std::size_t getCurrentSize() const noexcept = 0;
 
     /*!
      * \brief Get the high watermark of the total allocated size.
@@ -74,7 +74,7 @@ class AllocationStrategy
      * This is equivalent to the highest observed value of getCurrentSize.
      * \return High watermark allocation size.
      */
-    virtual std::size_t getHighWatermark() const noexcept = 0;
+    UMPIRESHAREDDLL_API virtual std::size_t getHighWatermark() const noexcept = 0;
 
     /*!
      * \brief Get the current amount of memory allocated by this allocator.
@@ -84,7 +84,7 @@ class AllocationStrategy
      *
      * \return The total size of all the memory this object has allocated.
      */
-    virtual std::size_t getActualSize() const noexcept;
+    UMPIRESHAREDDLL_API virtual std::size_t getActualSize() const noexcept;
 
     /*!
      * \brief Get the platform associated with this AllocationStrategy.
@@ -94,14 +94,14 @@ class AllocationStrategy
      *
      * \return The platform associated with this AllocationStrategy.
      */
-    virtual Platform getPlatform() noexcept = 0;
+    UMPIRESHAREDDLL_API virtual Platform getPlatform() noexcept = 0;
 
     /*!
      * \brief Get the name of this AllocationStrategy.
      *
      * \return The name of this AllocationStrategy.
      */
-    const std::string& getName() noexcept;
+    UMPIRESHAREDDLL_API const std::string& getName() noexcept;
 
 
     /*!
@@ -109,7 +109,7 @@ class AllocationStrategy
      *
      * \return The id of this AllocationStrategy.
      */
-    int getId() noexcept;
+    UMPIRESHAREDDLL_API int getId() noexcept;
 
     friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
 

@@ -21,7 +21,7 @@ class ZeroByteHandler :
   public AllocationStrategy
 {
   public:
-    ZeroByteHandler(
+    UMPIRESHAREDDLL_API ZeroByteHandler(
         std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
     void* allocate(std::size_t bytes);

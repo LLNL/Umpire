@@ -11,7 +11,7 @@
 
 #include "umpire/util/Macros.hpp"
 
-#include "conduit.hpp"
+#include "conduit/conduit.hpp"
 
 namespace umpire {
 namespace util {

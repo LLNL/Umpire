@@ -38,41 +38,41 @@ class ResourceManager {
     /*!
      * \brief
      */
-    static ResourceManager& getInstance();
+    UMPIRESHAREDDLL_API static ResourceManager& getInstance();
 
     /*!
      * \brief Initialize the ResourceManager.
      *
      * This will create all registered MemoryResource objects
      */
-    void initialize();
+    UMPIRESHAREDDLL_API void initialize();
 
     /*!
      * \brief Get the names of all available Allocator objects.
      */
-    std::vector<std::string> getAllocatorNames() const noexcept;
+    UMPIRESHAREDDLL_API std::vector<std::string> getAllocatorNames() const noexcept;
 
     /*!
      * \brief Get the ids of all available Allocator objects.
      */
-    std::vector<int> getAllocatorIds() const noexcept;
+    UMPIRESHAREDDLL_API std::vector<int> getAllocatorIds() const noexcept;
 
     /*!
      * \brief Get the Allocator with the given name.
      */
-    Allocator getAllocator(const std::string& name);
+    UMPIRESHAREDDLL_API Allocator getAllocator(const std::string& name);
 
-    Allocator getAllocator(const char* name);
+	UMPIRESHAREDDLL_API Allocator getAllocator(const char* name);
 
     /*!
      * \brief Get the default Allocator for the given resource_type.
      */
-    Allocator getAllocator(resource::MemoryResourceType resource_type);
+    UMPIRESHAREDDLL_API Allocator getAllocator(resource::MemoryResourceType resource_type);
 
     /*!
      * \brief Get the Allocator with the given ID.
      */
-    Allocator getAllocator(int id);
+    UMPIRESHAREDDLL_API Allocator getAllocator(int id);
 
     /*!
      * \brief Get the default Allocator.
@@ -82,7 +82,7 @@ class ResourceManager {
      *
      * \return The default Allocator.
      */
-    Allocator getDefaultAllocator();
+    UMPIRESHAREDDLL_API Allocator getDefaultAllocator();
 
     /*!
      * \brief Set the default Allocator.
@@ -92,7 +92,7 @@ class ResourceManager {
      *
      * \param allocator The Allocator to use as the default.
      */
-    void setDefaultAllocator(Allocator allocator) noexcept;
+    UMPIRESHAREDDLL_API void setDefaultAllocator(Allocator allocator) noexcept;
 
     /*!
      * \brief Construct a new Allocator.
@@ -113,7 +113,7 @@ class ResourceManager {
      * \param name Name to register Allocator with.
      * \param allocator Allocator to register.
      */
-    void registerAllocator(const std::string& name, Allocator allocator);
+    UMPIRESHAREDDLL_API void registerAllocator(const std::string& name, Allocator allocator);
 
     /*!
      * \brief Get the Allocator used to allocate ptr.
@@ -121,41 +121,41 @@ class ResourceManager {
      * \param ptr Pointer to find the Allocator for.
      * \return Allocator for the given ptr.
      */
-    Allocator getAllocator(void* ptr);
+    UMPIRESHAREDDLL_API Allocator getAllocator(void* ptr);
 
-    bool isAllocator(const std::string& name) noexcept;
+    UMPIRESHAREDDLL_API bool isAllocator(const std::string& name) noexcept;
 
     /*!
      * \brief Does the given pointer have an associated Allocator.
      *
      * \return True if the pointer has an associated Allocator.
      */
-    bool hasAllocator(void* ptr);
+    UMPIRESHAREDDLL_API bool hasAllocator(void* ptr);
 
     /*!
      * \brief register an allocation with the manager.
      */
-    void registerAllocation(void* ptr, util::AllocationRecord record);
+    UMPIRESHAREDDLL_API void registerAllocation(void* ptr, util::AllocationRecord record);
 
     /*!
      * \brief de-register the address ptr with the manager.
      *
      * \return the allocation record removed from the manager.
      */
-    util::AllocationRecord deregisterAllocation(void* ptr);
+    UMPIRESHAREDDLL_API util::AllocationRecord deregisterAllocation(void* ptr);
 
     /*!
      * \brief Find the allocation record associated with an address ptr.
      *
      * \return the record if found, or throws an exception if not found.
      */
-    const util::AllocationRecord* findAllocationRecord(void* ptr) const;
+    UMPIRESHAREDDLL_API const util::AllocationRecord* findAllocationRecord(void* ptr) const;
 
     /*!
      * \brief Check whether the named Allocator exists.
      *
      */
-    bool isAllocatorRegistered(const std::string& name);
+    UMPIRESHAREDDLL_API bool isAllocatorRegistered(const std::string& name);
 
     /*!
      * \brief Copy size bytes of data from src_ptr to dst_ptr.
@@ -169,7 +169,7 @@ class ResourceManager {
      * \param src_ptr Source pointer.
      * \param size Size in bytes.
      */
-    void copy(void* dst_ptr, void* src_ptr, std::size_t size=0);
+    UMPIRESHAREDDLL_API void copy(void* dst_ptr, void* src_ptr, std::size_t size=0);
 
     /*!
      * \brief Set the first length bytes of ptr to the value val.
@@ -178,7 +178,7 @@ class ResourceManager {
      * \param val Value to set.
      * \param length Number of bytes to set to val.
      */
-    void memset(void* ptr, int val, std::size_t length=0);
+    UMPIRESHAREDDLL_API void memset(void* ptr, int val, std::size_t length=0);
 
     /*!
      * \brief Reallocate current_ptr to new_size.
@@ -202,7 +202,7 @@ class ResourceManager {
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* current_ptr, std::size_t new_size);
+    UMPIRESHAREDDLL_API void* reallocate(void* current_ptr, std::size_t new_size);
 
     /*!
      * \brief Reallocate current_ptr to new_size.
@@ -220,7 +220,7 @@ class ResourceManager {
      * \return Reallocated pointer.
      *
      */
-    void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
+    UMPIRESHAREDDLL_API void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
 
     /*!
      * \brief Move src_ptr to memory from allocator
@@ -230,14 +230,14 @@ class ResourceManager {
      *
      * \return Pointer to new location of data.
      */
-    void* move(void* src_ptr, Allocator allocator);
+    UMPIRESHAREDDLL_API void* move(void* src_ptr, Allocator allocator);
 
     /*!
      * \brief Deallocate any pointer allocated by an Umpire-managed resource.
      *
      * \param ptr Pointer to deallocate.
      */
-    void deallocate(void* ptr);
+    UMPIRESHAREDDLL_API void deallocate(void* ptr);
 
     /*!
      * \brief Get the size in bytes of the allocation for the given pointer.
@@ -246,7 +246,7 @@ class ResourceManager {
      *
      * \return Size of allocation in bytes.
      */
-    std::size_t getSize(void* ptr) const;
+    UMPIRESHAREDDLL_API std::size_t getSize(void* ptr) const;
 
     std::shared_ptr<op::MemoryOperation> getOperation(
         const std::string& operation_name,
@@ -263,7 +263,7 @@ class ResourceManager {
     strategy::AllocationStrategy* findAllocatorForId(int id);
     strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
 
-    int getNextId() noexcept;
+    UMPIRESHAREDDLL_API int getNextId() noexcept;
 
     std::string getAllocatorInformation() const noexcept;
 

@@ -21,7 +21,7 @@ class AllocationTracker :
   private mixins::Inspector
 {
   public:
-    AllocationTracker(
+    UMPIRESHAREDDLL_API AllocationTracker(
         std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
     void* allocate(std::size_t bytes);

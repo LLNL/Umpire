@@ -1,2 +1,5 @@
 build-*
+Win32/umpire.vcxproj.user
+Win32/x64/
 *.swp
+*.aps

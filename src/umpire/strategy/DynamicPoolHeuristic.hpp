@@ -8,6 +8,7 @@
 #define UMPIRE_DynamicPoolHeuristic_HPP
 
 #include <functional>
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -26,7 +27,7 @@ class DynamicPoolMap;
    *
    * \return True if specified percentage of memory in pool is releasable.
    */
-  std::function<bool(const strategy::DynamicPoolList&)> heuristic_percent_releasable_list( int percentage );
+  UMPIRESHAREDDLL_API std::function<bool(const strategy::DynamicPoolList&)> heuristic_percent_releasable_list( int percentage );
 
   /*!
    * \brief Return true if specified percentage of pool is releasable
@@ -39,7 +40,7 @@ class DynamicPoolMap;
    *
    * \return True if specified percentage of memory in pool is releasable.
    */
-  std::function<bool(const strategy::DynamicPoolMap&)> heuristic_percent_releasable( int percentage );
+  UMPIRESHAREDDLL_API std::function<bool(const strategy::DynamicPoolMap&)> heuristic_percent_releasable( int percentage );
 
 } // end of namespace strategy
 } // end namespace umpire

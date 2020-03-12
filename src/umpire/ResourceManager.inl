@@ -40,9 +40,6 @@ Allocator ResourceManager::makeAllocator(
       << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
       << " ] }"
       );
-  if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
-  }
 
   if (!introspection) {
     allocator = 

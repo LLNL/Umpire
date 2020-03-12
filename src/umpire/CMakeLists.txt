@@ -4,6 +4,15 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+
+if (WIN32)
+  if (BUILD_SHARED_LIBS)
+     add_definitions(-DUMPIRESHAREDDLL_EXPORTS)
+  else ()
+     add_definitions(-DUMPIRESTATICLIB)
+  endif ()
+endif ()
+
 set (umpire_headers
   Allocator.hpp
   Allocator.inl

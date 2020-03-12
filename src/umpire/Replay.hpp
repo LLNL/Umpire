@@ -20,14 +20,14 @@ namespace umpire {
 
 class Allocator;
 
-std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
+UMPIRESHAREDDLL_API std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
 
-std::ostream& operator<< (std::ostream& out,
+UMPIRESHAREDDLL_API std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPoolMap::CoalesceHeuristic& );
-std::ostream& operator<< (std::ostream& out,
+UMPIRESHAREDDLL_API std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPoolList::CoalesceHeuristic& );
 
-class Replay {
+class UMPIRESHAREDDLL_API Replay {
 public:
   void logMessage( const std::string& message );
   static Replay* getReplayLogger();

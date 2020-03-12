@@ -9,20 +9,21 @@
 
 #include <string>
 #include <exception>
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace util {
 
 class Exception : public std::exception {
   public:
-    Exception(const std::string& msg,
+    UMPIRESHAREDDLL_API Exception(const std::string& msg,
         const std::string &file,
         int line);
 
     virtual ~Exception() = default;
 
-    std::string message() const;
-    virtual const char* what() const throw();
+    UMPIRESHAREDDLL_API std::string message() const;
+    UMPIRESHAREDDLL_API virtual const char* what() const throw();
 
   private:
     std::string m_message;

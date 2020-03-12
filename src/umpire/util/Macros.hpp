@@ -25,8 +25,14 @@
 #ifdef UMPIRE_ENABLE_LOGGING
 #ifdef UMPIRE_ENABLE_SLIC
 #include <stdlib.h>   // for getenv()
-#include <strings.h>  // for strcasecmp()
 #include <string>
+#ifdef _WIN32
+  #ifndef strcasecmp
+    #define strcasecmp stricmp
+  #endif
+#else
+  #include <strings.h>  // for strcasecmp()
+#endif
 
 #include "slic/Logger.hpp"
 #include "slic/GenericOutputStream.hpp"

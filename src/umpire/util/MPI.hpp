@@ -11,12 +11,14 @@
 #include "mpi.h"
 #endif
 
+#include "umpire/util/Platform.hpp"
+
 namespace umpire {
 namespace util {
 
 class MPI {
 public:
-  static void initialize(
+  UMPIRESHAREDDLL_API static void initialize(
 #if defined(UMPIRE_ENABLE_MPI)
       MPI_Comm umpire_communicator
 #endif

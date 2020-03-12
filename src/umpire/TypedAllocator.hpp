@@ -33,10 +33,10 @@ class TypedAllocator {
    *
    * \param allocator Allocator to use for allocating memory.
    */
-  explicit TypedAllocator(Allocator allocator);
+  UMPIRESHAREDDLL_API explicit TypedAllocator(Allocator allocator);
 
   template<typename U>
-  TypedAllocator(const TypedAllocator<U>& other);
+  UMPIRESHAREDDLL_API TypedAllocator(const TypedAllocator<U>& other);
 
   /*
    * \brief Allocate size objects of type T.
@@ -45,7 +45,7 @@ class TypedAllocator {
    *
    * \return Pointer to the start of the allocated memory.
    */
-  T* allocate(std::size_t size);
+  UMPIRESHAREDDLL_API T* allocate(std::size_t size);
 
   /*!
    * \brief Deallocate ptr, the passed size is ignored.
@@ -53,7 +53,7 @@ class TypedAllocator {
    * \param ptr Pointer to deallocate
    * \param size Size of allocation (ignored).
    */
-  void deallocate(T* ptr, std::size_t size);
+  UMPIRESHAREDDLL_API void deallocate(T* ptr, std::size_t size);
 
   private:
     umpire::Allocator m_allocator;

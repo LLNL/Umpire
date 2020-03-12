@@ -64,9 +64,9 @@
 #endif
 
 #include "judy.h"
+#include <string.h>
 
 #if defined(STANDALONE) || defined(ASKITIS)
-#include <string.h>
 #include <stdio.h>
 
 extern unsigned int MaxMem;

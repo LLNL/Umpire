@@ -54,7 +54,7 @@ class DynamicPoolList :
      * \param min_alloc_size The minimum size of all future allocations.
      * \param coalesce_heuristic Heuristic callback function.
      */
-    DynamicPoolList(
+    UMPIRESHAREDDLL_API DynamicPoolList(
         const std::string& name,
         int id,
         Allocator allocator,
