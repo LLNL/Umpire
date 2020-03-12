@@ -197,7 +197,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_SYCL)
   registerOperation(
       "COPY",
       std::make_pair(Platform::cpu, Platform::sycl),
