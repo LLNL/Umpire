@@ -22,12 +22,6 @@ jobs:
     inputs:
       workingDir: 'build'
       cmakeArgs: '--build . --config Release'
-  #- task: VSBuild@1
-  #  inputs:
-  #    solution: 'build/*.sln'
-  #    vsVersion: 'latest'
-  #  condition: eq( variables['Agent.OS'], 'Windows_NT')
-  #  displayName: 'Visual Studio Build'
   - task: VSTest@2
     inputs:
       configuration: 'Release'
