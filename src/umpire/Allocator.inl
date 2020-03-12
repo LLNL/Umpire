@@ -13,7 +13,7 @@
 
 namespace umpire {
 
-void*
+inline void*
 Allocator::allocate(std::size_t bytes)
 {
 
@@ -22,7 +22,7 @@ Allocator::allocate(std::size_t bytes)
   return allocate_impl(bytes);
 }
 
-void
+inline void
 Allocator::deallocate(void* ptr)
 {
   deallocate_impl(ptr);
