@@ -45,7 +45,9 @@ fi
 # Test
 if [[ "${1}" != "--build-only" ]]
 then
-    ctest -T test
+    ctest -T test 2>&1 | tee tests_output.txt
+    no_test_str="No tests were found\!\!\!"
+    [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]] && exit 1
     tree Testing
     cp Testing/*/Test.xml ${PROJECT_DIRECTORY}
 fi
