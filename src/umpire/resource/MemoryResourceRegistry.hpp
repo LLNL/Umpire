@@ -23,6 +23,9 @@ class MemoryResourceRegistry {
     std::unique_ptr<resource::MemoryResource>
     makeMemoryResource(const std::string& name, int id);
 
+    std::unique_ptr<resource::MemoryResource>
+    makeMemoryResource(const std::string& name, int id, MemoryResourceTraits traits);
+
     void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 
     MemoryResourceRegistry(const MemoryResourceRegistry&) = delete;

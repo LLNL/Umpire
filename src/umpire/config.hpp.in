@@ -25,6 +25,8 @@
 
 #cmakedefine UMPIRE_ENABLE_FILESYSTEM
 
+#cmakedefine UMPIRE_ENABLE_SANITIZERS
+
 #define UMPIRE_VERSION_MAJOR @Umpire_VERSION_MAJOR@
 #define UMPIRE_VERSION_MINOR @Umpire_VERSION_MINOR@
 #define UMPIRE_VERSION_PATCH @Umpire_VERSION_PATCH@
@@ -32,4 +34,9 @@
 
 extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 
+namespace umpire {
+constexpr int invalid_allocator_id = 0xDEADBEEF;
+}
+
 #endif
+

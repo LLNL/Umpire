@@ -36,6 +36,8 @@ struct MemoryResourceTraits {
     NVME
   };
 
+  int id;
+
   bool unified = false;
   std::size_t size = 0;
 

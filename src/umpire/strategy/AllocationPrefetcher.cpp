@@ -63,5 +63,11 @@ Platform AllocationPrefetcher::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+AllocationPrefetcher::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 } // end of namespace strategy
 } // end of namespace umpire
