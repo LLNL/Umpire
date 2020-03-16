@@ -31,7 +31,7 @@ Inspector::registerAllocation(
     m_high_watermark = m_current_size;
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, strategy, umpire::util::Backtrace{}});
+  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, strategy});
 }
 
 util::AllocationRecord
@@ -43,7 +43,7 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strateg
     m_current_size -= record.size;
   } else {
     // Re-register the pointer and throw an error
-    ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy, umpire::util::Backtrace{}});
+    ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy});
     UMPIRE_ERROR(ptr << " was not allocated by " << strategy->getName());
   }
 

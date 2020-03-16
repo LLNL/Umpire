@@ -48,7 +48,7 @@ void HostReallocateOperation::transform(
     }
 
     ResourceManager::getInstance().registerAllocation(
-       *new_ptr, {*new_ptr, new_size, allocator, umpire::util::Backtrace{}});
+       *new_ptr, {*new_ptr, new_size, allocator});
   }
 
   UMPIRE_RECORD_STATISTIC(
