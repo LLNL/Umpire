@@ -6,8 +6,7 @@
 ##############################################################################
 
 ####
-# This is the share configuration of jobs for lassen
-
+# Shared configuration of jobs for lassen
 .on_lassen:
   variables:
   tags:

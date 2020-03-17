@@ -6,8 +6,7 @@
 ##############################################################################
 
 ####
-# This is the share configuration of jobs for butte
-
+# Shared configuration of jobs for butte
 .on_butte:
   variables:
   tags:
@@ -32,7 +31,7 @@
   allow_failure: true
 
 ####
-# Here are all butte build jobs
+# All butte build jobs
 
 clang_3_9_1 (build and test on butte):
   variables:

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -31,7 +31,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   UMPIRE_ALLOC_NAME: umpire_ci_${CI_PIPELINE_ID}
-  BUILD_ROOT: ${CI_BUILDS_DIR}/umpire_${CI_COMMIT_REF_SLUG}_${CI_PIPELINE_ID}
+  BUILD_ROOT: ${CI_BUILDS_DIR}/umpire/${CI_COMMIT_REF_SLUG}_${CI_PIPELINE_ID}
 
 # This defines the default behavior, may be overridden it.
 before_script:
@@ -56,6 +56,8 @@ stages:
 
 # The start job is actually a dumb one, which serves as a reference to start
 # q_allocate_resources, l_build_and_test and b_build_and_test simultaneously.
+# TODO: GitLab 12.8 will allow for empty "needs" to trigger the job asap,
+# this start job will no be necessary anymore.
 # Note: "GIT_STRATEGY: none" tells GitLab not to clone umpire for this job.
 start:
   variables:
