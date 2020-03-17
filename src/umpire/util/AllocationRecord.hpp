@@ -13,6 +13,12 @@
 
 #include "umpire/util/Backtrace.hpp"
 
+#ifdef UMPIRE_ENABLE_BACKTRACE
+#define UMPIRE_GET_BACKTRACE(record)  record.allocationBacktrace.getBacktrace()
+#else
+#define UMPIRE_GET_BACKTRACE(record)
+#endif
+
 namespace umpire {
 
 namespace strategy {
@@ -32,7 +38,9 @@ struct AllocationRecord
   void* ptr;
   std::size_t size;
   strategy::AllocationStrategy* strategy;
+#ifdef UMPIRE_ENABLE_BACKTRACE
   util::Backtrace allocationBacktrace;
+#endif // UMPIRE_ENABLE_BACKTRACE
 };
 
 } // end of namespace util

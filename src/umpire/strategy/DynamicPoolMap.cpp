@@ -481,8 +481,10 @@ std::string DynamicPoolMap::getAllocationBacktraces() noexcept
         << ", base=" << iter.first
         << ", ptr=" << ar->ptr
         << ", size=" << ar->size
+#ifdef UMPIRE_ENABLE_BACKTRACE
         << std::endl
         << ar->allocationBacktrace
+#endif // UMPIRE_ENABLE_BACKTRACE
         << std::endl;
     }
   }

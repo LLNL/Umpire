@@ -13,6 +13,7 @@
 #cmakedefine UMPIRE_ENABLE_NUMA
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
+#cmakedefine UMPIRE_ENABLE_BACKTRACE
 #cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_HIP
 
