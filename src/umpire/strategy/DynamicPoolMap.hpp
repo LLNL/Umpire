@@ -128,8 +128,6 @@ class DynamicPoolMap : public AllocationStrategy
      */
     void coalesce();
 
-    std::string getAllocationBacktraces() noexcept;
-
   private:
     using SizeTuple = std::tuple<std::size_t, bool, std::size_t>;
     using AddressTuple = std::tuple<Pointer, bool, std::size_t>;

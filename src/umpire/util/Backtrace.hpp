@@ -12,7 +12,6 @@
 
 #include "umpire/config.hpp"
 
-#ifdef UMPIRE_ENABLE_BACKTRACE
 namespace umpire {
 namespace util {
 
@@ -29,7 +28,5 @@ private:
 
 } // end of namespace util
 } // end of namespace umpire
-
-#endif // UMPIRE_ENABLE_BACKTRACE
 
 #endif // UMPIRE_Backtrace_HPP

@@ -175,7 +175,7 @@ AllocationMap::AllocationMap() :
 void
 AllocationMap::insert(void* ptr, AllocationRecord record)
 {
-  UMPIRE_GET_BACKTRACE(record);
+  UMPIRE_GET_ALLOCATION_BACKTRACE(record);
 
   std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -339,9 +339,9 @@ AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
           " [ " << reinterpret_cast<void*>(iter->ptr) <<
           " -- " << reinterpret_cast<void*>(end_ptr) <<
           " ] " << std::endl
-#ifdef UMPIRE_ENABLE_BACKTRACE
+#ifdef UMPIRE_ENABLE_ALLOCATION_BACKTRACE
           << iter->allocationBacktrace
-#endif // UMPIRE_ENABLE_BACKTRACE
+#endif // UMPIRE_ENABLE_ALLOCATION_BACKTRACE
           << std::endl;
       }
       ++iter;

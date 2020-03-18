@@ -15,7 +15,6 @@
 #include "umpire/util/Backtrace.hpp"
 #include "umpire/util/Macros.hpp"
 
-#ifdef UMPIRE_ENABLE_BACKTRACE
 namespace umpire {
 namespace util {
 
@@ -67,4 +66,3 @@ std::ostream& operator<<(std::ostream& os, const Backtrace& bt)
 
 } // end of namespace util
 } // end of namespace umpire
-#endif // UMPIRE_ENABLE_BACKTRACE

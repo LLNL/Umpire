@@ -56,13 +56,6 @@ DynamicPoolMap::~DynamicPoolMap()
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
 
-  // Warning if blocks are still in use
-  if (m_used_map.size() > 0) {
-    auto s = DynamicPoolMap::getAllocationBacktraces();
-    // std::cout << s << std::endl;
-    UMPIRE_LOG(Warning, s);
-  }
-
   // Free any unused blocks
   for (auto& rec : m_free_map) {
     const std::size_t bytes{rec.first};
@@ -465,32 +458,5 @@ void DynamicPoolMap::do_coalesce()
     }
   }
 }
-
-std::string DynamicPoolMap::getAllocationBacktraces() noexcept
-{
-  std::stringstream ss;
-
-  if (m_used_map.size() > 0) {
-    ss << "There are " << m_used_map.size() << " addresses"
-       << " not deallocated at destruction. This will cause leak(s). "
-       << std::endl;
-
-    for (auto iter : m_used_map) {
-      auto ar = ResourceManager::getInstance().findAllocationRecord(iter.first);
-      ss << "strategy=" << ar->strategy->getName()
-        << ", base=" << iter.first
-        << ", ptr=" << ar->ptr
-        << ", size=" << ar->size
-#ifdef UMPIRE_ENABLE_BACKTRACE
-        << std::endl
-        << ar->allocationBacktrace
-#endif // UMPIRE_ENABLE_BACKTRACE
-        << std::endl;
-    }
-  }
-
-  return ss.str();
-}
-
 } // end of namespace strategy
 } // end of namespace umpire

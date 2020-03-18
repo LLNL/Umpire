@@ -30,18 +30,15 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples allocator)
 
-if (ENABLE_BACKTRACE)
-  blt_add_executable(
-    NAME backtrace_example
-    SOURCES backtrace_example.cpp
-    DEPENDS_ON ${example_depends})
-  list(APPEND umpire_examples backtrace_example)
+blt_add_executable(
+  NAME backtrace_example
+  SOURCES backtrace_example.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples backtrace_example)
 
-  blt_add_target_link_flags(
-    TO backtrace_example
-    FLAGS "-rdynamic")
-
-endif ()
+blt_add_target_link_flags(
+  TO backtrace_example
+  FLAGS "-rdynamic")
 
 if (ENABLE_C)
   blt_add_executable(
