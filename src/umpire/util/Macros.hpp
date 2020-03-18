@@ -93,12 +93,12 @@
 
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
-  UMPIRE_LOG(Error, msg);                                          \
   umpire::util::Backtrace backtrace;                               \
   backtrace.getBacktrace();                                        \
   std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << " " << msg;               \
+  umpire_oss_error << " " << __func__ << " " << msg << std::endl;  \
   umpire_oss_error << backtrace << std::endl;                      \
+  UMPIRE_LOG(Error, umpire_oss_error.str());                       \
   umpire::util::flush_files();                                     \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \
