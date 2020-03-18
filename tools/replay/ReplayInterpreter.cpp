@@ -9,16 +9,14 @@
 #include <string>
 #include <cstring>
 
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+#include <cxxabi.h>   // for __cxa_demangle
 
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
 #include "ReplayFile.hpp"
 #include "umpire/tpl/json/json.hpp"
-
-#if !defined(_MSC_VER)
-#include <cxxabi.h>
-#endif
 
 ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
     m_input_file_name{in_file_name}, m_input_file{in_file_name}
@@ -781,4 +779,4 @@ void ReplayInterpreter::replay_compileRelease( void )
   op->op_allocator = getAllocatorIndex(std::string{m_json["payload"]["allocator_ref"]});
   hdr->num_operations++;
 }
-
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)

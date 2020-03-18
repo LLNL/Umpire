@@ -11,11 +11,16 @@
 #include <string>
 #include <vector>
 
+#include "umpire/util/Macros.hpp"
+
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "ReplayInterpreter.hpp"
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
 {
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
   std::vector<std::string> positional_args;
 
   cxxopts::Options options(argv[0], "Compare two replay result files created"
@@ -60,6 +65,13 @@ int main(int argc, char* argv[])
     std::cerr << "Miscompare:" << std::endl;
     return -2;
   }
+#else
+  UMPIRE_USE_VAR(argc);
+  UMPIRE_USE_VAR(argv);
+  std::cerr << "This program requires the ability to demangle C++" << std::endl
+    << "However, this program was compiled with stdlib=c++ which does " << std::endl
+    << "not have this feature." << std::endl;
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
   return 0;
 }
