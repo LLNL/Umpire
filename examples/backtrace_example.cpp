@@ -22,9 +22,9 @@ void alloc_leak_example()
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dynamic_pool", rm.getAllocator("HOST"));
 
-  auto alloc1 = pool.allocate(24);
-  auto alloc2 = pool.allocate(64);
-  auto alloc3 = pool.allocate(128);
+  pool.allocate(24);
+  pool.allocate(64);
+  pool.allocate(128);
 
   std::stringstream ss;
   umpire::print_allocator_records(pool, ss);
@@ -32,15 +32,15 @@ void alloc_leak_example()
   if (! ss.str().empty() )
     std::cout << ss.str();
 
-  pool.deallocate(alloc1);
-  pool.deallocate(alloc2);
-  pool.deallocate(alloc3);
+  // pool.deallocate(alloc1);
+  // pool.deallocate(alloc2);
+  // pool.deallocate(alloc3);
 
-  ss.str("");
-  umpire::print_allocator_records(pool, ss);
+  // ss.str("");
+  // umpire::print_allocator_records(pool, ss);
 
-  if (! ss.str().empty() )
-    std::cout << ss.str() << std::endl;
+  // if (! ss.str().empty() )
+    // std::cout << ss.str() << std::endl;
 }
 
 void umpire_exception_example()
