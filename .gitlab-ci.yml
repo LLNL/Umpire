@@ -103,8 +103,8 @@ start:
 
 # This is where jobs are included
 include:
-  - local: .gitlab/ci/build_quartz.yml
-  - local: .gitlab/ci/build_lassen.yml
-  - local: .gitlab/ci/build_butte.yml
+  - local: .gitlab/quartz.yml
+  - local: .gitlab/lassen.yml
+  - local: .gitlab/butte.yml
 
 
