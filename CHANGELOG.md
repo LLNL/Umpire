@@ -16,7 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Allocation backtrace may be enabled by building umpire with 
   -DENABLE_ALLOCATION_BACKTRACE
 
-- Umpire exceptions now include backtrace information in exception string.
+- Umpire exceptions now include backtrace information in the exception string.
 
 ### Changed
 
