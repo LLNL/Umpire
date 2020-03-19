@@ -30,7 +30,7 @@ class CudaMemsetOperation : public MemoryOperation {
       int value,
       std::size_t length);
 
-  camp::resources::Event apply(
+  camp::resources::Event apply_async(
       void* src_ptr,
       util::AllocationRecord* ptr,
       int value,

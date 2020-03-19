@@ -45,7 +45,7 @@ class MemoryOperation {
         util::AllocationRecord *dst_allocation,
         std::size_t length);
 
-    virtual camp::resources::Event transform(
+    virtual camp::resources::Event transform_async(
         void* src_ptr,
         void** dst_ptr,
         util::AllocationRecord *src_allocation,
@@ -69,7 +69,7 @@ class MemoryOperation {
         int val,
         std::size_t length);
 
-    virtual camp::resources::Event apply(
+    virtual camp::resources::Event apply_async(
         void* src_ptr,
         util::AllocationRecord *src_allocation,
         int val,

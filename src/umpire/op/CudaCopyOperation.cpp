@@ -40,7 +40,7 @@ void CudaCopyOperation::transform(
 }
 
 camp::resources::Event 
-CudaCopyOperation::transform(
+CudaCopyOperation::transform_async(
     void* src_ptr,
     void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),

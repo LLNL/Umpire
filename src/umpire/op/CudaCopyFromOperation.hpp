@@ -34,7 +34,7 @@ class CudaCopyFromOperation :
       std::size_t length);
 
   camp::resources::Event 
-  transform(
+  transform_async(
       void* src_ptr,
       void** dst_ptr,
       util::AllocationRecord *src_allocation,

@@ -578,7 +578,7 @@ ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& c
       src_alloc_record->strategy,
       dst_alloc_record->strategy);
 
-  return op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
+  return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
 }
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)

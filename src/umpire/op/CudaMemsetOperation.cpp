@@ -39,7 +39,7 @@ CudaMemsetOperation::apply(
 }
 
 camp::resources::Event
-CudaMemsetOperation::apply(
+CudaMemsetOperation::apply_async(
     void* src_ptr,
     util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
     int value,

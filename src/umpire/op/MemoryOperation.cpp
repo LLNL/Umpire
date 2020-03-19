@@ -23,7 +23,7 @@ MemoryOperation::transform(
 }
 
 camp::resources::Event
-MemoryOperation::transform(
+MemoryOperation::transform_async(
     void* UMPIRE_UNUSED_ARG(src_ptr),
     void** UMPIRE_UNUSED_ARG(dst_ptr),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
@@ -45,7 +45,7 @@ MemoryOperation::apply(
 }
 
 camp::resources::Event
-MemoryOperation::apply(
+MemoryOperation::apply_async(
     void* UMPIRE_UNUSED_ARG(src_ptr),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     int UMPIRE_UNUSED_ARG(val),

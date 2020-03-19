@@ -45,7 +45,7 @@ void CudaCopyToOperation::transform(
       "event", "copy");
 }
 
-camp::resources::Event CudaCopyToOperation::transform(
+camp::resources::Event CudaCopyToOperation::transform_async(
     void* src_ptr,
     void** dst_ptr,
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
