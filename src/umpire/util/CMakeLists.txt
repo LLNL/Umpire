@@ -66,9 +66,11 @@ endif ()
 
 set (umpire_util_depends umpire_tpl_judy)
 
-set (umpire_util_depends
-  ${umpire_util_depends}
-  backtrace_symbols)
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    backtrace_symbols)
+endif ()
 
 if (ENABLE_NUMA)
   set (umpire_util_depends

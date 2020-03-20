@@ -49,6 +49,8 @@ if (ENABLE_SLIC AND ENABLE_LOGGING)
                       )
 endif ()
 
-blt_register_library( NAME backtrace_symbols
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  blt_register_library( NAME backtrace_symbols
     LIBRARIES ${CMAKE_DL_LIBS}
     )
+endif ()
