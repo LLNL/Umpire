@@ -29,7 +29,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
-- Clang builds using `-stdlib=lib++` option have been fixed.
+- Clang builds using `-stdlib=libc++` option have been fixed.
 
 ## [2.1.0] - 2020-01-30
 
