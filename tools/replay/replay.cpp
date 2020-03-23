@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
   UMPIRE_USE_VAR(argc);
   UMPIRE_USE_VAR(argv);
   std::cerr << "This program requires the ability to demangle C++" << std::endl
-    << "However, this program was compiled with stdlib=c++ which does " << std::endl
+    << "However, this program was compiled with -stdlib=libc++ which does " << std::endl
     << "not have this feature." << std::endl;
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
   return 0;
