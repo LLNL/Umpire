@@ -13,6 +13,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Add support for multiple CUDA devices. These devices are detected and
   registered as "DEVICE_N", where N is the device number.
 
+- Allocation backtrace may be enabled by building umpire with 
+  -DENABLE_ALLOCATION_BACKTRACE
+
+- Umpire exceptions now include backtrace information in the exception string.
+
 ### Changed
 
 - LC Gitlab CI runs only a subset of targets on PRs, and all of them on master
@@ -24,6 +29,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Clang builds using `-stdlib=libc++` option have been fixed.
 
 ## [2.1.0] - 2020-01-30
 

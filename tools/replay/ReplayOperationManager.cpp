@@ -10,6 +10,7 @@
 #include <vector>
 #include <fstream>
 
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
@@ -1096,3 +1097,4 @@ void ReplayOperationManager::dumpStats()
   }
 }
 
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
