@@ -214,6 +214,12 @@ FixedPool::getPlatform() noexcept
   return m_strategy->getPlatform();
 }
 
+MemoryResourceTraits
+FixedPool::getTraits() const noexcept
+{
+  return m_strategy->getTraits();
+}
+
 std::size_t
 FixedPool::numPools() const noexcept
 {

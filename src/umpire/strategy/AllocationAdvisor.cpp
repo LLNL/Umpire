@@ -87,5 +87,11 @@ Platform AllocationAdvisor::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+AllocationAdvisor::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 } // end of namespace strategy
 } // end of namespace umpire

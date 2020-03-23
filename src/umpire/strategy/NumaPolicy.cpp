@@ -86,6 +86,12 @@ NumaPolicy::getPlatform() noexcept
   return m_platform;
 }
 
+MemoryResourceTraits
+NumaPolicy::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 int
 NumaPolicy::getNode() const noexcept
 {

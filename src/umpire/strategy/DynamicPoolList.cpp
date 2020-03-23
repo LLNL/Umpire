@@ -113,6 +113,12 @@ DynamicPoolList::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+DynamicPoolList::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 void
 DynamicPoolList::coalesce() noexcept
 {

@@ -16,7 +16,7 @@ MemoryResource::MemoryResource(const std::string& name, int id, MemoryResourceTr
 }
 
 MemoryResourceTraits
-MemoryResource::getTraits()
+MemoryResource::getTraits() const noexcept
 {
   return m_traits;
 }

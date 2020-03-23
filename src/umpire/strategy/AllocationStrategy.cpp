@@ -41,6 +41,14 @@ AllocationStrategy::getActualSize() const noexcept
   return getCurrentSize();
 }
 
+MemoryResourceTraits 
+AllocationStrategy::getTraits() const noexcept
+{
+  UMPIRE_LOG(Error, "AllocationStrategy::getTraits() not implemented");
+
+  return MemoryResourceTraits{};
+}
+
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)
 {
   os << "[" << strategy.m_name << "," << strategy.m_id << "]";

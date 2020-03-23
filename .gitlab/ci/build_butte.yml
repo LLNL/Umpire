@@ -22,6 +22,8 @@
   allow_failure: true
   needs: ["start"]
 
+# Note: .build_butte_advanced inherits from .build_butte and .advanced_pileline.
+# In particular, the rules section will be merged. Careful when changing rules.
 .build_butte_advanced:
   extends: [.build_butte, .advanced_pipeline]
   allow_failure: true
