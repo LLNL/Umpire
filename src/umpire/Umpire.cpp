@@ -9,9 +9,10 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/ResourceManager.hpp"
 
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 #include <iterator>
+#include <sstream>
 
 volatile int umpire_ver_2_found;
 
@@ -19,13 +20,21 @@ namespace umpire {
 
 void print_allocator_records(Allocator allocator, std::ostream& os)
 {
+  std::stringstream ss;
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto strategy = allocator.getAllocationStrategy();
 
   rm.m_allocations.print([strategy] (const util::AllocationRecord& rec) {
     return rec.strategy == strategy;
-  }, os);
+  }, ss);
+
+  if (! ss.str().empty() ) {
+    os << "Allocations for "
+      << allocator.getName()
+      << " allocator:" << std::endl
+      << ss.str() << std::endl;
+  }
 }
 
 std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)

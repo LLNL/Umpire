@@ -31,6 +31,12 @@ Allocator ResourceManager::makeAllocator(
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
 
+  if (m_id+1 == umpire::invalid_allocator_id) {
+    UMPIRE_ERROR(
+        "Maximum number of concurrent allocators exceeded! "
+        << "Please email umpire-dev@llnl.gov");
+  }
+
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
   UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()

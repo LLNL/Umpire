@@ -7,6 +7,7 @@
 #ifndef REPLAY_ReplayInterpreter_HPP
 #define REPLAY_ReplayInterpreter_HPP
 
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -68,4 +69,5 @@ class ReplayInterpreter {
 
 #include "ReplayInterpreter.inl"
 
+#endif //!defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #endif // REPLAY_ReplayInterpreter_HPP

@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef REPLAY_ReplayFile_HPP
 #define REPLAY_ReplayFile_HPP
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 #include <string>
 #include <vector>
@@ -143,5 +144,5 @@ private:
 
   void checkHeader();
 };
-
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #endif // REPLAY_ReplayFile_HPP

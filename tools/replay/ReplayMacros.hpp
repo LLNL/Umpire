@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #ifndef REPLAY_Macros_HPP
 #define REPLAY_Macros_HPP
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 #include <cstdlib>
 #include <iostream>
@@ -23,4 +24,5 @@
   exit(-1);                                                                 \
 }
 
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #endif // REPLAY_Macros_HPP

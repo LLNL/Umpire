@@ -13,6 +13,7 @@
 #cmakedefine UMPIRE_ENABLE_NUMA
 #cmakedefine UMPIRE_ENABLE_SLIC
 #cmakedefine UMPIRE_ENABLE_LOGGING
+#cmakedefine UMPIRE_ENABLE_ALLOCATION_BACKTRACE
 #cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_HIP
 
@@ -34,4 +35,9 @@
 
 extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 
+namespace umpire {
+constexpr int invalid_allocator_id = 0xDEADBEEF;
+}
+
 #endif
+
