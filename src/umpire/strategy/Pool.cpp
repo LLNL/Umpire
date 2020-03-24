@@ -14,6 +14,14 @@
 namespace umpire {
 namespace strategy {
 
+namespace {
+  inline std::size_t aligned_size(const std::size_t size) {
+    const std::size_t boundary = 16;
+  //  return std::size_t (size + (boundary-1)) & ~(boundary-1);
+    return size + boundary - 1 - (size - 1) % boundary;
+  }
+}
+
 Pool::Pool(
     const std::string& name,
     int id,
@@ -46,6 +54,7 @@ void*
 Pool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
+  bytes = aligned_size(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
 
@@ -171,6 +180,7 @@ void Pool::release()
     if ( (chunk-> size == chunk->chunk_size) 
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
+      m_actual_bytes -= chunk->chunk_size;
       m_allocator->deallocate(chunk->data);
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);
@@ -202,6 +212,21 @@ Platform
 Pool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+void
+Pool::coalesce() noexcept
+{
+  UMPIRE_LOG(Info, "coalesce");
+//  size_t size_pre{getActualSize()};
+//  UMPIRE_LOG(Info, "size_pre = " << size_pre);
+//  release();
+//  size_t size_post{getActualSize()};
+//  UMPIRE_LOG(Info, "size_pre = " << size_post);
+//  size_t alloc_size{size_pre-size_post};
+//  UMPIRE_LOG(Info, "alloc_size = " << alloc_size);
+//  auto ptr = allocate(alloc_size);
+//  deallocate(ptr);
 }
 
 

@@ -9,7 +9,7 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/MemoryMap.hpp"
-#include "umpire/util/size_map.hpp"
+//#include "umpire/util/size_map.hpp"
 
 #include <map>
 #include <unordered_map>
@@ -54,6 +54,8 @@ class Pool :
     std::size_t getHighWatermark() const noexcept override;
 
     Platform getPlatform() noexcept override;
+
+    void coalesce() noexcept;
   private:
     struct Chunk;
 
