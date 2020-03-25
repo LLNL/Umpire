@@ -217,16 +217,12 @@ Pool::getPlatform() noexcept
 void
 Pool::coalesce() noexcept
 {
-  UMPIRE_LOG(Info, "coalesce");
-//  size_t size_pre{getActualSize()};
-//  UMPIRE_LOG(Info, "size_pre = " << size_pre);
-//  release();
-//  size_t size_post{getActualSize()};
-//  UMPIRE_LOG(Info, "size_pre = " << size_post);
-//  size_t alloc_size{size_pre-size_post};
-//  UMPIRE_LOG(Info, "alloc_size = " << alloc_size);
-//  auto ptr = allocate(alloc_size);
-//  deallocate(ptr);
+  size_t size_pre{getActualSize()};
+  release();
+  size_t size_post{getActualSize()};
+  size_t alloc_size{size_pre-size_post};
+  auto ptr = allocate(alloc_size);
+  deallocate(ptr);
 }
 
 
