@@ -217,10 +217,10 @@ Pool::getPlatform() noexcept
 void
 Pool::coalesce() noexcept
 {
-  size_t size_pre{getActualSize()};
+  std::size_t size_pre{getActualSize()};
   release();
-  size_t size_post{getActualSize()};
-  size_t alloc_size{size_pre-size_post};
+  std::size_t size_post{getActualSize()};
+  std::size_t alloc_size{size_pre-size_post};
   auto ptr = allocate(alloc_size);
   deallocate(ptr);
 }
