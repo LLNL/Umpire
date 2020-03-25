@@ -111,6 +111,16 @@ void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
  */
 std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
 
+bool pointer_overlaps(void* left, void* right);
+
+bool pointer_contains(void* left, void* right);
+
+std::string get_backtrace(void* ptr);
+
+std::size_t get_process_memory_usage();
+
+std::size_t get_device_memory_usage(int device_id)
+
 } // end of namespace umpire
 
 #endif // UMPIRE_Umpire_HPP

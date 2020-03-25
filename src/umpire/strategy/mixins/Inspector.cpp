@@ -14,7 +14,8 @@ namespace mixins {
 
 Inspector::Inspector() :
   m_current_size(0),
-  m_high_watermark(0)
+  m_high_watermark(0),
+  m_allocation_count{0}
 {
 }
 
@@ -26,6 +27,7 @@ Inspector::registerAllocation(
     strategy::AllocationStrategy* strategy)
 {
   m_current_size += size;
+  m_allocation_count++;
 
   if (m_current_size > m_high_watermark) {
     m_high_watermark = m_current_size;
@@ -41,6 +43,7 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strateg
 
   if (record.strategy == strategy) {
     m_current_size -= record.size;
+    m_allocation_count++;
   } else {
     // Re-register the pointer and throw an error
     ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy});

@@ -14,6 +14,9 @@
 #include <iterator>
 #include <sstream>
 
+#include <unistd.h>
+#include <ifstream>
+
 volatile int umpire_ver_2_found;
 
 namespace umpire {
@@ -49,6 +52,92 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
                });
 
   return recs;
+}
+
+bool pointer_overlaps(void* left_ptr, void* right_ptr)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto left_record{rm.findAllocationRecord(left_ptr)};
+    auto right_record{rm.findAllocationRecord(right_ptr)};
+
+    char* left{reinterpret_cast<char*>(left_record->ptr)};
+    char* right{reinterpret_cast<char*>(right_ptr->ptr)};
+
+    return ((right >= left) 
+      && (left + left_record->size >= right)
+      && (right + right_record->size > left + left_record->size));
+  } catch (umpire::Exception e) {
+    UMPIRE_ERROR("Unknown pointer passed to ")
+  }
+}
+
+bool pointer_contains(void* left, void* right)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  try {
+    auto left_record{rm.findAllocationRecord(left_ptr)};
+    auto right_record{rm.findAllocationRecord(right_ptr)};
+
+    char* left{reinterpret_cast<char*>(left_record->ptr)};
+    char* right{reinterpret_cast<char*>(right_ptr->ptr)};
+
+    return ((right >= left) 
+      && (left + left_record->size >= right)
+      && (right + right_record->size <= left + left_record->size));
+  } catch (umpire::Exception e) {
+    UMPIRE_ERROR("Unknown pointer passed to ")
+  }
+}
+
+std::string get_backtrace(void* ptr)
+{
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto record = rm.findAllocationRecord(ptr);
+
+  std::ostringstream backtrace_stream;
+  backtrace_stream << record->allocationBacktrace;
+
+  return backtrace_stream.str();
+#else
+  return "[Requires ENABLE_BACKTRACE=On]";
+#endif
+}
+
+
+std::size_t get_process_memory_usage()
+{
+  std::size_t ignore;
+  std::size_t rss;
+  std::ifstream statm("/proc/self/statm");
+  statm >> ignore >> rss >> ignore;
+  statm.close();
+  long page_size{::sysconf(_SC_PAGE_SIZE)};
+  return std::size_t{resident * page_size};
+}
+
+std::size_t get_device_memory_usage(int device_id)
+{
+#if defined(UMPIRE_ENABLE_CUDA)
+  int mem_free{0};
+  int mem_tot{0};
+
+  int current_device;
+  cudaGetDevice(&current_device);
+
+  cudaSetDevice(device_id);
+
+  cudaMemGetInfo(&mem_free, &mem_tot);
+
+  cudaSetDevice(current_device);
+
+  return std::size_t{mem_tot - mem_free};
+#else
+  return 0;
+#endif
 }
 
 } // end namespace umpire
