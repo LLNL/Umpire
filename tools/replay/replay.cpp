@@ -11,12 +11,17 @@
 #include <ratio>
 #include <chrono>
 
+#include "umpire/util/Macros.hpp"
+
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
 {
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
   cxxopts::Options options(argv[0], "Replay an umpire session from a file");
 
   options
@@ -85,6 +90,12 @@ int main(int argc, char* argv[])
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
   }
-
+#else
+  UMPIRE_USE_VAR(argc);
+  UMPIRE_USE_VAR(argv);
+  std::cerr << "This program requires the ability to demangle C++" << std::endl
+    << "However, this program was compiled with -stdlib=libc++ which does " << std::endl
+    << "not have this feature." << std::endl;
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
   return 0;
 }
