@@ -14,6 +14,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/Replay.hpp"
+#include "umpire/util/Backtrace.hpp"
 
 #include <cstdlib>
 #include <algorithm>
@@ -54,25 +55,6 @@ DynamicPoolMap::~DynamicPoolMap()
 {
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
-
-  // Warning if blocks are still in use
-  if (m_used_map.size() > 0) {
-    const std::size_t max_addr{25};
-    std::stringstream ss;
-    ss << "There are " << m_used_map.size() << " addresses";
-    ss << " not deallocated at destruction. This will cause leak(s). ";
-    if (m_used_map.size() <= max_addr)
-      ss << "Addresses:";
-    else
-      ss << "First " << max_addr << " addresses:";
-    auto iter = m_used_map.begin();
-    auto end = m_used_map.end();
-    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
-      if (i % 5 == 0) ss << "\n\t";
-      ss << " " << iter->first;
-    }
-    UMPIRE_LOG(Warning, ss.str());
-  }
 
   // Free any unused blocks
   for (auto& rec : m_free_map) {
@@ -476,6 +458,5 @@ void DynamicPoolMap::do_coalesce()
     }
   }
 }
-
 } // end of namespace strategy
 } // end of namespace umpire

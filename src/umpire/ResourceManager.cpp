@@ -44,6 +44,8 @@
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 #endif
 
+#include "umpire/Umpire.hpp"
+
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
@@ -148,6 +150,16 @@ ResourceManager::ResourceManager() :
 ResourceManager::~ResourceManager()
 {
   for (auto&& allocator : m_allocators) {
+    if (allocator->getCurrentSize() != 0) {
+      std::stringstream ss;
+
+      umpire::print_allocator_records(Allocator{allocator.get()}, ss);
+
+      UMPIRE_LOG(Error, allocator->getName() << " Allocator still has "
+                        << allocator->getCurrentSize() << " bytes allocated"
+                        << std::endl << ss.str() << std::endl);
+    }
+
     allocator.reset();
   }
 }
@@ -440,6 +452,10 @@ Allocator
 ResourceManager::getAllocator(int id)
 {
   UMPIRE_LOG(Debug, "(\"" << id << "\")");
+
+  if (id == umpire::invalid_allocator_id) {
+    UMPIRE_ERROR("Passed umpire::invalid_allocator_id");
+  }
 
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
