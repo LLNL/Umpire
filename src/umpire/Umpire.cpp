@@ -15,7 +15,8 @@
 #include <sstream>
 
 #include <unistd.h>
-#include <ifstream>
+#include <sstream>
+#include <fstream>
 
 volatile int umpire_ver_2_found;
 
@@ -63,12 +64,12 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
     auto right_record{rm.findAllocationRecord(right_ptr)};
 
     char* left{reinterpret_cast<char*>(left_record->ptr)};
-    char* right{reinterpret_cast<char*>(right_ptr->ptr)};
+    char* right{reinterpret_cast<char*>(right_record->ptr)};
 
     return ((right >= left) 
       && (left + left_record->size >= right)
       && (right + right_record->size > left + left_record->size));
-  } catch (umpire::Exception e) {
+  } catch (umpire::util::Exception e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
   }
 }
@@ -78,16 +79,16 @@ bool pointer_contains(void* left, void* right)
   auto& rm = umpire::ResourceManager::getInstance();
 
   try {
-    auto left_record{rm.findAllocationRecord(left_ptr)};
-    auto right_record{rm.findAllocationRecord(right_ptr)};
+    auto left_record{rm.findAllocationRecord(left)};
+    auto right_record{rm.findAllocationRecord(right)};
 
     char* left{reinterpret_cast<char*>(left_record->ptr)};
-    char* right{reinterpret_cast<char*>(right_ptr->ptr)};
+    char* right{reinterpret_cast<char*>(right_record->ptr)};
 
     return ((right >= left) 
       && (left + left_record->size >= right)
       && (right + right_record->size <= left + left_record->size));
-  } catch (umpire::Exception e) {
+  } catch (umpire::util::Exception e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
   }
 }
@@ -111,9 +112,9 @@ std::string get_backtrace(void* ptr)
 std::size_t get_process_memory_usage()
 {
   std::size_t ignore;
-  std::size_t rss;
+  std::size_t resident;
   std::ifstream statm("/proc/self/statm");
-  statm >> ignore >> rss >> ignore;
+  statm >> ignore >> resident >> ignore;
   statm.close();
   long page_size{::sysconf(_SC_PAGE_SIZE)};
   return std::size_t{resident * page_size};
@@ -136,6 +137,7 @@ std::size_t get_device_memory_usage(int device_id)
 
   return std::size_t{mem_tot - mem_free};
 #else
+  UMPIRE_USE_VAR(device_id);
   return 0;
 #endif
 }
