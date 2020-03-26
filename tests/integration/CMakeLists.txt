@@ -7,6 +7,7 @@
 set (allocator_integration_tests_depends
   umpire gtest)
 
+
 if (ENABLE_CUDA)
   set (allocator_integration_tests_depends
     ${allocator_integration_tests_depends}
@@ -121,6 +122,16 @@ blt_add_executable(
 blt_add_test(
   NAME static_initialization_test
   COMMAND static_initialization_test)
+
+blt_add_executable(
+  NAME introspection_tests
+  SOURCES introspection_tests.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME introspection_tests
+  COMMAND introspection_tests)
+
 
 # blt_add_executable(
 #   NAME memory_resource_traits_tests
