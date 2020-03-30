@@ -83,6 +83,11 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (ENABLE_CALIPER)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    caliper)
+endif ()
 
 blt_add_library(
   NAME umpire_util

@@ -17,6 +17,10 @@
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/io.hpp"
 
+#if defined(UMPIRE_ENABLE_CALIPER)
+#include "caliper/cali_datatracker.h"
+#endif
+
 #define UMPIRE_ASSERT(condition) assert(condition)
 
 #ifdef UMPIRE_ENABLE_LOGGING
@@ -138,6 +142,18 @@
 #else
 #define UMPIRE_INTERNAL_TRACK(p, s)
 #define UMPIRE_INTERNAL_UNTRACK(p) umpire::util::AllocationRecord{};
+#endif
+
+#if defined(UMPIRE_ENABLE_CALIPER)
+
+#define UMPIRE_CALIPER_TRACK(ptr, name, size) cali_datatracker_track(ptr, name, size)
+#define UMPIRE_CALIPER_UNTRACK(ptr) cali_datatracker_untrack(ptr)
+
+#else
+
+#define UMPIRE_CALIPER_TRACK(ptr, name, size)
+#define UMPIRE_CALIPER_UNTRACK(ptr)
+
 #endif
 
 #endif // UMPIRE_Macros_HPP

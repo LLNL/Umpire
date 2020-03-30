@@ -14,6 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   from the kernel without explicitly passing the allocator to the kernel first.
 
 - Added a reset function to the DeviceAllocator so that old data can be rewritten.
+- Added support for Caliper data tracker when configured with ENABLE_CALIPER=On.
 
 ### Changed
 

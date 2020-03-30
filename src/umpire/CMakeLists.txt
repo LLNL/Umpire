@@ -97,6 +97,14 @@ if (COMPILER_FAMILY_IS_MSVC AND NOT BUILD_SHARED_LIBS)
     UMPIRE_WIN_STATIC_BUILD)
 endif ()
 
+set (umpire_depends umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
+
+if (ENABLE_CALIPER)
+  set (umpire_depends
+    ${umpire_depends}
+    cali)
+endif ()
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}

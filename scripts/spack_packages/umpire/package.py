@@ -65,6 +65,10 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant('werror', default=True, description='Enable warnings as errors')
     variant('asan', default=False, description='Enable ASAN')
     variant('sanitizer_tests', default=False, description='Enable address sanitizer tests')
+    variant('caliper', default=False, description='Enable Caliper support')
+
+    depends_on('caliper~libunwind', when='+caliper')
+    depends_on('caliper~libunwind+cuda', when='+caliper+cuda')
 
     depends_on('cmake@3.14:', type='build')
     depends_on('mpi', when='+mpi')
@@ -222,7 +226,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         return entries
 
-
     def initconfig_package_entries(self):
         spec = self.spec
         entries = []
@@ -240,6 +243,9 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         entries.append(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         entries.append(cmake_cache_option("UMPIRE_ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
+        entries.append(cmake_cache_option("ENABLE_CALIPER", '+caliper' in spec))
+        if '+caliper' in spec:
+            entries.append(cmake_cache_path("caliper_DIR", spec['caliper'].prefix))
         
         return entries
 

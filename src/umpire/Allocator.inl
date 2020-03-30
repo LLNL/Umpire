@@ -37,6 +37,8 @@ inline void* Allocator::allocate(std::size_t bytes)
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  UMPIRE_CALIPER_TRACK(ret, getName().c_str(), bytes);
+
   return ret;
 }
 
@@ -64,6 +66,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
                 << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  UMPIRE_CALIPER_TRACK(ret, name.c_str(), bytes);
   return ret;
 }
 
@@ -73,6 +76,8 @@ inline void Allocator::deallocate(void* ptr)
                 << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
+
+  UMPIRE_CALIPER_UNTRACK(ptr);
 
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is intentionally allowed and ignored)");
