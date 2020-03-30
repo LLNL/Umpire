@@ -109,6 +109,13 @@ if (ENABLE_CUDA)
   list(APPEND umpire_examples multi_device)
 endif()
 
+if (ENABLE_CALIPER AND ENABLE_CUDA)
+  blt_add_executable(
+    NAME caliper_example
+    SOURCES caliper_example.cpp
+    DEPENDS_ON umpire cali cuda)
+endif ()
+
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
 
 add_subdirectory(tutorial)
