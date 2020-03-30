@@ -1,0 +1,122 @@
+##############################################################################
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+####
+# Shared configuration of jobs for lassen
+.on_lassen:
+  variables:
+  tags:
+    - shell
+    - lassen
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /_lnone/ || $UMPIRE_CI_LASSEN == "OFF"' #run except if ...
+      when: never
+    - when: on_success
+
+.build_and_test_on_lassen:
+  stage: l_build_and_test
+  extends: [.build_blueos_3_ppc64le_ib_p9_script, .on_lassen]
+  needs: ["start"]
+
+# Note: .build_and_test_on_lassen_advanced inherits from
+# .build_and_test_on_lassen and .advanced_pileline.
+# In particular, the rules section will be merged. Careful when changing rules.
+.build_and_test_on_lassen_advanced:
+  extends: [.build_and_test_on_lassen, .advanced_pipeline]
+
+####
+# Here are all lassen build jobs
+
+gcc_default (build and test on lassen):
+  variables:
+    COMPILER: "gcc_default"
+  extends: .build_and_test_on_lassen
+
+clang_3_9_1 (build and test on lassen):
+  variables:
+    COMPILER: "clang_3_9_1"
+  extends: .build_and_test_on_lassen_advanced
+
+clang_4_0_0 (build and test on lassen):
+  variables:
+    COMPILER: "clang_4_0_0"
+  extends: .build_and_test_on_lassen_advanced
+
+clang_9_0_0 (build and test on lassen):
+  variables:
+    COMPILER: "clang_9_0_0"
+  extends: .build_and_test_on_lassen
+
+gcc_8_3_1 (build and test on lassen):
+  variables:
+    COMPILER: "gcc_8_3_1"
+  extends: .build_and_test_on_lassen
+
+clang_coral_2017_06_29 (build and test on lassen):
+  variables:
+    COMPILER: "clang_coral_2017_06_29"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+clang_coral_2017_08_31 (build and test on lassen):
+  variables:
+    COMPILER: "clang_coral_2017_08_31"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+clang_coral_2017_09_06 (build and test on lassen):
+  variables:
+    COMPILER: "clang_coral_2017_09_06"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+clang_coral_2017_09_18 (build and test on lassen):
+  variables:
+    COMPILER: "clang_coral_2017_09_18"
+  extends: .build_and_test_on_lassen
+  allow_failure: true
+
+nvcc_gcc_4_9_3 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_gcc_4_9_3"
+  extends: .build_and_test_on_lassen
+
+nvcc_clang_coral_2017_06_29 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_clang_coral_2017_06_29"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+nvcc_clang_coral_2017_08_31 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_clang_coral_2017_08_31"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+nvcc_clang_coral_2017_09_06 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_clang_coral_2017_09_06"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+nvcc_clang_coral_2017_09_18 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_clang_coral_2017_09_18"
+  extends: .build_and_test_on_lassen
+  allow_failure: true
+
+nvcc_xl-beta-2017.09.13 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_xl-beta-2017.09.13"
+  extends: .build_and_test_on_lassen_advanced
+  allow_failure: true
+
+nvcc_xl-beta-2019.08.20 (build and test on lassen):
+  variables:
+    COMPILER: "nvcc_xl-beta-2019.08.20"
+  extends: .build_and_test_on_lassen
+  allow_failure: true
