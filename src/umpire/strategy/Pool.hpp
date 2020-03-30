@@ -11,9 +11,10 @@
 #include "umpire/util/MemoryMap.hpp"
 //#include "umpire/util/size_map.hpp"
 
+#include <functional>
 #include <map>
-#include <unordered_map>
 #include <tuple>
+#include <unordered_map>
 
 namespace umpire {
 
