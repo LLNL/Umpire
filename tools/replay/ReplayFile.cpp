@@ -5,17 +5,17 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "ReplayFile.hpp"
-#include "ReplayMacros.hpp"
-
 #include <iostream>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <cstring>
 #include <fcntl.h>
 #include <unistd.h>
+
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+#include "ReplayFile.hpp"
+#include "ReplayMacros.hpp"
 
 ReplayFile::ReplayFile( std::string input_filename, std::string binary_filename )
   : m_input_filename{input_filename}, m_binary_filename{binary_filename}
@@ -106,4 +106,4 @@ void ReplayFile::checkHeader()
   max_file_size = sizeof(ReplayFile::Header) + sbuf.st_size;
 
 }
-
+#endif
