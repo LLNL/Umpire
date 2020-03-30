@@ -64,5 +64,5 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
 
   endif ()
 else ()
-  message(STATUS, "No replay reference output available current build configuration, tests disabled.")
+  message(STATUS, "No replay reference output available for current build configuration, replay test disabled.")
 endif ()
