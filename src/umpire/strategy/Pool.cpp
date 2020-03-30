@@ -68,12 +68,20 @@ Pool::allocate(std::size_t bytes)
     void* ret{nullptr};
     try {
       ret = m_allocator->allocate(size);
-      m_actual_bytes += size;
-      m_releasable_bytes += size;
     } catch (...) {
-      // TODO: needs to release and retry, then rethrow if neccessary
-      UMPIRE_LOG(Debug, "Caught error allocating");
+      UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
+      release();
+      try {
+        ret = m_allocator->allocate(size);
+        UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
+      } catch (...) {
+        UMPIRE_LOG(Error, "recovery failed.");
+        throw;
+      }
     }
+
+    m_actual_bytes += size;
+    m_releasable_bytes += size;
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
   } else {
@@ -226,7 +234,9 @@ Pool::getHighWatermark() const noexcept
 std::size_t
 Pool::getReleasableSize() const noexcept
 {
-  return m_releasable_bytes;
+  if (m_size_map.size() > 1)
+    return m_releasable_bytes;
+  else return 0;
 }
 
 Platform 
@@ -242,6 +252,7 @@ Pool::coalesce() noexcept
   release();
   std::size_t size_post{getActualSize()};
   std::size_t alloc_size{size_pre-size_post};
+  UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
   auto ptr = allocate(alloc_size);
   deallocate(ptr);
 }
