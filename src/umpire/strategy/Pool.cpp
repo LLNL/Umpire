@@ -28,18 +28,19 @@ Pool::Pool(
     Allocator allocator,
     const std::size_t initial_alloc_size,
     const std::size_t min_alloc_size,
-    const int) noexcept :
+    CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy{name, id},
   m_pointer_map{},
   m_size_map{},
   m_chunk_pool{sizeof(Chunk)},
   m_allocator{allocator.getAllocationStrategy()},
+  m_should_coalesce{coalesce_heuristic},
   m_initial_alloc_bytes{initial_alloc_size},
   m_min_alloc_bytes{min_alloc_size}
-  //m_align_bytes{align_bytes}
 {
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
   m_actual_bytes += m_initial_alloc_bytes;
+  m_releasable_bytes += m_initial_alloc_bytes;
 
   void* chunk_storage{m_chunk_pool.allocate()};
   Chunk* chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, m_initial_alloc_bytes)};
@@ -68,7 +69,9 @@ Pool::allocate(std::size_t bytes)
     try {
       ret = m_allocator->allocate(size);
       m_actual_bytes += size;
+      m_releasable_bytes += size;
     } catch (...) {
+      // TODO: needs to release and retry, then rethrow if neccessary
       UMPIRE_LOG(Debug, "Caught error allocating");
     }
     void* chunk_storage{m_chunk_pool.allocate()};
@@ -91,6 +94,8 @@ Pool::allocate(std::size_t bytes)
     std::size_t remaining{chunk->size - bytes};
     UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " 
         << bytes << " and " << remaining);
+    
+    m_releasable_bytes -= chunk->chunk_size;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{
@@ -164,8 +169,18 @@ Pool::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "Inserting chunk " << chunk 
       << " with size " << chunk->size);
 
+  if (chunk->size == chunk->chunk_size) {
+    m_releasable_bytes += chunk->chunk_size;
+  }
+
   chunk->size_map_it = m_size_map.insert(std::make_pair(chunk->size, chunk));
+  // can do this with iterator?
   m_pointer_map.erase(ptr);
+
+  if (m_should_coalesce(*this))   {
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
+    coalesce();
+  }
 }
 
 void Pool::release()
@@ -177,7 +192,7 @@ void Pool::release()
   {
     auto chunk = (*pair).second;
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
-    if ( (chunk-> size == chunk->chunk_size) 
+    if ( (chunk->size == chunk->chunk_size) 
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
       m_actual_bytes -= chunk->chunk_size;
@@ -208,6 +223,12 @@ Pool::getHighWatermark() const noexcept
   return m_highwatermark;
 }
 
+std::size_t
+Pool::getReleasableSize() const noexcept
+{
+  return m_releasable_bytes;
+}
+
 Platform 
 Pool::getPlatform() noexcept
 {
@@ -223,6 +244,33 @@ Pool::coalesce() noexcept
   std::size_t alloc_size{size_pre-size_post};
   auto ptr = allocate(alloc_size);
   deallocate(ptr);
+}
+
+Pool::CoalesceHeuristic
+Pool::percent_releasable(int percentage)
+{
+  if ( percentage < 0 || percentage > 100 ) {
+    UMPIRE_ERROR("Invalid percentage of " << percentage 
+        << ", percentage must be an integer between 0 and 100");
+  }
+
+  if ( percentage == 0 ) {
+    return [=] (const Pool& UMPIRE_UNUSED_ARG(pool)) {
+        return false;
+    };
+  } else if ( percentage == 100 ) {
+    return [=] (const strategy::Pool& pool) {
+        return (pool.getCurrentSize() == 0 && pool.getReleasableSize() > 0);
+    };
+  } else {
+    float f = (float)((float)percentage / (float)100.0);
+
+    return [=] (const strategy::Pool& pool) {
+      // Calculate threshold in bytes from the percentage
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+      return (pool.getReleasableSize() >= threshold);
+    };
+  }
 }
 
 

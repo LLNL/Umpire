@@ -32,6 +32,7 @@ class Pool :
 {
   public:
     using Pointer = void*;
+    using CoalesceHeuristic = std::function<bool (const strategy::Pool& )>;
 
     Pool(
         const std::string& name,
@@ -39,7 +40,7 @@ class Pool :
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 * 1024),
-        const int align_bytes = 16) noexcept;
+        CoalesceHeuristic coalesce_heuristic = percent_releasable(100)) noexcept;
 
     ~Pool();
 
@@ -52,10 +53,13 @@ class Pool :
     std::size_t getCurrentSize() const noexcept override;
     std::size_t getActualSize() const noexcept override;
     std::size_t getHighWatermark() const noexcept override;
+    std::size_t getReleasableSize() const noexcept;
 
     Platform getPlatform() noexcept override;
 
     void coalesce() noexcept;
+
+    static CoalesceHeuristic percent_releasable(int percentage);
   private:
     struct Chunk;
 
@@ -106,13 +110,15 @@ class Pool :
 
     strategy::AllocationStrategy* m_allocator;
 
+    CoalesceHeuristic m_should_coalesce;
+
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
-    //const int m_align_bytes;
 
     std::size_t m_curr_bytes{0};
     std::size_t m_actual_bytes{0};
     std::size_t m_highwatermark{0};
+    std::size_t m_releasable_bytes{0};
 };
 
 } // end of namespace strategy
