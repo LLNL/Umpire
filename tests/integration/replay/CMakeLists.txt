@@ -36,30 +36,33 @@ endif()
 
 set(replay_file "${replay_file}.good" )
 
-message(STATUS "Using ${replay_file} as good replay test data")
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
 
-if (BASH_PROGRAM)
+  if (BASH_PROGRAM)
+    message(STATUS "Using ${replay_file} as good replay test data")
+    configure_file(
+      "${CMAKE_CURRENT_SOURCE_DIR}/${replay_file}"
+      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_output.good"
+      COPYONLY
+    )
 
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/${replay_file}"
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_output.good"
-    COPYONLY
-  )
-
-  blt_add_executable(
-    NAME replay_tests
-    SOURCES replay_tests.cpp
-    DEPENDS_ON ${replay_integration_tests_depends})
-
-  if (NOT C_COMPILER_FAMILY_IS_PGI)
-    add_test(
+    blt_add_executable(
       NAME replay_tests
-      COMMAND ${BASH_PROGRAM}
-      ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  endif()
+      SOURCES replay_tests.cpp
+      DEPENDS_ON ${replay_integration_tests_depends})
 
-else()
+    if (NOT C_COMPILER_FAMILY_IS_PGI)
+      add_test(
+        NAME replay_tests
+        COMMAND ${BASH_PROGRAM}
+        ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    endif()
 
-  message(STATUS, "Bash not configured, replay tests disabled.")
+  else ()
 
-endif()
+    message(STATUS, "Bash not configured, replay tests disabled.")
+
+  endif ()
+else ()
+  message(STATUS, "No replay reference output available for current build configuration, replay test disabled.")
+endif ()
