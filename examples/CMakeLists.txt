@@ -114,8 +114,3 @@ install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
 add_subdirectory(tutorial)
 
 add_subdirectory(cookbook)
-
-blt_add_executable(
-  NAME pool
-  SOURCES pool.cpp
-  DEPENDS_ON umpire)
