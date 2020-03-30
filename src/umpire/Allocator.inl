@@ -32,6 +32,9 @@ Allocator::allocate(std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
+
+  UMPIRE_CALIPER_TRACK(ret, getName().c_str(), bytes);
+
   return ret;
 }
 
@@ -43,6 +46,8 @@ Allocator::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
+
+  UMPIRE_CALIPER_UNTRACK(ptr);
 
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer");

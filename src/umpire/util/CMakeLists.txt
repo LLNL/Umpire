@@ -96,6 +96,12 @@ if (ENABLE_MPI)
     mpi)
 endif ()
 
+if (ENABLE_CALIPER)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    cali)
+endif ()
+
 blt_add_library(
   NAME umpire_util
   HEADERS ${umpire_util_headers}

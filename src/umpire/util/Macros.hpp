@@ -16,6 +16,10 @@
 #include "umpire/util/statistic_helper.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_CALIPER)
+#include "caliper/cali_datatracker.h"
+#endif
+
 #include <sstream>
 #include <iostream>
 #include <mutex>
@@ -112,5 +116,17 @@
 #define UMPIRE_RECORD_STATISTIC(name, ...) ((void) 0)
 
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
+
+#if defined(UMPIRE_ENABLE_CALIPER)
+
+#define UMPIRE_CALIPER_TRACK(ptr, name, size) cali_datatracker_track(ptr, name, size)
+#define UMPIRE_CALIPER_UNTRACK(ptr) cali_datatracker_untrack(ptr)
+
+#else
+
+#define UMPIRE_CALIPER_TRACK(ptr, name, size)
+#define UMPIRE_CALIPER_UNTRACK(ptr)
+
+#endif
 
 #endif // UMPIRE_Macros_HPP

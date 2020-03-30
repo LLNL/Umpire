@@ -54,3 +54,12 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     LIBRARIES ${CMAKE_DL_LIBS}
     )
 endif ()
+
+if (ENABLE_CALIPER)
+  find_package(caliper REQUIRED)
+
+  blt_register_library(
+    NAME cali
+    INCLUDES ${caliper_INCLUDE_DIR}
+    LIBRARIES caliper) 
+endif ()

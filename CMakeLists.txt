@@ -43,6 +43,7 @@ option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_SANITIZERS "Enable manual memory poisoning of pools" Off)
+option(ENABLE_CALIPER "Enable Caliper annotations" Off)
 
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL OFF)
