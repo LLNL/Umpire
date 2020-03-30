@@ -16,16 +16,17 @@ void daxpy(double* x, double* y, double a)
 {
   int i = blockIdx.x*blockDim.x + threadIdx.x;
   if (i < COUNT)
-    y[i]] += x[i] * a;
+    y[i] += x[i] * a;
 }
 
 int main(int argc, char* argv[])
 {
+  CALI_CXX_MARK_FUNCTION;
     auto& rm = umpire::ResourceManager::getInstance();
     auto allocator = rm.getAllocator("UM");
 
-    double* x = static_cast<double*>{allocator.allocate(COUNT*sizeof(double))};
-    double* y = static_cast<double*>{allocator.allocate(COUNT*sizeof(double))};
+    double* x = static_cast<double*>(allocator.allocate(COUNT*sizeof(double)));
+    double* y = static_cast<double*>(allocator.allocate(COUNT*sizeof(double)));
 
     for (auto i = 0; i < COUNT; i++) {
         x[i] = 1.0;
