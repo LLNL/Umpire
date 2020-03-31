@@ -129,7 +129,7 @@ int Found = 0;
 #  define JUDY_max    JUDY_32
 #endif
 
-#if defined(_WIN32) && defined(JUDYDLLLIB)
+#if defined(_WIN32) && !defined(JUDYSTATICLIB)
 #ifdef JUDYSHAREDDLL_EXPORTS
 #define JUDYSHAREDDLL_API __declspec(dllexport)
 #else
