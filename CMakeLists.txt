@@ -124,6 +124,16 @@ install(FILES
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
+if (WIN32)
+  if (BUILD_SHARED_LIBS)
+     add_definitions(-DUMPIRESHAREDDLL_EXPORTS)
+     add_definitions(-DJUDYSHAREDDLL_EXPORTS)
+  else ()
+     add_definitions(-DUMPIRESTATICLIB)
+     add_definitions(-DJUDYSTATICLIB)
+  endif ()
+endif ()
+
 add_subdirectory(src)
 
 if (ENABLE_TESTS)
