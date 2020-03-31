@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <vector>
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace util {
@@ -23,17 +24,16 @@ namespace util {
 class FixedMallocPool
 {
 public:
-  FixedMallocPool(const std::size_t object_bytes,
-                  const std::size_t objects_per_pool = 1024*1024);
+  UMPIRESHAREDDLL_API FixedMallocPool(const std::size_t object_bytes,
+                                      const std::size_t objects_per_pool = 1024*1024);
 
-  ~FixedMallocPool();
+  UMPIRESHAREDDLL_API ~FixedMallocPool();
 
-  void* allocate(std::size_t bytes = 0);
-  void deallocate(void* ptr);
+  UMPIRESHAREDDLL_API void* allocate(std::size_t bytes = 0);
+  UMPIRESHAREDDLL_API void deallocate(void* ptr);
 
-  std::size_t numPools() const noexcept;
+  UMPIRESHAREDDLL_API std::size_t numPools() const noexcept;
 
-private:
   struct Pool {
     unsigned char* data;
     unsigned char* next;
@@ -42,6 +42,7 @@ private:
     Pool(const std::size_t object_bytes, const std::size_t objects_per_pool);
   };
 
+private:
   void newPool();
   void* allocInPool(Pool& p) noexcept;
 
