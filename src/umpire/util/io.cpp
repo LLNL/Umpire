@@ -62,9 +62,7 @@ static std::string make_unique_filename(
 
 static inline bool file_exists(const std::string& file);
 
-#ifdef UMPIRE_ENABLE_MPI
 static inline bool directory_exists(const std::string& file);
-#endif
 
 void initialize_io(const bool enable_log, const bool enable_replay)
 {
@@ -99,7 +97,6 @@ void initialize_io(const bool enable_log, const bool enable_replay)
   const std::string error_filename{
     make_unique_filename(root_io_dir, file_basename, pid, "error")};
 
-#ifdef UMPIRE_ENABLE_MPI
   if (!directory_exists(root_io_dir)) {
     if (MPI::isInitialized()) {
       if (MPI::getRank() == 0) {
@@ -133,7 +130,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
                    "Please unset UMPIRE_OUTPUT_DIR in your environment");
     }
   }
-#endif
+
   if (enable_log) {
     static std::ofstream s_log_ofstream{log_filename};
 
@@ -191,7 +188,6 @@ static inline bool file_exists(const std::string& path)
   return ifile.good();
 }
 
-#ifdef UMPIRE_ENABLE_MPI
 static inline bool directory_exists(const std::string& path)
 {
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
@@ -206,7 +202,6 @@ static inline bool directory_exists(const std::string& path)
   }
 #endif
 }
-#endif
 
 } // end namespace util
 } // end namespace umpire
