@@ -13,18 +13,15 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
-if (ENABLE_STATISTICS)
-  set(OLD_COPY_HEADERS ${ENABLE_COPY_HEADERS})
-  set(OLD_ENABLE_TESTS ${ENABLE_TESTS})
-  set(OLD_ENABLE_FORTRAN ${ENABLE_FORTRAN})
-  set(ENABLE_COPY_HEADERS Off)
-  set(ENABLE_TESTS Off)
-  set(ENABLE_FORTRAN Off)
-  add_subdirectory(conduit/src)
-  set(ENABLE_COPY_HEADERS ${OLD_COPY_HEADERS})
-  set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
-  set(ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
+set(OLD_COPY_HEADERS ${ENABLE_COPY_HEADERS})
+set(OLD_ENABLE_TESTS ${ENABLE_TESTS})
+set(OLD_ENABLE_FORTRAN ${ENABLE_FORTRAN})
+set(ENABLE_COPY_HEADERS Off)
+set(ENABLE_TESTS Off)
+set(ENABLE_FORTRAN Off)
 
+if (ENABLE_STATISTICS)
+  add_subdirectory(conduit/src)
   set (conduit_includes
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs>
@@ -100,3 +97,28 @@ install(TARGETS
   ARCHIVE DESTINATION lib)
 
 add_subdirectory(judy)
+
+if (NOT TARGET camp)
+  if (DEFINED camp_DIR)
+    find_package(camp REQUIRED)
+
+    blt_register_library(
+      NAME camp
+      INCLUDES ${CAMP_INCLUDE_DIRS}
+      LIBRARIES camp)
+  else ()
+    add_subdirectory(camp)
+  endif()
+
+  if(ENABLE_CUDA)
+    blt_register_library(
+      NAME camp
+      DEPENDS_ON cuda_runtime
+      LIBRARIES camp
+      DEFINES CAMP_HAVE_CUDA)
+  endif()
+endif ()
+
+set(ENABLE_COPY_HEADERS ${OLD_COPY_HEADERS})
+set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
+set(ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
