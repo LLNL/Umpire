@@ -74,6 +74,12 @@ class Pool :
         pool_allocator() :
           pool{new util::FixedMallocPool{sizeof(Value)}} {}
 
+        /// BUG: Only required for MSVC
+        template<typename U>
+        pool_allocator(const pool_allocator<U>& other): 
+          pool{other.pool}
+        {}
+
         Value* allocate(std::size_t n) {
           return static_cast<Value*>(pool->allocate(n));
         }
