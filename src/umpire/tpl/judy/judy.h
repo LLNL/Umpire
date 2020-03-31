@@ -129,7 +129,7 @@ int Found = 0;
 #  define JUDY_max    JUDY_32
 #endif
 
-#if defined(_WIN32) && !defined(JUDYSTATICLIB)
+#if defined(_WIN32) && defined(JUDYDLLLIB)
 #ifdef JUDYSHAREDDLL_EXPORTS
 #define JUDYSHAREDDLL_API __declspec(dllexport)
 #else
@@ -147,37 +147,37 @@ extern "C" {
     JUDYSHAREDDLL_API Judy * judy_open( unsigned int max, unsigned int depth );
 
     /// close an open judy array, freeing all memory.
-	JUDYSHAREDDLL_API  void judy_close( Judy * judy );
+    JUDYSHAREDDLL_API  void judy_close( Judy * judy );
 
     /// clone an open judy array, duplicating the stack.
-	JUDYSHAREDDLL_API Judy * judy_clone( Judy * judy );
+    JUDYSHAREDDLL_API Judy * judy_clone( Judy * judy );
 
     /// allocate data memory within judy array for external use.
-	JUDYSHAREDDLL_API void * judy_data( Judy * judy, unsigned int amt );
+    JUDYSHAREDDLL_API void * judy_data( Judy * judy, unsigned int amt );
 
     /// insert a key into the judy array, return cell pointer.
-	JUDYSHAREDDLL_API JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max );
+    JUDYSHAREDDLL_API JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max );
 
     /// retrieve the cell pointer greater than or equal to given key
-	JUDYSHAREDDLL_API JudySlot * judy_strt( Judy * judy, const unsigned char * buff, unsigned int max );
+    JUDYSHAREDDLL_API JudySlot * judy_strt( Judy * judy, const unsigned char * buff, unsigned int max );
 
     /// retrieve the cell pointer, or return NULL for a given key.
-	JUDYSHAREDDLL_API JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max );
+    JUDYSHAREDDLL_API JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max );
 
     /// retrieve the string value for the most recent judy query.
-	JUDYSHAREDDLL_API unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max );
+    JUDYSHAREDDLL_API unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max );
 
     /// retrieve the cell pointer for the last string in the array.
-	JUDYSHAREDDLL_API JudySlot * judy_end( Judy * judy );
+    JUDYSHAREDDLL_API JudySlot * judy_end( Judy * judy );
 
     /// retrieve the cell pointer for the next string in the array.
-	JUDYSHAREDDLL_API JudySlot * judy_nxt( Judy * judy );
+    JUDYSHAREDDLL_API JudySlot * judy_nxt( Judy * judy );
 
     /// retrieve the cell pointer for the prev string in the array.
-	JUDYSHAREDDLL_API JudySlot * judy_prv( Judy * judy );
+    JUDYSHAREDDLL_API JudySlot * judy_prv( Judy * judy );
 
     /// delete the key and cell for the current stack entry.
-	JUDYSHAREDDLL_API JudySlot * judy_del( Judy * judy );
+    JUDYSHAREDDLL_API JudySlot * judy_del( Judy * judy );
 
 #ifdef __cplusplus
 }

@@ -62,7 +62,9 @@ static std::string make_unique_filename(
 
 static inline bool file_exists(const std::string& file);
 
+#ifdef UMPIRE_ENABLE_MPI
 static inline bool directory_exists(const std::string& file);
+#endif
 
 void initialize_io(const bool enable_log, const bool enable_replay)
 {
@@ -189,6 +191,7 @@ static inline bool file_exists(const std::string& path)
   return ifile.good();
 }
 
+#ifdef UMPIRE_ENABLE_MPI
 static inline bool directory_exists(const std::string& path)
 {
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
@@ -203,6 +206,7 @@ static inline bool directory_exists(const std::string& path)
   }
 #endif
 }
+#endif
 
 } // end namespace util
 } // end namespace umpire

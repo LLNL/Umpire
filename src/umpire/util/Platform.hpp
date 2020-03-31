@@ -7,7 +7,7 @@
 #ifndef UMPIRE_Platform_HPP
 #define UMPIRE_Platform_HPP
 
-#if defined(_WIN32) && !defined(UMPIRESTATICLIB)
+#if defined(_WIN32) && defined(UMPIREDLLLIB)
 #ifdef UMPIRESHAREDDLL_EXPORTS
 #define UMPIRESHAREDDLL_API __declspec(dllexport)
 #else
