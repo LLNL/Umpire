@@ -35,66 +35,66 @@
 
 clang_3_9_1 (build and test on butte):
   variables:
-    COMPILER: "clang_3_9_1"
+    CONFIGURATION: "clang_3_9_1"
   extends: .build_and_test_on_butte_advanced
 
 gcc_4_9_3 (build and test on butte):
   variables:
-    COMPILER: "gcc_4_9_3"
+    CONFIGURATION: "gcc_4_9_3"
   extends: .build_and_test_on_butte
 
 clang_4_0_0 (build and test on butte):
   variables:
-    COMPILER: "clang_4_0_0"
+    CONFIGURATION: "clang_4_0_0"
   extends: .build_and_test_on_butte
 
 clang_coral_2017_06_29 (build and test on butte):
   variables:
-    COMPILER: "clang_coral_2017_06_29"
+    CONFIGURATION: "clang_coral_2017_06_29"
   extends: .build_and_test_on_butte_advanced
 
 clang_coral_2017_08_31 (build and test on butte):
   variables:
-    COMPILER: "clang_coral_2017_08_31"
+    CONFIGURATION: "clang_coral_2017_08_31"
   extends: .build_and_test_on_butte_advanced
 
 clang_coral_2017_09_06 (build and test on butte):
   variables:
-    COMPILER: "clang_coral_2017_09_06"
+    CONFIGURATION: "clang_coral_2017_09_06"
   extends: .build_and_test_on_butte_advanced
 
 clang_coral_2017_09_18 (build and test on butte):
   variables:
-    COMPILER: "clang_coral_2017_09_18"
+    CONFIGURATION: "clang_coral_2017_09_18"
   extends: .build_and_test_on_butte
 
 nvcc_gcc_4_9_3 (build and test on butte):
   variables:
-    COMPILER: "nvcc_gcc_4_9_3"
+    CONFIGURATION: "nvcc_gcc_4_9_3"
   extends: .build_and_test_on_butte
 
 nvcc_clang_coral_2017_06_29 (build and test on butte):
   variables:
-    COMPILER: "nvcc_clang_coral_2017_06_29"
+    CONFIGURATION: "nvcc_clang_coral_2017_06_29"
   extends: .build_and_test_on_butte_advanced
 
 nvcc_clang_coral_2017_08_31 (build and test on butte):
   variables:
-    COMPILER: "nvcc_clang_coral_2017_08_31"
+    CONFIGURATION: "nvcc_clang_coral_2017_08_31"
   extends: .build_and_test_on_butte_advanced
 
 nvcc_clang_coral_2017_09_06 (build and test on butte):
   variables:
-    COMPILER: "nvcc_clang_coral_2017_09_06"
+    CONFIGURATION: "nvcc_clang_coral_2017_09_06"
   extends: .build_and_test_on_butte_advanced
 
 nvcc_clang_coral_2017_09_18 (build and test on butte):
   variables:
-    COMPILER: "nvcc_clang_coral_2017_09_18"
+    CONFIGURATION: "nvcc_clang_coral_2017_09_18"
   extends: .build_and_test_on_butte
 
 nvcc_xl-beta-2017.09.13 (build and test on butte):
   variables:
-    COMPILER: "nvcc_xl-beta-2017.09.13"
+    CONFIGURATION: "nvcc_xl-beta-2017.09.13"
   extends: .build_and_test_on_butte
 
