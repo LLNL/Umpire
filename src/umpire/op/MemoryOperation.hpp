@@ -11,6 +11,8 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
+#include "camp/resource.hpp"
+
 namespace umpire {
 namespace op {
 
@@ -43,6 +45,14 @@ class MemoryOperation {
         util::AllocationRecord *dst_allocation,
         std::size_t length);
 
+    virtual camp::resources::Event transform_async(
+        void* src_ptr,
+        void** dst_ptr,
+        util::AllocationRecord *src_allocation,
+        util::AllocationRecord *dst_allocation,
+        std::size_t length,
+        camp::resources::Resource& ctx);
+
     /*!
      * \brief Apply val to the first length bytes of src_ptr.
      *
@@ -58,6 +68,13 @@ class MemoryOperation {
         util::AllocationRecord *src_allocation,
         int val,
         std::size_t length);
+
+    virtual camp::resources::Event apply_async(
+        void* src_ptr,
+        util::AllocationRecord *src_allocation,
+        int val,
+        std::size_t length,
+        camp::resources::Resource& ctx);
 };
 
 } // end of namespace op
