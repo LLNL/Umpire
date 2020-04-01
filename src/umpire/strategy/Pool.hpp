@@ -35,6 +35,8 @@ class Pool :
     using Pointer = void*;
     using CoalesceHeuristic = std::function<bool (const strategy::Pool& )>;
 
+    static CoalesceHeuristic percent_releasable(int percentage);
+
     Pool(
         const std::string& name,
         int id,
@@ -60,7 +62,6 @@ class Pool :
 
     void coalesce() noexcept;
 
-    static CoalesceHeuristic percent_releasable(int percentage);
   private:
     struct Chunk;
 

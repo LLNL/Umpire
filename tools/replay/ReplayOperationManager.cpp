@@ -519,6 +519,69 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 #endif // defined(UMPIRE_ENABLE_NUMA)
     break;
 
+  case ReplayFile::rtype::POOL:
+    if (alloc->argc >= 3) {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::Pool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::Pool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+            )
+        );
+      }
+    }
+    else if (alloc->argc == 2) {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::Pool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::Pool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+            )
+        );
+      }
+    }
+    else {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::Pool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::Pool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+            )
+        );
+      }
+    }
+    break;
+
   case ReplayFile::rtype::DYNAMIC_POOL_LIST:
     if (alloc->argc >= 3) {
       if (alloc->introspection) {
