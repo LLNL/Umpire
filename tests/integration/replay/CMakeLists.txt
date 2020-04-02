@@ -16,9 +16,9 @@ if (ENABLE_HIP)
 endif()
 
 set(replay_file "test_output" )
-set(sys_type $ENV{SYS_TYPE})
 
 if (ENABLE_NUMA OR ENABLE_CUDA)
+  set(sys_type $ENV{SYS_TYPE})
   if (sys_type)
     set(replay_file "${replay_file}.${sys_type}")
   endif ()
@@ -28,16 +28,27 @@ if (ENABLE_NUMA)
   set(replay_file "${replay_file}.numa" )
 endif()
 
-if (ENABLE_CUDA)
-  set(replay_file "${replay_file}.cuda" )
-elseif (ENABLE_HIP)
-  set(replay_file "${replay_file}.hip" )
-endif()
+if (ENABLE_CUDA OR ENABLE_HIP)
+  set(replay_file "${replay_file}.devices" )
 
-set(replay_file "${replay_file}.good" )
+  if (ENABLE_DEVICE_CONST)
+    set(replay_file "${replay_file}.const")
+  endif ()
+endif ()
+
+set(replay_file "${replay_file}.good")
+
+blt_add_executable(
+  NAME replay_tests
+  SOURCES replay_tests.cpp
+  DEPENDS_ON ${replay_integration_tests_depends})
+
+add_custom_target(
+  regen_replay_output
+  COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.replay ${replay_file}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
-
   if (BASH_PROGRAM)
     message(STATUS "Using ${replay_file} as good replay test data")
     configure_file(
@@ -45,11 +56,6 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_output.good"
       COPYONLY
     )
-
-    blt_add_executable(
-      NAME replay_tests
-      SOURCES replay_tests.cpp
-      DEPENDS_ON ${replay_integration_tests_depends})
 
     if (NOT C_COMPILER_FAMILY_IS_PGI)
       add_test(
