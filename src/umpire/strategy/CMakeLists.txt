@@ -17,11 +17,11 @@ set (umpire_strategy_headers
   FixedPool.hpp
   FixedSizePool.hpp
   MixedPool.hpp
-  NamedAllocationStrategy.hpp
   MonotonicAllocationStrategy.hpp
-  Pool.hpp
-  SlotPool.hpp
+  NamedAllocationStrategy.hpp
+  QuickPool.hpp
   SizeLimiter.hpp
+  SlotPool.hpp
   StdAllocator.hpp
   ThreadSafeAllocator.hpp
   ZeroByteHandler.hpp)
@@ -37,21 +37,21 @@ set (umpire_strategy_mixin_headers
 
 set (umpire_strategy_sources
   AllocationAdvisor.cpp
-  AllocationStrategy.cpp
   AllocationPrefetcher.cpp
+  AllocationStrategy.cpp
   AllocationTracker.cpp
+  DynamicPoolHeuristic.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp
-  DynamicPoolHeuristic.cpp
   FixedPool.cpp
   MixedPool.cpp
-  mixins/Inspector.cpp
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
-  Pool.cpp
-  SlotPool.cpp
+  QuickPool.cpp
   SizeLimiter.cpp
+  SlotPool.cpp
   ThreadSafeAllocator.cpp
+  mixins/Inspector.cpp
   ZeroByteHandler.cpp)
 
 if (ENABLE_NUMA)

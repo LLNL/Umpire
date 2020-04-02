@@ -13,7 +13,7 @@
 #include <iostream>
 
 #include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/Pool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 
@@ -28,7 +28,7 @@ std::ostream& operator<< (std::ostream& out,
 std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPoolList::CoalesceHeuristic& );
 std::ostream& operator<< (std::ostream& out,
-    umpire::strategy::Pool::CoalesceHeuristic& );
+    umpire::strategy::QuickPool::CoalesceHeuristic& );
 
 class Replay {
 public:

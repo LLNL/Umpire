@@ -21,7 +21,7 @@
 #include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
-#include "umpire/strategy/Pool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
@@ -164,7 +164,7 @@ using Strategies = ::testing::Types<
   umpire::strategy::MixedPool,
   umpire::strategy::MonotonicAllocationStrategy,
   umpire::strategy::NamedAllocationStrategy,
-  umpire::strategy::Pool,
+  umpire::strategy::QuickPool,
   umpire::strategy::SizeLimiter,
   umpire::strategy::SlotPool,
   umpire::strategy::ThreadSafeAllocator>;

@@ -77,7 +77,7 @@ std::ostream& operator<< (
 
 std::ostream& operator<< (
     std::ostream& out,
-    umpire::strategy::Pool::CoalesceHeuristic& ) {
+    umpire::strategy::QuickPool::CoalesceHeuristic& ) {
   return out;
 }
 

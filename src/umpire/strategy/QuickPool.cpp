@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/Pool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 #include "umpire/util/FixedMallocPool.hpp"
 
@@ -22,7 +22,7 @@ namespace {
   }
 }
 
-Pool::Pool(
+QuickPool::QuickPool(
     const std::string& name,
     int id,
     Allocator allocator,
@@ -47,12 +47,12 @@ Pool::Pool(
   chunk->size_map_it = m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
 }
 
-Pool::~Pool()
+QuickPool::~QuickPool()
 {
 }
 
 void* 
-Pool::allocate(std::size_t bytes)
+QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
   bytes = aligned_size(bytes);
@@ -128,7 +128,7 @@ Pool::allocate(std::size_t bytes)
 }
 
 void 
-Pool::deallocate(void* ptr)
+QuickPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
@@ -191,7 +191,7 @@ Pool::deallocate(void* ptr)
   }
 }
 
-void Pool::release()
+void QuickPool::release()
 {
   UMPIRE_LOG(Debug, "release");
   UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
@@ -214,25 +214,25 @@ void Pool::release()
 }
 
 std::size_t 
-Pool::getCurrentSize() const noexcept
+QuickPool::getCurrentSize() const noexcept
 {
   return m_curr_bytes;
 }
 
 std::size_t 
-Pool::getActualSize() const noexcept
+QuickPool::getActualSize() const noexcept
 {
   return m_actual_bytes;
 }
 
 std::size_t 
-Pool::getHighWatermark() const noexcept
+QuickPool::getHighWatermark() const noexcept
 {
   return m_highwatermark;
 }
 
 std::size_t
-Pool::getReleasableSize() const noexcept
+QuickPool::getReleasableSize() const noexcept
 {
   if (m_size_map.size() > 1)
     return m_releasable_bytes;
@@ -240,13 +240,13 @@ Pool::getReleasableSize() const noexcept
 }
 
 Platform 
-Pool::getPlatform() noexcept
+QuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }
 
 void
-Pool::coalesce() noexcept
+QuickPool::coalesce() noexcept
 {
   std::size_t size_pre{getActualSize()};
   release();
@@ -257,8 +257,8 @@ Pool::coalesce() noexcept
   deallocate(ptr);
 }
 
-Pool::CoalesceHeuristic
-Pool::percent_releasable(int percentage)
+QuickPool::CoalesceHeuristic
+QuickPool::percent_releasable(int percentage)
 {
   if ( percentage < 0 || percentage > 100 ) {
     UMPIRE_ERROR("Invalid percentage of " << percentage 
@@ -266,17 +266,17 @@ Pool::percent_releasable(int percentage)
   }
 
   if ( percentage == 0 ) {
-    return [=] (const Pool& UMPIRE_UNUSED_ARG(pool)) {
+    return [=] (const QuickPool& UMPIRE_UNUSED_ARG(pool)) {
         return false;
     };
   } else if ( percentage == 100 ) {
-    return [=] (const strategy::Pool& pool) {
+    return [=] (const strategy::QuickPool& pool) {
         return (pool.getCurrentSize() == 0 && pool.getReleasableSize() > 0);
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
-    return [=] (const strategy::Pool& pool) {
+    return [=] (const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return (pool.getReleasableSize() >= threshold);

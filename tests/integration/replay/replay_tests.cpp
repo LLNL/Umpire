@@ -15,7 +15,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
-#include "umpire/strategy/Pool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
@@ -234,17 +234,17 @@ static void runTest()
 
     auto pa1 = 16 * 1024;         // min initial allocation size
     auto pa2 = 1 * 1024;          // min allocation size
-    auto pa3 = umpire::strategy::Pool::percent_releasable(50);
+    auto pa3 = umpire::strategy::QuickPool::percent_releasable(50);
     name = basename + "_Pool_spec_";
-    testAllocator<umpire::strategy::Pool, true>(name+"0", base_alloc);
-    testAllocator<umpire::strategy::Pool, true>(name+"1", base_alloc, pa1);
-    testAllocator<umpire::strategy::Pool, true>(name+"2", base_alloc, pa1, pa2);
-    testAllocator<umpire::strategy::Pool, true>(name+"3", base_alloc, pa1, pa2, pa3);
+    testAllocator<umpire::strategy::QuickPool, true>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::QuickPool, true>(name+"1", base_alloc, pa1);
+    testAllocator<umpire::strategy::QuickPool, true>(name+"2", base_alloc, pa1, pa2);
+    testAllocator<umpire::strategy::QuickPool, true>(name+"3", base_alloc, pa1, pa2, pa3);
     name = basename + "_Pool_no_instrospection_spec_";
-    testAllocator<umpire::strategy::Pool, false>(name+"0", base_alloc);
-    testAllocator<umpire::strategy::Pool, false>(name+"1", base_alloc, pa1);
-    testAllocator<umpire::strategy::Pool, false>(name+"2", base_alloc, pa1, pa2);
-    testAllocator<umpire::strategy::Pool, false>(name+"3", base_alloc, pa1, pa2, pa3);
+    testAllocator<umpire::strategy::QuickPool, false>(name+"0", base_alloc);
+    testAllocator<umpire::strategy::QuickPool, false>(name+"1", base_alloc, pa1);
+    testAllocator<umpire::strategy::QuickPool, false>(name+"2", base_alloc, pa1, pa2);
+    testAllocator<umpire::strategy::QuickPool, false>(name+"3", base_alloc, pa1, pa2, pa3);
 
     auto dpa1 = 16 * 1024;         // min initial allocation size
     auto dpa2 = 1 * 1024;          // min allocation size

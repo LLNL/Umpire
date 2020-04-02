@@ -519,7 +519,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 #endif // defined(UMPIRE_ENABLE_NUMA)
     break;
 
-  case ReplayFile::rtype::POOL:
+  case ReplayFile::rtype::QUICKPOOL:
     if (alloc->argc >= 3) {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(

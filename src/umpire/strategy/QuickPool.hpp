@@ -28,16 +28,16 @@ class FixedMallocPool;
 
 namespace strategy {
 
-class Pool : 
+class QuickPool : 
   public AllocationStrategy
 {
   public:
     using Pointer = void*;
-    using CoalesceHeuristic = std::function<bool (const strategy::Pool& )>;
+    using CoalesceHeuristic = std::function<bool (const strategy::QuickPool& )>;
 
     static CoalesceHeuristic percent_releasable(int percentage);
 
-    Pool(
+    QuickPool(
         const std::string& name,
         int id,
         Allocator allocator,
@@ -45,9 +45,9 @@ class Pool :
         const std::size_t min_alloc_size = (1 * 1024 * 1024),
         CoalesceHeuristic coalesce_heuristic = percent_releasable(100)) noexcept;
 
-    ~Pool();
+    ~QuickPool();
 
-    Pool(const Pool&) = delete;
+    QuickPool(const QuickPool&) = delete;
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;

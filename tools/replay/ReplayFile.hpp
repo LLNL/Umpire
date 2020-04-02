@@ -27,7 +27,7 @@ public:
     , MIXED_POOL
     , ALLOCATION_PREFETCHER
     , NUMA_POLICY
-    , POOL
+    , QUICKPOOL
   };
 
   static const std::size_t max_allocators{512};
@@ -119,7 +119,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 9;
+  const uint64_t REPLAY_VERSION = 10;
 
   struct Header {
     struct Magic {
