@@ -49,8 +49,7 @@ blt_add_executable(
 
 add_custom_target(
   regen_replay_output
-  COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.replay ${replay_file}
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.replay ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file} && rm -f *.replay)
 
 message(STATUS "Looking for ${replay_file} reference output...")
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
