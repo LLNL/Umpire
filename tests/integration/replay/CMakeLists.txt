@@ -18,13 +18,6 @@ endif()
 set(raw_replay_file "output" )
 set(replay_config "")
 
-if (ENABLE_NUMA OR ENABLE_CUDA)
-  set(sys_type $ENV{SYS_TYPE})
-  if (sys_type)
-    set(replay_config "${sys_type}_")
-  endif ()
-endif ()
-
 if (ENABLE_NUMA)
   set(replay_config "${replay_config}numa_" )
 endif()
