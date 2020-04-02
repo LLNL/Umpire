@@ -75,4 +75,10 @@ std::ostream& operator<< (
   return out;
 }
 
+std::ostream& operator<< (
+    std::ostream& out,
+    umpire::strategy::QuickPool::CoalesceHeuristic& ) {
+  return out;
+}
+
 } /* namespace umpire */
