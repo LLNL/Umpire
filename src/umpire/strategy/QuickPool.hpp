@@ -9,7 +9,6 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/MemoryMap.hpp"
-//#include "umpire/util/size_map.hpp"
 
 #include <functional>
 #include <map>
@@ -94,8 +93,6 @@ class QuickPool :
     };
 
     using PointerMap = std::unordered_map<void*, Chunk*>;
-    //using PointerMap = util::MemoryMap<Chunk*>;
-    //using SizeMap = umpire::util::size_map<std::size_t, Chunk*, 30>;
     using SizeMap = std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
     struct Chunk {
