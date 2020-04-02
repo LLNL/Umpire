@@ -76,6 +76,7 @@ if (SHROUD_FOUND)
 endif ()
 
 set (umpire_depends
+  camp
   umpire_resource
   umpire_strategy
   umpire_alloc
