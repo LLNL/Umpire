@@ -523,7 +523,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     if (alloc->argc >= 3) {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::Pool, true>
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
               , alloc->argv.dynamic_pool_list.initial_alloc_size
@@ -533,7 +533,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       }
       else {
         alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::Pool, false>
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
               , alloc->argv.pool.initial_alloc_size
@@ -545,7 +545,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     else if (alloc->argc == 2) {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::Pool, true>
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
               , alloc->argv.pool.initial_alloc_size
@@ -554,7 +554,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       }
       else {
         alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::Pool, false>
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
               , alloc->argv.pool.initial_alloc_size
@@ -565,7 +565,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     else {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::Pool, true>
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
             )
@@ -573,7 +573,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       }
       else {
         alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::Pool, false>
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
             )
