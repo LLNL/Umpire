@@ -19,6 +19,8 @@ namespace alloc {
  */
 struct OpenMPTargetAllocator
 {
+  OpenMPTargetAllocator(int _device) :
+    device{_device} {}
   /*!
    * \brief Allocate bytes of memory using malloc.
    *

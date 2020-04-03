@@ -9,6 +9,8 @@
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
 
+#include "umpire/alloc/OpenMPTargetAllocator.hpp"
+
 namespace umpire {
 namespace resource {
 
@@ -20,15 +22,18 @@ namespace resource {
 class OpenMPTargetResourceFactory :
   public MemoryResourceFactory
 {
-  public:
-    OpenMPTargetResourceFactory(int device);
+  using Allocator = alloc::OpenMPTargetAllocator;
 
+  public:
     bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
 
     std::unique_ptr<resource::MemoryResource>
     create(const std::string& name, int id) final override;
-  private:
-    int m_device;
+
+    std::unique_ptr<resource::MemoryResource>
+    create(const std::string& name, int id, MemoryResourceTraits traits) final override;
+
+    MemoryResourceTraits getDefaultTraits() final override;
 };
 
 } // end of namespace resource

@@ -137,9 +137,8 @@ ResourceManager::ResourceManager() :
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  int device{omp_get_default_device()};
   registry.registerMemoryResource(
-    util::make_unique<resource::OpenMPTargetResourceFactory>(device));
+    util::make_unique<resource::OpenMPTargetResourceFactory>());
 #endif
 
   initialize();
