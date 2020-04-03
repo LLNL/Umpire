@@ -214,22 +214,21 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
 
+  int device_count{0};
 #if defined(UMPIRE_ENABLE_CUDA)
-  int device_count;
   auto error = ::cudaGetDeviceCount(&device_count);
-
   if (error != cudaSuccess) {
     UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
   }
 #endif
-
 #if defined(UMPIRE_ENABLE_HIP)
-  int device_count;
   auto error = ::hipGetDeviceCount(&device_count);
-
   if (error != hipSuccess) {
     UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
   }
+#endif
+#if defined(UMPIRE_ENABLE_OPENPM_TARGET)
+  device_count = omp_get_num_devices();
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -302,6 +301,31 @@ ResourceManager::initialize()
     }
 #endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    for (int device = 1; device < device_count; device++) {
+      MemoryResourceTraits traits;
+      traits.unified = false;
+      traits.kind = MemoryResourceTraits::memory_type::GDDR;
+      traits.used_for = MemoryResourceTraits::optimized_for::any;
+      traits.id = device;
+
+      std::string name = "DEVICE_" + std::to_string(device);
+
+      std::unique_ptr<strategy::AllocationStrategy>
+        allocator{util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+              registry.makeMemoryResource(name, getNextId(), traits))};
+      UMPIRE_REPLAY(
+        R"( "event": "makeMemoryResource", "payload": { "name": ")" << name <<R"("})"
+        << R"(, "result": ")" << allocator.get() << R"(")");
+
+      int id{allocator->getId()};
+      m_allocators_by_name[name] = allocator.get();
+      m_allocators_by_id[id] = allocator.get();
+      m_allocators.emplace_front(std::move(allocator));
+    }
+#endif
   }
 #endif
 
