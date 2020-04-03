@@ -195,28 +195,25 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  int host{omp_get_initial_device()};
-  int device{omp_get_default_device()};
-
   registerOperation(
       "COPY",
       std::make_pair(Platform::cpu, Platform::omp),
-      std::make_shared<OpenMPTargetCopyOperation>(host, device));
+      std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation(
       "COPY",
       std::make_pair(Platform::omp, Platform::cpu),
-      std::make_shared<OpenMPTargetCopyOperation>(device, host));
+      std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation(
       "COPY",
       std::make_pair(Platform::omp, Platform::omp),
-      std::make_shared<OpenMPTargetCopyOperation>(device, device));
+      std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation(
       "MEMSET",
       std::make_pair(Platform::omp, Platform::omp),
-      std::make_shared<OpenMPTargetMemsetOperation>(device));
+      std::make_shared<OpenMPTargetMemsetOperation>());
 
   registerOperation(
       "REALLOCATE",

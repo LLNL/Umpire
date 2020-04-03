@@ -14,7 +14,7 @@ namespace op {
 
 class OpenMPTargetCopyOperation : public MemoryOperation {
  public:
-   OpenMPTargetCopyOperation(int src, int dst);
+   OpenMPTargetCopyOperation() = default;
 
    /*
     * \copybrief MemoryOperation::transform
@@ -29,10 +29,6 @@ class OpenMPTargetCopyOperation : public MemoryOperation {
       umpire::util::AllocationRecord *src_allocation,
       umpire::util::AllocationRecord *dst_allocation,
       std::size_t length);
-
- private:
-  int m_src_id;
-  int m_dst_id;
 };
 
 } // end of naemspace op

@@ -183,12 +183,23 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance()};
 
   {
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    MemoryResourceTraits traits = registry.getDefaultTraits("HOST");
+    traits.id = omp_get_initial_device();
+    std::unique_ptr<strategy::AllocationStrategy>
+      host_allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("HOST", getNextId(), traits))};
+#else
     std::unique_ptr<strategy::AllocationStrategy>
       host_allocator{
         util::wrap_allocator<
           strategy::AllocationTracker,
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("HOST", getNextId()))};
+#endif
 
     UMPIRE_REPLAY(
       R"( "event": "makeMemoryResource", "payload": { "name": "HOST" })"
@@ -215,6 +226,7 @@ ResourceManager::initialize()
   }
 
   int device_count{0};
+  UMPIRE_USE_VAR(device_count);
 #if defined(UMPIRE_ENABLE_CUDA)
   auto error = ::cudaGetDeviceCount(&device_count);
   if (error != cudaSuccess) {

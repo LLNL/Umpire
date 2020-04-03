@@ -15,11 +15,6 @@
 namespace umpire {
 namespace op {
 
-OpenMPTargetCopyOperation::OpenMPTargetCopyOperation(int src, int dst) :
-  m_src_id{src},
-  m_dst_id{dst}
-{}
-
 void OpenMPTargetCopyOperation::transform(
     void* src_ptr,
     void** dst_ptr,
@@ -27,6 +22,8 @@ void OpenMPTargetCopyOperation::transform(
     util::AllocationRecord* dst_allocation,
     std::size_t length)
 {
+  int src_device = src_allocation->strategy->getTraits().id;
+  int dst_device = dst_allocation->strategy->getTraits().id;
 
   void* src_base_ptr{src_allocation->ptr};
   void* dst_base_ptr{dst_allocation->ptr};
@@ -44,8 +41,8 @@ void OpenMPTargetCopyOperation::transform(
       << ", length = " << length
       << ", dst_offset = " << dst_offset
       << ", src_offset = " << src_offset
-      << ", src_id = " << m_src_id
-      << ", dst_id = " << m_dst_id);
+      << ", src_id = " << src_device
+      << ", dst_id = " << dst_device);
 
 
   omp_target_memcpy( 
@@ -54,8 +51,8 @@ void OpenMPTargetCopyOperation::transform(
       length,
       dst_offset, 
       src_offset, 
-      m_dst_id,
-      m_src_id); 
+      dst_device,
+      src_device); 
 
   UMPIRE_RECORD_STATISTIC(
       "OpenMPTargetCopyOperation",
