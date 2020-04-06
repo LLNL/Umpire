@@ -421,6 +421,26 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
       m_ops->copyString(base_allocator_name, alloc->base_name);
     }
+    else if ( type == "umpire::strategy::QuickPool" ) {
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
+
+      alloc->type = ReplayFile::rtype::QUICKPOOL;
+
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+
+      // Now grab the optional fields
+      if (alloc->argc >= 3) {
+        alloc->argc = 3;    // strip heuristic parameter
+        get_from_string(m_json["payload"]["args"][1],
+                        alloc->argv.pool.initial_alloc_size);
+        get_from_string(m_json["payload"]["args"][2],
+                        alloc->argv.pool.min_alloc_size);
+      }
+      else if (alloc->argc == 2) {
+        get_from_string(m_json["payload"]["args"][1],
+                        alloc->argv.pool.initial_alloc_size);
+      }
+    }
     else if ( type == "umpire::strategy::DynamicPoolList" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
