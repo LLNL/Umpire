@@ -68,18 +68,6 @@ NumaPolicy::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-std::size_t
-NumaPolicy::getCurrentSize() const noexcept
-{
-  return m_allocator->getCurrentSize();
-}
-
-std::size_t
-NumaPolicy::getHighWatermark() const noexcept
-{
-  return m_allocator->getHighWatermark();
-}
-
 Platform
 NumaPolicy::getPlatform() noexcept
 {

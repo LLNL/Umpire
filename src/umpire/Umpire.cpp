@@ -67,8 +67,8 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
     char* right{reinterpret_cast<char*>(right_record->ptr)};
 
     return ((right >= left) 
-      && (left + left_record->size >= right)
-      && (right + right_record->size > left + left_record->size));
+      && ((left + left_record->size) >= right)
+      && ((right + right_record->size) > (left + left_record->size)));
   } catch (umpire::util::Exception e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
   }
@@ -104,6 +104,7 @@ std::string get_backtrace(void* ptr)
 
   return backtrace_stream.str();
 #else
+  UMPIRE_USE_VAR(ptr);
   return "[Requires ENABLE_BACKTRACE=On]";
 #endif
 }

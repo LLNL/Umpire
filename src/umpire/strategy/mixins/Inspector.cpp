@@ -19,7 +19,6 @@ Inspector::Inspector() :
 {
 }
 
-
 void
 Inspector::registerAllocation(
     void* ptr,
