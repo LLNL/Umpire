@@ -147,6 +147,11 @@ std::size_t get_process_memory_usage();
  */ 
 std::size_t get_device_memory_usage(int device_id);
 
+/*!
+ * \brief Get all the leaked (active) allocations associated with allocator.
+ */
+std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
+
 } // end of namespace umpire
 
 #endif // UMPIRE_Umpire_HPP

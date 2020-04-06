@@ -143,4 +143,10 @@ std::size_t get_device_memory_usage(int device_id)
 #endif
 }
 
+std::vector<util::AllocationRecord>
+get_leaked_allocations(Allocator allocator)
+{
+  return get_allocator_records(allocator);
+}
+
 } // end namespace umpire
