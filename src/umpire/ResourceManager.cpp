@@ -184,7 +184,7 @@ ResourceManager::initialize()
 
   {
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-    MemoryResourceTraits traits = registry.getDefaultTraits("HOST");
+    MemoryResourceTraits traits = registry.getDefaultTraitsForResource("HOST");
     traits.id = omp_get_initial_device();
     std::unique_ptr<strategy::AllocationStrategy>
       host_allocator{
