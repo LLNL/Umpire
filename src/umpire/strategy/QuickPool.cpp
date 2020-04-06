@@ -7,9 +7,9 @@
 
 #include "umpire/strategy/QuickPool.hpp"
 
-#include "umpire/util/FixedMallocPool.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -38,6 +38,11 @@ QuickPool::QuickPool(
   m_initial_alloc_bytes{initial_alloc_size},
   m_min_alloc_bytes{min_alloc_size}
 {
+  {
+    auto bt = umpire::util::Backtrace{};
+    bt.getBacktrace();
+    UMPIRE_LOG(Info, "actual_size:" << m_initial_alloc_bytes << " (prev: 0) " << bt);
+  }
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
   m_actual_bytes += m_initial_alloc_bytes;
   m_releasable_bytes += m_initial_alloc_bytes;
@@ -67,6 +72,11 @@ QuickPool::allocate(std::size_t bytes)
 
     void* ret{nullptr};
     try {
+      {
+        auto bt = umpire::util::Backtrace{};
+        bt.getBacktrace();
+        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+bytes) << " (prev: " << m_actual_bytes << ") " << bt);
+      }
       ret = m_allocator->allocate(size);
     } catch (...) {
       UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
@@ -196,6 +206,8 @@ void QuickPool::release()
   UMPIRE_LOG(Debug, "release");
   UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
 
+  auto prev_size{m_actual_bytes};
+
   for (auto pair = m_size_map.begin(); pair != m_size_map.end(); )
   {
     auto chunk = (*pair).second;
@@ -210,6 +222,12 @@ void QuickPool::release()
     } else {
       ++pair;
     }
+  }
+
+  if (prev_size > m_actual_bytes) {
+      auto bt = umpire::util::Backtrace{};
+      bt.getBacktrace();
+      UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size << ") " << bt);
   }
 }
 

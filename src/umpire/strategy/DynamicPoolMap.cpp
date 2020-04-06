@@ -48,6 +48,11 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
   m_highwatermark{0}
 {
   const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
+  {
+    auto bt = umpire::util::Backtrace{};
+    bt.getBacktrace();
+    UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << bt);
+  }
   insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
 }
 
@@ -109,6 +114,11 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
+    {
+      auto bt = umpire::util::Backtrace{};
+      bt.getBacktrace();
+      UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes+bytes) << " (prev: " << m_actual_bytes << ") " << bt);
+    }
     ptr = m_allocator->allocate(bytes);
   } catch (...) {
     UMPIRE_LOG(Error,
@@ -414,6 +424,12 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
     } else {
       ++it;
     }
+  }
+
+  if (released_bytes > 0) {
+    auto bt = umpire::util::Backtrace{};
+    bt.getBacktrace();
+    UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes << " (prev: " << (m_actual_bytes+released_bytes) << ") " << bt);
   }
 
   return released_bytes;
