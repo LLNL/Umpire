@@ -27,6 +27,7 @@ public:
     , MIXED_POOL
     , ALLOCATION_PREFETCHER
     , NUMA_POLICY
+    , QUICKPOOL
   };
 
   static const std::size_t max_allocators{512};
@@ -47,6 +48,10 @@ public:
       struct {
         int node;
       } numa;
+      struct {
+        std::size_t initial_alloc_size;
+        std::size_t min_alloc_size;
+      } pool;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
@@ -114,7 +119,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 8;
+  const uint64_t REPLAY_VERSION = 10;
 
   struct Header {
     struct Magic {
