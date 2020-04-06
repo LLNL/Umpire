@@ -16,9 +16,6 @@
 namespace umpire {
 namespace op {
 
-OpenMPTargetMemsetOperation::OpenMPTargetMemsetOperation() :
-{}
-
 void OpenMPTargetMemsetOperation::apply(
     void* src_ptr,
     util::AllocationRecord* src_allocation,

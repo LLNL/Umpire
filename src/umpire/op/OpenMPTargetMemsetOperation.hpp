@@ -14,8 +14,6 @@ namespace op {
 
 class OpenMPTargetMemsetOperation : public MemoryOperation {
  public:
-   OpenMPTargetMemsetOperation();
-
    /*
     * \copybrief MemoryOperation::apply
     *
