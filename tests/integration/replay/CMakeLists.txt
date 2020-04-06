@@ -15,29 +15,37 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
-set(replay_file "test_output" )
-set(sys_type $ENV{SYS_TYPE})
+set(raw_replay_file "output" )
+set(replay_config "")
 
-if (ENABLE_NUMA OR ENABLE_CUDA)
-  if (sys_type)
-    set(replay_file "${replay_file}.${sys_type}")
+if (ENABLE_NUMA)
+  set(replay_config "${replay_config}numa_" )
+endif()
+
+if (ENABLE_CUDA OR ENABLE_HIP)
+  set(replay_config "${replay_config}devices_" )
+
+  if (ENABLE_DEVICE_CONST)
+    set(replay_config "${replay_config}const_")
   endif ()
 endif ()
 
-if (ENABLE_NUMA)
-  set(replay_file "${replay_file}.numa" )
-endif()
+set(replay_config_stripped "")
+string(REGEX REPLACE "_$" "" replay_config_stripped "${replay_config}")
+set(raw_replay_file "${raw_replay_file}.${replay_config_stripped}.replay")
+string(REGEX REPLACE "\\.+" "." replay_file "${raw_replay_file}")
 
-if (ENABLE_CUDA)
-  set(replay_file "${replay_file}.cuda" )
-elseif (ENABLE_HIP)
-  set(replay_file "${replay_file}.hip" )
-endif()
+blt_add_executable(
+  NAME replay_tests
+  SOURCES replay_tests.cpp
+  DEPENDS_ON ${replay_integration_tests_depends})
 
-set(replay_file "${replay_file}.good" )
+add_custom_target(
+  regen_replay_output
+  COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.replay ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file} && rm -f *.replay)
 
+message(STATUS "Looking for ${replay_file} reference output...")
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
-
   if (BASH_PROGRAM)
     message(STATUS "Using ${replay_file} as good replay test data")
     configure_file(
@@ -45,11 +53,6 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
       "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_output.good"
       COPYONLY
     )
-
-    blt_add_executable(
-      NAME replay_tests
-      SOURCES replay_tests.cpp
-      DEPENDS_ON ${replay_integration_tests_depends})
 
     if (NOT C_COMPILER_FAMILY_IS_PGI)
       add_test(
@@ -60,9 +63,9 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
 
   else ()
 
-    message(STATUS, "Bash not configured, replay tests disabled.")
+    message(STATUS "Bash not configured, replay tests disabled.")
 
   endif ()
 else ()
-  message(STATUS, "No replay reference output available for current build configuration, replay test disabled.")
+  message(WARNING "No replay reference output available for current build configuration, replay test disabled.")
 endif ()

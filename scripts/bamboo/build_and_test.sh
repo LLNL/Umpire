@@ -26,7 +26,7 @@ if [[ $HOSTNAME == *manta* ]] || [[ $HOSTNAME == *ansel* ]]; then
   fi
 else
   echo "srun -ppdebug -t 60 -N 1 ${UMPIRE_SCRIPT_PATH}/run_build_and_test.sh"
-  srun -ppdebug -t 60 -N 1 ${UMPIRE_SCRIPT_PATH}/run_build_and_test.sh
+  srun --mpibind=off -ppdebug -t 60 -N 1 ${UMPIRE_SCRIPT_PATH}/run_build_and_test.sh
   if [ $? -ne 0 ]; then
     echo "Error: srun job failed"
     exit -1
