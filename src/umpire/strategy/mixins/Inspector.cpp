@@ -42,7 +42,7 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strateg
 
   if (record.strategy == strategy) {
     m_current_size -= record.size;
-    m_allocation_count++;
+    m_allocation_count--;
   } else {
     // Re-register the pointer and throw an error
     ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy});
