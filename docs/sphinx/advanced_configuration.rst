@@ -25,6 +25,7 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
       ``ENABLE_SLIC``              Off      Enable SLIC logging
+      ``ENABLE_ALLOCATION_BACKTRACE`` Off   Enable backtraces for allocations
       ``ENABLE_TOOLS``             Off      Enable tools like replay
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
       ``ENABLE_C``                 Off      Build the C API
@@ -63,6 +64,9 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_SLIC``
   This option enables usage of logging services provided by SLIC.
+
+* ``ENABLE_ALLOCATION_BACKTRACE``
+  This option enables collection of backtrace information for each allocation.
 
 * ``ENABLE_TOOLS``
   Enable development tools for Umpire (replay, etc.)

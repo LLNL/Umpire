@@ -47,6 +47,8 @@
 #include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
 #endif
 
+#include "umpire/Umpire.hpp"
+
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
@@ -156,6 +158,16 @@ ResourceManager::ResourceManager() :
 ResourceManager::~ResourceManager()
 {
   for (auto&& allocator : m_allocators) {
+    if (allocator->getCurrentSize() != 0) {
+      std::stringstream ss;
+
+      umpire::print_allocator_records(Allocator{allocator.get()}, ss);
+
+      UMPIRE_LOG(Error, allocator->getName() << " Allocator still has "
+                        << allocator->getCurrentSize() << " bytes allocated"
+                        << std::endl << ss.str() << std::endl);
+    }
+
     allocator.reset();
   }
 }
@@ -546,6 +558,10 @@ ResourceManager::getAllocator(int id)
 {
   UMPIRE_LOG(Debug, "(\"" << id << "\")");
 
+  if (id == umpire::invalid_allocator_id) {
+    UMPIRE_ERROR("Passed umpire::invalid_allocator_id");
+  }
+
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
     UMPIRE_ERROR("Allocator \"" << id << "\" not found. Available allocators: "
@@ -681,6 +697,37 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
       dst_alloc_record->strategy);
 
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
+}
+
+camp::resources::Event 
+ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
+
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
+
+  if (size == 0) {
+    size = src_size;
+  }
+
+  if (size > dst_size) {
+    UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
+  }
+
+  auto op = op_registry.find(
+      "COPY",
+      src_alloc_record->strategy,
+      dst_alloc_record->strategy);
+
+  return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
 }
 
 void ResourceManager::memset(void* ptr, int value, std::size_t length)

@@ -10,6 +10,7 @@
 #include <vector>
 #include <fstream>
 
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
@@ -516,6 +517,69 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       << "version of replay with -DENABLE_NUMA=On."
       << std::endl;
 #endif // defined(UMPIRE_ENABLE_NUMA)
+    break;
+
+  case ReplayFile::rtype::QUICKPOOL:
+    if (alloc->argc >= 3) {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+            )
+        );
+      }
+    }
+    else if (alloc->argc == 2) {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+            )
+        );
+      }
+    }
+    else {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+            )
+        );
+      }
+    }
     break;
 
   case ReplayFile::rtype::DYNAMIC_POOL_LIST:
@@ -1096,3 +1160,4 @@ void ReplayOperationManager::dumpStats()
   }
 }
 
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)

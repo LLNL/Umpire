@@ -30,6 +30,18 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples allocator)
 
+blt_add_executable(
+  NAME backtrace_example
+  SOURCES backtrace_example.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples backtrace_example)
+
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  blt_add_target_link_flags(
+    TO backtrace_example
+    FLAGS "-rdynamic")
+endif ()
+
 if (ENABLE_C)
   blt_add_executable(
     NAME allocator_c

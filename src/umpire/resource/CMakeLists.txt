@@ -24,6 +24,9 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
+set(umpire_resource_depends
+  camp)
+
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}

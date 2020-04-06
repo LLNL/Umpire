@@ -10,7 +10,7 @@
 
 ####
 # In pre-build phase, allocate a node for builds
-.quartz_common:
+.on_quartz:
   tags:
     - shell
     - quartz
@@ -23,10 +23,10 @@
 
 ####
 # In pre-build phase, allocate a node for builds
-allocate_resources_build_quartz:
+allocate_resources (on quartz):
   variables:
     GIT_STRATEGY: none
-  extends: .quartz_common
+  extends: .on_quartz
   stage: q_allocate_resources
   script:
     - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${UMPIRE_ALLOC_NAME}
@@ -35,10 +35,10 @@ allocate_resources_build_quartz:
 ####
 # In post-build phase, deallocate resources
 # Note : make sure this is run even on build phase failure
-release_resources_build_quartz:
+release_resources (on quartz):
   variables:
     GIT_STRATEGY: none
-  extends: .quartz_common
+  extends: .on_quartz
   stage: q_release_resources
   script:
     - export JOBID=$(squeue -h --name=${UMPIRE_ALLOC_NAME} --format=%A)
@@ -46,141 +46,141 @@ release_resources_build_quartz:
 
 ####
 # Generic qwartz build job, extending build script
-.build_quartz:
+.build_on_quartz:
   stage: q_build
-  extends: [.quartz_common, .build_toss_3_x86_64_ib_script]
+  extends: [.build_toss_3_x86_64_ib_script, .on_quartz]
 
-.build_quartz_advanced:
-  extends: [.build_quartz, .advanced_pipeline]
+.build_on_quartz_advanced:
+  extends: [.build_on_quartz, .advanced_pipeline]
 
 ####
 # Generic qwartz test job, extending test script
-.test_quartz:
+.test_on_quartz:
   stage: q_test
-  extends: [.quartz_common, .test_toss_3_x86_64_ib_script]
+  extends: [.test_toss_3_x86_64_ib_script, .on_quartz]
 
-.test_quartz_advanced:
-  extends: [.test_quartz, .advanced_pipeline]
+.test_on_quartz_advanced:
+  extends: [.test_on_quartz, .advanced_pipeline]
 
 ####
 # Here are all quartz build jobs
 
-build_quartz_clang_3_9_1_advanced:
+clang_3_9_1 (build on quartz):
   variables:
     COMPILER: "clang_3_9_1"
-  extends: .build_quartz_advanced
+  extends: .build_on_quartz_advanced
 
-build_quartz_clang_4_0_0:
+clang_4_0_0 (build on quartz):
   variables:
     COMPILER: "clang_4_0_0"
-  extends: .build_quartz
+  extends: .build_on_quartz
 
-build_quartz_gcc_4_9_3_advanced:
+gcc_4_9_3 (build on quartz):
   variables:
     COMPILER: "gcc_4_9_3"
-  extends: .build_quartz_advanced
+  extends: .build_on_quartz_advanced
 
-build_quartz_gcc_6_1_0_advanced:
+gcc_6_1_0 (build on quartz):
   variables:
     COMPILER: "gcc_6_1_0"
-  extends: .build_quartz_advanced
+  extends: .build_on_quartz_advanced
 
-build_quartz_gcc_7_1_0:
+gcc_7_1_0 (build on quartz):
   variables:
     COMPILER: "gcc_7_1_0"
-  extends: .build_quartz
+  extends: .build_on_quartz
 
-build_quartz_cudatoolkit_9_1:
+cudatoolkit_9_1 (build on quartz):
   variables:
     COMPILER: "cudatoolkit_9_1"
-  extends: .build_quartz
+  extends: .build_on_quartz
 
-build_quartz_icpc_16_0_4_advanced:
+icpc_16_0_4 (build on quartz):
   variables:
     COMPILER: "icpc_16_0_4"
-  extends: .build_quartz_advanced
+  extends: .build_on_quartz_advanced
   allow_failure: true
 
-build_quartz_icpc_17_0_2_advanced:
+icpc_17_0_2 (build on quartz):
   variables:
     COMPILER: "icpc_17_0_2"
-  extends: .build_quartz_advanced
+  extends: .build_on_quartz_advanced
 
-build_quartz_pgi_17_10_advanced:
+pgi_17_10 (build on quartz):
   variables:
     COMPILER: "pgi_17_10"
-  extends: .build_quartz_advanced
+  extends: .build_on_quartz_advanced
   allow_failure: true
 
-build_quartz_pgi_18_5:
+pgi_18_5 (build on quartz):
   variables:
     COMPILER: "pgi_18_5"
-  extends: .build_quartz
+  extends: .build_on_quartz
   allow_failure: true
 
 
 ####
 # Here are all quartz tests jobs
 
-test_quartz_clang_3_9_1_advanced:
+clang_3_9_1 (test on quartz):
   variables:
     COMPILER: "clang_3_9_1"
-  extends: .test_quartz_advanced
-  needs: ["build_quartz_clang_3_9_1_advanced"]
+  extends: .test_on_quartz_advanced
+  needs: ["clang_3_9_1 (build on quartz)"]
 
-test_quartz_clang_4_0_0:
+clang_4_0_0 (test on quartz):
   variables:
     COMPILER: "clang_4_0_0"
-  extends: .test_quartz
-  needs: ["build_quartz_clang_4_0_0"]
+  extends: .test_on_quartz
+  needs: ["clang_4_0_0 (build on quartz)"]
 
-test_quartz_gcc_4_9_3_advanced:
+gcc_4_9_3 (test on quartz):
   variables:
     COMPILER: "gcc_4_9_3"
-  extends: .test_quartz_advanced
-  needs: ["build_quartz_gcc_4_9_3_advanced"]
+  extends: .test_on_quartz_advanced
+  needs: ["gcc_4_9_3 (build on quartz)"]
 
-test_quartz_gcc_6_1_0_advanced:
+gcc_6_1_0 (test on quartz):
   variables:
     COMPILER: "gcc_6_1_0"
-  extends: .test_quartz_advanced
-  needs: ["build_quartz_gcc_6_1_0_advanced"]
+  extends: .test_on_quartz_advanced
+  needs: ["gcc_6_1_0 (build on quartz)"]
 
-test_quartz_gcc_7_1_0:
+gcc_7_1_0 (test on quartz):
   variables:
     COMPILER: "gcc_7_1_0"
-  extends: .test_quartz
-  needs: ["build_quartz_gcc_7_1_0"]
+  extends: .test_on_quartz
+  needs: ["gcc_7_1_0 (build on quartz)"]
 
-test_quartz_cudatoolkit_9_1:
+cudatoolkit_9_1 (test on quartz):
   variables:
     COMPILER: "cudatoolkit_9_1"
-  extends: .test_quartz
-  needs: ["build_quartz_cudatoolkit_9_1"]
+  extends: .test_on_quartz
+  needs: ["cudatoolkit_9_1 (build on quartz)"]
 
-test_quartz_icpc_16_0_4_advanced:
+icpc_16_0_4 (test on quartz):
   variables:
     COMPILER: "icpc_16_0_4"
-  extends: .test_quartz_advanced
-  needs: ["build_quartz_icpc_16_0_4_advanced"]
+  extends: .test_on_quartz_advanced
+  needs: ["icpc_16_0_4 (build on quartz)"]
   allow_failure: true
 
-test_quartz_icpc_17_0_2_advanced:
+icpc_17_0_2 (test on quartz):
   variables:
     COMPILER: "icpc_17_0_2"
-  extends: .test_quartz_advanced
-  needs: ["build_quartz_icpc_17_0_2_advanced"]
+  extends: .test_on_quartz_advanced
+  needs: ["icpc_17_0_2 (build on quartz)"]
 
-test_quartz_pgi_17_10_advanced:
+pgi_17_10 (test on quartz):
   variables:
     COMPILER: "pgi_17_10"
-  extends: .test_quartz_advanced
-  needs: ["build_quartz_pgi_17_10_advanced"]
+  extends: .test_on_quartz_advanced
+  needs: ["pgi_17_10 (build on quartz)"]
   allow_failure: true
 
-test_quartz_pgi_18_5:
+pgi_18_5 (test on quartz):
   variables:
     COMPILER: "pgi_18_5"
-  extends: .test_quartz
-  needs: ["build_quartz_pgi_18_5"]
+  extends: .test_on_quartz
+  needs: ["pgi_18_5 (build on quartz)"]
   allow_failure: true
