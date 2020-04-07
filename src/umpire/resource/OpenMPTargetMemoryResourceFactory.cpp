@@ -34,7 +34,7 @@ std::unique_ptr<resource::MemoryResource>
 OpenMPTargetResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
   return util::make_unique<DefaultMemoryResource<
-    alloc::OpenMPTargetAllocator>>(Platform::omp, name, id, traits, Allocator{traits.id});
+    alloc::OpenMPTargetAllocator>>(Platform::omp_target name, id, traits, Allocator{traits.id});
 }
 
 MemoryResourceTraits

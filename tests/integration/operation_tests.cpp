@@ -731,7 +731,7 @@ TEST_P(AdviceTest, ReadMostly)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -756,7 +756,7 @@ TEST_P(AdviceTest, PreferredLocation)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -781,7 +781,7 @@ TEST_P(AdviceTest, AccessedBy)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
