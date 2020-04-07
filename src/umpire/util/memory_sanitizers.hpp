@@ -14,12 +14,12 @@
 #include <sanitizer/asan_interface.h>
 
 #define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size) \
-  if (allocator->getPlatform() == umpire::Platform::cpu) {\
+  if (allocator->getPlatform() == umpire::Platform::host) {\
     ASAN_POISON_MEMORY_REGION((ptr), (size));\
   }
 
 #define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size) \
-  if (allocator->getPlatform() == umpire::Platform::cpu) {\
+  if (allocator->getPlatform() == umpire::Platform::host) {\
     ASAN_UNPOISON_MEMORY_REGION((ptr), (size));\
   }
 

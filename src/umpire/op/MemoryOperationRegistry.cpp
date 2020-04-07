@@ -58,46 +58,46 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<HostCopyOperation>());
 
   registerOperation(
       "MEMSET",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<HostMemsetOperation>());
 
   registerOperation(
       "REALLOCATE",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<HostReallocateOperation>());
 
 #if defined(UMPIRE_ENABLE_NUMA)
   registerOperation(
       "MOVE",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<NumaMoveOperation>());
 
 // NOTE: We don't use CUDA calls in the move operation so no guard is needed
   registerOperation(
       "MOVE",
-      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_pair(Platform::host, Platform::cuda),
       std::make_shared<NumaMoveOperation>());
 
   registerOperation(
       "MOVE",
-      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_pair(Platform::cuda, Platform::host),
       std::make_shared<NumaMoveOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_pair(Platform::host, Platform::cuda),
       std::make_shared<CudaCopyToOperation>());
 
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_pair(Platform::cuda, Platform::host),
       std::make_shared<CudaCopyFromOperation>());
 
   registerOperation(
@@ -127,7 +127,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
   registerOperation(
       "PREFERRED_LOCATION",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<CudaAdvisePreferredLocationOperation>());
 
   registerOperation(
@@ -147,7 +147,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
   registerOperation(
       "UNSET_PREFERRED_LOCATION",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
   registerOperation(
@@ -164,12 +164,12 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #if defined(UMPIRE_ENABLE_HIP)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::hip),
+      std::make_pair(Platform::host, Platform::hip),
       std::make_shared<HipCopyToOperation>());
 
   registerOperation(
       "COPY",
-      std::make_pair(Platform::hip, Platform::cpu),
+      std::make_pair(Platform::hip, Platform::host),
       std::make_shared<HipCopyFromOperation>());
 
   registerOperation(

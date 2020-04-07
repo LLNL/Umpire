@@ -42,7 +42,7 @@ protected:
     data = malloc(100*sizeof(char));
 
     ON_CALL(*m_strategy, getPlatform())
-      .WillByDefault(::testing::Return(umpire::Platform::cpu));
+      .WillByDefault(::testing::Return(umpire::Platform::host));
 
     // set up allocate return value
     ON_CALL(*m_strategy, allocate(::testing::_))
@@ -73,7 +73,7 @@ TEST_F(AllocatorTest, getPlatform)
 {
   EXPECT_CALL(*m_strategy, getPlatform());
 
-  ASSERT_EQ(m_allocator.getPlatform(), umpire::Platform::cpu);
+  ASSERT_EQ(m_allocator.getPlatform(), umpire::Platform::host);
 }
 
 TEST_F(AllocatorTest, allocate)
