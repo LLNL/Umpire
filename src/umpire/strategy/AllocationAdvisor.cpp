@@ -47,7 +47,7 @@ AllocationAdvisor::AllocationAdvisor(
       m_allocator);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  if (accessing_allocator.getPlatform() == Platform::cpu) {
+  if (accessing_allocator.getPlatform() == Platform::host) {
     m_device = cudaCpuDeviceId;
   }
 #else

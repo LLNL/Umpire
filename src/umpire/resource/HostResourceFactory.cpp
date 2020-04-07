@@ -44,7 +44,7 @@ HostResourceFactory::create(const std::string& name, int id, MemoryResourceTrait
   using HostAllocator = alloc::MallocAllocator;
 #endif
 
-  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::cpu, name, id, traits);
+  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::host, name, id, traits);
 }
 
 MemoryResourceTraits

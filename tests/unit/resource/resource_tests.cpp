@@ -24,14 +24,14 @@ struct TestAllocator
 
 TEST(DefaultMemoryResource, Constructor)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
 
   SUCCEED();
 }
 
 TEST(DefaultMemoryResource, AllocateDeallocate)
 {
-  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::cpu, "TEST", 0, umpire::MemoryResourceTraits{});
+  auto alloc = std::make_shared<umpire::resource::DefaultMemoryResource<TestAllocator> >(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
   double* pointer = (double*)alloc->allocate(10*sizeof(double));
   ASSERT_NE(pointer, nullptr);
 
