@@ -4,3 +4,4 @@
 CMakeFiles
 *.tar.gz
 .vscode
+.devcontainer
