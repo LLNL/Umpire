@@ -34,7 +34,7 @@ NullMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
 std::unique_ptr<resource::MemoryResource>
 NullMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return util::make_unique<NullMemoryResource>(Platform::none, name, id, traits);
+  return util::make_unique<NullMemoryResource>(Platform::undefined, name, id, traits);
 }
 
 MemoryResourceTraits
