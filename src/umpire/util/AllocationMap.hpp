@@ -38,9 +38,15 @@ class AllocationMap
     using RecordBlock = Block<AllocationRecord>;
 
     // Iterator for RecordList
-    class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+    class ConstIterator
     {
     public:
+      using iterator_category = std::forward_iterator_tag;
+      using value_type = AllocationRecord;
+      using difference_type = std::ptrdiff_t;
+      using pointer = value_type*;
+      using reference = value_type&;
+
       ConstIterator();
       ConstIterator(const RecordList* list, iterator_begin);
       ConstIterator(const RecordList* list, iterator_end);
@@ -83,9 +89,15 @@ public:
   using Map = MemoryMap<RecordList>;
 
   // Iterator that flattens MemoryMap and RecordList iterators
-  class ConstIterator : public std::iterator<std::forward_iterator_tag, AllocationRecord>
+  class ConstIterator
   {
   public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = AllocationRecord;
+    using difference_type = std::ptrdiff_t;
+    using pointer = value_type*;
+    using reference = value_type&;
+
     // Iterator(AllocationMap* map, const OuterIterType& outer_iter, const InnerIterType& inner_iter);
     ConstIterator(const AllocationMap* map, iterator_begin);
     ConstIterator(const AllocationMap* map, iterator_end);
