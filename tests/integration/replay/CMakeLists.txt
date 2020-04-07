@@ -28,12 +28,16 @@ if (ENABLE_NUMA)
   set(replay_config "${replay_config}numa_" )
 endif()
 
-if (ENABLE_CUDA OR ENABLE_HIP OR ENABLE_OPENMP_TARGET)
+if (ENABLE_CUDA OR ENABLE_HIP)
   set(replay_config "${replay_config}devices_" )
 
   if (ENABLE_DEVICE_CONST)
     set(replay_config "${replay_config}const_")
   endif ()
+endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  set(replay_config "${replay_config}omp_")
 endif ()
 
 set(replay_config_stripped "")
