@@ -13,13 +13,6 @@ namespace umpire {
 
 using Platform = camp::resources::Platform;
 
-// enum class Platform {
-//   none,
-//   cpu,
-//   cuda,
-//   hip
-// };
-
 } // end of namespace umpire
 
 #endif
