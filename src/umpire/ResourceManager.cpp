@@ -239,7 +239,7 @@ ResourceManager::initialize()
     UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
   }
 #endif
-#if defined(UMPIRE_ENABLE_OPENPM_TARGET)
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   device_count = omp_get_num_devices();
 #endif
 
