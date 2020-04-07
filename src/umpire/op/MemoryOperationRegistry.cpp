@@ -197,12 +197,12 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::omp_target,
+      std::make_pair(Platform::host, Platform::omp_target,
       std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation(
       "COPY",
-      std::make_pair(Platform::omp_target Platform::cpu),
+      std::make_pair(Platform::omp_target Platform::host),
       std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation(
