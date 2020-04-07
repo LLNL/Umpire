@@ -11,6 +11,12 @@ if (ENABLE_HIP)
   set (strategy_tests_depends ${strategy_tests_depends} hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (strategy_tests_depends
+    ${strategy_tests_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME fixed_pool_tests
   SOURCES fixed_pool_tests.cpp

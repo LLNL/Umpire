@@ -75,11 +75,26 @@ if (SHROUD_FOUND)
   add_subdirectory(interface)
 endif ()
 
+set (umpire_depends
+  camp
+  umpire_resource
+  umpire_strategy
+  umpire_alloc
+  umpire_op
+  umpire_util
+  umpire_tpl_judy)
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_depends
+    ${umpire_depends}
+    openmp)
+endif ()
+  
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  DEPENDS_ON camp umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
+  DEPENDS_ON ${umpire_depends})
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
@@ -92,6 +107,7 @@ set(UMPIRE_ENABLE_ALLOCATION_BACKTRACE ${ENABLE_ALLOCATION_BACKTRACE})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
+set(UMPIRE_ENABLE_OPENMP_TARGET ${ENABLE_OPENMP_TARGET})
 set(UMPIRE_ENABLE_SANITIZERS ${ENABLE_SANITIZERS})
 
 if (ENABLE_CUDA OR ENABLE_HIP)
@@ -107,6 +123,10 @@ else ()
   set(UMPIRE_ENABLE_CONST Off)
   set(UMPIRE_ENABLE_UM Off)
 endif()
+
+if (ENABLE_OPENMP_TARGET)
+  set(UMPIRE_ENABLE_DEVICE On)
+endif ()
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in

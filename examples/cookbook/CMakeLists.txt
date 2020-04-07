@@ -10,6 +10,12 @@ if (ENABLE_HIP)
   set (cookbook_depends ${cookbook_depends} hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (cookbook_depends
+    ${cookbook_depends}
+    openmp)
+endif()
+
 blt_add_executable(
   NAME recipe_no_introspection
   SOURCES recipe_no_introspection.cpp

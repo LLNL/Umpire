@@ -28,6 +28,8 @@ class MemoryResourceRegistry {
 
     void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 
+    MemoryResourceTraits getDefaultTraitsForResource(const std::string& name);
+
     MemoryResourceRegistry(const MemoryResourceRegistry&) = delete;
     MemoryResourceRegistry& operator=(const MemoryResourceRegistry&) = delete;
     ~MemoryResourceRegistry() = default;

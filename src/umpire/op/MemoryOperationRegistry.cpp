@@ -42,6 +42,12 @@
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include <omp.h>
+#include "umpire/op/OpenMPTargetCopyOperation.hpp"
+#include "umpire/op/OpenMPTargetMemsetOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -186,7 +192,33 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
+#endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::host, Platform::omp_target),
+      std::make_shared<OpenMPTargetCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::omp_target, Platform::host),
+      std::make_shared<OpenMPTargetCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::omp_target, Platform::omp_target),
+      std::make_shared<OpenMPTargetCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::omp_target, Platform::omp_target),
+      std::make_shared<OpenMPTargetMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::omp_target, Platform::omp_target),
+      std::make_shared<GenericReallocateOperation>());
 #endif
 }
 
