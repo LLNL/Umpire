@@ -6,6 +6,12 @@ variables:
 
 jobs:
 - job: Windows
+  strategy:
+    matrix:
+      shared:
+        IS_SHARED: On
+      static:
+        IS_SHARED: Off
   pool:
     vmImage: 'windows-2019'
   variables:
@@ -17,7 +23,7 @@ jobs:
   - task: CMake@1
     inputs:
       workingDir: 'build'
-      cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
+      cmakeArgs: '$(CMAKE_EXTRA_FLAGS) -DBUILD_SHARED_LIBS=$(IS_SHARED) ../'
   - task: CMake@1
     inputs:
       workingDir: 'build'
