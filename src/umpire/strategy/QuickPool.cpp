@@ -38,11 +38,16 @@ QuickPool::QuickPool(
   m_initial_alloc_bytes{initial_alloc_size},
   m_min_alloc_bytes{min_alloc_size}
 {
+#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
   {
-    auto bt = umpire::util::Backtrace{};
-    bt.getBacktrace();
-    UMPIRE_LOG(Info, "actual_size:" << m_initial_alloc_bytes << " (prev: 0) " << bt);
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size:" 
+      << m_initial_alloc_bytes << " (prev: 0) " 
+      << umpire::util::backtracer<>::print(bt));
   }
+#endif
+
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
   m_actual_bytes += m_initial_alloc_bytes;
   m_releasable_bytes += m_initial_alloc_bytes;
@@ -72,11 +77,15 @@ QuickPool::allocate(std::size_t bytes)
 
     void* ret{nullptr};
     try {
+#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
       {
-        auto bt = umpire::util::Backtrace{};
-        bt.getBacktrace();
-        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+bytes) << " (prev: " << m_actual_bytes << ") " << bt);
+        umpire::util::backtrace bt{};
+        umpire::util::backtracer<>::get_backtrace(bt);
+        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+bytes) 
+          << " (prev: " << m_actual_bytes 
+          << ") " << umpire::util::backtracer<>::print(bt));
       }
+#endif
       ret = m_allocator->allocate(size);
     } catch (...) {
       UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
@@ -224,11 +233,15 @@ void QuickPool::release()
     }
   }
 
+#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
   if (prev_size > m_actual_bytes) {
-      auto bt = umpire::util::Backtrace{};
-      bt.getBacktrace();
-      UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size << ") " << bt);
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes 
+      << " (prev: " << prev_size 
+      << ") " << umpire::util::backtracer<>::print(bt));
   }
+#endif
 }
 
 std::size_t 

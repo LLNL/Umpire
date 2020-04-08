@@ -14,15 +14,9 @@ endif()
 
 if (ENABLE_OPENMP_TARGET)
   set (tutorial_depends
-<<<<<<< HEAD
     ${tutorial_depends}
     openmp)
 endif ()
-=======
-      ${tutorial_depends}
-      openmp)
-endif()
->>>>>>> develop
 
 blt_add_executable(
   NAME tut_allocator

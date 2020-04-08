@@ -14,7 +14,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/Replay.hpp"
-#include "umpire/util/Backtrace.hpp"
+#include "umpire/util/backtrace.hpp"
 
 #include <cstdlib>
 #include <algorithm>
@@ -48,11 +48,13 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
   m_highwatermark{0}
 {
   const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
+#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
   {
-    auto bt = umpire::util::Backtrace{};
-    bt.getBacktrace();
-    UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << bt);
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
   }
+#endif
   insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
 }
 
@@ -114,11 +116,15 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
+#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
     {
-      auto bt = umpire::util::Backtrace{};
-      bt.getBacktrace();
-      UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes+bytes) << " (prev: " << m_actual_bytes << ") " << bt);
+      umpire::util::backtrace bt{};
+      umpire::util::backtracer<>::get_backtrace(bt);
+      UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes+bytes) 
+        << " (prev: " << m_actual_bytes << ") " 
+        << umpire::util::backtracer<>::print(bt));
     }
+#endif
     ptr = m_allocator->allocate(bytes);
   } catch (...) {
     UMPIRE_LOG(Error,
@@ -426,11 +432,15 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
     }
   }
 
+#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
   if (released_bytes > 0) {
-    auto bt = umpire::util::Backtrace{};
-    bt.getBacktrace();
-    UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes << " (prev: " << (m_actual_bytes+released_bytes) << ") " << bt);
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes 
+      << " (prev: " << (m_actual_bytes+released_bytes) 
+      << ") " << umpire::util::backtracer<>::print(bt));
   }
+#endif
 
   return released_bytes;
 }
