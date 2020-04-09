@@ -21,7 +21,7 @@ class ResourceTest :
   public:
     void SetUp() override
     {
-      auto platform = umpire::Platform::none;
+      auto platform = umpire::Platform::undefined;
       const std::string name{"test resource"}; 
       const int id{0}; 
       auto traits = umpire::MemoryResourceTraits{};
@@ -38,7 +38,7 @@ class ResourceTest :
     Resource* memory_resource;
 };
 
-TYPED_TEST_CASE_P(ResourceTest);
+TYPED_TEST_SUITE_P(ResourceTest);
 
 TYPED_TEST_P(ResourceTest, Constructor)
 {
@@ -69,7 +69,7 @@ TYPED_TEST_P(ResourceTest, getHighWatermark)
 TYPED_TEST_P(ResourceTest, getPlatform)
 {
   auto platform = this->memory_resource->getPlatform();
-  ASSERT_EQ(platform, umpire::Platform::none);
+  ASSERT_EQ(platform, umpire::Platform::undefined);
 }
 
 TYPED_TEST_P(ResourceTest, getTraits)

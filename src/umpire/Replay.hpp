@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 
@@ -26,6 +27,8 @@ UMPIRESHAREDDLL_API std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPoolMap::CoalesceHeuristic& );
 UMPIRESHAREDDLL_API std::ostream& operator<< (std::ostream& out,
     umpire::strategy::DynamicPoolList::CoalesceHeuristic& );
+std::ostream& operator<< (std::ostream& out,
+    umpire::strategy::QuickPool::CoalesceHeuristic& );
 
 class UMPIRESHAREDDLL_API Replay {
 public:
@@ -43,13 +46,11 @@ public:
   static std::string printReplayAllocator(T&& firstArg, Args&&... args) {
     std::stringstream ss;
 
-    if (typeid(firstArg) != typeid(umpire::strategy::DynamicPool::CoalesceHeuristic)) {
-      m_argument_number++;
-      if ( m_argument_number != 1 )
-        ss << ", ";
+    m_argument_number++;
+    if ( m_argument_number != 1 )
+      ss << ", ";
 
-      ss << "\"" << firstArg << "\"";
-    }
+    ss << "\"" << firstArg << "\"";
 
     ss << printReplayAllocator(std::forward<Args>(args)...);
     return ss.str();

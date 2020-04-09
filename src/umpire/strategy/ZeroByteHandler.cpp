@@ -80,6 +80,12 @@ ZeroByteHandler::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits
+ZeroByteHandler::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 strategy::AllocationStrategy*
 ZeroByteHandler::getAllocationStrategy()
 {

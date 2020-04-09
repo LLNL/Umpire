@@ -1,0 +1,186 @@
+##############################################################################
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+####
+# This is the share configuration of jobs for quartz
+
+####
+# In pre-build phase, allocate a node for builds
+.on_quartz:
+  tags:
+    - shell
+    - quartz
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /_qnone/ || $UMPIRE_CI_QUARTZ == "OFF"' #run except if ...
+      when: never
+    - if: '$CI_JOB_NAME =~ /release_resources/'
+      when: always
+    - when: on_success
+
+####
+# In pre-build phase, allocate a node for builds
+allocate_resources (on quartz):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_quartz
+  stage: q_allocate_resources
+  script:
+    - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${UMPIRE_ALLOC_NAME}
+  needs: ["start"]
+
+####
+# In post-build phase, deallocate resources
+# Note : make sure this is run even on build phase failure
+release_resources (on quartz):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_quartz
+  stage: q_release_resources
+  script:
+    - export JOBID=$(squeue -h --name=${UMPIRE_ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+
+####
+# Generic qwartz build job, extending build script
+.build_on_quartz:
+  stage: q_build
+  extends: [.build_toss_3_x86_64_ib_script, .on_quartz]
+
+.build_on_quartz_advanced:
+  extends: [.build_on_quartz, .advanced_pipeline]
+
+####
+# Generic qwartz test job, extending test script
+.test_on_quartz:
+  stage: q_test
+  extends: [.test_toss_3_x86_64_ib_script, .on_quartz]
+
+.test_on_quartz_advanced:
+  extends: [.test_on_quartz, .advanced_pipeline]
+
+####
+# Here are all quartz build jobs
+
+clang_3_9_1 (build on quartz):
+  variables:
+    CONFIGURATION: "clang_3_9_1"
+  extends: .build_on_quartz_advanced
+
+clang_4_0_0 (build on quartz):
+  variables:
+    CONFIGURATION: "clang_4_0_0"
+  extends: .build_on_quartz
+
+gcc_4_9_3 (build on quartz):
+  variables:
+    CONFIGURATION: "gcc_4_9_3"
+  extends: .build_on_quartz_advanced
+
+gcc_6_1_0 (build on quartz):
+  variables:
+    CONFIGURATION: "gcc_6_1_0"
+  extends: .build_on_quartz_advanced
+
+gcc_7_1_0 (build on quartz):
+  variables:
+    CONFIGURATION: "gcc_7_1_0"
+  extends: .build_on_quartz
+
+cudatoolkit_9_1 (build on quartz):
+  variables:
+    CONFIGURATION: "cudatoolkit_9_1"
+  extends: .build_on_quartz
+
+icpc_16_0_4 (build on quartz):
+  variables:
+    CONFIGURATION: "icpc_16_0_4"
+  extends: .build_on_quartz_advanced
+  allow_failure: true
+
+icpc_17_0_2 (build on quartz):
+  variables:
+    CONFIGURATION: "icpc_17_0_2"
+  extends: .build_on_quartz_advanced
+
+pgi_17_10 (build on quartz):
+  variables:
+    CONFIGURATION: "pgi_17_10"
+  extends: .build_on_quartz_advanced
+  allow_failure: true
+
+pgi_18_5 (build on quartz):
+  variables:
+    CONFIGURATION: "pgi_18_5"
+  extends: .build_on_quartz
+  allow_failure: true
+
+
+####
+# Here are all quartz tests jobs
+
+clang_3_9_1 (test on quartz):
+  variables:
+    CONFIGURATION: "clang_3_9_1"
+  extends: .test_on_quartz_advanced
+  needs: ["clang_3_9_1 (build on quartz)"]
+
+clang_4_0_0 (test on quartz):
+  variables:
+    CONFIGURATION: "clang_4_0_0"
+  extends: .test_on_quartz
+  needs: ["clang_4_0_0 (build on quartz)"]
+
+gcc_4_9_3 (test on quartz):
+  variables:
+    CONFIGURATION: "gcc_4_9_3"
+  extends: .test_on_quartz_advanced
+  needs: ["gcc_4_9_3 (build on quartz)"]
+
+gcc_6_1_0 (test on quartz):
+  variables:
+    CONFIGURATION: "gcc_6_1_0"
+  extends: .test_on_quartz_advanced
+  needs: ["gcc_6_1_0 (build on quartz)"]
+
+gcc_7_1_0 (test on quartz):
+  variables:
+    CONFIGURATION: "gcc_7_1_0"
+  extends: .test_on_quartz
+  needs: ["gcc_7_1_0 (build on quartz)"]
+
+cudatoolkit_9_1 (test on quartz):
+  variables:
+    CONFIGURATION: "cudatoolkit_9_1"
+  extends: .test_on_quartz
+  needs: ["cudatoolkit_9_1 (build on quartz)"]
+
+icpc_16_0_4 (test on quartz):
+  variables:
+    CONFIGURATION: "icpc_16_0_4"
+  extends: .test_on_quartz_advanced
+  needs: ["icpc_16_0_4 (build on quartz)"]
+  allow_failure: true
+
+icpc_17_0_2 (test on quartz):
+  variables:
+    CONFIGURATION: "icpc_17_0_2"
+  extends: .test_on_quartz_advanced
+  needs: ["icpc_17_0_2 (build on quartz)"]
+
+pgi_17_10 (test on quartz):
+  variables:
+    CONFIGURATION: "pgi_17_10"
+  extends: .test_on_quartz_advanced
+  needs: ["pgi_17_10 (build on quartz)"]
+  allow_failure: true
+
+pgi_18_5 (test on quartz):
+  variables:
+    CONFIGURATION: "pgi_18_5"
+  extends: .test_on_quartz
+  needs: ["pgi_18_5 (build on quartz)"]
+  allow_failure: true

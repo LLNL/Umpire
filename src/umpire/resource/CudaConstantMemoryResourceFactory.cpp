@@ -26,7 +26,19 @@ CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& n
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+CudaConstantMemoryResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+CudaConstantMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<resource::CudaConstantMemoryResource>(name, id, traits);
+}
+
+MemoryResourceTraits
+CudaConstantMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -38,7 +50,7 @@ CudaConstantMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(n
 
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<resource::CudaConstantMemoryResource>("DEVICE_CONST", id, traits);
+  return traits;
 }
 
 } // end of namespace resource

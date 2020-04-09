@@ -39,8 +39,14 @@ public:
   using KeyValuePair = std::pair<Key, Value*>;
 
   template <bool Const = false>
-  class Iterator_ : public std::iterator<std::forward_iterator_tag, Value> {
+  class Iterator_
+  {
   public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = Value;
+    using difference_type = std::ptrdiff_t;
+    using pointer = value_type*;
+    using reference = value_type&;
 
     using Map = typename std::conditional<Const, const MemoryMap<Value>, MemoryMap<Value>>::type;
     using ValuePtr = typename std::conditional<Const, const Value*, Value*>::type;

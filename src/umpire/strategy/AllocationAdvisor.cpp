@@ -47,7 +47,7 @@ AllocationAdvisor::AllocationAdvisor(
       m_allocator);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  if (accessing_allocator.getPlatform() == Platform::cpu) {
+  if (accessing_allocator.getPlatform() == Platform::host) {
     m_device = cudaCpuDeviceId;
   }
 #else
@@ -85,6 +85,12 @@ std::size_t AllocationAdvisor::getHighWatermark() const noexcept
 Platform AllocationAdvisor::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+MemoryResourceTraits
+AllocationAdvisor::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
 }
 
 } // end of namespace strategy

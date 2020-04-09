@@ -31,6 +31,8 @@ class NamedAllocationStrategy :
 
     Platform getPlatform() noexcept override;
 
+    MemoryResourceTraits getTraits() const noexcept override;
+
   protected:
     strategy::AllocationStrategy* m_allocator;
 };

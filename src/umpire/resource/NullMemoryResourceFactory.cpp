@@ -28,6 +28,18 @@ NullMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
 std::unique_ptr<resource::MemoryResource>
 NullMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
 {
+  return create("__umpire_internal_null", id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+NullMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<NullMemoryResource>(Platform::undefined, name, id, traits);
+}
+
+MemoryResourceTraits
+NullMemoryResourceFactory::getDefaultTraits()
+{
   MemoryResourceTraits traits;
 
   traits.unified = false;
@@ -36,8 +48,8 @@ NullMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), in
   traits.vendor = MemoryResourceTraits::vendor_type::UNKNOWN;
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-
-  return util::make_unique<NullMemoryResource>(Platform::none, "__umpire_internal_null", id, traits);
+  
+  return traits;
 }
 
 } // end of namespace resource

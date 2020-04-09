@@ -26,6 +26,11 @@ if (ENABLE_HIP)
     ${allocation_map_tests_depends}
     hip_runtime)
 endif ()
+if (ENABLE_OPENMP_TARGET)
+  set (allocation_map_tests_depends
+    ${allocation_map_tests_depends}
+    openmp)
+endif ()
 
 blt_add_executable(
   NAME allocation_map_tests

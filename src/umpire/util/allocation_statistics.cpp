@@ -25,7 +25,7 @@ float relative_fragmentation(std::vector<util::AllocationRecord>& recs)
     total_free_space += free_space;
   }
 
-  return 1.0f - static_cast<float>(largest_free_space) / total_free_space;
+  return 1.0f - static_cast<float>(largest_free_space) / (total_free_space + std::numeric_limits<float>::epsilon());
 }
 
 }

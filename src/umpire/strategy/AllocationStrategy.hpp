@@ -8,6 +8,7 @@
 #define UMPIRE_AllocationStrategy_HPP
 
 #include "umpire/util/Platform.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 #include <string>
 #include <memory>
@@ -103,7 +104,6 @@ class AllocationStrategy
      */
     UMPIRESHAREDDLL_API const std::string& getName() noexcept;
 
-
     /*!
      * \brief Get the id of this AllocationStrategy.
      *
@@ -112,6 +112,8 @@ class AllocationStrategy
     UMPIRESHAREDDLL_API int getId() noexcept;
 
     friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
+
+    virtual MemoryResourceTraits getTraits() const noexcept;
 
   protected:
     std::string m_name;

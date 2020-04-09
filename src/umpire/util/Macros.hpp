@@ -7,6 +7,7 @@
 #ifndef UMPIRE_Macros_HPP
 #define UMPIRE_Macros_HPP
 
+#include "umpire/util/Backtrace.hpp"
 #include "umpire/util/Exception.hpp"
 #include "umpire/config.hpp"
 #include "umpire/util/io.hpp"
@@ -93,12 +94,14 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
-
 #define UMPIRE_ERROR( msg )                                        \
 {                                                                  \
-  UMPIRE_LOG(Error, msg);                                          \
+  umpire::util::Backtrace backtrace;                               \
+  backtrace.getBacktrace();                                        \
   std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << " " << msg;               \
+  umpire_oss_error << " " << __func__ << " " << msg << std::endl;  \
+  umpire_oss_error << backtrace << std::endl;                      \
+  UMPIRE_LOG(Error, umpire_oss_error.str());                       \
   umpire::util::flush_files();                                     \
   throw umpire::util::Exception( umpire_oss_error.str(),           \
                                  std::string(__FILE__),            \

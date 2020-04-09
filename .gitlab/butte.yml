@@ -1,0 +1,100 @@
+##############################################################################
+# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+####
+# Shared configuration of jobs for butte
+.on_butte:
+  variables:
+  tags:
+    - shell
+    - butte
+  rules:
+    - if: '$UMPIRE_CI_BUTTE != "ON"' #run except if ...
+      when: never
+    - when: on_success
+  allow_failure: true
+
+.build_and_test_on_butte:
+  stage: b_build_and_test
+  extends: [.build_blueos_3_ppc64le_ib_script, .on_butte]
+  needs: ["start"]
+
+# Note: .build_and_test_on_butte_advanced inherits from
+# .build_and_test_on_butte and .advanced_pileline.
+# In particular, the rules section will be merged. Careful when changing rules.
+.build_and_test_on_butte_advanced:
+  extends: [.build_and_test_on_butte, .advanced_pipeline]
+  allow_failure: true
+
+####
+# All butte build jobs
+
+clang_3_9_1 (build and test on butte):
+  variables:
+    CONFIGURATION: "clang_3_9_1"
+  extends: .build_and_test_on_butte_advanced
+
+gcc_4_9_3 (build and test on butte):
+  variables:
+    CONFIGURATION: "gcc_4_9_3"
+  extends: .build_and_test_on_butte
+
+clang_4_0_0 (build and test on butte):
+  variables:
+    CONFIGURATION: "clang_4_0_0"
+  extends: .build_and_test_on_butte
+
+clang_coral_2017_06_29 (build and test on butte):
+  variables:
+    CONFIGURATION: "clang_coral_2017_06_29"
+  extends: .build_and_test_on_butte_advanced
+
+clang_coral_2017_08_31 (build and test on butte):
+  variables:
+    CONFIGURATION: "clang_coral_2017_08_31"
+  extends: .build_and_test_on_butte_advanced
+
+clang_coral_2017_09_06 (build and test on butte):
+  variables:
+    CONFIGURATION: "clang_coral_2017_09_06"
+  extends: .build_and_test_on_butte_advanced
+
+clang_coral_2017_09_18 (build and test on butte):
+  variables:
+    CONFIGURATION: "clang_coral_2017_09_18"
+  extends: .build_and_test_on_butte
+
+nvcc_gcc_4_9_3 (build and test on butte):
+  variables:
+    CONFIGURATION: "nvcc_gcc_4_9_3"
+  extends: .build_and_test_on_butte
+
+nvcc_clang_coral_2017_06_29 (build and test on butte):
+  variables:
+    CONFIGURATION: "nvcc_clang_coral_2017_06_29"
+  extends: .build_and_test_on_butte_advanced
+
+nvcc_clang_coral_2017_08_31 (build and test on butte):
+  variables:
+    CONFIGURATION: "nvcc_clang_coral_2017_08_31"
+  extends: .build_and_test_on_butte_advanced
+
+nvcc_clang_coral_2017_09_06 (build and test on butte):
+  variables:
+    CONFIGURATION: "nvcc_clang_coral_2017_09_06"
+  extends: .build_and_test_on_butte_advanced
+
+nvcc_clang_coral_2017_09_18 (build and test on butte):
+  variables:
+    CONFIGURATION: "nvcc_clang_coral_2017_09_18"
+  extends: .build_and_test_on_butte
+
+nvcc_xl-beta-2017.09.13 (build and test on butte):
+  variables:
+    CONFIGURATION: "nvcc_xl-beta-2017.09.13"
+  extends: .build_and_test_on_butte
+

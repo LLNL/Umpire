@@ -24,13 +24,13 @@ NumaPolicy::NumaPolicy(
     int numa_node):
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
-  m_platform(Platform::cpu),
+  m_platform(Platform::host),
   m_node(numa_node)
 {
   if (numa_node < 0) {
     UMPIRE_ERROR("NumaPolicy error: NUMA nodes are always non-negative ints");
   }
-  if (allocator.getPlatform() != Platform::cpu) {
+  if (allocator.getPlatform() != Platform::host) {
     UMPIRE_ERROR("NumaPolicy error: allocator is not of cpu type");
   }
 
@@ -84,6 +84,12 @@ Platform
 NumaPolicy::getPlatform() noexcept
 {
   return m_platform;
+}
+
+MemoryResourceTraits
+NumaPolicy::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
 }
 
 int
