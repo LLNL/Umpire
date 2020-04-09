@@ -60,14 +60,14 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
   auto& rm = umpire::ResourceManager::getInstance();
 
   try {
-    auto left_record{rm.findAllocationRecord(left_ptr)};
-    auto right_record{rm.findAllocationRecord(right_ptr)};
+    auto left_record = rm.findAllocationRecord(left_ptr);
+    auto right_record = rm.findAllocationRecord(right_ptr);
 
     char* left{reinterpret_cast<char*>(left_record->ptr)};
     char* right{reinterpret_cast<char*>(right_record->ptr)};
 
     return ((right >= left) 
-      && ((left + left_record->size) >= right)
+      && ((left + left_record->size) > right)
       && ((right + right_record->size) > (left + left_record->size)));
   } catch (umpire::util::Exception e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
@@ -86,7 +86,7 @@ bool pointer_contains(void* left, void* right)
     char* right{reinterpret_cast<char*>(right_record->ptr)};
 
     return ((right >= left) 
-      && (left + left_record->size >= right)
+      && (left + left_record->size > right)
       && (right + right_record->size <= left + left_record->size));
   } catch (umpire::util::Exception e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
@@ -98,20 +98,19 @@ std::string get_backtrace(void* ptr)
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   auto& rm = umpire::ResourceManager::getInstance();
   auto record = rm.findAllocationRecord(ptr);
-
-  std::ostringstream backtrace_stream;
-  backtrace_stream << record->allocationBacktrace;
-
-  return backtrace_stream.str();
+  return umpire::util::backtracer<>::print(record->allocation_backtrace);
 #else
   UMPIRE_USE_VAR(ptr);
-  return "[Requires ENABLE_BACKTRACE=On]";
+  return "[Umpire: UMPIRE_BACKTRACE=Off]";
 #endif
 }
 
 
 std::size_t get_process_memory_usage()
 {
+#if defined(_MSC_VER) || defined(__APPLE__)
+  return 0;
+#else
   std::size_t ignore;
   std::size_t resident;
   std::ifstream statm("/proc/self/statm");
@@ -119,6 +118,7 @@ std::size_t get_process_memory_usage()
   statm.close();
   long page_size{::sysconf(_SC_PAGE_SIZE)};
   return std::size_t{resident * page_size};
+#endif
 }
 
 std::size_t get_device_memory_usage(int device_id)

@@ -48,7 +48,7 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
   m_highwatermark{0}
 {
   const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   {
     umpire::util::backtrace bt{};
     umpire::util::backtracer<>::get_backtrace(bt);
@@ -116,7 +116,7 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
     {
       umpire::util::backtrace bt{};
       umpire::util::backtracer<>::get_backtrace(bt);
@@ -432,7 +432,7 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
     }
   }
 
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   if (released_bytes > 0) {
     umpire::util::backtrace bt{};
     umpire::util::backtracer<>::get_backtrace(bt);

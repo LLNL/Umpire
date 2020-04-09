@@ -95,7 +95,7 @@ protected:
 
     // Allocate data
     try {
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
       {
         umpire::util::backtrace bt{};
         umpire::util::backtracer<>::get_backtrace(bt);
@@ -256,7 +256,7 @@ protected:
       curr = next;
     }
 
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
     if (freed > 0) {
       umpire::util::backtrace bt{};
       umpire::util::backtracer<>::get_backtrace(bt);

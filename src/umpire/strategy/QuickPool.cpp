@@ -38,7 +38,7 @@ QuickPool::QuickPool(
   m_initial_alloc_bytes{initial_alloc_size},
   m_min_alloc_bytes{min_alloc_size}
 {
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   {
     umpire::util::backtrace bt{};
     umpire::util::backtracer<>::get_backtrace(bt);
@@ -77,7 +77,7 @@ QuickPool::allocate(std::size_t bytes)
 
     void* ret{nullptr};
     try {
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
       {
         umpire::util::backtrace bt{};
         umpire::util::backtracer<>::get_backtrace(bt);
@@ -215,7 +215,7 @@ void QuickPool::release()
   UMPIRE_LOG(Debug, "release");
   UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
 
-  auto prev_size{m_actual_bytes};
+  std::size_t prev_size{m_actual_bytes};
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end(); )
   {
@@ -233,7 +233,7 @@ void QuickPool::release()
     }
   }
 
-#if defined(UMPIRE_ENABLE_ALLOCATION_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   if (prev_size > m_actual_bytes) {
     umpire::util::backtrace bt{};
     umpire::util::backtracer<>::get_backtrace(bt);
@@ -241,6 +241,8 @@ void QuickPool::release()
       << " (prev: " << prev_size 
       << ") " << umpire::util::backtracer<>::print(bt));
   }
+#else
+  UMPIRE_USE_VAR(prev_size);
 #endif
 }
 

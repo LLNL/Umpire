@@ -23,17 +23,18 @@ namespace util {
 struct AllocationRecord
 {
   AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
-    : ptr{p}, size{s}, strategy{strat} { };
+    : ptr{p}, size{s}, strategy{strat} {}
+
 
   AllocationRecord()
-    : ptr{nullptr}, size{0}, strategy{nullptr} { };
+    : ptr{nullptr}, size{0}, strategy{nullptr} { }
 
   void* ptr;
   std::size_t size;
   strategy::AllocationStrategy* strategy;
-#ifdef UMPIRE_ENABLE_ALLOCATION_BACKTRACE
+#ifdef UMPIRE_ENABLE_BACKTRACE
   util::backtrace allocation_backtrace;
-#endif // UMPIRE_ENABLE_ALLOCATION_BACKTRACE
+#endif // UMPIRE_ENABLE_BACKTRACE
 };
 
 } // end of namespace util

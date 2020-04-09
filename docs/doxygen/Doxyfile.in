@@ -1017,7 +1017,7 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-PREDEFINED             = UMPIRE_ENABLE_ALLOCATION_BACKTRACE \
+PREDEFINED             = UMPIRE_ENABLE_BACKTRACE \
                          UMPIRE_ENABLE_CUDA \
                          UMPIRE_ENABLE_SLIC \
                          UMPIRE_ENABLE_LOGGING \
