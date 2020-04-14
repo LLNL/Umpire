@@ -79,8 +79,8 @@ bool pointer_contains(void* left, void* right)
   auto& rm = umpire::ResourceManager::getInstance();
 
   try {
-    auto left_record{rm.findAllocationRecord(left)};
-    auto right_record{rm.findAllocationRecord(right)};
+    auto left_record = rm.findAllocationRecord(left);
+    auto right_record = rm.findAllocationRecord(right);
 
     char* left{reinterpret_cast<char*>(left_record->ptr)};
     char* right{reinterpret_cast<char*>(right_record->ptr)};
