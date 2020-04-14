@@ -99,8 +99,8 @@ std::string stringify(const std::vector<void*>& frames)
   }
   free(symbols);
 #else
-  static_cast<void>(frames);
-  backtrace_stream << " Backtrace not supported on Windows platform" << std::endl;
+  UMPIRE_USE_VAR(frames);
+  backtrace_stream << " Backtrace not supported on Windows" << std::endl;
 #endif
   return backtrace_stream.str();
 }
@@ -128,7 +128,7 @@ struct backtracer<trace_optional>
     if (backtrace_enabled()) {
       return stringify(bt.frames);
     } else {
-      return "[Umpire: UMPIRE_BACKTRACE=Off]";
+      return "[UMPIRE_BACKTRACE=Off]";
     }
   }
 };
