@@ -34,6 +34,7 @@ namespace {
 bool backtrace_enabled()
 {
   static bool enabled{false};
+#if !defined(_WIN_32)
   static bool initialized{false};
 
   if (!initialized) {
@@ -46,13 +47,14 @@ bool backtrace_enabled()
       } 
     }
   }
+#endif
 
   return enabled;
 }
 
 std::vector<void*> build_backtrace() {
   std::vector<void*> frames;
-  #if !defined(_MSC_VER)
+  #if !defined(_WIN_32)
     void *callstack[128];
     const int nMaxFrames = sizeof(callstack) / sizeof(callstack[0]);
     for (int i = 0; i < ::backtrace(callstack, nMaxFrames); ++i)
@@ -64,7 +66,7 @@ std::vector<void*> build_backtrace() {
 std::string stringify(const std::vector<void*>& frames)
 {
   std::ostringstream backtrace_stream;
-#if !defined(_MSC_VER)
+#if !defined(_WIN_32)
   int num_frames = frames.size();
   char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
@@ -97,8 +99,8 @@ std::string stringify(const std::vector<void*>& frames)
   }
   free(symbols);
 #else
-  UMPIRE_USE_VAR(frames);
-  backtrace_steam << " Backtrace not supported on Windows platform" << std::endl;
+  static_cast<void>(frames);
+  backtrace_stream << " Backtrace not supported on Windows platform" << std::endl;
 #endif
   return backtrace_stream.str();
 }
@@ -142,8 +144,6 @@ struct backtracer<trace_always>
     return stringify(bt.frames);
   }
 };
-
-
 
 } // end of namespace util
 } // end of namespace umpire
