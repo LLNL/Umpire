@@ -69,7 +69,7 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
     return ((right >= left) 
       && ((left + left_record->size) > right)
       && ((right + right_record->size) > (left + left_record->size)));
-  } catch (umpire::util::Exception e) {
+  } catch (umpire::util::Exception& e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
   }
 }
@@ -88,7 +88,7 @@ bool pointer_contains(void* left, void* right)
     return ((right >= left) 
       && (left + left_record->size > right)
       && (right + right_record->size <= left + left_record->size));
-  } catch (umpire::util::Exception e) {
+  } catch (umpire::util::Exception& e) {
     UMPIRE_ERROR("Unknown pointer passed to ")
   }
 }
@@ -124,8 +124,8 @@ std::size_t get_process_memory_usage()
 std::size_t get_device_memory_usage(int device_id)
 {
 #if defined(UMPIRE_ENABLE_CUDA)
-  int mem_free{0};
-  int mem_tot{0};
+  std::size_t mem_free{0};
+  std::size_t mem_tot{0};
 
   int current_device;
   cudaGetDevice(&current_device);
