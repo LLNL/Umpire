@@ -114,7 +114,7 @@
 #endif // defined(UMPIRE_ENABLE_STATISTICS)
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
-#define UMPIRE_RECORD_BACKTRACE(backtrace) umpire::util::backtracer<umpire::util::trace_optional>::get_backtrace(backtrace)
+#define UMPIRE_RECORD_BACKTRACE(record) umpire::util::backtracer<umpire::util::trace_optional>::get_backtrace(record.allocation_backtrace)
 #else
 #define UMPIRE_RECORD_BACKTRACE(backtrace) ((void) 0)
 #endif
