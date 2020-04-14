@@ -365,7 +365,7 @@ TEST_P(ReallocateTest, Reallocate)
 
   const std::size_t reallocated_size = (m_size/2);
 
-  rm.memset(source_array, 0);
+  rm.memset(source_array, 1);
 
   source_array =
     static_cast<float*>(
@@ -377,8 +377,9 @@ TEST_P(ReallocateTest, Reallocate)
 
   rm.copy(check_array, source_array, reallocated_size*sizeof(float));
 
-  for (std::size_t i = 0; i < reallocated_size; i++) {
-    ASSERT_FLOAT_EQ(check_array[i], 0);
+  auto checker = reinterpret_cast<char*>(check_array);
+  for (std::size_t i = 0; i < reallocated_size * (sizeof(float)/sizeof(char)); i++) {
+    ASSERT_FLOAT_EQ(checker[i], 1);
   }
 }
 
@@ -730,7 +731,7 @@ TEST_P(AdviceTest, ReadMostly)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -755,7 +756,7 @@ TEST_P(AdviceTest, PreferredLocation)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -780,7 +781,7 @@ TEST_P(AdviceTest, AccessedBy)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
