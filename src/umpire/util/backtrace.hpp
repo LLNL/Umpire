@@ -99,7 +99,7 @@ std::string stringify(const std::vector<void*>& frames)
   }
   free(symbols);
 #else
-  UMPIRE_USE_VAR(frames);
+  static_cast<void>(frames);
   backtrace_stream << " Backtrace not supported on Windows" << std::endl;
 #endif
   return backtrace_stream.str();
