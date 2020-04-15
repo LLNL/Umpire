@@ -34,7 +34,7 @@ namespace {
 bool backtrace_enabled()
 {
   static bool enabled{false};
-#if !defined(_WIN_32)
+#if !defined(_WIN32)
   static bool initialized{false};
 
   if (!initialized) {
@@ -54,7 +54,7 @@ bool backtrace_enabled()
 
 std::vector<void*> build_backtrace() {
   std::vector<void*> frames;
-  #if !defined(_WIN_32)
+  #if !defined(_WIN32)
     void *callstack[128];
     const int nMaxFrames = sizeof(callstack) / sizeof(callstack[0]);
     for (int i = 0; i < ::backtrace(callstack, nMaxFrames); ++i)
@@ -66,7 +66,7 @@ std::vector<void*> build_backtrace() {
 std::string stringify(const std::vector<void*>& frames)
 {
   std::ostringstream backtrace_stream;
-#if !defined(_WIN_32)
+#if !defined(_WIN32)
   int num_frames = frames.size();
   char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
