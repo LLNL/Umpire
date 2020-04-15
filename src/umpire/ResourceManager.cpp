@@ -18,6 +18,10 @@
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI)
+#include "umpire/resource/MpiSharedMemoryResourceFactory.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 
@@ -106,6 +110,11 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
+
+#if defined(UMPIRE_ENABLE_MPI)
+  registry.registerMemoryResource(
+    util::make_unique<resource::MpiSharedMemoryResourceFactory>());
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
@@ -212,6 +221,28 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = host_allocator.get();
     m_allocators.emplace_front(std::move(host_allocator));
   }
+
+#if defined(UMPIRE_ENABLE_MPI)
+  {
+    std::unique_ptr<strategy::AllocationStrategy>
+      host_allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("MPI_SHARED_MEM", getNextId()))};
+
+    UMPIRE_REPLAY(
+      R"( "event": "makeMemoryResource", "payload": { "name": "MPI_SHARED_MEM" })"
+      << R"(, "result": ")" << host_allocator.get() << R"(")");
+
+    int id{host_allocator->getId()};
+    m_allocators_by_name["MPI_SHARED_MEM"]  = host_allocator.get();
+    m_memory_resources[resource::Host] = host_allocator.get();
+    m_default_allocator = host_allocator.get();
+    m_allocators_by_id[id] = host_allocator.get();
+    m_allocators.emplace_front(std::move(host_allocator));
+  }
+#endif
 
   {
     std::unique_ptr<strategy::AllocationStrategy>
