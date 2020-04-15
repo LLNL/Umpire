@@ -54,19 +54,19 @@ bool backtrace_enabled()
 
 std::vector<void*> build_backtrace() {
   std::vector<void*> frames;
-  #if !defined(_WIN32)
+#if !defined(_MSC_VER)
     void *callstack[128];
     const int nMaxFrames = sizeof(callstack) / sizeof(callstack[0]);
     for (int i = 0; i < ::backtrace(callstack, nMaxFrames); ++i)
       frames.push_back(callstack[i]);
-  #endif // !defined(_MSC_VER)
+#endif // !defined(_MSC_VER)
     return frames;
 }
 
 std::string stringify(const std::vector<void*>& frames)
 {
   std::ostringstream backtrace_stream;
-#if !defined(_WIN32)
+#if !defined(_MSC_VER)
   int num_frames = frames.size();
   char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
