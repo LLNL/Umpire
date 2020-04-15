@@ -24,6 +24,20 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
+if (ENABLE_MPI)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    MpiSharedMemoryResource.hpp
+    MpiSharedMemoryResourceFactory.hpp
+    )
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    MpiSharedMemoryResource.cpp
+    MpiSharedMemoryResourceFactory.cpp
+    )
+endif ()
+
 set(umpire_resource_depends
   camp)
 
