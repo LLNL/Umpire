@@ -34,7 +34,15 @@
 #define UMPIRE_VERSION_PATCH @Umpire_VERSION_PATCH@
 #define UMPIRE_VERSION_RC "@UMPIRE_VERSION_RC@"
 
-extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
+// umpire_EXPORTS gets defined by CMake when we use
+// -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On
+#ifdef umpire_EXPORTS
+#define UMPIRE_EXPORT __declspec(dllexport)
+#else
+#define UMPIRE_EXPORT __declspec(dllimport)
+#endif
+
+UMPIRE_EXPORT extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 
 namespace umpire {
 constexpr int invalid_allocator_id = 0xDEADBEEF;

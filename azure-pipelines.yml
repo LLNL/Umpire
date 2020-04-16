@@ -9,9 +9,9 @@ jobs:
   strategy:
     matrix:
       shared:
-        IS_SHARED: On
+        SHARED_ARGS: '-DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On'
       static:
-        IS_SHARED: Off
+        SHARED_ARGS: '-DBUILD_SHARED_LIBS=Off'
   pool:
     vmImage: 'windows-2019'
   variables:
@@ -23,7 +23,7 @@ jobs:
   - task: CMake@1
     inputs:
       workingDir: 'build'
-      cmakeArgs: '$(CMAKE_EXTRA_FLAGS) -DBUILD_SHARED_LIBS=$(IS_SHARED) ../'
+      cmakeArgs: '$(CMAKE_EXTRA_FLAGS) $(SHARED_ARGS) ../'
   - task: CMake@1
     inputs:
       workingDir: 'build'

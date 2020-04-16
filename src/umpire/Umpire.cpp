@@ -14,7 +14,7 @@
 #include <iterator>
 #include <sstream>
 
-volatile int umpire_ver_2_found;
+UMPIRE_EXPORT volatile int umpire_ver_2_found = 0;
 
 namespace umpire {
 
