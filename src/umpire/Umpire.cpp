@@ -72,7 +72,8 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
       && ((left + left_record->size) > right)
       && ((right + right_record->size) > (left + left_record->size)));
   } catch (umpire::util::Exception& e) {
-    UMPIRE_ERROR("Unknown pointer passed to ")
+    UMPIRE_ERROR("Unknown pointer");
+    throw;
   }
 }
 
@@ -91,7 +92,8 @@ bool pointer_contains(void* left, void* right)
       && (left + left_record->size > right)
       && (right + right_record->size <= left + left_record->size));
   } catch (umpire::util::Exception& e) {
-    UMPIRE_ERROR("Unknown pointer passed to ")
+    UMPIRE_ERROR("Unknown pointer");
+    throw;
   }
 }
 
