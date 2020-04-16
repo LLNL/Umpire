@@ -71,19 +71,19 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
     return ((right >= left) 
       && ((left + left_record->size) > right)
       && ((right + right_record->size) > (left + left_record->size)));
-  } catch (umpire::util::Exception& e) {
+  } catch (umpire::util::Exception&) {
     UMPIRE_ERROR("Unknown pointer");
     throw;
   }
 }
 
-bool pointer_contains(void* left, void* right)
+bool pointer_contains(void* left_ptr, void* right_ptr)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   try {
-    auto left_record = rm.findAllocationRecord(left);
-    auto right_record = rm.findAllocationRecord(right);
+    auto left_record = rm.findAllocationRecord(left_ptr);
+    auto right_record = rm.findAllocationRecord(right_ptr);
 
     char* left{reinterpret_cast<char*>(left_record->ptr)};
     char* right{reinterpret_cast<char*>(right_record->ptr)};
@@ -91,7 +91,7 @@ bool pointer_contains(void* left, void* right)
     return ((right >= left) 
       && (left + left_record->size > right)
       && (right + right_record->size <= left + left_record->size));
-  } catch (umpire::util::Exception& e) {
+  } catch (umpire::util::Exception&) {
     UMPIRE_ERROR("Unknown pointer");
     throw;
   }
