@@ -14,7 +14,9 @@
 #include <iterator>
 #include <sstream>
 
+#if defined(_MSC_VER)
 #include <unistd.h>
+#endif
 #include <sstream>
 #include <fstream>
 
