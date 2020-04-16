@@ -65,16 +65,22 @@ TEST(IntrospectionTest, Overlaps)
 
 TEST(IntrospectionTest, Contains)
 {
-//  auto& rm = umpire::ResourceManager::getInstance();
-//  umpire::Allocator allocator{rm.getAllocator("HOST")};
-//  umpire::strategy::AllocationStrategy* strategy{
-//    rm.getAllocator("HOST").getAllocationStrategy()};
-//
-//  char* data{static_cast<char*>(allocator.allocate(4096))};
-//
-//  {
-//    char* contains_ptr = data+2048;
-//    ASSERT_FALSE(umpire::pointer_contains(data, contains_ptr));
-//  }
-//
+  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator allocator{rm.getAllocator("HOST")};
+  umpire::strategy::AllocationStrategy* strategy{
+    rm.getAllocator("HOST").getAllocationStrategy()};
+
+  char* data{static_cast<char*>(allocator.allocate(4096))};
+
+  {
+    char* contains_ptr = data+17;
+    auto contains_record = umpire::util::AllocationRecord{contains_ptr, 16, strategy};
+    rm.registerAllocation(contains_ptr, contains_record);
+
+    ASSERT_TRUE(umpire::pointer_contains(data, contains_ptr));
+
+    rm.deregisterAllocation(contains_ptr);
+  }
+
+  allocator.deallocate(data);
 }
