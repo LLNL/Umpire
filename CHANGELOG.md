@@ -14,7 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   registered as "DEVICE_N", where N is the device number.
 
 - Allocation backtrace may be enabled by building umpire with 
-  -DENABLE_ALLOCATION_BACKTRACE
+  -DENABLE_BACKTRACE
 
 - Umpire exceptions now include backtrace information in the exception string.
 

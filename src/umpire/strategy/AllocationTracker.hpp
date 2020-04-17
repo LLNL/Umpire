@@ -33,6 +33,7 @@ class AllocationTracker :
     std::size_t getCurrentSize() const noexcept override;
     std::size_t getHighWatermark() const noexcept override;
     std::size_t getActualSize() const noexcept override;
+    std::size_t getAllocationCount() const noexcept override;
 
     Platform getPlatform() noexcept override;
 

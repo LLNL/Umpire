@@ -42,7 +42,6 @@ inline void initialize(
 }
 
 void finalize();
-
 /*!
  * \brief Allocate memory in the default space, with the default allocator.
  *
@@ -110,6 +109,48 @@ void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
  * \param allocator source Allocator.
  */
 std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
+
+/*!
+ * \brief Check whether the right allocation overlaps the left.
+ * 
+ * right will overlap left if the right is greater than left, but less than left+size, and right+size is strictly greater than left+size.
+ * 
+ * \param left Pointer to left allocation
+ * \param right Poniter to right allocation
+ */
+bool pointer_overlaps(void* left, void* right);
+
+/*!
+ * \brief Check whether the left allocation contains the right.
+ * 
+ * right is contained by left if right is greater than left, and right+size is greater than left+size.
+ * 
+ * \param left Pointer to left allocation
+ * \param right Poniter to right allocation
+ */
+bool pointer_contains(void* left, void* right);
+
+/*!
+ * \brief Get the backtrace associated with the allocation of ptr
+ *
+ * The string may be empty if backtraces are not enabled.
+ */
+std::string get_backtrace(void* ptr);
+
+/*!
+ * \brief Get memory usage of the current process (uses underlying system-dependent calls)
+ */
+std::size_t get_process_memory_usage();
+
+/*!
+ * \brief Get memory usage of device device_id, using appropriate underlying vendor API.
+ */ 
+std::size_t get_device_memory_usage(int device_id);
+
+/*!
+ * \brief Get all the leaked (active) allocations associated with allocator.
+ */
+std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
 
 } // end of namespace umpire
 

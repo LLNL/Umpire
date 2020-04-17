@@ -539,6 +539,9 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.size
              << ", strategy=" << record.strategy << ") with " << this);
+
+  UMPIRE_RECORD_BACKTRACE(record);
+
   m_allocations.insert(ptr, record);
 }
 

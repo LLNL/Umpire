@@ -36,7 +36,6 @@ SlotPool::SlotPool(
 
 SlotPool::~SlotPool()
 {
-
   for (std::size_t i = 0; i < m_slots; ++i) {
     if (m_pointers[i]) {
       m_allocator->deallocate(m_pointers[i]);

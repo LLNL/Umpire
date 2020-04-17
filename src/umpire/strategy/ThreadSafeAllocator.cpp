@@ -37,18 +37,6 @@ ThreadSafeAllocator::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-std::size_t
-ThreadSafeAllocator::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t
-ThreadSafeAllocator::getHighWatermark() const noexcept
-{
-  return 0;
-}
-
 Platform
 ThreadSafeAllocator::getPlatform() noexcept
 {
