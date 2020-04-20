@@ -22,7 +22,7 @@ class AlignedAllocator :
         const std::string& name,
         int id,
         Allocator allocator,
-        std::size_t alignment); 
+        std::size_t alignment=8); 
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;

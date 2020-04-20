@@ -11,6 +11,7 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/AlignedAllocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
@@ -154,6 +155,7 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
 }
 
 using Strategies = ::testing::Types<
+  umpire::strategy::AlignedAllocator,
 #if defined(UMPIRE_ENABLE_CUDA)
   umpire::strategy::AllocationAdvisor,
 #endif
