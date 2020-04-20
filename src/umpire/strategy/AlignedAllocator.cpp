@@ -21,6 +21,9 @@ AlignedAllocator::AlignedAllocator(
   m_alignment{alignment},
   m_mask{reinterpret_cast<uintptr_t>(~(m_alignment-1))}
 {
+  if (m_allocator->getPlatform() != Platform::host) {
+    UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
+  }
 }
 
 void* 
