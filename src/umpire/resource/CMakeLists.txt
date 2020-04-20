@@ -101,6 +101,12 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (ENABLE_MPI)
+  set (umpire_resource_depends
+    ${umpire_resource_depends}
+    mpi)
+endif ()
+
 blt_add_library(
   NAME umpire_resource
   HEADERS ${umpire_resource_headers}

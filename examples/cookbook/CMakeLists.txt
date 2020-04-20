@@ -30,6 +30,14 @@ if (ENABLE_NUMA)
   list(APPEND umpire_cookbooks recipe_move_between_numa)
 endif ()
 
+if (ENABLE_MPI)
+  blt_add_executable(
+    NAME recipe_mpi_shared_memory
+    SOURCES recipe_mpi_shared_memory.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_mpi_shared_memory)
+endif ()
+
 if (ENABLE_CUDA)
   blt_add_executable(
     NAME recipe_shrink
