@@ -55,18 +55,6 @@ AlignedAllocator::deallocate(void* ptr)
   return m_allocator->deallocate(base_ptr);
 }
 
-std::size_t 
-AlignedAllocator::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t 
-AlignedAllocator::getHighWatermark() const noexcept
-{
-  return 0;
-}
-
 Platform 
 AlignedAllocator::getPlatform() noexcept
 {

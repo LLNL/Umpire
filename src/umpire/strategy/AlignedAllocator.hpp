@@ -27,9 +27,6 @@ class AlignedAllocator :
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
 
-    std::size_t getCurrentSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
-
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
