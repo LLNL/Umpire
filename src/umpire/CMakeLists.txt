@@ -33,6 +33,7 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   if (ENABLE_C)
     set (umpire_interface_sources
       interface/c_fortran/shroudrt.cpp
+      interface/c_fortran/utilUmpire.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp)
