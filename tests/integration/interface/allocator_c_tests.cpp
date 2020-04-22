@@ -94,12 +94,14 @@ TEST_P(AllocatorCTest, Introspection)
   ASSERT_NE(nullptr, data_three);
 
   std::size_t total_size = 3*m_big*sizeof(double);
-
   std::size_t count = 3;
 
   ASSERT_EQ(total_size, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
   ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
+  ASSERT_FALSE(umpire_pointer_contains(data_one, data_two));
+  ASSERT_FALSE(umpire_pointer_overlaps(data_one, data_two));
+  ASSERT_GE(0, umpire_get_process_memory_usage());
 
   umpire_allocator_deallocate(&m_allocator, data_three);
   count -= 1;
