@@ -82,7 +82,7 @@ TEST_P(AllocatorCTest, GetAllocatorById)
   umpire_allocator_delete(&alloc_two);
 }
 
-TEST_P(AllocatorCTest, SizeAndHighWatermark)
+TEST_P(AllocatorCTest, Introspection)
 {
   double* data_one = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
   ASSERT_NE(nullptr, data_one);
@@ -95,20 +95,29 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
 
   std::size_t total_size = 3*m_big*sizeof(double);
 
+  std::size_t count = 3;
+
   ASSERT_EQ(total_size, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
   umpire_allocator_deallocate(&m_allocator, data_three);
+  count -= 1;
   ASSERT_EQ((2*m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
   umpire_allocator_deallocate(&m_allocator, data_two);
+  count -= 1;
   ASSERT_EQ((m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
   umpire_allocator_deallocate(&m_allocator, data_one);
+  count -= 1;
   ASSERT_EQ(0, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 }
 
 TEST_P(AllocatorCTest, IsAllocator)
