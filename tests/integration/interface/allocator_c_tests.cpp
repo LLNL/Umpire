@@ -101,7 +101,7 @@ TEST_P(AllocatorCTest, Introspection)
   ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
   ASSERT_FALSE(umpire_pointer_contains(data_one, data_two));
   ASSERT_FALSE(umpire_pointer_overlaps(data_one, data_two));
-  ASSERT_GE(0, umpire_get_process_memory_usage());
+  ASSERT_GE(umpire_get_process_memory_usage(), 0);
 
   umpire_allocator_deallocate(&m_allocator, data_three);
   count -= 1;
