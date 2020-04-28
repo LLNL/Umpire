@@ -8,6 +8,7 @@
 #define UMPIRE_MemoryOperation_HPP
 
 #include <cstddef>
+#include <functional>
 
 #include "umpire/util/AllocationRecord.hpp"
 
@@ -75,6 +76,23 @@ class MemoryOperation {
         int val,
         std::size_t length,
         camp::resources::Resource& ctx);
+
+    /*!
+     * \brief Call provided function to initialize/set memory
+     *
+     * \param src_ptr Pointer to source memory location.
+     * \param src_allocation AllocationRecord of source.
+     * \param length Number of bytes to modify.
+     * \param init_fun used to modify memory in source memory location
+     *
+     * \throws util::Exception
+     */
+    virtual void apply(
+        void* src_ptr,
+        util::AllocationRecord *src_allocation,
+        std::size_t length,
+        std::function<void (void*)> set_fun);
+
 };
 
 } // end of namespace op

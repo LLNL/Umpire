@@ -48,6 +48,10 @@
 #include "umpire/op/OpenMPTargetMemsetOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI)
+#include "umpire/op/MpiSharedMemoryMemsetOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -93,6 +97,13 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "MOVE",
       std::make_pair(Platform::cuda, Platform::host),
       std::make_shared<NumaMoveOperation>());
+#endif
+
+#if defined(UMPIRE_ENABLE_MPI)
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::mpi_shmem, Platform::mpi_shmem),
+      std::make_shared<MpiSharedMemoryMemsetOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)

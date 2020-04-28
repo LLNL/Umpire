@@ -639,7 +639,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
-camp::resources::Event 
+camp::resources::Event
 ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
@@ -685,7 +685,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     length = size;
   }
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
        R"( "event": "memset", "payload": { )"
     << R"( "ptr": ")"            << ptr                   << R"(")"
     << R"(, "value": )"          << value
@@ -703,6 +703,41 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 
   op->apply(ptr, alloc_record, value, length);
 }
+
+void ResourceManager::memset(void* ptr, std::size_t length, std::function<void (void*)> set_fun)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", length=" << length << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
+
+  if (length == 0) {
+    length = size;
+  }
+
+  UMPIRE_REPLAY(
+       R"( "event": "memset", "payload": { )"
+    << R"( "ptr": ")"            << ptr                   << R"(")"
+    << R"(, "size": )"           << size
+    << R"(, "set_fun": ")" << "provided function" << R"(")"
+    << R"(, "allocator_ref": ")" << alloc_record->strategy << R"(")"
+    << R"( })");
+
+  if (length > size) {
+    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
+  }
+
+  auto op = op_registry.find("MEMSET",
+      alloc_record->strategy,
+      alloc_record->strategy);
+
+  op->apply(ptr, alloc_record, length, set_fun);
+}
+
 
 void*
 ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
@@ -844,7 +879,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
         UMPIRE_ASSERT(ret == ptr);
       }
 
-      UMPIRE_REPLAY( 
+      UMPIRE_REPLAY(
         R"( "event": "move", "payload": {)"
         << R"( "ptr": ")" << ptr << R"(")"
         << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
@@ -861,7 +896,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
   void* dst_ptr{allocator.allocate(alloc_record->size)};
   copy(dst_ptr, ptr);
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
     R"( "event": "move", "payload": {)"
     << R"( "ptr": ")" << ptr << R"(")"
     << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"

@@ -70,6 +70,16 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
+if (ENABLE_MPI)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    MpiSharedMemoryMemsetOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    MpiSharedMemoryMemsetOperation.cpp)
+endif ()
+
 if (ENABLE_HIP)
   set (umpire_op_headers
     ${umpire_op_headers}
@@ -105,6 +115,12 @@ if (ENABLE_OPENMP_TARGET)
   set (umpire_op_depends
     ${umpire_op_depends}
     openmp)
+endif ()
+
+if (ENABLE_MPI)
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    mpi)
 endif ()
 
 blt_add_library(

@@ -12,13 +12,11 @@
 
 #include "mpi.h"
 
-uint64_t* initData(void* shared_ptr)
+void initData(void* shared_ptr)
 {
   uint64_t* rval = reinterpret_cast<uint64_t*>(shared_ptr);
 
-  *rval = 0x12345678;
-
-  return rval;
+  *rval = 12345678;
 }
 
 int main(int ac, char** av) {
@@ -26,10 +24,24 @@ int main(int ac, char** av) {
 
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("MPI_SHARED_MEM");
-
   auto ptr = allocator.allocate(64);
 
-  uint64_t* Data = initData(ptr);
+  rm.memset(ptr, 64, initData);
+
+#ifdef not_yet
+  myT* mine = static_cast<myT*>(ptr);
+
+  void sharedSet(void*, std::function<void(void*)> myfun)
+
+  rm.sharedSet(ptr, (void* ptr)[]{
+      myT* mine = static_cast<myT*>(ptr);
+      *mine = 5;
+    });
+
+  rm.sharedSet(void*, ()[]{*mine = 5;});
+  #endif
+
+  uint64_t* Data = reinterpret_cast<uint64_t*>(ptr);
 
   std::cout << "Data pointer: " << Data << " is contains: " << *Data << std::endl;
 

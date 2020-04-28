@@ -185,6 +185,15 @@ class ResourceManager {
     void memset(void* ptr, int val, std::size_t length=0);
 
     /*!
+     * \brief Call provided function to set memory with data
+     *
+     * \param ptr Pointer to data.
+     * \param val Value to set.
+     * \param length Number of bytes to set to val.
+     */
+    void memset(void* ptr, std::size_t length, std::function<void (void*)> set_fun);
+
+    /*!
      * \brief Reallocate current_ptr to new_size.
      *
      * \param current_ptr Source pointer to reallocate.

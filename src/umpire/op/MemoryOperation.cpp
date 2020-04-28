@@ -55,6 +55,15 @@ MemoryOperation::apply_async(
   UMPIRE_ERROR("MemoryOperation::apply() is not implemented");
 }
 
+void
+MemoryOperation::apply(
+    void* UMPIRE_UNUSED_ARG(src_ptr),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    std::size_t UMPIRE_UNUSED_ARG(length),
+    std::function<void (void*)> UMPIRE_UNUSED_ARG(set_fun))
+{
+  UMPIRE_ERROR("MemoryOperation::apply() with setting function is not implemented");
+}
 
 } // end of namespace op
 } // end of namespace umpire
