@@ -26,20 +26,13 @@ int main(int ac, char** av) {
   auto allocator = rm.getAllocator("MPI_SHARED_MEM");
   auto ptr = allocator.allocate(64);
 
+  //
+  // Is collective call, only the foreman will call initData
+  // 
+  // memset implementation for MPI resource will have all ranks
+  // synchronize on a fence until foreman is done with function call.
+  //
   rm.memset(ptr, 64, initData);
-
-#ifdef not_yet
-  myT* mine = static_cast<myT*>(ptr);
-
-  void sharedSet(void*, std::function<void(void*)> myfun)
-
-  rm.sharedSet(ptr, (void* ptr)[]{
-      myT* mine = static_cast<myT*>(ptr);
-      *mine = 5;
-    });
-
-  rm.sharedSet(void*, ()[]{*mine = 5;});
-  #endif
 
   uint64_t* Data = reinterpret_cast<uint64_t*>(ptr);
 
