@@ -99,7 +99,7 @@ DynamicPoolList::getBlocksInPool() const noexcept
   return BlocksInPool;
 }
 
-std::size_t 
+std::size_t
 DynamicPoolList::getLargestAvailableBlock() const noexcept
 {
   std::size_t LargestAvailableBlock = dpa->getLargestAvailableBlock();
@@ -126,5 +126,10 @@ DynamicPoolList::coalesce() noexcept
   dpa->coalesce();
 }
 
+AllocationStrategy*
+DynamicPoolList::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
 } // end of namespace strategy
 } // end of namespace umpire

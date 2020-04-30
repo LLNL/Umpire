@@ -20,8 +20,14 @@ MpiSharedMemoryMemsetOperation::apply(
     std::size_t UMPIRE_UNUSED_ARG(length),
     std::function<void (void*)> set_fun)
 {
+    /**
     auto mpi_allocator {
         umpire::util::unwrap_allocation_strategy<resource::MpiSharedMemoryResource>(allocation->strategy)
+    };
+    **/
+
+    auto mpi_allocator {
+        reinterpret_cast<resource::MpiSharedMemoryResource*>(allocation->strategy->getAllocationResource())
     };
 
 

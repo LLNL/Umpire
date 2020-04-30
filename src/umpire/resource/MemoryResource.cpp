@@ -21,5 +21,11 @@ MemoryResource::getTraits() const noexcept
   return m_traits;
 }
 
-} // end of namespace resource
-} // end of namespace umpire
+strategy::AllocationStrategy*
+MemoryResource::getAllocationResource() noexcept
+{
+  return this;
+}
+
+} // namespace resource
+} // namespace umpire

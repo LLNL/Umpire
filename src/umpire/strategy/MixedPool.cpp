@@ -132,5 +132,11 @@ MixedPool::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+AllocationStrategy*
+MixedPool::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
+
 }
 }

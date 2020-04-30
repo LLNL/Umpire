@@ -21,7 +21,7 @@ class NamedAllocationStrategy :
     NamedAllocationStrategy(
         const std::string& name,
         int id,
-        Allocator allocator); 
+        Allocator allocator);
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
@@ -32,6 +32,7 @@ class NamedAllocationStrategy :
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   protected:
     strategy::AllocationStrategy* m_allocator;

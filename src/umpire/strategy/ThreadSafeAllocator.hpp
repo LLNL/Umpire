@@ -40,6 +40,7 @@ class ThreadSafeAllocator :
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   protected:
     strategy::AllocationStrategy* m_allocator;

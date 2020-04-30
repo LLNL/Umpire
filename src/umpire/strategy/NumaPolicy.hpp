@@ -45,6 +45,7 @@ class NumaPolicy :
     MemoryResourceTraits getTraits() const noexcept override;
 
     int getNode() const noexcept;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     strategy::AllocationStrategy* m_allocator;

@@ -76,5 +76,10 @@ MonotonicAllocationStrategy::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+AllocationStrategy*
+MonotonicAllocationStrategy::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
 } // end of namespace strategy
 } // end of namespace umpire

@@ -19,31 +19,31 @@ NamedAllocationStrategy::NamedAllocationStrategy(
 {
 }
 
-void* 
+void*
 NamedAllocationStrategy::allocate(std::size_t bytes)
 {
   return m_allocator->allocate(bytes);
 }
 
-void 
+void
 NamedAllocationStrategy::deallocate(void* ptr)
 {
   return m_allocator->deallocate(ptr);
 }
 
-std::size_t 
+std::size_t
 NamedAllocationStrategy::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-std::size_t 
+std::size_t
 NamedAllocationStrategy::getHighWatermark() const noexcept
 {
   return 0;
 }
 
-Platform 
+Platform
 NamedAllocationStrategy::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
@@ -53,6 +53,12 @@ MemoryResourceTraits
 NamedAllocationStrategy::getTraits() const noexcept
 {
   return m_allocator->getTraits();
+}
+
+AllocationStrategy*
+NamedAllocationStrategy::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
 }
 
 } // end of namespace strategy

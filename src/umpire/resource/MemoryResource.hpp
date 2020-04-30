@@ -79,7 +79,6 @@ class MemoryResource :
      */
     virtual std::size_t getHighWatermark() const noexcept override = 0;
 
-
     /*!
      * \brief Get the Platform assocatiated with this MemoryResource.
      *
@@ -91,6 +90,9 @@ class MemoryResource :
     virtual Platform getPlatform() noexcept override = 0;
 
     MemoryResourceTraits getTraits() const noexcept override;
+
+    strategy::AllocationStrategy* getAllocationResource() noexcept override;
+
   protected:
     MemoryResourceTraits m_traits;
 };

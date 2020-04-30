@@ -37,6 +37,7 @@ class SlotPool :
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     void init();

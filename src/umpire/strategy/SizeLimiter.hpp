@@ -42,6 +42,7 @@ class SizeLimiter :
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     strategy::AllocationStrategy* m_allocator;

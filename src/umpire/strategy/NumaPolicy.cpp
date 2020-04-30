@@ -92,6 +92,12 @@ NumaPolicy::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+AllocationStrategy*
+NumaPolicy::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
+
 int
 NumaPolicy::getNode() const noexcept
 {

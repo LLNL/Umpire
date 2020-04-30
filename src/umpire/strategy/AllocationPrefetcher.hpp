@@ -39,6 +39,7 @@ class AllocationPrefetcher :
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
+    AllocationStrategy* getAllocationResource() noexcept override;
   private:
     std::shared_ptr<op::MemoryOperation> m_prefetch_operation;
     strategy::AllocationStrategy* m_allocator;

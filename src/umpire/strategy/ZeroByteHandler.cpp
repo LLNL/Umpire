@@ -27,7 +27,7 @@ ZeroByteHandler::allocate(std::size_t bytes)
   if (0 == bytes) {
     UMPIRE_LOG(Debug, "Allocating 0 bytes for" << m_allocator->getName());
     if (!m_zero_byte_pool)
-      m_zero_byte_pool = 
+      m_zero_byte_pool =
         static_cast<FixedPool*>(ResourceManager::getInstance().getZeroByteAllocator());
     return m_zero_byte_pool->allocate(1);
   } else {
@@ -39,7 +39,7 @@ void
 ZeroByteHandler::deallocate(void* ptr)
 {
   if (!m_zero_byte_pool)
-    m_zero_byte_pool = 
+    m_zero_byte_pool =
       static_cast<FixedPool*>(ResourceManager::getInstance().getZeroByteAllocator());
 
   if (m_zero_byte_pool->pointerIsFromPool(ptr)) {
@@ -92,5 +92,10 @@ ZeroByteHandler::getAllocationStrategy()
   return m_allocator.get();
 }
 
+AllocationStrategy*
+ZeroByteHandler::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
 } // end of namespace umpire
 } // end of namespace strategy

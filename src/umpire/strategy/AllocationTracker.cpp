@@ -82,5 +82,10 @@ AllocationTracker::getAllocationStrategy()
   return m_allocator.get();
 }
 
+AllocationStrategy*
+AllocationTracker::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
 } // end of namespace umpire
 } // end of namespace strategy

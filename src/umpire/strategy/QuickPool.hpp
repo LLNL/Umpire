@@ -27,7 +27,7 @@ class FixedMallocPool;
 
 namespace strategy {
 
-class QuickPool : 
+class QuickPool :
   public AllocationStrategy
 {
   public:
@@ -60,6 +60,7 @@ class QuickPool :
     Platform getPlatform() noexcept override;
 
     void coalesce() noexcept;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     struct Chunk;
@@ -76,7 +77,7 @@ class QuickPool :
 
         /// BUG: Only required for MSVC
         template<typename U>
-        pool_allocator(const pool_allocator<U>& other): 
+        pool_allocator(const pool_allocator<U>& other):
           pool{other.pool}
         {}
 

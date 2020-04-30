@@ -58,6 +58,8 @@ class AllocationAdvisor :
     Platform getPlatform() noexcept override;
 
     MemoryResourceTraits getTraits() const noexcept override;
+
+    AllocationStrategy* getAllocationResource() noexcept override;
   private:
     std::shared_ptr<op::MemoryOperation> m_advice_operation;
 

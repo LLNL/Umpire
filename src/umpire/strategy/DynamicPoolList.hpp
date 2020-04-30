@@ -97,7 +97,7 @@ class DynamicPoolList :
      * \brief Get the largest allocatable number of bytes from pool before
      * the pool will grow.
      *
-     * return The largest number of bytes that may be allocated without 
+     * return The largest number of bytes that may be allocated without
      * causing pool growth
      */
     std::size_t getLargestAvailableBlock() const noexcept;
@@ -105,6 +105,7 @@ class DynamicPoolList :
     void coalesce() noexcept;
 
     MemoryResourceTraits getTraits() const noexcept final override;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     DynamicSizePool<>* dpa;

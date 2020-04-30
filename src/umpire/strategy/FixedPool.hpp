@@ -62,6 +62,7 @@ class FixedPool : public AllocationStrategy
 
     std::size_t numPools() const noexcept;
 
+    AllocationStrategy* getAllocationResource() noexcept override;
   private:
     struct Pool {
       AllocationStrategy* strategy;

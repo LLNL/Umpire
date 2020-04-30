@@ -22,7 +22,7 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy 
+class AllocationStrategy
 {
   public:
     /*!
@@ -96,6 +96,13 @@ class AllocationStrategy
      * \return The platform associated with this AllocationStrategy.
      */
     virtual Platform getPlatform() noexcept = 0;
+
+    /*!
+     * \brief Get the AllocationResource object used by this AllocationStrategy
+     *
+     * \return Pointer to the AllocationResource.
+     */
+    virtual AllocationStrategy* getAllocationResource() noexcept = 0;
 
     /*!
      * \brief Get the name of this AllocationStrategy.

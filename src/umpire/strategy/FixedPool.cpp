@@ -239,6 +239,11 @@ FixedPool::pointerIsFromPool(void* ptr) const noexcept
 
   return false;
 }
+AllocationStrategy*
+FixedPool::getAllocationResource() noexcept
+{
+  return m_strategy->getAllocationResource();
+}
 
 } // end of namespace strategy
 } // end of namespace umpire

@@ -328,6 +328,12 @@ DynamicPoolMap::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+AllocationStrategy*
+DynamicPoolMap::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
+
 void DynamicPoolMap::mergeFreeBlocks()
 {
   if (m_free_map.size() < 2) return;

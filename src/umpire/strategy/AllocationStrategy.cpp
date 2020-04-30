@@ -41,7 +41,7 @@ AllocationStrategy::getActualSize() const noexcept
   return getCurrentSize();
 }
 
-MemoryResourceTraits 
+MemoryResourceTraits
 AllocationStrategy::getTraits() const noexcept
 {
   UMPIRE_LOG(Error, "AllocationStrategy::getTraits() not implemented");

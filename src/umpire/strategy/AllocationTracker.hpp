@@ -39,6 +39,7 @@ class AllocationTracker :
     strategy::AllocationStrategy* getAllocationStrategy();
 
     MemoryResourceTraits getTraits() const noexcept override;
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     std::unique_ptr<strategy::AllocationStrategy> m_allocator;

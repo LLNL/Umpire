@@ -51,7 +51,7 @@ QuickPool::~QuickPool()
 {
 }
 
-void* 
+void*
 QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
@@ -89,8 +89,8 @@ QuickPool::allocate(std::size_t bytes)
     m_size_map.erase(best);
   }
 
-  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " 
-      << chunk->data << " and size " << chunk->size 
+  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data "
+      << chunk->data << " and size " << chunk->size
       << " for allocation of size " << bytes);
 
   void* ret = chunk->data;
@@ -100,14 +100,14 @@ QuickPool::allocate(std::size_t bytes)
 
   if (bytes != chunk->size) {
     std::size_t remaining{chunk->size - bytes};
-    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " 
+    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into "
         << bytes << " and " << remaining);
-    
+
     m_releasable_bytes -= chunk->chunk_size;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{
-      new (chunk_storage) 
+      new (chunk_storage)
         Chunk{static_cast<char*>(ret)+bytes, remaining, chunk->chunk_size}};
 
     auto old_next = chunk->next;
@@ -119,7 +119,7 @@ QuickPool::allocate(std::size_t bytes)
       split_chunk->next->prev = split_chunk;
 
     chunk->size = bytes;
-    split_chunk->size_map_it = 
+    split_chunk->size_map_it =
       m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
@@ -127,7 +127,7 @@ QuickPool::allocate(std::size_t bytes)
   return ret;
 }
 
-void 
+void
 QuickPool::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
@@ -174,7 +174,7 @@ QuickPool::deallocate(void* ptr)
     m_chunk_pool.deallocate(next);
   }
 
-  UMPIRE_LOG(Debug, "Inserting chunk " << chunk 
+  UMPIRE_LOG(Debug, "Inserting chunk " << chunk
       << " with size " << chunk->size);
 
   if (chunk->size == chunk->chunk_size) {
@@ -200,7 +200,7 @@ void QuickPool::release()
   {
     auto chunk = (*pair).second;
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
-    if ( (chunk->size == chunk->chunk_size) 
+    if ( (chunk->size == chunk->chunk_size)
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
       m_actual_bytes -= chunk->chunk_size;
@@ -213,19 +213,19 @@ void QuickPool::release()
   }
 }
 
-std::size_t 
+std::size_t
 QuickPool::getCurrentSize() const noexcept
 {
   return m_curr_bytes;
 }
 
-std::size_t 
+std::size_t
 QuickPool::getActualSize() const noexcept
 {
   return m_actual_bytes;
 }
 
-std::size_t 
+std::size_t
 QuickPool::getHighWatermark() const noexcept
 {
   return m_highwatermark;
@@ -239,7 +239,7 @@ QuickPool::getReleasableSize() const noexcept
   else return 0;
 }
 
-Platform 
+Platform
 QuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
@@ -257,11 +257,17 @@ QuickPool::coalesce() noexcept
   deallocate(ptr);
 }
 
+AllocationStrategy*
+QuickPool::getAllocationResource() noexcept
+{
+  return m_allocator->getAllocationResource();
+}
+
 QuickPool::CoalesceHeuristic
 QuickPool::percent_releasable(int percentage)
 {
   if ( percentage < 0 || percentage > 100 ) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage 
+    UMPIRE_ERROR("Invalid percentage of " << percentage
         << ", percentage must be an integer between 0 and 100");
   }
 

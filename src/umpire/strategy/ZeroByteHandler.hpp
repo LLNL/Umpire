@@ -39,6 +39,7 @@ class ZeroByteHandler :
     MemoryResourceTraits getTraits() const noexcept override;
 
     strategy::AllocationStrategy* getAllocationStrategy();
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     std::unique_ptr<strategy::AllocationStrategy> m_allocator;

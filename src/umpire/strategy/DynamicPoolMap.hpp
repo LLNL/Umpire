@@ -117,7 +117,7 @@ class DynamicPoolMap : public AllocationStrategy
      * \brief Get the largest allocatable number of bytes from pool before
      * the pool will grow.
      *
-     * return The largest number of bytes that may be allocated without 
+     * return The largest number of bytes that may be allocated without
      * causing pool growth
      */
     std::size_t getLargestAvailableBlock() noexcept;
@@ -127,6 +127,8 @@ class DynamicPoolMap : public AllocationStrategy
      * blocks, then reallocate a chunk to keep the actual size the same.
      */
     void coalesce();
+
+    AllocationStrategy* getAllocationResource() noexcept override;
 
   private:
     using SizeTuple = std::tuple<std::size_t, bool, std::size_t>;
