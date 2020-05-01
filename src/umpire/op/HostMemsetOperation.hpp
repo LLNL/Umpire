@@ -17,6 +17,8 @@ namespace op {
  */
 class HostMemsetOperation : public MemoryOperation {
  public:
+   using MemoryOperation::apply;
+
    /*!
     * \copybrief MemoryOperation::apply
     *
