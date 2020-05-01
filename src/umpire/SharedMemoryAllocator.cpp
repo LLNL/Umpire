@@ -5,19 +5,19 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
-#include "umpire/NamedAllocator.hpp"
+#include "umpire/SharedMemoryAllocator.hpp"
 
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
 
-NamedAllocator::NamedAllocator(Allocator allocator):
+SharedMemoryAllocator::SharedMemoryAllocator(Allocator allocator):
     m_allocator(allocator)
 {
 }
 
 void*
-NamedAllocator::allocate(std::string name, std::size_t bytes)
+SharedMemoryAllocator::allocate(std::string name, std::size_t bytes)
 {
     void* ptr = m_allocator.allocate(bytes);
     m_names_to_allocations[name] = ptr;
@@ -26,7 +26,7 @@ NamedAllocator::allocate(std::string name, std::size_t bytes)
 }
 
 void
-NamedAllocator::deallocate(void* ptr)
+SharedMemoryAllocator::deallocate(void* ptr)
 {
     m_allocator.deallocate(ptr);
 
@@ -35,7 +35,7 @@ NamedAllocator::deallocate(void* ptr)
 }
 
 void*
-NamedAllocator::get_allocation_by_name(std::string name)
+SharedMemoryAllocator::get_allocation_by_name(std::string name)
 {
     return m_names_to_allocations[name];
 }

@@ -7,7 +7,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/NamedAllocator.hpp"
+#include "umpire/SharedMemoryAllocator.hpp"
 
 #include <iostream>
 #include <string>
@@ -45,7 +45,7 @@ int main(int ac, char** av) {
   // 3. Allow for named allocation/deallocation
   //
   {
-    auto named_allocator = umpire::NamedAllocator{shared_allocator};
+    auto named_allocator = umpire::SharedMemoryAllocator{shared_allocator};
     auto ptr = named_allocator.allocate(std::string{"Named Allocation"}, 128);
     std::cout << "ptr=" << ptr << std::endl;
     named_allocator.deallocate(ptr);
@@ -55,7 +55,7 @@ int main(int ac, char** av) {
   // 4. Allow for finding allocation by name
   //
   {
-    auto named_allocator{umpire::NamedAllocator{shared_allocator}};
+    auto named_allocator{umpire::SharedMemoryAllocator{shared_allocator}};
     auto ptr{named_allocator.allocate(std::string{"Named Allocation"}, 128)};
     auto ptr2{named_allocator.get_allocation_by_name(std::string{"Named Allocation"})};
     std::cout << "ptr=" << ptr << ", ptr2=" << ptr2 << std::endl;

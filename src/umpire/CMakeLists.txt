@@ -7,7 +7,7 @@
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
-  NamedAllocator.hpp
+  SharedMemoryAllocator.hpp
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
@@ -17,7 +17,7 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
-  NamedAllocator.cpp
+  SharedMemoryAllocator.cpp
   Replay.cpp
   ResourceManager.cpp
   Umpire.cpp)

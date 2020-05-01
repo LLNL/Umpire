@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_NamedAllocator_HPP
-#define UMPIRE_NamedAllocator_HPP
+#ifndef UMPIRE_SharedMemoryAllocator_HPP
+#define UMPIRE_SharedMemoryAllocator_HPP
 
 #include "umpire/Allocator.hpp"
 
@@ -14,9 +14,9 @@
 
 namespace umpire {
 
-class NamedAllocator {
+class SharedMemoryAllocator {
   public:
-    NamedAllocator(Allocator alloc);
+    SharedMemoryAllocator(Allocator alloc);
     void* allocate(std::string name, std::size_t bytes);
     void* get_allocation_by_name(std::string name);
     void deallocate(void* ptr);
@@ -29,4 +29,4 @@ class NamedAllocator {
 
 } // end of namespace umpire
 
-#endif // UMPIRE_NamedAllocator_HPP
+#endif // UMPIRE_SharedMemoryAllocator_HPP
