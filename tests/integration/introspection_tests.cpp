@@ -89,7 +89,6 @@ TEST(IntrospectionTest, RegisterNull)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  umpire::Allocator allocator{rm.getAllocator("HOST")};
   umpire::strategy::AllocationStrategy* strategy{
     rm.getAllocator("HOST").getAllocationStrategy()};
 
