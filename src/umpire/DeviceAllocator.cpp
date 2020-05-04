@@ -24,6 +24,9 @@ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size) :
 
   m_counter = static_cast<unsigned int*>(
     device_alloc.allocate(sizeof(unsigned int)));
+  if (m_counter > m_size) {
+    UMPIRE_ERROR("DeviceAllocator out of space");
+  }
   rm.memset(m_counter, 0);
 }
 

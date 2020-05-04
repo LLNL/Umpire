@@ -88,6 +88,11 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
+#if defined(__CUDA_ARCH__)
+#define UMPIRE_ERROR( msg ) asm ("trap;");
+#elif defined(__HIPCC__)
+#define UMPIRE_ERROR( msg ) abort();
+#else 
 #define UMPIRE_ERROR( msg )                                                                         \
 {                                                                                                   \
   umpire::util::backtrace bt;                                                                       \
@@ -101,6 +106,7 @@
                                  std::string(__FILE__),                                             \
                                  __LINE__);                                                         \
 }
+#endif
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 
