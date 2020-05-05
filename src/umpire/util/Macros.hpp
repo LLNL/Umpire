@@ -88,7 +88,7 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
-#if defined(__CUDA_ARCH__)
+#if defined(__CUDACC__)
 #define UMPIRE_ERROR( msg ) asm ("trap;");
 #elif defined(__HIPCC__)
 #define UMPIRE_ERROR( msg ) abort();
