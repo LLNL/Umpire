@@ -351,7 +351,7 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-    for (int device = 0; device < device_count; device++) {
+    for (int device = 1; device < device_count; device++) {
       MemoryResourceTraits traits;
 
       hipSetDevice(device);
@@ -382,7 +382,10 @@ ResourceManager::initialize()
       traits.vendor = MemoryResourceTraits::vendor_type::AMD;
       traits.kind = MemoryResourceTraits::memory_type::GDDR;
       traits.used_for = MemoryResourceTraits::optimized_for::any;
+
       traits.id = device;
+
+      std::string name = "DEVICE_" + std::to_string(device);
 
       if (device != 0) { // since it DEVICE_0 was already created with an allocator
         std::unique_ptr<strategy::AllocationStrategy>
