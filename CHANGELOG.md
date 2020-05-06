@@ -29,6 +29,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Update BLT to version 0.3.0
 
+- `DeviceAllocator` will issue a trap instruction if it runs out of memory.
+
 ### Removed
 
 ### Fixed
