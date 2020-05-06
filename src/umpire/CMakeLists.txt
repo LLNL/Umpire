@@ -25,14 +25,13 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     interface/umpire.h)
 
   set (umpire_interface_c_fortran_headers
-    interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
     interface/c_fortran/typesUmpire.h)
 
   if (ENABLE_C)
     set (umpire_interface_sources
-      interface/c_fortran/shroudrt.cpp
+      interface/c_fortran/utilUmpire.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp)
@@ -75,11 +74,26 @@ if (SHROUD_FOUND)
   add_subdirectory(interface)
 endif ()
 
+set (umpire_depends
+  camp
+  umpire_resource
+  umpire_strategy
+  umpire_alloc
+  umpire_op
+  umpire_util
+  umpire_tpl_judy)
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_depends
+    ${umpire_depends}
+    openmp)
+endif ()
+  
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  DEPENDS_ON camp umpire_resource umpire_strategy umpire_alloc umpire_op umpire_util umpire_tpl_judy)
+  DEPENDS_ON ${umpire_depends})
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
@@ -88,11 +102,15 @@ set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
-set(UMPIRE_ENABLE_ALLOCATION_BACKTRACE ${ENABLE_ALLOCATION_BACKTRACE})
+set(UMPIRE_ENABLE_BACKTRACE ${ENABLE_BACKTRACE})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
+<<<<<<< HEAD
 set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
+=======
+set(UMPIRE_ENABLE_OPENMP_TARGET ${ENABLE_OPENMP_TARGET})
+>>>>>>> develop
 set(UMPIRE_ENABLE_SANITIZERS ${ENABLE_SANITIZERS})
 
 if (ENABLE_CUDA OR ENABLE_HIP)
@@ -111,6 +129,10 @@ else ()
   set(UMPIRE_ENABLE_CONST Off)
   set(UMPIRE_ENABLE_UM Off)
 endif()
+
+if (ENABLE_OPENMP_TARGET)
+  set(UMPIRE_ENABLE_DEVICE On)
+endif ()
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in

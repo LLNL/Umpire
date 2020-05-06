@@ -8,16 +8,9 @@
 #define UMPIRE_AllocationRecord_HPP
 
 #include <cstddef>
-
 #include <memory>
 
-#include "umpire/util/Backtrace.hpp"
-
-#ifdef UMPIRE_ENABLE_ALLOCATION_BACKTRACE
-#define UMPIRE_GET_ALLOCATION_BACKTRACE(record)  record.allocationBacktrace.getBacktrace()
-#else
-#define UMPIRE_GET_ALLOCATION_BACKTRACE(record)
-#endif
+#include "umpire/util/backtrace.hpp"
 
 namespace umpire {
 
@@ -30,17 +23,17 @@ namespace util {
 struct AllocationRecord
 {
   AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
-    : ptr{p}, size{s}, strategy{strat} { };
+    : ptr{p}, size{s}, strategy{strat} {}
 
   AllocationRecord()
-    : ptr{nullptr}, size{0}, strategy{nullptr} { };
+    : ptr{nullptr}, size{0}, strategy{nullptr} { }
 
   void* ptr;
   std::size_t size;
   strategy::AllocationStrategy* strategy;
-#ifdef UMPIRE_ENABLE_ALLOCATION_BACKTRACE
-  util::Backtrace allocationBacktrace;
-#endif // UMPIRE_ENABLE_ALLOCATION_BACKTRACE
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  util::backtrace allocation_backtrace;
+#endif // UMPIRE_ENABLE_BACKTRACE
 };
 
 } // end of namespace util

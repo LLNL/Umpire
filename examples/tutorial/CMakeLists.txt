@@ -12,6 +12,12 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (tutorial_depends
+    ${tutorial_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME tut_allocator
   SOURCES tut_allocator.cpp

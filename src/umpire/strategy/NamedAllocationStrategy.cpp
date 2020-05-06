@@ -31,18 +31,6 @@ NamedAllocationStrategy::deallocate(void* ptr)
   return m_allocator->deallocate(ptr);
 }
 
-std::size_t 
-NamedAllocationStrategy::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t 
-NamedAllocationStrategy::getHighWatermark() const noexcept
-{
-  return 0;
-}
-
 Platform 
 NamedAllocationStrategy::getPlatform() noexcept
 {

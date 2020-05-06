@@ -47,6 +47,11 @@
 #include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include <omp.h>
+#include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
+#endif
+
 #include "umpire/Umpire.hpp"
 
 #include "umpire/op/MemoryOperation.hpp"
@@ -150,6 +155,11 @@ ResourceManager::ResourceManager() :
     util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
 #endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  registry.registerMemoryResource(
+    util::make_unique<resource::OpenMPTargetResourceFactory>());
+#endif
+
   initialize();
 
   UMPIRE_LOG(Debug, "() leaving");
@@ -192,12 +202,23 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance()};
 
   {
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    MemoryResourceTraits traits = registry.getDefaultTraitsForResource("HOST");
+    traits.id = omp_get_initial_device();
+    std::unique_ptr<strategy::AllocationStrategy>
+      host_allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("HOST", getNextId(), traits))};
+#else
     std::unique_ptr<strategy::AllocationStrategy>
       host_allocator{
         util::wrap_allocator<
           strategy::AllocationTracker,
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("HOST", getNextId()))};
+#endif
 
     UMPIRE_REPLAY(
       R"( "event": "makeMemoryResource", "payload": { "name": "HOST" })"
@@ -223,22 +244,22 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
 
+  int device_count{0};
+  UMPIRE_USE_VAR(device_count);
 #if defined(UMPIRE_ENABLE_CUDA)
-  int device_count;
   auto error = ::cudaGetDeviceCount(&device_count);
-
   if (error != cudaSuccess) {
     UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
   }
 #endif
-
 #if defined(UMPIRE_ENABLE_HIP)
-  int device_count;
   auto error = ::hipGetDeviceCount(&device_count);
-
   if (error != hipSuccess) {
     UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
   }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  device_count = omp_get_num_devices();
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
@@ -361,7 +382,32 @@ ResourceManager::initialize()
       traits.vendor = MemoryResourceTraits::vendor_type::AMD;
       traits.kind = MemoryResourceTraits::memory_type::GDDR;
       traits.used_for = MemoryResourceTraits::optimized_for::any;
+      traits.id = device;
 
+      if (device != 0) { // since it DEVICE_0 was already created with an allocator
+        std::unique_ptr<strategy::AllocationStrategy>
+          allocator{util::wrap_allocator<
+                    strategy::AllocationTracker,
+                    strategy::ZeroByteHandler>(
+                                               registry.makeMemoryResource(name, getNextId(), traits))};
+        UMPIRE_REPLAY(
+                      R"( "event": "makeMemoryResource", "payload": { "name": << ")" << name <<R"("})"
+                      << R"(, "result": ")" << allocator.get() << R"(")");
+
+        int id{allocator->getId()};
+        m_allocators_by_name[name] = allocator.get();
+        m_allocators_by_id[id] = allocator.get();
+        m_allocators.emplace_front(std::move(allocator));
+      }
+    }
+#endif
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    for (int device = 1; device < device_count; device++) {
+      MemoryResourceTraits traits;
+      traits.unified = false;
+      traits.kind = MemoryResourceTraits::memory_type::GDDR;
+      traits.used_for = MemoryResourceTraits::optimized_for::any;
       traits.id = device;
 
       std::string name = "DEVICE_" + std::to_string(device);
@@ -428,7 +474,6 @@ ResourceManager::initialize()
       }
     }
 #endif
-
   }
 #endif
 
@@ -474,7 +519,7 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
 #endif
-  }
+}
 #endif
 
 #if defined(UMPIRE_ENABLE_CONST)
@@ -628,8 +673,15 @@ ResourceManager::hasAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
+  if (!ptr) {
+    UMPIRE_ERROR("Cannot register nullptr!");
+  }
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.size
              << ", strategy=" << record.strategy << ") with " << this);
+
+  UMPIRE_RECORD_BACKTRACE(record);
+
   m_allocations.insert(ptr, record);
 }
 

@@ -68,6 +68,12 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
+if (ENABLE_OPENMP_TARGET)
+  set( umpire_strategy_depends
+    ${umpire_strategy_depends}
+    openmp)
+endif ()
+
 blt_add_library(
   NAME umpire_strategy
   HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}

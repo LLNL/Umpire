@@ -7,9 +7,9 @@
 
 #include "umpire/strategy/QuickPool.hpp"
 
-#include "umpire/util/FixedMallocPool.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -38,6 +38,16 @@ QuickPool::QuickPool(
   m_initial_alloc_bytes{initial_alloc_size},
   m_min_alloc_bytes{min_alloc_size}
 {
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  {
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size:" 
+      << m_initial_alloc_bytes << " (prev: 0) " 
+      << umpire::util::backtracer<>::print(bt));
+  }
+#endif
+
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
   m_actual_bytes += m_initial_alloc_bytes;
   m_releasable_bytes += m_initial_alloc_bytes;
@@ -67,6 +77,15 @@ QuickPool::allocate(std::size_t bytes)
 
     void* ret{nullptr};
     try {
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+      {
+        umpire::util::backtrace bt{};
+        umpire::util::backtracer<>::get_backtrace(bt);
+        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+bytes) 
+          << " (prev: " << m_actual_bytes 
+          << ") " << umpire::util::backtracer<>::print(bt));
+      }
+#endif
       ret = m_allocator->allocate(size);
     } catch (...) {
       UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
@@ -196,6 +215,8 @@ void QuickPool::release()
   UMPIRE_LOG(Debug, "release");
   UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
 
+  std::size_t prev_size{m_actual_bytes};
+
   for (auto pair = m_size_map.begin(); pair != m_size_map.end(); )
   {
     auto chunk = (*pair).second;
@@ -211,6 +232,18 @@ void QuickPool::release()
       ++pair;
     }
   }
+
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  if (prev_size > m_actual_bytes) {
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes 
+      << " (prev: " << prev_size 
+      << ") " << umpire::util::backtracer<>::print(bt));
+  }
+#else
+  UMPIRE_USE_VAR(prev_size);
+#endif
 }
 
 std::size_t 

@@ -95,6 +95,15 @@ protected:
 
     // Allocate data
     try {
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+      {
+        umpire::util::backtrace bt{};
+        umpire::util::backtracer<>::get_backtrace(bt);
+        UMPIRE_LOG(Info, "actual_size:" << (totalBytes+sizeToAlloc) 
+          << " (prev: " << totalBytes << ") " 
+          << umpire::util::backtracer<>::print(bt));
+      }
+#endif
       data = allocator->allocate(sizeToAlloc);
     }
     catch (...) {
@@ -246,6 +255,16 @@ protected:
       }
       curr = next;
     }
+
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+    if (freed > 0) {
+      umpire::util::backtrace bt{};
+      umpire::util::backtracer<>::get_backtrace(bt);
+      UMPIRE_LOG(Info, "actual_size:" << (totalBytes) 
+        << " (prev: " << (totalBytes+freed) 
+        << ") " << umpire::util::backtracer<>::print(bt));
+    }
+#endif
 
     return freed;
   }

@@ -7,26 +7,24 @@
 #ifndef UMPIRE_Backtrace_HPP
 #define UMPIRE_Backtrace_HPP
 
-#include <iostream>
 #include <vector>
-
-#include "umpire/config.hpp"
 
 namespace umpire {
 namespace util {
 
-class Backtrace
-{
-public:
-  Backtrace() noexcept;
-  void getBacktrace();
-
-  friend std::ostream& operator<<(std::ostream& os, const Backtrace& bt);
-private:
-  std::vector<void*> m_backtrace;
+struct backtrace{
+  std::vector<void*> frames;
 };
+
+struct trace_optional {};
+struct trace_always {};
+
+template<typename TraceType=trace_optional>
+struct backtracer {};
 
 } // end of namespace util
 } // end of namespace umpire
+
+#include "umpire/util/backtrace.inl"
 
 #endif // UMPIRE_Backtrace_HPP

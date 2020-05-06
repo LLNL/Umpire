@@ -15,6 +15,12 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (replay_integration_tests_depends
+      ${replay_integration_tests_depends}
+      openmp)
+endif()
+
 set(raw_replay_file "output" )
 set(replay_config "")
 
@@ -28,6 +34,10 @@ if (ENABLE_CUDA OR ENABLE_HIP)
   if (ENABLE_DEVICE_CONST)
     set(replay_config "${replay_config}const_")
   endif ()
+endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  set(replay_config "${replay_config}omp_")
 endif ()
 
 set(replay_config_stripped "")

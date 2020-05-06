@@ -14,9 +14,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   registered as "DEVICE_N", where N is the device number.
 
 - Allocation backtrace may be enabled by building umpire with 
-  -DENABLE_ALLOCATION_BACKTRACE
+  -DENABLE_BACKTRACE
 
 - Umpire exceptions now include backtrace information in the exception string.
+
+- Check for nullptr during `ResourceManager::registerAllocation`.
 
 ### Changed
 
@@ -26,6 +28,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   directories in `${CI_BUILDS_DIR}`.
 
 - Update BLT to version 0.3.0
+
+- `DeviceAllocator` will issue a trap instruction if it runs out of memory.
 
 ### Removed
 
