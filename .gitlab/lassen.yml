@@ -13,14 +13,14 @@
     - shell
     - lassen
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /_lnone/ || $UMPIRE_CI_LASSEN == "OFF"' #run except if ...
+    - if: '$CI_COMMIT_BRANCH =~ /_lnone/ || $ON_LASSEN == "OFF"' #run except if ...
       when: never
     - when: on_success
 
 .build_and_test_on_lassen:
   stage: l_build_and_test
   extends: [.build_blueos_3_ppc64le_ib_p9_script, .on_lassen]
-  needs: ["start"]
+  needs: []
 
 # Note: .build_and_test_on_lassen_advanced inherits from
 # .build_and_test_on_lassen and .advanced_pileline.
