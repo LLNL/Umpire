@@ -10,6 +10,7 @@ set (umpire_headers
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
+  SharedMemoryAllocator.hpp
   TypedAllocator.hpp
   TypedAllocator.inl
   Umpire.hpp)
@@ -18,6 +19,7 @@ set (umpire_sources
   Allocator.cpp
   Replay.cpp
   ResourceManager.cpp
+  SharedMemoryAllocator.cpp
   Umpire.cpp)
 
 if (ENABLE_FORTRAN OR ENABLE_C)
@@ -88,7 +90,7 @@ if (ENABLE_OPENMP_TARGET)
     ${umpire_depends}
     openmp)
 endif ()
-  
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
@@ -159,7 +161,7 @@ install(FILES
 
 install(DIRECTORY
   ${CMAKE_Fortran_MODULE_DIRECTORY}/
-  DESTINATION include/umpire 
+  DESTINATION include/umpire
   FILES_MATCHING PATTERN "*.mod")
 
 install(DIRECTORY
