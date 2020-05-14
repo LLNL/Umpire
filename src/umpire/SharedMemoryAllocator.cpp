@@ -67,6 +67,13 @@ void* SharedMemoryAllocator::allocate(std::string name, std::size_t bytes)
   return ret;
 }
 
+void* SharedMemoryAllocator::get_allocation_by_name(std::string name)
+{
+  UMPIRE_LOG(Debug, "(" << name << ")");
+  return m_allocator->get_allocation_by_name(name);
+}
+
+
 void SharedMemoryAllocator::deallocate(void* ptr)
 {
   UMPIRE_REPLAY(
@@ -142,6 +149,24 @@ strategy::SharedMemoryAllocation* SharedMemoryAllocator::getAllocationStrategy()
 Platform SharedMemoryAllocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+void SharedMemoryAllocator::set_foreman(int id)
+{
+  UMPIRE_LOG(Debug, "(" << id << ")");
+  m_allocator->set_foreman(id);
+}
+
+bool SharedMemoryAllocator::is_foreman()
+{
+  UMPIRE_LOG(Debug, "()" );
+  return m_allocator->is_foreman();
+}
+
+void SharedMemoryAllocator::synchronize()
+{
+  UMPIRE_LOG(Debug, "()" );
+  m_allocator->synchronize();
 }
 
 std::ostream& operator<<(std::ostream& os, const SharedMemoryAllocator& allocator) {
