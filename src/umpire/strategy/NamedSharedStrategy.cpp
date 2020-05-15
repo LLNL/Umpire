@@ -25,7 +25,7 @@ void* NamedSharedStrategy::allocate(std::string name, std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(" << name << ", " << bytes << ")");
 
-  void* ret = m_allocator->allocate(name, bytes);
+  void* ret = m_allocator->allocate(bytes);
 
   m_name_to_pointer[name] = ret;
   m_pointer_to_name[ret] = name;
@@ -52,6 +52,21 @@ void NamedSharedStrategy::deallocate(void* ptr)
 Platform NamedSharedStrategy::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+void NamedSharedStrategy::set_foreman(int id)
+{
+  m_allocator->set_foreman(id);
+}
+
+bool NamedSharedStrategy::is_foreman()
+{
+  return m_allocator->is_foreman();
+}
+
+void NamedSharedStrategy::synchronize()
+{
+  m_allocator->synchronize();
 }
 
 } // end of namespace strategy

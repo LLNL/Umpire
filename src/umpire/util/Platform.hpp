@@ -7,11 +7,17 @@
 #ifndef UMPIRE_Platform_HPP
 #define UMPIRE_Platform_HPP
 
-#include "camp/resource/platform.hpp"
-
 namespace umpire {
 
-using Platform = camp::resources::Platform;
+    enum class Platform {
+        undefined = 0,
+        host = 1,
+        cuda = 2,
+        omp_target = 4,
+        hip = 8,
+        mpi_shmem = 9,
+        sycl = 16
+    };
 
 } // end of namespace umpire
 

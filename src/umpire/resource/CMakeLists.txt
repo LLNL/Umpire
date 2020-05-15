@@ -14,6 +14,7 @@ set (umpire_resource_headers
   MemoryResourceTypes.hpp
   NullMemoryResource.hpp
   NullMemoryResourceFactory.hpp
+  SharedMemoryResource.hpp
 )
 
 set (umpire_resource_sources
@@ -22,7 +23,22 @@ set (umpire_resource_sources
   MemoryResourceRegistry.cpp
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
+  SharedMemoryResource.cpp
 )
+
+if (ENABLE_MPI)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    MpiSharedMemoryResource.hpp
+    MpiSharedMemoryResourceFactory.hpp
+    )
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    MpiSharedMemoryResource.cpp
+    MpiSharedMemoryResourceFactory.cpp
+    )
+endif ()
 
 set(umpire_resource_depends
   camp)
@@ -85,6 +101,12 @@ if (ENABLE_OPENMP_TARGET)
   set (umpire_resource_depends
     ${umpire_resource_depends}
     openmp)
+endif ()
+
+if (ENABLE_MPI)
+  set (umpire_resource_depends
+    ${umpire_resource_depends}
+    mpi)
 endif ()
 
 blt_add_library(
