@@ -18,6 +18,10 @@
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI)
+#include "umpire/resource/MpiSharedMemoryResourceFactory.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 
@@ -106,6 +110,11 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
+
+#if defined(UMPIRE_ENABLE_MPI)
+  registry.registerMemoryResource(
+    util::make_unique<resource::MpiSharedMemoryResourceFactory>());
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
@@ -405,6 +414,28 @@ ResourceManager::initialize()
   }
 #endif
 
+#if defined(UMPIRE_ENABLE_MPI)
+  {
+    std::unique_ptr<strategy::AllocationStrategy>
+      host_allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("MPI_SHARED_MEM", getNextId()))};
+
+    UMPIRE_REPLAY(
+      R"( "event": "makeMemoryResource", "payload": { "name": "MPI_SHARED_MEM" })"
+      << R"(, "result": ")" << host_allocator.get() << R"(")");
+
+    int id{host_allocator->getId()};
+    m_allocators_by_name["MPI_SHARED_MEM"]  = host_allocator.get();
+    m_memory_resources[resource::Host] = host_allocator.get();
+    m_default_allocator = host_allocator.get();
+    m_allocators_by_id[id] = host_allocator.get();
+    m_allocators.emplace_front(std::move(host_allocator));
+  }
+#endif
+
   {
     std::unique_ptr<strategy::AllocationStrategy> allocator{
       new strategy::FixedPool{s_zero_byte_pool_name,
@@ -615,7 +646,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
-camp::resources::Event 
+camp::resources::Event
 ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
@@ -661,7 +692,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     length = size;
   }
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
        R"( "event": "memset", "payload": { )"
     << R"( "ptr": ")"            << ptr                   << R"(")"
     << R"(, "value": )"          << value
@@ -820,7 +851,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
         UMPIRE_ASSERT(ret == ptr);
       }
 
-      UMPIRE_REPLAY( 
+      UMPIRE_REPLAY(
         R"( "event": "move", "payload": {)"
         << R"( "ptr": ")" << ptr << R"(")"
         << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
@@ -837,7 +868,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
   void* dst_ptr{allocator.allocate(alloc_record->size)};
   copy(dst_ptr, ptr);
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
     R"( "event": "move", "payload": {)"
     << R"( "ptr": ")" << ptr << R"(")"
     << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
