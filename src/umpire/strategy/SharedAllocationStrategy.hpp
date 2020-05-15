@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_SharedMemoryAllocation_HPP
-#define UMPIRE_SharedMemoryAllocation_HPP
+#ifndef UMPIRE_SharedAllocationStrategy_HPP
+#define UMPIRE_SharedAllocationStrategy_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 
@@ -15,15 +15,15 @@ namespace umpire {
 namespace strategy {
 
 /*!
- * \brief SharedMemoryAllocation provides a unified interface to all classes that
+ * \brief SharedAllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class SharedMemoryAllocation : public AllocationStrategy
+class SharedAllocationStrategy : public AllocationStrategy
 {
   public:
-    SharedMemoryAllocation(const std::string& name, int id) noexcept;
+    SharedAllocationStrategy(const std::string& name, int id) noexcept;
 
-    virtual ~SharedMemoryAllocation() = default;
+    virtual ~SharedAllocationStrategy() = default;
 
     virtual void* allocate(std::size_t bytes);
     virtual void* allocate(std::string name, std::size_t bytes);
@@ -38,4 +38,4 @@ class SharedMemoryAllocation : public AllocationStrategy
 } // end of namespace strategy
 } // end of namespace umpire
 
-#endif // UMPIRE_SharedMemoryAllocation_HPP
+#endif // UMPIRE_SharedAllocationStrategy_HPP

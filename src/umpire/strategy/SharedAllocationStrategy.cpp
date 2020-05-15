@@ -4,33 +4,33 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/SharedMemoryAllocation.hpp"
+#include "umpire/strategy/SharedAllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace strategy {
 
-SharedMemoryAllocation::SharedMemoryAllocation(const std::string& name, int id) noexcept :
+SharedAllocationStrategy::SharedAllocationStrategy(const std::string& name, int id) noexcept :
   AllocationStrategy{name, id}
 {
 }
 
 void*
-SharedMemoryAllocation::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
+SharedAllocationStrategy::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   UMPIRE_ERROR("Unnamed shared memory allocation is not supported")
   return nullptr;
 }
 
 void*
-SharedMemoryAllocation::allocate(std::string UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
+SharedAllocationStrategy::allocate(std::string UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   UMPIRE_ERROR("Named shared memory allocation is not supported")
   return nullptr;
 }
 
 void*
-SharedMemoryAllocation::get_allocation_by_name(std::string UMPIRE_UNUSED_ARG(allocation_name))
+SharedAllocationStrategy::get_allocation_by_name(std::string UMPIRE_UNUSED_ARG(allocation_name))
 {
   UMPIRE_ERROR("Named shared memory allocation is not supported")
   return nullptr;

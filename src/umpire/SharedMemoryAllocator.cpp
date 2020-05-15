@@ -14,7 +14,7 @@
 
 namespace umpire {
 
-SharedMemoryAllocator::SharedMemoryAllocator(strategy::SharedMemoryAllocation* allocator) noexcept:
+SharedMemoryAllocator::SharedMemoryAllocator(strategy::SharedAllocationStrategy* allocator) noexcept:
   m_allocator(allocator)
 {
 }
@@ -138,13 +138,11 @@ int SharedMemoryAllocator::getId() const noexcept
   return m_allocator->getId();
 }
 
-/**
-strategy::SharedMemoryAllocation* SharedMemoryAllocator::getAllocationStrategy() noexcept
+strategy::SharedAllocationStrategy* SharedMemoryAllocator::getAllocationStrategy() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
   return m_allocator;
 }
-**/
 
 Platform SharedMemoryAllocator::getPlatform() noexcept
 {

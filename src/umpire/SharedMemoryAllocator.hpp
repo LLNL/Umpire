@@ -7,7 +7,7 @@
 #ifndef UMPIRE_SharedMemoryAllocator_HPP
 #define UMPIRE_SharedMemoryAllocator_HPP
 
-#include "umpire/strategy/SharedMemoryAllocation.hpp"
+#include "umpire/strategy/SharedAllocationStrategy.hpp"
 
 #include "umpire/util/Platform.hpp"
 
@@ -37,9 +37,8 @@ class SharedMemoryAllocator {
     const std::string& getName() const noexcept;
     int getId() const noexcept;
 
-    /**
-    strategy::SharedMemoryAllocation* getAllocationStrategy() noexcept;
-    **/
+    strategy::SharedAllocationStrategy* getAllocationStrategy() noexcept;
+
     Platform getPlatform() noexcept;
     SharedMemoryAllocator() = default;
 
@@ -50,9 +49,9 @@ class SharedMemoryAllocator {
     friend std::ostream& operator<<(std::ostream&, const SharedMemoryAllocator&);
 
   private:
-    SharedMemoryAllocator(strategy::SharedMemoryAllocation* allocator) noexcept;
+    SharedMemoryAllocator(strategy::SharedAllocationStrategy* allocator) noexcept;
 
-    strategy::SharedMemoryAllocation* m_allocator;
+    strategy::SharedAllocationStrategy* m_allocator;
 };
 
 } // end of namespace umpire

@@ -19,8 +19,9 @@ set (umpire_strategy_headers
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
+  NamedSharedStrategy.hpp
   QuickPool.hpp
-  SharedMemoryAllocation.hpp
+  SharedAllocationStrategy.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
@@ -48,8 +49,9 @@ set (umpire_strategy_sources
   MixedPool.cpp
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
+  NamedSharedStrategy.cpp
   QuickPool.cpp
-  SharedMemoryAllocation.cpp
+  SharedAllocationStrategy.cpp
   SizeLimiter.cpp
   SlotPool.cpp
   ThreadSafeAllocator.cpp
