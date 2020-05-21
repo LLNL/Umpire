@@ -23,10 +23,7 @@ void SyclCopyFromToOperation::transform(
 {
   cl::sycl::device sycl_device(dst_allocation->strategy->getTraits().deviceID);
   cl::sycl::queue sycl_queue(sycl_device);
-  sycl_queue.submit([&](cl::sycl::handler& cgh)
-  {
-    cgh.memcpy(*dst_ptr, src_ptr, length);
-  });
+  sycl_queue.memcpy(*dst_ptr, src_ptr, length);
   sycl_queue.wait_and_throw();
 
   UMPIRE_RECORD_STATISTIC(

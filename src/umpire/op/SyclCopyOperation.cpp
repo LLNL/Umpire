@@ -21,22 +21,19 @@ void SyclCopyOperation::transform(
     std::size_t length)
 {
   cl::sycl::device sycl_device(dst_allocation->strategy->getTraits().deviceID);
-  cl::sycl::queue sycl_queue(sycl_device);  
+  cl::sycl::queue sycl_queue(sycl_device);
 
   auto ctxt = sycl_queue.get_context();
   // copy within the same device
-  if (get_pointer_type(src_ptr, ctxt) && get_pointer_type(*dst_ptr, ctxt)) {
-      sycl_queue.submit([&](cl::sycl::handler &cgh)
-      {
-        cgh.memcpy(*dst_ptr, src_ptr, length);
-      });
+  if (get_pointer_device(src_ptr, ctxt) && get_pointer_device(*dst_ptr, ctxt)) {
+      sycl_queue.memcpy(*dst_ptr, src_ptr, length);
       sycl_queue.wait_and_throw();
   }
 
   UMPIRE_RECORD_STATISTIC(
       "SyclCopyOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "copy");
 }

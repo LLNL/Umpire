@@ -42,7 +42,7 @@ struct MemoryResourceTraits {
   int id;
   // for only SYCL devices (i.e., Intel GPUs)
 #ifdef UMPIRE_ENABLE_SYCL
-  cl_device_int deviceID;
+  cl_device_id deviceID;
 #endif
 
   bool unified = false;

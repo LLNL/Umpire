@@ -22,11 +22,9 @@ SyclMemsetOperation::apply(
 {
   cl::sycl::device sycl_device(allocation->strategy->getTraits().deviceID);
   cl::sycl::queue sycl_queue(sycl_device);
-  sycl_queue.submit([&](cl::sycl::handler& cgh)
-  {
-    cgh.memset(src_ptr, value, length);
-  });
-  sycl_queue.wait_and_throw();  
+
+  sycl_queue.memset(src_ptr, value, length);
+  sycl_queue.wait_and_throw();
 
   UMPIRE_RECORD_STATISTIC(
       "SyclMemsetOperation",
