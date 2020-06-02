@@ -24,7 +24,9 @@
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 #if !defined(_MSC_VER)
+#if defined(UMPIRE_ENABLE_DLSYMS)
 #include <dlfcn.h>    // for dladdr
+#endif // defined(UMPIRE_ENABLE_DLSYMS)
 #include <execinfo.h> // for backtrace
 #endif // !defined(_MSC_VER)
 
@@ -77,6 +79,7 @@ std::string stringify(const std::vector<void*>& frames)
   int index{0};
   for (const auto& it : frames) {
     backtrace_stream << "    " << index << " " << it << " "; 
+#if defined(UMPIRE_ENABLE_DLSYMS)
     Dl_info info;
     if (dladdr(it, &info) && info.dli_sname) {
       char *demangled = NULL;
@@ -93,7 +96,9 @@ std::string stringify(const std::vector<void*>& frames)
       free(demangled);
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
     }
-    else {
+    else
+#endif // defined(UMPIRE_ENABLE_DLSYMS)
+    {
       backtrace_stream << "No dladdr: " << symbols[index];
     }
     backtrace_stream << std::endl;
