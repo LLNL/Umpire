@@ -26,7 +26,7 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
       ``ENABLE_SLIC``              Off      Enable SLIC logging
       ``ENABLE_BACKTRACE``         Off      Enable backtraces for allocations
-      ``ENABLE_DLSYMS``            Off      Enable symbol lookup for backtraces
+      ``ENABLE_BACKTRACE_SYMBOLS`` Off      Enable symbol lookup for backtraces
       ``ENABLE_TOOLS``             Off      Enable tools like replay
       ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
       ``ENABLE_C``                 Off      Build the C API
@@ -69,7 +69,7 @@ These arguments are explained in more detail below:
 * ``ENABLE_BACKTRACE``
   This option enables collection of backtrace information for each allocation.
 
-* ``ENABLE_DLSYMS``
+* ``ENABLE_BACKTRACE_SYMBOLS``
   This option enables symbol information to be provided with backtraces.
 
 * ``ENABLE_TOOLS``

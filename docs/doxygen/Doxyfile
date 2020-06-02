@@ -1019,7 +1019,7 @@ INCLUDE_FILE_PATTERNS  =
 # instead of the = operator.
 
 PREDEFINED             = UMPIRE_ENABLE_BACKTRACE \
-                         UMPIRE_ENABLE_DLSYMS \
+                         UMPIRE_ENABLE_BACKTRACE_SYMBOLS \
                          UMPIRE_ENABLE_CUDA \
                          UMPIRE_ENABLE_SLIC \
                          UMPIRE_ENABLE_LOGGING \
