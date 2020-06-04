@@ -43,7 +43,8 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include "umpire/op/SyclCopyFromToOperation.hpp"
+#include "umpire/op/SyclCopyFromOperation.hpp"
+#include "umpire/op/SyclCopyToOperation.hpp"
 #include "umpire/op/SyclCopyOperation.hpp"
 
 #include "umpire/op/SyclMemsetOperation.hpp"
@@ -232,13 +233,13 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #if defined(UMPIRE_ENABLE_SYCL)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::sycl),
-      std::make_shared<SyclCopyFromToOperation>());
+      std::make_pair(Platform::host, Platform::sycl),
+      std::make_shared<SyclCopyToOperation>());
 
   registerOperation(
       "COPY",
-      std::make_pair(Platform::sycl, Platform::cpu),
-      std::make_shared<SyclCopyFromToOperation>());
+      std::make_pair(Platform::sycl, Platform::host),
+      std::make_shared<SyclCopyFromOperation>());
 
   registerOperation(
       "COPY",

@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/op/SyclCopyFromToOperation.hpp"
+#include "umpire/op/SyclCopyToOperation.hpp"
 
 #include <CL/sycl.hpp>
 
@@ -14,22 +14,22 @@
 namespace umpire {
 namespace op {
 
-void SyclCopyFromToOperation::transform(
+void SyclCopyToOperation::transform(
     void* src_ptr,
     void** dst_ptr,
-    util::AllocationRecord* src_allocation,
-    util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    util::AllocationRecord* dst_allocation,
     std::size_t length)
 {
-  cl::sycl::device sycl_device(dst_allocation->strategy->getTraits().deviceID);
-  cl::sycl::queue sycl_queue(sycl_device);
+  cl::sycl::device dst_device(dst_allocation->strategy->getTraits().deviceID);
+  cl::sycl::queue sycl_queue(dst_device);
   sycl_queue.memcpy(*dst_ptr, src_ptr, length);
-  sycl_queue.wait_and_throw();
+  sycl_queue.wait();
 
   UMPIRE_RECORD_STATISTIC(
-      "SyclCopyFromToOperation",
+      "SyclCopyToOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "copy");
 }

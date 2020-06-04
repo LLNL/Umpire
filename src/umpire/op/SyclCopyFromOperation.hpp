@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_SyclCopyFromToOperation_HPP
-#define UMPIRE_SyclCopyFromToOperation_HPP
+#ifndef UMPIRE_SyclCopyFromOperation_HPP
+#define UMPIRE_SyclCopyFromOperation_HPP
 
 #include "umpire/op/MemoryOperation.hpp"
 
@@ -15,14 +15,14 @@ namespace op {
 /*!
  * \brief Copy operation to move data between a Intel GPU and CPU memory.
  */
-class SyclCopyFromToOperation :
+class SyclCopyFromOperation :
   public MemoryOperation {
  public:
    /*!
     * @copybrief MemoryOperation::transform
     *
-    * Uses SYCL memcpy to move data when src_ptr is on a Intel GPU and dst_ptr
-    * is on the CPU and vice-versa
+    * Uses SYCL memcpy to move data when src_ptr is on Intel GPU and dst_ptr
+    * is on CPU
     *
     * @copydetails MemoryOperation::transform
     */
@@ -37,4 +37,4 @@ class SyclCopyFromToOperation :
 } // end of namespace op
 } //end of namespace umpire
 
-#endif // UMPIRE_SyclCopyFromToOperation_HPP
+#endif // UMPIRE_SyclCopyFromOperation_HPP
