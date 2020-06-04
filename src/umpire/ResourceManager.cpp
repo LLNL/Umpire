@@ -537,8 +537,15 @@ ResourceManager::hasAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
+  if (!ptr) {
+    UMPIRE_ERROR("Cannot register nullptr!");
+  }
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.size
              << ", strategy=" << record.strategy << ") with " << this);
+
+  UMPIRE_RECORD_BACKTRACE(record);
+
   m_allocations.insert(ptr, record);
 }
 

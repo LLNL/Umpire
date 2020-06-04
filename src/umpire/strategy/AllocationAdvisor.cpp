@@ -72,16 +72,6 @@ void AllocationAdvisor::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-std::size_t AllocationAdvisor::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t AllocationAdvisor::getHighWatermark() const noexcept
-{
-  return 0;
-}
-
 Platform AllocationAdvisor::getPlatform() noexcept
 {
   return m_allocator->getPlatform();

@@ -25,14 +25,13 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     interface/umpire.h)
 
   set (umpire_interface_c_fortran_headers
-    interface/c_fortran/shroudrt.hpp
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
     interface/c_fortran/typesUmpire.h)
 
   if (ENABLE_C)
     set (umpire_interface_sources
-      interface/c_fortran/shroudrt.cpp
+      interface/c_fortran/utilUmpire.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp)
@@ -112,7 +111,8 @@ set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
-set(UMPIRE_ENABLE_ALLOCATION_BACKTRACE ${ENABLE_ALLOCATION_BACKTRACE})
+set(UMPIRE_ENABLE_BACKTRACE ${ENABLE_BACKTRACE})
+set(UMPIRE_ENABLE_BACKTRACE_SYMBOLS ${ENABLE_BACKTRACE_SYMBOLS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})

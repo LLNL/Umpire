@@ -44,16 +44,6 @@ void SizeLimiter::deallocate(void* ptr)
 
 }
 
-std::size_t SizeLimiter::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t SizeLimiter::getHighWatermark() const noexcept
-{
-  return 0;
-}
-
 Platform SizeLimiter::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
