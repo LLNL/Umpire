@@ -31,13 +31,13 @@ SyclUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& na
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id)
+SyclUnifiedMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+SyclUnifiedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
   return
     util::make_unique<resource::DefaultMemoryResource<alloc::SyclMallocManagedAllocator>>(Platform::sycl, name, id, traits);

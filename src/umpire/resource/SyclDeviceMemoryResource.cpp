@@ -17,9 +17,9 @@ namespace umpire {
 namespace resource {
 
 SyclDeviceMemoryResource::SyclDeviceMemoryResource(
-    Platform platform, 
+    Platform platform,
     const std::string& name,
-    int id, 
+    int id,
     MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
   m_allocator{},
@@ -31,7 +31,7 @@ void* SyclDeviceMemoryResource::allocate(std::size_t bytes)
 {
   cl::sycl::device sycl_device(m_traits.deviceID);
   cl::sycl::queue sycl_queue(sycl_device);
-  
+
   void* ptr = m_allocator.allocate(bytes, sycl_queue);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);

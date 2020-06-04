@@ -31,7 +31,7 @@ struct SyclMallocManagedAllocator
   {
     void* usm_ptr = cl::sycl::malloc_shared(bytes, queue_t);
 
-    UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
+    UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
 
     if (usm_ptr == nullptr) {
       UMPIRE_ERROR("cl::sycl::malloc_shared( bytes = " << bytes << " ) failed with error!");

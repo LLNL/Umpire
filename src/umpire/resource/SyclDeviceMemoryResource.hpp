@@ -24,7 +24,7 @@ namespace resource {
 class SyclDeviceMemoryResource :
   public MemoryResource
 {
-  public: 
+  public:
     SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(std::size_t bytes);
