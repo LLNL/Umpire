@@ -70,7 +70,8 @@ These arguments are explained in more detail below:
   This option enables collection of backtrace information for each allocation.
 
 * ``ENABLE_BACKTRACE_SYMBOLS``
-  This option enables symbol information to be provided with backtraces.
+  This option enables symbol information to be provided with backtraces.  This
+  requires -ldl to be specified for using programs.
 
 * ``ENABLE_TOOLS``
   Enable development tools for Umpire (replay, etc.)
