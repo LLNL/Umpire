@@ -23,21 +23,29 @@ MpiSharedMemoryResource::MpiSharedMemoryResource(
     MemoryResource(name, id, traits)
   , m_platform{platform}
 {
-  char nodename[MPI_MAX_PROCESSOR_NAME];
-  int nodestringlen;
+}
 
-  MPI_Get_processor_name(nodename, &nodestringlen);
-  m_nodename = nodename;
+void MpiSharedMemoryResource::initialize()
+{
+  if (! m_initialized ) {
+    char nodename[MPI_MAX_PROCESSOR_NAME];
+    int nodestringlen;
 
-  int rank;
-  MPI_Comm_rank(m_allcomm, &rank);
-  MPI_Comm_split_type(m_allcomm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL, &m_nodecomm);
+    MPI_Get_processor_name(nodename, &nodestringlen);
+    m_nodename = nodename;
 
-  MPI_Comm_rank(m_nodecomm, &m_noderank);
+    int rank;
+    MPI_Comm_rank(m_allcomm, &rank);
+    MPI_Comm_split_type(m_allcomm, MPI_COMM_TYPE_SHARED, rank, MPI_INFO_NULL, &m_nodecomm);
+
+    MPI_Comm_rank(m_nodecomm, &m_noderank);
+    m_initialized = true;
+  }
 }
 
 void* MpiSharedMemoryResource::allocate(std::size_t bytes)
 {
+  initialize();
   auto localsize = isForeman() ? bytes : 0; // Foreman is the only one to actually allocate any memory
   void* ptr;
   MPI_Win window;
@@ -68,6 +76,7 @@ void* MpiSharedMemoryResource::allocate(std::size_t bytes)
 
 void MpiSharedMemoryResource::deallocate(void* ptr)
 {
+  initialize();
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
@@ -93,11 +102,13 @@ Platform MpiSharedMemoryResource::getPlatform() noexcept
 
 bool MpiSharedMemoryResource::isForeman() noexcept
 {
+  initialize();
   return m_noderank == m_foremanrank;
 }
 
 void MpiSharedMemoryResource::fence(void* ptr) noexcept
 {
+  initialize();
   MPI_Win_fence(0, m_winmap[ptr]);
 }
 

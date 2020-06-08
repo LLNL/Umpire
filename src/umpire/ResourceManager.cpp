@@ -417,7 +417,7 @@ ResourceManager::initialize()
 #if defined(UMPIRE_ENABLE_MPI)
   {
     std::unique_ptr<strategy::AllocationStrategy>
-      host_allocator{
+      shmem_allocator{
         util::wrap_allocator<
           strategy::AllocationTracker,
           strategy::ZeroByteHandler>(
@@ -425,14 +425,14 @@ ResourceManager::initialize()
 
     UMPIRE_REPLAY(
       R"( "event": "makeMemoryResource", "payload": { "name": "MPI_SHARED_MEM" })"
-      << R"(, "result": ")" << host_allocator.get() << R"(")");
+      << R"(, "result": ")" << shmem_allocator.get() << R"(")");
 
-    int id{host_allocator->getId()};
-    m_allocators_by_name["MPI_SHARED_MEM"]  = host_allocator.get();
-    m_memory_resources[resource::Host] = host_allocator.get();
-    m_default_allocator = host_allocator.get();
-    m_allocators_by_id[id] = host_allocator.get();
-    m_allocators.emplace_front(std::move(host_allocator));
+    int id{shmem_allocator->getId()};
+    m_allocators_by_name["MPI_SHARED_MEM"]  = shmem_allocator.get();
+    m_memory_resources[resource::HostShared] = shmem_allocator.get();
+    m_default_allocator = shmem_allocator.get();
+    m_allocators_by_id[id] = shmem_allocator.get();
+    m_allocators.emplace_front(std::move(shmem_allocator));
   }
 #endif
 

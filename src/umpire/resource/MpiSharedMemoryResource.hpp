@@ -37,6 +37,7 @@ class MpiSharedMemoryResource :
     void fence(void* ptr) noexcept;
 
   protected:
+    bool m_initialized{false};
     Platform m_platform;
     MPI_Comm m_allcomm{MPI_COMM_WORLD};
     MPI_Comm m_nodecomm;
@@ -44,6 +45,8 @@ class MpiSharedMemoryResource :
     const int m_foremanrank{0};
     int m_noderank;
     std::unordered_map<void*, MPI_Win> m_winmap;
+
+    void initialize();
 
   private:
 
