@@ -31,6 +31,7 @@ class NamedSharedStrategy :
 
     NamedSharedStrategy(const NamedSharedStrategy&) = delete;
 
+    using SharedAllocationStrategy::allocate;
     void* allocate(std::string name, std::size_t bytes) override;
     void* get_allocation_by_name(std::string allocation_name) override;
     void deallocate(void* ptr) override;
