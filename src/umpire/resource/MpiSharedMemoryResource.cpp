@@ -25,7 +25,7 @@ MpiSharedMemoryResource::MpiSharedMemoryResource(
 {
 }
 
-void MpiSharedMemoryResource::initialize()
+void MpiSharedMemoryResource::initialize() noexcept
 {
   if (! m_initialized ) {
     char nodename[MPI_MAX_PROCESSOR_NAME];
@@ -113,21 +113,25 @@ std::size_t MpiSharedMemoryResource::getHighWatermark() const noexcept
 
 Platform MpiSharedMemoryResource::getPlatform() noexcept
 {
+  initialize();
   return m_platform;
 }
 
 bool MpiSharedMemoryResource::is_foreman() noexcept
 {
+  initialize();
   return m_noderank == m_foremanrank;
 }
 
 void MpiSharedMemoryResource::synchronize() noexcept
 {
+  initialize();
   MPI_Barrier(m_allcomm);
 }
 
 void MpiSharedMemoryResource::set_foreman(int id) noexcept
 {
+  initialize();
   m_foremanrank = id;
 }
 

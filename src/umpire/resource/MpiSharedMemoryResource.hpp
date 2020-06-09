@@ -51,7 +51,7 @@ class MpiSharedMemoryResource :
     std::unordered_map<std::string, void*> m_name_to_allocation;
     std::unordered_map<void*, std::string> m_allocation_to_name;
 
-    void initialize();
+    void initialize() noexcept;
 };
 
 } // end of namespace resource
