@@ -470,7 +470,7 @@ ResourceManager::getSharedMemoryAllocator(const std::string& name)
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto strategy = getAllocationStrategy(name);
   auto resource = reinterpret_cast<umpire::resource::SharedMemoryResource*>(strategy);
-  auto shared_strat = reinterpret_cast<umpire::strategy::SharedAllocationStrategy*>(resource);
+  auto shared_strat = static_cast<umpire::strategy::SharedAllocationStrategy*>(resource);
 
   if (!shared_strat)
     UMPIRE_ERROR(name << " is not a shared strategy");
