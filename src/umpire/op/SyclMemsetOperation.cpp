@@ -8,6 +8,7 @@
 
 #include <CL/sycl.hpp>
 
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -16,7 +17,7 @@ namespace op {
 void
 SyclMemsetOperation::apply(
     void* src_ptr,
-    util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
+    util::AllocationRecord* allocation,
     int value,
     std::size_t length)
 {
@@ -24,7 +25,7 @@ SyclMemsetOperation::apply(
   cl::sycl::queue sycl_queue(sycl_device);
 
   sycl_queue.memset(src_ptr, value, length);
-  sycl_queue.wait_and_throw();
+  sycl_queue.wait();
 
   UMPIRE_RECORD_STATISTIC(
       "SyclMemsetOperation",

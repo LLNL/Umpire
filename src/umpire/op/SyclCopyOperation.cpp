@@ -8,6 +8,7 @@
 
 #include <CL/sycl.hpp>
 
+#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
