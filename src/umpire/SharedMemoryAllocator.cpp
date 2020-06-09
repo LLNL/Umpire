@@ -54,7 +54,7 @@ void* SharedMemoryAllocator::allocate(std::string name, std::size_t bytes)
     << R"( "name": ")" << name << R"(",)"
     << R"( "size": )" << bytes << " }");
 
-  ret = m_allocator->allocate(bytes);
+  ret = m_allocator->allocate(name, bytes);
 
   UMPIRE_REPLAY(
     R"("event": "named_allocate", "payload": {)"

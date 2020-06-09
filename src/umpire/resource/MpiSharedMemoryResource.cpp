@@ -20,7 +20,7 @@ MpiSharedMemoryResource::MpiSharedMemoryResource(
     const std::string& name,
     int id,
     MemoryResourceTraits traits) :
-    MemoryResource(name, id, traits)
+    SharedMemoryResource(name, id, traits)
   , m_platform{platform}
 {
 }
@@ -46,7 +46,7 @@ void MpiSharedMemoryResource::initialize()
 void* MpiSharedMemoryResource::allocate(std::size_t bytes)
 {
   initialize();
-  auto localsize = isForeman() ? bytes : 0; // Foreman is the only one to actually allocate any memory
+  auto localsize = is_foreman() ? bytes : 0; // Foreman is the only one to actually allocate any memory
   void* ptr;
   MPI_Win window;
 
@@ -56,7 +56,7 @@ void* MpiSharedMemoryResource::allocate(std::size_t bytes)
 
   // need to get local pointer valid for ptr on foreman rank
 
-  if ( !isForeman() ) {
+  if ( !is_foreman() ) {
     MPI_Aint lsize;
     int disp_unit;
 
@@ -74,13 +74,29 @@ void* MpiSharedMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
+void* MpiSharedMemoryResource::allocate(std::string name, std::size_t bytes)
+{
+  void* ptr = allocate(bytes);
+  m_name_to_allocation[name] = ptr;
+  m_allocation_to_name[ptr] = name;
+
+  return ptr;
+}
+
+void* MpiSharedMemoryResource::get_allocation_by_name(std::string name)
+{
+  return m_name_to_allocation[name];
+}
+
 void MpiSharedMemoryResource::deallocate(void* ptr)
 {
-  initialize();
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
   auto window = m_winmap[ptr];
+
+  m_name_to_allocation.erase(m_allocation_to_name[ptr]);
+  m_allocation_to_name.erase(ptr);
 
   MPI_Win_free(&window);  // Frees the window.  Not really sure how the shared memory actually gets freed
 }
@@ -100,16 +116,19 @@ Platform MpiSharedMemoryResource::getPlatform() noexcept
   return m_platform;
 }
 
-bool MpiSharedMemoryResource::isForeman() noexcept
+bool MpiSharedMemoryResource::is_foreman() noexcept
 {
-  initialize();
   return m_noderank == m_foremanrank;
 }
 
-void MpiSharedMemoryResource::fence(void* ptr) noexcept
+void MpiSharedMemoryResource::synchronize() noexcept
 {
-  initialize();
-  MPI_Win_fence(0, m_winmap[ptr]);
+  MPI_Barrier(m_allcomm);
+}
+
+void MpiSharedMemoryResource::set_foreman(int id) noexcept
+{
+  m_foremanrank = id;
 }
 
 } // end of namespace resource

@@ -15,6 +15,7 @@
 #include <unordered_map>
 
 #include "umpire/Allocator.hpp"
+#include "umpire/SharedMemoryAllocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
 
@@ -63,8 +64,10 @@ class ResourceManager {
      * \brief Get the Allocator with the given name.
      */
     Allocator getAllocator(const std::string& name);
+    SharedMemoryAllocator getSharedMemoryAllocator(const std::string& name);
 
     Allocator getAllocator(const char* name);
+
 
     /*!
      * \brief Get the default Allocator for the given resource_type.

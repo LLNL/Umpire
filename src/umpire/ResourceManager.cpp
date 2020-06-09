@@ -14,6 +14,8 @@
 
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
 
+#include "umpire/resource/SharedMemoryResource.hpp"
+
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -56,6 +58,7 @@
 #include "umpire/strategy/AllocationTracker.hpp"
 #include "umpire/strategy/ZeroByteHandler.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/SharedAllocationStrategy.hpp"
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
@@ -417,11 +420,7 @@ ResourceManager::initialize()
 #if defined(UMPIRE_ENABLE_MPI)
   {
     std::unique_ptr<strategy::AllocationStrategy>
-      shmem_allocator{
-        util::wrap_allocator<
-          strategy::AllocationTracker,
-          strategy::ZeroByteHandler>(
-            registry.makeMemoryResource("MPI_SHARED_MEM", getNextId()))};
+      shmem_allocator{registry.makeMemoryResource("MPI_SHARED_MEM", getNextId())};
 
     UMPIRE_REPLAY(
       R"( "event": "makeMemoryResource", "payload": { "name": "MPI_SHARED_MEM" })"
@@ -429,7 +428,6 @@ ResourceManager::initialize()
 
     int id{shmem_allocator->getId()};
     m_allocators_by_name["MPI_SHARED_MEM"]  = shmem_allocator.get();
-    m_memory_resources[resource::HostShared] = shmem_allocator.get();
     m_default_allocator = shmem_allocator.get();
     m_allocators_by_id[id] = shmem_allocator.get();
     m_allocators.emplace_front(std::move(shmem_allocator));
@@ -466,12 +464,27 @@ ResourceManager::getAllocationStrategy(const std::string& name)
   return m_allocators_by_name[name];
 }
 
+SharedMemoryAllocator
+ResourceManager::getSharedMemoryAllocator(const std::string& name)
+{
+  UMPIRE_LOG(Debug, "(\"" << name << "\")");
+  auto strategy = getAllocationStrategy(name);
+  auto resource = reinterpret_cast<umpire::resource::SharedMemoryResource*>(strategy);
+  auto shared_strat = reinterpret_cast<umpire::strategy::SharedAllocationStrategy*>(resource);
+
+  if (!shared_strat)
+    UMPIRE_ERROR(name << " is not a shared strategy");
+
+  return SharedMemoryAllocator{shared_strat};
+}
+
 Allocator
 ResourceManager::getAllocator(const std::string& name)
 {
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   return Allocator(getAllocationStrategy(name));
 }
+
 
 Allocator
 ResourceManager::getAllocator(const char* name)
