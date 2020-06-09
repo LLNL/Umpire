@@ -27,24 +27,23 @@ int main(int ac, char** av) {
   MPI_Init(&ac, &av);
 
   auto& rm = umpire::ResourceManager::getInstance();
-  umpire::SharedMemoryAllocator allocator = rm.getSharedMemoryAllocator("MPI_SHARED_MEM");
+  auto allocator{rm.getSharedMemoryAllocator("MPI_SHARED_MEM")};
 
   print(allocator.is_foreman(), "1.) Determine whether I am the foreman");
 
   print(allocator.is_foreman(), "2.) Confirm our allocator is indeed mpi_shmem resource");
   UMPIRE_ASSERT(allocator.getPlatform() == umpire::Platform::mpi_shmem);
 
+  print(allocator.is_foreman(), "3.) Unnamed allocation/deallocation");
   {
-    print(allocator.is_foreman(), "3.) Unnamed allocation/deallocation");
     auto ptr{allocator.allocate(64)};
     UMPIRE_ASSERT(ptr != nullptr);
     allocator.deallocate(ptr);
   }
 
+  print(allocator.is_foreman(), "4.) Named allocation/deallocation");
   {
-    std::string name{"Named Allocation"};
-
-    print(allocator.is_foreman(), "4.) Named allocation/deallocation");
+    const std::string name{"Named Allocation"};
     auto ptr{allocator.allocate(name, 128)};
     UMPIRE_ASSERT(ptr != nullptr);
 
@@ -71,16 +70,6 @@ int main(int ac, char** av) {
 
     allocator.deallocate(ptr);
   }
-
-/**
-  //
-  // 7. Set up different rank as owner (foreman)
-  //
-
-  //
-  // 8. Set the communicator group for this node (construction?)
-  //
-**/
 
   MPI_Finalize();
 
