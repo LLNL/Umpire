@@ -1,0 +1,9 @@
+{
+"package_name" : "umpire",
+"package_version" : "develop",
+"package_final_phase" : "hostconfig",
+"package_source_dir" : "../..",
+"spack_url": "https://github.com/spack/spack",
+"spack_commit": "1ad62f2e2805758ea90cc4de7a8d0431c0e7794d",
+"spack_activate" : {}
+}
