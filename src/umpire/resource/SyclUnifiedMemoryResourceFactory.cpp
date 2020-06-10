@@ -6,14 +6,11 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/resource/SyclDeviceMemoryResource.hpp"
 
 #include "umpire/alloc/SyclMallocManagedAllocator.hpp"
 
 #include "umpire/util/make_unique.hpp"
-
-#include <CL/sycl.hpp>
-
 
 namespace umpire {
 namespace resource {
@@ -39,8 +36,8 @@ SyclUnifiedMemoryResourceFactory::create(const std::string& name, int id)
 std::unique_ptr<resource::MemoryResource>
 SyclUnifiedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return
-    util::make_unique<resource::DefaultMemoryResource<alloc::SyclMallocManagedAllocator>>(Platform::sycl, name, id, traits);
+    return
+        util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclMallocManagedAllocator>>(Platform::sycl,name, id, traits);
 }
 
 MemoryResourceTraits

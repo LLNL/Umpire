@@ -7,8 +7,6 @@
 #ifndef UMPIRE_SyclDeviceMemoryResource_HPP
 #define UMPIRE_SyclDeviceMemoryResource_HPP
 
-#include "umpire/alloc/SyclMallocAllocator.hpp"
-
 #include "umpire/resource/MemoryResource.hpp"
 
 #include "umpire/util/AllocationRecord.hpp"
@@ -21,11 +19,14 @@ namespace resource {
    * \brief Concrete MemoryResource object that uses the template _allocator to
    * allocate and deallocate memory.
    */
+template <typename _allocator>
 class SyclDeviceMemoryResource :
   public MemoryResource
 {
   public:
     SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+
+    SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, _allocator alloc);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
@@ -36,7 +37,7 @@ class SyclDeviceMemoryResource :
     Platform getPlatform() noexcept;
 
   protected:
-    alloc::SyclMallocAllocator m_allocator;
+    _allocator m_allocator;
 
     Platform m_platform;
 };

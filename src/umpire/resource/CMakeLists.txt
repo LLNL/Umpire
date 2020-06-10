@@ -77,6 +77,7 @@ if (ENABLE_SYCL)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     SyclDeviceMemoryResource.hpp
+    SyclDeviceMemoryResource.inl
     SyclDeviceResourceFactory.hpp
     SyclPinnedMemoryResourceFactory.hpp
     SyclUnifiedMemoryResourceFactory.hpp
@@ -84,7 +85,6 @@ if (ENABLE_SYCL)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    SyclDeviceMemoryResource.cpp
     SyclDeviceResourceFactory.cpp
     SyclPinnedMemoryResourceFactory.cpp
     SyclUnifiedMemoryResourceFactory.cpp

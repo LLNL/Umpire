@@ -4,6 +4,9 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#ifndef UMPIRE_SyclDeviceMemoryResource_INL
+#define UMPIRE_SyclDeviceMemoryResource_INL
+
 #include "umpire/resource/SyclDeviceMemoryResource.hpp"
 
 #include "umpire/ResourceManager.hpp"
@@ -16,18 +19,33 @@
 namespace umpire {
 namespace resource {
 
+template<typename _allocator>
 SyclDeviceMemoryResource::SyclDeviceMemoryResource(
     Platform platform,
     const std::string& name,
     int id,
     MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
-  m_allocator{},
+  m_allocator(),
   m_platform(platform)
 {
 }
 
-void* SyclDeviceMemoryResource::allocate(std::size_t bytes)
+template<typename _allocator>
+SyclDeviceMemoryResource::SyclDeviceMemoryResource(
+    Platform platform,
+    const std::string& name,
+    int id,
+    MemoryResourceTraits traits,
+    _allocator alloc) :
+  MemoryResource(name, id, traits),
+  m_allocator(alloc),
+  m_platform(platform)
+{
+}
+
+template<typename _allocator>
+void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
   cl::sycl::device sycl_device(m_traits.deviceID);
   cl::sycl::queue sycl_queue(sycl_device);
@@ -40,7 +58,8 @@ void* SyclDeviceMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void SyclDeviceMemoryResource::deallocate(void* ptr)
+template<typename _allocator>
+void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
@@ -52,22 +71,26 @@ void SyclDeviceMemoryResource::deallocate(void* ptr)
   m_allocator.deallocate(ptr, sycl_queue);
 }
 
-std::size_t SyclDeviceMemoryResource::getCurrentSize() const noexcept
+template<typename _allocator>
+std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;
 }
 
-std::size_t SyclDeviceMemoryResource::getHighWatermark() const noexcept
+template<typename _allocator>
+std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;
 }
 
-Platform SyclDeviceMemoryResource::getPlatform() noexcept
+template<typename _allocator>
+Platform SyclDeviceMemoryResource<_allocator>::getPlatform() noexcept
 {
   return m_platform;
 }
 
 } // end of namespace resource
 } // end of namespace umpire
+#endif // UMPIRE_SyclDeviceMemoryResource_INL

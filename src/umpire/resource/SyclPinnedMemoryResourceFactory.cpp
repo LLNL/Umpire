@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/resource/SyclDeviceMemoryResource.hpp"
 
 #include "umpire/alloc/SyclPinnedAllocator.hpp"
 
@@ -35,7 +35,7 @@ SyclPinnedMemoryResourceFactory::create(const std::string& name, int id)
 std::unique_ptr<resource::MemoryResource>
 SyclPinnedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::DefaultMemoryResource<alloc::SyclPinnedAllocator>>(Platform::sycl, name, id, traits);
+  return util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclPinnedAllocator>>(Platform::sycl, name, id, traits);
 }
 
 MemoryResourceTraits

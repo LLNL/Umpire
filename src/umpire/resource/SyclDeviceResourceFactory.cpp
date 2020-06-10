@@ -7,12 +7,9 @@
 #include "umpire/resource/SyclDeviceResourceFactory.hpp"
 
 #include "umpire/resource/SyclDeviceMemoryResource.hpp"
-#include "umpire/resource/DefaultMemoryResource.hpp"
+
 #include "umpire/alloc/SyclMallocAllocator.hpp"
 
-#include <CL/sycl.hpp>
-
-#include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
@@ -39,7 +36,7 @@ std::unique_ptr<resource::MemoryResource>
 SyclDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
   return
-    util::make_unique<resource::SyclDeviceMemoryResource>(Platform::sycl, name, id, traits);
+    util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclMallocAllocator>>(Platform::sycl, name, id, traits);
 }
 
 MemoryResourceTraits

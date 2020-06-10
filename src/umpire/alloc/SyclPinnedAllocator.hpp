@@ -15,7 +15,7 @@ namespace umpire {
 namespace alloc {
 
 /*!
- * \brief Uses sycl's malloc_host and free to allocate and deallocate 
+ * \brief Uses sycl's malloc_host and free to allocate and deallocate
  *        pinned memory on host.
  */
 struct SyclPinnedAllocator {

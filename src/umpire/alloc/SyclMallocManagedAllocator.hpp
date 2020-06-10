@@ -9,6 +9,8 @@
 
 #include <CL/sycl.hpp>
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace alloc {
 

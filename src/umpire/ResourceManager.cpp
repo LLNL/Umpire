@@ -263,8 +263,6 @@ ResourceManager::initialize()
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-  int device_count;
-
   auto platforms = cl::sycl::platform::get_platforms();
   for (auto &platform : platforms) {
     auto devices = platform.get_devices();
@@ -1098,11 +1096,11 @@ ResourceManager::getNumDevices() const
 #elif defined(UMPIRE_ENABLE_HIP)
   hipGetDeviceCount(&device_count);
 #elif defined(UMPIRE_ENABLE_SYCL)
-  auto platforms = platform::get_platforms();
+  auto platforms = cl::sycl::platform::get_platforms();
   for (auto &platform : platforms) {
     auto devices = platform.get_devices();
     for (auto &device : devices) {
-      const std::string deviceName = device.get_info<info::device::name>();
+      const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
       if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos))
         device_count++;
     }
