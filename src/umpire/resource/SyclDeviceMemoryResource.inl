@@ -20,26 +20,13 @@ namespace umpire {
 namespace resource {
 
 template<typename _allocator>
-SyclDeviceMemoryResource::SyclDeviceMemoryResource(
+SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(
     Platform platform,
     const std::string& name,
     int id,
     MemoryResourceTraits traits) :
   MemoryResource(name, id, traits),
   m_allocator(),
-  m_platform(platform)
-{
-}
-
-template<typename _allocator>
-SyclDeviceMemoryResource::SyclDeviceMemoryResource(
-    Platform platform,
-    const std::string& name,
-    int id,
-    MemoryResourceTraits traits,
-    _allocator alloc) :
-  MemoryResource(name, id, traits),
-  m_allocator(alloc),
   m_platform(platform)
 {
 }

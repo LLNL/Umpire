@@ -6,9 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/SyclDeviceMemoryResource.hpp"
-
 #include "umpire/alloc/SyclPinnedAllocator.hpp"
+#include "umpire/resource/SyclDeviceMemoryResource.hpp"
 
 #include "umpire/util/make_unique.hpp"
 

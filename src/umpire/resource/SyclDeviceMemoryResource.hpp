@@ -9,9 +9,6 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 
-#include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Platform.hpp"
-
 namespace umpire {
 namespace resource {
 
@@ -25,8 +22,6 @@ class SyclDeviceMemoryResource :
 {
   public:
     SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
-
-    SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, _allocator alloc);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
@@ -44,5 +39,7 @@ class SyclDeviceMemoryResource :
 
 } // end of namespace resource
 } // end of namespace umpire
+
+#include "umpire/resource/SyclDeviceMemoryResource.inl"
 
 #endif // UMPIRE_SyclDeviceMemoryResource_HPP

@@ -6,9 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/SyclDeviceMemoryResource.hpp"
-
 #include "umpire/alloc/SyclMallocManagedAllocator.hpp"
+#include "umpire/resource/SyclDeviceMemoryResource.hpp"
 
 #include "umpire/util/make_unique.hpp"
 
