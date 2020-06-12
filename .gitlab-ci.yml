@@ -72,7 +72,7 @@ start:
 # jobs will share this through a template mechanism.
 .advanced_pipeline:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "develop" || $UMPIRE_ALL_TARGETS == "ON"' #run only if ...
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop" || $UMPIRE_ALL_TARGETS == "ON"' #run only if ...
 
 # These are also templates (.name) that define project specific build commands.
 # If an allocation exist with the name defined in this pipeline, the job will
