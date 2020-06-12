@@ -108,8 +108,7 @@ if (ENABLE_SYCL)
     SyclMemPrefetchOperation.cpp)
 
   set (umpire_op_depends
-    ${umpire_op_depends}
-    sycl_runtime)
+    ${umpire_op_depends})
 
 endif ()
 

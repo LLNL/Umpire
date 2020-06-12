@@ -91,8 +91,7 @@ if (ENABLE_SYCL)
     )
 
   set(umpire_resource_depends
-    ${umpire_resource_depends}
-    sycl_runtime)
+    ${umpire_resource_depends})
 endif ()
 
 if (ENABLE_OPENMP_TARGET)
