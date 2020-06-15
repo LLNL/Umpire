@@ -26,8 +26,8 @@ SyclMemPrefetchOperation::apply(
         UMPIRE_ERROR("SYCL memPrefetch failed with invalid deviceID  = " << value);
     }
 
-    cl::sycl::device sycl_device(allocation->strategy->getTraits().deviceID);
-    cl::sycl::queue sycl_queue(sycl_device);
+    cl::sycl::queue sycl_queue(allocation->strategy->getTraits().queue);
+    auto sycl_device = sycl_queue.get_device();
     auto ctxt = sycl_queue.get_context();
 
     cl::sycl::usm::alloc src_ptr_kind = get_pointer_type(src_ptr, ctxt);
@@ -37,8 +37,7 @@ SyclMemPrefetchOperation::apply(
         sycl_queue.prefetch(src_ptr, length);
         sycl_queue.wait();
     }
-    else
-    {
+    else {
         UMPIRE_ERROR("SYCL memPrefetch failed ( bytes = " << length << " )");
     }
 }

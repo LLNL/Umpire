@@ -21,8 +21,7 @@ void SyclCopyToOperation::transform(
     util::AllocationRecord* dst_allocation,
     std::size_t length)
 {
-  cl::sycl::device dst_device(dst_allocation->strategy->getTraits().deviceID);
-  cl::sycl::queue sycl_queue(dst_device);
+  cl::sycl::queue sycl_queue(dst_allocation->strategy->getTraits().queue);
   sycl_queue.memcpy(*dst_ptr, src_ptr, length);
   sycl_queue.wait();
 

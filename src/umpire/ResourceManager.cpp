@@ -150,7 +150,7 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
     util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
-  
+
   registry.registerMemoryResource(
     util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
 #endif
@@ -268,7 +268,7 @@ ResourceManager::initialize()
     auto devices = platform.get_devices();
     for (auto &device : devices) {
       const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
-      if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos))
+      if (device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos))
         device_count++;
     }
   }
@@ -441,7 +441,7 @@ ResourceManager::initialize()
         MemoryResourceTraits traits;
 
         const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
-        if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
+        if (device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
 
           traits.unified  = false;
           traits.size     = device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
@@ -450,7 +450,10 @@ ResourceManager::initialize()
           traits.kind     = MemoryResourceTraits::memory_type::GDDR;
           traits.used_for = MemoryResourceTraits::optimized_for::any;
           traits.id       = dev_cnt;
-          traits.deviceID = device.get();
+          cl::sycl::queue sycl_queue(device);
+          traits.queue    = sycl_queue;
+          std::cout << "value of QUEUE in RESOURCEMANAGER : " << sycl_queue.get() << ", " <<
+              device.get_info<cl::sycl::info::device::name>() << std::endl;
 
           std::string name = "DEVICE_" + std::to_string(dev_cnt);
 
@@ -752,7 +755,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
-camp::resources::Event 
+camp::resources::Event
 ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size)
 {
   UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
@@ -1101,7 +1104,7 @@ ResourceManager::getNumDevices() const
     auto devices = platform.get_devices();
     for (auto &device : devices) {
       const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
-      if (device.is_gpu() && (deviceName.find("Intel") != std::string::npos))
+      if (device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos))
         device_count++;
     }
   }

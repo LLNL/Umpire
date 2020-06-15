@@ -34,8 +34,7 @@ SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(
 template<typename _allocator>
 void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
-  cl::sycl::device sycl_device(m_traits.deviceID);
-  cl::sycl::queue sycl_queue(sycl_device);
+  cl::sycl::queue sycl_queue(m_traits.queue);
 
   void* ptr = m_allocator.allocate(bytes, sycl_queue);
 
@@ -52,8 +51,7 @@ void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
 
   UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
 
-  cl::sycl::device sycl_device(m_traits.deviceID);
-  cl::sycl::queue sycl_queue(sycl_device);
+  cl::sycl::queue sycl_queue(m_traits.queue);
 
   m_allocator.deallocate(ptr, sycl_queue);
 }

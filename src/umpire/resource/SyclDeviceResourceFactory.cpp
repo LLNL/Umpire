@@ -47,12 +47,11 @@ SyclDeviceResourceFactory::getDefaultTraits()
   cl::sycl::gpu_selector gpuSelect;
   cl::sycl::device sycl_device(gpuSelect);
   const std::string deviceName = sycl_device.get_info<cl::sycl::info::device::name>();
-  if (sycl_device.is_gpu() && (deviceName.find("Intel") != std::string::npos)) {
+  if (sycl_device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
     traits.size = sycl_device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
     traits.unified = false;
 
     traits.id = 0;
-    traits.deviceID = sycl_device.get();
 
     traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
     traits.kind = MemoryResourceTraits::memory_type::GDDR;

@@ -21,23 +21,11 @@ void SyclCopyOperation::transform(
     umpire::util::AllocationRecord* dst_allocation,
     std::size_t length)
 {
-  cl::sycl::device sycl_device(dst_allocation->strategy->getTraits().deviceID);
-  cl::sycl::queue sycl_queue(sycl_device);
+  cl::sycl::queue sycl_queue(dst_allocation->strategy->getTraits().queue);
   auto ctxt = sycl_queue.get_context();
 
-  // get device info for the pointers
-  cl::sycl::device src_dev = get_pointer_device(src_ptr, ctxt);
-  cl::sycl::device dst_dev = get_pointer_device(*dst_ptr, ctxt);
-
-  // copy within the same device
-  if (src_dev == dst_dev) {
-      sycl_queue.memcpy(*dst_ptr, src_ptr, length);
-      sycl_queue.wait();
-  }
-  else
-  {
-      UMPIRE_ERROR("SYCL deviceTodevice memcpy failed( bytes = " << length << " )");
-  }
+  sycl_queue.memcpy(*dst_ptr, src_ptr, length);
+  sycl_queue.wait();
 
   UMPIRE_RECORD_STATISTIC(
       "SyclCopyOperation",

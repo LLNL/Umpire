@@ -10,6 +10,7 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
+#include <iostream>
 
 namespace umpire {
 namespace op {
@@ -21,9 +22,7 @@ SyclMemsetOperation::apply(
     int value,
     std::size_t length)
 {
-  cl::sycl::device sycl_device(allocation->strategy->getTraits().deviceID);
-  cl::sycl::queue sycl_queue(sycl_device);
-
+  cl::sycl::queue sycl_queue = allocation->strategy->getTraits().queue;
   sycl_queue.memset(src_ptr, value, length);
   sycl_queue.wait();
 
