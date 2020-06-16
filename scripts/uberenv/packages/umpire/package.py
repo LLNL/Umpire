@@ -77,6 +77,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
+    variant('cuda', default=False, description='Enable Cuda support')
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
@@ -131,9 +132,14 @@ class Umpire(CMakePackage, CudaPackage):
         return sys_type
 
     def _get_host_config_path(self, spec):
-        host_config_path = "%s-%s-%s.cmake" % (socket.gethostname().rstrip('1234567890'),
+        var=''
+        if '+cuda' in spec:
+            var+='-cuda'
+
+        host_config_path = "%s-%s-%s%s.cmake" % (socket.gethostname().rstrip('1234567890'),
                                                self._get_sys_type(spec),
-                                               spec.compiler)
+                                               spec.compiler,
+                                               var)
         dest_dir = self.stage.source_path
         host_config_path = os.path.abspath(pjoin(dest_dir, host_config_path))
         return host_config_path
@@ -192,29 +198,29 @@ class Umpire(CMakePackage, CudaPackage):
 
         host_config_path = self._get_host_config_path(spec)
         cfg = open(host_config_path, "w")
-        cfg.write("####################################################################\n")
+        cfg.write("###################\n".format("#" * 60))
         cfg.write("# Generated host-config - Edit at own risk!\n")
-        cfg.write("####################################################################\n")
+        cfg.write("###################\n".format("#" * 60))
         cfg.write("# Copyright (c) 2020, Lawrence Livermore National Security, LLC and\n")
         cfg.write("# other Umpire Project Developers. See the top-level LICENSE file for\n")
         cfg.write("# details.\n")
         cfg.write("#\n")
         cfg.write("# SPDX-License-Identifier: (BSD-3-Clause) \n")
-        cfg.write("####################################################################\n\n")
+        cfg.write("###################\n\n".format("#" * 60))
 
-        cfg.write("#---------------------------------------\n")
+        cfg.write("#------------------\n".format("-" * 60))
         cfg.write("# SYS_TYPE: {0}\n".format(sys_type))
         cfg.write("# Compiler Spec: {0}\n".format(spec.compiler))
         cfg.write("# CMake executable path: %s\n" % cmake_exe)
-        cfg.write("#---------------------------------------\n\n")
+        cfg.write("#------------------\n\n".format("-" * 60))
 
         #######################
         # Compiler Settings
         #######################
 
-        cfg.write("#---------------------------------------\n")
+        cfg.write("#------------------\n".format("-" * 60))
         cfg.write("# Compilers\n")
-        cfg.write("#---------------------------------------\n")
+        cfg.write("#------------------\n\n".format("-" * 60))
         cfg.write(cmake_cache_entry("CMAKE_C_COMPILER", c_compiler))
         cfg.write(cmake_cache_entry("CMAKE_CXX_COMPILER", cpp_compiler))
 
@@ -243,10 +249,16 @@ class Umpire(CMakePackage, CudaPackage):
             debug_flags = "-O0 -g"
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_DEBUG", debug_flags))
 
+        if "+cuda" in spec:
+            cfg.write("#------------------{0}\n".format("-" * 60))
+            cfg.write("# Cuda\n")
+            cfg.write("#------------------{0}\n\n".format("-" * 60))
 
+            cfg.write(cmake_cache_option("ENABLE_CUDA", True))
 
-
-
-
-
-
+            cudatoolkitdir = spec['cuda'].prefix
+            cfg.write(cmake_cache_entry("CUDA_TOOLKIT_ROOT_DIR",
+                                        cudatoolkitdir))
+            cudacompiler = "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc"
+            cfg.write(cmake_cache_entry("CMAKE_CUDA_COMPILER",
+                                        cudacompiler))
