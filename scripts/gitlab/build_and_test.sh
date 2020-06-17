@@ -136,4 +136,9 @@ then
     echo "Copying Testing xml reports for export"
     tree Testing
     cp Testing/*/Test.xml ${project_dir}
+
+    if grep -q "Errors while running CTest" ./tests_output.txt
+    then
+        echo "ERROR: failure(s) while running CTest" && exit 1
+    fi
 fi
