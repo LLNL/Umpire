@@ -88,7 +88,7 @@ if (ENABLE_OPENMP_TARGET)
     ${umpire_depends}
     openmp)
 endif ()
-  
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
@@ -120,6 +120,7 @@ if (ENABLE_CUDA OR ENABLE_HIP)
 elseif (ENABLE_SYCL)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_UM On)
+  set(UMPIRE_ENABLE_PINNED On)
 else ()
   set(UMPIRE_ENABLE_DEVICE Off)
   set(UMPIRE_ENABLE_PINNED Off)
@@ -163,7 +164,7 @@ install(FILES
 
 install(DIRECTORY
   ${CMAKE_Fortran_MODULE_DIRECTORY}/
-  DESTINATION include/umpire 
+  DESTINATION include/umpire
   FILES_MATCHING PATTERN "*.mod")
 
 install(DIRECTORY
