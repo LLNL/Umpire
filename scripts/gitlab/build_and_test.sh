@@ -33,7 +33,8 @@ fi
 conf=${CONFIGURATION:-""}
 if [[ -z ${conf} ]]
 then
-    echo "CONFIGURATION is undefined... aborting" exit 1
+    echo "CONFIGURATION is undefined... aborting"
+    exit 1
 fi
 
 project_dir="$(pwd)"
