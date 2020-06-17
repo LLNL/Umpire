@@ -12,7 +12,9 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/Replay.hpp"
+#include "umpire/util/backtrace.hpp"
 
 #include <cstdlib>
 #include <algorithm>
@@ -46,6 +48,13 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
   m_highwatermark{0}
 {
   const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  {
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
+  }
+#endif
   insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
 }
 
@@ -53,25 +62,6 @@ DynamicPoolMap::~DynamicPoolMap()
 {
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
-
-  // Warning if blocks are still in use
-  if (m_used_map.size() > 0) {
-    const std::size_t max_addr{25};
-    std::stringstream ss;
-    ss << "There are " << m_used_map.size() << " addresses";
-    ss << " not deallocated at destruction. This will cause leak(s). ";
-    if (m_used_map.size() <= max_addr)
-      ss << "Addresses:";
-    else
-      ss << "First " << max_addr << " addresses:";
-    auto iter = m_used_map.begin();
-    auto end = m_used_map.end();
-    for (std::size_t i = 0; iter != end && i < max_addr; ++i, ++iter) {
-      if (i % 5 == 0) ss << "\n\t";
-      ss << " " << iter->first;
-    }
-    UMPIRE_LOG(Warning, ss.str());
-  }
 
   // Free any unused blocks
   for (auto& rec : m_free_map) {
@@ -126,6 +116,15 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+    {
+      umpire::util::backtrace bt{};
+      umpire::util::backtracer<>::get_backtrace(bt);
+      UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes+bytes) 
+        << " (prev: " << m_actual_bytes << ") " 
+        << umpire::util::backtracer<>::print(bt));
+    }
+#endif
     ptr = m_allocator->allocate(bytes);
   } catch (...) {
     UMPIRE_LOG(Error,
@@ -161,6 +160,8 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
       throw;
     }
   }
+
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
 
   // Add to count
   m_actual_bytes += bytes;
@@ -227,6 +228,7 @@ void* DynamicPool::allocate(std::size_t bytes)
 
   if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
 
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
 }
 
@@ -253,6 +255,8 @@ void DynamicPoolMap::deallocate(void* ptr)
 
     // Update currentSize
     m_curr_bytes -= bytes;
+
+    UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
@@ -332,6 +336,12 @@ std::size_t DynamicPoolMap::getReleasableSize() const noexcept
 Platform DynamicPoolMap::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+MemoryResourceTraits
+DynamicPoolMap::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
 }
 
 void DynamicPoolMap::mergeFreeBlocks()
@@ -422,6 +432,16 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
     }
   }
 
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  if (released_bytes > 0) {
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes 
+      << " (prev: " << (m_actual_bytes+released_bytes) 
+      << ") " << umpire::util::backtracer<>::print(bt));
+  }
+#endif
+
   return released_bytes;
 }
 
@@ -464,6 +484,5 @@ void DynamicPoolMap::do_coalesce()
     }
   }
 }
-
 } // end of namespace strategy
 } // end of namespace umpire

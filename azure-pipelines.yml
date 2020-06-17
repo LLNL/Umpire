@@ -18,12 +18,10 @@ jobs:
     inputs:
       workingDir: 'build'
       cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
-  - task: VSBuild@1
+  - task: CMake@1
     inputs:
-      solution: 'build/*.sln'
-      vsVersion: 'latest'
-    condition: eq( variables['Agent.OS'], 'Windows_NT')
-    displayName: 'Visual Studio Build'
+      workingDir: 'build'
+      cmakeArgs: '--build . --config Release'
   - task: VSTest@2
     inputs:
       configuration: 'Release'

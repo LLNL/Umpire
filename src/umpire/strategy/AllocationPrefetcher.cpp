@@ -48,19 +48,15 @@ void AllocationPrefetcher::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-std::size_t AllocationPrefetcher::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t AllocationPrefetcher::getHighWatermark() const noexcept
-{
-  return 0;
-}
-
 Platform AllocationPrefetcher::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+MemoryResourceTraits
+AllocationPrefetcher::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
 }
 
 } // end of namespace strategy

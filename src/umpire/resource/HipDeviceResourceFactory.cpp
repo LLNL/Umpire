@@ -21,7 +21,7 @@ bool
 HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   noexcept
 {
-  if (name.compare("DEVICE") == 0) {
+  if (name.find("DEVICE") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -29,7 +29,19 @@ HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
 }
 
 std::unique_ptr<resource::MemoryResource>
-HipDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+HipDeviceResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+HipDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+{
+  return util::make_unique<resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(Platform::hip, name, id, traits);
+}
+
+MemoryResourceTraits
+HipDeviceResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -47,7 +59,7 @@ HipDeviceResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(Platform::hip, "DEVICE", id, traits);
+  return traits;
 }
 
 } // end of namespace resource

@@ -82,7 +82,7 @@ TEST_P(AllocatorCTest, GetAllocatorById)
   umpire_allocator_delete(&alloc_two);
 }
 
-TEST_P(AllocatorCTest, SizeAndHighWatermark)
+TEST_P(AllocatorCTest, Introspection)
 {
   double* data_one = (double*) umpire_allocator_allocate(&m_allocator, m_big*sizeof(double));
   ASSERT_NE(nullptr, data_one);
@@ -94,21 +94,33 @@ TEST_P(AllocatorCTest, SizeAndHighWatermark)
   ASSERT_NE(nullptr, data_three);
 
   std::size_t total_size = 3*m_big*sizeof(double);
+  std::size_t count = 3;
 
   ASSERT_EQ(total_size, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
+  ASSERT_FALSE(umpire_pointer_contains(data_one, data_two));
+  ASSERT_FALSE(umpire_pointer_overlaps(data_one, data_two));
+  ASSERT_GE(umpire_get_process_memory_usage(), 0);
+  ASSERT_GE(umpire_get_device_memory_usage(0), 0);
 
   umpire_allocator_deallocate(&m_allocator, data_three);
+  count -= 1;
   ASSERT_EQ((2*m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
   umpire_allocator_deallocate(&m_allocator, data_two);
+  count -= 1;
   ASSERT_EQ((m_big*sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
   umpire_allocator_deallocate(&m_allocator, data_one);
+  count -= 1;
   ASSERT_EQ(0, umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
+  ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 }
 
 TEST_P(AllocatorCTest, IsAllocator)
@@ -147,10 +159,10 @@ const char* allocator_names[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Allocators,
     AllocatorCTest,
-    ::testing::ValuesIn(allocator_names),);
+    ::testing::ValuesIn(allocator_names));
 
 class PoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -223,10 +235,10 @@ const char* pool_names[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Pools,
     PoolAllocatorCTest,
-    ::testing::ValuesIn(pool_names),);
+    ::testing::ValuesIn(pool_names));
 
 class ListPoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -286,10 +298,10 @@ TEST_P(ListPoolAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ListPools,
     ListPoolAllocatorCTest,
-    ::testing::ValuesIn(pool_names),);
+    ::testing::ValuesIn(pool_names));
 
 class FixedPoolAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -336,10 +348,10 @@ TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     FixedPools,
     FixedPoolAllocatorCTest,
-    ::testing::ValuesIn(pool_names),);
+    ::testing::ValuesIn(pool_names));
 
 class NamedAllocatorCTest :
   public ::testing::TestWithParam< const char* >
@@ -394,7 +406,16 @@ TEST_P(NamedAllocatorCTest, AllocateDeallocateNothing)
   umpire_allocator_deallocate(&m_named_allocator, data);
 }
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Nameds,
     NamedAllocatorCTest,
-    ::testing::ValuesIn(pool_names),);
+    ::testing::ValuesIn(pool_names));
+
+TEST(Allocators, GetInvalidId)
+{
+  int id = UMPIRE_INVALID_ALLOCATOR_ID;
+  int cpp_id = umpire::invalid_allocator_id;
+
+  ASSERT_EQ(0xDEADBEEF, id);
+  ASSERT_EQ(id, cpp_id);
+}

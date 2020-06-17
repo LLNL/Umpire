@@ -9,16 +9,14 @@
 #include <string>
 #include <cstring>
 
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+#include <cxxabi.h>   // for __cxa_demangle
 
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
 #include "ReplayFile.hpp"
 #include "umpire/tpl/json/json.hpp"
-
-#if !defined(_MSC_VER)
-#include <cxxabi.h>
-#endif
 
 ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
     m_input_file_name{in_file_name}, m_input_file{in_file_name}
@@ -423,6 +421,26 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
       m_ops->copyString(base_allocator_name, alloc->base_name);
     }
+    else if ( type == "umpire::strategy::QuickPool" ) {
+      const std::string base_allocator_name{m_json["payload"]["args"][0]};
+
+      alloc->type = ReplayFile::rtype::QUICKPOOL;
+
+      m_ops->copyString(base_allocator_name, alloc->base_name);
+
+      // Now grab the optional fields
+      if (alloc->argc >= 3) {
+        alloc->argc = 3;    // strip heuristic parameter
+        get_from_string(m_json["payload"]["args"][1],
+                        alloc->argv.pool.initial_alloc_size);
+        get_from_string(m_json["payload"]["args"][2],
+                        alloc->argv.pool.min_alloc_size);
+      }
+      else if (alloc->argc == 2) {
+        get_from_string(m_json["payload"]["args"][1],
+                        alloc->argv.pool.initial_alloc_size);
+      }
+    }
     else if ( type == "umpire::strategy::DynamicPoolList" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
@@ -781,4 +799,4 @@ void ReplayInterpreter::replay_compileRelease( void )
   op->op_allocator = getAllocatorIndex(std::string{m_json["payload"]["allocator_ref"]});
   hdr->num_operations++;
 }
-
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)

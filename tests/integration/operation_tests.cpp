@@ -19,13 +19,13 @@
 #endif
 
 class OperationTest :
-  public ::testing::TestWithParam< ::testing::tuple<std::string, std::string> >
+  public ::testing::TestWithParam< std::tuple<std::string, std::string> >
 {
   public:
     void SetUp() override {
       auto& rm = umpire::ResourceManager::getInstance();
-      source_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<0>(GetParam())));
-      dest_allocator = new umpire::Allocator(rm.getAllocator(::testing::get<1>(GetParam())));
+      source_allocator = new umpire::Allocator(rm.getAllocator(std::get<0>(GetParam())));
+      dest_allocator = new umpire::Allocator(rm.getAllocator(std::get<1>(GetParam())));
 
       source_array = static_cast<float*>(source_allocator->allocate(m_size*sizeof(float)));
       dest_array = static_cast<float*>(dest_allocator->allocate(m_size*sizeof(float)));
@@ -161,13 +161,12 @@ const std::string zero_copy_dests[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     ZeroCopies,
     ZeroCopyTest,
     ::testing::Combine(
       ::testing::ValuesIn(zero_copy_sources),
-      ::testing::ValuesIn(zero_copy_dests)
-),);
+      ::testing::ValuesIn(zero_copy_dests)));
 
 const std::string copy_sources[] = {
   "HOST"
@@ -193,12 +192,12 @@ const std::string copy_dests[] = {
 };
 
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Copies,
     CopyTest,
     ::testing::Combine(
       ::testing::ValuesIn(copy_sources),
-      ::testing::ValuesIn(copy_dests)),);
+      ::testing::ValuesIn(copy_dests)));
 
 class MemsetTest :
   public OperationTest
@@ -271,12 +270,12 @@ const std::string memset_dests[] = {
   "HOST"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Sets,
     MemsetTest,
     ::testing::Combine(
       ::testing::ValuesIn(memset_sources),
-      ::testing::ValuesIn(memset_dests)),);
+      ::testing::ValuesIn(memset_dests)));
 
 class ReallocateTest :
   public OperationTest
@@ -366,7 +365,7 @@ TEST_P(ReallocateTest, Reallocate)
 
   const std::size_t reallocated_size = (m_size/2);
 
-  rm.memset(source_array, 0);
+  rm.memset(source_array, 1);
 
   source_array =
     static_cast<float*>(
@@ -378,8 +377,9 @@ TEST_P(ReallocateTest, Reallocate)
 
   rm.copy(check_array, source_array, reallocated_size*sizeof(float));
 
-  for (std::size_t i = 0; i < reallocated_size; i++) {
-    ASSERT_FLOAT_EQ(check_array[i], 0);
+  auto checker = reinterpret_cast<char*>(check_array);
+  for (std::size_t i = 0; i < reallocated_size * (sizeof(float)/sizeof(char)); i++) {
+    ASSERT_FLOAT_EQ(checker[i], 1);
   }
 }
 
@@ -645,12 +645,12 @@ const std::string reallocate_dests[] = {
   "HOST"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Reallocate,
     ReallocateTest,
     ::testing::Combine(
       ::testing::ValuesIn(reallocate_sources),
-      ::testing::ValuesIn(reallocate_dests)),);
+      ::testing::ValuesIn(reallocate_dests)));
 
 class MoveTest :
   public OperationTest
@@ -706,12 +706,12 @@ const std::string move_dests[] = {
 #endif
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Move,
     MoveTest,
     ::testing::Combine(
       ::testing::ValuesIn(move_sources),
-      ::testing::ValuesIn(move_dests)),);
+      ::testing::ValuesIn(move_dests)));
 
 #if defined(UMPIRE_ENABLE_CUDA)
 class AdviceTest :
@@ -731,7 +731,7 @@ TEST_P(AdviceTest, ReadMostly)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -756,7 +756,7 @@ TEST_P(AdviceTest, PreferredLocation)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -781,7 +781,7 @@ TEST_P(AdviceTest, AccessedBy)
       strategy,
       strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::cpu) {
+  if (dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -803,12 +803,43 @@ const std::string advice_dests[] = {
   , "DEVICE"
 };
 
-INSTANTIATE_TEST_CASE_P(
+INSTANTIATE_TEST_SUITE_P(
     Advice,
     AdviceTest,
     ::testing::Combine(
       ::testing::ValuesIn(advice_sources),
-      ::testing::ValuesIn(advice_dests)
-),);
+      ::testing::ValuesIn(advice_dests)));
+
+TEST(AsyncTest, Copy)
+{
+  auto resource = camp::resources::Resource{camp::resources::Cuda{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto host_alloc = rm.getAllocator("HOST");
+  auto device_alloc = rm.getAllocator("DEVICE");
+
+  float* source_array = static_cast<float*>(
+      host_alloc.allocate(size*sizeof(float)));
+  float* check_array = static_cast<float*>(
+      host_alloc.allocate(size*sizeof(float)));
+
+  float* dest_array = static_cast<float*>(
+      device_alloc.allocate(size*sizeof(float)));
+
+  for (std::size_t i = 0; i < size; i++) {
+    source_array[i] = static_cast<float>(i);
+  }
+
+  auto event = rm.copy(dest_array, source_array, resource);
+  event = rm.copy(check_array, dest_array, resource);
+
+  event.wait();
+
+  for (std::size_t i = 0; i < size; i++) {
+    ASSERT_FLOAT_EQ(source_array[i], check_array[i]);
+  }
+}
 
 #endif

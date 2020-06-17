@@ -35,10 +35,36 @@ AllocationStrategy::getId() noexcept
   return m_id;
 }
 
+std::size_t 
+AllocationStrategy::getCurrentSize() const noexcept
+{
+  return 0;
+}
+
+std::size_t 
+AllocationStrategy::getHighWatermark() const noexcept
+{
+  return 0;
+}
+
+std::size_t 
+AllocationStrategy::getAllocationCount() const noexcept
+{
+  return 0;
+}
+
 std::size_t
 AllocationStrategy::getActualSize() const noexcept
 {
   return getCurrentSize();
+}
+
+MemoryResourceTraits 
+AllocationStrategy::getTraits() const noexcept
+{
+  UMPIRE_LOG(Error, "AllocationStrategy::getTraits() not implemented");
+
+  return MemoryResourceTraits{};
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)
