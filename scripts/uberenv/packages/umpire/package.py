@@ -18,6 +18,12 @@ def cmake_cache_entry(name, value, comment=""):
     return 'set(%s "%s" CACHE PATH "%s")\n\n' % (name,value,comment)
 
 
+def cmake_cache_string(name, string, comment=""):
+    """Generate a string for a cmake cache variable"""
+
+    return 'set(%s "%s" CACHE STRING "%s")\n\n' % (name,string,comment)
+
+
 def cmake_cache_option(name, boolean_value, comment=""):
     """Generate a string for a cmake configuration option"""
 
@@ -77,7 +83,6 @@ class Umpire(CMakePackage, CudaPackage):
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
-    variant('cuda', default=False, description='Enable Cuda support')
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
@@ -86,43 +91,6 @@ class Umpire(CMakePackage, CudaPackage):
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
 
     phases = ['hostconfig', 'cmake', 'build',' install']
-
-    def cmake_args(self):
-        spec = self.spec
-
-        options = []
-
-        if '+cuda' in spec:
-            options.extend([
-                '-DENABLE_CUDA=On',
-                '-DCUDA_TOOLKIT_ROOT_DIR=%s' % (spec['cuda'].prefix)])
-
-            if not spec.satisfies('cuda_arch=none'):
-                cuda_arch = spec.variants['cuda_arch'].value
-                flag = '-arch sm_{0}'.format(cuda_arch[0])
-                options.append('-DCMAKE_CUDA_FLAGS:STRING={0}'.format(flag))
-
-            if '+deviceconst' in spec:
-                options.append('-DENABLE_DEVICE_CONST=On')
-        else:
-            options.append('-DENABLE_CUDA=Off')
-
-        options.append('-DENABLE_C={0}'.format(
-            'On' if '+c' in spec else 'Off'))
-
-        options.append('-DENABLE_FORTRAN={0}'.format(
-            'On' if '+fortran' in spec else 'Off'))
-
-        options.append('-DENABLE_NUMA={0}'.format(
-            'On' if '+numa' in spec else 'Off'))
-
-        options.append('-DENABLE_OPENMP={0}'.format(
-            'On' if '+openmp' in spec else 'Off'))
-
-        options.append('-DENABLE_TESTS={0}'.format(
-            'On' if self.run_tests else 'Off'))
-
-        return options
 
     def _get_sys_type(self, spec):
         sys_type = spec.architecture
@@ -262,3 +230,39 @@ class Umpire(CMakePackage, CudaPackage):
             cudacompiler = "${CUDA_TOOLKIT_ROOT_DIR}/bin/nvcc"
             cfg.write(cmake_cache_entry("CMAKE_CUDA_COMPILER",
                                         cudacompiler))
+
+            if not spec.satisfies('cuda_arch=none'):
+                cuda_arch = spec.variants['cuda_arch'].value
+                flag = '-arch sm_{0}'.format(cuda_arch[0])
+                cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS", flag))
+
+            if '+deviceconst' in spec:
+                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+
+        else:
+            cfg.write(cmake_cache_option("ENABLE_CUDA", False))
+
+
+    def cmake_args(self):
+        spec = self.spec
+        host_config_path = self._get_host_config_path(spec)
+
+        options = []
+        options.extend(['-C', host_config_path])
+
+        options.append('-DENABLE_C={0}'.format(
+            'On' if '+c' in spec else 'Off'))
+
+        options.append('-DENABLE_FORTRAN={0}'.format(
+            'On' if '+fortran' in spec else 'Off'))
+
+        options.append('-DENABLE_NUMA={0}'.format(
+            'On' if '+numa' in spec else 'Off'))
+
+        options.append('-DENABLE_OPENMP={0}'.format(
+            'On' if '+openmp' in spec else 'Off'))
+
+        options.append('-DENABLE_TESTS={0}'.format(
+            'On' if self.run_tests else 'Off'))
+
+        return options
