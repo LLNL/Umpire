@@ -15,7 +15,7 @@
     - shell
     - quartz
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /_qnone/ || $UMPIRE_CI_QUARTZ == "OFF"' #run except if ...
+    - if: '$CI_COMMIT_BRANCH =~ /_qnone/ || $ON_QUARTZ == "OFF"' #run except if ...
       when: never
     - if: '$CI_JOB_NAME =~ /release_resources/'
       when: always
@@ -29,8 +29,8 @@ allocate_resources (on quartz):
   extends: .on_quartz
   stage: q_allocate_resources
   script:
-    - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${UMPIRE_ALLOC_NAME}
-  needs: ["start"]
+    - salloc -N 1 -c 36 -p pdebug -t 10 --no-shell --job-name=${ALLOC_NAME}
+  needs: []
 
 ####
 # In post-build phase, deallocate resources
@@ -41,7 +41,7 @@ release_resources (on quartz):
   extends: .on_quartz
   stage: q_release_resources
   script:
-    - export JOBID=$(squeue -h --name=${UMPIRE_ALLOC_NAME} --format=%A)
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
 
 ####

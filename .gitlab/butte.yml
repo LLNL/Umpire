@@ -13,7 +13,7 @@
     - shell
     - butte
   rules:
-    - if: '$UMPIRE_CI_BUTTE != "ON"' #run except if ...
+    - if: '$ON_BUTTE != "ON"' #run except if ...
       when: never
     - when: on_success
   allow_failure: true
@@ -21,7 +21,7 @@
 .build_and_test_on_butte:
   stage: b_build_and_test
   extends: [.build_blueos_3_ppc64le_ib_script, .on_butte]
-  needs: ["start"]
+  needs: []
 
 # Note: .build_and_test_on_butte_advanced inherits from
 # .build_and_test_on_butte and .advanced_pileline.
