@@ -84,6 +84,8 @@ class Umpire(CMakePackage, CudaPackage):
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
 
+    variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
+
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
 
@@ -194,9 +196,14 @@ class Umpire(CMakePackage, CudaPackage):
 
         # use global spack compiler flags
         cflags = ' '.join(spec.compiler_flags['cflags'])
+        if "+libcpp" in spec:
+            cflags += ' '.join([cflags,"-DGTEST_HAS_CXXABI_H_=0"])
         if cflags:
             cfg.write(cmake_cache_entry("CMAKE_C_FLAGS", cflags))
+
         cxxflags = ' '.join(spec.compiler_flags['cxxflags'])
+        if "+libcpp" in spec:
+            cxxflags += ' '.join([cxxflags,"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0"])
         if cxxflags:
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
 
@@ -208,6 +215,9 @@ class Umpire(CMakePackage, CudaPackage):
                 if os.path.exists(_libpath):
                     flags += " -Wl,-rpath,{0}".format(_libpath)
             description = ("Adds a missing libstdc++ rpath")
+            if flags:
+                cfg.write(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags,
+                                            description))
 
         if sys_type == "toss_3_x86_64_ib":
             release_flags = "-O3 -finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch"
