@@ -7,6 +7,7 @@
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
+  FileMemoryResource.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
@@ -17,6 +18,7 @@ set (umpire_resource_headers
 )
 
 set (umpire_resource_sources
+  FileMemoryResource.cpp
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
