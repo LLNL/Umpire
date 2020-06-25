@@ -25,7 +25,7 @@ AlignedAllocator::AlignedAllocator(
     UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
   }
 
-  if (! (m_alignment > 0 && !(m_alignment & (m_alignment-1)))) {
+  if (! (m_alignment > 0 && ((m_alignment & (m_alignment-1)) == 0))) {
     UMPIRE_ERROR("AlignedAllocator alignment must be a power of 2");
   }
 }

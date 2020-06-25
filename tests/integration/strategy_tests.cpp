@@ -1504,7 +1504,7 @@ static inline void test_alignment(
 
 TEST(AlignedAllocator, AllocateAlign8)
 {
-  unsigned int align = 8;
+  unsigned int align = 256;
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
     "aligned_allocator_8", rm.getAllocator("HOST"), align);
@@ -1546,7 +1546,19 @@ TEST(AlignedAllocator, BadAlignment)
 
   EXPECT_THROW({
     auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
-    "aligned_allocator_17", rm.getAllocator("HOST"), 17);
+    "aligned_allocator_6", rm.getAllocator("HOST"), 6);
+    UMPIRE_USE_VAR(alloc);
+  }, umpire::util::Exception);
+
+  EXPECT_THROW({
+    auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_11", rm.getAllocator("HOST"), 11);
+    UMPIRE_USE_VAR(alloc);
+  }, umpire::util::Exception);
+
+  EXPECT_THROW({
+    auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_0", rm.getAllocator("HOST"), 0);
     UMPIRE_USE_VAR(alloc);
   }, umpire::util::Exception);
 }
