@@ -34,74 +34,63 @@
 
 clang_default (build and test on lassen):
   variables:
-    CONFIGURATION: "clang@default"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@default.cmake"
   extends: .build_and_test_on_lassen
 
 gcc_default (build and test on lassen):
   variables:
-    CONFIGURATION: "gcc@default"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@default.cmake"
   extends: .build_and_test_on_lassen
 
 xl_default (build and test on lassen):
   variables:
-    CONFIGURATION: "xl@default"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-xl@default.cmake"
   extends: .build_and_test_on_lassen
 
 pgi_default (build and test on lassen):
   variables:
-    CONFIGURATION: "pgi@default"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-pgi@default.cmake"
   extends: .build_and_test_on_lassen
 
 clang_3_9_1 (build and test on lassen):
   variables:
-    CONFIGURATION: "clang@3.9.1"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@3.9.1.cmake"
   extends: .build_and_test_on_lassen_advanced
 
 clang_4_0_0 (build and test on lassen):
   variables:
-    CONFIGURATION: "clang@4.0.0"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@4.0.0.cmake"
   extends: .build_and_test_on_lassen_advanced
 
 clang_9_0_0 (build and test on lassen):
   variables:
-    CONFIGURATION: "clang@9.0.0"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@9.0.0.cmake"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1 (build and test on lassen):
   variables:
-    CONFIGURATION: "gcc@8.3.1"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@8.3.1.cmake"
   extends: .build_and_test_on_lassen
 
 clang_coral_2018_08_08 (build and test on lassen):
   variables:
-    CONFIGURATION: "clang@coral2018.08.08"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08.cmake"
   extends: .build_and_test_on_lassen
   allow_failure: true
 
 nvcc_gcc_4_9_3 (build and test on lassen):
   variables:
-    CONFIGURATION: "gcc4.9.3 +cuda"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@4.9.3-cuda.cmake"
   extends: .build_and_test_on_lassen
 
 nvcc_clang_coral_2018_08_08 (build and test on lassen):
   variables:
-    CONFIGURATION: "clang@coral2018.08.08 +cuda"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08-cuda.cmake"
   extends: .build_and_test_on_lassen
   allow_failure: true
 
 nvcc_xl-beta-2019.06.20 (build and test on lassen):
   variables:
-    CONFIGURATION: "nvcc_xl-beta-2019.06.20 +cuda"
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-xl@beta2019.06.20.cmake"
   extends: .build_and_test_on_lassen
   allow_failure: true
