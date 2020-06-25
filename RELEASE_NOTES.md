@@ -1,3 +1,6 @@
+# v3.0.0
+
+
 # v2.1.0
 
 - Fixes a bug when calling reallocate with size 0.
