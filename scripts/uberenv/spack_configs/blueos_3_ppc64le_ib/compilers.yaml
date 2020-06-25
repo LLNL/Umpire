@@ -133,7 +133,7 @@ compilers:
     spec: pgi@default
     paths:
       cc: pgcc
-      cxx: pg++
+      cxx: pgc++
       f77: pgfortran
       fc: pgfortran
     flags: {}
