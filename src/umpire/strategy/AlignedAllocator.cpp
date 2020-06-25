@@ -17,46 +17,55 @@ AlignedAllocator::AlignedAllocator(
     Allocator allocator,
     std::size_t alignment) :
   AllocationStrategy(name, id),
-  m_allocator(allocator.getAllocationStrategy()),
-  m_alignment{alignment},
-  m_mask{static_cast<uintptr_t>(~(m_alignment-1))}
+  m_allocator(allocator.getAllocationStrategy())
 {
   if (m_allocator->getPlatform() != Platform::host) {
     UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
   }
 
-  if (! (m_alignment > 0 && ((m_alignment & (m_alignment-1)) == 0))) {
+  if (! (alignment > 0 && ((alignment & (alignment-1)) == 0))) {
     UMPIRE_ERROR("AlignedAllocator alignment must be a power of 2");
   }
+
+  m_alignment = std::max(sizeof(uintptr_t), alignment);
+  m_mask = static_cast<uintptr_t>(~(m_alignment-1));
 }
 
-void* 
+void*
 AlignedAllocator::allocate(std::size_t bytes)
 {
-  std::size_t total_bytes = bytes+sizeof(void*)+m_alignment-1;
-  UMPIRE_LOG(Debug, "requested: " << bytes << " actual: " << bytes+m_alignment-1);
+  //
+  // Make sure we allocate enough bytes to prepend our stuff AND still provide
+  // a ptr that is properly aligned to callers specfications.
+  //
+  std::size_t total_bytes = bytes
+                            + m_alignment    // This alignment is big enough for our header
+                            + m_alignment-1; // This is to ensure enough space for alignment
+
+  UMPIRE_LOG(Debug, "requested: " << bytes << " actual: " << total_bytes);
 
   uintptr_t ptr{reinterpret_cast<uintptr_t>(m_allocator->allocate(total_bytes))};
-  uintptr_t aligned_ptr{static_cast<uintptr_t>((reinterpret_cast<uintptr_t>(ptr) + sizeof(void*) + (m_alignment-1)) & m_mask)}; 
-  uintptr_t* header = (uintptr_t*) (aligned_ptr - sizeof(void*));
+  uintptr_t header_ptr{static_cast<uintptr_t>((reinterpret_cast<uintptr_t>(ptr) + (m_alignment-1)) & m_mask)};
+  uintptr_t aligned_ptr{static_cast<uintptr_t>(reinterpret_cast<uintptr_t>(header_ptr) + (m_alignment))};
+  uintptr_t* header = (uintptr_t*) (header_ptr);
   *header = ptr;
 
   UMPIRE_LOG(Debug, "ptr: " << reinterpret_cast<void*>(ptr) << " aligned: " << reinterpret_cast<void*>(aligned_ptr));
   return reinterpret_cast<void*>(aligned_ptr);
 }
 
-void 
+void
 AlignedAllocator::deallocate(void* ptr)
 {
   uintptr_t aligned_ptr{reinterpret_cast<uintptr_t>(ptr)};
-  uintptr_t* header = (uintptr_t*) (aligned_ptr - sizeof(void*));
+  uintptr_t* header = (uintptr_t*) (aligned_ptr - m_alignment);
   void* base_ptr = reinterpret_cast<void*>(*header);
-  
+
   UMPIRE_LOG(Debug, "ptr: " << reinterpret_cast<void*>(ptr) << " base_ptr: " << reinterpret_cast<void*>(base_ptr));
   return m_allocator->deallocate(base_ptr);
 }
 
-Platform 
+Platform
 AlignedAllocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
