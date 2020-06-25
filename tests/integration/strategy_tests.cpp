@@ -1502,12 +1502,12 @@ static inline void test_alignment(
   ASSERT_TRUE( p2 == 0 || p2 == align);
 }
 
-TEST(AlignedAllocator, AllocateAlign8)
+TEST(AlignedAllocator, AllocateAlign256)
 {
   unsigned int align = 256;
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
-    "aligned_allocator_8", rm.getAllocator("HOST"), align);
+    "aligned_allocator_256", rm.getAllocator("HOST"), align);
 
   void* d1{alloc.allocate(1)};
   void* d2{alloc.allocate(1)};
