@@ -19,7 +19,7 @@ AlignedAllocator::AlignedAllocator(
   AllocationStrategy(name, id),
   m_allocator(allocator.getAllocationStrategy()),
   m_alignment{alignment},
-  m_mask{reinterpret_cast<uintptr_t>(~(m_alignment-1))}
+  m_mask{static_cast<uintptr_t>(~(m_alignment-1))}
 {
   if (m_allocator->getPlatform() != Platform::host) {
     UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
@@ -33,7 +33,7 @@ AlignedAllocator::allocate(std::size_t bytes)
   UMPIRE_LOG(Debug, "requested: " << bytes << " actual: " << bytes+m_alignment-1);
 
   uintptr_t ptr{reinterpret_cast<uintptr_t>(m_allocator->allocate(total_bytes))};
-  uintptr_t aligned_ptr{reinterpret_cast<uintptr_t>((reinterpret_cast<uintptr_t>(ptr) + sizeof(void*) + (m_alignment-1)) & m_mask)}; 
+  uintptr_t aligned_ptr{static_cast<uintptr_t>((reinterpret_cast<uintptr_t>(ptr) + sizeof(void*) + (m_alignment-1)) & m_mask)}; 
   uintptr_t* header = (uintptr_t*) (aligned_ptr - sizeof(void*));
   *header = ptr;
 
