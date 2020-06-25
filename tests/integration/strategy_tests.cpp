@@ -1485,3 +1485,68 @@ TEST(NumaPolicyTest, Location) {
 }
 
 #endif // defined(UMPIRE_ENABLE_NUMA)
+
+static inline void test_alignment(
+    uintptr_t p1,
+    uintptr_t p2,
+    unsigned int align)
+{
+  ASSERT_EQ(0, p1 % align);
+  ASSERT_EQ(0, p2 % align);
+
+  p1 &= align;
+  p2 &= align;
+
+  ASSERT_NE(p1, p2);
+  ASSERT_TRUE( p1 == 0 || p1 == align);
+  ASSERT_TRUE( p2 == 0 || p2 == align);
+}
+
+TEST(AlignedAllocator, AllocateAlign8)
+{
+  unsigned int align = 8;
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_8", rm.getAllocator("HOST"), align);
+
+  void* d1{alloc.allocate(1)};
+  void* d2{alloc.allocate(1)};
+
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d1),
+    reinterpret_cast<uintptr_t>(d2),
+    align);
+
+  alloc.deallocate(d1);
+  alloc.deallocate(d2);
+}
+
+TEST(AlignedAllocator, AllocateAlign64)
+{
+  unsigned int align = 64;
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_64", rm.getAllocator("HOST"), align);
+
+  void* d1{alloc.allocate(1)};
+  void* d2{alloc.allocate(1)};
+
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d1),
+    reinterpret_cast<uintptr_t>(d2),
+    align);
+
+  alloc.deallocate(d1);
+  alloc.deallocate(d2);
+}
+
+TEST(AlignedAllocator, BadAlignment)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  EXPECT_THROW({
+    auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_17", rm.getAllocator("HOST"), 17);
+    UMPIRE_USE_VAR(alloc);
+  }, umpire::util::Exception);
+}

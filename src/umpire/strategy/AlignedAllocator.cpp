@@ -24,6 +24,10 @@ AlignedAllocator::AlignedAllocator(
   if (m_allocator->getPlatform() != Platform::host) {
     UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
   }
+
+  if (! (m_alignment > 0 && !(m_alignment & (m_alignment-1)))) {
+    UMPIRE_ERROR("AlignedAllocator alignment must be a power of 2");
+  }
 }
 
 void* 
@@ -36,9 +40,6 @@ AlignedAllocator::allocate(std::size_t bytes)
   uintptr_t aligned_ptr{static_cast<uintptr_t>((reinterpret_cast<uintptr_t>(ptr) + sizeof(void*) + (m_alignment-1)) & m_mask)}; 
   uintptr_t* header = (uintptr_t*) (aligned_ptr - sizeof(void*));
   *header = ptr;
-
-  std::cout << ptr << std::endl;
-  std::cout << aligned_ptr << std::endl;
 
   UMPIRE_LOG(Debug, "ptr: " << reinterpret_cast<void*>(ptr) << " aligned: " << reinterpret_cast<void*>(aligned_ptr));
   return reinterpret_cast<void*>(aligned_ptr);
