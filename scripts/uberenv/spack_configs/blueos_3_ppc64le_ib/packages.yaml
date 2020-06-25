@@ -2,7 +2,7 @@ packages:
   all:
     # This defaults us to machine specific flags of ivybridge which allows
     # us to run on broadwell as well
-    target: [power9le]
+    target: [ppc64le]
     compiler: [gcc, pgi, clang, xl]
 
   cmake:

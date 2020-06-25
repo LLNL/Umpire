@@ -104,7 +104,9 @@ class Umpire(CMakePackage, CudaPackage):
     def _get_host_config_path(self, spec):
         var=''
         if '+cuda' in spec:
-            var+='-cuda'
+            var= '-'.join([var,'cuda'])
+        if '+libcpp' in spec:
+            var='-'.join([var,'libcpp'])
 
         host_config_path = "%s-%s-%s%s.cmake" % (socket.gethostname().rstrip('1234567890'),
                                                self._get_sys_type(spec),

@@ -4,11 +4,11 @@ compilers:
     paths:
       cc: /usr/tcetmp/packages/clang/clang-3.9.1/bin/clang
       cxx: /usr/tcetmp/packages/clang/clang-3.9.1/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
+      f77: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -17,11 +17,11 @@ compilers:
     paths:
       cc: /usr/tcetmp/packages/clang/clang-4.0.0/bin/clang
       cxx: /usr/tcetmp/packages/clang/clang-4.0.0/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
+      f77: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -30,63 +30,24 @@ compilers:
     paths:
       cc: /usr/tce/packages/clang/clang-9.0.0/bin/clang
       cxx: /usr/tce/packages/clang/clang-9.0.0/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2019.08.20/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2019.08.20/bin/xlf2003_r
+      f77: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
 - compiler:
-    spec: clang@coral-2017.06.29
+    spec: clang@coral2018.08.08
     paths:
-      cc: /usr/tce/packages/clang/clang-coral-2017.06.29/bin/clang
-      cxx: /usr/tce/packages/clang/clang-coral-2017.06.29/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
+      cc: /usr/tce/packages/clang/clang-coral-2018.08.08/bin/clang
+      cxx: /usr/tce/packages/clang/clang-coral-2018.08.08/bin/clang++
+      f77: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
     flags: {}
     operating_system: rhel7
-    target: x86_64
-    modules: []
-    environment: {}
-    extra_rpaths: []
-- compiler:
-    spec: clang@coral-2017.08.31
-    paths:
-      cc: /usr/tce/packages/clang/clang-coral-2017.08.31/bin/clang
-      cxx: /usr/tce/packages/clang/clang-coral-2017.08.31/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-    flags: {}
-    operating_system: rhel7
-    target: x86_64
-    modules: []
-    environment: {}
-    extra_rpaths: []
-- compiler:
-    spec: clang@coral-2017.09.06
-    paths:
-      cc: /usr/tce/packages/clang/clang-coral-2017.09.06/bin/clang
-      cxx: /usr/tce/packages/clang/clang-coral-2017.09.06/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-    flags: {}
-    operating_system: rhel7
-    target: x86_64
-    modules: []
-    environment: {}
-    extra_rpaths: []
-- compiler:
-    spec: clang@coral-2017.09.18
-    paths:
-      cc: /usr/tce/packages/clang/clang-coral-2017.09.18/bin/clang
-      cxx: /usr/tce/packages/clang/clang-coral-2017.09.18/bin/clang++
-      f77: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2017.09.13/bin/xlf2003_r
-    flags: {}
-    operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -95,11 +56,11 @@ compilers:
     paths:
       cc: clang
       cxx: clang++
-      f77: /usr/tce/packages/xl/xl-beta-2019.08.20/bin/xlf2003_r
-      fc: /usr/tce/packages/xl/xl-beta-2019.08.20/bin/xlf2003_r
+      f77: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -112,7 +73,20 @@ compilers:
       fc: /usr/tce/packages/gcc/gcc-8.3.1/bin/gfortran
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: gcc@4.9.3
+    paths:
+      cc: /usr/tce/packages/gcc/gcc-4.9.3/bin/gcc
+      cxx: /usr/tce/packages/gcc/gcc-4.9.3/bin/g++
+      f77: /usr/tce/packages/gcc/gcc-4.9.3/bin/gfortran
+      fc: /usr/tce/packages/gcc/gcc-4.9.3/bin/gfortran
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -125,7 +99,7 @@ compilers:
       fc: gfortran
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -138,7 +112,20 @@ compilers:
       fc: xlf2003
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: xl@beta2019.06.20
+    paths:
+      cc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlc
+      cxx: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlc++
+      f77: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-beta-2019.06.20/bin/xlf2003_r
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
@@ -151,7 +138,7 @@ compilers:
       fc: pgfortran
     flags: {}
     operating_system: rhel7
-    target: x86_64
+    target: ppc64le
     modules: []
     environment: {}
     extra_rpaths: []
