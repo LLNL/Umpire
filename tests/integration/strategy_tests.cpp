@@ -1487,19 +1487,12 @@ TEST(NumaPolicyTest, Location) {
 #endif // defined(UMPIRE_ENABLE_NUMA)
 
 static inline void test_alignment(
-    uintptr_t p1,
-    uintptr_t p2,
+    uintptr_t p,
     unsigned int align)
 {
-  ASSERT_EQ(0, p1 % align);
-  ASSERT_EQ(0, p2 % align);
-
-  p1 &= align;
-  p2 &= align;
-
-  ASSERT_NE(p1, p2);
-  ASSERT_TRUE( p1 == 0 || p1 == align);
-  ASSERT_TRUE( p2 == 0 || p2 == align);
+  ASSERT_EQ(0, p % align);
+  p &= align;
+  ASSERT_TRUE( p == 0 || p == align);
 }
 
 TEST(AlignedAllocator, AllocateAlign256)
@@ -1510,15 +1503,22 @@ TEST(AlignedAllocator, AllocateAlign256)
     "aligned_allocator_256", rm.getAllocator("HOST"), align);
 
   void* d1{alloc.allocate(1)};
-  void* d2{alloc.allocate(1)};
+  void* d2{alloc.allocate(257)};
+  void* d3{alloc.allocate(783)};
 
   test_alignment(
     reinterpret_cast<uintptr_t>(d1),
+    align);
+  test_alignment(
     reinterpret_cast<uintptr_t>(d2),
+    align);
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d3),
     align);
 
   alloc.deallocate(d1);
   alloc.deallocate(d2);
+  alloc.deallocate(d3);
 }
 
 TEST(AlignedAllocator, AllocateAlign64)
@@ -1529,15 +1529,22 @@ TEST(AlignedAllocator, AllocateAlign64)
     "aligned_allocator_64", rm.getAllocator("HOST"), align);
 
   void* d1{alloc.allocate(1)};
-  void* d2{alloc.allocate(1)};
+  void* d2{alloc.allocate(17)};
+  void* d3{alloc.allocate(128)};
 
   test_alignment(
     reinterpret_cast<uintptr_t>(d1),
+    align);
+  test_alignment(
     reinterpret_cast<uintptr_t>(d2),
+    align);
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d3),
     align);
 
   alloc.deallocate(d1);
   alloc.deallocate(d2);
+  alloc.deallocate(d3);
 }
 
 TEST(AlignedAllocator, BadAlignment)

@@ -25,8 +25,8 @@ AlignedAllocator::AlignedAllocator(
     UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
   }
 
-  if (! (m_alignment > 0 && ((m_alignment & (m_alignment-1)) == 0))) {
-    UMPIRE_ERROR("AlignedAllocator alignment must be a power of 2");
+  if (! (m_alignment >= 16 && ((m_alignment & (m_alignment-1)) == 0))) {
+    UMPIRE_ERROR("AlignedAllocator alignment must be a power of 2 greater than or equal to 16");
   }
 }
 
@@ -37,7 +37,7 @@ AlignedAllocator::allocate(std::size_t bytes)
   UMPIRE_LOG(Debug, "requested: " << bytes << " actual: " << bytes+m_alignment-1);
 
   uintptr_t ptr{reinterpret_cast<uintptr_t>(m_allocator->allocate(total_bytes))};
-  uintptr_t aligned_ptr{static_cast<uintptr_t>((reinterpret_cast<uintptr_t>(ptr) + sizeof(void*) + (m_alignment-1)) & m_mask)}; 
+  uintptr_t aligned_ptr{static_cast<uintptr_t>((ptr + sizeof(void*) + (m_alignment-1)) & m_mask)}; 
   uintptr_t* header = (uintptr_t*) (aligned_ptr - sizeof(void*));
   *header = ptr;
 
