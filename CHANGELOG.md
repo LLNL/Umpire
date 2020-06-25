@@ -20,14 +20,21 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `AlignedAllocator` strategy providing aligned allocations for HOST memory.
 
+- Additional symbol information may be obtained in backtraces with
+  -DENABLE_BACKTRACE_SYMBOLS and including `-ldl` for the using program.
+
+- Check for nullptr during `ResourceManager::registerAllocation`.
+
 ### Changed
 
-- LC Gitlab CI runs only a subset of targets on PRs, and all of them on master
+- LC Gitlab CI runs only a subset of targets on PRs, and all of them on main
   and develop branch. Lassen allocation is shorter. Jobs name or more efficient
   to read in UI. All builds goes in `${CI_BUILDS_DIR}/umpire/` to avoid multiple
   directories in `${CI_BUILDS_DIR}`.
 
 - Update BLT to version 0.3.0
+
+- `DeviceAllocator` will issue a trap instruction if it runs out of memory.
 
 ### Removed
 

@@ -59,6 +59,7 @@ module umpire_mod
         procedure :: get_high_watermark => allocator_get_high_watermark
         procedure :: get_current_size => allocator_get_current_size
         procedure :: get_actual_size => allocator_get_actual_size
+        procedure :: get_allocation_count => allocator_get_allocation_count
         procedure :: get_name => allocator_get_name
         procedure :: get_id => allocator_get_id
         procedure :: get_instance => allocator_get_instance
@@ -267,6 +268,16 @@ module umpire_mod
             type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_actual_size
+
+        function c_allocator_get_allocation_count(self) &
+                result(SHT_rv) &
+                bind(C, name="umpire_allocator_get_allocation_count")
+            use iso_c_binding, only : C_SIZE_T
+            import :: SHROUD_allocator_capsule
+            implicit none
+            type(SHROUD_allocator_capsule), intent(IN) :: self
+            integer(C_SIZE_T) :: SHT_rv
+        end function c_allocator_get_allocation_count
 
         pure function c_allocator_get_name(self) &
                 result(SHT_rv) &
@@ -748,6 +759,52 @@ module umpire_mod
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
 
+        function c_pointer_overlaps(left, right) &
+                result(SHT_rv) &
+                bind(C, name="umpire_pointer_overlaps")
+            use iso_c_binding, only : C_BOOL, C_PTR
+            implicit none
+            type(C_PTR), value, intent(IN) :: left
+            type(C_PTR), value, intent(IN) :: right
+            logical(C_BOOL) :: SHT_rv
+        end function c_pointer_overlaps
+
+        function c_pointer_contains(left, right) &
+                result(SHT_rv) &
+                bind(C, name="umpire_pointer_contains")
+            use iso_c_binding, only : C_BOOL, C_PTR
+            implicit none
+            type(C_PTR), value, intent(IN) :: left
+            type(C_PTR), value, intent(IN) :: right
+            logical(C_BOOL) :: SHT_rv
+        end function c_pointer_contains
+
+        subroutine c_get_backtrace_bufferify(ptr, DSHF_rv) &
+                bind(C, name="umpire_get_backtrace_bufferify")
+            use iso_c_binding, only : C_PTR
+            import :: SHROUD_array
+            implicit none
+            type(C_PTR), value, intent(IN) :: ptr
+            type(SHROUD_array), intent(OUT) :: DSHF_rv
+        end subroutine c_get_backtrace_bufferify
+
+        function get_process_memory_usage() &
+                result(SHT_rv) &
+                bind(C, name="umpire_get_process_memory_usage")
+            use iso_c_binding, only : C_SIZE_T
+            implicit none
+            integer(C_SIZE_T) :: SHT_rv
+        end function get_process_memory_usage
+
+        function get_device_memory_usage(device_id) &
+                result(SHT_rv) &
+                bind(C, name="umpire_get_device_memory_usage")
+            use iso_c_binding, only : C_INT, C_SIZE_T
+            implicit none
+            integer(C_INT), value, intent(IN) :: device_id
+            integer(C_SIZE_T) :: SHT_rv
+        end function get_device_memory_usage
+
         ! splicer begin additional_interfaces
         ! splicer end additional_interfaces
     end interface
@@ -841,6 +898,16 @@ contains
         SHT_rv = c_allocator_get_actual_size(obj%cxxmem)
         ! splicer end class.Allocator.method.get_actual_size
     end function allocator_get_actual_size
+
+    function allocator_get_allocation_count(obj) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_SIZE_T
+        class(UmpireAllocator) :: obj
+        integer(C_SIZE_T) :: SHT_rv
+        ! splicer begin class.Allocator.method.get_allocation_count
+        SHT_rv = c_allocator_get_allocation_count(obj%cxxmem)
+        ! splicer end class.Allocator.method.get_allocation_count
+    end function allocator_get_allocation_count
 
     function allocator_get_name(obj) &
             result(SHT_rv)
@@ -1801,6 +1868,41 @@ contains
 
     ! splicer begin class.ResourceManager.additional_functions
     ! splicer end class.ResourceManager.additional_functions
+
+    function pointer_overlaps(left, right) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_BOOL, C_PTR
+        type(C_PTR), value, intent(IN) :: left
+        type(C_PTR), value, intent(IN) :: right
+        logical :: SHT_rv
+        ! splicer begin function.pointer_overlaps
+        SHT_rv = c_pointer_overlaps(left, right)
+        ! splicer end function.pointer_overlaps
+    end function pointer_overlaps
+
+    function pointer_contains(left, right) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_BOOL, C_PTR
+        type(C_PTR), value, intent(IN) :: left
+        type(C_PTR), value, intent(IN) :: right
+        logical :: SHT_rv
+        ! splicer begin function.pointer_contains
+        SHT_rv = c_pointer_contains(left, right)
+        ! splicer end function.pointer_contains
+    end function pointer_contains
+
+    function get_backtrace(ptr) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_PTR
+        type(C_PTR), value, intent(IN) :: ptr
+        type(SHROUD_array) :: DSHF_rv
+        character(len=:), allocatable :: SHT_rv
+        ! splicer begin function.get_backtrace
+        call c_get_backtrace_bufferify(ptr, DSHF_rv)
+        allocate(character(len=DSHF_rv%elem_len):: SHT_rv)
+        call SHROUD_copy_string_and_free(DSHF_rv, SHT_rv, DSHF_rv%elem_len)
+        ! splicer end function.get_backtrace
+    end function get_backtrace
 
     ! splicer begin additional_functions
     ! splicer end additional_functions

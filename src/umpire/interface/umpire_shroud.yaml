@@ -21,6 +21,7 @@ copyright:
 
 library: Umpire
 namespace: umpire
+cxx_header: umpire/Umpire.hpp
 
 options:
   F_module_per_class: False
@@ -30,6 +31,12 @@ format:
   C_prefix: umpire_
 
 declarations:
+  - decl: bool pointer_overlaps(void* left, void* right)
+  - decl: bool pointer_contains(void* left, void* right)
+  - decl: string get_backtrace(void* ptr)
+  - decl: size_t get_process_memory_usage()
+  - decl: size_t get_device_memory_usage(int device_id)
+
   - decl: namespace strategy
     options:
       flatten_namespace: True
@@ -94,6 +101,7 @@ declarations:
       - decl: size_t getHighWatermark()
       - decl: size_t getCurrentSize()
       - decl: size_t getActualSize()
+      - decl: size_t getAllocationCount()
       - decl: const std::string& getName() +pure
       - decl: size_t getId()
 
