@@ -266,11 +266,11 @@ ResourceManager::initialize()
       cudaDeviceEnablePeerAccess(device, 0);
     }
 
+    int current_device;
+    cudaGetDevice(&current_device);
+
     for (int device = 1; device < device_count; device++) {
       MemoryResourceTraits traits;
-
-      int current_device;
-      cudaGetDevice(&current_device);
       cudaSetDevice(device);
 
       for (int other_device = 0; other_device < device_count; other_device++) {
@@ -311,6 +311,7 @@ ResourceManager::initialize()
       m_allocators_by_id[id] = allocator.get();
       m_allocators.emplace_front(std::move(allocator));
     }
+    cudaSetDevice(current_device);
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
@@ -537,6 +538,10 @@ ResourceManager::hasAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
+  if (!ptr) {
+    UMPIRE_ERROR("Cannot register nullptr!");
+  }
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.size
              << ", strategy=" << record.strategy << ") with " << this);
 

@@ -84,3 +84,17 @@ TEST(IntrospectionTest, Contains)
 
   allocator.deallocate(data);
 }
+
+TEST(IntrospectionTest, RegisterNull)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  umpire::strategy::AllocationStrategy* strategy{
+    rm.getAllocator("HOST").getAllocationStrategy()};
+
+  auto record = umpire::util::AllocationRecord{nullptr, 0, strategy};
+
+  EXPECT_THROW(
+    rm.registerAllocation(nullptr, record),
+    umpire::util::Exception);
+}

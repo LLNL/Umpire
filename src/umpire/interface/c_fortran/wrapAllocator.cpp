@@ -32,18 +32,6 @@ static void ShroudStrToArray(umpire_SHROUD_array *array, const std::string * src
     array->size = 1;
     array->rank = 1;
 }
-
-// helper copy_string
-// Copy the char* or std::string in context into c_var.
-// Called by Fortran to deal with allocatable character.
-void umpire_ShroudCopyStringAndFree(umpire_SHROUD_array *data, char *c_var, size_t c_var_len) {
-    const char *cxx_var = data->addr.ccharp;
-    size_t n = c_var_len;
-    if (data->elem_len < n) n = data->elem_len;
-    std::strncpy(c_var, cxx_var, n);
-    umpire_SHROUD_memory_destructor(&data->cxx); // delete data->cxx.addr
-}
-
 // splicer begin class.Allocator.C_definitions
 // splicer end class.Allocator.C_definitions
 
@@ -123,6 +111,16 @@ size_t umpire_allocator_get_actual_size(umpire_allocator * self)
     size_t SHC_rv = SH_this->getActualSize();
     return SHC_rv;
     // splicer end class.Allocator.method.get_actual_size
+}
+
+size_t umpire_allocator_get_allocation_count(umpire_allocator * self)
+{
+    umpire::Allocator *SH_this =
+        static_cast<umpire::Allocator *>(self->addr);
+    // splicer begin class.Allocator.method.get_allocation_count
+    size_t SHC_rv = SH_this->getAllocationCount();
+    return SHC_rv;
+    // splicer end class.Allocator.method.get_allocation_count
 }
 
 const char * umpire_allocator_get_name(umpire_allocator * self)

@@ -46,6 +46,8 @@ size_t umpire_allocator_get_current_size(umpire_allocator * self);
 
 size_t umpire_allocator_get_actual_size(umpire_allocator * self);
 
+size_t umpire_allocator_get_allocation_count(umpire_allocator * self);
+
 const char * umpire_allocator_get_name(umpire_allocator * self);
 
 void umpire_allocator_get_name_bufferify(umpire_allocator * self,
