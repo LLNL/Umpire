@@ -17,9 +17,9 @@
 #---------------------------------------
 # Compilers
 #---------------------------------------
-set(CMAKE_C_COMPILER "usr/tce/packages/clang/clang-6.0.0/bin/clang" CACHE PATH "")
+set(CMAKE_C_COMPILER "/usr/tce/packages/clang/clang-6.0.0/bin/clang" CACHE PATH "")
 
-set(CMAKE_CXX_COMPILER "usr/tce/packages/clang/clang-6.0.0/bin/clang++" CACHE PATH "")
+set(CMAKE_CXX_COMPILER "/usr/tce/packages/clang/clang-6.0.0/bin/clang++" CACHE PATH "")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch" CACHE PATH "")
 
