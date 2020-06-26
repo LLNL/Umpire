@@ -31,7 +31,6 @@
 ####
 # Here are all lassen build jobs
 
-
 clang_default (build and test on lassen):
   variables:
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@default.cmake"

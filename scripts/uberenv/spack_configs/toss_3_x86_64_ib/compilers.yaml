@@ -28,8 +28,8 @@ compilers:
 - compiler:
     spec: clang@6.0.0
     paths:
-      cc: usr/tce/packages/clang/clang-6.0.0/bin/clang
-      cxx: usr/tce/packages/clang/clang-6.0.0/bin/clang++
+      cc: /usr/tce/packages/clang/clang-6.0.0/bin/clang
+      cxx: /usr/tce/packages/clang/clang-6.0.0/bin/clang++
       f77:
       fc:
     flags: {}
