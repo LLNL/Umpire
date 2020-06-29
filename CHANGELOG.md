@@ -18,6 +18,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Umpire exceptions now include backtrace information in the exception string.
 
+- `AlignedAllocator` strategy providing aligned allocations for HOST memory.
+
 - Additional symbol information may be obtained in backtraces with
   -DENABLE_BACKTRACE_SYMBOLS and including `-ldl` for the using program.
 
