@@ -14,14 +14,6 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <memory>
-#include <sstream>
-#include <time.h>
-#include <iostream>
-#include <cstdio>
-#include <string>
-#include <stdio.h>
 #include <utility>
 
 namespace umpire {
