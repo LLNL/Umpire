@@ -12,6 +12,8 @@
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
+#include <utility>
+
 namespace umpire {
 namespace resource {
 
@@ -31,6 +33,9 @@ class FileMemoryResource :
 
   protected:
     Platform m_platform;
+
+  private:
+    util::MemoryMap<std::pair <const char *, std::size_t>> m_size_map;
 
 };
 
