@@ -19,6 +19,11 @@ if (ENABLE_OPENMP_TARGET)
 endif()
 
 blt_add_executable(
+  NAME aligned_allocator
+  SOURCES aligned_allocator.cpp
+  DEPENDS_ON ${example_depends})
+
+blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
   DEPENDS_ON ${example_depends})
