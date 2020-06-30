@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [3.0.0] - 2020-06-30
+
+### Added
+
 - Add support for multiple CUDA devices. These devices are detected and
   registered as "DEVICE_N", where N is the device number.
 

@@ -1,5 +1,13 @@
 # v3.0.0
 
+- Added support for multiple GPU devices, detected and registered as "DEVICE_N"
+  where N is the device number.
+
+- Added support for capturing function backtraces with allocations.
+
+- Added `AlignedAllocator` to provide aligned allocations for host memory.
+
+- Fixed builds using `-stdlib=c++`
 
 # v2.1.0
 
