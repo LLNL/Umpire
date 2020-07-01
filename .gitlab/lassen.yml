@@ -76,7 +76,6 @@ clang_coral_2018_08_08 (build and test on lassen):
   variables:
     HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08.cmake"
   extends: .build_and_test_on_lassen
-  allow_failure: true
 
 nvcc_gcc_4_9_3 (build and test on lassen):
   variables:
