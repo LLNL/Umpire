@@ -59,8 +59,12 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (trun == -1) { UMPIRE_ERROR("Error: " << trun); }
 
   // Using mmap
-  void* ptr{mmap(NULL, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
-  if (ptr == MAP_FAILED) { UMPIRE_ERROR("Error: " << ptr); }
+  #if !defined(_MSC_VER)
+    void* ptr{mmap(NULL, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
+    if (ptr == MAP_FAILED) { UMPIRE_ERROR("Error: " << ptr); }
+  #else
+    //void* ptr{VirtualAlloc(NULL, bytes, MEM_RESERVE, PAGE_NOACCESS)};
+  #endif
 
   // Storing Information On File
   std::pair <const char *, std::size_t> INFO;
@@ -78,8 +82,11 @@ void FileMemoryResource::deallocate(void* ptr)
   auto file_name = iter->second->first;
   m_size_map.erase(ptr);
 
-  munmap(ptr, size);
-  
+  #if !defined(_MSC_VER)
+    munmap(ptr, size);
+  #else
+    VirtualFree(ptr, *size, MEM_RELEASE);
+  #endif
   remove(file_name);
 }
 
