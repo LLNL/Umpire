@@ -46,6 +46,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `DeviceAllocator` will issue a trap instruction if it runs out of memory.
 
+- Switched to camp::Platform
+
 ### Removed
 
 ### Fixed
