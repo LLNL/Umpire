@@ -49,8 +49,8 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (fd == -1) { UMPIRE_ERROR( "Error: " << fd); }
 
   // Setting Size Of Map File
-  std::size_t SIZE;
-  if(bytes / sysconf(_SC_PAGE_SIZE) == 0)
+  std::size_t SIZE = bytes / sysconf(_SC_PAGE_SIZE);
+  if(SIZE == 0)
     SIZE = sysconf(_SC_PAGE_SIZE);
   else
     SIZE = (sysconf(_SC_PAGE_SIZE) * SIZE) + (bytes % sysconf(_SC_PAGE_SIZE));
