@@ -35,6 +35,7 @@ class Inspector
   protected:
     std::size_t m_current_size;
     std::size_t m_high_watermark;
+    std::size_t m_allocation_count;
 };
 
 } // end of namespace mixins

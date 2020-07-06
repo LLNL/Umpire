@@ -7,6 +7,8 @@
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
+  backtrace.hpp
+  backtrace.inl
   Exception.hpp
   FixedMallocPool.hpp
   io.hpp
@@ -21,6 +23,7 @@ set (umpire_util_headers
   allocation_statistics.hpp
   detect_vendor.hpp
   make_unique.hpp
+  memory_sanitizers.hpp
   wrap_allocator.hpp)
 
 if (ENABLE_STATISTICS)
@@ -61,7 +64,13 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends umpire_tpl_judy)
+set (umpire_util_depends camp umpire_tpl_judy)
+
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    backtrace_symbols)
+endif ()
 
 if (ENABLE_NUMA)
   set (umpire_util_depends
@@ -86,6 +95,13 @@ if (ENABLE_MPI)
     ${umpire_util_depends}
     mpi)
 endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    openmp)
+endif ()
+
 
 blt_add_library(
   NAME umpire_util

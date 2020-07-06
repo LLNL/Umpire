@@ -27,6 +27,12 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
+if (ENABLE_OPENMP_TARGET)
+  set (log_depends
+    ${log_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME log_tests
   SOURCES log_tests.cpp

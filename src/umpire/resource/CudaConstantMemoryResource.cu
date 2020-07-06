@@ -23,8 +23,8 @@ CudaConstantMemoryResource::CudaConstantMemoryResource(const std::string& name, 
   m_highwatermark{0},
   m_platform{Platform::cuda},
   m_offset{0},
-  m_initialized{false},
-  m_ptr{nullptr}
+  m_ptr{nullptr},
+  m_initialized{false}
 {
 }
 

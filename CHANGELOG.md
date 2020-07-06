@@ -16,6 +16,45 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+## [3.0.0] - 2020-06-30
+
+### Added
+
+- Add support for multiple CUDA devices. These devices are detected and
+  registered as "DEVICE_N", where N is the device number.
+
+- Allocation backtrace may be enabled by building umpire with 
+  -DENABLE_BACKTRACE
+
+- Umpire exceptions now include backtrace information in the exception string.
+
+- `AlignedAllocator` strategy providing aligned allocations for HOST memory.
+
+- Additional symbol information may be obtained in backtraces with
+  -DENABLE_BACKTRACE_SYMBOLS and including `-ldl` for the using program.
+
+- Check for nullptr during `ResourceManager::registerAllocation`.
+
+### Changed
+
+- LC Gitlab CI runs only a subset of targets on PRs, and all of them on main
+  and develop branch. Lassen allocation is shorter. Jobs name or more efficient
+  to read in UI. All builds goes in `${CI_BUILDS_DIR}/umpire/` to avoid multiple
+  directories in `${CI_BUILDS_DIR}`.
+
+- Update BLT to version 0.3.0
+
+- `DeviceAllocator` will issue a trap instruction if it runs out of memory.
+
+- Switched to camp::Platform
+
+### Removed
+
+### Fixed
+
+- In gitlab CI, test jobs fails if no tests were found.
+
+- Clang builds using `-stdlib=libc++` option have been fixed.
 
 ## [2.1.0] - 2020-01-30
 

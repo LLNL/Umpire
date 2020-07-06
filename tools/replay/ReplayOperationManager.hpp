@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -7,6 +7,7 @@
 #ifndef REPLAY_ReplayOperationManager_HPP
 #define REPLAY_ReplayOperationManager_HPP
 
+#if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include <iostream>
 #include <cstdint>
 #include <vector>
@@ -46,4 +47,5 @@ private:
   void dumpStats();
 };
 
+#endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #endif // REPLAY_ReplayOperationManager_HPP

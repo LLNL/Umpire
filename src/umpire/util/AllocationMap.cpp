@@ -11,6 +11,8 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
 
+#include "umpire/util/backtrace.hpp"
+
 #include <sstream>
 #include <type_traits>
 #include <utility>
@@ -336,7 +338,11 @@ AllocationMap::print(const std::function<bool (const AllocationRecord&)>&& pred,
         ss << iter->size <<
           " [ " << reinterpret_cast<void*>(iter->ptr) <<
           " -- " << reinterpret_cast<void*>(end_ptr) <<
-          " ] " << std::endl;
+          " ] " << std::endl
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+          << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
+#endif // UMPIRE_ENABLE_BACKTRACE
+          << std::endl;
       }
       ++iter;
     }

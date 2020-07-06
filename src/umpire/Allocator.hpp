@@ -111,6 +111,11 @@ class Allocator {
     std::size_t getActualSize() const noexcept;
 
     /*!
+     * \brief Return the number of active allocations.
+     */
+    std::size_t getAllocationCount() const noexcept;
+
+    /*!
      * \brief Get the name of this Allocator.
      *
      * Allocators are uniquely named, and the name of the Allocator can be used

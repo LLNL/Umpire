@@ -53,8 +53,11 @@ __device__
 void*
 DeviceAllocator::allocate(size_t size)
 {
-  return static_cast<void*>(
-    m_ptr + atomicAdd(m_counter, size));
+  std::size_t counter = atomicAdd(m_counter, size);
+  if (*m_counter > m_size) {
+    UMPIRE_ERROR("DeviceAllocator out of space");
+  }
+  return static_cast<void*>(m_ptr + counter);
 }
 
 } // end of namespace umpire

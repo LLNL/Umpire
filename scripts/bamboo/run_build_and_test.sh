@@ -19,10 +19,13 @@ function trycmd
 
 module list
 
-if [ -f ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake ]; then
+if [ -f ${UMPIRE_SOURCE_DIR}/.radiuss-ci/gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake ]; then
   echo "Configuring..."
+  if [[ ${UMPIRE_COMPILER} == *"pgi"* ]]; then
+      export OMP_PROC_BIND=true
+  fi
   trycmd "cmake -DENABLE_DEVELOPER_DEFAULTS=On \
-    -C ${UMPIRE_SOURCE_DIR}/.gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
+    -C ${UMPIRE_SOURCE_DIR}/.radiuss-ci/gitlab/conf/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
     -C ${UMPIRE_SOURCE_DIR}/host-configs/${SYS_TYPE}/${UMPIRE_COMPILER}.cmake \
     -DCMAKE_BUILD_TYPE=${UMPIRE_BUILD_TYPE} ${BUILD_OPTIONS} ${UMPIRE_SOURCE_DIR}"
 

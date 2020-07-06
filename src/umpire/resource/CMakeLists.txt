@@ -24,22 +24,25 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
+set(umpire_resource_depends
+  camp)
+
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
+    CudaConstantMemoryResource.hpp
+    CudaConstantMemoryResourceFactory.hpp
+    CudaDeviceMemoryResource.hpp
     CudaDeviceResourceFactory.hpp
     CudaPinnedMemoryResourceFactory.hpp
     CudaUnifiedMemoryResourceFactory.hpp
-
-    CudaConstantMemoryResourceFactory.hpp
-    CudaConstantMemoryResource.hpp
     )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    CudaConstantMemoryResourceFactory.cpp
     CudaConstantMemoryResource.cu
-
+    CudaConstantMemoryResourceFactory.cpp
+    CudaDeviceMemoryResource.cpp
     CudaDeviceResourceFactory.cpp
     CudaPinnedMemoryResourceFactory.cpp
     CudaUnifiedMemoryResourceFactory.cpp)
@@ -68,6 +71,20 @@ if (ENABLE_HIP)
   set(umpire_resource_depends
     ${umpire_resource_depends}
     hip_runtime)
+endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    OpenMPTargetMemoryResourceFactory.hpp)
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    OpenMPTargetMemoryResourceFactory.cpp)
+
+  set (umpire_resource_depends
+    ${umpire_resource_depends}
+    openmp)
 endif ()
 
 blt_add_library(

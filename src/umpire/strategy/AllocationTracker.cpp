@@ -61,13 +61,26 @@ AllocationTracker::getHighWatermark() const noexcept
 std::size_t
 AllocationTracker::getActualSize() const noexcept
 {
-  return m_allocator->getActualSize();
+  auto actual_size = m_allocator->getActualSize();
+  return actual_size > 0 ? actual_size : m_current_size;
+}
+
+std::size_t
+AllocationTracker::getAllocationCount() const noexcept
+{
+  return m_allocation_count;
 }
 
 Platform
 AllocationTracker::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+MemoryResourceTraits
+AllocationTracker::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
 }
 
 strategy::AllocationStrategy*

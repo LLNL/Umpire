@@ -22,7 +22,7 @@ namespace resource {
 bool
 HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if (name.compare("HOST") == 0) {
+  if (name.find("HOST") != std::string::npos) {
     return true;
   } else {
     return false;
@@ -30,7 +30,13 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 }
 
 std::unique_ptr<resource::MemoryResource>
-HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
+HostResourceFactory::create(const std::string& name, int id)
+{
+  return create(name, id, getDefaultTraits());
+}
+
+std::unique_ptr<resource::MemoryResource>
+HostResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
   using HostAllocator = alloc::PosixMemalignAllocator;
@@ -38,6 +44,12 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   using HostAllocator = alloc::MallocAllocator;
 #endif
 
+  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::host, name, id, traits);
+}
+
+MemoryResourceTraits
+HostResourceFactory::getDefaultTraits()
+{
   MemoryResourceTraits traits;
 
   // int mib[2];
@@ -55,8 +67,10 @@ HostResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name), int id)
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
 
-  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::cpu, "HOST", id, traits);
+  return traits;
 }
+
+
 
 } // end of namespace resource
 } // end of namespace umpire
