@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -97,4 +97,3 @@ nvcc_xl-beta-2017.09.13 (build and test on butte):
   variables:
     CONFIGURATION: "nvcc_xl-beta-2017.09.13"
   extends: .build_and_test_on_butte
-
