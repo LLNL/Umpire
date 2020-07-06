@@ -16,7 +16,7 @@ typemap:
         c_type: umpire_strategy_allocationadvisor
         f_module_name: umpire_strategy_mod
         f_derived_type: allocationadvisor
-        f_capsule_data_type: SHROUD_strategy_allocationadvisor_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_allocationadvisor_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: AllocationPrefetcher
       fields:
@@ -26,7 +26,7 @@ typemap:
         c_type: umpire_strategy_allocationprefetcher
         f_module_name: umpire_strategy_mod
         f_derived_type: allocationprefetcher
-        f_capsule_data_type: SHROUD_strategy_allocationprefetcher_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_allocationprefetcher_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: Allocator
       fields:
@@ -36,7 +36,7 @@ typemap:
         c_type: umpire_allocator
         f_module_name: umpire_mod
         f_derived_type: UmpireAllocator
-        f_capsule_data_type: SHROUD_allocator_capsule
+        f_capsule_data_type: umpire_SHROUD_allocator_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: DynamicPool
       fields:
@@ -46,7 +46,7 @@ typemap:
         c_type: umpire_strategy_dynamicpool
         f_module_name: umpire_strategy_mod
         f_derived_type: dynamicpool
-        f_capsule_data_type: SHROUD_strategy_dynamicpool_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_dynamicpool_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: DynamicPoolList
       fields:
@@ -56,7 +56,7 @@ typemap:
         c_type: umpire_strategy_dynamicpoollist
         f_module_name: umpire_strategy_mod
         f_derived_type: dynamicpoollist
-        f_capsule_data_type: SHROUD_strategy_dynamicpoollist_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_dynamicpoollist_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: FixedPool
       fields:
@@ -66,7 +66,7 @@ typemap:
         c_type: umpire_strategy_fixedpool
         f_module_name: umpire_strategy_mod
         f_derived_type: fixedpool
-        f_capsule_data_type: SHROUD_strategy_fixedpool_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_fixedpool_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: NamedAllocationStrategy
       fields:
@@ -76,7 +76,7 @@ typemap:
         c_type: umpire_strategy_namedallocationstrategy
         f_module_name: umpire_strategy_mod
         f_derived_type: namedallocationstrategy
-        f_capsule_data_type: SHROUD_strategy_namedallocationstrategy_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_namedallocationstrategy_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: ResourceManager
       fields:
@@ -86,7 +86,7 @@ typemap:
         c_type: umpire_resourcemanager
         f_module_name: umpire_mod
         f_derived_type: UmpireResourceManager
-        f_capsule_data_type: SHROUD_resourcemanager_capsule
+        f_capsule_data_type: umpire_SHROUD_resourcemanager_capsule
         f_to_c: "{f_var}%cxxmem"
     - type: ThreadSafeAllocator
       fields:
@@ -96,5 +96,5 @@ typemap:
         c_type: umpire_strategy_threadsafeallocator
         f_module_name: umpire_strategy_mod
         f_derived_type: threadsafeallocator
-        f_capsule_data_type: SHROUD_strategy_threadsafeallocator_capsule
+        f_capsule_data_type: umpire_SHROUD_strategy_threadsafeallocator_capsule
         f_to_c: "{f_var}%cxxmem"
