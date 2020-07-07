@@ -11,6 +11,9 @@
 #include "umpire/util/Exception.hpp"
 
 #include <limits.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "gtest/gtest.h"
 
@@ -32,7 +35,13 @@ TEST(ResourceTest, ZeroFile)
 TEST(ResourceTest, VeryLargeFile)
 {
   auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
-  ASSERT_THROW(alloc->allocate((std::size_t)LDBL_MAX), umpire::util::Exception);
+  ASSERT_NE(alloc->allocate( LDBL_MAX ), nullptr);
+}
+
+TEST(ResourceTest, MmapFile)
+{
+  auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
+
 }
 
 REGISTER_TYPED_TEST_SUITE_P(
