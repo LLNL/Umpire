@@ -35,7 +35,7 @@ class FileMemoryResource :
     Platform m_platform;
 
   private:
-    util::MemoryMap<std::pair <const char *, std::size_t>> m_size_map;
+    util::MemoryMap<std::pair <const std::string, std::size_t>> m_size_map;
 
 };
 

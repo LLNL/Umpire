@@ -24,6 +24,16 @@ TEST(ResourceTest, AllocateDeallocate)
   ASSERT_NE(pointer, nullptr);
 
   alloc->deallocate(pointer);
+
+  pointer = alloc->allocate(sysconf(_SC_PAGE_SIZE) - 1010);
+  ASSERT_NE(pointer, nullptr);
+
+  alloc->deallocate(pointer);
+
+  pointer = alloc->allocate(sysconf(_SC_PAGE_SIZE) + 1010);
+  ASSERT_NE(pointer, nullptr);
+
+  alloc->deallocate(pointer);
 }
 
 TEST(ResourceTest, ZeroFile)
@@ -32,16 +42,40 @@ TEST(ResourceTest, ZeroFile)
   ASSERT_THROW(alloc->allocate(0), umpire::util::Exception);
 }
 
-TEST(ResourceTest, VeryLargeFile)
+TEST(ResourceTest, TooLargeForSystem)
 {
   auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
-  ASSERT_NE(alloc->allocate( LDBL_MAX ), nullptr);
+  ASSERT_THROW(alloc->allocate( ULLONG_MAX ), umpire::util::Exception);
+}
+
+TEST(ResourceTest, LargeFile)
+{
+  auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
+  std::size_t* ptr;
+  ASSERT_NO_THROW(ptr = (std::size_t*) alloc->allocate( 10000000000ULL*sizeof(std::size_t) ) );
+  alloc->deallocate(ptr);
 }
 
 TEST(ResourceTest, MmapFile)
 {
   auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
+  std::size_t* ptr;
+  ASSERT_NO_THROW(ptr = (std::size_t*) alloc->allocate( 1000000000ULL*sizeof(std::size_t)));
 
+  std::size_t* start = ptr;
+  for(int i = 0; i <= 9; i++)
+  {
+    *start = (size_t)i; 
+    start += sizeof(size_t);
+  }
+  start = ptr;
+  for(int i = 0; i <= 9; i++)
+  {
+    if((std::size_t)i != *start){ FAIL(); }
+    start += sizeof(size_t);
+  }
+
+  alloc->deallocate(ptr);
 }
 
 REGISTER_TYPED_TEST_SUITE_P(
