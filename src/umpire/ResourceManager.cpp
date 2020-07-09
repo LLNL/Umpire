@@ -232,17 +232,17 @@ ResourceManager::initialize()
 
   {
     std::unique_ptr<strategy::AllocationStrategy>
-      file_allocator{
+      allocator{
         util::wrap_allocator<
           strategy::AllocationTracker,
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("FILE", getNextId()))};
 
 
-    int id{file_allocator->getId()};
-    m_allocators_by_name["FILE"]  = file_allocator.get();
-    m_allocators_by_id[id] = file_allocator.get();
-    m_allocators.emplace_front(std::move(file_allocator));
+    int id{allocator->getId()};
+    m_allocators_by_name["FILE"]  = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
   }
 
   int device_count{0};

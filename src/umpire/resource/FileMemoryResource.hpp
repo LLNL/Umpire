@@ -36,6 +36,7 @@ class FileMemoryResource :
 
   private:
     util::MemoryMap<std::pair <const std::string, std::size_t>> m_size_map;
+    int FILE_COUNTER = 0;
 };
 
 } // end of namespace resource

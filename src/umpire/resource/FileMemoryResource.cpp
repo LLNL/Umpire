@@ -26,8 +26,6 @@
 namespace umpire {
 namespace resource {
 
-int FILE_COUNTER = 0;
-
 FileMemoryResource::FileMemoryResource(
     Platform platform, 
     const std::string& name,
@@ -52,23 +50,22 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (fd == -1) { UMPIRE_ERROR("Opening File Failed: " << strerror(errno)); }
 
   // Setting Size Of Map File
-  std::size_t SIZE = bytes / sysconf(_SC_PAGE_SIZE);
-  if(SIZE == 0)
-    SIZE = sysconf(_SC_PAGE_SIZE);
+  std::size_t num_pages = bytes / sysconf(_SC_PAGE_SIZE);
+  if(num_pages == 0)
+    num_pages = sysconf(_SC_PAGE_SIZE);
   else
-    SIZE = (sysconf(_SC_PAGE_SIZE) * SIZE) + (bytes % sysconf(_SC_PAGE_SIZE));
-  if (SIZE < bytes) { remove(SS.str().c_str()); UMPIRE_ERROR("Size Setting Failed: Size is not properly allocated"); }
- 
+    num_pages = (sysconf(_SC_PAGE_SIZE) * num_pages) + (bytes % sysconf(_SC_PAGE_SIZE));
+
   // Truncate file
-  int trun = ftruncate64(fd, SIZE);
+  int trun = ftruncate64(fd, num_pages);
   if (trun == -1) { remove(SS.str().c_str()); UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); }
 
   // Using mmap
-  void* ptr{mmap(NULL, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
+  void* ptr{mmap(NULL, num_pages, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
   if (ptr == MAP_FAILED) { remove(SS.str().c_str()); UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); }
 
   // Storing Information On File
-  std::pair <const std::string, std::size_t> INFO = std::make_pair(SS.str(), SIZE);
+  std::pair <const std::string, std::size_t> INFO = std::make_pair(SS.str(), num_pages);
   m_size_map.insert(ptr, INFO);
   
   close(fd);
