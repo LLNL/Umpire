@@ -60,7 +60,7 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (SIZE < bytes) { remove(SS.str().c_str()); UMPIRE_ERROR("Size Setting Failed: Size is not properly allocated"); }
  
   // Truncate file
-  int trun = ftruncate64(fd, SIZE);
+  int trun{ftruncate64(fd, SIZE)};
   if (trun == -1) { remove(SS.str().c_str()); UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); }
 
   // Using mmap
