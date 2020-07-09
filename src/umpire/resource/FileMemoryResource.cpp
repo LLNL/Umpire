@@ -48,7 +48,7 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   SS << "./umpire_mem_" << getpid() << FILE_COUNTER;
   FILE_COUNTER++;
 
-  int fd = open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU);
+  int fd{open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
   if (fd == -1) { UMPIRE_ERROR("Opening File Failed: " << strerror(errno)); }
 
   // Setting Size Of Map File
