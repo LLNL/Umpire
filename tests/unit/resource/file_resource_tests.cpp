@@ -49,7 +49,7 @@ TEST(ResourceTest, TooLargeForSystem)
 TEST(ResourceTest, LargeFile)
 {
   auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
-  std::size_t* ptr;
+  std::size_t* ptr = nullptr;
   ASSERT_NO_THROW(ptr = (std::size_t*) alloc->allocate( 10000000000ULL*sizeof(std::size_t) ) );
   alloc->deallocate(ptr);
 }
@@ -57,7 +57,7 @@ TEST(ResourceTest, LargeFile)
 TEST(ResourceTest, MmapFile)
 {
   auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
-  std::size_t* ptr;
+  std::size_t* ptr = nullptr;
   ASSERT_NO_THROW(ptr = (std::size_t*) alloc->allocate( 1000000000ULL*sizeof(std::size_t)));
 
   std::size_t* start = ptr;

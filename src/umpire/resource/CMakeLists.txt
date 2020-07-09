@@ -15,6 +15,7 @@ set (umpire_resource_headers
   MemoryResourceTypes.hpp
   NullMemoryResource.hpp
   NullMemoryResourceFactory.hpp
+  FileMemoryResource.hpp
 )
 
 set (umpire_resource_sources
@@ -24,6 +25,7 @@ set (umpire_resource_sources
   MemoryResourceRegistry.cpp
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
+  FileMemoryResource.cpp
 )
 
 set(umpire_resource_depends
