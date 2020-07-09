@@ -14,17 +14,19 @@
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
+#include <ctime>
 #include <sys/mman.h>
 #include <unistd.h>
 #include <utility>
 #include <stdlib.h>
 #include <sys/mman.h>
-
- #include <sys/types.h>
- #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 namespace umpire {
 namespace resource {
+
+int FILE_COUNTER = 0;
 
 FileMemoryResource::FileMemoryResource(
     Platform platform, 
@@ -35,18 +37,18 @@ FileMemoryResource::FileMemoryResource(
   m_platform{platform},
   m_size_map{}
 {
-}
+} 
 
 void* FileMemoryResource::allocate(std::size_t bytes)
 {
   if (bytes <= 0) { UMPIRE_ERROR( "Bytes Requested Error: Bytes size is 0"); }
 
   // Setting File Name And Opening the files
-  std::stringstream ss;
-  ss << "./umpire_mem_" << getpid();
-  remove(ss.str().c_str());
+  std::stringstream SS;
+  SS << "./umpire_mem_" << getpid() << FILE_COUNTER;
+  FILE_COUNTER++;
 
-  int fd = open(ss.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU);
+  int fd = open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU);
   if (fd == -1) { UMPIRE_ERROR("Opening File Failed: " << strerror(errno)); }
 
   // Setting Size Of Map File
@@ -55,20 +57,20 @@ void* FileMemoryResource::allocate(std::size_t bytes)
     SIZE = sysconf(_SC_PAGE_SIZE);
   else
     SIZE = (sysconf(_SC_PAGE_SIZE) * SIZE) + (bytes % sysconf(_SC_PAGE_SIZE));
-  if (SIZE < bytes) { UMPIRE_ERROR("Size Setting Failed: Size is not properly allocated"); }
+  if (SIZE < bytes) { remove(SS.str().c_str()); UMPIRE_ERROR("Size Setting Failed: Size is not properly allocated"); }
  
   // Truncate file
   int trun = ftruncate64(fd, SIZE);
-  if (trun == -1) { UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); }
+  if (trun == -1) { remove(SS.str().c_str()); UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); }
 
   // Using mmap
   void* ptr{mmap(NULL, SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
-  if (ptr == MAP_FAILED) { UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); }
+  if (ptr == MAP_FAILED) { remove(SS.str().c_str()); UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); }
 
   // Storing Information On File
-  std::pair <const std::string, std::size_t> INFO = std::make_pair(ss.str(), SIZE);
+  std::pair <const std::string, std::size_t> INFO = std::make_pair(SS.str(), SIZE);
   m_size_map.insert(ptr, INFO);
-
+  
   close(fd);
   return ptr;
 }

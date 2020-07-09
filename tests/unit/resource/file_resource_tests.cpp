@@ -20,20 +20,18 @@
 TEST(ResourceTest, AllocateDeallocate)
 {
   auto alloc = std::make_shared<umpire::resource::FileMemoryResource>(umpire::Platform::host, "TEST", 0, umpire::MemoryResourceTraits{});
-  auto pointer = alloc->allocate(sysconf(_SC_PAGE_SIZE) + 5000);
-  ASSERT_NE(pointer, nullptr);
+  auto pointer_1 = alloc->allocate(sysconf(_SC_PAGE_SIZE) + 5000);
+  ASSERT_NE(pointer_1, nullptr);
 
-  alloc->deallocate(pointer);
+  auto pointer_2 = alloc->allocate(sysconf(_SC_PAGE_SIZE) - 1010);
+  ASSERT_NE(pointer_2, nullptr);
 
-  pointer = alloc->allocate(sysconf(_SC_PAGE_SIZE) - 1010);
-  ASSERT_NE(pointer, nullptr);
+  auto pointer_3 = alloc->allocate(sysconf(_SC_PAGE_SIZE) + 1010);
+  ASSERT_NE(pointer_3, nullptr);
 
-  alloc->deallocate(pointer);
-
-  pointer = alloc->allocate(sysconf(_SC_PAGE_SIZE) + 1010);
-  ASSERT_NE(pointer, nullptr);
-
-  alloc->deallocate(pointer);
+  alloc->deallocate(pointer_1);
+  alloc->deallocate(pointer_2);
+  alloc->deallocate(pointer_3);
 }
 
 TEST(ResourceTest, ZeroFile)
