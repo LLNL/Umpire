@@ -99,23 +99,19 @@ install(TARGETS
 add_subdirectory(judy)
 
 if (NOT TARGET camp)
-  if (DEFINED camp_DIR)
+  if (camp_DIR)
     find_package(camp REQUIRED)
+
+    set(CAMP_INCLUDE_DIRS "${camp_INSTALL_PREFIX}/include")
+    set(CAMP_DEPENDS )
+    blt_list_append(TO CAMP_DEPENDS ELEMENTS cuda_runtime IF ENABLE_CUDA)
 
     blt_register_library(
       NAME camp
       INCLUDES ${CAMP_INCLUDE_DIRS}
-      LIBRARIES camp)
+      DEPENDS_ON ${CAMP_DEPENDS})
   else ()
     add_subdirectory(camp)
-  endif()
-
-  if(ENABLE_CUDA)
-    blt_register_library(
-      NAME camp
-      DEPENDS_ON cuda_runtime
-      LIBRARIES camp
-      DEFINES CAMP_HAVE_CUDA)
   endif()
 endif ()
 
