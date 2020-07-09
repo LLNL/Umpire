@@ -68,7 +68,7 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (ptr == MAP_FAILED) { remove(SS.str().c_str()); UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); }
 
   // Storing Information On File
-  std::pair <const std::string, std::size_t> INFO = std::make_pair(SS.str(), SIZE);
+  std::pair <const std::string, std::size_t> INFO{std::make_pair(SS.str(), SIZE)};
   m_size_map.insert(ptr, INFO);
   
   close(fd);
