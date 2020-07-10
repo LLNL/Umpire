@@ -99,7 +99,7 @@ install(TARGETS
 add_subdirectory(judy)
 
 if (NOT TARGET camp)
-   if (DEFINED camp_DIR)
+  if (DEFINED camp_DIR)
     find_package(camp REQUIRED)
     set(CAMP_INCLUDE_DIRS "${camp_INSTALL_PREFIX}/include")
 
