@@ -25,6 +25,8 @@
 namespace umpire {
 namespace resource {
 
+int FileMemoryResource::s_file_counter {0};
+
 FileMemoryResource::FileMemoryResource(
     Platform platform, 
     const std::string& name,
@@ -51,7 +53,7 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   }
 
   // Setting Size Of Map File
-  const std::size_t pagesize{ sysconf(_SC_PAGE_SIZE) };
+  const std::size_t pagesize{ (std::size_t) sysconf(_SC_PAGE_SIZE) };
   std::size_t rounded_bytes{ ((bytes + (pagesize - 1))/ pagesize) * pagesize };
 
   // Truncate file

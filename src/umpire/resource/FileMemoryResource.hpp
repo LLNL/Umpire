@@ -30,13 +30,13 @@ class FileMemoryResource :
     std::size_t getHighWatermark() const noexcept;
 
     Platform getPlatform() noexcept;
-
+    static int s_file_counter;
   protected:
     Platform m_platform;
 
   private:
     util::MemoryMap<std::pair <const std::string, std::size_t>> m_size_map;
-    int s_file_counter{0};
+    
 };
 
 } // end of namespace resource
