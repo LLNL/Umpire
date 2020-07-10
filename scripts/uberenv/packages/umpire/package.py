@@ -95,7 +95,7 @@ class Umpire(CMakePackage, CudaPackage):
     phases = ['hostconfig', 'cmake', 'build',' install']
 
     def _get_sys_type(self, spec):
-        sys_type = spec.architecture
+        sys_type = str(spec.architecture)
         # if on llnl systems, we can use the SYS_TYPE
         if "SYS_TYPE" in env:
             sys_type = env["SYS_TYPE"]
@@ -156,10 +156,7 @@ class Umpire(CMakePackage, CudaPackage):
         # 'host config' file that works outside of the spack install env.
         #######################################################################
 
-        sys_type = spec.architecture
-        # if on llnl systems, we can use the SYS_TYPE
-        if "SYS_TYPE" in env:
-            sys_type = env["SYS_TYPE"]
+        sys_type = self._get_sys_type(spec)
 
         ##############################################
         # Find and record what CMake is used
@@ -221,7 +218,7 @@ class Umpire(CMakePackage, CudaPackage):
                 cfg.write(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags,
                                             description))
 
-        if sys_type == "toss_3_x86_64_ib":
+        if "toss_3_x86_64_ib" in sys_type:
             release_flags = "-O3 -finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch"
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELEASE", release_flags))
             reldebinf_flags = "-O3 -g -finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch"
