@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_FileMemoryResource_INL
 #define UMPIRE_FileMemoryResource_INL
 
 #include "umpire/resource/FileMemoryResource.hpp"
@@ -43,29 +42,32 @@ void* FileMemoryResource::allocate(std::size_t bytes)
 
   // Setting File Name And Opening the files
   std::stringstream SS;
-  SS << "./umpire_mem_" << getpid() << FILE_COUNTER;
-  FILE_COUNTER++;
+  SS << "./umpire_mem_" << getpid() << s_file_counter;
+  s_file_counter++;
 
   int fd{open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
-  if (fd == -1) { UMPIRE_ERROR("Opening File Failed: " << strerror(errno)); }
+  if (fd == -1) { 
+    UMPIRE_ERROR("Opening File Failed: " << strerror(errno)); 
+  }
 
   // Setting Size Of Map File
-  std::size_t num_pages = bytes / sysconf(_SC_PAGE_SIZE);
-  if(num_pages == 0)
-    num_pages = sysconf(_SC_PAGE_SIZE);
-  else
-    num_pages = (sysconf(_SC_PAGE_SIZE) * num_pages) + (bytes % sysconf(_SC_PAGE_SIZE));
+  const std::size_t pagesize{ sysconf(_SC_PAGE_SIZE) };
+  std::size_t rounded_bytes{ ((bytes + (pagesize - 1))/ pagesize) * pagesize };
 
   // Truncate file
-  int trun{ftruncate64(fd, num_pages)};
-  if (trun == -1) { remove(SS.str().c_str()); UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); }
+  int trun{ftruncate64(fd, rounded_bytes)};
+  if (trun == -1) { 
+    remove(SS.str().c_str()); UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); 
+  }
 
   // Using mmap
-  void* ptr{mmap(NULL, num_pages, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
-  if (ptr == MAP_FAILED) { remove(SS.str().c_str()); UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); }
+  void* ptr{mmap(NULL, rounded_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
+  if (ptr == MAP_FAILED) { 
+    remove(SS.str().c_str()); UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); 
+  }
 
   // Storing Information On File
-  std::pair <const std::string, std::size_t> INFO{std::make_pair(SS.str(), num_pages)};
+  std::pair <const std::string, std::size_t> INFO{std::make_pair(SS.str(), rounded_bytes)};
   m_size_map.insert(ptr, INFO);
   
   close(fd);
@@ -101,4 +103,3 @@ Platform FileMemoryResource::getPlatform() noexcept
 
 } // end of namespace resource
 } // end of namespace umpire
-#endif // UMPIRE_FileMemoryResource_INL

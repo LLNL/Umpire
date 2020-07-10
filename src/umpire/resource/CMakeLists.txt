@@ -8,6 +8,7 @@ set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
   FileMemoryResource.hpp
+  FileMemoryResourceFactory.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
@@ -15,8 +16,6 @@ set (umpire_resource_headers
   MemoryResourceTypes.hpp
   NullMemoryResource.hpp
   NullMemoryResourceFactory.hpp
-  FileMemoryResource.hpp
-  FileMemoryResourceFactory.hpp
 )
 
 set (umpire_resource_sources
