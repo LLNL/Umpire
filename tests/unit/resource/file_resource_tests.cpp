@@ -38,11 +38,6 @@ TYPED_TEST_P(ResourceTest, ZeroFile)
   ASSERT_THROW(this->memory_resource->allocate(0), umpire::util::Exception);
 }
 
-TYPED_TEST_P(ResourceTest, TooLargeForSystem)
-{
-  ASSERT_THROW(this->memory_resource->allocate((std::size_t) std::numeric_limits<long double>::max), umpire::util::Exception);
-}
-
 TYPED_TEST_P(ResourceTest, LargeFile)
 {
   std::size_t* ptr = nullptr;
