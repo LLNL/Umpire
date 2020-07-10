@@ -4,7 +4,6 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#define UMPIRE_FileMemoryResource_INL
 
 #include "umpire/resource/FileMemoryResource.hpp"
 
