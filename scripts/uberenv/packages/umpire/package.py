@@ -80,6 +80,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('numa', default=False, description='Enable NUMA support')
+    variant('cuda', default=False, description='Enable CUDA support')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
