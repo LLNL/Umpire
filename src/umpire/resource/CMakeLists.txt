@@ -20,13 +20,12 @@ set (umpire_resource_headers
 
 set (umpire_resource_sources
   FileMemoryResource.cpp
+  FileMemoryResourceFactory.cpp
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
-  FileMemoryResource.cpp
-  FileMemoryResourceFactory.cpp
 )
 
 set(umpire_resource_depends
