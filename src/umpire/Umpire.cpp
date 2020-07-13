@@ -20,7 +20,7 @@
 #include <sstream>
 #include <fstream>
 
-volatile int umpire_ver_2_found;
+volatile int umpire_ver_3_found;
 
 namespace umpire {
 
