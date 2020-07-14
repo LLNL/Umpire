@@ -7,17 +7,11 @@
 
 #include "umpire/resource/FileMemoryResource.hpp"
 
-#include "umpire/util/Macros.hpp"
-
 #include <errno.h>
 #include <string.h>
 #include <fcntl.h>
-#include <ctime>
 #include <unistd.h>
-#include <utility>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/mman.h>
 
 namespace umpire {
@@ -38,18 +32,18 @@ FileMemoryResource::FileMemoryResource(
 
 void* FileMemoryResource::allocate(std::size_t bytes)
 {
-  if (bytes <= 0) { UMPIRE_ERROR( "Bytes Requested Error: Bytes size is 0"); }
+  if (bytes <= 0) { UMPIRE_ERROR( "Bytes Requested Error: Bytes size is less than 1"); }
 
-  // Setting File Name And Opening the files
-  std::stringstream SS;
-
-  std::string root_io_dir{"./"};
-  const char* output_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
-  if (output_dir) {
-    root_io_dir = std::string(output_dir); 
+  // Find output file directory for mmap files
+  std::string default_dir{"./"};
+  const char* memory_file_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
+  if (memory_file_dir) {
+    default_dir = std::string(memory_file_dir); 
   }
 
-  SS << root_io_dir << "umpire_mem_" << getpid() << s_file_counter;
+  // Create name and open file
+  std::stringstream SS;
+  SS << default_dir << "umpire_mem_" << getpid() << s_file_counter;
   s_file_counter++;
 
   int fd{open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
@@ -83,13 +77,16 @@ void* FileMemoryResource::allocate(std::size_t bytes)
 
 void FileMemoryResource::deallocate(void* ptr)
 {
+  // Find information about ptr for deallocation
   auto iter = m_size_map.find(ptr);
   auto size = iter->second->second;
   const std::string file_name = iter->second->first;
   m_size_map.erase(ptr);
 
+  // Un-map information using munmap
   munmap(ptr, size);
 
+  // Delete file
   remove(file_name.c_str());
 }
 
