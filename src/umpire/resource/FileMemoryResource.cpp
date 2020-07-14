@@ -45,7 +45,9 @@ void* FileMemoryResource::allocate(std::size_t bytes)
 
   std::string root_io_dir{"./"};
   const char* output_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
-  if (output_dir) root_io_dir = output_dir; 
+  if (output_dir) {
+    root_io_dir = std::string(output_dir); 
+  }
 
   SS << root_io_dir << "umpire_mem_" << getpid() << s_file_counter;
   s_file_counter++;
@@ -86,11 +88,7 @@ void FileMemoryResource::deallocate(void* ptr)
   const std::string file_name = iter->second->first;
   m_size_map.erase(ptr);
 
-  #if !defined(_MSC_VER)
-    munmap(ptr, size);
-  #else
-    VirtualFree(ptr, *size, MEM_RELEASE);
-  #endif
+  munmap(ptr, size);
 
   remove(file_name.c_str());
 }
