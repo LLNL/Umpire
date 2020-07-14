@@ -64,123 +64,199 @@ release_resources (on quartz):
 
 ####
 # Here are all quartz build jobs
-
 clang_3_9_1 (build on quartz):
   variables:
-    CONFIGURATION: "clang_3_9_1"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@3.9.1.cmake"
   extends: .build_on_quartz_advanced
 
 clang_4_0_0 (build on quartz):
   variables:
-    CONFIGURATION: "clang_4_0_0"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@4.0.0.cmake"
+  extends: .build_on_quartz_advanced
+
+clang_6_0_0 (build on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@6.0.0.cmake"
+  extends: .build_on_quartz_advanced
+
+clang_9_0_0 (build on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@9.0.0.cmake"
   extends: .build_on_quartz
+
 
 gcc_4_9_3 (build on quartz):
   variables:
-    CONFIGURATION: "gcc_4_9_3"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@4.9.3.cmake"
   extends: .build_on_quartz_advanced
 
 gcc_6_1_0 (build on quartz):
   variables:
-    CONFIGURATION: "gcc_6_1_0"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@6.1.0.cmake"
   extends: .build_on_quartz_advanced
 
 gcc_7_1_0 (build on quartz):
   variables:
-    CONFIGURATION: "gcc_7_1_0"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.1.0.cmake"
+  extends: .build_on_quartz_advanced
+
+gcc_7_3_0 (build on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.3.0.cmake"
+  extends: .build_on_quartz_advanced
+
+gcc_8_1_0 (build on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@8.1.0.cmake"
   extends: .build_on_quartz
 
-cudatoolkit_9_1 (build on quartz):
-  variables:
-    CONFIGURATION: "cudatoolkit_9_1"
-  extends: .build_on_quartz
 
 icpc_16_0_4 (build on quartz):
   variables:
-    CONFIGURATION: "icpc_16_0_4"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@16.0.4.cmake"
   extends: .build_on_quartz_advanced
-  allow_failure: true
 
 icpc_17_0_2 (build on quartz):
   variables:
-    CONFIGURATION: "icpc_17_0_2"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@17.0.2.cmake"
   extends: .build_on_quartz_advanced
+
+icpc_18_0_0 (build on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@18.0.0.cmake"
+  extends: .build_on_quartz_advanced
+  allow_failure: true
+
+icpc_19_0_4 (build on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@19.0.4.cmake"
+  extends: .build_on_quartz
+
 
 pgi_17_10 (build on quartz):
   variables:
-    CONFIGURATION: "pgi_17_10"
+    COMPILER: "pgi@17.10"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@17.10.cmake"
   extends: .build_on_quartz_advanced
   allow_failure: true
 
 pgi_18_5 (build on quartz):
   variables:
-    CONFIGURATION: "pgi_18_5"
+    COMPILER: "pgi@18.5"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@18.5.cmake"
+  extends: .build_on_quartz_advanced
+  allow_failure: true
+
+pgi_19_4 (build on quartz):
+  variables:
+    COMPILER: "pgi@19.4"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@19.4.cmake"
   extends: .build_on_quartz
   allow_failure: true
 
 
 ####
 # Here are all quartz tests jobs
-
 clang_3_9_1 (test on quartz):
   variables:
-    CONFIGURATION: "clang_3_9_1"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@3.9.1.cmake"
   extends: .test_on_quartz_advanced
   needs: ["clang_3_9_1 (build on quartz)"]
 
 clang_4_0_0 (test on quartz):
   variables:
-    CONFIGURATION: "clang_4_0_0"
-  extends: .test_on_quartz
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@4.0.0.cmake"
+  extends: .test_on_quartz_advanced
   needs: ["clang_4_0_0 (build on quartz)"]
+
+clang_6_0_0 (test on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@6.0.0.cmake"
+  extends: .test_on_quartz_advanced
+  needs: ["clang_6_0_0 (build on quartz)"]
+
+clang_9_0_0 (test on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@9.0.0.cmake"
+  extends: .test_on_quartz
+  needs: ["clang_9_0_0 (build on quartz)"]
+
 
 gcc_4_9_3 (test on quartz):
   variables:
-    CONFIGURATION: "gcc_4_9_3"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@4.9.3.cmake"
   extends: .test_on_quartz_advanced
   needs: ["gcc_4_9_3 (build on quartz)"]
 
 gcc_6_1_0 (test on quartz):
   variables:
-    CONFIGURATION: "gcc_6_1_0"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@6.1.0.cmake"
   extends: .test_on_quartz_advanced
   needs: ["gcc_6_1_0 (build on quartz)"]
 
 gcc_7_1_0 (test on quartz):
   variables:
-    CONFIGURATION: "gcc_7_1_0"
-  extends: .test_on_quartz
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.1.0.cmake"
+  extends: .test_on_quartz_advanced
   needs: ["gcc_7_1_0 (build on quartz)"]
 
-cudatoolkit_9_1 (test on quartz):
+gcc_7_3_0 (test on quartz):
   variables:
-    CONFIGURATION: "cudatoolkit_9_1"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.3.0.cmake"
+  extends: .test_on_quartz_advanced
+  needs: ["gcc_7_3_0 (build on quartz)"]
+
+gcc_8_1_0 (test on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@8.1.0.cmake"
   extends: .test_on_quartz
-  needs: ["cudatoolkit_9_1 (build on quartz)"]
+  needs: ["gcc_8_1_0 (build on quartz)"]
+
 
 icpc_16_0_4 (test on quartz):
   variables:
-    CONFIGURATION: "icpc_16_0_4"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@16.0.4.cmake"
   extends: .test_on_quartz_advanced
   needs: ["icpc_16_0_4 (build on quartz)"]
   allow_failure: true
 
 icpc_17_0_2 (test on quartz):
   variables:
-    CONFIGURATION: "icpc_17_0_2"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@17.0.2.cmake"
   extends: .test_on_quartz_advanced
   needs: ["icpc_17_0_2 (build on quartz)"]
 
+icpc_18_0_0 (test on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@18.0.0.cmake"
+  extends: .test_on_quartz_advanced
+  needs: ["icpc_18_0_0 (build on quartz)"]
+  allow_failure: true
+
+icpc_19_0_4 (test on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@19.0.4.cmake"
+  extends: .test_on_quartz
+  needs: ["icpc_19_0_4 (build on quartz)"]
+
+
 pgi_17_10 (test on quartz):
   variables:
-    CONFIGURATION: "pgi_17_10"
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@17.10.cmake"
   extends: .test_on_quartz_advanced
   needs: ["pgi_17_10 (build on quartz)"]
   allow_failure: true
 
 pgi_18_5 (test on quartz):
   variables:
-    CONFIGURATION: "pgi_18_5"
-  extends: .test_on_quartz
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@18.5.cmake"
+  extends: .test_on_quartz_advanced
   needs: ["pgi_18_5 (build on quartz)"]
+  allow_failure: true
+
+pgi_19_4 (test on quartz):
+  variables:
+    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@19.4.cmake"
+  extends: .test_on_quartz
+  needs: ["pgi_19_4 (build on quartz)"]
   allow_failure: true
