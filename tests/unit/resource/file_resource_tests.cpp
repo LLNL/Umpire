@@ -69,6 +69,6 @@ TYPED_TEST_P(ResourceTest, MmapFile)
 REGISTER_TYPED_TEST_SUITE_P(
     ResourceTest,
     Constructor, Allocate, getCurrentSize, getHighWatermark, getPlatform, getTraits, 
-    AllocateDeallocate, ZeroFile, TooLargeForSystem, LargeFile, MmapFile);
+    AllocateDeallocate, ZeroFile, LargeFile, MmapFile);
 
 INSTANTIATE_TYPED_TEST_SUITE_P(Mmap, ResourceTest, umpire::resource::FileMemoryResource,);

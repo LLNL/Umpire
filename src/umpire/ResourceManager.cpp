@@ -229,7 +229,7 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
-
+  
   {
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{

@@ -58,6 +58,7 @@ const char* AllocationDevices[] = {
 #if defined(UMPIRE_ENABLE_PINNED)
     , "PINNED"
 #endif
+    , "FILE"
 };
 
 template<typename T>

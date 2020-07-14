@@ -13,13 +13,12 @@
 #include <string.h>
 #include <fcntl.h>
 #include <ctime>
-#include <sys/mman.h>
 #include <unistd.h>
 #include <utility>
 #include <stdlib.h>
-#include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 
 namespace umpire {
 namespace resource {
@@ -43,7 +42,12 @@ void* FileMemoryResource::allocate(std::size_t bytes)
 
   // Setting File Name And Opening the files
   std::stringstream SS;
-  SS << "./umpire_mem_" << getpid() << s_file_counter;
+
+  std::string root_io_dir{"./"};
+  const char* output_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
+  if (output_dir) root_io_dir = output_dir; 
+
+  SS << root_io_dir << "umpire_mem_" << getpid() << s_file_counter;
   s_file_counter++;
 
   int fd{open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
@@ -82,7 +86,11 @@ void FileMemoryResource::deallocate(void* ptr)
   const std::string file_name = iter->second->first;
   m_size_map.erase(ptr);
 
-  munmap(ptr, size);
+  #if !defined(_MSC_VER)
+    munmap(ptr, size);
+  #else
+    VirtualFree(ptr, *size, MEM_RELEASE);
+  #endif
 
   remove(file_name.c_str());
 }
