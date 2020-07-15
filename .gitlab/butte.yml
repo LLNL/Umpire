@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -7,24 +7,24 @@
 
 ####
 # Shared configuration of jobs for butte
-.on_butte:
+.on_butte_advanced:
   variables:
   tags:
     - shell
     - butte
   rules:
-    - if: '$UMPIRE_CI_BUTTE != "ON"' #run except if ...
+    - if: '$ON_BUTTE != "ON"' #run except if ...
       when: never
     - when: on_success
   allow_failure: true
 
 .build_and_test_on_butte:
   stage: b_build_and_test
-  extends: [.build_blueos_3_ppc64le_ib_script, .on_butte]
-  needs: ["start"]
+  extends: [.build_blueos_3_ppc64le_ib_script, .on_butte_advanced]
+  needs: []
 
-# Note: .build_and_test_on_butte_advanced inherits from
-# .build_and_test_on_butte and .advanced_pileline.
+# Note: .build_and_test_on_butte_advanced_advanced inherits from
+# .build_and_test_on_butte_advanced and .advanced_pileline.
 # In particular, the rules section will be merged. Careful when changing rules.
 .build_and_test_on_butte_advanced:
   extends: [.build_and_test_on_butte, .advanced_pipeline]
@@ -33,68 +33,64 @@
 ####
 # All butte build jobs
 
-clang_3_9_1 (build and test on butte):
+clang_default (build and test on butte):
   variables:
-    CONFIGURATION: "clang_3_9_1"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@default.cmake"
   extends: .build_and_test_on_butte_advanced
 
-gcc_4_9_3 (build and test on butte):
+gcc_default (build and test on butte):
   variables:
-    CONFIGURATION: "gcc_4_9_3"
-  extends: .build_and_test_on_butte
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@default.cmake"
+  extends: .build_and_test_on_butte_advanced
+
+xl_default (build and test on butte):
+  variables:
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-xl@default.cmake"
+  extends: .build_and_test_on_butte_advanced
+
+pgi_default (build and test on butte):
+  variables:
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-pgi@default.cmake"
+  extends: .build_and_test_on_butte_advanced
+  allow_failure: true
+
+clang_3_9_1 (build and test on butte):
+  variables:
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@3.9.1.cmake"
+  extends: .build_and_test_on_butte_advanced
 
 clang_4_0_0 (build and test on butte):
   variables:
-    CONFIGURATION: "clang_4_0_0"
-  extends: .build_and_test_on_butte
-
-clang_coral_2017_06_29 (build and test on butte):
-  variables:
-    CONFIGURATION: "clang_coral_2017_06_29"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@4.0.0.cmake"
   extends: .build_and_test_on_butte_advanced
 
-clang_coral_2017_08_31 (build and test on butte):
+clang_9_0_0 (build and test on butte):
   variables:
-    CONFIGURATION: "clang_coral_2017_08_31"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@9.0.0.cmake"
   extends: .build_and_test_on_butte_advanced
 
-clang_coral_2017_09_06 (build and test on butte):
+gcc_8_3_1 (build and test on butte):
   variables:
-    CONFIGURATION: "clang_coral_2017_09_06"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@8.3.1.cmake"
   extends: .build_and_test_on_butte_advanced
 
-clang_coral_2017_09_18 (build and test on butte):
+clang_coral_2018_08_08 (build and test on butte):
   variables:
-    CONFIGURATION: "clang_coral_2017_09_18"
-  extends: .build_and_test_on_butte
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08.cmake"
+  extends: .build_and_test_on_butte_advanced
+  allow_failure: true
 
 nvcc_gcc_4_9_3 (build and test on butte):
   variables:
-    CONFIGURATION: "nvcc_gcc_4_9_3"
-  extends: .build_and_test_on_butte
-
-nvcc_clang_coral_2017_06_29 (build and test on butte):
-  variables:
-    CONFIGURATION: "nvcc_clang_coral_2017_06_29"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@4.9.3-cuda.cmake"
   extends: .build_and_test_on_butte_advanced
 
-nvcc_clang_coral_2017_08_31 (build and test on butte):
+nvcc_clang_coral_2018_08_08 (build and test on butte):
   variables:
-    CONFIGURATION: "nvcc_clang_coral_2017_08_31"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08-cuda.cmake"
   extends: .build_and_test_on_butte_advanced
 
-nvcc_clang_coral_2017_09_06 (build and test on butte):
+nvcc_xl-beta-2019.06.20 (build and test on butte):
   variables:
-    CONFIGURATION: "nvcc_clang_coral_2017_09_06"
+    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-xl@beta2019.06.20.cmake"
   extends: .build_and_test_on_butte_advanced
-
-nvcc_clang_coral_2017_09_18 (build and test on butte):
-  variables:
-    CONFIGURATION: "nvcc_clang_coral_2017_09_18"
-  extends: .build_and_test_on_butte
-
-nvcc_xl-beta-2017.09.13 (build and test on butte):
-  variables:
-    CONFIGURATION: "nvcc_xl-beta-2017.09.13"
-  extends: .build_and_test_on_butte
-

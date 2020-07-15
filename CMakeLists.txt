@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2.1.0)
+  VERSION 3.0.0)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -38,6 +38,7 @@ option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
+option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
 option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
@@ -76,7 +77,7 @@ if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
 endif ()
 
 if (ENABLE_CUDA)
-  if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+  if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
     endif ()
