@@ -22,6 +22,7 @@ class FileMemoryResource :
 {
   public: 
     FileMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+    ~FileMemoryResource();
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);

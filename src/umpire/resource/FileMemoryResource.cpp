@@ -30,16 +30,22 @@ FileMemoryResource::FileMemoryResource(
 {
 } 
 
+FileMemoryResource::~FileMemoryResource()
+{
+  for (auto i=m_size_map.begin(); i!=m_size_map.end(); i++) {
+        munmap(i->first, i->second->second);
+        remove(i->second->first.c_str());
+        m_size_map.erase(i->first);
+  }
+}
+
 void* FileMemoryResource::allocate(std::size_t bytes)
 {
   if (bytes <= 0) { UMPIRE_ERROR( "Bytes Requested Error: Bytes size is less than 1"); }
 
   // Find output file directory for mmap files
-  std::string default_dir{"./"};
   const char* memory_file_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
-  if (memory_file_dir) {
-    default_dir = std::string(memory_file_dir); 
-  }
+  std::string default_dir = memory_file_dir?"./":memory_file_dir;
 
   // Create name and open file
   std::stringstream SS;
@@ -79,15 +85,18 @@ void FileMemoryResource::deallocate(void* ptr)
 {
   // Find information about ptr for deallocation
   auto iter = m_size_map.find(ptr);
-  auto size = iter->second->second;
-  const std::string file_name = iter->second->first;
-  m_size_map.erase(ptr);
 
-  // Un-map information using munmap
-  munmap(ptr, size);
-
-  // Delete file
-  remove(file_name.c_str());
+  // Unmap File
+  if (munmap(iter->first, iter->second->second) < 0) {
+      UMPIRE_ERROR("munmap failed:" << strerror(errno));
+  }
+  // Remove File
+  if (remove(iter->second->first.c_str()) < 0) {
+      UMPIRE_ERROR("remove of " << iter->second->first.c_str() << " failed: " << strerror(errno));
+  }
+  
+  // Remove Information about file in m_size_map
+  m_size_map.erase(iter->first);
 }
 
 std::size_t FileMemoryResource::getCurrentSize() const noexcept
