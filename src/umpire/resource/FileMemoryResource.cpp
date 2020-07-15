@@ -49,7 +49,11 @@ void* FileMemoryResource::allocate(std::size_t bytes)
 
   // Find output file directory for mmap files
   const char* memory_file_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
-  std::string default_dir = memory_file_dir?"./":memory_file_dir;
+  std::string default_dir = "./";
+  if(memory_file_dir)
+  {
+    default_dir = memory_file_dir;
+  }
 
   // Create name and open file
   std::stringstream SS;
@@ -89,7 +93,6 @@ void FileMemoryResource::deallocate(void* ptr)
 {
   // Find information about ptr for deallocation
   auto iter = m_size_map.find(ptr);
-
   // Unmap File
   if (munmap(iter->first, iter->second->second) < 0) {
       UMPIRE_ERROR("munmap failed:" << strerror(errno));
@@ -98,7 +101,6 @@ void FileMemoryResource::deallocate(void* ptr)
   if (remove(iter->second->first.c_str()) < 0) {
       UMPIRE_ERROR("remove of " << iter->second->first.c_str() << " failed: " << strerror(errno));
   }
-  
   // Remove Information about file in m_size_map
   m_size_map.erase(iter->first);
 }
