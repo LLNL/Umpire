@@ -32,10 +32,14 @@ FileMemoryResource::FileMemoryResource(
 
 FileMemoryResource::~FileMemoryResource()
 {
-  for (auto i=m_size_map.begin(); i!=m_size_map.end(); i++) {
-        munmap(i->first, i->second->second);
-        remove(i->second->first.c_str());
-        m_size_map.erase(i->first);
+  std::vector<void*> leaked_items;
+
+  for ( auto const& m : m_size_map ) {
+      leaked_items.push_back(m.first);
+  }
+
+  for ( auto const& p : leaked_items ) {
+      deallocate(p);
   }
 }
 
