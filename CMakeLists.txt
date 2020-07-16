@@ -26,6 +26,7 @@ endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
+set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
@@ -81,6 +82,12 @@ if (ENABLE_CUDA)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
     endif ()
   endif ()
+endif()
+
+if (ENABLE_SYCL)
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
+   endif()
 endif()
 
 ################################

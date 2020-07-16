@@ -4,15 +4,10 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaDeviceMemoryResource_HPP
-#define UMPIRE_CudaDeviceMemoryResource_HPP
-
-#include "umpire/alloc/CudaMallocAllocator.hpp"
+#ifndef UMPIRE_SyclDeviceMemoryResource_HPP
+#define UMPIRE_SyclDeviceMemoryResource_HPP
 
 #include "umpire/resource/MemoryResource.hpp"
-
-#include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace resource {
@@ -21,11 +16,12 @@ namespace resource {
    * \brief Concrete MemoryResource object that uses the template _allocator to
    * allocate and deallocate memory.
    */
-class CudaDeviceMemoryResource :
+template <typename _allocator>
+class SyclDeviceMemoryResource :
   public MemoryResource
 {
   public:
-    CudaDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+    SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);
@@ -36,7 +32,7 @@ class CudaDeviceMemoryResource :
     Platform getPlatform() noexcept;
 
   protected:
-    alloc::CudaMallocAllocator m_allocator;
+    _allocator m_allocator;
 
     Platform m_platform;
 };
@@ -44,4 +40,6 @@ class CudaDeviceMemoryResource :
 } // end of namespace resource
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaDeviceMemoryResource_HPP
+#include "umpire/resource/SyclDeviceMemoryResource.inl"
+
+#endif // UMPIRE_SyclDeviceMemoryResource_HPP
