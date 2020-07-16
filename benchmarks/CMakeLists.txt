@@ -52,6 +52,11 @@ blt_add_executable(
   SOURCES debuglog_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends})
 
+blt_add_executable(
+  NAME file_resource_benchmarks
+  SOURCES file_resource_benchmarks.cpp
+  DEPENDS_ON ${benchmark_depends})
+
 blt_add_benchmark(
   NAME allocator_benchmarks
   COMMAND allocator_benchmarks)

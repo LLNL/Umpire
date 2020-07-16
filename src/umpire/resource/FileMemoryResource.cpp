@@ -24,7 +24,7 @@ FileMemoryResource::FileMemoryResource(
     const std::string& name,
     int id,
     MemoryResourceTraits traits) :
-  MemoryResource(name, id, traits),
+  MemoryResource{name, id, traits},
   m_platform{platform},
   m_size_map{}
 {
@@ -35,34 +35,31 @@ FileMemoryResource::~FileMemoryResource()
   std::vector<void*> leaked_items;
 
   for ( auto const& m : m_size_map ) {
-      leaked_items.push_back(m.first);
+    leaked_items.push_back(m.first);
   }
 
   for ( auto const& p : leaked_items ) {
-      deallocate(p);
+    deallocate(p);
   }
 }
 
 void* FileMemoryResource::allocate(std::size_t bytes)
 {
-  if (bytes <= 0) { UMPIRE_ERROR( "Bytes Requested Error: Bytes size is less than 1"); }
-
   // Find output file directory for mmap files
   const char* memory_file_dir{std::getenv("UMPIRE_MEMORY_FILE_DIR")};
   std::string default_dir = "./";
-  if(memory_file_dir)
-  {
+  if(memory_file_dir) {
     default_dir = memory_file_dir;
   }
 
   // Create name and open file
-  std::stringstream SS;
-  SS << default_dir << "umpire_mem_" << getpid() << s_file_counter;
+  std::stringstream ss;
+  ss << default_dir << "umpire_mem_" << getpid() << s_file_counter;
   s_file_counter++;
 
-  int fd{open(SS.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
+  int fd{open(ss.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
   if (fd == -1) { 
-    UMPIRE_ERROR("Opening File Failed: " << strerror(errno)); 
+    UMPIRE_ERROR("Opening File { " << ss.str() << " } Failed: " << strerror(errno)); 
   }
 
   // Setting Size Of Map File
@@ -72,17 +69,19 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   // Truncate file
   int trun{ftruncate64(fd, rounded_bytes)};
   if (trun == -1) { 
-    remove(SS.str().c_str()); UMPIRE_ERROR("Truncate Failed: " << strerror(errno)); 
+    remove(ss.str().c_str()); 
+    UMPIRE_ERROR("truncate64 Of File { " << ss.str() << " } Failed: " << strerror(errno)); 
   }
 
   // Using mmap
   void* ptr{mmap(NULL, rounded_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
   if (ptr == MAP_FAILED) { 
-    remove(SS.str().c_str()); UMPIRE_ERROR("Mmap Failed: " << strerror(errno)); 
+    remove(ss.str().c_str()); 
+    UMPIRE_ERROR("mmap Of " << rounded_bytes << " To File { " << ss.str() << " } Failed: " << strerror(errno)); 
   }
 
   // Storing Information On File
-  std::pair <const std::string, std::size_t> INFO{std::make_pair(SS.str(), rounded_bytes)};
+  std::pair <const std::string, std::size_t> INFO{std::make_pair(ss.str(), rounded_bytes)};
   m_size_map.insert(ptr, INFO);
   
   close(fd);
@@ -95,11 +94,11 @@ void FileMemoryResource::deallocate(void* ptr)
   auto iter = m_size_map.find(ptr);
   // Unmap File
   if (munmap(iter->first, iter->second->second) < 0) {
-      UMPIRE_ERROR("munmap failed:" << strerror(errno));
+    UMPIRE_ERROR("munmap Of File { " << iter->second->first.c_str() << " } Failed:" << strerror(errno));
   }
   // Remove File
   if (remove(iter->second->first.c_str()) < 0) {
-      UMPIRE_ERROR("remove of " << iter->second->first.c_str() << " failed: " << strerror(errno));
+    UMPIRE_ERROR("remove Of File { " << iter->second->first.c_str() << " } Failed: " << strerror(errno));
   }
   // Remove Information about file in m_size_map
   m_size_map.erase(iter->first);
