@@ -11,6 +11,7 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/AlignedAllocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
@@ -155,6 +156,7 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
 }
 
 using Strategies = ::testing::Types<
+  umpire::strategy::AlignedAllocator,
 #if defined(UMPIRE_ENABLE_CUDA)
   umpire::strategy::AllocationAdvisor,
 #endif
@@ -1484,3 +1486,87 @@ TEST(NumaPolicyTest, Location) {
 }
 
 #endif // defined(UMPIRE_ENABLE_NUMA)
+
+static inline void test_alignment(
+    uintptr_t p,
+    unsigned int align)
+{
+  ASSERT_EQ(0, p % align);
+  p &= align;
+  ASSERT_TRUE( p == 0 || p == align);
+}
+
+TEST(AlignedAllocator, AllocateAlign256)
+{
+  unsigned int align = 256;
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_256", rm.getAllocator("HOST"), align);
+
+  void* d1{alloc.allocate(1)};
+  void* d2{alloc.allocate(257)};
+  void* d3{alloc.allocate(783)};
+
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d1),
+    align);
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d2),
+    align);
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d3),
+    align);
+
+  alloc.deallocate(d1);
+  alloc.deallocate(d2);
+  alloc.deallocate(d3);
+}
+
+TEST(AlignedAllocator, AllocateAlign64)
+{
+  unsigned int align = 64;
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_64", rm.getAllocator("HOST"), align);
+
+  void* d1{alloc.allocate(1)};
+  void* d2{alloc.allocate(17)};
+  void* d3{alloc.allocate(128)};
+
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d1),
+    align);
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d2),
+    align);
+  test_alignment(
+    reinterpret_cast<uintptr_t>(d3),
+    align);
+
+  alloc.deallocate(d1);
+  alloc.deallocate(d2);
+  alloc.deallocate(d3);
+}
+
+TEST(AlignedAllocator, BadAlignment)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  EXPECT_THROW({
+    auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_6", rm.getAllocator("HOST"), 6);
+    UMPIRE_USE_VAR(alloc);
+  }, umpire::util::Exception);
+
+  EXPECT_THROW({
+    auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_11", rm.getAllocator("HOST"), 11);
+    UMPIRE_USE_VAR(alloc);
+  }, umpire::util::Exception);
+
+  EXPECT_THROW({
+    auto alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
+    "aligned_allocator_0", rm.getAllocator("HOST"), 0);
+    UMPIRE_USE_VAR(alloc);
+  }, umpire::util::Exception);
+}
