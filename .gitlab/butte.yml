@@ -23,7 +23,7 @@
   extends: [.build_blueos_3_ppc64le_ib_script, .on_butte_advanced]
   needs: []
 
-# Note: .build_and_test_on_butte_advanced_advanced inherits from
+# Note: .build_and_test_on_butte_advanced inherits from
 # .build_and_test_on_butte_advanced and .advanced_pileline.
 # In particular, the rules section will be merged. Careful when changing rules.
 .build_and_test_on_butte_advanced:

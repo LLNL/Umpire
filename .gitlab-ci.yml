@@ -1,9 +1,9 @@
-##############################################################################
+###############################################################################
 # Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
-##############################################################################
+###############################################################################
 
 ###############################################################################
 # General GitLab pipelines configurations for supercomputers and Linux clusters
@@ -37,6 +37,7 @@ variables:
 # can express dependencies between job that break the ordering of stages, in
 # favor of a DAG.
 # In practice q_*, l_* and b_* stages are independently run and start immediately.
+
 stages:
   - q_allocate_resources
   - q_build_and_test
@@ -58,8 +59,8 @@ stages:
     - echo ${ALLOC_NAME}
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 -n 1 -c 4 scripts/gitlab/build_and_test.sh --build-only
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 1 -N 1 -n 1 -c 4 scripts/gitlab/build_and_test.sh --test-only
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 scripts/gitlab/build_and_test.sh --build-only
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 1 -N 1 scripts/gitlab/build_and_test.sh --test-only
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
@@ -72,7 +73,7 @@ stages:
   extends: .build_blueos_3_ppc64le_ib_script
 
 
-# This is where jobs are included
+# This is where jobs are included.
 include:
   - local: .gitlab/quartz.yml
   - local: .gitlab/lassen.yml

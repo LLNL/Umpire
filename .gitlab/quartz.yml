@@ -45,7 +45,7 @@ release_resources (on quartz):
     - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
 
 ####
-# Generic qwartz build job, extending build script
+# Generic quartz build job, extending build script
 .build_and_test_on_quartz:
   stage: q_build_and_test
   extends: [.build_toss_3_x86_64_ib_script, .on_quartz]
@@ -54,7 +54,7 @@ release_resources (on quartz):
   extends: [.build_and_test_on_quartz, .advanced_pipeline]
 
 ####
-# Here are all quartz build and test jobs
+# Quartz build jobs
 clang_3_9_1 (build and test on quartz):
   variables:
     HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@3.9.1.cmake"
