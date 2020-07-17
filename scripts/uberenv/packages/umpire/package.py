@@ -108,10 +108,11 @@ class Umpire(CMakePackage, CudaPackage):
         if '+libcpp' in spec:
             var='-'.join([var,'libcpp'])
 
-        host_config_path = "%s-%s-%s%s.cmake" % (socket.gethostname().rstrip('1234567890'),
+        host_config_path = "%s-%s-%s%s-%s.cmake" % (socket.gethostname().rstrip('1234567890'),
                                                self._get_sys_type(spec),
                                                spec.compiler,
-                                               var)
+                                               var,
+                                               spec.dag_hash())
         dest_dir = self.stage.source_path
         host_config_path = os.path.abspath(pjoin(dest_dir, host_config_path))
         return host_config_path
@@ -251,6 +252,19 @@ class Umpire(CMakePackage, CudaPackage):
         else:
             cfg.write(cmake_cache_option("ENABLE_CUDA", False))
 
+        cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
+        cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
+        cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
+        cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
+        cfg.write(cmake_cache_option("ENABLE_TESTS", self.run_tests))
+
+        #######################
+        # Close and save
+        #######################
+        cfg.write("\n")
+        cfg.close()
+
+        print("OUT: host-config file {0}".format(host_config_path))
 
     def cmake_args(self):
         spec = self.spec
@@ -258,20 +272,5 @@ class Umpire(CMakePackage, CudaPackage):
 
         options = []
         options.extend(['-C', host_config_path])
-
-        options.append('-DENABLE_C={0}'.format(
-            'On' if '+c' in spec else 'Off'))
-
-        options.append('-DENABLE_FORTRAN={0}'.format(
-            'On' if '+fortran' in spec else 'Off'))
-
-        options.append('-DENABLE_NUMA={0}'.format(
-            'On' if '+numa' in spec else 'Off'))
-
-        options.append('-DENABLE_OPENMP={0}'.format(
-            'On' if '+openmp' in spec else 'Off'))
-
-        options.append('-DENABLE_TESTS={0}'.format(
-            'On' if self.run_tests else 'Off'))
 
         return options
