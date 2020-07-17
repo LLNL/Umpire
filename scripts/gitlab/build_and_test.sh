@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#!/bin/bash
 ##############################################################################
 # Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
@@ -97,7 +96,8 @@ then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # If building, then delete everything first
-    rm -rf ${build_dir} && mkdir -p ${build_dir} && cd ${build_dir}
+    rm -rf ${build_dir} 2>/dev/null
+    mkdir -p ${build_dir} && cd ${build_dir}
 
     cmake \
       -C ${hostconfig_path} \
