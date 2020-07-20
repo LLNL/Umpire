@@ -42,6 +42,15 @@
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_SYCL)
+#include "umpire/op/SyclCopyFromOperation.hpp"
+#include "umpire/op/SyclCopyToOperation.hpp"
+#include "umpire/op/SyclCopyOperation.hpp"
+
+#include "umpire/op/SyclMemsetOperation.hpp"
+#include "umpire/op/SyclMemPrefetchOperation.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
 #include <omp.h>
 #include "umpire/op/OpenMPTargetCopyOperation.hpp"
@@ -219,6 +228,38 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::omp_target, Platform::omp_target),
       std::make_shared<GenericReallocateOperation>());
+#endif
+
+#if defined(UMPIRE_ENABLE_SYCL)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::host, Platform::sycl),
+      std::make_shared<SyclCopyToOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sycl, Platform::host),
+      std::make_shared<SyclCopyFromOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<GenericReallocateOperation>());
+
+  registerOperation(
+      "PREFETCH",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclMemPrefetchOperation>());
 #endif
 }
 
