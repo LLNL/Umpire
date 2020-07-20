@@ -72,7 +72,7 @@ class StrategyTest :
 
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<T>(
-            name, 
+            name,
             rm.getAllocator("HOST")));
     }
 
@@ -95,7 +95,7 @@ void StrategyTest<umpire::strategy::FixedPool>::SetUp()
 
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::FixedPool>(
-            name, 
+            name,
             rm.getAllocator("HOST"),
             m_big*sizeof(double)));
 }
@@ -109,7 +109,7 @@ void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
 
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-            name, 
+            name,
             rm.getAllocator("UM"),
             "READ_MOSTLY"));
 }
@@ -123,7 +123,7 @@ void StrategyTest<umpire::strategy::SizeLimiter>::SetUp()
 
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::SizeLimiter>(
-            name, 
+            name,
             rm.getAllocator("HOST"),
             1024));
 }
@@ -136,7 +136,7 @@ void StrategyTest<umpire::strategy::SlotPool>::SetUp()
 
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::SlotPool>(
-            name, 
+            name,
             rm.getAllocator("HOST"),
             8));
 }
@@ -149,7 +149,7 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
 
       m_allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-            name, 
+            name,
             rm.getAllocator("HOST"),
             1024));
 }
@@ -250,7 +250,7 @@ TYPED_TEST(StrategyTest, getCurrentSize)
   void* data = this->m_allocator->allocate(this->m_big*sizeof(double));
 
   ASSERT_EQ(this->m_allocator->getCurrentSize(), this->m_big*sizeof(double));
-  
+
   this->m_allocator->deallocate(data);
 }
 
@@ -619,7 +619,7 @@ TEST(ThreadSafeAllocator, HostStdThread)
   {
     threads.push_back(
         std::thread([=, &allocator, &thread_allocs] {
-          for ( int j = 0; j < N; ++j) { 
+          for ( int j = 0; j < N; ++j) {
             thread_allocs[i] = allocator.allocate(1024);
             ASSERT_NE(thread_allocs[i], nullptr);
             allocator.deallocate(thread_allocs[i]);
@@ -684,7 +684,7 @@ TEST(ThreadSafeAllocator, DeviceStdThread)
   {
     threads.push_back(
         std::thread([=, &allocator, &thread_allocs] {
-          for ( int j = 0; j < N; ++j) { 
+          for ( int j = 0; j < N; ++j) {
             thread_allocs[i] = allocator.allocate(1024);
             ASSERT_NE(thread_allocs[i], nullptr);
             allocator.deallocate(thread_allocs[i]);
@@ -953,9 +953,9 @@ TEST(DynamicPoolMap, coalesce)
 
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
 
-  ASSERT_EQ(dynamic_pool->getCurrentSize(), 0);
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
   ASSERT_EQ(dynamic_pool->getActualSize(), initial_bytes);
-  ASSERT_GE(dynamic_pool->getHighWatermark(), 62 + 1024);
+  ASSERT_GE(alloc.getHighWatermark(), 62 + 1024);
 }
 
 TEST(DynamicPoolList, coalesce)
@@ -989,9 +989,9 @@ TEST(DynamicPoolList, coalesce)
 
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
 
-  ASSERT_EQ(dynamic_pool->getCurrentSize(), 0);
+  ASSERT_EQ(alloc.getCurrentSize(), 0);
   ASSERT_EQ(dynamic_pool->getActualSize(), initial_bytes+1024);
-  ASSERT_GE(dynamic_pool->getHighWatermark(), 62 + 1024);
+  ASSERT_GE(alloc.getHighWatermark(), 62 + 1024);
 }
 
 TEST(HeuristicTest, OutOfBounds)

@@ -142,10 +142,6 @@ QuickPool::allocate(std::size_t bytes)
       m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
-  m_curr_bytes += bytes;
-  if (m_curr_bytes > m_highwatermark) {
-    m_highwatermark = m_curr_bytes;
-  }
   return ret;
 }
 
@@ -155,7 +151,6 @@ QuickPool::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
-  m_curr_bytes -= chunk->size;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -250,21 +245,9 @@ void QuickPool::release()
 }
 
 std::size_t
-QuickPool::getCurrentSize() const noexcept
-{
-  return m_curr_bytes;
-}
-
-std::size_t
 QuickPool::getActualSize() const noexcept
 {
   return m_actual_bytes;
-}
-
-std::size_t
-QuickPool::getHighWatermark() const noexcept
-{
-  return m_highwatermark;
 }
 
 std::size_t

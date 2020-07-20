@@ -47,17 +47,11 @@ protected:
   // Total size allocated (bytes)
   std::size_t totalBytes;
 
-  // Allocated size (bytes)
-  std::size_t allocBytes;
-
   // Minimum size of initial allocation
   std::size_t minInitialBytes;
 
   // Minimum size for allocations
   std::size_t minBytes;
-
-  // High water mark of allocations
-  std::size_t highWatermark;
 
   // Pointer to our allocator's allocation strategy
   umpire::strategy::AllocationStrategy* allocator;
@@ -99,40 +93,40 @@ protected:
       {
         umpire::util::backtrace bt{};
         umpire::util::backtracer<>::get_backtrace(bt);
-        UMPIRE_LOG(Info, "actual_size:" << (totalBytes+sizeToAlloc) 
-          << " (prev: " << totalBytes << ") " 
+        UMPIRE_LOG(Info, "actual_size:" << (totalBytes+sizeToAlloc)
+          << " (prev: " << totalBytes << ") "
           << umpire::util::backtracer<>::print(bt));
       }
 #endif
       data = allocator->allocate(sizeToAlloc);
     }
     catch (...) {
-      UMPIRE_LOG(Error, 
+      UMPIRE_LOG(Error,
           "\n\tMemory exhausted at allocation resource. "
-          "Attempting to give blocks back.\n\t"
-          << getCurrentSize() << " Allocated to pool, "
+          "Attempting to give blocks back.\n\n"
+          << getActualSize() << " Allocated to pool, "
           << getFreeBlocks() << " Free Blocks, "
           << getInUseBlocks() << " Used Blocks\n"
       );
       freeReleasedBlocks();
-      UMPIRE_LOG(Error, 
+      UMPIRE_LOG(Error,
           "\n\tMemory exhausted at allocation resource.  "
           "\n\tRetrying allocation operation: "
-          << getCurrentSize() << " Bytes still allocated to pool, "
+          << getActualSize() << " Bytes still allocated to pool, "
           << getFreeBlocks() << " Free Blocks, "
           << getInUseBlocks() << " Used Blocks\n"
       );
       try {
         data = allocator->allocate(sizeToAlloc);
-        UMPIRE_LOG(Error, 
+        UMPIRE_LOG(Error,
           "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
       }
       catch (...) {
-        UMPIRE_LOG(Error, 
+        UMPIRE_LOG(Error,
           "\n\tUnable to allocate from resource even after giving back free blocks.\n"
           "\tThrowing to let application know we have no more memory: "
-          << getCurrentSize() << " Bytes still allocated to pool\n"
+          << getActualSize() << " Bytes still allocated to pool\n"
           << getFreeBlocks() << " Partially Free Blocks, "
           << getInUseBlocks() << " Used Blocks\n"
         );
@@ -260,8 +254,8 @@ protected:
     if (freed > 0) {
       umpire::util::backtrace bt{};
       umpire::util::backtracer<>::get_backtrace(bt);
-      UMPIRE_LOG(Info, "actual_size:" << (totalBytes) 
-        << " (prev: " << (totalBytes+freed) 
+      UMPIRE_LOG(Info, "actual_size:" << (totalBytes)
+        << " (prev: " << (totalBytes+freed)
         << ") " << umpire::util::backtracer<>::print(bt));
     }
 #endif
@@ -300,10 +294,8 @@ public:
       freeBlocks(NULL),
       totalBlocks(0),
       totalBytes(0),
-      allocBytes(0),
       minInitialBytes(_minInitialBytes),
       minBytes(_minBytes),
-      highWatermark(0),
       allocator(strat) { }
 
   ~DynamicSizePool() { freeAllBlocks(); }
@@ -324,12 +316,6 @@ public:
     best->next = usedBlocks;
     usedBlocks = best;
 
-    // Increment the allocated size
-    allocBytes += size;
-
-    if ( allocBytes > highWatermark )
-      highWatermark = allocBytes;
-
     UMPIRE_UNPOISON_MEMORY_REGION(allocator, usedBlocks->data, size);
 
     // Return the new pointer
@@ -346,9 +332,6 @@ public:
     }
     if (!curr) return;
 
-    // Remove from allocBytes
-    allocBytes -= curr->size;
-
     UMPIRE_POISON_MEMORY_REGION(allocator, ptr, curr->size);
 
     // Release it
@@ -356,14 +339,8 @@ public:
 
   }
 
-  std::size_t getCurrentSize() const { return allocBytes; }
-
   std::size_t getActualSize() const {
     return totalBytes;
-  }
-
-  std::size_t getHighWatermark() const {
-    return highWatermark;
   }
 
   std::size_t getBlocksInPool() const {
