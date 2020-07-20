@@ -15,6 +15,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Removed
 
 ### Fixed
+- Quickpool is now correctly tracking for getHighWatermark statistic.
 
 ## [3.0.0] - 2020-06-30
 
