@@ -17,34 +17,30 @@ const int interations{10000};
 size_t Scalar = 5;
 
 void Copy(std::size_t* A, std::size_t* C){
-    for(int i = 0; i < interations; i++)
-    {
+    for(int i = 0; i < interations; i++){
         A[i] = C[i];
     }   
 }
 
 void Scale(std::size_t* B, std::size_t* C){
-    for(int i = 0; i < interations; i++)
-    {
+    for(int i = 0; i < interations; i++){
         B[i] = C[i] * Scalar;
     }   
 }
 
 void Add(std::size_t* A, std::size_t* B, std::size_t* C){
-    for(int i = 0; i < interations; i++)
-    {
+    for(int i = 0; i < interations; i++){
         C[i] = A[i] + B[i];
     }   
 }
 
 void Triad(std::size_t* A, std::size_t* B, std::size_t* C){
-    for(int i = 0; i < interations; i++)
-    {
+    for(int i = 0; i < interations; i++){
         A[i] = B[i] + Scalar * C[i];
     }   
 }
 
-void Allocate(umpire::Allocator alloc, std::size_t*& A, std::size_t*& B, std::size_t*& C){
+void Allocation_Initialized(umpire::Allocator alloc, std::size_t*& A, std::size_t*& B, std::size_t*& C){
 
     A = (std::size_t*) alloc.allocate(sizeof(size_t) * interations);
     B = (std::size_t*) alloc.allocate(sizeof(size_t) * interations);
@@ -57,7 +53,7 @@ void Allocate(umpire::Allocator alloc, std::size_t*& A, std::size_t*& B, std::si
     }
 }
 
-void Deallocate(umpire::Allocator alloc, std::size_t* A, std::size_t* B, std::size_t* C){
+void Deallocation_Requested(umpire::Allocator alloc, std::size_t* A, std::size_t* B, std::size_t* C){
     alloc.deallocate( A );
     alloc.deallocate( B );
     alloc.deallocate( C );
@@ -72,29 +68,29 @@ void benchmark(std::string name){
     std::size_t* B = nullptr;
     std::size_t* C = nullptr;
     
-    Allocate(alloc,A,B,C);
+    Allocation_Initialized(alloc,A,B,C);
     auto begin_copy = std::chrono::system_clock::now();
     Copy(A,C);
     auto end_copy = std::chrono::system_clock::now();
-    Deallocate(alloc,A,B,C);
+    Deallocation_Requested(alloc,A,B,C);
 
-    Allocate(alloc,A,B,C);
+    Allocation_Initialized(alloc,A,B,C);
     auto begin_scale = std::chrono::system_clock::now();
     Scale(B,C);
     auto end_scale = std::chrono::system_clock::now();
-    Deallocate(alloc,A,B,C);
+    Deallocation_Requested(alloc,A,B,C);
 
-    Allocate(alloc,A,B,C);
+    Allocation_Initialized(alloc,A,B,C);
     auto begin_add = std::chrono::system_clock::now();
     Add(A,B,C);
     auto end_add = std::chrono::system_clock::now();
-    Deallocate(alloc,A,B,C);
+    Deallocation_Requested(alloc,A,B,C);
 
-    Allocate(alloc,A,B,C);
+    Allocation_Initialized(alloc,A,B,C);
     auto begin_triad = std::chrono::system_clock::now();
     Triad(A,B,C);
     auto end_triad = std::chrono::system_clock::now();
-    Deallocate(alloc,A,B,C);
+    Deallocation_Requested(alloc,A,B,C);
 
     std::cout << name << std::endl;
     std::cout << "    Copy:     " <<  std::chrono::duration<double>(end_copy - begin_copy).count()/interations << " sec/elements" <<std::endl;
@@ -104,14 +100,13 @@ void benchmark(std::string name){
 }
 
 int main(int, char**) {
-  benchmark("HOST");
-  benchmark("FILE");
-
+    benchmark("HOST");
+    benchmark("FILE");
 #if defined(UMPIRE_ENABLE_CUDA)
-  benchmark("DEVICE");
-  benchmark("UM");
+    benchmark("DEVICE");
+    benchmark("UM");
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
-  benchmark("DEVICE");
+    benchmark("DEVICE");
 #endif
 }
