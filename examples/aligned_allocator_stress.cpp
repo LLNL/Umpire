@@ -78,17 +78,17 @@ int main()
   auto& rm(umpire::ResourceManager::getInstance());
 
   auto quick_allocation_pool{rm.makeAllocator<umpire::strategy::QuickPool>("HOST_quick_pool", rm.getAllocator("HOST"), initial_pool_size, subsequent_pool_increments) };
-  auto quick_dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(quick_allocation_pool);
+  auto quick_dynamic_pool{ umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(quick_allocation_pool) };
   auto quick_aligned_allocator{ rm.makeAllocator<umpire::strategy::AlignedAllocator>("HOST_quick_aligned", quick_allocation_pool, allocation_alignment) };
   auto quick_alloc{ rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>("HOST_quick_safe_pool", quick_aligned_allocator) };
 
   auto map_allocation_pool{rm.makeAllocator<umpire::strategy::DynamicPoolMap>("HOST_map_pool", rm.getAllocator("HOST"), initial_pool_size, subsequent_pool_increments) };
-  auto map_dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(map_allocation_pool);
+  auto map_dynamic_pool { umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(map_allocation_pool) };
   auto map_aligned_allocator{ rm.makeAllocator<umpire::strategy::AlignedAllocator>("HOST_map_aligned", map_allocation_pool, allocation_alignment) };
   auto map_alloc{ rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>("HOST_map_safe_pool", map_aligned_allocator) };
 
   auto list_allocation_pool{rm.makeAllocator<umpire::strategy::DynamicPoolList>("HOST_list_pool", rm.getAllocator("HOST"), initial_pool_size, subsequent_pool_increments) };
-  auto list_dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(list_allocation_pool);
+  auto list_dynamic_pool { umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(list_allocation_pool) };
   auto list_aligned_allocator{ rm.makeAllocator<umpire::strategy::AlignedAllocator>("HOST_list_aligned", list_allocation_pool, allocation_alignment) };
   auto list_alloc{ rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>("HOST_list_safe_pool", list_aligned_allocator) };
 
