@@ -13,40 +13,40 @@
 #include <unistd.h>
 #include <time.h>
 
-const int interations{10000};
+int iterations;
 size_t Scalar = 5;
 
 void Copy(std::size_t* A, std::size_t* C){
-    for(int i = 0; i < interations; i++){
+    for(int i = 0; i < iterations; i++){
         A[i] = C[i];
     }   
 }
 
 void Scale(std::size_t* B, std::size_t* C){
-    for(int i = 0; i < interations; i++){
+    for(int i = 0; i < iterations; i++){
         B[i] = C[i] * Scalar;
     }   
 }
 
 void Add(std::size_t* A, std::size_t* B, std::size_t* C){
-    for(int i = 0; i < interations; i++){
+    for(int i = 0; i < iterations; i++){
         C[i] = A[i] + B[i];
     }   
 }
 
 void Triad(std::size_t* A, std::size_t* B, std::size_t* C){
-    for(int i = 0; i < interations; i++){
+    for(int i = 0; i < iterations; i++){
         A[i] = B[i] + Scalar * C[i];
     }   
 }
 
 void Allocation_Initialized(umpire::Allocator alloc, std::size_t*& A, std::size_t*& B, std::size_t*& C){
 
-    A = (std::size_t*) alloc.allocate(sizeof(size_t) * interations);
-    B = (std::size_t*) alloc.allocate(sizeof(size_t) * interations);
-    C = (std::size_t*) alloc.allocate(sizeof(size_t) * interations);
+    A = (std::size_t*) alloc.allocate(sizeof(size_t) * iterations);
+    B = (std::size_t*) alloc.allocate(sizeof(size_t) * iterations);
+    C = (std::size_t*) alloc.allocate(sizeof(size_t) * iterations);
 
-    for (int i=0; i<interations; i++) {
+    for (int i=0; i<iterations; i++) {
         A[i] = (size_t) rand() % 100;
         B[i] = (size_t) rand() % 100;
         C[i] = (size_t) rand() % 100;
@@ -93,17 +93,18 @@ void benchmark(std::string name){
     Deallocation_Requested(alloc,A,B,C);
 
     std::cout << name << std::endl;
-    std::cout << "    Copy:     " <<  std::chrono::duration<double>(end_copy - begin_copy).count()/interations << " sec/elements" <<std::endl;
-    std::cout << "    Scale:    " << std::chrono::duration<double>(end_scale - begin_scale).count()/interations << " sec/elements" << std::endl;
-    std::cout << "    Add:      " <<  std::chrono::duration<double>(end_add - begin_add).count()/interations << " sec/elements" << std::endl;
-    std::cout << "    Triad:    " << std::chrono::duration<double>(end_triad - begin_triad).count()/interations << " sec/elements" << std::endl;
+    std::cout << "    Copy:     " << ((2*sizeof(size_t) * iterations)/1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
+    std::cout << "    Scale:    " << ((2*sizeof(size_t) * iterations)/1.0E-6)/std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
+    std::cout << "    Add:      " << ((3*sizeof(size_t) * iterations)/1.0E-6)/std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
+    std::cout << "    Triad:    " << ((3*sizeof(size_t) * iterations)/1.0E-6)/std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
 }
 
-int main(int, char**) {
+int main(int, char** argv) {
+    iterations = atoi(argv[1]);;
+    std::cout << "Array Size: " << iterations << std::endl;
     benchmark("HOST");
     benchmark("FILE");
 #if defined(UMPIRE_ENABLE_CUDA)
-    benchmark("DEVICE");
     benchmark("UM");
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
