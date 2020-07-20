@@ -93,10 +93,10 @@ void benchmark(std::string name){
     Deallocation_Requested(alloc,A,B,C);
 
     std::cout << name << std::endl;
-    std::cout << "    Copy:     " << ((2*sizeof(size_t) * iterations)*1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
-    std::cout << "    Scale:    " << ((2*sizeof(size_t) * iterations)*1.0E-6)/std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
-    std::cout << "    Add:      " << ((3*sizeof(size_t) * iterations)*1.0E-6)/std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
-    std::cout << "    Triad:    " << ((3*sizeof(size_t) * iterations)*1.0E-6)/std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
+    std::cout << "    Copy:     " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
+    std::cout << "    Scale:    " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
+    std::cout << "    Add:      " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
+    std::cout << "    Triad:    " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
 }
 
 int main(int, char** argv) {
