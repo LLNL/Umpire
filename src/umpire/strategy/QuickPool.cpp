@@ -296,7 +296,7 @@ QuickPool::percent_releasable(int percentage)
     };
   } else if ( percentage == 100 ) {
     return [=] (const strategy::QuickPool& pool) {
-        return (pool.getCurrentSize() == 0 && pool.getReleasableSize() > 0);
+        return ( pool.getActualSize() == pool.getReleasableSize() );
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
