@@ -6,10 +6,28 @@
 ##############################################################################
 set (test_applications_depends umpire)
 
+if (ENABLE_HIP)
+  set (test_applications_depends
+      ${test_applications_depends}
+      hip_runtime)
+endif()
+
+if (ENABLE_OPENMP_TARGET)
+  set (test_applications_depends
+      ${test_applications_depends}
+      openmp)
+endif()
+
+if (ENABLE_BACKTRACE_SYMBOLS)
+  set (test_applications_depends
+      ${test_applications_depends}
+      ${CMAKE_DL_LIBS})
+endif()
+
 blt_add_executable(
   NAME pool_allocator_stress
   SOURCES pool_allocator_stress.cpp
-  DEPENDS_ON ${test_applications_depends} ${CMAKE_DL_LIBS})
+  DEPENDS_ON ${test_applications_depends})
 list(APPEND umpire_test_applications pool_allocator_stress)
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

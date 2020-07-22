@@ -22,6 +22,7 @@ void report_and_deallocate(int iteration, std::vector<void*>& ptrs, umpire::Allo
 
   for ( auto a : ptrs ) {
     allocator.deallocate(a);
+    allocator.deallocate(a);
   }
 
   strategy->coalesce();
