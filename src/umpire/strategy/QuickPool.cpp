@@ -271,9 +271,15 @@ QuickPool::coalesce() noexcept
   release();
   std::size_t size_post{getActualSize()};
   std::size_t alloc_size{size_pre-size_post};
-  UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-  auto ptr = allocate(alloc_size);
-  deallocate(ptr);
+
+  //
+  // Only perform the coalesce if there were bytes found to coalesce
+  //
+  if (alloc_size) {
+    UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
+    auto ptr = allocate(alloc_size);
+    deallocate(ptr);
+  }
 }
 
 QuickPool::CoalesceHeuristic
