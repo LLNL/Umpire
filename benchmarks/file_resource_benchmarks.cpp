@@ -68,6 +68,8 @@ void benchmark(std::string name){
     std::size_t* B = nullptr;
     std::size_t* C = nullptr;
     
+    auto begin = std::chrono::system_clock::now();
+
     Allocation_Initialized(alloc,A,B,C);
     auto begin_copy = std::chrono::system_clock::now();
     Copy(A,C);
@@ -92,11 +94,14 @@ void benchmark(std::string name){
     auto end_triad = std::chrono::system_clock::now();
     Deallocation_Requested(alloc,A,B,C);
 
+    auto end = std::chrono::system_clock::now();
+
     std::cout << name << std::endl;
     std::cout << "    Copy:     " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
     std::cout << "    Scale:    " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
     std::cout << "    Add:      " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
     std::cout << "    Triad:    " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
+    std::cout << "    Total:     " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end - begin).count() << " MB/sec" <<std::endl;
 }
 
 int main(int, char** argv) {
