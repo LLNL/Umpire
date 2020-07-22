@@ -101,7 +101,7 @@ void benchmark(std::string name){
     std::cout << "    Scale:    " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
     std::cout << "    Add:      " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
     std::cout << "    Triad:    " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
-    std::cout << "    Total:     " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end - begin).count() << " MB/sec" <<std::endl;
+    std::cout << "    Total:     " << std::chrono::duration<double>(end - begin).count() << " sec" <<std::endl;
 }
 
 int main(int, char** argv) {
