@@ -55,7 +55,7 @@ blt_add_executable(
 blt_add_executable(
   NAME file_resource_benchmarks
   SOURCES file_resource_benchmarks.cpp
-  DEPENDS_ON ${benchmark_depends})
+  DEPENDS_ON ${benchmark_depends} openmp)
 
 blt_add_benchmark(
   NAME allocator_benchmarks
