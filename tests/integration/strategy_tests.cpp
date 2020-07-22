@@ -97,7 +97,8 @@ void StrategyTest<umpire::strategy::FixedPool>::SetUp()
           rm.makeAllocator<umpire::strategy::FixedPool>(
             name,
             rm.getAllocator("HOST"),
-            m_big*sizeof(double)));
+            m_big*sizeof(double),
+            64));
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -125,7 +126,7 @@ void StrategyTest<umpire::strategy::SizeLimiter>::SetUp()
           rm.makeAllocator<umpire::strategy::SizeLimiter>(
             name,
             rm.getAllocator("HOST"),
-            1024));
+            4*1024));
 }
 
 template<>
@@ -138,7 +139,7 @@ void StrategyTest<umpire::strategy::SlotPool>::SetUp()
           rm.makeAllocator<umpire::strategy::SlotPool>(
             name,
             rm.getAllocator("HOST"),
-            8));
+            sizeof(double)));
 }
 
 template<>
@@ -151,7 +152,7 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
           rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
             name,
             rm.getAllocator("HOST"),
-            1024));
+            4*1024));
 }
 
 using Strategies = ::testing::Types<
@@ -185,7 +186,7 @@ TYPED_TEST(StrategyTest, AllocateDeallocateBig)
 
 TYPED_TEST(StrategyTest, MultipleAllocateDeallocate)
 {
-  const int number_of_allocations{10};
+  const int number_of_allocations{8};
   std::vector<void*> allocations;
 
   for (int i{0}; i < number_of_allocations; ++i) {
