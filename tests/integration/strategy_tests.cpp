@@ -183,6 +183,21 @@ TYPED_TEST(StrategyTest, AllocateDeallocateBig)
   this->m_allocator->deallocate(data);
 }
 
+TYPED_TEST(StrategyTest, MultipleAllocateDeallocate)
+{
+  const int number_of_allocations{10};
+  std::vector<void*> allocations;
+
+  for (int i{0}; i < number_of_allocations; ++i) {
+    void* ptr = this->m_allocator->allocate(this->m_big*sizeof(double));
+    ASSERT_NE(nullptr, ptr);
+    allocations.push_back(ptr);
+  }
+
+  for (auto ptr : allocations) {
+    this->m_allocator->deallocate(ptr);
+  }
+}
 
 TYPED_TEST(StrategyTest, AllocateDeallocateNothing)
 {
