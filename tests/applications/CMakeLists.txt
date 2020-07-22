@@ -9,13 +9,13 @@ set (test_applications_depends umpire)
 blt_add_executable(
   NAME pool_allocator_stress
   SOURCES pool_allocator_stress.cpp
-  DEPENDS_ON ${test_applications_depends})
+  DEPENDS_ON ${test_applications_depends} ${CMAKE_DL_LIBS})
 list(APPEND umpire_test_applications pool_allocator_stress)
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   blt_add_target_link_flags(
     TO pool_allocator_stress
-    FLAGS "-rdynamic -l${CMAKE_DL_LIBS}")
+    FLAGS "-rdynamic")
 endif ()
 
 install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)
