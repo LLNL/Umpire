@@ -75,9 +75,7 @@ class DynamicPoolMap : public AllocationStrategy
     void deallocate(void* ptr) override;
     void release() override;
 
-    std::size_t getCurrentSize() const noexcept override;
     std::size_t getActualSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
 
     Platform getPlatform() noexcept override;
 
@@ -117,7 +115,7 @@ class DynamicPoolMap : public AllocationStrategy
      * \brief Get the largest allocatable number of bytes from pool before
      * the pool will grow.
      *
-     * return The largest number of bytes that may be allocated without 
+     * return The largest number of bytes that may be allocated without
      * causing pool growth
      */
     std::size_t getLargestAvailableBlock() noexcept;
@@ -184,9 +182,7 @@ class DynamicPoolMap : public AllocationStrategy
     CoalesceHeuristic m_coalesce_heuristic;
     AddressMap m_used_map;
     SizeMap m_free_map;
-    std::size_t m_curr_bytes;
     std::size_t m_actual_bytes;
-    std::size_t m_highwatermark;
 };
 
 } // end of namespace strategy
