@@ -15,7 +15,7 @@ list(APPEND umpire_test_applications pool_allocator_stress)
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   blt_add_target_link_flags(
     TO pool_allocator_stress
-    FLAGS "-rdynamic -ldl")
+    FLAGS "-rdynamic -l${CMAKE_DL_LIBS}")
 endif ()
 
 install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)
