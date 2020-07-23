@@ -53,12 +53,14 @@ void* Allocation(umpire::Allocator alloc){
 }
 
 void Initialized(std::size_t* A, std::size_t* B, std::size_t* C){
-
+    size_t a = (size_t) rand();
+    size_t b = (size_t) rand();
+    size_t c = (size_t) rand();
     #pragma omp parallel for
         for (int i=0; i<iterations; i++) {
-            A[i] = (size_t) rand() % 100;
-            B[i] = (size_t) rand() % 100;
-            C[i] = (size_t) rand() % 100;
+            A[i] = a % 100;
+            B[i] = b % 100;
+            C[i] = c % 100;
         }
 }
 
@@ -96,7 +98,7 @@ void benchmark(std::string name){
     auto end = std::chrono::system_clock::now();
 
     std::cout << name << std::endl;
-    std::cout << "  Initialization:      " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
+    std::cout << "  Initialization:      " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_initialized - begin_initialized).count() << " MB/sec" <<std::endl;
     std::cout << "  Initialization Time: " << std::chrono::duration<double>(end_initialized - begin_initialized).count() << " sec" <<std::endl;
     std::cout << "  ---------------------------------------\n";
     std::cout << "  Copy:                " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
