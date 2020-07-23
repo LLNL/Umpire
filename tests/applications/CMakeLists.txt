@@ -30,6 +30,16 @@ blt_add_executable(
   DEPENDS_ON ${test_applications_depends})
 list(APPEND umpire_test_applications pool_allocator_stress)
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  blt_add_executable(
+    NAME poison_memory_checks
+    SOURCES poison_memory_checks.cpp
+    DEPENDS_ON ${test_applications_depends})
+  blt_add_target_compile_flags(TO poison_memory_checks FLAGS "-fsanitize=address" )
+  blt_add_target_link_flags(TO poison_memory_checks FLAGS "-fsanitize=address" )
+  list(APPEND umpire_test_applications poison_memory_checks)
+endif()
+
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   blt_add_target_link_flags(
     TO pool_allocator_stress
