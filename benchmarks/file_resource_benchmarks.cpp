@@ -118,7 +118,9 @@ void benchmark(std::string name){
 
 int main(int, char** argv) {
     iterations = atoi(argv[1]);
-    std::cout << "Array Size: " << iterations << std::endl;
+    std::cout << "Array Size:   " << iterations << "        Memory Size: " << (double)((sizeof(size_t)*iterations)* 1.0E-6) << " MB" << std::endl;
+    std::cout << "Total Arrays: 3       " << "        Total Memory Size: " << (double)((3*sizeof(size_t)*iterations)* 1.0E-6) << " MB" << std::endl << std::endl;
+    
     benchmark("HOST");
     benchmark("FILE");
 #if defined(UMPIRE_ENABLE_CUDA)
