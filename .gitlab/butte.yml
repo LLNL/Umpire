@@ -35,62 +35,62 @@
 
 clang_default (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@default.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-clang@default-pvoijsslwtluxzeka5oysltvfle56iym.cmake"
   extends: .build_and_test_on_butte_advanced
 
 gcc_default (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@default.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-gcc@default-z77a43cvmuc2yqcvlhijahespcniseic.cmake"
   extends: .build_and_test_on_butte_advanced
 
 xl_default (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-xl@default.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-xl@default-4akxingutrx6pxr7vsuonwqom6nqsvyz.cmake"
   extends: .build_and_test_on_butte_advanced
 
 pgi_default (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-pgi@default.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-pgi@default-rby2vjldcfsctfllfgs4xz6tbinplyps.cmake"
   extends: .build_and_test_on_butte_advanced
   allow_failure: true
 
 clang_3_9_1 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@3.9.1.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-clang@3.9.1-4t44cwmd4bvmiidfq7zyyxs5vutn7t3v.cmake"
   extends: .build_and_test_on_butte_advanced
 
 clang_4_0_0 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@4.0.0.cmake"
-  extends: .build_and_test_on_butte_advanced
-
-clang_9_0_0 (build and test on butte):
-  variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@9.0.0.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-clang@4.0.0-lqsjpb6lznjdmgsiefg7q3yjmgz6byzs.cmake"
   extends: .build_and_test_on_butte_advanced
 
 gcc_8_3_1 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@8.3.1.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-gcc@8.3.1-sha5a7s465pswaakivnvl7v2lv33d2qy.cmake"
+  extends: .build_and_test_on_butte_advanced
+
+clang_9_0_0_libcpp (build and test on butte):
+  variables:
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-clang@9.0.0-libcpp-s3afqkvcqvxccprqxabudg3k6ftyyftm.cmake"
   extends: .build_and_test_on_butte_advanced
 
 clang_coral_2018_08_08 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08-j676nomo7em64mvxg3hfrcebnfp7ppnx.cmake"
   extends: .build_and_test_on_butte_advanced
   allow_failure: true
 
 nvcc_gcc_4_9_3 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-gcc@4.9.3-cuda.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-gcc@4.9.3-cuda-vk3dss4sxairjgwk6736b2iigkrqy5l4.cmake"
   extends: .build_and_test_on_butte_advanced
 
 nvcc_clang_coral_2018_08_08 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08-cuda.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-clang@coral2018.08.08-cuda-utanamnspv6tabbpgu6rkp56p3ka276d.cmake"
   extends: .build_and_test_on_butte_advanced
 
 nvcc_xl-beta-2019.06.20 (build and test on butte):
   variables:
-    HOST_CONFIG: "lassen-blueos_3_ppc64le_ib_p9-xl@beta2019.06.20.cmake"
+    HOST_CONFIG: "butte-blueos_3_ppc64le_ib_p9-xl@beta2019.06.20-cuda-7ymlfxgrfplb5tztddd6ta46zc2iypwg.cmake"
   extends: .build_and_test_on_butte_advanced
