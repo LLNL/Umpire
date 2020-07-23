@@ -11,6 +11,9 @@
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
+// NOTE:
+// To test with ASAN, you must reconfigure Umpire with CMAKE_CXX_FLAGS="-fsanitize=address"
+//
 int main(int, char**)
 {
   const bool try_map{false};
