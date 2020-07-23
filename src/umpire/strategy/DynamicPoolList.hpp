@@ -68,9 +68,7 @@ class DynamicPoolList :
 
     void release() override;
 
-    std::size_t getCurrentSize() const noexcept override;
     std::size_t getActualSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
 
     Platform getPlatform() noexcept override;
 
@@ -97,7 +95,7 @@ class DynamicPoolList :
      * \brief Get the largest allocatable number of bytes from pool before
      * the pool will grow.
      *
-     * return The largest number of bytes that may be allocated without 
+     * return The largest number of bytes that may be allocated without
      * causing pool growth
      */
     std::size_t getLargestAvailableBlock() const noexcept;

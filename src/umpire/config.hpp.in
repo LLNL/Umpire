@@ -17,6 +17,7 @@
 #cmakedefine UMPIRE_ENABLE_BACKTRACE_SYMBOLS
 #cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_HIP
+#cmakedefine UMPIRE_ENABLE_SYCL
 #cmakedefine UMPIRE_ENABLE_OPENMP_TARGET
 
 #cmakedefine UMPIRE_ENABLE_DEVICE
@@ -35,7 +36,19 @@
 #define UMPIRE_VERSION_PATCH @Umpire_VERSION_PATCH@
 #define UMPIRE_VERSION_RC "@UMPIRE_VERSION_RC@"
 
-extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
+// umpire_EXPORTS gets defined by CMake when we use
+// -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On
+#if (defined(_WIN32) || defined(_WIN64)) && !defined(UMPIRE_WIN_STATIC_BUILD)
+#ifdef umpire_EXPORTS
+#define UMPIRE_EXPORT __declspec(dllexport)
+#else
+#define UMPIRE_EXPORT __declspec(dllimport)
+#endif
+#else
+#define UMPIRE_EXPORT
+#endif
+
+UMPIRE_EXPORT extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 
 namespace umpire {
 constexpr int invalid_allocator_id = 0xDEADBEEF;

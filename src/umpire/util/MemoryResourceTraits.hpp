@@ -8,6 +8,11 @@
 #define UMPIRE_MemoryResourceTraits_HPP
 
 #include <cstddef>
+#include "umpire/config.hpp"
+
+#if defined(UMPIRE_ENABLE_SYCL)
+#include <CL/sycl.hpp>
+#endif
 
 namespace umpire {
 
@@ -37,6 +42,11 @@ struct MemoryResourceTraits {
   };
 
   int id;
+
+  // variables for only SYCL devices (i.e., Intel GPUs)
+#if defined(UMPIRE_ENABLE_SYCL)
+  cl::sycl::queue queue;
+#endif
 
   bool unified = false;
   std::size_t size = 0;

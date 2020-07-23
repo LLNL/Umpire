@@ -28,6 +28,14 @@ if (ENABLE_HIP)
     HipPinnedAllocator.hpp)
 endif ()
 
+if (ENABLE_SYCL)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    SyclMallocAllocator.hpp
+    SyclMallocManagedAllocator.hpp
+    SyclPinnedAllocator.hpp)
+endif ()
+
 if (ENABLE_OPENMP_TARGET)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
