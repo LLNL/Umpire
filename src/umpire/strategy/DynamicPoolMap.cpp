@@ -217,7 +217,7 @@ void* DynamicPool::allocate(std::size_t bytes)
                  false, alloc_bytes);
   }
 
-  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, rounded_bytes);
   return ptr;
 }
 
