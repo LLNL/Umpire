@@ -57,6 +57,8 @@ jobs:
         docker_target: nvcc
       hip:
         docker_target: hip
+      sycl:
+        docker_target: sycl
   pool:
     vmImage: 'ubuntu-latest'
   variables:

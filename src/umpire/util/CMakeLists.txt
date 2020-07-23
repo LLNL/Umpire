@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
+
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp

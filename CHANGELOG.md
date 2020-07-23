@@ -10,6 +10,20 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+- Removed replicated implementations for tracking high watermarks and
+  allocated byte counts from the Pools as this is now being provided
+  from the AllocationTracker/Inspector
+
+### Fixed
+
+## [3.0.0] - 2020-06-30
+
+### Added
+
 - Add support for multiple CUDA devices. These devices are detected and
   registered as "DEVICE_N", where N is the device number.
 
@@ -17,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   -DENABLE_BACKTRACE
 
 - Umpire exceptions now include backtrace information in the exception string.
+
+- `AlignedAllocator` strategy providing aligned allocations for HOST memory.
 
 - Additional symbol information may be obtained in backtraces with
   -DENABLE_BACKTRACE_SYMBOLS and including `-ldl` for the using program.
@@ -33,6 +49,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Update BLT to version 0.3.0
 
 - `DeviceAllocator` will issue a trap instruction if it runs out of memory.
+
+- Switched to camp::Platform
 
 ### Removed
 

@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_strategy_headers
+  AlignedAllocator.hpp
   AllocationAdvisor.hpp
   AllocationPrefetcher.hpp
   AllocationStrategy.hpp
@@ -36,6 +37,7 @@ set (umpire_strategy_mixin_headers
   mixins/Inspector.hpp)
 
 set (umpire_strategy_sources
+  AlignedAllocator.cpp
   AllocationAdvisor.cpp
   AllocationPrefetcher.cpp
   AllocationStrategy.cpp

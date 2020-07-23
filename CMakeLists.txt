@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2.1.0)
+  VERSION 3.0.0)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -26,6 +26,7 @@ endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
+set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
@@ -76,11 +77,17 @@ if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
 endif ()
 
 if (ENABLE_CUDA)
-  if (CMAKE_CXX_COMPILER_ID MATCHES GNU)
+  if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
     endif ()
   endif ()
+endif()
+
+if (ENABLE_SYCL)
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
+   endif()
 endif()
 
 ################################

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-19, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -27,7 +27,7 @@ class FixedMallocPool;
 
 namespace strategy {
 
-class QuickPool : 
+class QuickPool :
   public AllocationStrategy
 {
   public:
@@ -52,9 +52,7 @@ class QuickPool :
     void deallocate(void* ptr) override;
     void release() override;
 
-    std::size_t getCurrentSize() const noexcept override;
     std::size_t getActualSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
     std::size_t getReleasableSize() const noexcept;
 
     Platform getPlatform() noexcept override;
@@ -76,7 +74,7 @@ class QuickPool :
 
         /// BUG: Only required for MSVC
         template<typename U>
-        pool_allocator(const pool_allocator<U>& other): 
+        pool_allocator(const pool_allocator<U>& other):
           pool{other.pool}
         {}
 
@@ -120,9 +118,7 @@ class QuickPool :
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
 
-    std::size_t m_curr_bytes{0};
     std::size_t m_actual_bytes{0};
-    std::size_t m_highwatermark{0};
     std::size_t m_releasable_bytes{0};
 };
 
