@@ -9,7 +9,7 @@
 
 #include "umpire/config.hpp"
 
-#if (defined(__clang__) || defined(__GNUC__)) && defined(UMPIRE_ENABLE_SANITIZERS)
+#if (defined(__clang__) || defined(__GNUC__))
 
 #include <sanitizer/asan_interface.h>
 
