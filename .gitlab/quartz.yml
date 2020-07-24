@@ -57,113 +57,113 @@ release_resources (on quartz):
 # Quartz build jobs
 clang_3_9_1 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@3.9.1-z4nkydd7hyoxv5rzkkybnvpp5f3wkjhi.cmake"
+    SPEC: "%clang@3.9.1"
   extends: .build_and_test_on_quartz_advanced
 
 nvcc_clang_3_9_1 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@3.9.1-cuda-gxqiebuavuu476wbmyudujq3rqttw65v.cmake"
+    SPEC: "%clang@3.9.1+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 clang_4_0_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@4.0.0-erccqxnzos2gwtu3hyqcfa7x7gmmrzfh.cmake"
+    SPEC: "%clang@4.0.0"
   extends: .build_and_test_on_quartz_advanced
 
 nvcc_clang_4_0_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@4.0.0-cuda-izookkwdf233jvf4ii5lefm66lcfhvyg.cmake"
+    SPEC: "%clang@4.0.0+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 clang_6_0_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@6.0.0-z4qpdc6l5nd2ce6xyn3wpi465uxs33kb.cmake"
+    SPEC: "%clang@6.0.0"
   extends: .build_and_test_on_quartz_advanced
 
 clang_9_0_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-clang@9.0.0-fdezuxuluknkhnwumt5kq5rcudwdz5rp.cmake"
+    SPEC: "%clang@9.0.0"
   extends: .build_and_test_on_quartz
 
 
 gcc_4_9_3 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@4.9.3-bjxcvuejht6uf7bioc5t5dolzvwdndxy.cmake"
+    SPEC: "%gcc@4.9.3"
   extends: .build_and_test_on_quartz_advanced
 
 nvcc_gcc_4_9_3 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@4.9.3-cuda-qd7g4dy4yaic4kdbtybg356m5upwize6.cmake"
+    SPEC: "%gcc@4.9.3+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 gcc_6_1_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@6.1.0-f3wj2hdfjdo3qerg5idf77wi4d343irm.cmake"
+    SPEC: "%gcc@6.1.0"
   extends: .build_and_test_on_quartz_advanced
 
 nvcc_gcc_6_1_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@6.1.0-cuda-kxqns5qmqqc544nrxfb7ieo5wlm4g4zp.cmake"
+    SPEC: "%gcc@6.1.0+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 gcc_7_1_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.1.0-t62yc3zw7xtwdpzeatfq6e3547skipcp.cmake"
+    SPEC: "%gcc@7.1.0"
   extends: .build_and_test_on_quartz_advanced
 
 nvcc_gcc_7_1_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.1.0-cuda-2qate2b63sndf2fj6cq3sshn5p2wwbwb.cmake"
+    SPEC: "%gcc@7.1.0+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 gcc_7_3_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@7.3.0-pbm4wm642ya3dwfxlt37stsu42wf7d3e.cmake"
+    SPEC: "%gcc@7.3.0"
   extends: .build_and_test_on_quartz_advanced
 
 gcc_8_1_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-gcc@8.1.0-wlkgaxmabmg5chshpriijzy5dx2fjasl.cmake"
+    SPEC: "%gcc@8.1.0"
   extends: .build_and_test_on_quartz
 
 
 icpc_16_0_4 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@16.0.4-q324iqyyh36yqfiftewvwxunzm6qanaq.cmake"
+    SPEC: "%intel@16.0.4"
   extends: .build_and_test_on_quartz_advanced
   allow_failure: true
 
 icpc_17_0_2 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@17.0.2-rioo63kioh3dzrevgtfyx575wamohpkf.cmake"
+    SPEC: "%intel@17.0.2"
   extends: .build_and_test_on_quartz_advanced
 
 icpc_18_0_0 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@18.0.0-r3dfmycxrevzsawodcyxbgm7gd4npida.cmake"
+    SPEC: "%intel@18.0.0"
   extends: .build_and_test_on_quartz_advanced
   allow_failure: true
 
 icpc_19_0_4 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-intel@19.0.4-wkaxobyuz3czsj3pefyvereaejth4ja2.cmake"
+    SPEC: "%intel@19.0.4"
   extends: .build_and_test_on_quartz
 
 
 pgi_17_10 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@17.10-g5yexhn5oqdknywsydbiegomc2xlekzt.cmake"
+    SPEC: "%pgi@17.10"
   extends: .build_and_test_on_quartz_advanced
   allow_failure: true
 
 pgi_18_5 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@18.5-n3jfv4pq22zrbwtag6xytlcx6bme6pde.cmake"
+    SPEC: "%pgi@18.5"
   extends: .build_and_test_on_quartz_advanced
   allow_failure: true
 
 pgi_19_4 (build and test on quartz):
   variables:
-    HOST_CONFIG: "quartz-toss_3_x86_64_ib-pgi@19.4-ivmzh4afugowi3dmasz2kd64nzqnld3u.cmake"
+    SPEC: "%pgi@19.4"
   extends: .build_and_test_on_quartz
   allow_failure: true
