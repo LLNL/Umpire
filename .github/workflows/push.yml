@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with:
     - run: |
         git fetch origin
         if sh -c "git diff origin/develop --exit-code $var"; then
