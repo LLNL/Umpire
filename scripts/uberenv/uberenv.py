@@ -208,6 +208,13 @@ def parse_args():
         if not os.path.isdir(opts["spack_config_dir"]):
             print("[ERROR: invalid spack config dir: {} ]".format(opts["spack_config_dir"]))
             sys.exit(-1)
+    # if rel path is given for the mirror, we need to evaluate here -- before any
+    # chdirs to avoid confusion related to what it is relative to.
+    # (it should be relative to where uberenv is run from, so it matches what you expect
+    #  from shell completion, etc)
+    if not opts["mirror"] is None:
+        if not opts["mirror"].startswith("http") and not os.path.isabs(opts["mirror"]):
+            opts["mirror"] = os.path.abspath(opts["mirror"])
     return opts, extras
 
 
@@ -453,6 +460,7 @@ class SpackEnv(UberEnv):
         # hot-copy our packages into spack
         if self.pkgs:
             dest_spack_pkgs = pjoin(spack_dir,"var","spack","repos","builtin","packages")
+            print("[copying patched packages from {0}]".format(self.pkgs))
             sexe("cp -Rf {} {}".format(self.pkgs,dest_spack_pkgs))
 
 
@@ -592,7 +600,7 @@ class SpackEnv(UberEnv):
         if not mirror_path:
             print("[--create-mirror requires a mirror directory]")
             sys.exit(-1)
-        return os.path.abspath(mirror_path)
+        return mirror_path
 
     def create_mirror(self):
         """
@@ -604,8 +612,9 @@ class SpackEnv(UberEnv):
         mirror_cmd = "spack/bin/spack "
         if self.opts["ignore_ssl_errors"]:
             mirror_cmd += "-k "
-        mirror_cmd += "mirror create -d {} --dependencies {}".format(mirror_path,
-                                                                    self.pkg_name)
+        mirror_cmd += "mirror create -d {} --dependencies {}{}".format(mirror_path,
+                                                                    self.pkg_name,
+                                                                    self.opts["spec"])
         return sexe(mirror_cmd, echo=True)
 
     def find_spack_mirror(self, mirror_name):
