@@ -65,15 +65,20 @@ def parse_args():
     Parses args from command line
     """
     parser = OptionParser()
-    parser.add_option("--spec",
-                      dest="spec",
+    parser.add_option("--spec-filter",
+                      dest="spec-filter",
                       default=None,
                       help="Partial spec to match")
+
+    parser.add_option("--forced-spec",
+                      dest="forced-spec",
+                      default=False,
+                      help="Force the use of this spec without checking spec list")
 
     parser.add_option("--shm",
                       dest="use_shm",
                       default=False,
-                      help="Partial spec to match")
+                      help="Use Spack in shared memory")
 
     opts, extras = parser.parse_args()
     opts = vars(opts)
@@ -90,11 +95,12 @@ def main():
     """
 
     opts, extra_opts = parse_args()
-    
-    partial_spec = opts["spec"]
+
+    partial_spec = opts["spec-filter"]
+    exact_spec = opts["forced-spec"]
     machine = get_machine_name()
     sys_type = get_system_type()
-   
+
     uberenv_cmd_opts = ""
 
     if opts["use_shm"]:
@@ -105,14 +111,19 @@ def main():
     with open('scripts/gitlab/list_of_specs.json') as f:
         specs_data = json.load(f)
 
-        # Exclude spec not matching partial_spec if defined
-        for spec in specs_data[sys_type][machine]:
-            if partial_spec and not partial_spec in spec:
-                print("[INFO]: spec {0} ignored".format(spec))
-            else:
-                print("[INFO]: generate host-config for spec {0}".format(spec))
-                cmd = "python scripts/uberenv/uberenv.py --spec={0} {1}".format(spec,uberenv_cmd_opts)
-                cmd_exe(cmd, echo=True)
+        if exact_spec:
+            print("[INFO]: generate host-config for spec {0}".format(exact_spec))
+            cmd = "python scripts/uberenv/uberenv.py --spec={0} {1}".format(exact_spec,uberenv_cmd_opts)
+            cmd_exe(cmd, echo=True)
+        else:
+            # Exclude spec not matching partial_spec if defined
+            for spec in specs_data[sys_type][machine]:
+                if partial_spec and not partial_spec in spec:
+                    print("[INFO]: spec {0} ignored".format(spec))
+                else:
+                    print("[INFO]: generate host-config for spec {0}".format(spec))
+                    cmd = "python scripts/uberenv/uberenv.py --spec={0} {1}".format(spec,uberenv_cmd_opts)
+                    cmd_exe(cmd, echo=True)
 
 if __name__ == "__main__":
     sys.exit(main())
