@@ -58,9 +58,9 @@ void Initialized(std::size_t* A, std::size_t* B, std::size_t* C){
     size_t c = (size_t) rand();
     #pragma omp parallel for
         for (int i=0; i<iterations; i++) {
-            A[i] = a % 100;
-            B[i] = b % 100;
-            C[i] = c % 100;
+            A[i] = a;
+            B[i] = b;
+            C[i] = c;
         }
 }
 
