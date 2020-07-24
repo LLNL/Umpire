@@ -16,7 +16,6 @@ hostname="$(hostname)"
 project_dir="$(pwd)"
 
 build_root=${BUILD_ROOT:-""}
-sys_type=${SYS_TYPE:-""}
 hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
 
@@ -33,7 +32,16 @@ then
         exit 1
     fi
 
-    python scripts/uberenv/uberenv.py --spec=${spec}
+    prefix_opt=""
+
+    if [[ -d /dev/shm ]]
+    then
+        prefix="/dev/shm/${hostname}/${spec}"
+        mkdir -p ${prefix}
+        prefix_opt="--prefix=${prefix}"
+    fi
+
+    python scripts/uberenv/uberenv.py --spec=${spec} ${prefix_opt}
 
 fi
 
