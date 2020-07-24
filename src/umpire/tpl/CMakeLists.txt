@@ -105,10 +105,14 @@ if (NOT TARGET camp)
   else ()
     add_subdirectory(camp)
   endif()
+
   if(ENABLE_CUDA)
-    blt_add_target_compile_flags(TO    camp
-                                 FLAGS CAMP_HAVE_CUDA)
+    blt_add_target_definitions(
+      TO camp
+      SCOPE INTERFACE
+      TARGET_DEFINITIONS CAMP_HAVE_CUDA)
   endif()
+
 endif ()
 
 set(ENABLE_COPY_HEADERS ${OLD_COPY_HEADERS})
