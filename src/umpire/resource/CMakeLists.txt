@@ -73,6 +73,27 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
+if (ENABLE_SYCL)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    SyclDeviceMemoryResource.hpp
+    SyclDeviceMemoryResource.inl
+    SyclDeviceResourceFactory.hpp
+    SyclPinnedMemoryResourceFactory.hpp
+    SyclUnifiedMemoryResourceFactory.hpp
+    )
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    SyclDeviceResourceFactory.cpp
+    SyclPinnedMemoryResourceFactory.cpp
+    SyclUnifiedMemoryResourceFactory.cpp
+    )
+
+  set(umpire_resource_depends
+    ${umpire_resource_depends})
+endif ()
+
 if (ENABLE_OPENMP_TARGET)
   set (umpire_resource_headers
     ${umpire_resource_headers}

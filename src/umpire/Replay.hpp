@@ -19,6 +19,10 @@
 
 namespace umpire {
 
+namespace {
+    int m_argument_number;
+}
+
 class Allocator;
 
 std::ostream& operator<< (std::ostream& out, umpire::Allocator& );
@@ -64,7 +68,6 @@ private:
 
   bool replayEnabled;
   uint64_t m_replayUid;
-  static int m_argument_number;
 };
 
 } /* namespace umpire */

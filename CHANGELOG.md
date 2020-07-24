@@ -14,7 +14,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
+- Removed replicated implementations for tracking high watermarks and
+  allocated byte counts from the Pools as this is now being provided
+  from the AllocationTracker/Inspector
+
 ### Fixed
+
+- Poisoning instrumentation has is now properly balanced between allocate
+  and deallocate in DyanmicPoolMap.
 
 ## [3.0.0] - 2020-06-30
 
