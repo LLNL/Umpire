@@ -33,17 +33,19 @@ compiler loaded and the configuration is as simple as:
 .. code-block:: bash
 
   $ mkdir build && cd build
-  $ cmake -DCUDA_TOOLKIT_ROOT_DIR=/path/to/cuda ../
+  $ cmake ../
 
-By default, Umpire will attempt to build with CUDA. CMake will provide output
-about which compiler is being used, and what version of CUDA was detected. Once
-CMake has completed, Umpire can be built with Make:
+By default, Umpire will only support host memory. Additional backends for
+device support can be enabled using the options detailed in
+:doc:`advanced_configuration`. CMake will provide output about which compiler
+is being used and the values of other options. Once CMake has completed, Umpire
+can be built with Make:
 
 .. code-block:: bash
 
   $ make
 
-For more advanced configuration, see :doc:`advanced_configuration`.
+For more advanced configuration options, see :doc:`advanced_configuration`.
 
 ^^^^^^^^^^^^^^^^^
 Installing Umpire
