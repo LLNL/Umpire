@@ -5,6 +5,7 @@ import os
 import subprocess
 from string import digits
 import sys
+import time
 
 from optparse import OptionParser
 
@@ -69,6 +70,11 @@ def parse_args():
                       default=None,
                       help="Partial spec to match")
 
+    parser.add_option("--shm",
+                      dest="use_shm",
+                      default=False,
+                      help="Partial spec to match")
+
     opts, extras = parser.parse_args()
     opts = vars(opts)
 
@@ -88,17 +94,24 @@ def main():
     partial_spec = opts["spec"]
     machine = get_machine_name()
     sys_type = get_system_type()
-    
+   
+    uberenv_cmd_opts = ""
+
+    if opts["use_shm"]:
+        prefix="/dev/shm/uberenv_libs-{0}-{1}-{2}".format(sys_type,machine,time.time())
+        uberenv_cmd_opts = ' '.join([uberenv_cmd_opts,"--prefix={0}".format(prefix)])
+        print("[INFO]: Uberenv will use prefix {0}".format(prefix))
+
     with open('scripts/gitlab/list_of_specs.json') as f:
         specs_data = json.load(f)
-    
+
         # Exclude spec not matching partial_spec if defined
         for spec in specs_data[sys_type][machine]:
             if partial_spec and not partial_spec in spec:
                 print("[INFO]: spec {0} ignored".format(spec))
             else:
                 print("[INFO]: generate host-config for spec {0}".format(spec))
-                cmd = "python scripts/uberenv/uberenv.py --spec={0}".format(spec)
+                cmd = "python scripts/uberenv/uberenv.py --spec={0} {1}".format(spec,uberenv_cmd_opts)
                 cmd_exe(cmd, echo=True)
 
 if __name__ == "__main__":

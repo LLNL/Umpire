@@ -373,7 +373,7 @@ class SpackEnv(UberEnv):
             spack_url = self.project_opts.get("spack_url", "https://github.com/spack/spack.git")
             spack_branch = self.project_opts.get("spack_branch", "develop")
 
-            clone_cmd =  "git {0} clone -b {1} {2}".format(clone_opts, spack_branch,spack_url)
+            clone_cmd =  "git {0} clone --single-branch --depth=1 -b {1} {2}".format(clone_opts, spack_branch,spack_url)
             sexe(clone_cmd, echo=True)
 
         if "spack_commit" in self.project_opts:
@@ -384,7 +384,7 @@ class SpackEnv(UberEnv):
             if sha1 != current_sha1:
                 print("[info: using spack commit {}]".format(sha1))
                 sexe("git stash", echo=True)
-                sexe("git fetch origin {0}".format(sha1),echo=True)
+                sexe("git fetch --depth=1 origin {0}".format(sha1),echo=True)
                 sexe("git checkout {0}".format(sha1),echo=True)
 
         if self.opts["spack_pull"]:
