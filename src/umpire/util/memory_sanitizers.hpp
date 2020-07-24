@@ -10,7 +10,9 @@
 #include "umpire/config.hpp"
 
 #if (defined(__clang__) && !defined(__ibmxl__))  || (defined(__GNUC__) && __GNUC__ > 4)
+#if !defined(__SYCL_COMPILER_VERSION)
 #include <sanitizer/asan_interface.h>
+#endif
 #endif
 
 #undef UMPIRE_USE_MEMORY_SANITIZER
