@@ -14,12 +14,12 @@ jobs:
     - uses: actions/checkout@v2
     - run: |
         git fetch origin
-        if sh -c "git diff origin/develop --exit-code $var"; then
-            echo "$var wasn't changed, failing!"
+        if sh -c "git diff origin/develop --exit-code CHANGELOG.md"; then
+            echo "CHANGELOG.md wasn't changed, failing!"
             exit 255 
         else
             exit_code=$?
-            echo "$var was changed, passing!"
+            echo "CHANGELOG.md was changed, passing!"
             exit 0
         fi
 
