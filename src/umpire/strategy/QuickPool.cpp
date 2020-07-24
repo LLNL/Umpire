@@ -9,6 +9,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
+#include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -49,6 +50,7 @@ QuickPool::QuickPool(
 #endif
 
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
   m_actual_bytes += m_initial_alloc_bytes;
   m_releasable_bytes += m_initial_alloc_bytes;
 
@@ -99,6 +101,7 @@ QuickPool::allocate(std::size_t bytes)
       }
     }
 
+    UMPIRE_POISON_MEMORY_REGION(m_allocator, ret, size);
     m_actual_bytes += size;
     m_releasable_bytes += size;
     void* chunk_storage{m_chunk_pool.allocate()};
@@ -142,6 +145,7 @@ QuickPool::allocate(std::size_t bytes)
       m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
   return ret;
 }
 
@@ -153,6 +157,8 @@ QuickPool::deallocate(void* ptr)
   chunk->free = true;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
+
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
 
   if (chunk->prev && chunk->prev->free == true)
   {
@@ -222,6 +228,7 @@ void QuickPool::release()
     if ( (chunk->size == chunk->chunk_size)
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
+      UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->size);
       m_actual_bytes -= chunk->chunk_size;
       m_allocator->deallocate(chunk->data);
       m_chunk_pool.deallocate(chunk);
