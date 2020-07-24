@@ -256,7 +256,6 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
-        cfg.write(cmake_cache_option("ENABLE_TESTS", self.run_tests))
 
         #######################
         # Close and save
