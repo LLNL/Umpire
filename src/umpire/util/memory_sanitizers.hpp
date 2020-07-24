@@ -7,9 +7,6 @@
 #ifndef UMPIRE_memory_sanitizers_HPP
 #define UMPIRE_memory_sanitizers_HPP
 
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-
 #undef __UMPIRE_USE_MEMORY_SANITIZER__    // This may be defined below
 
 //
