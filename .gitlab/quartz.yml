@@ -60,19 +60,9 @@ clang_3_9_1 (build and test on quartz):
     SPEC: "%clang@3.9.1"
   extends: .build_and_test_on_quartz_advanced
 
-nvcc_clang_3_9_1 (build and test on quartz):
-  variables:
-    SPEC: "%clang@3.9.1+cuda"
-  extends: .build_and_test_on_quartz_advanced
-
 clang_4_0_0 (build and test on quartz):
   variables:
     SPEC: "%clang@4.0.0"
-  extends: .build_and_test_on_quartz_advanced
-
-nvcc_clang_4_0_0 (build and test on quartz):
-  variables:
-    SPEC: "%clang@4.0.0+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 clang_6_0_0 (build and test on quartz):
@@ -91,29 +81,14 @@ gcc_4_9_3 (build and test on quartz):
     SPEC: "%gcc@4.9.3"
   extends: .build_and_test_on_quartz_advanced
 
-nvcc_gcc_4_9_3 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@4.9.3+cuda"
-  extends: .build_and_test_on_quartz_advanced
-
 gcc_6_1_0 (build and test on quartz):
   variables:
     SPEC: "%gcc@6.1.0"
   extends: .build_and_test_on_quartz_advanced
 
-nvcc_gcc_6_1_0 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@6.1.0+cuda"
-  extends: .build_and_test_on_quartz_advanced
-
 gcc_7_1_0 (build and test on quartz):
   variables:
     SPEC: "%gcc@7.1.0"
-  extends: .build_and_test_on_quartz_advanced
-
-nvcc_gcc_7_1_0 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@7.1.0+cuda"
   extends: .build_and_test_on_quartz_advanced
 
 gcc_7_3_0 (build and test on quartz):
