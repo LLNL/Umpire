@@ -53,7 +53,9 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
     UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
   }
 #endif
-  insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
+  void* ptr = m_allocator->allocate(bytes);
+  insertFree(ptr, bytes, true, bytes);
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
 }
 
 DynamicPoolMap::~DynamicPoolMap()
