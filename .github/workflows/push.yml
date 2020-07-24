@@ -5,7 +5,7 @@ jobs:
     name: Static Analysis
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
     - uses: ./.github/actions/static-analysis
   checkChangelog:
     name: Check CHANGELOG
