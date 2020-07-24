@@ -11,9 +11,10 @@
 #include "umpire/Allocator.hpp"
 
 #include <omp.h>
-
+#include <vector>
 #include <unistd.h>
 #include <time.h>
+#include <algorithm>
 
 int iterations;
 size_t Scalar = 5;
@@ -56,8 +57,17 @@ void Initialized(std::size_t* A, std::size_t* B, std::size_t* C){
     size_t a = (size_t) rand();
     size_t b = (size_t) rand();
     size_t c = (size_t) rand();
+
+    std::vector<int> index;
+    index.resize(iterations);
     #pragma omp parallel for
-        for (int i=0; i<iterations; i++) {
+    for (int i=0; i<iterations; i++) {
+            index[i] = i; 
+        } 
+    std::random_shuffle(index.begin(), index.end());
+
+    #pragma omp parallel for
+        for (int i: index) {
             A[i] = a;
             B[i] = b;
             C[i] = c;
