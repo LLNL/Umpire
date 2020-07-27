@@ -184,6 +184,8 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write("# CMake executable path: %s\n" % cmake_exe)
         cfg.write("#------------------\n\n".format("-" * 60))
 
+        cfg.write(cmake_cache_string("CMAKE_BUILD_TYPE", spec.variants['build_type'].value))
+
         #######################
         # Compiler Settings
         #######################
