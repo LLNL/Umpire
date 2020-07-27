@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- GitLab CI pipelines now generate the host-config files on-the-fly.
+
 ### Removed
 
 - Removed replicated implementations for tracking high watermarks and
