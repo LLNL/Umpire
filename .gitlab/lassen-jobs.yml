@@ -49,19 +49,9 @@ clang_9_0_0_libcpp (build and test on lassen):
     SPEC: "%clang@9.0.0"
   extends: .build_and_test_on_lassen
 
-clang_coral_2018_08_08 (build and test on lassen):
-  variables:
-    SPEC: "%clang@coral2018.08.08"
-  extends: .build_and_test_on_lassen
-
 nvcc_gcc_4_9_3 (build and test on lassen):
   variables:
     SPEC: "%gcc@4.9.3+cuda"
-  extends: .build_and_test_on_lassen
-
-nvcc_clang_coral_2018_08_08 (build and test on lassen):
-  variables:
-    SPEC: "%clang@coral2018.08.08+cuda"
   extends: .build_and_test_on_lassen
 
 nvcc_xl-beta-2019.06.20 (build and test on lassen):
