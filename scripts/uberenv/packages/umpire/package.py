@@ -226,7 +226,7 @@ class Umpire(CMakePackage, CudaPackage):
             reldebinf_flags = "-O3 -g -finline-functions -axCORE-AVX2"
             debug_flags = "-O0 -g"
 
-            if "intel" in spec.compiler:
+            if "intel" in str(spec.compiler):
                 release_flags = ' '.join([release_flags,'-diag-disable cpu-dispatch'])
                 reldebinf_flags = ' '.join([reldebinf_flags,'-diag-disable cpu-dispatch'])
 
