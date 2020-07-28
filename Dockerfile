@@ -54,7 +54,7 @@ RUN mkdir build && cd build && cmake -DENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_
 RUN cd build && make -j 16
 RUN cd build && make test
 
-FROM axom/compilers:nvcc-9 AS nvcc
+FROM axom/compilers:nvcc-10 AS nvcc
 ENV GTEST_COLOR=1
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
