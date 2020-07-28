@@ -8,6 +8,7 @@
 #include "umpire/strategy/QuickPool.hpp"
 
 #include "umpire/Allocator.hpp"
+#include "umpire/util/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/util/Macros.hpp"
@@ -15,20 +16,13 @@
 namespace umpire {
 namespace strategy {
 
-namespace {
-  inline std::size_t aligned_size(const std::size_t size) {
-    const std::size_t boundary = 16;
-  //  return std::size_t (size + (boundary-1)) & ~(boundary-1);
-    return size + boundary - 1 - (size - 1) % boundary;
-  }
-}
-
 QuickPool::QuickPool(
     const std::string& name,
     int id,
     Allocator allocator,
     const std::size_t initial_alloc_size,
     const std::size_t min_alloc_size,
+    std::size_t alignment,
     CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy{name, id},
   m_pointer_map{},
@@ -37,7 +31,8 @@ QuickPool::QuickPool(
   m_allocator{allocator.getAllocationStrategy()},
   m_should_coalesce{coalesce_heuristic},
   m_initial_alloc_bytes{initial_alloc_size},
-  m_min_alloc_bytes{min_alloc_size}
+  m_min_alloc_bytes{min_alloc_size},
+  m_aligned_alloc{alignment}
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
@@ -55,7 +50,10 @@ QuickPool::QuickPool(
   m_releasable_bytes += m_initial_alloc_bytes;
 
   void* chunk_storage{m_chunk_pool.allocate()};
-  Chunk* chunk{new (chunk_storage) Chunk(ptr, initial_alloc_size, m_initial_alloc_bytes)};
+  std::size_t aligned_size{m_initial_alloc_bytes};
+  m_aligned_alloc.align_create(aligned_size, ptr);
+
+  Chunk* chunk{new (chunk_storage) Chunk(ptr, aligned_size, aligned_size)};
   chunk->size_map_it = m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
 }
 
@@ -67,7 +65,7 @@ void*
 QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
-  bytes = aligned_size(bytes);
+  bytes = m_aligned_alloc.round_up(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
 
@@ -105,7 +103,11 @@ QuickPool::allocate(std::size_t bytes)
     m_actual_bytes += size;
     m_releasable_bytes += size;
     void* chunk_storage{m_chunk_pool.allocate()};
-    chunk = new (chunk_storage) Chunk{ret, size, size};
+
+    std::size_t aligned_size{size};
+    m_aligned_alloc.align_create(size, ret);
+
+    chunk = new (chunk_storage) Chunk{ret, aligned_size, aligned_size};
   } else {
     chunk = (*best).second;
     m_size_map.erase(best);
@@ -230,7 +232,10 @@ void QuickPool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
       UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->size);
       m_actual_bytes -= chunk->chunk_size;
-      m_allocator->deallocate(chunk->data);
+
+      void* base_ptr{ m_aligned_alloc.align_destroy(chunk->data) };
+
+      m_allocator->deallocate(base_ptr);
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);
     } else {

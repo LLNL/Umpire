@@ -8,6 +8,7 @@
 #define UMPIRE_PoolMap_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/util/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
 #include <functional>
@@ -42,6 +43,7 @@ class QuickPool :
         Allocator allocator,
         const std::size_t initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 * 1024),
+        const std::size_t alignment = 16,
         CoalesceHeuristic coalesce_heuristic = percent_releasable(100)) noexcept;
 
     ~QuickPool();
@@ -120,6 +122,9 @@ class QuickPool :
 
     std::size_t m_actual_bytes{0};
     std::size_t m_releasable_bytes{0};
+
+    util::AlignedAllocation m_aligned_alloc;
+
 };
 
 } // end of namespace strategy

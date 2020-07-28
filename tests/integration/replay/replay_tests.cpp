@@ -149,7 +149,7 @@ static void runTest()
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::vector<std::string> allocators{
-      "HOST" 
+      "HOST"
 #if defined(UMPIRE_ENABLE_DEVICE)
     , "DEVICE"
 #endif
@@ -234,17 +234,20 @@ static void runTest()
 
     auto pa1 = 16 * 1024;         // min initial allocation size
     auto pa2 = 1 * 1024;          // min allocation size
-    auto pa3 = umpire::strategy::QuickPool::percent_releasable(50);
+    auto pa3 = 128;
+    auto pa4 = umpire::strategy::QuickPool::percent_releasable(50);
     name = basename + "_Pool_spec_";
     testAllocator<umpire::strategy::QuickPool, true>(name+"0", base_alloc);
     testAllocator<umpire::strategy::QuickPool, true>(name+"1", base_alloc, pa1);
     testAllocator<umpire::strategy::QuickPool, true>(name+"2", base_alloc, pa1, pa2);
     testAllocator<umpire::strategy::QuickPool, true>(name+"3", base_alloc, pa1, pa2, pa3);
+    testAllocator<umpire::strategy::QuickPool, true>(name+"4", base_alloc, pa1, pa2, pa3, pa4);
     name = basename + "_Pool_no_instrospection_spec_";
     testAllocator<umpire::strategy::QuickPool, false>(name+"0", base_alloc);
     testAllocator<umpire::strategy::QuickPool, false>(name+"1", base_alloc, pa1);
     testAllocator<umpire::strategy::QuickPool, false>(name+"2", base_alloc, pa1, pa2);
     testAllocator<umpire::strategy::QuickPool, false>(name+"3", base_alloc, pa1, pa2, pa3);
+    testAllocator<umpire::strategy::QuickPool, false>(name+"4", base_alloc, pa1, pa2, pa3, pa4);
 
     auto dpa1 = 16 * 1024;         // min initial allocation size
     auto dpa2 = 1 * 1024;          // min allocation size
@@ -308,7 +311,7 @@ static void runTest()
     testAllocator<umpire::strategy::ThreadSafeAllocator, false>(name, base_alloc);
 
     auto fpa1 = ALLOCATION_SIZE; // object_bytes
-    auto fpa2 = 1024; // objects_per_pool                        
+    auto fpa2 = 1024; // objects_per_pool
     name = basename + "_FixedPool_spec_";
     testAllocator<umpire::strategy::FixedPool, true>(name+"1", base_alloc, fpa1);
     testAllocator<umpire::strategy::FixedPool, true>(name+"2", base_alloc, fpa1, fpa2);
