@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Bump BLT to v0.3.6
+
 ### Removed
 
 - Removed replicated implementations for tracking high watermarks and
