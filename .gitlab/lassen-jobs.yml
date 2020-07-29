@@ -46,7 +46,7 @@ clang_4_0_0 (build and test on lassen):
 
 clang_9_0_0_libcpp (build and test on lassen):
   variables:
-    SPEC: "%clang@9.0.0"
+    SPEC: "%clang@9.0.0+libcpp"
   extends: .build_and_test_on_lassen
 
 nvcc_gcc_4_9_3 (build and test on lassen):
