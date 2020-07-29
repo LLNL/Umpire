@@ -30,8 +30,6 @@ set(umpire_resource_depends
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    CudaConstantMemoryResource.hpp
-    CudaConstantMemoryResourceFactory.hpp
     CudaDeviceMemoryResource.hpp
     CudaDeviceResourceFactory.hpp
     CudaPinnedMemoryResourceFactory.hpp
@@ -40,13 +38,22 @@ if (ENABLE_CUDA)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    CudaConstantMemoryResource.cu
-    CudaConstantMemoryResourceFactory.cpp
     CudaDeviceMemoryResource.cpp
     CudaDeviceResourceFactory.cpp
     CudaPinnedMemoryResourceFactory.cpp
     CudaUnifiedMemoryResourceFactory.cpp)
 
+  if (ENABLE_DEVICE_CONST)
+    set (umpire_resource_headers
+      ${umpire_resource_headers}
+      CudaConstantMemoryResource.hpp
+      CudaConstantMemoryResourceFactory.hpp)
+
+    set (umpire_resource_sources
+      ${umpire_resource_sources}
+      CudaConstantMemoryResource.cu
+      CudaConstantMemoryResourceFactory.cpp)
+  endif ()
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
@@ -57,20 +64,28 @@ if (ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     HipDeviceResourceFactory.hpp
-    HipPinnedMemoryResourceFactory.hpp
-    HipConstantMemoryResourceFactory.hpp
-    HipConstantMemoryResource.hpp)
+    HipPinnedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    HipConstantMemoryResourceFactory.cpp
-    HipConstantMemoryResource.cpp
     HipDeviceResourceFactory.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
     hip_runtime)
+
+  if (ENABLE_DEVICE_CONST)
+    set (umpire_resource_headers
+      ${umpire_resource_headers}
+      HipConstantMemoryResourceFactory.hpp
+      HipConstantMemoryResource.hpp)
+
+    set (umpire_resource_sources
+      ${umpire_resource_sources}
+      HipConstantMemoryResourceFactory.cpp
+      HipConstantMemoryResource.cpp)
+  endif ()
 endif ()
 
 if (ENABLE_SYCL)
