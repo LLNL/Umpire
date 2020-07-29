@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-#!/bin/bash
 ##############################################################################
 # Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
@@ -17,8 +16,6 @@ hostname="$(hostname)"
 project_dir="$(pwd)"
 
 build_root=${BUILD_ROOT:-""}
-sys_type=${SYS_TYPE:-""}
-compiler=${COMPILER:-""}
 hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
 
@@ -35,39 +32,38 @@ then
         exit 1
     fi
 
-    python scripts/uberenv/uberenv.py --spec=${spec}
+    prefix_opt=""
+
+    if [[ -d /dev/shm ]]
+    then
+        prefix="/dev/shm/${hostname}/${spec}"
+        mkdir -p ${prefix}
+        prefix_opt="--prefix=${prefix}"
+    fi
+
+    python scripts/uberenv/uberenv.py --spec=${spec} ${prefix_opt}
 
 fi
 
 # Host config file
 if [[ -z ${hostconfig} ]]
 then
-    # Attempt to retrieve host-config from env. We need sys_type and compiler.
-    if [[ -z ${sys_type} ]]
+    # If no host config file was provided, we assume it was generated.
+    # This means we are looking of a unique one in project dir.
+    hostconfigs=( $( ls "${project_dir}/"hc-*.cmake ) )
+    if [[ ${#hostconfigs[@]} == 1 ]]
     then
-        echo "SYS_TYPE is undefined, aborting..."
+        hostconfig_path=${hostconfigs[0]}
+        echo "Found host config file: ${hostconfig_path}"
+    elif [[ ${#hostconfigs[@]} == 0 ]]
+    then
+        echo "No result for: ${project_dir}/hc-*.cmake"
+        echo "Spack generated host-config not found."
         exit 1
-    fi
-    if [[ -z ${compiler} ]]
-    then
-        echo "COMPILER is undefined, aborting..."
-        exit 1
-    fi
-    hostconfig="${hostname//[0-9]/}-${sys_type}-${compiler}.cmake"
-
-    # First try with where uberenv generates host-configs.
-    hostconfig_path="${project_dir}/${hostconfig}"
-    if [[ ! -f ${hostconfig_path} ]]
-    then
-        echo "File not found: ${hostconfig_path}"
-        echo "Spack generated host-config not found, trying with predefined"
-    fi
-    # Otherwise look into project predefined host-configs.
-    hostconfig_path="${project_dir}/host-configs/${hostconfig}"
-    if [[ ! -f ${hostconfig_path} ]]
-    then
-        echo "File not found: ${hostconfig_path}"
-        echo "Predefined host-config not found, aborting"
+    else
+        echo "More than one result for: ${project_dir}/hc-*.cmake"
+        echo "${hostconfigs[@]}"
+        echo "Please specify one with HOST_CONFIG variable"
         exit 1
     fi
 else
@@ -97,7 +93,8 @@ then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
     # If building, then delete everything first
-    rm -rf ${build_dir} && mkdir -p ${build_dir} && cd ${build_dir}
+    rm -rf ${build_dir} 2>/dev/null
+    mkdir -p ${build_dir} && cd ${build_dir}
 
     cmake \
       -C ${hostconfig_path} \
