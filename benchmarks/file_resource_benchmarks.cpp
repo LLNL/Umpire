@@ -19,8 +19,6 @@
 int iterations;
 size_t Scalar = 5;
 
-
-
 void Copy(std::size_t* A, std::size_t* C){
     #pragma omp parallel for
         for(int i = 0; i < iterations; i++){
@@ -63,15 +61,16 @@ void Initialized(std::size_t* A, std::size_t* B, std::size_t* C){
     #pragma omp parallel for
     for (int i=0; i<iterations; i++) {
             index[i] = i; 
-        } 
+    } 
+
     std::random_shuffle(index.begin(), index.end());
 
     #pragma omp parallel for
-        for (int i: index) {
-            A[i] = a;
-            B[i] = b;
-            C[i] = c;
-        }
+    for (int i = 0; i < index.size(); i++) {
+        A[index[i]] = a;
+        B[index[i]] = b;
+        C[index[i]] = c;
+    }
 }
 
 void benchmark(std::string name){
