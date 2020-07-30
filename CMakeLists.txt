@@ -45,6 +45,11 @@ option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
+option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
+if(WIN32)
+  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
+endif()
+option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL OFF)
