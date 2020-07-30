@@ -28,7 +28,6 @@
 namespace umpire {
 
 static const char* env_name = "UMPIRE_REPLAY";
-int Replay::m_argument_number = 0;
 
 Replay::Replay() : m_replayUid(getpid())
 {

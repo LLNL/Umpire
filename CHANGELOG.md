@@ -10,11 +10,27 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added ASAN memory sanitization to QuickPool
+
 ### Changed
+
+- GitLab CI pipelines now generate the host-config files on-the-fly.
+- Bump BLT to v0.3.6
 
 ### Removed
 
+- Removed replicated implementations for tracking high watermarks and
+  allocated byte counts from the Pools as this is now being provided
+  from the AllocationTracker/Inspector
+
+- Final remnants of unused ENABLE_COPY_HEADERS option removed.
+
 ### Fixed
+
+- Poisoning instrumentation has is now properly balanced between allocate
+  and deallocate in DyanmicPoolMap.
+
+- Github action for checking CHANGELOG.
 
 ## [3.0.0] - 2020-06-30
 

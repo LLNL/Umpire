@@ -24,7 +24,7 @@ namespace resource {
 class CudaDeviceMemoryResource :
   public MemoryResource
 {
-  public: 
+  public:
     CudaDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
     void* allocate(std::size_t bytes);
