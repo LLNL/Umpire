@@ -39,7 +39,7 @@ void CudaCopyOperation::transform(
       "event", "copy");
 }
 
-camp::resources::Event 
+camp::resources::Event
 CudaCopyOperation::transform_async(
     void* src_ptr,
     void** dst_ptr,
@@ -63,9 +63,9 @@ CudaCopyOperation::transform_async(
   }
 
   UMPIRE_RECORD_STATISTIC(
-      "CudaCopyFromOperation",
+      "CudaCopyOperation",
       "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
+      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
       "size", length,
       "event", "copy");
 

@@ -1,0 +1,60 @@
+##############################################################################
+# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+####
+# All lassen build jobs
+
+clang_default (build and test on lassen):
+  variables:
+    SPEC: "%clang@default"
+  extends: .build_and_test_on_lassen
+
+gcc_default (build and test on lassen):
+  variables:
+    SPEC: "%gcc@default"
+  extends: .build_and_test_on_lassen
+
+xl_default (build and test on lassen):
+  variables:
+    SPEC: "%xl@default"
+  extends: .build_and_test_on_lassen
+
+pgi_default (build and test on lassen):
+  variables:
+    SPEC: "%pgi@default"
+  extends: .build_and_test_on_lassen
+  allow_failure: true
+
+gcc_8_3_1 (build and test on lassen):
+  variables:
+    SPEC: "%gcc@8.3.1"
+  extends: .build_and_test_on_lassen
+
+clang_3_9_1 (build and test on lassen):
+  variables:
+    SPEC: "%clang@3.9.1"
+  extends: .build_and_test_on_lassen_advanced
+
+clang_4_0_0 (build and test on lassen):
+  variables:
+    SPEC: "%clang@4.0.0"
+  extends: .build_and_test_on_lassen_advanced
+
+clang_9_0_0_libcpp (build and test on lassen):
+  variables:
+    SPEC: "%clang@9.0.0+libcpp"
+  extends: .build_and_test_on_lassen
+
+nvcc_gcc_4_9_3 (build and test on lassen):
+  variables:
+    SPEC: "%gcc@4.9.3+cuda"
+  extends: .build_and_test_on_lassen
+
+nvcc_xl-beta-2019.06.20 (build and test on lassen):
+  variables:
+    SPEC: "%xl@beta2019.06.20+cuda"
+  extends: .build_and_test_on_lassen

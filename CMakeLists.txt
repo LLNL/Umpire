@@ -26,6 +26,7 @@ endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
+set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
@@ -44,7 +45,6 @@ option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
-option(ENABLE_SANITIZERS "Enable manual memory poisoning of pools" Off)
 
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL OFF)
@@ -81,6 +81,12 @@ if (ENABLE_CUDA)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
     endif ()
   endif ()
+endif()
+
+if (ENABLE_SYCL)
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
+   endif()
 endif()
 
 ################################

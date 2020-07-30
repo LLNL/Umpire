@@ -88,12 +88,21 @@ if (ENABLE_OPENMP_TARGET)
     ${umpire_depends}
     openmp)
 endif ()
-  
+
+set (umpire_defines)
+
+if (COMPILER_FAMILY_IS_MSVC AND NOT BUILD_SHARED_LIBS)
+  set (umpire_defines
+    ${umpire_defines}
+    UMPIRE_WIN_STATIC_BUILD)
+endif ()
+
 blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
   SOURCES ${umpire_sources} ${umpire_interface_sources}
-  DEPENDS_ON ${umpire_depends})
+  DEPENDS_ON ${umpire_depends}
+  DEFINES ${umpire_defines})
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
@@ -107,8 +116,8 @@ set(UMPIRE_ENABLE_BACKTRACE_SYMBOLS ${ENABLE_BACKTRACE_SYMBOLS})
 set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
+set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
 set(UMPIRE_ENABLE_OPENMP_TARGET ${ENABLE_OPENMP_TARGET})
-set(UMPIRE_ENABLE_SANITIZERS ${ENABLE_SANITIZERS})
 
 if (ENABLE_CUDA OR ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
@@ -117,6 +126,10 @@ if (ENABLE_CUDA OR ENABLE_HIP)
   if (ENABLE_DEVICE_CONST)
     set(UMPIRE_ENABLE_CONST On)
   endif()
+elseif (ENABLE_SYCL)
+  set(UMPIRE_ENABLE_DEVICE On)
+  set(UMPIRE_ENABLE_UM On)
+  set(UMPIRE_ENABLE_PINNED On)
 else ()
   set(UMPIRE_ENABLE_DEVICE Off)
   set(UMPIRE_ENABLE_PINNED Off)
@@ -160,7 +173,7 @@ install(FILES
 
 install(DIRECTORY
   ${CMAKE_Fortran_MODULE_DIRECTORY}/
-  DESTINATION include/umpire 
+  DESTINATION include/umpire
   FILES_MATCHING PATTERN "*.mod")
 
 install(DIRECTORY

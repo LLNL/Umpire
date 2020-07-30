@@ -54,7 +54,7 @@ RUN mkdir build && cd build && cmake -DENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_
 RUN cd build && make -j 16
 RUN cd build && make test
 
-FROM axom/compilers:nvcc-9 AS nvcc
+FROM axom/compilers:nvcc-10 AS nvcc
 ENV GTEST_COLOR=1
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
@@ -66,5 +66,12 @@ ENV GTEST_COLOR=1
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
 ENV HCC_AMDGPU_TARGET=gfx900
-RUN mkdir build && cd build && cmake -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On ..
-RUN cd build && make VERBOSE=1
+RUN mkdir build && cd build && cmake -DROCM_ROOT_DIR=/opt/rocm/include -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On ..
+RUN cd build && make -j 16
+
+FROM axom/compilers:oneapi AS sycl
+ENV GTEST_COLOR=1
+COPY --chown=axom:axom . /home/axom/workspace
+WORKDIR /home/axom/workspace
+RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && mkdir build && cd build && cmake -DCMAKE_CXX_COMPILER=dpcpp -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_SYCL=On .."
+RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && cd build && make -j 16"
