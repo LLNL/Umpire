@@ -8,7 +8,7 @@ Umpire supports the use of file based memory allocation. When ``ENABLE_FILE_RESO
 is enabled, the environment variables ``UMPIRE_MEMORY_FILE_DIR``can be used to determine 
 where memory can be allocated from:
 
-    .. list-table:
+.. list-table::
    :widths: 25 25 50
    :header-rows: 1
 
