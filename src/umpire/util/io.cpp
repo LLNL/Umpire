@@ -30,6 +30,7 @@
 #else
 #include <process.h>
 #define getpid _getpid
+#include <direct.h>
 #endif
 
 namespace umpire {
@@ -112,10 +113,16 @@ void initialize_io(const bool enable_log, const bool enable_replay)
         if ( stat( root_io_dir.c_str(), &info ) )
         {
           if (enable_log || enable_replay) {
+#ifndef WIN32
             if ( mkdir(root_io_dir.c_str(),
                        S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) ) {
               UMPIRE_ERROR("mkdir(" << root_io_dir << ") failed");
             }
+#else
+            if (_mkdir(root_io_dir.c_str())) {
+              UMPIRE_ERROR("mkdir(" << root_io_dir << ") failed");
+            }
+#endif
           }
         }
         else if ( !(S_ISDIR(info.st_mode)) )

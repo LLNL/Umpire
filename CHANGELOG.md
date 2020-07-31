@@ -14,6 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- GitLab CI pipelines now generate the host-config files on-the-fly.
 - Bump BLT to v0.3.6
 
 ### Removed
@@ -21,6 +22,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Removed replicated implementations for tracking high watermarks and
   allocated byte counts from the Pools as this is now being provided
   from the AllocationTracker/Inspector
+
+- Final remnants of unused ENABLE_COPY_HEADERS option removed.
 
 ### Fixed
 

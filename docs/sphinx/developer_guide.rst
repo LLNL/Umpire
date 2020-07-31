@@ -30,8 +30,8 @@ Uberenv helps by doing the following:
 
 Uberenv will create a directory ``uberenv_libs`` containing a Spack instance with the required Umpire dependencies installed. It then generates a host-config file (``<config_dependent_name>.cmake``) at the root of Umpire repository.
 
-Usage
------
+Using Uberenv to generate the host-config file
+----------------------------------------------
 
 .. code-block:: bash
 
@@ -50,11 +50,25 @@ Some examples uberenv options:
 * ``--spec=%clang@4.0.0+cuda``
 * ``--prefix=<Path to uberenv build directory (defaults to ./uberenv_libs)>``
 
-If you already have a spack instance you would like to reuse, you can do so changing the uberenv
-command as follow:
+Building dependencies can take a long time. If you already have a spack instance you would like to reuse (in supplement of the local one managed by Uberenv), you can do so changing the uberenv command as follow:
 
 .. code-block:: bash
 
    $ python scripts/uberenv/uberenv.py --upstream=</path/to/my/spack>/opt/spack
 
+Using host-config files to build RAJA
+-------------------------------------
 
+When a host-config file exists for the desired machine and toolchain, it can easily be used in the CMake build process:
+
+If I need to build Umpire with _clang_ on _lassen_, I can see there is already a host-config file named `lassen-blueos_3_ppc64le_ib_p9-clang@9.0.0.cmake`. To use it (on lassen):
+
+.. code-block:: bash
+
+  $ mkdir build && cd build
+  $ cmake -C ../host-configs/lassen-blueos_3_ppc64le_ib_p9-clang@9.0.0.cmake ..
+  $ cmake --build -j .
+  $ ctest --output-on-failure -T test
+
+.. note::
+  This will build the default configuration. Not all parameters are embedded into the host-config file. For example, producing C/Fortran APIs, using OppenMP, enabling tests, is to be configured on command line.
