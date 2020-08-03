@@ -14,7 +14,7 @@
 
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
 
-#if defined(UMPIRE_ENABLE_FILE)
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
 #include "umpire/resource/FileMemoryResourceFactory.hpp"
 #endif
 
@@ -253,7 +253,7 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
   
-  #if defined(UMPIRE_ENABLE_FILE)
+#if defined(UMPIRE_ENABLE_FILE)
   {
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{
@@ -261,7 +261,6 @@ ResourceManager::initialize()
           strategy::AllocationTracker,
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("FILE", getNextId()))};
-
 
     int id{allocator->getId()};
     m_allocators_by_name["FILE"]  = allocator.get();

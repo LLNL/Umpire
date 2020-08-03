@@ -54,7 +54,7 @@ void* FileMemoryResource::allocate(std::size_t bytes)
 
   // Create name and open file
   std::stringstream ss;
-  ss << default_dir << "umpire_mem_" << getpid() << s_file_counter;
+  ss << default_dir << "umpire_mem_" << getpid() << "_" << s_file_counter;
   s_file_counter++;
 
   int fd{open(ss.str().c_str(), O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
@@ -81,8 +81,8 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   }
 
   // Storing Information On File
-  std::pair <const std::string, std::size_t> INFO{std::make_pair(ss.str(), rounded_bytes)};
-  m_size_map.insert(ptr, INFO);
+  std::pair <const std::string, std::size_t> info{std::make_pair(ss.str(), rounded_bytes)};
+  m_size_map.insert(ptr, info);
   
   close(fd);
   return ptr;

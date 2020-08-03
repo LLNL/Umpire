@@ -57,7 +57,6 @@ if (ENABLE_OPENMP)
       ${benchmark_depends}
       openmp)
 
-
 blt_add_executable(
   NAME file_resource_benchmarks
   SOURCES file_resource_benchmarks.cpp
