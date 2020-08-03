@@ -9,7 +9,7 @@ is enabled, the environment variables ``UMPIRE_MEMORY_FILE_DIR``can be used to d
 where memory can be allocated from:
 
 .. list-table::
-   :widths: 25 25 50
+   :widths: 25 25 40
    :header-rows: 1
 
    * - Variable
