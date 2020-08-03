@@ -37,6 +37,17 @@ class QuickPool :
 
     static CoalesceHeuristic percent_releasable(int percentage);
 
+    /*!
+     * \brief Construct a new QuickPool.
+     *
+     * \param name Name of this instance of the QuickPool
+     * \param id Unique identifier for this instance
+     * \param allocator Allocation resource that pool uses
+     * \param initial_alloc_size Size the pool initially allocates
+     * \param min_alloc_size The minimum size of all future allocations
+     * \param align_bytes Number of bytes with which to align allocation sizes (power-of-2)
+     * \param coalesce_heuristic Heuristic for when to perform coalesce operation
+     */
     QuickPool(
         const std::string& name,
         int id,
@@ -108,23 +119,22 @@ class QuickPool :
       SizeMap::iterator size_map_it;
     };
 
-    PointerMap m_pointer_map;
-    SizeMap m_size_map;
+    PointerMap m_pointer_map{};
+    SizeMap m_size_map{};
 
-    util::FixedMallocPool m_chunk_pool;
+    util::FixedMallocPool m_chunk_pool{ sizeof(Chunk) };
 
     strategy::AllocationStrategy* m_allocator;
 
     CoalesceHeuristic m_should_coalesce;
+
+    util::AlignedAllocation m_aligned_alloc;
 
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
 
     std::size_t m_actual_bytes{0};
     std::size_t m_releasable_bytes{0};
-
-    util::AlignedAllocation m_aligned_alloc;
-
 };
 
 } // end of namespace strategy

@@ -25,14 +25,11 @@ QuickPool::QuickPool(
     std::size_t alignment,
     CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy{name, id},
-  m_pointer_map{},
-  m_size_map{},
-  m_chunk_pool{sizeof(Chunk)},
   m_allocator{allocator.getAllocationStrategy()},
   m_should_coalesce{coalesce_heuristic},
-  m_initial_alloc_bytes{initial_alloc_size},
-  m_min_alloc_bytes{min_alloc_size},
-  m_aligned_alloc{alignment}
+  m_aligned_alloc{alignment},
+  m_initial_alloc_bytes{ m_aligned_alloc.round_up(initial_alloc_size) },
+  m_min_alloc_bytes{ m_aligned_alloc.round_up(min_alloc_size) }
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
@@ -46,6 +43,7 @@ QuickPool::QuickPool(
 
   void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
+
   m_actual_bytes += m_initial_alloc_bytes;
   m_releasable_bytes += m_initial_alloc_bytes;
 
@@ -105,7 +103,7 @@ QuickPool::allocate(std::size_t bytes)
     void* chunk_storage{m_chunk_pool.allocate()};
 
     std::size_t aligned_size{size};
-    m_aligned_alloc.align_create(size, ret);
+    m_aligned_alloc.align_create(aligned_size, ret);
 
     chunk = new (chunk_storage) Chunk{ret, aligned_size, aligned_size};
   } else {
@@ -230,12 +228,15 @@ void QuickPool::release()
     if ( (chunk->size == chunk->chunk_size)
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
-      UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->size);
-      m_actual_bytes -= chunk->chunk_size;
 
-      void* base_ptr{ m_aligned_alloc.align_destroy(chunk->data) };
+      std::size_t original_size;
+      void* original_base_ptr;
+      m_aligned_alloc.align_destroy(chunk->data, original_size, original_base_ptr);
 
-      m_allocator->deallocate(base_ptr);
+      UMPIRE_POISON_MEMORY_REGION(m_allocator, original_base_ptr, original_size);
+      m_actual_bytes -= original_size;
+      m_allocator->deallocate(original_base_ptr);
+
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);
     } else {

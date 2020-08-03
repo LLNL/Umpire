@@ -22,7 +22,12 @@ TEST(AligndAllocation, Alignment)
       std::size_t size{bufsize};
       void* buffer{(void*)(i+j)};
       align.align_create(size, buffer);
-      void* original_buffer{align.align_destroy(buffer)};
+
+      std::size_t original_size;
+      void* original_buffer;
+
+      align.align_destroy(buffer, original_size, original_buffer);
+
       std::size_t align_check{align.round_up(i+j)};
 
       EXPECT_EQ(buffer, (void*)align_check);

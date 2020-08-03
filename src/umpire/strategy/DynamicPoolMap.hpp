@@ -10,6 +10,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 
+#include "umpire/util/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
 #include <map>
@@ -50,10 +51,11 @@ class DynamicPoolMap : public AllocationStrategy
      *
      * \param name Name of this instance of the DynamicPoolMap
      * \param id Unique identifier for this instance
+     * \param allocator Allocation resource that pool uses
      * \param initial_alloc_bytes Size the pool initially allocates
      * \param min_alloc_bytes The minimum size of all future allocations
-     * \param coalesce_heuristic Heuristic callback function
-     * \param align_bytes Number of bytes with which to align allocation sizes
+     * \param align_bytes Number of bytes with which to align allocation sizes (power-of-2)
+     * \param coalesce_heuristic Heuristic for when to perform coalesce operation
      */
     DynamicPoolMap(
         const std::string& name,
@@ -64,9 +66,6 @@ class DynamicPoolMap : public AllocationStrategy
         const std::size_t align_bytes = 16,
         CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
 
-    /*!
-     * \brief Destructs the DynamicPoolMap.
-     */
     ~DynamicPoolMap();
 
     DynamicPoolMap(const DynamicPoolMap&) = delete;
@@ -140,7 +139,7 @@ class DynamicPoolMap : public AllocationStrategy
     /*!
      * \brief Deallocate from m_allocator.
      */
-    void deallocateBlock(void* ptr, std::size_t bytes);
+    std::size_t deallocateBlock(void* ptr);
 
     /*!
      * \brief Insert a block to the used map.
@@ -175,14 +174,19 @@ class DynamicPoolMap : public AllocationStrategy
 
     void do_coalesce();
 
+    AddressMap m_used_map{};
+    SizeMap m_free_map{};
+
     strategy::AllocationStrategy* m_allocator;
+
+    CoalesceHeuristic m_should_coalesce;
+
+    util::AlignedAllocation m_aligned_alloc;
+
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;
-    const std::size_t m_align_bytes;
-    CoalesceHeuristic m_coalesce_heuristic;
-    AddressMap m_used_map;
-    SizeMap m_free_map;
-    std::size_t m_actual_bytes;
+
+    std::size_t m_actual_bytes{0};
 };
 
 } // end of namespace strategy

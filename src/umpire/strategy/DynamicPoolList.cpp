@@ -21,14 +21,15 @@ DynamicPoolList::DynamicPoolList(
     Allocator allocator,
     const std::size_t min_initial_alloc_size,
     const std::size_t min_alloc_size,
-    CoalesceHeuristic coalesce_heuristic) noexcept
+    const std::size_t alignment,
+    CoalesceHeuristic should_coalesce) noexcept
   :
   AllocationStrategy(name, id),
   dpa(nullptr),
   m_allocator(allocator.getAllocationStrategy()),
-  do_coalesce{coalesce_heuristic}
+  m_should_coalesce{should_coalesce}
 {
-  dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size);
+  dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size, alignment);
 }
 
 void*
@@ -46,7 +47,7 @@ DynamicPoolList::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa->deallocate(ptr);
 
-  if ( do_coalesce(*this) ) {
+  if ( m_should_coalesce(*this) ) {
     UMPIRE_LOG(Debug, "Heuristic returned true, "
         "performing coalesce operation for " << this << "\n");
     dpa->coalesce();

@@ -11,6 +11,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/util/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/Replay.hpp"
@@ -20,32 +21,25 @@
 #include <algorithm>
 #include <sstream>
 
-inline static std::size_t round_up(std::size_t num, std::size_t factor)
-{
-  return num + factor - 1 - (num - 1) % factor;
-}
-
 namespace umpire {
 namespace strategy {
 
-DynamicPoolMap::DynamicPoolMap(const std::string& name,
-                         int id,
-                         Allocator allocator,
-                         const std::size_t initial_alloc_bytes,
-                         const std::size_t min_alloc_bytes,
-                         const std::size_t align_bytes,
-                         CoalesceHeuristic coalesce_heuristic) noexcept :
-  AllocationStrategy(name, id),
-  m_allocator{allocator.getAllocationStrategy()},
-  m_initial_alloc_bytes{round_up(initial_alloc_bytes, align_bytes)},
-  m_min_alloc_bytes{round_up(min_alloc_bytes, align_bytes)},
-  m_align_bytes{align_bytes},
-  m_coalesce_heuristic{coalesce_heuristic},
-  m_used_map{},
-  m_free_map{},
-  m_actual_bytes{round_up(initial_alloc_bytes, align_bytes)}
+DynamicPoolMap::DynamicPoolMap(
+    const std::string& name,
+    int id,
+    Allocator allocator,
+    const std::size_t initial_alloc_bytes,
+    const std::size_t min_alloc_bytes,
+    const std::size_t alignment,
+    CoalesceHeuristic coalesce_heuristic) noexcept :
+  AllocationStrategy{name, id},
+  m_allocator{ allocator.getAllocationStrategy() },
+  m_should_coalesce{ coalesce_heuristic },
+  m_aligned_alloc{ alignment },
+  m_initial_alloc_bytes{ m_aligned_alloc.round_up(initial_alloc_bytes) },
+  m_min_alloc_bytes{ m_aligned_alloc.round_up(min_alloc_bytes) }
 {
-  const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
+  std::size_t bytes{ m_initial_alloc_bytes };
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
     umpire::util::backtrace bt{};
@@ -54,8 +48,12 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
   }
 #endif
   void* ptr = m_allocator->allocate(bytes);
-  insertFree(ptr, bytes, true, bytes);
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
+  m_actual_bytes += bytes;
+
+  m_aligned_alloc.align_create(bytes, ptr);
+
+  insertFree(ptr, bytes, true, bytes);
 }
 
 DynamicPoolMap::~DynamicPoolMap()
@@ -71,7 +69,9 @@ DynamicPoolMap::~DynamicPoolMap()
     std::size_t whole_bytes;
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
-    if (is_head && bytes == whole_bytes) deallocateBlock(addr, bytes);
+    if (is_head && bytes == whole_bytes) {
+      (void)deallocateBlock(addr);
+    }
   }
 
   if (m_used_map.size() == 0) {
@@ -159,27 +159,35 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
 
-  // Add to count
   m_actual_bytes += bytes;
+
+  m_aligned_alloc.align_create(bytes, ptr);
 
   return ptr;
 }
 
-void DynamicPool::deallocateBlock(void* ptr, std::size_t bytes)
+std::size_t DynamicPool::deallocateBlock(void* ptr)
 {
-  m_actual_bytes -= bytes;
-  m_allocator->deallocate(ptr);
+  std::size_t original_size;
+  void* original_base_ptr;
+
+  m_aligned_alloc.align_destroy(ptr, original_size, original_base_ptr);
+
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, original_base_ptr, original_size);
+  m_actual_bytes -= original_size;
+  m_allocator->deallocate(original_base_ptr);
+  return original_size;
 }
 
 void* DynamicPool::allocate(std::size_t bytes)
 {
+  bytes = m_aligned_alloc.round_up(bytes);
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
-  const std::size_t rounded_bytes = round_up(bytes, m_align_bytes);
   Pointer ptr{nullptr};
 
   // Check if the previous block is a match
-  const SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
+  const SizeMap::const_iterator iter{findFreeBlock(bytes)};
 
   if (iter != m_free_map.end()) {
     // Found this acceptable address pair
@@ -188,38 +196,40 @@ void* DynamicPool::allocate(std::size_t bytes)
     std::tie(ptr, is_head, whole_bytes) = iter->second;
 
     // Add used map
-    insertUsed(ptr, rounded_bytes, is_head, whole_bytes);
+    insertUsed(ptr, bytes, is_head, whole_bytes);
 
     // Remove the entry from the free map
     const std::size_t free_size{iter->first};
     m_free_map.erase(iter);
 
-    const std::size_t left_bytes{free_size - rounded_bytes};
+    const std::size_t left_bytes{free_size - bytes};
 
     if (left_bytes > 0) {
-      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
+      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes,
                  false, whole_bytes);
     }
   } else {
-    // Allocate new block -- note this does not check whether alignment is met
     const std::size_t min_block_size =
       ( m_actual_bytes == 0 ) ? m_initial_alloc_bytes : m_min_alloc_bytes;
 
-    const std::size_t alloc_bytes{std::max(rounded_bytes, min_block_size)};
+    const std::size_t alloc_bytes{std::max(bytes, min_block_size)};
     ptr = allocateBlock(alloc_bytes);
 
-    // Add used
-    insertUsed(ptr, rounded_bytes, true, alloc_bytes);
+    std::size_t aligned_size{alloc_bytes};
+    m_aligned_alloc.align_create(aligned_size, ptr);
+    UMPIRE_ASSERT("bytes too large" && bytes <= aligned_size);
 
-    const std::size_t left_bytes{alloc_bytes - rounded_bytes};
+    insertUsed(ptr, bytes, true, aligned_size);
+
+    const std::size_t left_bytes{aligned_size - bytes};
 
     // Add free
     if (left_bytes > 0)
-      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
-                 false, alloc_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes,
+                 false, aligned_size);
   }
 
-  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, rounded_bytes);
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
 }
 
@@ -249,7 +259,7 @@ void DynamicPoolMap::deallocate(void* ptr)
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
 
-  if (m_coalesce_heuristic(*this)) {
+  if (m_should_coalesce(*this)) {
     UMPIRE_LOG(Debug, this
                << " heuristic function returned true, calling coalesce()");
     do_coalesce();
@@ -400,8 +410,7 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
     std::size_t whole_bytes;
     std::tie(ptr, is_head, whole_bytes) = it->second;
     if (is_head && bytes == whole_bytes) {
-      released_bytes += bytes;
-      deallocateBlock(ptr, bytes);
+      released_bytes += deallocateBlock(ptr);
       it = m_free_map.erase(it);
     } else {
       ++it;
@@ -455,8 +464,11 @@ void DynamicPoolMap::do_coalesce()
 
     // If this removed anything from the map, re-allocate a single large chunk and insert to free map
     if (released_bytes > 0) {
-      const Pointer ptr{allocateBlock(released_bytes)};
-      insertFree(ptr, released_bytes, true, released_bytes);
+      Pointer ptr{allocateBlock(released_bytes)};
+      std::size_t aligned_size{released_bytes};
+      m_aligned_alloc.align_create(aligned_size, ptr);
+
+      insertFree(ptr, aligned_size, true, aligned_size);
     }
   }
 }

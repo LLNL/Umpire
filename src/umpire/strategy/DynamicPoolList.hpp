@@ -14,6 +14,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/DynamicSizePool.hpp"
+#include "umpire/util/AlignedAllocation.hpp"
 
 namespace umpire {
 
@@ -49,10 +50,11 @@ class DynamicPoolList :
      *
      * \param name Name of this instance of the DynamicPoolList.
      * \param id Id of this instance of the DynamicPoolList.
-     * \param min_initial_alloc_size The minimum size of the first allocation
-     *                               the pool will make.
+     * \param allocator Allocation resource that pool uses
+     * \param min_initial_alloc_bytes Minimum size the pool initially allocates
      * \param min_alloc_size The minimum size of all future allocations.
-     * \param coalesce_heuristic Heuristic callback function.
+     * \param align_bytes Number of bytes with which to align allocation sizes (power-of-2)
+     * \param do_heuristic Heuristic for when to perform coalesce operation
      */
     DynamicPoolList(
         const std::string& name,
@@ -60,17 +62,22 @@ class DynamicPoolList :
         Allocator allocator,
         const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
         const std::size_t min_alloc_size = (1 * 1024 *1024),
-        CoalesceHeuristic coalesce_heuristic = heuristic_percent_releasable_list(100)) noexcept;
+        const std::size_t alignment = 16,
+        CoalesceHeuristic should_coalesce = heuristic_percent_releasable_list(100)) noexcept;
+
+
+
+    DynamicPoolList(const DynamicPoolMap&) = delete;
 
     void* allocate(size_t bytes) override;
-
     void deallocate(void* ptr) override;
-
     void release() override;
 
     std::size_t getActualSize() const noexcept override;
 
     Platform getPlatform() noexcept override;
+
+    MemoryResourceTraits getTraits() const noexcept final override;
 
     /*!
      * \brief Get the number of bytes that may be released back to resource
@@ -102,13 +109,12 @@ class DynamicPoolList :
 
     void coalesce() noexcept;
 
-    MemoryResourceTraits getTraits() const noexcept final override;
-
   private:
     DynamicSizePool<>* dpa;
 
     strategy::AllocationStrategy* m_allocator;
-    CoalesceHeuristic do_coalesce;
+
+    CoalesceHeuristic m_should_coalesce;
 };
 
 } // end of namespace strategy

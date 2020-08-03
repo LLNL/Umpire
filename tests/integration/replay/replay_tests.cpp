@@ -281,17 +281,20 @@ static void runTest()
 
     auto lpa1 = dpa1;
     auto lpa2 = dpa2;
-    auto lpa3 = umpire::strategy::heuristic_percent_releasable_list(50);
+    auto lpa3 = dpa3;
+    auto lpa4 = umpire::strategy::heuristic_percent_releasable_list(50);
     name = basename + "_DynamicPoolList_spec_";
     testAllocator<umpire::strategy::DynamicPoolList, true>(name+"0", base_alloc);
     testAllocator<umpire::strategy::DynamicPoolList, true>(name+"1", base_alloc, lpa1);
     testAllocator<umpire::strategy::DynamicPoolList, true>(name+"2", base_alloc, lpa1, lpa2);
     testAllocator<umpire::strategy::DynamicPoolList, true>(name+"3", base_alloc, lpa1, lpa2, lpa3);
+    testAllocator<umpire::strategy::DynamicPoolList, true>(name+"4", base_alloc, lpa1, lpa2, lpa3, lpa4);
     name = basename + "_DynamicPoolList_no_instrospection_spec_";
     testAllocator<umpire::strategy::DynamicPoolList, false>(name+"0", base_alloc);
     testAllocator<umpire::strategy::DynamicPoolList, false>(name+"1", base_alloc, lpa1);
     testAllocator<umpire::strategy::DynamicPoolList, false>(name+"2", base_alloc, lpa1, lpa2);
     testAllocator<umpire::strategy::DynamicPoolList, false>(name+"3", base_alloc, lpa1, lpa2, lpa3);
+    testAllocator<umpire::strategy::DynamicPoolList, false>(name+"4", base_alloc, lpa1, lpa2, lpa3, lpa4);
 
     auto ma1 = 1024; // Capacity
     name = basename + "_MonotonicAllocationStrategy_spec_";

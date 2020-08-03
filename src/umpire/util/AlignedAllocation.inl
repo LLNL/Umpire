@@ -10,6 +10,8 @@
 #include "umpire/util/allocation_statistics.hpp"
 #include "umpire/util/Macros.hpp"
 
+#include <tuple>
+
 namespace umpire {
 namespace util {
 
@@ -29,19 +31,17 @@ inline void AlignedAllocation::align_create(std::size_t& size, void*& ptr)
 
     std::size_t aligned_size{buffer_size - (reinterpret_cast<char*>(aligned_ptr) - reinterpret_cast<char*>(base_ptr))};
 
-    base_pointer_map[aligned_ptr] = base_ptr;
+    base_pointer_map[aligned_ptr] = std::make_tuple(size, base_ptr);
 
     size = aligned_size;
     ptr = aligned_ptr;
 }
 
-inline void* AlignedAllocation::align_destroy(void* ptr)
+inline void AlignedAllocation::align_destroy(void* ptr, std::size_t& osize, void*& obuffer)
 {
-    void* base{ base_pointer_map[ptr] };
+    std::tie(osize, obuffer) = base_pointer_map[ptr];
 
     base_pointer_map.erase(ptr);
-
-    return base;
 }
 
 } // namespace umpire

@@ -7,6 +7,7 @@
 #ifndef UMPIRE_aligned_allocation_HPP
 #define UMPIRE_aligned_allocation_HPP
 
+#include <tuple>
 #include <unordered_map>
 
 namespace umpire {
@@ -46,10 +47,10 @@ public:
     /// \brief Return original address that was aligned by `align_create` and
     ///        delete the mapping previously established.
     //////////////////////////////////////////////////////////////////////////
-    void* align_destroy(void* ptr);
+    void align_destroy(void* ptr, std::size_t& orig_size, void*& orig_buf);
 
 private:
-    std::unordered_map<void*, void*> base_pointer_map;
+    std::unordered_map< void*, std::tuple<std::size_t, void*> > base_pointer_map;
     std::size_t m_alignment;
     std::size_t m_mask;
 };
