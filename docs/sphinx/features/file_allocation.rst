@@ -5,7 +5,7 @@ Using File System Allocator (FILE)
 ==================================
 
 Umpire supports the use of file based memory allocation. When ``ENABLE_FILE_RESOURCE`` 
-is enabled, the environment variables ``UMPIRE_MEMORY_FILE_DIR``can be used to determine 
+is enabled, the environment variables ``UMPIRE_MEMORY_FILE_DIR`` can be used to determine 
 where memory can be allocated from:
 
 .. list-table::
