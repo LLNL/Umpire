@@ -12,4 +12,3 @@ Features
   features/operations
   features/logging_and_replay
   features/file_output
-  features/file_allocation
