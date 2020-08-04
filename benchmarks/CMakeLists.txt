@@ -57,10 +57,10 @@ if (ENABLE_OPENMP)
       ${benchmark_depends}
       openmp)
 
-blt_add_executable(
-  NAME file_resource_benchmarks
-  SOURCES file_resource_benchmarks.cpp
-  DEPENDS_ON ${benchmark_depends})
+  blt_add_executable(
+    NAME file_resource_benchmarks
+    SOURCES file_resource_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
 endif()
 
 blt_add_benchmark(

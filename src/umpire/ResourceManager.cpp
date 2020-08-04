@@ -119,7 +119,7 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
-#if defined(UMPIRE_ENABLE_FILE)
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
   registry.registerMemoryResource(
       util::make_unique<resource::FileMemoryResourceFactory>());
 #endif
@@ -253,7 +253,7 @@ ResourceManager::initialize()
     m_allocators.emplace_front(std::move(allocator));
   }
   
-#if defined(UMPIRE_ENABLE_FILE)
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
   {
     std::unique_ptr<strategy::AllocationStrategy>
       allocator{

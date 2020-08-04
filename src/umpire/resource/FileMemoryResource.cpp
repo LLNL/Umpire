@@ -69,15 +69,17 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   // Truncate file
   int trun{ftruncate64(fd, rounded_bytes)};
   if (trun == -1) { 
+    int errno_save = errno;
     remove(ss.str().c_str()); 
-    UMPIRE_ERROR("truncate64 Of File { " << ss.str() << " } Failed: " << strerror(errno)); 
+    UMPIRE_ERROR("truncate64 Of File { " << ss.str() << " } Failed: " << strerror(errno_save)); 
   }
 
   // Using mmap
   void* ptr{mmap(NULL, rounded_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
   if (ptr == MAP_FAILED) { 
+    int errno_save = errno;
     remove(ss.str().c_str()); 
-    UMPIRE_ERROR("mmap Of " << rounded_bytes << " To File { " << ss.str() << " } Failed: " << strerror(errno)); 
+    UMPIRE_ERROR("mmap Of " << rounded_bytes << " To File { " << ss.str() << " } Failed: " << strerror(errno_save)); 
   }
 
   // Storing Information On File

@@ -20,14 +20,14 @@ blt_add_test(
   COMMAND null_resource_tests)
   
 if(ENABLE_FILE_RESOURCE)
-blt_add_executable(
-  NAME file_resource_tests
-  SOURCES file_resource_tests.cpp
-  DEPENDS_ON umpire gtest)
+  blt_add_executable(
+    NAME file_resource_tests
+    SOURCES file_resource_tests.cpp
+    DEPENDS_ON umpire gtest)
 
-blt_add_test(
-  NAME file_resource_tests
-  COMMAND file_resource_tests)
+  blt_add_test(
+    NAME file_resource_tests
+    COMMAND file_resource_tests)
 endif()
 
 if (ENABLE_GMOCK)

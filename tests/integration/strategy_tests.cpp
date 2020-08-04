@@ -59,7 +59,7 @@ const char* AllocationDevices[] = {
 #if defined(UMPIRE_ENABLE_PINNED)
     , "PINNED"
 #endif
-#if defined(UMPIRE_ENABLE_FILE)
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
     , "FILE"
 #endif
 };
