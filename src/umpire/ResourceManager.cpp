@@ -502,7 +502,7 @@ ResourceManager::initialize()
   {
 #if defined(UMPIRE_ENABLE_HIP)
     // associate "DEVICE" allocator with "UM" name
-    auto allocator{m_memory_resources[resource::Device]};
+    auto allocator = m_memory_resources[resource::Device];
     m_allocators_by_name["UM"] = allocator;
     m_memory_resources[resource::Unified] = allocator;
 #else
