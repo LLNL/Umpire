@@ -28,7 +28,6 @@ namespace resource {
  * The return should be a pointer location. The same pointer location can be used for 
  * the deallocation. Deallocation uses munmap and removes the file associated with the 
  * pointer location. 
- * 
  */
 class FileMemoryResource :
   public MemoryResource
@@ -43,6 +42,7 @@ class FileMemoryResource :
     * \param traits Traits of this instance of the FileMemoryResource.
     */
     FileMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+    
     /*!
     * \brief Dallocates and removes all files created by the code meant for allocations
     */
@@ -69,6 +69,7 @@ class FileMemoryResource :
     * type if needed.
     */
     void* allocate(std::size_t bytes);
+    
     /*!
     * \brief Deallocates file connected to the pointer
     * 
@@ -89,6 +90,7 @@ class FileMemoryResource :
     Platform m_platform;
 
   private:
+    
     /*!
      * \brief Creates a map of the pointers used in the allocation
      *
