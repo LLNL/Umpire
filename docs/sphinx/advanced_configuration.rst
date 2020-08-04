@@ -52,8 +52,9 @@ These arguments are explained in more detail below:
   option, which may be used to locate the allocation to a specific node.
 
 * ``ENABLE_FILE_RESOURCE``
-  This option will allow the build to make all File Memory Allocation files. If Umpire is built without FILE, CUDA or HIP support,
-  then only the ``HOST`` allocator is available for use.
+  This option will allow the build to make all File Memory Allocation files. 
+  If Umpire is built without FILE, CUDA or HIP support, then only the ``HOST`` 
+  allocator is available for use.
 
 * ``ENABLE_STATISTICS``
   This option enables collection of memory statistics. If Umpire is built with
