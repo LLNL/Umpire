@@ -22,14 +22,18 @@ inline std::size_t AlignedAllocation::round_up(std::size_t size)
 
 inline void AlignedAllocation::align_create(std::size_t& size, void*& ptr)
 {
-    void* base_ptr{ptr};
+    void* buffer{ptr};
     std::size_t buffer_size{size};
 
-    void* aligned_ptr{(void*)((uintptr_t)((char*)(ptr) + (m_alignment - 1)) & (uintptr_t)m_mask) };
+    uintptr_t alignment{ m_alignment - 1 };
+    uintptr_t mask{ m_mask };
+    uintptr_t cptr{ reinterpret_cast<uintptr_t>(ptr) };
 
-    std::size_t aligned_size{buffer_size - (reinterpret_cast<char*>(aligned_ptr) - reinterpret_cast<char*>(base_ptr))};
+    void *aligned_ptr{ reinterpret_cast<void*>((cptr + alignment) & mask) };
 
-    base_pointer_map[aligned_ptr] = std::make_tuple(size, base_ptr);
+    std::size_t aligned_size{buffer_size - (reinterpret_cast<char*>(aligned_ptr) - reinterpret_cast<char*>(buffer))};
+
+    base_pointer_map[aligned_ptr] = std::make_tuple(size, buffer);
 
     size = aligned_size;
     ptr = aligned_ptr;
