@@ -95,7 +95,7 @@ protected:
           << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      data = m_allocator->allocate(size);
+      data = m_aligned_alloc.allocate(size);
     }
     catch (...) {
       UMPIRE_LOG(Error,
@@ -112,7 +112,7 @@ protected:
           << getInUseBlocks() << " Used Blocks\n"
       );
       try {
-        data = m_allocator->allocate(size);
+        data = m_aligned_alloc.allocate(size);
         UMPIRE_LOG(Error,
           "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
@@ -132,8 +132,6 @@ protected:
 
     totalBlocks += 1;
     m_actual_bytes += size;
-
-    m_aligned_alloc.align_create(size, data);
 
     // Allocate the block
     curr = (struct Block *) blockPool.allocate();
@@ -231,16 +229,10 @@ protected:
       //
       if ( curr->size == curr->blockSize ) {
         totalBlocks -= 1;
-
-        std::size_t original_size;
-        void* original_base_ptr;
-
-        m_aligned_alloc.align_destroy(curr->data, original_size, original_base_ptr);
-
-        UMPIRE_POISON_MEMORY_REGION(m_allocator, original_base_ptr, original_size);
-        m_actual_bytes -= original_size;
-        freed += original_size;
-        m_allocator->deallocate(original_base_ptr);
+        UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
+        m_actual_bytes -= curr->size;
+        freed += curr->size;
+        m_aligned_alloc.deallocate(curr->data);
 
         if ( prev )   prev->next = curr->next;
         else          freeBlocks = curr->next;
@@ -293,9 +285,9 @@ public:
       const std::size_t min_alloc_size = 256,
       const std::size_t alignment = 16) :
     m_allocator(strat),
-    m_aligned_alloc{alignment},
-    m_initial_alloc_size{ m_aligned_alloc.round_up(initial_alloc_size) },
-    m_min_alloc_size{ m_aligned_alloc.round_up(min_alloc_size) }
+    m_aligned_alloc{alignment, m_allocator},
+    m_initial_alloc_size{ m_aligned_alloc.round_up_to_alignment(initial_alloc_size) },
+    m_min_alloc_size{ m_aligned_alloc.round_up_to_alignment(min_alloc_size) }
   {
   }
 
@@ -306,7 +298,7 @@ public:
 
   void *allocate(std::size_t size)
   {
-    size = m_aligned_alloc.round_up(size);
+    size = m_aligned_alloc.round_up_to_alignment(size);
 
     struct Block *best{nullptr}, *prev{nullptr};
 

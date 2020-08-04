@@ -35,9 +35,9 @@ DynamicPoolMap::DynamicPoolMap(
   AllocationStrategy{name, id},
   m_allocator{ allocator.getAllocationStrategy() },
   m_should_coalesce{ coalesce_heuristic },
-  m_aligned_alloc{ alignment },
-  m_initial_alloc_bytes{ m_aligned_alloc.round_up(initial_alloc_bytes) },
-  m_min_alloc_bytes{ m_aligned_alloc.round_up(min_alloc_bytes) }
+  m_aligned_alloc{ alignment, m_allocator },
+  m_initial_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(initial_alloc_bytes) },
+  m_min_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(min_alloc_bytes) }
 {
   std::size_t bytes{ m_initial_alloc_bytes };
 #if defined(UMPIRE_ENABLE_BACKTRACE)
@@ -47,11 +47,9 @@ DynamicPoolMap::DynamicPoolMap(
     UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
   }
 #endif
-  void* ptr = m_allocator->allocate(bytes);
+  void* ptr = m_aligned_alloc.allocate(bytes);
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
   m_actual_bytes += bytes;
-
-  m_aligned_alloc.align_create(bytes, ptr);
 
   insertFree(ptr, bytes, true, bytes);
 }
@@ -70,7 +68,7 @@ DynamicPoolMap::~DynamicPoolMap()
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
     if (is_head && bytes == whole_bytes) {
-      (void)deallocateBlock(addr);
+      deallocateBlock(addr, bytes);
     }
   }
 
@@ -124,7 +122,7 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
         << umpire::util::backtracer<>::print(bt));
     }
 #endif
-    ptr = m_allocator->allocate(bytes);
+    ptr = m_aligned_alloc.allocate(bytes);
   } catch (...) {
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource. "
@@ -141,7 +139,7 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
                << getInUseBlocks() << " Used Blocks\n"
       );
     try {
-      ptr = m_allocator->allocate(bytes);
+      ptr = m_aligned_alloc.allocate(bytes);
       UMPIRE_LOG(Error,
                  "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
@@ -161,27 +159,19 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 
   m_actual_bytes += bytes;
 
-  m_aligned_alloc.align_create(bytes, ptr);
-
   return ptr;
 }
 
-std::size_t DynamicPool::deallocateBlock(void* ptr)
+void DynamicPool::deallocateBlock(void* ptr, std::size_t size)
 {
-  std::size_t original_size;
-  void* original_base_ptr;
-
-  m_aligned_alloc.align_destroy(ptr, original_size, original_base_ptr);
-
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, original_base_ptr, original_size);
-  m_actual_bytes -= original_size;
-  m_allocator->deallocate(original_base_ptr);
-  return original_size;
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, size);
+  m_actual_bytes -= size;
+  m_aligned_alloc.deallocate(ptr);
 }
 
 void* DynamicPool::allocate(std::size_t bytes)
 {
-  bytes = m_aligned_alloc.round_up(bytes);
+  bytes = m_aligned_alloc.round_up_to_alignment(bytes);
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
   Pointer ptr{nullptr};
@@ -215,18 +205,16 @@ void* DynamicPool::allocate(std::size_t bytes)
     const std::size_t alloc_bytes{std::max(bytes, min_block_size)};
     ptr = allocateBlock(alloc_bytes);
 
-    std::size_t aligned_size{alloc_bytes};
-    m_aligned_alloc.align_create(aligned_size, ptr);
-    UMPIRE_ASSERT("bytes too large" && bytes <= aligned_size);
+    UMPIRE_ASSERT("bytes too large" && bytes <= alloc_bytes);
 
-    insertUsed(ptr, bytes, true, aligned_size);
+    insertUsed(ptr, bytes, true, alloc_bytes);
 
-    const std::size_t left_bytes{aligned_size - bytes};
+    const std::size_t left_bytes{alloc_bytes - bytes};
 
     // Add free
     if (left_bytes > 0)
       insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes,
-                 false, aligned_size);
+                 false, alloc_bytes);
   }
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
@@ -410,7 +398,8 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
     std::size_t whole_bytes;
     std::tie(ptr, is_head, whole_bytes) = it->second;
     if (is_head && bytes == whole_bytes) {
-      released_bytes += deallocateBlock(ptr);
+      released_bytes += bytes;
+      deallocateBlock(ptr, bytes);
       it = m_free_map.erase(it);
     } else {
       ++it;
@@ -465,10 +454,7 @@ void DynamicPoolMap::do_coalesce()
     // If this removed anything from the map, re-allocate a single large chunk and insert to free map
     if (released_bytes > 0) {
       Pointer ptr{allocateBlock(released_bytes)};
-      std::size_t aligned_size{released_bytes};
-      m_aligned_alloc.align_create(aligned_size, ptr);
-
-      insertFree(ptr, aligned_size, true, aligned_size);
+      insertFree(ptr, released_bytes, true, released_bytes);
     }
   }
 }

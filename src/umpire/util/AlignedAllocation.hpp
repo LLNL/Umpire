@@ -7,7 +7,8 @@
 #ifndef UMPIRE_aligned_allocation_HPP
 #define UMPIRE_aligned_allocation_HPP
 
-#include <tuple>
+#include "umpire/strategy/AllocationStrategy.hpp"
+
 #include <unordered_map>
 
 namespace umpire {
@@ -16,7 +17,7 @@ namespace util {
 class AlignedAllocation {
 public:
     AlignedAllocation() = delete;
-    AlignedAllocation(std::size_t alignment);
+    AlignedAllocation(std::size_t alignment, strategy::AllocationStrategy* strategy);
 
     //////////////////////////////////////////////////////////////////////////
     /// \brief Round up the size to be an integral multple of configured
@@ -25,33 +26,23 @@ public:
     /// \returns Size rounded up to be integral multiple of configured
     ///          alignment
     //////////////////////////////////////////////////////////////////////////
-    std::size_t round_up(std::size_t size);
+    std::size_t round_up_to_alignment(std::size_t size);
 
     //////////////////////////////////////////////////////////////////////////
-    /// \brief Adjust given pointer `ptr` and `size` to storage that is
-    ///        aligned to the configured `alignment` number of bytes
-    ///
-    /// This function will also establish a mapping between the base buffer
-    /// address and the aligned address (see: `align_destroy`)
-    ///
-    /// \param size Input:  size of buffer.
-    ///             Output: the actual size of storage after alignment
-    /// \param ptr Input: pointer to contiguous storage of at least `size`
-    ///                   bytes
-    ///            Output: pointer that is aligned by the configured
-    ///                    alignment number of bytes.
+    /// \brief Return an allocation of `size` bytes that is aligned on the
+    ///        configured alignment boundary.
     //////////////////////////////////////////////////////////////////////////
-    void align_create(std::size_t& size, void*& ptr);
+    void* allocate(const std::size_t size);
 
     //////////////////////////////////////////////////////////////////////////
-    /// \brief Return original address that was aligned by `align_create` and
-    ///        delete the mapping previously established.
+    /// \brief Deallocate previously alligned allocation
     //////////////////////////////////////////////////////////////////////////
-    void align_destroy(void* ptr, std::size_t& orig_size, void*& orig_buf);
+    void deallocate(void* ptr);
 
 private:
-    std::unordered_map< void*, std::tuple<std::size_t, void*> > base_pointer_map;
+    std::unordered_map<void*, void*> base_pointer_map;
     std::size_t m_alignment;
+    strategy::AllocationStrategy* m_allocator;
     std::size_t m_mask;
 };
 

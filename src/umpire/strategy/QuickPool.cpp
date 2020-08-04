@@ -27,9 +27,9 @@ QuickPool::QuickPool(
   AllocationStrategy{name, id},
   m_allocator{allocator.getAllocationStrategy()},
   m_should_coalesce{coalesce_heuristic},
-  m_aligned_alloc{alignment},
-  m_initial_alloc_bytes{ m_aligned_alloc.round_up(initial_alloc_size) },
-  m_min_alloc_bytes{ m_aligned_alloc.round_up(min_alloc_size) }
+  m_aligned_alloc{alignment, m_allocator},
+  m_initial_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(initial_alloc_size) },
+  m_min_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(min_alloc_size) }
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
@@ -41,17 +41,14 @@ QuickPool::QuickPool(
   }
 #endif
 
-  void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
+  void* ptr{m_aligned_alloc.allocate(m_initial_alloc_bytes)};
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
 
   m_actual_bytes += m_initial_alloc_bytes;
   m_releasable_bytes += m_initial_alloc_bytes;
 
   void* chunk_storage{m_chunk_pool.allocate()};
-  std::size_t aligned_size{m_initial_alloc_bytes};
-  m_aligned_alloc.align_create(aligned_size, ptr);
-
-  Chunk* chunk{new (chunk_storage) Chunk(ptr, aligned_size, aligned_size)};
+  Chunk* chunk{new (chunk_storage) Chunk(ptr, m_initial_alloc_bytes, m_initial_alloc_bytes)};
   chunk->size_map_it = m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
 }
 
@@ -63,7 +60,7 @@ void*
 QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
-  bytes = m_aligned_alloc.round_up(bytes);
+  bytes = m_aligned_alloc.round_up_to_alignment(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
 
@@ -84,12 +81,12 @@ QuickPool::allocate(std::size_t bytes)
           << ") " << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = m_allocator->allocate(size);
+      ret = m_aligned_alloc.allocate(size);
     } catch (...) {
       UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
       release();
       try {
-        ret = m_allocator->allocate(size);
+        ret = m_aligned_alloc.allocate(size);
         UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
         UMPIRE_LOG(Error, "recovery failed.");
@@ -100,12 +97,9 @@ QuickPool::allocate(std::size_t bytes)
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ret, size);
     m_actual_bytes += size;
     m_releasable_bytes += size;
+
     void* chunk_storage{m_chunk_pool.allocate()};
-
-    std::size_t aligned_size{size};
-    m_aligned_alloc.align_create(aligned_size, ret);
-
-    chunk = new (chunk_storage) Chunk{ret, aligned_size, aligned_size};
+    chunk = new (chunk_storage) Chunk{ret, size, size};
   } else {
     chunk = (*best).second;
     m_size_map.erase(best);
@@ -229,13 +223,9 @@ void QuickPool::release()
         && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
-      std::size_t original_size;
-      void* original_base_ptr;
-      m_aligned_alloc.align_destroy(chunk->data, original_size, original_base_ptr);
-
-      UMPIRE_POISON_MEMORY_REGION(m_allocator, original_base_ptr, original_size);
-      m_actual_bytes -= original_size;
-      m_allocator->deallocate(original_base_ptr);
+      UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
+      m_actual_bytes -= chunk->chunk_size;
+      m_aligned_alloc.deallocate(chunk->data);
 
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);

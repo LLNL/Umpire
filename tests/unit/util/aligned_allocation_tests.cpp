@@ -12,6 +12,8 @@
 
 TEST(AligndAllocation, Alignment)
 {
+#ifdef need_a_good_alignment_tester
+  // This also belongs in the pool tests
   const std::size_t bufsize{512};
   const std::size_t alignment{128};
   umpire::util::AlignedAllocation align{alignment};
@@ -42,4 +44,5 @@ TEST(AligndAllocation, Alignment)
         << std::endl;
     }
   }
+#endif // need_a_good_alignment_tester
 }

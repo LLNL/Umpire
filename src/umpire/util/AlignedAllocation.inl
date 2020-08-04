@@ -8,42 +8,36 @@
 #define UMPIRE_aligned_allocation_INL
 
 #include "umpire/util/allocation_statistics.hpp"
+#include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/util/Macros.hpp"
-
-#include <tuple>
 
 namespace umpire {
 namespace util {
 
-inline std::size_t AlignedAllocation::round_up(std::size_t size)
+inline std::size_t AlignedAllocation::round_up_to_alignment(std::size_t size)
 {
     return size + (m_alignment - 1) - (size - 1) % m_alignment;
 }
 
-inline void AlignedAllocation::align_create(std::size_t& size, void*& ptr)
+inline void* AlignedAllocation::allocate(std::size_t size)
 {
-    void* buffer{ptr};
-    std::size_t buffer_size{size};
+    std::size_t total_bytes{ size + m_alignment - 1 };
+    uintptr_t ptr{ reinterpret_cast<uintptr_t>(m_allocator->allocate(total_bytes)) };
 
     uintptr_t alignment{ m_alignment - 1 };
     uintptr_t mask{ m_mask };
-    uintptr_t cptr{ reinterpret_cast<uintptr_t>(ptr) };
+    void *aligned_ptr{ reinterpret_cast<void*>( (ptr + alignment) & mask ) };
 
-    void *aligned_ptr{ reinterpret_cast<void*>((cptr + alignment) & mask) };
+    base_pointer_map[aligned_ptr] = reinterpret_cast<void*>(ptr);
 
-    std::size_t aligned_size{buffer_size - (reinterpret_cast<char*>(aligned_ptr) - reinterpret_cast<char*>(buffer))};
-
-    base_pointer_map[aligned_ptr] = std::make_tuple(size, buffer);
-
-    size = aligned_size;
-    ptr = aligned_ptr;
+    return aligned_ptr;
 }
 
-inline void AlignedAllocation::align_destroy(void* ptr, std::size_t& osize, void*& obuffer)
+inline void AlignedAllocation::deallocate(void* ptr)
 {
-    std::tie(osize, obuffer) = base_pointer_map[ptr];
-
+    void* buffer{ base_pointer_map[ptr] };
     base_pointer_map.erase(ptr);
+    m_allocator->deallocate(buffer);
 }
 
 } // namespace umpire

@@ -139,7 +139,7 @@ class DynamicPoolMap : public AllocationStrategy
     /*!
      * \brief Deallocate from m_allocator.
      */
-    std::size_t deallocateBlock(void* ptr);
+    void deallocateBlock(void* ptr, std::size_t size);
 
     /*!
      * \brief Insert a block to the used map.
