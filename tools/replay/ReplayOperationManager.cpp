@@ -32,7 +32,7 @@
 #define getpid _getpid
 #endif
 
-ReplayOperationManager::ReplayOperationManager( ReplayFile::Header* Operations ) 
+ReplayOperationManager::ReplayOperationManager( ReplayFile::Header* Operations )
   : m_ops_table{Operations}
 {
 }
@@ -333,7 +333,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
         std::string cur_stat_name{alloc_name + " current_size"};
         std::string actual_stat_name{alloc_name + " actual_size"};
         std::string hwm_stat_name{alloc_name + " hwm"};
-        
+
         m_stat_series[cur_stat_name].push_back(
             std::make_pair(
               op_counter,
@@ -520,7 +520,31 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     break;
 
   case ReplayFile::rtype::QUICKPOOL:
-    if (alloc->argc >= 3) {
+    if (alloc->argc >= 4) {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+              , alloc->argv.pool.alignment
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+              , alloc->argv.pool.alignment
+            )
+        );
+      }
+    }
+    else if (alloc->argc == 3) {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::QuickPool, true>
@@ -583,7 +607,31 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     break;
 
   case ReplayFile::rtype::DYNAMIC_POOL_LIST:
-    if (alloc->argc >= 3) {
+    if (alloc->argc >= 4) {
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.dynamic_pool_list.min_alloc_size
+              , alloc->argv.dynamic_pool_list.alignment
+            )
+        );
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.dynamic_pool_list.min_alloc_size
+              , alloc->argv.dynamic_pool_list.alignment
+            )
+        );
+      }
+    }
+    else if (alloc->argc == 3) {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
@@ -1153,7 +1201,7 @@ void ReplayOperationManager::dumpStats()
       std::size_t val;
       std::tie(t, val) = entry;
 
-      file 
+      file
         <<  t
         << " " << val << std::endl;
     }
