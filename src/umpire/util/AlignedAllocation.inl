@@ -25,9 +25,7 @@ inline void AlignedAllocation::align_create(std::size_t& size, void*& ptr)
     void* base_ptr{ptr};
     std::size_t buffer_size{size};
 
-    void* aligned_ptr{
-        reinterpret_cast<void*>(
-            reinterpret_cast<uintptr_t>(reinterpret_cast<char*>(ptr) + (m_alignment - 1)) & reinterpret_cast<uintptr_t>(m_mask) ) };
+    void* aligned_ptr{(void*)((uintptr_t)((char*)(ptr) + (m_alignment - 1)) & (uintptr_t)m_mask) };
 
     std::size_t aligned_size{buffer_size - (reinterpret_cast<char*>(aligned_ptr) - reinterpret_cast<char*>(base_ptr))};
 
