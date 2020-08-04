@@ -92,7 +92,7 @@ class Umpire(CMakePackage, CudaPackage):
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
 
-    phases = ['hostconfig', 'cmake', 'build',' install']
+    phases = ['hostconfig', 'cmake', 'build', 'install']
 
     def _get_sys_type(self, spec):
         sys_type = str(spec.architecture)
