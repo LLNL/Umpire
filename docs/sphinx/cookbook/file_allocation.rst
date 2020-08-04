@@ -40,7 +40,7 @@ On Lassen, 1) Download the latest version of Umpire 2) request a private node to
   $ git clone --recursive https://github.com/LLNL/Umpire.git
   $ lalloc 1 -stage storage=64
 
-3) In order to use the Burst Buffers, the envirometnal Variable needs to set to ``$BBPATH`` :
+3) In order to use the Burst Buffers, the environment variable needs to set to ``$BBPATH`` :
 
 .. code-block:: bash
 
