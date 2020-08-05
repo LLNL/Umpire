@@ -13,6 +13,7 @@
 
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/util/Macros.hpp"
 
 template <typename Resource>
 class ResourceTest :
