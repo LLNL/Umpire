@@ -12,6 +12,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added ASAN memory sanitization to QuickPool
 - Added File Memory Allocator
+- Added alignment option to QuickPool and DynamicPoolList
 
 ### Changed
 
