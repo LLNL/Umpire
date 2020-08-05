@@ -16,6 +16,14 @@ set (umpire_resource_headers
   NullMemoryResourceFactory.hpp
 )
 
+if(ENABLE_FILE_RESOURCE)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    FileMemoryResource.hpp
+    FileMemoryResourceFactory.hpp
+  )
+endif()
+
 set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
@@ -23,6 +31,14 @@ set (umpire_resource_sources
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
 )
+
+if(ENABLE_FILE_RESOURCE)
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    FileMemoryResource.cpp
+    FileMemoryResourceFactory.cpp
+  )
+endif()
 
 set(umpire_resource_depends
   camp)

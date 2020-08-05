@@ -14,24 +14,25 @@ argument is a boolean option, and  can be turned on or off:
 
 Here is a summary of the configuration options, their default value, and meaning:
 
-      ===========================  ======== ===============================================================================
-      Variable                     Default  Meaning
-      ===========================  ======== ===============================================================================
-      ``ENABLE_CUDA``              Off      Enable CUDA support
-      ``ENABLE_HIP``               Off      Enable HIP support
-      ``ENABLE_NUMA``              Off      Enable NUMA support
-      ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
-      ``ENABLE_TESTING``           On       Build test executables
-      ``ENABLE_BENCHMARKS``        On       Build benchmark programs
-      ``ENABLE_LOGGING``           On       Enable Logging within Umpire
-      ``ENABLE_SLIC``              Off      Enable SLIC logging
-      ``ENABLE_BACKTRACE``         Off      Enable backtraces for allocations
-      ``ENABLE_BACKTRACE_SYMBOLS`` Off      Enable symbol lookup for backtraces
-      ``ENABLE_TOOLS``             Off      Enable tools like replay
-      ``ENABLE_DOCS``              Off      Build documentation (requires Sphinx and/or Doxygen)
-      ``ENABLE_C``                 Off      Build the C API
-      ``ENABLE_FORTRAN``           Off      Build the Fortran API
-      ===========================  ======== ===============================================================================
+    ============================  ======== ===========================================================================
+    Variable                      Default  Meaning
+    ============================  ======== ===========================================================================
+    ``ENABLE_CUDA``               Off      Enable CUDA support
+    ``ENABLE_HIP``                Off      Enable HIP support
+    ``ENABLE_NUMA``               Off      Enable NUMA support
+    ``ENABLE_FILE_RESOURCE``      Off      Enable FILE support      
+    ``ENABLE_STATISTICS``         Off      Enable collection of memory statistics
+    ``ENABLE_TESTING``            On       Build test executables
+    ``ENABLE_BENCHMARKS``         On       Build benchmark programs
+    ``ENABLE_LOGGING``            On       Enable Logging within Umpire
+    ``ENABLE_SLIC``               Off      Enable SLIC logging
+    ``ENABLE_BACKTRACE``          Off      Enable backtraces for allocations
+    ``ENABLE_BACKTRACE_SYMBOLS``  Off      Enable symbol lookup for backtraces
+    ``ENABLE_TOOLS``              Off      Enable tools like replay
+    ``ENABLE_DOCS``               Off      Build documentation (requires Sphinx and/or Doxygen)
+    ``ENABLE_C``                  Off      Build the C API
+    ``ENABLE_FORTRAN``            Off      Build the Fortran API
+    ============================  ======== ===========================================================================
 
 These arguments are explained in more detail below:
 
@@ -49,6 +50,11 @@ These arguments are explained in more detail below:
   This option enables support for NUMA. The
   :class:`umpire::strategy::NumaPolicy` is available when built with this
   option, which may be used to locate the allocation to a specific node.
+
+* ``ENABLE_FILE_RESOURCE``
+  This option will allow the build to make all File Memory Allocation files. 
+  If Umpire is built without FILE, CUDA or HIP support, then only the ``HOST`` 
+  allocator is available for use.
 
 * ``ENABLE_STATISTICS``
   This option enables collection of memory statistics. If Umpire is built with

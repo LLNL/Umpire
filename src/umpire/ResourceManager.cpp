@@ -14,6 +14,10 @@
 
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
 
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
+#include "umpire/resource/FileMemoryResourceFactory.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -114,6 +118,11 @@ ResourceManager::ResourceManager() :
 
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
+
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
+  registry.registerMemoryResource(
+      util::make_unique<resource::FileMemoryResourceFactory>());
+#endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
@@ -243,6 +252,22 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
+  
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
+  {
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("FILE", getNextId()))};
+
+    int id{allocator->getId()};
+    m_allocators_by_name["FILE"]  = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
+#endif
 
   int device_count{0};
   UMPIRE_USE_VAR(device_count);
