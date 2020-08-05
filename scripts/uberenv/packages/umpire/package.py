@@ -58,6 +58,7 @@ class Umpire(CMakePackage, CudaPackage):
 
     version('develop', branch='develop', submodules='True')
     version('master', branch='master', submodules='True')
+    version('3.0.0', tag='v3.0.0', submodules='True')
     version('2.1.0', tag='v2.1.0', submodules='True')
     version('2.0.0', tag='v2.0.0', submodules='True')
     version('1.1.0', tag='v1.1.0', submodules='True')
