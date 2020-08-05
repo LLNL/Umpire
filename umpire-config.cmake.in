@@ -7,6 +7,11 @@
 get_filename_component(UMPIRE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 set(UMPIRE_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
 
+if (NOT DEFINED camp_DIR)
+  set(camp_DIR @CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
+endif ()
+find_package(camp REQUIRED)
+
 set(Umpire_VERSION_MAJOR  @Umpire_VERSION_MAJOR@)
 set(Umpire_VERSION_MINOR @Umpire_VERSION_MINOR@)
 set(Umpire_VERSION_PATCH @Umpire_VERSION_PATCH@)
