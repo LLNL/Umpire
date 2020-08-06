@@ -90,7 +90,7 @@ protected:
           << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      data = allocate_aligned(size);
+      data = aligned_allocate(size);
     }
     catch (...) {
       UMPIRE_LOG(Error,
@@ -107,7 +107,7 @@ protected:
           << getInUseBlocks() << " Used Blocks\n"
       );
       try {
-        data = allocate_aligned(size);
+        data = aligned_allocate(size);
         UMPIRE_LOG(Error,
           "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
@@ -227,7 +227,7 @@ protected:
         UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
         m_actual_bytes -= curr->size;
         freed += curr->size;
-        deallocate_aligned(curr->data);
+        aligned_deallocate(curr->data);
 
         if ( prev )   prev->next = curr->next;
         else          freeBlocks = curr->next;
@@ -280,8 +280,8 @@ public:
       const std::size_t min_alloc_size = 256,
       const std::size_t alignment = 16) :
     umpire::strategy::mixins::AlignedAllocation{alignment, strat},
-    m_initial_alloc_size{ round_up_to_alignment(initial_alloc_size) },
-    m_min_alloc_size{ round_up_to_alignment(min_alloc_size) }
+    m_initial_alloc_size{ aligned_round_up(initial_alloc_size) },
+    m_min_alloc_size{ aligned_round_up(min_alloc_size) }
   {
   }
 
@@ -292,7 +292,7 @@ public:
 
   void *allocate(std::size_t size)
   {
-    size = round_up_to_alignment(size);
+    size = aligned_round_up(size);
 
     struct Block *best{nullptr}, *prev{nullptr};
 

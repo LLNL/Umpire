@@ -15,12 +15,12 @@ namespace umpire {
 namespace strategy {
 namespace mixins {
 
-inline std::size_t AlignedAllocation::round_up_to_alignment(std::size_t size)
+inline std::size_t AlignedAllocation::aligned_round_up(std::size_t size)
 {
     return size + (m_alignment - 1) - (size - 1) % m_alignment;
 }
 
-inline void* AlignedAllocation::allocate_aligned(std::size_t size)
+inline void* AlignedAllocation::aligned_allocate(std::size_t size)
 {
     std::size_t total_bytes{ size + m_alignment - 1 };
     uintptr_t ptr{ reinterpret_cast<uintptr_t>(m_allocator->allocate(total_bytes)) };
@@ -34,7 +34,7 @@ inline void* AlignedAllocation::allocate_aligned(std::size_t size)
     return aligned_ptr;
 }
 
-inline void AlignedAllocation::deallocate_aligned(void* ptr)
+inline void AlignedAllocation::aligned_deallocate(void* ptr)
 {
     void* buffer{ base_pointer_map[ptr] };
     base_pointer_map.erase(ptr);

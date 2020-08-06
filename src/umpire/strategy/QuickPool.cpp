@@ -27,8 +27,8 @@ QuickPool::QuickPool(
   AllocationStrategy{name, id},
   mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
   m_should_coalesce{coalesce_heuristic},
-  m_initial_alloc_bytes{ round_up_to_alignment(initial_alloc_size) },
-  m_min_alloc_bytes{ round_up_to_alignment(min_alloc_size) }
+  m_initial_alloc_bytes{ aligned_round_up(initial_alloc_size) },
+  m_min_alloc_bytes{ aligned_round_up(min_alloc_size) }
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
@@ -40,7 +40,7 @@ QuickPool::QuickPool(
   }
 #endif
 
-  void* ptr{allocate_aligned(m_initial_alloc_bytes)};
+  void* ptr{aligned_allocate(m_initial_alloc_bytes)};
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
 
   m_actual_bytes += m_initial_alloc_bytes;
@@ -59,7 +59,7 @@ void*
 QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
-  bytes = round_up_to_alignment(bytes);
+  bytes = aligned_round_up(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
 
@@ -80,12 +80,12 @@ QuickPool::allocate(std::size_t bytes)
           << ") " << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = allocate_aligned(size);
+      ret = aligned_allocate(size);
     } catch (...) {
       UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
       release();
       try {
-        ret = allocate_aligned(size);
+        ret = aligned_allocate(size);
         UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
         UMPIRE_LOG(Error, "recovery failed.");
@@ -224,7 +224,7 @@ void QuickPool::release()
 
       UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
       m_actual_bytes -= chunk->chunk_size;
-      deallocate_aligned(chunk->data);
+      aligned_deallocate(chunk->data);
 
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);

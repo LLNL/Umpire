@@ -13,8 +13,8 @@ namespace mixins {
 AlignedAllocation::AlignedAllocation(
   std::size_t alignment,
   strategy::AllocationStrategy* strategy)
-    : m_alignment{ alignment },
-      m_allocator{ strategy },
+    : m_allocator{ strategy },
+      m_alignment{ alignment },
       m_mask{ static_cast<uintptr_t>( ~(m_alignment-1)) }
 {
 }

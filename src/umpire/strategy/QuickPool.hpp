@@ -45,7 +45,7 @@ class QuickPool :
      * \param allocator Allocation resource that pool uses
      * \param initial_alloc_size Size the pool initially allocates
      * \param min_alloc_size The minimum size of all future allocations
-     * \param align_bytes Number of bytes with which to align allocation sizes (power-of-2)
+     * \param alignment Number of bytes with which to align allocation sizes (power-of-2)
      * \param coalesce_heuristic Heuristic for when to perform coalesce operation
      */
     QuickPool(

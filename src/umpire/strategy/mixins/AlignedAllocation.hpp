@@ -27,23 +27,25 @@ public:
     /// \returns Size rounded up to be integral multiple of configured
     ///          alignment
     //////////////////////////////////////////////////////////////////////////
-    std::size_t round_up_to_alignment(std::size_t size);
+    std::size_t aligned_round_up(std::size_t size);
 
     //////////////////////////////////////////////////////////////////////////
     /// \brief Return an allocation of `size` bytes that is aligned on the
     ///        configured alignment boundary.
     //////////////////////////////////////////////////////////////////////////
-    void* allocate_aligned(const std::size_t size);
+    void* aligned_allocate(const std::size_t size);
 
     //////////////////////////////////////////////////////////////////////////
     /// \brief Deallocate previously alligned allocation
     //////////////////////////////////////////////////////////////////////////
-    void deallocate_aligned(void* ptr);
+    void aligned_deallocate(void* ptr);
 
 protected:
+    strategy::AllocationStrategy* m_allocator;
+
+private:
     std::unordered_map<void*, void*> base_pointer_map;
     std::size_t m_alignment;
-    strategy::AllocationStrategy* m_allocator;
     std::size_t m_mask;
 };
 
