@@ -22,4 +22,11 @@ jobs:
             echo "CHANGELOG.md was changed, passing!"
             exit 0
         fi
+  abiDiff:
+    name: ABI Compatibility Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./.github/actions/abi-compat
+
 
