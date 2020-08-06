@@ -99,22 +99,18 @@ add_subdirectory(judy)
 if (NOT TARGET camp)
   if (DEFINED camp_DIR)
     find_package(camp REQUIRED)
-
-    blt_register_library(
-      NAME camp
-      INCLUDES ${CAMP_INCLUDE_DIRS}
-      LIBRARIES camp)
+    set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
     add_subdirectory(camp)
   endif()
 
   if(ENABLE_CUDA)
-    blt_register_library(
-      NAME camp
-      DEPENDS_ON cuda_runtime
-      LIBRARIES camp
-      DEFINES CAMP_HAVE_CUDA)
+    blt_add_target_definitions(
+      TO camp
+      SCOPE INTERFACE
+      TARGET_DEFINITIONS CAMP_HAVE_CUDA)
   endif()
+
 endif ()
 
 set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
