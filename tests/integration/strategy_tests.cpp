@@ -309,45 +309,6 @@ class DynamicPoolTest :
     std::stringstream poolName;
 };
 
-TEST_P(DynamicPoolTest, Allocate) {
-  void* alloc = nullptr;
-  alloc = allocator->allocate(100);
-  allocator->deallocate(alloc);
-}
-
-TEST_P(DynamicPoolTest, Sizes) {
-  void* alloc = nullptr;
-  ASSERT_NO_THROW({ alloc = allocator->allocate(100); });
-  ASSERT_EQ(allocator->getSize(alloc), 100);
-  ASSERT_GE(allocator->getCurrentSize(), 100);
-  ASSERT_EQ(allocator->getHighWatermark(), 100);
-  ASSERT_GE(allocator->getActualSize(), initial_size);
-
-  void* alloc2 = nullptr;
-  ASSERT_NO_THROW({ alloc2 = allocator->allocate(initial_size); });
-  ASSERT_NO_THROW({ allocator->deallocate(alloc); });
-
-  ASSERT_GE(allocator->getCurrentSize(), initial_size);
-  ASSERT_EQ(allocator->getHighWatermark(), initial_size+100);
-  ASSERT_GE(allocator->getActualSize(), initial_size+subsequent_min_size);
-  ASSERT_EQ(allocator->getSize(alloc2), initial_size);
-
-  ASSERT_NO_THROW({ allocator->deallocate(alloc2); });
-}
-
-TEST_P(DynamicPoolTest, Duplicate)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  ASSERT_TRUE(rm.isAllocator(allocatorName));
-
-  ASSERT_EQ(allocator->getName(), poolName.str());
-
-  ASSERT_ANY_THROW(
-      rm.makeAllocator<umpire::strategy::DynamicPool>(
-        poolName.str(), rm.getAllocator(allocatorName)));
-}
-
 INSTANTIATE_TEST_SUITE_P(Allocations, DynamicPoolTest, ::testing::ValuesIn(AllocationDevices));
 
 class DynamicPoolListTest :
@@ -377,45 +338,6 @@ class DynamicPoolListTest :
     std::string allocatorName;
     std::stringstream poolName;
 };
-
-TEST_P(DynamicPoolListTest, Allocate) {
-  void* alloc = nullptr;
-  alloc = allocator->allocate(100);
-  allocator->deallocate(alloc);
-}
-
-TEST_P(DynamicPoolListTest, Sizes) {
-  void* alloc = nullptr;
-  ASSERT_NO_THROW({ alloc = allocator->allocate(100); });
-  ASSERT_EQ(allocator->getSize(alloc), 100);
-  ASSERT_GE(allocator->getCurrentSize(), 100);
-  ASSERT_EQ(allocator->getHighWatermark(), 100);
-  ASSERT_GE(allocator->getActualSize(), initial_size);
-
-  void* alloc2 = nullptr;
-  ASSERT_NO_THROW({ alloc2 = allocator->allocate(initial_size); });
-  ASSERT_NO_THROW({ allocator->deallocate(alloc); });
-
-  ASSERT_GE(allocator->getCurrentSize(), initial_size);
-  ASSERT_EQ(allocator->getHighWatermark(), initial_size+100);
-  ASSERT_GE(allocator->getActualSize(), initial_size+subsequent_min_size);
-  ASSERT_EQ(allocator->getSize(alloc2), initial_size);
-
-  ASSERT_NO_THROW({ allocator->deallocate(alloc2); });
-}
-
-TEST_P(DynamicPoolListTest, Duplicate)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  ASSERT_TRUE(rm.isAllocator(allocatorName));
-
-  ASSERT_EQ(allocator->getName(), poolName.str());
-
-  ASSERT_ANY_THROW(
-      rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-        poolName.str(), rm.getAllocator(allocatorName)));
-}
 
 INSTANTIATE_TEST_SUITE_P(Allocations, DynamicPoolListTest, ::testing::ValuesIn(AllocationDevices));
 
