@@ -35,6 +35,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Type of `auto allocator` in HIP codepath.
 
+- When installing, camp target was not exported.
+
 ## [3.0.0] - 2020-06-30
 
 ### Added
