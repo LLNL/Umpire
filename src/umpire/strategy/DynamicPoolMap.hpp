@@ -10,7 +10,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolHeuristic.hpp"
 
-#include "umpire/util/AlignedAllocation.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
 #include <map>
@@ -33,7 +33,7 @@ namespace strategy {
  * and the minimum size controls the lower bound on all future chunk
  * allocations.
  */
-class DynamicPoolMap : public AllocationStrategy
+class DynamicPoolMap : public AllocationStrategy, private mixins::AlignedAllocation
 {
   public:
     using Pointer = void*;
@@ -177,11 +177,7 @@ class DynamicPoolMap : public AllocationStrategy
     AddressMap m_used_map{};
     SizeMap m_free_map{};
 
-    strategy::AllocationStrategy* m_allocator;
-
     CoalesceHeuristic m_should_coalesce;
-
-    util::AlignedAllocation m_aligned_alloc;
 
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;

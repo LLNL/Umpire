@@ -4,10 +4,11 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/AlignedAllocation.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 
 namespace umpire {
-namespace util {
+namespace strategy {
+namespace mixins {
 
 AlignedAllocation::AlignedAllocation(
   std::size_t alignment,
@@ -18,5 +19,6 @@ AlignedAllocation::AlignedAllocation(
 {
 }
 
+} // namespace mixins
+} // namespace strategy
 } // namespace umpire
-} // namespace util

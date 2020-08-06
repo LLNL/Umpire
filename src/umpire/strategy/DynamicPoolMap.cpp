@@ -9,12 +9,12 @@
 #include "umpire/strategy/DynamicPool.hpp"
 
 #include "umpire/Allocator.hpp"
+#include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 
-#include "umpire/util/AlignedAllocation.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/util/backtrace.hpp"
 
 #include <cstdlib>
@@ -33,11 +33,10 @@ DynamicPoolMap::DynamicPoolMap(
     const std::size_t alignment,
     CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy{name, id},
-  m_allocator{ allocator.getAllocationStrategy() },
+  mixins::AlignedAllocation{ alignment, allocator.getAllocationStrategy() },
   m_should_coalesce{ coalesce_heuristic },
-  m_aligned_alloc{ alignment, m_allocator },
-  m_initial_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(initial_alloc_bytes) },
-  m_min_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(min_alloc_bytes) }
+  m_initial_alloc_bytes{ round_up_to_alignment(initial_alloc_bytes) },
+  m_min_alloc_bytes{ round_up_to_alignment(min_alloc_bytes) }
 {
   std::size_t bytes{ m_initial_alloc_bytes };
 #if defined(UMPIRE_ENABLE_BACKTRACE)
@@ -47,7 +46,7 @@ DynamicPoolMap::DynamicPoolMap(
     UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
   }
 #endif
-  void* ptr = m_aligned_alloc.allocate(bytes);
+  void* ptr = allocate_aligned(bytes);
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
   m_actual_bytes += bytes;
 
@@ -122,7 +121,7 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
         << umpire::util::backtracer<>::print(bt));
     }
 #endif
-    ptr = m_aligned_alloc.allocate(bytes);
+    ptr = allocate_aligned(bytes);
   } catch (...) {
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource. "
@@ -139,7 +138,7 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
                << getInUseBlocks() << " Used Blocks\n"
       );
     try {
-      ptr = m_aligned_alloc.allocate(bytes);
+      ptr = allocate_aligned(bytes);
       UMPIRE_LOG(Error,
                  "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
@@ -166,12 +165,12 @@ void DynamicPool::deallocateBlock(void* ptr, std::size_t size)
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, size);
   m_actual_bytes -= size;
-  m_aligned_alloc.deallocate(ptr);
+  deallocate_aligned(ptr);
 }
 
 void* DynamicPool::allocate(std::size_t bytes)
 {
-  bytes = m_aligned_alloc.round_up_to_alignment(bytes);
+  bytes = round_up_to_alignment(bytes);
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
   Pointer ptr{nullptr};

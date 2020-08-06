@@ -12,7 +12,8 @@
 #include <unordered_map>
 
 namespace umpire {
-namespace util {
+namespace strategy {
+namespace mixins {
 
 class AlignedAllocation {
 public:
@@ -32,23 +33,24 @@ public:
     /// \brief Return an allocation of `size` bytes that is aligned on the
     ///        configured alignment boundary.
     //////////////////////////////////////////////////////////////////////////
-    void* allocate(const std::size_t size);
+    void* allocate_aligned(const std::size_t size);
 
     //////////////////////////////////////////////////////////////////////////
     /// \brief Deallocate previously alligned allocation
     //////////////////////////////////////////////////////////////////////////
-    void deallocate(void* ptr);
+    void deallocate_aligned(void* ptr);
 
-private:
+protected:
     std::unordered_map<void*, void*> base_pointer_map;
     std::size_t m_alignment;
     strategy::AllocationStrategy* m_allocator;
     std::size_t m_mask;
 };
 
+} // namespace mixins
+} // namespace strategy
 } // namespace umpire
-} // namespace util
 
-#include "umpire/util/AlignedAllocation.inl"
+#include "umpire/strategy/mixins/AlignedAllocation.inl"
 
 #endif // UMPIRE_aligned_allocation_HPP

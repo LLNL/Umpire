@@ -60,12 +60,3 @@ blt_add_executable(
 blt_add_test(
   NAME memory_map_tests
   COMMAND memory_map_tests)
-
-blt_add_executable(
-  NAME aligned_allocation_tests
-  SOURCES aligned_allocation_tests.cpp
-  DEPENDS_ON umpire gtest)
-
-blt_add_test(
-  NAME aligned_allocation_tests
-  COMMAND aligned_allocation_tests)

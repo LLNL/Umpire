@@ -8,7 +8,7 @@
 #include "umpire/strategy/QuickPool.hpp"
 
 #include "umpire/Allocator.hpp"
-#include "umpire/util/AlignedAllocation.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/util/Macros.hpp"
@@ -25,11 +25,10 @@ QuickPool::QuickPool(
     std::size_t alignment,
     CoalesceHeuristic coalesce_heuristic) noexcept :
   AllocationStrategy{name, id},
-  m_allocator{allocator.getAllocationStrategy()},
+  mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
   m_should_coalesce{coalesce_heuristic},
-  m_aligned_alloc{alignment, m_allocator},
-  m_initial_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(initial_alloc_size) },
-  m_min_alloc_bytes{ m_aligned_alloc.round_up_to_alignment(min_alloc_size) }
+  m_initial_alloc_bytes{ round_up_to_alignment(initial_alloc_size) },
+  m_min_alloc_bytes{ round_up_to_alignment(min_alloc_size) }
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
@@ -41,7 +40,7 @@ QuickPool::QuickPool(
   }
 #endif
 
-  void* ptr{m_aligned_alloc.allocate(m_initial_alloc_bytes)};
+  void* ptr{allocate_aligned(m_initial_alloc_bytes)};
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
 
   m_actual_bytes += m_initial_alloc_bytes;
@@ -60,7 +59,7 @@ void*
 QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
-  bytes = m_aligned_alloc.round_up_to_alignment(bytes);
+  bytes = round_up_to_alignment(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
 
@@ -81,12 +80,12 @@ QuickPool::allocate(std::size_t bytes)
           << ") " << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = m_aligned_alloc.allocate(size);
+      ret = allocate_aligned(size);
     } catch (...) {
       UMPIRE_LOG(Error, "Caught error allocating new chunk, giving up free chunks and retrying...");
       release();
       try {
-        ret = m_aligned_alloc.allocate(size);
+        ret = allocate_aligned(size);
         UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
         UMPIRE_LOG(Error, "recovery failed.");
@@ -225,7 +224,7 @@ void QuickPool::release()
 
       UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
       m_actual_bytes -= chunk->chunk_size;
-      m_aligned_alloc.deallocate(chunk->data);
+      deallocate_aligned(chunk->data);
 
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);

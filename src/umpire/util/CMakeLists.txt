@@ -7,8 +7,6 @@
 set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
 
 set (umpire_util_headers
-  AlignedAllocation.hpp
-  AlignedAllocation.inl
   AllocationMap.hpp
   AllocationRecord.hpp
   backtrace.hpp
@@ -45,7 +43,6 @@ if (ENABLE_NUMA)
 endif ()
 
 set (umpire_util_sources
-  AlignedAllocation.cpp
   AllocationMap.cpp
   Exception.cpp
   FixedMallocPool.cpp

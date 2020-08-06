@@ -8,7 +8,7 @@
 #define UMPIRE_PoolMap_HPP
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AlignedAllocation.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
 #include <functional>
@@ -29,7 +29,7 @@ class FixedMallocPool;
 namespace strategy {
 
 class QuickPool :
-  public AllocationStrategy
+  public AllocationStrategy, private mixins::AlignedAllocation
 {
   public:
     using Pointer = void*;
@@ -124,11 +124,7 @@ class QuickPool :
 
     util::FixedMallocPool m_chunk_pool{ sizeof(Chunk) };
 
-    strategy::AllocationStrategy* m_allocator;
-
     CoalesceHeuristic m_should_coalesce;
-
-    util::AlignedAllocation m_aligned_alloc;
 
     const std::size_t m_initial_alloc_bytes;
     const std::size_t m_min_alloc_bytes;

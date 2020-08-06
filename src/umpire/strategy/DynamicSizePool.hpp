@@ -18,12 +18,12 @@
 #include "umpire/strategy/FixedSizePool.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/AlignedAllocation.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
 template <class IA = StdAllocator>
-class DynamicSizePool
+class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation
 {
 protected:
   struct Block
@@ -47,11 +47,6 @@ protected:
 
   // Total size allocated (bytes)
   std::size_t m_actual_bytes{0};
-
-  // Pointer to our allocator's allocation strategy
-  umpire::strategy::AllocationStrategy* m_allocator;
-
-  umpire::util::AlignedAllocation m_aligned_alloc;
 
   // Minimum size of initial allocation
   std::size_t m_initial_alloc_size;
@@ -95,7 +90,7 @@ protected:
           << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      data = m_aligned_alloc.allocate(size);
+      data = allocate_aligned(size);
     }
     catch (...) {
       UMPIRE_LOG(Error,
@@ -112,7 +107,7 @@ protected:
           << getInUseBlocks() << " Used Blocks\n"
       );
       try {
-        data = m_aligned_alloc.allocate(size);
+        data = allocate_aligned(size);
         UMPIRE_LOG(Error,
           "\n\tMemory successfully recovered at resource.  Allocation succeeded\n"
         );
@@ -232,7 +227,7 @@ protected:
         UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
         m_actual_bytes -= curr->size;
         freed += curr->size;
-        m_aligned_alloc.deallocate(curr->data);
+        deallocate_aligned(curr->data);
 
         if ( prev )   prev->next = curr->next;
         else          freeBlocks = curr->next;
@@ -284,10 +279,9 @@ public:
       const std::size_t initial_alloc_size = (16 * 1024),
       const std::size_t min_alloc_size = 256,
       const std::size_t alignment = 16) :
-    m_allocator(strat),
-    m_aligned_alloc{alignment, m_allocator},
-    m_initial_alloc_size{ m_aligned_alloc.round_up_to_alignment(initial_alloc_size) },
-    m_min_alloc_size{ m_aligned_alloc.round_up_to_alignment(min_alloc_size) }
+    umpire::strategy::mixins::AlignedAllocation{alignment, strat},
+    m_initial_alloc_size{ round_up_to_alignment(initial_alloc_size) },
+    m_min_alloc_size{ round_up_to_alignment(min_alloc_size) }
   {
   }
 
@@ -298,7 +292,7 @@ public:
 
   void *allocate(std::size_t size)
   {
-    size = m_aligned_alloc.round_up_to_alignment(size);
+    size = round_up_to_alignment(size);
 
     struct Block *best{nullptr}, *prev{nullptr};
 
