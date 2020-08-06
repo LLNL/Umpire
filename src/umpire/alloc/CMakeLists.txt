@@ -28,6 +28,20 @@ if (ENABLE_HIP)
     HipPinnedAllocator.hpp)
 endif ()
 
+if (ENABLE_SYCL)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    SyclMallocAllocator.hpp
+    SyclMallocManagedAllocator.hpp
+    SyclPinnedAllocator.hpp)
+endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_alloc_headers
+    ${umpire_alloc_headers}
+    OpenMPTargetAllocator.hpp)
+endif ()
+
 blt_add_library(
   NAME umpire_alloc
   HEADERS ${umpire_alloc_headers})

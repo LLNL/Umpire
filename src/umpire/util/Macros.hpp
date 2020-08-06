@@ -7,7 +7,7 @@
 #ifndef UMPIRE_Macros_HPP
 #define UMPIRE_Macros_HPP
 
-#include "umpire/util/Backtrace.hpp"
+#include "umpire/util/backtrace.hpp"
 #include "umpire/util/Exception.hpp"
 #include "umpire/config.hpp"
 #include "umpire/util/io.hpp"
@@ -92,19 +92,25 @@
 
 #define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
-#define UMPIRE_ERROR( msg )                                        \
-{                                                                  \
-  umpire::util::Backtrace backtrace;                               \
-  backtrace.getBacktrace();                                        \
-  std::ostringstream umpire_oss_error;                             \
-  umpire_oss_error << " " << __func__ << " " << msg << std::endl;  \
-  umpire_oss_error << backtrace << std::endl;                      \
-  UMPIRE_LOG(Error, umpire_oss_error.str());                       \
-  umpire::util::flush_files();                                     \
-  throw umpire::util::Exception( umpire_oss_error.str(),           \
-                                 std::string(__FILE__),            \
-                                 __LINE__);                        \
+#if defined(__CUDA_ARCH__)
+#define UMPIRE_ERROR( msg ) asm ("trap;");
+#elif defined(__HIPCC__)
+#define UMPIRE_ERROR( msg ) abort();
+#else 
+#define UMPIRE_ERROR( msg )                                                                         \
+{                                                                                                   \
+  umpire::util::backtrace bt;                                                                       \
+  umpire::util::backtracer<umpire::util::trace_always>::get_backtrace(bt);                          \
+  std::ostringstream umpire_oss_error;                                                              \
+  umpire_oss_error << " " << __func__ << " " << msg << std::endl;                                   \
+  umpire_oss_error << umpire::util::backtracer<umpire::util::trace_always>::print(bt) << std::endl; \
+  UMPIRE_LOG(Error, umpire_oss_error.str());                                                        \
+  umpire::util::flush_files();                                                                      \
+  throw umpire::util::Exception( umpire_oss_error.str(),                                            \
+                                 std::string(__FILE__),                                             \
+                                 __LINE__);                                                         \
 }
+#endif
 
 #if defined(UMPIRE_ENABLE_STATISTICS)
 
@@ -127,6 +133,13 @@
 #define UMPIRE_CALIPER_TRACK(ptr, name, size)
 #define UMPIRE_CALIPER_UNTRACK(ptr)
 
+#endif // defined(UMPIRE_ENABLE_CALIPER)
+
+
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+#define UMPIRE_RECORD_BACKTRACE(record) umpire::util::backtracer<umpire::util::trace_optional>::get_backtrace(record.allocation_backtrace)
+#else
+#define UMPIRE_RECORD_BACKTRACE(backtrace) ((void) 0)
 #endif
 
 #endif // UMPIRE_Macros_HPP

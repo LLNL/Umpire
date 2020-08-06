@@ -47,7 +47,7 @@ AllocationAdvisor::AllocationAdvisor(
       m_allocator);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  if (accessing_allocator.getPlatform() == Platform::cpu) {
+  if (accessing_allocator.getPlatform() == Platform::host) {
     m_device = cudaCpuDeviceId;
   }
 #else
@@ -70,16 +70,6 @@ void* AllocationAdvisor::allocate(std::size_t bytes)
 void AllocationAdvisor::deallocate(void* ptr)
 {
   m_allocator->deallocate(ptr);
-}
-
-std::size_t AllocationAdvisor::getCurrentSize() const noexcept
-{
-  return 0;
-}
-
-std::size_t AllocationAdvisor::getHighWatermark() const noexcept
-{
-  return 0;
 }
 
 Platform AllocationAdvisor::getPlatform() noexcept

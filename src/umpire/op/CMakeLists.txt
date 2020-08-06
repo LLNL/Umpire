@@ -20,7 +20,7 @@ set (umpire_op_sources
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 
-set (umpire_op_depends)
+set (umpire_op_depends camp)
 
 if (ENABLE_NUMA)
   set (umpire_op_headers
@@ -88,6 +88,45 @@ if (ENABLE_HIP)
   set (umpire_op_depends
     ${umpire_op_depends}
     hip_runtime)
+endif ()
+
+if (ENABLE_SYCL)
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    SyclCopyOperation.hpp
+    SyclCopyFromOperation.hpp
+    SyclCopyToOperation.hpp
+    SyclMemsetOperation.hpp
+    SyclMemPrefetchOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    SyclCopyOperation.cpp
+    SyclCopyFromOperation.cpp
+    SyclCopyToOperation.cpp
+    SyclMemsetOperation.cpp
+    SyclMemPrefetchOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends})
+
+endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  message(STATUS "Adding OpenMP Target operations")
+  set (umpire_op_headers
+    ${umpire_op_headers}
+    OpenMPTargetCopyOperation.hpp
+    OpenMPTargetMemsetOperation.hpp)
+
+  set (umpire_op_sources
+    ${umpire_op_sources}
+    OpenMPTargetCopyOperation.cpp
+    OpenMPTargetMemsetOperation.cpp)
+
+  set (umpire_op_depends
+    ${umpire_op_depends}
+    openmp)
 endif ()
 
 blt_add_library(

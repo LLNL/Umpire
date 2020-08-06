@@ -1,14 +1,25 @@
 on: push
-name: Code checks
+name: Code Checks
 jobs:
   staticAnalysis:
     name: Static Analysis
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
-    - name: Static Analysis
-      uses: ./.github/actions/static-analysis
-    - name: Check CHANGELOG
-      uses: ./.github/actions/bin/diff-check
-      with:
-        args: CHANGELOG.md
+    - uses: actions/checkout@v2
+    - uses: ./.github/actions/static-analysis
+  checkChangelog:
+    name: Check CHANGELOG
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        git fetch origin
+        if sh -c "git diff origin/develop --exit-code CHANGELOG.md"; then
+            echo "CHANGELOG.md wasn't changed, failing!"
+            exit 255 
+        else
+            exit_code=$?
+            echo "CHANGELOG.md was changed, passing!"
+            exit 0
+        fi
+

@@ -1,3 +1,42 @@
+# v3.0.0
+
+- Added support for multiple GPU devices, detected and registered as "DEVICE_N"
+  where N is the device number.
+
+- Added support for capturing function backtraces with allocations.
+
+- Added `AlignedAllocator` to provide aligned allocations for host memory.
+
+- Fixed builds using `-stdlib=c++`
+
+- Switched to camp::Platform: Platform::cpu is now Platform::host
+
+# v2.1.0
+
+- Fixes a bug when calling reallocate with size 0.
+
+- Replay tool now supports replaying reallocate operations.
+
+# v2.0.0
+
+- ENABLE_DEVICE_CONST CMake option to control whether device constant memory
+  is enabled. It is now disabled by default.
+
+- DeviceAllocator that provides a pool for allocations inside GPU kernels.
+
+- Added "unset" operations for removing CUDA memory advice.
+
+- Extended C/Fortran API with more allocation strategies.
+
+- NamedAllocator that allows creating a new allocator that passes allocations
+  through to underlying strategy
+
+- UMPIRE_VERSION_X are now defined as macros, rather than constexpr variables
+
+- Fixed reallocate to properly handle case where size == 0
+
+- AllocationStrategy constructor parameters re-ordered for consistency
+
 # v1.1.0
 
 - Added symbol `umpire_ver_1_detected` to help detect version mismatches when

@@ -42,6 +42,21 @@
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
+#if defined(UMPIRE_ENABLE_SYCL)
+#include "umpire/op/SyclCopyFromOperation.hpp"
+#include "umpire/op/SyclCopyToOperation.hpp"
+#include "umpire/op/SyclCopyOperation.hpp"
+
+#include "umpire/op/SyclMemsetOperation.hpp"
+#include "umpire/op/SyclMemPrefetchOperation.hpp"
+#endif
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include <omp.h>
+#include "umpire/op/OpenMPTargetCopyOperation.hpp"
+#include "umpire/op/OpenMPTargetMemsetOperation.hpp"
+#endif
+
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -58,46 +73,46 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<HostCopyOperation>());
 
   registerOperation(
       "MEMSET",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<HostMemsetOperation>());
 
   registerOperation(
       "REALLOCATE",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<HostReallocateOperation>());
 
 #if defined(UMPIRE_ENABLE_NUMA)
   registerOperation(
       "MOVE",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<NumaMoveOperation>());
 
 // NOTE: We don't use CUDA calls in the move operation so no guard is needed
   registerOperation(
       "MOVE",
-      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_pair(Platform::host, Platform::cuda),
       std::make_shared<NumaMoveOperation>());
 
   registerOperation(
       "MOVE",
-      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_pair(Platform::cuda, Platform::host),
       std::make_shared<NumaMoveOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::cuda),
+      std::make_pair(Platform::host, Platform::cuda),
       std::make_shared<CudaCopyToOperation>());
 
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cuda, Platform::cpu),
+      std::make_pair(Platform::cuda, Platform::host),
       std::make_shared<CudaCopyFromOperation>());
 
   registerOperation(
@@ -127,7 +142,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
   registerOperation(
       "PREFERRED_LOCATION",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<CudaAdvisePreferredLocationOperation>());
 
   registerOperation(
@@ -147,7 +162,7 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
   registerOperation(
       "UNSET_PREFERRED_LOCATION",
-      std::make_pair(Platform::cpu, Platform::cpu),
+      std::make_pair(Platform::host, Platform::host),
       std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
   registerOperation(
@@ -164,12 +179,12 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #if defined(UMPIRE_ENABLE_HIP)
   registerOperation(
       "COPY",
-      std::make_pair(Platform::cpu, Platform::hip),
+      std::make_pair(Platform::host, Platform::hip),
       std::make_shared<HipCopyToOperation>());
 
   registerOperation(
       "COPY",
-      std::make_pair(Platform::hip, Platform::cpu),
+      std::make_pair(Platform::hip, Platform::host),
       std::make_shared<HipCopyFromOperation>());
 
   registerOperation(
@@ -186,7 +201,65 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
       "REALLOCATE",
       std::make_pair(Platform::hip, Platform::hip),
       std::make_shared<GenericReallocateOperation>());
+#endif
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::host, Platform::omp_target),
+      std::make_shared<OpenMPTargetCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::omp_target, Platform::host),
+      std::make_shared<OpenMPTargetCopyOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::omp_target, Platform::omp_target),
+      std::make_shared<OpenMPTargetCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::omp_target, Platform::omp_target),
+      std::make_shared<OpenMPTargetMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::omp_target, Platform::omp_target),
+      std::make_shared<GenericReallocateOperation>());
+#endif
+
+#if defined(UMPIRE_ENABLE_SYCL)
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::host, Platform::sycl),
+      std::make_shared<SyclCopyToOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sycl, Platform::host),
+      std::make_shared<SyclCopyFromOperation>());
+
+  registerOperation(
+      "COPY",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclCopyOperation>());
+
+  registerOperation(
+      "MEMSET",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclMemsetOperation>());
+
+  registerOperation(
+      "REALLOCATE",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<GenericReallocateOperation>());
+
+  registerOperation(
+      "PREFETCH",
+      std::make_pair(Platform::sycl, Platform::sycl),
+      std::make_shared<SyclMemPrefetchOperation>());
 #endif
 }
 

@@ -25,8 +25,10 @@ template <typename _allocator>
 class DefaultMemoryResource :
   public MemoryResource
 {
-  public: 
+  public:
     DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+
+    DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits, _allocator alloc);
 
     void* allocate(std::size_t bytes);
     void deallocate(void* ptr);

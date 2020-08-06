@@ -14,6 +14,10 @@
 
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
 
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
+#include "umpire/resource/FileMemoryResourceFactory.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -37,6 +41,19 @@
 #if defined(UMPIRE_ENABLE_CONST)
 #include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
 #endif
+#endif
+
+#if defined(UMPIRE_ENABLE_SYCL)
+#include <CL/sycl.hpp>
+
+#include "umpire/resource/SyclDeviceResourceFactory.hpp"
+#include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
+#include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
+#endif
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include <omp.h>
+#include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 #endif
 
 #include "umpire/Umpire.hpp"
@@ -102,6 +119,11 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
+  registry.registerMemoryResource(
+      util::make_unique<resource::FileMemoryResourceFactory>());
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
   registry.registerMemoryResource(
     util::make_unique<resource::CudaDeviceResourceFactory>());
@@ -129,6 +151,22 @@ ResourceManager::ResourceManager() :
   registry.registerMemoryResource(
     util::make_unique<resource::HipConstantMemoryResourceFactory>());
 #endif
+#endif
+
+#if defined(UMPIRE_ENABLE_SYCL)
+  registry.registerMemoryResource(
+    util::make_unique<resource::SyclDeviceResourceFactory>());
+
+  registry.registerMemoryResource(
+    util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
+
+  registry.registerMemoryResource(
+    util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
+#endif
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  registry.registerMemoryResource(
+    util::make_unique<resource::OpenMPTargetResourceFactory>());
 #endif
 
   initialize();
@@ -173,12 +211,23 @@ ResourceManager::initialize()
     resource::MemoryResourceRegistry::getInstance()};
 
   {
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    MemoryResourceTraits traits = registry.getDefaultTraitsForResource("HOST");
+    traits.id = omp_get_initial_device();
+    std::unique_ptr<strategy::AllocationStrategy>
+      host_allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("HOST", getNextId(), traits))};
+#else
     std::unique_ptr<strategy::AllocationStrategy>
       host_allocator{
         util::wrap_allocator<
           strategy::AllocationTracker,
           strategy::ZeroByteHandler>(
             registry.makeMemoryResource("HOST", getNextId()))};
+#endif
 
     UMPIRE_REPLAY(
       R"( "event": "makeMemoryResource", "payload": { "name": "HOST" })"
@@ -203,22 +252,54 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
+  
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
+  {
+    std::unique_ptr<strategy::AllocationStrategy>
+      allocator{
+        util::wrap_allocator<
+          strategy::AllocationTracker,
+          strategy::ZeroByteHandler>(
+            registry.makeMemoryResource("FILE", getNextId()))};
 
+    int id{allocator->getId()};
+    m_allocators_by_name["FILE"]  = allocator.get();
+    m_allocators_by_id[id] = allocator.get();
+    m_allocators.emplace_front(std::move(allocator));
+  }
+#endif
+
+  int device_count{0};
+  UMPIRE_USE_VAR(device_count);
 #if defined(UMPIRE_ENABLE_CUDA)
-  int device_count;
   auto error = ::cudaGetDeviceCount(&device_count);
-
   if (error != cudaSuccess) {
     UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
   }
 #endif
-
 #if defined(UMPIRE_ENABLE_HIP)
-  int device_count;
   auto error = ::hipGetDeviceCount(&device_count);
-
   if (error != hipSuccess) {
     UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
+  }
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  device_count = omp_get_num_devices();
+#endif
+
+#if defined(UMPIRE_ENABLE_SYCL)
+  auto platforms = cl::sycl::platform::get_platforms();
+  for (auto &platform : platforms) {
+    auto devices = platform.get_devices();
+    for (auto &device : devices) {
+      const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
+      if (device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos))
+        device_count++;
+    }
+  }
+
+  if (device_count == 0) {
+    UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
   }
 #endif
 
@@ -245,11 +326,11 @@ ResourceManager::initialize()
       cudaDeviceEnablePeerAccess(device, 0);
     }
 
+    int current_device;
+    cudaGetDevice(&current_device);
+
     for (int device = 1; device < device_count; device++) {
       MemoryResourceTraits traits;
-
-      int current_device;
-      cudaGetDevice(&current_device);
       cudaSetDevice(device);
 
       for (int other_device = 0; other_device < device_count; other_device++) {
@@ -259,7 +340,7 @@ ResourceManager::initialize()
       }
 
       cudaDeviceProp properties;
-      auto error = ::cudaGetDeviceProperties(&properties, 0);
+      auto error = ::cudaGetDeviceProperties(&properties, device);
 
       if (error != cudaSuccess) {
         UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
@@ -290,8 +371,136 @@ ResourceManager::initialize()
       m_allocators_by_id[id] = allocator.get();
       m_allocators.emplace_front(std::move(allocator));
     }
+    cudaSetDevice(current_device);
 #endif
 
+#if defined(UMPIRE_ENABLE_HIP)
+    for (int device = 1; device < device_count; device++) {
+      MemoryResourceTraits traits;
+
+      hipSetDevice(device);
+      const int top = device > 0 ? device-1 : (device_count - 1);
+
+      int canAccessPeer=0;
+      hipDeviceCanAccessPeer(&canAccessPeer, device, top);
+      if(canAccessPeer)
+        hipDeviceEnablePeerAccess(top, 0);
+
+      const int bottom = (device+1) % device_count;
+      if(top != bottom) {
+        hipDeviceCanAccessPeer(&canAccessPeer, device, bottom);
+        if(canAccessPeer)
+          hipDeviceEnablePeerAccess(bottom, 0);
+      }
+
+      hipDeviceProp_t properties;
+      auto error = hipGetDeviceProperties(&properties, device);
+
+      if (error != hipSuccess) {
+        UMPIRE_ERROR("hipGetDeviceProperties failed with error: " << hipGetErrorString(error));
+      }
+
+      traits.unified = false;
+      traits.size = properties.totalGlobalMem;
+
+      traits.vendor = MemoryResourceTraits::vendor_type::AMD;
+      traits.kind = MemoryResourceTraits::memory_type::GDDR;
+      traits.used_for = MemoryResourceTraits::optimized_for::any;
+
+      traits.id = device;
+
+      std::string name = "DEVICE_" + std::to_string(device);
+
+      if (device != 0) { // since it DEVICE_0 was already created with an allocator
+        std::unique_ptr<strategy::AllocationStrategy>
+          allocator{util::wrap_allocator<
+                    strategy::AllocationTracker,
+                    strategy::ZeroByteHandler>(
+                                               registry.makeMemoryResource(name, getNextId(), traits))};
+        UMPIRE_REPLAY(   R"( "event": "makeMemoryResource", "payload": { "name": ")" << name <<R"("})"
+                      << R"(, "result": ")" << allocator.get() << R"(")");
+
+        int id{allocator->getId()};
+        m_allocators_by_name[name] = allocator.get();
+        m_allocators_by_id[id] = allocator.get();
+        m_allocators.emplace_front(std::move(allocator));
+      }
+    }
+#endif
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    for (int device = 1; device < device_count; device++) {
+      MemoryResourceTraits traits;
+      traits.unified = false;
+      traits.kind = MemoryResourceTraits::memory_type::GDDR;
+      traits.used_for = MemoryResourceTraits::optimized_for::any;
+      traits.id = device;
+
+      std::string name = "DEVICE_" + std::to_string(device);
+
+      if (device != 0) { // since it DEVICE_0 was already created with an allocator
+        std::unique_ptr<strategy::AllocationStrategy>
+          allocator{util::wrap_allocator<
+                    strategy::AllocationTracker,
+                    strategy::ZeroByteHandler>(
+                                               registry.makeMemoryResource(name, getNextId(), traits))};
+        UMPIRE_REPLAY(   R"( "event": "makeMemoryResource", "payload": { "name": ")" << name <<R"("})"
+                      << R"(, "result": ")" << allocator.get() << R"(")");
+
+        int id{allocator->getId()};
+        m_allocators_by_name[name] = allocator.get();
+        m_allocators_by_id[id] = allocator.get();
+        m_allocators.emplace_front(std::move(allocator));
+      }
+    }
+#endif
+
+#if defined(UMPIRE_ENABLE_SYCL)
+    auto platforms = cl::sycl::platform::get_platforms();
+    for (auto &platform : platforms) {
+      auto devices = platform.get_devices();
+
+      unsigned int dev_cnt = 0; // SYCL multi.device count
+      for (auto &device : devices) {
+        MemoryResourceTraits traits;
+
+        const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
+        if (device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
+
+          traits.unified  = false;
+          traits.size     = device.get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
+
+          traits.vendor   = MemoryResourceTraits::vendor_type::INTEL;
+          traits.kind     = MemoryResourceTraits::memory_type::GDDR;
+          traits.used_for = MemoryResourceTraits::optimized_for::any;
+          traits.id       = dev_cnt;
+          cl::sycl::queue sycl_queue(device);
+          traits.queue    = sycl_queue;
+          std::cout << "value of QUEUE in RESOURCEMANAGER : " << sycl_queue.get() << ", " <<
+              device.get_info<cl::sycl::info::device::name>() << std::endl;
+
+          std::string name = "DEVICE_" + std::to_string(dev_cnt);
+
+          if (dev_cnt != 0) {
+            std::unique_ptr<strategy::AllocationStrategy>
+              allocator{util::wrap_allocator<
+                        strategy::AllocationTracker,
+                        strategy::ZeroByteHandler>(
+                                                   registry.makeMemoryResource(name, getNextId(), traits))};
+            UMPIRE_REPLAY(   R"( "event": "makeMemoryResource", "payload": { "name": ")" << name <<R"("})"
+                          << R"(, "result": ")" << allocator.get() << R"(")");
+
+            int id{allocator->getId()};
+            m_allocators_by_name[name] = allocator.get();
+            m_allocators_by_id[id] = allocator.get();
+            m_allocators.emplace_front(std::move(allocator));
+          }
+
+          dev_cnt++;
+        }
+      }
+    }
+#endif
   }
 #endif
 
@@ -318,7 +527,7 @@ ResourceManager::initialize()
   {
 #if defined(UMPIRE_ENABLE_HIP)
     // associate "DEVICE" allocator with "UM" name
-    auto allocator{m_memory_resources[resource::Device]};
+    auto allocator = m_memory_resources[resource::Device];
     m_allocators_by_name["UM"] = allocator;
     m_memory_resources[resource::Unified] = allocator;
 #else
@@ -337,7 +546,7 @@ ResourceManager::initialize()
     m_allocators_by_id[id] = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
 #endif
-  }
+}
 #endif
 
 #if defined(UMPIRE_ENABLE_CONST)
@@ -491,8 +700,15 @@ ResourceManager::hasAllocator(void* ptr)
 
 void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord record)
 {
+  if (!ptr) {
+    UMPIRE_ERROR("Cannot register nullptr!");
+  }
+
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", size=" << record.size
              << ", strategy=" << record.strategy << ") with " << this);
+
+  UMPIRE_RECORD_BACKTRACE(record);
+
   m_allocations.insert(ptr, record);
 }
 
@@ -562,6 +778,37 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
   op->transform(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size);
 }
 
+camp::resources::Event
+ResourceManager::copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size)
+{
+  UMPIRE_LOG(Debug, "(src_ptr=" << src_ptr << ", dst_ptr=" << dst_ptr << ", size=" << size << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto src_alloc_record = m_allocations.find(src_ptr);
+  std::ptrdiff_t src_offset = static_cast<char*>(src_ptr) - static_cast<char*>(src_alloc_record->ptr);
+  std::size_t src_size = src_alloc_record->size - src_offset;
+
+  auto dst_alloc_record = m_allocations.find(dst_ptr);
+  std::ptrdiff_t dst_offset = static_cast<char*>(dst_ptr) - static_cast<char*>(dst_alloc_record->ptr);
+  std::size_t dst_size = dst_alloc_record->size - dst_offset;
+
+  if (size == 0) {
+    size = src_size;
+  }
+
+  if (size > dst_size) {
+    UMPIRE_ERROR("Not enough resource in destination for copy: " << size << " -> " << dst_size);
+  }
+
+  auto op = op_registry.find(
+      "COPY",
+      src_alloc_record->strategy,
+      dst_alloc_record->strategy);
+
+  return op->transform_async(src_ptr, &dst_ptr, src_alloc_record, dst_alloc_record, size, ctx);
+}
+
 void ResourceManager::memset(void* ptr, int value, std::size_t length)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
@@ -577,7 +824,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
     length = size;
   }
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
        R"( "event": "memset", "payload": { )"
     << R"( "ptr": ")"            << ptr                   << R"(")"
     << R"(, "value": )"          << value
@@ -736,7 +983,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
         UMPIRE_ASSERT(ret == ptr);
       }
 
-      UMPIRE_REPLAY( 
+      UMPIRE_REPLAY(
         R"( "event": "move", "payload": {)"
         << R"( "ptr": ")" << ptr << R"(")"
         << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
@@ -753,7 +1000,7 @@ ResourceManager::move(void* ptr, Allocator allocator)
   void* dst_ptr{allocator.allocate(alloc_record->size)};
   copy(dst_ptr, ptr);
 
-  UMPIRE_REPLAY( 
+  UMPIRE_REPLAY(
     R"( "event": "move", "payload": {)"
     << R"( "ptr": ")" << ptr << R"(")"
     << R"(, "allocator": ")" << allocator.getAllocationStrategy() << R"(" })"
@@ -874,6 +1121,16 @@ ResourceManager::getNumDevices() const
   ::cudaGetDeviceCount(&device_count);
 #elif defined(UMPIRE_ENABLE_HIP)
   hipGetDeviceCount(&device_count);
+#elif defined(UMPIRE_ENABLE_SYCL)
+  auto platforms = cl::sycl::platform::get_platforms();
+  for (auto &platform : platforms) {
+    auto devices = platform.get_devices();
+    for (auto &device : devices) {
+      const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
+      if (device.is_gpu() && (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos))
+        device_count++;
+    }
+  }
 #endif
   return device_count;
 }

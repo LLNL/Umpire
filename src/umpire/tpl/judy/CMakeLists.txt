@@ -20,11 +20,16 @@ set (judy_headers
   judyLArray.h
   judyL2Array.h)
 
+if (ENABLE_OPENMP_TARGET)
+  set (judy_depends
+    openmp)
+endif ()
 
 blt_add_library(
   NAME umpire_tpl_judy
   SOURCES ${judy_sources}
   HEADERS ${judy_headers}
+  DEPENDS_ON ${judy_depends}
   OBJECT TRUE)
 
 target_include_directories(

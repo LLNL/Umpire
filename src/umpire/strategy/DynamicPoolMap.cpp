@@ -14,7 +14,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/Replay.hpp"
-#include "umpire/util/Backtrace.hpp"
+#include "umpire/util/backtrace.hpp"
 
 #include <cstdlib>
 #include <algorithm>
@@ -43,12 +43,19 @@ DynamicPoolMap::DynamicPoolMap(const std::string& name,
   m_coalesce_heuristic{coalesce_heuristic},
   m_used_map{},
   m_free_map{},
-  m_curr_bytes{0},
-  m_actual_bytes{round_up(initial_alloc_bytes, align_bytes)},
-  m_highwatermark{0}
+  m_actual_bytes{round_up(initial_alloc_bytes, align_bytes)}
 {
   const std::size_t bytes{round_up(initial_alloc_bytes, align_bytes)};
-  insertFree(m_allocator->allocate(bytes), bytes, true, bytes);
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  {
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
+  }
+#endif
+  void* ptr = m_allocator->allocate(bytes);
+  insertFree(ptr, bytes, true, bytes);
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
 }
 
 DynamicPoolMap::~DynamicPoolMap()
@@ -68,7 +75,6 @@ DynamicPoolMap::~DynamicPoolMap()
   }
 
   if (m_used_map.size() == 0) {
-    UMPIRE_ASSERT(m_curr_bytes == 0);
     UMPIRE_ASSERT(m_actual_bytes == 0);
   }
 }
@@ -109,12 +115,20 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+    {
+      umpire::util::backtrace bt{};
+      umpire::util::backtracer<>::get_backtrace(bt);
+      UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes+bytes)
+        << " (prev: " << m_actual_bytes << ") "
+        << umpire::util::backtracer<>::print(bt));
+    }
+#endif
     ptr = m_allocator->allocate(bytes);
   } catch (...) {
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource. "
                "Attempting to give blocks back.\n\t"
-               << getCurrentSize() << " Allocated to pool, "
                << getFreeBlocks() << " Free Blocks, "
                << getInUseBlocks() << " Used Blocks\n"
       );
@@ -123,7 +137,6 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource.  "
                "\n\tRetrying allocation operation: "
-               << getCurrentSize() << " Bytes still allocated to pool, "
                << getFreeBlocks() << " Free Blocks, "
                << getInUseBlocks() << " Used Blocks\n"
       );
@@ -137,7 +150,6 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
       UMPIRE_LOG(Error,
                  "\n\tUnable to allocate from resource even after giving back free blocks.\n"
                  "\tThrowing to let application know we have no more memory: "
-                 << getCurrentSize() << " Bytes still allocated to pool\n"
                  << getFreeBlocks() << " Partially Free Blocks, "
                  << getInUseBlocks() << " Used Blocks\n"
         );
@@ -182,8 +194,6 @@ void* DynamicPool::allocate(std::size_t bytes)
     const std::size_t free_size{iter->first};
     m_free_map.erase(iter);
 
-    m_curr_bytes += rounded_bytes;
-
     const std::size_t left_bytes{free_size - rounded_bytes};
 
     if (left_bytes > 0) {
@@ -200,7 +210,6 @@ void* DynamicPool::allocate(std::size_t bytes)
 
     // Add used
     insertUsed(ptr, rounded_bytes, true, alloc_bytes);
-    m_curr_bytes += rounded_bytes;
 
     const std::size_t left_bytes{alloc_bytes - rounded_bytes};
 
@@ -210,9 +219,7 @@ void* DynamicPool::allocate(std::size_t bytes)
                  false, alloc_bytes);
   }
 
-  if (m_curr_bytes > m_highwatermark) m_highwatermark = m_curr_bytes;
-
-  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, rounded_bytes);
   return ptr;
 }
 
@@ -237,9 +244,6 @@ void DynamicPoolMap::deallocate(void* ptr)
     // Remove from used map
     m_used_map.erase(iter);
 
-    // Update currentSize
-    m_curr_bytes -= bytes;
-
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
   } else {
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
@@ -252,22 +256,10 @@ void DynamicPoolMap::deallocate(void* ptr)
   }
 }
 
-std::size_t DynamicPoolMap::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << m_curr_bytes);
-  return m_curr_bytes;
-}
-
 std::size_t DynamicPoolMap::getActualSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_actual_bytes);
   return m_actual_bytes;
-}
-
-std::size_t DynamicPoolMap::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
 }
 
 std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
@@ -415,6 +407,16 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
       ++it;
     }
   }
+
+#if defined(UMPIRE_ENABLE_BACKTRACE)
+  if (released_bytes > 0) {
+    umpire::util::backtrace bt{};
+    umpire::util::backtracer<>::get_backtrace(bt);
+    UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes
+      << " (prev: " << (m_actual_bytes+released_bytes)
+      << ") " << umpire::util::backtracer<>::print(bt));
+  }
+#endif
 
   return released_bytes;
 }

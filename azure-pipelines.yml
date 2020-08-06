@@ -6,6 +6,12 @@ variables:
 
 jobs:
 - job: Windows
+  strategy:
+    matrix:
+      shared:
+        SHARED_ARGS: '-DBUILD_SHARED_LIBS=On -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On'
+      static:
+        SHARED_ARGS: '-DBUILD_SHARED_LIBS=Off'
   pool:
     vmImage: 'windows-2019'
   variables:
@@ -17,13 +23,11 @@ jobs:
   - task: CMake@1
     inputs:
       workingDir: 'build'
-      cmakeArgs: '$(CMAKE_EXTRA_FLAGS) ../'
-  - task: VSBuild@1
+      cmakeArgs: '$(CMAKE_EXTRA_FLAGS) $(SHARED_ARGS) ../'
+  - task: CMake@1
     inputs:
-      solution: 'build/*.sln'
-      vsVersion: 'latest'
-    condition: eq( variables['Agent.OS'], 'Windows_NT')
-    displayName: 'Visual Studio Build'
+      workingDir: 'build'
+      cmakeArgs: '--build . --config Release'
   - task: VSTest@2
     inputs:
       configuration: 'Release'
@@ -53,6 +57,8 @@ jobs:
         docker_target: nvcc
       hip:
         docker_target: hip
+      sycl:
+        docker_target: sycl
   pool:
     vmImage: 'ubuntu-latest'
   variables:

@@ -10,6 +10,10 @@ if (ENABLE_HIP)
   set (unit_depends ${unit_depends} hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (unit_depends ${unit_depends} openmp)
+endif ()
+
 blt_add_executable(
   NAME resource_manager_tests
   SOURCES resource_manager_tests.cpp

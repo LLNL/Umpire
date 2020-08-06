@@ -4,10 +4,13 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
+
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
-  Backtrace.hpp
+  backtrace.hpp
+  backtrace.inl
   Exception.hpp
   FixedMallocPool.hpp
   io.hpp
@@ -41,7 +44,6 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
-  Backtrace.cpp
   Exception.cpp
   FixedMallocPool.cpp
   io.cpp
@@ -64,7 +66,7 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends umpire_tpl_judy)
+set (umpire_util_depends camp umpire_tpl_judy)
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (umpire_util_depends
@@ -100,6 +102,12 @@ if (ENABLE_CALIPER)
   set (umpire_util_depends
     ${umpire_util_depends}
     cali)
+endif ()
+
+if (ENABLE_OPENMP_TARGET)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    openmp)
 endif ()
 
 blt_add_library(

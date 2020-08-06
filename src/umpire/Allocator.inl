@@ -21,7 +21,7 @@ Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
-  umpire_ver_2_found = 0;
+  umpire_ver_3_found = 0;
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 

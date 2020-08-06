@@ -57,5 +57,17 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id, Memo
   UMPIRE_ERROR("MemoryResource " << name << " not found");
 }
 
+MemoryResourceTraits
+MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
+{
+  for (auto const& allocator_factory : m_allocator_factories) {
+    if (allocator_factory->isValidMemoryResourceFor(name)) {
+      return allocator_factory->getDefaultTraits();
+    }
+  }
+
+  UMPIRE_ERROR("MemoryResource " << name << " not found");
+}
+
 } // end of namespace resource
 } // end of namespace umpire

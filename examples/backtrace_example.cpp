@@ -32,10 +32,10 @@ int main(int, char**)
 
   // Example #1 of 3 - Leaked allocations
   //
-  // If Umpire compiled with -DENABLE_ALLOCATION_BACKTRACE=On, then backtrace
+  // If Umpire compiled with -DENABLE_BACKTRACE=On, then backtrace
   // information will be printed for each of the allocations made above.
   //
-  // Otherwise, if Umpire was not compiled with -DENABLE_ALLOCATION_BACKTRACE=On,
+  // Otherwise, if Umpire was not compiled with -DENABLE_BACKTRACE=On,
   // then only the addresses and size information for each allocation will be
   // printed.
   //
@@ -65,7 +65,7 @@ int main(int, char**)
   // deconstructed.  During deconstruction, Umpire will log the size and
   // address, of each leaked allocation in each allocator.
   //
-  // If Umpire was compiled with -DENABLE_ALLOCATION_BACKTRACE=On, backtrace
+  // If Umpire was compiled with -DENABLE_BACKTRACE=On, backtrace
   // information will also be logged for each leaked allocation in each
   // allocator.
   //

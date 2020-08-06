@@ -28,7 +28,6 @@
 namespace umpire {
 
 static const char* env_name = "UMPIRE_REPLAY";
-int Replay::m_argument_number = 0;
 
 Replay::Replay() : m_replayUid(getpid())
 {
@@ -72,6 +71,12 @@ std::ostream& operator<< (
 std::ostream& operator<< (
     std::ostream& out,
     umpire::strategy::DynamicPoolList::CoalesceHeuristic& ) {
+  return out;
+}
+
+std::ostream& operator<< (
+    std::ostream& out,
+    umpire::strategy::QuickPool::CoalesceHeuristic& ) {
   return out;
 }
 

@@ -12,6 +12,17 @@ if (ENABLE_HIP)
       hip_runtime)
 endif()
 
+if (ENABLE_OPENMP_TARGET)
+  set (example_depends
+      ${example_depends}
+      openmp)
+endif()
+
+blt_add_executable(
+  NAME aligned_allocator
+  SOURCES aligned_allocator.cpp
+  DEPENDS_ON ${example_depends})
+
 blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx

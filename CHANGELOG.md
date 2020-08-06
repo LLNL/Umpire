@@ -10,22 +10,64 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added ASAN memory sanitization to QuickPool
+- Added File Memory Allocator
+
+### Changed
+
+- GitLab CI pipelines now generate the host-config files on-the-fly.
+- Bump BLT to v0.3.6
+
+### Removed
+
+- Removed replicated implementations for tracking high watermarks and
+  allocated byte counts from the Pools as this is now being provided
+  from the AllocationTracker/Inspector
+
+- Final remnants of unused ENABLE_COPY_HEADERS option removed.
+
+### Fixed
+
+- Poisoning instrumentation has is now properly balanced between allocate
+  and deallocate in DyanmicPoolMap.
+
+- Github action for checking CHANGELOG.
+
+- Type of `auto allocator` in HIP codepath.
+
+- When installing, camp target was not exported.
+
+## [3.0.0] - 2020-06-30
+
+### Added
+
 - Add support for multiple CUDA devices. These devices are detected and
   registered as "DEVICE_N", where N is the device number.
 
 - Allocation backtrace may be enabled by building umpire with 
-  -DENABLE_ALLOCATION_BACKTRACE
+  -DENABLE_BACKTRACE
 
 - Umpire exceptions now include backtrace information in the exception string.
 
+- `AlignedAllocator` strategy providing aligned allocations for HOST memory.
+
+- Additional symbol information may be obtained in backtraces with
+  -DENABLE_BACKTRACE_SYMBOLS and including `-ldl` for the using program.
+
+- Check for nullptr during `ResourceManager::registerAllocation`.
+
 ### Changed
 
-- LC Gitlab CI runs only a subset of targets on PRs, and all of them on master
+- LC Gitlab CI runs only a subset of targets on PRs, and all of them on main
   and develop branch. Lassen allocation is shorter. Jobs name or more efficient
   to read in UI. All builds goes in `${CI_BUILDS_DIR}/umpire/` to avoid multiple
   directories in `${CI_BUILDS_DIR}`.
 
 - Update BLT to version 0.3.0
+
+- `DeviceAllocator` will issue a trap instruction if it runs out of memory.
+
+- Switched to camp::Platform
 
 ### Removed
 

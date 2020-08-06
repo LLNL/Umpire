@@ -21,7 +21,7 @@ namespace strategy {
 std::function<bool(const strategy::DynamicPoolMap&)> heuristic_percent_releasable( int percentage )
 {
   if ( percentage < 0 || percentage > 100 ) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage 
+    UMPIRE_ERROR("Invalid percentage of " << percentage
         << ", percentage must be an integer between 0 and 100");
   }
 
@@ -32,7 +32,7 @@ std::function<bool(const strategy::DynamicPoolMap&)> heuristic_percent_releasabl
   }
   else if ( percentage == 100 ) {
     return [=] (const strategy::DynamicPoolMap& pool) {
-        return (pool.getCurrentSize() == 0 && pool.getReleasableSize() > 0);
+        return ( pool.getActualSize() == pool.getReleasableSize() );
     };
   }
 
@@ -48,7 +48,7 @@ std::function<bool(const strategy::DynamicPoolMap&)> heuristic_percent_releasabl
 std::function<bool(const strategy::DynamicPoolList&)> heuristic_percent_releasable_list( int percentage )
 {
   if ( percentage < 0 || percentage > 100 ) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage 
+    UMPIRE_ERROR("Invalid percentage of " << percentage
         << ", percentage must be an integer between 0 and 100");
   }
 
@@ -59,7 +59,7 @@ std::function<bool(const strategy::DynamicPoolList&)> heuristic_percent_releasab
   }
   else if ( percentage == 100 ) {
     return [=] (const strategy::DynamicPoolList& pool) {
-        return (pool.getCurrentSize() == 0 && pool.getReleasableSize() > 0);
+        return ( pool.getActualSize() == pool.getReleasableSize() );
     };
   }
 
