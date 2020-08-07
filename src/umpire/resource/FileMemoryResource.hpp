@@ -25,6 +25,7 @@ class FileMemoryResource :
     ~FileMemoryResource();
 
     void* allocate(std::size_t bytes);
+    void* allocate(std::size_t bytes, const char *pathname);
     void deallocate(void* ptr);
 
     std::size_t getCurrentSize() const noexcept;

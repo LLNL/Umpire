@@ -88,6 +88,40 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
+void* FileMemoryResource::allocate(std::size_t bytes, const char *pathname)
+{
+  // Open file
+  int fd{open(pathname, O_RDWR | O_CREAT | O_LARGEFILE, S_IRWXU)};
+  if (fd == -1) { 
+    UMPIRE_ERROR("Opening File { " << pathname << " } Failed: " << strerror(errno)); 
+  }
+
+//If file is of requested size no need for truncate but otherwise trancate the file larger?
+  // Setting Size Of Map File
+  const std::size_t pagesize{ (std::size_t) sysconf(_SC_PAGE_SIZE) };
+  std::size_t rounded_bytes{ ((bytes + (pagesize - 1))/ pagesize) * pagesize };
+
+  // Truncate file
+  int trun{ftruncate64(fd, rounded_bytes)};
+  if (trun == -1) { 
+    UMPIRE_ERROR("truncate64 Of File { " << ss.str() << " } Failed: " << strerror(errno)); 
+  }
+
+  // Using mmap
+// Find out location and replace NULL
+  void* ptr{mmap(NULL, rounded_bytes, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0)};
+  if (ptr == MAP_FAILED) { 
+    UMPIRE_ERROR("mmap Of " << rounded_bytes << " To File { " << pathname << " } Failed: " << strerror(errno)); 
+  }
+
+  // Storing Information On File
+  std::pair <const std::string, std::size_t> INFO{std::make_pair(pathname, rounded_bytes)};
+  m_size_map.insert(ptr, INFO);
+  
+  close(fd);
+  return ptr;
+}
+
 void FileMemoryResource::deallocate(void* ptr)
 {
   // Find information about ptr for deallocation
