@@ -108,7 +108,7 @@ DynamicPoolMap::findFreeBlock(std::size_t bytes) const
   return iter;
 }
 
-void* DynamicPool::allocateBlock(std::size_t bytes)
+void* DynamicPoolMap::allocateBlock(std::size_t bytes)
 {
   void* ptr{nullptr};
   try {
@@ -161,14 +161,14 @@ void* DynamicPool::allocateBlock(std::size_t bytes)
   return ptr;
 }
 
-void DynamicPool::deallocateBlock(void* ptr, std::size_t size)
+void DynamicPoolMap::deallocateBlock(void* ptr, std::size_t size)
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, size);
   m_actual_bytes -= size;
   aligned_deallocate(ptr);
 }
 
-void* DynamicPool::allocate(std::size_t bytes)
+void* DynamicPoolMap::allocate(std::size_t bytes)
 {
   bytes = aligned_round_up(bytes);
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
