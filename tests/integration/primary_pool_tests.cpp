@@ -15,7 +15,9 @@
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
+#include <random>
 #include <string>
+#include <vector>
 
 template <typename T> struct tag_to_string {};
 
@@ -102,11 +104,11 @@ class PrimaryPoolTest : public ::testing::Test
         }
 
         umpire::Allocator* m_allocator;
-        const std::size_t m_big{64};
+        const std::size_t m_big{512};
         const std::size_t m_nothing{0};
-        const std::size_t m_initial_pool_size{256};
-        const std::size_t m_min_pool_growth_size{15};
-        const std::size_t m_alignment{256};
+        const std::size_t m_initial_pool_size{ 16*1024 };
+        const std::size_t m_min_pool_growth_size{ 64 };
+        const std::size_t m_alignment{ 256 };
         std::string m_resource_name;
 };
 
@@ -160,4 +162,31 @@ TYPED_TEST(PrimaryPoolTest, Duplicate)
     ASSERT_ANY_THROW( rm.makeAllocator<Pool>(
                         this->m_allocator->getName(),
                         rm.getAllocator(this->m_resource_name)));
+}
+
+TYPED_TEST(PrimaryPoolTest, Alignment)
+{
+    std::random_device rd;
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<std::size_t> dist(1, this->m_big);
+    std::vector<void*> allocations;
+    const int num_allocations{1000};
+
+    for (int i=0; i<num_allocations; ++i) {
+        const std::size_t size{dist(mt)};
+        void *ptr{nullptr};
+
+        ASSERT_NO_THROW({ ptr = this->m_allocator->allocate(size); });
+
+        EXPECT_TRUE(0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment))
+            << "Allocation for size: " << size << " : "
+            << ptr << " mod " << this->m_alignment << " = "
+            << (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment) << std::endl;
+        ASSERT_TRUE(0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment));
+        allocations.push_back(ptr);
+    }
+
+    for (auto alloc : allocations) {
+        ASSERT_NO_THROW({ this->m_allocator->deallocate(alloc); });
+    }
 }
