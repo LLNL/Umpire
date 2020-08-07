@@ -57,7 +57,7 @@ class Umpire(CMakePackage, CudaPackage):
     git      = 'https://github.com/LLNL/Umpire.git'
 
     version('develop', branch='develop', submodules='True')
-    version('master', branch='master', submodules='True')
+    version('master', branch='main', submodules='True')
     version('3.0.0', tag='v3.0.0', submodules='True')
     version('2.1.0', tag='v2.1.0', submodules='True')
     version('2.0.0', tag='v2.0.0', submodules='True')
@@ -83,6 +83,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('numa', default=False, description='Enable NUMA support')
+    variant('shared', default=True, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
