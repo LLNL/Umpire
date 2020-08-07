@@ -19,24 +19,85 @@
 #include <string>
 #include <vector>
 
-template <typename T> struct tag_to_string {};
+template <typename T>
+struct tag_to_string
+{
+};
 
-template<> struct tag_to_string<umpire::strategy::DynamicPoolList> { static constexpr const char* value = "DynamicPoolList"; };
-template<> struct tag_to_string<umpire::strategy::DynamicPoolMap>  { static constexpr const char* value = "DynamicPoolMap"; };
-template<> struct tag_to_string<umpire::strategy::QuickPool>       { static constexpr const char* value = "QuickPool"; };
+template<>
+struct tag_to_string<umpire::strategy::DynamicPoolList>
+{
+    static constexpr const char* value = "DynamicPoolList";
+};
 
-struct host_resource_tag {};    template<> struct tag_to_string<host_resource_tag>      { static constexpr const char* value = "HOST"; };
+template<>
+struct tag_to_string<umpire::strategy::DynamicPoolMap>
+{
+    static constexpr const char* value = "DynamicPoolMap";
+};
+
+template<>
+struct tag_to_string<umpire::strategy::QuickPool>
+{
+    static constexpr const char* value = "QuickPool";
+};
+
+struct host_resource_tag
+{
+};
+
+template<>
+struct tag_to_string<host_resource_tag>
+{
+    static constexpr const char* value = "HOST";
+};
+
 #if defined(UMPIRE_ENABLE_DEVICE)
-struct device_resource_tag {};  template<> struct tag_to_string<device_resource_tag>    { static constexpr const char* value = "DEVICE"; };
+struct device_resource_tag
+{
+};
+
+template<>
+struct tag_to_string<device_resource_tag>
+{
+    static constexpr const char* value = "DEVICE";
+};
 #endif
+
 #if defined(UMPIRE_ENABLE_UM)
-struct um_resource_tag {};      template<> struct tag_to_string<um_resource_tag>        { static constexpr const char* value = "UM"; };
+struct um_resource_tag
+{
+};
+
+template<>
+struct tag_to_string<um_resource_tag>
+{
+    static constexpr const char* value = "UM";
+};
 #endif
+
 #if defined(UMPIRE_ENABLE_PINNED)
-struct pinned_resource_tag {};  template<> struct tag_to_string<pinned_resource_tag>    { static constexpr const char* value = "PINNED"; };
+struct pinned_resource_tag
+{
+};
+
+template<>
+struct tag_to_string<pinned_resource_tag>
+{
+    static constexpr const char* value = "PINNED";
+};
 #endif
+
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
-struct file_resource_tag {};    template<> struct tag_to_string<file_resource_tag>      { static constexpr const char* value = "FILE"; };
+struct file_resource_tag
+{
+};
+
+template<>
+struct tag_to_string<file_resource_tag>
+{
+    static constexpr const char* value = "FILE";
+};
 #endif
 
 using ResourceTypes = camp::list<
@@ -55,7 +116,9 @@ using ResourceTypes = camp::list<
 #endif
                         >;
 
-using PoolTypes = camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
+using PoolTypes = camp::list<umpire::strategy::DynamicPoolList,
+                    umpire::strategy::DynamicPoolMap,
+                    umpire::strategy::QuickPool>;
 
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
@@ -65,7 +128,8 @@ using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 template <class T>
 struct Test;
 template <class... T>
-struct Test<camp::list<T...>> {
+struct Test<camp::list<T...>>
+{
   using Types = ::testing::Types<T...>;
 };
 
@@ -90,11 +154,11 @@ class PrimaryPoolTest : public ::testing::Test
                 + std::string{"_"} + std::to_string(unique_counter++) };
 
             m_allocator = new umpire::Allocator(
-                            rm.makeAllocator<Pool>(   name
-                                                    , rm.getAllocator(m_resource_name)
-                                                    , m_initial_pool_size
-                                                    , m_min_pool_growth_size
-                                                    , m_alignment));
+                            rm.makeAllocator<Pool>(name
+                                            , rm.getAllocator(m_resource_name)
+                                            , m_initial_pool_size
+                                            , m_min_pool_growth_size
+                                            , m_alignment));
         }
 
         void TearDown() override
@@ -116,7 +180,8 @@ TYPED_TEST_SUITE(PrimaryPoolTest, PoolTestTypes,);
 
 TYPED_TEST(PrimaryPoolTest, AllocateDeallocateBig)
 {
-    double* data = static_cast<double*>(this->m_allocator->allocate(this->m_big*sizeof(double)));
+    double* data = static_cast<double*>(
+        this->m_allocator->allocate(this->m_big*sizeof(double)));
 
     ASSERT_NE(nullptr, data);
 
@@ -132,21 +197,38 @@ TYPED_TEST(PrimaryPoolTest, Allocate)
 
 TYPED_TEST(PrimaryPoolTest, Sizes)
 {
-    void* data = nullptr;
+    void* data{nullptr};
     const std::size_t size{this->m_initial_pool_size-1};
-    ASSERT_NO_THROW({ data = this->m_allocator->allocate(size); });
+
+    ASSERT_NO_THROW(
+        {
+            data = this->m_allocator->allocate(size);
+        });
+
     ASSERT_EQ(this->m_allocator->getSize(data), size);
     ASSERT_GE(this->m_allocator->getCurrentSize(), size);
     ASSERT_EQ(this->m_allocator->getHighWatermark(), size);
     ASSERT_EQ(this->m_allocator->getActualSize(), this->m_initial_pool_size);
 
-    void* data2 = nullptr;
-    ASSERT_NO_THROW({ data2 = this->m_allocator->allocate(this->m_initial_pool_size); });
-    ASSERT_NO_THROW({ this->m_allocator->deallocate(data); });
+    void* data2{nullptr};
+
+    ASSERT_NO_THROW(
+        {
+            data2 = this->m_allocator->allocate(this->m_initial_pool_size);
+        });
+    ASSERT_NO_THROW(
+        {
+            this->m_allocator->deallocate(data);
+        });
 
     ASSERT_GE(this->m_allocator->getCurrentSize(), this->m_initial_pool_size);
-    ASSERT_EQ(this->m_allocator->getHighWatermark(), this->m_initial_pool_size+size);
-    ASSERT_GE(this->m_allocator->getActualSize(), this->m_initial_pool_size+this->m_min_pool_growth_size);
+
+    ASSERT_EQ(this->m_allocator->getHighWatermark(),
+                this->m_initial_pool_size+size);
+
+    ASSERT_GE(this->m_allocator->getActualSize(),
+                this->m_initial_pool_size+this->m_min_pool_growth_size);
+
     ASSERT_EQ(this->m_allocator->getSize(data2), this->m_initial_pool_size);
 
     ASSERT_NO_THROW({ this->m_allocator->deallocate(data2); });
@@ -178,11 +260,16 @@ TYPED_TEST(PrimaryPoolTest, Alignment)
 
         ASSERT_NO_THROW({ ptr = this->m_allocator->allocate(size); });
 
-        EXPECT_TRUE(0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment))
+        EXPECT_TRUE(
+            0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment))
             << "Allocation for size: " << size << " : "
             << ptr << " mod " << this->m_alignment << " = "
-            << (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment) << std::endl;
-        ASSERT_TRUE(0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment));
+            << (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment)
+            << std::endl;
+
+        ASSERT_TRUE(
+            0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment));
+
         allocations.push_back(ptr);
     }
 
