@@ -105,9 +105,9 @@ class DynamicPoolList :
     MemoryResourceTraits getTraits() const noexcept final override;
 
   private:
-    DynamicSizePool<>* dpa;
-
     strategy::AllocationStrategy* m_allocator;
+    DynamicSizePool<> dpa;
+    
     CoalesceHeuristic do_coalesce;
 };
 
