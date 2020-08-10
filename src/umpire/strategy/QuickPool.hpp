@@ -71,6 +71,12 @@ class QuickPool :
     Platform getPlatform() noexcept override;
 
     /*!
+     * \brief Return the number of memory blocks -- both leased to application
+     * and internal free memory -- that the pool holds.
+     */
+    std::size_t getBlocksInPool() const noexcept;
+
+    /*!
      * \brief Get the largest allocatable number of bytes from pool before
      * the pool will grow.
      *

@@ -383,3 +383,46 @@ TYPED_TEST(PrimaryPoolTest, largestavailable)
         ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
     }
 }
+
+TYPED_TEST(PrimaryPoolTest, coalesce)
+{
+    using Pool  = typename TestFixture::Pool;
+
+    auto dynamic_pool =
+                    umpire::util::unwrap_allocator<Pool>(*this->m_allocator);
+
+    ASSERT_NE(dynamic_pool, nullptr);
+
+    void* ptr_one{nullptr};
+    void* ptr_two{nullptr};
+
+    ASSERT_NO_THROW(
+        {
+            ptr_one = this->m_allocator->allocate( 1 + this->m_initial_pool_size - this->m_min_pool_growth_size );
+            ptr_two = this->m_allocator->allocate( this->m_min_pool_growth_size );
+        });
+
+    ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+    ASSERT_NO_THROW(
+        {
+            this->m_allocator->deallocate(ptr_two);
+        });
+
+    dynamic_pool->coalesce();
+
+    ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
+
+    ASSERT_NO_THROW(
+        {
+            this->m_allocator->deallocate(ptr_one);
+        });
+
+    dynamic_pool->coalesce();
+
+    ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
+
+    ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
+    ASSERT_EQ(dynamic_pool->getActualSize(), this->m_initial_pool_size + this->m_alignment);
+    ASSERT_EQ(this->m_allocator->getHighWatermark(),
+             1 + this->m_initial_pool_size );
+}

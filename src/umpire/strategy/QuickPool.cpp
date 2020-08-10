@@ -266,6 +266,12 @@ QuickPool::getPlatform() noexcept
 }
 
 std::size_t
+QuickPool::getBlocksInPool() const noexcept
+{
+  return m_pointer_map.size() + m_size_map.size();
+};
+
+std::size_t
 QuickPool::getLargestAvailableBlock() noexcept
 {
   if ( !m_size_map.size() ) {
