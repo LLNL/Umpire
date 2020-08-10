@@ -129,6 +129,12 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (ENABLE_CALIPER)
+  set( umpire_op_depends
+    ${umpire_op_depends}
+    cali)
+endif ()
+
 blt_add_library(
   NAME umpire_op
   HEADERS ${umpire_op_headers}

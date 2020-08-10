@@ -76,6 +76,12 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (ENABLE_CALIPER)
+  set( umpire_strategy_depends
+    ${umpire_strategy_depends}
+    cali)
+endif ()
+
 blt_add_library(
   NAME umpire_strategy
   HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
