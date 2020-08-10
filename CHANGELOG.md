@@ -43,6 +43,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - When installing, camp target was not exported.
 
+- DynamicPoolList no longer uses a pointer for DynamicSizePool, fixing
+  memory leak.
+
 ## [3.0.0] - 2020-06-30
 
 ### Added

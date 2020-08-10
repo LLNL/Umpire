@@ -24,12 +24,14 @@ DynamicPoolList::DynamicPoolList(
     const std::size_t alignment,
     CoalesceHeuristic should_coalesce) noexcept
   :
-  AllocationStrategy(name, id),
-  dpa(nullptr),
-  m_allocator(allocator.getAllocationStrategy()),
+  AllocationStrategy{ name, id },
+  m_allocator{ allocator.getAllocationStrategy() },
+  dpa{ DynamicSizePool<>{ m_allocator,
+                          min_initial_alloc_size,
+                          min_alloc_size,
+                          alignment } },
   m_should_coalesce{should_coalesce}
 {
-  dpa = new DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size, alignment);
 }
 
 void*
@@ -37,7 +39,7 @@ DynamicPoolList::allocate(size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
 
-  void* ptr = dpa->allocate(bytes);
+  void* ptr = dpa.allocate(bytes);
   return ptr;
 }
 
@@ -45,25 +47,25 @@ void
 DynamicPoolList::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  dpa->deallocate(ptr);
+  dpa.deallocate(ptr);
 
   if ( m_should_coalesce(*this) ) {
     UMPIRE_LOG(Debug, "Heuristic returned true, "
         "performing coalesce operation for " << this << "\n");
-    dpa->coalesce();
+    dpa.coalesce();
   }
 }
 
 void
 DynamicPoolList::release()
 {
-  dpa->release();
+  dpa.release();
 }
 
 std::size_t
 DynamicPoolList::getActualSize() const noexcept
 {
-  std::size_t ActualSize = dpa->getActualSize();
+  std::size_t ActualSize = dpa.getActualSize();
   UMPIRE_LOG(Debug, "() returning " << ActualSize);
   return ActualSize;
 }
@@ -71,7 +73,7 @@ DynamicPoolList::getActualSize() const noexcept
 std::size_t
 DynamicPoolList::getReleasableSize() const noexcept
 {
-  std::size_t SparseBlockSize = dpa->getReleasableSize();
+  std::size_t SparseBlockSize = dpa.getReleasableSize();
   UMPIRE_LOG(Debug, "() returning " << SparseBlockSize);
   return SparseBlockSize;
 }
@@ -79,7 +81,7 @@ DynamicPoolList::getReleasableSize() const noexcept
 std::size_t
 DynamicPoolList::getBlocksInPool() const noexcept
 {
-  std::size_t BlocksInPool = dpa->getBlocksInPool();
+  std::size_t BlocksInPool = dpa.getBlocksInPool();
   UMPIRE_LOG(Debug, "() returning " << BlocksInPool);
   return BlocksInPool;
 }
@@ -87,7 +89,7 @@ DynamicPoolList::getBlocksInPool() const noexcept
 std::size_t
 DynamicPoolList::getLargestAvailableBlock() const noexcept
 {
-  std::size_t LargestAvailableBlock = dpa->getLargestAvailableBlock();
+  std::size_t LargestAvailableBlock = dpa.getLargestAvailableBlock();
   UMPIRE_LOG(Debug, "() returning " << LargestAvailableBlock);
   return LargestAvailableBlock;
 }
@@ -108,7 +110,7 @@ void
 DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
-  dpa->coalesce();
+  dpa.coalesce();
 }
 
 } // end of namespace strategy
