@@ -27,7 +27,8 @@ struct PosixMemalignAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t bytes) {
+  void* allocate(std::size_t bytes)
+  {
     void* ret = NULL;
     ::posix_memalign(&ret, get_page_size(), bytes);
 
@@ -49,13 +50,14 @@ struct PosixMemalignAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be free'd.
    */
-  void deallocate(void* ptr) {
+  void deallocate(void* ptr)
+  {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::free(ptr);
   }
 };
 
-}  // end of namespace alloc
-}  // end of namespace umpire
+} // end of namespace alloc
+} // end of namespace umpire
 
-#endif  // UMPIRE_PosixMemalignAllocator_HPP
+#endif // UMPIRE_PosixMemalignAllocator_HPP

@@ -13,7 +13,8 @@ namespace umpire {
 namespace alloc {
 
 struct CudaPinnedAllocator {
-  void* allocate(std::size_t bytes) {
+  void* allocate(std::size_t bytes)
+  {
     void* ptr = nullptr;
     cudaError_t error = ::cudaMallocHost(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
@@ -26,7 +27,8 @@ struct CudaPinnedAllocator {
     }
   }
 
-  void deallocate(void* ptr) {
+  void deallocate(void* ptr)
+  {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFreeHost(ptr);
     if (error != cudaSuccess) {
@@ -36,7 +38,7 @@ struct CudaPinnedAllocator {
   }
 };
 
-}  // end of namespace alloc
-}  // end of namespace umpire
+} // end of namespace alloc
+} // end of namespace umpire
 
-#endif  // UMPIRE_CudaPinnedAllocator_HPP
+#endif // UMPIRE_CudaPinnedAllocator_HPP

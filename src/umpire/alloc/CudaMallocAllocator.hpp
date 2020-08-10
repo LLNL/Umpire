@@ -27,7 +27,8 @@ struct CudaMallocAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t size) {
+  void* allocate(std::size_t size)
+  {
     void* ptr = nullptr;
     cudaError_t error = ::cudaMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
@@ -46,7 +47,8 @@ struct CudaMallocAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be free'd.
    */
-  void deallocate(void* ptr) {
+  void deallocate(void* ptr)
+  {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
@@ -56,7 +58,7 @@ struct CudaMallocAllocator {
   }
 };
 
-}  // end of namespace alloc
-}  // end of namespace umpire
+} // end of namespace alloc
+} // end of namespace umpire
 
-#endif  // UMPIRE_CudaMallocAllocator_HPP
+#endif // UMPIRE_CudaMallocAllocator_HPP

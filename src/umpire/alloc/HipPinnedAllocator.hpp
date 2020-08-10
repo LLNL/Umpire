@@ -13,7 +13,8 @@ namespace umpire {
 namespace alloc {
 
 struct HipPinnedAllocator {
-  void* allocate(std::size_t bytes) {
+  void* allocate(std::size_t bytes)
+  {
     void* ptr = nullptr;
     hipError_t error = ::hipHostMalloc(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
@@ -26,7 +27,8 @@ struct HipPinnedAllocator {
     }
   }
 
-  void deallocate(void* ptr) {
+  void deallocate(void* ptr)
+  {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipHostFree(ptr);
     if (error != hipSuccess) {
@@ -36,7 +38,7 @@ struct HipPinnedAllocator {
   }
 };
 
-}  // end of namespace alloc
-}  // end of namespace umpire
+} // end of namespace alloc
+} // end of namespace umpire
 
-#endif  // UMPIRE_HipPinnedAllocator_HPP
+#endif // UMPIRE_HipPinnedAllocator_HPP
