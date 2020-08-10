@@ -1,4 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
@@ -264,6 +263,15 @@ Platform
 QuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+std::size_t
+QuickPool::getLargestAvailableBlock() noexcept
+{
+  if ( !m_size_map.size() ) {
+    return 0;
+  }
+  return m_size_map.rbegin()->first;
 }
 
 void

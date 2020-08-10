@@ -70,6 +70,15 @@ class QuickPool :
 
     Platform getPlatform() noexcept override;
 
+    /*!
+     * \brief Get the largest allocatable number of bytes from pool before
+     * the pool will grow.
+     *
+     * return The largest number of bytes that may be allocated without
+     * causing pool growth
+     */
+    std::size_t getLargestAvailableBlock() noexcept;
+
     void coalesce() noexcept;
 
   private:

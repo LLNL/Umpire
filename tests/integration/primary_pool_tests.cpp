@@ -274,6 +274,112 @@ TYPED_TEST(PrimaryPoolTest, Alignment)
     }
 
     for (auto alloc : allocations) {
-        ASSERT_NO_THROW({ this->m_allocator->deallocate(alloc); });
+        ASSERT_NO_THROW(
+            {
+                this->m_allocator->deallocate(alloc);
+            });
+    }
+}
+
+TYPED_TEST(PrimaryPoolTest, Works)
+{
+    void* ptr_one{nullptr};
+    void* ptr_two{nullptr};
+
+    ASSERT_NO_THROW(
+        {
+            ptr_one = this->m_allocator->allocate(62);
+            ptr_two = this->m_allocator->allocate(1024);
+            this->m_allocator->deallocate(ptr_two);
+        });
+
+    ASSERT_EQ(this->m_allocator->getCurrentSize(), 62);
+    EXPECT_NO_THROW(this->m_allocator->release());
+
+    ASSERT_LE(this->m_allocator->getActualSize(), this->m_initial_pool_size);
+
+    ASSERT_NO_THROW(
+        {
+            this->m_allocator->deallocate(ptr_one);
+        });
+
+    ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
+
+    EXPECT_NO_THROW(this->m_allocator->release());
+
+    ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
+    ASSERT_LE(this->m_allocator->getActualSize(), 0);
+}
+
+TYPED_TEST(PrimaryPoolTest, MissingBlocks)
+{
+    void* ptr_one{nullptr};
+    void* ptr_two{nullptr};
+
+    ASSERT_NO_THROW(
+        {
+            ptr_one = this->m_allocator->allocate(128);
+            ptr_two = this->m_allocator->allocate(44);
+            this->m_allocator->deallocate(ptr_one);
+            this->m_allocator->deallocate(ptr_two);
+        });
+
+    ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
+    ASSERT_GE(this->m_allocator->getActualSize(), 0);
+
+    this->m_allocator->release();
+
+    ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
+    ASSERT_EQ(this->m_allocator->getActualSize(), 0);
+}
+
+TYPED_TEST(PrimaryPoolTest, largestavailable)
+{
+    using Pool  = typename TestFixture::Pool;
+    const int num_allocs = 16;
+
+    auto dynamic_pool =
+                    umpire::util::unwrap_allocator<Pool>(*this->m_allocator);
+
+    ASSERT_NE(dynamic_pool, nullptr);
+
+    ASSERT_NO_THROW(
+        {
+            void* ptr{ this->m_allocator->allocate(1024) };
+
+            this->m_allocator->deallocate(ptr);
+        });
+
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), this->m_initial_pool_size);
+
+    void* ptrs[num_allocs];
+
+    for ( int i{0}; i < num_allocs; ++i ) {
+        ASSERT_NO_THROW(
+            {
+                ptrs[i] = this->m_allocator->allocate(1024);
+            });
+
+        ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(),
+                                    ( (num_allocs-(i+1)) * 1024) );
+    }
+
+    for ( int i{0}; i < num_allocs; i += 2 ) {
+        ASSERT_NO_THROW(
+            {
+                this->m_allocator->deallocate(ptrs[i]);
+            });
+
+        ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), 1024);
+    }
+
+    for ( int i{1}; i < num_allocs; i += 2 ) {
+        const int largest_block{
+                        ((i+2) < num_allocs) ? (i+2) * 1024 : (i+1) * 1024 };
+        ASSERT_NO_THROW(
+            {
+                this->m_allocator->deallocate(ptrs[i]);
+            });
+        ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
     }
 }
