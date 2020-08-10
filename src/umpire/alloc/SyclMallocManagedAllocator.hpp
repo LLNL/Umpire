@@ -18,8 +18,7 @@ namespace alloc {
  * \brief Uses sycl_shared and sycl_free to allocate and deallocate
  *        unified shared memory (USM) on Intel GPUs.
  */
-struct SyclMallocManagedAllocator
-{
+struct SyclMallocManagedAllocator {
   /*!
    * \brief Allocate bytes of memory using cl::sycl::malloc_shared.
    *
@@ -29,8 +28,7 @@ struct SyclMallocManagedAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t bytes, const cl::sycl::queue& queue_t)
-  {
+  void* allocate(std::size_t bytes, const cl::sycl::queue& queue_t) {
     void* usm_ptr = cl::sycl::malloc_shared(bytes, queue_t);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
@@ -50,15 +48,14 @@ struct SyclMallocManagedAllocator
    *
    * \throws umpire::util::Exception if memory be free'd.
    */
-  void deallocate(void* usm_ptr, const cl::sycl::queue& queue_t)
-  {
+  void deallocate(void* usm_ptr, const cl::sycl::queue& queue_t) {
     UMPIRE_LOG(Debug, "(usm_ptr=" << usm_ptr << ")");
 
     cl::sycl::free(usm_ptr, queue_t);
   }
 };
 
-} // end of namespace alloc
-} // end of namespace umpire
+}  // end of namespace alloc
+}  // end of namespace umpire
 
-#endif // UMPIRE_SyclMallocManagedAllocator_HPP
+#endif  // UMPIRE_SyclMallocManagedAllocator_HPP

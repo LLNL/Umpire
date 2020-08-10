@@ -8,7 +8,7 @@ macro(umpire_add_code_checks)
 
     if ("${PROJECT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
         set(_sources)
-        file(GLOB_RECURSE _sources
+        file(GLOB _sources
              "*.cpp" "*.hpp" "*.inl" "*.c" "*.h" "*.F" "*.f" "*.f90" "*.F90")
 
         blt_add_code_checks(PREFIX    ${arg_PREFIX}

@@ -17,8 +17,7 @@ namespace alloc {
 /*!
  * \brief Uses malloc and free to allocate and deallocate CPU memory.
  */
-struct MallocAllocator
-{
+struct MallocAllocator {
   /*!
    * \brief Allocate bytes of memory using malloc.
    *
@@ -27,8 +26,7 @@ struct MallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t bytes)
-  {
+  void* allocate(std::size_t bytes) {
     void* ret = ::malloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
@@ -46,14 +44,13 @@ struct MallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be free'd.
    */
-  void deallocate(void* ptr)
-  {
+  void deallocate(void* ptr) {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::free(ptr);
   }
 };
 
-} // end of namespace alloc
-} // end of namespace umpire
+}  // end of namespace alloc
+}  // end of namespace umpire
 
-#endif // UMPIRE_MallocAllocator_HPP
+#endif  // UMPIRE_MallocAllocator_HPP

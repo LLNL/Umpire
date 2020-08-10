@@ -18,8 +18,7 @@ namespace alloc {
  * \brief Uses sycl's malloc and free to allocate and deallocate memory on
  *        Intel GPUs.
  */
-struct SyclMallocAllocator
-{
+struct SyclMallocAllocator {
   /*!
    * \Brief Allocate bytes of memory using SYCL malloc
    *
@@ -29,8 +28,7 @@ struct SyclMallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t size, const cl::sycl::queue& queue_t)
-  {
+  void* allocate(std::size_t size, const cl::sycl::queue& queue_t) {
     void* ptr = cl::sycl::malloc_device(size, queue_t);
 
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
@@ -51,15 +49,14 @@ struct SyclMallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be free'd.
    */
-  void deallocate(void* ptr, const cl::sycl::queue& queue_t)
-  {
+  void deallocate(void* ptr, const cl::sycl::queue& queue_t) {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
     cl::sycl::free(ptr, queue_t);
   }
 };
 
-} // end of namespace alloc
-} // end of namespace umpire
+}  // end of namespace alloc
+}  // end of namespace umpire
 
-#endif // UMPIRE_SyclMallocAllocator_HPP
+#endif  // UMPIRE_SyclMallocAllocator_HPP

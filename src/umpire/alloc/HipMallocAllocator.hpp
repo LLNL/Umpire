@@ -16,8 +16,7 @@ namespace alloc {
  * \brief Uses hipMalloc and hipFree to allocate and deallocate memory on
  *        AMD GPUs.
  */
-struct HipMallocAllocator
-{
+struct HipMallocAllocator {
   /*!
    * \brief Allocate bytes of memory using hipMalloc
    *
@@ -26,8 +25,7 @@ struct HipMallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t size)
-  {
+  void* allocate(std::size_t size) {
     void* ptr = nullptr;
     hipError_t error = ::hipMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
@@ -46,8 +44,7 @@ struct HipMallocAllocator
    *
    * \throws umpire::util::Exception if memory cannot be free'd.
    */
-  void deallocate(void* ptr)
-  {
+  void deallocate(void* ptr) {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
@@ -57,7 +54,7 @@ struct HipMallocAllocator
   }
 };
 
-} // end of namespace alloc
-} // end of namespace umpire
+}  // end of namespace alloc
+}  // end of namespace umpire
 
-#endif // UMPIRE_HipMallocAllocator_HPP
+#endif  // UMPIRE_HipMallocAllocator_HPP
