@@ -87,6 +87,8 @@ class Umpire(CMakePackage, CudaPackage):
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
+    variant('tests', default='none', values=('none', 'basic', 'benchmarks'),
+            multi=False, description='Tests to run')
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
 
@@ -267,6 +269,9 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
+
+        cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
+        cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
 
         #######################
         # Close and save
