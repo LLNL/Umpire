@@ -10,3 +10,5 @@ if(ENABLE_TESTS)
     include(CTest)
     message(STATUS "Memcheck suppressions file: ${MEMORYCHECK_SUPPRESSIONS_FILE}")
 endif()
+
+include(cmake/UmpireMacros.cmake)

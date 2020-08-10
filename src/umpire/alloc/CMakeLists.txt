@@ -63,3 +63,5 @@ install(TARGETS
 install(FILES
   ${umpire_alloc_headers}
   DESTINATION include/umpire/alloc)
+
+umpire_add_code_checks(PREFIX alloc)

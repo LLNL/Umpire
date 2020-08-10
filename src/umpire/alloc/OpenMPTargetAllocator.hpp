@@ -19,8 +19,7 @@ namespace alloc {
  */
 struct OpenMPTargetAllocator
 {
-  OpenMPTargetAllocator(int _device) :
-    device{_device} {}
+  OpenMPTargetAllocator(int _device) : device {_device} { }
   /*!
    * \brief Allocate bytes of memory using malloc.
    *
@@ -34,8 +33,9 @@ struct OpenMPTargetAllocator
     void* ret = omp_target_alloc(bytes, device);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
-    if  (ret == nullptr) {
-      UMPIRE_ERROR("omp_target_alloc( bytes = " << bytes << ", device = " << device << " ) failed");
+    if (ret == nullptr) {
+      UMPIRE_ERROR("omp_target_alloc( bytes = " << bytes << ", device = "
+                                                << device << " ) failed");
     } else {
       return ret;
     }

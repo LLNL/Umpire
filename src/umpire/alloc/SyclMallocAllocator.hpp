@@ -18,7 +18,8 @@ namespace alloc {
  * \brief Uses sycl's malloc and free to allocate and deallocate memory on
  *        Intel GPUs.
  */
-struct SyclMallocAllocator {
+struct SyclMallocAllocator
+{
   /*!
    * \Brief Allocate bytes of memory using SYCL malloc
    *
@@ -35,7 +36,8 @@ struct SyclMallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR("SYCL malloc_device( bytes = " << size << " ) failed with error!");
+      UMPIRE_ERROR("SYCL malloc_device( bytes = " << size
+                                                  << " ) failed with error!");
     } else {
       return ptr;
     }

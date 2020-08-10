@@ -18,7 +18,8 @@ namespace alloc {
  * \brief Uses sycl's malloc_host and free to allocate and deallocate
  *        pinned memory on host.
  */
-struct SyclPinnedAllocator {
+struct SyclPinnedAllocator
+{
   /*!
    * \Brief Allocate bytes of memory using SYCL malloc_host
    *
@@ -35,7 +36,8 @@ struct SyclPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR("SYCL malloc_host( bytes = " << size << " ) failed with error!");
+      UMPIRE_ERROR("SYCL malloc_host( bytes = " << size
+                                                << " ) failed with error!");
     } else {
       return ptr;
     }

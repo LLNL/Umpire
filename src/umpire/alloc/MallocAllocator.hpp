@@ -32,7 +32,7 @@ struct MallocAllocator
     void* ret = ::malloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
-    if  (ret == nullptr) {
+    if (ret == nullptr) {
       UMPIRE_ERROR("malloc( bytes = " << bytes << " ) failed");
     } else {
       return ret;
