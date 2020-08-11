@@ -12,6 +12,7 @@
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
+#include <functional>
 #include <map>
 #include <tuple>
 
