@@ -41,7 +41,7 @@ DynamicPoolMap::DynamicPoolMap(
   std::size_t bytes{ m_first_minimum_pool_allocation_size };
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
-    umpire::util::backtrace bt{};
+    umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
   }
@@ -114,7 +114,7 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
   try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
     {
-      umpire::util::backtrace bt{};
+      umpire::util::backtrace bt;
       umpire::util::backtracer<>::get_backtrace(bt);
       UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes+bytes)
         << " (prev: " << m_actual_bytes << ") "
@@ -407,7 +407,7 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   if (released_bytes > 0) {
-    umpire::util::backtrace bt{};
+    umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes
       << " (prev: " << (m_actual_bytes+released_bytes)

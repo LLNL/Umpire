@@ -31,7 +31,7 @@ QuickPool::QuickPool(
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
-    umpire::util::backtrace bt{};
+    umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size:"
       << m_first_minimum_pool_allocation_size << " (prev: 0) "
@@ -78,7 +78,7 @@ QuickPool::allocate(std::size_t bytes)
     try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
       {
-        umpire::util::backtrace bt{};
+        umpire::util::backtrace bt;
         umpire::util::backtracer<>::get_backtrace(bt);
         UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+bytes)
           << " (prev: " << m_actual_bytes
@@ -243,7 +243,7 @@ void QuickPool::release()
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   if (prev_size > m_actual_bytes) {
-    umpire::util::backtrace bt{};
+    umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes
       << " (prev: " << prev_size
@@ -327,10 +327,9 @@ QuickPool::percent_releasable(int percentage)
     float f = (float)((float)percentage / (float)100.0);
 
     return [=] (const strategy::QuickPool& pool) {
-      auto actual_size{pool.getActualSize()};
-      auto releasable_size{pool.getReleasableSize()};
-      const std::size_t threshold = static_cast<std::size_t>(f * actual_size);
-      return (releasable_size >= threshold);
+      // Calculate threshold in bytes from the percentage
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+      return (pool.getReleasableSize() >= threshold);
     };
   }
 }

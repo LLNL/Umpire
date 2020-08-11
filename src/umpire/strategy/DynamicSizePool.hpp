@@ -80,7 +80,7 @@ protected:
     try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
       {
-        umpire::util::backtrace bt{};
+        umpire::util::backtrace bt;
         umpire::util::backtracer<>::get_backtrace(bt);
         UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+size)
           << " (prev: " << m_actual_bytes << ") "
@@ -237,7 +237,7 @@ protected:
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
     if (freed > 0) {
-      umpire::util::backtrace bt{};
+      umpire::util::backtrace bt;
       umpire::util::backtracer<>::get_backtrace(bt);
       UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes)
         << " (prev: " << (m_actual_bytes+freed)
