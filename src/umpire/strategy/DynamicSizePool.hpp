@@ -42,17 +42,14 @@ protected:
   struct Block *usedBlocks{nullptr};
   struct Block *freeBlocks{nullptr};
 
-  // Total blocks in the pool
-  std::size_t totalBlocks{0};
-
   // Total size allocated (bytes)
   std::size_t m_actual_bytes{0};
 
   // Minimum size of initial allocation
-  std::size_t m_initial_alloc_size;
+  std::size_t m_first_minimum_pool_allocation_size;
 
   // Minimum size for allocations
-  std::size_t m_min_alloc_size;
+  std::size_t m_next_minimum_pool_allocation_size;
 
   // Search the list of free blocks and return a usable one if that exists, else NULL
   void findUsableBlock(struct Block *&best, struct Block *&prev, std::size_t size) {
@@ -72,9 +69,9 @@ protected:
   void allocateBlock(struct Block *&curr, struct Block *&prev, std::size_t size)
   {
     if ( freeBlocks == NULL && usedBlocks == NULL )
-      size = std::max(size, m_initial_alloc_size);
+      size = std::max(size, m_first_minimum_pool_allocation_size);
     else
-      size = std::max(size, m_min_alloc_size);
+      size = std::max(size, m_next_minimum_pool_allocation_size);
 
     curr = nullptr;
     prev = nullptr;
@@ -125,7 +122,6 @@ protected:
 
     UMPIRE_POISON_MEMORY_REGION(m_allocator, data, size);
 
-    totalBlocks += 1;
     m_actual_bytes += size;
 
     // Allocate the block
@@ -223,7 +219,6 @@ protected:
       // Make sure to only free blocks that are completely released.
       //
       if ( curr->size == curr->blockSize ) {
-        totalBlocks -= 1;
         UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
         m_actual_bytes -= curr->size;
         freed += curr->size;
@@ -276,12 +271,12 @@ protected:
 public:
   DynamicSizePool(
       umpire::strategy::AllocationStrategy* strat,
-      const std::size_t initial_alloc_size = (16 * 1024),
-      const std::size_t min_alloc_size = 256,
+      const std::size_t first_minimum_pool_allocation_size = (16 * 1024),
+      const std::size_t next_minimum_pool_allocation_size = 256,
       const std::size_t alignment = 16) :
     umpire::strategy::mixins::AlignedAllocation{alignment, strat},
-    m_initial_alloc_size{ aligned_round_up(initial_alloc_size) },
-    m_min_alloc_size{ aligned_round_up(min_alloc_size) }
+    m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
+    m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
   {
   }
 
@@ -341,7 +336,17 @@ public:
 
   std::size_t getBlocksInPool() const
   {
-    return totalBlocks;
+    std::size_t total_blocks{0};
+    struct Block *curr{nullptr};
+
+    for (curr = usedBlocks ; curr; curr = curr->next ) {
+      total_blocks += 1;
+    }
+    for (curr = freeBlocks ; curr; curr = curr->next ) {
+      total_blocks += 1;
+    }
+
+    return total_blocks;
   }
 
   std::size_t getLargestAvailableBlock() const

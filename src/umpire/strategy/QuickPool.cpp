@@ -19,35 +19,35 @@ QuickPool::QuickPool(
     const std::string& name,
     int id,
     Allocator allocator,
-    const std::size_t initial_alloc_size,
-    const std::size_t min_alloc_size,
+    const std::size_t first_minimum_pool_allocation_size,
+    const std::size_t next_minimum_pool_allocation_size,
     std::size_t alignment,
-    CoalesceHeuristic coalesce_heuristic) noexcept :
+    CoalesceHeuristic should_coalesce) noexcept :
   AllocationStrategy{name, id},
   mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
-  m_should_coalesce{coalesce_heuristic},
-  m_initial_alloc_bytes{ aligned_round_up(initial_alloc_size) },
-  m_min_alloc_bytes{ aligned_round_up(min_alloc_size) }
+  m_should_coalesce{should_coalesce},
+  m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
+  m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
 {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
     umpire::util::backtrace bt{};
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size:"
-      << m_initial_alloc_bytes << " (prev: 0) "
+      << m_first_minimum_pool_allocation_size << " (prev: 0) "
       << umpire::util::backtracer<>::print(bt));
   }
 #endif
 
-  void* ptr{aligned_allocate(m_initial_alloc_bytes)};
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
+  void* ptr{aligned_allocate(m_first_minimum_pool_allocation_size)};
+  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_first_minimum_pool_allocation_size);
 
-  m_actual_bytes += m_initial_alloc_bytes;
-  m_releasable_bytes += m_initial_alloc_bytes;
+  m_actual_bytes += m_first_minimum_pool_allocation_size;
+  m_releasable_bytes += m_first_minimum_pool_allocation_size;
 
   void* chunk_storage{m_chunk_pool.allocate()};
-  Chunk* chunk{new (chunk_storage) Chunk(ptr, m_initial_alloc_bytes, m_initial_alloc_bytes)};
-  chunk->size_map_it = m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
+  Chunk* chunk{new (chunk_storage) Chunk(ptr, m_first_minimum_pool_allocation_size, m_first_minimum_pool_allocation_size)};
+  chunk->size_map_it = m_size_map.insert(std::make_pair(m_first_minimum_pool_allocation_size, chunk));
 }
 
 QuickPool::~QuickPool()
@@ -65,7 +65,13 @@ QuickPool::allocate(std::size_t bytes)
   Chunk* chunk{nullptr};
 
   if (best == m_size_map.end()) {
-    std::size_t size{ (bytes > m_min_alloc_bytes) ? bytes : m_min_alloc_bytes};
+
+    std::size_t bytes_to_use{
+      ( m_actual_bytes == 0 ) ? m_first_minimum_pool_allocation_size
+                              : m_next_minimum_pool_allocation_size };
+
+    std::size_t size{ (bytes > bytes_to_use) ? bytes : bytes_to_use };
+
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
 
     void* ret{nullptr};
@@ -107,6 +113,10 @@ QuickPool::allocate(std::size_t bytes)
       << chunk->data << " and size " << chunk->size
       << " for allocation of size " << bytes);
 
+  if ( (chunk->size == chunk->chunk_size) && chunk->free) {
+    m_releasable_bytes -= chunk->chunk_size;
+  }
+
   void* ret = chunk->data;
   m_pointer_map.insert(std::make_pair(ret, chunk));
 
@@ -117,7 +127,6 @@ QuickPool::allocate(std::size_t bytes)
     UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into "
         << bytes << " and " << remaining);
 
-    m_releasable_bytes -= chunk->chunk_size;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{
@@ -318,9 +327,10 @@ QuickPool::percent_releasable(int percentage)
     float f = (float)((float)percentage / (float)100.0);
 
     return [=] (const strategy::QuickPool& pool) {
-      // Calculate threshold in bytes from the percentage
-      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return (pool.getReleasableSize() >= threshold);
+      auto actual_size{pool.getActualSize()};
+      auto releasable_size{pool.getReleasableSize()};
+      const std::size_t threshold = static_cast<std::size_t>(f * actual_size);
+      return (releasable_size >= threshold);
     };
   }
 }

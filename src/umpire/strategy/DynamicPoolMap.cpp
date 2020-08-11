@@ -28,17 +28,17 @@ DynamicPoolMap::DynamicPoolMap(
     const std::string& name,
     int id,
     Allocator allocator,
-    const std::size_t initial_alloc_bytes,
-    const std::size_t min_alloc_bytes,
+    const std::size_t first_minimum_pool_allocation_size,
+    const std::size_t next_minimum_pool_allocation_size,
     const std::size_t alignment,
-    CoalesceHeuristic coalesce_heuristic) noexcept :
+    CoalesceHeuristic should_coalesce) noexcept :
   AllocationStrategy{name, id},
   mixins::AlignedAllocation{ alignment, allocator.getAllocationStrategy() },
-  m_should_coalesce{ coalesce_heuristic },
-  m_initial_alloc_bytes{ aligned_round_up(initial_alloc_bytes) },
-  m_min_alloc_bytes{ aligned_round_up(min_alloc_bytes) }
+  m_should_coalesce{ should_coalesce },
+  m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
+  m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
 {
-  std::size_t bytes{ m_initial_alloc_bytes };
+  std::size_t bytes{ m_first_minimum_pool_allocation_size };
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   {
     umpire::util::backtrace bt{};
@@ -199,7 +199,7 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
     }
   } else {
     const std::size_t min_block_size =
-      ( m_actual_bytes == 0 ) ? m_initial_alloc_bytes : m_min_alloc_bytes;
+      ( m_actual_bytes == 0 ) ? m_first_minimum_pool_allocation_size : m_next_minimum_pool_allocation_size;
 
     const std::size_t alloc_bytes{std::max(bytes, min_block_size)};
     ptr = allocateBlock(alloc_bytes);
@@ -457,5 +457,33 @@ void DynamicPoolMap::do_coalesce()
     }
   }
 }
+
+DynamicPoolMap::CoalesceHeuristic
+DynamicPoolMap::percent_releasable(int percentage)
+{
+  if ( percentage < 0 || percentage > 100 ) {
+    UMPIRE_ERROR("Invalid percentage of " << percentage
+        << ", percentage must be an integer between 0 and 100");
+  }
+
+  if ( percentage == 0 ) {
+    return [=] (const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) {
+        return false;
+    };
+  } else if ( percentage == 100 ) {
+    return [=] (const strategy::DynamicPoolMap& pool) {
+        return ( pool.getActualSize() == pool.getReleasableSize() );
+    };
+  } else {
+    float f = (float)((float)percentage / (float)100.0);
+
+    return [=] (const strategy::DynamicPoolMap& pool) {
+      // Calculate threshold in bytes from the percentage
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+      return (pool.getReleasableSize() >= threshold);
+    };
+  }
+}
+
 } // end of namespace strategy
 } // end of namespace umpire

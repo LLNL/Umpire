@@ -12,7 +12,6 @@
 #include <functional>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/DynamicSizePool.hpp"
 
 namespace umpire {
@@ -36,13 +35,9 @@ class DynamicPoolList :
   public AllocationStrategy
 {
   public:
-    /*!
-     * \brief Callback Heuristic to trigger coalesce of free blocks in pool.
-     *
-     * The registered heuristic callback function will be called immediately
-     * after a deallocation() has completed from the pool.
-     */
     using CoalesceHeuristic = std::function<bool( const strategy::DynamicPoolList& )>;
+
+    static CoalesceHeuristic percent_releasable(int percentage);
 
     /*!
      * \brief Construct a new DynamicPoolList.
@@ -50,8 +45,8 @@ class DynamicPoolList :
      * \param name Name of this instance of the DynamicPoolList.
      * \param id Id of this instance of the DynamicPoolList.
      * \param allocator Allocation resource that pool uses
-     * \param min_initial_alloc_bytes Minimum size the pool initially allocates
-     * \param min_alloc_size The minimum size of all future allocations.
+     * \param first_minimum_pool_allocation_size Minimum size the pool initially allocates
+     * \param next_minimum_pool_allocation_size The minimum size of all future allocations.
      * \param align_bytes Number of bytes with which to align allocation sizes (power-of-2)
      * \param do_heuristic Heuristic for when to perform coalesce operation
      */
@@ -59,14 +54,13 @@ class DynamicPoolList :
         const std::string& name,
         int id,
         Allocator allocator,
-        const std::size_t min_initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 *1024),
+        const std::size_t first_minimum_pool_allocation_size = (512 * 1024 * 1024),
+        const std::size_t next_minimum_pool_allocation_size = (1 * 1024 *1024),
         const std::size_t alignment = 16,
-        CoalesceHeuristic should_coalesce = heuristic_percent_releasable_list(100)) noexcept;
+        CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
 
-
-    DynamicPoolList(const DynamicPoolMap&) = delete;
+    DynamicPoolList(const DynamicPoolList&) = delete;
 
     void* allocate(size_t bytes) override;
     void deallocate(void* ptr) override;

@@ -210,7 +210,7 @@ static void runTest()
     auto mpa5 = 256 * 1024;         // Size the dynamic pool initially allocates
     auto mpa6 = 1 * 1024 * 1024;    // Minimum size of all future allocations in the dynamic pool
     auto mpa7 = 128;                // Size with which to align allocations
-    auto mpa8 = umpire::strategy::heuristic_percent_releasable(75); // Heuristic
+    auto mpa8 = umpire::strategy::DynamicPool::percent_releasable(75); // Heuristic
     name = basename + "_MixedPool_spec_";
     testAllocator<umpire::strategy::MixedPool, true>(name+"0", base_alloc);
     testAllocator<umpire::strategy::MixedPool, true>(name+"1", base_alloc , mpa1);
@@ -252,7 +252,7 @@ static void runTest()
     auto dpa1 = 16 * 1024;         // min initial allocation size
     auto dpa2 = 1 * 1024;          // min allocation size
     auto dpa3 = 128;               // byte alignment
-    auto dpa4 = umpire::strategy::heuristic_percent_releasable(50);
+    auto dpa4 = umpire::strategy::DynamicPool::percent_releasable(50);
     name = basename + "_DynamicPool_spec_";
     testAllocator<umpire::strategy::DynamicPool, true>(name+"0", base_alloc);
     testAllocator<umpire::strategy::DynamicPool, true>(name+"1", base_alloc, dpa1);
@@ -282,7 +282,7 @@ static void runTest()
     auto lpa1 = dpa1;
     auto lpa2 = dpa2;
     auto lpa3 = dpa3;
-    auto lpa4 = umpire::strategy::heuristic_percent_releasable_list(50);
+    auto lpa4 = umpire::strategy::DynamicPoolList::percent_releasable(50);
     name = basename + "_DynamicPoolList_spec_";
     testAllocator<umpire::strategy::DynamicPoolList, true>(name+"0", base_alloc);
     testAllocator<umpire::strategy::DynamicPoolList, true>(name+"1", base_alloc, lpa1);

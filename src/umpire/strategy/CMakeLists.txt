@@ -11,7 +11,6 @@ set (umpire_strategy_headers
   AllocationStrategy.hpp
   AllocationTracker.hpp
   DynamicPool.hpp
-  DynamicPoolHeuristic.hpp
   DynamicPoolList.hpp
   DynamicPoolMap.hpp
   DynamicSizePool.hpp
@@ -44,7 +43,6 @@ set (umpire_strategy_sources
   AllocationPrefetcher.cpp
   AllocationStrategy.cpp
   AllocationTracker.cpp
-  DynamicPoolHeuristic.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp
   FixedPool.cpp

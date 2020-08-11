@@ -43,19 +43,19 @@ class QuickPool :
      * \param name Name of this instance of the QuickPool
      * \param id Unique identifier for this instance
      * \param allocator Allocation resource that pool uses
-     * \param initial_alloc_size Size the pool initially allocates
-     * \param min_alloc_size The minimum size of all future allocations
+     * \param first_minimum_pool_allocation_size Size the pool initially allocates
+     * \param next_minimum_pool_allocation_size The minimum size of all future allocations
      * \param alignment Number of bytes with which to align allocation sizes (power-of-2)
-     * \param coalesce_heuristic Heuristic for when to perform coalesce operation
+     * \param should_coalesce Heuristic for when to perform coalesce operation
      */
     QuickPool(
         const std::string& name,
         int id,
         Allocator allocator,
-        const std::size_t initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 * 1024),
+        const std::size_t first_minimum_pool_allocation_size = (512 * 1024 * 1024),
+        const std::size_t next_minimum_pool_allocation_size = (1 * 1024 * 1024),
         const std::size_t alignment = 16,
-        CoalesceHeuristic coalesce_heuristic = percent_releasable(100)) noexcept;
+        CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
     ~QuickPool();
 
@@ -141,8 +141,8 @@ class QuickPool :
 
     CoalesceHeuristic m_should_coalesce;
 
-    const std::size_t m_initial_alloc_bytes;
-    const std::size_t m_min_alloc_bytes;
+    const std::size_t m_first_minimum_pool_allocation_size;
+    const std::size_t m_next_minimum_pool_allocation_size;
 
     std::size_t m_actual_bytes{0};
     std::size_t m_releasable_bytes{0};
