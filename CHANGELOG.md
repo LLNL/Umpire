@@ -30,6 +30,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitLab CI pipelines now generate the host-config files on-the-fly.
 
+- GitLab CI pipeline can now trigger pipeline in CHAI with develop version of
+  Umpire.
+
 - Bump BLT to v0.3.6
 
 ### Removed
