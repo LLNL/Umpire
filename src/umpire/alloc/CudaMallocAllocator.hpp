@@ -7,9 +7,9 @@
 #ifndef UMPIRE_CudaMallocAllocator_HPP
 #define UMPIRE_CudaMallocAllocator_HPP
 
-#include <cuda_runtime_api.h>
-
 #include "umpire/util/Macros.hpp"
+
+#include <cuda_runtime_api.h>
 
 namespace umpire {
 namespace alloc {

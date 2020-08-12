@@ -7,10 +7,11 @@
 #ifndef UMPIRE_PosixMemalignAllocator_HPP
 #define UMPIRE_PosixMemalignAllocator_HPP
 
-#include <stdlib.h>
-
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/numa.hpp"
+
+#include <stdlib.h>
+
 
 namespace umpire {
 namespace alloc {

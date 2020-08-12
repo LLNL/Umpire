@@ -7,6 +7,8 @@
 #ifndef UMPIRE_CudaPinnedAllocator_HPP
 #define UMPIRE_CudaPinnedAllocator_HPP
 
+#include "umpire/util/Macros.hpp"
+
 #include <cuda_runtime_api.h>
 
 namespace umpire {

@@ -7,9 +7,9 @@
 #ifndef UMPIRE_SyclPinnedAllocator_HPP
 #define UMPIRE_SyclPinnedAllocator_HPP
 
-#include <CL/sycl.hpp>
-
 #include "umpire/util/Macros.hpp"
+
+#include <CL/sycl.hpp>
 
 namespace umpire {
 namespace alloc {
