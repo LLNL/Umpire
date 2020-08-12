@@ -27,6 +27,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Bump BLT to v0.3.6
 
+- Applied clang-format to all sources
+
 ### Removed
 
 - Removed replicated implementations for tracking high watermarks and
