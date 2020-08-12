@@ -15,6 +15,8 @@
 #include <string>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/FixedSizePool.hpp"
+#include "umpire/strategy/StdAllocator.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -273,26 +275,6 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
 
     freeReleasedBlocks();
     assert("Not all blocks were released properly" && freeBlocks == NULL);
-  }
-
- public:
-  DynamicSizePool(umpire::strategy::AllocationStrategy *strat,
-                  const std::size_t _minInitialBytes = (16 * 1024),
-                  const std::size_t _minBytes = 256)
-      : blockPool(),
-        usedBlocks(NULL),
-        freeBlocks(NULL),
-        totalBlocks(0),
-        totalBytes(0),
-        minInitialBytes(_minInitialBytes),
-        minBytes(_minBytes),
-        allocator(strat)
-  {
-  }
-
-  ~DynamicSizePool()
-  {
-    freeAllBlocks();
   }
 
  public:

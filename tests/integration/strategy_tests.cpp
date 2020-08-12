@@ -14,7 +14,6 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
