@@ -17,7 +17,9 @@ namespace alloc {
  * \brief Uses malloc and free to allocate and deallocate CPU memory.
  */
 struct OpenMPTargetAllocator {
-  OpenMPTargetAllocator(int _device) : device{_device} {}
+  OpenMPTargetAllocator(int _device) : device{_device}
+  {
+  }
   /*!
    * \brief Allocate bytes of memory using malloc.
    *

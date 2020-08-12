@@ -15,9 +15,7 @@ namespace umpire {
 namespace op {
 
 void SyclCopyFromOperation::transform(
-    void* src_ptr,
-    void** dst_ptr,
-    util::AllocationRecord* src_allocation,
+    void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t length)
 {
@@ -25,12 +23,10 @@ void SyclCopyFromOperation::transform(
   sycl_queue.memcpy(*dst_ptr, src_ptr, length);
   sycl_queue.wait();
 
-  UMPIRE_RECORD_STATISTIC(
-      "SyclCopyFromOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(*dst_ptr),
-      "size", length,
-      "event", "copy");
+  UMPIRE_RECORD_STATISTIC("SyclCopyFromOperation", "src_ptr",
+                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
+                          reinterpret_cast<uintptr_t>(*dst_ptr), "size", length,
+                          "event", "copy");
 }
 
 } // end of namespace op

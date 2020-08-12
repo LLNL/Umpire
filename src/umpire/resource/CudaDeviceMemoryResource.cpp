@@ -6,24 +6,20 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/CudaDeviceMemoryResource.hpp"
 
-#include "umpire/ResourceManager.hpp"
-
-#include "umpire/util/Macros.hpp"
-
 #include <memory>
 #include <sstream>
+
+#include "umpire/ResourceManager.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace resource {
 
-CudaDeviceMemoryResource::CudaDeviceMemoryResource(
-    Platform platform,
-    const std::string& name,
-    int id,
-    MemoryResourceTraits traits) :
-  MemoryResource(name, id, traits),
-  m_allocator{},
-  m_platform(platform)
+CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform,
+                                                   const std::string& name,
+                                                   int id,
+                                                   MemoryResourceTraits traits)
+    : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
 {
 }
 
@@ -37,7 +33,8 @@ void* CudaDeviceMemoryResource::allocate(std::size_t bytes)
   void* ptr = m_allocator.allocate(bytes);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", bytes, "event", "allocate");
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
+                          "size", bytes, "event", "allocate");
 
   if (old_device != m_traits.id)
     cudaSetDevice(old_device);
@@ -53,7 +50,8 @@ void CudaDeviceMemoryResource::deallocate(void* ptr)
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
+                          "size", 0x0, "event", "deallocate");
 
   m_allocator.deallocate(ptr);
   if (old_device != m_traits.id)

@@ -5,13 +5,13 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-
 #include "umpire/ResourceManager.hpp"
 
-TEST(ResourceManager, Constructor) {
+TEST(ResourceManager, Constructor)
+{
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
-  (void) rm;
+  (void)rm;
   SUCCEED();
 }
 
@@ -25,9 +25,12 @@ TEST(ResourceManager, findAllocationRecord)
   const std::size_t offset = 1024;
 
   char* ptr = static_cast<char*>(alloc.allocate(size));
-  const umpire::util::AllocationRecord* rec_begin = rm.findAllocationRecord(ptr);
-  const umpire::util::AllocationRecord* rec_middle = rm.findAllocationRecord(ptr + offset);
-  const umpire::util::AllocationRecord* rec_end = rm.findAllocationRecord(ptr + (size-1));
+  const umpire::util::AllocationRecord* rec_begin =
+      rm.findAllocationRecord(ptr);
+  const umpire::util::AllocationRecord* rec_middle =
+      rm.findAllocationRecord(ptr + offset);
+  const umpire::util::AllocationRecord* rec_end =
+      rm.findAllocationRecord(ptr + (size - 1));
 
   ASSERT_EQ(ptr, rec_begin->ptr);
   ASSERT_EQ(ptr, rec_middle->ptr);
@@ -35,7 +38,8 @@ TEST(ResourceManager, findAllocationRecord)
 
   ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::util::Exception);
 
-  ASSERT_THROW(rm.findAllocationRecord(ptr + size+1), umpire::util::Exception);
+  ASSERT_THROW(rm.findAllocationRecord(ptr + size + 1),
+               umpire::util::Exception);
 
   alloc.deallocate(ptr);
 
@@ -44,7 +48,6 @@ TEST(ResourceManager, findAllocationRecord)
 
 TEST(ResourceManager, getAllocatorByName)
 {
-
   auto& rm = umpire::ResourceManager::getInstance();
 
   EXPECT_NO_THROW({
@@ -52,14 +55,11 @@ TEST(ResourceManager, getAllocatorByName)
     UMPIRE_USE_VAR(alloc);
   });
 
-  ASSERT_THROW(
-      rm.getAllocator("BANANA"),
-      umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator("BANANA"), umpire::util::Exception);
 }
 
 TEST(ResourceManager, getAllocatorById)
 {
-
   auto& rm = umpire::ResourceManager::getInstance();
 
   EXPECT_NO_THROW({
@@ -67,16 +67,13 @@ TEST(ResourceManager, getAllocatorById)
     UMPIRE_USE_VAR(alloc);
   });
 
-  ASSERT_THROW(
-      rm.getAllocator(-4),
-      umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator(-4), umpire::util::Exception);
 }
 
 TEST(ResourceManager, getAllocatorInvalidId)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(
-      rm.getAllocator(umpire::invalid_allocator_id),
-      umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator(umpire::invalid_allocator_id),
+               umpire::util::Exception);
 }

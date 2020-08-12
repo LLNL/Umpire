@@ -39,7 +39,7 @@ int main(int, char**)
   // then only the addresses and size information for each allocation will be
   // printed.
   //
-  if (! ss.str().empty() )
+  if (!ss.str().empty())
     std::cout << ss.str();
 
   // Example #2 of 3 - Umpire error exceptions
@@ -51,8 +51,7 @@ int main(int, char**)
 
   try {
     allocator.deallocate(bad_ptr); // Will cause a throw from umpire
-  }
-  catch (const std::exception &exc) {
+  } catch (const std::exception& exc) {
     //
     // exc.what() string will also contain a backtrace
     //

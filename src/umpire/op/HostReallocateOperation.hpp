@@ -15,8 +15,7 @@ namespace op {
 /*!
  * \brief Reallocate data in CPU memory.
  */
-class HostReallocateOperation :
-  public MemoryOperation {
+class HostReallocateOperation : public MemoryOperation {
  public:
   /*!
    * \copybrief MemoryOperation::transform
@@ -25,15 +24,12 @@ class HostReallocateOperation :
    *
    * \copydetails MemoryOperation::transform
    */
-  void transform(
-      void* current_ptr,
-      void** new_ptr,
-      util::AllocationRecord *current_allocation,
-      util::AllocationRecord *new_allocation,
-      std::size_t new_size);
+  void transform(void* current_ptr, void** new_ptr,
+                 util::AllocationRecord* current_allocation,
+                 util::AllocationRecord* new_allocation, std::size_t new_size);
 };
 
-} // end of naemspace op
+} // namespace op
 } // end of namespace umpire
 
 #endif // UMPIRE_HostReallocateOperation_HPP

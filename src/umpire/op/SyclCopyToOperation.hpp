@@ -15,25 +15,21 @@ namespace op {
 /*!
  * \brief Copy operation to move data between a Intel GPU and CPU memory.
  */
-class SyclCopyToOperation :
-  public MemoryOperation {
+class SyclCopyToOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::transform
-    *
-    * Uses SYCL memcpy to move data when src_ptr on CPU to dst_ptr on Intel GPU
-    *
-    * @copydetails MemoryOperation::transform
-    */
-  void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      util::AllocationRecord *src_allocation,
-      util::AllocationRecord *dst_allocation,
-      std::size_t length);
+  /*!
+   * @copybrief MemoryOperation::transform
+   *
+   * Uses SYCL memcpy to move data when src_ptr on CPU to dst_ptr on Intel GPU
+   *
+   * @copydetails MemoryOperation::transform
+   */
+  void transform(void* src_ptr, void** dst_ptr,
+                 util::AllocationRecord* src_allocation,
+                 util::AllocationRecord* dst_allocation, std::size_t length);
 };
 
 } // end of namespace op
-} //end of namespace umpire
+} // end of namespace umpire
 
 #endif // UMPIRE_SyclCopyToOperation_HPP

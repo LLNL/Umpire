@@ -6,21 +6,17 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
-
-#include "umpire/alloc/CudaMallocManagedAllocator.hpp"
-
-#include "umpire/util/make_unique.hpp"
-
 #include <cuda_runtime_api.h>
 
+#include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool
-CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
-  noexcept
+bool CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.find("UM") != std::string::npos) {
     return true;
@@ -36,13 +32,15 @@ CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id)
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id,
+                                         MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(Platform::cuda, name, id, traits);
+  return util::make_unique<
+      resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(
+      Platform::cuda, name, id, traits);
 }
 
-MemoryResourceTraits
-CudaUnifiedMemoryResourceFactory::getDefaultTraits()
+MemoryResourceTraits CudaUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -50,7 +48,8 @@ CudaUnifiedMemoryResourceFactory::getDefaultTraits()
   auto error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: "
+                 << cudaGetErrorString(error));
   }
 
   traits.unified = true;

@@ -6,14 +6,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "gtest/gtest.h"
-
-#include "umpire/config.hpp"
-
 #include "umpire/ResourceManager.hpp"
-
+#include "umpire/config.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
-TEST(FixedPoolTest, Construction) {
+TEST(FixedPoolTest, Construction)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -22,7 +20,8 @@ TEST(FixedPoolTest, Construction) {
   EXPECT_EQ(pool.getCurrentSize(), 0);
 }
 
-TEST(FixedPoolTest, Construction_with_count) {
+TEST(FixedPoolTest, Construction_with_count)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -33,7 +32,8 @@ TEST(FixedPoolTest, Construction_with_count) {
   EXPECT_GT(pool.getActualSize(), num_obj * sizeof(int));
 }
 
-TEST(FixedPoolTest, Allocate) {
+TEST(FixedPoolTest, Allocate)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -42,20 +42,21 @@ TEST(FixedPoolTest, Allocate) {
   void* ptr1{pool.allocate(0)};
   void* ptr2{pool.allocate(0)};
 
-  EXPECT_EQ(pool.getCurrentSize(), 2*sizeof(int));
-  EXPECT_EQ(pool.getHighWatermark(), 2*sizeof(int));
+  EXPECT_EQ(pool.getCurrentSize(), 2 * sizeof(int));
+  EXPECT_EQ(pool.getHighWatermark(), 2 * sizeof(int));
 
   pool.deallocate(ptr1);
 
-  EXPECT_EQ(pool.getCurrentSize(), 1*sizeof(int));
+  EXPECT_EQ(pool.getCurrentSize(), 1 * sizeof(int));
 
   pool.deallocate(ptr2);
 
   EXPECT_EQ(pool.getCurrentSize(), 0);
-  EXPECT_EQ(pool.getHighWatermark(), 2*sizeof(int));
+  EXPECT_EQ(pool.getHighWatermark(), 2 * sizeof(int));
 }
 
-TEST(FixedPoolTest, Allocate_2_pools) {
+TEST(FixedPoolTest, Allocate_2_pools)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -69,16 +70,16 @@ TEST(FixedPoolTest, Allocate_2_pools) {
   void* ptr3{pool.allocate()};
 
   EXPECT_EQ(pool.numPools(), 2);
-  EXPECT_EQ(pool.getCurrentSize(), 3*sizeof(int));
-  EXPECT_EQ(pool.getHighWatermark(), 3*sizeof(int));
+  EXPECT_EQ(pool.getCurrentSize(), 3 * sizeof(int));
+  EXPECT_EQ(pool.getHighWatermark(), 3 * sizeof(int));
 
   pool.deallocate(ptr1);
 
-  EXPECT_EQ(pool.getCurrentSize(), 2*sizeof(int));
+  EXPECT_EQ(pool.getCurrentSize(), 2 * sizeof(int));
 
   pool.deallocate(ptr2);
   pool.deallocate(ptr3);
 
   EXPECT_EQ(pool.getCurrentSize(), 0);
-  EXPECT_EQ(pool.getHighWatermark(), 3*sizeof(int));
+  EXPECT_EQ(pool.getHighWatermark(), 3 * sizeof(int));
 }

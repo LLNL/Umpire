@@ -180,3 +180,5 @@ install(DIRECTORY
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ".")
+
+umpire_add_code_checks(PREFIX umpire)

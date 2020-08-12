@@ -17,21 +17,18 @@ namespace op {
  */
 class HipMemsetOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::apply
-    *
-    * Uses hipMemset to set first length bytes of src_ptr to value.
-    *
-    * @copydetails MemoryOperation::apply
-    */
-  void apply(
-      void* src_ptr,
-      util::AllocationRecord* ptr,
-      int value,
-      std::size_t length);
+  /*!
+   * @copybrief MemoryOperation::apply
+   *
+   * Uses hipMemset to set first length bytes of src_ptr to value.
+   *
+   * @copydetails MemoryOperation::apply
+   */
+  void apply(void* src_ptr, util::AllocationRecord* ptr, int value,
+             std::size_t length);
 };
 
-} // end of naemspace op
+} // namespace op
 } // end of namespace umpire
 
 #endif // UMPIRE_HipMemsetOperation_HPP

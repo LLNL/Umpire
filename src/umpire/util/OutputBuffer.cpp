@@ -12,8 +12,7 @@
 namespace umpire {
 namespace util {
 
-void
-OutputBuffer::setConsoleStream(std::ostream* stream)
+void OutputBuffer::setConsoleStream(std::ostream* stream)
 {
   if (stream) {
     d_console_stream = stream->rdbuf();
@@ -22,8 +21,7 @@ OutputBuffer::setConsoleStream(std::ostream* stream)
   }
 }
 
-void
-OutputBuffer::setFileStream(std::ostream* stream)
+void OutputBuffer::setFileStream(std::ostream* stream)
 {
   if (stream) {
     d_file_stream = stream->rdbuf();
@@ -32,11 +30,9 @@ OutputBuffer::setFileStream(std::ostream* stream)
   }
 }
 
-int
-OutputBuffer::overflow(int ch)
+int OutputBuffer::overflow(int ch)
 {
-  if (ch == EOF)
-  {
+  if (ch == EOF) {
     return !EOF;
   } else {
     int r_console{ch};
@@ -52,11 +48,9 @@ OutputBuffer::overflow(int ch)
 
     return r_console == EOF || r_file == EOF ? EOF : ch;
   }
-
 }
 
-int
-OutputBuffer::sync()
+int OutputBuffer::sync()
 {
   auto ret = 0;
 

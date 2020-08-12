@@ -6,7 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-
 #include "umpire/strategy/DynamicPool.hpp"
 
 void allocate_and_deallocate_pool(const std::string& resource)
@@ -17,22 +16,22 @@ void allocate_and_deallocate_pool(const std::string& resource)
 
   auto allocator = rm.getAllocator(resource);
 
-  auto pooled_allocator =
-    rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
-                                                    allocator);
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      resource + "_pool", allocator);
 
-  double* data = static_cast<double*>(
-      pooled_allocator.allocate(SIZE*sizeof(double)));
+  double* data =
+      static_cast<double*>(pooled_allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << pooled_allocator.getName() << " allocator...";
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
+            << pooled_allocator.getName() << " allocator...";
 
   pooled_allocator.deallocate(data);
 
   std::cout << " deallocated." << std::endl;
 }
 
-int main(int, char**) {
+int main(int, char**)
+{
   allocate_and_deallocate_pool("HOST");
 
 #if defined(UMPIRE_ENABLE_CUDA)

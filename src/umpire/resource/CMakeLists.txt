@@ -156,3 +156,5 @@ target_include_directories(
 install(FILES
   ${umpire_resource_headers}
   DESTINATION include/umpire/resource)
+
+umpire_add_code_checks(PREFIX resource)

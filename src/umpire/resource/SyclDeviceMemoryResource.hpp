@@ -12,29 +12,28 @@
 namespace umpire {
 namespace resource {
 
-  /*!
-   * \brief Concrete MemoryResource object that uses the template _allocator to
-   * allocate and deallocate memory.
-   */
+/*!
+ * \brief Concrete MemoryResource object that uses the template _allocator to
+ * allocate and deallocate memory.
+ */
 template <typename _allocator>
-class SyclDeviceMemoryResource :
-  public MemoryResource
-{
-  public:
-    SyclDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
+class SyclDeviceMemoryResource : public MemoryResource {
+ public:
+  SyclDeviceMemoryResource(Platform platform, const std::string& name, int id,
+                           MemoryResourceTraits traits);
 
-    void* allocate(std::size_t bytes);
-    void deallocate(void* ptr);
+  void* allocate(std::size_t bytes);
+  void deallocate(void* ptr);
 
-    std::size_t getCurrentSize() const noexcept;
-    std::size_t getHighWatermark() const noexcept;
+  std::size_t getCurrentSize() const noexcept;
+  std::size_t getHighWatermark() const noexcept;
 
-    Platform getPlatform() noexcept;
+  Platform getPlatform() noexcept;
 
-  protected:
-    _allocator m_allocator;
+ protected:
+  _allocator m_allocator;
 
-    Platform m_platform;
+  Platform m_platform;
 };
 
 } // end of namespace resource

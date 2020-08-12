@@ -10,23 +10,15 @@
 namespace umpire {
 namespace resource {
 
-struct MemoryResourceTypeHash
-{
-    template <typename T>
-    std::size_t operator()(T t) const noexcept
-    {
-        return static_cast<std::size_t>(t);
-    }
+struct MemoryResourceTypeHash {
+  template <typename T>
+  std::size_t operator()(T t) const noexcept
+  {
+    return static_cast<std::size_t>(t);
+  }
 };
 
-
-enum MemoryResourceType {
-  Host,
-  Device,
-  Unified,
-  Pinned,
-  Constant
-};
+enum MemoryResourceType { Host, Device, Unified, Pinned, Constant };
 
 } // end of namespace resource
 } // end of namespace umpire

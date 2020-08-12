@@ -17,21 +17,18 @@ namespace op {
  */
 class SyclMemsetOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::apply
-    *
-    * Uses SYCL memset to set first length bytes of src_ptr to value.
-    *
-    * @copydetails MemoryOperation::apply
-    */
-  void apply(
-      void* src_ptr,
-      util::AllocationRecord* ptr,
-      int value,
-      std::size_t length);
+  /*!
+   * @copybrief MemoryOperation::apply
+   *
+   * Uses SYCL memset to set first length bytes of src_ptr to value.
+   *
+   * @copydetails MemoryOperation::apply
+   */
+  void apply(void* src_ptr, util::AllocationRecord* ptr, int value,
+             std::size_t length);
 };
 
-} // end of naemspace op
-} //end of namespace umpire
+} // namespace op
+} // end of namespace umpire
 
 #endif // UMPIRE_SyclMemsetOperation_HPP

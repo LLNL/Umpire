@@ -7,10 +7,8 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
-
-#include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
-
+#include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/Macros.hpp"
 
 int main(int, char**)

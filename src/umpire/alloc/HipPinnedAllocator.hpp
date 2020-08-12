@@ -9,6 +9,8 @@
 
 #include <hip/hip_runtime.h>
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace alloc {
 

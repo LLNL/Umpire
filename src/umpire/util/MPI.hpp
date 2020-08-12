@@ -15,7 +15,7 @@ namespace umpire {
 namespace util {
 
 class MPI {
-public:
+ public:
   static void initialize(
 #if defined(UMPIRE_ENABLE_MPI)
       MPI_Comm umpire_communicator
@@ -32,7 +32,8 @@ public:
   static void logMpiInfo();
 
   static bool isInitialized();
-private:
+
+ private:
   static int s_rank;
   static int s_world_size;
 

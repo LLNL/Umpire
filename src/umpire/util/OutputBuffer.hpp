@@ -12,9 +12,8 @@
 namespace umpire {
 namespace util {
 
-class OutputBuffer : public std::streambuf
-{
-public:
+class OutputBuffer : public std::streambuf {
+ public:
   OutputBuffer() = default;
 
   ~OutputBuffer();
@@ -25,7 +24,7 @@ public:
   int overflow(int ch) override;
   int sync() override;
 
-private:
+ private:
   std::streambuf* d_console_stream;
   std::streambuf* d_file_stream;
 };

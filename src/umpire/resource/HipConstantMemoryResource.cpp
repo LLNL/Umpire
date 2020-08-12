@@ -7,24 +7,25 @@
 
 #include "umpire/resource/HipConstantMemoryResource.hpp"
 
-#include "umpire/ResourceManager.hpp"
-#include "umpire/util/Macros.hpp"
-
 #include <memory>
 #include <sstream>
 
-__constant__ static char s_umpire_internal_device_constant_memory[64*1024];
+#include "umpire/ResourceManager.hpp"
+#include "umpire/util/Macros.hpp"
+
+__constant__ static char s_umpire_internal_device_constant_memory[64 * 1024];
 
 namespace umpire {
 namespace resource {
 
-HipConstantMemoryResource::HipConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits) :
-  MemoryResource{name, id, traits},
-  m_current_size{0},
-  m_highwatermark{0},
-  m_platform{Platform::hip},
-  m_offset{0},
-  m_ptr{s_umpire_internal_device_constant_memory}
+HipConstantMemoryResource::HipConstantMemoryResource(
+    const std::string& name, int id, MemoryResourceTraits traits)
+    : MemoryResource{name, id, traits},
+      m_current_size{0},
+      m_highwatermark{0},
+      m_platform{Platform::hip},
+      m_offset{0},
+      m_ptr{s_umpire_internal_device_constant_memory}
 {
 }
 
@@ -37,9 +38,10 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
 
   void* ret{static_cast<void*>(ptr)};
 
-  if (m_offset > 1024 * 64)
-  {
-    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
+  if (m_offset > 1024 * 64) {
+    UMPIRE_ERROR(
+        "Max total size of constant allocations is 64KB, current size is "
+        << m_offset - bytes << "bytes");
   }
 
   ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
@@ -66,8 +68,8 @@ void HipConstantMemoryResource::deallocate(void* ptr)
     UMPIRE_ERROR(ptr << " was not allocated by " << getName());
   }
 
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record.size))
-      == static_cast<char*>(ptr)) {
+  if ((static_cast<char*>(m_ptr) + (m_offset - record.size)) ==
+      static_cast<char*>(ptr)) {
     m_offset -= record.size;
   } else {
     UMPIRE_ERROR("HipConstantMemory deallocations must be in reverse order");

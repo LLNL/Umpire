@@ -14,22 +14,19 @@ namespace op {
 
 class OpenMPTargetMemsetOperation : public MemoryOperation {
  public:
-   /*
-    * \copybrief MemoryOperation::apply
-    *
-    * \copydetails MemoryOperation::apply
-    */
-  void apply(
-      void* src_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      int value,
-      std::size_t length);
+  /*
+   * \copybrief MemoryOperation::apply
+   *
+   * \copydetails MemoryOperation::apply
+   */
+  void apply(void* src_ptr, umpire::util::AllocationRecord* src_allocation,
+             int value, std::size_t length);
 
  private:
   int m_device_id;
 };
 
-} // end of naemspace op
-} //end of namespace umpire
+} // namespace op
+} // end of namespace umpire
 
 #endif // UMPIRE_OpenMPTargetMemsetOperation_HPP

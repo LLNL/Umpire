@@ -93,3 +93,5 @@ if (ENABLE_FORTRAN)
 endif ()
 
 install(TARGETS ${umpire_tutorials} RUNTIME DESTINATION bin)
+
+umpire_add_code_checks(PREFIX tutorial)

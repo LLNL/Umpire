@@ -7,17 +7,14 @@
 #ifndef UMPIRE_Allocator_INL
 #define UMPIRE_Allocator_INL
 
-#include "umpire/config.hpp"
-
 #include "umpire/Allocator.hpp"
-
-#include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
+#include "umpire/config.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 
-inline void*
-Allocator::allocate(std::size_t bytes)
+inline void* Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
@@ -25,24 +22,30 @@ Allocator::allocate(std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }");
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                << m_allocator << "\", \"size\": " << bytes << " }");
 
   ret = m_allocator->allocate(bytes);
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                << m_allocator << "\", \"size\": " << bytes
+                << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret), "size", bytes, "event", "allocate");
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret),
+                          "size", bytes, "event", "allocate");
   return ret;
 }
 
-inline void
-Allocator::deallocate(void* ptr)
+inline void Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
+  UMPIRE_REPLAY(
+      "\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \""
+      << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr), "size", 0x0, "event", "deallocate");
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
+                          "size", 0x0, "event", "deallocate");
 
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer");

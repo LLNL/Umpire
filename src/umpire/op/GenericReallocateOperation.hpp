@@ -15,27 +15,24 @@ namespace op {
 /*!
  * Generic reallocate operation to work on any current_ptr location.
  */
-class GenericReallocateOperation :
-  public MemoryOperation {
+class GenericReallocateOperation : public MemoryOperation {
  public:
-   /*!
-    * \copybrief MemoryOperation::transform
-    *
-    * This operation relies on ResourceManager::copy,
-    * AllocationStrategy::allocate and AllocationStrategy::deallocate to
-    * implement a reallocate operation that can work for any current_ptr location.
-    *
-    * \copydetails MemoryOperation::transform
-    */
-  void transform(
-      void* current_ptr,
-      void** new_ptr,
-      util::AllocationRecord *current_allocation,
-      util::AllocationRecord *new_allocation,
-      std::size_t new_size);
+  /*!
+   * \copybrief MemoryOperation::transform
+   *
+   * This operation relies on ResourceManager::copy,
+   * AllocationStrategy::allocate and AllocationStrategy::deallocate to
+   * implement a reallocate operation that can work for any current_ptr
+   * location.
+   *
+   * \copydetails MemoryOperation::transform
+   */
+  void transform(void* current_ptr, void** new_ptr,
+                 util::AllocationRecord* current_allocation,
+                 util::AllocationRecord* new_allocation, std::size_t new_size);
 };
 
-} // end of naemspace op
+} // namespace op
 } // end of namespace umpire
 
 #endif // UMPIRE_GenericReallocateOperation_HPP

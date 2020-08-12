@@ -7,17 +7,16 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
-
-#include "umpire/strategy/SlotPool.hpp"
-#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/SlotPool.hpp"
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAllocatorNames()){
+  for (auto s : rm.getAllocatorNames()) {
     std::cout << s << "  ";
   }
   std::cout << std::endl;
@@ -29,7 +28,8 @@ int main(int, char**)
    *     const std::string& name,  // Allocator name
    *     const std::string& strategy,  // Strategy name
    *     AllocatorTraits traits, // Traits object
-   *     std::vector<Allocator> providers); // Vector of providers (parent) Allocators
+   *     std::vector<Allocator> providers); // Vector of providers (parent)
+   * Allocators
    *
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
@@ -56,7 +56,6 @@ int main(int, char**)
   void* test = alloc.allocate(100);
   alloc.deallocate(test);
 
-
   /*
    * Get the default HOST allocator.
    */
@@ -74,7 +73,7 @@ int main(int, char**)
   std::cout << "Size: " << alloc.getSize(test) << std::endl;
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAllocatorNames()){
+  for (auto s : rm.getAllocatorNames()) {
     std::cout << s << ", ";
   }
   std::cout << std::endl;

@@ -7,7 +7,7 @@
 #ifndef UMPIRE_memory_sanitizers_HPP
 #define UMPIRE_memory_sanitizers_HPP
 
-#undef __UMPIRE_USE_MEMORY_SANITIZER__    // This may be defined below
+#undef __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
 
 //
 // When a user compiles with "-fsanitize=memory", a couple of macros may be
@@ -20,7 +20,8 @@
 // The SYCL compiler (at least the one as of this writing) also does not
 // seem to know where <sanitizer/asan_interface> is so we exclude its inclusion.
 //
-#if (defined(__clang__) && !defined(__ibmxl__))  || (defined(__GNUC__) && __GNUC__ > 4)
+#if (defined(__clang__) && !defined(__ibmxl__)) || \
+    (defined(__GNUC__) && __GNUC__ > 4)
 
 #if !defined(__SYCL_COMPILER_VERSION)
 
@@ -42,21 +43,21 @@
 #endif // #if __has_feature(address_sanitizer)
 #endif // #if defined(__has_feature)
 
-#endif  // #if !defined(__SYCL_COMPILER_VERSION)
+#endif // #if !defined(__SYCL_COMPILER_VERSION)
 
-#endif // #if (defined(__clang__) && !defined(__ibmxl__))  || (defined(__GNUC__) && __GNUC__ > 4)
-
+#endif // #if (defined(__clang__) && !defined(__ibmxl__))  || (defined(__GNUC__)
+       // && __GNUC__ > 4)
 
 #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
-#define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size) \
-  if (allocator->getPlatform() == umpire::Platform::host) {\
-    ASAN_POISON_MEMORY_REGION((ptr), (size));\
+#define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)   \
+  if (allocator->getPlatform() == umpire::Platform::host) { \
+    ASAN_POISON_MEMORY_REGION((ptr), (size));               \
   }
 
 #define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size) \
-  if (allocator->getPlatform() == umpire::Platform::host) {\
-    ASAN_UNPOISON_MEMORY_REGION((ptr), (size));\
+  if (allocator->getPlatform() == umpire::Platform::host) { \
+    ASAN_UNPOISON_MEMORY_REGION((ptr), (size));             \
   }
 
 #else // !defined(__UMPIRE_USE_MEMORY_SANITIZER__)

@@ -98,3 +98,5 @@ install(FILES
 install(FILES
   ${umpire_strategy_mixin_headers}
   DESTINATION include/umpire/strategy/mixins)
+
+umpire_add_code_checks(PREFIX strategy)

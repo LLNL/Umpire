@@ -7,9 +7,9 @@
 #ifndef UMPIRE_allocation_statistics_HPP
 #define UMPIRE_allocation_statistics_HPP
 
-#include "umpire/util/AllocationRecord.hpp"
-
 #include <vector>
+
+#include "umpire/util/AllocationRecord.hpp"
 
 namespace umpire {
 namespace util {
@@ -21,7 +21,7 @@ namespace util {
  */
 float relative_fragmentation(std::vector<util::AllocationRecord>& recs);
 
-}
-}
+} // namespace util
+} // namespace umpire
 
 #endif // UMPIRE_allocation_statistics_HPP

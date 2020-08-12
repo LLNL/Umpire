@@ -13,21 +13,15 @@
 namespace umpire {
 namespace op {
 
-void
-HostMemsetOperation::apply(
-    void* src_ptr,
-    util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
-    int value,
-    std::size_t length)
+void HostMemsetOperation::apply(
+    void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
+    int value, std::size_t length)
 {
   std::memset(src_ptr, value, length);
 
-  UMPIRE_RECORD_STATISTIC(
-      "HostMemsetOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "value", value,
-      "size", length,
-      "event", "memset");
+  UMPIRE_RECORD_STATISTIC("HostMemsetOperation", "src_ptr",
+                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
+                          "size", length, "event", "memset");
 }
 
 } // end of namespace op

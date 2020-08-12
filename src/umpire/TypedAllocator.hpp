@@ -18,9 +18,9 @@ namespace umpire {
  * of type T. You can use this class as an allocator for STL containers like
  * std::vector.
  */
-template<typename T>
+template <typename T>
 class TypedAllocator {
-  public:
+ public:
   typedef T value_type;
 
   template <typename U>
@@ -35,7 +35,7 @@ class TypedAllocator {
    */
   explicit TypedAllocator(Allocator allocator);
 
-  template<typename U>
+  template <typename U>
   TypedAllocator(const TypedAllocator<U>& other);
 
   /*
@@ -49,14 +49,14 @@ class TypedAllocator {
 
   /*!
    * \brief Deallocate ptr, the passed size is ignored.
-   * 
+   *
    * \param ptr Pointer to deallocate
    * \param size Size of allocation (ignored).
    */
   void deallocate(T* ptr, std::size_t size);
 
-  private:
-    umpire::Allocator m_allocator;
+ private:
+  umpire::Allocator m_allocator;
 };
 
 } // end of namespace umpire

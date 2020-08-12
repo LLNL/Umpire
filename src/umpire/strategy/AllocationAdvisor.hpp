@@ -9,9 +9,9 @@
 
 #include <memory>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/op/MemoryOperation.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -30,37 +30,28 @@ namespace strategy {
  * Using this AllocationStrategy when combined with a pool like DynamicPool is
  * a good way to mitigate the overhead of applying the memory advice.
  */
-class AllocationAdvisor :
-  public AllocationStrategy
-{
-  public:
-      AllocationAdvisor(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        const std::string& advice_operation,
-        int device_id = 0);
+class AllocationAdvisor : public AllocationStrategy {
+ public:
+  AllocationAdvisor(const std::string& name, int id, Allocator allocator,
+                    const std::string& advice_operation, int device_id = 0);
 
-      AllocationAdvisor(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        const std::string& advice_operation,
-        Allocator accessing_allocator,
-        int device_id = 0);
+  AllocationAdvisor(const std::string& name, int id, Allocator allocator,
+                    const std::string& advice_operation,
+                    Allocator accessing_allocator, int device_id = 0);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
-  private:
-    std::shared_ptr<op::MemoryOperation> m_advice_operation;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-    strategy::AllocationStrategy* m_allocator;
+ private:
+  std::shared_ptr<op::MemoryOperation> m_advice_operation;
 
-    int m_device;
+  strategy::AllocationStrategy* m_allocator;
+
+  int m_device;
 };
 
 } // end of namespace strategy

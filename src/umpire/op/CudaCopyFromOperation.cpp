@@ -15,9 +15,7 @@ namespace umpire {
 namespace op {
 
 void CudaCopyFromOperation::transform(
-    void* src_ptr,
-    void** dst_ptr,
-    util::AllocationRecord* src_allocation,
+    void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
     std::size_t length)
 {
@@ -27,55 +25,46 @@ void CudaCopyFromOperation::transform(
   cudaSetDevice(device);
 
   cudaError_t error =
-    ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost);
+      ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost);
 
   cudaSetDevice(old_device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << *dst_ptr
-      << ", src_ptr = " << src_ptr
-      << ", length = " << length
-      << ", cudaMemcpyDeviceToHost ) failed with error: "
-      << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaMemcpy( dest_ptr = "
+                 << *dst_ptr << ", src_ptr = " << src_ptr << ", length = "
+                 << length << ", cudaMemcpyDeviceToHost ) failed with error: "
+                 << cudaGetErrorString(error));
   }
 
-  UMPIRE_RECORD_STATISTIC(
-      "CudaCopyFromOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
-      "size", length,
-      "event", "copy");
+  UMPIRE_RECORD_STATISTIC("CudaCopyFromOperation", "src_ptr",
+                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
+                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
+                          "event", "copy");
 }
 
-camp::resources::Event 
-CudaCopyFromOperation::transform_async(
-    void* src_ptr,
-    void** dst_ptr,
+camp::resources::Event CudaCopyFromOperation::transform_async(
+    void* src_ptr, void** dst_ptr,
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
-    std::size_t length,
-    camp::resources::Resource& ctx)
+    std::size_t length, camp::resources::Resource& ctx)
 {
   auto device = ctx.get<camp::resources::Cuda>();
   auto stream = device.get_stream();
 
-  cudaError_t error =
-    ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost,stream);
+  cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length,
+                                        cudaMemcpyDeviceToHost, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << *dst_ptr
-      << ", src_ptr = " << src_ptr
-      << ", length = " << length
-      << ", cudaMemcpyDeviceToHost ) failed with error: "
-      << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaMemcpy( dest_ptr = "
+                 << *dst_ptr << ", src_ptr = " << src_ptr << ", length = "
+                 << length << ", cudaMemcpyDeviceToHost ) failed with error: "
+                 << cudaGetErrorString(error));
   }
 
-  UMPIRE_RECORD_STATISTIC(
-      "CudaCopyFromOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "dst_ptr", reinterpret_cast<uintptr_t>(dst_ptr),
-      "size", length,
-      "event", "copy");
+  UMPIRE_RECORD_STATISTIC("CudaCopyFromOperation", "src_ptr",
+                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
+                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
+                          "event", "copy");
 
   return ctx.get_event();
 }

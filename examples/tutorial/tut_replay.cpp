@@ -4,14 +4,15 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include <algorithm>
+#include <functional>
+#include <random>
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-#include <functional>
-#include <algorithm>
-#include <random>
-
-int main(int, char**) {
+int main(int, char**)
+{
   constexpr int NUM_ALLOCATIONS = 64;
   std::default_random_engine generator;
   std::uniform_int_distribution<int> distribution{0, 1024};
@@ -24,16 +25,16 @@ int main(int, char**) {
 
   // Make an allocator
   auto allocator = rm.getAllocator("HOST");
-  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "pool",
-      allocator);
+  auto pool =
+      rm.makeAllocator<umpire::strategy::DynamicPool>("pool", allocator);
 
   // Do some allocations
   std::generate(allocations.begin(), allocations.end(),
-                [&] () { return pool.allocate(random_number()); });
+                [&]() { return pool.allocate(random_number()); });
 
   // Clean up
-  for (auto& ptr : allocations) pool.deallocate(ptr);
+  for (auto& ptr : allocations)
+    pool.deallocate(ptr);
 
   return 0;
 }

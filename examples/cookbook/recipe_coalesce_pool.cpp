@@ -4,25 +4,24 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationTracker.hpp"
+#include <iostream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-
+#include "umpire/strategy/AllocationTracker.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/util/Exception.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
-#include <iostream>
-
-int main(int, char**) {
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "pool", rm.getAllocator("HOST"));
 
   auto dynamic_pool =
-    umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
+      umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
 
   if (dynamic_pool) {
     dynamic_pool->coalesce();
@@ -32,4 +31,3 @@ int main(int, char**) {
 
   return 0;
 }
-

@@ -7,18 +7,14 @@
 #ifndef UMPIRE_Umpire_HPP
 #define UMPIRE_Umpire_HPP
 
-#include "umpire/config.hpp"
-
-#include "umpire/util/MPI.hpp"
-#include "umpire/util/io.hpp"
-
-#include "umpire/ResourceManager.hpp"
+#include <iostream>
 
 #include "umpire/Allocator.hpp"
-
+#include "umpire/ResourceManager.hpp"
+#include "umpire/config.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-
-#include <iostream>
+#include "umpire/util/MPI.hpp"
+#include "umpire/util/io.hpp"
 
 namespace umpire {
 
@@ -50,8 +46,7 @@ void finalize();
  *
  * \param size Number of bytes to allocate.
  */
-inline
-void* malloc(std::size_t size)
+inline void* malloc(std::size_t size)
 {
   return ResourceManager::getInstance().getDefaultAllocator().allocate(size);
 }
@@ -64,32 +59,27 @@ void* malloc(std::size_t size)
  *
  * \param ptr Address to free.
  */
-inline
-void free(void* ptr)
+inline void free(void* ptr)
 {
   return ResourceManager::getInstance().deallocate(ptr);
 }
 
-inline
-int get_major_version()
+inline int get_major_version()
 {
   return UMPIRE_VERSION_MAJOR;
 }
 
-inline
-int get_minor_version()
+inline int get_minor_version()
 {
   return UMPIRE_VERSION_MINOR;
 }
 
-inline
-int get_patch_version()
+inline int get_patch_version()
 {
   return UMPIRE_VERSION_PATCH;
 }
 
-inline
-std::string get_rc_version()
+inline std::string get_rc_version()
 {
   return UMPIRE_VERSION_RC;
 }
@@ -112,9 +102,10 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
 
 /*!
  * \brief Check whether the right allocation overlaps the left.
- * 
- * right will overlap left if the right is greater than left, but less than left+size, and right+size is strictly greater than left+size.
- * 
+ *
+ * right will overlap left if the right is greater than left, but less than
+ * left+size, and right+size is strictly greater than left+size.
+ *
  * \param left Pointer to left allocation
  * \param right Poniter to right allocation
  */
@@ -122,9 +113,10 @@ bool pointer_overlaps(void* left, void* right);
 
 /*!
  * \brief Check whether the left allocation contains the right.
- * 
- * right is contained by left if right is greater than left, and right+size is greater than left+size.
- * 
+ *
+ * right is contained by left if right is greater than left, and right+size is
+ * greater than left+size.
+ *
  * \param left Pointer to left allocation
  * \param right Poniter to right allocation
  */
@@ -138,13 +130,15 @@ bool pointer_contains(void* left, void* right);
 std::string get_backtrace(void* ptr);
 
 /*!
- * \brief Get memory usage of the current process (uses underlying system-dependent calls)
+ * \brief Get memory usage of the current process (uses underlying
+ * system-dependent calls)
  */
 std::size_t get_process_memory_usage();
 
 /*!
- * \brief Get memory usage of device device_id, using appropriate underlying vendor API.
- */ 
+ * \brief Get memory usage of device device_id, using appropriate underlying
+ * vendor API.
+ */
 std::size_t get_device_memory_usage(int device_id);
 
 /*!

@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -23,28 +23,23 @@ namespace strategy {
  * total size of allocations made on a particular resource or from a particular
  * context.
  */
-class SizeLimiter :
-  public AllocationStrategy
-{
-  public:
-      SizeLimiter(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        std::size_t size_limit);
+class SizeLimiter : public AllocationStrategy {
+ public:
+  SizeLimiter(const std::string& name, int id, Allocator allocator,
+              std::size_t size_limit);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-  private:
-    strategy::AllocationStrategy* m_allocator;
+ private:
+  strategy::AllocationStrategy* m_allocator;
 
-    std::size_t m_size_limit;
-    std::size_t m_total_size;
+  std::size_t m_size_limit;
+  std::size_t m_total_size;
 };
 
 } // end of namespace strategy

@@ -4,22 +4,22 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/AllocationPrefetcher.hpp"
+#include <iostream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/AllocationPrefetcher.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
-#include <iostream>
-
-int main(int, char**) {
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto prefetcher = rm.makeAllocator<umpire::strategy::AllocationPrefetcher>(
       "prefetcher", rm.getAllocator("UM"));
 
-  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
-        "prefetch_pool", prefetcher);
+  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>("prefetch_pool",
+                                                              prefetcher);
 
   void* data_one = pool.allocate(1024);
   void* data_two = pool.allocate(4096);

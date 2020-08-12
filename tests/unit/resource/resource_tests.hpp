@@ -7,36 +7,33 @@
 #ifndef UMPIRE_resource_tests_HPP
 #define UMPIRE_resource_tests_HPP
 
-#include "gtest/gtest.h"
-
 #include <memory>
 
-#include "umpire/util/Platform.hpp"
-#include "umpire/util/MemoryResourceTraits.hpp"
+#include "gtest/gtest.h"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/util/Platform.hpp"
 
 template <typename Resource>
-class ResourceTest :
-  public ::testing::Test
-{
-  public:
-    void SetUp() override
-    {
-      auto platform = umpire::Platform::undefined;
-      const std::string name{"test resource"}; 
-      const int id{0}; 
-      auto traits = umpire::MemoryResourceTraits{};
+class ResourceTest : public ::testing::Test {
+ public:
+  void SetUp() override
+  {
+    auto platform = umpire::Platform::undefined;
+    const std::string name{"test resource"};
+    const int id{0};
+    auto traits = umpire::MemoryResourceTraits{};
 
-      memory_resource = new Resource{platform, name , id, traits};
-    }
+    memory_resource = new Resource{platform, name, id, traits};
+  }
 
-    void TearDown() override
-    {
-      delete memory_resource;
-    }
+  void TearDown() override
+  {
+    delete memory_resource;
+  }
 
-  protected:
-    Resource* memory_resource;
+ protected:
+  Resource* memory_resource;
 };
 
 TYPED_TEST_SUITE_P(ResourceTest);
