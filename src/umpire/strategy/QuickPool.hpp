@@ -72,6 +72,12 @@ class QuickPool :
         pool_allocator() :
           pool{new util::FixedMallocPool{sizeof(Value)}} {}
 
+        ~pool_allocator()
+	{
+	  if (pool != nullptr) 
+	    delete(pool); 
+	}
+
         /// BUG: Only required for MSVC
         template<typename U>
         pool_allocator(const pool_allocator<U>& other):

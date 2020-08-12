@@ -61,6 +61,7 @@ QuickPool::QuickPool(
 
 QuickPool::~QuickPool()
 {
+  release(); 
 }
 
 void*
