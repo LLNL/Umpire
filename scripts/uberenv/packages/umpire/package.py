@@ -57,7 +57,8 @@ class Umpire(CMakePackage, CudaPackage):
     git      = 'https://github.com/LLNL/Umpire.git'
 
     version('develop', branch='develop', submodules='True')
-    version('master', branch='master', submodules='True')
+    version('master', branch='main', submodules='True')
+    version('3.0.0', tag='v3.0.0', submodules='True')
     version('2.1.0', tag='v2.1.0', submodules='True')
     version('2.0.0', tag='v2.0.0', submodules='True')
     version('1.1.0', tag='v1.1.0', submodules='True')
@@ -77,12 +78,17 @@ class Umpire(CMakePackage, CudaPackage):
     version('0.1.4', tag='v0.1.4', submodules='True')
     version('0.1.3', tag='v0.1.3', submodules='True')
 
+    patch('camp_target_umpire_3.0.0.patch', when='@3.0.0')
+
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('numa', default=False, description='Enable NUMA support')
+    variant('shared', default=True, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
+    variant('tests', default='basic', values=('none', 'basic', 'benchmarks'),
+            multi=False, description='Tests to run')
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
 
@@ -92,7 +98,7 @@ class Umpire(CMakePackage, CudaPackage):
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
 
-    phases = ['hostconfig', 'cmake', 'build',' install']
+    phases = ['hostconfig', 'cmake', 'build', 'install']
 
     def _get_sys_type(self, spec):
         sys_type = str(spec.architecture)
@@ -184,6 +190,8 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write("# CMake executable path: %s\n" % cmake_exe)
         cfg.write("#------------------\n\n".format("-" * 60))
 
+        cfg.write(cmake_cache_string("CMAKE_BUILD_TYPE", spec.variants['build_type'].value))
+
         #######################
         # Compiler Settings
         #######################
@@ -220,11 +228,16 @@ class Umpire(CMakePackage, CudaPackage):
                                             description))
 
         if "toss_3_x86_64_ib" in sys_type:
-            release_flags = "-O3 -finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch"
-            cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELEASE", release_flags))
-            reldebinf_flags = "-O3 -g -finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch"
-            cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELWITHDEBINFO", reldebinf_flags))
+            release_flags = "-O3"
+            reldebinf_flags = "-O3 -g"
             debug_flags = "-O0 -g"
+
+            if "intel" in str(spec.compiler):
+                release_flags = ' '.join([release_flags,'-finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch'])
+                reldebinf_flags = ' '.join([reldebinf_flags,'-finline-functions -axCORE-AVX2 -diag-disable cpu-dispatch'])
+
+            cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELEASE", release_flags))
+            cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELWITHDEBINFO", reldebinf_flags))
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_DEBUG", debug_flags))
 
         if "+cuda" in spec:
@@ -256,6 +269,9 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
+
+        cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
+        cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
 
         #######################
         # Close and save
