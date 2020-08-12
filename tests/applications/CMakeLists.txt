@@ -43,5 +43,3 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
 endif ()
 
 install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)
-
-umpire_add_code_checks(PREFIX application_tests)
