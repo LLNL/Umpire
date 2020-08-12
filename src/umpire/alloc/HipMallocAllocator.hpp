@@ -7,6 +7,8 @@
 #ifndef UMPIRE_HipMallocAllocator_HPP
 #define UMPIRE_HipMallocAllocator_HPP
 
+#include "umpire/util/Macros.hpp"
+
 #include <hip/hip_runtime_api.h>
 
 namespace umpire {

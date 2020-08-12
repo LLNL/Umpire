@@ -7,6 +7,8 @@
 #ifndef UMPIRE_HipPinnedAllocator_HPP
 #define UMPIRE_HipPinnedAllocator_HPP
 
+#include "umpire/util/Macros.hpp"
+
 #include <hip/hip_runtime.h>
 
 namespace umpire {
