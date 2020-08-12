@@ -54,7 +54,8 @@ FixedMallocPool::FixedMallocPool(const std::size_t object_bytes,
 
 FixedMallocPool::~FixedMallocPool()
 {
-  for (auto& a : m_pool) std::free(a.data);
+  for (auto& a : m_pool)
+    std::free(a.data);
 }
 
 void FixedMallocPool::newPool()

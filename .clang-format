@@ -8,6 +8,7 @@ BraceWrapping:
 
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortFunctionsOnASingleLine: None
+AllowShortLoopsOnASingleLine: false
 
 ColumnLimit: 80
 

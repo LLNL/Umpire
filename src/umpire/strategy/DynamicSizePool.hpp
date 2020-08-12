@@ -402,7 +402,8 @@ class DynamicSizePool {
   std::size_t getInUseBlocks() const
   {
     std::size_t nb = 0;
-    for (struct Block *temp = usedBlocks; temp; temp = temp->next) nb++;
+    for (struct Block *temp = usedBlocks; temp; temp = temp->next)
+      nb++;
     return nb;
   }
 

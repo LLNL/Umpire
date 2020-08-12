@@ -51,7 +51,8 @@ Logger::Logger() noexcept
 
 void Logger::setLoggingMsgLevel(message::Level level) noexcept
 {
-  for (int i = 0; i < message::Num_Levels; ++i) m_is_enabled[i] = (i <= level);
+  for (int i = 0; i < message::Num_Levels; ++i)
+    m_is_enabled[i] = (i <= level);
 }
 
 void Logger::logMessage(message::Level level, const std::string& message,

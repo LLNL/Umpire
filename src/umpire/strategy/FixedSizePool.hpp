@@ -59,7 +59,8 @@ class FixedSizePool {
     p->data =
         reinterpret_cast<unsigned char *>(MA::allocate(numPerPool * sizeof(T)));
     p->avail = reinterpret_cast<unsigned int *>(p + 1);
-    for (int i = 0; i < NP; i++) p->avail[i] = (~0);
+    for (int i = 0; i < NP; i++)
+      p->avail[i] = (~0);
 
     *pnew = p;
   }
@@ -175,7 +176,8 @@ class FixedSizePool {
   std::size_t numPools() const
   {
     std::size_t np = 0;
-    for (struct Pool *curr = pool; curr; curr = curr->next) np++;
+    for (struct Pool *curr = pool; curr; curr = curr->next)
+      np++;
     return np;
   }
 

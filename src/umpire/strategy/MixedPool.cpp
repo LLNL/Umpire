@@ -103,7 +103,8 @@ void MixedPool::release()
 std::size_t MixedPool::getCurrentSize() const noexcept
 {
   std::size_t size = 0;
-  for (auto& fp : m_fixed_pool) size += fp->getCurrentSize();
+  for (auto& fp : m_fixed_pool)
+    size += fp->getCurrentSize();
   size += m_dynamic_pool.getCurrentSize();
   return size;
 }
@@ -111,7 +112,8 @@ std::size_t MixedPool::getCurrentSize() const noexcept
 std::size_t MixedPool::getActualSize() const noexcept
 {
   std::size_t size = 0;
-  for (auto& fp : m_fixed_pool) size += fp->getActualSize();
+  for (auto& fp : m_fixed_pool)
+    size += fp->getActualSize();
   size += m_dynamic_pool.getActualSize();
   return size;
 }
@@ -119,7 +121,8 @@ std::size_t MixedPool::getActualSize() const noexcept
 std::size_t MixedPool::getHighWatermark() const noexcept
 {
   std::size_t size = 0;
-  for (auto& fp : m_fixed_pool) size += fp->getHighWatermark();
+  for (auto& fp : m_fixed_pool)
+    size += fp->getHighWatermark();
   size += m_dynamic_pool.getHighWatermark();
   return size;
 }
