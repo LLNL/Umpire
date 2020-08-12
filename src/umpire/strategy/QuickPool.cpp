@@ -29,25 +29,6 @@ QuickPool::QuickPool(
   m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
   m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
 {
-#if defined(UMPIRE_ENABLE_BACKTRACE)
-  {
-    umpire::util::backtrace bt;
-    umpire::util::backtracer<>::get_backtrace(bt);
-    UMPIRE_LOG(Info, "actual_size:"
-      << m_first_minimum_pool_allocation_size << " (prev: 0) "
-      << umpire::util::backtracer<>::print(bt));
-  }
-#endif
-
-  void* ptr{aligned_allocate(m_first_minimum_pool_allocation_size)};
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_first_minimum_pool_allocation_size);
-
-  m_actual_bytes += m_first_minimum_pool_allocation_size;
-  m_releasable_bytes += m_first_minimum_pool_allocation_size;
-
-  void* chunk_storage{m_chunk_pool.allocate()};
-  Chunk* chunk{new (chunk_storage) Chunk(ptr, m_first_minimum_pool_allocation_size, m_first_minimum_pool_allocation_size)};
-  chunk->size_map_it = m_size_map.insert(std::make_pair(m_first_minimum_pool_allocation_size, chunk));
 }
 
 QuickPool::~QuickPool()

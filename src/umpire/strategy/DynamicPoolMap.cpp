@@ -38,19 +38,6 @@ DynamicPoolMap::DynamicPoolMap(
   m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
   m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
 {
-  std::size_t bytes{ m_first_minimum_pool_allocation_size };
-#if defined(UMPIRE_ENABLE_BACKTRACE)
-  {
-    umpire::util::backtrace bt;
-    umpire::util::backtracer<>::get_backtrace(bt);
-    UMPIRE_LOG(Info, "actual_size: " << bytes << " (prev: 0) " << umpire::util::backtracer<>::print(bt));
-  }
-#endif
-  void* ptr = aligned_allocate(bytes);
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
-  m_actual_bytes += bytes;
-
-  insertFree(ptr, bytes, true, bytes);
 }
 
 DynamicPoolMap::~DynamicPoolMap()
@@ -199,7 +186,8 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
     }
   } else {
     const std::size_t min_block_size =
-      ( m_actual_bytes == 0 ) ? m_first_minimum_pool_allocation_size : m_next_minimum_pool_allocation_size;
+      ( m_actual_bytes == 0 ) ? m_first_minimum_pool_allocation_size
+                              : m_next_minimum_pool_allocation_size;
 
     const std::size_t alloc_bytes{std::max(bytes, min_block_size)};
     ptr = allocateBlock(alloc_bytes);

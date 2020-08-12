@@ -179,18 +179,25 @@ TYPED_TEST_SUITE(PrimaryPoolTest, PoolTestTypes,);
 
 TYPED_TEST(PrimaryPoolTest, Allocate)
 {
-  void* data = nullptr;
-  data = this->m_allocator->allocate(100);
-  this->m_allocator->deallocate(data);
+  ASSERT_NO_THROW(
+    this->m_allocator->deallocate( this->m_allocator->allocate(100)); );
+}
+
+TYPED_TEST(PrimaryPoolTest, LazyFirstAllocation)
+{
+  ASSERT_EQ(this->m_allocator->getActualSize(), 0);
+
+  ASSERT_NO_THROW(
+    this->m_allocator->deallocate( this->m_allocator->allocate(100)); );
+
+  ASSERT_EQ(this->m_allocator->getActualSize(), this->m_initial_pool_size);
 }
 
 TYPED_TEST(PrimaryPoolTest, AllocateDeallocateBig)
 {
-  double* data = static_cast<double*>(
-                  this->m_allocator->allocate(this->m_big*sizeof(double)));
-
-  ASSERT_NE(nullptr, data);
-  this->m_allocator->deallocate(data);
+  ASSERT_NO_THROW(
+    this->m_allocator->deallocate(
+            this->m_allocator->allocate(this->m_big*sizeof(double))); );
 }
 
 TYPED_TEST(PrimaryPoolTest, Duplicate)
