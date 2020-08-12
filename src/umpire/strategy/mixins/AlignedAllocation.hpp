@@ -20,24 +20,24 @@ public:
     AlignedAllocation() = delete;
     AlignedAllocation(std::size_t alignment, strategy::AllocationStrategy* strategy);
 
-    //////////////////////////////////////////////////////////////////////////
-    /// \brief Round up the size to be an integral multple of configured
-    ///        alignment.
-    ///
-    /// \returns Size rounded up to be integral multiple of configured
-    ///          alignment
-    //////////////////////////////////////////////////////////////////////////
+    //!
+    //! \brief Round up the size to be an integral multple of configured
+    //!        alignment.
+    //!
+    //! \returns Size rounded up to be integral multiple of configured
+    //!          alignment
+    //!
     std::size_t aligned_round_up(std::size_t size);
 
-    //////////////////////////////////////////////////////////////////////////
-    /// \brief Return an allocation of `size` bytes that is aligned on the
-    ///        configured alignment boundary.
-    //////////////////////////////////////////////////////////////////////////
+    //!
+    //! \brief Return an allocation of `size` bytes that is aligned on the
+    //!        configured alignment boundary.
+    //!
     void* aligned_allocate(const std::size_t size);
 
-    //////////////////////////////////////////////////////////////////////////
-    /// \brief Deallocate previously alligned allocation
-    //////////////////////////////////////////////////////////////////////////
+    //!
+    //! \brief Deallocate previously alligned allocation
+    //!
     void aligned_deallocate(void* ptr);
 
 protected:
