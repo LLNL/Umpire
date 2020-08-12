@@ -7,9 +7,9 @@
 #ifndef UMPIRE_MallocAllocator_HPP
 #define UMPIRE_MallocAllocator_HPP
 
-#include "umpire/util/Macros.hpp"
-
 #include <cstdlib>
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace alloc {

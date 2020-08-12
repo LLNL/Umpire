@@ -39,7 +39,10 @@ class Replay {
   void logMessage(const std::string& message);
   static Replay* getReplayLogger();
   bool replayLoggingEnabled();
-  uint64_t replayUid() { return m_replayUid; }
+  uint64_t replayUid()
+  {
+    return m_replayUid;
+  }
 
   static std::string printReplayAllocator(void)
   {
@@ -53,7 +56,8 @@ class Replay {
     std::stringstream ss;
 
     m_argument_number++;
-    if (m_argument_number != 1) ss << ", ";
+    if (m_argument_number != 1)
+      ss << ", ";
 
     ss << "\"" << firstArg << "\"";
 

@@ -16,18 +16,30 @@ AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
 {
 }
 
-const std::string& AllocationStrategy::getName() noexcept { return m_name; }
+const std::string& AllocationStrategy::getName() noexcept
+{
+  return m_name;
+}
 
 void AllocationStrategy::release()
 {
   UMPIRE_LOG(Info, "AllocationStrategy::release is a no-op");
 }
 
-int AllocationStrategy::getId() noexcept { return m_id; }
+int AllocationStrategy::getId() noexcept
+{
+  return m_id;
+}
 
-std::size_t AllocationStrategy::getCurrentSize() const noexcept { return 0; }
+std::size_t AllocationStrategy::getCurrentSize() const noexcept
+{
+  return 0;
+}
 
-std::size_t AllocationStrategy::getHighWatermark() const noexcept { return 0; }
+std::size_t AllocationStrategy::getHighWatermark() const noexcept
+{
+  return 0;
+}
 
 std::size_t AllocationStrategy::getAllocationCount() const noexcept
 {

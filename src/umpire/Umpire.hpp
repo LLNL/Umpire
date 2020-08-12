@@ -64,13 +64,25 @@ inline void free(void* ptr)
   return ResourceManager::getInstance().deallocate(ptr);
 }
 
-inline int get_major_version() { return UMPIRE_VERSION_MAJOR; }
+inline int get_major_version()
+{
+  return UMPIRE_VERSION_MAJOR;
+}
 
-inline int get_minor_version() { return UMPIRE_VERSION_MINOR; }
+inline int get_minor_version()
+{
+  return UMPIRE_VERSION_MINOR;
+}
 
-inline int get_patch_version() { return UMPIRE_VERSION_PATCH; }
+inline int get_patch_version()
+{
+  return UMPIRE_VERSION_PATCH;
+}
 
-inline std::string get_rc_version() { return UMPIRE_VERSION_RC; }
+inline std::string get_rc_version()
+{
+  return UMPIRE_VERSION_RC;
+}
 
 /*!
  * \brief Print the allocations from a specific allocator in a

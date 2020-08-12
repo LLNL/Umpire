@@ -111,7 +111,10 @@ void MPI::logMpiInfo()
   }
 }
 
-bool MPI::isInitialized() { return s_initialized; }
+bool MPI::isInitialized()
+{
+  return s_initialized;
+}
 
 } // end of namespace util
 } // end of namespace umpire

@@ -372,12 +372,14 @@ void ResourceManager::initialize()
 
       int canAccessPeer = 0;
       hipDeviceCanAccessPeer(&canAccessPeer, device, top);
-      if (canAccessPeer) hipDeviceEnablePeerAccess(top, 0);
+      if (canAccessPeer)
+        hipDeviceEnablePeerAccess(top, 0);
 
       const int bottom = (device + 1) % device_count;
       if (top != bottom) {
         hipDeviceCanAccessPeer(&canAccessPeer, device, bottom);
-        if (canAccessPeer) hipDeviceEnablePeerAccess(bottom, 0);
+        if (canAccessPeer)
+          hipDeviceEnablePeerAccess(bottom, 0);
       }
 
       hipDeviceProp_t properties;
@@ -1062,7 +1064,10 @@ std::vector<int> ResourceManager::getAllocatorIds() const noexcept
   return ids;
 }
 
-int ResourceManager::getNextId() noexcept { return m_id++; }
+int ResourceManager::getNextId() noexcept
+{
+  return m_id++;
+}
 
 std::string ResourceManager::getAllocatorInformation() const noexcept
 {

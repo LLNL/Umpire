@@ -121,7 +121,8 @@ template <>
 struct backtracer<trace_optional> {
   static void get_backtrace(backtrace& bt)
   {
-    if (backtrace_enabled()) bt.frames = build_backtrace();
+    if (backtrace_enabled())
+      bt.frames = build_backtrace();
   }
 
   static std::string print(const backtrace& bt)
@@ -136,9 +137,15 @@ struct backtracer<trace_optional> {
 
 template <>
 struct backtracer<trace_always> {
-  static void get_backtrace(backtrace& bt) { bt.frames = build_backtrace(); }
+  static void get_backtrace(backtrace& bt)
+  {
+    bt.frames = build_backtrace();
+  }
 
-  static std::string print(const backtrace& bt) { return stringify(bt.frames); }
+  static std::string print(const backtrace& bt)
+  {
+    return stringify(bt.frames);
+  }
 };
 
 } // end of namespace util

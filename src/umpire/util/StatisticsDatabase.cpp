@@ -38,7 +38,9 @@ std::shared_ptr<Statistic> StatisticsDatabase::getStatistic(
   return stat;
 }
 
-StatisticsDatabase::StatisticsDatabase() noexcept : m_statistics() {}
+StatisticsDatabase::StatisticsDatabase() noexcept : m_statistics()
+{
+}
 
 void StatisticsDatabase::printStatistics(std::ostream& stream) noexcept
 {

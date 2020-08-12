@@ -40,7 +40,10 @@ void AllocationTracker::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-void AllocationTracker::release() { m_allocator->release(); }
+void AllocationTracker::release()
+{
+  m_allocator->release();
+}
 
 std::size_t AllocationTracker::getCurrentSize() const noexcept
 {

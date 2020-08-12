@@ -176,7 +176,8 @@ class DynamicSizePool {
       // Split the block
       std::size_t remaining = curr->size - size;
       struct Block *newBlock = (struct Block *)blockPool.allocate();
-      if (!newBlock) return;
+      if (!newBlock)
+        return;
       newBlock->data = curr->data + size;
       newBlock->size = remaining;
       newBlock->blockSize = 0;
@@ -310,7 +311,10 @@ class DynamicSizePool {
   {
   }
 
-  ~DynamicSizePool() { freeAllBlocks(); }
+  ~DynamicSizePool()
+  {
+    freeAllBlocks();
+  }
 
   void *allocate(std::size_t size)
   {
@@ -319,7 +323,8 @@ class DynamicSizePool {
     findUsableBlock(best, prev, size);
 
     // Allocate a block if needed
-    if (!best) allocateBlock(best, prev, size);
+    if (!best)
+      allocateBlock(best, prev, size);
     assert(best);
 
     // Split the free block
@@ -344,7 +349,8 @@ class DynamicSizePool {
     for (; curr && curr->data != ptr; curr = curr->next) {
       prev = curr;
     }
-    if (!curr) return;
+    if (!curr)
+      return;
 
     UMPIRE_POISON_MEMORY_REGION(allocator, ptr, curr->size);
 
@@ -352,15 +358,22 @@ class DynamicSizePool {
     releaseBlock(curr, prev);
   }
 
-  std::size_t getActualSize() const { return totalBytes; }
+  std::size_t getActualSize() const
+  {
+    return totalBytes;
+  }
 
-  std::size_t getBlocksInPool() const { return totalBlocks; }
+  std::size_t getBlocksInPool() const
+  {
+    return totalBlocks;
+  }
 
   std::size_t getLargestAvailableBlock() const
   {
     std::size_t largest_block{0};
     for (struct Block *temp = freeBlocks; temp; temp = temp->next)
-      if (temp->size > largest_block) largest_block = temp->size;
+      if (temp->size > largest_block)
+        largest_block = temp->size;
     return largest_block;
   }
 
@@ -381,7 +394,8 @@ class DynamicSizePool {
   {
     std::size_t nb = 0;
     for (struct Block *temp = freeBlocks; temp; temp = temp->next)
-      if (temp->size == temp->blockSize) nb++;
+      if (temp->size == temp->blockSize)
+        nb++;
     return nb;
   }
 
@@ -404,7 +418,10 @@ class DynamicSizePool {
     }
   }
 
-  void release() { freeReleasedBlocks(); }
+  void release()
+  {
+    freeReleasedBlocks();
+  }
 };
 
 #endif

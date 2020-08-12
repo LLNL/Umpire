@@ -57,7 +57,8 @@ void Logger::setLoggingMsgLevel(message::Level level) noexcept
 void Logger::logMessage(message::Level level, const std::string& message,
                         const std::string& fileName, int line) noexcept
 {
-  if (!logLevelEnabled(level)) return;
+  if (!logLevelEnabled(level))
+    return;
 
   umpire::log() << "[" << MessageLevelName[level] << "]"
                 << "[" << fileName << ":" << line << "]:" << message

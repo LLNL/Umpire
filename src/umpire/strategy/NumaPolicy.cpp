@@ -57,16 +57,25 @@ void* NumaPolicy::allocate(std::size_t bytes)
   return ret;
 }
 
-void NumaPolicy::deallocate(void* ptr) { m_allocator->deallocate(ptr); }
+void NumaPolicy::deallocate(void* ptr)
+{
+  m_allocator->deallocate(ptr);
+}
 
-Platform NumaPolicy::getPlatform() noexcept { return m_platform; }
+Platform NumaPolicy::getPlatform() noexcept
+{
+  return m_platform;
+}
 
 MemoryResourceTraits NumaPolicy::getTraits() const noexcept
 {
   return m_allocator->getTraits();
 }
 
-int NumaPolicy::getNode() const noexcept { return m_node; }
+int NumaPolicy::getNode() const noexcept
+{
+  return m_node;
+}
 
 } // end of namespace strategy
 } // end of namespace umpire

@@ -49,7 +49,10 @@ void DynamicPoolList::deallocate(void* ptr)
   }
 }
 
-void DynamicPoolList::release() { dpa.release(); }
+void DynamicPoolList::release()
+{
+  dpa.release();
+}
 
 std::size_t DynamicPoolList::getActualSize() const noexcept
 {

@@ -89,7 +89,8 @@ void* FixedMallocPool::allocate(std::size_t bytes)
 
   for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
     ptr = allocInPool(*it);
-    if (ptr) return ptr;
+    if (ptr)
+      return ptr;
   }
 
   if (!ptr) {
@@ -125,7 +126,10 @@ void FixedMallocPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
-std::size_t FixedMallocPool::numPools() const noexcept { return m_pool.size(); }
+std::size_t FixedMallocPool::numPools() const noexcept
+{
+  return m_pool.size();
+}
 
 } // namespace util
 } // end of namespace umpire

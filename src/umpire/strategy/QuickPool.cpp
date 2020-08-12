@@ -58,7 +58,9 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
       m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
 }
 
-QuickPool::~QuickPool() {}
+QuickPool::~QuickPool()
+{
+}
 
 void* QuickPool::allocate(std::size_t bytes)
 {
@@ -135,7 +137,8 @@ void* QuickPool::allocate(std::size_t bytes)
     split_chunk->prev = chunk;
     split_chunk->next = old_next;
 
-    if (split_chunk->next) split_chunk->next->prev = split_chunk;
+    if (split_chunk->next)
+      split_chunk->next->prev = split_chunk;
 
     chunk->size = bytes;
     split_chunk->size_map_it =
@@ -165,7 +168,8 @@ void QuickPool::deallocate(void* ptr)
     prev->size += chunk->size;
     prev->next = chunk->next;
 
-    if (prev->next) prev->next->prev = prev;
+    if (prev->next)
+      prev->next->prev = prev;
 
     UMPIRE_LOG(Debug, "Merging with prev" << prev << " and " << chunk);
     UMPIRE_LOG(Debug, "New size: " << prev->size);
@@ -178,7 +182,8 @@ void QuickPool::deallocate(void* ptr)
     auto next = chunk->next;
     chunk->size += next->size;
     chunk->next = next->next;
-    if (chunk->next) chunk->next->prev = chunk;
+    if (chunk->next)
+      chunk->next->prev = chunk;
 
     UMPIRE_LOG(Debug, "Merging with next" << chunk << " and " << next);
     UMPIRE_LOG(Debug, "New size: " << chunk->size);
@@ -241,7 +246,10 @@ void QuickPool::release()
 #endif
 }
 
-std::size_t QuickPool::getActualSize() const noexcept { return m_actual_bytes; }
+std::size_t QuickPool::getActualSize() const noexcept
+{
+  return m_actual_bytes;
+}
 
 std::size_t QuickPool::getReleasableSize() const noexcept
 {

@@ -24,13 +24,15 @@ namespace numa {
 
 int preferred_node()
 {
-  if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
+  if (numa_available() < 0)
+    UMPIRE_ERROR("libnuma is unusable.");
   return numa_preferred();
 }
 
 void move_to_node(void* ptr, std::size_t bytes, int node)
 {
-  if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
+  if (numa_available() < 0)
+    UMPIRE_ERROR("libnuma is unusable.");
 
   struct bitmask* mask = numa_bitmask_alloc(numa_max_node() + 1);
   numa_bitmask_clearall(mask);
@@ -58,7 +60,8 @@ int get_location(void* ptr)
 
 std::vector<int> get_host_nodes()
 {
-  if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
+  if (numa_available() < 0)
+    UMPIRE_ERROR("libnuma is unusable.");
 
   std::vector<int> host_nodes;
   struct bitmask* cpus = numa_allocate_cpumask();
@@ -85,7 +88,8 @@ std::vector<int> get_host_nodes()
 
 std::vector<int> get_device_nodes()
 {
-  if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
+  if (numa_available() < 0)
+    UMPIRE_ERROR("libnuma is unusable.");
 
   std::vector<int> device_nodes;
   struct bitmask* cpus = numa_allocate_cpumask();
@@ -112,13 +116,15 @@ std::vector<int> get_device_nodes()
 
 std::vector<int> get_allocatable_nodes()
 {
-  if (numa_available() < 0) UMPIRE_ERROR("libnuma is unusable.");
+  if (numa_available() < 0)
+    UMPIRE_ERROR("libnuma is unusable.");
 
   struct bitmask* mask = numa_get_mems_allowed();
   std::vector<int> nodes;
   const int size = mask->size;
   for (int i = 0; i < size; i++) {
-    if (numa_bitmask_isbitset(mask, i)) nodes.push_back(i);
+    if (numa_bitmask_isbitset(mask, i))
+      nodes.push_back(i);
   }
 
   numa_free_nodemask(mask);

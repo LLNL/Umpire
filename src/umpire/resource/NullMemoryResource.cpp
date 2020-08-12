@@ -66,11 +66,20 @@ void NullMemoryResource::deallocate(void* ptr)
 #endif
 }
 
-std::size_t NullMemoryResource::getCurrentSize() const noexcept { return 0; }
+std::size_t NullMemoryResource::getCurrentSize() const noexcept
+{
+  return 0;
+}
 
-std::size_t NullMemoryResource::getHighWatermark() const noexcept { return 0; }
+std::size_t NullMemoryResource::getHighWatermark() const noexcept
+{
+  return 0;
+}
 
-Platform NullMemoryResource::getPlatform() noexcept { return m_platform; }
+Platform NullMemoryResource::getPlatform() noexcept
+{
+  return m_platform;
+}
 
 } // end of namespace resource
 } // end of namespace umpire

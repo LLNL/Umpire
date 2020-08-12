@@ -81,11 +81,13 @@ void initialize_io(const bool enable_log, const bool enable_replay)
 
   std::string root_io_dir{"./"};
   const char* output_dir{std::getenv("UMPIRE_OUTPUT_DIR")};
-  if (output_dir) root_io_dir = output_dir;
+  if (output_dir)
+    root_io_dir = output_dir;
 
   std::string file_basename{"umpire"};
   const char* base_name{std::getenv("UMPIRE_OUTPUT_BASENAME")};
-  if (base_name) file_basename = base_name;
+  if (base_name)
+    file_basename = base_name;
 
   const int pid{getpid()};
 

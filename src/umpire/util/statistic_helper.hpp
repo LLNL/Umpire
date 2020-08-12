@@ -14,7 +14,10 @@ namespace umpire {
 namespace util {
 namespace detail {
 
-inline conduit::Node add_entry(conduit::Node& n) { return n; }
+inline conduit::Node add_entry(conduit::Node& n)
+{
+  return n;
+}
 
 template <typename T, typename U>
 inline conduit::Node add_entry(conduit::Node& n, T k, U v)

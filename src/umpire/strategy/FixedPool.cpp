@@ -96,7 +96,8 @@ FixedPool::~FixedPool()
     else
       ss << "First " << max_addr << " addresses:";
     for (std::size_t i = 0; i < std::min(max_addr, leaked_addrs.size()); ++i) {
-      if (i % 5 == 0) ss << "\n\t";
+      if (i % 5 == 0)
+        ss << "\n\t";
       ss << " " << leaked_addrs[i];
     }
     UMPIRE_LOG(Warning, ss.str());
@@ -117,7 +118,8 @@ void FixedPool::newPool()
 
 void* FixedPool::allocInPool(Pool& p)
 {
-  if (!p.num_avail) return nullptr;
+  if (!p.num_avail)
+    return nullptr;
 
   for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index) {
     // Return the index of the first 1 bit
@@ -197,21 +199,30 @@ std::size_t FixedPool::getCurrentSize() const noexcept
   return m_current_bytes;
 }
 
-std::size_t FixedPool::getActualSize() const noexcept { return m_actual_bytes; }
+std::size_t FixedPool::getActualSize() const noexcept
+{
+  return m_actual_bytes;
+}
 
 std::size_t FixedPool::getHighWatermark() const noexcept
 {
   return m_highwatermark;
 }
 
-Platform FixedPool::getPlatform() noexcept { return m_strategy->getPlatform(); }
+Platform FixedPool::getPlatform() noexcept
+{
+  return m_strategy->getPlatform();
+}
 
 MemoryResourceTraits FixedPool::getTraits() const noexcept
 {
   return m_strategy->getTraits();
 }
 
-std::size_t FixedPool::numPools() const noexcept { return m_pool.size(); }
+std::size_t FixedPool::numPools() const noexcept
+{
+  return m_pool.size();
+}
 
 bool FixedPool::pointerIsFromPool(void* ptr) const noexcept
 {

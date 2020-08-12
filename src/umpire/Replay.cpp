@@ -38,12 +38,16 @@ Replay::Replay() : m_replayUid(getpid())
 
 void Replay::logMessage(const std::string& message)
 {
-  if (!replayEnabled) return; /* short-circuit */
+  if (!replayEnabled)
+    return; /* short-circuit */
 
   umpire::replay() << message;
 }
 
-bool Replay::replayLoggingEnabled() { return replayEnabled; }
+bool Replay::replayLoggingEnabled()
+{
+  return replayEnabled;
+}
 
 Replay* Replay::getReplayLogger()
 {

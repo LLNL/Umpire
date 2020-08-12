@@ -66,7 +66,8 @@ class FixedSizePool {
 
   T *allocInPool(struct Pool *p)
   {
-    if (!p->numAvail) return NULL;
+    if (!p->numAvail)
+      return NULL;
 
     for (int i = 0; i < NP; i++) {
       const int bit = find_first_set(p->avail[i]) - 1;
@@ -159,10 +160,16 @@ class FixedSizePool {
   }
 
   /// Return allocated size to user.
-  std::size_t getCurrentSize() const { return numBlocks * sizeof(T); }
+  std::size_t getCurrentSize() const
+  {
+    return numBlocks * sizeof(T);
+  }
 
   /// Return total size with internal overhead.
-  std::size_t getActualSize() const { return numPools() * totalPoolSize; }
+  std::size_t getActualSize() const
+  {
+    return numPools() * totalPoolSize;
+  }
 
   /// Return the number of pools
   std::size_t numPools() const
@@ -173,7 +180,10 @@ class FixedSizePool {
   }
 
   /// Return the pool size
-  std::size_t poolSize() const { return totalPoolSize; }
+  std::size_t poolSize() const
+  {
+    return totalPoolSize;
+  }
 };
 
 #if defined(_MSC_VER)

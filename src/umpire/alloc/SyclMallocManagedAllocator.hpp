@@ -7,9 +7,9 @@
 #ifndef UMPIRE_SyclMallocManagedAllocator_HPP
 #define UMPIRE_SyclMallocManagedAllocator_HPP
 
-#include "umpire/util/Macros.hpp"
-
 #include <CL/sycl.hpp>
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace alloc {

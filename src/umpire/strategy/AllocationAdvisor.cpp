@@ -57,7 +57,10 @@ void* AllocationAdvisor::allocate(std::size_t bytes)
   return ptr;
 }
 
-void AllocationAdvisor::deallocate(void* ptr) { m_allocator->deallocate(ptr); }
+void AllocationAdvisor::deallocate(void* ptr)
+{
+  m_allocator->deallocate(ptr);
+}
 
 Platform AllocationAdvisor::getPlatform() noexcept
 {

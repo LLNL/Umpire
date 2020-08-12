@@ -43,7 +43,9 @@ void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
   return ret;
 }
 
-void MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr)) {}
+void MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
+{
+}
 
 std::size_t MonotonicAllocationStrategy::getCurrentSize() const noexcept
 {

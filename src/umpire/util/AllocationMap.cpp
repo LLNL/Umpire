@@ -75,11 +75,20 @@ AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::end() const
   return AllocationMap::RecordList::ConstIterator{this, iterator_end{}};
 }
 
-std::size_t AllocationMap::RecordList::size() const { return m_length; }
+std::size_t AllocationMap::RecordList::size() const
+{
+  return m_length;
+}
 
-bool AllocationMap::RecordList::empty() const { return size() == 0; }
+bool AllocationMap::RecordList::empty() const
+{
+  return size() == 0;
+}
 
-AllocationRecord* AllocationMap::RecordList::back() { return &m_tail->rec; }
+AllocationRecord* AllocationMap::RecordList::back()
+{
+  return &m_tail->rec;
+}
 
 const AllocationRecord* AllocationMap::RecordList::back() const
 {
@@ -110,14 +119,16 @@ const AllocationRecord& AllocationMap::RecordList::ConstIterator::operator*()
 
 const AllocationRecord* AllocationMap::RecordList::ConstIterator::operator->()
 {
-  if (!m_curr) UMPIRE_ERROR("Cannot dereference nullptr");
+  if (!m_curr)
+    UMPIRE_ERROR("Cannot dereference nullptr");
   return &m_curr->rec;
 }
 
 AllocationMap::RecordList::ConstIterator&
 AllocationMap::RecordList::ConstIterator::operator++()
 {
-  if (!m_curr) UMPIRE_ERROR("Cannot dereference nullptr");
+  if (!m_curr)
+    UMPIRE_ERROR("Cannot dereference nullptr");
   m_curr = m_curr->prev;
   return *this;
 }
@@ -262,7 +273,8 @@ AllocationRecord AllocationMap::remove(void* ptr)
   if (iter->second) {
     // faster, equivalent way of checking iter != m_map->end()
     ret = iter->second->pop_back();
-    if (iter->second->empty()) m_map.removeLast();
+    if (iter->second->empty())
+      m_map.removeLast();
   } else {
     UMPIRE_ERROR("Cannot remove " << ptr);
   }
@@ -289,7 +301,10 @@ void AllocationMap::clear()
   m_size = 0;
 }
 
-std::size_t AllocationMap::size() const { return m_size; }
+std::size_t AllocationMap::size() const
+{
+  return m_size;
+}
 
 void AllocationMap::print(
     const std::function<bool(const AllocationRecord&)>&& pred,

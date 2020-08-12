@@ -70,7 +70,8 @@ DynamicPoolMap::~DynamicPoolMap()
     std::size_t whole_bytes;
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
-    if (is_head && bytes == whole_bytes) deallocateBlock(addr, bytes);
+    if (is_head && bytes == whole_bytes)
+      deallocateBlock(addr, bytes);
   }
 
   if (m_used_map.size() == 0) {
@@ -284,7 +285,8 @@ std::size_t DynamicPoolMap::getLargestAvailableBlock() noexcept
 
   for (auto& rec : m_free_map) {
     const std::size_t bytes{rec.first};
-    if (bytes > largest_block) largest_block = bytes;
+    if (bytes > largest_block)
+      largest_block = bytes;
   }
 
   UMPIRE_LOG(Debug, "() returning " << largest_block);
@@ -300,7 +302,8 @@ std::size_t DynamicPoolMap::getReleasableSize() const noexcept
     bool is_head;
     std::size_t whole_bytes;
     std::tie(ptr, is_head, whole_bytes) = rec.second;
-    if (is_head && bytes == whole_bytes) releasable_bytes += bytes;
+    if (is_head && bytes == whole_bytes)
+      releasable_bytes += bytes;
   }
 
   return releasable_bytes;
@@ -318,7 +321,8 @@ MemoryResourceTraits DynamicPoolMap::getTraits() const noexcept
 
 void DynamicPoolMap::mergeFreeBlocks()
 {
-  if (m_free_map.size() < 2) return;
+  if (m_free_map.size() < 2)
+    return;
 
   using PointerMap = std::map<Pointer, SizeTuple>;
 

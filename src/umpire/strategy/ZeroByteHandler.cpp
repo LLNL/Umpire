@@ -47,7 +47,10 @@ void ZeroByteHandler::deallocate(void* ptr)
   }
 }
 
-void ZeroByteHandler::release() { m_allocator->release(); }
+void ZeroByteHandler::release()
+{
+  m_allocator->release();
+}
 
 std::size_t ZeroByteHandler::getCurrentSize() const noexcept
 {

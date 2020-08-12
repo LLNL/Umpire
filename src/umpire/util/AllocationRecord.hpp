@@ -26,7 +26,9 @@ struct AllocationRecord {
   {
   }
 
-  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr} {}
+  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}
+  {
+  }
 
   void* ptr;
   std::size_t size;

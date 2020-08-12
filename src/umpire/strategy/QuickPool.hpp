@@ -65,7 +65,9 @@ class QuickPool : public AllocationStrategy {
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    pool_allocator() : pool{new util::FixedMallocPool{sizeof(Value)}} {}
+    pool_allocator() : pool{new util::FixedMallocPool{sizeof(Value)}}
+    {
+    }
 
     /// BUG: Only required for MSVC
     template <typename U>
@@ -78,7 +80,10 @@ class QuickPool : public AllocationStrategy {
       return static_cast<Value*>(pool->allocate(n));
     }
 
-    void deallocate(Value* data, std::size_t) { pool->deallocate(data); }
+    void deallocate(Value* data, std::size_t)
+    {
+      pool->deallocate(data);
+    }
 
     util::FixedMallocPool* pool;
   };

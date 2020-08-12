@@ -6,6 +6,9 @@ BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction:   true
 
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+
 ColumnLimit: 80
 
 SpacesBeforeTrailingComments: 1

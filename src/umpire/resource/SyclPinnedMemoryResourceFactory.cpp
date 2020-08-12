@@ -48,8 +48,9 @@ MemoryResourceTraits SyclPinnedMemoryResourceFactory::getDefaultTraits()
       sycl_device.get_info<cl::sycl::info::device::name>();
   if (sycl_device.is_gpu() &&
       (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
-    traits.size = 0; // sycl_device.get_info<cl::sycl::info::device::global_mem_size>();
-                     // // in bytes
+    traits.size =
+        0; // sycl_device.get_info<cl::sycl::info::device::global_mem_size>();
+           // // in bytes
     traits.unified = false;
 
     traits.id = 0;

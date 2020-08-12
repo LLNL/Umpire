@@ -26,7 +26,10 @@ std::string Exception::message() const
   return oss.str();
 }
 
-const char* Exception::what() const throw() { return m_what.c_str(); }
+const char* Exception::what() const throw()
+{
+  return m_what.c_str();
+}
 
 } // end of namespace util
 } // end of namespace umpire

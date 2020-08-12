@@ -96,7 +96,10 @@ std::size_t SlotPool::getHighWatermark() const noexcept
   return m_highwatermark;
 }
 
-Platform SlotPool::getPlatform() noexcept { return m_allocator->getPlatform(); }
+Platform SlotPool::getPlatform() noexcept
+{
+  return m_allocator->getPlatform();
+}
 
 MemoryResourceTraits SlotPool::getTraits() const noexcept
 {

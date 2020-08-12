@@ -63,7 +63,10 @@ const std::string& Allocator::getName() const noexcept
   return m_allocator->getName();
 }
 
-int Allocator::getId() const noexcept { return m_allocator->getId(); }
+int Allocator::getId() const noexcept
+{
+  return m_allocator->getId();
+}
 
 strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept
 {

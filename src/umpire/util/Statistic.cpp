@@ -21,7 +21,9 @@ Statistic::Statistic(const std::string& name) noexcept
   m_data["name"] = name;
 }
 
-Statistic::~Statistic() noexcept {}
+Statistic::~Statistic() noexcept
+{
+}
 
 void Statistic::recordStatistic(conduit::Node&& stat)
 {
@@ -33,7 +35,10 @@ void Statistic::recordStatistic(conduit::Node&& stat)
   m_data["statistics"].append().set(stat);
 }
 
-void Statistic::printData(std::ostream& stream) noexcept { m_data.print(); }
+void Statistic::printData(std::ostream& stream) noexcept
+{
+  m_data.print();
+}
 
 } // end of namespace util
 } // end of namespace umpire

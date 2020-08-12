@@ -47,7 +47,8 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
   ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
 
   m_current_size += bytes;
-  if (m_current_size > m_highwatermark) m_highwatermark = m_current_size;
+  if (m_current_size > m_highwatermark)
+    m_highwatermark = m_current_size;
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 

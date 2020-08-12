@@ -109,11 +109,20 @@ void FileMemoryResource::deallocate(void* ptr)
   m_size_map.erase(iter->first);
 }
 
-std::size_t FileMemoryResource::getCurrentSize() const noexcept { return 0; }
+std::size_t FileMemoryResource::getCurrentSize() const noexcept
+{
+  return 0;
+}
 
-std::size_t FileMemoryResource::getHighWatermark() const noexcept { return 0; }
+std::size_t FileMemoryResource::getHighWatermark() const noexcept
+{
+  return 0;
+}
 
-Platform FileMemoryResource::getPlatform() noexcept { return m_platform; }
+Platform FileMemoryResource::getPlatform() noexcept
+{
+  return m_platform;
+}
 
 } // end of namespace resource
 } // end of namespace umpire
