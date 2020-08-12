@@ -44,6 +44,7 @@ stages:
   - q_release_resources
   - l_build_and_test
   - b_build_and_test
+  - multi_project
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
@@ -59,17 +60,30 @@ stages:
     - echo ${ALLOC_NAME}
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 scripts/gitlab/build_and_test.sh
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 15 -N 1 scripts/gitlab/build_and_test.sh
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
 .build_blueos_3_ppc64le_ib_script:
   script:
-    - lalloc 1 -W 10 scripts/gitlab/build_and_test.sh
+    - lalloc 1 -W 15 scripts/gitlab/build_and_test.sh
 
 .build_blueos_3_ppc64le_ib_p9_script:
   extends: .build_blueos_3_ppc64le_ib_script
 
+# If testing develop branch, trigger CHAI pipeline with this version of Umpire.
+# TODO: Once spack allows to clone a specific commit on demand, then point to the exact commit.
+#       This will prevent from sticking to a branch (here develop).
+trigger-chai:
+  stage: multi_project
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
+  variables:
+    UPDATE_UMPIRE: develop
+  trigger:
+    project: radiuss/chai
+    branch: develop
+    strategy: depend
 
 # This is where jobs are included.
 include:
