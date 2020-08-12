@@ -13,6 +13,7 @@
 
 #include "umpire/util/backtrace.hpp"
 
+#include <functional>
 #include <sstream>
 #include <type_traits>
 #include <utility>

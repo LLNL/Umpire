@@ -19,14 +19,18 @@ DynamicPoolList::DynamicPoolList(
     const std::string& name,
     int id,
     Allocator allocator,
-    const std::size_t min_initial_alloc_size,
-    const std::size_t min_alloc_size,
-    CoalesceHeuristic coalesce_heuristic) noexcept
+    const std::size_t first_minimum_pool_allocation_size,
+    const std::size_t next_minimum_pool_allocation_size,
+    const std::size_t alignment,
+    CoalesceHeuristic should_coalesce) noexcept
   :
-  AllocationStrategy(name, id),
-  m_allocator(allocator.getAllocationStrategy()),
-  dpa(DynamicSizePool<>(m_allocator, min_initial_alloc_size, min_alloc_size)),
-  do_coalesce{coalesce_heuristic}
+  AllocationStrategy{ name, id },
+  m_allocator{ allocator.getAllocationStrategy() },
+  dpa{  m_allocator,
+        first_minimum_pool_allocation_size,
+        next_minimum_pool_allocation_size,
+        alignment },
+  m_should_coalesce{should_coalesce}
 {
 }
 
@@ -45,7 +49,7 @@ DynamicPoolList::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa.deallocate(ptr);
 
-  if ( do_coalesce(*this) ) {
+  if ( m_should_coalesce(*this) ) {
     UMPIRE_LOG(Debug, "Heuristic returned true, "
         "performing coalesce operation for " << this << "\n");
     dpa.coalesce();
@@ -107,6 +111,33 @@ DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
   dpa.coalesce();
+}
+
+DynamicPoolList::CoalesceHeuristic
+DynamicPoolList::percent_releasable(int percentage)
+{
+  if ( percentage < 0 || percentage > 100 ) {
+    UMPIRE_ERROR("Invalid percentage of " << percentage
+        << ", percentage must be an integer between 0 and 100");
+  }
+
+  if ( percentage == 0 ) {
+    return [=] (const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) {
+        return false;
+    };
+  } else if ( percentage == 100 ) {
+    return [=] (const strategy::DynamicPoolList& pool) {
+        return ( pool.getActualSize() == pool.getReleasableSize() );
+    };
+  } else {
+    float f = (float)((float)percentage / (float)100.0);
+
+    return [=] (const strategy::DynamicPoolList& pool) {
+      // Calculate threshold in bytes from the percentage
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+      return (pool.getReleasableSize() >= threshold);
+    };
+  }
 }
 
 } // end of namespace strategy

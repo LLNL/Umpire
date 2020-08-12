@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/DynamicPoolHeuristic.hpp"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -23,7 +22,7 @@ int main(int, char**) {
   // Create a heuristic function that will return true to the DynamicPool
   // object when the threshold of releasable size to total size is 75%.
   //
-  auto heuristic_function = umpire::strategy::heuristic_percent_releasable(75);
+  auto heuristic_function = umpire::strategy::DynamicPool::percent_releasable(75);
 
   //
   // Create a pool with an initial block size of 1 Kb and 1 Kb block size for

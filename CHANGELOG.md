@@ -14,11 +14,19 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added File Memory Allocator
 
+- Added alignment option to QuickPool and DynamicPoolList
+
 - GitHub "action" to check ABI compatibility against `main`
 
 - clang-format file, and CMake infrastructure for styling code
 
 ### Changed
+
+- API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are
+  now identical to one another.
+
+- Quickpool and DynamicPoolMap now both allocate initial pool block
+  lazily like DynamicPoolList.
 
 - GitLab CI pipelines now generate the host-config files on-the-fly.
 
@@ -56,7 +64,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Add support for multiple CUDA devices. These devices are detected and
   registered as "DEVICE_N", where N is the device number.
 
-- Allocation backtrace may be enabled by building umpire with 
+- Allocation backtrace may be enabled by building umpire with
   -DENABLE_BACKTRACE
 
 - Umpire exceptions now include backtrace information in the exception string.

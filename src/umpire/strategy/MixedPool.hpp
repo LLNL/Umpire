@@ -16,8 +16,6 @@
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 
-#include "umpire/strategy/DynamicPoolHeuristic.hpp"
-
 #include "umpire/Allocator.hpp"
 
 namespace umpire {
@@ -47,7 +45,7 @@ class MixedPool :
    * \param dynamic_initial_alloc_size Size the dynamic pool initially allocates
    * \param dynamic_min_alloc_bytes Minimum size of all future allocations in the dynamic pool
    * \param dynamic_align_bytes Size with which to align allocations (for the dynamic pool)
-   * \param coalesce_heuristic Heuristic callback function (for the dynamic pool)
+   * \param should_coalesce Heuristic callback function (for the dynamic pool)
    */
     MixedPool(
       const std::string& name, int id,
@@ -59,7 +57,7 @@ class MixedPool :
       const std::size_t dynamic_initial_alloc_size = (512 * 1024 * 1024),
       const std::size_t dynamic_min_alloc_size = (1 * 1024 *1024),
       const std::size_t dynamic_align_bytes = 16,
-      DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic = heuristic_percent_releasable(100)) noexcept;
+      DynamicPoolMap::CoalesceHeuristic should_coalesce = DynamicPoolMap::percent_releasable(100)) noexcept;
 
     void* allocate(std::size_t bytes) override;
     void deallocate(void* ptr) override;
