@@ -24,12 +24,6 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 
 blt_add_executable(
-  NAME hello_pool
-  SOURCES hello_pool.cpp
-  DEPENDS_ON ${example_depends})
-list(APPEND umpire_examples hello_pool)
-
-blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
   DEPENDS_ON ${example_depends})
