@@ -17,8 +17,7 @@ namespace alloc {
 /*!
  * \brief Uses malloc and free to allocate and deallocate CPU memory.
  */
-struct MallocAllocator
-{
+struct MallocAllocator {
   /*!
    * \brief Allocate bytes of memory using malloc.
    *
@@ -32,7 +31,7 @@ struct MallocAllocator
     void* ret = ::malloc(bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
-    if  (ret == nullptr) {
+    if (ret == nullptr) {
       UMPIRE_ERROR("malloc( bytes = " << bytes << " ) failed");
     } else {
       return ret;

@@ -22,4 +22,15 @@ jobs:
             echo "CHANGELOG.md was changed, passing!"
             exit 0
         fi
+  abiDiff:
+    name: ABI Compatibility Check
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ./.github/actions/abi-compat
+    - uses: actions/upload-artifact@v2
+      with:
+        name: ABI Compatibility Report
+        path: compat_reports/umpire/3.0.0_to_4.0.0/compat_report.html
+
 

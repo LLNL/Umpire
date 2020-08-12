@@ -11,11 +11,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - Added ASAN memory sanitization to QuickPool
+
 - Added File Memory Allocator
+
+- GitHub "action" to check ABI compatibility against `main`
+
+- clang-format file, and CMake infrastructure for styling code
 
 ### Changed
 
 - GitLab CI pipelines now generate the host-config files on-the-fly.
+
 - Bump BLT to v0.3.6
 
 ### Removed
@@ -36,6 +42,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Type of `auto allocator` in HIP codepath.
 
 - When installing, camp target was not exported.
+
+- DynamicPoolList no longer uses a pointer for DynamicSizePool, fixing
+  memory leak.
 
 ## [3.0.0] - 2020-06-30
 

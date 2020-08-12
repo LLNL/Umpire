@@ -16,8 +16,7 @@ namespace alloc {
  * \brief Uses cudaMallocManaged and cudaFree to allocate and deallocate
  *        unified memory on NVIDIA GPUs.
  */
-struct CudaMallocManagedAllocator
-{
+struct CudaMallocManagedAllocator {
   /*!
    * \brief Allocate bytes of memory using cudaMallocManaged.
    *
@@ -33,7 +32,9 @@ struct CudaMallocManagedAllocator
     cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMallocManaged( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMallocManaged( bytes = " << bytes
+                                                 << " ) failed with error: "
+                                                 << cudaGetErrorString(error));
     } else {
       return ptr;
     }
@@ -52,7 +53,8 @@ struct CudaMallocManagedAllocator
 
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: "
+                                      << cudaGetErrorString(error));
     }
   }
 };
