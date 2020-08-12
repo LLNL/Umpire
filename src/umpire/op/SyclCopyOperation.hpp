@@ -17,20 +17,18 @@ namespace op {
  */
 class SyclCopyOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::transform
-    *
-    * Uses DPCPP's USM memcpy to move data when both src_ptr  and dst_ptr are on Intel
-    * GPUs.
-    *
-    * @copydetails MemoryOperation::transform
-    */
-  void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      umpire::util::AllocationRecord *dst_allocation,
-      std::size_t length);
+  /*!
+   * @copybrief MemoryOperation::transform
+   *
+   * Uses DPCPP's USM memcpy to move data when both src_ptr  and dst_ptr are on
+   * Intel GPUs.
+   *
+   * @copydetails MemoryOperation::transform
+   */
+  void transform(void* src_ptr, void** dst_ptr,
+                 umpire::util::AllocationRecord* src_allocation,
+                 umpire::util::AllocationRecord* dst_allocation,
+                 std::size_t length);
 };
 
 } // end of namespace op

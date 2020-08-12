@@ -12,15 +12,18 @@
 namespace umpire {
 namespace util {
 
-struct backtrace{
+struct backtrace {
   std::vector<void*> frames;
 };
 
-struct trace_optional {};
-struct trace_always {};
+struct trace_optional {
+};
+struct trace_always {
+};
 
-template<typename TraceType=trace_optional>
-struct backtracer {};
+template <typename TraceType = trace_optional>
+struct backtracer {
+};
 
 } // end of namespace util
 } // end of namespace umpire

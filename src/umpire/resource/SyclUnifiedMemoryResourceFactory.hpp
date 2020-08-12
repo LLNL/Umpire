@@ -16,19 +16,18 @@ namespace resource {
  * \brief Factory class to construct a MemoryResource that uses Intel's
  * "unified shared" memory (USM), accesible from both the CPU and Intel GPUs.
  */
-class SyclUnifiedMemoryResourceFactory :
-  public MemoryResourceFactory
-{
-  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
+class SyclUnifiedMemoryResourceFactory : public MemoryResourceFactory {
+  bool isValidMemoryResourceFor(
+      const std::string& name) noexcept final override;
 
-  std::unique_ptr<resource::MemoryResource>
-  create(const std::string& name, int id) final override;
+  std::unique_ptr<resource::MemoryResource> create(const std::string& name,
+                                                   int id) final override;
 
-  std::unique_ptr<resource::MemoryResource>
-  create(const std::string& name, int id, MemoryResourceTraits traits) final override;
+  std::unique_ptr<resource::MemoryResource> create(
+      const std::string& name, int id,
+      MemoryResourceTraits traits) final override;
 
-  MemoryResourceTraits
-  getDefaultTraits() final override;
+  MemoryResourceTraits getDefaultTraits() final override;
 };
 
 } // end of namespace resource

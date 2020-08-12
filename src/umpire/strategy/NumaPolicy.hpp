@@ -9,9 +9,8 @@
 
 #include <vector>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 
@@ -24,29 +23,24 @@ namespace strategy {
  * on a specific NUMA node. This can be used either for optimization,
  * or for moving memory between the host and devices.
  */
-class NumaPolicy :
-  public AllocationStrategy
-{
-  public:
-    NumaPolicy(
-          const std::string& name
-        , int id
-        , Allocator allocator
-        , int numa_node);
+class NumaPolicy : public AllocationStrategy {
+ public:
+  NumaPolicy(const std::string& name, int id, Allocator allocator,
+             int numa_node);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-    int getNode() const noexcept;
+  int getNode() const noexcept;
 
-  private:
-    strategy::AllocationStrategy* m_allocator;
-    Platform m_platform;
-    int m_node;
+ private:
+  strategy::AllocationStrategy* m_allocator;
+  Platform m_platform;
+  int m_node;
 };
 
 } // end of namespace strategy

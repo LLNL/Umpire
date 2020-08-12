@@ -22,26 +22,21 @@ namespace strategy {
  * Using this AllocationStrategy will make the provided allocator thread-safe
  * by syncronizing access to the allocators interface.
  */
-class ThreadSafeAllocator :
-  public AllocationStrategy
-{
-  public:
-    ThreadSafeAllocator(
-        const std::string& name,
-        int id,
-        Allocator allocator);
+class ThreadSafeAllocator : public AllocationStrategy {
+ public:
+  ThreadSafeAllocator(const std::string& name, int id, Allocator allocator);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-  protected:
-    strategy::AllocationStrategy* m_allocator;
+ protected:
+  strategy::AllocationStrategy* m_allocator;
 
-    std::mutex m_mutex;
+  std::mutex m_mutex;
 };
 
 } // end of namespace strategy

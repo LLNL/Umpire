@@ -6,20 +6,18 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/HipMallocAllocator.hpp"
+#include <hip/hip_runtime.h>
 
+#include "umpire/alloc/HipMallocAllocator.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
-
-#include <hip/hip_runtime.h>
 
 namespace umpire {
 namespace resource {
 
-bool
-HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
-  noexcept
+bool HipDeviceResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.find("DEVICE") != std::string::npos) {
     return true;
@@ -28,20 +26,21 @@ HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-HipDeviceResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(
+    const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-HipDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(
+    const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(Platform::hip, name, id, traits);
+  return util::make_unique<
+      resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(
+      Platform::hip, name, id, traits);
 }
 
-MemoryResourceTraits
-HipDeviceResourceFactory::getDefaultTraits()
+MemoryResourceTraits HipDeviceResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -49,7 +48,8 @@ HipDeviceResourceFactory::getDefaultTraits()
   auto error = ::hipGetDeviceProperties(&properties, 0);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipGetDeviceProperties failed with error: " << hipGetErrorString(error));
+    UMPIRE_ERROR("hipGetDeviceProperties failed with error: "
+                 << hipGetErrorString(error));
   }
 
   traits.unified = false;

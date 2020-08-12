@@ -11,26 +11,22 @@
 // for the map, with an array-like object to hold multiple values with
 // the same key.
 
-#include "umpire/util/AllocationRecord.hpp"
-
-#include "umpire/util/MemoryMap.hpp"
-
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <iterator>
-#include <functional>
+
+#include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/MemoryMap.hpp"
 
 namespace umpire {
 namespace util {
 
-class AllocationMap
-{
-  class RecordList
-  {
-  public:
+class AllocationMap {
+  class RecordList {
+   public:
     template <typename T>
-    struct Block
-    {
+    struct Block {
       T rec;
       Block* prev;
     };
@@ -38,9 +34,8 @@ class AllocationMap
     using RecordBlock = Block<AllocationRecord>;
 
     // Iterator for RecordList
-    class ConstIterator
-    {
-    public:
+    class ConstIterator {
+     public:
       using iterator_category = std::forward_iterator_tag;
       using value_type = AllocationRecord;
       using difference_type = std::ptrdiff_t;
@@ -60,8 +55,8 @@ class AllocationMap
       bool operator==(const ConstIterator& other) const;
       bool operator!=(const ConstIterator& other) const;
 
-    private:
-      const RecordList *m_list;
+     private:
+      const RecordList* m_list;
       RecordBlock* m_curr;
     };
 
@@ -79,26 +74,26 @@ class AllocationMap
     AllocationRecord* back();
     const AllocationRecord* back() const;
 
-  private:
+   private:
     AllocationMap& m_map;
     RecordBlock* m_tail;
     std::size_t m_length;
   };
 
-public:
+ public:
   using Map = MemoryMap<RecordList>;
 
   // Iterator that flattens MemoryMap and RecordList iterators
-  class ConstIterator
-  {
-  public:
+  class ConstIterator {
+   public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = AllocationRecord;
     using difference_type = std::ptrdiff_t;
     using pointer = value_type*;
     using reference = value_type&;
 
-    // Iterator(AllocationMap* map, const OuterIterType& outer_iter, const InnerIterType& inner_iter);
+    // Iterator(AllocationMap* map, const OuterIterType& outer_iter, const
+    // InnerIterType& inner_iter);
     ConstIterator(const AllocationMap* map, iterator_begin);
     ConstIterator(const AllocationMap* map, iterator_end);
     ConstIterator(const ConstIterator&) = default;
@@ -111,7 +106,7 @@ public:
     bool operator==(const ConstIterator& other) const;
     bool operator!=(const ConstIterator& other) const;
 
-  private:
+   private:
     using OuterIter = Map::ConstIterator;
     using InnerIter = RecordList::ConstIterator;
 
@@ -155,7 +150,7 @@ public:
   std::size_t size() const;
 
   // Print methods -- either matching a predicate or all records
-  void print(const std::function<bool (const AllocationRecord&)>&& predicate,
+  void print(const std::function<bool(const AllocationRecord&)>&& predicate,
              std::ostream& os = std::cout) const;
 
   void printAll(std::ostream& os = std::cout) const;
@@ -163,7 +158,7 @@ public:
   ConstIterator begin() const;
   ConstIterator end() const;
 
-private:
+ private:
   // Content of findRecord(void*) without the lock
   const AllocationRecord* doFindRecord(void* ptr) const noexcept;
 

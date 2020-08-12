@@ -5,20 +5,21 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/config.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/ResourceManager.hpp"
 
 #include <algorithm>
 #include <iostream>
 #include <iterator>
 #include <sstream>
 
+#include "umpire/ResourceManager.hpp"
+#include "umpire/config.hpp"
+
 #if !defined(_MSC_VER)
 #include <unistd.h>
 #endif
-#include <sstream>
 #include <fstream>
+#include <sstream>
 
 UMPIRE_EXPORT volatile int umpire_ver_3_found = 0;
 
@@ -31,15 +32,16 @@ void print_allocator_records(Allocator allocator, std::ostream& os)
 
   auto strategy = allocator.getAllocationStrategy();
 
-  rm.m_allocations.print([strategy] (const util::AllocationRecord& rec) {
-    return rec.strategy == strategy;
-  }, ss);
+  rm.m_allocations.print(
+      [strategy](const util::AllocationRecord& rec) {
+        return rec.strategy == strategy;
+      },
+      ss);
 
-  if (! ss.str().empty() ) {
-    os << "Allocations for "
-      << allocator.getName()
-      << " allocator:" << std::endl
-      << ss.str() << std::endl;
+  if (!ss.str().empty()) {
+    os << "Allocations for " << allocator.getName()
+       << " allocator:" << std::endl
+       << ss.str() << std::endl;
   }
 }
 
@@ -50,7 +52,8 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
 
   std::vector<util::AllocationRecord> recs;
   std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
-               std::back_inserter(recs), [strategy] (const util::AllocationRecord& rec) {
+               std::back_inserter(recs),
+               [strategy](const util::AllocationRecord& rec) {
                  return rec.strategy == strategy;
                });
 
@@ -68,9 +71,8 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
     char* left{reinterpret_cast<char*>(left_record->ptr)};
     char* right{reinterpret_cast<char*>(right_record->ptr)};
 
-    return ((right >= left) 
-      && ((left + left_record->size) > right)
-      && ((right + right_record->size) > (left + left_record->size)));
+    return ((right >= left) && ((left + left_record->size) > right) &&
+            ((right + right_record->size) > (left + left_record->size)));
   } catch (umpire::util::Exception&) {
     UMPIRE_LOG(Error, "Unknown pointer in pointer_overlaps");
     throw;
@@ -88,9 +90,8 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
     char* left{reinterpret_cast<char*>(left_record->ptr)};
     char* right{reinterpret_cast<char*>(right_record->ptr)};
 
-    return ((right >= left) 
-      && (left + left_record->size > right)
-      && (right + right_record->size <= left + left_record->size));
+    return ((right >= left) && (left + left_record->size > right) &&
+            (right + right_record->size <= left + left_record->size));
   } catch (umpire::util::Exception&) {
     UMPIRE_LOG(Error, "Unknown pointer in pointer_contains");
     throw;
@@ -108,7 +109,6 @@ std::string get_backtrace(void* ptr)
   return "[Umpire: UMPIRE_BACKTRACE=Off]";
 #endif
 }
-
 
 std::size_t get_process_memory_usage()
 {
@@ -147,8 +147,7 @@ std::size_t get_device_memory_usage(int device_id)
 #endif
 }
 
-std::vector<util::AllocationRecord>
-get_leaked_allocations(Allocator allocator)
+std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
 {
   return get_allocator_records(allocator);
 }

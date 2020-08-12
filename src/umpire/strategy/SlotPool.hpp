@@ -10,46 +10,41 @@
 #include <memory>
 #include <vector>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class SlotPool :
-  public AllocationStrategy
-{
-  public:
-    SlotPool(
-      const std::string& name,
-      int id,
-      Allocator allocator,
-      std::size_t slots);
+class SlotPool : public AllocationStrategy {
+ public:
+  SlotPool(const std::string& name, int id, Allocator allocator,
+           std::size_t slots);
 
-    ~SlotPool();
+  ~SlotPool();
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    std::size_t getCurrentSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
+  std::size_t getCurrentSize() const noexcept override;
+  std::size_t getHighWatermark() const noexcept override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-  private:
-    void init();
+ private:
+  void init();
 
-    void** m_pointers;
-    int64_t* m_lengths;
+  void** m_pointers;
+  int64_t* m_lengths;
 
-    std::size_t m_current_size;
-    std::size_t m_highwatermark;
+  std::size_t m_current_size;
+  std::size_t m_highwatermark;
 
-    std::size_t m_slots;
+  std::size_t m_slots;
 
-    strategy::AllocationStrategy* m_allocator;
+  strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

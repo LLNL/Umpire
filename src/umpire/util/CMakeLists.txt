@@ -122,3 +122,5 @@ target_include_directories(
 install(FILES
   ${umpire_util_headers}
   DESTINATION include/umpire/util)
+
+umpire_add_code_checks(PREFIX util)

@@ -9,44 +9,38 @@
 
 #include <vector>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 
 namespace strategy {
 
-class MonotonicAllocationStrategy :
-  public AllocationStrategy
-{
-  public:
-    MonotonicAllocationStrategy(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        std::size_t capacity);
+class MonotonicAllocationStrategy : public AllocationStrategy {
+ public:
+  MonotonicAllocationStrategy(const std::string& name, int id,
+                              Allocator allocator, std::size_t capacity);
 
-    ~MonotonicAllocationStrategy();
+  ~MonotonicAllocationStrategy();
 
-    void* allocate(std::size_t bytes) override;
+  void* allocate(std::size_t bytes) override;
 
-    void deallocate(void* ptr) override;
+  void deallocate(void* ptr) override;
 
-    std::size_t getCurrentSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
+  std::size_t getCurrentSize() const noexcept override;
+  std::size_t getHighWatermark() const noexcept override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-  private:
-    void* m_block;
+ private:
+  void* m_block;
 
-    std::size_t m_size;
-    std::size_t m_capacity;
+  std::size_t m_size;
+  std::size_t m_capacity;
 
-    strategy::AllocationStrategy* m_allocator;
+  strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

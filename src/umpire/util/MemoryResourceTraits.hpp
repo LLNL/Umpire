@@ -8,6 +8,7 @@
 #define UMPIRE_MemoryResourceTraits_HPP
 
 #include <cstddef>
+
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_SYCL)
@@ -17,29 +18,11 @@
 namespace umpire {
 
 struct MemoryResourceTraits {
+  enum class optimized_for { any, latency, bandwidth, access };
 
-  enum class optimized_for {
-    any,
-    latency,
-    bandwidth,
-    access
-  };
+  enum class vendor_type { UNKNOWN, AMD, IBM, INTEL, NVIDIA };
 
-  enum class vendor_type {
-    UNKNOWN,
-    AMD,
-    IBM,
-    INTEL,
-    NVIDIA
-  };
-
-  enum class memory_type {
-    UNKNOWN,
-    DDR,
-    GDDR,
-    HBM,
-    NVME
-  };
+  enum class memory_type { UNKNOWN, DDR, GDDR, HBM, NVME };
 
   int id;
 

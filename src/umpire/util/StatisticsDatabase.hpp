@@ -7,9 +7,9 @@
 #ifndef UMPIRE_StatisticsDatabase_HPP
 #define UMPIRE_StatisticsDatabase_HPP
 
-#include <ostream>
 #include <map>
 #include <memory>
+#include <ostream>
 
 #include "umpire/util/Statistic.hpp"
 
@@ -17,22 +17,22 @@ namespace umpire {
 namespace util {
 
 class StatisticsDatabase {
-  public:
-    static StatisticsDatabase* getDatabase();
+ public:
+  static StatisticsDatabase* getDatabase();
 
-    std::shared_ptr<Statistic> getStatistic(
-        const std::string& name);
+  std::shared_ptr<Statistic> getStatistic(const std::string& name);
 
-    void printStatistics(std::ostream& stream) noexcept;
-  private:
-    StatisticsDatabase() noexcept;
+  void printStatistics(std::ostream& stream) noexcept;
 
-    StatisticsDatabase (const StatisticsDatabase&) = delete;
-    StatisticsDatabase& operator= (const StatisticsDatabase&) = delete;
+ private:
+  StatisticsDatabase() noexcept;
 
-    static StatisticsDatabase* s_statistics_database_instance;
+  StatisticsDatabase(const StatisticsDatabase&) = delete;
+  StatisticsDatabase& operator=(const StatisticsDatabase&) = delete;
 
-    std::map<std::string, std::shared_ptr<Statistic> > m_statistics;
+  static StatisticsDatabase* s_statistics_database_instance;
+
+  std::map<std::string, std::shared_ptr<Statistic>> m_statistics;
 };
 
 } // end of namespace util

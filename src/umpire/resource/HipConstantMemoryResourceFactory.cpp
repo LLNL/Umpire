@@ -7,16 +7,14 @@
 #include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
 
 #include "umpire/resource/HipConstantMemoryResource.hpp"
-
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool
-HipConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
-  noexcept
+bool HipConstantMemoryResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.find("DEVICE_CONST") != std::string::npos) {
     return true;
@@ -32,18 +30,19 @@ HipConstantMemoryResourceFactory::create(const std::string& name, int id)
 }
 
 std::unique_ptr<resource::MemoryResource>
-HipConstantMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+HipConstantMemoryResourceFactory::create(const std::string& name, int id,
+                                         MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::HipConstantMemoryResource>(name, id, traits);
+  return util::make_unique<resource::HipConstantMemoryResource>(name, id,
+                                                                traits);
 }
 
-MemoryResourceTraits
-HipConstantMemoryResourceFactory::getDefaultTraits()
+MemoryResourceTraits HipConstantMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
   traits.unified = false;
-  traits.size = 64*1024;
+  traits.size = 64 * 1024;
 
   traits.vendor = MemoryResourceTraits::vendor_type::AMD;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;

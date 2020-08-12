@@ -6,27 +6,26 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
-#include "umpire/util/Macros.hpp"
 #include "umpire/Replay.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace resource {
 
-MemoryResourceRegistry&
-MemoryResourceRegistry::getInstance() noexcept
+MemoryResourceRegistry& MemoryResourceRegistry::getInstance() noexcept
 {
   static MemoryResourceRegistry resource_registry;
 
   return resource_registry;
 }
 
-MemoryResourceRegistry::MemoryResourceRegistry() noexcept :
-  m_allocator_factories()
+MemoryResourceRegistry::MemoryResourceRegistry() noexcept
+    : m_allocator_factories()
 {
 }
 
-void
-MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory)
+void MemoryResourceRegistry::registerMemoryResource(
+    std::unique_ptr<MemoryResourceFactory>&& factory)
 {
   m_allocator_factories.push_back(std::move(factory));
 }
@@ -45,7 +44,8 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 }
 
 std::unique_ptr<resource::MemoryResource>
-MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
+MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
+                                           MemoryResourceTraits traits)
 {
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
@@ -57,8 +57,8 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id, Memo
   UMPIRE_ERROR("MemoryResource " << name << " not found");
 }
 
-MemoryResourceTraits
-MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
+MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(
+    const std::string& name)
 {
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {

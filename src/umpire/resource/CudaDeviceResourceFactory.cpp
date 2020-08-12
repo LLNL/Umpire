@@ -6,21 +6,19 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/CudaDeviceResourceFactory.hpp"
 
-#include "umpire/resource/CudaDeviceMemoryResource.hpp"
-#include "umpire/resource/DefaultMemoryResource.hpp"
-#include "umpire/alloc/CudaMallocAllocator.hpp"
-
 #include <cuda_runtime_api.h>
 
+#include "umpire/alloc/CudaMallocAllocator.hpp"
+#include "umpire/resource/CudaDeviceMemoryResource.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool
-CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
-  noexcept
+bool CudaDeviceResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.find("DEVICE") != std::string::npos) {
     return true;
@@ -29,21 +27,20 @@ CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name)
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaDeviceResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(
+    const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaDeviceResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(
+    const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return 
-    util::make_unique<resource::CudaDeviceMemoryResource>(Platform::cuda, name, id, traits);
+  return util::make_unique<resource::CudaDeviceMemoryResource>(
+      Platform::cuda, name, id, traits);
 }
 
-MemoryResourceTraits
-CudaDeviceResourceFactory::getDefaultTraits()
+MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -51,7 +48,8 @@ CudaDeviceResourceFactory::getDefaultTraits()
   auto error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: "
+                 << cudaGetErrorString(error));
   }
 
   traits.unified = false;

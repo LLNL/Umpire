@@ -7,31 +7,25 @@
 #ifndef UMPIRE_NamedAllocationStrategy_HPP
 #define UMPIRE_NamedAllocationStrategy_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class NamedAllocationStrategy :
-  public AllocationStrategy
-{
-  public:
-    NamedAllocationStrategy(
-        const std::string& name,
-        int id,
-        Allocator allocator); 
+class NamedAllocationStrategy : public AllocationStrategy {
+ public:
+  NamedAllocationStrategy(const std::string& name, int id, Allocator allocator);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-  protected:
-    strategy::AllocationStrategy* m_allocator;
+ protected:
+  strategy::AllocationStrategy* m_allocator;
 };
 
 } // end of namespace strategy

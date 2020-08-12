@@ -6,9 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HostResourceFactory.hpp"
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
-
 #include "umpire/alloc/MallocAllocator.hpp"
+#include "umpire/resource/DefaultMemoryResource.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/alloc/PosixMemalignAllocator.hpp"
 #endif
@@ -19,8 +18,8 @@
 namespace umpire {
 namespace resource {
 
-bool
-HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
+bool HostResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.find("HOST") != std::string::npos) {
     return true;
@@ -29,14 +28,14 @@ HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-HostResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
+    const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-HostResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
+    const std::string& name, int id, MemoryResourceTraits traits)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
   using HostAllocator = alloc::PosixMemalignAllocator;
@@ -44,11 +43,11 @@ HostResourceFactory::create(const std::string& name, int id, MemoryResourceTrait
   using HostAllocator = alloc::MallocAllocator;
 #endif
 
-  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::host, name, id, traits);
+  return util::make_unique<DefaultMemoryResource<HostAllocator>>(
+      Platform::host, name, id, traits);
 }
 
-MemoryResourceTraits
-HostResourceFactory::getDefaultTraits()
+MemoryResourceTraits HostResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
@@ -69,8 +68,6 @@ HostResourceFactory::getDefaultTraits()
 
   return traits;
 }
-
-
 
 } // end of namespace resource
 } // end of namespace umpire

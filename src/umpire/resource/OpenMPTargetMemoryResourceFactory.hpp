@@ -7,33 +7,31 @@
 #ifndef UMPIRE_OpenMPTargetResourceFactory_HPP
 #define UMPIRE_OpenMPTargetResourceFactory_HPP
 
-#include "umpire/resource/MemoryResourceFactory.hpp"
-
 #include "umpire/alloc/OpenMPTargetAllocator.hpp"
+#include "umpire/resource/MemoryResourceFactory.hpp"
 
 namespace umpire {
 namespace resource {
-
 
 /*!
  * \brief Factory class for constructing MemoryResource objects that use GPU
  * memory.
  */
-class OpenMPTargetResourceFactory :
-  public MemoryResourceFactory
-{
+class OpenMPTargetResourceFactory : public MemoryResourceFactory {
   using Allocator = alloc::OpenMPTargetAllocator;
 
-  public:
-    bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
+ public:
+  bool isValidMemoryResourceFor(
+      const std::string& name) noexcept final override;
 
-    std::unique_ptr<resource::MemoryResource>
-    create(const std::string& name, int id) final override;
+  std::unique_ptr<resource::MemoryResource> create(const std::string& name,
+                                                   int id) final override;
 
-    std::unique_ptr<resource::MemoryResource>
-    create(const std::string& name, int id, MemoryResourceTraits traits) final override;
+  std::unique_ptr<resource::MemoryResource> create(
+      const std::string& name, int id,
+      MemoryResourceTraits traits) final override;
 
-    MemoryResourceTraits getDefaultTraits() final override;
+  MemoryResourceTraits getDefaultTraits() final override;
 };
 
 } // end of namespace resource

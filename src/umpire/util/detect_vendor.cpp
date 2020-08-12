@@ -9,7 +9,8 @@
 
 namespace umpire {
 
-MemoryResourceTraits::vendor_type cpu_vendor_type() noexcept {
+MemoryResourceTraits::vendor_type cpu_vendor_type() noexcept
+{
 #if defined(__x86_64__)
   return MemoryResourceTraits::vendor_type::INTEL;
 #elif defined(__powerpc__)

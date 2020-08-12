@@ -20,11 +20,10 @@ namespace util {
  * version does not rely on Allocator and all the memory tracking
  * statistics, so it is useful for building objects in umpire::util.
  */
-class FixedMallocPool
-{
-public:
+class FixedMallocPool {
+ public:
   FixedMallocPool(const std::size_t object_bytes,
-                  const std::size_t objects_per_pool = 1024*1024);
+                  const std::size_t objects_per_pool = 1024 * 1024);
 
   ~FixedMallocPool();
 
@@ -33,7 +32,7 @@ public:
 
   std::size_t numPools() const noexcept;
 
-private:
+ private:
   struct Pool {
     unsigned char* data;
     unsigned char* next;
@@ -57,7 +56,7 @@ private:
   // to avoid a memory leak.
 };
 
-} // end namespace strategy
+} // namespace util
 } // end namespace umpire
 
 #endif // UMPIRE_FixedPool_HPP

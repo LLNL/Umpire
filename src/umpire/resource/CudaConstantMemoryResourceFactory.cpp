@@ -7,16 +7,14 @@
 #include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
 
 #include "umpire/resource/CudaConstantMemoryResource.hpp"
-
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool
-CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
-  noexcept
+bool CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.compare("DEVICE_CONST") == 0) {
     return true;
@@ -32,18 +30,19 @@ CudaConstantMemoryResourceFactory::create(const std::string& name, int id)
 }
 
 std::unique_ptr<resource::MemoryResource>
-CudaConstantMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+CudaConstantMemoryResourceFactory::create(const std::string& name, int id,
+                                          MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::CudaConstantMemoryResource>(name, id, traits);
+  return util::make_unique<resource::CudaConstantMemoryResource>(name, id,
+                                                                 traits);
 }
 
-MemoryResourceTraits
-CudaConstantMemoryResourceFactory::getDefaultTraits()
+MemoryResourceTraits CudaConstantMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
   traits.unified = false;
-  traits.size = 64*1024;
+  traits.size = 64 * 1024;
 
   traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;

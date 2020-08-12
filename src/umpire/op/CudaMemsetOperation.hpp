@@ -17,28 +17,22 @@ namespace op {
  */
 class CudaMemsetOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::apply
-    *
-    * Uses cudaMemset to set first length bytes of src_ptr to value.
-    *
-    * @copydetails MemoryOperation::apply
-    */
-  void apply(
-      void* src_ptr,
-      util::AllocationRecord* ptr,
-      int value,
-      std::size_t length);
+  /*!
+   * @copybrief MemoryOperation::apply
+   *
+   * Uses cudaMemset to set first length bytes of src_ptr to value.
+   *
+   * @copydetails MemoryOperation::apply
+   */
+  void apply(void* src_ptr, util::AllocationRecord* ptr, int value,
+             std::size_t length);
 
-  camp::resources::Event apply_async(
-      void* src_ptr,
-      util::AllocationRecord* ptr,
-      int value,
-      std::size_t length,
-      camp::resources::Resource& ctx);
+  camp::resources::Event apply_async(void* src_ptr, util::AllocationRecord* ptr,
+                                     int value, std::size_t length,
+                                     camp::resources::Resource& ctx);
 };
 
-} // end of naemspace op
-} //end of namespace umpire
+} // namespace op
+} // end of namespace umpire
 
 #endif // UMPIRE_CudaMemsetOperation_HPP

@@ -17,18 +17,15 @@ namespace op {
  */
 class HostMemsetOperation : public MemoryOperation {
  public:
-   /*!
-    * \copybrief MemoryOperation::apply
-    *
-    * Uses std::memset to set the first length bytes of src_ptr to value.
-    *
-    * \copydetails MemoryOperation::apply
-    */
-  void apply(
-      void* src_ptr,
-      util::AllocationRecord* allocation,
-      int value,
-      std::size_t length);
+  /*!
+   * \copybrief MemoryOperation::apply
+   *
+   * Uses std::memset to set the first length bytes of src_ptr to value.
+   *
+   * \copydetails MemoryOperation::apply
+   */
+  void apply(void* src_ptr, util::AllocationRecord* allocation, int value,
+             std::size_t length);
 };
 
 } // end of namespace op

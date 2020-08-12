@@ -7,36 +7,30 @@
 #ifndef UMPIRE_AlignedAllocator_HPP
 #define UMPIRE_AlignedAllocator_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
 
-class AlignedAllocator :
-  public AllocationStrategy
-{
-  public:
-    AlignedAllocator(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        std::size_t alignment=16); 
+class AlignedAllocator : public AllocationStrategy {
+ public:
+  AlignedAllocator(const std::string& name, int id, Allocator allocator,
+                   std::size_t alignment = 16);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
+  MemoryResourceTraits getTraits() const noexcept override;
 
-  protected:
-    strategy::AllocationStrategy* m_allocator;
+ protected:
+  strategy::AllocationStrategy* m_allocator;
 
-  private:
-    std::size_t m_alignment;
-    uintptr_t m_mask;
+ private:
+  std::size_t m_alignment;
+  uintptr_t m_mask;
 };
 
 } // end of namespace strategy

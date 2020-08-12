@@ -6,18 +6,15 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
 
-#include "umpire/resource/DefaultMemoryResource.hpp"
-
 #include "umpire/alloc/HipPinnedAllocator.hpp"
-
+#include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool
-HipPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name)
-  noexcept
+bool HipPinnedMemoryResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
   if (name.find("PINNED") != std::string::npos) {
     return true;
@@ -33,14 +30,15 @@ HipPinnedMemoryResourceFactory::create(const std::string& name, int id)
 }
 
 std::unique_ptr<resource::MemoryResource>
-HipPinnedMemoryResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+HipPinnedMemoryResourceFactory::create(const std::string& name, int id,
+                                       MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::DefaultMemoryResource<alloc::HipPinnedAllocator>>(Platform::hip, name, id, traits);
+  return util::make_unique<
+      resource::DefaultMemoryResource<alloc::HipPinnedAllocator>>(
+      Platform::hip, name, id, traits);
 }
 
-
-MemoryResourceTraits
-HipPinnedMemoryResourceFactory::getDefaultTraits()
+MemoryResourceTraits HipPinnedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 

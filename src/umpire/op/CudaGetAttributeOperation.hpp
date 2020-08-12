@@ -7,9 +7,9 @@
 #ifndef UMPIRE_CudaGetAttributeOperation_HPP
 #define UMPIRE_CudaGetAttributeOperation_HPP
 
-#include "umpire/op/MemoryOperation.hpp"
-
 #include <cuda_runtime_api.h>
+
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
@@ -17,21 +17,19 @@ namespace op {
 /*!
  * \brief Copy operation to move data from CPU to NVIDIA GPU memory.
  */
-template<cudaMemRangeAttribute ATTRIBUTE>
+template <cudaMemRangeAttribute ATTRIBUTE>
 class CudaGetAttributeOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::check_apply
-    *
-    * Uses cudaMemRangeGetAtribute to check attributes of a CUDA memory range.
-    *
-    * @copydetails MemoryOperation::transform
-    */
-  bool check_apply(
-      void* src_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      int val,
-      std::size_t length) override;
+  /*!
+   * @copybrief MemoryOperation::check_apply
+   *
+   * Uses cudaMemRangeGetAtribute to check attributes of a CUDA memory range.
+   *
+   * @copydetails MemoryOperation::transform
+   */
+  bool check_apply(void* src_ptr,
+                   umpire::util::AllocationRecord* src_allocation, int val,
+                   std::size_t length) override;
 };
 
 #include "umpire/op/CudaGetAttributeOperation.inl"

@@ -13,12 +13,9 @@
 namespace umpire {
 namespace op {
 
-void
-CudaAdviseAccessedByOperation::apply(
-    void* src_ptr,
-    util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-    int val,
-    std::size_t length)
+void CudaAdviseAccessedByOperation::apply(
+    void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    int val, std::size_t length)
 {
   int device = val;
   cudaError_t error;
@@ -27,21 +24,21 @@ CudaAdviseAccessedByOperation::apply(
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << 0 << "),"
-        << " failed with error: "
-        << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaGetDeviceProperties( device = "
+                 << 0 << "),"
+                 << " failed with error: " << cudaGetErrorString(error));
   }
 
-  if (properties.managedMemory == 1
-      && properties.concurrentManagedAccess == 1) {
+  if (properties.managedMemory == 1 &&
+      properties.concurrentManagedAccess == 1) {
     error =
-      ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, device);
+        ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr
-        << ", length = " << length
-        << ", cudaMemAdviseSetAccessedBy, " << device << ") failed with error: "
-        << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMemAdvise( src_ptr = "
+                   << src_ptr << ", length = " << length
+                   << ", cudaMemAdviseSetAccessedBy, " << device
+                   << ") failed with error: " << cudaGetErrorString(error));
     }
   }
 }
