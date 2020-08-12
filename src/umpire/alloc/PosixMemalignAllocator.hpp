@@ -18,13 +18,12 @@ namespace alloc {
 /*!
  * \brief Uses posix_memalign() and free() to allocate page-aligned memory.
  */
-struct PosixMemalignAllocator
-{
+struct PosixMemalignAllocator {
   /*!
    * \brief Allocate bytes of memory using posix_memalign.
    *
-   * \param bytes Number of bytes to allocate. Does not have to be a multiple of the system page size.
-   * \return Pointer to start of the allocation.
+   * \param bytes Number of bytes to allocate. Does not have to be a multiple of
+   * the system page size. \return Pointer to start of the allocation.
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
@@ -35,9 +34,10 @@ struct PosixMemalignAllocator
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
-    if  (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes <<
-                   ", pagesize = " << get_page_size() << " ) failed");
+    if (ret == nullptr) {
+      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = "
+                                              << get_page_size()
+                                              << " ) failed");
     }
 
     return ret;

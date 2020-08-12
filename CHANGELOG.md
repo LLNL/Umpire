@@ -18,6 +18,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitHub "action" to check ABI compatibility against `main`
 
+- clang-format file, and CMake infrastructure for styling code
+
 ### Changed
 
 - API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are

@@ -1,0 +1,11 @@
+BasedOnStyle: Google
+Language: Cpp
+Standard: Cpp11
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction:   true
+
+ColumnLimit: 80
+
+SpacesBeforeTrailingComments: 1
