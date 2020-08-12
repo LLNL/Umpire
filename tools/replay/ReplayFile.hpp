@@ -51,10 +51,12 @@ public:
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
+        int alignment;
       } pool;
       struct {
         std::size_t initial_alloc_size;
         std::size_t min_alloc_size;
+        int alignment;
       } dynamic_pool_list;
       struct {
         std::size_t initial_alloc_size;
@@ -119,7 +121,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 10;
+  const uint64_t REPLAY_VERSION = 11;
 
   struct Header {
     struct Magic {

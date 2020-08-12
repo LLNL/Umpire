@@ -25,12 +25,3 @@ blt_add_executable(
 blt_add_test(
   NAME fixed_pool_tests
   COMMAND fixed_pool_tests)
-
-blt_add_executable(
-  NAME dynamic_pool_tests
-  SOURCES dynamic_pool_tests.cpp
-  DEPENDS_ON ${strategy_tests_depends})
-
-blt_add_test(
-  NAME dynamic_pool_tests
-  COMMAND dynamic_pool_tests)

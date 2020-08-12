@@ -16,26 +16,26 @@
 namespace umpire {
 namespace strategy {
 
-MixedPool::MixedPool(
-    const std::string& name, int id, Allocator allocator,
-    std::size_t smallest_fixed_obj_size, std::size_t largest_fixed_obj_size,
-    std::size_t max_initial_fixed_pool_size, std::size_t fixed_size_multiplier,
-    const std::size_t dynamic_initial_alloc_size,
-    const std::size_t dynamic_min_alloc_size,
-    const std::size_t dynamic_align_bytes,
-    DynamicPoolMap::CoalesceHeuristic dynamic_coalesce_heuristic) noexcept
-    : AllocationStrategy{name, id},
-      m_map{},
-      m_fixed_pool_map{},
-      m_fixed_pool{},
-      m_dynamic_pool{"internal_dynamic_pool",
-                     -1,
-                     allocator,
-                     dynamic_initial_alloc_size,
-                     dynamic_min_alloc_size,
-                     dynamic_align_bytes,
-                     dynamic_coalesce_heuristic},
-      m_allocator{allocator.getAllocationStrategy()}
+MixedPool::MixedPool(const std::string& name, int id,
+                     Allocator allocator,
+                     std::size_t smallest_fixed_obj_size,
+                     std::size_t largest_fixed_obj_size,
+                     std::size_t max_initial_fixed_pool_size,
+                     std::size_t fixed_size_multiplier,
+                     const std::size_t dynamic_initial_alloc_size,
+                     const std::size_t dynamic_min_alloc_size,
+                     const std::size_t dynamic_align_bytes,
+                     DynamicPoolMap::CoalesceHeuristic should_coalesce) noexcept :
+  AllocationStrategy{name, id},
+  m_map{},
+  m_fixed_pool_map{},
+  m_fixed_pool{},
+  m_dynamic_pool{"internal_dynamic_pool", -1, allocator,
+                 dynamic_initial_alloc_size,
+                 dynamic_min_alloc_size,
+                 dynamic_align_bytes,
+                 should_coalesce},
+  m_allocator{allocator.getAllocationStrategy()}
 {
   std::size_t obj_size{smallest_fixed_obj_size};
   while (obj_size <= largest_fixed_obj_size) {

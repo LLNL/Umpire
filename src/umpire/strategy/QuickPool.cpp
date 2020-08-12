@@ -1,4 +1,3 @@
-//////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
@@ -8,6 +7,7 @@
 #include "umpire/strategy/QuickPool.hpp"
 
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -15,47 +15,20 @@
 namespace umpire {
 namespace strategy {
 
-namespace {
-inline std::size_t aligned_size(const std::size_t size)
+QuickPool::QuickPool(
+    const std::string& name,
+    int id,
+    Allocator allocator,
+    const std::size_t first_minimum_pool_allocation_size,
+    const std::size_t next_minimum_pool_allocation_size,
+    std::size_t alignment,
+    CoalesceHeuristic should_coalesce) noexcept :
+  AllocationStrategy{name, id},
+  mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
+  m_should_coalesce{should_coalesce},
+  m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
+  m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
 {
-  const std::size_t boundary = 16;
-  //  return std::size_t (size + (boundary-1)) & ~(boundary-1);
-  return size + boundary - 1 - (size - 1) % boundary;
-}
-} // namespace
-
-QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
-                     const std::size_t initial_alloc_size,
-                     const std::size_t min_alloc_size,
-                     CoalesceHeuristic coalesce_heuristic) noexcept
-    : AllocationStrategy{name, id},
-      m_pointer_map{},
-      m_size_map{},
-      m_chunk_pool{sizeof(Chunk)},
-      m_allocator{allocator.getAllocationStrategy()},
-      m_should_coalesce{coalesce_heuristic},
-      m_initial_alloc_bytes{initial_alloc_size},
-      m_min_alloc_bytes{min_alloc_size}
-{
-#if defined(UMPIRE_ENABLE_BACKTRACE)
-  {
-    umpire::util::backtrace bt{};
-    umpire::util::backtracer<>::get_backtrace(bt);
-    UMPIRE_LOG(Info, "actual_size:" << m_initial_alloc_bytes << " (prev: 0) "
-                                    << umpire::util::backtracer<>::print(bt));
-  }
-#endif
-
-  void* ptr{m_allocator->allocate(m_initial_alloc_bytes)};
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, m_initial_alloc_bytes);
-  m_actual_bytes += m_initial_alloc_bytes;
-  m_releasable_bytes += m_initial_alloc_bytes;
-
-  void* chunk_storage{m_chunk_pool.allocate()};
-  Chunk* chunk{new (chunk_storage)
-                   Chunk(ptr, initial_alloc_size, m_initial_alloc_bytes)};
-  chunk->size_map_it =
-      m_size_map.insert(std::make_pair(m_initial_alloc_bytes, chunk));
 }
 
 QuickPool::~QuickPool()
@@ -65,21 +38,27 @@ QuickPool::~QuickPool()
 void* QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
-  bytes = aligned_size(bytes);
+  bytes = aligned_round_up(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
 
   Chunk* chunk{nullptr};
 
   if (best == m_size_map.end()) {
-    std::size_t size{(bytes > m_min_alloc_bytes) ? bytes : m_min_alloc_bytes};
+
+    std::size_t bytes_to_use{
+      ( m_actual_bytes == 0 ) ? m_first_minimum_pool_allocation_size
+                              : m_next_minimum_pool_allocation_size };
+
+    std::size_t size{ (bytes > bytes_to_use) ? bytes : bytes_to_use };
+
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
 
     void* ret{nullptr};
     try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
       {
-        umpire::util::backtrace bt{};
+        umpire::util::backtrace bt;
         umpire::util::backtracer<>::get_backtrace(bt);
         UMPIRE_LOG(Info,
                    "actual_size:" << (m_actual_bytes + bytes)
@@ -87,14 +66,14 @@ void* QuickPool::allocate(std::size_t bytes)
                                   << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = m_allocator->allocate(size);
+      ret = aligned_allocate(size);
     } catch (...) {
       UMPIRE_LOG(Error,
                  "Caught error allocating new chunk, giving up free chunks and "
                  "retrying...");
       release();
       try {
-        ret = m_allocator->allocate(size);
+        ret = aligned_allocate(size);
         UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
         UMPIRE_LOG(Error, "recovery failed.");
@@ -105,6 +84,7 @@ void* QuickPool::allocate(std::size_t bytes)
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ret, size);
     m_actual_bytes += size;
     m_releasable_bytes += size;
+
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
   } else {
@@ -116,6 +96,10 @@ void* QuickPool::allocate(std::size_t bytes)
                                    << " and size " << chunk->size
                                    << " for allocation of size " << bytes);
 
+  if ( (chunk->size == chunk->chunk_size) && chunk->free) {
+    m_releasable_bytes -= chunk->chunk_size;
+  }
+
   void* ret = chunk->data;
   m_pointer_map.insert(std::make_pair(ret, chunk));
 
@@ -126,7 +110,6 @@ void* QuickPool::allocate(std::size_t bytes)
     UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << bytes
                                          << " and " << remaining);
 
-    m_releasable_bytes -= chunk->chunk_size;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{new (chunk_storage) Chunk{
@@ -223,9 +206,11 @@ void QuickPool::release()
     UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
     if ((chunk->size == chunk->chunk_size) && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
-      UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->size);
+
+      UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
       m_actual_bytes -= chunk->chunk_size;
-      m_allocator->deallocate(chunk->data);
+      aligned_deallocate(chunk->data);
+
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);
     } else {
@@ -235,7 +220,7 @@ void QuickPool::release()
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   if (prev_size > m_actual_bytes) {
-    umpire::util::backtrace bt{};
+    umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size
                                     << ") "
@@ -264,7 +249,23 @@ Platform QuickPool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
-void QuickPool::coalesce() noexcept
+std::size_t
+QuickPool::getBlocksInPool() const noexcept
+{
+  return m_pointer_map.size() + m_size_map.size();
+}
+
+std::size_t
+QuickPool::getLargestAvailableBlock() noexcept
+{
+  if ( !m_size_map.size() ) {
+    return 0;
+  }
+  return m_size_map.rbegin()->first;
+}
+
+void
+QuickPool::coalesce() noexcept
 {
   std::size_t size_pre{getActualSize()};
   release();
