@@ -4,22 +4,22 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/MixedPool.hpp"
+#include <iostream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 
-#include <iostream>
-
-int main(int, char**) {
-  auto& rm = umpire::ResourceManager::getInstance();
+int main(int, char **)
+{
+  auto &rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("HOST");
 
   /*
    * Create a default mixed pool.
    */
   auto default_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
-    "default_mixed_pool", allocator);
+      "default_mixed_pool", allocator);
 
   UMPIRE_USE_VAR(default_mixed_allocator);
 
@@ -29,7 +29,7 @@ int main(int, char**) {
    * pool is kept under 4MB in size to begin.
    */
   auto custom_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
-    "custom_mixed_pool", allocator, 256, 16*1024, 4*1024*1024, 5);
+      "custom_mixed_pool", allocator, 256, 16 * 1024, 4 * 1024 * 1024, 5);
 
   /*
    * Although this calls for only 4*4=16 bytes, this allocation will

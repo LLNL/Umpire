@@ -7,7 +7,8 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-int main(int, char**) {
+int main(int, char**)
+{
   constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
@@ -16,8 +17,8 @@ int main(int, char**) {
   /*
    * Allocate host data
    */
-  double* host_data = static_cast<double*>(
-      allocator.allocate(SIZE*sizeof(double)));
+  double* host_data =
+      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
   /*
    * Move data to unified memory

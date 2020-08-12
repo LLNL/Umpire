@@ -166,3 +166,5 @@ if (ENABLE_FORTRAN)
 endif ()
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
+
+umpire_add_code_checks(PREFIX cookbook)

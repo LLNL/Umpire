@@ -5,13 +5,12 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-
-#include "umpire/config.hpp"
-
 #include "umpire/ResourceManager.hpp"
+#include "umpire/config.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-TEST(Traits, DDR) {
+TEST(Traits, DDR)
+{
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
 
   using namespace umpire::resource;
@@ -21,7 +20,7 @@ TEST(Traits, DDR) {
 
   auto allocator = rm.getAllocator(traits);
 
-  float* data = static_cast<float*>(allocator.allocate(sizeof(float)*1024));
+  float* data = static_cast<float*>(allocator.allocate(sizeof(float) * 1024));
 
   for (int i = 0; i < 1024; i++) {
     data[i] = 3.14;

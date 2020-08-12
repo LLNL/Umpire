@@ -4,26 +4,25 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/DynamicPool.hpp"
+#include <iostream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-
+#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/util/Macros.hpp"
 
-#include <iostream>
-
-int main(int, char**) {
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator("HOST");
 
-  /* 
+  /*
    * Create a pool with introspection disabled (can improve performance)
    */
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool, false>(
-                            "NO_INTROSPECTION_POOL",
-                            allocator);
+  auto pooled_allocator =
+      rm.makeAllocator<umpire::strategy::DynamicPool, false>(
+          "NO_INTROSPECTION_POOL", allocator);
 
   void* data = pooled_allocator.allocate(1024);
 

@@ -7,7 +7,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
-int main(int UMPIRE_UNUSED_ARG(argc), char** UMPIRE_UNUSED_ARG(argv)) {
+int main(int UMPIRE_UNUSED_ARG(argc), char** UMPIRE_UNUSED_ARG(argv))
+{
   auto& rm = umpire::ResourceManager::getInstance();
   UMPIRE_USE_VAR(rm);
 

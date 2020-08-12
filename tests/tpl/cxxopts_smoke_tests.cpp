@@ -6,7 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "gtest/gtest.h"
-
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
 TEST(Cxxopts, TestOptions)

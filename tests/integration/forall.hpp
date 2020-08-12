@@ -17,12 +17,15 @@
 #include <hip/hip_runtime.h>
 #endif
 
-struct sequential {};
+struct sequential {
+};
 #if defined(UMPIRE_ENABLE_CUDA)
-struct cuda {};
+struct cuda {
+};
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
-struct hip {};
+struct hip {
+};
 #endif
 
 template <typename LOOP_BODY>
@@ -37,7 +40,8 @@ void forall_kernel_cpu(int begin, int end, LOOP_BODY body)
  * \brief Run forall kernel on CPU.
  */
 template <typename LOOP_BODY>
-void forall(sequential, int begin, int end, LOOP_BODY body) {
+void forall(sequential, int begin, int end, LOOP_BODY body)
+{
 #if defined(UMPIRE_ENABLE_CUDA)
   cudaDeviceSynchronize();
 #endif
@@ -50,7 +54,8 @@ void forall(sequential, int begin, int end, LOOP_BODY body) {
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 template <typename LOOP_BODY>
-__global__ void forall_kernel_gpu(int start, int length, LOOP_BODY body) {
+__global__ void forall_kernel_gpu(int start, int length, LOOP_BODY body)
+{
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
 
   if (idx < length) {
@@ -64,20 +69,23 @@ __global__ void forall_kernel_gpu(int start, int length, LOOP_BODY body) {
  */
 #if defined(UMPIRE_ENABLE_CUDA)
 template <typename LOOP_BODY>
-void forall(cuda, int begin, int end, LOOP_BODY&& body) {
+void forall(cuda, int begin, int end, LOOP_BODY&& body)
+{
   std::size_t blockSize = 32;
-  std::size_t gridSize = (end - begin + blockSize - 1)/blockSize;
+  std::size_t gridSize = (end - begin + blockSize - 1) / blockSize;
 
-  forall_kernel_gpu<<<gridSize, blockSize>>>(begin, end-begin, body);
+  forall_kernel_gpu<<<gridSize, blockSize>>>(begin, end - begin, body);
 }
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
 template <typename LOOP_BODY>
-void forall(hip, int begin, int end, LOOP_BODY&& body) {
+void forall(hip, int begin, int end, LOOP_BODY&& body)
+{
   std::size_t blockSize = 32;
-  std::size_t gridSize = (end - begin + blockSize - 1)/blockSize;
+  std::size_t gridSize = (end - begin + blockSize - 1) / blockSize;
 
-  hipLaunchKernelGGL(forall_kernel_gpu, dim3(gridSize), dim3(blockSize), 0, 0, begin, end-begin, body);
+  hipLaunchKernelGGL(forall_kernel_gpu, dim3(gridSize), dim3(blockSize), 0, 0,
+                     begin, end - begin, body);
 }
 #endif
 

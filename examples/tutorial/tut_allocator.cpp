@@ -7,19 +7,19 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-int main(int, char**) {
-
+int main(int, char**)
+{
   constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
 
-  double* data = static_cast<double*>(
-      allocator.allocate(SIZE*sizeof(double)));
+  double* data =
+      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << allocator.getName() << " allocator...";
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
+            << allocator.getName() << " allocator...";
 
   allocator.deallocate(data);
 

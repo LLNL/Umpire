@@ -8,13 +8,12 @@
 
 #include "umpire/ResourceManager.hpp"
 
-__global__
-void touch_data(double* data, int len) {
-
+__global__ void touch_data(double* data, int len)
+{
   int id = blockIdx.x * blockDim.x + threadIdx.x;
 
   if (id < len) {
-    data[id] = id*1024;
+    data[id] = id * 1024;
   }
 }
 
@@ -23,7 +22,7 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAllocatorNames()){
+  for (auto s : rm.getAllocatorNames()) {
     std::cout << s << "  ";
   }
   std::cout << std::endl;
@@ -34,8 +33,8 @@ int main(int, char**)
   auto pool1 = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "pool1", rm.getAllocator("DEVICE_1"));
 
-  double* a = static_cast<double*>(pool0.allocate(4096*sizeof(double)));
-  double* b = static_cast<double*>(pool1.allocate(4096*sizeof(double)));
+  double* a = static_cast<double*>(pool0.allocate(4096 * sizeof(double)));
+  double* b = static_cast<double*>(pool1.allocate(4096 * sizeof(double)));
 
   int BLOCK_SIZE = 256;
   int NUM_BLOCKS = 4096 / 256;

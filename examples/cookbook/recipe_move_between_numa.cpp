@@ -4,21 +4,20 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include <iostream>
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-
 #include "umpire/strategy/NumaPolicy.hpp"
-
-#include "umpire/util/numa.hpp"
 #include "umpire/util/Macros.hpp"
-
-#include <iostream>
+#include "umpire/util/numa.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 #endif
 
-int main(int, char**) {
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
 
   const std::size_t alloc_size = 5 * umpire::get_page_size();
@@ -32,7 +31,7 @@ int main(int, char**) {
 
   // Create an allocator on the first NUMA node
   auto host_src_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-    "host_numa_src_alloc", rm.getAllocator("HOST"), host_nodes[0]);
+      "host_numa_src_alloc", rm.getAllocator("HOST"), host_nodes[0]);
 
   // Create an allocation on that node
   void* src_ptr = host_src_alloc.allocate(alloc_size);
@@ -40,7 +39,7 @@ int main(int, char**) {
   if (host_nodes.size() > 1) {
     // Create an allocator on another host NUMA node.
     auto host_dst_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      "host_numa_dst_alloc", rm.getAllocator("HOST"), host_nodes[1]);
+        "host_numa_dst_alloc", rm.getAllocator("HOST"), host_nodes[1]);
 
     // Move the memory
     void* dst_ptr = rm.move(src_ptr, host_dst_alloc);
@@ -68,7 +67,7 @@ int main(int, char**) {
     // this still requires using the "HOST" allocator. The allocations
     // are moved after the address space is reserved.
     auto device_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      "device_numa_src_alloc", rm.getAllocator("HOST"), device_nodes[0]);
+        "device_numa_src_alloc", rm.getAllocator("HOST"), device_nodes[0]);
 
     // Move the memory
     void* dst_ptr = rm.move(src_ptr, device_alloc);
@@ -78,7 +77,8 @@ int main(int, char**) {
       UMPIRE_ERROR("Pointers should match");
     }
 
-    // Touch it -- this currently uses the host memset operation (thus, copying the memory back)
+    // Touch it -- this currently uses the host memset operation (thus, copying
+    // the memory back)
     rm.memset(dst_ptr, 0);
 
     // Verify NUMA node

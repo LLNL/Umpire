@@ -14,26 +14,27 @@ double* move_data(double* source_data, const std::string& destination)
 
   std::cout << "Moved source data (" << source_data << ") to destination ";
 
-  double* dest_data = static_cast<double*>(
-      rm.move(source_data, dest_allocator));
+  double* dest_data =
+      static_cast<double*>(rm.move(source_data, dest_allocator));
 
   std::cout << destination << " (" << dest_data << ")" << std::endl;
 
   return dest_data;
 }
 
-int main(int, char**) {
+int main(int, char**)
+{
   constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator("HOST");
 
-  double* data = static_cast<double*>(
-      allocator.allocate(SIZE*sizeof(double)));
+  double* data =
+      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << allocator.getName() << " allocator." << std::endl;
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
+            << allocator.getName() << " allocator." << std::endl;
 
   std::cout << "Filling with 0.0...";
 

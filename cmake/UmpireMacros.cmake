@@ -1,6 +1,6 @@
 macro(umpire_add_code_checks)
     set(options)
-    set(singleValueArgs PREFIX )
+    set(singleValueArgs PREFIX RECURSIVE)
 
     # Parse the arguments to the macro
     cmake_parse_arguments(arg
@@ -8,8 +8,13 @@ macro(umpire_add_code_checks)
 
     if ("${PROJECT_SOURCE_DIR}" STREQUAL "${CMAKE_SOURCE_DIR}")
         set(_sources)
-        file(GLOB _sources
-             "*.cpp" "*.hpp" "*.inl" "*.c" "*.h" "*.F" "*.f" "*.f90" "*.F90")
+        if (DEFINED arg_RECURSIVE AND arg_RECURSIVE) 
+          file(GLOB_RECURSE _sources
+               "*.cpp" "*.hpp" "*.inl" "*.c" "*.h" "*.F" "*.f" "*.f90" "*.F90")
+         else ()
+           file(GLOB _sources
+               "*.cpp" "*.hpp" "*.inl" "*.c" "*.h" "*.F" "*.f" "*.f90" "*.F90")
+         endif ()
 
         blt_add_code_checks(PREFIX    ${arg_PREFIX}
                             SOURCES   ${_sources}

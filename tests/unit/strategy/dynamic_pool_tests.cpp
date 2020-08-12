@@ -6,16 +6,14 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "gtest/gtest.h"
-
-#include "umpire/config.hpp"
-
 #include "umpire/ResourceManager.hpp"
-
+#include "umpire/config.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 
 static constexpr std::size_t SIZE = 1024;
 
-TEST(DynamicPoolTest, Construction) {
+TEST(DynamicPoolTest, Construction)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -26,15 +24,23 @@ TEST(DynamicPoolTest, Construction) {
   }
 
   {
-    umpire::strategy::DynamicPool pool{"DynamicPool", 0, alloc,
-                                       SIZE*SIZE, SIZE, 16, umpire::strategy::heuristic_percent_releasable(100)};
+    umpire::strategy::DynamicPool pool{
+        "DynamicPool",
+        0,
+        alloc,
+        SIZE * SIZE,
+        SIZE,
+        16,
+        umpire::strategy::heuristic_percent_releasable(100)};
 
-    // Pool should pre-allocate exactly this amount of memory (assuming alignment fits)
-    EXPECT_EQ(pool.getActualSize(), SIZE*SIZE);
+    // Pool should pre-allocate exactly this amount of memory (assuming
+    // alignment fits)
+    EXPECT_EQ(pool.getActualSize(), SIZE * SIZE);
   }
 }
 
-TEST(DynamicPoolTest, Allocate) {
+TEST(DynamicPoolTest, Allocate)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -45,29 +51,31 @@ TEST(DynamicPoolTest, Allocate) {
     void* ptr2{pool.allocate(SIZE)};
 
     // Pool internal size should be greater than or equal to the current size
-    EXPECT_GE(pool.getActualSize(), 2*SIZE);
+    EXPECT_GE(pool.getActualSize(), 2 * SIZE);
 
     pool.deallocate(ptr1);
     pool.deallocate(ptr2);
 
     // Pool should hang on to the memory
-    EXPECT_GE(pool.getActualSize(), 2*SIZE);
+    EXPECT_GE(pool.getActualSize(), 2 * SIZE);
   }
 
   // Allocate with a min_alloc_size greater than the size requested
   {
-    umpire::strategy::DynamicPool pool{"DynamicPool", 0, alloc, 64, SIZE*SIZE};
+    umpire::strategy::DynamicPool pool{"DynamicPool", 0, alloc, 64,
+                                       SIZE * SIZE};
 
     // Should allocate a SIZE*SIZE block, leaving the initial block in the pool
     void* ptr{pool.allocate(SIZE)};
 
-    EXPECT_EQ(pool.getActualSize(), 64 + SIZE*SIZE);
+    EXPECT_EQ(pool.getActualSize(), 64 + SIZE * SIZE);
 
     pool.deallocate(ptr);
   }
 }
 
-TEST(DynamicPoolTest, release) {
+TEST(DynamicPoolTest, release)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 

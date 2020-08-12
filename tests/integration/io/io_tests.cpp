@@ -4,10 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/config.hpp"
-
 #include "umpire/Umpire.hpp"
-
+#include "umpire/config.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
 
@@ -17,26 +15,21 @@
 
 #include "umpire/tpl/cxxopts/include/cxxopts.hpp"
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 #if defined(UMPIRE_ENABLE_MPI)
   MPI_Init(&argc, &argv);
   umpire::initialize(MPI_COMM_WORLD);
 #else
-  (void) argc;
-  (void) argv;
+  (void)argc;
+  (void)argv;
   umpire::initialize();
 #endif
 
   cxxopts::Options options(argv[0], "IO tests");
 
-  options
-    .add_options()
-    (  "l, enable-logging"
-     , "Enable logging output"
-    )
-    (  "r, enable-replay"
-     , "Enable replay output"
-    );
+  options.add_options()("l, enable-logging", "Enable logging output")(
+      "r, enable-replay", "Enable replay output");
 
   auto result = options.parse(argc, argv);
 

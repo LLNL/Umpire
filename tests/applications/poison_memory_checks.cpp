@@ -12,7 +12,8 @@
 #include "umpire/strategy/QuickPool.hpp"
 
 // NOTE:
-// To test with ASAN, you must reconfigure Umpire with CMAKE_CXX_FLAGS="-fsanitize=address"
+// To test with ASAN, you must reconfigure Umpire with
+// CMAKE_CXX_FLAGS="-fsanitize=address"
 //
 int main(int, char**)
 {
@@ -23,18 +24,21 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   if (try_map) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>("pool", rm.getAllocator("HOST"));
-    data = static_cast<double*>(pool.allocate(1024*sizeof(double)));
+    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
+        "pool", rm.getAllocator("HOST"));
+    data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[256] = 100;
     pool.deallocate(data);
   } else if (try_list) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("pool", rm.getAllocator("HOST"));
-    data = static_cast<double*>(pool.allocate(1024*sizeof(double)));
+    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
+        "pool", rm.getAllocator("HOST"));
+    data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[256] = 100;
     pool.deallocate(data);
   } else if (try_quick) {
-    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("pool", rm.getAllocator("HOST"));
-    data = static_cast<double*>(pool.allocate(1024*sizeof(double)));
+    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
+        "pool", rm.getAllocator("HOST"));
+    data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[256] = 100;
     pool.deallocate(data);
   } else {

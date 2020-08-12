@@ -4,12 +4,12 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
-
+#include "umpire/ResourceManager.hpp"
 #include "umpire/TypedAllocator.hpp"
 
-int main(int, char**) {
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
@@ -19,8 +19,8 @@ int main(int, char**) {
 
   double_allocator.deallocate(my_doubles, 1024);
 
-  std::vector< double, umpire::TypedAllocator<double> > 
-    my_vector{double_allocator};
+  std::vector<double, umpire::TypedAllocator<double>> my_vector{
+      double_allocator};
 
   my_vector.resize(100);
 

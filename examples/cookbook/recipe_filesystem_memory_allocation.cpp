@@ -5,16 +5,17 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 
-int main(int, char** argv) {    
-    auto& rm = umpire::ResourceManager::getInstance();
-    umpire::Allocator alloc = rm.getAllocator("FILE");
+int main(int, char** argv)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator alloc = rm.getAllocator("FILE");
 
-    std::size_t* A = (std::size_t*) alloc.allocate(sizeof(size_t));
+  std::size_t* A = (std::size_t*)alloc.allocate(sizeof(size_t));
 
-    alloc.deallocate(A);
+  alloc.deallocate(A);
 
-    return 0;
+  return 0;
 }

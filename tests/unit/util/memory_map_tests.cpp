@@ -4,9 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/MemoryMap.hpp"
-
 #include "gtest/gtest.h"
+#include "umpire/util/MemoryMap.hpp"
 
 using Map = umpire::util::MemoryMap<int>;
 
@@ -14,25 +13,31 @@ static std::size_t size_by_iterator(Map& map)
 {
   auto iter = map.begin(), end = map.end();
   std::size_t size = 0;
-  while (iter != end) { ++size; ++iter; }
+  while (iter != end) {
+    ++size;
+    ++iter;
+  }
   return size;
 }
 
 class MemoryMapTest : public ::testing::Test {
-  protected:
-    MemoryMapTest()
+ protected:
+  MemoryMapTest()
       : a{reinterpret_cast<void*>(1)},
         b{reinterpret_cast<void*>(2)},
-        c{reinterpret_cast<void*>(3)} {}
+        c{reinterpret_cast<void*>(3)}
+  {
+  }
 
-    void TearDown() override {
-      map.clear();
-    }
+  void TearDown() override
+  {
+    map.clear();
+  }
 
-    Map map;
-    void* a;
-    void* b;
-    void* c;
+  Map map;
+  void* a;
+  void* b;
+  void* c;
 };
 
 TEST_F(MemoryMapTest, insert)
@@ -52,9 +57,7 @@ TEST_F(MemoryMapTest, insert)
     EXPECT_EQ(inserted, false);
   }
 
-  EXPECT_NO_THROW({
-    map.insert(b, 2);
-  });
+  EXPECT_NO_THROW({ map.insert(b, 2); });
 
   ASSERT_EQ(map.size(), 2);
   ASSERT_EQ(size_by_iterator(map), 2);
@@ -130,7 +133,6 @@ TEST_F(MemoryMapTest, clear)
   ASSERT_EQ(map.size(), 0);
   ASSERT_EQ(size_by_iterator(map), 0);
 }
-
 
 TEST_F(MemoryMapTest, Iterator)
 {
