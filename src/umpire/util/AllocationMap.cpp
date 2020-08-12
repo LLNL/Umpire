@@ -6,13 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/AllocationMap.hpp"
 
-#include "umpire/util/FixedMallocPool.hpp"
-
-#include "umpire/util/Macros.hpp"
-#include "umpire/Replay.hpp"
-
-#include "umpire/util/backtrace.hpp"
-
 #include <functional>
 #include <sstream>
 #include <type_traits>

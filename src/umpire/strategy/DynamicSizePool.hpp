@@ -20,11 +20,9 @@
 #include "umpire/util/memory_sanitizers.hpp"
 
 template <class IA = StdAllocator>
-class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation
-{
-protected:
-  struct Block
-  {
+class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
+ protected:
+  struct Block {
     char *data;
     std::size_t size;
     std::size_t blockSize;
@@ -69,41 +67,39 @@ protected:
   // Allocate a new block and add it to the list of free blocks
   void allocateBlock(struct Block *&curr, struct Block *&prev, std::size_t size)
   {
-    if ( freeBlocks == NULL && usedBlocks == NULL )
+    if (freeBlocks == NULL && usedBlocks == NULL)
       size = std::max(size, m_first_minimum_pool_allocation_size);
     else
       size = std::max(size, m_next_minimum_pool_allocation_size);
 
     curr = nullptr;
     prev = nullptr;
-    void *data{ nullptr };
+    void *data{nullptr};
 
     try {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
       {
         umpire::util::backtrace bt;
         umpire::util::backtracer<>::get_backtrace(bt);
-        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes+size)
-          << " (prev: " << m_actual_bytes << ") "
-          << umpire::util::backtracer<>::print(bt));
+        UMPIRE_LOG(Info,
+                   "actual_size:" << (m_actual_bytes + size)
+                                  << " (prev: " << m_actual_bytes << ") "
+                                  << umpire::util::backtracer<>::print(bt));
       }
 #endif
       data = aligned_allocate(size);
-    }
-    catch (...) {
+    } catch (...) {
       UMPIRE_LOG(Error,
-          "\n\tMemory exhausted at allocation resource. "
-          "Attempting to give blocks back.\n\n"
-          << getFreeBlocks() << " Free Blocks, "
-          << getInUseBlocks() << " Used Blocks\n"
-      );
+                 "\n\tMemory exhausted at allocation resource. "
+                 "Attempting to give blocks back.\n\n"
+                     << getFreeBlocks() << " Free Blocks, " << getInUseBlocks()
+                     << " Used Blocks\n");
       freeReleasedBlocks();
       UMPIRE_LOG(Error,
-          "\n\tMemory exhausted at allocation resource.  "
-          "\n\tRetrying allocation operation: "
-          << getFreeBlocks() << " Free Blocks, "
-          << getInUseBlocks() << " Used Blocks\n"
-      );
+                 "\n\tMemory exhausted at allocation resource.  "
+                 "\n\tRetrying allocation operation: "
+                     << getFreeBlocks() << " Free Blocks, " << getInUseBlocks()
+                     << " Used Blocks\n");
       try {
         data = aligned_allocate(size);
         UMPIRE_LOG(Error,
@@ -111,11 +107,11 @@ protected:
                    "succeeded\n");
       } catch (...) {
         UMPIRE_LOG(Error,
-          "\n\tUnable to allocate from resource even after giving back free blocks.\n"
-          "\tThrowing to let application know we have no more memory: "
-          << getFreeBlocks() << " Partially Free Blocks, "
-          << getInUseBlocks() << " Used Blocks\n"
-        );
+                   "\n\tUnable to allocate from resource even after giving "
+                   "back free blocks.\n"
+                   "\tThrowing to let application know we have no more memory: "
+                       << getFreeBlocks() << " Partially Free Blocks, "
+                       << getInUseBlocks() << " Used Blocks\n");
         throw;
       }
     }
@@ -227,7 +223,7 @@ protected:
       // The free block list may contain partially released released blocks.
       // Make sure to only free blocks that are completely released.
       //
-      if ( curr->size == curr->blockSize ) {
+      if (curr->size == curr->blockSize) {
         UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
         m_actual_bytes -= curr->size;
         freed += curr->size;
@@ -249,9 +245,9 @@ protected:
     if (freed > 0) {
       umpire::util::backtrace bt;
       umpire::util::backtracer<>::get_backtrace(bt);
-      UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes)
-        << " (prev: " << (m_actual_bytes+freed)
-        << ") " << umpire::util::backtracer<>::print(bt));
+      UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes) << " (prev: "
+                                      << (m_actual_bytes + freed) << ") "
+                                      << umpire::util::backtracer<>::print(bt));
     }
 #endif
 
@@ -299,23 +295,25 @@ protected:
     freeAllBlocks();
   }
 
-public:
-  DynamicSizePool(
-      umpire::strategy::AllocationStrategy* strat,
-      const std::size_t first_minimum_pool_allocation_size = (16 * 1024),
-      const std::size_t next_minimum_pool_allocation_size = 256,
-      const std::size_t alignment = 16) :
-    umpire::strategy::mixins::AlignedAllocation{alignment, strat},
-    blockPool{},
-    usedBlocks{ nullptr },
-    freeBlocks{ nullptr },
-    m_actual_bytes{ 0 },
-    m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
-    m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
+ public:
+  DynamicSizePool(umpire::strategy::AllocationStrategy *strat,
+                  const std::size_t first_minimum_pool_allocation_size = (16 *
+                                                                          1024),
+                  const std::size_t next_minimum_pool_allocation_size = 256,
+                  const std::size_t alignment = 16)
+      : umpire::strategy::mixins::AlignedAllocation{alignment, strat},
+        blockPool{},
+        usedBlocks{nullptr},
+        freeBlocks{nullptr},
+        m_actual_bytes{0},
+        m_first_minimum_pool_allocation_size{
+            aligned_round_up(first_minimum_pool_allocation_size)},
+        m_next_minimum_pool_allocation_size{
+            aligned_round_up(next_minimum_pool_allocation_size)}
   {
   }
 
-  DynamicSizePool(const DynamicSizePool&) = delete;
+  DynamicSizePool(const DynamicSizePool &) = delete;
 
   ~DynamicSizePool()
   {
@@ -376,10 +374,10 @@ public:
     std::size_t total_blocks{0};
     struct Block *curr{nullptr};
 
-    for (curr = usedBlocks ; curr; curr = curr->next ) {
+    for (curr = usedBlocks; curr; curr = curr->next) {
       total_blocks += 1;
     }
-    for (curr = freeBlocks ; curr; curr = curr->next ) {
+    for (curr = freeBlocks; curr; curr = curr->next) {
       total_blocks += 1;
     }
 
@@ -427,7 +425,7 @@ public:
 
   void coalesce()
   {
-    if ( getFreeBlocks() > 1 ) {
+    if (getFreeBlocks() > 1) {
       std::size_t size_to_coalesce = freeReleasedBlocks();
 
       UMPIRE_LOG(Debug,

@@ -14,10 +14,8 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
-
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/memory_sanitizers.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
@@ -25,18 +23,17 @@ namespace umpire {
 namespace strategy {
 
 DynamicPoolMap::DynamicPoolMap(
-    const std::string& name,
-    int id,
-    Allocator allocator,
+    const std::string& name, int id, Allocator allocator,
     const std::size_t first_minimum_pool_allocation_size,
     const std::size_t next_minimum_pool_allocation_size,
-    const std::size_t alignment,
-    CoalesceHeuristic should_coalesce) noexcept :
-  AllocationStrategy{name, id},
-  mixins::AlignedAllocation{ alignment, allocator.getAllocationStrategy() },
-  m_should_coalesce{ should_coalesce },
-  m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
-  m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
+    const std::size_t alignment, CoalesceHeuristic should_coalesce) noexcept
+    : AllocationStrategy{name, id},
+      mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
+      m_should_coalesce{should_coalesce},
+      m_first_minimum_pool_allocation_size{
+          aligned_round_up(first_minimum_pool_allocation_size)},
+      m_next_minimum_pool_allocation_size{
+          aligned_round_up(next_minimum_pool_allocation_size)}
 {
 }
 
@@ -179,12 +176,12 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
     const std::size_t left_bytes{free_size - bytes};
 
     if (left_bytes > 0) {
-      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes,
-                 false, whole_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes, false,
+                 whole_bytes);
     }
   } else {
     const std::size_t min_block_size =
-      ( m_actual_bytes == 0 ) ? m_first_minimum_pool_allocation_size
+        (m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                               : m_next_minimum_pool_allocation_size;
 
     const std::size_t alloc_bytes{std::max(bytes, min_block_size)};
@@ -198,8 +195,8 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
 
     // Add free
     if (left_bytes > 0)
-      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes,
-                 false, alloc_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes, false,
+                 alloc_bytes);
   }
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
@@ -233,8 +230,8 @@ void DynamicPoolMap::deallocate(void* ptr)
   }
 
   if (m_should_coalesce(*this)) {
-    UMPIRE_LOG(Debug, this
-               << " heuristic function returned true, calling coalesce()");
+    UMPIRE_LOG(Debug,
+               this << " heuristic function returned true, calling coalesce()");
     do_coalesce();
   }
 }
@@ -451,28 +448,28 @@ void DynamicPoolMap::do_coalesce()
   }
 }
 
-DynamicPoolMap::CoalesceHeuristic
-DynamicPoolMap::percent_releasable(int percentage)
+DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(
+    int percentage)
 {
-  if ( percentage < 0 || percentage > 100 ) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage
-        << ", percentage must be an integer between 0 and 100");
+  if (percentage < 0 || percentage > 100) {
+    UMPIRE_ERROR("Invalid percentage of "
+                 << percentage
+                 << ", percentage must be an integer between 0 and 100");
   }
 
-  if ( percentage == 0 ) {
-    return [=] (const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) {
-        return false;
-    };
-  } else if ( percentage == 100 ) {
-    return [=] (const strategy::DynamicPoolMap& pool) {
-        return ( pool.getActualSize() == pool.getReleasableSize() );
+  if (percentage == 0) {
+    return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return false; };
+  } else if (percentage == 100) {
+    return [=](const strategy::DynamicPoolMap& pool) {
+      return (pool.getActualSize() == pool.getReleasableSize());
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
-    return [=] (const strategy::DynamicPoolMap& pool) {
+    return [=](const strategy::DynamicPoolMap& pool) {
       // Calculate threshold in bytes from the percentage
-      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+      const std::size_t threshold =
+          static_cast<std::size_t>(f * pool.getActualSize());
       return (pool.getReleasableSize() >= threshold);
     };
   }

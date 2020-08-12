@@ -41,8 +41,7 @@
 
 static int unique_strategy_id = 0;
 
-const char* AllocationDevices[] = {
-  "HOST"
+const char* AllocationDevices[] = {"HOST"
 #if defined(UMPIRE_ENABLE_DEVICE)
                                    ,
                                    "DEVICE"
