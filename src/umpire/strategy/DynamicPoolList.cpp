@@ -26,10 +26,10 @@ DynamicPoolList::DynamicPoolList(
   :
   AllocationStrategy{ name, id },
   m_allocator{ allocator.getAllocationStrategy() },
-  dpa{ DynamicSizePool<>{ m_allocator,
-                          first_minimum_pool_allocation_size,
-                          next_minimum_pool_allocation_size,
-                          alignment } },
+  dpa{  m_allocator,
+        first_minimum_pool_allocation_size,
+        next_minimum_pool_allocation_size,
+        alignment },
   m_should_coalesce{should_coalesce}
 {
 }

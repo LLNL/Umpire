@@ -36,14 +36,14 @@ protected:
 
   // Allocator for the underlying data
   typedef FixedSizePool<struct Block, IA, IA, (1<<6)> BlockPool;
-  BlockPool blockPool{};
+  BlockPool blockPool;
 
   // Start of the nodes of used and free block lists
-  struct Block *usedBlocks{nullptr};
-  struct Block *freeBlocks{nullptr};
+  struct Block *usedBlocks;
+  struct Block *freeBlocks;
 
   // Total size allocated (bytes)
-  std::size_t m_actual_bytes{0};
+  std::size_t m_actual_bytes;
 
   // Minimum size of initial allocation
   std::size_t m_first_minimum_pool_allocation_size;
@@ -275,10 +275,16 @@ public:
       const std::size_t next_minimum_pool_allocation_size = 256,
       const std::size_t alignment = 16) :
     umpire::strategy::mixins::AlignedAllocation{alignment, strat},
+    blockPool{},
+    usedBlocks{ nullptr },
+    freeBlocks{ nullptr },
+    m_actual_bytes{ 0 },
     m_first_minimum_pool_allocation_size{ aligned_round_up(first_minimum_pool_allocation_size) },
     m_next_minimum_pool_allocation_size{ aligned_round_up(next_minimum_pool_allocation_size) }
   {
   }
+
+  DynamicSizePool(const DynamicSizePool&) = delete;
 
   ~DynamicSizePool()
   {
