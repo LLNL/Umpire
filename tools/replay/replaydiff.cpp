@@ -14,43 +14,24 @@
 #include "umpire/util/Macros.hpp"
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
+#include "umpire/tpl/CLI11/CLI11.hpp"
 #include "ReplayInterpreter.hpp"
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
 {
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+  CLI::App app{"Compare two replay result files created"
+                " by Umpire library with UMPIRE_REPLAY=On"};
+
   std::vector<std::string> positional_args;
 
-  cxxopts::Options options(argv[0], "Compare two replay result files created"
-    " by Umpire library with UMPIRE_REPLAY=On");
-  options
-    .positional_help("replay_file_1 replay_file_2")
-    .show_positional_help();
+  app.add_option("files", positional_args, "replay_file_1 replay_file_2")
+    ->required()
+    ->expected(2)
+    ->check(CLI::ExistingFile);
 
-  options.add_options()
-    ("h, help", "Print help");
-
-  options.add_options()
-    ("positional_args", "Positional parameters",
-        cxxopts::value<std::vector<std::string>>(positional_args));
-
-  std::vector<std::string> pos_names = {"positional_args"};
-
-  options.parse_positional(pos_names.begin(), pos_names.end());
-
-  auto command_line_args = options.parse(argc, argv);
-
-  if (command_line_args.count("help")) {
-    std::cout << options.help({""}) << std::endl;
-    exit(0);
-  }
-
-  if (positional_args.size() != 2) {
-    std::cout << options.help({""}) << std::endl;
-    exit(1);
-  }
+  CLI11_PARSE(app, argc, argv);
 
   const std::string& left_filename = positional_args[0];
   const std::string& right_filename = positional_args[1];

@@ -66,29 +66,29 @@ install(TARGETS
   ARCHIVE DESTINATION lib)
 
 #
-# CXX Option Parsing Headers
-set (cxxopts_headers
-  ./cxxopts/include/cxxopts.hpp )
+# CLI11 Option Parsing Headers
+set (CLI11_headers
+  ./CLI11/CLI11.hpp )
 
 blt_add_library(
-  NAME umpire_tpl_cxxopts
-  HEADERS ${cxxopts_headers})
+  NAME umpire_tpl_CLI11
+  HEADERS ${CLI11_headers})
 
-target_link_libraries(umpire_tpl_cxxopts INTERFACE)
+target_link_libraries(umpire_tpl_CLI11 INTERFACE)
 
 target_include_directories(
-  umpire_tpl_cxxopts
+  umpire_tpl_CLI11
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(FILES
-  ${cxxopts_headers}
-  DESTINATION include/umpire/tpl/cxxopts/include)
+  ${CLI11_headers}
+  DESTINATION include/umpire/tpl/CLI11)
 
 install(TARGETS
-  umpire_tpl_cxxopts
+  umpire_tpl_CLI11
   EXPORT umpire-targets
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
