@@ -99,6 +99,12 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     {
     }
 
+    ~pool_allocator()
+    {
+      if (pool != nullptr)
+        delete(pool);
+    }
+
     /// BUG: Only required for MSVC
     template <typename U>
     pool_allocator(const pool_allocator<U>& other) : pool{other.pool}
