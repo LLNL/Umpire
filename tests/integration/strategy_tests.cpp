@@ -467,23 +467,21 @@ TEST(ThreadSafeAllocator, HostStdThread)
       "thread_safe_allocator_host_std", rm.getAllocator("HOST"));
 
   constexpr int N = 16;
-  std::vector<void*> thread_allocs{N};
-  std::vector<std::thread> threads;
+  void* thread_allocs[N];
+  std::thread* threads = new std::thread[N];
 
-  for (std::size_t i = 0; i < N; ++i) {
-    threads.push_back(std::thread([=, &allocator, &thread_allocs] {
-      for (int j = 0; j < N; ++j) {
-        thread_allocs[i] = allocator.allocate(1024);
-        ASSERT_NE(thread_allocs[i], nullptr);
-        allocator.deallocate(thread_allocs[i]);
-        thread_allocs[i] = allocator.allocate(1024);
-        ASSERT_NE(thread_allocs[i], nullptr);
-      }
-    }));
+  for (std::size_t i = 0; i < N; i++) {
+    threads[i] = std::thread([=, &allocator, &thread_allocs] {
+      thread_allocs[i] = allocator.allocate(1024);
+      ASSERT_NE(thread_allocs[i], nullptr);
+      allocator.deallocate(thread_allocs[i]);
+      thread_allocs[i] = allocator.allocate(1024);
+      ASSERT_NE(thread_allocs[i], nullptr);
+    });
   }
 
-  for (auto& t : threads) {
-    t.join();
+  for (int t = 0; t< N; t++) {
+    threads[t].join();
   }
 
   for (auto alloc : thread_allocs) {
@@ -491,10 +489,13 @@ TEST(ThreadSafeAllocator, HostStdThread)
   }
 
   ASSERT_NO_THROW({
-    for (auto alloc : thread_allocs) {
-      allocator.deallocate(alloc);
-    }
+  for (auto alloc : thread_allocs) {
+    allocator.deallocate(alloc);
+  }
   });
+
+  delete [] threads;
+
 }
 
 #if defined(_OPENMP)
