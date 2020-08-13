@@ -624,4 +624,3 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
 }
-

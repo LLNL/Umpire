@@ -26,13 +26,12 @@ int main(int argc, char** argv)
   umpire::initialize();
 #endif
 
-
   CLI::App app{"IO tests"};
 
-  auto enable_logging = app.add_flag("-l,--enable-logging",
-                                            "Enable logging output");
-  auto enable_replay = app.add_flag("-r,--enable-replay",
-                                            "Enable replay output");
+  auto enable_logging =
+      app.add_flag("-l,--enable-logging", "Enable logging output");
+  auto enable_replay =
+      app.add_flag("-r,--enable-replay", "Enable replay output");
 
   CLI11_PARSE(app, argc, argv);
 
