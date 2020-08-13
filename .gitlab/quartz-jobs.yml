@@ -76,7 +76,6 @@ icpc_19_0_4 (build and test on quartz):
     SPEC: "%intel@19.0.4"
   extends: .build_and_test_on_quartz
 
-
 pgi_17_10 (build and test on quartz):
   variables:
     SPEC: "%pgi@17.10"
@@ -89,8 +88,8 @@ pgi_18_5 (build and test on quartz):
   extends: .build_and_test_on_quartz_advanced
   allow_failure: true
 
-pgi_19_4 (build and test on quartz):
+pgi_20_1 (build and test on quartz):
   variables:
-    SPEC: "%pgi@19.4"
+    SPEC: "%pgi@20.1"
+    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
   extends: .build_and_test_on_quartz
-  allow_failure: true
