@@ -256,8 +256,10 @@ void ResourceManager::initialize()
   }
 #endif
 
+#if defined(UMPIRE_ENABLE_DEVICE)
   int device_count{0};
   UMPIRE_USE_VAR(device_count);
+#endif
 #if defined(UMPIRE_ENABLE_CUDA)
   auto error = ::cudaGetDeviceCount(&device_count);
   if (error != cudaSuccess) {
