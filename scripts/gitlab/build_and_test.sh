@@ -84,6 +84,8 @@ echo "~~~~~ Host-config: ${hostconfig_path}"
 echo "~~~~~ Build Dir:   ${build_dir}"
 echo "~~~~~ Project Dir: ${project_dir}"
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~ ENV ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+env
 
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
