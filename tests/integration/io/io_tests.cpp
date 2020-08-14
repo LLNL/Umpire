@@ -26,16 +26,16 @@ int main(int argc, char** argv)
   umpire::initialize();
 #endif
 
+  bool enable_logging{false};
+  bool enable_replay{false};
   CLI::App app{"IO tests"};
 
-  auto enable_logging =
-      app.add_flag("-l,--enable-logging", "Enable logging output");
-  auto enable_replay =
-      app.add_flag("-r,--enable-replay", "Enable replay output");
+  app.add_flag("-l,--enable-logging", enable_logging, "Enable logging output");
+  app.add_flag("-r,--enable-replay", enable_replay, "Enable replay output");
 
   CLI11_PARSE(app, argc, argv);
 
-  umpire::util::initialize_io(*enable_logging, *enable_replay);
+  umpire::util::initialize_io(enable_logging, enable_replay);
 
   umpire::log() << "testing log stream" << std::endl;
   umpire::replay() << "testing replay stream" << std::endl;

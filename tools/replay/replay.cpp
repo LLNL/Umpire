@@ -30,11 +30,17 @@ int main(int argc, char* argv[])
       ->required()
       ->check(CLI::ExistingFile);
 
-  auto time_it = app.add_flag("-t,--time", "Display replay times");
-  auto print_stats = app.add_flag("-s,--stats",
-            "Dump ULTRA file containing memory usage stats for each Allocator");
-  auto print_info = app.add_flag("--info" ,
-            "Display information about the replay file");
+  bool time_it{false};
+  bool print_stats{false};
+  bool print_info{false};
+
+  app.add_flag("-t,--time", time_it, "Display replay times");
+
+  app.add_flag("-s,--stats", print_stats,
+      "Dump ULTRA file containing memory usage stats for each Allocator");
+
+  app.add_flag("--info" , print_info,
+      "Display information about the replay file");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -49,20 +55,20 @@ int main(int argc, char* argv[])
 
   t2 = std::chrono::high_resolution_clock::now();
 
-  if (*time_it) {
+  if (time_it) {
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Parsing replay log took " << time_span.count() << " seconds." << std::endl;
   }
 
-  if (*print_info) {
+  if (print_info) {
     replay.printInfo();
   }
 
   t1 = std::chrono::high_resolution_clock::now();
-  replay.runOperations(*print_stats);
+  replay.runOperations(print_stats);
   t2 = std::chrono::high_resolution_clock::now();
 
-  if (*print_info) {
+  if (time_it) {
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
   }
