@@ -20,8 +20,4 @@ blt_add_executable(
 
 blt_add_test(
   NAME cli11_smoke_help
-  COMMAND cli11_smoke_test --help)
-
-blt_add_test(
-  NAME cli11_smoke_with_options
-  COMMAND cli11_smoke_test -b -i 42 --some-float=3.14 --some-string "hello world")
+  COMMAND cli11_smoke_test)
