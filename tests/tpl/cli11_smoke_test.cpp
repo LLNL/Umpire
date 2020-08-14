@@ -68,7 +68,8 @@ static int test_parse_fun(int argc, const char** argv)
 
   EXPECT_TRUE(opt_bool);
   EXPECT_EQ(opt_int, 42);
-  int ifloat = opt_float * 100;
+  opt_float *= 100;
+  int ifloat = static_cast<int>(opt_float);
   EXPECT_EQ(ifloat, 314);
   EXPECT_EQ(opt_str, std::string("hello world"));
 
