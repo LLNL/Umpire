@@ -13,7 +13,7 @@
 #include "mpi.h"
 #endif
 
-#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
+#include "umpire/tpl/CLI11/CLI11.hpp"
 
 int main(int argc, char** argv)
 {
@@ -26,23 +26,14 @@ int main(int argc, char** argv)
   umpire::initialize();
 #endif
 
-  cxxopts::Options options(argv[0], "IO tests");
+  bool enable_logging{false};
+  bool enable_replay{false};
+  CLI::App app{"IO tests"};
 
-  options.add_options()("l, enable-logging", "Enable logging output")(
-      "r, enable-replay", "Enable replay output");
+  app.add_flag("-l,--enable-logging", enable_logging, "Enable logging output");
+  app.add_flag("-r,--enable-replay", enable_replay, "Enable replay output");
 
-  auto result = options.parse(argc, argv);
-
-  bool enable_logging = false;
-  bool enable_replay = false;
-
-  if (result.count("enable-logging")) {
-    enable_logging = true;
-  }
-
-  if (result.count("enable-replay")) {
-    enable_replay = true;
-  }
+  CLI11_PARSE(app, argc, argv);
 
   umpire::util::initialize_io(enable_logging, enable_replay);
 

@@ -55,4 +55,3 @@ const std::string allocators[] = {"HOST"
 
 INSTANTIATE_TEST_SUITE_P(FreeFunctions, FreeFunctionsTest,
                          ::testing::ValuesIn(allocators));
-

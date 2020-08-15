@@ -31,4 +31,3 @@ struct backtracer {
 #include "umpire/util/backtrace.inl"
 
 #endif // UMPIRE_Backtrace_HPP
-
