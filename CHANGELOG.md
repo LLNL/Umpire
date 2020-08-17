@@ -65,7 +65,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - When installing, camp target was not exported.
 
-- Fixed memory leak in DynamicPoolList, QuickPool, and ThreadSafeAllocator test.
+- Fixed memory leak in DynamicPoolList, QuickPool, and ThreadSafeAllocator 
+  tests + replay.
 
 ## [3.0.0] - 2020-06-30
 
