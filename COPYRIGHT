@@ -34,9 +34,9 @@ PackageName: BLT
 PackageHomePage: https://github.com/LLNL/blt/
 PackageLicenseDeclared: BSD-3-Clause
 
-PackageName: cxxopts
-PackageHomePage: https://github.com/LLNL/cxxopts
-PackageLicenseDeclared: MIT
+PackageName: CLI11  
+PackageHomePage: https://github.com/CLIUtils/CLI11  
+PackageLicenseDeclared: BSD-3-Clause  
 
 PackageName: json
 PackageHomePage: https://github.com/nlohmann/json
@@ -49,3 +49,4 @@ PackageLicenseDeclared: Public Domain
 PackageName: conduit
 PackageHomePage: https://github.com/LLNL/conduit/
 PackageLicenseDeclared: BSD-3-Clause
+

@@ -20,6 +20,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - clang-format file, and CMake infrastructure for styling code
 
+- Added [CLI11](https://github.com/CLIUtils/CLI11) command line parser as a
+  built-in third party library.
+
 ### Changed
 
 - API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are
@@ -37,6 +40,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Applied clang-format to all sources
 
+- Minor updates to fix PGI compiler warnings.
+
 ### Removed
 
 - Removed replicated implementations for tracking high watermarks and
@@ -44,6 +49,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   from the AllocationTracker/Inspector
 
 - Final remnants of unused ENABLE_COPY_HEADERS option removed.
+
+- Removed the third party library
+  [cxxopts](https://github.com/jarro2783/cxxopts) command line parser as it
+  has been replaced by [CLI11](https://github.com/CLIUtils/CLI11).
 
 ### Fixed
 
