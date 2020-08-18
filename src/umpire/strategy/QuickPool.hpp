@@ -101,7 +101,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
     /// BUG: Only required for MSVC
     template <typename U>
-    pool_allocator(const pool_allocator<U> other) : pool{other.pool}
+    pool_allocator(const pool_allocator<U>& other) : pool{other.pool}
     {
     }
 

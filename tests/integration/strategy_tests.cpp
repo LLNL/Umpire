@@ -472,9 +472,11 @@ TEST(ThreadSafeAllocator, HostStdThread)
 
   for (std::size_t i = 0; i < N; i++) {
     threads.push_back(std::thread([=, &allocator, &thread_allocs] {  
+    for (int j = 0; j < N; ++j) {
       thread_allocs[i] = allocator.allocate(1024);
       ASSERT_NE(thread_allocs[i], nullptr);
       allocator.deallocate(thread_allocs[i]);
+    }
       thread_allocs[i] = allocator.allocate(1024);
       ASSERT_NE(thread_allocs[i], nullptr);
     }));
