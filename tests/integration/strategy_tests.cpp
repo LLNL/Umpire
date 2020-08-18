@@ -477,8 +477,8 @@ TEST(ThreadSafeAllocator, HostStdThread)
       ASSERT_NE(thread_allocs[i], nullptr);
       allocator.deallocate(thread_allocs[i]);
     }
-      thread_allocs[i] = allocator.allocate(1024);
-      ASSERT_NE(thread_allocs[i], nullptr);
+    thread_allocs[i] = allocator.allocate(1024);
+    ASSERT_NE(thread_allocs[i], nullptr);
     }));
   }
 
