@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
   bool time_it{false};
   bool print_stats{false};
   bool print_info{false};
+  bool skip_operations{false};
 
   app.add_flag("-t,--time", time_it, "Display replay times");
 
@@ -41,6 +42,9 @@ int main(int argc, char* argv[])
 
   app.add_flag("--info" , print_info,
       "Display information about the replay file");
+
+  app.add_flag("--skip-operations" , skip_operations,
+      "Skip Umpire Operations during replays");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -65,7 +69,7 @@ int main(int argc, char* argv[])
   }
 
   t1 = std::chrono::high_resolution_clock::now();
-  replay.runOperations(print_stats);
+  replay.runOperations(print_stats, skip_operations);
   t2 = std::chrono::high_resolution_clock::now();
 
   if (time_it) {

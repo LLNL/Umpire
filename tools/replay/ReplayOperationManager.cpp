@@ -284,7 +284,8 @@ void ReplayOperationManager::printInfo()
   std::cout << m_ops_table->num_operations-1 << " Operations" << std::endl;
 }
 
-void ReplayOperationManager::runOperations(bool gather_statistics)
+void ReplayOperationManager::runOperations(bool gather_statistics,
+    bool skip_operations)
 {
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
@@ -301,7 +302,9 @@ void ReplayOperationManager::runOperations(bool gather_statistics)
         makeSetDefaultAllocator(op);
         break;
       case ReplayFile::otype::COPY:
-        makeCopy(op);
+        if (skip_operations == false) {
+          makeCopy(op);
+        }
         break;
       case ReplayFile::otype::REALLOCATE:
         makeReallocate(op);
