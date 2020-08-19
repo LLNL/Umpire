@@ -49,9 +49,9 @@ void ReplayInterpreter::runOperations(bool gather_statistics, bool skip_operatio
   m_operation_mgr.runOperations(gather_statistics, skip_operations);
 }
 
-void ReplayInterpreter::buildOperations()
+void ReplayInterpreter::buildOperations(bool recompile)
 {
-  if (! m_ops->compileNeeded() )
+  if ( ! recompile && ! m_ops->compileNeeded() )
     return;
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();

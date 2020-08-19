@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
   bool print_stats{false};
   bool print_info{false};
   bool skip_operations{false};
+  bool recompile{false};
 
   app.add_flag("-t,--time", time_it, "Display replay times");
 
@@ -46,6 +47,8 @@ int main(int argc, char* argv[])
   app.add_flag("--skip-operations" , skip_operations,
       "Skip Umpire Operations during replays");
 
+  app.add_flag("-r,--recompile" , recompile, "Recompile replay binary");
+
   CLI11_PARSE(app, argc, argv);
 
   std::chrono::high_resolution_clock::time_point t1;
@@ -55,7 +58,7 @@ int main(int argc, char* argv[])
   t1 = std::chrono::high_resolution_clock::now();
   ReplayInterpreter replay(input_file_name);
 
-  replay.buildOperations();
+  replay.buildOperations(recompile);
 
   t2 = std::chrono::high_resolution_clock::now();
 
