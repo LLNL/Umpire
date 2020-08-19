@@ -80,9 +80,9 @@ static int test_parse_fun(int argc, const char** argv)
 TEST(CLI11, Parsing)
 {
   int argc{7};
-  const char* argv[] = {"cli11_smoke_test",
-                        "-b", "-i", "42", "--some-float=3.14",
-                        "--some-string", "hello world" };
+  const char* argv[] = {
+      "cli11_smoke_test", "-b",         "-i", "42", "--some-float=3.14",
+      "--some-string",    "hello world"};
 
   ASSERT_EQ(0, test_parse_fun(argc, argv));
 }

@@ -18,7 +18,7 @@
 class ReplayInterpreter {
   public:
     void buildOperations();
-    void runOperations(bool gather_statistics);
+    void runOperations(bool gather_statistics, bool skip_operations);
     void printInfo();
     bool compareOperations(ReplayInterpreter& rh);
 

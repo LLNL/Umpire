@@ -42,11 +42,11 @@ void ReplayInterpreter::printInfo()
   m_operation_mgr.printInfo();
 }
 
-void ReplayInterpreter::runOperations(bool gather_statistics)
+void ReplayInterpreter::runOperations(bool gather_statistics, bool skip_operations)
 {
   ReplayOperationManager m_operation_mgr{m_ops->getOperationsTable()};
 
-  m_operation_mgr.runOperations(gather_statistics);
+  m_operation_mgr.runOperations(gather_statistics, skip_operations);
 }
 
 void ReplayInterpreter::buildOperations()
