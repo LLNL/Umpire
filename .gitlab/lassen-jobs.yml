@@ -58,3 +58,8 @@ nvcc_xl-beta-2019.06.20 (build and test on lassen):
   variables:
     SPEC: "%xl@beta2019.06.20+cuda"
   extends: .build_and_test_on_lassen
+
+nvcc_pgi_default (build and test on lassen):
+  variables:
+    SPEC: "%pgi@default+cuda"
+  extends: .build_and_test_on_lassen
