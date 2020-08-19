@@ -25,7 +25,7 @@
 
 class ReplayOperationManager {
 public:
-  ReplayOperationManager( ReplayFile::Header* Operations );
+  ReplayOperationManager( ReplayFile* rFile, ReplayFile::Header* Operations );
   ~ReplayOperationManager();
 
   void runOperations(bool gather_statistics, bool skip_operations);
@@ -33,6 +33,7 @@ public:
 
 private:
   std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;
+  ReplayFile* m_replay_file;
   ReplayFile::Header* m_ops_table;
 
   void makeAllocator(ReplayFile::Operation* op);

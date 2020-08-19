@@ -11,6 +11,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "ReplayOperationManager.hpp"
 #include "umpire/tpl/json/json.hpp"
@@ -43,7 +45,10 @@ class ReplayInterpreter {
     std::vector<std::string> m_row;
     AllocatorIndexMap m_allocator_indices;
     AllocationAllocatorMap m_allocation_id;
+    std::unordered_set<AllocationFromLog> m_external_registrations;
     bool m_replaying_reallocate{false};
+    std::size_t m_line_number{0};
+    bool m_allocation_in_process{false};
 
     int m_log_version_major;
     int m_log_version_minor;
@@ -54,11 +59,13 @@ class ReplayInterpreter {
     void strip_off_base(std::string& s);
     void replay_compileMemoryResource( void );
     void replay_compileSetDefaultAllocator( void );
+    void replay_processMapInsert( void );
+    void replay_processMapRemove( void );
     void replay_compileAllocator( void );
     void replay_compileReallocate( void );
     void replay_compileReallocate_ex( void );
     void replay_compileAllocate( void );
-    void replay_compileDeallocate( void );
+    bool replay_compileDeallocate( void );
     void replay_compileCoalesce( void );
     void replay_compileRelease( void );
     void replay_compileCopy( void );

@@ -32,8 +32,9 @@
 #define getpid _getpid
 #endif
 
-ReplayOperationManager::ReplayOperationManager( ReplayFile::Header* Operations )
-  : m_ops_table{Operations}
+ReplayOperationManager::ReplayOperationManager( ReplayFile* rFile,
+  ReplayFile::Header* Operations )
+    : m_replay_file{rFile}, m_ops_table{Operations}
 {
 }
 
@@ -114,17 +115,46 @@ void ReplayOperationManager::printInfo()
         REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
         break;
       case 3:
-        std::cout << ", " << alloc->argv.dynamic_pool_list.initial_alloc_size
-          << ", " << alloc->argv.dynamic_pool_list.min_alloc_size;
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size
+          << ", " << alloc->argv.pool.min_alloc_size;
         break;
       case 2:
-        std::cout << ", " << alloc->argv.dynamic_pool_list.initial_alloc_size;
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size;
         break;
       case 1:
         break;
       }
       std::cout << " )";
 
+      break;
+
+    case ReplayFile::rtype::QUICKPOOL:
+      std::cout << "<umpire::strategy::QuickPool, "
+        << (alloc->introspection == true ? "true" : "false") << ">"
+        << "( " << "\"" << alloc->name << "\""
+        << ", \"" << alloc->base_name << "\"";
+
+      switch ( alloc->argc ) {
+      default:
+        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+        break;
+      case 4:
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size
+          << ", " << alloc->argv.pool.min_alloc_size
+          << ", " << alloc->argv.pool.alignment;
+        break;
+      case 3:
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size
+          << ", " << alloc->argv.pool.min_alloc_size;
+        break;
+      case 2:
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size;
+        break;
+      case 1:
+        break;
+      }
+
+      std::cout << " )";
       break;
 
     case ReplayFile::rtype::DYNAMIC_POOL_MAP:
@@ -138,16 +168,16 @@ void ReplayOperationManager::printInfo()
         REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
         break;
       case 4:
-        std::cout << ", " << alloc->argv.dynamic_pool_map.initial_alloc_size
-          << ", " << alloc->argv.dynamic_pool_map.min_alloc_size
-          << ", " << alloc->argv.dynamic_pool_map.alignment;
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size
+          << ", " << alloc->argv.pool.min_alloc_size
+          << ", " << alloc->argv.pool.alignment;
         break;
       case 3:
-        std::cout << ", " << alloc->argv.dynamic_pool_map.initial_alloc_size
-          << ", " << alloc->argv.dynamic_pool_map.min_alloc_size;
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size
+          << ", " << alloc->argv.pool.min_alloc_size;
         break;
       case 2:
-        std::cout << ", " << alloc->argv.dynamic_pool_map.initial_alloc_size;
+        std::cout << ", " << alloc->argv.pool.initial_alloc_size;
         break;
       case 1:
         break;
@@ -529,7 +559,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::QuickPool, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.initial_alloc_size
               , alloc->argv.pool.min_alloc_size
               , alloc->argv.pool.alignment
             )
@@ -553,7 +583,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::QuickPool, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.initial_alloc_size
               , alloc->argv.pool.min_alloc_size
             )
         );
@@ -616,9 +646,9 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
-              , alloc->argv.dynamic_pool_list.min_alloc_size
-              , alloc->argv.dynamic_pool_list.alignment
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+              , alloc->argv.pool.alignment
             )
         );
       }
@@ -627,9 +657,9 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
-              , alloc->argv.dynamic_pool_list.min_alloc_size
-              , alloc->argv.dynamic_pool_list.alignment
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+              , alloc->argv.pool.alignment
             )
         );
       }
@@ -640,8 +670,8 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
-              , alloc->argv.dynamic_pool_list.min_alloc_size
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
             )
         );
       }
@@ -650,8 +680,8 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
-              , alloc->argv.dynamic_pool_list.min_alloc_size
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
             )
         );
       }
@@ -662,7 +692,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.initial_alloc_size
             )
         );
       }
@@ -671,7 +701,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.initial_alloc_size
             )
         );
       }
@@ -703,9 +733,9 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_map.initial_alloc_size
-              , alloc->argv.dynamic_pool_map.min_alloc_size
-              , alloc->argv.dynamic_pool_map.alignment
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+              , alloc->argv.pool.alignment
             )
         );
       }
@@ -714,9 +744,9 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
-              , alloc->argv.dynamic_pool_list.min_alloc_size
-              , alloc->argv.dynamic_pool_map.alignment
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
+              , alloc->argv.pool.alignment
             )
         );
       }
@@ -727,8 +757,8 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_map.initial_alloc_size
-              , alloc->argv.dynamic_pool_map.min_alloc_size
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
             )
         );
       }
@@ -737,8 +767,8 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
-              , alloc->argv.dynamic_pool_list.min_alloc_size
+              , alloc->argv.pool.initial_alloc_size
+              , alloc->argv.pool.min_alloc_size
             )
         );
       }
@@ -749,7 +779,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_map.initial_alloc_size
+              , alloc->argv.pool.initial_alloc_size
             )
         );
       }
@@ -758,7 +788,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
             (   alloc->name
               , rm.getAllocator(alloc->base_name)
-              , alloc->argv.dynamic_pool_list.initial_alloc_size
+              , alloc->argv.pool.initial_alloc_size
             )
         );
       }
@@ -1162,9 +1192,22 @@ void ReplayOperationManager::makeCopy(ReplayFile::Operation* op)
 
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
 {
-  auto alloc = &m_ops_table->allocators[op->op_allocator];
-  auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
-  alloc->allocator->deallocate(ptr);
+  try {
+    auto alloc = &m_ops_table->allocators[op->op_allocator];
+    auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
+    alloc->allocator->deallocate(ptr);
+  }
+  catch (...) {
+    std::cerr << std::endl
+      << "Deallocation Failure Line Number: " << std::endl
+      << "  Line: " << op->op_line_number << m_replay_file->getLine(op->op_line_number) << std::endl
+      << "  for memory allocation at:" << std::endl
+      << "  Line: " << m_ops_table->ops[op->op_alloc_ops[0]].op_line_number
+      << m_replay_file->getLine(
+              m_ops_table->ops[op->op_alloc_ops[0]].op_line_number)
+      << std::endl << std::endl;
+    throw;
+  }
 }
 
 void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)

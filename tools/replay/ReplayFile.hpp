@@ -35,6 +35,7 @@ public:
 
   struct AllocatorTableEntry {
     rtype type;
+    std::size_t line_number;    // Causal line number of input file
     bool introspection;
     char name[max_name_length];
     char base_name[max_name_length];
@@ -53,16 +54,6 @@ public:
         std::size_t min_alloc_size;
         int alignment;
       } pool;
-      struct {
-        std::size_t initial_alloc_size;
-        std::size_t min_alloc_size;
-        int alignment;
-      } dynamic_pool_list;
-      struct {
-        std::size_t initial_alloc_size;
-        std::size_t min_alloc_size;
-        int alignment;
-      } dynamic_pool_map;
       struct {
         std::size_t capacity;
       } monotonic_pool;
@@ -104,6 +95,7 @@ public:
 
   struct Operation {
     otype       op_type;
+    std::size_t op_line_number;     // Causal line number of input file
     int         op_allocator;
     void*       op_allocated_ptr;
     std::size_t op_size;            // Size of allocation/operation
@@ -121,7 +113,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 11;
+  const uint64_t REPLAY_VERSION = 12;
 
   struct Header {
     struct Magic {
@@ -140,6 +132,7 @@ public:
 
   void copyString(std::string source, char (&dest)[max_name_length]);
   bool compileNeeded() { return m_compile_needed; }
+  std::string getLine(std::size_t lineno);
   const std::string m_input_filename;
 
 private:

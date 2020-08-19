@@ -5,7 +5,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include <fstream>
 #include <iostream>
+#include <limits>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -49,6 +51,24 @@ ReplayFile::ReplayFile( std::string input_filename, std::string binary_filename 
 
   m_op_tables->m.magic = REPLAY_MAGIC;
   m_op_tables->m.version = REPLAY_VERSION;
+}
+
+std::string ReplayFile::getLine(std::size_t lineno)
+{
+  std::ifstream file{m_input_filename};
+
+  if ( ! file.is_open() ) {
+    REPLAY_ERROR("Unable to open input file " << m_input_filename);
+  }
+
+  file.seekg(std::ios::beg);
+  for (std::size_t i=0; i < lineno - 1; ++i) {
+      file.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+  }
+
+  std::string line;
+  std::getline(file, line);
+  return line;
 }
 
 ReplayFile::~ReplayFile()
