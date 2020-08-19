@@ -95,7 +95,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    pool_allocator() : pool{util::FixedMallocPool{sizeof(Value)}}
+    pool_allocator() : pool{sizeof(Value)}
     {
     }
 
