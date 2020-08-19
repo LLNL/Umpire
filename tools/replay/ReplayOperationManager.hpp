@@ -28,7 +28,7 @@ public:
   ReplayOperationManager( ReplayFile::Header* Operations );
   ~ReplayOperationManager();
 
-  void runOperations(bool gather_statistics);
+  void runOperations(bool gather_statistics, bool skip_operations);
   void printInfo();
 
 private:

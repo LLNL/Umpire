@@ -23,6 +23,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added [CLI11](https://github.com/CLIUtils/CLI11) command line parser as a
   built-in third party library.
 
+- Added option to replay to skip replaying of umpire operations
+
 ### Changed
 
 - API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are
