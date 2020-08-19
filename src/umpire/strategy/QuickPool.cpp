@@ -32,6 +32,7 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
 
 QuickPool::~QuickPool()
 {
+  release();
 }
 
 void* QuickPool::allocate(std::size_t bytes)
