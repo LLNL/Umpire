@@ -25,19 +25,22 @@ int main(int argc, char* argv[])
                 " by Umpire library with UMPIRE_REPLAY=On"};
 
   std::vector<std::string> positional_args;
+  bool recompile{false};
 
   app.add_option("files", positional_args, "replay_file_1 replay_file_2")
     ->required()
     ->expected(2)
     ->check(CLI::ExistingFile);
 
+  app.add_flag("-r,--recompile" , recompile, "Recompile replay binaries");
+
   CLI11_PARSE(app, argc, argv);
 
   const std::string& left_filename = positional_args[0];
   const std::string& right_filename = positional_args[1];
 
-  ReplayInterpreter left{left_filename};
-  ReplayInterpreter right{right_filename};
+  ReplayInterpreter left{recompile, left_filename};
+  ReplayInterpreter right{recompile, right_filename};
 
   left.buildOperations();
   right.buildOperations();

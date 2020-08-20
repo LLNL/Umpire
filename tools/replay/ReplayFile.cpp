@@ -19,8 +19,8 @@
 #include "ReplayFile.hpp"
 #include "ReplayMacros.hpp"
 
-ReplayFile::ReplayFile( std::string input_filename, std::string binary_filename )
-  : m_input_filename{input_filename}, m_binary_filename{binary_filename}
+ReplayFile::ReplayFile( bool force_compile, std::string input_filename, std::string binary_filename )
+  : m_force_compile{force_compile}, m_input_filename{input_filename}, m_binary_filename{binary_filename}
 {
   const int prot = PROT_READ|PROT_WRITE;
   int flags;
@@ -104,16 +104,18 @@ void ReplayFile::checkHeader()
   struct stat sbuf;
   Header::Magic m;
 
-  if (read(m_fd, &m, sizeof(m)) == sizeof(m)) {
-    if (m.magic == REPLAY_MAGIC) {
-      if (m.version == REPLAY_VERSION) {
-        m_compile_needed = false;
+  if (! m_force_compile ) {
+    if (read(m_fd, &m, sizeof(m)) == sizeof(m)) {
+      if (m.magic == REPLAY_MAGIC) {
+        if (m.version == REPLAY_VERSION) {
+          m_compile_needed = false;
 
-        if (stat(m_binary_filename.c_str(), &sbuf))
-          REPLAY_ERROR( "Unable to open " << m_binary_filename );
+          if (stat(m_binary_filename.c_str(), &sbuf))
+            REPLAY_ERROR( "Unable to open " << m_binary_filename );
 
-        max_file_size = sbuf.st_size;
-        return;
+          max_file_size = sbuf.st_size;
+          return;
+        }
       }
     }
   }

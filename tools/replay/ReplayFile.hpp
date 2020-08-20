@@ -126,17 +126,19 @@ public:
     Operation ops[1];
   };
 
-  ReplayFile( std::string input_filename, std::string binary_filename );
+  ReplayFile( bool force_compile, std::string input_filename, std::string binary_filename );
   ~ReplayFile( );
   ReplayFile::Header* getOperationsTable();
 
   void copyString(std::string source, char (&dest)[max_name_length]);
   bool compileNeeded() { return m_compile_needed; }
   std::string getLine(std::size_t lineno);
-  const std::string m_input_filename;
+  std::string getInputFileName() { return m_input_filename; }
 
 private:
   Header* m_op_tables{nullptr};
+  bool m_force_compile{false};
+  const std::string m_input_filename;
   const std::string m_binary_filename;
   int m_fd;
   bool m_compile_needed{false};

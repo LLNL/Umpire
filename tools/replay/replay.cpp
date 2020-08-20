@@ -56,9 +56,9 @@ int main(int argc, char* argv[])
   std::chrono::duration<double> time_span;
 
   t1 = std::chrono::high_resolution_clock::now();
-  ReplayInterpreter replay(input_file_name);
+  ReplayInterpreter replay(recompile, input_file_name);
 
-  replay.buildOperations(recompile);
+  replay.buildOperations();
 
   t2 = std::chrono::high_resolution_clock::now();
 

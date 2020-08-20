@@ -18,13 +18,13 @@
 #include "ReplayFile.hpp"
 #include "umpire/tpl/json/json.hpp"
 
-ReplayInterpreter::ReplayInterpreter( std::string in_file_name ):
+ReplayInterpreter::ReplayInterpreter( bool force_compile, std::string in_file_name ):
     m_input_file_name{in_file_name}, m_input_file{in_file_name}
 {
   if ( ! m_input_file.is_open() )
     REPLAY_ERROR("Unable to open input file " << in_file_name);
 
-  m_ops = new ReplayFile{m_input_file_name, m_input_file_name + ".bin" };
+  m_ops = new ReplayFile{force_compile, m_input_file_name, m_input_file_name + ".bin" };
 }
 
 ReplayInterpreter::~ReplayInterpreter()
@@ -49,9 +49,9 @@ void ReplayInterpreter::runOperations(bool gather_statistics, bool skip_operatio
   m_operation_mgr.runOperations(gather_statistics, skip_operations);
 }
 
-void ReplayInterpreter::buildOperations(bool recompile)
+void ReplayInterpreter::buildOperations()
 {
-  if ( ! recompile && ! m_ops->compileNeeded() )
+  if ( ! m_ops->compileNeeded() )
     return;
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
@@ -177,13 +177,13 @@ void ReplayInterpreter::buildOperations(bool recompile)
   // Flush operations to compile file and read back in read-only (PRIVATE) mode
   //
   delete m_ops;
-  m_ops = new ReplayFile{m_input_file_name, m_input_file_name + ".bin"};
+  m_ops = new ReplayFile{false, m_input_file_name, m_input_file_name + ".bin"};
 }
 
 void ReplayInterpreter::printAllocators(ReplayFile* rf)
 {
   auto optable = rf->getOperationsTable();
-  std::cerr << rf->m_input_filename << std::endl;
+  std::cerr << rf->getInputFileName() << std::endl;
   for (std::size_t i{0}; i < optable->num_allocators; ++i) {
     switch (optable->allocators[i].type) {
       default: std::cerr << "?? "; break;

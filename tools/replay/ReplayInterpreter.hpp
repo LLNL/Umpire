@@ -19,12 +19,12 @@
 
 class ReplayInterpreter {
   public:
-    void buildOperations(bool recompile = false);
+    void buildOperations();
     void runOperations(bool gather_statistics, bool skip_operations);
     void printInfo();
     bool compareOperations(ReplayInterpreter& rh);
 
-    ReplayInterpreter( std::string in_file_name );
+    ReplayInterpreter( bool force_compile, std::string in_file_name );
     ~ReplayInterpreter();
 
     ReplayFile* m_ops{nullptr};
