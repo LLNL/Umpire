@@ -57,6 +57,7 @@ void ReplayInterpreter::buildOperations()
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
   hdr->num_allocators = 0;
+  memset(hdr->allocators, 0, sizeof(hdr->allocators));
   ReplayFile::Operation* op = &hdr->ops[0];
   memset(op, 0, sizeof(*op));
   op->op_type = ReplayFile::otype::ALLOCATE;
@@ -247,53 +248,85 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
 
   if ( rval != false ) {
     for ( std::size_t i = 0; i < rh.m_ops->getOperationsTable()->num_allocators; ++i) {
-      if (bcmp(   &m_ops->getOperationsTable()->allocators[i]
-                , &rh.m_ops->getOperationsTable()->allocators[i]
-                , sizeof(ReplayFile::AllocatorTableEntry)))
+      if ( m_ops->getOperationsTable()->allocators[i].type != rh.m_ops->getOperationsTable()->allocators[i].type ) {
+        std::cerr << "AllocatorTable type data miscompare at type " << i << std::endl;
+        rval = false;
+      }
+
+      if ( m_ops->getOperationsTable()->allocators[i].introspection != rh.m_ops->getOperationsTable()->allocators[i].introspection ) {
+        std::cerr << "AllocatorTable introspection data miscompare at index " << i << std::endl;
+        rval = false;
+      }
+
+      if ( strcmp( m_ops->getOperationsTable()->allocators[i].name, rh.m_ops->getOperationsTable()->allocators[i].name ) ) {
+        std::cerr << "AllocatorTable name data miscompare at index " << i << std::endl;
+        rval = false;
+      }
+
+      if ( strcmp( m_ops->getOperationsTable()->allocators[i].base_name, rh.m_ops->getOperationsTable()->allocators[i].base_name ) )   {
+        std::cerr << "AllocatorTable base_name data miscompare at index " << i << std::endl;
+        rval = false;
+      }
+
+      if ( m_ops->getOperationsTable()->allocators[i].argc != rh.m_ops->getOperationsTable()->allocators[i].argc ) {
+        std::cerr << "AllocatorTable argc data miscompare at index " << i << std::endl;
+        rval = false;
+      }
+
+      if (bcmp(   &m_ops->getOperationsTable()->allocators[i].argv
+                , &rh.m_ops->getOperationsTable()->allocators[i].argv
+                , sizeof(ReplayFile::AllocatorTableEntry::argv)))
       {
-        std::cerr << "AllocatorTable data miscompare at index " << i
-          << ", sizeof Entry is: " << sizeof(ReplayFile::AllocatorTableEntry)
-          << std::endl;
-
-        unsigned char* lhs = (unsigned char*)(&m_ops->getOperationsTable()->allocators[i]);
-        unsigned char* rhs = (unsigned char*)(&rh.m_ops->getOperationsTable()->allocators[i]);
-
-        for ( std::size_t j = 0; j < sizeof(ReplayFile::AllocatorTableEntry); ++j ) {
-          if (lhs[j] != rhs[j]) {
-            std::cerr << j << ": " << (unsigned int)lhs[j] << " ~= " << (unsigned int)rhs[j] << std::endl;
-          }
-        }
-
+        std::cerr << "AllocatorTable Union data miscompare at index " << i << std::endl;
         rval = false;
       }
     }
 
+    bool mismatch{false};
     for (std::size_t i = 0; i < rh.m_ops->getOperationsTable()->num_operations; ++i) {
-      if (bcmp(   &m_ops->getOperationsTable()->ops[i]
-                , &rh.m_ops->getOperationsTable()->ops[i]
-                , sizeof(ReplayFile::Operation)))
-      {
-        std::cerr << "Operations table data miscompare at operation #" << i << std::endl;
+      if ( m_ops->getOperationsTable()->ops[i].op_type != rh.m_ops->getOperationsTable()->ops[i].op_type ) {
+        std::cerr << "Operation Type mismatch" << std::endl;
+        mismatch = true;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_allocator != rh.m_ops->getOperationsTable()->ops[i].op_allocator ) {
+        std::cerr << "Operation Allocator mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_allocated_ptr != rh.m_ops->getOperationsTable()->ops[i].op_allocated_ptr ) {
+        std::cerr << "Operation Allocated Ptr mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_size != rh.m_ops->getOperationsTable()->ops[i].op_size ) {
+        std::cerr << "Operation Size mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_offsets[0] != rh.m_ops->getOperationsTable()->ops[i].op_offsets[0] ) {
+        std::cerr << "Operation Offset[0] mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_offsets[1] != rh.m_ops->getOperationsTable()->ops[i].op_offsets[1] ) {
+        std::cerr << "Operation Offset[1] mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_alloc_ops[0] != rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[0] ) {
+        std::cerr << "Operation Offset[0] mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( m_ops->getOperationsTable()->ops[i].op_alloc_ops[1] != rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[1] ) {
+        std::cerr << "Operation Offset[1] mismatch" << std::endl;
+        mismatch = false;
+      }
+      if ( mismatch ) {
         std::cerr << "    LHS: "
-          << "type=" << m_ops->getOperationsTable()->ops[i].op_type
-          << ", op_line_number=" << m_ops->getOperationsTable()->ops[i].op_line_number
-          << ", op_allocator=" << m_ops->getOperationsTable()->ops[i].op_allocator
-          << ", op_alloc_ops[1]=" << m_ops->getOperationsTable()->ops[i].op_alloc_ops[1]
-          << ", op_alloc_ops[0]=" << m_ops->getOperationsTable()->ops[i].op_alloc_ops[0]
-          << ", size=" << m_ops->getOperationsTable()->ops[i].op_size
-          << ", op_allocated_ptr=" << m_ops->getOperationsTable()->ops[i].op_allocated_ptr
+          << "Line #=" << m_ops->getOperationsTable()->ops[i].op_line_number << " "
+          << m_ops->getLine(m_ops->getOperationsTable()->ops[i].op_line_number)
           << std::endl;
         std::cerr << "    RHS: "
-          << "type=" << rh.m_ops->getOperationsTable()->ops[i].op_type
-          << ", op_line_number=" << rh.m_ops->getOperationsTable()->ops[i].op_line_number
-          << ", op_allocator=" << rh.m_ops->getOperationsTable()->ops[i].op_allocator
-          << ", op_alloc_ops[1]=" << rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[1]
-          << ", op_alloc_ops[0]=" << rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[0]
-          << ", size=" << rh.m_ops->getOperationsTable()->ops[i].op_size
-          << ", op_allocated_ptr=" << rh.m_ops->getOperationsTable()->ops[i].op_allocated_ptr
+          << "Line #=" << rh.m_ops->getOperationsTable()->ops[i].op_line_number << " "
+          << rh.m_ops->getLine(rh.m_ops->getOperationsTable()->ops[i].op_line_number)
           << std::endl;
-
         rval = false;
+        mismatch = false;
       }
     }
   }
