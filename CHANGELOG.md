@@ -25,6 +25,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added option to replay to skip replaying of umpire operations
 
+- Replay now tracks line number of input file with each operation and displays
+  better error diagnostics when errors are found.
+
 ### Changed
 
 - API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are
@@ -43,6 +46,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Applied clang-format to all sources
 
 - Minor updates to fix PGI compiler warnings.
+
+- Updated replay to properly handle external pointer registration
 
 ### Removed
 
@@ -67,7 +72,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - When installing, camp target was not exported.
 
-- Fixed memory leak in DynamicPoolList, QuickPool, and ThreadSafeAllocator 
+- Fixed memory leak in DynamicPoolList, QuickPool, and ThreadSafeAllocator
   tests + replay.
 
 ## [3.0.0] - 2020-06-30
