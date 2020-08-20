@@ -38,7 +38,14 @@ ReplayOperationManager::ReplayOperationManager( ReplayFile* rFile,
 {
 }
 
-ReplayOperationManager::~ReplayOperationManager() { }
+ReplayOperationManager::~ReplayOperationManager() 
+{
+  for (std::size_t i = 0; i < m_ops_table->num_allocators; i++) {
+    auto alloc = &m_ops_table->allocators[i];
+    if (alloc->allocator != nullptr)
+      delete(alloc->allocator);
+  } 
+}
 
 void ReplayOperationManager::printInfo()
 {

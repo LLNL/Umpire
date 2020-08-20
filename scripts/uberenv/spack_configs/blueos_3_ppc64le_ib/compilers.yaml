@@ -142,3 +142,29 @@ compilers:
     modules: []
     environment: {}
     extra_rpaths: []
+- compiler:
+    spec: pgi@19.10
+    paths:
+      cc: /usr/tce/packages/pgi/pgi-19.10/bin/pgcc
+      cxx: /usr/tce/packages/pgi/pgi-19.10/bin/pgc++
+      f77: /usr/tce/packages/pgi/pgi-19.10/bin/pgfortran
+      fc: /usr/tce/packages/pgi/pgi-19.10/bin/pgfortran
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
+    spec: pgi@20.4
+    paths:
+      cc: /usr/tce/packages/pgi/pgi-20.4/bin/pgcc
+      cxx: /usr/tce/packages/pgi/pgi-20.4/bin/pgc++
+      f77: /usr/tce/packages/pgi/pgi-20.4/bin/pgfortran
+      fc: /usr/tce/packages/pgi/pgi-20.4/bin/pgfortran
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
