@@ -44,6 +44,9 @@ int main(int argc, char* argv[])
   app.add_flag("--info" , options.print_info,
       "Display information about the replay file");
 
+  app.add_flag("--no-demangle" , options.do_not_demangle,
+      "Disable demangling of replay file");
+
   app.add_flag("--skip-operations" , options.skip_operations,
       "Skip Umpire Operations during replays");
 

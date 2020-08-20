@@ -114,7 +114,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 13;
+  const uint64_t REPLAY_VERSION = 14;
 
   struct Header {
     struct Magic {

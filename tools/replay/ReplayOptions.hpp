@@ -29,6 +29,7 @@ struct ReplayOptions {
   bool print_statistics{false};   // -s,--stats
   bool skip_operations{false};    // --skip-operations
   bool force_compile{false};      // -r,--recompile
+  bool do_not_demangle{false};    // --no-demangle
   std::string input_file;         // -i,-infile input_file
   std::string pool_to_use;        // -p,--use-pool
 };

@@ -52,7 +52,6 @@ class ReplayInterpreter {
     bool m_replaying_reallocate{false};
     std::size_t m_line_number{0};
     bool m_allocation_in_process{false};
-    bool m_prev_op_make_allocator{false};
 
     int m_log_version_major;
     int m_log_version_minor;

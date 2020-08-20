@@ -101,9 +101,7 @@ void ReplayInterpreter::buildOperations()
       continue;
     }
 
-    m_prev_op_make_allocator = false;
     if ( m_json["event"] == "makeAllocator" ) {
-      m_prev_op_make_allocator = true;
       replay_compileAllocator();
     }
     else if ( m_json["event"] == "makeMemoryResource" ) {
@@ -402,7 +400,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
     alloc->argc = static_cast<int>(m_json["payload"]["args"].size());
 
     std::string type;
-    if (m_log_version_major >= 2) {
+    if (!m_options.do_not_demangle && m_log_version_major >= 2) {
       const std::string type_prefix{raw_mangled_type.substr(0, 2)};
 
       // Add _Z so that we can demangle the external symbol
@@ -682,7 +680,7 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
 void ReplayInterpreter::replay_processMapInsert()
 {
-  if ( m_prev_op_make_allocator || m_replaying_reallocate || m_allocation_in_process ) {
+  if ( m_replaying_reallocate || m_allocation_in_process ) {
     return;
   }
   uint64_t memory_ptr{ getPointer( std::string{m_json["payload"]["ptr"]} ) };
