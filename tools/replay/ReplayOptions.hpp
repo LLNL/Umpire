@@ -8,6 +8,19 @@
 #define REPLAY_ReplayOptions_HPP
 
 #include <string>
+#include "umpire/tpl/CLI11/CLI11.hpp"
+
+struct ReplayUsePoolValidator : public CLI::Validator {
+  ReplayUsePoolValidator() {
+    func_ = [](const std::string &str) {
+      if (str != "Quick" && str != "List" && str != "Map") {
+        return std::string("Invalid pool name, must be Quick, List, or Map");
+      }
+      else
+        return std::string();
+    };
+  }
+};
 
 struct ReplayOptions {
   bool time_replay_run{false};    // -t,--time-run

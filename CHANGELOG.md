@@ -28,6 +28,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay now tracks line number of input file with each operation and displays
   better error diagnostics when errors are found.
 
+- Replay now takes a "-p,--use-pool" option to tell it to replay using "Quick",
+  "Map", or "List" dynamic pool.
+
 ### Changed
 
 - API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are

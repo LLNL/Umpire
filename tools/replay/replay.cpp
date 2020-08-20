@@ -19,6 +19,9 @@
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOptions.hpp"
+
+const static ReplayUsePoolValidator ReplayValidPool;
+
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
@@ -48,7 +51,7 @@ int main(int argc, char* argv[])
       "Force recompile replay binary");
 
   app.add_option("-p,--use-pool", options.pool_to_use,
-    "Specify pool to use: List, Map, or Quick");
+    "Specify pool to use: List, Map, or Quick")->check(ReplayValidPool);
 
   CLI11_PARSE(app, argc, argv);
 

@@ -413,6 +413,25 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
   auto alloc = &m_ops_table->allocators[op->op_allocator];
   auto& rm = umpire::ResourceManager::getInstance();
 
+  //
+  // Check to see if user requested that we switch to a different pool
+  //
+  if ( !m_options.pool_to_use.empty() ) {
+    if (   alloc->type == ReplayFile::rtype::DYNAMIC_POOL_LIST
+        || alloc->type == ReplayFile::rtype::DYNAMIC_POOL_MAP
+        || alloc->type == ReplayFile::rtype::QUICKPOOL) {
+      if (m_options.pool_to_use == "List") {
+        alloc->type = ReplayFile::rtype::DYNAMIC_POOL_LIST;
+      }
+      else if (m_options.pool_to_use == "Map") {
+        alloc->type = ReplayFile::rtype::DYNAMIC_POOL_MAP;
+      }
+      else if (m_options.pool_to_use == "Quick") {
+        alloc->type = ReplayFile::rtype::QUICKPOOL;
+      }
+    }
+  }
+
   switch (alloc->type) {
   case ReplayFile::rtype::MEMORY_RESOURCE:
     alloc->allocator = new umpire::Allocator(rm.getAllocator(alloc->name));
