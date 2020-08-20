@@ -15,16 +15,17 @@
 #include <unordered_set>
 
 #include "ReplayOperationManager.hpp"
+#include "ReplayOptions.hpp"
 #include "umpire/tpl/json/json.hpp"
 
 class ReplayInterpreter {
   public:
     void buildOperations();
-    void runOperations(bool gather_statistics, bool skip_operations);
+    void runOperations();
     void printInfo();
     bool compareOperations(ReplayInterpreter& rh);
 
-    ReplayInterpreter( bool force_compile, std::string in_file_name );
+    ReplayInterpreter( const ReplayOptions& options );
     ~ReplayInterpreter();
 
     ReplayFile* m_ops{nullptr};
@@ -33,12 +34,14 @@ class ReplayInterpreter {
     using AllocatorIndex = int;
     using AllocatorFromLog = uint64_t;
     using AllocationFromLog = uint64_t;
-    using AllocatorIndexMap = std::unordered_map<AllocatorFromLog, AllocatorIndex>;
-    using AllocationAllocatorMap = std::unordered_map<AllocationFromLog, AllocatorIndex>;
+    using AllocatorIndexMap = std::unordered_map<AllocatorFromLog,
+                                                  AllocatorIndex>;
+    using AllocationAllocatorMap = std::unordered_map<AllocationFromLog,
+                                                  AllocatorIndex>;
 
-    std::string m_input_file_name;
+    ReplayOptions m_options;
     std::ifstream m_input_file;
-    std::unordered_map<std::string, void*> m_allocated_ptrs;    // key(alloc_ptr), val(replay_alloc_ptr)
+    std::unordered_map<std::string, void*> m_allocated_ptrs;
     std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;
     nlohmann::json m_json;

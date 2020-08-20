@@ -12,19 +12,21 @@
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include <cxxabi.h>   // for __cxa_demangle
 
+#include "ReplayFile.hpp"
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
-#include "ReplayFile.hpp"
+#include "ReplayOptions.hpp"
 #include "umpire/tpl/json/json.hpp"
 
-ReplayInterpreter::ReplayInterpreter( bool force_compile, std::string in_file_name ):
-    m_input_file_name{in_file_name}, m_input_file{in_file_name}
+ReplayInterpreter::ReplayInterpreter( const ReplayOptions& options ) :
+    m_options{options},
+    m_input_file{m_options.input_file}
 {
   if ( ! m_input_file.is_open() )
-    REPLAY_ERROR("Unable to open input file " << in_file_name);
+    REPLAY_ERROR("Unable to open input file " << m_options.input_file[0]);
 
-  m_ops = new ReplayFile{force_compile, m_input_file_name, m_input_file_name + ".bin" };
+  m_ops = new ReplayFile{m_options};
 }
 
 ReplayInterpreter::~ReplayInterpreter()
@@ -37,16 +39,16 @@ ReplayInterpreter::~ReplayInterpreter()
 
 void ReplayInterpreter::printInfo()
 {
-  ReplayOperationManager m_operation_mgr{m_ops, m_ops->getOperationsTable()};
+  ReplayOperationManager m_operation_mgr{m_options, m_ops, m_ops->getOperationsTable()};
 
   m_operation_mgr.printInfo();
 }
 
-void ReplayInterpreter::runOperations(bool gather_statistics, bool skip_operations)
+void ReplayInterpreter::runOperations()
 {
-  ReplayOperationManager m_operation_mgr{m_ops, m_ops->getOperationsTable()};
+  ReplayOperationManager m_operation_mgr{m_options, m_ops, m_ops->getOperationsTable()};
 
-  m_operation_mgr.runOperations(gather_statistics, skip_operations);
+  m_operation_mgr.runOperations();
 }
 
 void ReplayInterpreter::buildOperations()
@@ -184,7 +186,7 @@ void ReplayInterpreter::buildOperations()
   // Flush operations to compile file and read back in read-only (PRIVATE) mode
   //
   delete m_ops;
-  m_ops = new ReplayFile{false, m_input_file_name, m_input_file_name + ".bin"};
+  m_ops = new ReplayFile{m_options};
 }
 
 void ReplayInterpreter::printAllocators(ReplayFile* rf)

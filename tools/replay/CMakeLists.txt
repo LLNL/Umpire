@@ -20,6 +20,7 @@ set(replay_headers
   ReplayInterpreter.inl
   ReplayMacros.hpp
   ReplayOperationManager.hpp
+  ReplayOptions.hpp
   ReplayFile.hpp)
 
 set(replay_sources
@@ -38,5 +39,14 @@ blt_add_executable(
   SOURCES replaydiff.cpp ${replay_sources}
   DEPENDS_ON ${tools_depends})
 list(APPEND replay_tools replaydiff)
+
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND ENABLE_BACKTRACE_SYMBOLS)
+  blt_add_target_link_flags(
+    TO replay
+    FLAGS "-rdynamic")
+  blt_add_target_link_flags(
+    TO replaydiff
+    FLAGS "-rdynamic")
+endif ()
 
 install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)

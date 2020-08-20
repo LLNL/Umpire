@@ -53,16 +53,16 @@ void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
 }
 
 template <typename _allocator>
-std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize() const
-    noexcept
+std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize()
+    const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;
 }
 
 template <typename _allocator>
-std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark() const
-    noexcept
+std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark()
+    const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;

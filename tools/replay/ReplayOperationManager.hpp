@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "ReplayFile.hpp"
+#include "ReplayOptions.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
@@ -25,14 +26,16 @@
 
 class ReplayOperationManager {
 public:
-  ReplayOperationManager( ReplayFile* rFile, ReplayFile::Header* Operations );
+  ReplayOperationManager( const ReplayOptions& options, ReplayFile* rFile,
+      ReplayFile::Header* Operations );
   ~ReplayOperationManager();
 
-  void runOperations(bool gather_statistics, bool skip_operations);
+  void runOperations();
   void printInfo();
 
 private:
   std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;
+  ReplayOptions m_options;
   ReplayFile* m_replay_file;
   ReplayFile::Header* m_ops_table;
 

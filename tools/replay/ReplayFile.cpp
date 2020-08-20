@@ -18,9 +18,10 @@
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "ReplayFile.hpp"
 #include "ReplayMacros.hpp"
+#include "ReplayOptions.hpp"
 
-ReplayFile::ReplayFile( bool force_compile, std::string input_filename, std::string binary_filename )
-  : m_force_compile{force_compile}, m_input_filename{input_filename}, m_binary_filename{binary_filename}
+ReplayFile::ReplayFile( const ReplayOptions& options ) :
+    m_options{options}, m_binary_filename{m_options.input_file + ".bin"}
 {
   const int prot = PROT_READ|PROT_WRITE;
   int flags;
@@ -55,10 +56,10 @@ ReplayFile::ReplayFile( bool force_compile, std::string input_filename, std::str
 
 std::string ReplayFile::getLine(std::size_t lineno)
 {
-  std::ifstream file{m_input_filename};
+  std::ifstream file{m_options.input_file};
 
   if ( ! file.is_open() ) {
-    REPLAY_ERROR("Unable to open input file " << m_input_filename);
+    REPLAY_ERROR("Unable to open input file " << m_options.input_file);
   }
 
   file.seekg(std::ios::beg);
@@ -104,7 +105,7 @@ void ReplayFile::checkHeader()
   struct stat sbuf;
   Header::Magic m;
 
-  if (! m_force_compile ) {
+  if (! m_options.force_compile ) {
     if (read(m_fd, &m, sizeof(m)) == sizeof(m)) {
       if (m.magic == REPLAY_MAGIC) {
         if (m.version == REPLAY_VERSION) {
@@ -122,8 +123,8 @@ void ReplayFile::checkHeader()
 
   m_compile_needed = true;
 
-  if (stat(m_input_filename.c_str(), &sbuf))
-    REPLAY_ERROR( "Unable to open " << m_input_filename );
+  if (stat(m_options.input_file.c_str(), &sbuf))
+    REPLAY_ERROR( "Unable to open " << m_options.input_file );
 
   max_file_size = sizeof(ReplayFile::Header) + sbuf.st_size;
 

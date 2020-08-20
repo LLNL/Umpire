@@ -50,6 +50,7 @@ bool backtrace_enabled()
         enabled = true;
       }
     }
+    initialized = true;
   }
 #endif
 

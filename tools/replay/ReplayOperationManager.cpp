@@ -19,7 +19,9 @@
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
+#include "ReplayOptions.hpp"
 
+#include "ReplayOptions.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #include "umpire/util/numa.hpp"
@@ -32,9 +34,9 @@
 #define getpid _getpid
 #endif
 
-ReplayOperationManager::ReplayOperationManager( ReplayFile* rFile,
-  ReplayFile::Header* Operations )
-    : m_replay_file{rFile}, m_ops_table{Operations}
+ReplayOperationManager::ReplayOperationManager( const ReplayOptions& options,
+  ReplayFile* rFile, ReplayFile::Header* Operations )
+    : m_options{options}, m_replay_file{rFile}, m_ops_table{Operations}
 {
 }
 
@@ -321,8 +323,7 @@ void ReplayOperationManager::printInfo()
   std::cout << m_ops_table->num_operations-1 << " Operations" << std::endl;
 }
 
-void ReplayOperationManager::runOperations(bool gather_statistics,
-    bool skip_operations)
+void ReplayOperationManager::runOperations()
 {
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
@@ -340,7 +341,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics,
           makeSetDefaultAllocator(op);
           break;
         case ReplayFile::otype::COPY:
-          if (skip_operations == false) {
+          if (m_options.skip_operations == false) {
             makeCopy(op);
           }
           break;
@@ -375,7 +376,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics,
       throw;
     }
 
-    if (gather_statistics) {
+    if (m_options.print_statistics) {
       for (const auto& alloc_name : rm.getAllocatorNames()) {
         auto alloc = rm.getAllocator(alloc_name);
 
@@ -402,7 +403,7 @@ void ReplayOperationManager::runOperations(bool gather_statistics,
     op_counter++;
   }
 
-  if (gather_statistics) {
+  if (m_options.print_statistics) {
     dumpStats();
   }
 }
