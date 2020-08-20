@@ -12,7 +12,8 @@
 #endif
 
 class OperationTest : public ::testing::TestWithParam<
-                          ::testing::tuple<const char*, const char*>> {
+                             ::testing::tuple<const char*, const char*>> 
+{
  public:
   virtual void SetUp()
   {
@@ -37,6 +38,8 @@ class OperationTest : public ::testing::TestWithParam<
 
     check_array = (float*)umpire_allocator_allocate(&host_allocator,
                                                     m_size * sizeof(float));
+
+    umpire_allocator_delete(&host_allocator);
   }
 
   virtual void TearDown()
@@ -48,13 +51,13 @@ class OperationTest : public ::testing::TestWithParam<
     umpire_resourcemanager_get_allocator_by_name(&rm, "HOST", &host_allocator);
     ;
 
-    if (source_array)
+    if (source_array) 
       umpire_allocator_deallocate(&source_allocator, source_array);
 
-    if (dest_array)
+    if (dest_array) 
       umpire_allocator_deallocate(&dest_allocator, dest_array);
 
-    if (check_array)
+    if (check_array) 
       umpire_allocator_deallocate(&host_allocator, check_array);
 
     umpire_allocator_delete(&host_allocator);
@@ -201,6 +204,8 @@ TEST_P(ReallocateTest, Reallocate)
   }
 
   source_array = nullptr;
+  if(reallocated_array)
+    free(reallocated_array);
 }
 
 TEST_P(ReallocateTest, ReallocateLarger)
@@ -233,7 +238,11 @@ TEST_P(ReallocateTest, ReallocateLarger)
   umpire_resourcemanager_deallocate(&rm, reallocated_check_array);
 
   source_array = nullptr;
+  if(reallocated_array)
+    free(reallocated_array);
   check_array = nullptr;
+  if(check_array)
+    free(check_array);
 }
 
 // TEST_P(ReallocateTest, ReallocateWithAllocator)
