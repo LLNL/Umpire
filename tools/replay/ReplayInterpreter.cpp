@@ -243,7 +243,7 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
         << m_ops->getOperationsTable()->num_operations
         << " != " << rh.m_ops->getOperationsTable()->num_operations
         << std::endl;
-    rval = false;
+    // rval = false;
   }
 
   if ( rval != false ) {
@@ -290,31 +290,31 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
       }
       if ( m_ops->getOperationsTable()->ops[i].op_allocator != rh.m_ops->getOperationsTable()->ops[i].op_allocator ) {
         std::cerr << "Operation Allocator mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_allocated_ptr != rh.m_ops->getOperationsTable()->ops[i].op_allocated_ptr ) {
         std::cerr << "Operation Allocated Ptr mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_size != rh.m_ops->getOperationsTable()->ops[i].op_size ) {
         std::cerr << "Operation Size mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_offsets[0] != rh.m_ops->getOperationsTable()->ops[i].op_offsets[0] ) {
         std::cerr << "Operation Offset[0] mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_offsets[1] != rh.m_ops->getOperationsTable()->ops[i].op_offsets[1] ) {
         std::cerr << "Operation Offset[1] mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_alloc_ops[0] != rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[0] ) {
         std::cerr << "Operation Offset[0] mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_alloc_ops[1] != rh.m_ops->getOperationsTable()->ops[i].op_alloc_ops[1] ) {
         std::cerr << "Operation Offset[1] mismatch" << std::endl;
-        mismatch = false;
+        mismatch = true;
       }
       if ( mismatch ) {
         std::cerr << "    LHS: "
@@ -325,6 +325,7 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
           << "Line #=" << rh.m_ops->getOperationsTable()->ops[i].op_line_number << " "
           << rh.m_ops->getLine(rh.m_ops->getOperationsTable()->ops[i].op_line_number)
           << std::endl;
+        break;
         rval = false;
         mismatch = false;
       }
