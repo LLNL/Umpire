@@ -38,13 +38,13 @@ ReplayOperationManager::ReplayOperationManager( ReplayFile* rFile,
 {
 }
 
-ReplayOperationManager::~ReplayOperationManager() 
+ReplayOperationManager::~ReplayOperationManager()
 {
   for (std::size_t i = 0; i < m_ops_table->num_allocators; i++) {
     auto alloc = &m_ops_table->allocators[i];
     if (alloc->allocator != nullptr)
       delete(alloc->allocator);
-  } 
+  }
 }
 
 void ReplayOperationManager::printInfo()
@@ -331,39 +331,48 @@ void ReplayOperationManager::runOperations(bool gather_statistics,
         op < &m_ops_table->ops[m_ops_table->num_operations];
         ++op)
   {
-    switch (op->op_type) {
-      case ReplayFile::otype::ALLOCATOR_CREATION:
-        makeAllocator(op);
-        break;
-      case ReplayFile::otype::SETDEFAULTALLOCATOR:
-        makeSetDefaultAllocator(op);
-        break;
-      case ReplayFile::otype::COPY:
-        if (skip_operations == false) {
-          makeCopy(op);
-        }
-        break;
-      case ReplayFile::otype::REALLOCATE:
-        makeReallocate(op);
-        break;
-      case ReplayFile::otype::REALLOCATE_EX:
-        makeReallocate_ex(op);
-        break;
-      case ReplayFile::otype::ALLOCATE:
-        makeAllocate(op);
-        break;
-      case ReplayFile::otype::DEALLOCATE:
-        makeDeallocate(op);
-        break;
-      case ReplayFile::otype::COALESCE:
-        makeCoalesce(op);
-        break;
-      case ReplayFile::otype::RELEASE:
-        makeRelease(op);
-        break;
-      default:
-        REPLAY_ERROR("Unknown operation type: " << op->op_type);
-        break;
+    try {
+      switch (op->op_type) {
+        case ReplayFile::otype::ALLOCATOR_CREATION:
+          makeAllocator(op);
+          break;
+        case ReplayFile::otype::SETDEFAULTALLOCATOR:
+          makeSetDefaultAllocator(op);
+          break;
+        case ReplayFile::otype::COPY:
+          if (skip_operations == false) {
+            makeCopy(op);
+          }
+          break;
+        case ReplayFile::otype::REALLOCATE:
+          makeReallocate(op);
+          break;
+        case ReplayFile::otype::REALLOCATE_EX:
+          makeReallocate_ex(op);
+          break;
+        case ReplayFile::otype::ALLOCATE:
+          makeAllocate(op);
+          break;
+        case ReplayFile::otype::DEALLOCATE:
+          makeDeallocate(op);
+          break;
+        case ReplayFile::otype::COALESCE:
+          makeCoalesce(op);
+          break;
+        case ReplayFile::otype::RELEASE:
+          makeRelease(op);
+          break;
+        default:
+          REPLAY_ERROR("Unknown operation type: " << op->op_type);
+          break;
+      }
+    }
+    catch(...) {
+      std::cerr << std::endl << std::endl
+        << "Replay Failure Line Number: " << std::endl
+        << "  Line: " << op->op_line_number << m_replay_file->getLine(op->op_line_number)
+        << std::endl << std::endl;
+      throw;
     }
 
     if (gather_statistics) {

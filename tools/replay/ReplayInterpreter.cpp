@@ -71,11 +71,14 @@ void ReplayInterpreter::buildOperations()
 
   while ( std::getline(m_input_file, m_line) ) {
     m_line_number++;
+    // std::cout << "Processing Line# " << m_line_number << " " << m_ops->getLine(m_line_number) << std::endl;
     const std::string header("{ \"kind\":\"replay\", \"uid\":");
     auto const header_len(header.size());
 
-    if ( m_line.size() <= header_len || m_line.substr(0, header_len) != header.substr(0, header_len) )
+    if ( m_line.size() <= header_len || m_line.substr(0, header_len) != header.substr(0, header_len) ) {
+      // std::cout << "Line# " << m_line_number << " Skipped - " << m_ops->getLine(m_line_number) << std::endl << std::endl;
       continue;
+    }
 
     m_json.clear();
     m_json = nlohmann::json::parse(m_line);
@@ -95,7 +98,9 @@ void ReplayInterpreter::buildOperations()
       continue;
     }
 
+    m_prev_op_make_allocator = false;
     if ( m_json["event"] == "makeAllocator" ) {
+      m_prev_op_make_allocator = true;
       replay_compileAllocator();
     }
     else if ( m_json["event"] == "makeMemoryResource" ) {
@@ -118,6 +123,7 @@ void ReplayInterpreter::buildOperations()
     }
     else if ( m_json["event"] == "deallocate" ) {
       if (!replay_compileDeallocate()) {
+        // std::cout << "Skipped Line# " << m_line_number << " " << m_ops->getLine(m_line_number) << std::endl << std::endl;
         continue;
       }
     }
@@ -641,20 +647,23 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
 void ReplayInterpreter::replay_processMapInsert()
 {
-  if ( m_replaying_reallocate || m_allocation_in_process ) {
+  if ( m_prev_op_make_allocator || m_replaying_reallocate || m_allocation_in_process ) {
     return;
   }
-  std::cout << "Skipping Line " << m_line_number << " "
-    << m_ops->getLine(m_line_number) << std::endl;
+  uint64_t memory_ptr{ getPointer( std::string{m_json["payload"]["ptr"]} ) };
+  // std::cout << "Inserting Address: " << (void*)memory_ptr << std::endl;
+  // std::cout << "Skipping Line " << m_line_number << " " << m_ops->getLine(m_line_number) << std::endl << std::endl;
 
-  m_external_registrations.insert( getPointer( std::string{m_json["payload"]["ptr"]} ));
+  m_external_registrations.insert(memory_ptr);
 }
 
 void ReplayInterpreter::replay_processMapRemove()
 {
   uint64_t memory_ptr{ getPointer( std::string{m_json["payload"]["ptr"]} ) };
 
+  // std::cout << "Processing: " << (void*)memory_ptr << std::endl;
   if ( m_external_registrations.find(memory_ptr) != m_external_registrations.end() ) {
+    // std::cout << "Erasing Line# " << m_line_number << " " << m_ops->getLine(m_line_number) << std::endl << std::endl;
     m_external_registrations.erase(memory_ptr);
   }
 }

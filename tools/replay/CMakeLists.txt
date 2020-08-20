@@ -7,6 +7,10 @@
 
 set(tools_depends umpire umpire_tpl_json)
 
+if (ENABLE_BACKTRACE_SYMBOLS)
+  set(tools_depends ${tools_depends} ${CMAKE_DL_LIBS})
+endif()
+
 if (ENABLE_HIP)
   set(tools_depends ${tools_depends} hip_runtime)
 endif()
