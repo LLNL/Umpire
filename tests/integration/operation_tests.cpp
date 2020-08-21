@@ -68,7 +68,7 @@ using AllResources = camp::list<host_resource_tag
 
 using Strategies = camp::list<
     NullStrategy 
-#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET))
+#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET) || defined(__PGI))
     , umpire::strategy::AlignedAllocator
     , umpire::strategy::DynamicPoolList 
     , umpire::strategy::DynamicPoolMap
