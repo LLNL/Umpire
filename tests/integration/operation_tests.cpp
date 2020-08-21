@@ -68,9 +68,6 @@ using AllResources = camp::list<host_resource_tag
 
 using Strategies = camp::list<
     NullStrategy 
-#if defined(UMPIRE_ENABLE_CUDA)
-    , umpire::strategy::AllocationAdvisor
-#endif
 #if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET))
     , umpire::strategy::AlignedAllocator
     , umpire::strategy::DynamicPoolList 
@@ -742,58 +739,58 @@ using AdviceTypes = camp::cartesian_product<
 
 using AdviceTestTypes = Test<AdviceTypes>::Types;
 
-TYPED_TEST_SUITE(AdviceTest, AdviceTestTypes, )
+TYPED_TEST_SUITE(AdviceTest, AdviceTestTypes, );
 
 TYPED_TEST(AdviceTest, ReadMostly)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
-  auto strategy = source_allocator->getAllocationStrategy();
+  auto strategy = this->source_allocator->getAllocationStrategy();
 
   int device = 0;
 
   auto m_advice_operation = op_registry.find("READ_MOSTLY", strategy, strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::host) {
+  if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
   ASSERT_NO_THROW(
-      { m_advice_operation->apply(source_array, nullptr, device, m_size); });
+      { m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
 
 TYPED_TEST(AdviceTest, PreferredLocation)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
-  auto strategy = source_allocator->getAllocationStrategy();
+  auto strategy = this->source_allocator->getAllocationStrategy();
 
   int device = 0;
 
   auto m_advice_operation =
       op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::host) {
+  if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
   ASSERT_NO_THROW(
-      { m_advice_operation->apply(source_array, nullptr, device, m_size); });
+      { m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
 
 TYPED_TEST(AdviceTest, AccessedBy)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
-  auto strategy = source_allocator->getAllocationStrategy();
+  auto strategy = this->source_allocator->getAllocationStrategy();
 
   int device = 0;
 
   auto m_advice_operation = op_registry.find("ACCESSED_BY", strategy, strategy);
 
-  if (dest_allocator->getPlatform() == umpire::Platform::host) {
+  if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
   ASSERT_NO_THROW(
-      { m_advice_operation->apply(source_array, nullptr, device, m_size); });
+      { m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
 
 
