@@ -204,7 +204,7 @@ TEST_P(ReallocateTest, Reallocate)
   }
 
   if(reallocated_array)
-    free(reallocated_array);
+    umpire_allocator_deallocate(&source_allocator, reallocated_array);
   
   source_array = nullptr;
 }
@@ -239,7 +239,7 @@ TEST_P(ReallocateTest, ReallocateLarger)
   umpire_resourcemanager_deallocate(&rm, reallocated_check_array);
   
   if(reallocated_array)
-    free(reallocated_array);
+    umpire_allocator_deallocate(&source_allocator, reallocated_array);
   
   source_array = nullptr;
   check_array = nullptr;
