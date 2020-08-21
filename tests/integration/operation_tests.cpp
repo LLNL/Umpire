@@ -71,7 +71,7 @@ using Strategies = camp::list<
 #if defined(UMPIRE_ENABLE_CUDA)
     , umpire::strategy::AllocationAdvisor
 #endif
-#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA))
+#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET))
     , umpire::strategy::AlignedAllocator
     , umpire::strategy::DynamicPoolList 
     , umpire::strategy::DynamicPoolMap
@@ -85,7 +85,7 @@ using Strategies = camp::list<
   >;
 
 using TestTypes = camp::cartesian_product<HostAccessibleResources, AllResources, Strategies, Strategies>;
-using SourceTypes = camp::cartesian_product<AllResources, camp::list<host_resource_tag>, Strategies, Strategies>;
+using SourceTypes = camp::cartesian_product<AllResources, camp::list<host_resource_tag>, Strategies, camp::list<NullStrategy>>;
 
 using AllTestTypes = Test<TestTypes>::Types;
 using SourceTestTypes = Test<SourceTypes>::Types;
@@ -129,6 +129,17 @@ struct make_allocator_helper<umpire::strategy::SizeLimiter> {
     auto& rm = umpire::ResourceManager::getInstance();
     return rm.makeAllocator<umpire::strategy::SizeLimiter>(
         name, rm.getAllocator(resource_name), 1024 * 1024 * 1024);
+  }
+};
+
+template <>
+struct make_allocator_helper<umpire::strategy::AllocationAdvisor> {
+  static umpire::Allocator make(const std::string& name,
+                                const std::string& resource_name)
+  {
+    auto& rm = umpire::ResourceManager::getInstance();
+    return rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        name, rm.getAllocator(resource_name), "PREFERRED_LOCATION");
   }
 };
 
