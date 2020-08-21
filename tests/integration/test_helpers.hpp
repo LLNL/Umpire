@@ -6,21 +6,6 @@ template <typename T>
 struct tag_to_string {
 };
 
-template <>
-struct tag_to_string<umpire::strategy::DynamicPoolList> {
-  static constexpr const char* value = "DynamicPoolList";
-};
-
-template <>
-struct tag_to_string<umpire::strategy::DynamicPoolMap> {
-  static constexpr const char* value = "DynamicPoolMap";
-};
-
-template <>
-struct tag_to_string<umpire::strategy::QuickPool> {
-  static constexpr const char* value = "QuickPool";
-};
-
 struct host_resource_tag {
 };
 

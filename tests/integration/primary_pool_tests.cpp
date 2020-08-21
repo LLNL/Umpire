@@ -17,6 +17,21 @@
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
+template <>
+struct tag_to_string<umpire::strategy::DynamicPoolList> {
+  static constexpr const char* value = "DynamicPoolList";
+};
+
+template <>
+struct tag_to_string<umpire::strategy::DynamicPoolMap> {
+  static constexpr const char* value = "DynamicPoolMap";
+};
+
+template <>
+struct tag_to_string<umpire::strategy::QuickPool> {
+  static constexpr const char* value = "QuickPool";
+};
+
 using ResourceTypes = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_DEVICE)
                                  ,

@@ -75,6 +75,10 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
                     std::make_pair(Platform::host, Platform::host),
                     std::make_shared<HostReallocateOperation>());
 
+  registerOperation("REALLOCATE",
+                    std::make_pair(Platform::undefined, Platform::undefined),
+                    std::make_shared<GenericReallocateOperation>());
+
 #if defined(UMPIRE_ENABLE_NUMA)
   registerOperation("MOVE", std::make_pair(Platform::host, Platform::host),
                     std::make_shared<NumaMoveOperation>());
@@ -229,6 +233,12 @@ std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
   auto platforms = std::make_pair(src_allocator->getPlatform(),
                                   dst_allocator->getPlatform());
 
+  return find(name, platforms);
+}
+
+std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
+    const std::string& name, std::pair<Platform, Platform> platforms)
+{
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
