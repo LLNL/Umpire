@@ -1,6 +1,8 @@
 #pragma once
 
 #include "umpire/config.hpp"
+#include "camp/camp.hpp"
+#include "gtest/gtest.h"
 
 template <typename T>
 struct tag_to_string {
@@ -53,3 +55,11 @@ struct tag_to_string<file_resource_tag> {
   static constexpr const char* value = "FILE";
 };
 #endif
+
+template <class T>
+struct Test;
+
+template <class... T>
+struct Test<camp::list<T...>> {
+  using Types = ::testing::Types<T...>;
+};

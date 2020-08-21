@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "test_helpers.hpp"
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
@@ -39,7 +40,7 @@ struct NullStrategy {
 
 // TODO: memset & reallocate test needs teh complete source list, and only a
 // single dest
-using Sources = camp::list<host_resource_tag
+using HostAccessibleResources = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_UM)
                            ,
                            um_resource_tag
@@ -50,7 +51,7 @@ using Sources = camp::list<host_resource_tag
 #endif
                            >;
 
-using Destinations = camp::list<host_resource_tag
+using AllResources = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_DEVICE)
                                 ,
                                 device_resource_tag
@@ -66,27 +67,28 @@ using Destinations = camp::list<host_resource_tag
                                 >;
 
 using Strategies = camp::list<
-    NullStrategy, umpire::strategy::AlignedAllocator,
+    NullStrategy 
 #if defined(UMPIRE_ENABLE_CUDA)
-    umpire::strategy::AllocationAdvisor,
+    , umpire::strategy::AllocationAdvisor
 #endif
-    umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap,
-    umpire::strategy::QuickPool, umpire::strategy::MixedPool,
-    umpire::strategy::NamedAllocationStrategy, umpire::strategy::QuickPool,
-    umpire::strategy::SizeLimiter, umpire::strategy::SlotPool,
-    umpire::strategy::ThreadSafeAllocator>;
+#if !defined(UMPIRE_ENABLE_HIP) || !defined(UMPIRE_ENABLE_CUDA)
+    , umpire::strategy::AlignedAllocator
+    , umpire::strategy::DynamicPoolList 
+    , umpire::strategy::DynamicPoolMap
+    , umpire::strategy::QuickPool
+    , umpire::strategy::MixedPool
+    , umpire::strategy::NamedAllocationStrategy
+    , umpire::strategy::SizeLimiter
+    , umpire::strategy::SlotPool
+    , umpire::strategy::ThreadSafeAllocator
+#endif
+  >;
 
-using TestTypes =
-    camp::cartesian_product<Sources, Destinations, Strategies, Strategies>;
+using TestTypes = camp::cartesian_product<HostAccessibleResources, AllResources, Strategies, Strategies>;
+using SourceTypes = camp::cartesian_product<AllResources, camp::list<host_resource_tag>, Strategies, Strategies>;
 
-template <class T>
-struct Test;
-
-template <class... T>
-struct Test<camp::list<T...>> {
-  using Types = ::testing::Types<T...>;
-};
-using OperationTestTypes = Test<TestTypes>::Types;
+using AllTestTypes = Test<TestTypes>::Types;
+using SourceTestTypes = Test<SourceTypes>::Types;
 
 template <typename Strategy>
 struct make_allocator_helper {
@@ -206,7 +208,7 @@ template <typename T>
 class ZeroCopyTest : public OperationTest<T> {
 };
 
-TYPED_TEST_SUITE(ZeroCopyTest, OperationTestTypes, );
+TYPED_TEST_SUITE(ZeroCopyTest, AllTestTypes, );
 
 TYPED_TEST(ZeroCopyTest, Zero)
 {
@@ -225,7 +227,7 @@ template <typename T>
 class CopyTest : public OperationTest<T> {
 };
 
-TYPED_TEST_SUITE(CopyTest, OperationTestTypes, );
+TYPED_TEST_SUITE(CopyTest, AllTestTypes, );
 
 TYPED_TEST(CopyTest, Copy)
 {
@@ -299,7 +301,7 @@ template <typename T>
 class MemsetTest : public OperationTest<T> {
 };
 
-TYPED_TEST_SUITE(MemsetTest, OperationTestTypes, );
+TYPED_TEST_SUITE(MemsetTest, SourceTestTypes, );
 
 TYPED_TEST(MemsetTest, Memset)
 {
@@ -355,7 +357,7 @@ template <typename T>
 class ReallocateTest : public OperationTest<T> {
 };
 
-TYPED_TEST_SUITE(ReallocateTest, OperationTestTypes, );
+TYPED_TEST_SUITE(ReallocateTest, SourceTestTypes, );
 
 // This value is such that the 64Kb limit on device constant memory is not hit
 // in check_alloc_realloc_free when reallocating to 3 * SIZE.
@@ -687,7 +689,7 @@ template <typename T>
 class MoveTest : public OperationTest<T> {
 };
 
-TYPED_TEST_SUITE(MoveTest, OperationTestTypes, );
+TYPED_TEST_SUITE(MoveTest, AllTestTypes, );
 
 TYPED_TEST(MoveTest, Move)
 {
@@ -717,10 +719,21 @@ TYPED_TEST(MoveTest, Move)
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
-class AdviceTest : public OperationTest {
+template <typename T>
+class AdviceTest : public OperationTest<T> {
 };
 
-TEST_P(AdviceTest, ReadMostly)
+using AdviceTypes = camp::cartesian_product<
+    camp::list<um_resource_tag>, 
+    camp::list<host_resource_tag, device_resource_tag>,
+    camp::list<NullStrategy>, 
+    camp::list<NullStrategy>>;
+
+using AdviceTestTypes = Test<AdviceTypes>::Types;
+
+TYPED_TEST_SUITE(AdviceTest, AdviceTestType, )
+
+TYPED_TEST(AdviceTest, ReadMostly)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
   auto strategy = source_allocator->getAllocationStrategy();
@@ -737,7 +750,7 @@ TEST_P(AdviceTest, ReadMostly)
       { m_advice_operation->apply(source_array, nullptr, device, m_size); });
 }
 
-TEST_P(AdviceTest, PreferredLocation)
+TYPED_TEST(AdviceTest, PreferredLocation)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
   auto strategy = source_allocator->getAllocationStrategy();
@@ -755,7 +768,7 @@ TEST_P(AdviceTest, PreferredLocation)
       { m_advice_operation->apply(source_array, nullptr, device, m_size); });
 }
 
-TEST_P(AdviceTest, AccessedBy)
+TYPED_TEST(AdviceTest, AccessedBy)
 {
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
   auto strategy = source_allocator->getAllocationStrategy();
@@ -772,13 +785,6 @@ TEST_P(AdviceTest, AccessedBy)
       { m_advice_operation->apply(source_array, nullptr, device, m_size); });
 }
 
-const std::string advice_sources[] = {"UM"};
-
-const std::string advice_dests[] = {"HOST", "DEVICE"};
-
-INSTANTIATE_TEST_SUITE_P(Advice, AdviceTest,
-                         ::testing::Combine(::testing::ValuesIn(advice_sources),
-                                            ::testing::ValuesIn(advice_dests)));
 
 TEST(AsyncTest, Copy)
 {

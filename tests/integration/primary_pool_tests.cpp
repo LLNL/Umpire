@@ -56,16 +56,6 @@ using PoolTypes =
                umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
-//
-// Unroll types for gtest testing::Types
-//
-template <class T>
-struct Test;
-template <class... T>
-struct Test<camp::list<T...>> {
-  using Types = ::testing::Types<T...>;
-};
-
 using PoolTestTypes = Test<TestTypes>::Types;
 
 template <typename PoolTuple>
