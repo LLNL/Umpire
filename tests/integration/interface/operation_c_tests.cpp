@@ -203,12 +203,10 @@ TEST_P(ReallocateTest, Reallocate)
     ASSERT_FLOAT_EQ(check_array[i], 0);
   }
 
-  source_array = nullptr;
-  if(source_array)
-    free(source_array);
-  
   if(reallocated_array)
     free(reallocated_array);
+  
+  source_array = nullptr;
 }
 
 TEST_P(ReallocateTest, ReallocateLarger)
@@ -239,17 +237,12 @@ TEST_P(ReallocateTest, ReallocateLarger)
   }
 
   umpire_resourcemanager_deallocate(&rm, reallocated_check_array);
-
-  source_array = nullptr;
-  if(source_array)
-    free(source_array);
   
   if(reallocated_array)
     free(reallocated_array);
   
+  source_array = nullptr;
   check_array = nullptr;
-  if(check_array)
-    free(check_array);
 }
 
 // TEST_P(ReallocateTest, ReallocateWithAllocator)
