@@ -35,14 +35,17 @@ int main(int argc, char* argv[])
       ->required()
       ->check(CLI::ExistingFile);
 
+  app.add_flag("-q,--quiet", options.quiet,
+        "Only errors will be displayed.");
+
   app.add_flag("-t,--time-run", options.time_replay_run,
         "Display time information for replay running operations");
 
   app.add_flag("-s,--stats", options.print_statistics,
       "Dump ULTRA file containing memory usage stats for each Allocator");
 
-  app.add_flag("--info" , options.print_info,
-      "Display information about the replay file");
+  app.add_flag("--info-only" , options.info_only,
+      "Information about replay file, no actual replay performed");
 
   app.add_flag("--no-demangle" , options.do_not_demangle,
       "Disable demangling of replay file");
@@ -73,17 +76,15 @@ int main(int argc, char* argv[])
     std::cout << "Parsing replay log took " << time_span.count() << " seconds." << std::endl;
   }
 
-  if (options.print_info) {
-    replay.printInfo();
-  }
+  if ( !options.info_only ) {
+    t1 = std::chrono::high_resolution_clock::now();
+    replay.runOperations();
 
-  t1 = std::chrono::high_resolution_clock::now();
-  replay.runOperations();
-
-  if (options.time_replay_run) {
-    t2 = std::chrono::high_resolution_clock::now();
-    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
+    if (options.time_replay_run) {
+      t2 = std::chrono::high_resolution_clock::now();
+      time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+      std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
+    }
   }
 #else
   UMPIRE_USE_VAR(argc);

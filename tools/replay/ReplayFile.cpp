@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -69,7 +70,9 @@ std::string ReplayFile::getLine(std::size_t lineno)
 
   std::string line;
   std::getline(file, line);
-  return line;
+  std::stringstream ss;
+  ss << "Line Number: " << lineno << " " << line;
+  return ss.str();
 }
 
 ReplayFile::~ReplayFile()

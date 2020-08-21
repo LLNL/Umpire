@@ -22,7 +22,6 @@ class ReplayInterpreter {
   public:
     void buildOperations();
     void runOperations();
-    void printInfo();
     bool compareOperations(ReplayInterpreter& rh);
 
     ReplayInterpreter( const ReplayOptions& options );
@@ -51,11 +50,37 @@ class ReplayInterpreter {
     std::unordered_set<AllocationFromLog> m_external_registrations;
     bool m_replaying_reallocate{false};
     std::size_t m_line_number{0};
-    bool m_allocation_in_process{false};
+    bool m_make_allocation_in_progress{false};
+    bool m_make_allocator_in_progress{false};
 
     int m_log_version_major;
     int m_log_version_minor;
     int m_log_version_patch;
+    std::size_t m_allocation_map_insert_ops{0};
+    std::size_t m_allocation_map_insert_due_to_make_allocator{0};
+    std::size_t m_allocation_map_insert_due_to_allocation{0};
+    std::size_t m_allocation_map_insert_due_to_reallocate{0};
+    std::size_t m_allocation_map_insert_rogue_ignored{0};
+
+    std::size_t m_allocation_map_remove_ops{0};
+    std::size_t m_allocation_map_remove_rogue_ignored{0};
+
+    std::size_t m_allocation_map_find_ops{0};
+    std::size_t m_allocation_map_clear_ops{0};
+    std::size_t m_make_allocator_ops{0};
+    std::size_t m_make_memory_resource_ops{0};
+    std::size_t m_copy_ops{0};
+    std::size_t m_reallocate_ex_ops{0};
+    std::size_t m_reallocate_ops{0};
+    std::size_t m_set_default_allocator_ops{0};
+    std::size_t m_allocate_ops{0};
+    std::size_t m_deallocate_ops{0};
+    std::size_t m_deallocate_due_to_reallocate{0};
+    std::size_t m_deallocate_rogue_ignored{0};
+
+    std::size_t m_coalesce_ops{0};
+    std::size_t m_release_ops{0};
+    std::size_t m_version_ops{0};
 
     template <typename T> void get_from_string( const std::string& s, T& val );
 
