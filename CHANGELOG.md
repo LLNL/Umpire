@@ -70,6 +70,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed memory leak in DynamicPoolList, QuickPool, and ThreadSafeAllocator 
   tests + replay.
 
+- Fixed reallocate when called on an Allocator using a pool
+
 ## [3.0.0] - 2020-06-30
 
 ### Added
