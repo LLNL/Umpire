@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "test_helpers.hpp"
-
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
@@ -42,14 +41,14 @@ struct NullStrategy {
 // single dest
 using HostAccessibleResources = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_UM)
-                           ,
-                           um_resource_tag
+                                           ,
+                                           um_resource_tag
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-                           ,
-                           pinned_resource_tag
+                                           ,
+                                           pinned_resource_tag
 #endif
-                           >;
+                                           >;
 
 using AllResources = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -67,22 +66,24 @@ using AllResources = camp::list<host_resource_tag
                                 >;
 
 using Strategies = camp::list<
-    NullStrategy 
-#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET) || defined(__PGI))
-    , umpire::strategy::AlignedAllocator
-    , umpire::strategy::DynamicPoolList 
-    , umpire::strategy::DynamicPoolMap
-    , umpire::strategy::QuickPool
-    , umpire::strategy::MixedPool
-    , umpire::strategy::NamedAllocationStrategy
-    , umpire::strategy::SizeLimiter
-    , umpire::strategy::SlotPool
-    , umpire::strategy::ThreadSafeAllocator
+    NullStrategy
+#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) ||           \
+      defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET) || \
+      defined(__PGI))
+    ,
+    umpire::strategy::AlignedAllocator, umpire::strategy::DynamicPoolList,
+    umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool,
+    umpire::strategy::MixedPool, umpire::strategy::NamedAllocationStrategy,
+    umpire::strategy::SizeLimiter, umpire::strategy::SlotPool,
+    umpire::strategy::ThreadSafeAllocator
 #endif
-  >;
+    >;
 
-using TestTypes = camp::cartesian_product<HostAccessibleResources, AllResources, Strategies, Strategies>;
-using SourceTypes = camp::cartesian_product<AllResources, camp::list<host_resource_tag>, Strategies, camp::list<NullStrategy>>;
+using TestTypes = camp::cartesian_product<HostAccessibleResources, AllResources,
+                                          Strategies, Strategies>;
+using SourceTypes =
+    camp::cartesian_product<AllResources, camp::list<host_resource_tag>,
+                            Strategies, camp::list<NullStrategy>>;
 
 using AllTestTypes = Test<TestTypes>::Types;
 using SourceTestTypes = Test<SourceTypes>::Types;
@@ -731,11 +732,10 @@ template <typename T>
 class AdviceTest : public OperationTest<T> {
 };
 
-using AdviceTypes = camp::cartesian_product<
-    camp::list<um_resource_tag>, 
-    camp::list<host_resource_tag, device_resource_tag>,
-    camp::list<NullStrategy>, 
-    camp::list<NullStrategy>>;
+using AdviceTypes =
+    camp::cartesian_product<camp::list<um_resource_tag>,
+                            camp::list<host_resource_tag, device_resource_tag>,
+                            camp::list<NullStrategy>, camp::list<NullStrategy>>;
 
 using AdviceTestTypes = Test<AdviceTypes>::Types;
 
@@ -754,8 +754,10 @@ TYPED_TEST(AdviceTest, ReadMostly)
     device = cudaCpuDeviceId;
   }
 
-  ASSERT_NO_THROW(
-      { m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
+  ASSERT_NO_THROW({
+    m_advice_operation->apply(this->source_array, nullptr, device,
+                              this->m_size);
+  });
 }
 
 TYPED_TEST(AdviceTest, PreferredLocation)
@@ -772,8 +774,10 @@ TYPED_TEST(AdviceTest, PreferredLocation)
     device = cudaCpuDeviceId;
   }
 
-  ASSERT_NO_THROW(
-      { m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
+  ASSERT_NO_THROW({
+    m_advice_operation->apply(this->source_array, nullptr, device,
+                              this->m_size);
+  });
 }
 
 TYPED_TEST(AdviceTest, AccessedBy)
@@ -789,10 +793,11 @@ TYPED_TEST(AdviceTest, AccessedBy)
     device = cudaCpuDeviceId;
   }
 
-  ASSERT_NO_THROW(
-      { m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
+  ASSERT_NO_THROW({
+    m_advice_operation->apply(this->source_array, nullptr, device,
+                              this->m_size);
+  });
 }
-
 
 TEST(AsyncTest, Copy)
 {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "umpire/config.hpp"
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
+#include "umpire/config.hpp"
 
 template <typename T>
 struct tag_to_string {
