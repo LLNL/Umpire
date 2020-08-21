@@ -10,15 +10,12 @@
 
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
+#include "test_helpers.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-
-template <typename T>
-struct tag_to_string {
-};
 
 template <>
 struct tag_to_string<umpire::strategy::DynamicPoolList> {
@@ -34,54 +31,6 @@ template <>
 struct tag_to_string<umpire::strategy::QuickPool> {
   static constexpr const char* value = "QuickPool";
 };
-
-struct host_resource_tag {
-};
-
-template <>
-struct tag_to_string<host_resource_tag> {
-  static constexpr const char* value = "HOST";
-};
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-struct device_resource_tag {
-};
-
-template <>
-struct tag_to_string<device_resource_tag> {
-  static constexpr const char* value = "DEVICE";
-};
-#endif
-
-#if defined(UMPIRE_ENABLE_UM)
-struct um_resource_tag {
-};
-
-template <>
-struct tag_to_string<um_resource_tag> {
-  static constexpr const char* value = "UM";
-};
-#endif
-
-#if defined(UMPIRE_ENABLE_PINNED)
-struct pinned_resource_tag {
-};
-
-template <>
-struct tag_to_string<pinned_resource_tag> {
-  static constexpr const char* value = "PINNED";
-};
-#endif
-
-#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
-struct file_resource_tag {
-};
-
-template <>
-struct tag_to_string<file_resource_tag> {
-  static constexpr const char* value = "FILE";
-};
-#endif
 
 using ResourceTypes = camp::list<host_resource_tag
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -106,16 +55,6 @@ using PoolTypes =
     camp::list<umpire::strategy::DynamicPoolList,
                umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
-
-//
-// Unroll types for gtest testing::Types
-//
-template <class T>
-struct Test;
-template <class... T>
-struct Test<camp::list<T...>> {
-  using Types = ::testing::Types<T...>;
-};
 
 using PoolTestTypes = Test<TestTypes>::Types;
 
