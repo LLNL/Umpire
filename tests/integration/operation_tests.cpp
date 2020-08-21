@@ -742,7 +742,7 @@ using AdviceTypes = camp::cartesian_product<
 
 using AdviceTestTypes = Test<AdviceTypes>::Types;
 
-TYPED_TEST_SUITE(AdviceTest, AdviceTestType, )
+TYPED_TEST_SUITE(AdviceTest, AdviceTestTypes, )
 
 TYPED_TEST(AdviceTest, ReadMostly)
 {
