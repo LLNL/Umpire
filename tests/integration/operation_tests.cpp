@@ -71,7 +71,7 @@ using Strategies = camp::list<
 #if defined(UMPIRE_ENABLE_CUDA)
     , umpire::strategy::AllocationAdvisor
 #endif
-#if !defined(UMPIRE_ENABLE_HIP) || !defined(UMPIRE_ENABLE_CUDA)
+#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA))
     , umpire::strategy::AlignedAllocator
     , umpire::strategy::DynamicPoolList 
     , umpire::strategy::DynamicPoolMap
