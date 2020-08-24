@@ -1,5 +1,5 @@
 on: push
-name: Code Checks (for all)
+name: Code Checks (run on all branches)
 jobs:
   staticAnalysis:
     name: Static Analysis
