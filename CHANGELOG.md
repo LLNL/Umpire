@@ -25,6 +25,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added option to replay to skip replaying of umpire operations
 
+- Documentation added for backtrace capability
+
 ### Changed
 
 - API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are
