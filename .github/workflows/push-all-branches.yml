@@ -1,5 +1,5 @@
 on: push
-name: Code Checks
+name: Code Checks (run on all branches)
 jobs:
   staticAnalysis:
     name: Static Analysis
@@ -7,21 +7,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: ./.github/actions/static-analysis
-  checkChangelog:
-    name: Check CHANGELOG
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - run: |
-        git fetch origin
-        if sh -c "git diff origin/develop --exit-code CHANGELOG.md"; then
-            echo "CHANGELOG.md wasn't changed, failing!"
-            exit 255 
-        else
-            exit_code=$?
-            echo "CHANGELOG.md was changed, passing!"
-            exit 0
-        fi
   abiDiff:
     name: ABI Compatibility Check
     runs-on: ubuntu-latest
@@ -32,5 +17,3 @@ jobs:
       with:
         name: ABI Compatibility Report
         path: compat_reports/umpire/3.0.0_to_4.0.0/compat_report.html
-
-
