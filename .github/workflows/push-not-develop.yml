@@ -1,7 +1,9 @@
-on: push
-  branches-ignore:
-    - develop
-name: Code Checks
+on:
+  push:
+    branches-ignore:
+      - develop
+
+name: Code Checks (not develop branch)
 jobs:
   checkChangelog:
     name: Check CHANGELOG
