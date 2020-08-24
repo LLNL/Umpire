@@ -11,11 +11,23 @@
 #include <cstdlib>
 #include <iostream>
 
+// #define REPLAY_TRACE_ON
+
+#if defined(REPLAY_TRACE_ON)
+#define REPLAY_TRACE( msg )                                                 \
+{                                                                           \
+  std::cout << std::string(__FILE__) << " " << __LINE__ << " " << __func__  \
+    << " " << msg << std::endl;                                             \
+}
+#else
+#define REPLAY_TRACE( msg )
+#endif // REPLAY_TRACE_ON
+
 #define REPLAY_WARNING( msg )                                               \
 {                                                                           \
   std::cout << std::string(__FILE__) << " " << __LINE__ << " " << __func__  \
     << " " << msg << std::endl;                                             \
-}       
+}
 
 #define REPLAY_ERROR( msg )                                                 \
 {                                                                           \
