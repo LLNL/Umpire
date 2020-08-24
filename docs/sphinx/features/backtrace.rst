@@ -24,9 +24,8 @@ Runtime Configuration
 For versions of the Umpire library that are backtrace enabled (from flags
 above), the user may expect the following.
 
-When running with a version of Umpire that has been compiled with
-``-DENABLE_BACKTRACE=On``, backtrace information will always be provided
-in the description strings of umpire generated exception throws.
+Backtrace information will always be provided in the description strings of
+umpire generated exception throws.
 
 Setting the environment variable ``UMPIRE_BACKTRACE=On`` will cause
 Umpire to record backtrace information for each memory allocation it provides.
@@ -34,6 +33,9 @@ Umpire to record backtrace information for each memory allocation it provides.
 Setting the environment variable ``UMPIRE_LOG_LEVEL=Error`` will cause to
 Umpire to log backtrace information for each of the leaked Umpire allocations
 found during application exit.
+
+A programatic interface is also availble via the
+func::`umpire::print_allocator_records` free function.
 
 An example for checking and displaying the information this information
 logged above may be found here:
