@@ -16,28 +16,36 @@
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "umpire/tpl/CLI11/CLI11.hpp"
 #include "ReplayInterpreter.hpp"
+#include "ReplayOptions.hpp"
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
 {
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+  ReplayOptions lhs_options;
+  ReplayOptions rhs_options;
   CLI::App app{"Compare two replay result files created"
                 " by Umpire library with UMPIRE_REPLAY=On"};
 
   std::vector<std::string> positional_args;
+  bool recompile{false};
 
   app.add_option("files", positional_args, "replay_file_1 replay_file_2")
     ->required()
     ->expected(2)
     ->check(CLI::ExistingFile);
 
+  app.add_flag("-r,--recompile" , recompile, "Recompile replay binaries");
+
   CLI11_PARSE(app, argc, argv);
 
-  const std::string& left_filename = positional_args[0];
-  const std::string& right_filename = positional_args[1];
+  rhs_options = lhs_options;
 
-  ReplayInterpreter left{left_filename};
-  ReplayInterpreter right{right_filename};
+  lhs_options.input_file = positional_args[0];
+  rhs_options.input_file = positional_args[1];
+
+  ReplayInterpreter left{lhs_options};
+  ReplayInterpreter right{rhs_options};
 
   left.buildOperations();
   right.buildOperations();

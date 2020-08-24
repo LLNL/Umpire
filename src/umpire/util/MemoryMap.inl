@@ -132,8 +132,8 @@ typename MemoryMap<V>::Iterator MemoryMap<V>::findOrBefore(Key ptr) noexcept
 }
 
 template <typename V>
-typename MemoryMap<V>::ConstIterator MemoryMap<V>::findOrBefore(Key ptr) const
-    noexcept
+typename MemoryMap<V>::ConstIterator MemoryMap<V>::findOrBefore(
+    Key ptr) const noexcept
 {
   ptr = doFindOrBefore(ptr);
   return ConstIterator{this, ptr};
@@ -275,7 +275,7 @@ MemoryMap<V>::Iterator_<Const>::Iterator_(const Iterator_<OtherConst>& other)
 template <typename V>
 template <bool Const>
 typename MemoryMap<V>::template Iterator_<Const>::Reference
-    MemoryMap<V>::Iterator_<Const>::operator*()
+MemoryMap<V>::Iterator_<Const>::operator*()
 {
   return m_pair;
 }
@@ -283,7 +283,7 @@ typename MemoryMap<V>::template Iterator_<Const>::Reference
 template <typename V>
 template <bool Const>
 typename MemoryMap<V>::template Iterator_<Const>::Pointer
-    MemoryMap<V>::Iterator_<Const>::operator->()
+MemoryMap<V>::Iterator_<Const>::operator->()
 {
   return &m_pair;
 }

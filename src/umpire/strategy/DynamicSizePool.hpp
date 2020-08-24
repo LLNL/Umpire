@@ -266,17 +266,6 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     deallocate(ptr);
   }
 
-  void freeAllBlocks()
-  {
-    // Release the used blocks
-    while (usedBlocks) {
-      releaseBlock(usedBlocks, NULL);
-    }
-
-    freeReleasedBlocks();
-    assert("Not all blocks were released properly" && freeBlocks == NULL);
-  }
-
  public:
   DynamicSizePool(umpire::strategy::AllocationStrategy *strat,
                   const std::size_t first_minimum_pool_allocation_size = (16 *
@@ -299,7 +288,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
 
   ~DynamicSizePool()
   {
-    freeAllBlocks();
+    freeReleasedBlocks();
   }
 
   void *allocate(std::size_t size)
