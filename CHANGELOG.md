@@ -57,6 +57,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - (Internal) Updated github workflows to omit certain checks when pushing to
   develop.
 
+- Bump camp to v0.1.0
+
 ### Removed
 
 - Removed replicated implementations for tracking high watermarks and
