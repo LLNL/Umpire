@@ -19,4 +19,4 @@ cd ..
 abi-dumper build-main/lib/libumpire.so -o umpire-main.dump -lver 3.0.0
 abi-dumper build/lib/libumpire.so -o umpire-dev.dump -lver 4.0.0
 
-abi-compliance-checker -l umpire -old umpire-main.dump -new umpire-dev.dump
+abi-compliance-checker -l umpire -old umpire-main.dump -new umpire-dev.dump || true
