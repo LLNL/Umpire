@@ -31,6 +31,18 @@ void* AllocationTracker::allocate(std::size_t bytes)
   return ptr;
 }
 
+void* AllocationTracker::allocate(const std::string& name, std::size_t bytes)
+{
+  void* ptr = m_allocator->allocate(name, bytes);
+
+  UMPIRE_LOG(Debug,
+             "Tracking " << bytes << " bytes for " << m_allocator->getName());
+
+  registerAllocation(ptr, bytes, this);
+
+  return ptr;
+}
+
 void AllocationTracker::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug,

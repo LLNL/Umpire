@@ -36,6 +36,28 @@ inline void* Allocator::allocate(std::size_t bytes)
   return ret;
 }
 
+inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
+{
+  void* ret = nullptr;
+
+  umpire_ver_3_found = 0;
+
+  UMPIRE_LOG(Debug, "(" << bytes << ")");
+
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
+
+  ret = m_allocator->allocate(name, bytes);
+
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
+                << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+
+  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret),
+                          "size", bytes, "event", "allocate");
+  return ret;
+}
+
 inline void Allocator::deallocate(void* ptr)
 {
   UMPIRE_REPLAY(

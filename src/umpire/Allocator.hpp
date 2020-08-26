@@ -51,6 +51,8 @@ class Allocator {
    */
   inline void* allocate(std::size_t bytes);
 
+  inline void* allocate(const std::string& name, std::size_t bytes);
+
   /*!
    * \brief Free the memory at ptr.
    *

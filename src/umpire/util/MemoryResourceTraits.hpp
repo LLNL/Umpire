@@ -32,6 +32,8 @@ struct MemoryResourceTraits {
 #endif
 
   bool unified = false;
+  bool ipc = false;
+
   std::size_t size = 0;
 
   vendor_type vendor = vendor_type::UNKNOWN;
