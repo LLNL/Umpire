@@ -7,7 +7,8 @@ cmake -DENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_FLAGS="-Og" -DCMAKE_BUILD_TYPE=
 make -j 3 umpire
 cd ..
 
-git checkout origin/main
+git fetch
+git checkout main
 git submodule update --init --recursive
 
 mkdir build-main && cd build-main 
