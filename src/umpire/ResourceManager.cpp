@@ -259,7 +259,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   std::unique_ptr<strategy::AllocationStrategy> allocator{
       util::wrap_allocator<strategy::AllocationTracker,
                             strategy::ZeroByteHandler>(
-          registry.makeMemoryResource("HOST", getNextId(), traits))};
+          registry.makeMemoryResource(name, getNextId(), traits))};
 
     UMPIRE_REPLAY(
         R"( "event": "makeMemoryResource", "payload": { "name": ")" << name << R"(" })"
