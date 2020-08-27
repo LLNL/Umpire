@@ -43,6 +43,7 @@ MemoryResourceTraits OpenMPTargetResourceFactory::getDefaultTraits()
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
   traits.id = omp_get_default_device();
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   return traits;
 }

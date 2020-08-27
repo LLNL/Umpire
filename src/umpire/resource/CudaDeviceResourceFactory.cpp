@@ -58,6 +58,7 @@ MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
   traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   traits.id = 0;
 

@@ -58,6 +58,7 @@ MemoryResourceTraits HipDeviceResourceFactory::getDefaultTraits()
   traits.vendor = MemoryResourceTraits::vendor_type::AMD;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   return traits;
 }

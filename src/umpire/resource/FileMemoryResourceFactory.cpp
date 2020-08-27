@@ -46,6 +46,7 @@ MemoryResourceTraits FileMemoryResourceFactory::getDefaultTraits()
   traits.vendor = MemoryResourceTraits::vendor_type::UNKNOWN;
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::HOST;
 
   return traits;
 }
