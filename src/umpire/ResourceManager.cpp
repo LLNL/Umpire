@@ -131,6 +131,22 @@ ResourceManager::ResourceManager()
       util::make_unique<resource::CudaDeviceResourceFactory>());
   m_resource_names.push_back("DEVICE");
 
+  int current_device;
+  cudaGetDevice(&current_device);
+
+  for (int device = 0; device < device_count; ++device) {
+    std::string name = "DEVICE_" + std::to_string(device);
+    m_resource_names.push_back(name);
+    cudaSetDevice(device);
+    for (int other_device = 0; other_device < device_count; other_device++) {
+      if (device != other_device) {
+        cudaDeviceEnablePeerAccess(other_device, 0);
+      }
+    }
+  }
+
+  cudaSetDevice(current_device);
+
   registry.registerMemoryResource(
       util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
   m_resource_names.push_back("UM");
@@ -259,6 +275,10 @@ Allocator ResourceManager::makeResource(const std::string& name)
 
 Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceTraits traits)
 {
+  if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
+    UMPIRE_ERROR("Allocator " << name << " already exists, and cannot be re-created.");
+  }
+
   resource::MemoryResourceRegistry& registry{
       resource::MemoryResourceRegistry::getInstance()};
 
