@@ -38,17 +38,19 @@ inline std::string resource_to_string(MemoryResourceType type)
     return "PINNED";
   case Constant:
     return "DEVICE_CONST";
+  default: 
+    UMPIRE_ERROR("Unkown resource type: " << type);
   }
 }
 
-inline MemoryResourceType string_to_resource(const std::string& str)
+inline MemoryResourceType string_to_resource(const std::string& resource)
 {
-  if (str == "HOST") return MemoryResourceType::Host;
-  else if (str == "DEVICE") return MemoryResourceType::Device;
-  else if (str == "UM") return MemoryResourceType::Unified;
-  else if (str == "PINNED") return MemoryResourceType::Pinned;
-  else if (str == "DEVICE_CONST") return MemoryResourceType::Constant;
-  else UMPIRE_ERROR("");
+  if (resource == "HOST") return MemoryResourceType::Host;
+  else if (resource == "DEVICE") return MemoryResourceType::Device;
+  else if (resource == "UM") return MemoryResourceType::Unified;
+  else if (resource == "PINNED") return MemoryResourceType::Pinned;
+  else if (resource == "DEVICE_CONST") return MemoryResourceType::Constant;
+  else UMPIRE_ERROR("Unkown resource name: " << resource);
 }
 
 } // end of namespace resource
