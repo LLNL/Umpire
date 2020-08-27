@@ -134,7 +134,7 @@ ResourceManager::ResourceManager()
   int current_device;
   cudaGetDevice(&current_device);
   for (int device = 0; device < device_count; ++device) {
-    std::string name{"DEVICE_" + std::to_string(device)};
+    std::string name{"DEVICE::" + std::to_string(device)};
     m_resource_names.push_back(name);
     cudaSetDevice(device);
     for (int other_device = 0; other_device < device_count; other_device++) {
@@ -161,9 +161,28 @@ ResourceManager::ResourceManager()
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
+  auto error = ::hipGetDeviceCount(&device_count);
+  if (error != hipSuccess) {
+    UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
+  }
+
   registry.registerMemoryResource(
       util::make_unique<resource::HipDeviceResourceFactory>());
   m_resource_names.push_back("DEVICE");
+
+  int current_device;
+  hipGetDevice(&current_device);
+  for (int device = 0; device < device_count; ++device) {
+    std::string name{"DEVICE::" + std::to_string(device)};
+    m_resource_names.push_back(name);
+    hipSetDevice(device);
+    for (int other_device = 0; other_device < device_count; other_device++) {
+      if (device != other_device) {
+        hipDeviceEnablePeerAccess(other_device, 0);
+      }
+    }
+  }
+  hipSetDevice(current_device);
 
   registry.registerMemoryResource(
       util::make_unique<resource::HipPinnedMemoryResourceFactory>());
@@ -177,6 +196,23 @@ ResourceManager::ResourceManager()
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
+  auto platforms = cl::sycl::platform::get_platforms();
+  for (auto& platform : platforms) {
+    auto devices = platform.get_devices();
+    for (auto& device : devices) {
+      const std::string deviceName =
+          device.get_info<cl::sycl::info::device::name>();
+      if (device.is_gpu() &&
+          (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
+           std::string::npos))
+        device_count++;
+    }
+  }
+
+  if (device_count == 0) {
+    UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
+  }
+
   registry.registerMemoryResource(
       util::make_unique<resource::SyclDeviceResourceFactory>());
   m_resource_names.push_back("DEVICE");
@@ -280,13 +316,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   resource::MemoryResourceRegistry& registry{
       resource::MemoryResourceRegistry::getInstance()};
 
-  int device_id{0};
-  if (name.find("_") != std::string::npos) {
-    device_id = std::stoi(name.substr(name.find("_") + 1)); 
-    std::cout << "creating device " << device_id << std::endl;
-    traits.id = device_id;
-  }
-
+  traits.id = resource::resource_to_device_id(name);
   std::unique_ptr<strategy::AllocationStrategy> allocator{
       util::wrap_allocator<strategy::AllocationTracker,
                             strategy::ZeroByteHandler>(
@@ -299,13 +329,13 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
     int id{allocator->getId()};
     m_allocators_by_name[name] = allocator.get();
     if (name == "DEVICE") {
-      m_allocators_by_name["DEVICE_0"] = allocator.get();
+      m_allocators_by_name["DEVICE::0"] = allocator.get();
     }
-    if (name.find("_0") != std::string::npos) {
-      std::string base_name{name.substr(0, name.find("_") - 1)};
+    if (name.find("::0") != std::string::npos) {
+      std::string base_name{name.substr(0, name.find("::") - 1)};
       m_allocators_by_name[base_name] = allocator.get();
     }
-    if (name.find("_") == std::string::npos) {
+    if (name.find("::") == std::string::npos) {
       m_memory_resources[resource::string_to_resource(name)] = allocator.get();
     }
     m_default_allocator = allocator.get();
