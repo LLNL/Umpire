@@ -93,7 +93,7 @@ TEST_P(AllocatorTest, GetSize)
 
 TEST_P(AllocatorTest, GetName)
 {
-  ASSERT_EQ(m_allocator->getName(), GetParam());
+  ASSERT_TRUE(GetParam().find(m_allocator->getName()) != std::string::npos);
 }
 
 TEST_P(AllocatorTest, GetById)
@@ -145,34 +145,36 @@ TEST_P(AllocatorTest, getActualSize)
   m_allocator->deallocate(data);
 }
 
-const std::string allocator_strings[] = {"HOST"
+std::vector<std::string> allocator_strings() {
+  std::vector<std::string> allocators;
+  allocators.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
-                                         ,
-                                         "DEVICE"
+  allocators.push_back("DEVICE");
+  auto& rm = umpire::ResourceManager::getInstance();
+  for (int id = 0; id < rm.getNumDevices(); id++) {
+    allocators.push_back(std::string{"DEVICE_" + std::to_string(id)});
+  }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-                                         ,
-                                         "UM"
+  allocators.push_back("UM");
 #endif
 #if defined(UMPIRE_ENABLE_CONST)
-                                         ,
-                                         "DEVICE_CONST"
+  allocators.push_back("DEVICE_CONST");
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-                                         ,
-                                         "PINNED"
+  allocators.push_back("PINNED");
 #endif
-};
 
-INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest,
-                         ::testing::ValuesIn(allocator_strings));
+  return allocators;
+}
 
+INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest, ::testing::ValuesIn(allocator_strings()));
 
 TEST(Allocator, registerAllocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  for (const std::string& allocator_name : allocator_strings) {
+  for (const std::string& allocator_name : allocator_strings()) {
     const std::string allocator_copy_name = allocator_name + std::string{"_copy"};
 
     rm.registerAllocator(allocator_copy_name, rm.getAllocator(allocator_name));
