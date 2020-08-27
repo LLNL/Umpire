@@ -121,6 +121,12 @@ ResourceManager::ResourceManager()
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
+  int device_count{0};
+  auto error = ::cudaGetDeviceCount(&device_count);
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
+  }
+
   registry.registerMemoryResource(
       util::make_unique<resource::CudaDeviceResourceFactory>());
   m_resource_names.push_back("DEVICE");
