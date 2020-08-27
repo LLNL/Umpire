@@ -167,27 +167,26 @@ const std::string allocator_strings[] = {"HOST"
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest,
                          ::testing::ValuesIn(allocator_strings));
 
-TEST(Allocator, isRegistered)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  for (const std::string& allocator_string : allocator_strings) {
-    ASSERT_TRUE(rm.isAllocatorRegistered(allocator_string));
-  }
-  ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
-}
 
 TEST(Allocator, registerAllocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  rm.registerAllocator("my_host_allocator_copy", rm.getAllocator("HOST"));
+  for (const std::string& allocator_name : allocator_strings) {
+    const std::string allocator_copy_name = allocator_name + std::string{"_copy"};
 
-  ASSERT_EQ(rm.getAllocator("HOST").getAllocationStrategy(),
-            rm.getAllocator("my_host_allocator_copy").getAllocationStrategy());
+    rm.registerAllocator(allocator_copy_name, rm.getAllocator(allocator_name));
 
-  ASSERT_ANY_THROW(
-      rm.registerAllocator("HOST", rm.getAllocator("my_host_allocator_copy")));
+    ASSERT_EQ(rm.getAllocator(allocator_name).getAllocationStrategy(),
+              rm.getAllocator(allocator_copy_name).getAllocationStrategy());
+
+    ASSERT_ANY_THROW(
+        rm.registerAllocator(allocator_name, rm.getAllocator(allocator_copy_name)));
+
+    ASSERT_TRUE(rm.isAllocatorRegistered(allocator_name));
+  }
+
+  ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
 }
 
 TEST(Allocator, GetSetDefault)
