@@ -47,7 +47,7 @@ MemoryResourceTraits HipConstantMemoryResourceFactory::getDefaultTraits()
   traits.vendor = MemoryResourceTraits::vendor_type::AMD;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::DEVICE_CONST;
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE; //DEVICE_CONST gives error?
 
   return traits;
 }

@@ -24,7 +24,8 @@ struct MemoryResourceTraits {
 
   enum class memory_type { UNKNOWN, DDR, GDDR, HBM, NVME };
   
-  enum class resource_type { UNKNOWN, HOST, DEVICE, DEVICE_CONST, PINNED, UM, FILE };
+  //enum class resource_type { UNKNOWN, HOST, DEVICE, DEVICE_CONST, PINNED, UM, FILE }; //DEVICE_CONST gives error?
+  enum class resource_type { UNKNOWN, HOST, DEVICE, PINNED, UM, FILE };
 
   int id;
 

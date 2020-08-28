@@ -40,6 +40,20 @@ blt_add_test(
   COMMAND allocator_integration_tests)
 
 blt_add_executable(
+  NAME memory_resource_traits_tests 
+  SOURCES memory_resource_traits_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  memory_resource_traits_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME memory_resource_traits_tests
+  COMMAND memory_resource_traits_tests)
+
+blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
