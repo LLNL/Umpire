@@ -14,9 +14,6 @@
 
 using umpire::MemoryResourceTraits;
 
-class MemoryResourceTraitTest : public ::testing::Test {
-};
-
 TEST(MemoryResourceTraitsTest, HOST_Resource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
