@@ -31,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay now takes a "-p,--use-pool" option to tell it to replay using "Quick",
   "Map", or "List" dynamic pool.
 
+- MemoryResourceTraits now provides a resource type for allocations.
+
 - Documentation added for backtrace capability
 
 ### Changed
