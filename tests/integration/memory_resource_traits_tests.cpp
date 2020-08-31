@@ -10,7 +10,6 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
-//#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
 using umpire::MemoryResourceTraits;
@@ -77,7 +76,7 @@ TEST(MemoryResourceTraitsTest, DEVICE_Resource)
 
 }
 #endif
-/*#if defined(UMPIRE_ENABLE_CONST)
+#if defined(UMPIRE_ENABLE_CONST)
 TEST(MemoryResourceTraitsTest, DEVICE_CONST_Resource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -89,14 +88,14 @@ TEST(MemoryResourceTraitsTest, DEVICE_CONST_Resource)
   double* data =
     static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::DEVICE_CONST, alloc_one.getAllocationStrategy()->getTraits().resource);
+  ASSERT_EQ(MemoryResourceTraits::resource_type::DEVICE_CONST, alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
 
   ASSERT_NO_THROW(alloc_one.deallocate(data));
 
 }
-#endif */
+#endif 
 #if defined(UMPIRE_ENABLE_PINNED)
 TEST(MemoryResourceTraitsTest, PINNED_Resource)
 {
