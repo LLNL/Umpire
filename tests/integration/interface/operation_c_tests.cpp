@@ -12,8 +12,7 @@
 #endif
 
 class OperationTest : public ::testing::TestWithParam<
-                             ::testing::tuple<const char*, const char*>> 
-{
+                          ::testing::tuple<const char*, const char*>> {
  public:
   virtual void SetUp()
   {
@@ -203,9 +202,9 @@ TEST_P(ReallocateTest, Reallocate)
     ASSERT_FLOAT_EQ(check_array[i], 0);
   }
 
-  if(reallocated_array)
+  if (reallocated_array)
     umpire_allocator_deallocate(&source_allocator, reallocated_array);
-  
+
   source_array = nullptr;
 }
 
@@ -237,10 +236,10 @@ TEST_P(ReallocateTest, ReallocateLarger)
   }
 
   umpire_resourcemanager_deallocate(&rm, reallocated_check_array);
-  
-  if(reallocated_array)
+
+  if (reallocated_array)
     umpire_allocator_deallocate(&source_allocator, reallocated_array);
-  
+
   source_array = nullptr;
   check_array = nullptr;
 }
