@@ -8,7 +8,8 @@ Features
   :maxdepth: 1
 
   features/allocators
-  features/strategies
-  features/operations
-  features/logging_and_replay
+  features/backtrace
   features/file_output
+  features/logging_and_replay
+  features/operations
+  features/strategies

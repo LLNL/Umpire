@@ -12,24 +12,22 @@
 namespace umpire {
 namespace resource {
 
-
 /*!
  * \brief Factory class for constructing MemoryResource objects that use GPU
  * memory.
  */
-class CudaDeviceResourceFactory :
-  public MemoryResourceFactory
-{
-  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
+class CudaDeviceResourceFactory : public MemoryResourceFactory {
+  bool isValidMemoryResourceFor(
+      const std::string& name) noexcept final override;
 
-  std::unique_ptr<resource::MemoryResource>
-  create(const std::string& name, int id) final override;
+  std::unique_ptr<resource::MemoryResource> create(const std::string& name,
+                                                   int id) final override;
 
-  std::unique_ptr<resource::MemoryResource>
-  create(const std::string& name, int id, MemoryResourceTraits traits) final override;
+  std::unique_ptr<resource::MemoryResource> create(
+      const std::string& name, int id,
+      MemoryResourceTraits traits) final override;
 
-  MemoryResourceTraits
-  getDefaultTraits() final override;
+  MemoryResourceTraits getDefaultTraits() final override;
 };
 
 } // end of namespace resource

@@ -17,27 +17,23 @@ namespace op {
  */
 class CudaCopyToOperation : public MemoryOperation {
  public:
-   /*!
-    * @copybrief MemoryOperation::transform
-    *
-    * Uses cudaMemcpy to move data when src_ptr is on the CPU and dst_ptr
-    * is on an NVIDIA GPU.
-    *
-    * @copydetails MemoryOperation::transform
-    */
-  void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      umpire::util::AllocationRecord *dst_allocation,
-      std::size_t length);
+  /*!
+   * @copybrief MemoryOperation::transform
+   *
+   * Uses cudaMemcpy to move data when src_ptr is on the CPU and dst_ptr
+   * is on an NVIDIA GPU.
+   *
+   * @copydetails MemoryOperation::transform
+   */
+  void transform(void* src_ptr, void** dst_ptr,
+                 umpire::util::AllocationRecord* src_allocation,
+                 umpire::util::AllocationRecord* dst_allocation,
+                 std::size_t length);
 
   camp::resources::Event transform_async(
-      void* src_ptr,
-      void** dst_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      umpire::util::AllocationRecord *dst_allocation,
-      std::size_t length,
+      void* src_ptr, void** dst_ptr,
+      umpire::util::AllocationRecord* src_allocation,
+      umpire::util::AllocationRecord* dst_allocation, std::size_t length,
       camp::resources::Resource& ctx);
 };
 

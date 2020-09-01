@@ -4,9 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/config.hpp"
-
 #include "umpire/alloc/MallocAllocator.hpp"
+#include "umpire/config.hpp"
 
 using namespace umpire::alloc;
 
@@ -29,7 +28,8 @@ class MemoryAllocatorTest : public ::testing::Test {
 
 TYPED_TEST_SUITE_P(MemoryAllocatorTest);
 
-TYPED_TEST_P(MemoryAllocatorTest, Allocate) {
+TYPED_TEST_P(MemoryAllocatorTest, Allocate)
+{
   TypeParam allocator;
   void* allocation = allocator.allocate(1000);
   ASSERT_NE(nullptr, allocation);
@@ -37,18 +37,19 @@ TYPED_TEST_P(MemoryAllocatorTest, Allocate) {
   allocator.deallocate(allocation);
 }
 
-REGISTER_TYPED_TEST_SUITE_P(
-    MemoryAllocatorTest,
-    Allocate);
+REGISTER_TYPED_TEST_SUITE_P(MemoryAllocatorTest, Allocate);
 
-using test_types = ::testing::Types<
-    MallocAllocator
+using test_types =
+    ::testing::Types<MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
-    , CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
+                     ,
+                     CudaMallocAllocator, CudaMallocManagedAllocator,
+                     CudaPinnedAllocator
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
-    , HipMallocAllocator, HipPinnedAllocator
+                     ,
+                     HipMallocAllocator, HipPinnedAllocator
 #endif
->;
+                     >;
 
-INSTANTIATE_TYPED_TEST_SUITE_P(Default, MemoryAllocatorTest, test_types,);
+INSTANTIATE_TYPED_TEST_SUITE_P(Default, MemoryAllocatorTest, test_types, );

@@ -39,5 +39,4 @@ std::vector<int> get_allocatable_nodes();
 
 } // end namespace umpire
 
-
 #endif // UMPIRE_numa_HPP

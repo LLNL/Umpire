@@ -5,12 +5,13 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>   // for std::cout, std::cerr
-#include <stdlib.h>   // for getenv()
+#include <stdlib.h> // for getenv()
+
+#include <iostream> // for std::cout, std::cerr
 
 #if !defined(_MSC_VER)
-#include <strings.h>  // for strcasecmp()
-#include <unistd.h>   // getpid()
+#include <strings.h> // for strcasecmp()
+#include <unistd.h>  // getpid()
 #else
 #include <process.h>
 #define strcasecmp _stricmp
@@ -18,30 +19,27 @@
 #endif
 
 #include "umpire/Allocator.hpp"
+#include "umpire/Replay.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
-
 #include "umpire/util/io.hpp"
-
-#include "umpire/Replay.hpp"
 
 namespace umpire {
 
 static const char* env_name = "UMPIRE_REPLAY";
-int Replay::m_argument_number = 0;
 
 Replay::Replay() : m_replayUid(getpid())
 {
   char* enval = getenv(env_name);
-  bool enable_replay = ( enval != NULL );
+  bool enable_replay = (enval != NULL);
 
-  replayEnabled =  enable_replay;
+  replayEnabled = enable_replay;
 }
 
-void Replay::logMessage( const std::string& message )
+void Replay::logMessage(const std::string& message)
 {
-  if ( !replayEnabled )
-    return;   /* short-circuit */
+  if (!replayEnabled)
+    return; /* short-circuit */
 
   umpire::replay() << message;
 }
@@ -58,26 +56,27 @@ Replay* Replay::getReplayLogger()
   return &replay_logger;
 }
 
-std::ostream& operator<< (std::ostream& out, umpire::Allocator& alloc) {
+std::ostream& operator<<(std::ostream& out, umpire::Allocator& alloc)
+{
   out << alloc.getName();
   return out;
 }
 
-std::ostream& operator<< (
-    std::ostream& out,
-    umpire::strategy::DynamicPoolMap::CoalesceHeuristic& ) {
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&)
+{
   return out;
 }
 
-std::ostream& operator<< (
-    std::ostream& out,
-    umpire::strategy::DynamicPoolList::CoalesceHeuristic& ) {
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&)
+{
   return out;
 }
 
-std::ostream& operator<< (
-    std::ostream& out,
-    umpire::strategy::QuickPool::CoalesceHeuristic& ) {
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::QuickPool::CoalesceHeuristic&)
+{
   return out;
 }
 

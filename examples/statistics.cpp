@@ -4,14 +4,15 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/ResourceManager.hpp"
-#include "umpire/util/StatisticsDatabase.hpp"
-#include "umpire/util/Macros.hpp"
-
 #include <iostream>
 
-int main() {
-  auto &rm = umpire::ResourceManager::getInstance();
+#include "umpire/ResourceManager.hpp"
+#include "umpire/util/Macros.hpp"
+#include "umpire/util/StatisticsDatabase.hpp"
+
+int main()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
 
   const int size = 100;
@@ -21,8 +22,8 @@ int main() {
     allocs[i] = static_cast<double*>(alloc.allocate(100 * sizeof(double)));
   }
 
-  for (int i = 0; i < size/2; i++) {
-    rm.copy(allocs[i], allocs[size-1-i]);
+  for (int i = 0; i < size / 2; i++) {
+    rm.copy(allocs[i], allocs[size - 1 - i]);
   }
 
   for (int i = 0; i < size; i++) {

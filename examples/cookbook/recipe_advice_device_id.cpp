@@ -4,16 +4,15 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/AllocationAdvisor.hpp"
+#include <iostream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-
+#include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/util/Exception.hpp"
 
-#include <iostream>
-
-int main(int, char**) {
+int main(int, char**)
+{
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator("UM");
@@ -28,8 +27,9 @@ int main(int, char**) {
 
   try {
     auto preferred_location_allocator =
-      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-        "preferred_location_device_2", allocator, "PREFERRED_LOCATION", device_id);
+        rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+            "preferred_location_device_2", allocator, "PREFERRED_LOCATION",
+            device_id);
 
     void* data = preferred_location_allocator.allocate(1024);
 

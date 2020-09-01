@@ -125,3 +125,5 @@ install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
 add_subdirectory(tutorial)
 
 add_subdirectory(cookbook)
+
+umpire_add_code_checks(PREFIX examples)

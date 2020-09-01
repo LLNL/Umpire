@@ -16,6 +16,91 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+## [v4.0.0] - 2020-09-01
+
+### Added
+
+- Added ASAN memory sanitization to QuickPool
+
+- Added File Memory Allocator
+
+- Added alignment option to QuickPool and DynamicPoolList
+
+- GitHub "action" to check ABI compatibility against `main`
+
+- clang-format file, and CMake infrastructure for styling code
+
+- Added [CLI11](https://github.com/CLIUtils/CLI11) command line parser as a
+  built-in third party library.
+
+- Added option to replay to skip replaying of umpire operations
+
+- Replay now tracks line number of input file with each operation and displays
+  better error diagnostics when errors are found.
+
+- Replay now takes a "-p,--use-pool" option to tell it to replay using "Quick",
+  "Map", or "List" dynamic pool.
+
+- MemoryResourceTraits now provides a resource type for allocations.
+
+- Documentation added for backtrace capability
+
+### Changed
+
+- API signature of QuickPool, DynamicPoolList, and DynamicPoolMap are
+  now identical to one another.
+
+- Quickpool and DynamicPoolMap now both allocate initial pool block
+  lazily like DynamicPoolList.
+
+- GitLab CI pipelines now generate the host-config files on-the-fly.
+
+- GitLab CI pipeline can now trigger pipeline in CHAI with develop version of
+  Umpire.
+
+- Bump BLT to v0.3.6
+
+- Applied clang-format to all sources
+
+- Minor updates to fix PGI compiler warnings.
+
+- Updated replay to properly handle external pointer registration
+
+- (Internal) Updated github workflows to omit certain checks when pushing to
+  develop.
+
+- Bump camp to v0.1.0
+
+### Removed
+
+- Removed replicated implementations for tracking high watermarks and
+  allocated byte counts from the Pools as this is now being provided
+  from the AllocationTracker/Inspector
+
+- Final remnants of unused ENABLE_COPY_HEADERS option removed.
+
+- Removed the third party library
+  [cxxopts](https://github.com/jarro2783/cxxopts) command line parser as it
+  has been replaced by [CLI11](https://github.com/CLIUtils/CLI11).
+
+### Fixed
+
+- Poisoning instrumentation has is now properly balanced between allocate
+  and deallocate in DyanmicPoolMap.
+
+- Github action for checking CHANGELOG.
+
+- Type of `auto allocator` in HIP codepath.
+
+- When installing, camp target was not exported.
+
+- Fixed memory leak in DynamicPoolList, QuickPool, and ThreadSafeAllocator
+  tests + replay.
+
+- Fixed memory leaks detected during testing.
+
+- Fixed reallocate when called on an Allocator using a pool
+
 ## [3.0.0] - 2020-06-30
 
 ### Added
@@ -23,7 +108,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Add support for multiple CUDA devices. These devices are detected and
   registered as "DEVICE_N", where N is the device number.
 
-- Allocation backtrace may be enabled by building umpire with 
+- Allocation backtrace may be enabled by building umpire with
   -DENABLE_BACKTRACE
 
 - Umpire exceptions now include backtrace information in the exception string.

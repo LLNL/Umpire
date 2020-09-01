@@ -9,34 +9,37 @@
 
 #include <cstddef>
 
+#include "umpire/config.hpp"
+
+#if defined(UMPIRE_ENABLE_SYCL)
+#include <CL/sycl.hpp>
+#endif
+
 namespace umpire {
 
 struct MemoryResourceTraits {
+  enum class optimized_for { any, latency, bandwidth, access };
 
-  enum class optimized_for {
-    any,
-    latency,
-    bandwidth,
-    access
-  };
+  enum class vendor_type { UNKNOWN, AMD, IBM, INTEL, NVIDIA };
 
-  enum class vendor_type {
+  enum class memory_type { UNKNOWN, DDR, GDDR, HBM, NVME };
+
+  enum class resource_type {
     UNKNOWN,
-    AMD,
-    IBM,
-    INTEL,
-    NVIDIA
-  };
-
-  enum class memory_type {
-    UNKNOWN,
-    DDR,
-    GDDR,
-    HBM,
-    NVME
+    HOST,
+    DEVICE,
+    DEVICE_CONST,
+    PINNED,
+    UM,
+    FILE
   };
 
   int id;
+
+  // variables for only SYCL devices (i.e., Intel GPUs)
+#if defined(UMPIRE_ENABLE_SYCL)
+  cl::sycl::queue queue;
+#endif
 
   bool unified = false;
   std::size_t size = 0;
@@ -44,6 +47,7 @@ struct MemoryResourceTraits {
   vendor_type vendor = vendor_type::UNKNOWN;
   memory_type kind = memory_type::UNKNOWN;
   optimized_for used_for = optimized_for::any;
+  resource_type resource = resource_type::UNKNOWN;
 };
 
 } // end of namespace umpire

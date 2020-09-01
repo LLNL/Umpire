@@ -16,7 +16,7 @@ int main(int, char**)
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
       "pool", rm.getAllocator("HOST"));
 
-  double* data = static_cast<double*>(pool.allocate(1024*sizeof(double)));
+  double* data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
   data[256] = 100;
   std::cout << "data[256] = " << data[256] << std::endl;
   pool.deallocate(data);

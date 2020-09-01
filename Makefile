@@ -33,6 +33,13 @@ else
 	DOCKER_BUILDKIT=1 docker build --target hip --no-cache .
 endif
 
+sycl:
+ifeq ($(DEBUG),1)
+	DOCKER_BUILDKIT=1 docker build --target sycl --no-cache --progress plain .
+else
+	DOCKER_BUILDKIT=1 docker build --target sycl --no-cache .
+endif
+
 help:
 	@echo 'usage: make [variable] [target]'
 	@echo ''

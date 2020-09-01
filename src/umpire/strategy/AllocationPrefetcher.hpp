@@ -9,9 +9,9 @@
 
 #include <memory>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/op/MemoryOperation.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -20,26 +20,22 @@ namespace strategy {
  *
  * \brief Apply the appropriate "PREFETCH" operation to every allocation.
  */
-class AllocationPrefetcher :
-  public AllocationStrategy
-{
-  public:
-      AllocationPrefetcher(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        int device_id = 0);
+class AllocationPrefetcher : public AllocationStrategy {
+ public:
+  AllocationPrefetcher(const std::string& name, int id, Allocator allocator,
+                       int device_id = 0);
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    MemoryResourceTraits getTraits() const noexcept override;
-  private:
-    std::shared_ptr<op::MemoryOperation> m_prefetch_operation;
-    strategy::AllocationStrategy* m_allocator;
-    int m_device;
+  MemoryResourceTraits getTraits() const noexcept override;
+
+ private:
+  std::shared_ptr<op::MemoryOperation> m_prefetch_operation;
+  strategy::AllocationStrategy* m_allocator;
+  int m_device;
 };
 
 } // end of namespace strategy

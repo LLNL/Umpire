@@ -11,56 +11,47 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept :
-  m_name(name),
-  m_id(id)
+AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
+    : m_name(name), m_id(id)
 {
 }
 
-const std::string&
-AllocationStrategy::getName() noexcept
+const std::string& AllocationStrategy::getName() noexcept
 {
   return m_name;
 }
 
-void
-AllocationStrategy::release()
+void AllocationStrategy::release()
 {
   UMPIRE_LOG(Info, "AllocationStrategy::release is a no-op");
 }
 
-int
-AllocationStrategy::getId() noexcept
+int AllocationStrategy::getId() noexcept
 {
   return m_id;
 }
 
-std::size_t 
-AllocationStrategy::getCurrentSize() const noexcept
+std::size_t AllocationStrategy::getCurrentSize() const noexcept
 {
   return 0;
 }
 
-std::size_t 
-AllocationStrategy::getHighWatermark() const noexcept
+std::size_t AllocationStrategy::getHighWatermark() const noexcept
 {
   return 0;
 }
 
-std::size_t 
-AllocationStrategy::getAllocationCount() const noexcept
+std::size_t AllocationStrategy::getAllocationCount() const noexcept
 {
   return 0;
 }
 
-std::size_t
-AllocationStrategy::getActualSize() const noexcept
+std::size_t AllocationStrategy::getActualSize() const noexcept
 {
   return getCurrentSize();
 }
 
-MemoryResourceTraits 
-AllocationStrategy::getTraits() const noexcept
+MemoryResourceTraits AllocationStrategy::getTraits() const noexcept
 {
   UMPIRE_LOG(Error, "AllocationStrategy::getTraits() not implemented");
 

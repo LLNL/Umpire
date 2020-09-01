@@ -7,13 +7,14 @@
 #ifndef UMPIRE_PoolMap_HPP
 #define UMPIRE_PoolMap_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/MemoryMap.hpp"
-
 #include <functional>
 #include <map>
 #include <tuple>
 #include <unordered_map>
+
+#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
+#include "umpire/util/MemoryMap.hpp"
 
 namespace umpire {
 
@@ -27,103 +28,128 @@ class FixedMallocPool;
 
 namespace strategy {
 
-class QuickPool : 
-  public AllocationStrategy
-{
-  public:
-    using Pointer = void*;
-    using CoalesceHeuristic = std::function<bool (const strategy::QuickPool& )>;
+class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
+ public:
+  using Pointer = void*;
+  using CoalesceHeuristic = std::function<bool(const strategy::QuickPool&)>;
 
-    static CoalesceHeuristic percent_releasable(int percentage);
+  static CoalesceHeuristic percent_releasable(int percentage);
 
-    QuickPool(
-        const std::string& name,
-        int id,
-        Allocator allocator,
-        const std::size_t initial_alloc_size = (512 * 1024 * 1024),
-        const std::size_t min_alloc_size = (1 * 1024 * 1024),
-        CoalesceHeuristic coalesce_heuristic = percent_releasable(100)) noexcept;
+  /*!
+   * \brief Construct a new QuickPool.
+   *
+   * \param name Name of this instance of the QuickPool
+   * \param id Unique identifier for this instance
+   * \param allocator Allocation resource that pool uses
+   * \param first_minimum_pool_allocation_size Size the pool initially allocates
+   * \param next_minimum_pool_allocation_size The minimum size of all future
+   * allocations \param alignment Number of bytes with which to align allocation
+   * sizes (power-of-2) \param should_coalesce Heuristic for when to perform
+   * coalesce operation
+   */
+  QuickPool(
+      const std::string& name, int id, Allocator allocator,
+      const std::size_t first_minimum_pool_allocation_size = (512 * 1024 *
+                                                              1024),
+      const std::size_t next_minimum_pool_allocation_size = (1 * 1024 * 1024),
+      const std::size_t alignment = 16,
+      CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
-    ~QuickPool();
+  ~QuickPool();
 
-    QuickPool(const QuickPool&) = delete;
+  QuickPool(const QuickPool&) = delete;
 
-    void* allocate(std::size_t bytes) override;
-    void deallocate(void* ptr) override;
-    void release() override;
+  void* allocate(std::size_t bytes) override;
+  void deallocate(void* ptr) override;
+  void release() override;
 
-    std::size_t getCurrentSize() const noexcept override;
-    std::size_t getActualSize() const noexcept override;
-    std::size_t getHighWatermark() const noexcept override;
-    std::size_t getReleasableSize() const noexcept;
+  std::size_t getActualSize() const noexcept override;
+  std::size_t getReleasableSize() const noexcept;
 
-    Platform getPlatform() noexcept override;
+  Platform getPlatform() noexcept override;
 
-    void coalesce() noexcept;
+  /*!
+   * \brief Return the number of memory blocks -- both leased to application
+   * and internal free memory -- that the pool holds.
+   */
+  std::size_t getBlocksInPool() const noexcept;
 
-  private:
-    struct Chunk;
+  /*!
+   * \brief Get the largest allocatable number of bytes from pool before
+   * the pool will grow.
+   *
+   * return The largest number of bytes that may be allocated without
+   * causing pool growth
+   */
+  std::size_t getLargestAvailableBlock() noexcept;
 
-    template <typename Value>
-    class pool_allocator {
-      public:
-        using value_type = Value;
-        using size_type = std::size_t;
-        using difference_type = std::ptrdiff_t;
+  void coalesce() noexcept;
 
-        pool_allocator() :
-          pool{new util::FixedMallocPool{sizeof(Value)}} {}
+ private:
+  struct Chunk;
 
-        /// BUG: Only required for MSVC
-        template<typename U>
-        pool_allocator(const pool_allocator<U>& other): 
-          pool{other.pool}
-        {}
+  template <typename Value>
+  class pool_allocator {
+   public:
+    using value_type = Value;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
-        Value* allocate(std::size_t n) {
-          return static_cast<Value*>(pool->allocate(n));
-        }
+    pool_allocator() : pool{sizeof(Value)}
+    {
+    }
 
-        void deallocate(Value* data, std::size_t)
-        {
-          pool->deallocate(data);
-        }
+    /// BUG: Only required for MSVC
+    template <typename U>
+    pool_allocator(const pool_allocator<U>& other) : pool{other.pool}
+    {
+    }
 
-      util::FixedMallocPool* pool;
-    };
+    Value* allocate(std::size_t n)
+    {
+      return static_cast<Value*>(pool.allocate(n));
+    }
 
-    using PointerMap = std::unordered_map<void*, Chunk*>;
-    using SizeMap = std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
+    void deallocate(Value* data, std::size_t)
+    {
+      pool.deallocate(data);
+    }
 
-    struct Chunk {
-      Chunk(void* ptr, std::size_t s, std::size_t cs) :
-        data{ptr}, size{s}, chunk_size{cs} {}
+    util::FixedMallocPool pool;
+  };
 
-      void* data{nullptr};
-      std::size_t size{0};
-      std::size_t chunk_size{0};
-      bool free{true};
-      Chunk* prev{nullptr};
-      Chunk* next{nullptr};
-      SizeMap::iterator size_map_it;
-    };
+  using PointerMap = std::unordered_map<void*, Chunk*>;
+  using SizeMap =
+      std::multimap<std::size_t, Chunk*, std::less<std::size_t>,
+                    pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
-    PointerMap m_pointer_map;
-    SizeMap m_size_map;
+  struct Chunk {
+    Chunk(void* ptr, std::size_t s, std::size_t cs)
+        : data{ptr}, size{s}, chunk_size{cs}
+    {
+    }
 
-    util::FixedMallocPool m_chunk_pool;
+    void* data{nullptr};
+    std::size_t size{0};
+    std::size_t chunk_size{0};
+    bool free{true};
+    Chunk* prev{nullptr};
+    Chunk* next{nullptr};
+    SizeMap::iterator size_map_it;
+  };
 
-    strategy::AllocationStrategy* m_allocator;
+  PointerMap m_pointer_map{};
+  SizeMap m_size_map{};
 
-    CoalesceHeuristic m_should_coalesce;
+  util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
-    const std::size_t m_initial_alloc_bytes;
-    const std::size_t m_min_alloc_bytes;
+  CoalesceHeuristic m_should_coalesce;
 
-    std::size_t m_curr_bytes{0};
-    std::size_t m_actual_bytes{0};
-    std::size_t m_highwatermark{0};
-    std::size_t m_releasable_bytes{0};
+  const std::size_t m_first_minimum_pool_allocation_size;
+  const std::size_t m_next_minimum_pool_allocation_size;
+
+  std::size_t m_actual_bytes{0};
+  std::size_t m_releasable_bytes{0};
 };
 
 } // end of namespace strategy

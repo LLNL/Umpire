@@ -7,8 +7,8 @@
 #ifndef UMPIRE_IOManager_HPP
 #define UMPIRE_IOManager_HPP
 
-#include <string>
 #include <ostream>
+#include <string>
 
 namespace umpire {
 

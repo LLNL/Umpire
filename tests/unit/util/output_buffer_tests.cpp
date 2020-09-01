@@ -5,24 +5,23 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/util/OutputBuffer.hpp"
-
-#include "gtest/gtest.h"
-
 #include <sstream>
 
+#include "gtest/gtest.h"
+#include "umpire/util/OutputBuffer.hpp"
+
 class OutputBufferTest : public ::testing::Test {
-  protected:
-    OutputBufferTest()
-    {
-      d_buffer.setConsoleStream(&d_mock_console_stream);
-      d_buffer.setFileStream(&d_mock_file_stream);
-    }
+ protected:
+  OutputBufferTest()
+  {
+    d_buffer.setConsoleStream(&d_mock_console_stream);
+    d_buffer.setFileStream(&d_mock_file_stream);
+  }
 
-    std::stringstream d_mock_console_stream;
-    std::stringstream d_mock_file_stream;
+  std::stringstream d_mock_console_stream;
+  std::stringstream d_mock_file_stream;
 
-    umpire::util::OutputBuffer d_buffer;
+  umpire::util::OutputBuffer d_buffer;
 };
 
 TEST_F(OutputBufferTest, WriteToStreams)

@@ -4,6 +4,8 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
+
 set (umpire_util_headers
   AllocationMap.hpp
   AllocationRecord.hpp
@@ -120,3 +122,5 @@ target_include_directories(
 install(FILES
   ${umpire_util_headers}
   DESTINATION include/umpire/util)
+
+umpire_add_code_checks(PREFIX util)

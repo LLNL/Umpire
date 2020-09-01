@@ -13,29 +13,21 @@
 namespace umpire {
 namespace op {
 
-void
-HipMemsetOperation::apply(
-    void* src_ptr,
-    util::AllocationRecord*  UMPIRE_UNUSED_ARG(allocation),
-    int value,
-    std::size_t length)
+void HipMemsetOperation::apply(
+    void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
+    int value, std::size_t length)
 {
   hipError_t error = ::hipMemset(src_ptr, value, length);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemset( src_ptr = " << src_ptr
-      << ", value = " << value
-      << ", length = " << length
-      << ") failed with error: "
-      << hipGetErrorString(error));
+    UMPIRE_ERROR("hipMemset( src_ptr = "
+                 << src_ptr << ", value = " << value << ", length = " << length
+                 << ") failed with error: " << hipGetErrorString(error));
   }
 
-  UMPIRE_RECORD_STATISTIC(
-      "HipMemsetOperation",
-      "src_ptr", reinterpret_cast<uintptr_t>(src_ptr),
-      "value", value,
-      "size", length,
-      "event", "memset");
+  UMPIRE_RECORD_STATISTIC("HipMemsetOperation", "src_ptr",
+                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
+                          "size", length, "event", "memset");
 }
 
 } // end of namespace op

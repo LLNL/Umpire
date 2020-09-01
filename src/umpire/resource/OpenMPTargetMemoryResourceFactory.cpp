@@ -6,44 +6,45 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 
+#include <omp.h>
+
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/util/make_unique.hpp"
-
-#include <omp.h>
 
 namespace umpire {
 namespace resource {
 
-bool
-OpenMPTargetResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
+bool OpenMPTargetResourceFactory::isValidMemoryResourceFor(
+    const std::string& name) noexcept
 {
-  if (name.find("DEVICE") != std::string::npos) {
+  if ((name.find("CONST") == std::string::npos) &&
+      (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-OpenMPTargetResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> OpenMPTargetResourceFactory::create(
+    const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-OpenMPTargetResourceFactory::create(const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> OpenMPTargetResourceFactory::create(
+    const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return util::make_unique<DefaultMemoryResource<
-    alloc::OpenMPTargetAllocator>>(Platform::omp_target, name, id, traits, Allocator{traits.id});
+  return util::make_unique<DefaultMemoryResource<alloc::OpenMPTargetAllocator>>(
+      Platform::omp_target, name, id, traits, Allocator{traits.id});
 }
 
-MemoryResourceTraits
-OpenMPTargetResourceFactory::getDefaultTraits()
+MemoryResourceTraits OpenMPTargetResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
   traits.id = omp_get_default_device();
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   return traits;
 }

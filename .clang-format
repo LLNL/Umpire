@@ -1,0 +1,15 @@
+BasedOnStyle: Google
+Language: Cpp
+Standard: Cpp11
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction:   true
+
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortLoopsOnASingleLine: false
+
+ColumnLimit: 80
+
+SpacesBeforeTrailingComments: 1

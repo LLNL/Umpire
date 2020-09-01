@@ -9,18 +9,21 @@
 
 #include <hip/hip_runtime.h>
 
+#include "umpire/util/Macros.hpp"
+
 namespace umpire {
 namespace alloc {
 
-struct HipPinnedAllocator
-{
+struct HipPinnedAllocator {
   void* allocate(std::size_t bytes)
   {
     void* ptr = nullptr;
     hipError_t error = ::hipHostMalloc(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipMallocHost( bytes = " << bytes << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR("hipMallocHost( bytes = " << bytes
+                                             << " ) failed with error: "
+                                             << hipGetErrorString(error));
     } else {
       return ptr;
     }
@@ -31,7 +34,8 @@ struct HipPinnedAllocator
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipHostFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipFreeHost( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR("hipFreeHost( ptr = " << ptr << " ) failed with error: "
+                                         << hipGetErrorString(error));
     }
   }
 };

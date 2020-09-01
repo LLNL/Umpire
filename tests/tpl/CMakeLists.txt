@@ -14,12 +14,10 @@ blt_add_test(
   COMMAND judy_smoke_tests)
 
 blt_add_executable(
-  NAME cxxopts_smoke_tests
-  SOURCES cxxopts_smoke_tests.cpp
-  DEPENDS_ON umpire_tpl_cxxopts gtest)
+  NAME cli11_smoke_test
+  SOURCES cli11_smoke_test.cpp
+  DEPENDS_ON umpire_tpl_CLI11 gtest)
 
-if (NOT C_COMPILER_FAMILY_IS_PGI)
-  blt_add_test(
-    NAME cxxopts_smoke_tests
-    COMMAND cxxopts_smoke_tests)
-endif()
+blt_add_test(
+  NAME cli11_smoke_help
+  COMMAND cli11_smoke_test)

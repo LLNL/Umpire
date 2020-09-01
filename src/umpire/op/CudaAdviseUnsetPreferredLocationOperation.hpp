@@ -12,9 +12,8 @@
 namespace umpire {
 namespace op {
 
-class CudaAdviseUnsetPreferredLocationOperation :
-  public MemoryOperation {
-public:
+class CudaAdviseUnsetPreferredLocationOperation : public MemoryOperation {
+ public:
   /*!
    * @copybrief MemoryOperation::apply
    *
@@ -22,11 +21,8 @@ public:
    *
    * @copydetails MemoryOperation::apply
    */
-    void apply(
-        void* src_ptr,
-        util::AllocationRecord *src_allocation,
-        int val,
-        std::size_t length);
+  void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val,
+             std::size_t length);
 };
 
 } // end of namespace op

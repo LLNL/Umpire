@@ -8,8 +8,8 @@
 #define UMPIRE_Statistic_HPP
 
 #include <chrono>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "conduit/conduit.hpp"
 
@@ -20,21 +20,22 @@ class StatisticsDatabase;
 
 class Statistic {
   friend class StatisticsDatabase;
-  public:
-    ~Statistic() noexcept;
 
-    void recordStatistic(conduit::Node&& n);
+ public:
+  ~Statistic() noexcept;
 
-    void printData(std::ostream& stream) noexcept;
+  void recordStatistic(conduit::Node&& n);
 
-  protected:
-    Statistic(const std::string& name) noexcept;
+  void printData(std::ostream& stream) noexcept;
 
-  private:
-    std::string m_name;
-    std::size_t m_counter;
+ protected:
+  Statistic(const std::string& name) noexcept;
 
-    conduit::Node m_data;
+ private:
+  std::string m_name;
+  std::size_t m_counter;
+
+  conduit::Node m_data;
 };
 
 } // end of namespace util

@@ -5,90 +5,86 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-#include <fstream>
-#include <ctime>
-#include <ratio>
 #include <chrono>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <ratio>
+#include <string>
 
 #include "umpire/util/Macros.hpp"
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
+#include "umpire/tpl/CLI11/CLI11.hpp"
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
+#include "ReplayOptions.hpp"
+
+const static ReplayUsePoolValidator ReplayValidPool;
+
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
 {
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-  cxxopts::Options options(argv[0], "Replay an umpire session from a file");
+  ReplayOptions options;
+  CLI::App app{"Replay an umpire session from a file"};
 
-  options
-    .add_options()
-    (  "h, help"
-     , "Print help"
-    )
-    (  "a, allocation_map"
-     , "Replay allocation map"
-    )
-    (  "t, time"
-     , "Display replay times"
-    )
-    (  "i, infile"
-     , "Input file created by Umpire library with UMPIRE_REPLAY=On"
-     , cxxopts::value<std::string>(), "FILE"
-    )
-    (
-      "s, stats"
-      , "Dump ULTRA file containing memory usage stats for each Allocator"
-    )
-    (
-      "info"
-      , "Display information about the replay file"
-    )
-  ;
+  app.add_option("-i,--infile", options.input_file,
+      "Input file created by Umpire library with UMPIRE_REPLAY=On")
+      ->required()
+      ->check(CLI::ExistingFile);
 
-  auto command_line_args = options.parse(argc, argv);
+  app.add_flag("-q,--quiet", options.quiet,
+        "Only errors will be displayed.");
 
-  if (command_line_args.count("help")) {
-    std::cout << options.help({""}) << std::endl;
-    exit(0);
-  }
+  app.add_flag("-t,--time-run", options.time_replay_run,
+        "Display time information for replay running operations");
 
-  if ( ! command_line_args.count("infile") )
-    REPLAY_ERROR("No input file specified");
+  app.add_flag("-s,--stats", options.print_statistics,
+      "Dump ULTRA file containing memory usage stats for each Allocator");
 
-  std::string input_file_name = command_line_args["infile"].as<std::string>();
+  app.add_flag("--info-only" , options.info_only,
+      "Information about replay file, no actual replay performed");
+
+  app.add_flag("--no-demangle" , options.do_not_demangle,
+      "Disable demangling of replay file");
+
+  app.add_flag("--skip-operations" , options.skip_operations,
+      "Skip Umpire Operations during replays");
+
+  app.add_flag("-r,--recompile" , options.force_compile,
+      "Force recompile replay binary");
+
+  app.add_option("-p,--use-pool", options.pool_to_use,
+    "Specify pool to use: List, Map, or Quick")->check(ReplayValidPool);
+
+  CLI11_PARSE(app, argc, argv);
 
   std::chrono::high_resolution_clock::time_point t1;
   std::chrono::high_resolution_clock::time_point t2;
   std::chrono::duration<double> time_span;
 
   t1 = std::chrono::high_resolution_clock::now();
-  ReplayInterpreter replay(input_file_name);
+  ReplayInterpreter replay(options);
 
   replay.buildOperations();
 
-  t2 = std::chrono::high_resolution_clock::now();
-
-  if (command_line_args.count("time")) {
+  if (options.time_replay_parse) {
+    t2 = std::chrono::high_resolution_clock::now();
     time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
     std::cout << "Parsing replay log took " << time_span.count() << " seconds." << std::endl;
   }
 
-  if (command_line_args.count("info")) {
-    replay.printInfo();
-  }
+  if ( !options.info_only ) {
+    t1 = std::chrono::high_resolution_clock::now();
+    replay.runOperations();
 
-  t1 = std::chrono::high_resolution_clock::now();
-  const bool print_statistics{command_line_args.count("stats") > 0};
-  replay.runOperations(print_statistics);
-  t2 = std::chrono::high_resolution_clock::now();
-
-  if (command_line_args.count("time")) {
-    time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
-    std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
+    if (options.time_replay_run) {
+      t2 = std::chrono::high_resolution_clock::now();
+      time_span = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+      std::cout << "Running replay took " << time_span.count() << " seconds." << std::endl;
+    }
   }
 #else
   UMPIRE_USE_VAR(argc);

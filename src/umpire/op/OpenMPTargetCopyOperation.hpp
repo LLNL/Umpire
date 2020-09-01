@@ -14,24 +14,22 @@ namespace op {
 
 class OpenMPTargetCopyOperation : public MemoryOperation {
  public:
-   OpenMPTargetCopyOperation() = default;
+  OpenMPTargetCopyOperation() = default;
 
-   /*
-    * \copybrief MemoryOperation::transform
-    *
-    * Perform a memcpy to move length bytes of data from src_ptr to dst_ptr
-    *
-    * \copydetails MemoryOperation::transform
-    */
-  void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      umpire::util::AllocationRecord *dst_allocation,
-      std::size_t length);
+  /*
+   * \copybrief MemoryOperation::transform
+   *
+   * Perform a memcpy to move length bytes of data from src_ptr to dst_ptr
+   *
+   * \copydetails MemoryOperation::transform
+   */
+  void transform(void* src_ptr, void** dst_ptr,
+                 umpire::util::AllocationRecord* src_allocation,
+                 umpire::util::AllocationRecord* dst_allocation,
+                 std::size_t length);
 };
 
-} // end of naemspace op
-} //end of namespace umpire
+} // namespace op
+} // end of namespace umpire
 
 #endif // UMPIRE_OpenMPTargetCopyOperation_HPP

@@ -22,8 +22,8 @@ StatisticsDatabase* StatisticsDatabase::getDatabase()
   return s_statistics_database_instance;
 }
 
-std::shared_ptr<Statistic>
-StatisticsDatabase::getStatistic(const std::string& name)
+std::shared_ptr<Statistic> StatisticsDatabase::getStatistic(
+    const std::string& name)
 {
   auto statistic = m_statistics.find(name);
   std::shared_ptr<Statistic> stat;
@@ -38,15 +38,14 @@ StatisticsDatabase::getStatistic(const std::string& name)
   return stat;
 }
 
-StatisticsDatabase::StatisticsDatabase() noexcept:
-  m_statistics()
+StatisticsDatabase::StatisticsDatabase() noexcept : m_statistics()
 {
 }
 
-void
-StatisticsDatabase::printStatistics(std::ostream& stream) noexcept
+void StatisticsDatabase::printStatistics(std::ostream& stream) noexcept
 {
-  stream << "umpire::util::StatisticsDatabase contains " << m_statistics.size() << " statistics" << std::endl;
+  stream << "umpire::util::StatisticsDatabase contains " << m_statistics.size()
+         << " statistics" << std::endl;
   for (auto& stat : m_statistics) {
     stat.second->printData(stream);
   }

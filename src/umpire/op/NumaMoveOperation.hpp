@@ -17,22 +17,20 @@ namespace op {
  */
 class NumaMoveOperation : public MemoryOperation {
  public:
-   /*
-    * \copybrief MemoryOperation::transform
-    *
-    * Relocate the memory to the NUMA node implicitly given by the
-    * dst_allocation. This performs a static_cast to a a NumaPolicy,
-    * and will therefore throw an error if dst_allocation is not this
-    * type. dst_ptr == src_ptr when successful.
-    *
-    * \copydetails MemoryOperation::transform
-    */
-  void transform(
-      void* src_ptr,
-      void** dst_ptr,
-      umpire::util::AllocationRecord *src_allocation,
-      umpire::util::AllocationRecord *dst_allocation,
-      std::size_t length);
+  /*
+   * \copybrief MemoryOperation::transform
+   *
+   * Relocate the memory to the NUMA node implicitly given by the
+   * dst_allocation. This performs a static_cast to a a NumaPolicy,
+   * and will therefore throw an error if dst_allocation is not this
+   * type. dst_ptr == src_ptr when successful.
+   *
+   * \copydetails MemoryOperation::transform
+   */
+  void transform(void* src_ptr, void** dst_ptr,
+                 umpire::util::AllocationRecord* src_allocation,
+                 umpire::util::AllocationRecord* dst_allocation,
+                 std::size_t length);
 };
 
 } // end of namespace op

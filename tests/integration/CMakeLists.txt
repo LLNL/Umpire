@@ -40,6 +40,20 @@ blt_add_test(
   COMMAND allocator_integration_tests)
 
 blt_add_executable(
+  NAME memory_resource_traits_tests 
+  SOURCES memory_resource_traits_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  memory_resource_traits_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME memory_resource_traits_tests
+  COMMAND memory_resource_traits_tests)
+
+blt_add_executable(
   NAME strategy_tests
   SOURCES strategy_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
@@ -81,6 +95,14 @@ blt_add_test(
   NAME free_functions_integration_tests
   COMMAND free_functions_integration_tests)
 
+blt_add_executable(
+  NAME primary_pool_tests
+  SOURCES primary_pool_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+blt_add_test(
+  NAME primary_pool_tests
+  COMMAND primary_pool_tests)
 
 blt_add_executable(
   NAME static_initialization_test

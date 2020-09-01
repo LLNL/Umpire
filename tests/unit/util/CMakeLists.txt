@@ -21,11 +21,13 @@ if (ENABLE_CUDA)
     ${allocation_map_tests_depends}
     cuda_runtime)
 endif ()
+
 if (ENABLE_HIP)
   set (allocation_map_tests_depends
     ${allocation_map_tests_depends}
     hip_runtime)
 endif ()
+
 if (ENABLE_OPENMP_TARGET)
   set (allocation_map_tests_depends
     ${allocation_map_tests_depends}

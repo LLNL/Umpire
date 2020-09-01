@@ -5,48 +5,44 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "gtest/gtest.h"
 #include "gmock/gmock.h"
-
-#include "umpire/config.hpp"
-
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "gtest/gtest.h"
 #include "umpire/Allocator.hpp"
+#include "umpire/config.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
-class MockAllocationStrategy : public umpire::strategy::AllocationStrategy
-{
-  public:
-    MockAllocationStrategy() :
-      umpire::strategy::AllocationStrategy("MockAllocationStrategy", 12345)
-    {
-    }
+class MockAllocationStrategy : public umpire::strategy::AllocationStrategy {
+ public:
+  MockAllocationStrategy()
+      : umpire::strategy::AllocationStrategy("MockAllocationStrategy", 12345)
+  {
+  }
 
-    MOCK_METHOD1(allocate, void*(std::size_t bytes));
-    MOCK_METHOD1(deallocate, void(void* ptr));
-    MOCK_METHOD0(getCurrentSize, long() const noexcept);
-    MOCK_METHOD0(getHighWatermark, long() const noexcept);
-    MOCK_METHOD0(getPlatform, umpire::Platform() noexcept);
+  MOCK_METHOD1(allocate, void*(std::size_t bytes));
+  MOCK_METHOD1(deallocate, void(void* ptr));
+  MOCK_METHOD0(getCurrentSize, long() const noexcept);
+  MOCK_METHOD0(getHighWatermark, long() const noexcept);
+  MOCK_METHOD0(getPlatform, umpire::Platform() noexcept);
 };
 
-class AllocatorTest : public ::testing::Test
-{
-protected:
-  AllocatorTest():
-    m_strategy(std::make_shared<MockAllocationStrategy>()),
-    m_allocator(m_strategy)
+class AllocatorTest : public ::testing::Test {
+ protected:
+  AllocatorTest()
+      : m_strategy(std::make_shared<MockAllocationStrategy>()),
+        m_allocator(m_strategy)
   {
   }
 
   virtual void SetUp()
   {
-    data = malloc(100*sizeof(char));
+    data = malloc(100 * sizeof(char));
 
     ON_CALL(*m_strategy, getPlatform())
-      .WillByDefault(::testing::Return(umpire::Platform::host));
+        .WillByDefault(::testing::Return(umpire::Platform::host));
 
     // set up allocate return value
     ON_CALL(*m_strategy, allocate(::testing::_))
-      .WillByDefault(::testing::Return(data));
+        .WillByDefault(::testing::Return(data));
   }
 
   virtual void TearDown()
@@ -103,8 +99,7 @@ TEST_F(AllocatorTest, getAllocationStrategy)
 
 TEST_F(AllocatorTest, getCurrentSize)
 {
-  EXPECT_CALL(*m_strategy, getCurrentSize())
-    .WillOnce(::testing::Return(1024));
+  EXPECT_CALL(*m_strategy, getCurrentSize()).WillOnce(::testing::Return(1024));
 
   int size = m_allocator.getCurrentSize();
 
@@ -114,7 +109,7 @@ TEST_F(AllocatorTest, getCurrentSize)
 TEST_F(AllocatorTest, getHighWatermark)
 {
   EXPECT_CALL(*m_strategy, getHighWatermark())
-    .WillOnce(::testing::Return(4096));
+      .WillOnce(::testing::Return(4096));
 
   int size = m_allocator.getHighWatermark();
 

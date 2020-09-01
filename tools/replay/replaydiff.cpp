@@ -14,49 +14,38 @@
 #include "umpire/util/Macros.hpp"
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include "umpire/tpl/cxxopts/include/cxxopts.hpp"
+#include "umpire/tpl/CLI11/CLI11.hpp"
 #include "ReplayInterpreter.hpp"
+#include "ReplayOptions.hpp"
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])
 {
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+  ReplayOptions lhs_options;
+  ReplayOptions rhs_options;
+  CLI::App app{"Compare two replay result files created"
+                " by Umpire library with UMPIRE_REPLAY=On"};
+
   std::vector<std::string> positional_args;
+  bool recompile{false};
 
-  cxxopts::Options options(argv[0], "Compare two replay result files created"
-    " by Umpire library with UMPIRE_REPLAY=On");
-  options
-    .positional_help("replay_file_1 replay_file_2")
-    .show_positional_help();
+  app.add_option("files", positional_args, "replay_file_1 replay_file_2")
+    ->required()
+    ->expected(2)
+    ->check(CLI::ExistingFile);
 
-  options.add_options()
-    ("h, help", "Print help");
+  app.add_flag("-r,--recompile" , recompile, "Recompile replay binaries");
 
-  options.add_options()
-    ("positional_args", "Positional parameters",
-        cxxopts::value<std::vector<std::string>>(positional_args));
+  CLI11_PARSE(app, argc, argv);
 
-  std::vector<std::string> pos_names = {"positional_args"};
+  rhs_options = lhs_options;
 
-  options.parse_positional(pos_names.begin(), pos_names.end());
+  lhs_options.input_file = positional_args[0];
+  rhs_options.input_file = positional_args[1];
 
-  auto command_line_args = options.parse(argc, argv);
-
-  if (command_line_args.count("help")) {
-    std::cout << options.help({""}) << std::endl;
-    exit(0);
-  }
-
-  if (positional_args.size() != 2) {
-    std::cout << options.help({""}) << std::endl;
-    exit(1);
-  }
-
-  const std::string& left_filename = positional_args[0];
-  const std::string& right_filename = positional_args[1];
-
-  ReplayInterpreter left{left_filename};
-  ReplayInterpreter right{right_filename};
+  ReplayInterpreter left{lhs_options};
+  ReplayInterpreter right{rhs_options};
 
   left.buildOperations();
   right.buildOperations();

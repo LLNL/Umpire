@@ -7,22 +7,23 @@
 #ifndef UMPIRE_MemoryMap_HPP
 #define UMPIRE_MemoryMap_HPP
 
-#include "umpire/tpl/judy/judy.h"
-
-#include "umpire/util/FixedMallocPool.hpp"
-
 #include <cstdint>
 #include <iterator>
-#include <utility>
-#include <type_traits>
 #include <mutex>
+#include <type_traits>
+#include <utility>
+
+#include "umpire/tpl/judy/judy.h"
+#include "umpire/util/FixedMallocPool.hpp"
 
 namespace umpire {
 namespace util {
 
 // Tags for iterator constructors
-struct iterator_begin {};
-struct iterator_end {};
+struct iterator_begin {
+};
+struct iterator_end {
+};
 
 /*!
  * \brief A fast replacement for std::map<void*,Value> for a generic Value.
@@ -31,35 +32,37 @@ struct iterator_end {};
  * const and non-const iterators.
  */
 template <typename V>
-class MemoryMap
-{
-public:
+class MemoryMap {
+ public:
   using Key = void*;
   using Value = V;
   using KeyValuePair = std::pair<Key, Value*>;
 
   template <bool Const = false>
-  class Iterator_
-  {
-  public:
+  class Iterator_ {
+   public:
     using iterator_category = std::forward_iterator_tag;
     using value_type = Value;
     using difference_type = std::ptrdiff_t;
     using pointer = value_type*;
     using reference = value_type&;
 
-    using Map = typename std::conditional<Const, const MemoryMap<Value>, MemoryMap<Value>>::type;
-    using ValuePtr = typename std::conditional<Const, const Value*, Value*>::type;
+    using Map = typename std::conditional<Const, const MemoryMap<Value>,
+                                          MemoryMap<Value>>::type;
+    using ValuePtr =
+        typename std::conditional<Const, const Value*, Value*>::type;
 
     using Content = std::pair<Key, ValuePtr>;
-    using Reference = typename std::conditional<Const, const Content&, Content&>::type;
-    using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
+    using Reference =
+        typename std::conditional<Const, const Content&, Content&>::type;
+    using Pointer =
+        typename std::conditional<Const, const Content*, Content*>::type;
 
     Iterator_(Map* map, Key ptr);
     Iterator_(Map* map, iterator_begin);
     Iterator_(Map* map, iterator_end);
 
-    template<bool OtherConst>
+    template <bool OtherConst>
     Iterator_(const Iterator_<OtherConst>& other);
 
     Reference operator*();
@@ -73,12 +76,13 @@ public:
     template <bool OtherConst>
     bool operator!=(const Iterator_<OtherConst>& other) const;
 
-  private:
+   private:
     Map* m_map;
     Content m_pair;
   };
 
-  template <bool Const> friend class Iterator_;
+  template <bool Const>
+  friend class Iterator_;
 
   using Iterator = Iterator_<false>;
   using ConstIterator = Iterator_<true>;
@@ -105,7 +109,7 @@ public:
    *
    * \return See alternative version.
    */
-  template<typename P>
+  template <typename P>
   std::pair<Iterator, bool> insert(P&& pair) noexcept;
 
   /*!
@@ -171,7 +175,7 @@ public:
    */
   std::size_t size() const noexcept;
 
-private:
+ private:
   // Helper method for public findOrBefore()
   Key doFindOrBefore(Key ptr) const noexcept;
 
@@ -183,9 +187,8 @@ private:
   mutable JudySlot* m_last; // last found value in judy array
   mutable uintptr_t m_oper; // address of last object to set internal judy state
   FixedMallocPool m_pool;   // value pool
-  std::size_t m_size;            // number of objects stored
+  std::size_t m_size;       // number of objects stored
 };
-
 
 } // end of namespace util
 } // end of namespace umpire

@@ -5,10 +5,8 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-
-#include "umpire/config.hpp"
-
 #include "umpire/ResourceManager.hpp"
+#include "umpire/config.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 
@@ -20,11 +18,7 @@ TEST(CudaAdviseAccessedBy, Find)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  ASSERT_NO_THROW(
-      op_registry.find(
-      "ACCESSED_BY",
-      strategy,
-      strategy));
+  ASSERT_NO_THROW(op_registry.find("ACCESSED_BY", strategy, strategy));
 }
 
 TEST(CudaAdviseAccessedBy, Apply)
@@ -35,19 +29,15 @@ TEST(CudaAdviseAccessedBy, Apply)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation = op_registry.find(
-      "ACCESSED_BY",
-      strategy,
-      strategy);
+  auto advice_operation = op_registry.find("ACCESSED_BY", strategy, strategy);
 
-  float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
+  float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
 
   ASSERT_NO_THROW(
-    advice_operation->apply(
-      data,
-      nullptr, // AllocationRecord* is unused
-      0, // val is unused
-      1024*sizeof(float)));
+      advice_operation->apply(data,
+                              nullptr, // AllocationRecord* is unused
+                              0,       // val is unused
+                              1024 * sizeof(float)));
 }
 
 TEST(CudaAdvisePreferredLocation, Find)
@@ -58,11 +48,7 @@ TEST(CudaAdvisePreferredLocation, Find)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  ASSERT_NO_THROW(
-      op_registry.find(
-      "PREFERRED_LOCATION",
-      strategy,
-      strategy));
+  ASSERT_NO_THROW(op_registry.find("PREFERRED_LOCATION", strategy, strategy));
 }
 
 TEST(CudaAdvisePreferredLocation, Apply)
@@ -73,20 +59,16 @@ TEST(CudaAdvisePreferredLocation, Apply)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation = op_registry.find(
-      "PREFERRED_LOCATION",
-      strategy,
-      strategy);
+  auto advice_operation =
+      op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
-  float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
-  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
+  float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
+  auto record =
+      new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
 
-  ASSERT_NO_THROW(
-    advice_operation->apply(
-      data,
-      record,
-      0, // val is unused
-      1024*sizeof(float)));
+  ASSERT_NO_THROW(advice_operation->apply(data, record,
+                                          0, // val is unused
+                                          1024 * sizeof(float)));
 
   allocator.deallocate(data);
   delete record;
@@ -100,20 +82,16 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation = op_registry.find(
-      "PREFERRED_LOCATION",
-      strategy,
-      strategy);
+  auto advice_operation =
+      op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
-  float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
-  auto record = new umpire::util::AllocationRecord{data, 1024*sizeof(float), strategy};
+  float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
+  auto record =
+      new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
 
-  ASSERT_NO_THROW(
-    advice_operation->apply(
-      data,
-      record,
-      0, // val is unused
-      1024*sizeof(float)));
+  ASSERT_NO_THROW(advice_operation->apply(data, record,
+                                          0, // val is unused
+                                          1024 * sizeof(float)));
 
   allocator.deallocate(data);
   delete record;
@@ -127,11 +105,7 @@ TEST(CudaAdviseReadMostly, Find)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  ASSERT_NO_THROW(
-      op_registry.find(
-      "READ_MOSTLY",
-      strategy,
-      strategy));
+  ASSERT_NO_THROW(op_registry.find("READ_MOSTLY", strategy, strategy));
 }
 
 TEST(CudaAdviseReadMostly, Apply)
@@ -142,17 +116,13 @@ TEST(CudaAdviseReadMostly, Apply)
   auto allocator = rm.getAllocator("UM");
   auto strategy = allocator.getAllocationStrategy();
 
-  auto advice_operation = op_registry.find(
-      "READ_MOSTLY",
-      strategy,
-      strategy);
+  auto advice_operation = op_registry.find("READ_MOSTLY", strategy, strategy);
 
-  float* data = static_cast<float*>(allocator.allocate(1024*sizeof(float)));
+  float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
 
   ASSERT_NO_THROW(
-    advice_operation->apply(
-      data,
-      nullptr, // AllocationRecord* is unused
-      0, // val is unused
-      1024*sizeof(float)));
+      advice_operation->apply(data,
+                              nullptr, // AllocationRecord* is unused
+                              0,       // val is unused
+                              1024 * sizeof(float)));
 }

@@ -15,18 +15,20 @@
 namespace umpire {
 
 namespace strategy {
-  class AllocationStrategy;
+class AllocationStrategy;
 }
 
 namespace util {
 
-struct AllocationRecord
-{
+struct AllocationRecord {
   AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
-    : ptr{p}, size{s}, strategy{strat} {}
+      : ptr{p}, size{s}, strategy{strat}
+  {
+  }
 
-  AllocationRecord()
-    : ptr{nullptr}, size{0}, strategy{nullptr} { }
+  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}
+  {
+  }
 
   void* ptr;
   std::size_t size;

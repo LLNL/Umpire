@@ -15,7 +15,7 @@ namespace umpire {
  * \brief Lightweight allocator for use in GPU code
  */
 class DeviceAllocator {
-  public:
+ public:
   /*!
    *
    * \brief Construct a new DeviceAllocator that will use allocator to allocate
@@ -23,14 +23,11 @@ class DeviceAllocator {
    *
    * \param allocator Allocator to use for allocating memory.
    */
-   __host__
-  DeviceAllocator(Allocator allocator, size_t size);
+  __host__ DeviceAllocator(Allocator allocator, size_t size);
 
-   __host__
-  ~DeviceAllocator();
+  __host__ ~DeviceAllocator();
 
-   __host__ __device__
-   DeviceAllocator(const DeviceAllocator& other);
+  __host__ __device__ DeviceAllocator(const DeviceAllocator& other);
 
   /*
    * \brief Allocate size objects of type T.
@@ -39,20 +36,18 @@ class DeviceAllocator {
    *
    * \return Pointer to the start of the allocated memory.
    */
-  __device__
-  void* allocate(size_t size);
+  __device__ void* allocate(size_t size);
 
-  private:
-    umpire::Allocator m_allocator;
+ private:
+  umpire::Allocator m_allocator;
 
-    char* m_ptr;
-    unsigned int* m_counter;
+  char* m_ptr;
+  unsigned int* m_counter;
 
-    size_t m_size;
+  size_t m_size;
 
-    bool m_child;
+  bool m_child;
 };
-
 
 } // end of namespace umpire
 
