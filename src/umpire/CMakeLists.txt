@@ -89,6 +89,12 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (NOT WIN32)
+  set(umpire_depends
+    ${umpire_depends}
+    ${CMAKE_DL_LIBS})
+endif ()
+
 set (umpire_defines)
 
 if (COMPILER_FAMILY_IS_MSVC AND NOT BUILD_SHARED_LIBS)
@@ -103,6 +109,13 @@ blt_add_library(
   SOURCES ${umpire_sources} ${umpire_interface_sources}
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
+
+if (NOT WIN32)
+  blt_add_target_link_flags(
+    TO umpire
+    FLAGS "-rdynamic"
+  )
+endif()
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
