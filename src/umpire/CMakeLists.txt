@@ -105,14 +105,12 @@ blt_add_library(
   DEFINES ${umpire_defines})
 
 if (NOT WIN32)
-  blt_add_target_link_flags(
-    TO umpire
-    SCOPE INTERFACE
-    FLAGS "-rdynamic"
+  target_link_options(
+    umpire INTERFACE $<BUILD_INTERFACE:-rdynamic>
   )
 
   target_link_libraries(
-    umpire INTERFACE ${CMAKE_DL_LIBS}
+    umpire INTERFACE $<BUILD_INTERFACE:${CMAKE_DL_LIBS}>
   )
 endif()
 
