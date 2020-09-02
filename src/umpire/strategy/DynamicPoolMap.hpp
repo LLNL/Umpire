@@ -35,6 +35,8 @@ namespace strategy {
 class DynamicPoolMap : public AllocationStrategy,
                        private mixins::AlignedAllocation {
  public:
+  using AllocationStrategy::allocate;
+
   using Pointer = void*;
 
   using CoalesceHeuristic =

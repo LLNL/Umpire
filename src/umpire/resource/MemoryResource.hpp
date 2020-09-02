@@ -22,6 +22,8 @@ namespace resource {
  */
 class MemoryResource : public strategy::AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   /*!
    * \brief Construct a MemoryResource with the given name and id.
    *

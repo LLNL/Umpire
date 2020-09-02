@@ -25,6 +25,8 @@ namespace strategy {
  */
 class NumaPolicy : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   NumaPolicy(const std::string& name, int id, Allocator allocator,
              int numa_node);
 
