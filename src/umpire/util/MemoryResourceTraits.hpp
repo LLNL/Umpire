@@ -23,8 +23,16 @@ struct MemoryResourceTraits {
   enum class vendor_type { UNKNOWN, AMD, IBM, INTEL, NVIDIA };
 
   enum class memory_type { UNKNOWN, DDR, GDDR, HBM, NVME };
-  
-  enum class resource_type { UNKNOWN, HOST, DEVICE, DEVICE_CONST, PINNED, UM, FILE };
+
+  enum class resource_type {
+    UNKNOWN,
+    HOST,
+    DEVICE,
+    DEVICE_CONST,
+    PINNED,
+    UM,
+    FILE
+  };
 
   int id;
 

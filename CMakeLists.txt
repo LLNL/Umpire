@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 3.0.0)
+  VERSION 4.0.0)
 
 set(UMPIRE_VERSION_RC "")
 

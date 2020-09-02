@@ -17,7 +17,7 @@ namespace resource {
 bool OpenMPTargetResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  if ((name.find("CONST") == std::string::npos) && 
+  if ((name.find("CONST") == std::string::npos) &&
       (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
