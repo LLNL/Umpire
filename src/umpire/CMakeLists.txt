@@ -89,12 +89,6 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
-if (NOT WIN32)
-  set(umpire_depends
-    ${umpire_depends}
-    ${CMAKE_DL_LIBS})
-endif ()
-
 set (umpire_defines)
 
 if (COMPILER_FAMILY_IS_MSVC AND NOT BUILD_SHARED_LIBS)
@@ -113,7 +107,12 @@ blt_add_library(
 if (NOT WIN32)
   blt_add_target_link_flags(
     TO umpire
+    SCOPE INTERFACE
     FLAGS "-rdynamic"
+  )
+
+  target_link_libraries(
+    umpire INTERFACE ${CMAKE_DL_LIBS}
   )
 endif()
 
