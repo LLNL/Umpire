@@ -14,7 +14,7 @@
 # Per-user settings (overrides default and site settings):
 #   ~/.spack/packages.yaml
 # -------------------------------------------------------------------------
-packages:
+packages::
   all:
     compiler: [clang]
 
