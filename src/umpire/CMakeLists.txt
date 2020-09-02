@@ -106,7 +106,8 @@ blt_add_library(
 
 if (NOT WIN32)
   target_link_options(
-    umpire INTERFACE $<BUILD_INTERFACE:-rdynamic>
+    umpire INTERFACE 
+    $<BUILD_INTERFACE:$<$<NOT:$<LINK_LANGUAGE:Fortran>>:-rdynamic>>
   )
 
   target_link_libraries(
