@@ -63,3 +63,16 @@ compilers::
       fc: /usr/local/bin/gfortran
     spec: clang@10.0.0
     target: x86_64
+- compiler:
+    environment: {}
+    extra_rpaths: []
+    flags: {}
+    modules: []
+    operating_system: catalina
+    paths:
+      cc: /usr/bin/clang
+      cxx: /usr/bin/clang++
+      f77: /usr/local/bin/gfortran
+      fc: /usr/local/bin/gfortran
+    spec: clang@11.0.0-apple
+    target: x86_64
