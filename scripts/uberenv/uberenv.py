@@ -53,6 +53,7 @@
 
 import os
 import sys
+import stat
 import subprocess
 import shutil
 import socket
@@ -420,6 +421,16 @@ class SpackEnv(UberEnv):
         # environment is well designed.
 
         self.spack_cmd = "{} -e {}".format(self.spack_cmd,self.config_dir())
+
+        # A simple proxy script for spack
+        uber_spack='#!/bin/bash\n$(dirname ${{0}})/{} "$@"\n'.format(self.spack_cmd)
+
+        with open('uber-spack','w+') as script:
+            script.write(uber_spack)
+
+        # Making the script executable
+        st = os.stat('uber-spack')
+        os.chmod('uber-spack', st.st_mode | stat.S_IEXEC)
 
         # hot-copy our packages into spack
         if self.pkgs:
