@@ -12,6 +12,8 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
+#include <nvtx3/nvToolsExtMem.h>
+
 namespace umpire {
 namespace strategy {
 
@@ -81,6 +83,18 @@ void* QuickPool::allocate(std::size_t bytes)
     }
 
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ret, size);
+    auto nvtxDomain = nvtxDomainCreate(getName().c_str());
+    nvtxMemVirtualDesc_t nvtxHeapDesc = { 0 };
+    nvtxHeapDesc.extCompatID = NVTX_EXT_COMPATID_MEM;
+    nvtxHeapDesc.structSize = sizeof(nvtxMemVirtualDesc_t);
+    nvtxHeapDesc.ptr = ret;
+    nvtxHeapDesc.size = size;
+    m_nvtxPool = nvtxMemHeapRegister(
+      nvtxDomain,
+      NVTX_MEM_HEAP_USAGE_TYPE_SUB_ALLOCATOR,
+      NVTX_MEM_TYPE_VIRTUAL_ADDRESS,
+      &nvtxHeapDesc);
+
     m_actual_bytes += size;
     m_releasable_bytes += size;
 
@@ -127,6 +141,7 @@ void* QuickPool::allocate(std::size_t bytes)
   }
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
+  nvtxMemRegionRegister(m_nvtxDomain, m_nvtxPool, ret, bytes);
   return ret;
 }
 
@@ -139,6 +154,7 @@ void QuickPool::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, chunk->size);
+  nvtxMemRegionUnregister(m_nvtxDomain, m_nvtxPool, ptr);
 
   if (chunk->prev && chunk->prev->free == true) {
     auto prev = chunk->prev;
@@ -206,6 +222,7 @@ void QuickPool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
       UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
+      nvtxMemHeapUnregister(m_nvtxDomain, m_nvtxPool);
       m_actual_bytes -= chunk->chunk_size;
       aligned_deallocate(chunk->data);
 

@@ -118,6 +118,20 @@ if (ENABLE_CUDA)
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   list(APPEND umpire_examples multi_device)
+
+  blt_add_executable(
+    NAME test_nvtx_mem
+    SOURCES test_nvtx_mem.cu
+    DEPENDS_ON umpire cuda)
+
+  set_source_files_properties(
+    test_nvtx_mem.cu
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  set_target_properties(
+    test_nvtx_mem
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)

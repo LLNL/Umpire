@@ -139,6 +139,17 @@ install(FILES
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
+
+include_directories(
+  SYSTEM
+  /g/g92/ukbeck/nvtx-sanitizer/nvtx-sanitizer-beta/NVTX/include
+)
+
+include_directories(
+  SYSTEM
+  /usr/tce/packages/cuda/cuda-11.0.2/include
+)
+
 add_subdirectory(src)
 
 if (ENABLE_TESTS)

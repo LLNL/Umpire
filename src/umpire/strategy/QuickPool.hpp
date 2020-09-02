@@ -16,6 +16,11 @@
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
+struct nvtxDomainRegistration_st;
+typedef struct nvtxDomainRegistration_st nvtxDomainRegistration;
+struct nvtxMemHeap_v1;
+typedef struct nvtxMemHeap_v1 nvtxMemHeap_t;
+
 namespace umpire {
 
 class Allocator;
@@ -150,6 +155,9 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   std::size_t m_actual_bytes{0};
   std::size_t m_releasable_bytes{0};
+
+  nvtxDomainRegistration* m_nvtxDomain;
+  nvtxMemHeap_t* m_nvtxPool;
 };
 
 } // end of namespace strategy
