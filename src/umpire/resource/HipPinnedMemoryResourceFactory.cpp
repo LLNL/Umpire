@@ -48,6 +48,7 @@ MemoryResourceTraits HipPinnedMemoryResourceFactory::getDefaultTraits()
   traits.vendor = MemoryResourceTraits::vendor_type::AMD;
   traits.kind = MemoryResourceTraits::memory_type::DDR;
   traits.used_for = MemoryResourceTraits::optimized_for::access;
+  traits.resource = MemoryResourceTraits::resource_type::PINNED;
 
   return traits;
 }

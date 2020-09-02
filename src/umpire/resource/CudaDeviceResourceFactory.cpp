@@ -20,7 +20,8 @@ namespace resource {
 bool CudaDeviceResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  if (name.find("DEVICE") != std::string::npos) {
+  if ((name.find("CONST") == std::string::npos) &&
+      (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
@@ -58,6 +59,7 @@ MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
   traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   traits.id = 0;
 

@@ -16,7 +16,8 @@ namespace resource {
 bool SyclDeviceResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  if (name.find("DEVICE") != std::string::npos) {
+  if ((name.find("CONST") == std::string::npos) &&
+      (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
@@ -57,6 +58,7 @@ MemoryResourceTraits SyclDeviceResourceFactory::getDefaultTraits()
     traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
     traits.kind = MemoryResourceTraits::memory_type::GDDR;
     traits.used_for = MemoryResourceTraits::optimized_for::any;
+    traits.resource = MemoryResourceTraits::resource_type::DEVICE;
   }
 
   return traits;

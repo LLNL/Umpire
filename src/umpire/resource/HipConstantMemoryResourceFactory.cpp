@@ -16,7 +16,7 @@ namespace resource {
 bool HipConstantMemoryResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  if (name.find("DEVICE_CONST") != std::string::npos) {
+  if (name.compare("DEVICE_CONST") == 0) {
     return true;
   } else {
     return false;
@@ -46,8 +46,8 @@ MemoryResourceTraits HipConstantMemoryResourceFactory::getDefaultTraits()
 
   traits.vendor = MemoryResourceTraits::vendor_type::AMD;
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
-
   traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE_CONST;
 
   return traits;
 }

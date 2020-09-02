@@ -17,7 +17,8 @@ namespace resource {
 bool OpenMPTargetResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  if (name.find("DEVICE") != std::string::npos) {
+  if ((name.find("CONST") == std::string::npos) &&
+      (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
@@ -43,6 +44,7 @@ MemoryResourceTraits OpenMPTargetResourceFactory::getDefaultTraits()
   traits.kind = MemoryResourceTraits::memory_type::GDDR;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
   traits.id = omp_get_default_device();
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   return traits;
 }

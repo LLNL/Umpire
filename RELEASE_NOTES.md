@@ -1,3 +1,21 @@
+# v4.0.0
+
+- Added a FILE memory resource that allocates memory using mmap'd files. This
+  can be used to allocate memory from the burst buffers on machines like Sierra
+  and Lassen.
+
+- All pools now have an "alignment" parameter that can be provided to the
+  constructor.
+
+- MemoryResourceTraits now includes a `resource` member that can be used to
+  indentify the underlying resource for any Allocator.
+
+- Bundled tpl cxxopts has been replaced by CLI11 (only used when ENABLE_TOOLS=On)
+
+- Fixed memory leaks in DynamicPoolList, QuickPool.
+
+- Fixed reallocate operation when called on an allocation from a pool.
+
 # v3.0.0
 
 - Added support for multiple GPU devices, detected and registered as "DEVICE_N"
