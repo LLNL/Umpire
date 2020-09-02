@@ -31,7 +31,8 @@ struct MemoryResourceTraits {
     DEVICE_CONST,
     PINNED,
     UM,
-    FILE
+    FILE,
+    SHARED
   };
 
   int id;

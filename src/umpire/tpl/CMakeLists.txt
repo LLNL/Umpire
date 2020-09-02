@@ -38,6 +38,17 @@ if (ENABLE_STATISTICS)
 endif()
 
 #
+# Boost (interprocess)
+add_library(
+  umpire_tpl_boost
+  IMPORTED GLOBAL
+  INTERFACE)
+
+target_include_directories(
+  umpire_tpl_boost
+  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/boost_1_74_0/boost )
+
+#
 # Json
 set (json_headers
   ./json/json.hpp )
