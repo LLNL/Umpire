@@ -18,3 +18,12 @@ packages:
       cuda@9.2.148: /usr/tce/packages/cuda/cuda-9.2.148
       cuda@8.0: /usr/tce/packages/cuda/cuda-8.0
     buildable: False
+# LLNL blueos mpi
+# note, we need to fake this as an existing mpi package
+# so even though this is spectrum mpi, we call it mvapich2
+  mvapich2:
+    paths:
+      mvapich2@2.2%gcc@4.9.3: /usr/tcetmp/packages/spectrum-mpi/spectrum-mpi-2017.04.03-gcc-4.9.3
+      mvapich2@2.2%clang@coral: /usr/tcetmp/packages/spectrum-mpi/spectrum-mpi-2017.04.03-clang-4.0.0
+      mvapich2@2.2%xl@13.1 : /usr/tcetmp/packages/spectrum-mpi/spectrum-mpi-2017.11.10-xl-beta-2017.10.13
+    buildable: False
