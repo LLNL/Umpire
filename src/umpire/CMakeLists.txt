@@ -27,6 +27,7 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_c_fortran_headers
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
+    interface/c_fortran/wrapUmpire.h
     interface/c_fortran/typesUmpire.h)
 
   if (ENABLE_C)
