@@ -829,6 +829,10 @@ TEST(AsyncTest, Copy)
   for (std::size_t i = 0; i < size; i++) {
     ASSERT_FLOAT_EQ(source_array[i], check_array[i]);
   }
+
+  host_alloc.deallocate(source_array);
+  host_alloc.deallocate(check_array);
+  device_alloc.deallocate(dest_array);
 }
 
 #endif

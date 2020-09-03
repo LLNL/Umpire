@@ -65,6 +65,7 @@ MemoryResourceTraits HostResourceFactory::getDefaultTraits()
   traits.vendor = cpu_vendor_type();
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::HOST;
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   traits.id = omp_get_initial_device();
