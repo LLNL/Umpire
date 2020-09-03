@@ -159,22 +159,20 @@ static void runTest()
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  std::vector<std::string> allocators
-  {
-    "HOST"
+  std::vector<std::string> allocators;
+  allocators.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
-        ,
-        "DEVICE"
+  allocators.push_back("DEVICE");
+  for (int id = 0; id < rm.getNumDevices(); id++) {
+    allocators.push_back(std::string{"DEVICE::" + std::to_string(id)});
+  }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-        ,
-        "UM"
+  allocators.push_back("UM");
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-        ,
-        "PINNED"
+  allocators.push_back("PINNED");
 #endif
-  };
 
   for (auto basename : allocators) {
     testCopy(basename);
