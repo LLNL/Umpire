@@ -345,7 +345,7 @@ class SpackEnv(UberEnv):
 
 
     def find_spack_pkg_path_from_hash(self, pkg_name, pkg_hash):
-        res, out = sexe("{0} find -p /{1}".format(spack_cmd,pkg_hash), ret_output = True)
+        res, out = sexe("{0} find -p /{1}".format(self.spack_cmd, pkg_hash), ret_output = True)
         for l in out.split("\n"):
             if l.startswith(pkg_name):
                    return {"name": pkg_name, "path": l.split()[-1]}
@@ -353,7 +353,7 @@ class SpackEnv(UberEnv):
         sys.exit(-1)
 
     def find_spack_pkg_path(self, pkg_name, spec = ""):
-        res, out = sexe("{} find -p ".format(spack_cmd) + pkg_name + spec,ret_output = True)
+        res, out = sexe("{0} find -p {1}".format(self.spack_cmd, pkg_name+spec),ret_output = True)
         for l in out.split("\n"):
             # TODO: at least print a warning when several choices exist. This will
             # pick the first in the list.
@@ -364,7 +364,7 @@ class SpackEnv(UberEnv):
 
     # Extract the first line of the full spec
     def read_spack_full_spec(self,pkg_name,spec):
-        res, out = sexe("{} spec ".format(self.spack_cmd)  + pkg_name + " " + spec, ret_output=True)
+        res, out = sexe("{0} spec {1} {2}".format(self.spack_cmd, pkg_name, spec), ret_output=True)
         for l in out.split("\n"):
             if l.startswith(pkg_name) and l.count("@") > 0 and l.count("arch=") > 0:
                 return l.strip()
@@ -494,7 +494,7 @@ class SpackEnv(UberEnv):
             if not self.opts["install"]:
                 install_cmd += "dev-build --quiet -d {} ".format(self.pkg_src_dir)
                 if self.pkg_final_phase:
-                    install_cmd += "-u {} ".format(self.pkg_final_phase)                
+                    install_cmd += "-u {} ".format(self.pkg_final_phase)
             else:
                 install_cmd += "install "
                 if self.opts["run_tests"]:
@@ -519,12 +519,12 @@ class SpackEnv(UberEnv):
                         activate=False
                         break
                 if activate:
-                    activate_cmd = "{} activate ".format(self.spack_cmd) + pkg_name
+                    activate_cmd = "{0} activate {1}".format(self.spack_cmd,pkg_name)
                     sexe(activate_cmd, echo=True)
         # note: this assumes package extends python when +python
         # this may fail general cases
         if self.opts["install"] and "+python" in full_spec:
-            activate_cmd = "{} activate /".format(self.spack_cmd) + self.spec_hash
+            activate_cmd = "{0} activate /{1}".format(self.spack_cmd, self.spec_hash)
             sexe(activate_cmd, echo=True)
         # if user opt'd for an install, we want to symlink the final
         # install to an easy place:
@@ -589,7 +589,7 @@ class SpackEnv(UberEnv):
         mirror_cmd = self.spack_cmd()
         if self.opts["ignore_ssl_errors"]:
             mirror_cmd += "-k "
-        mirror_cmd += "mirror create -d {} --dependencies {}{}".format(mirror_path,
+        mirror_cmd += "mirror create -d {0} --dependencies {1}{2}".format(mirror_path,
                                                                     self.pkg_name,
                                                                     self.opts["spec"])
         return sexe(mirror_cmd, echo=True)
@@ -618,18 +618,18 @@ class SpackEnv(UberEnv):
 
         if existing_mirror_path and mirror_path != existing_mirror_path:
             # Existing mirror has different URL, error out
-            print("[removing existing spack mirror `{}` @ {}]".format(mirror_name,
+            print("[removing existing spack mirror `{0}` @ {1}]".format(mirror_name,
                                                                     existing_mirror_path))
             #
             # Note: In this case, spack says it removes the mirror, but we still
             # get errors when we try to add a new one, sounds like a bug
             #
-            sexe("{} mirror remove --scope=defaults {} ".format(self.spack_cmd,mirror_name),
+            sexe("{0} mirror remove --scope=defaults {1} ".format(self.spack_cmd,mirror_name),
                 echo=True)
             existing_mirror_path = None
         if not existing_mirror_path:
             # Add if not already there
-            sexe("{} mirror add --scope=defaults {} {}".format(
+            sexe("{1} mirror add --scope=defaults {1} {2}".format(
                     self.spack_cmd, mirror_name, mirror_path), echo=True)
             print("[using mirror {}]".format(mirror_path))
 
