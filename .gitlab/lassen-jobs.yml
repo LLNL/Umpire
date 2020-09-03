@@ -49,6 +49,11 @@ clang_9_0_0_libcpp (build and test on lassen):
     SPEC: "%clang@9.0.0+libcpp"
   extends: .build_and_test_on_lassen
 
+clang_9_0_0_mpi (build and test on lassen):
+  variables:
+    SPEC: "%clang@9.0.0+mpi"
+  extends: .build_and_test_on_lassen
+
 clang_9_0_0_memleak (build and test on lassen):
   variables:
     SPEC: "%clang@9.0.0 cxxflags=-fsanitize=address"
