@@ -4,7 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
+#ifndef UMPIRE_MPI_HPP
+#define UMPIRE_MPI_HPP
 
 #include "umpire/config.hpp"
 
@@ -49,3 +50,5 @@ class MPI {
 
 } // end of namespace util
 } // end of namespace umpire
+
+#endif // UMPIRE_MPI_HPP
