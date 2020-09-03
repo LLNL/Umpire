@@ -12,7 +12,11 @@ blt_add_executable(
 if (NOT C_COMPILER_FAMILY_IS_PGI)
   include(FindPythonInterp)
 
-  if (PYTHON_EXECUTABLE)
+  #
+  # Temporarily disable this test when MPI is enabled.  This will be
+  # re-enabled again for MPI when UM-703 has been fixed.
+  #
+  if (PYTHON_EXECUTABLE AND NOT ENABLE_MPI)
     add_test(
       NAME io_tests
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py 
