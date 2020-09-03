@@ -40,6 +40,7 @@ QuickPool::~QuickPool()
 void* QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
+  auto bytes_org = bytes;
   bytes = aligned_round_up(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
@@ -140,8 +141,8 @@ void* QuickPool::allocate(std::size_t bytes)
         m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
-  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
-  nvtxMemRegionRegister(m_nvtxDomain, m_nvtxPool, ret, bytes);
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes_org);
+  nvtxMemRegionRegister(m_nvtxDomain, m_nvtxPool, ret, bytes_org);
   return ret;
 }
 
