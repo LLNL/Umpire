@@ -16,8 +16,6 @@ namespace resource {
 
 class BoostMemoryResource : public MemoryResource {
   public:
-    using MemoryResource::allocate;
-
     BoostMemoryResource(Platform platform, const std::string& name, int id,
                       MemoryResourceTraits traits);
 

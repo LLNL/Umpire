@@ -25,8 +25,6 @@ namespace strategy {
  */
 class SizeLimiter : public AllocationStrategy {
  public:
-  using AllocationStrategy::allocate;
-
   SizeLimiter(const std::string& name, int id, Allocator allocator,
               std::size_t size_limit);
 

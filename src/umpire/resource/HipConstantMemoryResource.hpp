@@ -20,8 +20,6 @@ namespace resource {
 
 class HipConstantMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   HipConstantMemoryResource(const std::string& name, int id,
                             MemoryResourceTraits traits);
 
