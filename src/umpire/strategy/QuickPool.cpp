@@ -40,6 +40,7 @@ QuickPool::~QuickPool()
 void* QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
+  const auto actual_bytes = bytes;
   bytes = aligned_round_up(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
@@ -83,14 +84,14 @@ void* QuickPool::allocate(std::size_t bytes)
     }
 
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ret, size);
-    auto nvtxDomain = nvtxDomainCreate(getName().c_str());
+    m_nvtxDomain = nvtxDomainCreate(getName().c_str());
     nvtxMemVirtualDesc_t nvtxHeapDesc = { 0 };
     nvtxHeapDesc.extCompatID = NVTX_EXT_COMPATID_MEM;
     nvtxHeapDesc.structSize = sizeof(nvtxMemVirtualDesc_t);
     nvtxHeapDesc.ptr = ret;
     nvtxHeapDesc.size = size;
     m_nvtxPool = nvtxMemHeapRegister(
-      nvtxDomain,
+      m_nvtxDomain,
       NVTX_MEM_HEAP_USAGE_TYPE_SUB_ALLOCATOR,
       NVTX_MEM_TYPE_VIRTUAL_ADDRESS,
       &nvtxHeapDesc);
@@ -140,8 +141,8 @@ void* QuickPool::allocate(std::size_t bytes)
         m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
-  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
-  nvtxMemRegionRegister(m_nvtxDomain, m_nvtxPool, ret, bytes);
+  UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, actual_bytes);
+  nvtxMemRegionRegister(m_nvtxDomain, m_nvtxPool, ret, actual_bytes);
   return ret;
 }
 

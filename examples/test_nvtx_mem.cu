@@ -32,9 +32,12 @@ int main(void)
 
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("DEVICE");
-  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("NVTX_POOL", allocator);
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("NVTX_POOL", allocator, 4096 );
 
-    auto alloc = (uint8_t*) pool.allocate(63);
+    uint8_t* alloc;
+    // cudaMalloc(&alloc, sizeof(uint8_t)*63);
+    alloc = (uint8_t*) pool.allocate(63);
+
     InitArray<<<1, 64>>>(alloc, 63);
     ASSERT_RT(cudaDeviceSynchronize());
 
