@@ -7,6 +7,8 @@
 #ifndef UMPIRE_MPI_HPP
 #define UMPIRE_MPI_HPP
 
+#include "umpire/config.hpp"
+
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
 #endif
