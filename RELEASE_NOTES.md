@@ -1,3 +1,8 @@
+# v4.0.1
+- Fixed Umpire builds with MPI enabled
+
+- Added missing wrapUmpire.hpp to installation directory
+
 # v4.0.0
 
 - Added a FILE memory resource that allocates memory using mmap'd files. This
