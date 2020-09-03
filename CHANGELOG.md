@@ -22,6 +22,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed Umpire builds with MPI enabled
 
+- Added missing wrapUmpire.hpp to installation directory
+
 ## [v4.0.0] - 2020-09-01
 
 ### Added
