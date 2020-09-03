@@ -13,8 +13,9 @@ if (NOT C_COMPILER_FAMILY_IS_PGI)
   include(FindPythonInterp)
 
   if (PYTHON_EXECUTABLE)
-    add_test(
+    blt_add_test(
       NAME io_tests
+      NUM_API_TASKS 1
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   endif ()
 endif ()

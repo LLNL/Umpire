@@ -95,6 +95,7 @@ class Umpire(CMakePackage, CudaPackage):
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
+    depends_on('mpi', when='+mpi')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
@@ -268,7 +269,11 @@ class Umpire(CMakePackage, CudaPackage):
 
         cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
-        cfg.write(cmake_cache_option("ENABLE_MPI", '+mpi' in spec))
+
+        if "+mpi" in spec:
+            cfg.write(cmake_cache_option("ENABLE_MPI", '+mpi' in spec))
+            cfg.write(cmake_cache_entry("MPI_CXX_COMPILER", spec['mpi'].mpicxx))
+
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
 
