@@ -16,8 +16,6 @@ namespace resource {
 
 class NullMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   NullMemoryResource(Platform platform, const std::string& name, int id,
                      MemoryResourceTraits traits);
 

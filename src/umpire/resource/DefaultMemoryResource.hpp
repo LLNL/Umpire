@@ -22,8 +22,6 @@ namespace resource {
 template <typename _allocator>
 class DefaultMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   DefaultMemoryResource(Platform platform, const std::string& name, int id,
                         MemoryResourceTraits traits);
 

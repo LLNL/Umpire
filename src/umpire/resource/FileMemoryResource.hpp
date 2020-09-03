@@ -31,8 +31,6 @@ namespace resource {
  */
 class FileMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   /*!
    * \brief Construct a new FileMemoryResource
    *
