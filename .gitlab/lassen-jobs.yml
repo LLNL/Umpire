@@ -72,5 +72,5 @@ nvcc_pgi_19.10 (build and test on lassen):
 
 xl_default_omp_target (build and test on lassen):
   variables:
-    SPEC: "%xl@default+openmptarget"
+    SPEC: "%xl@default+openmp+openmp_target"
   extends: .build_and_test_on_lassen
