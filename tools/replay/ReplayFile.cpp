@@ -71,7 +71,7 @@ std::string ReplayFile::getLine(std::size_t lineno)
   std::string line;
   std::getline(file, line);
   std::stringstream ss;
-  ss << "Line Number: " << lineno << " " << line;
+  ss << m_options.input_file << " " << lineno << " " << line;
   return ss.str();
 }
 
@@ -99,6 +99,9 @@ ReplayFile::Header* ReplayFile::getOperationsTable()
 
 void ReplayFile::copyString(std::string source, char (&dest)[max_name_length])
 {
+  if (source.length() >= max_name_length) {
+    REPLAY_ERROR( "String too large: " << source );
+  }
   strncpy( dest, source.c_str(), source.length() );
   dest[source.length()] = '\0';
 }
