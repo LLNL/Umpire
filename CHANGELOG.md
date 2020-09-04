@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - All Umpire tests and executables now built with rdynamic and -ldl
 
+- Resources are now created on-demand when accessed for the first time.
+
 ### Removed
 
 ### Fixed
