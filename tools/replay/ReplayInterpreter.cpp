@@ -467,7 +467,6 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
   if (hdr->num_allocators >= ReplayFile::max_allocators) {
     REPLAY_ERROR("Too many allocators for replay: " << hdr->num_allocators);
   }
-
   hdr->num_operations++;
 }
 
