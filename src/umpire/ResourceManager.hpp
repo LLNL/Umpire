@@ -100,6 +100,10 @@ class ResourceManager {
   template <typename Strategy, bool introspection = true, typename... Args>
   Allocator makeAllocator(const std::string& name, Args&&... args);
 
+  Allocator makeResource(const std::string& name);
+
+  Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
+
   /*!
    * \brief Register an Allocator with the ResourceManager.
    *
@@ -294,6 +298,8 @@ class ResourceManager {
   int m_id;
 
   std::mutex m_mutex;
+
+  std::vector<std::string> m_resource_names;
 
   // Methods that need access to m_allocations to print/filter records
   friend void print_allocator_records(Allocator, std::ostream&);

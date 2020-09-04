@@ -10,11 +10,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- OpenMP target test for XL on GitLab
+
 - Added Boost shared memory resource  
 
 ### Changed
 
 - All Umpire tests and executables now built with rdynamic and -ldl
+
+- Resources are now created on-demand when accessed for the first time.
 
 ### Removed
 
