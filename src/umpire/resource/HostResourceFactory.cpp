@@ -15,6 +15,10 @@
 #include "umpire/util/detect_vendor.hpp"
 #include "umpire/util/make_unique.hpp"
 
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include "omp.h"
+#endif
+
 namespace umpire {
 namespace resource {
 

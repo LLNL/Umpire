@@ -464,6 +464,9 @@ void ReplayInterpreter::replay_compileMemoryResource( void )
   op->op_allocator = hdr->num_allocators;
   m_allocator_index[allocator_name] = hdr->num_allocators;
   hdr->num_allocators++;
+  if (hdr->num_allocators >= ReplayFile::max_allocators) {
+    REPLAY_ERROR("Too many allocators for replay: " << hdr->num_allocators);
+  }
   hdr->num_operations++;
 }
 
@@ -762,6 +765,9 @@ void ReplayInterpreter::replay_compileAllocator( void )
     m_allocator_index[allocator_name] = hdr->num_allocators;
 
     hdr->num_allocators++;
+    if (hdr->num_allocators >= ReplayFile::max_allocators) {
+      REPLAY_ERROR("Too many allocators for replay: " << hdr->num_allocators);
+    }
     hdr->num_operations++;
     m_make_allocator_in_progress = false;
   }
