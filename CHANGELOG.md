@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added gitlab testing of Umpire when MPI is enabled
+
 ### Changed
 
 - All Umpire tests and executables now built with rdynamic and -ldl
