@@ -121,112 +121,126 @@ ResourceManager::ResourceManager()
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  int device_count{0};
-  auto error = ::cudaGetDeviceCount(&device_count);
-  if (error != cudaSuccess) {
-    UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
-  }
+  {
+    int device_count{0};
+    auto error = ::cudaGetDeviceCount(&device_count);
+    if (error != cudaSuccess) {
+      UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
+    }
 
-  registry.registerMemoryResource(
-      util::make_unique<resource::CudaDeviceResourceFactory>());
-  m_resource_names.push_back("DEVICE");
+    registry.registerMemoryResource(
+        util::make_unique<resource::CudaDeviceResourceFactory>());
+    m_resource_names.push_back("DEVICE");
 
-  int current_device;
-  cudaGetDevice(&current_device);
-  for (int device = 0; device < device_count; ++device) {
-    std::string name{"DEVICE::" + std::to_string(device)};
-    m_resource_names.push_back(name);
-    cudaSetDevice(device);
-    for (int other_device = 0; other_device < device_count; other_device++) {
-      if (device != other_device) {
-        cudaDeviceEnablePeerAccess(other_device, 0);
+    int current_device;
+    cudaGetDevice(&current_device);
+    for (int device = 0; device < device_count; ++device) {
+      std::string name{"DEVICE::" + std::to_string(device)};
+      m_resource_names.push_back(name);
+      cudaSetDevice(device);
+      for (int other_device = 0; other_device < device_count; other_device++) {
+        if (device != other_device) {
+          cudaDeviceEnablePeerAccess(other_device, 0);
+        }
       }
     }
-  }
-  cudaSetDevice(current_device);
+    cudaSetDevice(current_device);
 
-  registry.registerMemoryResource(
-      util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
-  m_resource_names.push_back("UM");
+    registry.registerMemoryResource(
+        util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
+    m_resource_names.push_back("UM");
 
-  registry.registerMemoryResource(
-      util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
-  m_resource_names.push_back("PINNED");
+    registry.registerMemoryResource(
+        util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
+    m_resource_names.push_back("PINNED");
 
 #if defined(UMPIRE_ENABLE_CONST)
-  registry.registerMemoryResource(
-      util::make_unique<resource::CudaConstantMemoryResourceFactory>());
-  m_resource_names.push_back("DEVICE_CONST");
+    registry.registerMemoryResource(
+        util::make_unique<resource::CudaConstantMemoryResourceFactory>());
+    m_resource_names.push_back("DEVICE_CONST");
 #endif
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-  auto error = ::hipGetDeviceCount(&device_count);
-  if (error != hipSuccess) {
-    UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
-  }
+  {
+    int device_count{0};
+    auto error = ::hipGetDeviceCount(&device_count);
+    if (error != hipSuccess) {
+      UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
+    }
 
-  registry.registerMemoryResource(
-      util::make_unique<resource::HipDeviceResourceFactory>());
-  m_resource_names.push_back("DEVICE");
+    registry.registerMemoryResource(
+        util::make_unique<resource::HipDeviceResourceFactory>());
+    m_resource_names.push_back("DEVICE");
 
-  int current_device;
-  hipGetDevice(&current_device);
-  for (int device = 0; device < device_count; ++device) {
-    std::string name{"DEVICE::" + std::to_string(device)};
-    m_resource_names.push_back(name);
-    hipSetDevice(device);
-    for (int other_device = 0; other_device < device_count; other_device++) {
-      if (device != other_device) {
-        hipDeviceEnablePeerAccess(other_device, 0);
+    int current_device;
+    hipGetDevice(&current_device);
+    for (int device = 0; device < device_count; ++device) {
+      std::string name{"DEVICE::" + std::to_string(device)};
+      m_resource_names.push_back(name);
+      hipSetDevice(device);
+      for (int other_device = 0; other_device < device_count; other_device++) {
+        if (device != other_device) {
+          hipDeviceEnablePeerAccess(other_device, 0);
+        }
       }
     }
-  }
-  hipSetDevice(current_device);
+    hipSetDevice(current_device);
 
-  registry.registerMemoryResource(
-      util::make_unique<resource::HipPinnedMemoryResourceFactory>());
-  m_resource_names.push_back("PINNED");
+    registry.registerMemoryResource(
+        util::make_unique<resource::HipPinnedMemoryResourceFactory>());
+    m_resource_names.push_back("PINNED");
 
 #if defined(UMPIRE_ENABLE_CONST)
-  registry.registerMemoryResource(
-      util::make_unique<resource::HipConstantMemoryResourceFactory>());
-  m_resource_names.push_back("DEVICE_CONST");
+    registry.registerMemoryResource(
+        util::make_unique<resource::HipConstantMemoryResourceFactory>());
+    m_resource_names.push_back("DEVICE_CONST");
 #endif
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-  auto platforms = cl::sycl::platform::get_platforms();
-  for (auto& platform : platforms) {
-    auto devices = platform.get_devices();
-    for (auto& device : devices) {
-      const std::string deviceName =
-          device.get_info<cl::sycl::info::device::name>();
-      if (device.is_gpu() &&
-          (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
-           std::string::npos))
-        device_count++;
+  {
+    int device_count{0};
+    auto platforms = cl::sycl::platform::get_platforms();
+    for (auto& platform : platforms) {
+      auto devices = platform.get_devices();
+      for (auto& device : devices) {
+        const std::string deviceName =
+            device.get_info<cl::sycl::info::device::name>();
+        if (device.is_gpu() &&
+            (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
+            std::string::npos))
+          device_count++;
+      }
     }
+
+    if (device_count == 0) {
+      UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
+    }
+
+    registry.registerMemoryResource(
+        util::make_unique<resource::SyclDeviceResourceFactory>());
+    m_resource_names.push_back("DEVICE");
+
+    registry.registerMemoryResource(
+        util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
+    m_resource_names.push_back("UM");
+
+    registry.registerMemoryResource(
+        util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
+    m_resource_names.push_back("PINNED");
   }
-
-  if (device_count == 0) {
-    UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
-  }
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::SyclDeviceResourceFactory>());
-  m_resource_names.push_back("DEVICE");
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
-  m_resource_names.push_back("UM");
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
-  m_resource_names.push_back("PINNED");
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  int device_count{device_count = omp_get_num_devices()};
+  for (int device = 0; device < device_count; ++device) {
+      std::string name{"DEVICE::" + std::to_string(device)};
+      m_resource_names.push_back(name);
+  }
+
   registry.registerMemoryResource(
       util::make_unique<resource::OpenMPTargetResourceFactory>());
   m_resource_names.push_back("DEVICE");
