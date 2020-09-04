@@ -12,7 +12,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- All Umpire tests and executables now built with rdynamic and -ldl
+
 ### Removed
+
+### Fixed
+
+- Fixed Allocator overrun problem in replay tool
+
+## [v4.0.1] - 2020-09-03
 
 ### Fixed
 
