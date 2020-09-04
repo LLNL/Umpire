@@ -98,7 +98,7 @@ class Umpire(CMakePackage, CudaPackage):
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
-    conflicts('~openmp', when='~openmp_target', msg='OpenMP target requires OpenMP')
+    conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
 
     phases = ['hostconfig', 'cmake', 'build', 'install']
 
