@@ -330,7 +330,9 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   resource::MemoryResourceRegistry& registry{
       resource::MemoryResourceRegistry::getInstance()};
 
-  traits.id = resource::resource_to_device_id(name);
+  if (name.find("DEVICE") != std::string::npos) {
+    traits.id = resource::resource_to_device_id(name);
+  }
   std::unique_ptr<strategy::AllocationStrategy> allocator{
       util::wrap_allocator<strategy::AllocationTracker,
                             strategy::ZeroByteHandler>(
