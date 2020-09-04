@@ -271,7 +271,7 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         if "+openmptarget" in spec:
-        cfg.write(cmake_cache_option("ENABLE_OPENMP_TARGET", True))
+            cfg.write(cmake_cache_option("ENABLE_OPENMP_TARGET", True))
             if ('xl' in cpp_compiler):
                 cfg.write(cmake_cache_entry("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
 
