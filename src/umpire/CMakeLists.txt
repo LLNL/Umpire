@@ -27,6 +27,7 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_c_fortran_headers
     interface/c_fortran/wrapAllocator.h
     interface/c_fortran/wrapResourceManager.h
+    interface/c_fortran/wrapUmpire.h
     interface/c_fortran/typesUmpire.h)
 
   if (ENABLE_C)
@@ -103,6 +104,17 @@ blt_add_library(
   SOURCES ${umpire_sources} ${umpire_interface_sources}
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
+
+if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.17)
+  target_link_options(
+    umpire INTERFACE 
+    $<BUILD_INTERFACE:$<$<NOT:$<LINK_LANGUAGE:Fortran>>:-rdynamic>>
+  )
+
+  target_link_libraries(
+    umpire INTERFACE $<BUILD_INTERFACE:${CMAKE_DL_LIBS}>
+  )
+endif()
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
