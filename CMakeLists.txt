@@ -59,7 +59,7 @@ set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
 else ()
-  cmake_minimum_required(VERSION 3.8)
+  cmake_minimum_required(VERSION 3.8.2)
 endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
