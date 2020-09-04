@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include "umpire/config.hpp"
+
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #include "umpire/alloc/MallocAllocator.hpp"
