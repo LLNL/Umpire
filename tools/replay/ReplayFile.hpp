@@ -31,8 +31,8 @@ public:
     , QUICKPOOL
   };
 
-  static const std::size_t max_allocators{512};
-  static const std::size_t max_name_length{256};
+  static const std::size_t max_allocators{256 * 1024};
+  static const std::size_t max_name_length{512};
 
   struct AllocatorTableEntry {
     rtype type;
@@ -114,7 +114,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 14;
+  const uint64_t REPLAY_VERSION = 15;
 
   struct Header {
     struct Magic {
