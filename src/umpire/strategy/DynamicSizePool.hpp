@@ -293,19 +293,18 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
 
   void *allocate(std::size_t size)
   {
-    size = aligned_round_up(size);
-
+    const std::size_t rounded_size{ aligned_round_up(size) };
     struct Block *best{nullptr}, *prev{nullptr};
 
-    findUsableBlock(best, prev, size);
+    findUsableBlock(best, prev, rounded_size);
 
     // Allocate a block if needed
     if (!best) {
-      allocateBlock(best, prev, size);
+      allocateBlock(best, prev, rounded_size);
     }
 
     // Split the free block
-    splitBlock(best, prev, size);
+    splitBlock(best, prev, rounded_size);
 
     // Push node to the list of used nodes
     best->next = usedBlocks;
