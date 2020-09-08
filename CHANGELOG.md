@@ -22,6 +22,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed ASAN poisoning to limit it to what user originally requested and not
+  rounded amount.
+
 - Fixed Allocator overrun problem in replay tool
 
 ## [v4.0.1] - 2020-09-03
