@@ -28,16 +28,25 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
       m_next_minimum_pool_allocation_size{
           aligned_round_up(next_minimum_pool_allocation_size)}
 {
+  UMPIRE_LOG(Debug, " { "
+    << "Name(\"" << name << "\")"
+    << ", Id(" << id << ")"
+    << ", For(\"" << allocator.getName() << "\")"
+    << " 1st_alloc(" << m_first_minimum_pool_allocation_size << ")"
+    << ", next_alloc(" << m_next_minimum_pool_allocation_size << ")"
+    << ", align(" << alignment << ")"
+    << " }");
 }
 
 QuickPool::~QuickPool()
 {
+  UMPIRE_LOG(Debug, "Releasing free blocks to device");
   release();
 }
 
 void* QuickPool::allocate(std::size_t bytes)
 {
-  UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   bytes = aligned_round_up(bytes);
 
   const auto& best = m_size_map.lower_bound(bytes);
@@ -132,7 +141,7 @@ void* QuickPool::allocate(std::size_t bytes)
 
 void QuickPool::deallocate(void* ptr)
 {
-  UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
 
@@ -188,13 +197,13 @@ void QuickPool::deallocate(void* ptr)
 
   if (m_should_coalesce(*this)) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
-    coalesce();
+    do_coalesce();
   }
 }
 
 void QuickPool::release()
 {
-  UMPIRE_LOG(Debug, "release");
+  UMPIRE_LOG(Debug, "()");
   UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
 
   std::size_t prev_size{m_actual_bytes};
@@ -262,6 +271,15 @@ std::size_t QuickPool::getLargestAvailableBlock() noexcept
 
 void QuickPool::coalesce() noexcept
 {
+  UMPIRE_LOG(Debug, "()");
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \""
+                << getName() << "\" }");
+  do_coalesce();
+}
+
+void QuickPool::do_coalesce() noexcept
+{
+  UMPIRE_LOG(Debug, "()");
   std::size_t size_pre{getActualSize()};
   release();
   std::size_t size_post{getActualSize()};
