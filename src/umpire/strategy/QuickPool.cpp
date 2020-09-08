@@ -4,10 +4,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/QuickPool.hpp"
-
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -41,6 +40,7 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
 QuickPool::~QuickPool()
 {
   UMPIRE_LOG(Debug, "Releasing free blocks to device");
+  m_is_destructing = true;
   release();
 }
 
@@ -203,8 +203,8 @@ void QuickPool::deallocate(void* ptr)
 
 void QuickPool::release()
 {
-  UMPIRE_LOG(Debug, "()");
-  UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
+  UMPIRE_LOG(Debug, "() " << m_size_map.size()
+    << " chunks in free map, m_is_destructing set to " << m_is_destructing);
 
   std::size_t prev_size{m_actual_bytes};
 
@@ -216,7 +216,22 @@ void QuickPool::release()
 
       UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
       m_actual_bytes -= chunk->chunk_size;
-      aligned_deallocate(chunk->data);
+
+      try {
+        aligned_deallocate(chunk->data);
+      }
+      catch (...) {
+        if (m_is_destructing) {
+          //
+          // Ignore the error if we are destructing as the resource to which we
+          // are releasing to may have gone away
+          //
+          UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+        }
+        else {
+          throw;
+        }
+      }
 
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);

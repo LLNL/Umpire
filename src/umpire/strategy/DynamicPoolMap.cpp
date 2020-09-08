@@ -48,6 +48,7 @@ DynamicPoolMap::DynamicPoolMap(
 DynamicPoolMap::~DynamicPoolMap()
 {
   UMPIRE_LOG(Debug, "Releasing free blocks to device");
+  m_is_destructing = true;
   // Get as many whole blocks as possible in the m_free_map
   mergeFreeBlocks();
 
@@ -60,6 +61,7 @@ DynamicPoolMap::~DynamicPoolMap()
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
     if (is_head && bytes == whole_bytes) {
+      UMPIRE_LOG(Debug, "Releasing " << whole_bytes << " size chunk @ " << addr);
       deallocateBlock(addr, bytes);
     }
   }
@@ -338,7 +340,21 @@ void DynamicPoolMap::deallocateBlock(void* ptr, std::size_t size)
 {
   UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, size);
   m_actual_bytes -= size;
-  aligned_deallocate(ptr);
+  try {
+    aligned_deallocate(ptr);
+  }
+  catch (...) {
+    if (m_is_destructing) {
+      //
+      // Ignore the error if we are destructing as the resource to which we
+      // are releasing to may have gone away
+      //
+      UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+    }
+    else {
+      throw;
+    }
+  }
 }
 
 void DynamicPoolMap::mergeFreeBlocks()

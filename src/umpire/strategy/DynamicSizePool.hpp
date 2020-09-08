@@ -48,6 +48,8 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   // Minimum size for allocations
   std::size_t m_next_minimum_pool_allocation_size;
 
+  bool m_is_destructing{false};
+
   // Search the list of free blocks and return a usable one if that exists, else
   // NULL
   void findUsableBlock(struct Block *&best, struct Block *&prev,
@@ -214,10 +216,27 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
       // Make sure to only free blocks that are completely released.
       //
       if (curr->size == curr->blockSize) {
+        UMPIRE_LOG(Debug, "Releasing " << curr->size
+          << " size chunk @ " << static_cast<void*>(curr->data));
+
         UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
         m_actual_bytes -= curr->size;
         freed += curr->size;
-        aligned_deallocate(curr->data);
+        try {
+          aligned_deallocate(curr->data);
+        }
+        catch (...) {
+          if (m_is_destructing) {
+            //
+            // Ignore the error if we are destructing as the resource to which we
+            // are releasing to may have gone away
+            //
+            UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+          }
+          else {
+            throw;
+          }
+        }
 
         if (prev)
           prev->next = curr->next;
@@ -283,6 +302,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   ~DynamicSizePool()
   {
     UMPIRE_LOG(Debug, "Releasing free blocks to device");
+    m_is_destructing = true;
     freeReleasedBlocks();
   }
 
