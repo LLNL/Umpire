@@ -247,6 +247,11 @@ Platform QuickPool::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits QuickPool::getTraits() const noexcept
+{
+  return m_allocator->getTraits();
+}
+
 std::size_t QuickPool::getBlocksInPool() const noexcept
 {
   return m_pointer_map.size() + m_size_map.size();
