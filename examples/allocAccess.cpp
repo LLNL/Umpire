@@ -23,21 +23,40 @@ int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto host_alloc = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-      "host_dynamicpool", rm.getAllocator("HOST"));
+      "host_DynamicPoolMap", rm.getAllocator("HOST"));
 
   double* data = static_cast<double*>(host_alloc.allocate(1024*sizeof(double)));
 
   std::cout << "Testing the host platform..." << std::endl;
   if(is_accessible(cPlatform::host, host_alloc)) {
     std::cout << "The allocator, " << host_alloc.getName() << 
-                 " is accessible." << std::endl << std::endl;
+                 ", is accessible." << std::endl << std::endl;
   }
   
-  std::cout << "Testing another platform..." << std::endl;
+  std::cout << "Testing the cuda platform..." << std::endl;
   if(is_accessible(cPlatform::cuda, host_alloc)) {
-    std::cout << "This would be weird..." <<std::endl;
+    std::cout << "The allocator, " << host_alloc.getName() << 
+                 ", is accessible." << std::endl << std::endl;
+  }
+ 
+  std::cout << "Testing the hip platform..." << std::endl;
+  if(is_accessible(cPlatform::hip, host_alloc)) {
+    std::cout << "The allocator, " << host_alloc.getName() << 
+                 ", is accessible." << std::endl << std::endl;
   } 
-  
+
+  std::cout << "Testing the omp_target platform..." << std::endl;
+  if(is_accessible(cPlatform::omp_target, host_alloc)) {
+    std::cout << "The allocator, " << host_alloc.getName() << 
+                 ", is accessible." << std::endl << std::endl;
+  } 
+
+  std::cout << "Testing the sycl platform..." << std::endl;
+  if(is_accessible(cPlatform::sycl, host_alloc)) {
+    std::cout << "The allocator, " << host_alloc.getName() << 
+                 ", is accessible." << std::endl << std::endl;
+  } 
+
   host_alloc.deallocate(data);
 
   return 0;

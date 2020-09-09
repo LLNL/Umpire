@@ -130,20 +130,23 @@ bool is_accessible(Platform p, Allocator a)
         return true;
     break;
     ////////////////////////////////////////////////////
-#if defined(UMPIRE_ENABLE_CUDA)    
     case (cPlatform::cuda): 
-      int pageableMem = managedMem = 0;
-      int dev = cudaGetDevice();
+    {
+#if defined(UMPIRE_ENABLE_CUDA)    
+      int pageableMem = 0;
+      int managedMem = 0;
+      int dev = 0;
+      cudaGetDevice(&dev);
 
       //Device supports coherently accessing pageable memory 
       //without calling cudaHostRegister on it
-      cudaDeviceGetAttribute(pageableMem&, 
+      cudaDeviceGetAttribute(&pageableMem, 
                      cudaDevAttrPageableMemoryAccess, dev);
-
+      
       //Device can allocate managed memory on this system
-      cudaDeviceGetAttribute(managedMem&, 
+      cudaDeviceGetAttribute(&managedMem, 
                      cudaDevAttrManagedMemory, dev);
-
+      
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::FILE)
         return false;
@@ -151,23 +154,34 @@ bool is_accessible(Platform p, Allocator a)
         return true;
       else
         return false;
-    break;
+#else
+      std::cout << "Platform is undefined" << std::endl;
+      return false;
 #endif
+    }
+    break;
     ////////////////////////////////////////////////////
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
     case (cPlatform::omp_target):
+    {
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::PINNED)
         return false;
       else
         return true;
-    break;
+#else
+      std::cout << "Platform is undefined" << std::endl;
+      return false;
 #endif
+    }
+    break;
     ////////////////////////////////////////////////////
-#if defined(UMPIRE_ENABLE_HIP)
     case (cPlatform::hip):
+    {
+#if defined(UMPIRE_ENABLE_HIP)
       hipDeviceProp_t props;
-      int dev = hipGetDevice();
+      int* dev = 0;
+      hipGetDevice(dev);
       hipGetDeviceProperties(&props, dev);
 
       if (findResource(a) == myResource::UNKNOWN 
@@ -177,24 +191,36 @@ bool is_accessible(Platform p, Allocator a)
         return true;
       else
         return false;
-    break;
+#else
+      std::cout << "Platform is undefined" << std::endl;
+      return false;
 #endif
+    }
+    break;
     ////////////////////////////////////////////////////
-#if defined(UMPIRE_ENABLE_SYCL)
     case (cPlatform::sycl):
+    {
+#if defined(UMPIRE_ENABLE_SYCL)
       if (findResource(a) == myResource::HOST
        || findResource(a) == myResource::UM)
         return true;
       else
         return false;
-    break;
-#endif
-    ////////////////////////////////////////////////////
-    default:
+#else
       std::cout << "Platform is undefined" << std::endl;
       return false;
-      break;
+#endif
+    }
+    break;
+    ////////////////////////////////////////////////////
+    default:
+    {
+      std::cout << "Platform is undefined" << std::endl;
+      return false;
+    }
+    break;
   }
+  return false;
 }
 
 MemoryResourceTraits::resource_type findResource(Allocator a) {
