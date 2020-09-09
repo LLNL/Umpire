@@ -123,6 +123,21 @@ bool pointer_overlaps(void* left, void* right);
 bool pointer_contains(void* left, void* right);
 
 /*!
+ * \brief Check whether or not an Allocator is accessible from a given platform.
+ *
+ *\param camp::Platform p  
+ *\param umpire::Allocator a 
+ */
+bool isAccessible(Platform p, Allocator a);
+
+/*!
+ * \brief Helper function to find the resource type of a given allocator
+ *
+ *\param umpire::allocator a  
+ */
+MemoryResourceTraits::resource_type findResource(Allocator a);
+
+/*!
  * \brief Get the backtrace associated with the allocation of ptr
  *
  * The string may be empty if backtraces are not enabled.

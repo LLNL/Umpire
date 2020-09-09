@@ -24,6 +24,12 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 
 blt_add_executable(
+  NAME alloc_access
+  SOURCES allocAccess.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples alloc_access)
+
+blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
   DEPENDS_ON ${example_depends})

@@ -13,7 +13,17 @@
 #include <sstream>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
+#include "camp/resource/platform.hpp"
 #include "umpire/config.hpp"
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  #include <cuda_runtime_api.h>
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+  #include <hip_runtime_api.h>
+#endif
 
 #if !defined(_MSC_VER)
 #include <unistd.h>
@@ -22,6 +32,9 @@
 #include <sstream>
 
 UMPIRE_EXPORT volatile int umpire_ver_4_found = 0;
+
+using myResource = umpire::MemoryResourceTraits::resource_type;
+using cPlatform = camp::resources::Platform;
 
 namespace umpire {
 
@@ -96,6 +109,96 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
     UMPIRE_LOG(Error, "Unknown pointer in pointer_contains");
     throw;
   }
+}
+
+bool is_accessible(Platform p, Allocator a) 
+{
+  /*              UNDEFINED  HOST  CUDA  OMP_TARGET  HIP  SYCL   
+  *  UNKNOWN          F       F     F        F        F    F
+  *  HOST             F       T     T        T        T    T
+  *  DEVICE           F       T     T        T        T    F
+  *  DEVICE_CONST     F       T     T        T        T    F 
+  *  UM               F       T     T        T        T    T 
+  *  PINNED           F       T     T        F        T    F
+  *  FILE             F       T     F        T        F    F
+  */
+  switch(p) {
+    case (cPlatform::host):
+      if(findResource(a) == myResource::UNKNOWN)
+        return false;
+      else
+        return true;
+    break;
+    ////////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_CUDA)    
+    case (cPlatform::cuda): 
+      int pageableMem = managedMem = 0;
+      int dev = cudaGetDevice();
+
+      //Device supports coherently accessing pageable memory 
+      //without calling cudaHostRegister on it
+      cudaDeviceGetAttribute(pageableMem&, 
+                     cudaDevAttrPageableMemoryAccess, dev);
+
+      //Device can allocate managed memory on this system
+      cudaDeviceGetAttribute(managedMem&, 
+                     cudaDevAttrManagedMemory, dev);
+
+      if (findResource(a) == myResource::UNKNOWN 
+       || findResource(a) == myResource::FILE)
+        return false;
+      else if(pageableMem || managedMem)
+        return true;
+      else
+        return false;
+    break;
+#endif
+    ////////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+    case (cPlatform::omp_target):
+      if (findResource(a) == myResource::UNKNOWN 
+       || findResource(a) == myResource::PINNED)
+        return false;
+      else
+        return true;
+    break;
+#endif
+    ////////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_HIP)
+    case (cPlatform::hip):
+      hipDeviceProp_t props;
+      int dev = hipGetDevice();
+      hipGetDeviceProperties(&props, dev);
+
+      if (findResource(a) == myResource::UNKNOWN 
+       || findResource(a) == myResource::FILE)
+        return false;
+      else if(props.canMapHostMemory)
+        return true;
+      else
+        return false;
+    break;
+#endif
+    ////////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_SYCL)
+    case (cPlatform::sycl):
+      if (findResource(a) == myResource::HOST
+       || findResource(a) == myResource::UM)
+        return true;
+      else
+        return false;
+    break;
+#endif
+    ////////////////////////////////////////////////////
+    default:
+      std::cout << "Platform is undefined" << std::endl;
+      return false;
+      break;
+  }
+}
+
+MemoryResourceTraits::resource_type findResource(Allocator a) {
+  return a.getAllocationStrategy()->getTraits().resource;
 }
 
 std::string get_backtrace(void* ptr)
