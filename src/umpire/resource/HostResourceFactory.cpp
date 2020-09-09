@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include "umpire/config.hpp"
+
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #include "umpire/alloc/MallocAllocator.hpp"
@@ -14,6 +16,10 @@
 
 #include "umpire/util/detect_vendor.hpp"
 #include "umpire/util/make_unique.hpp"
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+#include "omp.h"
+#endif
 
 namespace umpire {
 namespace resource {
@@ -66,6 +72,10 @@ MemoryResourceTraits HostResourceFactory::getDefaultTraits()
   traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
   traits.resource = MemoryResourceTraits::resource_type::HOST;
+
+#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
+  traits.id = omp_get_initial_device();
+#endif
 
   return traits;
 }
