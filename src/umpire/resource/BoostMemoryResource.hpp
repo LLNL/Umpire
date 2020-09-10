@@ -27,6 +27,9 @@ class BoostMemoryResource : public MemoryResource {
 
     void deallocate(void* ptr);
 
+    std::size_t getCurrentSize() const noexcept;
+    std::size_t getHighWatermark() const noexcept;
+
     Platform getPlatform() noexcept;
 
   protected:

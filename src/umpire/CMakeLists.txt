@@ -107,13 +107,21 @@ blt_add_library(
 
 if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.17)
   target_link_options(
-    umpire INTERFACE 
+    umpire INTERFACE
     $<BUILD_INTERFACE:$<$<NOT:$<LINK_LANGUAGE:Fortran>>:-rdynamic>>
   )
 
   target_link_libraries(
     umpire INTERFACE $<BUILD_INTERFACE:${CMAKE_DL_LIBS}>
   )
+
+  if (ENABLE_BOOST_RESOURCE)
+    target_link_libraries(
+      umpire INTERFACE $<BUILD_INTERFACE:-lrt>
+      umpire INTERFACE $<BUILD_INTERFACE:-pthread>
+    )
+  endif()
+
 endif()
 
 set_target_properties(umpire PROPERTIES
