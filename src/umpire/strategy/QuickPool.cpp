@@ -23,10 +23,8 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
     : AllocationStrategy{name, id},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
-      m_first_minimum_pool_allocation_size{
-          aligned_round_up(first_minimum_pool_allocation_size)},
-      m_next_minimum_pool_allocation_size{
-          aligned_round_up(next_minimum_pool_allocation_size)}
+      m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
+      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
 {
 }
 
@@ -64,14 +62,14 @@ void* QuickPool::allocate(std::size_t bytes)
                                   << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      ret = aligned_allocate(size);
+      ret = aligned_allocate(size); // Will Poison
     } catch (...) {
       UMPIRE_LOG(Error,
                  "Caught error allocating new chunk, giving up free chunks and "
                  "retrying...");
       release();
       try {
-        ret = aligned_allocate(size);
+        ret = aligned_allocate(size); // Will Poison
         UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
       } catch (...) {
         UMPIRE_LOG(Error, "recovery failed.");
@@ -79,7 +77,6 @@ void* QuickPool::allocate(std::size_t bytes)
       }
     }
 
-    UMPIRE_POISON_MEMORY_REGION(m_allocator, ret, size);
     m_actual_bytes += size;
     m_releasable_bytes += size;
 
@@ -204,7 +201,6 @@ void QuickPool::release()
     if ((chunk->size == chunk->chunk_size) && chunk->free) {
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
-      UMPIRE_POISON_MEMORY_REGION(m_allocator, chunk->data, chunk->chunk_size);
       m_actual_bytes -= chunk->chunk_size;
       aligned_deallocate(chunk->data);
 

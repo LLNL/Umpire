@@ -89,7 +89,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
                                   << umpire::util::backtracer<>::print(bt));
       }
 #endif
-      data = aligned_allocate(size);
+      data = aligned_allocate(size);  // Will POISON
     } catch (...) {
       UMPIRE_LOG(Error,
                  "\n\tMemory exhausted at allocation resource. "
@@ -103,7 +103,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
                      << getFreeBlocks() << " Free Blocks, " << getInUseBlocks()
                      << " Used Blocks\n");
       try {
-        data = aligned_allocate(size);
+        data = aligned_allocate(size);  // Will POISON
         UMPIRE_LOG(Error,
                    "\n\tMemory successfully recovered at resource.  Allocation "
                    "succeeded\n");
@@ -117,8 +117,6 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
         throw;
       }
     }
-
-    UMPIRE_POISON_MEMORY_REGION(m_allocator, data, size);
 
     m_actual_bytes += size;
 
@@ -226,7 +224,6 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
       // Make sure to only free blocks that are completely released.
       //
       if (curr->size == curr->blockSize) {
-        UMPIRE_POISON_MEMORY_REGION(m_allocator, curr->data, curr->size);
         m_actual_bytes -= curr->size;
         freed += curr->size;
         aligned_deallocate(curr->data);
@@ -277,10 +274,8 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
         usedBlocks{nullptr},
         freeBlocks{nullptr},
         m_actual_bytes{0},
-        m_first_minimum_pool_allocation_size{
-            aligned_round_up(first_minimum_pool_allocation_size)},
-        m_next_minimum_pool_allocation_size{
-            aligned_round_up(next_minimum_pool_allocation_size)}
+        m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
+        m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
   {
   }
 

@@ -30,10 +30,8 @@ DynamicPoolMap::DynamicPoolMap(
     : AllocationStrategy{name, id},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
-      m_first_minimum_pool_allocation_size{
-          aligned_round_up(first_minimum_pool_allocation_size)},
-      m_next_minimum_pool_allocation_size{
-          aligned_round_up(next_minimum_pool_allocation_size)}
+      m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
+      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
 {
 }
 
@@ -106,7 +104,7 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
                                  << umpire::util::backtracer<>::print(bt));
     }
 #endif
-    ptr = aligned_allocate(bytes);
+    ptr = aligned_allocate(bytes);  // Will POISON
   } catch (...) {
     UMPIRE_LOG(Error,
                "\n\tMemory exhausted at allocation resource. "
@@ -121,7 +119,7 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
                    << getFreeBlocks() << " Free Blocks, " << getInUseBlocks()
                    << " Used Blocks\n");
     try {
-      ptr = aligned_allocate(bytes);
+      ptr = aligned_allocate(bytes);  // Will POISON
       UMPIRE_LOG(Error,
                  "\n\tMemory successfully recovered at resource.  Allocation "
                  "succeeded\n");
@@ -136,8 +134,6 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
     }
   }
 
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
-
   m_actual_bytes += bytes;
 
   return ptr;
@@ -145,7 +141,6 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
 
 void DynamicPoolMap::deallocateBlock(void* ptr, std::size_t size)
 {
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, size);
   m_actual_bytes -= size;
   aligned_deallocate(ptr);
 }
