@@ -54,5 +54,15 @@ Platform BoostMemoryResource::getPlatform() noexcept
   return m_platform;
 }
 
+std::size_t BoostMemoryResource::getCurrentSize() const noexcept
+{
+  return 0;
+}
+
+std::size_t BoostMemoryResource::getHighWatermark() const noexcept
+{
+  return 0;
+}
+
 } // end of namespace resource
 } // end of namespace umpire

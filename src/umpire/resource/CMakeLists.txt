@@ -47,12 +47,14 @@ if(ENABLE_BOOST_RESOURCE)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     BoostMemoryResource.hpp
+    BoostMemoryResourceFactory.hpp
     BoostMemoryResourceImpl.hpp
   )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
     BoostMemoryResource.cpp
+    BoostMemoryResourceFactory.cpp
   )
 endif()
 
