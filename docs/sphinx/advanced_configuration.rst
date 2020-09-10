@@ -17,10 +17,11 @@ Here is a summary of the configuration options, their default value, and meaning
     ============================  ======== ===========================================================================
     Variable                      Default  Meaning
     ============================  ======== ===========================================================================
+    ``ENABLE_BOOST_RESOURCE``     Off      Enable BOOST Shared Memory support
     ``ENABLE_CUDA``               Off      Enable CUDA support
     ``ENABLE_HIP``                Off      Enable HIP support
     ``ENABLE_NUMA``               Off      Enable NUMA support
-    ``ENABLE_FILE_RESOURCE``      Off      Enable FILE support      
+    ``ENABLE_FILE_RESOURCE``      Off      Enable FILE support
     ``ENABLE_STATISTICS``         Off      Enable collection of memory statistics
     ``ENABLE_TESTING``            On       Build test executables
     ``ENABLE_BENCHMARKS``         On       Build benchmark programs
@@ -51,9 +52,13 @@ These arguments are explained in more detail below:
   :class:`umpire::strategy::NumaPolicy` is available when built with this
   option, which may be used to locate the allocation to a specific node.
 
+* ``ENABLE_BOOST_RESOURCE``
+  This option enables support for interprocess shared memory on the ``HOST``
+  platform via Boost Interprocess
+
 * ``ENABLE_FILE_RESOURCE``
-  This option will allow the build to make all File Memory Allocation files. 
-  If Umpire is built without FILE, CUDA or HIP support, then only the ``HOST`` 
+  This option will allow the build to make all File Memory Allocation files.
+  If Umpire is built without FILE, CUDA or HIP support, then only the ``HOST``
   allocator is available for use.
 
 * ``ENABLE_STATISTICS``
