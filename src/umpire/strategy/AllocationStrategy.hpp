@@ -117,6 +117,13 @@ class AllocationStrategy {
    */
   int getId() noexcept;
 
+  /*!
+   * \brief Find out if this strategy uses threads or not.
+   *
+   * \return A boolean value for whether or not there are threads.
+   */
+  virtual bool getThreaded() const noexcept;
+
   friend std::ostream& operator<<(std::ostream& os,
                                   const AllocationStrategy& strategy);
 
@@ -124,8 +131,8 @@ class AllocationStrategy {
 
  protected:
   std::string m_name;
-
   int m_id;
+  bool m_threaded;
 };
 
 } // end of namespace strategy

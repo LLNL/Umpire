@@ -63,6 +63,11 @@ Platform AlignedAllocator::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+bool AlignedAllocator::getThreaded() const noexcept
+{
+  return m_threaded;
+}
+
 MemoryResourceTraits AlignedAllocator::getTraits() const noexcept
 {
   return m_allocator->getTraits();

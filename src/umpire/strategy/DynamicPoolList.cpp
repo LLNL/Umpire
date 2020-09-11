@@ -87,6 +87,11 @@ Platform DynamicPoolList::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+bool DynamicPoolList::getThreaded() const noexcept 
+{
+  return m_threaded;
+}
+
 MemoryResourceTraits DynamicPoolList::getTraits() const noexcept
 {
   return m_allocator->getTraits();

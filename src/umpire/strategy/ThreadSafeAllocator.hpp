@@ -30,13 +30,15 @@ class ThreadSafeAllocator : public AllocationStrategy {
   void deallocate(void* ptr) override;
 
   Platform getPlatform() noexcept override;
-
+  bool getThreaded() const noexcept override;
   MemoryResourceTraits getTraits() const noexcept override;
 
  protected:
   strategy::AllocationStrategy* m_allocator;
-
   std::mutex m_mutex;
+
+ private:
+  const bool m_threaded = true;
 };
 
 } // end of namespace strategy

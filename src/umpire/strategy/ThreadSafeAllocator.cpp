@@ -39,6 +39,11 @@ Platform ThreadSafeAllocator::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+bool ThreadSafeAllocator::getThreaded() const noexcept
+{
+  return m_threaded;
+}
+
 MemoryResourceTraits ThreadSafeAllocator::getTraits() const noexcept
 {
   return m_allocator->getTraits();

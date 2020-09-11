@@ -31,6 +31,11 @@ int AllocationStrategy::getId() noexcept
   return m_id;
 }
 
+bool AllocationStrategy::getThreaded() const noexcept
+{
+  return m_threaded;
+}
+
 std::size_t AllocationStrategy::getCurrentSize() const noexcept
 {
   return 0;

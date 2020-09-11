@@ -22,7 +22,7 @@ class AlignedAllocator : public AllocationStrategy {
   void deallocate(void* ptr) override;
 
   Platform getPlatform() noexcept override;
-
+  bool getThreaded() const noexcept override;
   MemoryResourceTraits getTraits() const noexcept override;
 
  protected:
@@ -31,6 +31,7 @@ class AlignedAllocator : public AllocationStrategy {
  private:
   std::size_t m_alignment;
   uintptr_t m_mask;
+  const bool m_threaded = true;
 };
 
 } // end of namespace strategy

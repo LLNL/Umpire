@@ -65,7 +65,7 @@ class DynamicPoolList : public AllocationStrategy {
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
-
+  bool getThreaded() const noexcept override;
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept final override;
@@ -104,6 +104,7 @@ class DynamicPoolList : public AllocationStrategy {
   strategy::AllocationStrategy* m_allocator;
   DynamicSizePool<> dpa;
   CoalesceHeuristic m_should_coalesce;
+  const bool m_threaded = true;
 };
 
 } // end of namespace strategy

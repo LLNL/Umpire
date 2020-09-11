@@ -140,9 +140,14 @@ class Allocator {
   int getId() const noexcept;
 
   /*!
+   * \brief Find out if this strategy uses threads or not.
+   *
+   * \return A boolean value for whether or not there are threads.
+   */
+  bool getThreaded() noexcept;
+  
+  /*!
    * \brief Get the AllocationStrategy object used by this Allocator.
-   *
-   *
    *
    * \return Pointer to the AllocationStrategy.
    */

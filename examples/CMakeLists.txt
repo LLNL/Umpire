@@ -30,6 +30,12 @@ blt_add_executable(
 list(APPEND umpire_examples malloc)
 
 blt_add_executable(
+  NAME threaded
+  SOURCES threaded_test.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples threaded)
+
+blt_add_executable(
   NAME strategy_example
   SOURCES strategy_example.cpp
   DEPENDS_ON ${example_depends})
