@@ -115,12 +115,12 @@ bool is_accessible(Platform p, Allocator a)
 {
   /*              UNDEFINED  HOST  CUDA  OMP_TARGET  HIP  SYCL   
   *  UNKNOWN          F       F     F        F        F    F
-  *  HOST             F       T     T        T        T    T
-  *  DEVICE           F       T     T        T        T    F
+  *  HOST             F       T     T        T        T    F
+  *  DEVICE           F       T     T        T        T    T
   *  DEVICE_CONST     F       T     T        T        T    F 
   *  UM               F       T     T        T        T    T 
-  *  PINNED           F       T     T        F        T    F
-  *  FILE             F       T     F        T        F    F
+  *  PINNED           F       T     T        T        T    F
+  *  FILE             F       T     F        F        F    F
   */
   switch(p) {
     case (cPlatform::host):
@@ -134,7 +134,6 @@ bool is_accessible(Platform p, Allocator a)
     {
 #if defined(UMPIRE_ENABLE_CUDA)    
       int pageableMem = 0;
-      int managedMem = 0;
       int dev = 0;
       cudaGetDevice(&dev);
 
@@ -143,14 +142,10 @@ bool is_accessible(Platform p, Allocator a)
       cudaDeviceGetAttribute(&pageableMem, 
                      cudaDevAttrPageableMemoryAccess, dev);
       
-      //Device can allocate managed memory on this system
-      cudaDeviceGetAttribute(&managedMem, 
-                     cudaDevAttrManagedMemory, dev);
-      
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::FILE)
         return false;
-      else if(pageableMem || managedMem)
+      else if(pageableMem)
         return true;
       else
         return false;
@@ -164,8 +159,8 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::omp_target):
     {
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-      if (findResource(a) == myResource::UNKNOWN 
-       || findResource(a) == myResource::PINNED)
+      if (findResource(a) == myResource::UNKNOWN
+       || findResource(a) == myResource::FILE)
         return false;
       else
         return true;
@@ -182,6 +177,8 @@ bool is_accessible(Platform p, Allocator a)
       hipDeviceProp_t props;
       int* dev = 0;
       hipGetDevice(dev);
+
+      //Check whether HIP can map host memory.
       hipGetDeviceProperties(&props, dev);
 
       if (findResource(a) == myResource::UNKNOWN 
@@ -201,7 +198,7 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::sycl):
     {
 #if defined(UMPIRE_ENABLE_SYCL)
-      if (findResource(a) == myResource::HOST
+      if (findResource(a) == myResource::DEVICE
        || findResource(a) == myResource::UM)
         return true;
       else
