@@ -15,6 +15,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
@@ -67,6 +68,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t getReleasableSize() const noexcept;
 
   Platform getPlatform() noexcept override;
+
+  MemoryResourceTraits getTraits() const noexcept override;
 
   /*!
    * \brief Return the number of memory blocks -- both leased to application

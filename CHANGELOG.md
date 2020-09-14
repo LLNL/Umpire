@@ -26,6 +26,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   previously allocated blocks to a device that has already been cleaned up
   will no longer throw an error, but instead will now be logged and ignored.
 
+- Added missing getTraits() call to QuickPool
+
 - Fixed Allocator overrun problem in replay tool
 
 ## [v4.0.1] - 2020-09-03
