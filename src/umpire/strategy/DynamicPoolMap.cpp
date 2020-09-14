@@ -31,18 +31,20 @@ DynamicPoolMap::DynamicPoolMap(
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{
-          aligned_round_up(first_minimum_pool_allocation_size)},
+            first_minimum_pool_allocation_size},
       m_next_minimum_pool_allocation_size{
-          aligned_round_up(next_minimum_pool_allocation_size)}
+            next_minimum_pool_allocation_size}
 {
-  UMPIRE_LOG(Debug, " { "
-    << "Name(\"" << name << "\")"
-    << ", Id(" << id << ")"
-    << ", For(\"" << allocator.getName() << "\")"
-    << " 1st_alloc(" << m_first_minimum_pool_allocation_size << ")"
-    << ", next_alloc(" << m_next_minimum_pool_allocation_size << ")"
-    << ", align(" << alignment << ")"
-    << " }");
+  UMPIRE_LOG(Debug, " ( "
+    << "name=\"" << name << "\""
+    << ", id=" << id
+    << ", allocator=\"" << allocator.getName() << "\""
+    << ", first_minimum_pool_allocation_size="
+        << m_first_minimum_pool_allocation_size
+    << ", next_minimum_pool_allocation_size="
+        << m_next_minimum_pool_allocation_size
+    << ", alignment=" << alignment
+    << " )");
 }
 
 DynamicPoolMap::~DynamicPoolMap()
@@ -346,8 +348,8 @@ void DynamicPoolMap::deallocateBlock(void* ptr, std::size_t size)
   catch (...) {
     if (m_is_destructing) {
       //
-      // Ignore the error if we are destructing as the resource to which we
-      // are releasing to may have gone away
+      // Ignore error in case the underlying vendor API has already
+      // shutdown
       //
       UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
     }

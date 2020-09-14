@@ -228,8 +228,8 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
         catch (...) {
           if (m_is_destructing) {
             //
-            // Ignore the error if we are destructing as the resource to which we
-            // are releasing to may have gone away
+            // Ignore error in case the underlying vendor API has already
+            // shutdown
             //
             UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
           }
@@ -285,16 +285,18 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
         freeBlocks{nullptr},
         m_actual_bytes{0},
         m_first_minimum_pool_allocation_size{
-            aligned_round_up(first_minimum_pool_allocation_size)},
+              first_minimum_pool_allocation_size},
         m_next_minimum_pool_allocation_size{
-            aligned_round_up(next_minimum_pool_allocation_size)}
+              next_minimum_pool_allocation_size}
   {
-    UMPIRE_LOG(Debug, " { "
-      << "Pool For(\"" << strat->getName() << "\")"
-      << " 1st_alloc(" << m_first_minimum_pool_allocation_size << ")"
-      << ", next_alloc(" << m_next_minimum_pool_allocation_size << ")"
-      << ", align(" << alignment << ")"
-      << " }");
+    UMPIRE_LOG(Debug, " ( "
+      << ", allocator=\"" << strat->getName() << "\""
+      << ", first_minimum_pool_allocation_size="
+          << m_first_minimum_pool_allocation_size
+      << ", next_minimum_pool_allocation_size="
+          << m_next_minimum_pool_allocation_size
+      << ", alignment=" << alignment
+      << " )");
   }
 
   DynamicSizePool(const DynamicSizePool &) = delete;
