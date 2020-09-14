@@ -4,10 +4,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/strategy/QuickPool.hpp"
-
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -23,19 +22,33 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
     : AllocationStrategy{name, id},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
-      m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
-      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
+      m_first_minimum_pool_allocation_size{
+            first_minimum_pool_allocation_size},
+      m_next_minimum_pool_allocation_size{
+            next_minimum_pool_allocation_size}
 {
+  UMPIRE_LOG(Debug, " ( "
+    << "name=\"" << name << "\""
+    << ", id=" << id
+    << ", allocator=\"" << allocator.getName() << "\""
+    << ", first_minimum_pool_allocation_size="
+        << m_first_minimum_pool_allocation_size
+    << ", next_minimum_pool_allocation_size="
+        << m_next_minimum_pool_allocation_size
+    << ", alignment=" << alignment
+    << " )");
 }
 
 QuickPool::~QuickPool()
 {
+  UMPIRE_LOG(Debug, "Releasing free blocks to device");
+  m_is_destructing = true;
   release();
 }
 
 void* QuickPool::allocate(std::size_t bytes)
 {
-  UMPIRE_LOG(Debug, "allocate(" << bytes << ")");
+  UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{ aligned_round_up(bytes) };
   const auto& best = m_size_map.lower_bound(rounded_bytes);
 
@@ -46,7 +59,7 @@ void* QuickPool::allocate(std::size_t bytes)
                                  ? m_first_minimum_pool_allocation_size
                                  : m_next_minimum_pool_allocation_size};
 
-    std::size_t size{ std::max(rounded_bytes, bytes_to_use) };
+    std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
 
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
 
@@ -128,7 +141,7 @@ void* QuickPool::allocate(std::size_t bytes)
 
 void QuickPool::deallocate(void* ptr)
 {
-  UMPIRE_LOG(Debug, "deallocate(" << ptr << ")");
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
 
@@ -184,14 +197,14 @@ void QuickPool::deallocate(void* ptr)
 
   if (m_should_coalesce(*this)) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
-    coalesce();
+    do_coalesce();
   }
 }
 
 void QuickPool::release()
 {
-  UMPIRE_LOG(Debug, "release");
-  UMPIRE_LOG(Debug, m_size_map.size() << " chunks in free map");
+  UMPIRE_LOG(Debug, "() " << m_size_map.size()
+    << " chunks in free map, m_is_destructing set to " << m_is_destructing);
 
   std::size_t prev_size{m_actual_bytes};
 
@@ -202,7 +215,21 @@ void QuickPool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
       m_actual_bytes -= chunk->chunk_size;
-      aligned_deallocate(chunk->data);
+
+      try {
+        aligned_deallocate(chunk->data);
+      }
+      catch (...) {
+        if (m_is_destructing) {
+          //
+          // Ignore error in case the underlying vendor API has already shutdown
+          //
+          UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+        }
+        else {
+          throw;
+        }
+      }
 
       m_chunk_pool.deallocate(chunk);
       pair = m_size_map.erase(pair);
@@ -262,6 +289,15 @@ std::size_t QuickPool::getLargestAvailableBlock() noexcept
 
 void QuickPool::coalesce() noexcept
 {
+  UMPIRE_LOG(Debug, "()");
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \""
+                << getName() << "\" }");
+  do_coalesce();
+}
+
+void QuickPool::do_coalesce() noexcept
+{
+  UMPIRE_LOG(Debug, "()");
   std::size_t size_pre{getActualSize()};
   release();
   std::size_t size_post{getActualSize()};

@@ -51,6 +51,7 @@ void DynamicPoolList::deallocate(void* ptr)
 
 void DynamicPoolList::release()
 {
+  UMPIRE_LOG(Debug, "()");
   dpa.release();
 }
 
@@ -94,6 +95,7 @@ MemoryResourceTraits DynamicPoolList::getTraits() const noexcept
 
 void DynamicPoolList::coalesce() noexcept
 {
+  UMPIRE_LOG(Debug, "()");
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \""
                 << getName() << "\" }");
   dpa.coalesce();

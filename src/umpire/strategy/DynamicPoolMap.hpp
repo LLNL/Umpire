@@ -178,6 +178,7 @@ class DynamicPoolMap : public AllocationStrategy,
   const std::size_t m_next_minimum_pool_allocation_size;
 
   std::size_t m_actual_bytes{0};
+  bool m_is_destructing{false};
 };
 
 } // end of namespace strategy
