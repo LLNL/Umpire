@@ -25,6 +25,18 @@
 
 #if !defined(__SYCL_COMPILER_VERSION)
 
+#if defined (__has_include)
+
+#if __has_include(<sanitizer/asan_interface.h>)
+#include <sanitizer/asan_interface.h>
+#endif // __has_include(<sanitizer/asan_interface.h>)
+
+#else // __has_include not defined
+
+#include <sanitizer/asan_interface.h>   // Just try to include if __has_include
+                                        // macro doesn't exist.
+#endif // defined (__has_include)
+
 #include <sanitizer/asan_interface.h>
 
 #if defined(__SANITIZE_ADDRESS__)
