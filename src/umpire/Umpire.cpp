@@ -111,41 +111,80 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
   }
 }
 
+bool is_host_pageable_from_cuda()
+{
+#if defined(UMPIRE_ENABLE_CUDA)
+  int pageableMem = 0;
+  int cdev = 0;
+  cudaGetDevice(&cdev);
+
+  //Device supports coherently accessing pageable memory
+  //without calling cudaHostRegister on it
+  cudaDeviceGetAttribute(&pageableMem,
+    cudaDevAttrPageableMemoryAccess, cdev); 
+  if(pageableMem)
+    return true;
+  else
+    return false;
+#endif
+  return false;
+}
+
+bool is_host_pageable_from_hip()
+{
+#if defined(UMPIRE_ENABLE_HIP)    
+  hipDeviceProp_t props;
+  int* hdev = 0;
+  hipGetDevice(hdev);
+
+  //Check whether HIP can map host memory.
+  hipGetDeviceProperties(&props, hdev);
+  if(props.canMapHostMemory)
+    return true;
+  else
+    return false;
+#endif
+  return false;
+}
+
 bool is_accessible(Platform p, Allocator a) 
 {
   /*              UNDEFINED  HOST  CUDA  OMP_TARGET  HIP  SYCL   
   *  UNKNOWN          F       F     F        F        F    F
   *  HOST             F       T     T        T        T    F
-  *  DEVICE           F       T     T        T        T    T
-  *  DEVICE_CONST     F       T     T        T        T    F 
-  *  UM               F       T     T        T        T    T 
-  *  PINNED           F       T     T        T        T    F
+  *  DEVICE           F       M     T        T        T    T
+  *  DEVICE_CONST     F       M     T        X        T    X 
+  *  UM               F       T     T        X        T    T 
+  *  PINNED           F       T     T        X        T    F
   *  FILE             F       T     F        F        F    F
   */
   switch(p) {
     case (cPlatform::host):
-      if(findResource(a) == myResource::UNKNOWN)
+    {
+#if defined(UMPIRE_ENABLE_CUDA)
+      //check DEVICE/DEVICE_CONST case for (Umpire) CUDA
+      return is_host_pageable_from_cuda();
+#elif defined(UMPIRE_ENABLE_HIP)
+      //check DEVICE/DEVICE_CONST case for (Umpire) HIP
+      return is_host_pageable_from_hip();
+#endif
+
+      if(findResource(a) == myResource::UNKNOWN
+       //DEVICE case for (Umpire) OPENMP_TARGET
+       || findResource(a) == myResource::DEVICE)
         return false;
       else
-        return true;
+        return true;       
+    }
     break;
     ////////////////////////////////////////////////////
     case (cPlatform::cuda): 
     {
 #if defined(UMPIRE_ENABLE_CUDA)    
-      int pageableMem = 0;
-      int dev = 0;
-      cudaGetDevice(&dev);
-
-      //Device supports coherently accessing pageable memory 
-      //without calling cudaHostRegister on it
-      cudaDeviceGetAttribute(&pageableMem, 
-                     cudaDevAttrPageableMemoryAccess, dev);
-      
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::FILE)
         return false;
-      else if(pageableMem)
+      else if(is_host_pageable_from_cuda())
         return true;
       else
         return false;
@@ -174,17 +213,10 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::hip):
     {
 #if defined(UMPIRE_ENABLE_HIP)
-      hipDeviceProp_t props;
-      int* dev = 0;
-      hipGetDevice(dev);
-
-      //Check whether HIP can map host memory.
-      hipGetDeviceProperties(&props, dev);
-
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::FILE)
         return false;
-      else if(props.canMapHostMemory)
+      else if (is_host_pageable_from_hip())
         return true;
       else
         return false;
@@ -220,7 +252,8 @@ bool is_accessible(Platform p, Allocator a)
   return false;
 }
 
-MemoryResourceTraits::resource_type findResource(Allocator a) {
+MemoryResourceTraits::resource_type findResource(Allocator a) 
+{
   return a.getAllocationStrategy()->getTraits().resource;
 }
 
