@@ -78,6 +78,16 @@ typemap:
         f_derived_type: namedallocationstrategy
         f_capsule_data_type: umpire_SHROUD_strategy_namedallocationstrategy_capsule
         f_to_c: "{f_var}%cxxmem"
+    - type: QuickPool
+      fields:
+        base: shadow
+        wrap_header:
+        - typesUmpire.h
+        c_type: umpire_strategy_quickpool
+        f_module_name: umpire_strategy_mod
+        f_derived_type: quickpool
+        f_capsule_data_type: umpire_SHROUD_strategy_quickpool_capsule
+        f_to_c: "{f_var}%cxxmem"
     - type: ResourceManager
       fields:
         base: shadow

@@ -135,6 +135,13 @@ struct s_umpire_strategy_namedallocationstrategy {
 };
 typedef struct s_umpire_strategy_namedallocationstrategy umpire_strategy_namedallocationstrategy;
 
+// helper capsule_umpire_strategy_quickpool
+struct s_umpire_strategy_quickpool {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_quickpool umpire_strategy_quickpool;
+
 // helper capsule_umpire_strategy_threadsafeallocator
 struct s_umpire_strategy_threadsafeallocator {
     void *addr;     /* address of C++ memory */
