@@ -48,8 +48,10 @@ option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
 if(WIN32 OR APPLE)
   set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
+  set(ENABLE_BOOST_RESOURCE Off CACHE BOOL "")
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
+option(ENABLE_BOOST_RESOURCE "Enable Boost Shared Memory Resource" Off)
 
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL OFF)

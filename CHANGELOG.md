@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - OpenMP target test for XL on GitLab
 
+- Initial support for IPC Shared Memory via a "SHARED" resource allocator.
+
 ### Changed
 
 - All Umpire tests and executables now built with rdynamic and -ldl
