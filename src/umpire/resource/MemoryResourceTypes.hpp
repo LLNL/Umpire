@@ -23,7 +23,7 @@ struct MemoryResourceTypeHash {
   }
 };
 
-enum MemoryResourceType { Host, Device, Unified, Pinned, Constant, File };
+enum MemoryResourceType { Host, Device, Unified, Pinned, Constant, File, Unknown };
 
 inline std::string resource_to_string(MemoryResourceType type)
 {
@@ -42,6 +42,7 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "FILE";
     default: 
       UMPIRE_ERROR("Unkown resource type: " << type);
+      return "UNKNOWN"; 
   }
 }
 
@@ -53,7 +54,10 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "PINNED") return MemoryResourceType::Pinned;
   else if (resource == "DEVICE_CONST") return MemoryResourceType::Constant;
   else if (resource == "FILE") return MemoryResourceType::File;
-  else UMPIRE_ERROR("Unkown resource name: " << resource);
+  else {
+    UMPIRE_ERROR("Unkown resource name: " << resource);
+    return MemoryResourceType::Unknown;
+  }
 }
 
 inline int resource_to_device_id(const std::string& resource) {
