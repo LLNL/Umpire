@@ -130,6 +130,10 @@ then
     tree Testing
     cp Testing/*/Test.xml ${project_dir}
 
+    ${project_dir}/scripts/gitlab/convert_to_junit.py \
+      ${project_dir}/Test.xml \
+      ${project_dir}/scrits/gitlab/junit.xslt > junit.xml
+
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
         echo "ERROR: failure(s) while running CTest" && exit 1
