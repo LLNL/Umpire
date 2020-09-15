@@ -53,6 +53,12 @@ declarations:
           wrap_c: false
           wrap_fortran: false
 
+      - decl: class QuickPool
+        cxx_header: umpire/strategy/QuickPool.hpp
+        options:
+          wrap_c: false
+          wrap_fortran: false
+
       - decl: class AllocationAdvisor
         cxx_header: umpire/strategy/AllocationAdvisor.hpp
         options:
@@ -134,6 +140,10 @@ declarations:
         - instantiation: <umpire::strategy::DynamicPoolList>
           format:
             template_suffix: _list_pool
+            function_suffix: ""
+        - instantiation: <umpire::strategy::QuickPool>
+          format:
+            template_suffix: _quick_pool
             function_suffix: ""
 
       - decl: template <typename T> Allocator makeAllocator(const std::string& name, Allocator allocator, const std::string& advice_op, int device_id);
