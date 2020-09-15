@@ -8,6 +8,7 @@
 #define UMPIRE_AllocationTracker_HPP
 
 #include <memory>
+#include <string>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
