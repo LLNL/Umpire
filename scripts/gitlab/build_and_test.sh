@@ -132,7 +132,7 @@ then
 
     ${project_dir}/scripts/gitlab/convert_to_junit.py \
       ${project_dir}/Test.xml \
-      ${project_dir}/scripts/gitlab/junit.xslt > junit.xml
+      ${project_dir}/scripts/gitlab/junit.xslt > ${project_dir}/junit.xml
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
