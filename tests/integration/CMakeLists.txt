@@ -122,6 +122,36 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
+set (access_tests_depends
+  umpire gtest)
+
+if (ENABLE_CUDA)
+  set (access_tests_depends
+    ${access_tests_depends}
+    cuda)
+endif ()
+
+if (ENABLE_HIP)
+  set (access_tests_depends
+    ${access_tests_depends}
+    hip)
+endif ()
+
+if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+  set (access_tests_depends
+    ${access_tests_depends}
+    openmp)
+endif ()
+
+blt_add_executable(
+  NAME access_tests
+  SOURCES access_tests.cpp
+  DEPENDS_ON ${access_tests_depends})
+
+blt_add_test(
+  NAME access_tests
+  COMMAND access_tests)
+
 if (ENABLE_TOOLS)
   add_subdirectory(replay)
 endif()
