@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - OpenMP target test for XL on GitLab
 
+- QuickPool available via the C & Fortran APIs.
+
 ### Changed
 
 - All Umpire tests and executables now built with rdynamic and -ldl
@@ -32,6 +34,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added missing getTraits() call to QuickPool
 
 - Fixed Allocator overrun problem in replay tool
+
+- Removed warnings from MemoryResourceTypes header file
 
 ## [v4.0.1] - 2020-09-03
 
