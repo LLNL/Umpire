@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - OpenMP target test for XL on GitLab
 
+- QuickPool available via the C & Fortran APIs.
+
 ### Changed
 
 - All Umpire tests and executables now built with rdynamic and -ldl
@@ -21,6 +23,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Removed
 
 ### Fixed
+
+- Fixed ASAN poisoning to limit it to what user originally requested and not
+  rounded amount.
 
 - Improved resilliance of primary pool destructors so that giving back
   previously allocated blocks to a device that has already been cleaned up
