@@ -130,9 +130,12 @@ then
     tree Testing
     cp Testing/*/Test.xml ${project_dir}
 
-    ${project_dir}/scripts/gitlab/convert_to_junit.py \
-      ${project_dir}/Test.xml \
-      ${project_dir}/scripts/gitlab/junit.xslt > ${project_dir}/junit.xml
+    # Convert CTest xml to JUnit (on toss3 only)
+    if [[ $SYS_TYPE == *toss3* ]]; then
+        ${project_dir}/scripts/gitlab/convert_to_junit.py \
+        ${project_dir}/Test.xml \
+        ${project_dir}/scripts/gitlab/junit.xslt > ${project_dir}/junit.xml
+    fi
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
