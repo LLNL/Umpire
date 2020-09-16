@@ -37,8 +37,6 @@
                                         // macro doesn't exist.
 #endif // defined (__has_include)
 
-#include <sanitizer/asan_interface.h>
-
 #if defined(__SANITIZE_ADDRESS__)
 
 #undef __UMPIRE_USE_MEMORY_SANITIZER__
