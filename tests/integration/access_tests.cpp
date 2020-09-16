@@ -31,27 +31,30 @@ class AccessTest : public ::testing::TestWithParam<std::string> {
   const std::size_t m_size = 1024;
 };
 
-TEST_P(AccessTest, Read)
+TEST_P(AccessTest, VectorAdd)
 {
-  double* data =
+  std::cout << "Running with allocator " << m_allocator->getName() << std::endl;
+
+  double* a =
       static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-  ASSERT_NE(nullptr, data);
-
-  umpire::read(m_allocator->getAllocationStrategy()->getTraits().resource, data);
-
-  m_allocator->deallocate(data);
-}
-
-TEST_P(AccessTest, Write)
-{
-  double* data =
+  double* b =
       static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-  ASSERT_NE(nullptr, data);
+  double* c =
+      static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
+  ASSERT_NE(nullptr, a);
+  ASSERT_NE(nullptr, b);
+  ASSERT_NE(nullptr, c);
 
-  umpire::write(m_allocator->getAllocationStrategy()->getTraits().resource, data);
+  umpire::forall(m_allocator->getAllocationStrategy()->getTraits().resource, 
+    0,
+    m_size,
+    [=] __host__ __device__ (int i)  {
+      b[i] = i;
+      c[i] = 1.0;
 
-  m_allocator->deallocate(data);
-}
+      a[i] = b[i] + c[i];
+  });
+};
 
 std::vector<std::string> allocator_strings() {
   std::vector<std::string> allocators;
