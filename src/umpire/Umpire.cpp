@@ -149,15 +149,25 @@ bool is_host_pageable_from_hip()
 
 bool is_accessible(Platform p, Allocator a) 
 {
-  /*              UNDEFINED  HOST  CUDA  OMP_TARGET  HIP  SYCL   
+ /*
+  * This function implements the following table which 
+  * describes whether or not an Umpire::Allocator (rows,
+  * labeled by memory resource_type) is accessible by a CAMP
+  * platform (columns). 'T' = True; 'F' = False; 'X' = Does
+  * Not Exist; '*' = Conditional. For those marked with '*',
+  * certain tests are done to determine accessibility. See
+  * confluence page for more details.
+  * 
+  *               UNDEFINED  HOST  CUDA  OMP_TARGET  HIP  SYCL   
   *  UNKNOWN          F       F     F        F        F    F
-  *  HOST             F       T     T        T        T    F
-  *  DEVICE           F       M     T        T        T    T
-  *  DEVICE_CONST     F       M     T        X        T    X 
+  *  HOST             F       T     *        T        *    F
+  *  DEVICE           F       *     T        T        T    T
+  *  DEVICE_CONST     F       F     T        X        T    X 
   *  UM               F       T     T        X        T    T 
-  *  PINNED           F       T     T        X        T    F
+  *  PINNED           F       T     T        X        T    T
   *  FILE             F       T     F        F        F    F
   */
+
   switch(p) {
     case (cPlatform::host):
     {
@@ -169,9 +179,11 @@ bool is_accessible(Platform p, Allocator a)
       return is_host_pageable_from_hip();
 #endif
 
-      if(findResource(a) == myResource::UNKNOWN
+      if(findResource(a) == myResource::UNKNOWN)
+        return false;
        //DEVICE case for (Umpire) OPENMP_TARGET
-       || findResource(a) == myResource::DEVICE)
+      else if (findResource(a) == myResource::DEVICE
+       || findResource(a) == myResource::DEVICE_CONST)
         return false;
       else
         return true;       
@@ -184,10 +196,10 @@ bool is_accessible(Platform p, Allocator a)
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::FILE)
         return false;
-      else if(is_host_pageable_from_cuda())
-        return true;
+      else if(findResource(a) == myResource::HOST)
+        return is_host_pageable_from_cuda();
       else
-        return false;
+        return true;
 #else
       std::cout << "Platform is undefined" << std::endl;
       return false;
@@ -202,7 +214,7 @@ bool is_accessible(Platform p, Allocator a)
        || findResource(a) == myResource::FILE)
         return false;
       else
-        return true;
+        return true; //true for (Umpire) HOST or DEVICE
 #else
       std::cout << "Platform is undefined" << std::endl;
       return false;
@@ -216,10 +228,10 @@ bool is_accessible(Platform p, Allocator a)
       if (findResource(a) == myResource::UNKNOWN 
        || findResource(a) == myResource::FILE)
         return false;
-      else if (is_host_pageable_from_hip())
-        return true;
+      else if(findResource(a) == myResource::HOST)      
+        return is_host_pageable_from_hip();
       else
-        return false;
+        return true;
 #else
       std::cout << "Platform is undefined" << std::endl;
       return false;
@@ -232,6 +244,7 @@ bool is_accessible(Platform p, Allocator a)
 #if defined(UMPIRE_ENABLE_SYCL)
       if (findResource(a) == myResource::DEVICE
        || findResource(a) == myResource::UM)
+       || findResource(a) == myResource::PINNED)
         return true;
       else
         return false;
