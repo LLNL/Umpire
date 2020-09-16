@@ -24,6 +24,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed ASAN poisoning to limit it to what user originally requested and not
+  rounded amount.
+
 - Improved resilliance of primary pool destructors so that giving back
   previously allocated blocks to a device that has already been cleaned up
   will no longer throw an error, but instead will now be logged and ignored.
