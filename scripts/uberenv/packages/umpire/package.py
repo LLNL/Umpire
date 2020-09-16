@@ -92,13 +92,19 @@ class Umpire(CMakePackage, CudaPackage):
             multi=False, description='Tests to run')
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
+    variant('hip', default=False, description='Build with HIP support')
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
+    depends_on('hip', when='+hip')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
     conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
+    conflicts('+cuda', when='+hip')
+    conflicts('+openmp', when='+hip')
+    conflicts('+openmp_target', when='+hip')
+    conflicts('+deviceconst', when='~hip~cuda')
 
     phases = ['hostconfig', 'cmake', 'build', 'install']
 
@@ -266,6 +272,27 @@ class Umpire(CMakePackage, CudaPackage):
 
         else:
             cfg.write(cmake_cache_option("ENABLE_CUDA", False))
+
+        if "+hip" in spec:
+            cfg.write("#------------------{0}\n".format("-" * 60))
+            cfg.write("# HIP\n")
+            cfg.write("#------------------{0}\n\n".format("-" * 60))
+
+            cfg.write(cmake_cache_option("ENABLE_HIP", True))
+
+#            -DHIP_ROOT_DIR=/opt/rocm-3.6.0/hip -DHIP_CLANG_PATH=/opt/rocm-3.6.0/llvm/bin
+
+            hip_root = spec['hip'].prefix
+            cfg.write(cmake_cache_entry("HIP_ROOT_DIR",
+                                        hip_root))
+            cfg.write(cmake_cache_entry("HIP_CLANG_PATH",
+                                        spec['llvm-amdgpu'].prefix.bin))
+
+            if '+deviceconst' in spec:
+                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+
+        else:
+            cfg.write(cmake_cache_option("ENABLE_HIP", False))
 
         cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))

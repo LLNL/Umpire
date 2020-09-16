@@ -16,3 +16,13 @@ packages:
     paths:
       cuda@10.1.168: /usr/tce/packages/cuda/cuda-10.1.168
     buildable: False
+
+  hip:
+    version: [3.7.0]
+    paths:
+      hip@3.7.0: /opt/rocm-3.7.0/hip
+    buildable: False
+  llvm-amdgpu:
+    version: [3.7.0]
+    paths:
+      llvm-amdgpu@3.7.0: /opt/rocm-3.7.0/llvm
