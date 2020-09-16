@@ -171,19 +171,20 @@ bool is_accessible(Platform p, Allocator a)
   switch(p) {
     case (cPlatform::host):
     {
+      if(findResource(a) == myResource::UNKNOWN
+       || findResource(a) == myResource::DEVICE_CONST)
+        return false;
+
 #if defined(UMPIRE_ENABLE_CUDA)
-      //check DEVICE/DEVICE_CONST case for (Umpire) CUDA
+      //check DEVICE case for (Umpire) CUDA
       return is_host_pageable_from_cuda();
 #elif defined(UMPIRE_ENABLE_HIP)
-      //check DEVICE/DEVICE_CONST case for (Umpire) HIP
+      //check DEVICE case for (Umpire) HIP
       return is_host_pageable_from_hip();
 #endif
 
-      if(findResource(a) == myResource::UNKNOWN)
-        return false;
-       //DEVICE case for (Umpire) OPENMP_TARGET
-      else if (findResource(a) == myResource::DEVICE
-       || findResource(a) == myResource::DEVICE_CONST)
+      //If it reaches here, no DEVICE resource is accessible
+      if (findResource(a) == myResource::DEVICE)
         return false;
       else
         return true;       
