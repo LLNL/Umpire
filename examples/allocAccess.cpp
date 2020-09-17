@@ -86,7 +86,7 @@ int main()
   
   ///////////////////////////////////////////////////
   //Test accessibility
-  for(int c = 0; c < alloc.size(); c++) {
+  for(unsigned int c = 0; c < alloc.size(); c++) {
 #if defined UNIQUE
     if (allNames[c].find("::") == std::string::npos)
 #endif
