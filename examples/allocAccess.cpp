@@ -11,6 +11,13 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.cpp"
 
+//////////////////////////////////////////////////////////////////////////
+//Some resource types may be repeated. If only the unique types should be
+//tested, define this value. For example, if there is a DEVICE::1 and a 
+//DEVICE resource type, only DEVICE will be tested for accessibility. 
+//////////////////////////////////////////////////////////////////////////
+#define UNIQUE
+
 using cPlatform = camp::resources::Platform;
 
 void testAccess(umpire::Allocator a)
@@ -69,28 +76,24 @@ int main()
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::vector<std::string> allNames = rm.getResourceNames();
-  std::vector<std::string> allocAvail;
   std::vector<umpire::Allocator> alloc;
   
   ///////////////////////////////////////////////////
-  //Create a list of unique available resource types
-  for (auto s : allNames) {
-    if (s.find("::") == std::string::npos) {
-      allocAvail.push_back(s);
-    }
-  }
-
-  ///////////////////////////////////////////////////
   //Create an allocator for each available type
-  for(auto a : allocAvail) {
+  for(auto a : allNames) {
     alloc.push_back(rm.getAllocator(a));
   }
   
   ///////////////////////////////////////////////////
   //Test accessibility
   for(int c = 0; c < alloc.size(); c++) {
-    std::cout << allocAvail[c] << std::endl;
-    testAccess(alloc[c]);
+#if defined UNIQUE
+    if (allNames[c].find("::") == std::string::npos)
+#endif
+    {
+      std::cout << allNames[c] << std::endl;
+      testAccess(alloc[c]);
+    }
   }
  
   return 0;
