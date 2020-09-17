@@ -75,7 +75,7 @@ int main()
   ///////////////////////////////////////////////////
   //Create a list of unique available resource types
   for (auto s : allNames) {
-    if (s.find("::") == std::string::npos){
+    if (s.find("::") == std::string::npos) {
       allocAvail.push_back(s);
     }
   }
@@ -88,11 +88,9 @@ int main()
   
   ///////////////////////////////////////////////////
   //Test accessibility
-  int c = 0;
-  for(auto a : alloc) {
+  for(int c = 0; c < alloc.size(); c++) {
     std::cout << allocAvail[c] << std::endl;
-    testAccess(a);
-    c++;
+    testAccess(alloc[c]);
   }
  
   return 0;
