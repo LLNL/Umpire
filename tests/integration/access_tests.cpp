@@ -63,7 +63,7 @@ std::vector<std::string> allocator_strings() {
   allocators.push_back("DEVICE");
   auto& rm = umpire::ResourceManager::getInstance();
   for (int id = 0; id < rm.getNumDevices(); id++) {
-    allocators.push_back(std::string{"DEVICE::" + std::to_string(id)});
+    allocators.push_back(std::string{"DEVICE_" + std::to_string(id)});
   }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
