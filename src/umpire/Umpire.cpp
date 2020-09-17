@@ -21,8 +21,10 @@
   #include <cuda_runtime_api.h>
 #endif
 
+//make sure "/opt/rocm-3.6.0/hsa/include/" is 
+//added to blt/cmake/thirdparty/SetupHIP.cmake file
 #if defined(UMPIRE_ENABLE_HIP)
-  #include <hip_runtime_api.h>
+  #include <hip/hip_runtime.h>
 #endif
 
 #if !defined(_MSC_VER)
@@ -134,8 +136,8 @@ bool is_host_pageable_from_hip()
 {
 #if defined(UMPIRE_ENABLE_HIP)    
   hipDeviceProp_t props;
-  int* hdev = 0;
-  hipGetDevice(hdev);
+  int hdev = 0;
+  hipGetDevice(&hdev);
 
   //Check whether HIP can map host memory.
   hipGetDeviceProperties(&props, hdev);
