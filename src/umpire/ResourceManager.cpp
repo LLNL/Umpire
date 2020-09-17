@@ -434,6 +434,11 @@ Allocator ResourceManager::getDefaultAllocator()
   return Allocator(m_default_allocator);
 }
 
+std::vector<std::string> ResourceManager::getResourceNames()
+{
+  return m_resource_names;
+}
+
 void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 {
   UMPIRE_LOG(Debug, "(\"" << allocator.getName() << "\")");

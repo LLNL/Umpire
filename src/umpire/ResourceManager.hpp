@@ -85,6 +85,17 @@ class ResourceManager {
   Allocator getDefaultAllocator();
 
   /*!
+   * \brief Get the existing Resources.
+   *
+   * The Resource Manager dynamically populates available memory resource types with
+   * m_resource_names based on what's available. This is used for determining 
+   * allocator accessibility.
+   *
+   * \return The private member, m_resource_names.
+   */
+   std::vector<std::string> getResourceNames();
+
+  /*!
    * \brief Set the default Allocator.
    *
    * The default Allocator is used whenever an Allocator is required and one
