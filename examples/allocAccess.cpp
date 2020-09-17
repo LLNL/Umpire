@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <string>
+#include "umpire/util/Macros.hpp"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -87,18 +88,27 @@ int main()
   auto dev_alloc = rm.makeAllocator<umpire::strategy::QuickPool>(
       "dev_QuickPool", rm.getAllocator("DEVICE"));
   
-  auto const_alloc = rm.getAllocator("DEVICE_CONST");
-  
   auto file_alloc = rm.getAllocator("FILE");
   
-  auto pin_alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "pin_SizeLimiter", rm.getAllocator("PINNED"), 1024*sizeof(double));
+ // auto const_alloc = rm.getAllocator("DEVICE_CONST");
   
-  auto um_alloc = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-      "um_DynamicPoolList", rm.getAllocator("UM"));
+  //auto pin_alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+    //  "pin_SizeLimiter", rm.getAllocator("PINNED"), 1024*sizeof(double));
+  
+  //auto um_alloc = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
+    //  "um_DynamicPoolList", rm.getAllocator("UM"));
   
   //////////////////////////////////////////////////////////////////
   //Allocate memory on each of the allocators and test accessibility
+//TODO use new ResourceManager function to get list of available allocators
+//and then loop though them
+
+  std::vector<std::string> allNames = rm.getResourceNames();
+  
+  std::cout << "Names: ";
+  for (auto s : allNames) {
+    std::cout << s << " ";
+  }
  
   double* dataH = static_cast<double*>(host_alloc.allocate(1024*sizeof(double)));
   std::cout << "HOST" << std::endl;
@@ -107,32 +117,32 @@ int main()
   double* dataD = static_cast<double*>(dev_alloc.allocate(1024*sizeof(double)));
   std::cout << "DEVICE" << std::endl;
   testAccess(dev_alloc);
-
-  int* dataC = static_cast<int*>(const_alloc.allocate(1024));
-  std::cout << "DEVICE_CONST" << std::endl;
-  testAccess(const_alloc);
   
   int* dataF = static_cast<int*>(file_alloc.allocate(1024));
   std::cout << "FILE" << std::endl;
   testAccess(file_alloc);
   
-  double* dataP = static_cast<double*>(pin_alloc.allocate(1024*sizeof(double)));
-  std::cout << "PINNED" << std::endl;
-  testAccess(pin_alloc);
+  //int* dataC = static_cast<int*>(const_alloc.allocate(1024));
+  //std::cout << "DEVICE_CONST" << std::endl;
+  //testAccess(const_alloc);
+  
+  //double* dataP = static_cast<double*>(pin_alloc.allocate(1024*sizeof(double)));
+  //std::cout << "PINNED" << std::endl;
+  //testAccess(pin_alloc);
 
-  double* dataU = static_cast<double*>(um_alloc.allocate(1024*sizeof(double)));
-  std::cout << "UM" << std::endl;
-  testAccess(um_alloc);
-
+  //double* dataU = static_cast<double*>(um_alloc.allocate(1024*sizeof(double)));
+  //std::cout << "UM" << std::endl;
+  //testAccess(um_alloc);
+  
   /////////////////////////////
   //Clean up, deallocate memory
 
   host_alloc.deallocate(dataH);
   dev_alloc.deallocate(dataD);
-  const_alloc.deallocate(dataC);
   file_alloc.deallocate(dataF);
-  pin_alloc.deallocate(dataP);
-  um_alloc.deallocate(dataU);
+  //const_alloc.deallocate(dataC);
+  //pin_alloc.deallocate(dataP);
+  //um_alloc.deallocate(dataU);
 
   return 0;
 }
