@@ -22,6 +22,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Resources are now created on-demand when accessed for the first time.
 
+- GitLab test script now converts CTest output to JUnit so that test results
+  are visible in the native GitLab UI.
+
 ### Removed
 
 ### Fixed
