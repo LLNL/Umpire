@@ -246,7 +246,7 @@ bool is_accessible(Platform p, Allocator a)
     {
 #if defined(UMPIRE_ENABLE_SYCL)
       if (findResource(a) == myResource::DEVICE
-       || findResource(a) == myResource::UM)
+       || findResource(a) == myResource::UM
        || findResource(a) == myResource::PINNED)
         return true;
       else
