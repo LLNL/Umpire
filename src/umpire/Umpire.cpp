@@ -11,9 +11,12 @@
 #include <iostream>
 #include <iterator>
 #include <sstream>
+#include <string>
 
-#include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+
+#include "umpire/resource/BoostMemoryResource.hpp"
+#include "umpire/ResourceManager.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>
@@ -150,6 +153,30 @@ std::size_t get_device_memory_usage(int device_id)
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
 {
   return get_allocator_records(allocator);
+}
+
+void* find_pointer_from_name(Allocator allocator, std::string name)
+{
+  void* ptr{nullptr};
+#if defined(UMPIRE_ENABLE_BOOST_RESOURCE)
+  auto base_strategy =
+          util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
+
+   umpire::resource::BoostMemoryResource* shared_resource =
+      reinterpret_cast<umpire::resource::BoostMemoryResource*>(base_strategy);
+
+  if (shared_resource != nullptr) {
+    ptr = shared_resource->find_pointer_from_name(name);
+  }
+  else
+#else
+  UMPIRE_USE_VAR(name);
+#endif // defined(UMPIRE_ENABLE_BOOST_RESOURCE)
+  {
+    UMPIRE_ERROR(allocator.getName()
+      << " Allocator is not a Shared Memory Allocator");
+  }
+  return ptr;
 }
 
 } // end namespace umpire

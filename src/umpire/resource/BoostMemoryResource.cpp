@@ -64,5 +64,9 @@ std::size_t BoostMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
+void* BoostMemoryResource::find_pointer_from_name(std::string name)
+{
+  return pimpl->find_pointer_from_name(name);
+}
 } // end of namespace resource
 } // end of namespace umpire

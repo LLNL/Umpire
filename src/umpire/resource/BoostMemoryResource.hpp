@@ -32,6 +32,7 @@ class BoostMemoryResource : public MemoryResource {
 
     Platform getPlatform() noexcept;
 
+    void* find_pointer_from_name(std::string name);
   protected:
     Platform m_platform;
   private:

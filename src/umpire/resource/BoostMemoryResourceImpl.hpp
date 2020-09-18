@@ -46,6 +46,12 @@ class BoostMemoryResource::impl {
       m_segment->destroy_ptr(ptr);
     }
 
+    void* find_pointer_from_name(std::string name)
+    {
+      char* ptr{ m_segment->find<char>(name.c_str()).first };
+      return ptr;
+    }
+
     std::size_t getCurrentSize() const noexcept;
     std::size_t getHighWatermark() const noexcept;
 

@@ -8,6 +8,7 @@
 #define UMPIRE_Umpire_HPP
 
 #include <iostream>
+#include <string>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -145,6 +146,11 @@ std::size_t get_device_memory_usage(int device_id);
  * \brief Get all the leaked (active) allocations associated with allocator.
  */
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
+
+/*!
+ * \brief Return the pointer of an allocation for the given allocator and name
+ */
+void* find_pointer_from_name(Allocator allocator, std::string name);
 
 } // end of namespace umpire
 
