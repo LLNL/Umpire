@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - QuickPool available via the C & Fortran APIs.
 
+- Allocator accessibility information and testing
+
 ### Changed
 
 - All Umpire tests and executables now built with rdynamic and -ldl
