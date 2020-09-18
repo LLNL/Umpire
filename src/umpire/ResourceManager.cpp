@@ -335,6 +335,13 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
 {
   if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
     UMPIRE_ERROR("Allocator " << name << " already exists, and cannot be re-created.");
+  } else if ((name.find("DEVICE::") == std::string::npos) &&
+          (name.find("SHARED::") == std::string::npos)) {
+    auto resource_name = std::find(m_resource_names.begin(), m_resource_names.end(), name);
+    if (resource_name == std::end(m_resource_names) ) {
+        UMPIRE_ERROR("Resource " << name << " is unknown. Available resources: " 
+                     << getResourceInformation());
+    }
   }
 
   resource::MemoryResourceRegistry& registry{
@@ -343,6 +350,7 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   if (name.find("DEVICE") != std::string::npos) {
     traits.id = resource::resource_to_device_id(name);
   }
+
   std::unique_ptr<strategy::AllocationStrategy> allocator{
       util::wrap_allocator<strategy::AllocationTracker,
                             strategy::ZeroByteHandler>(
@@ -879,6 +887,17 @@ std::string ResourceManager::getAllocatorInformation() const noexcept
 
   for (auto& it : m_allocators_by_name) {
     info << *it.second << " ";
+  }
+
+  return info.str();
+}
+
+std::string ResourceManager::getResourceInformation() const noexcept
+{
+  std::ostringstream info;
+
+  for (const auto& it : m_resource_names) {
+    info << it << " ";
   }
 
   return info.str();

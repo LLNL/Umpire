@@ -114,14 +114,13 @@ if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.17)
   target_link_libraries(
     umpire INTERFACE $<BUILD_INTERFACE:${CMAKE_DL_LIBS}>
   )
+endif()
 
-  if (ENABLE_BOOST_RESOURCE)
-    target_link_libraries(
-      umpire INTERFACE $<BUILD_INTERFACE:-lrt>
-      umpire INTERFACE $<BUILD_INTERFACE:-pthread>
-    )
-  endif()
-
+if (ENABLE_BOOST_RESOURCE)
+  target_link_libraries(
+    umpire INTERFACE $<BUILD_INTERFACE:-lrt>
+                     $<BUILD_INTERFACE:-pthread>
+  )
 endif()
 
 set_target_properties(umpire PROPERTIES

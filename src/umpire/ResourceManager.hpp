@@ -275,6 +275,7 @@ class ResourceManager {
   int getNextId() noexcept;
 
   std::string getAllocatorInformation() const noexcept;
+  std::string getResourceInformation() const noexcept;
 
   strategy::AllocationStrategy* getZeroByteAllocator();
 
