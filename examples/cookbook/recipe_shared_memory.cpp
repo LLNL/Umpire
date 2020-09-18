@@ -51,7 +51,7 @@ int main(int ac, char** av)
   print(is_foreman(), "2.) Named allocation/deallocation");
 
   auto ptr = allocator.allocate(name, 10 * sizeof(uint64_t));
-  auto ptr = allocator_two.allocate(name, 10 * sizeof(uint64_t));
+  auto ptr_two = allocator_two.allocate(name, 10 * sizeof(uint64_t));
   uint64_t* data{static_cast<uint64_t*>(ptr)};
 
   print(is_foreman(), "3.) Modify memory as foreman (3 second delay)");
@@ -67,6 +67,7 @@ int main(int ac, char** av)
   UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
   allocator.deallocate(ptr);
+  allocator_two.deallocate(ptr_two);
 
   MPI_Finalize();
 

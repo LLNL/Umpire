@@ -335,14 +335,12 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
 {
   if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
     UMPIRE_ERROR("Allocator " << name << " already exists, and cannot be re-created.");
-  } else {
-    for (const auto& resource_name : m_resource_names) {
-      if ((name.find("DEVICE::") == std::string::npos) &&
-          (name.find("SHARED::") == std::string::npos) &&
-          (resource_name.compare(name) != 0 )) {
-            UMPIRE_ERROR("Resource " << name << " is unknown. Available resources: " 
-                         << getResourceInformation());
-      }
+  } else if ((name.find("DEVICE::") == std::string::npos) &&
+          (name.find("SHARED::") == std::string::npos)) {
+    auto resource_name = std::find(m_resource_names.begin(), m_resource_names.end(), name);
+    if (resource_name == std::end(m_resource_names) ) {
+        UMPIRE_ERROR("Resource " << name << " is unknown. Available resources: " 
+                     << getResourceInformation());
     }
   }
 
