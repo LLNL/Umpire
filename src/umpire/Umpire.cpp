@@ -261,7 +261,6 @@ bool is_accessible(Platform p, Allocator a)
     }
     break;
   }
-  return false;
 }
 
 MemoryResourceTraits::resource_type get_resource(Allocator a) 
