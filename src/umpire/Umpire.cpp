@@ -113,7 +113,7 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
   }
 }
 
-bool is_host_pageable_from_cuda()
+bool is_host_pageable()
 {
 #if defined(UMPIRE_ENABLE_CUDA)
   int pageableMem = 0;
@@ -124,17 +124,13 @@ bool is_host_pageable_from_cuda()
   //without calling cudaHostRegister on it
   cudaDeviceGetAttribute(&pageableMem,
     cudaDevAttrPageableMemoryAccess, cdev); 
+
   if(pageableMem)
     return true;
   else
     return false;
 #endif
-  return false;
-}
-
-bool is_host_pageable_from_hip()
-{
-#if defined(UMPIRE_ENABLE_HIP)    
+#if defined(UMPIRE_ENABLE_HIP)
   hipDeviceProp_t props;
   int hdev = 0;
   hipGetDevice(&hdev);
@@ -173,20 +169,20 @@ bool is_accessible(Platform p, Allocator a)
   switch(p) {
     case (cPlatform::host):
     {
-      if(findResource(a) == myResource::UNKNOWN
-       || findResource(a) == myResource::DEVICE_CONST)
+      if(get_resource(a) == myResource::UNKNOWN
+       || get_resource(a) == myResource::DEVICE_CONST)
         return false;
 
 #if defined(UMPIRE_ENABLE_CUDA)
       //check DEVICE case for (Umpire) CUDA
-      return is_host_pageable_from_cuda();
+      return is_host_pageable();
 #elif defined(UMPIRE_ENABLE_HIP)
       //check DEVICE case for (Umpire) HIP
-      return is_host_pageable_from_hip();
+      return is_host_pageable();
 #endif
 
       //If it reaches here, no DEVICE resource is accessible
-      if (findResource(a) == myResource::DEVICE)
+      if (get_resource(a) == myResource::DEVICE)
         return false;
       else
         return true;       
@@ -196,11 +192,11 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::cuda): 
     {
 #if defined(UMPIRE_ENABLE_CUDA)    
-      if (findResource(a) == myResource::UNKNOWN 
-       || findResource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::UNKNOWN 
+       || get_resource(a) == myResource::FILE)
         return false;
-      else if(findResource(a) == myResource::HOST)
-        return is_host_pageable_from_cuda();
+      else if(get_resource(a) == myResource::HOST)
+        return is_host_pageable();
       else
         return true;
 #else
@@ -213,8 +209,8 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::omp_target):
     {
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-      if (findResource(a) == myResource::UNKNOWN
-       || findResource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::UNKNOWN
+       || get_resource(a) == myResource::FILE)
         return false;
       else
         return true; //true for (Umpire) HOST or DEVICE
@@ -228,11 +224,11 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::hip):
     {
 #if defined(UMPIRE_ENABLE_HIP)
-      if (findResource(a) == myResource::UNKNOWN 
-       || findResource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::UNKNOWN 
+       || get_resource(a) == myResource::FILE)
         return false;
-      else if(findResource(a) == myResource::HOST)      
-        return is_host_pageable_from_hip();
+      else if(get_resource(a) == myResource::HOST)      
+        return is_host_pageable();
       else
         return true;
 #else
@@ -245,9 +241,9 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::sycl):
     {
 #if defined(UMPIRE_ENABLE_SYCL)
-      if (findResource(a) == myResource::DEVICE
-       || findResource(a) == myResource::UM
-       || findResource(a) == myResource::PINNED)
+      if (get_resource(a) == myResource::DEVICE
+       || get_resource(a) == myResource::UM
+       || get_resource(a) == myResource::PINNED)
         return true;
       else
         return false;
@@ -268,7 +264,7 @@ bool is_accessible(Platform p, Allocator a)
   return false;
 }
 
-MemoryResourceTraits::resource_type findResource(Allocator a) 
+MemoryResourceTraits::resource_type get_resource(Allocator a) 
 {
   return a.getAllocationStrategy()->getTraits().resource;
 }

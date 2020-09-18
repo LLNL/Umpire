@@ -128,14 +128,14 @@ bool pointer_contains(void* left, void* right);
  *\param camp::Platform p  
  *\param umpire::Allocator a 
  */
-bool isAccessible(Platform p, Allocator a);
+bool is_accessible(Platform p, Allocator a);
 
 /*!
  * \brief Helper function to find the resource type of a given allocator
  *
  *\param umpire::allocator a  
  */
-MemoryResourceTraits::resource_type findResource(Allocator a);
+MemoryResourceTraits::resource_type get_resource(Allocator a);
 
 /*!
  * \brief Get the backtrace associated with the allocation of ptr
