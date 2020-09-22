@@ -6,71 +6,34 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/Umpire.cpp"
-
-//////////////////////////////////////////////////////////////////////////
-//Some resource types may be repeated. If only the unique types should be
-//tested, define this value. For example, if there is a DEVICE::1 and a 
-//DEVICE resource type, only DEVICE will be tested for accessibility. 
-//////////////////////////////////////////////////////////////////////////
-#define UNIQUE
+#include "umpire/Umpire.hpp"
 
 using cPlatform = camp::resources::Platform;
 
-void testAccess(umpire::Allocator a)
+bool testAccess(umpire::Allocator a)
 {
-  std::cout << "Testing the host platform..." << std::endl;
   if(is_accessible(cPlatform::host, a)) {
-    std::cout << "The allocator, " << a.getName() << 
-                 ", is accessible." << std::endl << std::endl;
+    std::cout << "The allocator, " << a.getName()
+              << ", is accessible." << std::endl;
+    return true;
   } else {
-    std::cout << "The allocator is not accessible."
-              << std::endl << std::endl;
+    std::cout << "However, the allocator, " << a.getName() 
+              << " is not accessible." << std::endl;
+    return false;
   }
-  
-  std::cout << "Testing the cuda platform..." << std::endl;
-  if(is_accessible(cPlatform::cuda, a)) {
-    std::cout << "The allocator, " << a.getName() << 
-                 ", is accessible." << std::endl << std::endl;
-  } else {
-    std::cout << "The allocator is not accessible."
-              << std::endl << std::endl;
-  }
- 
-  std::cout << "Testing the hip platform..." << std::endl;
-  if(is_accessible(cPlatform::hip, a)) {
-    std::cout << "The allocator, " << a.getName() << 
-                 ", is accessible." << std::endl << std::endl;
-  } else {
-    std::cout << "The allocator is not accessible."
-              << std::endl << std::endl;
-  }
-
-  std::cout << "Testing the omp_target platform..." << std::endl;
-  if(is_accessible(cPlatform::omp_target, a)) {
-    std::cout << "The allocator, " << a.getName() << 
-                 ", is accessible." << std::endl << std::endl;
-  } else {
-    std::cout << "The allocator is not accessible."
-              << std::endl << std::endl;
-  } 
-
-  std::cout << "Testing the sycl platform..." << std::endl;
-  if(is_accessible(cPlatform::sycl, a)) {
-    std::cout << "The allocator, " << a.getName() << 
-                 ", is accessible." << std::endl << std::endl;
-  } else {
-    std::cout << "The allocator is not accessible."
-              << std::endl << std::endl;
-  }
-  
-  std::cout << "---------------------------------" << std::endl; 
-  return; 
 }
 
+///////////////////////////////////////////////////
+//Depending on how Umpire has been set up, several
+//different allocators could be accessible from the 
+//host CAMP platform. This test will create a list
+//of all currently available allocators and then test
+//each individually to see if it can be accessed from
+//the host platform. 
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -80,19 +43,29 @@ int main()
   
   ///////////////////////////////////////////////////
   //Create an allocator for each available type
+  std::cout << "Available allocators: ";
   for(auto a : allNames) {
-    alloc.push_back(rm.getAllocator(a));
+    if (a.find("::") == std::string::npos) {
+      alloc.push_back(rm.getAllocator(a));
+      std::cout << a << " ";
+    }
   }
-  
+  std::cout<<std::endl<<std::endl;
+
   ///////////////////////////////////////////////////
   //Test accessibility
-  for(unsigned int c = 0; c < alloc.size(); c++) {
-#if defined UNIQUE
-    if (allNames[c].find("::") == std::string::npos)
-#endif
-    {
-      std::cout << allNames[c] << std::endl;
-      testAccess(alloc[c]);
+  std::cout << "Testing the available allocators for "
+            << "accessibility from the CAMP host platform:" 
+            << std::endl;
+  const int size = 100;
+  for(auto a : alloc) {
+    if(testAccess(a)) { // && (a.getAllocationStrategy()->getTraits().resource != umpire::MemoryResourceTraits::resource_type::DEVICE)) {
+      int* data = static_cast<int*>(a.allocate(size*sizeof(int)));
+      for(int i = 0; i < size; i++) {
+        data[i] = i * i;
+      }
+      std::cout << data[size-1] << " should be equal to " 
+                << (size-1)*(size-1) << std::endl << std::endl; 
     }
   }
  
