@@ -28,7 +28,6 @@ namespace {
       }
 
       bool is_foreman() { return my_rank == foreman; }
-      // void synchronize() { MPI_Barrier(comm); }
       void synchronize() { MPI_Barrier(comm); }
 
       int my_rank;
