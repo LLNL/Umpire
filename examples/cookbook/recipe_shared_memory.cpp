@@ -40,10 +40,6 @@ namespace {
 int main(int ac, char** av)
 {
   MPI_Init(&ac, &av);
-
-  //
-  // Initialize our synchronization object
-  //
   const int foreman_rank{0};
   MPI_Comm shmcomm;
   MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &shmcomm);
@@ -57,13 +53,13 @@ int main(int ac, char** av)
   auto& rm = umpire::ResourceManager::getInstance();
   auto traits{umpire::get_default_resource_traits("SHARED")};
   traits.size = 1024*1024;
-  auto allocator_1KiB{rm.makeResource("SHARED::1KiB_allocator", traits)};
-  UMPIRE_ASSERT(allocator_1KiB.getAllocationStrategy()->getTraits().resource
+  auto allocator_1MiB{rm.makeResource("SHARED::1MiB_allocator", traits)};
+  UMPIRE_ASSERT(allocator_1MiB.getAllocationStrategy()->getTraits().resource
                         == umpire::MemoryResourceTraits::resource_type::SHARED);
 
   traits.size *= 1024;
-  auto allocator_1MiB{rm.makeResource("SHARED::1MiB_allocator", traits)};
-  UMPIRE_ASSERT(allocator_1MiB.getAllocationStrategy()->getTraits().resource
+  auto allocator_1GiB{rm.makeResource("SHARED::1GiB_allocator", traits)};
+  UMPIRE_ASSERT(allocator_1GiB.getAllocationStrategy()->getTraits().resource
                         == umpire::MemoryResourceTraits::resource_type::SHARED);
 
   //
@@ -72,7 +68,7 @@ int main(int ac, char** av)
   {
     void* ptr{nullptr};
     if ( sync.is_foreman() ) {
-      ptr = allocator_1KiB.allocate("allocation_name_1", 100 * sizeof(uint64_t));
+      ptr = allocator_1MiB.allocate("allocation_name_1", sizeof(uint64_t));
       uint64_t* data{static_cast<uint64_t*>(ptr)};
       *data = 0xDEADBEEF;
     }
@@ -80,27 +76,27 @@ int main(int ac, char** av)
     sync.synchronize();
 
     if ( ! sync.is_foreman() )
-      ptr = allocator_1KiB.allocate("allocation_name_1", 100 * sizeof(uint64_t));
+      ptr = allocator_1MiB.allocate("allocation_name_1", sizeof(uint64_t));
 
     uint64_t* data{static_cast<uint64_t*>(ptr)};
     UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
     sync.synchronize();
-    allocator_1KiB.deallocate(ptr);
+    allocator_1MiB.deallocate(ptr);
   }
 
   //
   // Race for allocation/attach, foreman write, others wait
   //
   {
-    void* ptr{allocator_1MiB.allocate("allocation_name_2", sizeof(uint64_t))};
+    void* ptr{allocator_1GiB.allocate("allocation_name_2", sizeof(uint64_t))};
     uint64_t* data{static_cast<uint64_t*>(ptr)};
 
     if ( sync.is_foreman() )
       *data = 0xDEADBEEF;
 
     UMPIRE_ASSERT(
-      umpire::find_pointer_from_name(allocator_1MiB, "allocation_name_2") == ptr );
+      umpire::find_pointer_from_name(allocator_1GiB, "allocation_name_2") == ptr);
 
     sync.synchronize();
 
@@ -108,7 +104,7 @@ int main(int ac, char** av)
 
     sync.synchronize();
 
-    allocator_1MiB.deallocate(ptr);
+    allocator_1GiB.deallocate(ptr);
   }
 
   MPI_Finalize();
