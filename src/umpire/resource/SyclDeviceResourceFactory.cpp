@@ -33,6 +33,8 @@ std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
 std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
     const std::string& name, int id, MemoryResourceTraits traits)
 {
+  cl::sycl::queue sycl_queue(traits.id);
+  traits.queue = sycl_queue;
   return util::make_unique<
       resource::SyclDeviceMemoryResource<alloc::SyclMallocAllocator>>(
       Platform::sycl, name, id, traits);

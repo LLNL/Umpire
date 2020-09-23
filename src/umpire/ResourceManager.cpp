@@ -137,10 +137,13 @@ ResourceManager::ResourceManager()
     for (int device = 0; device < device_count; ++device) {
       std::string name{"DEVICE::" + std::to_string(device)};
       m_resource_names.push_back(name);
-      cudaSetDevice(device);
-      for (int other_device = 0; other_device < device_count; other_device++) {
-        if (device != other_device) {
-          cudaDeviceEnablePeerAccess(other_device, 0);
+
+      if (device_count > 1) {
+        cudaSetDevice(device);
+        for (int other_device = 0; other_device < device_count; other_device++) {
+          if (device != other_device) {
+            cudaDeviceEnablePeerAccess(other_device, 0);
+          }
         }
       }
     }
@@ -180,9 +183,11 @@ ResourceManager::ResourceManager()
       std::string name{"DEVICE::" + std::to_string(device)};
       m_resource_names.push_back(name);
       hipSetDevice(device);
-      for (int other_device = 0; other_device < device_count; other_device++) {
-        if (device != other_device) {
-          hipDeviceEnablePeerAccess(other_device, 0);
+      if (device_count > 1) {
+        for (int other_device = 0; other_device < device_count; other_device++) {
+          if (device != other_device) {
+            hipDeviceEnablePeerAccess(other_device, 0);
+          }
         }
       }
     }
@@ -223,6 +228,11 @@ ResourceManager::ResourceManager()
     registry.registerMemoryResource(
         util::make_unique<resource::SyclDeviceResourceFactory>());
     m_resource_names.push_back("DEVICE");
+
+    for (int device = 0; device < device_count; ++device) {
+      std::string name{"DEVICE::" + std::to_string(device)};
+      m_resource_names.push_back(name);
+    }
 
     registry.registerMemoryResource(
         util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
