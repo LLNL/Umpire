@@ -187,4 +187,20 @@ void* find_pointer_from_name(Allocator allocator, const std::string name)
   return ptr;
 }
 
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
+  auto scope = a.getAllocationStrategy()->getTraits().scope;
+  MPI_Comm c;
+
+  if (scope == MemoryResourceTraits::shared_scope::NODE) {
+    MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
+  } else {
+    c = MPI_COMM_WORLD;
+  }
+
+  return c;
+
+}
+#endif
+
 } // end namespace umpire

@@ -35,6 +35,12 @@ struct MemoryResourceTraits {
     SHARED
   };
 
+  enum class shared_scope {
+    UNKNOWN,
+    NODE,
+    SOCKET
+  };
+
   int id;
 
   // variables for only SYCL devices (i.e., Intel GPUs)
@@ -51,6 +57,7 @@ struct MemoryResourceTraits {
   memory_type kind = memory_type::UNKNOWN;
   optimized_for used_for = optimized_for::any;
   resource_type resource = resource_type::UNKNOWN;
+  shared_scope scope = shared_scope::UNKNOWN;
 };
 
 } // end of namespace umpire

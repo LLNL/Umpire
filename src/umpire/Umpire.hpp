@@ -158,6 +158,10 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string name)
  */
 void* find_pointer_from_name(Allocator allocator, const std::string name);
 
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
+#endif
+
 } // end of namespace umpire
 
 #endif // UMPIRE_Umpire_HPP

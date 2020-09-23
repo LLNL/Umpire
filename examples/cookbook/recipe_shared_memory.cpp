@@ -17,35 +17,10 @@
 #include <string>
 #include <thread>
 
-namespace {
-  //
-  // Umpire provides Shared Memory, Umpire user provides sync mechanism.
-  //
-  struct SynchronizationMechanism {
-    public:
-      SynchronizationMechanism(MPI_Comm _comm, int _foreman) : comm{_comm}, foreman{_foreman} {
-        MPI_Comm_rank(comm, &my_rank);
-      }
-
-      bool is_foreman() { return my_rank == foreman; }
-      void synchronize() { MPI_Barrier(comm); }
-
-      int my_rank;
-    private:
-      MPI_Comm comm;
-      int foreman;
-  };
-} // end of anonymous namespace
-
 int main(int ac, char** av)
 {
   MPI_Init(&ac, &av);
   const int foreman_rank{0};
-  MPI_Comm shmcomm;
-  MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &shmcomm);
-  int shmrank;
-  MPI_Comm_rank(shmcomm, &shmrank);
-  SynchronizationMechanism sync{shmcomm, foreman_rank};
 
   //
   // Create/Attach to our two named, sized allocators
@@ -53,6 +28,7 @@ int main(int ac, char** av)
   auto& rm = umpire::ResourceManager::getInstance();
   auto traits{umpire::get_default_resource_traits("SHARED")};
   traits.size = 1024*1024;
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::NODE;
   auto allocator_1MiB{rm.makeResource("SHARED::1MiB_allocator", traits)};
   UMPIRE_ASSERT(allocator_1MiB.getAllocationStrategy()->getTraits().resource
                         == umpire::MemoryResourceTraits::resource_type::SHARED);
@@ -62,26 +38,32 @@ int main(int ac, char** av)
   UMPIRE_ASSERT(allocator_1GiB.getAllocationStrategy()->getTraits().resource
                         == umpire::MemoryResourceTraits::resource_type::SHARED);
 
+  auto shared_allocator_comm = umpire::get_communicator_for_allocator(
+      allocator_1MiB, MPI_COMM_WORLD);
+
+  int shared_rank;
+  MPI_Comm_rank(shared_allocator_comm, &shared_rank);
+
   //
   // Allocate and initialize if foreman, wait/attach if not
   //
   {
     void* ptr{nullptr};
-    if ( sync.is_foreman() ) {
+    if (shared_rank == foreman_rank) {
       ptr = allocator_1MiB.allocate("allocation_name_1", sizeof(uint64_t));
       uint64_t* data{static_cast<uint64_t*>(ptr)};
       *data = 0xDEADBEEF;
     }
 
-    sync.synchronize();
+    MPI_Barrier(shared_allocator_comm);
 
-    if ( ! sync.is_foreman() )
+    if ( shared_rank != foreman_rank )
       ptr = allocator_1MiB.allocate("allocation_name_1", sizeof(uint64_t));
 
     uint64_t* data{static_cast<uint64_t*>(ptr)};
     UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
-    sync.synchronize();
+    MPI_Barrier(shared_allocator_comm);
     allocator_1MiB.deallocate(ptr);
   }
 
@@ -92,19 +74,30 @@ int main(int ac, char** av)
     void* ptr{allocator_1GiB.allocate("allocation_name_2", sizeof(uint64_t))};
     uint64_t* data{static_cast<uint64_t*>(ptr)};
 
-    if ( sync.is_foreman() )
+    if ( shared_rank == foreman_rank )
       *data = 0xDEADBEEF;
 
     UMPIRE_ASSERT(
       umpire::find_pointer_from_name(allocator_1GiB, "allocation_name_2") == ptr);
 
-    sync.synchronize();
+    MPI_Barrier(shared_allocator_comm);
 
     UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
-    sync.synchronize();
+    MPI_Barrier(shared_allocator_comm);
 
     allocator_1GiB.deallocate(ptr);
+  }
+
+  {
+    auto traits{umpire::get_default_resource_traits("SHARED")};
+    traits.size = 1024*1024;
+    traits.scope = umpire::MemoryResourceTraits::shared_scope::SOCKET;
+    try {
+      auto socket_allocator{rm.makeResource("SHARED::socket", traits)};
+    } catch (...) {
+      std::cout << "Cannot create resource" << std::endl;
+    }
   }
 
   MPI_Finalize();

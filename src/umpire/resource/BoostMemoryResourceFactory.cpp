@@ -32,6 +32,9 @@ std::unique_ptr<resource::MemoryResource> BoostMemoryResourceFactory::create(
 std::unique_ptr<resource::MemoryResource> BoostMemoryResourceFactory::create(
     const std::string& name, int id, MemoryResourceTraits traits)
 {
+  if (traits.scope != MemoryResourceTraits::shared_scope::NODE) {
+    UMPIRE_ERROR("BoostMemoryResource only supports shared_scope::NODE");
+  }
   return util::make_unique<BoostMemoryResource>(Platform::undefined, name, id,
                                                traits);
 }
@@ -48,6 +51,7 @@ MemoryResourceTraits BoostMemoryResourceFactory::getDefaultTraits()
   traits.used_for = MemoryResourceTraits::optimized_for::any;
   traits.resource = MemoryResourceTraits::resource_type::SHARED;
   traits.size = 16 * 1024 * 1024;
+  traits.scope = MemoryResourceTraits::shared_scope::NODE;
 
   return traits;
 }
