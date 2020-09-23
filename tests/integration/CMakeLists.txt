@@ -40,6 +40,20 @@ blt_add_test(
   COMMAND allocator_integration_tests)
 
 blt_add_executable(
+  NAME allocator_accessibility_tests
+  SOURCES allocator_accessibility.cpp
+  DEPENDS_ON cuda ${integration_tests_depends})
+
+target_include_directories(
+  allocator_accessibility_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME allocator_accessibility_tests
+  COMMAND allocator_accessibility_tests)
+
+blt_add_executable(
   NAME memory_resource_traits_tests 
   SOURCES memory_resource_traits_tests.cpp
   DEPENDS_ON ${integration_tests_depends})

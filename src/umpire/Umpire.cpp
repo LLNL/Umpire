@@ -115,6 +115,18 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
 
 bool is_host_pageable()
 {
+#if defined(UMPIRE_ENABLE_HIP)
+  hipDeviceProp_t props;
+  int hdev = 0;
+  hipGetDevice(&hdev);
+
+  //Check whether HIP can map host memory.
+  hipGetDeviceProperties(&props, hdev);
+  if(props.canMapHostMemory)
+    return true;
+  else
+    return false;
+#endif
 #if defined(UMPIRE_ENABLE_CUDA)
   int pageableMem = 0;
   int cdev = 0;
@@ -126,18 +138,6 @@ bool is_host_pageable()
     cudaDevAttrPageableMemoryAccess, cdev); 
 
   if(pageableMem)
-    return true;
-  else
-    return false;
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-  hipDeviceProp_t props;
-  int hdev = 0;
-  hipGetDevice(&hdev);
-
-  //Check whether HIP can map host memory.
-  hipGetDeviceProperties(&props, hdev);
-  if(props.canMapHostMemory)
     return true;
   else
     return false;
@@ -173,12 +173,10 @@ bool is_accessible(Platform p, Allocator a)
        || get_resource(a) == myResource::DEVICE_CONST)
         return false;
 
-#if defined(UMPIRE_ENABLE_CUDA)
-      //check DEVICE case for (Umpire) CUDA
-      return is_host_pageable();
-#elif defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_HIP)
       //check DEVICE case for (Umpire) HIP
-      return is_host_pageable();
+      if(get_resource(a) == myResource::DEVICE)
+        return true;
 #endif
 
       //If it reaches here, no DEVICE resource is accessible
