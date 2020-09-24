@@ -52,14 +52,14 @@ void test(double* ptr, double m_size)
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-void test(double* ptr, double m_size)
+void test(double* ptr, double m_size, int dev)
 {
   double* dev_ptr{static_cast<double*>(ptr)};
 
-#pragma omp target is_device_ptr(data_ptr) device(device)
+#pragma omp target is_device_ptr(dev_ptr) device(dev)
 #pragma omp teams distribute parallel for schedule(static, 1)
   for (std::size_t i = 0; i < m_size; ++i) {
-    data_ptr[i] = static_cast<unsigned char>(i);
+    dev_ptr[i] = static_cast<unsigned char>(i);
   }
 }
 #endif
@@ -129,8 +129,12 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromHip)
     double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
     ASSERT_NO_THROW(test(data, m_size));
   } else {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_DEATH(test(data, m_size), "");
+    if(m_allocator->getAllocationStrategy()->getTraits().resource == myResource::FILE)
+      SUCCEED(); //FILE should not be accessed from HIP
+    else {
+      double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
+      ASSERT_DEATH(test(data, m_size), "");
+    }
   }
 }
 #endif
@@ -139,12 +143,17 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromHip)
 TEST_P(AllocatorAccessibilityTest, AccessibilityFromOpenMP)
 {
   ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
+  int dev = m_allocator->getAllocationStrategy()->getTraits().id;
   if(is_accessible(cPlatform::omp_target, *m_allocator)) {
     double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_NO_THROW(test(data, m_size));
+    ASSERT_NO_THROW(test(data, m_size, dev));
   } else {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_DEATH(test(data, m_size), "");
+    if(m_allocator->getAllocationStrategy()->getTraits().resource == myResource::FILE)
+      SUCCEED(); //FILE should not be accessed from OpenMP
+    else {
+      double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
+      ASSERT_DEATH(test(data, m_size, dev), "");
+    }
   }
 }
 #endif
