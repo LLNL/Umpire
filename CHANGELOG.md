@@ -23,6 +23,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
 
+- Documentation of Uberenv is moved to a shared location (radiuss-ci), we
+  keep only the examples locally.
+
 ### Removed
 
 ### Fixed

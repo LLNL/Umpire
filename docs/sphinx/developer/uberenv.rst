@@ -15,6 +15,14 @@ workflow described in the documentation.
 Before to start
 ---------------
 
+First of all, it is worth noting that Umpire does not have dependencies, except
+for CMake, which is most of the time installed externally.
+
+That does not make the workflow useless:
+Uberenv will drive Spack which will generate a host-config file with the
+toolchain (including cuda if activated) and the options or variants
+pre-configured.
+
 Machine specific configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
