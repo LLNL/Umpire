@@ -4,58 +4,74 @@
 Uberenv
 =======
 
-This page describes how to generate a cmake configuration file that
-reproduces the configuration `Spack <https://github.com/spack/spack>` would
-have generated in the same context. It contains all the information necessary
-to build Umpire with a specific compiler, compile flags, and build options.
+Umpire shares its Uberenv workflow with other projects. The documentation is
+therefore `shared`_.
 
-In particular, the host config file will setup:
-* flags corresponding with the target required (Release, Debug).
-* compilers and other toolkits (cuda if required), etc.
-* paths to installed dependencies (CMake is currently the only dependency). 
+.. shared: <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#uberenv-guide)
 
-Uberenv helps by doing the following:
+This page will provides some Umpire specific examples to illustrates the
+workflow described in the documentation.
 
-* Pulls a blessed version of Spack locally
-* If you are on a known operating system (like TOSS3), we have defined
-  compilers and system packages so you don't have to rebuild the world (CMake
-  typically in Umpire).
-* Overrides Umpire Spack packages with the local one if it exists. (see
-  ``scripts/uberenv/packages``).
-* Covers both dependencies and project build in one command.
+Before to start
+---------------
 
-Uberenv will create a directory ``uberenv_libs`` containing a Spack instance
-with the required Umpire dependencies installed. It then generates a
-host-config file (``<config_dependent_name>.cmake``) at the root of Umpire
-repository.
+Machine specific configuration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+  $ ls -c1 scripts/uberenv/spack_configs
+  blueos_3_ppc64le_ib
+  toss_3_x86_64_ib
+  darwin
+  blueos_3_ppc64le_ib_p9
+  config.yaml
+
+Uberenv is pre-configured for ``toss_3_x86_64_ib`` among others.
+
+Vetted specs
+^^^^^^^^^^^^
+
+.. code-block:: bash
+
+  $ ls -c1 .gitlab/*jobs.yml
+  .gitlab/lassen-jobs.yml
+  .gitlab/quartz-jobs.yml
+  .gitlab/butte-jobs.yml
+
+CI contains jobs for quartz.
+
+.. code-block:: bash
+
+  $ git grep -h "SPEC" .gitlab/quartz-jobs.yml | grep "gcc"
+      SPEC: "%gcc@4.9.3"
+      SPEC: "%gcc@6.1.0"
+      SPEC: "%gcc@7.1.0"
+      SPEC: "%gcc@7.3.0"
+      SPEC: "%gcc@8.1.0"
+
+We now have a list of the specs vetted on ``quartz``/``toss_3_x86_64_ib``.
+
+.. note::
+  In practice, one should check if the job is not *allowed to fail*, or even deactivated.
+
+MacOS case
+^^^^^^^^^^
+
+In Umpire, the Spack configuration for MacOS contains the default compilers depending on the OS version (`compilers.yaml`), and a commented section to illustrated how to add `CMake` as an external package. You may install CMake with homebrew, for example.
+
 
 Using Uberenv to generate the host-config file
 ----------------------------------------------
 
+We have seen that we can safely use `gcc@8.1.0` on quartz. Let us ask for the default configuration first, and then produce static libs, have OpenMP support and run the benchmarks:
+
 .. code-block:: bash
 
-  $ python scripts/uberenv/uberenv.py
+  $ python scripts/uberenv/uberenv.py --spec="%gcc@8.1.0"
+  $ python scripts/uberenv/uberenv.py --spec="%gcc@8.1.0~shared+openmp tests=benchmarks"
 
-.. note::
-  On LC machines, it is good practice to do the build step in parallel on a
-  compute node. Here is an example command: ``srun -ppdebug -N1 --exclusive
-  python scripts/uberenv/uberenv.py``
-
-Unless otherwise specified Spack will default to a compiler. It is
-recommended to specify which compiler to use: add the compiler spec to the
-``--spec`` Uberenv command line option.
-
-On blessed systems, compiler specs can be found in the Spack compiler files
-in our repository: ``scripts/uberenv/spack_configs/<System
-type>/compilers.yaml``.
-
-Some examples uberenv options:
-
-* ``--spec=%clang@4.0.0``
-* ``--spec=%clang@4.0.0+cuda``
-
-This will generate a CMake cache file, named with the system host name,
-system type, compiler, and the Spack hash for the build options:
+Each will generate a CMake cache file, e.g.:
 
 .. code-block:: bash
 
@@ -64,13 +80,10 @@ system type, compiler, and the Spack hash for the build options:
 Using host-config files to build Umpire
 ---------------------------------------
 
-When a host-config file exists for the desired machine and toolchain, it can
-easily be used in the CMake build process:
-
 .. code-block:: bash
 
   $ mkdir build && cd build
-  $ cmake -C <path_to>/hc-quartz-toss_3_x86_64_ib-gcc@8.1.0-fjcjwd6ec3uen5rh6msdqujydsj74ubf.cmake ..
+  $ cmake -C <path_to>/<host-config>.cmake ..
   $ cmake --build -j .
   $ ctest --output-on-failure -T test
 
