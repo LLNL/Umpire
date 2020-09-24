@@ -190,10 +190,9 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::cuda): 
     {
 #if defined(UMPIRE_ENABLE_CUDA)    
-      if (get_resource(a) == myResource::UNKNOWN)
+      if (get_resource(a) == myResource::UNKNOWN
+        || get_resource(a) == myResource::FILE)
         return false;
-      if (get_resource(a) == myResource::FILE) //NEW KB CHANGE
-        return true;
       else if(get_resource(a) == myResource::HOST)
         return is_host_pageable();
       else

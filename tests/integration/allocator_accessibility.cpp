@@ -15,7 +15,7 @@
 //#include "omp.h"
 
 using cPlatform = camp::resources::Platform;
-using umpire::MemoryResourceTraits;
+using myResource = umpire::MemoryResourceTraits::resource_type;
 
 #if defined(UMPIRE_ENABLE_CUDA)
 __global__ void tester(double* ptr, double m_size)
@@ -93,6 +93,16 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromHost)
   }
 }
 
+TEST_P(AllocatorAccessibilityTest, AccessibilityFromUndefined)
+{
+  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
+  if(is_accessible(cPlatform::undefined, *m_allocator)) {
+    FAIL() << "An Undefined platform is not accessible." << std::endl;
+  } else {
+    SUCCEED(); //Succeed every time we can't access an undefined platform.
+  }
+}
+
 #if defined(UMPIRE_ENABLE_CUDA)
 TEST_P(AllocatorAccessibilityTest, AccessibilityFromCuda)
 {
@@ -101,8 +111,12 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromCuda)
     double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
     ASSERT_NO_THROW(test(data, m_size));
   } else {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_DEATH(test(data, m_size), "");
+    if(m_allocator->getAllocationStrategy()->getTraits().resource == myResource::FILE)
+      SUCCEED(); //FILE should not be accessed from CUDA
+    else {
+      double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
+      ASSERT_DEATH(test(data, m_size), "");
+    }
   }
 }
 #endif
@@ -138,16 +152,6 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromOpenMP)
 /////////////////////////////
 //Sycl test not yet available
 /////////////////////////////
-
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromUndefined)
-{
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-  if(is_accessible(cPlatform::undefined, *m_allocator)) {
-    FAIL() << "An Undefined platform is not accessible.";
-  } else {
-    SUCCEED(); //Succeed every time we can't access an undefined platform.
-  }
-}
 
 std::vector<std::string> get_allocators()
 {
