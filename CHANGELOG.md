@@ -25,6 +25,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
+- Peer access is no longer automatically enabled for CUDA and HIP.
+
 ### Fixed
 
 - Fixed ASAN poisoning to limit it to what user originally requested and not
