@@ -132,22 +132,10 @@ ResourceManager::ResourceManager()
         util::make_unique<resource::CudaDeviceResourceFactory>());
     m_resource_names.push_back("DEVICE");
 
-    int current_device;
-    cudaGetDevice(&current_device);
     for (int device = 0; device < device_count; ++device) {
       std::string name{"DEVICE::" + std::to_string(device)};
       m_resource_names.push_back(name);
-
-      if (device_count > 1) {
-        cudaSetDevice(device);
-        for (int other_device = 0; other_device < device_count; other_device++) {
-          if (device != other_device) {
-            cudaDeviceEnablePeerAccess(other_device, 0);
-          }
-        }
-      }
     }
-    cudaSetDevice(current_device);
 
     registry.registerMemoryResource(
         util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
@@ -177,21 +165,10 @@ ResourceManager::ResourceManager()
         util::make_unique<resource::HipDeviceResourceFactory>());
     m_resource_names.push_back("DEVICE");
 
-    int current_device;
-    hipGetDevice(&current_device);
     for (int device = 0; device < device_count; ++device) {
       std::string name{"DEVICE::" + std::to_string(device)};
       m_resource_names.push_back(name);
-      hipSetDevice(device);
-      if (device_count > 1) {
-        for (int other_device = 0; other_device < device_count; other_device++) {
-          if (device != other_device) {
-            hipDeviceEnablePeerAccess(other_device, 0);
-          }
-        }
-      }
     }
-    hipSetDevice(current_device);
 
     registry.registerMemoryResource(
         util::make_unique<resource::HipPinnedMemoryResourceFactory>());
