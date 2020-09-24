@@ -190,15 +190,15 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::cuda): 
     {
 #if defined(UMPIRE_ENABLE_CUDA)    
-      if (get_resource(a) == myResource::UNKNOWN 
-       || get_resource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::UNKNOWN)
         return false;
+      if (get_resource(a) == myResource::FILE) //NEW KB CHANGE
+        return true;
       else if(get_resource(a) == myResource::HOST)
         return is_host_pageable();
       else
         return true;
 #else
-      std::cout << "Platform is undefined" << std::endl;
       return false;
 #endif
     }
@@ -213,7 +213,6 @@ bool is_accessible(Platform p, Allocator a)
       else
         return true; //true for (Umpire) HOST or DEVICE
 #else
-      std::cout << "Platform is undefined" << std::endl;
       return false;
 #endif
     }
@@ -230,7 +229,6 @@ bool is_accessible(Platform p, Allocator a)
       else
         return true;
 #else
-      std::cout << "Platform is undefined" << std::endl;
       return false;
 #endif
     }
@@ -246,7 +244,6 @@ bool is_accessible(Platform p, Allocator a)
       else
         return false;
 #else
-      std::cout << "Platform is undefined" << std::endl;
       return false;
 #endif
     }
@@ -254,7 +251,6 @@ bool is_accessible(Platform p, Allocator a)
     ////////////////////////////////////////////////////
     default:
     {
-      std::cout << "Platform is undefined" << std::endl;
       return false;
     }
     break;
