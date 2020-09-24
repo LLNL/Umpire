@@ -12,7 +12,8 @@
 #include "umpire/config.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-//#include "omp.h"
+//Need to enable gtest death tests with 
+// -DENABLE_GTEST_DEATH_TESTS=On
 
 using cPlatform = camp::resources::Platform;
 using myResource = umpire::MemoryResourceTraits::resource_type;

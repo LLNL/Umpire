@@ -25,7 +25,7 @@ blt_add_executable(
 
 blt_add_executable(
   NAME alloc_access
-  SOURCES allocAccess.cpp
+  SOURCES allocator_access.cpp
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples alloc_access)
 

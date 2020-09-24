@@ -22,18 +22,18 @@ bool testAccess(umpire::Allocator a)
     return true;
   } else {
     std::cout << "However, the allocator, " << a.getName() 
-              << " is not accessible." << std::endl;
+              << ", is not accessible." << std::endl << std::endl;
     return false;
   }
 }
 
 ///////////////////////////////////////////////////
 //Depending on how Umpire has been set up, several
-//different allocators could be accessible from the 
-//host CAMP platform. This test will create a list
-//of all currently available allocators and then test
-//each individually to see if it can be accessed from
-//the host platform. 
+//different allocators could be accessible from the host
+//CAMP platform. This test will create a list of all
+//currently available allocators and then test each
+//individually to see if it can be accessed from the
+//*host* platform. (To test other platforms, see test.)
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -43,9 +43,12 @@ int main()
   
   ///////////////////////////////////////////////////
   //Create an allocator for each available type
+  //Note: This example only tests the default device.
+  //To test all devices, remove the 'if' statement within
+  //the for-loop.
   std::cout << "Available allocators: ";
   for(auto a : allNames) {
-    if (a.find("::") == std::string::npos) {
+    if (a.find("::") == std::string::npos) { 
       alloc.push_back(rm.getAllocator(a));
       std::cout << a << " ";
     }
@@ -59,7 +62,7 @@ int main()
             << std::endl;
   const int size = 100;
   for(auto a : alloc) {
-    if(testAccess(a)) { // && (a.getAllocationStrategy()->getTraits().resource != umpire::MemoryResourceTraits::resource_type::DEVICE)) {
+    if(testAccess(a)) {
       int* data = static_cast<int*>(a.allocate(size*sizeof(int)));
       for(int i = 0; i < size; i++) {
         data[i] = i * i;
