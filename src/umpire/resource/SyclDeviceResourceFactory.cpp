@@ -33,6 +33,26 @@ std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
 std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
     const std::string& name, int id, MemoryResourceTraits traits)
 {
+  auto platforms = cl::sycl::platform::get_platforms();
+  cl::sycl::device d;
+
+  for (auto& platform : platforms) {
+    auto devices = platform.get_devices();
+    for (auto& device : devices) {
+      int device_count = 0; // SYCL multi.device count
+      const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
+      if (device.is_gpu() &&
+        (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
+          if (device_count == traits.id) {
+            d = device;
+          }
+        device_count++;
+      }
+    }
+  }
+
+  cl::sycl::queue sycl_queue(d);
+  traits.queue = sycl_queue;
   return util::make_unique<
       resource::SyclDeviceMemoryResource<alloc::SyclMallocAllocator>>(
       Platform::sycl, name, id, traits);
@@ -42,24 +62,12 @@ MemoryResourceTraits SyclDeviceResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
-  cl::sycl::gpu_selector gpuSelect;
-  cl::sycl::device sycl_device(gpuSelect);
-  const std::string deviceName =
-      sycl_device.get_info<cl::sycl::info::device::name>();
-  if (sycl_device.is_gpu() &&
-      (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
-    traits.size =
-        sycl_device
-            .get_info<cl::sycl::info::device::global_mem_size>(); // in bytes
-    traits.unified = false;
-
-    traits.id = 0;
-
-    traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
-    traits.kind = MemoryResourceTraits::memory_type::GDDR;
-    traits.used_for = MemoryResourceTraits::optimized_for::any;
-    traits.resource = MemoryResourceTraits::resource_type::DEVICE;
-  }
+  traits.unified = false;
+  traits.id = 0;
+  traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
+  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.used_for = MemoryResourceTraits::optimized_for::any;
+  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
 
   return traits;
 }
