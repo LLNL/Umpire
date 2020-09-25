@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 
-#include <hip/hip_runtime.h>
+#include "hip/hip_runtime_api.h"
 
 #include "umpire/alloc/HipMallocAllocator.hpp"
 #include "umpire/resource/DefaultMemoryResource.hpp"

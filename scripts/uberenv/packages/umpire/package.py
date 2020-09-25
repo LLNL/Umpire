@@ -283,10 +283,18 @@ class Umpire(CMakePackage, CudaPackage):
 #            -DHIP_ROOT_DIR=/opt/rocm-3.6.0/hip -DHIP_CLANG_PATH=/opt/rocm-3.6.0/llvm/bin
 
             hip_root = spec['hip'].prefix
+            rocm_root = hip_root + "/.."
             cfg.write(cmake_cache_entry("HIP_ROOT_DIR",
                                         hip_root))
             cfg.write(cmake_cache_entry("HIP_CLANG_PATH",
-                                        spec['llvm-amdgpu'].prefix.bin))
+                                        rocm_root + '/llvm/bin'))
+            cfg.write(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
+                                        "{0}/include;{0}/../hsa/include".format(hip_root)))
+            if '%gcc' in spec:
+                gcc_bin = os.path.dirname(self.compiler.cxx)
+                gcc_prefix = join_path(gcc_bin, '..')
+                cfg.write(cmake_cache_entry("HIP_CLANG_FLAGS",
+                "--gcc-toolchain={0}".format(gcc_prefix))) 
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
