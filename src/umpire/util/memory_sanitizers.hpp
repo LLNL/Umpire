@@ -7,7 +7,11 @@
 #ifndef UMPIRE_memory_sanitizers_HPP
 #define UMPIRE_memory_sanitizers_HPP
 
+#include "umpire/config.hpp"
+
 #undef __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
+
+#if defined(UMPIRE_ENABLE_POOL_SANITIZER)
 
 //
 // When a user compiles with "-fsanitize=memory", a couple of macros may be
@@ -58,6 +62,8 @@
 #endif // #if (defined(__clang__) && !defined(__ibmxl__))  || (defined(__GNUC__)
        // && __GNUC__ > 4)
 
+#endif // defined(UMPIRE_ENABLE_POOL_SANITIZER)
+
 #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
 #define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)   \
@@ -75,6 +81,6 @@
 #define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)
 #define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size)
 
-#endif // #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
+#endif // defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
-#endif // #ifndef UMPIRE_memory_sanitizers_HPP
+#endif // defined(UMPIRE_memory_sanitizers_HPP)
