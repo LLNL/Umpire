@@ -43,21 +43,21 @@ if(ENABLE_CUDA)
 blt_add_executable(
   NAME allocator_accessibility_tests
   SOURCES allocator_accessibility.cpp
-  DEPENDS_ON cuda ${integration_tests_depends})
+  DEPENDS_ON umpire cuda ${integration_tests_depends})
 endif()
 
 if(ENABLE_HIP)
 blt_add_executable(
   NAME allocator_accessibility_tests
   SOURCES allocator_accessibility.cpp
-  DEPENDS_ON hip ${integration_tests_depends})
+  DEPENDS_ON umpire hip ${integration_tests_depends})
 endif()
 
 if(ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
 blt_add_executable(
   NAME allocator_accessibility_tests
   SOURCES allocator_accessibility.cpp
-  DEPENDS_ON openmp ${integration_tests_depends})
+  DEPENDS_ON umpire openmp ${integration_tests_depends})
 endif()
 
 target_include_directories(
