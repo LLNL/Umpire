@@ -18,51 +18,80 @@
 using cPlatform = camp::resources::Platform;
 using myResource = umpire::MemoryResourceTraits::resource_type;
 
-#if defined(UMPIRE_ENABLE_CUDA)
-__global__ void tester(double* ptr, double m_size)
+
+struct host_platform {};
+
+template <typename Platform>
+struct allocate_and_use{};
+
+template<>
+struct allocate_and_use<host_platform>
+{
+  void test(umpire::Allocator* alloc, double size)
+  {
+    double* data = static_cast<double*>(alloc->allocate(size * sizeof(double)));
+    data[0] = size * size;
+  }
+};
+
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+__global__ void tester(double* d_data, double m_size)
 {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
    
   if (idx == 0) {
-    ptr[0] = m_size * m_size;
+    d_data[0] = m_size * m_size;
   }
 }
+#endif
 
-void test(double* ptr, double m_size)
+#if defined(UMPIRE_ENABLE_CUDA)
+struct cuda_platform {};
+
+template<>
+struct allocate_and_use<cuda_platform>
 {
-  tester<<<1, 16>>>(ptr, m_size);
-  cudaDeviceSynchronize();
-}
+  void test(umpire::Allocator* alloc, double size)
+  {
+    double* data = static_cast<double*>(alloc->allocate(size * sizeof(double)));
+    tester<<<1, 16>>>(data, size);
+    cudaDeviceSynchronize();
+  }
+};
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-__global__ void tester(double* ptr, double m_size)
-{
-  int idx = blockDim.x * blockIdx.x + threadIdx.x;
-   
-  if (idx == 0) {
-    ptr[0] = m_size * m_size;
-  }
-}
+struct hip_platform{};
 
-void test(double* ptr, double m_size)
+template<>
+struct allocate_and_use<hip_platform>
 {
-  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0,0, ptr, m_size);
-  hipDeviceSynchronize();
-}
+  void test(umpire::Allocator* alloc, double size)
+  {
+    double* data = static_cast<double*>(alloc->allocate(size * sizeof(double)));
+    hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0,0, data, size);
+    hipDeviceSynchronize();
+  }
+};
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-void test(double* ptr, double m_size, int dev)
-{
-  double* dev_ptr{static_cast<double*>(ptr)};
+struct omp_target_platform{};
 
-#pragma omp target is_device_ptr(dev_ptr) device(dev)
+template<>
+struct allocate_and_use<omp_target_platform>
+{
+  void test(double* data, double size, int dev)
+  {
+    double* d_data{static_cast<double*>(data)};
+
+#pragma omp target is_device_ptr(d_data) device(dev)
 #pragma omp teams distribute parallel for schedule(static, 1)
-  for (std::size_t i = 0; i < m_size; ++i) {
-    dev_ptr[i] = static_cast<unsigned char>(i);
+    for (std::size_t i = 0; i < size; ++i) {
+      d_data[i] = static_cast<unsigned char>(i);
+    }
   }
-}
+};
 #endif
 
 class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> {
@@ -82,86 +111,50 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
   double m_size = 42;
 };
 
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromHost)
+TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
 {
   ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-  if(is_accessible(cPlatform::host, *m_allocator)) {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_NO_THROW(data[0] = m_size*m_size);
-  } else {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_DEATH(data[0] = m_size*m_size, "");
-  }
-}
 
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromUndefined)
-{
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-  if(is_accessible(cPlatform::undefined, *m_allocator)) {
-    FAIL() << "An Undefined platform is not accessible." << std::endl;
-  } else {
-    SUCCEED(); //Succeed every time we can't access an undefined platform.
+  if(is_accessible(cPlatform::host, *m_allocator)) {
+    allocate_and_use<host_platform> h;
+    ASSERT_NO_THROW(h.test(m_allocator, m_size));
   }
-}
 
 #if defined(UMPIRE_ENABLE_CUDA)
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromCuda)
-{
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-  if(is_accessible(cPlatform::cuda, *m_allocator)) {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_NO_THROW(test(data, m_size));
-  } else {
-    if(m_allocator->getAllocationStrategy()->getTraits().resource == myResource::FILE)
-      SUCCEED(); //FILE should not be accessed from CUDA
-    else {
-      double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-      ASSERT_DEATH(test(data, m_size), "");
-    }
+  if (is_accessible(cPlatform::cuda, *m_allocator)) {
+    allocate_and_use<cuda_platform> c;
+    ASSERT_NO_THROW(c.test(m_allocator, m_size));
   }
-}
 #endif
-
+  
 #if defined(UMPIRE_ENABLE_HIP)
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromHip)
-{
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-  if(is_accessible(cPlatform::hip, *m_allocator)) {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_NO_THROW(test(data, m_size));
-  } else {
-    if(m_allocator->getAllocationStrategy()->getTraits().resource == myResource::FILE)
-      SUCCEED(); //FILE should not be accessed from HIP
-    else {
-      double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-      ASSERT_DEATH(test(data, m_size), "");
-    }
+  if (is_accessible(cPlatform::hip, *m_allocator)) {
+    allocate_and_use<hip_platform> hd;
+    ASSERT_NO_THROW(hd.test(m_allocator, m_size));
   }
-}
 #endif
-
+ 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromOpenMP)
-{
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-  int dev = m_allocator->getAllocationStrategy()->getTraits().id;
-  if(is_accessible(cPlatform::omp_target, *m_allocator)) {
-    double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-    ASSERT_NO_THROW(test(data, m_size, dev));
-  } else {
-    if(m_allocator->getAllocationStrategy()->getTraits().resource == myResource::FILE)
-      SUCCEED(); //FILE should not be accessed from OpenMP
-    else {
-      double* data = static_cast<double*>(m_allocator->allocate(m_size * sizeof(double)));
-      ASSERT_DEATH(test(data, m_size, dev), "");
-    }
+  if (is_accessible(cPlatform::omp_target, *m_allocator)) {
+    allocate_and_use<omp_target_platform> o;
+    ASSERT_NO_THROW(o.test(m_allocator, m_size));
   }
-}
 #endif
 
 /////////////////////////////
 //Sycl test not yet available
 /////////////////////////////
+
+  if(is_accessible(cPlatform::undefined, *m_allocator)) {
+    FAIL() << "An Undefined platform is not accessible." << std::endl;
+  }
+
+//////////////////////////////////////////////////////////
+//Will have to eventually add option to double check that 
+//when is_accessible returns false, that allocator can't be 
+//accessed, it really is correct.
+//////////////////////////////////////////////////////////
+}
 
 std::vector<std::string> get_allocators()
 {
