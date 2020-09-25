@@ -81,8 +81,10 @@ struct omp_target_platform{};
 template<>
 struct allocate_and_use<omp_target_platform>
 {
-  void test(double* data, double size, int dev)
+  void test(umpire::Allocator* alloc, double size)
   {
+    int dev = alloc->getAllocationStrategy()->getTraits().id;
+    double* data = static_cast<double*>(alloc->allocate(size * sizeof(double)));
     double* d_data{static_cast<double*>(data)};
 
 #pragma omp target is_device_ptr(d_data) device(dev)
