@@ -9,7 +9,7 @@ therefore `shared`_.
 
 .. shared: <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#uberenv-guide)
 
-This page will provides some Umpire specific examples to illustrates the
+This page will provides some Umpire specific examples to illustrate the
 workflow described in the documentation.
 
 Before to start
