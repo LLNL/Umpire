@@ -34,12 +34,6 @@ endif ()
 
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
-
-  if (ROCM_ROOT_DIR)
-    blt_register_library(NAME          hip_runtime
-                         INCLUDES      ${ROCM_ROOT_DIR}
-                         TREAT_INCLUDES_AS_SYSTEM ON)
-  endif ()
 endif()
 
 if (ENABLE_PEDANTIC_WARNINGS)
