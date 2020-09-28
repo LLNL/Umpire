@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [v4.1.0] - 2020-09-28
+
+### Added
+
 - OpenMP target test for XL on GitLab
 
 - QuickPool available via the C & Fortran APIs.
