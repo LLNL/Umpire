@@ -9,10 +9,9 @@
 
 #include "umpire/config.hpp"
 
-#if defined(UMPIRE_HAS_ASAN)
-
 #undef __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
 
+#if defined(UMPIRE_HAS_ASAN)
 //
 // When a user compiles with "-fsanitize=memory", a couple of macros may be
 // set depending upon compiler and version.
@@ -20,10 +19,10 @@
 #include <sanitizer/asan_interface.h>
 
 #if defined(__SANITIZE_ADDRESS__)
-
 #define __UMPIRE_USE_MEMORY_SANITIZER__
-
 #endif // defined(__SANITIZE_ADDRESS__)
+
+#endif // defined(UMPIRE_HAS_ASAN)
 
 #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
@@ -43,5 +42,5 @@
 #define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size)
 
 #endif // defined(__UMPIRE_USE_MEMORY_SANITIZER__)
-#endif // defined(UMPIRE_HAS_ASAN)
+
 #endif // UMPIRE_memory_sanitizers_HPP
