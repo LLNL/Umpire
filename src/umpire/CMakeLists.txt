@@ -154,22 +154,6 @@ if (ENABLE_OPENMP_TARGET)
   set(UMPIRE_ENABLE_DEVICE On)
 endif ()
 
-include(CheckCXXSourceCompiles)
-check_cxx_source_compiles(
-  "#include <sanitizer/asan_interface.h>
-
-  int main(int, char**)
-  {
-    return 0;
-  }"
-  UMPIRE_HAS_ASAN)
-
-if (UMPIRE_HAS_ASAN)
-  message(STATUS "Umpire may be built with ASAN support")
-else ()
-  message(STATUS "Umpire ASAN disabled")
-endif ()
-
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/config.hpp.in
   ${CMAKE_BINARY_DIR}/include/umpire/config.hpp)
