@@ -25,6 +25,24 @@ if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (ENABLE_CUDA)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    cuda)
+endif ()
+
+if (ENABLE_HIP)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    hip)
+endif ()
+
+if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME allocator_integration_tests
   SOURCES allocator_integration_tests.cpp
@@ -39,22 +57,10 @@ blt_add_test(
   NAME allocator_integration_tests
   COMMAND allocator_integration_tests)
 
-if(ENABLE_CUDA)
 blt_add_executable(
   NAME allocator_accessibility_tests
   SOURCES allocator_accessibility.cpp
-  DEPENDS_ON umpire cuda ${integration_tests_depends})
-elseif(ENABLE_HIP)
-blt_add_executable(
-  NAME allocator_accessibility_tests
-  SOURCES allocator_accessibility.cpp
-  DEPENDS_ON umpire hip ${integration_tests_depends})
-elseif(ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
-blt_add_executable(
-  NAME allocator_accessibility_tests
-  SOURCES allocator_accessibility.cpp
-  DEPENDS_ON umpire openmp ${integration_tests_depends})
-endif()
+  DEPENDS_ON ${accessibility_test_depends} ${integration_tests_depends})
 
 target_include_directories(
   allocator_accessibility_tests
