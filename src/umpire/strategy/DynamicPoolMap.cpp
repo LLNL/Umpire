@@ -76,12 +76,12 @@ DynamicPoolMap::~DynamicPoolMap()
 void* DynamicPoolMap::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
-  bytes = aligned_round_up(bytes);
+  const std::size_t rounded_bytes{ aligned_round_up(bytes) };
 
   Pointer ptr{nullptr};
 
   // Check if the previous block is a match
-  const SizeMap::const_iterator iter{findFreeBlock(bytes)};
+  const SizeMap::const_iterator iter{findFreeBlock(rounded_bytes)};
 
   if (iter != m_free_map.end()) {
     // Found this acceptable address pair
@@ -90,16 +90,16 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
     std::tie(ptr, is_head, whole_bytes) = iter->second;
 
     // Add used map
-    insertUsed(ptr, bytes, is_head, whole_bytes);
+    insertUsed(ptr, rounded_bytes, is_head, whole_bytes);
 
     // Remove the entry from the free map
     const std::size_t free_size{iter->first};
     m_free_map.erase(iter);
 
-    const std::size_t left_bytes{free_size - bytes};
+    const std::size_t left_bytes{free_size - rounded_bytes};
 
     if (left_bytes > 0) {
-      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes, false,
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes, false,
                  whole_bytes);
     }
   } else {
@@ -107,18 +107,18 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
         (m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
                               : m_next_minimum_pool_allocation_size;
 
-    const std::size_t alloc_bytes{std::max(bytes, min_block_size)};
+    const std::size_t alloc_bytes{std::max(rounded_bytes, min_block_size)};
     ptr = allocateBlock(alloc_bytes);
 
-    UMPIRE_ASSERT("bytes too large" && bytes <= alloc_bytes);
+    UMPIRE_ASSERT("bytes too large" && rounded_bytes <= alloc_bytes);
 
-    insertUsed(ptr, bytes, true, alloc_bytes);
+    insertUsed(ptr, rounded_bytes, true, alloc_bytes);
 
-    const std::size_t left_bytes{alloc_bytes - bytes};
+    const std::size_t left_bytes{alloc_bytes - rounded_bytes};
 
     // Add free
     if (left_bytes > 0)
-      insertFree(static_cast<unsigned char*>(ptr) + bytes, left_bytes, false,
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes, false,
                  alloc_bytes);
   }
 
@@ -315,7 +315,7 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
                                  << umpire::util::backtracer<>::print(bt));
     }
 #endif
-    ptr = aligned_allocate(bytes);
+    ptr = aligned_allocate(bytes); // Will POISON
   } catch (...) {
     UMPIRE_LOG(Error,
                 "Caught error allocating new chunk, giving up free chunks and "
@@ -323,15 +323,13 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
     mergeFreeBlocks();
     releaseFreeBlocks();
     try {
-      ptr = aligned_allocate(bytes);
+      ptr = aligned_allocate(bytes); // Will POISON
       UMPIRE_LOG(Debug, "memory reclaimed, chunk successfully allocated.");
     } catch (...) {
       UMPIRE_LOG(Error, "recovery failed.");
       throw;
     }
   }
-
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, bytes);
 
   m_actual_bytes += bytes;
 
@@ -340,7 +338,6 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
 
 void DynamicPoolMap::deallocateBlock(void* ptr, std::size_t size)
 {
-  UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, size);
   m_actual_bytes -= size;
   try {
     aligned_deallocate(ptr);
