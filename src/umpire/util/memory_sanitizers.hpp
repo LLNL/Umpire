@@ -7,6 +7,10 @@
 #ifndef UMPIRE_memory_sanitizers_HPP
 #define UMPIRE_memory_sanitizers_HPP
 
+#include "umpire/config.hpp"
+
+#if defined(UMPIRE_HAS_ASAN)
+
 #undef __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
 
 //
@@ -77,4 +81,5 @@
 
 #endif // #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
+#endif // defined(UMPIRE_HAS_ASAN)
 #endif // #ifndef UMPIRE_memory_sanitizers_HPP
