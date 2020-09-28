@@ -46,6 +46,8 @@ class AllocationStrategy {
    */
   virtual void* allocate(std::size_t bytes) = 0;
 
+  virtual void* allocate(const std::string& name, std::size_t bytes);
+
   /*!
    * \brief Free the memory at ptr.
    *

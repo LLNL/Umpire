@@ -8,6 +8,7 @@
 #define UMPIRE_AllocationTracker_HPP
 
 #include <memory>
+#include <string>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -21,6 +22,7 @@ class AllocationTracker : public AllocationStrategy, private mixins::Inspector {
   AllocationTracker(std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
   void* allocate(std::size_t bytes) override;
+  void* allocate(const std::string& name, std::size_t bytes) override;
 
   void deallocate(void* ptr) override;
 
