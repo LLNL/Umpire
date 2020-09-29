@@ -31,6 +31,7 @@ struct allocate_and_use<host_platform>
   {
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     data[0] = size * size;
+    alloc->deallocate(data);
   }
 };
 
@@ -56,6 +57,7 @@ struct allocate_and_use<cuda_platform>
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     tester<<<1, 16>>>(data, size);
     cudaDeviceSynchronize();
+    alloc->deallocate(data);
   }
 };
 #endif
@@ -71,6 +73,7 @@ struct allocate_and_use<hip_platform>
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0,0, data, size);
     hipDeviceSynchronize();
+    alloc->deallocate(data);
   }
 };
 #endif
@@ -92,6 +95,8 @@ struct allocate_and_use<omp_target_platform>
     for (auto i = 0; i < size; ++i) {
       d_data[i] = static_cast<size_t>(i);
     }
+
+    alloc->deallocate(data);
   }
 };
 #endif
@@ -106,6 +111,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 
   virtual void TearDown()
   {
+    m_allocator->release();
     delete m_allocator;
   }
   
