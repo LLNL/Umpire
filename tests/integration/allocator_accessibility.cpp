@@ -110,7 +110,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
   }
   
   umpire::Allocator* m_allocator;
-  size_t m_size = 42.42;
+  size_t m_size = 42;
 };
 
 TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
