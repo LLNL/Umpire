@@ -49,7 +49,7 @@ release_resources (on quartz):
 .build_and_test_on_quartz:
   extends: [.build_toss_3_x86_64_ib_script, .on_quartz]
   stage: q_build_and_test
-  needs: [configure_python, allocate_resources]
+  needs: [configure_python, allocate_resources (on quartz)]
 
 .build_and_test_on_quartz_advanced:
   extends: [.build_and_test_on_quartz, .advanced_pipeline]
