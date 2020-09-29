@@ -42,6 +42,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed warnings from MemoryResourceTypes header file
 
+- Added cmake check to deterime if build subsystem capable of ASAN.
+
 ## [v4.0.1] - 2020-09-03
 
 ### Fixed
