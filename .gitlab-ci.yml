@@ -49,6 +49,8 @@ stages:
   - multi_project
 
 configure_python:
+  variables:
+    GIT_STRATEGY: none
   tags:
     - shell
     - quartz
