@@ -27,26 +27,29 @@ int main(int, char**)
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
         "pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
-    data[256] = 100;
+    data[1023] = 100;
+    data[1024] = 100;
     pool.deallocate(data);
   } else if (try_list) {
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
         "pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
-    data[256] = 100;
+    data[1023] = 100;
+    data[1024] = 100;
     pool.deallocate(data);
   } else if (try_quick) {
     auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
         "pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
-    data[256] = 100;
+    data[1023] = 100;
+    data[1024] = 100;
     pool.deallocate(data);
   } else {
     std::cout << "No pools to try" << std::endl;
     return 1;
   }
 
-  std::cout << "data[256] = " << data[256] << std::endl;
+  std::cout << "data[0] = " << data[0] << std::endl;
 
   return 0;
 }
