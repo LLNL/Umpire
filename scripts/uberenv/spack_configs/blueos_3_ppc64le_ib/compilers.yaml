@@ -130,6 +130,19 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
+    spec: xl@16.01
+    paths:
+      cc: /usr/tce/packages/xl/xl-2020.09.17/bin/xlc
+      cxx: /usr/tce/packages/xl/xl-2020.09.17/bin/xlc++
+      f77: /usr/tce/packages/xl/xl-2020.09.17/bin/xlf2003_r
+      fc: /usr/tce/packages/xl/xl-2020.09.17/bin/xlf2003_r
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
     spec: pgi@default
     paths:
       cc: pgcc

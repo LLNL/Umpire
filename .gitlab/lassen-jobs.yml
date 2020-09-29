@@ -60,9 +60,9 @@ nvcc_gcc_4_9_3 (build and test on lassen):
     SPEC: "%gcc@4.9.3+cuda"
   extends: .build_and_test_on_lassen
 
-nvcc_xl-beta-2019.06.20 (build and test on lassen):
+nvcc_xl-16.01 (build and test on lassen):
   variables:
-    SPEC: "%xl@beta2019.06.20+cuda"
+    SPEC: "%xl@16.01+cuda"
   extends: .build_and_test_on_lassen
 
 nvcc_pgi_19.10 (build and test on lassen):
