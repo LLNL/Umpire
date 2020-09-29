@@ -105,6 +105,17 @@ blt_add_library(
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
 
+if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.17)
+  target_link_options(
+    umpire INTERFACE
+    $<BUILD_INTERFACE:$<$<NOT:$<LINK_LANGUAGE:Fortran>>:-rdynamic>>
+  )
+
+  target_link_libraries(
+    umpire INTERFACE $<BUILD_INTERFACE:${CMAKE_DL_LIBS}>
+  )
+endif()
+
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
 

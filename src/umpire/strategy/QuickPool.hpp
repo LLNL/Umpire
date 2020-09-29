@@ -15,6 +15,7 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
@@ -68,6 +69,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   Platform getPlatform() noexcept override;
 
+  MemoryResourceTraits getTraits() const noexcept override;
+
   /*!
    * \brief Return the number of memory blocks -- both leased to application
    * and internal free memory -- that the pool holds.
@@ -84,6 +87,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t getLargestAvailableBlock() noexcept;
 
   void coalesce() noexcept;
+  void do_coalesce() noexcept;
 
  private:
   struct Chunk;
@@ -150,6 +154,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   std::size_t m_actual_bytes{0};
   std::size_t m_releasable_bytes{0};
+  bool m_is_destructing{false};
 };
 
 } // end of namespace strategy

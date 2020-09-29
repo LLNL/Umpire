@@ -16,6 +16,44 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+## [v4.1.0] - 2020-09-28
+
+### Added
+
+- OpenMP target test for XL on GitLab
+
+- QuickPool available via the C & Fortran APIs.
+
+### Changed
+
+- All Umpire tests and executables now built with rdynamic and -ldl
+
+- Resources are now created on-demand when accessed for the first time.
+
+- GitLab test script now converts CTest output to JUnit so that test results
+  are visible in the native GitLab UI.
+
+### Removed
+
+- Peer access is no longer automatically enabled for CUDA and HIP.
+
+### Fixed
+
+- Fixed ASAN poisoning to limit it to what user originally requested and not
+  rounded amount.
+
+- Improved resilliance of primary pool destructors so that giving back
+  previously allocated blocks to a device that has already been cleaned up
+  will no longer throw an error, but instead will now be logged and ignored.
+
+- Added missing getTraits() call to QuickPool
+
+- Fixed Allocator overrun problem in replay tool
+
+- Removed warnings from MemoryResourceTypes header file
+
+- Added cmake check to deterime if build subsystem capable of ASAN.
+
 ## [v4.0.1] - 2020-09-03
 
 ### Fixed

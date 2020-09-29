@@ -1,4 +1,4 @@
-Umpire Version 4.0
+Umpire Version 4.1
 
 Copyright (c) 2016-20, Lawrence Livermore National Security, LLC. 
 Produced at the Lawrence Livermore National Laboratory.
@@ -11,6 +11,7 @@ OCEC-18-031
 Created by David Beckingsale (david@llnl.gov)
 
 Contributors:
+- Kristi Belcher (belcher6@llnl.gov)
+- Johann Dahm (johann.dahm@ibm.com)
 - Marty McFadden (mcfadden8@llnl.gov)
 - Rich Hornung (hornung1@llnl.gov)
-- Johann Dahm (johann.dahm@ibm.com)
