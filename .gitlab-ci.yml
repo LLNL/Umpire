@@ -56,7 +56,7 @@ configure_python:
     - quartz
   stage: environment
   script:
-    - virtualenv $PYTHON_ENVIRONMENT_PATH
+    - virtualenv -p /usr/tce/packages/python/python-3.8.2/bin/python $PYTHON_ENVIRONMENT_PATH
     - . ${PYTHON_ENVIRONMENT_PATH}/bin/activate
     - pip install lxml
 
