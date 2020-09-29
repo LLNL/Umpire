@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [v4.1.0] - 2020-09-28
+
+### Added
+
 - OpenMP target test for XL on GitLab
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator.
@@ -45,6 +55,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Removed warnings from MemoryResourceTypes header file
 
 - Added cmake check to deterime if build subsystem capable of ASAN.
+
+- CI script junit generation
 
 ## [v4.0.1] - 2020-09-03
 
