@@ -44,6 +44,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added cmake check to deterime if build subsystem capable of ASAN.
 
+- CI script junit generation
+
 ## [v4.0.1] - 2020-09-03
 
 ### Fixed
