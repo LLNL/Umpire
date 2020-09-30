@@ -33,6 +33,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
 
+- Gitlab test scripts now caches python virtual environment.
+
 - Spack config files in Uberenv are now coming from a submodule.
 
 ### Removed
