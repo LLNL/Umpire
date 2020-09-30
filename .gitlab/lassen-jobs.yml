@@ -11,7 +11,7 @@ ibm_clang_9:
     SPEC: "+fortran %clang@9.0.0ibm"
   extends: .build_and_test_on_lassen
 
-ibm_clang_9:
+ibm_clang_9_gcc_8:
   variables:
     SPEC: "+fortran %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 fflags=-gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
@@ -43,27 +43,22 @@ xl_16_1_1_7:
 
 # CUDA
 
-ibm_clang_9:
+ibm_clang_9_cuda:
   variables:
-    SPEC: "+cuda+fortran %ibm-clang@9.0.0 fc=/usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r"
+    SPEC: "+cuda+fortran %clang@9.0.0ibm fc=/usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r"
   extends: .build_and_test_on_lassen
 
-gcc_8_3_1:
+gcc_8_3_1_cuda:
   variables:
     SPEC: "+cuda+fortran%gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-pgi_19_10:
+pgi_19_10_cuda:
   variables:
     SPEC: "+cuda+fortran%pgi@19.10"
   extends: .build_and_test_on_lassen
 
-pgi_20_4:
-  variables:
-    SPEC: "+cuda+fortran%pgi@20.4"
-  extends: .build_and_test_on_lassen
-
-xl_16_1_1_7:
+xl_16_1_1_7_cuda:
   variables:
     SPEC: "+cuda+fortran%xl@16.1.1.7"
   extends: .build_and_test_on_lassen

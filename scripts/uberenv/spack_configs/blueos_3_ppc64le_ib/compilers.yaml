@@ -147,7 +147,8 @@ compilers:
     paths:
       cc: /usr/tce/packages/xl/xl-2020.03.18/bin/xlc_r
       cxx: /usr/tce/packages/xl/xl-2020.03.18/bin/xlC_r
-      fc: /usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r
+      fc: /usr/tce/packages/xl/xl-2020.03.18/bin/xlf2003_r
+      f77: /usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r
     flags: {}
     operating_system: rhel7
     target: ppc64le
