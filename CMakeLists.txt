@@ -55,6 +55,7 @@ option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 set(BENCHMARK_ENABLE_INSTALL OFF)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+set(CMAKE_CUDA_STANDARD 11)
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)

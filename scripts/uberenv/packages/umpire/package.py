@@ -12,6 +12,8 @@ import os
 from os import environ as env
 from os.path import join as pjoin
 
+import re
+
 def cmake_cache_entry(name, value, comment=""):
     """Generate a string for a cmake cache variable"""
 
@@ -47,7 +49,6 @@ def get_spec_path(spec, package_name, path_replacements = {}, use_bin = False) :
         path = path.replace(key, path_replacements[key])
 
     return path
-
 
 class Umpire(CMakePackage, CudaPackage):
     """An application-focused API for memory management on NUMA & GPU
@@ -144,6 +145,8 @@ class Umpire(CMakePackage, CudaPackage):
           on this issue see: https://github.com/spack/spack/issues/6261
         """
 
+        gcc_toolchain_regex = re.compile(".*gcc-toolchain.*")
+
         #######################
         # Compiler Info
         #######################
@@ -229,6 +232,14 @@ class Umpire(CMakePackage, CudaPackage):
                 cfg.write(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags,
                                             description))
 
+
+        toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags['cxxflags']))
+
+        if "pgi" in cpp_compiler:
+            if toolchain:
+                cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+                "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64"))
+
         if "toss_3_x86_64_ib" in sys_type:
             release_flags = "-O3"
             reldebinf_flags = "-O3 -g"
@@ -256,13 +267,19 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write(cmake_cache_entry("CMAKE_CUDA_COMPILER",
                                         cudacompiler))
 
+            cuda_flags = []
+
             if not spec.satisfies('cuda_arch=none'):
                 cuda_arch = spec.variants['cuda_arch'].value
-                flag = '-arch sm_{0}'.format(cuda_arch[0])
-                cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS", flag))
+                cuda_flags.append('-arch sm_{0}'.format(cuda_arch[0]))
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+
+            if toolchain:
+                cuda_flags.append("-Xcompiler {}".format(toolchain[0]))
+
+            cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
         else:
             cfg.write(cmake_cache_option("ENABLE_CUDA", False))

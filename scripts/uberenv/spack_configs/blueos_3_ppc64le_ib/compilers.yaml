@@ -39,6 +39,19 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
+    spec: clang@9.0.0ibm
+    paths:
+      cc: /usr/tce/packages/clang/clang-ibm-2019.10.03/bin/clang
+      cxx: /usr/tce/packages/clang/clang-ibm-2019.10.03/bin/clang++
+      fc: /usr/tce/packages/xl/xl-2020.03.18/bin/xlf90_r
+      f77: /usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
     spec: clang@coral2018.08.08
     paths:
       cc: /usr/tce/packages/clang/clang-coral-2018.08.08/bin/clang
@@ -130,6 +143,18 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
+    spec: xl@16.1.1.7
+    paths:
+      cc: /usr/tce/packages/xl/xl-2020.03.18/bin/xlc_r
+      cxx: /usr/tce/packages/xl/xl-2020.03.18/bin/xlC_r
+      fc: /usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r
+    flags: {}
+    operating_system: rhel7
+    target: ppc64le
+    modules: []
+    environment: {}
+    extra_rpaths: []
+- compiler:
     spec: pgi@default
     paths:
       cc: pgcc
@@ -161,7 +186,7 @@ compilers:
       cc: /usr/tce/packages/pgi/pgi-20.4/bin/pgcc
       cxx: /usr/tce/packages/pgi/pgi-20.4/bin/pgc++
       f77: /usr/tce/packages/pgi/pgi-20.4/bin/pgfortran
-      fc: /usr/tce/packages/pgi/pgi-20.4/bin/pgfortran
+      fc: /usr/tce/packages/pgi/pgi-20.4/bin/pgf90
     flags: {}
     operating_system: rhel7
     target: ppc64le
