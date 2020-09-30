@@ -122,6 +122,8 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
                  alloc_bytes);
   }
 
+  m_current_bytes += bytes;
+
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
 }
@@ -139,6 +141,8 @@ void DynamicPoolMap::deallocate(void* ptr)
     bool is_head;
     std::size_t whole_bytes;
     std::tie(bytes, is_head, whole_bytes) = *iter->second;
+
+    m_current_bytes -= bytes;
 
     // Insert in free map
     insertFree(ptr, bytes, is_head, whole_bytes);
@@ -175,6 +179,12 @@ std::size_t DynamicPoolMap::getActualSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_actual_bytes);
   return m_actual_bytes;
+}
+
+std::size_t DynamicPoolMap::getCurrentSize() const noexcept
+{
+  UMPIRE_LOG(Debug, "() returning " << m_current_bytes);
+  return m_current_bytes;
 }
 
 std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
