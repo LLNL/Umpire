@@ -136,7 +136,7 @@ then
     # Convert CTest xml to JUnit (on toss3 only)
     if [[ ${sys_type} == *toss_3* ]]; then
         if [[ -n ${py_env_path} ]]; then
-            . ./${py_env_path}/bin/activate
+            . ${py_env_path}/bin/activate
 
             python3 ${project_dir}/scripts/gitlab/convert_to_junit.py \
             ${project_dir}/Test.xml \
