@@ -483,7 +483,7 @@ DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(
     return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
     return [=](const strategy::DynamicPoolMap& pool) {
-      return (pool.getActualSize() == pool.getReleasableSize());
+      return ( pool.getCurrentSize() == 0 );
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
