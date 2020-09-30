@@ -177,9 +177,6 @@ TYPED_TEST(PrimaryPoolTest, BlocksStatistic)
   for (int i{1}; i >= 0; --i) {
     ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
   }
-  if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-    dynamic_pool->coalesce();
-  }
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
 
   dynamic_pool->release();
