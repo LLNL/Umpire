@@ -295,6 +295,8 @@ class Umpire(CMakePackage, CudaPackage):
                 gcc_prefix = join_path(gcc_bin, '..')
                 cfg.write(cmake_cache_entry("HIP_CLANG_FLAGS",
                 "--gcc-toolchain={0}".format(gcc_prefix))) 
+                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS",
+                "-Wl,-rpath {}/lib64".format(gcc_prefix)))
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
