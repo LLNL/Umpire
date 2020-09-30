@@ -33,6 +33,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
 
+- Spack config files in Uberenv are now coming from a submodule.
+
 ### Removed
 
 - Peer access is no longer automatically enabled for CUDA and HIP.
