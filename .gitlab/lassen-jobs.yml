@@ -45,7 +45,7 @@ xl_16_1_1_7:
 
 ibm_clang_9_cuda:
   variables:
-    SPEC: "+cuda+fortran %clang@9.0.0ibm fc=/usr/tce/packages/xl/xl-2020.03.18/bin/xlf_r"
+    SPEC: "+cuda+fortran %clang@9.0.0ibm"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda:

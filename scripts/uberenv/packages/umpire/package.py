@@ -162,6 +162,7 @@ class Umpire(CMakePackage, CudaPackage):
             if os.path.isfile(env["SPACK_FC"]):
                 f_compiler = env["SPACK_FC"]
 
+
         #######################################################################
         # By directly fetching the names of the actual compilers we appear
         # to doing something evil here, but this is necessary to create a
@@ -206,6 +207,8 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write("#------------------\n\n".format("-" * 60))
         cfg.write(cmake_cache_entry("CMAKE_C_COMPILER", c_compiler))
         cfg.write(cmake_cache_entry("CMAKE_CXX_COMPILER", cpp_compiler))
+        if '+fortran' in spec:
+          cfg.write(cmake_cache_entry("CMAKE_Fortran_COMPILER", f_compiler))
 
         # use global spack compiler flags
         cflags = ' '.join(spec.compiler_flags['cflags'])
