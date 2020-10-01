@@ -413,8 +413,8 @@ Allocator ResourceManager::getDefaultAllocator()
   UMPIRE_LOG(Debug, "");
 
   if (!m_default_allocator) {
-    return getAllocator("HOST");
-    UMPIRE_ERROR("The default Allocator is not defined");
+    UMPIRE_LOG(Debug, "Initializing m_default_allocator as HOST");
+    m_default_allocator = getAllocator("HOST").getAllocationStrategy();
   }
 
   return Allocator(m_default_allocator);
