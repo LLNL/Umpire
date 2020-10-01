@@ -4,92 +4,51 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-
-####
-# Quartz build jobs
-clang_3_9_1 (build and test on quartz):
+clang_10:
   variables:
-    SPEC: "%clang@3.9.1"
-  extends: .build_and_test_on_quartz_advanced
-
-clang_4_0_0 (build and test on quartz):
-  variables:
-    SPEC: "%clang@4.0.0"
-  extends: .build_and_test_on_quartz_advanced
-
-clang_6_0_0 (build and test on quartz):
-  variables:
-    SPEC: "%clang@6.0.0"
-  extends: .build_and_test_on_quartz_advanced
-
-clang_9_0_0 (build and test on quartz):
-  variables:
-    SPEC: "%clang@9.0.0"
+    SPEC: "+fortran %clang@10.0.1"
   extends: .build_and_test_on_quartz
 
+clang_9:
+  variables:
+    SPEC: "+fortran %clang@9.0.0"
+  extends: .build_and_test_on_quartz
 
-gcc_4_9_3 (build and test on quartz):
+gcc_8_1_0:
+  variables:
+    SPEC: "+fortran %gcc@8.1.0"
+  extends: .build_and_test_on_quartz
+
+icpc_17_0_2:
+  variables:
+    SPEC: "+fortran %intel@17.0.2"
+  extends: .build_and_test_on_quartz
+
+icpc_18_0_2:
+  variables:
+    SPEC: "+fortran %intel@18.0.2"
+  extends: .build_and_test_on_quartz
+
+icpc_19_1_0:
+  variables:
+    SPEC: "+fortran %intel@19.1.0"
+  extends: .build_and_test_on_quartz
+
+pgi_19_7:
+  variables:
+    SPEC: "+fortran %pgi@19.7"
+    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
+  extends: .build_and_test_on_quartz
+
+pgi_20_1:
+  variables:
+    SPEC: "+fortran %pgi@20.1"
+    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
+  extends: .build_and_test_on_quartz
+
+# EXTRAS
+
+gcc_4_9_3:
   variables:
     SPEC: "%gcc@4.9.3"
-  extends: .build_and_test_on_quartz_advanced
-
-gcc_6_1_0 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@6.1.0"
-  extends: .build_and_test_on_quartz_advanced
-
-gcc_7_1_0 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@7.1.0"
-  extends: .build_and_test_on_quartz_advanced
-
-gcc_7_3_0 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@7.3.0"
-  extends: .build_and_test_on_quartz_advanced
-
-gcc_8_1_0 (build and test on quartz):
-  variables:
-    SPEC: "%gcc@8.1.0"
-  extends: .build_and_test_on_quartz
-
-
-icpc_16_0_4 (build and test on quartz):
-  variables:
-    SPEC: "%intel@16.0.4"
-  extends: .build_and_test_on_quartz_advanced
-  allow_failure: true
-
-icpc_17_0_2 (build and test on quartz):
-  variables:
-    SPEC: "%intel@17.0.2"
-  extends: .build_and_test_on_quartz_advanced
-
-icpc_18_0_0 (build and test on quartz):
-  variables:
-    SPEC: "%intel@18.0.0"
-  extends: .build_and_test_on_quartz_advanced
-  allow_failure: true
-
-icpc_19_0_4 (build and test on quartz):
-  variables:
-    SPEC: "%intel@19.0.4"
-  extends: .build_and_test_on_quartz
-
-pgi_17_10 (build and test on quartz):
-  variables:
-    SPEC: "%pgi@17.10"
-  extends: .build_and_test_on_quartz_advanced
-  allow_failure: true
-
-pgi_18_5 (build and test on quartz):
-  variables:
-    SPEC: "%pgi@18.5"
-  extends: .build_and_test_on_quartz_advanced
-  allow_failure: true
-
-pgi_20_1 (build and test on quartz):
-  variables:
-    SPEC: "%pgi@20.1"
-    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
   extends: .build_and_test_on_quartz
