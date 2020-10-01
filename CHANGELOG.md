@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
+
 ## [v4.1.0] - 2020-09-28
 
 ### Added
@@ -32,6 +34,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
+
+- Gitlab test scripts now caches python virtual environment.
 
 ### Removed
 
