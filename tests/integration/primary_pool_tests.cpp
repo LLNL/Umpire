@@ -159,15 +159,18 @@ TYPED_TEST(PrimaryPoolTest, BlocksStatistic)
                         this->m_min_pool_growth_size / 8););
   }
 
-  if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-    dynamic_pool->coalesce();
-  }
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 5);
 
   // 3 BLocks (1 Free, 2 allocated)
   for (int i{3}; i >= 2; --i) {
     ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
   }
+
+  //
+  // The DynamicPoolMap does not recombine blocks dynamically, so we have
+  // to (carefully) coalesce them here to have our total block count match
+  // with the other pools.
+  //
   if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
     dynamic_pool->coalesce();
   }
