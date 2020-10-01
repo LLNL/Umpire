@@ -30,8 +30,8 @@ compilers:
     paths:
       cc: /usr/tce/packages/clang/clang-6.0.0/bin/clang
       cxx: /usr/tce/packages/clang/clang-6.0.0/bin/clang++
-      f77:
-      fc:
+      f77: /usr/tce/packages/gcc/gcc-8.1.0/bin/gfortran
+      fc: /usr/tce/packages/gcc/gcc-8.1.0/bin/gfortran
     flags: {}
     operating_system: rhel7
     target: x86_64
@@ -156,21 +156,21 @@ compilers:
     environment: {}
     extra_rpaths: []
 - compiler:
-  spec: intel@19.1.0
-  paths:
-    cc: /usr/tce/packages/intel/intel-19.1.0/bin/icc
-    cxx: /usr/tce/packages/intel/intel-19.1.0/bin/icpc
-    f77: /usr/tce/packages/intel/intel-19.1.0/bin/ifort
-    fc: /usr/tce/packages/intel/intel-19.1.0/bin/ifort
-  flags:
-    cflags: -gcc-name=/usr/tce/packages/gcc/gcc-8.1.0/bin/gcc
-    cxxflags: -gcc-name=/usr/tce/packages/gcc/gcc-8.1.0/bin/g++
-    fflags: -gcc-name=/usr/tce/packages/gcc/gcc-8.1.0/bin/gcc
-  operating_system: rhel7
-  target: x86_64
-  modules: []
-  environment: {}
-  extra_rpaths: []
+    spec: intel@19.1.0
+    paths:
+      cc: /usr/tce/packages/intel/intel-19.1.0/bin/icc
+      cxx: /usr/tce/packages/intel/intel-19.1.0/bin/icpc
+      f77: /usr/tce/packages/intel/intel-19.1.0/bin/ifort
+      fc: /usr/tce/packages/intel/intel-19.1.0/bin/ifort
+    flags:
+      cflags: -gcc-name=/usr/tce/packages/gcc/gcc-8.1.0/bin/gcc
+      cxxflags: -gcc-name=/usr/tce/packages/gcc/gcc-8.1.0/bin/g++
+      fflags: -gcc-name=/usr/tce/packages/gcc/gcc-8.1.0/bin/gcc
+    operating_system: rhel7
+    target: x86_64
+    modules: []
+    environment: {}
+    extra_rpaths: []
 - compiler:
     spec: pgi@17.10
     paths:
