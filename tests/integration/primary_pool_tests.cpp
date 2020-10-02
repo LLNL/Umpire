@@ -594,7 +594,7 @@ class PrimaryPoolTimingsTest : public ::testing::Test {
   //
   // Returns the test duration in milliseconds
   //
-  void run_test(umpire::Allocator* alloc, int& duration)
+  void run_test(umpire::Allocator* alloc, int64_t& duration)
   {
     std::random_device rd;
     std::mt19937 g{rd()};
@@ -658,15 +658,15 @@ TYPED_TEST(PrimaryPoolTimingsTest, TestCoalesceHeuristicTiming)
   // heuristic is close to the same as the time taken to run
   // with the percent_releaseable(0) heuristic
   //
-  int ms_h_100{0};
-  int ms_h_0{0};
+  int64_t ms_h_100{0};
+  int64_t ms_h_0{0};
 
   this->run_test(this->m_allocator, ms_h_100);
   this->run_test(this->m_allocator_no_coalesce, ms_h_0);
 
-  int delta{ std::abs(ms_h_100 - ms_h_0) };
+  int64_t delta{ std::abs(ms_h_100 - ms_h_0) };
 
-  const int max_delta{ std::max((ms_h_100/10), 25) };
+  const int64_t max_delta{ std::max((ms_h_100/10), INT64_C(25)) };
 
   if (delta >= max_delta) {
     std::cerr << "Difference between heuristic durations exceed maximum of: "
