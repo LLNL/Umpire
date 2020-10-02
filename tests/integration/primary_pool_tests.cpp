@@ -4,6 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+#include <algorithm>
+#include <chrono>
 #include <random>
 #include <string>
 #include <vector>
@@ -52,8 +54,11 @@ using ResourceTypes = camp::list<host_resource_tag
                                  >;
 
 using PoolTypes =
-    camp::list<umpire::strategy::DynamicPoolList,
-               umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
+    camp::list<
+                  umpire::strategy::DynamicPoolList
+                , umpire::strategy::DynamicPoolMap
+                , umpire::strategy::QuickPool
+              >;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;
@@ -562,4 +567,99 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2); // Collapse happened
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
+}
+
+template <typename PoolTuple>
+class PrimaryPoolTimingsTest : public ::testing::Test {
+ public:
+  using Pool = typename camp::at<PoolTuple, camp::num<0>>::type;
+  using ResourceType = typename camp::at<PoolTuple, camp::num<1>>::type;
+
+  void SetUp() override
+  {
+    m_resource_name = std::string(tag_to_string<ResourceType>::value);
+    m_allocator = build_allocator<Pool, false>("pool_", 100);
+    m_allocator_no_coalesce = build_allocator<Pool, false>("no_coalesce_pool", 0);
+  }
+
+  void TearDown() override
+  {
+    delete m_allocator;
+    delete m_allocator_no_coalesce;
+  }
+
+  void run_test(umpire::Allocator* alloc)
+  {
+    int max_time{0};
+
+    if (std::is_same<Pool, umpire::strategy::DynamicPoolList>::value) {
+      max_time = 800;
+    }
+    else if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
+      max_time = 25;
+    }
+    else if (std::is_same<Pool, umpire::strategy::QuickPool>::value) {
+      max_time = 20;
+    }
+
+    auto start = std::chrono::steady_clock::now();
+
+    for (std::size_t i{0}; i < m_max_allocs; ++i)
+      ASSERT_NO_THROW( m_allocations[i] = alloc->allocate(1); );
+
+    std::random_shuffle( m_allocations.begin(), m_allocations.end() );
+
+    for (auto a : m_allocations )
+      ASSERT_NO_THROW( alloc->deallocate(a); );
+
+    auto end = std::chrono::steady_clock::now();
+    auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    ASSERT_LT(msec, max_time);
+  }
+
+  umpire::Allocator* m_allocator;
+  umpire::Allocator* m_allocator_no_coalesce;
+
+private:
+  const std::size_t m_max_allocs{20000};
+  std::vector<void*> m_allocations{m_max_allocs};
+  std::string m_resource_name;
+
+  template <typename P, bool use_introspection = true>
+  umpire::Allocator* build_allocator(std::string name, int percentage)
+  {
+    static int unique_counter{0};
+    const std::size_t initial_pool_size{512 * 1024 * 1024};
+    const std::size_t min_pool_growth_size{1 * 1024 * 1024};
+    const std::size_t alignment{16};
+    const std::string pool_name{ name
+                              + std::string{tag_to_string<Pool>::value}
+                              + std::string{"_"}
+                              + std::string{m_resource_name} + std::string{"_"}
+                              + std::to_string(unique_counter++)};
+
+    auto& rm = umpire::ResourceManager::getInstance();
+    return new umpire::Allocator(
+                rm.makeAllocator<P, use_introspection>(
+                    pool_name
+                  , rm.getAllocator(m_resource_name)
+                  , initial_pool_size
+                  , min_pool_growth_size
+                  , alignment
+                  , Pool::percent_releasable(percentage)
+        )
+     );
+  }
+};
+
+TYPED_TEST_SUITE(PrimaryPoolTimingsTest, PoolTestTypes, );
+
+TYPED_TEST(PrimaryPoolTimingsTest, NoIntrospectionAllocator)
+{
+  this->run_test(this->m_allocator);
+}
+
+TYPED_TEST(PrimaryPoolTimingsTest, NoIntrospectionNoCoalesceAllocator)
+{
+  this->run_test(this->m_allocator_no_coalesce);
 }
