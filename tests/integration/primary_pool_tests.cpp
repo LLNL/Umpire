@@ -666,7 +666,7 @@ TYPED_TEST(PrimaryPoolTimingsTest, TestCoalesceHeuristicTiming)
 
   int64_t delta{ std::abs(ms_h_100 - ms_h_0) };
 
-  const int64_t max_delta{ std::max((ms_h_100/10), INT64_C(25)) };
+  const int64_t max_delta{ std::max((ms_h_100/4), INT64_C(25)) };
 
   if (delta >= max_delta) {
     std::cerr << "Difference between heuristic durations exceed maximum of: "
