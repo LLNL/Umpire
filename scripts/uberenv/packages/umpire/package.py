@@ -289,7 +289,7 @@ class Umpire(CMakePackage, CudaPackage):
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
 
             if using_toolchain:
-                cuda_flags.append("-Xcompiler {}".format(toolchain[0]))
+                cuda_flags.append("-Xcompiler {}".format(using_toolchain[0]))
 
             cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
