@@ -222,8 +222,9 @@ class Umpire(CMakePackage, CudaPackage):
             cxxflags += ' '.join([cxxflags,"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0"])
         if cxxflags:
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
-
-        if ("gfortran" in f_compiler) and ("clang" in cpp_compiler):
+    
+        fortran_compilers = ["gfortran", "xlf"]
+        if any(compiler in f_compiler for compiler in fortran_compilers) and ("clang" in cpp_compiler):
             libdir = pjoin(os.path.dirname(
                            os.path.dirname(f_compiler)), "lib")
             flags = ""
@@ -236,10 +237,10 @@ class Umpire(CMakePackage, CudaPackage):
                                             description))
 
 
-        toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags['cxxflags']))
-
-        if "pgi" in cpp_compiler:
-            if toolchain:
+        using_toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags['cxxflags']))
+        compilers_using_toolchain = ["pgi", "xl"]
+        if any(compiler in cpp_compiler for compiler in compilers_using_toolchain):
+            if using_toolchain:
                 cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
                 "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64"))
 
