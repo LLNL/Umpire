@@ -21,13 +21,6 @@
       when: always
     - when: on_success
 
-.venv:
-  cache:
-    key: venv
-    paths:
-      - ${PYTHON_ENVIRONMENT_PATH}
-    policy: pull
-
 ####
 # In pre-build phase, allocate a node for builds
 allocate_resources (on quartz):
@@ -52,13 +45,6 @@ release_resources (on quartz):
 
 ####
 # Generic quartz build job, extending build script
-.build_on_quartz:
-  extends: [.build_toss_3_x86_64_ib_script, .on_quartz, .venv]
-  stage: q_build_and_test
-
-.build_on_quartz_advanced:
-  extends: [.build_on_quartz, .advanced_pipeline]
-
 .build_and_test_on_quartz:
   extends: [.build_and_test_toss_3_x86_64_ib_script, .on_quartz, .venv]
   stage: q_build_and_test

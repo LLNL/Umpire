@@ -63,6 +63,13 @@ configure_python:
     paths:
       - ${PYTHON_ENVIRONMENT_PATH}
 
+.venv:
+  cache:
+    key: venv
+    paths:
+      - ${PYTHON_ENVIRONMENT_PATH}
+    policy: pull
+
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
 .advanced_pipeline:
@@ -72,13 +79,6 @@ configure_python:
 # These are also templates (.name) that define project specific build commands.
 # If an allocation exist with the name defined in this pipeline, the job will
 # use it (slurm specific).
-.build_toss_3_x86_64_ib_script:
-  script:
-    - echo ${ALLOC_NAME}
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 15 -N 1 scripts/gitlab/build_and_test.sh --build-only
-
 .build_and_test_toss_3_x86_64_ib_script:
   script:
     - echo ${ALLOC_NAME}
