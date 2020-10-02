@@ -595,14 +595,19 @@ class PrimaryPoolTimingsTest : public ::testing::Test {
 
     int max_time{0};
 
+    //
+    // This is only to make certain things don't go pear shaped with
+    // timings.  We need to utilize different tools to get more accurate
+    // performance checking.
+    //
     if (std::is_same<Pool, umpire::strategy::DynamicPoolList>::value) {
-      max_time = 800;
+      max_time = 1200;   // Measure 549 on hasgpu
     }
     else if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-      max_time = 25;
+      max_time = 100;    // Measure 16 on hasgpu
     }
     else if (std::is_same<Pool, umpire::strategy::QuickPool>::value) {
-      max_time = 20;
+      max_time = 100;    // Measure 12 on hasgpu
     }
 
     auto start = std::chrono::steady_clock::now();
