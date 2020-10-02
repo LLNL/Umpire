@@ -226,6 +226,9 @@ class Umpire(CMakePackage, CudaPackage):
 
         fortran_compilers = ["gfortran", "xlf"]
         if any(compiler in f_compiler for compiler in fortran_compilers) and ("clang" in cpp_compiler):
+            cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+            "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
+
             libdir = pjoin(os.path.dirname(
                            os.path.dirname(f_compiler)), "lib")
             flags = ""
