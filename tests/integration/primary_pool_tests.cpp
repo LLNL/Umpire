@@ -658,7 +658,6 @@ TYPED_TEST(PrimaryPoolTimingsTest, TestCoalesceHeuristicTiming)
   // heuristic is close to the same as the time taken to run
   // with the percent_releaseable(0) heuristic
   //
-  const int max_delta{25};
   int ms_h_100{0};
   int ms_h_0{0};
 
@@ -666,6 +665,8 @@ TYPED_TEST(PrimaryPoolTimingsTest, TestCoalesceHeuristicTiming)
   this->run_test(this->m_allocator_no_coalesce, ms_h_0);
 
   int delta{ std::abs(ms_h_100 - ms_h_0) };
+
+  const int max_delta{ std::max((ms_h_100/10), 25) };
 
   if (delta >= max_delta) {
     std::cerr << "Difference between heuristic durations exceed maximum of: "
