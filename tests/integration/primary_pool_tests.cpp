@@ -590,6 +590,9 @@ class PrimaryPoolTimingsTest : public ::testing::Test {
 
   void run_test(umpire::Allocator* alloc)
   {
+    std::random_device rd;
+    std::mt19937 g{rd()};
+
     int max_time{0};
 
     if (std::is_same<Pool, umpire::strategy::DynamicPoolList>::value) {
@@ -607,7 +610,7 @@ class PrimaryPoolTimingsTest : public ::testing::Test {
     for (std::size_t i{0}; i < m_max_allocs; ++i)
       ASSERT_NO_THROW( m_allocations[i] = alloc->allocate(1); );
 
-    std::random_shuffle( m_allocations.begin(), m_allocations.end() );
+    std::shuffle( m_allocations.begin(), m_allocations.end(), g );
 
     for (auto a : m_allocations )
       ASSERT_NO_THROW( alloc->deallocate(a); );
