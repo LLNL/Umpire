@@ -50,7 +50,7 @@ xl_16_1_1_7_gcc_8_3_1:
 
 ibm_clang_9_cuda:
   variables:
-    SPEC: "+fortran+cuda %clang@9.0.0ibm +allow-untested-versions"
+    SPEC: "+fortran+cuda+allow-untested-versions %clang@9.0.0ibm"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8_cuda:
@@ -104,4 +104,5 @@ clang_9_0_0_memleak (build and test on lassen):
 xl_default_omp_target (build and test on lassen):
   variables:
     SPEC: "%xl@default+openmp+openmp_target"
-  extends: .
+  extends: .build_and_test_on_lassen
+  
