@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added primary pools test for allocation/deallocation overhead checking
+
 ### Changed
 
 ### Removed
