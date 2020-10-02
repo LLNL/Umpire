@@ -6,6 +6,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <algorithm>
 #include <chrono>
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 #include <random>
 #include <string>
 #include <vector>
@@ -588,27 +591,13 @@ class PrimaryPoolTimingsTest : public ::testing::Test {
     delete m_allocator_no_coalesce;
   }
 
-  void run_test(umpire::Allocator* alloc)
+  //
+  // Returns the test duration in milliseconds
+  //
+  void run_test(umpire::Allocator* alloc, int& duration)
   {
     std::random_device rd;
     std::mt19937 g{rd()};
-
-    int max_time{0};
-
-    //
-    // This is only to make certain things don't go pear shaped with
-    // timings.  We need to utilize different tools to get more accurate
-    // performance checking.
-    //
-    if (std::is_same<Pool, umpire::strategy::DynamicPoolList>::value) {
-      max_time = 1200;   // Measure 549 on hasgpu
-    }
-    else if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-      max_time = 100;    // Measure 16 on hasgpu
-    }
-    else if (std::is_same<Pool, umpire::strategy::QuickPool>::value) {
-      max_time = 100;    // Measure 12 on hasgpu
-    }
 
     auto start = std::chrono::steady_clock::now();
 
@@ -621,8 +610,8 @@ class PrimaryPoolTimingsTest : public ::testing::Test {
       ASSERT_NO_THROW( alloc->deallocate(a); );
 
     auto end = std::chrono::steady_clock::now();
-    auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    ASSERT_LT(msec, max_time);
+
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
   }
 
   umpire::Allocator* m_allocator;
@@ -662,12 +651,27 @@ private:
 
 TYPED_TEST_SUITE(PrimaryPoolTimingsTest, PoolTestTypes, );
 
-TYPED_TEST(PrimaryPoolTimingsTest, NoIntrospectionAllocator)
+TYPED_TEST(PrimaryPoolTimingsTest, TestCoalesceHeuristicTiming)
 {
-  this->run_test(this->m_allocator);
-}
+  //
+  // Make sure that the time taken to run with the percent_releaseable(100)
+  // heuristic is close to the same as the time taken to run
+  // with the percent_releaseable(0) heuristic
+  //
+  const int max_delta{25};
+  int ms_h_100{0};
+  int ms_h_0{0};
 
-TYPED_TEST(PrimaryPoolTimingsTest, NoIntrospectionNoCoalesceAllocator)
-{
-  this->run_test(this->m_allocator_no_coalesce);
+  this->run_test(this->m_allocator, ms_h_100);
+  this->run_test(this->m_allocator_no_coalesce, ms_h_0);
+
+  int delta{ std::abs(ms_h_100 - ms_h_0) };
+
+  if (delta >= max_delta) {
+    std::cerr << "Difference between heuristic durations exceed maximum of: "
+      << max_delta << std::endl
+      << "Heuristic(100) Duration: " << ms_h_100
+      << ", Heuristic(0) Duration: " << ms_h_0 << std::endl;
+  }
+  ASSERT_LT(delta, max_delta);
 }
