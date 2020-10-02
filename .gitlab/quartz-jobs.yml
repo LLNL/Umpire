@@ -24,10 +24,12 @@ icpc_17_0_2:
     SPEC: "+fortran %intel@17.0.2"
   extends: .build_and_test_on_quartz
 
+# Warning: "tests=none" variant requires "build_on_quartz"
+# instead of "build_and_tests_on_quartz"
 icpc_18_0_2:
   variables:
-    SPEC: "+fortran %intel@18.0.2"
-  extends: .build_and_test_on_quartz
+    SPEC: "+fortran tests=none %intel@18.0.2"
+  extends: .build_on_quartz
 
 icpc_19_1_0:
   variables:

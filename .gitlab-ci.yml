@@ -77,6 +77,13 @@ configure_python:
     - echo ${ALLOC_NAME}
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 15 -N 1 scripts/gitlab/build_and_test.sh --build-only
+
+.build_and_test_toss_3_x86_64_ib_script:
+  script:
+    - echo ${ALLOC_NAME}
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 15 -N 1 scripts/gitlab/build_and_test.sh
   artifacts:
     reports:
