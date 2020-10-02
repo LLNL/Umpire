@@ -63,6 +63,13 @@ configure_python:
     paths:
       - ${PYTHON_ENVIRONMENT_PATH}
 
+.venv:
+  cache:
+    key: venv
+    paths:
+      - ${PYTHON_ENVIRONMENT_PATH}
+    policy: pull
+
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
 .advanced_pipeline:
