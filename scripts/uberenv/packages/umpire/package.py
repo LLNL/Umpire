@@ -220,7 +220,10 @@ class Umpire(CMakePackage, CudaPackage):
             cxxflags += ' '.join([cxxflags,"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0"])
         if cxxflags:
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
-    
+
+        fflags = ' '.join(spec.compiler_flags['fflags'])
+        cfg.write(cmake_cache_entry("CMAKE_Fortran_FLAGS", fflags))
+
         fortran_compilers = ["gfortran", "xlf"]
         if any(compiler in f_compiler for compiler in fortran_compilers) and ("clang" in cpp_compiler):
             libdir = pjoin(os.path.dirname(
@@ -282,7 +285,7 @@ class Umpire(CMakePackage, CudaPackage):
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
 
-            if toolchain:
+            if using_toolchain:
                 cuda_flags.append("-Xcompiler {}".format(toolchain[0]))
 
             cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
