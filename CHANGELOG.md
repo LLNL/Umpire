@@ -12,6 +12,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Made primary pool performance tests optional by introducing
+  ENABLE_PERFORMANCE_TESTS flag with the default being Off.
+
 ### Removed
 
 ### Fixed

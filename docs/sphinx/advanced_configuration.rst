@@ -32,6 +32,7 @@ Here is a summary of the configuration options, their default value, and meaning
     ``ENABLE_DOCS``               Off      Build documentation (requires Sphinx and/or Doxygen)
     ``ENABLE_C``                  Off      Build the C API
     ``ENABLE_FORTRAN``            Off      Build the Fortran API
+    ``ENABLE_PERFORMANCE_TESTS``  Off      Build and run performance tests
     ============================  ======== ===========================================================================
 
 These arguments are explained in more detail below:
@@ -91,3 +92,7 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_FORTRAN``
   Build the Fortran API.
+
+* ``ENABLE_PERFORMANCE_TESTS``
+  Build and run performance tests
+
