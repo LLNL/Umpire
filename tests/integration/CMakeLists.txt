@@ -114,6 +114,20 @@ blt_add_test(
   COMMAND operation_tests)
 
 blt_add_executable(
+  NAME reallocate_tests
+  SOURCES reallocate_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  reallocate_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME reallocate_tests
+  COMMAND reallocate_tests)
+
+blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
   DEPENDS_ON ${integration_tests_depends})

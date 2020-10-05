@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 4.1.0)
+  VERSION 4.1.1)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -55,6 +55,13 @@ option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 set(BENCHMARK_ENABLE_INSTALL OFF)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+set(CMAKE_CUDA_STANDARD 11)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+    message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
+    set( CMAKE_CXX_EXTENSIONS ON )
+  endif()
+endif()
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
