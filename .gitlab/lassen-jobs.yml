@@ -50,27 +50,27 @@ xl_16_1_1_7_gcc_8_3_1:
 
 ibm_clang_9_cuda:
   variables:
-    SPEC: "+fortran+cuda+allow-untested-versions %clang@9.0.0ibm"
+    SPEC: "+fortran+cuda+allow-untested-versions %clang@9.0.0ibm ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8_cuda:
   variables:
-    SPEC: "+fortran+cuda %clang@9.0.0ibm +allow-untested-versions cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
+    SPEC: "+fortran+cuda %clang@9.0.0ibm +allow-untested-versions cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda:
   variables:
-    SPEC: "+fortran+cuda %gcc@8.3.1"
+    SPEC: "+fortran+cuda %gcc@8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 pgi_19_10_cuda:
   variables:
-    SPEC: "+fortran+cuda %pgi@19.10"
+    SPEC: "+fortran+cuda %pgi@19.10 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 pgi_19_10_gcc_8_3_1_cuda:
   variables:
-    SPEC: "+fortran+cuda %pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
+    SPEC: "+fortran+cuda %pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
   allow_failure: true
   extends: .build_and_test_on_lassen
 
@@ -82,7 +82,7 @@ pgi_20_4_gcc_8_3_1_cuda_11:
 
 xl_16_1_1_7_cuda:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.7"
+    SPEC: "+fortran+cuda %xl@16.1.1.7 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_7_gcc_8_3_1_cuda_11:
