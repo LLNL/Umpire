@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added primary pools test for allocation/deallocation overhead checking
+
 ### Changed
 
 ### Removed
@@ -19,6 +21,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
 
 - Initialize m_default_allocator to HOST if not set explicitly.
+
+- Removed unreachable code that PGI compiler was giving compile warnings about.
 
 ## [v4.1.0] - 2020-09-28
 
