@@ -24,6 +24,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
 ### Removed
 
 ### Fixed
