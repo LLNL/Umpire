@@ -12,6 +12,25 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Made primary pool performance tests optional by introducing
+  ENABLE_PERFORMANCE_TESTS flag with the default being Off.
+
+### Removed
+
+### Fixed
+
+## [v4.1.1] - 2020-10-05
+
+### Added
+
+- Added primary pools test for allocation/deallocation overhead checking
+
+### Changed
+
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
 ### Removed
 
 ### Fixed
@@ -19,6 +38,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
 
 - Initialize m_default_allocator to HOST if not set explicitly.
+
+- Removed unreachable code that PGI compiler was giving compile warnings about.
 
 ## [v4.1.0] - 2020-09-28
 

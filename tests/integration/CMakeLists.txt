@@ -118,6 +118,17 @@ blt_add_test(
   NAME primary_pool_tests
   COMMAND primary_pool_tests)
 
+if (ENABLE_PERFORMANCE_TESTS)
+  blt_add_executable(
+    NAME primary_pool_performance_tests
+    SOURCES primary_pool_performance_tests.cpp
+    DEPENDS_ON ${integration_tests_depends})
+
+  blt_add_test(
+    NAME primary_pool_performance_tests
+    COMMAND primary_pool_performance_tests)
+endif()
+
 blt_add_executable(
   NAME static_initialization_test
   SOURCES static_initialization_test.cpp
