@@ -146,6 +146,11 @@ blt_add_library(
   DEPENDS_ON ${umpire_resource_depends}
   OBJECT TRUE)
 
+target_compile_options(
+  umpire_resource PUBLIC
+  $<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe "--diag_suppress=implicit_return_from_non_void_function">
+)
+
 target_include_directories(
   umpire_resource
   PUBLIC

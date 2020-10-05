@@ -96,6 +96,11 @@ if (ENABLE_CUDA)
     device_allocator_example
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
+  target_compile_options(
+    device_allocator_example PUBLIC
+    $<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe "--diag_suppress=implicit_return_from_non_void_function">
+  )
+
   list(APPEND umpire_examples device_allocator_example)
 
   blt_add_executable(
@@ -110,6 +115,11 @@ if (ENABLE_CUDA)
   set_target_properties(
     multi_device
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  target_compile_options(
+    multi_device PUBLIC
+    $<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe "--diag_suppress=implicit_return_from_non_void_function">
+  )
 
   list(APPEND umpire_examples multi_device)
 endif()
