@@ -19,6 +19,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed warnings from nvcc about potential early returns from non-void
+  functions.
+
 ## [v4.1.1] - 2020-10-05
 
 ### Added
