@@ -22,6 +22,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initialize m_default_allocator to HOST if not set explicitly.
 
+- Removed unreachable code that PGI compiler was giving compile warnings about.
+
 ## [v4.1.0] - 2020-09-28
 
 ### Added
