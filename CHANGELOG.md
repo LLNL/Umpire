@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [v4.1.1] - 2020-10-05
+
+### Added
+
 - Added primary pools test for allocation/deallocation overhead checking
 
 ### Changed
