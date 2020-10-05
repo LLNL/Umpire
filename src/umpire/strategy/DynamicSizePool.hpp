@@ -42,6 +42,8 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   // Total size allocated (bytes)
   std::size_t m_actual_bytes;
 
+  std::size_t m_current_size{0};
+
   // Minimum size of initial allocation
   std::size_t m_first_minimum_pool_allocation_size;
 
@@ -325,6 +327,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     best->next = usedBlocks;
     usedBlocks = best;
 
+    m_current_size += rounded_bytes;
     UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, usedBlocks->data, bytes);
 
     // Return the new pointer
@@ -343,6 +346,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     if (!curr)
       return;
 
+    m_current_size -= curr->size;
     UMPIRE_POISON_MEMORY_REGION(m_allocator, ptr, curr->size);
 
     UMPIRE_LOG(Debug, "Deallocating data held by " << curr);
@@ -359,6 +363,11 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   std::size_t getActualSize() const
   {
     return m_actual_bytes;
+  }
+
+  std::size_t getCurrentSize() const
+  {
+    return m_current_size;
   }
 
   std::size_t getBlocksInPool() const

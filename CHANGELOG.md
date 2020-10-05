@@ -16,6 +16,24 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+## [v4.1.1] - 2020-10-05
+
+### Added
+
+- Added primary pools test for allocation/deallocation overhead checking
+
+### Changed
+
+### Removed
+
+### Fixed
+
+- Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
+
+- Initialize m_default_allocator to HOST if not set explicitly.
+
+- Removed unreachable code that PGI compiler was giving compile warnings about.
+
 ## [v4.1.0] - 2020-09-28
 
 ### Added
@@ -32,6 +50,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
+
+- Gitlab test scripts now caches python virtual environment.
 
 ### Removed
 
@@ -53,6 +73,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Removed warnings from MemoryResourceTypes header file
 
 - Added cmake check to deterime if build subsystem capable of ASAN.
+
+- CI script junit generation
 
 ## [v4.0.1] - 2020-09-03
 
