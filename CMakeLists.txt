@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 4.1.0)
+  VERSION 4.1.1)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -46,6 +46,7 @@ option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
+option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
 if(WIN32 OR APPLE)
   set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
@@ -55,6 +56,13 @@ option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 set(BENCHMARK_ENABLE_INSTALL OFF)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+set(CMAKE_CUDA_STANDARD 11)
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+    message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
+    set( CMAKE_CXX_EXTENSIONS ON )
+  endif()
+endif()
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)

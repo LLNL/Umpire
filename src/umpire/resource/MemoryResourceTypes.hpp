@@ -40,9 +40,8 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "DEVICE_CONST";
     case File:
       return "FILE";
-    default: 
+    default:
       UMPIRE_ERROR("Unkown resource type: " << type);
-      return "UNKNOWN"; 
   }
 }
 
@@ -56,14 +55,13 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "FILE") return MemoryResourceType::File;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
-    return MemoryResourceType::Unknown;
   }
 }
 
 inline int resource_to_device_id(const std::string& resource) {
   int device_id{0};
   if (resource.find("::") != std::string::npos) {
-    device_id = std::stoi(resource.substr(resource.find("::") + 2)); 
+    device_id = std::stoi(resource.substr(resource.find("::") + 2));
   }
   return device_id;
 }
