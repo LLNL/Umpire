@@ -112,7 +112,7 @@ then
 fi
 
 # Test
-if [[ "${option}" != "--build-only" && $(grep -q “ENABLE_TESTS ON” ${hostconfig_path}) ]]
+if [[ "${option}" != "--build-only" && $(grep -q "ENABLE_TESTS ON" ${hostconfig_path}) ]]
 then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Testing Umpire"
