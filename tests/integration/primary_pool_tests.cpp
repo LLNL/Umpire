@@ -52,11 +52,8 @@ using ResourceTypes = camp::list<host_resource_tag
                                  >;
 
 using PoolTypes =
-    camp::list<
-                  umpire::strategy::DynamicPoolList
-                , umpire::strategy::DynamicPoolMap
-                , umpire::strategy::QuickPool
-              >;
+    camp::list<umpire::strategy::DynamicPoolList,
+               umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;
@@ -566,4 +563,3 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
 }
-
