@@ -19,6 +19,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fixed warnings from nvcc about potential early returns from non-void
+  functions.
+
 ## [v4.1.1] - 2020-10-05
 
 ### Added
@@ -81,7 +84,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added cmake check to deterime if build subsystem capable of ASAN.
 
-- CI script junit generation
+- CI script junit generation && --deps-only mode.
 
 ## [v4.0.1] - 2020-09-03
 
