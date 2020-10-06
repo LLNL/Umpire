@@ -9,7 +9,7 @@
 
 #include "umpire/config.hpp"
 
-#undef  __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
+#undef __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
 
 #if defined(UMPIRE_HAS_ASAN)
 //
@@ -19,7 +19,7 @@
 #include <sanitizer/asan_interface.h>
 
 #if defined(__SANITIZE_ADDRESS__)
-#undef  __UMPIRE_USE_MEMORY_SANITIZER__
+#undef __UMPIRE_USE_MEMORY_SANITIZER__
 #define __UMPIRE_USE_MEMORY_SANITIZER__
 #endif // defined(__SANITIZE_ADDRESS__)
 

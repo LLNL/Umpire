@@ -12,8 +12,9 @@ packages:
     buildable: False
 
   cuda:
-    version: [10.1.168,9.2.148,8.0]
+    version: [10.1.168,11.0.2,9.2.148,8.0]
     paths:
+      cuda@11.0.2: /usr/tce/packages/cuda/cuda-11.0.2
       cuda@10.1.168: /usr/tce/packages/cuda/cuda-10.1.168
       cuda@9.2.148: /usr/tce/packages/cuda/cuda-9.2.148
       cuda@8.0: /usr/tce/packages/cuda/cuda-8.0

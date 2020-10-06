@@ -122,7 +122,7 @@ DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(
         [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
     return [=](const strategy::DynamicPoolList& pool) {
-      return ( pool.getCurrentSize() == 0 );
+      return (pool.getCurrentSize() == 0);
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);

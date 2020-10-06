@@ -45,7 +45,6 @@ stages:
   - q_build_and_test
   - q_release_resources
   - l_build_and_test
-  - b_build_and_test
   - multi_project
 
 configure_python:
@@ -63,6 +62,13 @@ configure_python:
     key: venv
     paths:
       - ${PYTHON_ENVIRONMENT_PATH}
+
+.venv:
+  cache:
+    key: venv
+    paths:
+      - ${PYTHON_ENVIRONMENT_PATH}
+    policy: pull
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
@@ -112,5 +118,3 @@ include:
   - local: .gitlab/quartz-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-  - local: .gitlab/butte-templates.yml
-  - local: .gitlab/butte-jobs.yml

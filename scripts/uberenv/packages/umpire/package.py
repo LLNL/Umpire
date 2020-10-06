@@ -12,6 +12,8 @@ import os
 from os import environ as env
 from os.path import join as pjoin
 
+import re
+
 def cmake_cache_entry(name, value, comment=""):
     """Generate a string for a cmake cache variable"""
 
@@ -47,7 +49,6 @@ def get_spec_path(spec, package_name, path_replacements = {}, use_bin = False) :
         path = path.replace(key, path_replacements[key])
 
     return path
-
 
 class Umpire(CMakePackage, CudaPackage):
     """An application-focused API for memory management on NUMA & GPU
@@ -159,6 +160,7 @@ class Umpire(CMakePackage, CudaPackage):
             if os.path.isfile(env["SPACK_FC"]):
                 f_compiler = env["SPACK_FC"]
 
+
         #######################################################################
         # By directly fetching the names of the actual compilers we appear
         # to doing something evil here, but this is necessary to create a
@@ -203,6 +205,8 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write("#------------------\n\n".format("-" * 60))
         cfg.write(cmake_cache_entry("CMAKE_C_COMPILER", c_compiler))
         cfg.write(cmake_cache_entry("CMAKE_CXX_COMPILER", cpp_compiler))
+        if '+fortran' in spec:
+          cfg.write(cmake_cache_entry("CMAKE_Fortran_COMPILER", f_compiler))
 
         # use global spack compiler flags
         cflags = ' '.join(spec.compiler_flags['cflags'])
@@ -217,7 +221,14 @@ class Umpire(CMakePackage, CudaPackage):
         if cxxflags:
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
 
-        if ("gfortran" in f_compiler) and ("clang" in cpp_compiler):
+        fflags = ' '.join(spec.compiler_flags['fflags'])
+        cfg.write(cmake_cache_entry("CMAKE_Fortran_FLAGS", fflags))
+
+        fortran_compilers = ["gfortran", "xlf"]
+        if any(compiler in f_compiler for compiler in fortran_compilers) and ("clang" in cpp_compiler):
+            cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+            "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
+
             libdir = pjoin(os.path.dirname(
                            os.path.dirname(f_compiler)), "lib")
             flags = ""
@@ -228,6 +239,18 @@ class Umpire(CMakePackage, CudaPackage):
             if flags:
                 cfg.write(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags,
                                             description))
+
+
+        gcc_toolchain_regex = re.compile(".*gcc-toolchain.*")
+        gcc_name_regex = re.compile(".*gcc-name.*")
+
+        using_toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags['cxxflags']))
+        using_gcc_name = list(filter(gcc_name_regex.match, spec.compiler_flags['cxxflags']))
+        compilers_using_toolchain = ["pgi", "xl", "icpc"]
+        if any(compiler in cpp_compiler for compiler in compilers_using_toolchain):
+            if using_toolchain or using_gcc_name:
+                cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+                "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
         if "toss_3_x86_64_ib" in sys_type:
             release_flags = "-O3"
@@ -256,13 +279,19 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write(cmake_cache_entry("CMAKE_CUDA_COMPILER",
                                         cudacompiler))
 
+            cuda_flags = []
+
             if not spec.satisfies('cuda_arch=none'):
                 cuda_arch = spec.variants['cuda_arch'].value
-                flag = '-arch sm_{0}'.format(cuda_arch[0])
-                cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS", flag))
+                cuda_flags.append('-arch sm_{0}'.format(cuda_arch[0]))
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+
+            if using_toolchain:
+                cuda_flags.append("-Xcompiler {}".format(using_toolchain[0]))
+
+            cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
         else:
             cfg.write(cmake_cache_option("ENABLE_CUDA", False))
