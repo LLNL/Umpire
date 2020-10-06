@@ -42,6 +42,13 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "FILE";
     default:
       UMPIRE_ERROR("Unkown resource type: " << type);
+      //
+      // The UMPIRE_ERROR macro above does not return.  It instead throws
+      // an exception.  However, for some reason, nvcc throws a warning
+      // "warning: missing return statement at end of non-void function"
+      // even though the following line cannot be reached.  Adding this
+      // fake return statement to work around the incorrect warning.
+      //
 #if defined(__CUDACC__)
       return "Unknown";
 #endif
@@ -58,6 +65,14 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "FILE") return MemoryResourceType::File;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
+
+    //
+    // The UMPIRE_ERROR macro above does not return.  It instead throws
+    // an exception.  However, for some reason, nvcc throws a warning
+    // "warning: missing return statement at end of non-void function"
+    // even though the following line cannot be reached.  Adding this
+    // fake return statement to work around the incorrect warning.
+    //
 #if defined(__CUDACC__)
     return MemoryResourceType::Unknown;
 #endif
