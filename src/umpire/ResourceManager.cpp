@@ -193,7 +193,7 @@ ResourceManager::ResourceManager()
             device.get_info<cl::sycl::info::device::name>();
         if (device.is_gpu() &&
             (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
-            std::string::npos))
+             std::string::npos))
           device_count++;
       }
     }
@@ -224,8 +224,8 @@ ResourceManager::ResourceManager()
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   int device_count{device_count = omp_get_num_devices()};
   for (int device = 0; device < device_count; ++device) {
-      std::string name{"DEVICE::" + std::to_string(device)};
-      m_resource_names.push_back(name);
+    std::string name{"DEVICE::" + std::to_string(device)};
+    m_resource_names.push_back(name);
   }
 
   registry.registerMemoryResource(
@@ -308,10 +308,12 @@ Allocator ResourceManager::makeResource(const std::string& name)
   return makeResource(name, registry.getDefaultTraitsForResource(name));
 }
 
-Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceTraits traits)
+Allocator ResourceManager::makeResource(const std::string& name,
+                                        MemoryResourceTraits traits)
 {
   if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
-    UMPIRE_ERROR("Allocator " << name << " already exists, and cannot be re-created.");
+    UMPIRE_ERROR("Allocator " << name
+                              << " already exists, and cannot be re-created.");
   }
 
   resource::MemoryResourceRegistry& registry{
@@ -322,29 +324,29 @@ Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceT
   }
   std::unique_ptr<strategy::AllocationStrategy> allocator{
       util::wrap_allocator<strategy::AllocationTracker,
-                            strategy::ZeroByteHandler>(
+                           strategy::ZeroByteHandler>(
           registry.makeMemoryResource(name, getNextId(), traits))};
 
-    UMPIRE_REPLAY(
-        R"( "event": "makeMemoryResource", "payload": { "name": ")" << name << R"(" })"
-        << R"(, "result": ")" << allocator.get() << R"(")");
+  UMPIRE_REPLAY(R"( "event": "makeMemoryResource", "payload": { "name": ")"
+                << name << R"(" })"
+                << R"(, "result": ")" << allocator.get() << R"(")");
 
-    int id{allocator->getId()};
-    m_allocators_by_name[name] = allocator.get();
-    if (name == "DEVICE") {
-      m_allocators_by_name["DEVICE::0"] = allocator.get();
-    }
-    if (name.find("::0") != std::string::npos) {
-      std::string base_name{name.substr(0, name.find("::") - 1)};
-      m_allocators_by_name[base_name] = allocator.get();
-    }
-    if (name.find("::") == std::string::npos) {
-      m_memory_resources[resource::string_to_resource(name)] = allocator.get();
-    }
-    m_allocators_by_id[id] = allocator.get();
-    m_allocators.emplace_front(std::move(allocator));
+  int id{allocator->getId()};
+  m_allocators_by_name[name] = allocator.get();
+  if (name == "DEVICE") {
+    m_allocators_by_name["DEVICE::0"] = allocator.get();
+  }
+  if (name.find("::0") != std::string::npos) {
+    std::string base_name{name.substr(0, name.find("::") - 1)};
+    m_allocators_by_name[base_name] = allocator.get();
+  }
+  if (name.find("::") == std::string::npos) {
+    m_memory_resources[resource::string_to_resource(name)] = allocator.get();
+  }
+  m_allocators_by_id[id] = allocator.get();
+  m_allocators.emplace_front(std::move(allocator));
 
-    return Allocator{m_allocators_by_name[name]};
+  return Allocator{m_allocators_by_name[name]};
 }
 
 strategy::AllocationStrategy* ResourceManager::getAllocationStrategy(
@@ -353,14 +355,14 @@ strategy::AllocationStrategy* ResourceManager::getAllocationStrategy(
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
-    auto resource_name = std::find(m_resource_names.begin(), m_resource_names.end(), name);
-    if (resource_name != std::end(m_resource_names) ) {
+    auto resource_name =
+        std::find(m_resource_names.begin(), m_resource_names.end(), name);
+    if (resource_name != std::end(m_resource_names)) {
       makeResource(name);
     } else {
       UMPIRE_ERROR("Allocator \"" << name
                                   << "\" not found. Available allocators: "
                                   << getAllocatorInformation());
-
     }
   }
 
