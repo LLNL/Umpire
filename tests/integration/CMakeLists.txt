@@ -6,6 +6,8 @@
 ##############################################################################
 set (integration_tests_depends
   umpire gtest)
+set (accessibility_test_depends
+  umpire gtest)
 
 if (ENABLE_CUDA)
   set (integration_tests_depends
@@ -60,7 +62,7 @@ blt_add_test(
 blt_add_executable(
   NAME allocator_accessibility_tests
   SOURCES allocator_accessibility.cpp
-  DEPENDS_ON ${accessibility_test_depends} ${integration_tests_depends})
+  DEPENDS_ON ${accessibility_test_depends})
 
 target_include_directories(
   allocator_accessibility_tests

@@ -5,19 +5,14 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-#include "gtest/gtest-death-test.h"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-//Need to enable gtest death tests with 
-// -DENABLE_GTEST_DEATH_TESTS=On
-
 using cPlatform = camp::resources::Platform;
 using myResource = umpire::MemoryResourceTraits::resource_type;
-
 
 struct host_platform {};
 
@@ -156,19 +151,24 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
   if(is_accessible(cPlatform::undefined, *m_allocator)) {
     FAIL() << "An Undefined platform is not accessible." << std::endl;
   }
-
-//////////////////////////////////////////////////////////
-//Will have to eventually add option to size_t check that 
-//when is_accessible returns false, that allocator can't be 
-//accessed, it really is correct.
-//////////////////////////////////////////////////////////
 }
 
 std::vector<std::string> get_allocators()
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  std::vector<std::string> available_allocators = rm.getResourceNames();
-  return available_allocators;
+  std::vector<std::string> all_allocators = rm.getResourceNames();
+  std::vector<std::string> avail_allocators;
+  
+  std::cout << "Available allocators: ";
+  for(auto a : all_allocators) {
+    if(a.find("::") == std::string::npos) { 
+      avail_allocators.push_back(a);
+      std::cout << a << " ";
+    }
+  }
+  std::cout << std::endl;
+
+  return avail_allocators;
 }
 
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators()));

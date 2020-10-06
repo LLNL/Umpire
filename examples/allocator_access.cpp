@@ -34,6 +34,7 @@ bool testAccess(umpire::Allocator a)
 //currently available allocators and then test each
 //individually to see if it can be accessed from the
 //*host* platform. (To test other platforms, see test.)
+///////////////////////////////////////////////////
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -46,6 +47,7 @@ int main()
   //Note: This example only tests the default device.
   //To test all devices, remove the 'if' statement within
   //the for-loop.
+  //////////////////////////////////////////////////
   std::cout << "Available allocators: ";
   for(auto a : allNames) {
     if (a.find("::") == std::string::npos) { 
@@ -57,6 +59,7 @@ int main()
 
   ///////////////////////////////////////////////////
   //Test accessibility
+  ///////////////////////////////////////////////////
   std::cout << "Testing the available allocators for "
             << "accessibility from the CAMP host platform:" 
             << std::endl;
