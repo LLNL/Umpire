@@ -1,3 +1,9 @@
+# v4.1.2
+
+- Added workaround for incorrect nvcc compiler warning:
+  "warning: missing return statement at end of non-void function"
+  occuring in one Umpire's header files.
+
 # v4.1.1
 
 - Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
