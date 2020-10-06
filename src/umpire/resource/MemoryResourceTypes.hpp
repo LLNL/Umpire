@@ -7,10 +7,10 @@
 #ifndef UMPIRE_MemoryResourceTypes_HPP
 #define UMPIRE_MemoryResourceTypes_HPP
 
-#include "umpire/util/Macros.hpp"
-
-#include <string>
 #include <cstddef>
+#include <string>
+
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 namespace resource {
@@ -23,7 +23,15 @@ struct MemoryResourceTypeHash {
   }
 };
 
-enum MemoryResourceType { Host, Device, Unified, Pinned, Constant, File, Unknown };
+enum MemoryResourceType {
+  Host,
+  Device,
+  Unified,
+  Pinned,
+  Constant,
+  File,
+  Unknown
+};
 
 inline std::string resource_to_string(MemoryResourceType type)
 {
@@ -40,30 +48,35 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "DEVICE_CONST";
     case File:
       return "FILE";
-    default: 
+    default:
       UMPIRE_ERROR("Unkown resource type: " << type);
-      return "UNKNOWN"; 
   }
 }
 
 inline MemoryResourceType string_to_resource(const std::string& resource)
 {
-  if (resource == "HOST") return MemoryResourceType::Host;
-  else if (resource == "DEVICE") return MemoryResourceType::Device;
-  else if (resource == "UM") return MemoryResourceType::Unified;
-  else if (resource == "PINNED") return MemoryResourceType::Pinned;
-  else if (resource == "DEVICE_CONST") return MemoryResourceType::Constant;
-  else if (resource == "FILE") return MemoryResourceType::File;
+  if (resource == "HOST")
+    return MemoryResourceType::Host;
+  else if (resource == "DEVICE")
+    return MemoryResourceType::Device;
+  else if (resource == "UM")
+    return MemoryResourceType::Unified;
+  else if (resource == "PINNED")
+    return MemoryResourceType::Pinned;
+  else if (resource == "DEVICE_CONST")
+    return MemoryResourceType::Constant;
+  else if (resource == "FILE")
+    return MemoryResourceType::File;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
-    return MemoryResourceType::Unknown;
   }
 }
 
-inline int resource_to_device_id(const std::string& resource) {
+inline int resource_to_device_id(const std::string& resource)
+{
   int device_id{0};
   if (resource.find("::") != std::string::npos) {
-    device_id = std::stoi(resource.substr(resource.find("::") + 2)); 
+    device_id = std::stoi(resource.substr(resource.find("::") + 2));
   }
   return device_id;
 }

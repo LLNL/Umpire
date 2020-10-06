@@ -30,21 +30,18 @@ DynamicPoolMap::DynamicPoolMap(
     : AllocationStrategy{name, id},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
-      m_first_minimum_pool_allocation_size{
-            first_minimum_pool_allocation_size},
-      m_next_minimum_pool_allocation_size{
-            next_minimum_pool_allocation_size}
+      m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
+      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
 {
   UMPIRE_LOG(Debug, " ( "
-    << "name=\"" << name << "\""
-    << ", id=" << id
-    << ", allocator=\"" << allocator.getName() << "\""
-    << ", first_minimum_pool_allocation_size="
-        << m_first_minimum_pool_allocation_size
-    << ", next_minimum_pool_allocation_size="
-        << m_next_minimum_pool_allocation_size
-    << ", alignment=" << alignment
-    << " )");
+                        << "name=\"" << name << "\""
+                        << ", id=" << id << ", allocator=\""
+                        << allocator.getName() << "\""
+                        << ", first_minimum_pool_allocation_size="
+                        << m_first_minimum_pool_allocation_size
+                        << ", next_minimum_pool_allocation_size="
+                        << m_next_minimum_pool_allocation_size
+                        << ", alignment=" << alignment << " )");
 }
 
 DynamicPoolMap::~DynamicPoolMap()
@@ -63,7 +60,8 @@ DynamicPoolMap::~DynamicPoolMap()
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
     if (is_head && bytes == whole_bytes) {
-      UMPIRE_LOG(Debug, "Releasing " << whole_bytes << " size chunk @ " << addr);
+      UMPIRE_LOG(Debug,
+                 "Releasing " << whole_bytes << " size chunk @ " << addr);
       deallocateBlock(addr, bytes);
     }
   }
@@ -76,7 +74,7 @@ DynamicPoolMap::~DynamicPoolMap()
 void* DynamicPoolMap::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
-  const std::size_t rounded_bytes{ aligned_round_up(bytes) };
+  const std::size_t rounded_bytes{aligned_round_up(bytes)};
 
   Pointer ptr{nullptr};
 
@@ -99,8 +97,8 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
     const std::size_t left_bytes{free_size - rounded_bytes};
 
     if (left_bytes > 0) {
-      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes, false,
-                 whole_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
+                 false, whole_bytes);
     }
   } else {
     const std::size_t min_block_size =
@@ -118,9 +116,11 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
 
     // Add free
     if (left_bytes > 0)
-      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes, false,
-                 alloc_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
+                 false, alloc_bytes);
   }
+
+  m_current_bytes += bytes;
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
@@ -139,6 +139,8 @@ void DynamicPoolMap::deallocate(void* ptr)
     bool is_head;
     std::size_t whole_bytes;
     std::tie(bytes, is_head, whole_bytes) = *iter->second;
+
+    m_current_bytes -= bytes;
 
     // Insert in free map
     insertFree(ptr, bytes, is_head, whole_bytes);
@@ -175,6 +177,12 @@ std::size_t DynamicPoolMap::getActualSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_actual_bytes);
   return m_actual_bytes;
+}
+
+std::size_t DynamicPoolMap::getCurrentSize() const noexcept
+{
+  UMPIRE_LOG(Debug, "() returning " << m_current_bytes);
+  return m_current_bytes;
 }
 
 std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
@@ -318,8 +326,8 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
     ptr = aligned_allocate(bytes); // Will POISON
   } catch (...) {
     UMPIRE_LOG(Error,
-                "Caught error allocating new chunk, giving up free chunks and "
-                "retrying...");
+               "Caught error allocating new chunk, giving up free chunks and "
+               "retrying...");
     mergeFreeBlocks();
     releaseFreeBlocks();
     try {
@@ -341,16 +349,14 @@ void DynamicPoolMap::deallocateBlock(void* ptr, std::size_t size)
   m_actual_bytes -= size;
   try {
     aligned_deallocate(ptr);
-  }
-  catch (...) {
+  } catch (...) {
     if (m_is_destructing) {
       //
       // Ignore error in case the underlying vendor API has already
       // shutdown
       //
       UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
-    }
-    else {
+    } else {
       throw;
     }
   }
@@ -473,7 +479,7 @@ DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(
     return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
     return [=](const strategy::DynamicPoolMap& pool) {
-      return (pool.getActualSize() == pool.getReleasableSize());
+      return (pool.getCurrentSize() == 0);
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);

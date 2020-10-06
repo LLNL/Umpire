@@ -55,6 +55,13 @@ void DynamicPoolList::release()
   dpa.release();
 }
 
+std::size_t DynamicPoolList::getCurrentSize() const noexcept
+{
+  std::size_t CurrentSize = dpa.getCurrentSize();
+  UMPIRE_LOG(Debug, "() returning " << CurrentSize);
+  return CurrentSize;
+}
+
 std::size_t DynamicPoolList::getActualSize() const noexcept
 {
   std::size_t ActualSize = dpa.getActualSize();
@@ -115,7 +122,7 @@ DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(
         [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
     return [=](const strategy::DynamicPoolList& pool) {
-      return (pool.getActualSize() == pool.getReleasableSize());
+      return (pool.getCurrentSize() == 0);
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
