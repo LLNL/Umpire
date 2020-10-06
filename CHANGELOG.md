@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Documentation on configuring and running different CI tests.
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing
