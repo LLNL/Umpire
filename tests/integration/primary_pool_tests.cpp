@@ -52,8 +52,11 @@ using ResourceTypes = camp::list<host_resource_tag
                                  >;
 
 using PoolTypes =
-    camp::list<umpire::strategy::DynamicPoolList,
-               umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
+    camp::list<
+                  umpire::strategy::DynamicPoolList
+                , umpire::strategy::DynamicPoolMap
+                , umpire::strategy::QuickPool
+              >;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;
@@ -159,15 +162,18 @@ TYPED_TEST(PrimaryPoolTest, BlocksStatistic)
                         this->m_min_pool_growth_size / 8););
   }
 
-  if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-    dynamic_pool->coalesce();
-  }
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 5);
 
   // 3 BLocks (1 Free, 2 allocated)
   for (int i{3}; i >= 2; --i) {
     ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
   }
+
+  //
+  // The DynamicPoolMap does not recombine blocks dynamically, so we have
+  // to (carefully) coalesce them here to have our total block count match
+  // with the other pools.
+  //
   if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
     dynamic_pool->coalesce();
   }
@@ -176,9 +182,6 @@ TYPED_TEST(PrimaryPoolTest, BlocksStatistic)
   // 1 BLocks (1 Free, 0 allocated) - Auto-collapsed
   for (int i{1}; i >= 0; --i) {
     ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
-  }
-  if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-    dynamic_pool->coalesce();
   }
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
 
@@ -563,3 +566,4 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
 }
+

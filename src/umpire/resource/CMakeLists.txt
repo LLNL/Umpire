@@ -161,10 +161,16 @@ blt_add_library(
   DEPENDS_ON ${umpire_resource_depends}
   OBJECT TRUE)
 
-
 if (ENABLE_BOOST_RESOURCE)
   target_include_directories(umpire_resource BEFORE PRIVATE
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/umpire/tpl/boost_1_74_0>
+  )
+endif()
+
+if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.11)
+  target_compile_options(
+    umpire_resource PUBLIC
+    $<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe "--diag_suppress=implicit_return_from_non_void_function">
   )
 endif()
 

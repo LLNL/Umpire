@@ -12,9 +12,37 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Made primary pool performance tests optional by introducing
+  ENABLE_PERFORMANCE_TESTS flag with the default being Off.
+
 ### Removed
 
 ### Fixed
+
+- Fixed warnings from nvcc about potential early returns from non-void
+  functions.
+
+## [v4.1.1] - 2020-10-05
+
+### Added
+
+- Added primary pools test for allocation/deallocation overhead checking
+
+### Changed
+
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
+### Removed
+
+### Fixed
+
+- Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
+
+- Initialize m_default_allocator to HOST if not set explicitly.
+
+- Removed unreachable code that PGI compiler was giving compile warnings about.
 
 ## [v4.1.0] - 2020-09-28
 
@@ -34,6 +62,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
+
+- Gitlab test scripts now caches python virtual environment.
 
 ### Removed
 
@@ -56,7 +86,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added cmake check to deterime if build subsystem capable of ASAN.
 
-- CI script junit generation
+- CI script junit generation && --deps-only mode.
 
 ## [v4.0.1] - 2020-09-03
 

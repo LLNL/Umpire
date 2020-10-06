@@ -1,3 +1,9 @@
+# v4.1.1
+
+- Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
+
+- Initialize m_default_allocator to HOST if not set explicitly.
+
 # v4.1.0
 
 - QuickPool available via the C & Fortran APIs.
