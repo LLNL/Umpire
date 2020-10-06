@@ -16,6 +16,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Worked around nvcc statement not reached warning.
+
 ## [v4.1.1] - 2020-10-05
 
 ### Added

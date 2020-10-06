@@ -42,6 +42,9 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "FILE";
     default:
       UMPIRE_ERROR("Unkown resource type: " << type);
+#if defined(__CUDACC__)
+      return "Unknown";
+#endif
   }
 }
 
@@ -55,6 +58,9 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "FILE") return MemoryResourceType::File;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
+#if defined(__CUDACC__)
+    return MemoryResourceType::Unknown;
+#endif
   }
 }
 
