@@ -40,12 +40,14 @@ std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
     auto devices = platform.get_devices();
     for (auto& device : devices) {
       int device_count = 0; // SYCL multi.device count
-      const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
+      const std::string deviceName =
+          device.get_info<cl::sycl::info::device::name>();
       if (device.is_gpu() &&
-        (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
-          if (device_count == traits.id) {
-            d = device;
-          }
+          (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
+           std::string::npos)) {
+        if (device_count == traits.id) {
+          d = device;
+        }
         device_count++;
       }
     }
