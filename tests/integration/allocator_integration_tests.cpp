@@ -145,7 +145,8 @@ TEST_P(AllocatorTest, getActualSize)
   m_allocator->deallocate(data);
 }
 
-std::vector<std::string> allocator_strings() {
+std::vector<std::string> allocator_strings()
+{
   std::vector<std::string> allocators;
   allocators.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -168,22 +169,24 @@ std::vector<std::string> allocator_strings() {
   return allocators;
 }
 
-INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest, ::testing::ValuesIn(allocator_strings()));
+INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest,
+                         ::testing::ValuesIn(allocator_strings()));
 
 TEST(Allocator, registerAllocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   for (const std::string& allocator_name : allocator_strings()) {
-    const std::string allocator_copy_name = allocator_name + std::string{"_copy"};
+    const std::string allocator_copy_name =
+        allocator_name + std::string{"_copy"};
 
     rm.registerAllocator(allocator_copy_name, rm.getAllocator(allocator_name));
 
     ASSERT_EQ(rm.getAllocator(allocator_name).getAllocationStrategy(),
               rm.getAllocator(allocator_copy_name).getAllocationStrategy());
 
-    ASSERT_ANY_THROW(
-        rm.registerAllocator(allocator_name, rm.getAllocator(allocator_copy_name)));
+    ASSERT_ANY_THROW(rm.registerAllocator(
+        allocator_name, rm.getAllocator(allocator_copy_name)));
 
     ASSERT_TRUE(rm.isAllocatorRegistered(allocator_name));
   }

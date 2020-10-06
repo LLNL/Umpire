@@ -1,6 +1,5 @@
-#include "umpire/ResourceManager.hpp"
-
 #include "gtest/gtest.h"
+#include "umpire/ResourceManager.hpp"
 
 // Needs to be in separate file so that resources are not initialized prior to
 // reallocate call
@@ -10,9 +9,7 @@ TEST(Reallocate, Nullptr)
   constexpr std::size_t size = 1024;
 
   void* ptr{nullptr};
-  EXPECT_NO_THROW({
-    ptr = rm.reallocate(ptr, size);
-  });
+  EXPECT_NO_THROW({ ptr = rm.reallocate(ptr, size); });
 
   ASSERT_NE(nullptr, ptr);
 
