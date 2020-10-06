@@ -15,6 +15,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Made primary pool performance tests optional by introducing
   ENABLE_PERFORMANCE_TESTS flag with the default being Off.
 
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
 ### Removed
 
 ### Fixed
@@ -33,12 +37,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - Added primary pools test for allocation/deallocation overhead checking
-
-### Changed
-
-- Update BLT submodule.
-
-- Added more compiler configurations to GitLab CI.
 
 ### Fixed
 
