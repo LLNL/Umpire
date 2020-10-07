@@ -100,7 +100,7 @@ If there is a leak in one of the tests, it can be useful to gather more informat
 
   $ ASAN_OPTIONS=detect_leaks=1 ctest -T test --output-on-failure
  
-Additionally, the Leak Sanitizer can be run on one specific test (in this case, the "replay" tests) with:
+Additionally, the Leak Sanitizer can be run on one specific test (in this example, the "replay" tests) with:
 
 .. code-block:: bash
 
