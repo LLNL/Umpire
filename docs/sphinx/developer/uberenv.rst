@@ -30,12 +30,12 @@ Machine specific configuration
 
   $ ls -c1 scripts/uberenv/spack_configs
   blueos_3_ppc64le_ib
-  toss_3_x86_64_ib
   darwin
+  toss_3_x86_64_ib
   blueos_3_ppc64le_ib_p9
   config.yaml
 
-Uberenv is pre-configured for ``toss_3_x86_64_ib`` among others.
+Umpire has been configured for ``toss_3_x86_64_ib`` and other systems.
 
 Vetted specs
 ^^^^^^^^^^^^
@@ -45,7 +45,6 @@ Vetted specs
   $ ls -c1 .gitlab/*jobs.yml
   .gitlab/lassen-jobs.yml
   .gitlab/quartz-jobs.yml
-  .gitlab/butte-jobs.yml
 
 CI contains jobs for quartz.
 
@@ -66,7 +65,7 @@ We now have a list of the specs vetted on ``quartz``/``toss_3_x86_64_ib``.
 MacOS case
 ^^^^^^^^^^
 
-In Umpire, the Spack configuration for MacOS contains the default compilers depending on the OS version (`compilers.yaml`), and a commented section to illustrated how to add `CMake` as an external package. You may install CMake with homebrew, for example.
+In Umpire, the Spack configuration for MacOS contains the default compilers depending on the OS version (`compilers.yaml`), and a commented section to illustrate how to add `CMake` as an external package. You may install CMake with homebrew, for example.
 
 
 Using Uberenv to generate the host-config file
