@@ -145,27 +145,14 @@ bool is_host_pageable()
   return false;
 }
 
+/*
+ *  This function describes which allocators should be 
+ *  accessible from which CAMP platforms.
+ *  Information on platform/allocator accessibility
+ *  can be found at <link>.
+*/
 bool is_accessible(Platform p, Allocator a) 
 {
- /*
-  * This function implements the following table which 
-  * describes whether or not an Umpire::Allocator (rows,
-  * labeled by memory resource_type) is accessible by a CAMP
-  * platform (columns). 'T' = True; 'F' = False; 'X' = Does
-  * Not Exist; '*' = Conditional. For those marked with '*',
-  * certain tests are done to determine accessibility. See
-  * confluence page for more details.
-  * 
-  *               UNDEFINED  HOST  CUDA  OMP_TARGET  HIP  SYCL   
-  *  UNKNOWN          F       F     F        F        F    F
-  *  HOST             F       T     *        T        *    F
-  *  DEVICE           F       *     T        T        T    T
-  *  DEVICE_CONST     F       F     T        X        T    X 
-  *  UM               F       T     T        X        T    T 
-  *  PINNED           F       T     T        X        T    T
-  *  FILE             F       T     F        F        F    F
-  */
-
   switch(p) {
     case (cPlatform::host):
     {
@@ -210,7 +197,7 @@ bool is_accessible(Platform p, Allocator a)
        || get_resource(a) == myResource::FILE)
         return false;
       else
-        return true; //true for (Umpire) HOST or DEVICE
+        return true; 
 #else
       return false;
 #endif
@@ -248,7 +235,7 @@ bool is_accessible(Platform p, Allocator a)
     }
     break;
     ////////////////////////////////////////////////////
-    default:
+    default: //Catches the "undefined" platform
     {
       return false;
     }
