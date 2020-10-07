@@ -95,6 +95,9 @@ int main(int ac, char** av)
     traits.scope = umpire::MemoryResourceTraits::shared_scope::SOCKET;
     try {
       auto socket_allocator{rm.makeResource("SHARED::socket", traits)};
+      void* ptr{
+        socket_allocator.allocate("socket_allocation_1", sizeof(uint64_t))};
+      socket_allocator.deallocate(ptr);
     } catch (...) {
       std::cout << "Cannot create resource" << std::endl;
     }
