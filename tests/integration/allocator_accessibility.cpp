@@ -116,8 +116,6 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 
 TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
 {
-  ::testing::FLAGS_gtest_death_test_style = "threadsafe"; 
-
   if(is_accessible(cPlatform::host, *m_allocator)) {
     allocate_and_use<host_platform> h;
     ASSERT_NO_THROW(h.test(m_allocator, m_size));
