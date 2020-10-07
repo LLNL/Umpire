@@ -1,8 +1,8 @@
 .. _ci:
 
-=============================
-Umpire Continuous Integration
-=============================
+======================
+Continuous Integration
+======================
 
 Gitlab CI
 ---------
