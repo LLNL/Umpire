@@ -8,6 +8,7 @@
 #define UMPIRE_ZeroByteHandler_HPP
 
 #include <memory>
+#include <string>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -21,6 +22,7 @@ class ZeroByteHandler : public AllocationStrategy {
   ZeroByteHandler(std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
   void* allocate(std::size_t bytes) override;
+  void* allocate(const std::string& name, std::size_t bytes) override;
 
   void deallocate(void* ptr) override;
 

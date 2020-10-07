@@ -31,7 +31,14 @@ struct MemoryResourceTraits {
     DEVICE_CONST,
     PINNED,
     UM,
-    FILE
+    FILE,
+    SHARED
+  };
+
+  enum class shared_scope {
+    UNKNOWN,
+    NODE,
+    SOCKET
   };
 
   int id;
@@ -42,12 +49,15 @@ struct MemoryResourceTraits {
 #endif
 
   bool unified = false;
+  bool ipc = false;
+
   std::size_t size = 0;
 
   vendor_type vendor = vendor_type::UNKNOWN;
   memory_type kind = memory_type::UNKNOWN;
   optimized_for used_for = optimized_for::any;
   resource_type resource = resource_type::UNKNOWN;
+  shared_scope scope = shared_scope::UNKNOWN;
 };
 
 } // end of namespace umpire
