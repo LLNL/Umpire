@@ -94,4 +94,16 @@ During development, it may be beneficial to regularly check for memory leaks. Th
   $ cmake --build -j
   $ ASAN_OPTIONS=detect_leaks=1 make test
   
+If there is a leak in one of the tests, it can be useful to gather more information about what happened and more details about where it happened. One way to do this is to run:
+
+.. code-block:: bash
+
+  $ ASAN_OPTIONS=detect_leaks=1 ctest -T test --output-on-failure
+ 
+Additionally, the Leak Sanitizer can be run on one specific test (in this case, the "replay" tests) with:
+
+.. code-block:: bash
+
+  $ ASAN_OPTIONS=detect_leaks=1 ctest -T test -R replay --output-on-failure
+
 This will configure a build with Clang 9.0.0 and the Leak Sanitizer. Depending on the output given when running the test with the Leak Sanitizer, it may be useful to use ``addr2line -e <./path_to/executable> <address_of_leak>`` to see the exact line the output is referring to.
