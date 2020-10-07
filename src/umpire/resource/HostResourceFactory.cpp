@@ -4,11 +4,10 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/config.hpp"
-
 #include "umpire/resource/HostResourceFactory.hpp"
 
 #include "umpire/alloc/MallocAllocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/resource/DefaultMemoryResource.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/alloc/PosixMemalignAllocator.hpp"

@@ -82,6 +82,20 @@ blt_add_test(
   COMMAND operation_tests)
 
 blt_add_executable(
+  NAME reallocate_tests
+  SOURCES reallocate_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  reallocate_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME reallocate_tests
+  COMMAND reallocate_tests)
+
+blt_add_executable(
   NAME free_functions_integration_tests
   SOURCES free_functions_integration_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
@@ -103,6 +117,17 @@ blt_add_executable(
 blt_add_test(
   NAME primary_pool_tests
   COMMAND primary_pool_tests)
+
+if (ENABLE_PERFORMANCE_TESTS)
+  blt_add_executable(
+    NAME primary_pool_performance_tests
+    SOURCES primary_pool_performance_tests.cpp
+    DEPENDS_ON ${integration_tests_depends})
+
+  blt_add_test(
+    NAME primary_pool_performance_tests
+    COMMAND primary_pool_performance_tests)
+endif()
 
 blt_add_executable(
   NAME static_initialization_test
