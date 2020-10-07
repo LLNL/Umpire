@@ -15,26 +15,25 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Made primary pool performance tests optional by introducing
   ENABLE_PERFORMANCE_TESTS flag with the default being Off.
 
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
 ### Removed
 
 ### Fixed
 
-- Fixed warnings from nvcc about potential early returns from non-void
-  functions.
+## [v4.1.2] - 2020-10-06
+
+### Fixed
+
+- Worked around nvcc statement not reached warning.
 
 ## [v4.1.1] - 2020-10-05
 
 ### Added
 
 - Added primary pools test for allocation/deallocation overhead checking
-
-### Changed
-
-- Update BLT submodule.
-
-- Added more compiler configurations to GitLab CI.
-
-### Removed
 
 ### Fixed
 
