@@ -75,8 +75,6 @@ int main(int ac, char** av)
 
   UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
-  MPI_Barrier(shared_allocator_comm);
-
   node_allocator.deallocate(ptr);
 
   MPI_Finalize();
