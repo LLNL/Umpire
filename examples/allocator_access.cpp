@@ -6,7 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <string>
-#include <sstream>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -21,8 +20,8 @@ bool testAccess(umpire::Allocator a)
               << ", is accessible." << std::endl;
     return true;
   } else {
-    std::cout << "However, the allocator, " << a.getName() 
-              << ", is not accessible." << std::endl << std::endl;
+    std::cout << "The allocator, " << a.getName() 
+              << ", is _not_ accessible." << std::endl << std::endl;
     return false;
   }
 }
@@ -44,9 +43,6 @@ int main()
   
   ///////////////////////////////////////////////////
   //Create an allocator for each available type
-  //Note: This example only tests the default device.
-  //To test all devices, remove the 'if' statement within
-  //the for-loop.
   //////////////////////////////////////////////////
   std::cout << "Available allocators: ";
   for(auto a : allNames) {
@@ -62,7 +58,7 @@ int main()
   ///////////////////////////////////////////////////
   std::cout << "Testing the available allocators for "
             << "accessibility from the CAMP host platform:" 
-            << std::endl;
+            << std::endl << std::endl;
   const int size = 100;
   for(auto a : alloc) {
     if(testAccess(a)) {
@@ -70,7 +66,7 @@ int main()
       for(int i = 0; i < size; i++) {
         data[i] = i * i;
       }
-      std::cout << data[size-1] << " should be equal to " 
+      std::cout << "Testing: " << data[size-1] << " should be equal to " 
                 << (size-1)*(size-1) << std::endl << std::endl; 
     }
   }
