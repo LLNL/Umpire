@@ -56,10 +56,10 @@ MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
   traits.unified = false;
   traits.size = properties.totalGlobalMem;
 
-  traits.vendor = MemoryResourceTraits::vendor_type::NVIDIA;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.vendor = MemoryResourceTraits::vendor_type::nvidia;
+  traits.kind = MemoryResourceTraits::memory_type::gddr;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
+  traits.resource = MemoryResourceTraits::resource_type::device;
 
   traits.id = 0;
 
