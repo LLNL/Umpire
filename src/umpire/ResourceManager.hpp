@@ -85,7 +85,7 @@ class ResourceManager {
   Allocator getDefaultAllocator();
 
   /*!
-   * \brief Get the existing Resources.
+   * \brief Get the names for existing Resources.
    *
    * The Resource Manager dynamically populates available memory resource types with
    * m_resource_names based on what's available. This is used for determining 

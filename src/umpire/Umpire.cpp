@@ -21,8 +21,6 @@
   #include <cuda_runtime_api.h>
 #endif
 
-//make sure "/opt/rocm-3.6.0/hsa/include/" is 
-//added to blt/cmake/thirdparty/SetupHIP.cmake file
 #if defined(UMPIRE_ENABLE_HIP)
   #include <hip/hip_runtime.h>
 #endif
@@ -156,18 +154,18 @@ bool is_accessible(Platform p, Allocator a)
   switch(p) {
     case (cPlatform::host):
     {
-      if(get_resource(a) == myResource::UNKNOWN
-       || get_resource(a) == myResource::DEVICE_CONST)
+      if(get_resource(a) == myResource::unknown
+       || get_resource(a) == myResource::device_const)
         return false;
 
 #if defined(UMPIRE_ENABLE_HIP)
-      //check DEVICE case for (Umpire) HIP
-      if(get_resource(a) == myResource::DEVICE)
+      //check device case for HIP
+      if(get_resource(a) == myResource::device)
         return true;
 #endif
 
-      //If it reaches here, no DEVICE resource is accessible
-      if (get_resource(a) == myResource::DEVICE)
+      //If it reaches here, no device resource is accessible
+      if (get_resource(a) == myResource::device)
         return false;
       else
         return true;       
@@ -177,10 +175,10 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::cuda): 
     {
 #if defined(UMPIRE_ENABLE_CUDA)    
-      if (get_resource(a) == myResource::UNKNOWN
-        || get_resource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::unknown
+        || get_resource(a) == myResource::file)
         return false;
-      else if(get_resource(a) == myResource::HOST)
+      else if(get_resource(a) == myResource::host)
         return is_host_pageable();
       else
         return true;
@@ -193,8 +191,8 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::omp_target):
     {
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-      if (get_resource(a) == myResource::UNKNOWN
-       || get_resource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::unknown
+       || get_resource(a) == myResource::file)
         return false;
       else
         return true; 
@@ -207,10 +205,10 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::hip):
     {
 #if defined(UMPIRE_ENABLE_HIP)
-      if (get_resource(a) == myResource::UNKNOWN 
-       || get_resource(a) == myResource::FILE)
+      if (get_resource(a) == myResource::unknown 
+       || get_resource(a) == myResource::file)
         return false;
-      else if(get_resource(a) == myResource::HOST)      
+      else if(get_resource(a) == myResource::host)      
         return is_host_pageable();
       else
         return true;
@@ -223,9 +221,9 @@ bool is_accessible(Platform p, Allocator a)
     case (cPlatform::sycl):
     {
 #if defined(UMPIRE_ENABLE_SYCL)
-      if (get_resource(a) == myResource::DEVICE
-       || get_resource(a) == myResource::UM
-       || get_resource(a) == myResource::PINNED)
+      if (get_resource(a) == myResource::device
+       || get_resource(a) == myResource::um
+       || get_resource(a) == myResource::pinned)
         return true;
       else
         return false;
