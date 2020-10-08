@@ -15,7 +15,7 @@ using cPlatform = camp::resources::Platform;
 
 bool testAccess(umpire::Allocator a)
 {
-  if(is_accessible(cPlatform::host, a)) {
+  if(umpire::is_accessible(cPlatform::host, a)) {
     std::cout << "The allocator, " << a.getName()
               << ", is accessible." << std::endl;
     return true;
