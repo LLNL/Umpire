@@ -94,6 +94,9 @@ During development, it may be beneficial to regularly check for memory leaks. Th
   $ cmake --build -j
   $ ASAN_OPTIONS=detect_leaks=1 make test
   
+.. note::
+  The host config file (i.e., ``hc-quartz-...cmake``) can be reused in order to rebuild with the same configuration if needed.
+
 This will configure a build with Clang 9.0.0 and the Leak Sanitizer. If there is a leak in one of the tests, it can be useful to gather more information about what happened and more details about where it happened. One way to do this is to run:
 
 .. code-block:: bash
