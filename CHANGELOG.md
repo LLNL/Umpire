@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- GitLab CI now includes jobs testing HIP backend.
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing
