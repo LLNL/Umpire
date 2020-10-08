@@ -43,10 +43,10 @@ MemoryResourceTraits FileMemoryResourceFactory::getDefaultTraits()
   traits.unified = false;
   traits.size = 0;
 
-  traits.vendor = MemoryResourceTraits::vendor_type::UNKNOWN;
-  traits.kind = MemoryResourceTraits::memory_type::UNKNOWN;
+  traits.vendor = MemoryResourceTraits::vendor_type::unknown;
+  traits.kind = MemoryResourceTraits::memory_type::unknown;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::FILE;
+  traits.resource = MemoryResourceTraits::resource_type::file;
 
   return traits;
 }

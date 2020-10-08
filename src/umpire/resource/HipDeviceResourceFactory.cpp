@@ -56,10 +56,10 @@ MemoryResourceTraits HipDeviceResourceFactory::getDefaultTraits()
   traits.unified = false;
   traits.size = properties.totalGlobalMem;
 
-  traits.vendor = MemoryResourceTraits::vendor_type::AMD;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.vendor = MemoryResourceTraits::vendor_type::amd;
+  traits.kind = MemoryResourceTraits::memory_type::gddr;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
+  traits.resource = MemoryResourceTraits::resource_type::device;
 
   return traits;
 }
