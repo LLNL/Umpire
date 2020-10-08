@@ -105,13 +105,6 @@ blt_add_library(
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
 
-if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.11)
-  target_compile_options(
-    umpire PUBLIC
-    $<$<COMPILE_LANGUAGE:CUDA>:-Xcudafe "--diag_suppress=implicit_return_from_non_void_function">
-  )
-endif()
-
 if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.17)
   target_link_options(
     umpire INTERFACE
@@ -142,7 +135,9 @@ set(UMPIRE_ENABLE_FILE_RESOURCE ${ENABLE_FILE_RESOURCE})
 if (ENABLE_CUDA OR ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
-  set(UMPIRE_ENABLE_UM On)
+  if (ENABLE_CUDA)
+    set(UMPIRE_ENABLE_UM On)
+  endif ()
   if (ENABLE_DEVICE_CONST)
     set(UMPIRE_ENABLE_CONST On)
   endif()

@@ -10,31 +10,36 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- GitLab CI now includes jobs testing HIP backend.
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing
   ENABLE_PERFORMANCE_TESTS flag with the default being Off.
 
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
+- Changed enumeration names from all upper case to all lower case in order to
+  avoid name collisions.  (Note: this changes may be user visible so need to be
+  release noted).
+
 ### Removed
 
 ### Fixed
 
-- Fixed warnings from nvcc about potential early returns from non-void
-  functions.
+## [v4.1.2] - 2020-10-06
+
+### Fixed
+
+- Worked around nvcc statement not reached warning.
 
 ## [v4.1.1] - 2020-10-05
 
 ### Added
 
 - Added primary pools test for allocation/deallocation overhead checking
-
-### Changed
-
-- Update BLT submodule.
-
-- Added more compiler configurations to GitLab CI.
-
-### Removed
 
 ### Fixed
 
