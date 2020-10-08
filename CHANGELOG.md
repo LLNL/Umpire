@@ -10,6 +10,50 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+- Made primary pool performance tests optional by introducing
+  ENABLE_PERFORMANCE_TESTS flag with the default being Off.
+
+- Update BLT submodule.
+
+- Added more compiler configurations to GitLab CI.
+
+- Changed enumeration names from all upper case to all lower case in order to
+  avoid name collisions.  (Note: this changes may be user visible so need to be
+  release noted).
+  
+- Documentation of Uberenv is moved to a shared location (radiuss-ci), we
+  keep only the examples locally.
+
+### Removed
+
+### Fixed
+
+## [v4.1.2] - 2020-10-06
+
+### Fixed
+
+- Worked around nvcc statement not reached warning.
+
+## [v4.1.1] - 2020-10-05
+
+### Added
+
+- Added primary pools test for allocation/deallocation overhead checking
+
+### Fixed
+
+- Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
+
+- Initialize m_default_allocator to HOST if not set explicitly.
+
+- Removed unreachable code that PGI compiler was giving compile warnings about.
+
+## [v4.1.0] - 2020-09-28
+
+### Added
+
 - OpenMP target test for XL on GitLab
 
 - QuickPool available via the C & Fortran APIs.
@@ -23,10 +67,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - GitLab test script now converts CTest output to JUnit so that test results
   are visible in the native GitLab UI.
 
-- Documentation of Uberenv is moved to a shared location (radiuss-ci), we
-  keep only the examples locally.
+- Gitlab test scripts now caches python virtual environment.
 
 ### Removed
+
+- Peer access is no longer automatically enabled for CUDA and HIP.
 
 ### Fixed
 
@@ -42,6 +87,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed Allocator overrun problem in replay tool
 
 - Removed warnings from MemoryResourceTypes header file
+
+- Added cmake check to deterime if build subsystem capable of ASAN.
+
+- CI script junit generation && --deps-only mode.
 
 ## [v4.0.1] - 2020-09-03
 

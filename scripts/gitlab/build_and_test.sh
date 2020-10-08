@@ -19,6 +19,9 @@ build_root=${BUILD_ROOT:-""}
 hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
 
+sys_type=${SYS_TYPE:-""}
+py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
+
 # Dependencies
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
@@ -79,17 +82,19 @@ fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
 
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo "~~~~~ Host-config: ${hostconfig_path}"
-echo "~~~~~ Build Dir:   ${build_dir}"
-echo "~~~~~ Project Dir: ${project_dir}"
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-echo "~~~~ ENV ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-env
-
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~ Host-config: ${hostconfig_path}"
+    echo "~ Build Dir:   ${build_dir}"
+    echo "~ Project Dir: ${project_dir}"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo ""
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~~~~ ENV ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Building Umpire"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -105,7 +110,7 @@ then
 fi
 
 # Test
-if [[ "${option}" != "--build-only" ]]
+if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_TESTS.*ON" ${hostconfig_path}
 then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Testing Umpire"
@@ -131,10 +136,16 @@ then
     cp Testing/*/Test.xml ${project_dir}
 
     # Convert CTest xml to JUnit (on toss3 only)
-    if [[ $SYS_TYPE == *toss3* ]]; then
-        ${project_dir}/scripts/gitlab/convert_to_junit.py \
-        ${project_dir}/Test.xml \
-        ${project_dir}/scripts/gitlab/junit.xslt > ${project_dir}/junit.xml
+    if [[ ${sys_type} == *toss_3* ]]; then
+        if [[ -n ${py_env_path} ]]; then
+            . ${py_env_path}/bin/activate
+
+            python3 ${project_dir}/scripts/gitlab/convert_to_junit.py \
+            ${project_dir}/Test.xml \
+            ${project_dir}/scripts/gitlab/junit.xslt > ${project_dir}/junit.xml
+        else
+            echo "ERROR: needs python env with lxml, please set PYTHON_ENVIRONMENT_PATH"
+        fi
     fi
 
     if grep -q "Errors while running CTest" ./tests_output.txt

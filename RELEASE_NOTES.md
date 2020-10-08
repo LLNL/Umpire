@@ -1,3 +1,32 @@
+# v4.1.2
+
+- Added workaround for incorrect nvcc compiler warning:
+  "warning: missing return statement at end of non-void function"
+  occuring in one Umpire's header files.
+
+# v4.1.1
+
+- Fixed DynamicPoolMap deallocate to make coalesce check O(1) again.
+
+- Initialize m_default_allocator to HOST if not set explicitly.
+
+# v4.1.0
+
+- QuickPool available via the C & Fortran APIs.
+
+- Resources are now created on-demand when accessed for the first time.
+
+- Peer access is no longer automatically enabled for CUDA and HIP.
+
+- Added cmake check to deterime if build subsystem capable of ASAN.
+
+- Fixed ASAN poisoning to limit it to what user originally requested and not
+  rounded amount.
+
+- Improved resilliance of primary pool destructors so that giving back
+  previously allocated blocks to a device that has already been cleaned up
+  will no longer throw an error, but instead will now be logged and ignored.
+
 # v4.0.1
 
 - Fixed Umpire builds with MPI enabled

@@ -32,6 +32,21 @@ else ()
   message(STATUS "std::filesystem NOT found, using POSIX")
 endif ()
 
+check_cxx_source_compiles(
+  "#include <sanitizer/asan_interface.h>
+
+  int main(int, char**)
+  {
+    return 0;
+  }"
+  UMPIRE_HAS_ASAN)
+
+if (UMPIRE_HAS_ASAN)
+  message(STATUS "Umpire may be built with ASAN support")
+else ()
+  message(STATUS "Umpire ASAN disabled")
+endif ()
+
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 
@@ -57,12 +72,5 @@ if (ENABLE_PEDANTIC_WARNINGS)
 
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  endif()
-endif()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-  if (NOT ${CMAKE_CXX_EXTENSIONS} EQUAL ON)
-    message(STATUS "Setting CXX_EXTENSIONS to ON for PGI Compiler")
-    SET( CMAKE_CXX_EXTENSIONS ON )
   endif()
 endif()
