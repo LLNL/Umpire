@@ -7,14 +7,14 @@ Developer Guide
 Generating Umpire host-config files
 ===================================
 
-This mechanism will generate a cmake configuration file that reproduces the configuration `Spack <https://github.com/spack/spack>` would have generated in the same context. It contains all the information necessary to build Umpire with the described toolchain.
+This mechanism will generate a cmake configuration file that reproduces the configuration `Spack <https://github.com/spack/spack>`_ would have generated in the same context. It contains all the information necessary to build Umpire with the described toolchain.
 
 In particular, the host config file will setup:
 * flags corresponding with the target required (Release, Debug).
 * compilers path, and other toolkits (cuda if required), etc.
 * paths to installed dependencies. However, Umpire only directly depends on CMake.
 
-This provides an easy way to build Umpire based on `Spack <https://github.com/spack/spack>` itself driven by `Uberenv <https://github.com/LLNL/uberenv>`_.
+This provides an easy way to build Umpire based on `Spack <https://github.com/spack/spack>`_ itself driven by `Uberenv <https://github.com/LLNL/uberenv>`_.
 
 Uberenv role
 ------------
