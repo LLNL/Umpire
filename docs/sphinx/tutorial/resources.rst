@@ -44,8 +44,8 @@ information.
 
 .. note::
    In order to test some memory resources, you may need to configure your Umpire
-        build to use a particular platform that has access to that resource. See
-        the `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer_guide.html>`_ for more information. 
+   build to use a particular platform that has access to that resource. See
+   the `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer_guide.html>`_ for more information. 
 
 Next, we will see an example of how to move data between resources using
 operations.
