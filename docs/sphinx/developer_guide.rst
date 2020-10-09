@@ -28,6 +28,9 @@ Uberenv helps by doing the following:
 
 Uberenv will create a directory ``uberenv_libs`` containing a Spack instance with the required Umpire dependencies installed. It then generates a host-config file (``<config_dependent_name>.cmake``) at the root of Umpire repository.
 
+.. note::
+  One common error that comes up when using Uberenv is that the ``uberenv_libs`` folder is out of date. To resolve, make sure this folder is deleted before running new scripts for the first time because this folder needs to be regenerated.
+
 Using Uberenv to generate the host-config file
 ----------------------------------------------
 
@@ -77,3 +80,33 @@ It is also possible to use the CI script outside of CI:
 .. code-block:: bash
 
   $ HOST_CONFIG=<path_to>/<host-config>.cmake scripts/gitlab/build_and_test.sh
+
+Using Uberenv to configure and run Leak Sanitizer
+-------------------------------------------------
+
+During development, it may be beneficial to regularly check for memory leaks. This will help avoid the possibility of having many memory leaks showing up all at once during the CI tests later on. The Leak Sanitizer can easily be configured from the root directory with:
+
+.. code-block:: bash
+
+  $ srun -ppdebug -N1 --exclusive python scripts/uberenv/uberenv.py --spec="%clang@9.0.0 cxxflags=-fsanitize=address"
+  $ cd build
+  $ cmake -C <path_to>/hc-quartz-toss_3_x86_64_ib-clang@9.0.0.cmake ..
+  $ cmake --build -j
+  $ ASAN_OPTIONS=detect_leaks=1 make test
+  
+.. note::
+  The host config file (i.e., ``hc-quartz-...cmake``) can be reused in order to rebuild with the same configuration if needed.
+
+This will configure a build with Clang 9.0.0 and the Leak Sanitizer. If there is a leak in one of the tests, it can be useful to gather more information about what happened and more details about where it happened. One way to do this is to run:
+
+.. code-block:: bash
+
+  $ ASAN_OPTIONS=detect_leaks=1 ctest -T test --output-on-failure
+ 
+Additionally, the Leak Sanitizer can be run on one specific test (in this example, the "replay" tests) with:
+
+.. code-block:: bash
+
+  $ ASAN_OPTIONS=detect_leaks=1 ctest -T test -R replay --output-on-failure
+
+Depending on the output given when running the test with the Leak Sanitizer, it may be useful to use ``addr2line -e <./path_to/executable> <address_of_leak>`` to see the exact line the output is referring to.

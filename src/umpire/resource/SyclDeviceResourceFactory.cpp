@@ -66,10 +66,10 @@ MemoryResourceTraits SyclDeviceResourceFactory::getDefaultTraits()
 
   traits.unified = false;
   traits.id = 0;
-  traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.vendor = MemoryResourceTraits::vendor_type::intel;
+  traits.kind = MemoryResourceTraits::memory_type::gddr;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
+  traits.resource = MemoryResourceTraits::resource_type::device;
 
   return traits;
 }
