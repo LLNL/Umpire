@@ -38,9 +38,12 @@ it is for, this means we can run the same code for all the resources available i
 the system.
 
 While using Umpire memory resources, it may be useful to query the memory 
-resource currently associated with a particular allocator. The test code provided
-in ``memory_resource_traits_tests.cpp`` shows an example of how to query this
-information.
+resource currently associated with a particular allocator. For example, if we wanted
+to double check that our allocator is using the ``device`` resource, we can 
+assert that ``MemoryResourceTraits::resource_type::device`` is equal 
+to the return value of ``allocator.getAllocationStrategy()->getTraits().resource``. 
+The test code provided in ``memory_resource_traits_tests.cpp`` shows a complete 
+example of how to query this information.
 
 .. note::
    In order to test some memory resources, you may need to configure your Umpire
