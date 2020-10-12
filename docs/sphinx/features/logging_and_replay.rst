@@ -90,7 +90,8 @@ provided by Umpire with the **makeMemoryResource** event:
                     :language: json
 
 The *payload* shows that a memory resource was created for *HOST*, *DEVICE*,
-*PINNED*, *UM*, and *DEVICE_CONST* respectively.  The *result* is a reference
+*PINNED*, *UM*, and *DEVICE_CONST* respectively. Note that this could also
+be done with the *FILE* memory resource. The *result* is a reference
 to the object that was created within Umpire for that resource.
 
 makeAllocator Event

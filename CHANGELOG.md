@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
-- Documentation on configuring and running Leak Sanitizer CI tests.
+- Documentation on memory resources and configuring/running Leak Sanitizer CI tests.
 
 - GitLab CI now includes jobs testing HIP backend.
 
