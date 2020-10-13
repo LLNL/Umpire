@@ -37,11 +37,6 @@ CudaConstantMemoryResourceFactory::create(const std::string& name, int id,
                                                                  traits);
 }
 
-MemoryResourceTraits::resource_type CudaConstantMemoryResourceFactory::getBaseParent()
-{
-  return MemoryResourceTraits::resource_type::device_const;
-}
-
 MemoryResourceTraits CudaConstantMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;

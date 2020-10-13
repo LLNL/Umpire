@@ -11,13 +11,8 @@ namespace resource {
 
 MemoryResource::MemoryResource(const std::string& name, int id,
                                MemoryResourceTraits traits)
-    : strategy::AllocationStrategy(name, id), m_traits(traits)
+    : strategy::AllocationStrategy(name, id, nullptr), m_traits(traits)
 {
-}
-
-MemoryResourceTraits::resource_type* MemoryResource::getParent() const noexcept
-{
-  return nullptr;
 }
 
 MemoryResourceTraits MemoryResource::getTraits() const noexcept

@@ -40,11 +40,6 @@ CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id,
       Platform::cuda, name, id, traits);
 }
 
-MemoryResourceTraits::resource_type CudaUnifiedMemoryResourceFactory::getBaseParent()
-{
-  return MemoryResourceTraits::resource_type::um;
-}
-
 MemoryResourceTraits CudaUnifiedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
