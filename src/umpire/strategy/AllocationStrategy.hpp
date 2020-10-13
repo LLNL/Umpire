@@ -126,8 +126,8 @@ class AllocationStrategy {
 
  protected:
   std::string m_name;
-  AllocationStrategy* m_parent; 
   int m_id;
+  AllocationStrategy* m_parent; 
 };
 
 } // end of namespace strategy
