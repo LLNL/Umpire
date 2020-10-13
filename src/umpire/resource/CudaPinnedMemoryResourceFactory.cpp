@@ -38,6 +38,11 @@ CudaPinnedMemoryResourceFactory::create(const std::string& name, int id,
       Platform::cuda, name, id, traits);
 }
 
+MemoryResourceTraits::resource_type CudaPinnedMemoryResourceFactory::getBaseParent()
+{
+  return MemoryResourceTraits::resource_type::pinned;
+}
+
 MemoryResourceTraits CudaPinnedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;

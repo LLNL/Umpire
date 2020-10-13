@@ -95,6 +95,11 @@ Platform DynamicPoolList::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits::resource_type* DynamicPoolList::getParent() const noexcept
+{
+  return m_allocator->getParent();
+}
+
 MemoryResourceTraits DynamicPoolList::getTraits() const noexcept
 {
   return m_allocator->getTraits();

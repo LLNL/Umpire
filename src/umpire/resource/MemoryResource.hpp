@@ -87,6 +87,8 @@ class MemoryResource : public strategy::AllocationStrategy {
   virtual Platform getPlatform() noexcept override = 0;
 
   MemoryResourceTraits getTraits() const noexcept override;
+  
+  MemoryResourceTraits::resource_type* getParent() const noexcept override;
 
  protected:
   MemoryResourceTraits m_traits;

@@ -58,6 +58,11 @@ MemoryResourceTraits AllocationStrategy::getTraits() const noexcept
   return MemoryResourceTraits{};
 }
 
+MemoryResourceTraits::resource_type* AllocationStrategy::getParent() const noexcept
+{
+  return parent;
+}
+
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)
 {
   os << "[" << strategy.m_name << "," << strategy.m_id << "]";

@@ -239,6 +239,11 @@ Platform DynamicPoolMap::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits::resource_type* DynamicPoolMap::getParent() const noexcept
+{
+  return m_allocator->getParent();
+}
+
 MemoryResourceTraits DynamicPoolMap::getTraits() const noexcept
 {
   return m_allocator->getTraits();

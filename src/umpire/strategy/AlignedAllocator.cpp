@@ -63,6 +63,11 @@ Platform AlignedAllocator::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+MemoryResourceTraits::resource_type* AlignedAllocator::getParent() const noexcept
+{
+  return m_allocator->getParent();
+}
+
 MemoryResourceTraits AlignedAllocator::getTraits() const noexcept
 {
   return m_allocator->getTraits();

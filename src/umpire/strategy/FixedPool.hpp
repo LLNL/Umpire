@@ -55,6 +55,7 @@ class FixedPool : public AllocationStrategy {
 
   Platform getPlatform() noexcept override final;
   MemoryResourceTraits getTraits() const noexcept override final;
+  MemoryResourceTraits::resource_type* getParent() const noexcept override;
 
   bool pointerIsFromPool(void* ptr) const noexcept;
 

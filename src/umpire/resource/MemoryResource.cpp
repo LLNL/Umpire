@@ -15,6 +15,11 @@ MemoryResource::MemoryResource(const std::string& name, int id,
 {
 }
 
+MemoryResourceTraits::resource_type* MemoryResource::getParent() const noexcept
+{
+  return nullptr;
+}
+
 MemoryResourceTraits MemoryResource::getTraits() const noexcept
 {
   return m_traits;

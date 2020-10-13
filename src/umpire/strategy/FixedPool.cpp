@@ -219,6 +219,11 @@ MemoryResourceTraits FixedPool::getTraits() const noexcept
   return m_strategy->getTraits();
 }
 
+MemoryResourceTraits::resource_type* FixedPool::getParent() const noexcept
+{
+  return m_strategy->getParent();
+}
+
 std::size_t FixedPool::numPools() const noexcept
 {
   return m_pool.size();

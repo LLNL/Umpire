@@ -138,5 +138,10 @@ MemoryResourceTraits MixedPool::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+MemoryResourceTraits::resource_type* MixedPool::getParent() const noexcept
+{
+  return m_allocator->getParent();
+}
+
 } // namespace strategy
 } // namespace umpire

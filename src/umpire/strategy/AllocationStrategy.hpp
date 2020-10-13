@@ -120,11 +120,13 @@ class AllocationStrategy {
   friend std::ostream& operator<<(std::ostream& os,
                                   const AllocationStrategy& strategy);
 
+  virtual MemoryResourceTraits::resource_type* getParent() const noexcept;
+
   virtual MemoryResourceTraits getTraits() const noexcept;
 
  protected:
   std::string m_name;
-
+  MemoryResourceTraits::resource_type* parent; 
   int m_id;
 };
 

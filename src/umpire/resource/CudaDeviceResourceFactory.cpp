@@ -41,6 +41,11 @@ std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(
       Platform::cuda, name, id, traits);
 }
 
+MemoryResourceTraits::resource_type CudaDeviceResourceFactory::getBaseParent()
+{
+  return MemoryResourceTraits::resource_type::device;
+}
+
 MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
