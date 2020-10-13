@@ -13,7 +13,7 @@ namespace strategy {
 
 AlignedAllocator::AlignedAllocator(const std::string& name, int id,
                                    Allocator allocator, std::size_t alignment)
-    : AllocationStrategy(name, id),
+    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
       m_allocator(allocator.getAllocationStrategy()),
       m_alignment{alignment},
       m_mask{static_cast<uintptr_t>(~(m_alignment - 1))}
@@ -61,11 +61,6 @@ void AlignedAllocator::deallocate(void* ptr)
 Platform AlignedAllocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
-}
-
-MemoryResourceTraits::resource_type* AlignedAllocator::getParent() const noexcept
-{
-  return m_allocator->getParent();
 }
 
 MemoryResourceTraits AlignedAllocator::getTraits() const noexcept

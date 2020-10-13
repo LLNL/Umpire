@@ -11,8 +11,8 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
-    : m_name(name), m_id(id)
+AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept
+    : m_name(name), m_id(id), m_parent(parent), 
 {
 }
 
@@ -58,9 +58,9 @@ MemoryResourceTraits AllocationStrategy::getTraits() const noexcept
   return MemoryResourceTraits{};
 }
 
-MemoryResourceTraits::resource_type* AllocationStrategy::getParent() const noexcept
+AllocationStrategy* AllocationStrategy::getParentResource() const noexcept
 {
-  return parent;
+  return m_parent;
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)

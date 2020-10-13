@@ -19,7 +19,7 @@ DynamicPoolList::DynamicPoolList(
     const std::size_t first_minimum_pool_allocation_size,
     const std::size_t next_minimum_pool_allocation_size,
     const std::size_t alignment, CoalesceHeuristic should_coalesce) noexcept
-    : AllocationStrategy{name, id},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
       m_allocator{allocator.getAllocationStrategy()},
       dpa{m_allocator, first_minimum_pool_allocation_size,
           next_minimum_pool_allocation_size, alignment},
@@ -93,11 +93,6 @@ std::size_t DynamicPoolList::getLargestAvailableBlock() const noexcept
 Platform DynamicPoolList::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
-}
-
-MemoryResourceTraits::resource_type* DynamicPoolList::getParent() const noexcept
-{
-  return m_allocator->getParent();
 }
 
 MemoryResourceTraits DynamicPoolList::getTraits() const noexcept

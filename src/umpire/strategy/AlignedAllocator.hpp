@@ -24,7 +24,6 @@ class AlignedAllocator : public AllocationStrategy {
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
-  MemoryResourceTraits::resource_type* getParent() const noexcept override;
 
  protected:
   strategy::AllocationStrategy* m_allocator;

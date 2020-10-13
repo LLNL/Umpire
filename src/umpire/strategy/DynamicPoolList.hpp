@@ -69,8 +69,6 @@ class DynamicPoolList : public AllocationStrategy {
 
   Platform getPlatform() noexcept override;
 
-  MemoryResourceTraits::resource_type* getParent() const noexcept override;
-
   MemoryResourceTraits getTraits() const noexcept final override;
 
   /*!
