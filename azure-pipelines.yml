@@ -31,6 +31,7 @@ jobs:
   - task: VSTest@2
     inputs:
       configuration: 'Release'
+      searchFolder: 'build'
     condition: eq( variables['Agent.OS'], 'Windows_NT')
   - task: PublishTestResults@2
     inputs:
