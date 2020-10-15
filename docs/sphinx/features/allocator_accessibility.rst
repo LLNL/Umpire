@@ -9,20 +9,87 @@ which can be used by :class:`umpire::Allocator`s depending on what's available o
 your system. The resources are explained more on the `Resources <https://umpire.readthedocs.io/en/develop/tutorial/resources.html>`_
 page.
 
-Because of the wide selection of memory resources, it can get difficult to trace
-which memory resources can be accessed by which platforms. Blah, I need an outline...
+Additionally, the `platforms <https://github.com/LLNL/Umpire/blob/develop/src/umpire/util/Platform.hpp>`_ that Umpire supports is defined by the CAMP library.
+This means that there is also a selection of platforms for which an allocator can
+be associated with as well. Because of these options, it can be difficult to trace
+not only which memory resource an allocator has been created with but also
+which allocators can be accessed by which platforms.
 
--Allocators have memory resources that they're associated with by definition.
-   -- link to resource info
--Allocators can be accessed by only certain platforms depending on the memory
-resource it was created with.
-   -- link to platform info
--This leads to potential confusion of which memory resource a particuar allocator
-may be associated with (hence the ability to query a memory resource) but also 
-confusion as to which allocators can be accessed by which platforms (hence ability
-to figure out which allocators are accessible by which platforms).
--Allocator Accessibility table
--Example code + tests that are provided
+Umpire provides the ability to query which memory resource is associated with a
+particular allocator (link example/test). Additionally, Umpire has a feature
+that exposes which allocators are accessible by which platforms (link example/
+test).
+
+Allocator Accessibility Table
+-----------------------------
+The following is a truth table showing whether or not an allocator will be accessible.
+For example, if ``:class:`umpire::Allocator` alloc`` is created with the host memory 
+resource and I want to know if it should be accessible from the ``omp_target`` CAMP
+platform, then I can look at the corresponding entry in the table and find that it 
+should be accessible.
+
+.. list-table:: Allocator Accessibility
+   :widths: 25 25 50
+   :header-rows: 2
+
+   * - Undefined
+     - host
+     - cuda
+     - omp_target
+     - hip
+     - sycl
+   * - Unknown
+     - host
+     - device
+     - device_const
+     - um
+     - pinned
+     - file 
+   * - F
+     - F
+     - F
+     - F
+     - F
+     - F
+   * - F
+     - T
+     - T*
+     - T
+     - T*
+     - F
+   * - F
+     - T*
+     - T
+     - T
+     - T
+     - T
+   * - F
+     - F
+     - T
+     - X
+     - T
+     - X
+   * - F
+     - T
+     - T
+     - X
+     - T
+     - T
+   * - F
+     - T
+     - T
+     - X
+     - T
+     - T
+   * - F
+     - T
+     - F
+     - F
+     - F
+     - F
+
+.. note: In the table, ``T`` means ``true``, ``F`` means ``false``, ``*`` means ``conditional``,
+  and ``X`` means ``does not exist``.
 
 Build Configuration
 -------------------
