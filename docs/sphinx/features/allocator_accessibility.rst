@@ -3,6 +3,7 @@
 =========
 Allocator Accessibility
 =========
+
 The Umpire library provides a variety of :class:`umpire::resource::MemoryResource`s 
 which can be used by :class:`umpire::Allocator`s depending on what's available on
 your system. The resources are explained more on the `Resources <https://umpire.readthedocs.io/en/develop/tutorial/resources.html>`_
