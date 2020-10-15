@@ -4,8 +4,8 @@
 Allocator Accessibility
 =========
 
-The Umpire library provides a variety of :class:`umpire::resource::MemoryResource`s 
-which can be used by :class:`umpire::Allocator`s depending on what's available on
+The Umpire library provides a variety of :class:`umpire::resource::MemoryResource` s 
+which can be used by :class:`umpire::Allocator` s depending on what's available on
 your system. The resources are explained more on the `Resources <https://umpire.readthedocs.io/en/develop/tutorial/resources.html>`_
 page.
 
@@ -29,7 +29,6 @@ platform, then I can look at the corresponding entry in the table and find that 
 should be accessible.
 
 .. list-table:: Allocator Accessibility
-   :widths: 25 25 50
    :header-rows: 2
 
    * - Undefined
@@ -88,7 +87,7 @@ should be accessible.
      - F
      - F
 
-.. note: In the table, ``T`` means ``true``, ``F`` means ``false``, ``*`` means ``conditional``,
+.. note:: In the table, ``T`` means ``true``, ``F`` means ``false``, ``*`` means ``conditional``,
   and ``X`` means ``does not exist``.
 
 Build Configuration
