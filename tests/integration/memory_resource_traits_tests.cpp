@@ -25,7 +25,7 @@ TEST(MemoryResourceTraitsTest, HOST_Resource)
   double* data =
       static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::HOST,
+  ASSERT_EQ(MemoryResourceTraits::resource_type::host,
             alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
@@ -45,7 +45,7 @@ TEST(MemoryResourceTraitsTest, FILE_Resource)
   double* data =
       static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::FILE,
+  ASSERT_EQ(MemoryResourceTraits::resource_type::file,
             alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
@@ -65,7 +65,7 @@ TEST(MemoryResourceTraitsTest, DEVICE_Resource)
   double* data =
       static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::DEVICE,
+  ASSERT_EQ(MemoryResourceTraits::resource_type::device,
             alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
@@ -85,7 +85,7 @@ TEST(MemoryResourceTraitsTest, DEVICE_CONST_Resource)
   double* data =
       static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::DEVICE_CONST,
+  ASSERT_EQ(MemoryResourceTraits::resource_type::device_const,
             alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
@@ -105,7 +105,7 @@ TEST(MemoryResourceTraitsTest, PINNED_Resource)
   double* data =
       static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::PINNED,
+  ASSERT_EQ(MemoryResourceTraits::resource_type::pinned,
             alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
@@ -125,7 +125,7 @@ TEST(MemoryResourceTraitsTest, UM_Resource)
   double* data =
       static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(MemoryResourceTraits::resource_type::UM,
+  ASSERT_EQ(MemoryResourceTraits::resource_type::um,
             alloc_two.getAllocationStrategy()->getTraits().resource);
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
