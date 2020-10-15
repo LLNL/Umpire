@@ -30,7 +30,7 @@ jobs:
       cmakeArgs: '--build . --config Release'
   - task: CmdLine@2
     inputs:
-      script: 'ctest.exe -T test'
+      script: 'ctest.exe -T test -C Release'
       workingDirectory: 'build'
     condition: eq( variables['Agent.OS'], 'Windows_NT')
   - task: PublishTestResults@2
