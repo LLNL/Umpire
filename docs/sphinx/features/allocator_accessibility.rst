@@ -29,58 +29,60 @@ platform, then I can look at the corresponding entry in the table and find that 
 should be accessible.
 
 .. list-table:: Allocator Accessibility
-   :header-rows: 2
+   :header-rows: 1
+   :stub-columns: 1
 
-   * - Undefined
+   * - 
+     - Undefined
      - host
      - cuda
      - omp_target
      - hip
      - sycl
    * - Unknown
-     - host
-     - device
-     - device_const
-     - um
-     - pinned
-     - file 
-   * - F
      - F
      - F
      - F
      - F
      - F
-   * - F
+     - F
+   * - host
+     - F
      - T
      - T*
      - T
      - T*
      - F
-   * - F
+   * - device
+     - F
      - T*
      - T
      - T
      - T
      - T
-   * - F
+   * - device_const
+     - F
      - F
      - T
      - X
      - T
      - X
-   * - F
+   * - um
+     - F
      - T
      - T
      - X
      - T
      - T
-   * - F
+   * - pinned
+     - F
      - T
      - T
      - X
      - T
      - T
-   * - F
+   * - file
+     - F
      - T
      - F
      - F
