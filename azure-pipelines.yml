@@ -28,15 +28,15 @@ jobs:
     inputs:
       workingDir: 'build'
       cmakeArgs: '--build . --config Release'
-  - task: CmdLine@2
-    inputs:
-      script: 'ctest.exe -T test -C Release'
-      workingDirectory: 'build'
-    condition: eq( variables['Agent.OS'], 'Windows_NT')
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: 'cTest'
-      testResultsFiles: '**/Test.xml'
+#   - task: CmdLine@2
+#     inputs:
+#       script: 'ctest.exe -T test -C Release'
+#       workingDirectory: 'build'
+#     condition: eq( variables['Agent.OS'], 'Windows_NT')
+#   - task: PublishTestResults@2
+#     inputs:
+#       testResultsFormat: 'cTest'
+#       testResultsFiles: '**/Test.xml'
 - job: Docker
   strategy:
     matrix: 
