@@ -13,6 +13,13 @@ using parent_resource = umpire::MemoryResourceTraits::resource_type;
 
 void check_parent(umpire::Allocator alloc, const std::string& resource)
 {
+  std::cout << alloc.getName() << std::endl;
+  umpire::strategy::AllocationStrategy* root = alloc.getAllocationStrategy();
+  while ((root->getParentResource() != nullptr)) {
+    root = root->getParentResource();
+  }
+  std::cout << root->getName() << std::endl;
+/*
   if(resource == "HOST") {
     UMPIRE_ASSERT(parent_resource::host == alloc.getParentResource()->getTraits().resource);
     std::cout << "Check passed..." << std::endl;
@@ -28,6 +35,7 @@ void check_parent(umpire::Allocator alloc, const std::string& resource)
   } else {
     std::cout << "Error, no match!" << std::endl << std::endl;
   }
+*/
 }
 
 void allocate_and_deallocate_pool(const std::string& resource)
@@ -41,30 +49,16 @@ void allocate_and_deallocate_pool(const std::string& resource)
   auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       resource + "_pool", allocator);
 
-  auto test_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
-      resource + "_test", pooled_allocator);
-
   double* data =
       static_cast<double*>(pooled_allocator.allocate(SIZE * sizeof(double)));
 
-  double* test =
-      static_cast<double*>(test_allocator.allocate(SIZE * sizeof(double)));
-  
   std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
             << pooled_allocator.getName() << " allocator" << std::endl;
 
+  check_parent(allocator, resource);
   check_parent(pooled_allocator, resource);
 
   pooled_allocator.deallocate(data);
-
-  std::cout << "Memory deallocated." << std::endl << std::endl;
-  
-  std::cout << "...NOW: Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-            << test_allocator.getName() << " allocator" << std::endl;
-
-  check_parent(test_allocator, resource);
-
-  test_allocator.deallocate(test);
 
   std::cout << "Memory deallocated." << std::endl << std::endl;
 }
