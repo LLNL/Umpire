@@ -39,7 +39,7 @@ TEST_P(AllocatorTest, AllocateDeallocateBig)
       static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
   
   m_allocator->deallocate(data);
 }
@@ -50,7 +50,7 @@ TEST_P(AllocatorTest, AllocateDeallocateSmall)
       static_cast<double*>(m_allocator->allocate(m_small * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   m_allocator->deallocate(data);
 }
@@ -66,7 +66,7 @@ TEST_P(AllocatorTest, AllocateDeallocateNothing)
         static_cast<double*>(m_allocator->allocate(m_nothing * sizeof(double)));
 
     ASSERT_NE(nullptr, data);
-    ASSERT_EQ(nullptr, m_allocator->getParentResource());
+    ASSERT_EQ(nullptr, m_allocator->getParent());
 
     m_allocator->deallocate(data);
   }
@@ -77,7 +77,7 @@ TEST_P(AllocatorTest, DeallocateNullptr)
   double* data = nullptr;
 
   ASSERT_NO_THROW(m_allocator->deallocate(data));
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   SUCCEED();
 }
@@ -89,7 +89,7 @@ TEST_P(AllocatorTest, GetSize)
   double* data = static_cast<double*>(m_allocator->allocate(size));
 
   ASSERT_EQ(size, m_allocator->getSize(data));
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   m_allocator->deallocate(data);
 
@@ -99,7 +99,7 @@ TEST_P(AllocatorTest, GetSize)
 TEST_P(AllocatorTest, GetName)
 {
   ASSERT_TRUE(GetParam().find(m_allocator->getName()) != std::string::npos);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 }
 
 TEST_P(AllocatorTest, GetById)
@@ -110,7 +110,7 @@ TEST_P(AllocatorTest, GetById)
   ASSERT_GE(id, 0);
 
   auto allocator_by_id = rm.getAllocator(id);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   ASSERT_EQ(m_allocator->getAllocationStrategy(),
             allocator_by_id.getAllocationStrategy());
@@ -126,7 +126,7 @@ TEST_P(AllocatorTest, get_allocator_records)
   auto records = umpire::get_allocator_records(*m_allocator);
 
   ASSERT_EQ(records.size(), 1);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   m_allocator->deallocate(data);
 }
@@ -138,7 +138,7 @@ TEST_P(AllocatorTest, getCurrentSize)
   void* data = m_allocator->allocate(128);
 
   ASSERT_EQ(m_allocator->getCurrentSize(), 128);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   m_allocator->deallocate(data);
 }
@@ -150,7 +150,7 @@ TEST_P(AllocatorTest, getActualSize)
   void* data = m_allocator->allocate(128);
 
   ASSERT_EQ(m_allocator->getActualSize(), 128);
-  ASSERT_EQ(nullptr, m_allocator->getParentResource());
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 
   m_allocator->deallocate(data);
 }
