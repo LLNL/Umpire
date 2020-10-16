@@ -33,6 +33,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Corrected documentation: `ENABLE_TESTING` should be `ENABLE_TESTS`.
+
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
