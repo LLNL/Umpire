@@ -13,7 +13,7 @@ namespace strategy {
 
 AllocationTracker::AllocationTracker(
     std::unique_ptr<AllocationStrategy>&& allocator) noexcept
-    : AllocationStrategy(allocator->getName(), allocator->getId(), allocator->getParentResource()),
+    : AllocationStrategy(allocator->getName(), allocator->getId(), allocator->getParent()),
       mixins::Inspector(),
       m_allocator(std::move(allocator))
 {

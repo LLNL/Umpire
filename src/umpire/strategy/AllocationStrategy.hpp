@@ -120,7 +120,12 @@ class AllocationStrategy {
   friend std::ostream& operator<<(std::ostream& os,
                                   const AllocationStrategy& strategy);
 
-  virtual AllocationStrategy* getParentResource() const noexcept;
+  /*!
+   * \brief Traces where the allocator came from.
+   *
+   * \return Pointer to the parent AllocationStrategy.
+   */
+  virtual AllocationStrategy* getParent() const noexcept;
 
   virtual MemoryResourceTraits getTraits() const noexcept;
 

@@ -68,9 +68,9 @@ int Allocator::getId() const noexcept
   return m_allocator->getId();
 }
 
-strategy::AllocationStrategy* Allocator::getParentResource() const noexcept
+strategy::AllocationStrategy* Allocator::getParent() const noexcept
 {
-  return m_allocator->getParentResource();
+  return m_allocator->getParent();
 }
 
 strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept

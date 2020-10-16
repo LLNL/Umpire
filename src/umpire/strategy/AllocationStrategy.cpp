@@ -58,7 +58,7 @@ MemoryResourceTraits AllocationStrategy::getTraits() const noexcept
   return MemoryResourceTraits{};
 }
 
-AllocationStrategy* AllocationStrategy::getParentResource() const noexcept
+AllocationStrategy* AllocationStrategy::getParent() const noexcept
 {
   return m_parent;
 }

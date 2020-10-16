@@ -139,7 +139,7 @@ class Allocator {
    */
   int getId() const noexcept;
 
-  strategy::AllocationStrategy* getParentResource() const noexcept;
+  strategy::AllocationStrategy* getParent() const noexcept;
 
   /*!
    * \brief Get the AllocationStrategy object used by this Allocator.
