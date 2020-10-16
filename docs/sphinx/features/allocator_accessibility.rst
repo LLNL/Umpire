@@ -91,7 +91,7 @@ should be accessible.
 
 .. note:: 
   In the table, ``T`` means *true*, ``F`` means *false*, ``*`` means *conditional*,
-and ``X`` means *does not exist*.
+  and ``X`` means *does not exist*.
 
 Build Configuration
 -------------------
