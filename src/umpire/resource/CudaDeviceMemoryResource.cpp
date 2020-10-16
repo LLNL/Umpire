@@ -58,8 +58,6 @@ void CudaDeviceMemoryResource::deallocate(void* ptr)
     cudaSetDevice(old_device);
 }
 
-//where host_pageable function goes (bool)
-
 std::size_t CudaDeviceMemoryResource::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);

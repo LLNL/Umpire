@@ -27,7 +27,6 @@ class CudaConstantMemoryResourceFactory : public MemoryResourceFactory {
       const std::string& name, int id,
       MemoryResourceTraits traits) final override;
 
-  //MemoryResourceTraits::resource_type getBaseParent() override;
   MemoryResourceTraits getDefaultTraits() final override;
 };
 
