@@ -37,12 +37,6 @@ blt_add_executable(
 list(APPEND umpire_tutorials tut_dynamic_pool_1)
 
 blt_add_executable(
-  NAME tut_get_parent
-  SOURCES tut_get_parent.cpp
-  DEPENDS_ON ${tutorial_depends})
-list(APPEND umpire_tutorials tut_get_parent)
-
-blt_add_executable(
   NAME tut_dynamic_pool_2
   SOURCES tut_dynamic_pool_2.cpp
   DEPENDS_ON ${tutorial_depends})

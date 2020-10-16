@@ -24,8 +24,6 @@ class CudaDeviceMemoryResource : public MemoryResource {
   CudaDeviceMemoryResource(Platform platform, const std::string& name, int id,
                            MemoryResourceTraits traits);
 
-  //where host_pageable function goes
-
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr);
 

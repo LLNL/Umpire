@@ -55,7 +55,6 @@ class MemoryResourceFactory {
   virtual std::unique_ptr<resource::MemoryResource> create(
       const std::string& name, int id, MemoryResourceTraits traits) = 0;
 
-  //virtual MemoryResourceTraits::resource_type getBaseParent() = 0;
   virtual MemoryResourceTraits getDefaultTraits() = 0;
 };
 

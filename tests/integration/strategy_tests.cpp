@@ -69,6 +69,8 @@ class StrategyTest : public ::testing::Test {
 
     m_allocator = new umpire::Allocator(
         rm.makeAllocator<T>(name, rm.getAllocator("HOST")));
+
+    m_parent_name = "HOST";
   }
 
   void TearDown() override
@@ -79,6 +81,7 @@ class StrategyTest : public ::testing::Test {
 
   umpire::Allocator* m_allocator;
 
+  std::string m_parent_name;
   const std::size_t m_big = 64;
   const std::size_t m_nothing = 0;
 };
@@ -92,6 +95,8 @@ void StrategyTest<umpire::strategy::FixedPool>::SetUp()
   m_allocator =
       new umpire::Allocator(rm.makeAllocator<umpire::strategy::FixedPool>(
           name, rm.getAllocator("HOST"), m_big * sizeof(double), 64));
+  
+  m_parent_name = "HOST";
 }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -104,6 +109,8 @@ void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
   m_allocator = new umpire::Allocator(
       rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
           name, rm.getAllocator("UM"), "READ_MOSTLY"));
+  
+  m_parent_name = "UM";
 }
 #endif
 
@@ -116,6 +123,8 @@ void StrategyTest<umpire::strategy::SizeLimiter>::SetUp()
   m_allocator =
       new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
           name, rm.getAllocator("HOST"), 4 * 1024));
+
+  m_parent_name = "HOST";
 }
 
 template <>
@@ -127,6 +136,8 @@ void StrategyTest<umpire::strategy::SlotPool>::SetUp()
   m_allocator =
       new umpire::Allocator(rm.makeAllocator<umpire::strategy::SlotPool>(
           name, rm.getAllocator("HOST"), sizeof(double)));
+
+  m_parent_name = "HOST";
 }
 
 template <>
@@ -138,6 +149,8 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
   m_allocator = new umpire::Allocator(
       rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
           name, rm.getAllocator("HOST"), 4 * 1024));
+  
+  m_parent_name = "HOST";
 }
 
 using Strategies = ::testing::Types<
@@ -160,7 +173,8 @@ TYPED_TEST(StrategyTest, AllocateDeallocateBig)
       this->m_allocator->allocate(this->m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
+            
   this->m_allocator->deallocate(data);
 }
 
@@ -175,6 +189,8 @@ TYPED_TEST(StrategyTest, MultipleAllocateDeallocate)
     allocations.push_back(ptr);
   }
 
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
+  
   for (auto ptr : allocations) {
     this->m_allocator->deallocate(ptr);
   }
@@ -186,6 +202,7 @@ TYPED_TEST(StrategyTest, AllocateDeallocateNothing)
       this->m_allocator->allocate(this->m_nothing * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -195,6 +212,7 @@ TYPED_TEST(StrategyTest, DeallocateNullptr)
   double* data = nullptr;
 
   ASSERT_NO_THROW(this->m_allocator->deallocate(data));
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   SUCCEED();
 }
@@ -206,6 +224,7 @@ TYPED_TEST(StrategyTest, GetSize)
   double* data = static_cast<double*>(this->m_allocator->allocate(size));
 
   ASSERT_EQ(size, this->m_allocator->getSize(data));
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -221,6 +240,7 @@ TYPED_TEST(StrategyTest, GetById)
 
   ASSERT_EQ(this->m_allocator->getAllocationStrategy(),
             allocator_by_id.getAllocationStrategy());
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   ASSERT_THROW(rm.getAllocator(-25), umpire::util::Exception);
 }
@@ -233,6 +253,7 @@ TYPED_TEST(StrategyTest, get_allocator_records)
   auto records = umpire::get_allocator_records(*(this->m_allocator));
 
   ASSERT_EQ(records.size(), 1);
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -244,6 +265,7 @@ TYPED_TEST(StrategyTest, getCurrentSize)
   void* data = this->m_allocator->allocate(this->m_big * sizeof(double));
 
   ASSERT_EQ(this->m_allocator->getCurrentSize(), this->m_big * sizeof(double));
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -251,7 +273,9 @@ TYPED_TEST(StrategyTest, getCurrentSize)
 TYPED_TEST(StrategyTest, getActualSize)
 {
   void* data = this->m_allocator->allocate(this->m_big * sizeof(double));
+
   ASSERT_GE(this->m_allocator->getActualSize(), this->m_big * sizeof(double));
+  ASSERT_EQ(this->m_allocator->getParentResource()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
