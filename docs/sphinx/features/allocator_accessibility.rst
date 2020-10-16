@@ -89,38 +89,22 @@ should be accessible.
      - F
      - F
 
-.. note:: In the table, ``T`` means ``true``, ``F`` means ``false``, ``*`` means ``conditional``,
-  and ``X`` means ``does not exist``.
+.. note:: 
+  In the table, ``T`` means *true*, ``F`` means *false*, ``*`` means *conditional*,
+and ``X`` means *does not exist*.
 
 Build Configuration
 -------------------
-Backtrace is enabled in Umpire builds with the following:
 
-- **``cmake ... -DENABLE_BACKTRACE=On ...``** to backtrace capability in Umpire.
-- **``cmake -DENABLE_BACKTRACE=On -DENABLE_BACKTRACE_SYMBOLS=On ...``** to
-  enable Umpire to display symbol information with backtrace.  **Note:**
-  Using programs will need to add the ``-rdyanmic`` and ``-ldl`` linker flags
-  in order to properly link with this configuration of the Umpire library.
+This is where information on how to build the Allocator Accessibility example
+and test files will go.
 
 Runtime Configuration
 ---------------------
-For versions of the Umpire library that are backtrace enabled (from flags
-above), the user may expect the following.
 
-Backtrace information will always be provided in the description strings of
-umpire generated exception throws.
+This is where I will discuss different runtime configurations for using the Allocator
+Accessibility test (specifically gtest configurations that should be useful).
 
-Setting the environment variable ``UMPIRE_BACKTRACE=On`` will cause
-Umpire to record backtrace information for each memory allocation it provides.
-
-Setting the environment variable ``UMPIRE_LOG_LEVEL=Error`` will cause to
-Umpire to log backtrace information for each of the leaked Umpire allocations
-found during application exit.
-
-A programatic interface is also availble via the
-func::`umpire::print_allocator_records` free function.
-
-An example for checking and displaying the information this information
-logged above may be found here:
+Can link the allocator accessibility example here:
 
 .. literalinclude:: ../../../examples/backtrace_example.cpp
