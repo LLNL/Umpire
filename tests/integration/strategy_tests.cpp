@@ -173,9 +173,14 @@ TYPED_TEST(StrategyTest, AllocateDeallocateBig)
       this->m_allocator->allocate(this->m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
             
   this->m_allocator->deallocate(data);
+}
+
+TYPED_TEST(StrategyTest, GetParentCheck)
+{
+  //Check to make sure the parent matches what is expected
+  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 }
 
 TYPED_TEST(StrategyTest, MultipleAllocateDeallocate)
@@ -189,8 +194,6 @@ TYPED_TEST(StrategyTest, MultipleAllocateDeallocate)
     allocations.push_back(ptr);
   }
 
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
-  
   for (auto ptr : allocations) {
     this->m_allocator->deallocate(ptr);
   }
@@ -202,7 +205,6 @@ TYPED_TEST(StrategyTest, AllocateDeallocateNothing)
       this->m_allocator->allocate(this->m_nothing * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -212,7 +214,6 @@ TYPED_TEST(StrategyTest, DeallocateNullptr)
   double* data = nullptr;
 
   ASSERT_NO_THROW(this->m_allocator->deallocate(data));
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   SUCCEED();
 }
@@ -224,7 +225,6 @@ TYPED_TEST(StrategyTest, GetSize)
   double* data = static_cast<double*>(this->m_allocator->allocate(size));
 
   ASSERT_EQ(size, this->m_allocator->getSize(data));
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -240,7 +240,6 @@ TYPED_TEST(StrategyTest, GetById)
 
   ASSERT_EQ(this->m_allocator->getAllocationStrategy(),
             allocator_by_id.getAllocationStrategy());
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   ASSERT_THROW(rm.getAllocator(-25), umpire::util::Exception);
 }
@@ -253,7 +252,6 @@ TYPED_TEST(StrategyTest, get_allocator_records)
   auto records = umpire::get_allocator_records(*(this->m_allocator));
 
   ASSERT_EQ(records.size(), 1);
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -265,7 +263,6 @@ TYPED_TEST(StrategyTest, getCurrentSize)
   void* data = this->m_allocator->allocate(this->m_big * sizeof(double));
 
   ASSERT_EQ(this->m_allocator->getCurrentSize(), this->m_big * sizeof(double));
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }
@@ -275,7 +272,6 @@ TYPED_TEST(StrategyTest, getActualSize)
   void* data = this->m_allocator->allocate(this->m_big * sizeof(double));
 
   ASSERT_GE(this->m_allocator->getActualSize(), this->m_big * sizeof(double));
-  ASSERT_EQ(this->m_allocator->getParent()->getName(), this->m_parent_name);
 
   this->m_allocator->deallocate(data);
 }

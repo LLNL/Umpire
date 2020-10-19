@@ -18,7 +18,7 @@ void check_parent(umpire::Allocator alloc)
   //
   // At this point, root will be pointing to the resource being used.
   //
-  std::cout << "(root) allocator name is " << root->getName() << std::endl;
+  std::cout << "(root allocator)" << std::endl;
   std::cout << "------------------" << std::endl;
 }
 
