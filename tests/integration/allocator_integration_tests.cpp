@@ -39,8 +39,14 @@ TEST_P(AllocatorTest, AllocateDeallocateBig)
       static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-
+  
   m_allocator->deallocate(data);
+}
+
+TEST_P(AllocatorTest, GetParentCheck)
+{
+  //Parent of default allocator should be nullptr 
+  ASSERT_EQ(nullptr, m_allocator->getParent());
 }
 
 TEST_P(AllocatorTest, AllocateDeallocateSmall)
