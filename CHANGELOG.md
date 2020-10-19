@@ -72,6 +72,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Gitlab test scripts now caches python virtual environment.
 
+- Spack config files in Uberenv are now coming from a submodule.
+
 ### Removed
 
 - Peer access is no longer automatically enabled for CUDA and HIP.
