@@ -33,7 +33,7 @@ class AllocationStrategy {
    * \param name The name of this AllocationStrategy object.
    * \param id The id of this AllocationStrategy object.
    */
-  AllocationStrategy(const std::string& name, int id) noexcept;
+  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept;
 
   virtual ~AllocationStrategy() = default;
 
@@ -120,12 +120,19 @@ class AllocationStrategy {
   friend std::ostream& operator<<(std::ostream& os,
                                   const AllocationStrategy& strategy);
 
+  /*!
+   * \brief Traces where the allocator came from.
+   *
+   * \return Pointer to the parent AllocationStrategy.
+   */
+  virtual AllocationStrategy* getParent() const noexcept;
+
   virtual MemoryResourceTraits getTraits() const noexcept;
 
  protected:
   std::string m_name;
-
   int m_id;
+  AllocationStrategy* m_parent; 
 };
 
 } // end of namespace strategy

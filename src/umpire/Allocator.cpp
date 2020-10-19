@@ -68,6 +68,11 @@ int Allocator::getId() const noexcept
   return m_allocator->getId();
 }
 
+strategy::AllocationStrategy* Allocator::getParent() const noexcept
+{
+  return m_allocator->getParent();
+}
+
 strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);

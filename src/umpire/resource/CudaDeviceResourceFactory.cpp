@@ -8,9 +8,7 @@
 
 #include <cuda_runtime_api.h>
 
-#include "umpire/alloc/CudaMallocAllocator.hpp"
 #include "umpire/resource/CudaDeviceMemoryResource.hpp"
-#include "umpire/resource/DefaultMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
