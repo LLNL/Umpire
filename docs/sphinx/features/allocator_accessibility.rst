@@ -108,9 +108,9 @@ that all memory resources which should be accessible to that platform can actual
 accessed. On the other hand, the ``allocator_access.cpp`` file shows all available memory 
 resource types for an allocator, given the *host* platform.
 
-To build and run these files, use the appropriate cmake flags for the desired platform and then
-run ``ctest -C test -R allocator_accessibility_tests --output-on-failure`` for the test code and
-``./bin/allocator_access`` for the example code.
+To build and run these files, either use uberenv or the appropriate cmake flags for the 
+desired platform and then run ``ctest -C test -R allocator_accessibility_tests --output-on-failure`` 
+for the test code and ``./bin/allocator_access`` for the example code.
 
 .. note::
    The `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer_guide.html>`_ shows
