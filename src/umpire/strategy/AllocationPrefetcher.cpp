@@ -15,7 +15,7 @@ namespace strategy {
 
 AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id,
                                            Allocator allocator, int device_id)
-    : AllocationStrategy(name, id),
+    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
       m_allocator{allocator.getAllocationStrategy()},
       m_device{device_id}
 {
