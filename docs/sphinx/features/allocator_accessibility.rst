@@ -23,7 +23,7 @@ test).
 Allocator Accessibility Table
 -----------------------------
 The following is a truth table showing whether or not an allocator will be accessible.
-For example, if ``:class:`umpire::Allocator` alloc`` is created with the host memory 
+For example, if :class:`umpire::Allocator` ``alloc`` is created with the host memory 
 resource and I want to know if it should be accessible from the ``omp_target`` CAMP
 platform, then I can look at the corresponding entry in the table and find that it 
 should be accessible.
@@ -90,21 +90,35 @@ should be accessible.
      - F
 
 .. note:: 
-  In the table, ``T`` means *true*, ``F`` means *false*, ``*`` means *conditional*,
-  and ``X`` means *does not exist*.
+  In the table, ``T`` means **true**, ``F`` means **false**, ``*`` means **conditional**,
+  and ``X`` means **does not exist**.
+  
+Allocator Inaccessibility Configuration
+---------------------------------------
 
-Build Configuration
--------------------
+This is where I will show how to configure Umpire to also double check that those memory 
+resources that should not be accessible given a specific platform are indeed not accessible.
+(They result in an exception using the EXPECT_DEATH gtest function.)
 
-This is where information on how to build the Allocator Accessibility example
-and test files will go.
+Build and Run Configuration
+---------------------------
 
-Runtime Configuration
----------------------
+The ``allocator_integration_tests.cpp`` file checks what platforms are available and confirms
+that all memory resources which should be accessible to that platform can actually be 
+accessed. On the other hand, the ``allocator_access.cpp`` file shows all available memory 
+resource types for an allocator, given the *host* platform.
 
-This is where I will discuss different runtime configurations for using the Allocator
-Accessibility test (specifically gtest configurations that should be useful).
+To build and run these files, use the appropriate cmake flags for the desired platform and then
+run ``ctest -C test -R allocator_accessibility_tests --output-on-failure`` for the test code and
+``./bin/allocator_access`` for the example code.
 
-Can link the allocator accessibility example here:
+.. note::
+   The `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer_guide.html>`_ shows
+   how to configure Umpire with uberenv to build with different CAMP platforms.
 
-.. literalinclude:: ../../../examples/backtrace_example.cpp
+Below, the ``allocator_access.cpp`` code is shown to demonstrate how this functionality can be 
+used during development.
+
+CHANGE EXAMPLE LINK
+
+.. literalinclude:: ../../../examples/allocator.c
