@@ -11,3 +11,6 @@
 	path = .radiuss-ci
 	url = https://github.com/LLNL/radiuss-ci
 	branch = feature/umpire-ci
+[submodule "scripts/radiuss-spack-configs"]
+	path = scripts/radiuss-spack-configs
+	url = https://github.com/LLNL/radiuss-spack-configs
