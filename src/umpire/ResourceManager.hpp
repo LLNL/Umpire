@@ -118,6 +118,21 @@ class ResourceManager {
   void registerAllocator(const std::string& name, Allocator allocator);
 
   /*!
+   * \brief Deregister an Allocator with the ResourceManager.
+   *
+   * After calling, allocator can no longer by accessed by calling
+   * getAllocator(name). If allocator is not registered under name, an error
+   * will be thrown.
+   *
+   * If one of the default resource names (e.g. HOST) is used, an error will be
+   * thrown.
+   *
+   * \param name Name to deregister Allocator with.
+   * \param allocator Allocator to deregister.
+   */
+  void deregisterAllocator(const std::string& name, Allocator allocator);
+
+  /*!
    * \brief Get the Allocator used to allocate ptr.
    *
    * \param ptr Pointer to find the Allocator for.

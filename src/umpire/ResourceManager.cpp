@@ -443,6 +443,28 @@ void ResourceManager::registerAllocator(const std::string& name,
   m_allocators_by_name[name] = allocator.getAllocationStrategy();
 }
 
+void ResourceManager::deregisterAllocator(const std::string& name,
+                                        Allocator allocator)
+{
+  auto a = m_allocators_by_name.find(name);
+
+  if (!isAllocator(name)) {
+    UMPIRE_ERROR("Allocator " << name << " is not registered.");
+  }
+
+  if (a->second->getId() != allocator.getId()) {
+    UMPIRE_ERROR("Allocator " << name << " is not registered as an alias of " << allocator.getName());
+  }
+
+  auto resource_name = std::find(m_resource_names.begin(), m_resource_names.end(), name);
+
+  if (resource_name != std::end(m_resource_names)) {
+    UMPIRE_ERROR("Cannot deregister a resource: " << name);
+  }
+
+  m_allocators_by_name.erase(a);
+}
+
 Allocator ResourceManager::getAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
