@@ -77,3 +77,37 @@ TEST(ResourceManager, getAllocatorInvalidId)
   ASSERT_THROW(rm.getAllocator(umpire::invalid_allocator_id),
                umpire::util::Exception);
 }
+
+TEST(ResourceManager, registerAllocator)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.getAllocator("HOST");
+  rm.registerAllocator("ALIAS", alloc);
+  EXPECT_THROW({
+      rm.registerAllocator("ALIAS", alloc);
+  }, umpire::util::Exception);
+
+  auto alloc_alias = rm.getAllocator("ALIAS");
+
+  EXPECT_EQ(alloc_alias.getId(), alloc.getId());
+}
+
+TEST(ResourceManager, deregisterAllocator)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.getAllocator("ALIAS");
+  EXPECT_THROW({
+    rm.deregisterAllocator("BLAH", alloc);
+  }, umpire::util::Exception);
+  EXPECT_NO_THROW({
+    rm.deregisterAllocator("ALIAS", alloc);
+  });
+
+  alloc = rm.getAllocator("HOST");
+  EXPECT_THROW({
+    rm.deregisterAllocator("HOST", alloc);
+  }, umpire::util::Exception);
+
+
+}
