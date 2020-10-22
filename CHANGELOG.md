@@ -31,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   avoid name collisions.  (Note: this changes may be user visible so need to be
   release noted).
 
+- Fixed up broken source links in tutorial documentation.
+
 ### Removed
 
 ### Fixed

@@ -9,11 +9,14 @@
 
 int main(int, char**)
 {
-  constexpr std::size_t SIZE = 1024;
-
+  // _umpire_tut_get_allocator_start
   auto& rm = umpire::ResourceManager::getInstance();
 
   umpire::Allocator allocator = rm.getAllocator("HOST");
+  // _umpire_tut_get_allocator_end
+
+  // _umpire_tut_de_allocate_start
+  constexpr std::size_t SIZE = 1024;
 
   double* data =
       static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
@@ -22,8 +25,10 @@ int main(int, char**)
             << allocator.getName() << " allocator...";
 
   allocator.deallocate(data);
+  // _umpire_tut_de_allocate_end
 
   std::cout << " deallocated." << std::endl;
 
   return 0;
 }
+
