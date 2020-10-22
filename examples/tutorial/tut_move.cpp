@@ -14,8 +14,10 @@ double* move_data(double* source_data, const std::string& destination)
 
   std::cout << "Moved source data (" << source_data << ") to destination ";
 
+  // _umpire_tut_move_start
   double* dest_data =
       static_cast<double*>(rm.move(source_data, dest_allocator));
+  // _umpire_tut_move_end
 
   std::cout << destination << " (" << dest_data << ")" << std::endl;
 

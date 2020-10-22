@@ -24,17 +24,23 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   // Make an allocator
+  // _umpire_tut_replay_make_allocate_start
   auto allocator = rm.getAllocator("HOST");
   auto pool =
       rm.makeAllocator<umpire::strategy::DynamicPool>("pool", allocator);
+  // _umpire_tut_replay_make_allocate_end
 
   // Do some allocations
+  // _umpire_tut_replay_allocate_start
   std::generate(allocations.begin(), allocations.end(),
                 [&]() { return pool.allocate(random_number()); });
+  // _umpire_tut_replay_allocate_end
 
   // Clean up
+  // _umpire_tut_replay_dealocate_start
   for (auto& ptr : allocations)
     pool.deallocate(ptr);
+  // _umpire_tut_replay_dealocate_end
 
   return 0;
 }

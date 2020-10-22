@@ -10,14 +10,17 @@
 
 void allocate_and_deallocate_pool(const std::string& resource)
 {
-  constexpr std::size_t SIZE = 1024;
-
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator(resource);
 
+  // _umpire_tut_makepool_start
   auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       resource + "_pool", allocator);
+  // _umpire_tut_makepool_end
+
+  // _umpire_tut_allocate_start
+  constexpr std::size_t SIZE = 1024;
 
   double* data =
       static_cast<double*>(pooled_allocator.allocate(SIZE * sizeof(double)));
@@ -26,12 +29,14 @@ void allocate_and_deallocate_pool(const std::string& resource)
             << pooled_allocator.getName() << " allocator...";
 
   pooled_allocator.deallocate(data);
+  // _umpire_tut_allocate_end
 
   std::cout << " deallocated." << std::endl;
 }
 
 int main(int, char**)
 {
+  // _umpire_tut_anyallocator_start
   allocate_and_deallocate_pool("HOST");
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -43,6 +48,7 @@ int main(int, char**)
   allocate_and_deallocate_pool("DEVICE");
   allocate_and_deallocate_pool("PINNED");
 #endif
+  // _umpire_tut_anyallocator_end
 
   return 0;
 }
