@@ -33,7 +33,7 @@ int main(int ac, char** av)
   //
   // Default scope for allocator is NODE.  SOCKET is another option of interest
   //
-  traits.scope = umpire::MemoryResourceTraits::shared_scope::NODE;  // default
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::node;  // default
 
   //
   // Create (or attach to) the allocator
@@ -44,7 +44,7 @@ int main(int ac, char** av)
   // Resource of this allocator is SHARED
   //
   UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource
-                        == umpire::MemoryResourceTraits::resource_type::SHARED);
+                        == umpire::MemoryResourceTraits::resource_type::shared);
 
   //
   // Get communicator for this allocator

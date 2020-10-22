@@ -41,10 +41,10 @@ std::unique_ptr<resource::MemoryResource> OpenMPTargetResourceFactory::create(
 MemoryResourceTraits OpenMPTargetResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.kind = MemoryResourceTraits::memory_type::gddr;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
   traits.id = omp_get_default_device();
-  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
+  traits.resource = MemoryResourceTraits::resource_type::device;
 
   return traits;
 }

@@ -18,7 +18,7 @@ namespace strategy {
 
 NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
                        int numa_node)
-    : AllocationStrategy(name, id),
+    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
       m_allocator(allocator.getAllocationStrategy()),
       m_platform(Platform::host),
       m_node(numa_node)

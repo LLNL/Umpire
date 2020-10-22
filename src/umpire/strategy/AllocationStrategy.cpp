@@ -11,8 +11,8 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id) noexcept
-    : m_name(name), m_id(id)
+AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept
+    : m_name(name), m_id(id), m_parent(parent) 
 {
 }
 
@@ -60,6 +60,11 @@ MemoryResourceTraits AllocationStrategy::getTraits() const noexcept
   UMPIRE_LOG(Error, "AllocationStrategy::getTraits() not implemented");
 
   return MemoryResourceTraits{};
+}
+
+AllocationStrategy* AllocationStrategy::getParent() const noexcept
+{
+  return m_parent;
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)

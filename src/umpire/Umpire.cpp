@@ -192,7 +192,7 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
   auto scope = a.getAllocationStrategy()->getTraits().scope;
   MPI_Comm c;
 
-  if (scope == MemoryResourceTraits::shared_scope::NODE) {
+  if (scope == MemoryResourceTraits::shared_scope::node) {
     MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
   } else {
     c = MPI_COMM_WORLD;

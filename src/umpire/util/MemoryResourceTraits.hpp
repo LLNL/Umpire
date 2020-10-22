@@ -20,25 +20,25 @@ namespace umpire {
 struct MemoryResourceTraits {
   enum class optimized_for { any, latency, bandwidth, access };
 
-  enum class vendor_type { UNKNOWN, AMD, IBM, INTEL, NVIDIA };
+  enum class vendor_type { unknown, amd, ibm, intel, nvidia };
 
-  enum class memory_type { UNKNOWN, DDR, GDDR, HBM, NVME };
+  enum class memory_type { unknown, ddr, gddr, hbm, nvme };
 
   enum class resource_type {
-    UNKNOWN,
-    HOST,
-    DEVICE,
-    DEVICE_CONST,
-    PINNED,
-    UM,
-    FILE,
-    SHARED
+    unknown,
+    host,
+    device,
+    device_const,
+    pinned,
+    um,
+    file,
+    shared
   };
 
   enum class shared_scope {
-    UNKNOWN,
-    NODE,
-    SOCKET
+    unknown,
+    node,
+    socket
   };
 
   int id;
@@ -53,11 +53,11 @@ struct MemoryResourceTraits {
 
   std::size_t size = 0;
 
-  vendor_type vendor = vendor_type::UNKNOWN;
-  memory_type kind = memory_type::UNKNOWN;
+  vendor_type vendor = vendor_type::unknown;
+  memory_type kind = memory_type::unknown;
   optimized_for used_for = optimized_for::any;
-  resource_type resource = resource_type::UNKNOWN;
-  shared_scope scope = shared_scope::UNKNOWN;
+  resource_type resource = resource_type::unknown;
+  shared_scope scope = shared_scope::unknown;
 };
 
 } // end of namespace umpire
