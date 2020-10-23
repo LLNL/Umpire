@@ -30,12 +30,16 @@ class HipDeviceMemoryResource : public MemoryResource {
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
+  bool isAccessibleFrom(Platform p) noexcept;
   Platform getPlatform() noexcept;
 
  protected:
   alloc::HipMallocAllocator m_allocator;
 
   Platform m_platform;
+
+ private:
+  bool isHostPageable(); 
 };
 
 } // end of namespace resource

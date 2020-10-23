@@ -88,6 +88,14 @@ std::size_t HipConstantMemoryResource::getHighWatermark() const noexcept
   return m_highwatermark;
 }
 
+bool HipConstantMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  if(p == Platform::undefined || p == Platform::host)
+    return false;
+  else
+    return true;
+}
+
 Platform HipConstantMemoryResource::getPlatform() noexcept
 {
   return m_platform;

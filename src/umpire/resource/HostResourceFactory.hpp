@@ -19,6 +19,8 @@ class HostResourceFactory : public MemoryResourceFactory {
   bool isValidMemoryResourceFor(
       const std::string& name) noexcept final override;
 
+  bool isAccessibleFrom(Platform p) noexcept;
+
   std::unique_ptr<resource::MemoryResource> create(const std::string& name,
                                                    int id) final override;
 

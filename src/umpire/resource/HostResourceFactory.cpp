@@ -33,6 +33,13 @@ bool HostResourceFactory::isValidMemoryResourceFor(
   }
 }
 
+bool HostResourceFactory::isAccessibleFrom(Platform p) noexcept
+{
+  if(p == Platform::host)
+    std::cout << "here" << std::endl;
+  return false;
+}
+
 std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
     const std::string& name, int id)
 {

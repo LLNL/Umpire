@@ -96,6 +96,14 @@ std::size_t CudaConstantMemoryResource::getHighWatermark() const noexcept
   return m_highwatermark;
 }
 
+bool CudaConstantMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  if(p == Platform::undefined || p == Platform::host)
+    return false
+  else
+    return true;
+}
+
 Platform CudaConstantMemoryResource::getPlatform() noexcept
 {
   return m_platform;
