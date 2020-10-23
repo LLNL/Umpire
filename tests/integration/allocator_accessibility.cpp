@@ -117,28 +117,28 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
 {
   if(umpire::is_accessible(cPlatform::host, *m_allocator)) {
-    allocate_and_use<host_platform> h;
-    ASSERT_NO_THROW(h.test(m_allocator, m_size));
+    allocate_and_use<host_platform> host;
+    ASSERT_NO_THROW(host.test(m_allocator, m_size));
   }
 
 #if defined(UMPIRE_ENABLE_CUDA)
   if (umpire::is_accessible(cPlatform::cuda, *m_allocator)) {
-    allocate_and_use<cuda_platform> c;
-    ASSERT_NO_THROW(c.test(m_allocator, m_size));
+    allocate_and_use<cuda_platform> cuda;
+    ASSERT_NO_THROW(cuda.test(m_allocator, m_size));
   }
 #endif
   
 #if defined(UMPIRE_ENABLE_HIP)
   if (umpire::is_accessible(cPlatform::hip, *m_allocator)) {
-    allocate_and_use<hip_platform> hd;
-    ASSERT_NO_THROW(hd.test(m_allocator, m_size));
+    allocate_and_use<hip_platform> hip;
+    ASSERT_NO_THROW(hip.test(m_allocator, m_size));
   }
 #endif
  
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   if (umpire::is_accessible(cPlatform::omp_target, *m_allocator)) {
-    allocate_and_use<omp_target_platform> o;
-    ASSERT_NO_THROW(o.test(m_allocator, m_size));
+    allocate_and_use<omp_target_platform> omp;
+    ASSERT_NO_THROW(omp.test(m_allocator, m_size));
   }
 #endif
 

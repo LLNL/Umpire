@@ -136,13 +136,6 @@ bool pointer_contains(void* left, void* right);
 bool is_accessible(Platform p, Allocator a);
 
 /*!
- * \brief Helper function to find the resource type of a given allocator
- *
- *\param umpire::allocator a  
- */
-MemoryResourceTraits::resource_type get_resource(Allocator a);
-
-/*!
  * \brief Get the backtrace associated with the allocation of ptr
  *
  * The string may be empty if backtraces are not enabled.

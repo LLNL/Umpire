@@ -6,16 +6,13 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <string>
-
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 
-using cPlatform = camp::resources::Platform;
-
 bool testAccess(umpire::Allocator a)
 {
-  if(umpire::is_accessible(cPlatform::host, a)) {
+  if(umpire::is_accessible(umpire::Platform::host, a)) {
     std::cout << "The allocator, " << a.getName()
               << ", is accessible." << std::endl;
     return true;
@@ -26,14 +23,13 @@ bool testAccess(umpire::Allocator a)
   }
 }
 
-///////////////////////////////////////////////////
-//Depending on how Umpire has been set up, several
-//different allocators could be accessible from the host
-//CAMP platform. This test will create a list of all
-//currently available allocators and then test each
-//individually to see if it can be accessed from the
-//*host* platform. (To test other platforms, see test.)
-///////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+//Depending on how Umpire has been set up, several different 
+//allocators could be accessible from the host CAMP platform. 
+//This test will create a list of all currently available allocators 
+//and then test each individually to see if it can be accessed from 
+//the host platform. (To test other platforms, see test.)
+///////////////////////////////////////////////////////////////
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
