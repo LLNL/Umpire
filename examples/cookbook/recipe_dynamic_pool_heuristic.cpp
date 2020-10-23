@@ -24,6 +24,7 @@ int main(int, char**)
       umpire::strategy::DynamicPool::percent_releasable(75);
   // _umpire_tut_creat_heuristic_fun_end
 
+  // _umpire_tut_use_heuristic_fun_start
   //
   // Create a pool with an initial block size of 1 Kb and 1 Kb block size for
   // all subsequent allocations and with our previously created heuristic
@@ -31,8 +32,8 @@ int main(int, char**)
   //
   auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "HOST_POOL", allocator, 1024ul, 1024ul, 16, heuristic_function);
+  // _umpire_tut_use_heuristic_fun_end
 
-  // _umpire_tut_use_heuristic_fun_start
   //
   // Obtain a pointer to our specifi DynamicPool instance in order to see the
   // DynamicPool-specific statistics
@@ -40,7 +41,6 @@ int main(int, char**)
   auto dynamic_pool =
       umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(
           pooled_allocator);
-  // _umpire_tut_use_heuristic_fun_end
 
   void* a[4];
   for (int i = 0; i < 4; ++i)
