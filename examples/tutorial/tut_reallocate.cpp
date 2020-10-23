@@ -40,9 +40,9 @@ int main(int, char**)
     std::cout << "Reallocating data (" << data << ") to size "
               << REALLOCATED_SIZE << "...";
 
-    // _umpire_tut_realloc_start
+    // _sphinx_tag_tut_realloc_start
     data = static_cast<double*>(rm.reallocate(data, REALLOCATED_SIZE));
-    // _umpire_tut_realloc_end
+    // _sphinx_tag_tut_realloc_end
 
     std::cout << "done.  Reallocated data (" << data << ")" << std::endl;
 

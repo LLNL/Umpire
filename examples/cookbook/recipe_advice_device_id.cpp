@@ -17,7 +17,7 @@ int main(int, char**)
 
   auto allocator = rm.getAllocator("UM");
 
-  // _umpire_tut_device_advice_start
+  // _sphinx_tag_tut_device_advice_start
   //
   // Create an allocator that applied "PREFFERED_LOCATION" advice to set a
   // specific GPU device as the preferred location.
@@ -32,7 +32,7 @@ int main(int, char**)
             "preferred_location_device_2", allocator, "PREFERRED_LOCATION",
             device_id);
 
-    // _umpire_tut_device_advice_end
+    // _sphinx_tag_tut_device_advice_end
     void* data = preferred_location_allocator.allocate(1024);
 
     preferred_location_allocator.deallocate(data);

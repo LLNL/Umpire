@@ -20,19 +20,19 @@ int main(int, char**)
   //
   // Create a pool with introspection disabled (can improve performance)
   //
-  // _umpire_tut_nointro_start
+  // _sphinx_tag_tut_nointro_start
   auto pooled_allocator =
       rm.makeAllocator<umpire::strategy::DynamicPool, false>(
           "NO_INTROSPECTION_POOL", allocator);
-  // _umpire_tut_nointro_end
+  // _sphinx_tag_tut_nointro_end
 
   void* data = pooled_allocator.allocate(1024);
 
-  // _umpire_tut_getsize_start
+  // _sphinx_tag_tut_getsize_start
   std::cout << "Pool has allocated " << pooled_allocator.getActualSize()
             << " bytes of memory. " << pooled_allocator.getCurrentSize()
             << " bytes are used" << std::endl;
-  // _umpire_tut_getsize_end
+  // _sphinx_tag_tut_getsize_end
 
   pooled_allocator.deallocate(data);
 

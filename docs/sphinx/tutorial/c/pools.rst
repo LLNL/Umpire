@@ -14,8 +14,8 @@ allocations of any size. To create a new ``umpire_allocator`` using the pooling
 algorithm:
 
 .. literalinclude:: ../../../examples/tutorial/c/tut_pool.c
-   :start-after: _umpire_tut_pool_create_start
-   :end-before: _umpire_tut_pool_create_end
+   :start-after: _sphinx_tag_tut_pool_create_start
+   :end-before: _sphinx_tag_tut_pool_create_end
    :language: C
 
 The two arguments are the size of the initial block that is allocated, and the
@@ -28,8 +28,8 @@ before, without needing to worry about the underlying algorithm used for the
 allocations:
 
 .. literalinclude:: ../../../examples/tutorial/c/tut_pool.c
-   :start-after: _umpire_tut_allocate_start
-   :end-before: _umpire_tut_allocate_end
+   :start-after: _sphinx_tag_tut_allocate_start
+   :end-before: _sphinx_tag_tut_allocate_end
    :language: C
 
 

@@ -27,8 +27,8 @@ can get them using the same ``umpire_resourcemanager_get_allocator_by_name``
 call you saw in the previous example:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp
-   :start-after: _umpire_tut_create_allocator_start
-   :end-before: _umpire_tut_create_allocator_end
+   :start-after: _sphinx_tag_tut_create_allocator_start
+   :end-before: _sphinx_tag_tut_create_allocator_end
    :language: C
 
 Note that every allocator supports the same calls, no matter which resource it
@@ -36,15 +36,15 @@ is for, this means we can run the same code for all the resources available in
 the system:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp 
-   :start-after: _umpire_tut_allocate_start
-   :end-before: _umpire_tut_allocate_end
+   :start-after: _sphinx_tag_tut_allocate_start
+   :end-before: _sphinx_tag_tut_allocate_end
    :language: C
 
 As you can see, we can call this function with any valid resource name:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_resources.cpp 
-   :start-after: _umpire_tut_resource_types_start
-   :end-before: _umpire_tut_resource_types_end
+   :start-after: _sphinx_tag_tut_resource_types_start
+   :end-before: _sphinx_tag_tut_resource_types_end
    :language: C
 
 In the next example, we will learn how to move data between resources using

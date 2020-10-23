@@ -14,16 +14,16 @@ function, you must get the pointer to the
 :class:`umpire::Allocator`:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_get_largest_available_block_in_pool.cpp
-   :start-after: _umpire_tut_unwrap_start
-   :end-before: _umpire_tut_unwrap_end
+   :start-after: _sphinx_tag_tut_unwrap_start
+   :end-before: _sphinx_tag_tut_unwrap_end
    :language: C++
 
 Once you have the pointer to the appropriate strategy, you can call the
 function:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_get_largest_available_block_in_pool.cpp
-   :start-after: _umpire_tut_get_info_start
-   :end-before: _umpire_tut_get_info_end
+   :start-after: _sphinx_tag_tut_get_info_start
+   :end-before: _sphinx_tag_tut_get_info_end
    :language: C++
 
 The complete example is included below:

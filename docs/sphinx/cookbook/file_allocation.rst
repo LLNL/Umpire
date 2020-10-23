@@ -18,15 +18,15 @@ Requesting the allocation takes two steps: 1) getting a "FILE" allocator,
 2) requesting the amount of memory to allocate.
 
 .. literalinclude:: ../../../examples/cookbook/recipe_filesystem_memory_allocation.cpp
-   :start-after: _umpire_tut_file_allocate_start
-   :end-before: _umpire_tut_file_allocate_end
+   :start-after: _sphinx_tag_tut_file_allocate_start
+   :end-before: _sphinx_tag_tut_file_allocate_end
    :language: C++
 
 To deallocate:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_filesystem_memory_allocation.cpp
-   :start-after: _umpire_tut_file_deallocate_start
-   :end-before: _umpire_tut_file_deallocate_end
+   :start-after: _sphinx_tag_tut_file_deallocate_start
+   :end-before: _sphinx_tag_tut_file_deallocate_end
    :language: C++
 
 The complete example is included below:

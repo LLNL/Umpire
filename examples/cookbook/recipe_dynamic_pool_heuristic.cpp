@@ -15,16 +15,16 @@ int main(int, char**)
 
   auto allocator = rm.getAllocator("HOST");
 
-  // _umpire_tut_creat_heuristic_fun_start
+  // _sphinx_tag_tut_creat_heuristic_fun_start
   //
   // Create a heuristic function that will return true to the DynamicPool
   // object when the threshold of releasable size to total size is 75%.
   //
   auto heuristic_function =
       umpire::strategy::DynamicPool::percent_releasable(75);
-  // _umpire_tut_creat_heuristic_fun_end
+  // _sphinx_tag_tut_creat_heuristic_fun_end
 
-  // _umpire_tut_use_heuristic_fun_start
+  // _sphinx_tag_tut_use_heuristic_fun_start
   //
   // Create a pool with an initial block size of 1 Kb and 1 Kb block size for
   // all subsequent allocations and with our previously created heuristic
@@ -32,7 +32,7 @@ int main(int, char**)
   //
   auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "HOST_POOL", allocator, 1024ul, 1024ul, 16, heuristic_function);
-  // _umpire_tut_use_heuristic_fun_end
+  // _sphinx_tag_tut_use_heuristic_fun_end
 
   //
   // Obtain a pointer to our specifi DynamicPool instance in order to see the

@@ -15,8 +15,8 @@ allocations of any size. To create a new ``Allocator`` using the
 :class:`umpire::strategy::DynamicPool` strategy:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
-   :start-after: _umpire_tut_makepool_start
-   :end-before: _umpire_tut_makepool_end
+   :start-after: _sphinx_tag_tut_makepool_start
+   :end-before: _sphinx_tag_tut_makepool_end
    :language: C++
 
 We have to provide a new name for the Allocator, as well as the underlying
@@ -27,15 +27,15 @@ before, without needing to worry about the underlying algorithm used for the
 allocations:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
-   :start-after: _umpire_tut_allocate_start
-   :end-before: _umpire_tut_allocate_end
+   :start-after: _sphinx_tag_tut_allocate_start
+   :end-before: _sphinx_tag_tut_allocate_end
    :language: C++
 
 Don't forget, these strategies can be created on top of any valid Allocator:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
-   :start-after: _umpire_tut_anyallocator_start
-   :end-before: _umpire_tut_anyallocator_end
+   :start-after: _sphinx_tag_tut_anyallocator_start
+   :end-before: _sphinx_tag_tut_anyallocator_end
    :language: C++
 
 Most Umpire users will make allocations that use the GPU via the
@@ -50,16 +50,16 @@ any future underlying allocations. These two parameters can be passed when
 constructing a pool:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_2.cpp
-   :start-after: _umpire_tut_allocator_tuning_start
-   :end-before: _umpire_tut_allocator_tuning_end
+   :start-after: _sphinx_tag_tut_allocator_tuning_start
+   :end-before: _sphinx_tag_tut_allocator_tuning_end
    :language: C++
 
 Depending on where you are allocating data, you might want to use different
 sizes. It's easy to construct multiple pools with different configurations:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_2.cpp
-   :start-after: _umpire_tut_device_sized_pool_start
-   :end-before: _umpire_tut_device_sized_pool_end
+   :start-after: _sphinx_tag_tut_device_sized_pool_start
+   :end-before: _sphinx_tag_tut_device_sized_pool_end
    :language: C++
 
 There are lots of different strategies that you can use, we will look at some

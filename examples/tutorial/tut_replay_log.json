@@ -4,24 +4,24 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-# _umpire_doc_version_start
+# _sphinx_tag_doc_version_start
 { "kind":"replay", "uid":27494, "timestamp":1558388052211435757, "event": "version", "payload": { "major":0, "minor":3, "patch":3 } }
-# _umpire_doc_version_end
-# _umpire_doc_makememoryresource_start
+# _sphinx_tag_doc_version_end
+# _sphinx_tag_doc_makememoryresource_start
 { "kind":"replay", "uid":27494, "timestamp":1558388052211477678, "event": "makeMemoryResource", "payload": { "name": "HOST" }, "result": "0x101626b0" }
 { "kind":"replay", "uid":27494, "timestamp":1558388052471684134, "event": "makeMemoryResource", "payload": { "name": "DEVICE" }, "result": "0x101d79a0" }
 { "kind":"replay", "uid":27494, "timestamp":1558388052471698804, "event": "makeMemoryResource", "payload": { "name": "PINNED" }, "result": "0x101d7a50" }
 { "kind":"replay", "uid":27494, "timestamp":1558388052472972935, "event": "makeMemoryResource", "payload": { "name": "UM" }, "result": "0x101d7b00" }
 { "kind":"replay", "uid":27494, "timestamp":1558388052595814979, "event": "makeMemoryResource", "payload": { "name": "DEVICE_CONST" }, "result": "0x101d7bb0" }
-# _umpire_doc_makememoryresource_end
-# _umpire_doc_makeallocator_start
+# _sphinx_tag_doc_makememoryresource_end
+# _sphinx_tag_doc_makeallocator_start
 { "kind":"replay", "uid":27494, "timestamp":1558388052595864262, "event": "makeAllocator", "payload": { "type":"umpire::strategy::DynamicPool", "with_introspection":true, "allocator_name":"pool", "args": [ "HOST" ] } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052595903505, "event": "makeAllocator", "payload": { "type":"umpire::strategy::DynamicPool", "with_introspection":true, "allocator_name":"pool", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x108a8730" } }
-# _umpire_doc_makeallocator_end
-# _umpire_doc_allocate_start
+# _sphinx_tag_doc_makeallocator_end
+# _sphinx_tag_doc_allocate_start
 { "kind":"replay", "uid":27494, "timestamp":1558388052595911583, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 0 } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052595934822, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 0 }, "result": { "memory_ptr": "0x200040000010" } }
-# _umpire_doc_allocate_end
+# _sphinx_tag_doc_allocate_end
 { "kind":"replay", "uid":27494, "timestamp":1558388052595939623, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 134 } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052595943793, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 134 }, "result": { "memory_ptr": "0x200040000010" } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052595947408, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 774 } }
@@ -148,9 +148,9 @@
 { "kind":"replay", "uid":27494, "timestamp":1558388052596350263, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 529 }, "result": { "memory_ptr": "0x200040007ed0" } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052596352741, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 327 } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052596356087, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 327 }, "result": { "memory_ptr": "0x2000400080f0" } }
-# _umpire_doc_deallocate_start
+# _sphinx_tag_doc_deallocate_start
 { "kind":"replay", "uid":27494, "timestamp":1558388052596358577, "event": "deallocate", "payload": { "allocator_ref": "0x108a8730", "memory_ptr": "0x200040000010" } }
-# _umpire_doc_deallocate_end
+# _sphinx_tag_doc_deallocate_end
 { "kind":"replay", "uid":27494, "timestamp":1558388052596364727, "event": "deallocate", "payload": { "allocator_ref": "0x108a8730", "memory_ptr": "0x200040000010" } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052596369203, "event": "deallocate", "payload": { "allocator_ref": "0x108a8730", "memory_ptr": "0x2000400000a0" } }
 { "kind":"replay", "uid":27494, "timestamp":1558388052596374324, "event": "deallocate", "payload": { "allocator_ref": "0x108a8730", "memory_ptr": "0x2000400003b0" } }

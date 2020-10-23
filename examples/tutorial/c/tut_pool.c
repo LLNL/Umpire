@@ -12,7 +12,7 @@
 
 int main()
 {
-  /* _umpire_tut_pool_create_start */
+  /* _sphinx_tag_tut_pool_create_start */
   umpire_resourcemanager rm;
   umpire_resourcemanager_get_instance(&rm);
 
@@ -21,16 +21,16 @@ int main()
 
   umpire_allocator pool;
   umpire_resourcemanager_make_allocator_pool(&rm, "pool", allocator, 1024*512, 512, &pool);
-  /* _umpire_tut_pool_create_end */
+  /* _sphinx_tag_tut_pool_create_end */
 
-  /* _umpire_tut_allocate_start */
+  /* _sphinx_tag_tut_allocate_start */
   double* data = (double*) umpire_allocator_allocate(&pool, SIZE*sizeof(double));
 
   printf("Allocated %lu bytes using the %s allocator...", 
       (SIZE*sizeof(double)), umpire_allocator_get_name(&allocator));
 
   umpire_allocator_deallocate(&allocator, data);
-  /* _umpire_tut_allocate_end */
+  /* _sphinx_tag_tut_allocate_end */
 
   printf("deallocated.\n");
 

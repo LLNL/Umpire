@@ -11,9 +11,9 @@ void allocate_and_deallocate(const std::string& resource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  // _umpire_tut_get_allocator_start
+  // _sphinx_tag_tut_get_allocator_start
   umpire::Allocator allocator = rm.getAllocator(resource);
-  // _umpire_tut_get_allocator_end
+  // _sphinx_tag_tut_get_allocator_end
 
   constexpr std::size_t SIZE = 1024;
 

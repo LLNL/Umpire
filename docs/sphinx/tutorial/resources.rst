@@ -31,8 +31,8 @@ and you can get them using the same
 example:
 
 .. literalinclude:: ../../../examples/tutorial/tut_resources.cpp
-   :start-after: _umpire_tut_get_allocator_start
-   :end-before: _umpire_tut_get_allocator_end
+   :start-after: _sphinx_tag_tut_get_allocator_start
+   :end-before: _sphinx_tag_tut_get_allocator_end
    :language: C++
 
 Note that since every allocator supports the same calls, no matter which resource 

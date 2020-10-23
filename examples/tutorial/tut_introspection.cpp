@@ -36,20 +36,20 @@ int main(int, char**)
     std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
               << allocator.getName() << " allocator." << std::endl;
 
-    // _umpire_tut_getallocator_start
+    // _sphinx_tag_tut_getallocator_start
     auto found_allocator = rm.getAllocator(data);
-    // _umpire_tut_getallocator_end
+    // _sphinx_tag_tut_getallocator_end
 
-    // _umpire_tut_getinfo_start
+    // _sphinx_tag_tut_getinfo_start
     std::cout << "According to the ResourceManager, the Allocator used is "
               << found_allocator.getName() << ", which has the Platform "
               << static_cast<int>(found_allocator.getPlatform()) << std::endl;
-    // _umpire_tut_getinfo_end
+    // _sphinx_tag_tut_getinfo_end
 
-    // _umpire_tut_getsize_start
+    // _sphinx_tag_tut_getsize_start
     std::cout << "The size of the allocation is << "
               << found_allocator.getSize(data) << std::endl;
-    // _umpire_tut_getsize_end
+    // _sphinx_tag_tut_getsize_end
 
     allocator.deallocate(data);
   }

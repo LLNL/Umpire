@@ -14,16 +14,16 @@ As with the native C++ interface, all allocators are accessed via the
 ``umpire_resourcemanager`` type. To get an ``umpire_allocator``:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_allocator.c
-   :start-after: _umpire_tut_c_get_allocator_start
-   :end-before: _umpire_tut_c_get_allocator_end
+   :start-after: _sphinx_tag_tut_c_get_allocator_start
+   :end-before: _sphinx_tag_tut_c_get_allocator_end
    :language: C
 
 Once you have an ``umpire_allocator``, you can use it to allocate and
 deallocate memory:
 
 .. literalinclude:: ../../../../examples/tutorial/c/tut_allocator.c
-   :start-after: _umpire_tut_c_allocate_start
-   :end-before: _umpire_tut_c_allocate_end
+   :start-after: _sphinx_tag_tut_c_allocate_start
+   :end-before: _sphinx_tag_tut_c_allocate_end
    :language: C
 
 In the next section, we will see how to allocate memory in different places.

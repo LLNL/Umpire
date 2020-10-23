@@ -16,9 +16,9 @@ void copy_data(double* source_data, std::size_t size,
   double* dest_data =
       static_cast<double*>(dest_allocator.allocate(size * sizeof(double)));
 
-  // _umpire_tut_copy_start
+  // _sphinx_tag_tut_copy_start
   rm.copy(dest_data, source_data);
-  // _umpire_tut_copy_end
+  // _sphinx_tag_tut_copy_end
 
   std::cout << "Copied source data (" << source_data << ") to destination "
             << destination << " (" << dest_data << ")" << std::endl;

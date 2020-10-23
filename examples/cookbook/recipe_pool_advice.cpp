@@ -18,7 +18,7 @@ int main(int, char**)
 
   auto allocator = rm.getAllocator("UM");
 
-  // _umpire_tut_pool_advice_start
+  // _sphinx_tag_tut_pool_advice_start
   //
   // Create an allocator that applied "PREFFERED_LOCATION" advice to set the
   // GPU as the preferred location.
@@ -33,7 +33,7 @@ int main(int, char**)
   //
   auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "GPU_POOL", preferred_location_allocator);
-  // _umpire_tut_pool_advice_end
+  // _sphinx_tag_tut_pool_advice_end
 
   UMPIRE_USE_VAR(pooled_allocator);
 
