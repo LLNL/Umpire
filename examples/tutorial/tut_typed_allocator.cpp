@@ -18,7 +18,7 @@ int main(int, char**)
 
   double* my_doubles = double_allocator.allocate(1024);
 
-  double_allocator.deallocate(my_doubles);
+  double_allocator.deallocate(my_doubles, 1024);
   // _umpire_tut_typed_alloc_end
 
   // _umpire_tut_vector_alloc_start
