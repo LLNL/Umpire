@@ -12,6 +12,7 @@
 #include <iterator>
 #include <sstream>
 
+#include "umpire/resource/MemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "camp/resource/platform.hpp"
@@ -33,8 +34,7 @@
 
 UMPIRE_EXPORT volatile int umpire_ver_4_found = 0;
 
-using myResource = umpire::MemoryResourceTraits::resource_type;
-using cPlatform = camp::resources::Platform;
+using MemResrc = umpire::resource::MemoryResource;
 
 namespace umpire {
 
@@ -111,139 +111,10 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
   }
 }
 
-bool is_host_pageable()
-{
-#if defined(UMPIRE_ENABLE_HIP)
-  hipDeviceProp_t props;
-  int hdev = 0;
-  hipGetDevice(&hdev);
-
-  //Check whether HIP can map host memory.
-  hipGetDeviceProperties(&props, hdev);
-  if(props.canMapHostMemory)
-    return true;
-  else
-    return false;
-#endif
-#if defined(UMPIRE_ENABLE_CUDA)
-  int pageableMem = 0;
-  int cdev = 0;
-  cudaGetDevice(&cdev);
-
-  //Device supports coherently accessing pageable memory
-  //without calling cudaHostRegister on it
-  cudaDeviceGetAttribute(&pageableMem,
-    cudaDevAttrPageableMemoryAccess, cdev); 
-
-  if(pageableMem)
-    return true;
-  else
-    return false;
-#endif
-  return false;
-}
-
-/*
- *  This function describes which allocators should be 
- *  accessible from which CAMP platforms.
- *  Information on platform/allocator accessibility
- *  can be found at <link>.
-*/
 bool is_accessible(Platform p, Allocator a) 
 {
-  switch(p) {
-    case (cPlatform::host):
-    {
-      if(get_resource(a) == myResource::unknown
-       || get_resource(a) == myResource::device_const)
-        return false;
-
-#if defined(UMPIRE_ENABLE_HIP)
-      //check device case for HIP
-      if(get_resource(a) == myResource::device)
-        return true;
-#endif
-
-      //If it reaches here, no device resource is accessible
-      if (get_resource(a) == myResource::device)
-        return false;
-      else
-        return true;       
-    }
-    break;
-    ////////////////////////////////////////////////////
-    case (cPlatform::cuda): 
-    {
-#if defined(UMPIRE_ENABLE_CUDA)    
-      if (get_resource(a) == myResource::unknown
-        || get_resource(a) == myResource::file)
-        return false;
-      else if(get_resource(a) == myResource::host)
-        return is_host_pageable();
-      else
-        return true;
-#else
-      return false;
-#endif
-    }
-    break;
-    ////////////////////////////////////////////////////
-    case (cPlatform::omp_target):
-    {
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-      if (get_resource(a) == myResource::unknown
-       || get_resource(a) == myResource::file)
-        return false;
-      else
-        return true; 
-#else
-      return false;
-#endif
-    }
-    break;
-    ////////////////////////////////////////////////////
-    case (cPlatform::hip):
-    {
-#if defined(UMPIRE_ENABLE_HIP)
-      if (get_resource(a) == myResource::unknown 
-       || get_resource(a) == myResource::file)
-        return false;
-      else if(get_resource(a) == myResource::host)      
-        return is_host_pageable();
-      else
-        return true;
-#else
-      return false;
-#endif
-    }
-    break;
-    ////////////////////////////////////////////////////
-    case (cPlatform::sycl):
-    {
-#if defined(UMPIRE_ENABLE_SYCL)
-      if (get_resource(a) == myResource::device
-       || get_resource(a) == myResource::um
-       || get_resource(a) == myResource::pinned)
-        return true;
-      else
-        return false;
-#else
-      return false;
-#endif
-    }
-    break;
-    ////////////////////////////////////////////////////
-    default: //Catches the "undefined" platform
-    {
-      return false;
-    }
-    break;
-  }
-}
-
-MemoryResourceTraits::resource_type get_resource(Allocator a) 
-{
-  return a.getAllocationStrategy()->getTraits().resource;
+  MemResrc* resource = util::unwrap_allocator<MemResrc>(a);
+  return resource->isAccessibleFrom(p);
 }
 
 std::string get_backtrace(void* ptr)
