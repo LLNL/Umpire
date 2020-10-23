@@ -39,7 +39,7 @@ class HipDeviceMemoryResource : public MemoryResource {
   Platform m_platform;
 
  private:
-  bool isHostPageable(); 
+  bool isHostPageable() noexcept; 
 };
 
 } // end of namespace resource
