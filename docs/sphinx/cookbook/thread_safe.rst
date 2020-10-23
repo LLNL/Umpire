@@ -13,7 +13,9 @@ In this recipe, we look at creating a `umpire::strategy::ThreadSafeAllocator`
 for an `umpire::strategy::DynamicPool` object:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_thread_safe.cpp
-                    :lines: 14-21
+   :start-after: _umpire_tut_thread_safe_start
+   :end-before: _umpire_tut_thread_safe_end
+   :language: C++
 
 The complete example is included below:
 

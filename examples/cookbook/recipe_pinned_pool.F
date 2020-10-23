@@ -15,6 +15,7 @@ program umpire_f_pinned_pool
       type(UmpireAllocator) pinned_pool
       type(UmpireResourceManager) rm
 
+      ! _umpire_tut_pinned_fortran_start
       rm = rm%get_instance()
       base_allocator = rm%get_allocator_by_name("PINNED")
 
@@ -22,6 +23,7 @@ program umpire_f_pinned_pool
                                            base_allocator, &
                                            512_8*1024_8, &
                                            1024_8)
+      ! _umpire_tut_pinned_fortran_end
 
       call pinned_pool%allocate(array, [10])
 end program umpire_f_pinned_pool

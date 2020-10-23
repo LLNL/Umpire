@@ -44,13 +44,17 @@ A heuristic of 0 will cause the DynamicPool to never automatically coalesce.
 Creation of the heuristic function is accomplished by:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_dynamic_pool_heuristic.cpp
-                    :lines: 25
+   :start-after: _umpire_tut_creat_heuristic_fun_start
+   :end-before: _umpire_tut_creat_heuristic_fun_end
+   :language: C++
 
 The heuristic function is then provided as a parameter when the object is
 instantiated:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_dynamic_pool_heuristic.cpp
-                    :lines: 33-38
+   :start-after: _umpire_tut_use_heuristic_fun_start
+   :end-before: _umpire_tut_use_heuristic_fun_end
+   :language: C++
 
 The complete example is included below:
 

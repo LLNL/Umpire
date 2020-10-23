@@ -11,6 +11,7 @@
 
 int main(int, char**)
 {
+  // _umpire_tut_thread_safe_start
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
@@ -19,6 +20,7 @@ int main(int, char**)
   auto thread_safe_pool =
       rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>(
           "thread_safe_pool", pool);
+  // _umpire_tut_thread_safe_end
 
   auto allocation = thread_safe_pool.allocate(256);
   thread_safe_pool.deallocate(allocation);

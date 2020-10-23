@@ -9,7 +9,9 @@ should be moved to unified memory in order to make it accessible by the GPU.
 You can do this with the :func:`umpire::ResourceManager::move` operation:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_move_to_managed.cpp
-                    :lines: 26
+   :start-after: _umpire_tut_move_host_to_managed_start
+   :end-before: _umpire_tut_move_host_to_managed_end
+   :language: C++
 
 The move operation will copy the data from host memory to unified memory,
 allocated using the provided ``um_allocator``. The original allocation in host

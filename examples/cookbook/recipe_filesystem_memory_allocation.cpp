@@ -10,12 +10,16 @@
 
 int main(int, char** argv)
 {
+  // _umpire_tut_file_allocate_start
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("FILE");
 
   std::size_t* A = (std::size_t*)alloc.allocate(sizeof(size_t));
+  // _umpire_tut_file_allocate_end
 
+  // _umpire_tut_file_deallocate_start
   alloc.deallocate(A);
+  // _umpire_tut_file_deallocate_end
 
   return 0;
 }
