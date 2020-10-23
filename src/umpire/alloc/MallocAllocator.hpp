@@ -10,6 +10,7 @@
 #include <cstdlib>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -49,6 +50,21 @@ struct MallocAllocator {
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::free(ptr);
+  }
+
+  bool isHostPageable()
+  {
+    return false;
+  }
+
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::undefined || p == Platform::sycl)
+      return false;
+    else if(p == Platform::cuda || p == Platform::hip)
+      return isHostPageable();
+    else
+      return true;
   }
 };
 

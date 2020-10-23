@@ -55,6 +55,14 @@ struct SyclMallocManagedAllocator {
 
     cl::sycl::free(usm_ptr, queue_t);
   }
+
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::undefined)
+      return false;
+    else
+      return true;
+  }
 };
 
 } // end of namespace alloc
