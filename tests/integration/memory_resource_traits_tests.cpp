@@ -21,7 +21,7 @@ class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
     
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
     m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
-        ("pool_" + m_allocator->getId(), *m_allocator));
+        ("pool_" + std::to_string(m_allocator->getId()), *m_allocator));
     
     m_resource = GetParam();
   }
