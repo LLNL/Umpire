@@ -13,8 +13,10 @@ In this example, we will look at creating a pool that can fulfill requests for
 allocations of any size. To create a new ``umpire_allocator`` using the pooling
 algorithm:
 
-.. literalinclude:: ../../../examples/tutorial/tut_pool.c
-                    :lines: 21-22
+.. literalinclude:: ../../../examples/tutorial/c/tut_pool.c
+   :start-after: _umpire_tut_pool_create_start
+   :end-before: _umpire_tut_pool_create_end
+   :language: C
 
 The two arguments are the size of the initial block that is allocated, and the
 minimum size of any future blocks. We have to provide a new name for the
@@ -26,7 +28,9 @@ before, without needing to worry about the underlying algorithm used for the
 allocations:
 
 .. literalinclude:: ../../../examples/tutorial/c/tut_pool.c
-                    :lines: 24-29
+   :start-after: _umpire_tut_allocate_start
+   :end-before: _umpire_tut_allocate_end
+   :language: C
 
 
 This pool can be created with any valid underlying ``umpire_allocator``.

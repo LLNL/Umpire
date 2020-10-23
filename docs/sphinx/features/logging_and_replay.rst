@@ -52,8 +52,9 @@ The first event captured is the **version** event which shows the version
 information as follows:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.json
-                    :lines: 15
-                    :language: json
+   :start-after: _umpire_doc_version_start
+   :end-before: _umpire_doc_version_end
+   :language: json
 
 Each line contains the following set of common elements:
 
@@ -86,8 +87,9 @@ Next you will see events for the creation of the default memory resources
 provided by Umpire with the **makeMemoryResource** event:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.json
-                    :lines: 16-20
-                    :language: json
+   :start-after: _umpire_doc_makememoryresource_start
+   :end-before: _umpire_doc_makememoryresource_end
+   :language: json
 
 The *payload* shows that a memory resource was created for *HOST*, *DEVICE*,
 *PINNED*, *UM*, and *DEVICE_CONST* respectively. Note that this could also
@@ -106,8 +108,9 @@ later.
 :class:`umpire::Allocator`:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.json
-                    :lines: 21-22
-                    :language: json
+   :start-after: _umpire_doc_makeallocator_start
+   :end-before: _umpire_doc_makeallocator_end
+   :language: json
 
 The *payload* shows how the allocator was constructed.  The *result* shows the
 reference to the allocated object.
@@ -119,8 +122,9 @@ intention/result pair so that an error may be replayed in the event that
 there is an allocation failure.
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.json
-                    :lines: 23-24
-                    :language: json
+   :start-after: _umpire_doc_allocate_start
+   :end-before: _umpire_doc_allocate_end
+   :language: json
 
 The *payload* shows the object reference of the allocator and the size of the
 allocation request.  The *result* shows the pointer to the memory allocated.
@@ -128,8 +132,9 @@ allocation request.  The *result* shows the pointer to the memory allocated.
 deallocate Event
 ----------------
 .. literalinclude:: ../../../examples/tutorial/tut_replay_log.json
-                    :lines: 151
-                    :language: json
+   :start-after: _umpire_doc_deallocate_start
+   :end-before: _umpire_doc_deallocate_end
+   :language: json
 
 The *payload* shows the reference to the allocator object and the pointer
 to the allocated memory that is to be freed.
