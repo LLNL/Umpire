@@ -19,17 +19,19 @@ void allocate_and_deallocate_pool(const std::string& resource)
       resource + "_pool", allocator);
   // _sphinx_tag_tut_makepool_end
 
-  // _sphinx_tag_tut_allocate_start
   constexpr std::size_t SIZE = 1024;
 
+  // _sphinx_tag_tut_allocate_start
   double* data =
       static_cast<double*>(pooled_allocator.allocate(SIZE * sizeof(double)));
+  // _sphinx_tag_tut_allocate_end
 
   std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
             << pooled_allocator.getName() << " allocator...";
 
+  // _sphinx_tag_tut_deallocate_start
   pooled_allocator.deallocate(data);
-  // _sphinx_tag_tut_allocate_end
+  // _sphinx_tag_tut_deallocate_end
 
   std::cout << " deallocated." << std::endl;
 }

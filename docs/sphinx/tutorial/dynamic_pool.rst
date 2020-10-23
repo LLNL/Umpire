@@ -31,6 +31,11 @@ allocations:
    :end-before: _sphinx_tag_tut_allocate_end
    :language: C++
 
+.. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
+   :start-after: _sphinx_tag_tut_deallocate_start
+   :end-before: _sphinx_tag_tut_deallocate_end
+   :language: C++
+
 Don't forget, these strategies can be created on top of any valid Allocator:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp

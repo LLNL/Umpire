@@ -12,7 +12,6 @@ int main(int, char**)
   constexpr std::size_t SIZE = 1024;
 
   auto& rm = umpire::ResourceManager::getInstance();
-  // _sphinx_tag_tut_move_host_to_managed_start
   auto allocator = rm.getAllocator("HOST");
 
   //
@@ -25,6 +24,7 @@ int main(int, char**)
   // Move data to unified memory
   //
   auto um_allocator = rm.getAllocator("UM");
+  // _sphinx_tag_tut_move_host_to_managed_start
   double* um_data = static_cast<double*>(rm.move(host_data, um_allocator));
   // _sphinx_tag_tut_move_host_to_managed_end
 
