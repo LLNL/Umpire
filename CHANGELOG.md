@@ -10,9 +10,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Memory Resource header and source files for HIP
+
 - Documentation on memory resources and configuring/running Leak Sanitizer CI tests.
 
 - GitLab CI now includes jobs testing HIP backend.
+
+- Added a getParent functionality for retrieving the memory resource of an allocator.
 
 ### Changed
 
@@ -30,6 +34,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Removed
 
 ### Fixed
+
+- Corrected documentation: `ENABLE_TESTING` should be `ENABLE_TESTS`.
 
 ## [v4.1.2] - 2020-10-06
 
@@ -69,6 +75,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   are visible in the native GitLab UI.
 
 - Gitlab test scripts now caches python virtual environment.
+
+- Spack config files in Uberenv are now coming from a submodule.
 
 ### Removed
 
