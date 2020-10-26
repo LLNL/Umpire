@@ -8,6 +8,9 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
+
+using myResource = umpire::MemoryResourceTraits::resource_type;
 
 //
 //This test confirms that when an allocator is created with a specific
@@ -39,13 +42,32 @@ class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
   std::string m_resource;
 };
 
+umpire::MemoryResourceTraits::resource_type getResourceType(std::string resource)
+{
+  if(resource == "HOST")
+    return myResource::host;
+  else if(resource == "DEVICE")
+    return myResource::device;
+  else if(resource == "DEVICE_CONST")
+    return myResource::device_const;
+  else if(resource == "UM")
+    return myResource::um;
+  else if(resource == "PINNED")
+    return myResource::pinned;
+  else if(resource == "FILE")
+    return myResource::file;
+  else //unknown
+    return myResource::unknown;
+}
+
 TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
 {
   double* data =
       static_cast<double*>(m_allocator->allocate(1024 * sizeof(double)));
 
-  ASSERT_EQ(m_allocator->getAllocationStrategy()->getTraits().resource,
-        m_allocator_pool->getAllocationStrategy()->getTraits().resource);
+  myResource resource = getResourceType(m_resource);
+
+  ASSERT_EQ(resource, m_allocator_pool->getAllocationStrategy()->getTraits().resource);
 
   ASSERT_EQ(m_allocator->getName(), m_resource);
 
