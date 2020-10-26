@@ -36,7 +36,9 @@ int main(int, char**)
     std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
               << allocator.getName() << " allocator." << std::endl;
 
+    // _sphinx_tag_tut_memset_start
     rm.memset(data, 0);
+    // _sphinx_tag_tut_memset_end
 
     std::cout << "Set data from " << destination << " (" << data << ") to 0."
               << std::endl;
