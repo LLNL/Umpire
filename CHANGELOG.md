@@ -18,7 +18,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a getParent functionality for retrieving the memory resource of an allocator.
 
-- Added gitlab testing of Umpire when MPI is enabled
+- Added GitLab testing of Umpire when MPI is enabled
 
 ### Changed
 
