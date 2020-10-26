@@ -44,8 +44,6 @@ macro(umpire_add_test_with_mpi)
      "${options}" "${singleValueArgs}" "${multiValueArgs}" ${ARGN} )
 
    if (ENABLE_MPI)
-      # The 'CONFIGURATIONS Benchmark' line excludes benchmarks
-      # from the general list of tests
       blt_add_test( NAME           ${arg_NAME}
                     COMMAND        ${arg_COMMAND}
                     NUM_MPI_TASKS  ${arg_NUM_MPI_TASKS})
