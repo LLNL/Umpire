@@ -6,10 +6,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 
-#include <hip/hip_runtime.h>
+#include "hip/hip_runtime_api.h"
 
-#include "umpire/alloc/HipMallocAllocator.hpp"
-#include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/resource/HipDeviceMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
@@ -36,9 +35,8 @@ std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(
 std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(
     const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return util::make_unique<
-      resource::DefaultMemoryResource<alloc::HipMallocAllocator>>(
-      Platform::hip, name, id, traits);
+  return util::make_unique<resource::HipDeviceMemoryResource>(
+     Platform::hip, name, id, traits);
 }
 
 MemoryResourceTraits HipDeviceResourceFactory::getDefaultTraits()
