@@ -16,17 +16,22 @@ of the run that generated the log.
 The file ``tut_replay.cpp`` makes a :class:`umpire::strategy::DynamicPool`:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay.cpp
-                    :lines: 27-29
-                    :language: c++
+   :start-after: _sphinx_tag_tut_replay_make_allocate_start
+   :end-before: _sphinx_tag_tut_replay_make_allocate_end
+   :language: C++
 
 This allocator is used to perform some randomly sized allocations, and later
 free them:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay.cpp
-                    :lines: 32-33
+   :start-after: _sphinx_tag_tut_replay_allocate_start
+   :end-before: _sphinx_tag_tut_replay_allocate_end
+   :language: C++
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay.cpp
-                    :lines: 36
+   :start-after: _sphinx_tag_tut_replay_dealocate_start
+   :end-before: _sphinx_tag_tut_replay_dealocate_end
+   :language: C++
 
 Running the Example
 -------------------
