@@ -14,21 +14,27 @@ and then allocate a single word from this pool to ensure the initial block is
 never freed:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shrink.cpp
-                    :lines: 24-29
+   :start-after: _sphinx_tag_tut_create_pool_start
+   :end-before: _sphinx_tag_tut_create_pool_end
+   :language: C++
 
 To increase the pool size you can preallocate a large chunk and then
 immediately free it. The pool will retain this memory for use by later
 allocations:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shrink.cpp
-                    :lines: 40-41
+   :start-after: _sphinx_tag_tut_grow_pool_start
+   :end-before: _sphinx_tag_tut_grow_pool_end
+   :language: C++
 
 Assuming that there are no allocations left in the larger "chunk" of the pool,
 you can shrink the pool back down to the initial size by calling
 :func:`umpire::Allocator::release`:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_shrink.cpp
-                    :lines: 50
+   :start-after: _sphinx_tag_tut_shrink_pool_back_start
+   :end-before: _sphinx_tag_tut_shrink_pool_back_end
+   :language: C++
 
 The complete example is included below:
 
