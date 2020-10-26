@@ -81,7 +81,7 @@ struct allocate_and_use<omp_target_platform>
 {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    int dev = alloc->getAllocationStrategy()->getTraits().id;
+    int dev = alloc->getAllocationStrategy()->getTraits().id; 
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     size_t* d_data{static_cast<size_t*>(data)};
 

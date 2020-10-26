@@ -78,8 +78,8 @@ std::size_t NullMemoryResource::getHighWatermark() const noexcept
 
 bool NullMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::host)
-    std::cout << "This is a placeholder..." << std::endl;
+  if(p != Platform::undefined)
+    UMPIRE_LOG(Debug, "NullMemoryResource: platform is not accessible");
   return false;
 }
 
