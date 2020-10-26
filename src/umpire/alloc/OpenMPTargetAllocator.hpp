@@ -9,6 +9,7 @@
 
 #include "omp.h"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -52,6 +53,14 @@ struct OpenMPTargetAllocator {
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     omp_target_free(ptr, device);
+  }
+  
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::host || p == Platform::undefined)
+      return false;
+    else
+      return true;
   }
 
   int device;
