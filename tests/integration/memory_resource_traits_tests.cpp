@@ -61,16 +61,11 @@ umpire::MemoryResourceTraits::resource_type get_resource_trait(std::string resou
 
 TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
 {
-  double* data =
-      static_cast<double*>(m_allocator->allocate(1024 * sizeof(double)));
-
   umpire::MemoryResourceTraits::resource_type resource = get_resource_trait(m_resource);
 
   ASSERT_EQ(resource, m_allocator_pool->getAllocationStrategy()->getTraits().resource);
   ASSERT_EQ(resource, m_allocator->getAllocationStrategy()->getTraits().resource);
   ASSERT_EQ(m_allocator->getName(), m_resource);
-
-  m_allocator->deallocate(data);
 }
 
 //returns a vector of strings with the names of the
