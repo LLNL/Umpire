@@ -186,12 +186,12 @@ TEST(Allocator, registerAllocator)
     const std::string allocator_copy_name =
         allocator_name + std::string{"_copy"};
 
-    rm.registerAllocator(allocator_copy_name, rm.getAllocator(allocator_name));
+    rm.addAlias(allocator_copy_name, rm.getAllocator(allocator_name));
 
     ASSERT_EQ(rm.getAllocator(allocator_name).getAllocationStrategy(),
               rm.getAllocator(allocator_copy_name).getAllocationStrategy());
 
-    ASSERT_ANY_THROW(rm.registerAllocator(
+    ASSERT_ANY_THROW(rm.addAlias(
         allocator_name, rm.getAllocator(allocator_copy_name)));
 
     ASSERT_TRUE(rm.isAllocatorRegistered(allocator_name));

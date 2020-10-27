@@ -115,10 +115,11 @@ class ResourceManager {
    * \param name Name to register Allocator with.
    * \param allocator Allocator to register.
    */
+  UMPIRE_DEPRECATE("addAlias should be used instead")
   void registerAllocator(const std::string& name, Allocator allocator);
 
   /*!
-   * \brief Deregister an Allocator with the ResourceManager.
+   * \brief Remove an Allocator alias.
    *
    * After calling, allocator can no longer by accessed by calling
    * getAllocator(name). If allocator is not registered under name, an error
@@ -130,7 +131,22 @@ class ResourceManager {
    * \param name Name to deregister Allocator with.
    * \param allocator Allocator to deregister.
    */
-  void deregisterAllocator(const std::string& name, Allocator allocator);
+  void addAlias(const std::string& name, Allocator allocator);
+
+  /*!
+   * \brief Remove an Allocator alias.
+   *
+   * After calling, allocator can no longer by accessed by calling
+   * getAllocator(name). If allocator is not registered under name, an error
+   * will be thrown.
+   *
+   * If one of the default resource names (e.g. HOST) is used, an error will be
+   * thrown.
+   *
+   * \param name Name to deregister Allocator with.
+   * \param allocator Allocator to deregister.
+   */
+  void removeAlias(const std::string& name, Allocator allocator);
 
   /*!
    * \brief Get the Allocator used to allocate ptr.

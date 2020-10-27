@@ -7,6 +7,8 @@
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
 
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
+
 TEST(ResourceManager, Constructor)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
@@ -78,36 +80,37 @@ TEST(ResourceManager, getAllocatorInvalidId)
                umpire::util::Exception);
 }
 
-TEST(ResourceManager, registerAllocator)
+TEST(ResourceManager, aliases)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc = rm.getAllocator("HOST");
-  rm.registerAllocator("ALIAS", alloc);
+  rm.addAlias("HOST_ALIAS", alloc);
   EXPECT_THROW({
-      rm.registerAllocator("ALIAS", alloc);
+      rm.addAlias("HOST_ALIAS", alloc);
   }, umpire::util::Exception);
 
-  auto alloc_alias = rm.getAllocator("ALIAS");
-
+  auto alloc_alias = rm.getAllocator("HOST_ALIAS");
   EXPECT_EQ(alloc_alias.getId(), alloc.getId());
-}
+  EXPECT_EQ(alloc_alias.getName(), alloc.getName());
+  EXPECT_NE(alloc_alias.getName(), "HOST_ALIAS");
 
-TEST(ResourceManager, deregisterAllocator)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto alloc = rm.getAllocator("ALIAS");
   EXPECT_THROW({
-    rm.deregisterAllocator("BLAH", alloc);
+    rm.removeAlias("BLAH", alloc);
   }, umpire::util::Exception);
   EXPECT_NO_THROW({
-    rm.deregisterAllocator("ALIAS", alloc);
+    rm.removeAlias("HOST_ALIAS", alloc);
   });
 
   alloc = rm.getAllocator("HOST");
   EXPECT_THROW({
-    rm.deregisterAllocator("HOST", alloc);
+    rm.removeAlias("HOST", alloc);
   }, umpire::util::Exception);
 
+  auto named_alloc = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>(
+    "NAMED_ALLOCATOR", alloc);
 
+  EXPECT_THROW({
+    rm.removeAlias("NAMED_ALLOCATOR", named_alloc);
+  }, umpire::util::Exception);
 }

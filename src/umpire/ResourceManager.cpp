@@ -436,30 +436,34 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 void ResourceManager::registerAllocator(const std::string& name,
                                         Allocator allocator)
 {
+  addAlias(name, allocator);
+}
+
+void ResourceManager::addAlias(const std::string& name,
+                                        Allocator allocator)
+{
   if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator " << name << " is already registered.");
+    auto ra = getAllocator(name);
+    UMPIRE_ERROR("Allocator " << name << " is already an alias for " << ra.getName());
   }
 
   m_allocators_by_name[name] = allocator.getAllocationStrategy();
 }
 
-void ResourceManager::deregisterAllocator(const std::string& name,
+void ResourceManager::removeAlias(const std::string& name,
                                         Allocator allocator)
 {
-  auto a = m_allocators_by_name.find(name);
-
   if (!isAllocator(name)) {
     UMPIRE_ERROR("Allocator " << name << " is not registered.");
   }
 
-  if (a->second->getId() != allocator.getId()) {
-    UMPIRE_ERROR("Allocator " << name << " is not registered as an alias of " << allocator.getName());
+  auto a = m_allocators_by_name.find(name);
+  if (a->second->getName().compare(name) == 0) {
+    UMPIRE_ERROR(name << " is not an alias, so cannot be removed.")
   }
 
-  auto resource_name = std::find(m_resource_names.begin(), m_resource_names.end(), name);
-
-  if (resource_name != std::end(m_resource_names)) {
-    UMPIRE_ERROR("Cannot deregister a resource: " << name);
+  if (a->second->getId() != allocator.getId()) {
+    UMPIRE_ERROR("Allocator " << name << " is not registered as an alias of " << allocator.getName());
   }
 
   m_allocators_by_name.erase(a);
