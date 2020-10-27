@@ -9,11 +9,13 @@
 
 void allocate_and_deallocate(const std::string& resource)
 {
-  constexpr std::size_t SIZE = 1024;
-
   auto& rm = umpire::ResourceManager::getInstance();
 
+  // _sphinx_tag_tut_get_allocator_start
   umpire::Allocator allocator = rm.getAllocator(resource);
+  // _sphinx_tag_tut_get_allocator_end
+
+  constexpr std::size_t SIZE = 1024;
 
   double* data =
       static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
