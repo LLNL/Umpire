@@ -119,24 +119,21 @@ class ResourceManager {
   void registerAllocator(const std::string& name, Allocator allocator);
 
   /*!
-   * \brief Remove an Allocator alias.
+   * \brief Add an Allocator alias.
    *
-   * After calling, allocator can no longer by accessed by calling
-   * getAllocator(name). If allocator is not registered under name, an error
-   * will be thrown.
+   * After this call, allocator can be retrieved by calling getAllocator(name).
    *
-   * If one of the default resource names (e.g. HOST) is used, an error will be
-   * thrown.
+   * The same Allocator can have multiple aliases.
    *
-   * \param name Name to deregister Allocator with.
-   * \param allocator Allocator to deregister.
+   * \param name Name to alias Allocator with.
+   * \param allocator Allocator to register.
    */
   void addAlias(const std::string& name, Allocator allocator);
 
   /*!
    * \brief Remove an Allocator alias.
    *
-   * After calling, allocator can no longer by accessed by calling
+   * After calling, allocator can no longer be accessed by calling
    * getAllocator(name). If allocator is not registered under name, an error
    * will be thrown.
    *
