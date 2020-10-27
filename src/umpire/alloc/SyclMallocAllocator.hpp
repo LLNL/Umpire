@@ -59,12 +59,10 @@ struct SyclMallocAllocator {
 
   bool isAccessible(umpire::Platform p)
   {
-    if(p == umpire::Platform::undefined || 
-       p == umpire::Platform::host) {
-      return false;
-    }
-    else
+    if(p == umpire::Platform::host) 
       return true;
+    else //Platform is sycl or undefined
+      return false;
   }
 };
 

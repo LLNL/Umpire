@@ -10,6 +10,7 @@
 #include <hip/hip_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -56,8 +57,31 @@ struct HipMallocAllocator {
                                      << hipGetErrorString(error));
     }
   }
-};
+  
+  bool isHostPageable()
+  {
+    hipDeviceProp_t props;
+    int hdev = 0;
+    hipGetDevice(&hdev);
 
+    //Check whether HIP can map host memory.
+    hipGetDeviceProperties(&props, hdev);
+    if(props.canMapHostMemory)
+      return true;
+    else
+      return false;
+  }
+
+  bool isAccessible(umpire::Platform p)
+  {
+    if(p == umpire::Platform::hip)
+      return isHostPageable();
+    else if(p == umpire::Platform::host)
+      return true;
+    else
+      return false;
+  }
+};
 } // end of namespace alloc
 } // end of namespace umpire
 
