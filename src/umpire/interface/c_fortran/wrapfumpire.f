@@ -161,6 +161,8 @@ module umpire_mod
         procedure :: make_allocator_fixed_pool => resourcemanager_make_allocator_fixed_pool
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
         procedure :: register_allocator => resourcemanager_register_allocator
+        procedure :: add_alias => resourcemanager_add_alias
+        procedure :: remove_alias => resourcemanager_remove_alias
         procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
         procedure :: is_allocator => resourcemanager_is_allocator
         procedure :: has_allocator => resourcemanager_has_allocator
@@ -640,6 +642,50 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: Lname
             type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_register_allocator_bufferify
+
+        subroutine c_resourcemanager_add_alias(self, name, allocator) &
+                bind(C, name="umpire_resourcemanager_add_alias")
+            use iso_c_binding, only : C_CHAR
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+        end subroutine c_resourcemanager_add_alias
+
+        subroutine c_resourcemanager_add_alias_bufferify(self, name, &
+                Lname, allocator) &
+                bind(C, name="umpire_resourcemanager_add_alias_bufferify")
+            use iso_c_binding, only : C_CHAR, C_INT
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+        end subroutine c_resourcemanager_add_alias_bufferify
+
+        subroutine c_resourcemanager_remove_alias(self, name, allocator) &
+                bind(C, name="umpire_resourcemanager_remove_alias")
+            use iso_c_binding, only : C_CHAR
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+        end subroutine c_resourcemanager_remove_alias
+
+        subroutine c_resourcemanager_remove_alias_bufferify(self, name, &
+                Lname, allocator) &
+                bind(C, name="umpire_resourcemanager_remove_alias_bufferify")
+            use iso_c_binding, only : C_CHAR, C_INT
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            character(kind=C_CHAR), intent(IN) :: name(*)
+            integer(C_INT), value, intent(IN) :: Lname
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+        end subroutine c_resourcemanager_remove_alias_bufferify
 
         function c_resourcemanager_get_allocator_for_ptr(self, ptr, &
                 SHT_crv) &
@@ -1770,6 +1816,28 @@ contains
             name, len_trim(name, kind=C_INT), allocator%cxxmem)
         ! splicer end class.ResourceManager.method.register_allocator
     end subroutine resourcemanager_register_allocator
+
+    subroutine resourcemanager_add_alias(obj, name, allocator)
+        use iso_c_binding, only : C_INT
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        ! splicer begin class.ResourceManager.method.add_alias
+        call c_resourcemanager_add_alias_bufferify(obj%cxxmem, name, &
+            len_trim(name, kind=C_INT), allocator%cxxmem)
+        ! splicer end class.ResourceManager.method.add_alias
+    end subroutine resourcemanager_add_alias
+
+    subroutine resourcemanager_remove_alias(obj, name, allocator)
+        use iso_c_binding, only : C_INT
+        class(UmpireResourceManager) :: obj
+        character(len=*), intent(IN) :: name
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        ! splicer begin class.ResourceManager.method.remove_alias
+        call c_resourcemanager_remove_alias_bufferify(obj%cxxmem, name, &
+            len_trim(name, kind=C_INT), allocator%cxxmem)
+        ! splicer end class.ResourceManager.method.remove_alias
+    end subroutine resourcemanager_remove_alias
 
     function resourcemanager_get_allocator_for_ptr(obj, ptr) &
             result(SHT_rv)
