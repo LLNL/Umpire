@@ -10,8 +10,6 @@
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-using myResource = umpire::MemoryResourceTraits::resource_type;
-
 //
 //This test confirms that when an allocator is created with a specific
 //memory resource, that same memory resource can be quiered and returned
@@ -24,7 +22,7 @@ class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
     
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
     m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
-        ("pool_" + std::to_string(m_allocator->getId()), *m_allocator));
+        ("pool_" + GetParam(), *m_allocator));
     
     m_resource = GetParam();
   }
@@ -42,22 +40,23 @@ class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
   std::string m_resource;
 };
 
-umpire::MemoryResourceTraits::resource_type getResourceType(std::string resource)
+umpire::MemoryResourceTraits::resource_type get_resource_trait(std::string resource)
 {
   if(resource == "HOST")
-    return myResource::host;
-  else if(resource == "DEVICE")
-    return myResource::device;
+    return umpire::MemoryResourceTraits::resource_type::host;
+  else if(resource.find("::") != std::string::npos ||
+          resource == "DEVICE")
+    return umpire::MemoryResourceTraits::resource_type::device;
   else if(resource == "DEVICE_CONST")
-    return myResource::device_const;
+    return umpire::MemoryResourceTraits::resource_type::device_const;
   else if(resource == "UM")
-    return myResource::um;
+    return umpire::MemoryResourceTraits::resource_type::um;
   else if(resource == "PINNED")
-    return myResource::pinned;
+    return umpire::MemoryResourceTraits::resource_type::pinned;
   else if(resource == "FILE")
-    return myResource::file;
-  else //unknown
-    return myResource::unknown;
+    return umpire::MemoryResourceTraits::resource_type::file;
+  else
+    return umpire::MemoryResourceTraits::resource_type::unknown;
 }
 
 TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
@@ -65,7 +64,7 @@ TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
   double* data =
       static_cast<double*>(m_allocator->allocate(1024 * sizeof(double)));
 
-  myResource resource = getResourceType(m_resource);
+  umpire::MemoryResourceTraits::resource_type resource = get_resource_trait(m_resource);
 
   ASSERT_EQ(resource, m_allocator_pool->getAllocationStrategy()->getTraits().resource);
 
@@ -80,10 +79,15 @@ TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
 //memory resources currently available.
 std::vector<std::string> memory_resource_strings()
 {
+  std::cout << "Available allocators: ";
   std::vector<std::string> resources;
   resources.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
   resources.push_back("DEVICE");
+  auto& rm = umpire::ResourceManager::getInstance();
+  for (int id = 1; id == rm.getNumDevices(); id++) {
+    resources.push_back(std::string{"DEVICE::" + std::to_string(id)});
+  }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
   resources.push_back("UM");
@@ -94,6 +98,10 @@ std::vector<std::string> memory_resource_strings()
 #if defined(UMPIRE_ENABLE_PINNED)
   resources.push_back("PINNED");
 #endif
+
+  for(auto r : resources)
+    std::cout << r << " ";
+  std::cout << std::endl;
 
   return resources;
 }
