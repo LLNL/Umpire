@@ -17,7 +17,9 @@ By passing a specific device id when constructing an
 will be applied with respect to that device
 
 .. literalinclude:: ../../../examples/cookbook/recipe_advice_device_id.cpp
-                    :lines: 30-32
+   :start-after: _sphinx_tag_tut_device_advice_start
+   :end-before: _sphinx_tag_tut_device_advice_end
+   :language: C++
 
 The complete example is included below:
 

@@ -16,6 +16,11 @@ ibm_clang_9_gcc_8:
     SPEC: "+fortran %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
+clang_10_0_1_mpi (build and test on lassen):
+  variables:
+    SPEC: "%clang@10.0.1ibm +mpi ^spectrum-mpi"
+  extends: .build_and_test_on_lassen
+
 gcc_8_3_1:
   variables:
     SPEC: "+fortran%gcc@8.3.1"
