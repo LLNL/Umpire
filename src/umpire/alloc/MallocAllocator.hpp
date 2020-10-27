@@ -88,6 +88,7 @@ struct MallocAllocator {
   else
     return false;
 #endif
+    return false;
   }
 
   bool isAccessible(Platform p)
