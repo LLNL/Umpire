@@ -67,20 +67,18 @@ TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
   umpire::MemoryResourceTraits::resource_type resource = get_resource_trait(m_resource);
 
   ASSERT_EQ(resource, m_allocator_pool->getAllocationStrategy()->getTraits().resource);
-
+  ASSERT_EQ(resource, m_allocator->getAllocationStrategy()->getTraits().resource);
   ASSERT_EQ(m_allocator->getName(), m_resource);
 
-  ASSERT_THROW(m_allocator_pool->deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(m_allocator->deallocate(data));
+  m_allocator->deallocate(data);
 }
 
 //returns a vector of strings with the names of the
 //memory resources currently available.
 std::vector<std::string> memory_resource_strings()
 {
-  std::cout << "Available allocators: ";
   std::vector<std::string> resources;
+  
   resources.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
   resources.push_back("DEVICE");
@@ -98,10 +96,6 @@ std::vector<std::string> memory_resource_strings()
 #if defined(UMPIRE_ENABLE_PINNED)
   resources.push_back("PINNED");
 #endif
-
-  for(auto r : resources)
-    std::cout << r << " ";
-  std::cout << std::endl;
 
   return resources;
 }
