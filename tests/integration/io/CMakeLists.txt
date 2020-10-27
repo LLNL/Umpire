@@ -14,27 +14,27 @@ if (NOT C_COMPILER_FAMILY_IS_PGI)
 
   if (PYTHON_EXECUTABLE)
     umpire_add_test_with_mpi(
-      NAME io_tests_1
+      NAME io_tests_with_basename_logging_replay
       NUM_MPI_TASKS 1
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +logging +replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     umpire_add_test_with_mpi(
-      NAME io_tests_2
+      NAME io_tests_with_basename_directory
       NUM_MPI_TASKS 1
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory -logging -replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     umpire_add_test_with_mpi(
-      NAME io_tests_3
+      NAME io_tests_with_basename_directory_logging
       NUM_MPI_TASKS 1
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory +logging -replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     umpire_add_test_with_mpi(
-      NAME io_tests_4
+      NAME io_tests_with_basename_directory_replay
       NUM_MPI_TASKS 1
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory -logging +replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     umpire_add_test_with_mpi(
-      NAME io_tests_5
+      NAME io_tests_with_basename_directory_logging_replay
       NUM_MPI_TASKS 1
       COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory +logging +replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
