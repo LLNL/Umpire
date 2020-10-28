@@ -10,9 +10,10 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
-using cPlatform = camp::resources::Platform;
-using myResource = umpire::MemoryResourceTraits::resource_type;
+//using cPlatform = camp::resources::Platform;
+//using myResource = umpire::MemoryResourceTraits::resource_type;
 
 struct host_platform {};
 
@@ -102,43 +103,50 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
   {
     auto& rm = umpire::ResourceManager::getInstance();
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
+    m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
+        ("pool_" + GetParam(), *m_allocator));
   }
 
   virtual void TearDown()
   {
     m_allocator->release();
-    delete m_allocator;
+    m_allocator_pool->release();
+    if(m_allocator)
+      delete m_allocator;
+    if(m_allocator_pool)
+      delete m_allocator_pool;
   }
   
   umpire::Allocator* m_allocator;
+  umpire::Allocator* m_allocator_pool;
   size_t m_size = 42;
 };
 
-TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
+void run_access_test(umpire::Allocator* alloc, size_t size)
 {
-  if(umpire::is_accessible(cPlatform::host, *m_allocator)) {
+  if(umpire::is_accessible(umpire::Platform::host, *alloc)) {
     allocate_and_use<host_platform> host;
-    ASSERT_NO_THROW(host.test(m_allocator, m_size));
+    ASSERT_NO_THROW(host.test(alloc, size));
   }
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  if (umpire::is_accessible(cPlatform::cuda, *m_allocator)) {
+  if (umpire::is_accessible(umpire::Platform::cuda, *alloc)) {
     allocate_and_use<cuda_platform> cuda;
-    ASSERT_NO_THROW(cuda.test(m_allocator, m_size));
+    ASSERT_NO_THROW(cuda.test(alloc, size));
   }
 #endif
   
 #if defined(UMPIRE_ENABLE_HIP)
-  if (umpire::is_accessible(cPlatform::hip, *m_allocator)) {
+  if (umpire::is_accessible(umpire::Platform::hip, *alloc)) {
     allocate_and_use<hip_platform> hip;
-    ASSERT_NO_THROW(hip.test(m_allocator, m_size));
+    ASSERT_NO_THROW(hip.test(alloc, size));
   }
 #endif
  
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  if (umpire::is_accessible(cPlatform::omp_target, *m_allocator)) {
+  if (umpire::is_accessible(umpire::Platform::omp_target, *alloc)) {
     allocate_and_use<omp_target_platform> omp;
-    ASSERT_NO_THROW(omp.test(m_allocator, m_size));
+    ASSERT_NO_THROW(omp.test(alloc, size));
   }
 #endif
 
@@ -146,9 +154,15 @@ TEST_P(AllocatorAccessibilityTest, AccessibilityFromPlatform)
 //Sycl test not yet available
 /////////////////////////////
 
-  if(umpire::is_accessible(cPlatform::undefined, *m_allocator)) {
+  if(umpire::is_accessible(umpire::Platform::undefined, *alloc)) {
     FAIL() << "An Undefined platform is not accessible." << std::endl;
   }
+}
+
+TEST_P(AllocatorAccessibilityTest, AllocatorAccessibilityFromPlatform)
+{
+  run_access_test(m_allocator, m_size);
+  run_access_test(m_allocator_pool, m_size);
 }
 
 std::vector<std::string> get_allocators()
