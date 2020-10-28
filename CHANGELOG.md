@@ -48,6 +48,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Cleaner and more efficient Memory Resource Trait test.
 
+- Fixed CMake version check (checking for version >= 3.18)
+
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
