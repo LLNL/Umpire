@@ -194,10 +194,10 @@ TEST(Allocator, registerAllocator)
     ASSERT_ANY_THROW(rm.addAlias(
         allocator_name, rm.getAllocator(allocator_copy_name)));
 
-    ASSERT_TRUE(rm.isAllocatorRegistered(allocator_name));
+    ASSERT_TRUE(rm.isAllocator(allocator_name));
   }
 
-  ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
+  ASSERT_FALSE(rm.isAllocator("BANANAS"));
 }
 
 TEST(Allocator, GetSetDefault)

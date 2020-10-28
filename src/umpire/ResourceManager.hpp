@@ -185,6 +185,7 @@ class ResourceManager {
    * \brief Check whether the named Allocator exists.
    *
    */
+  UMPIRE_DEPRECATE("Use isAllocator instead.")
   bool isAllocatorRegistered(const std::string& name);
 
   /*!

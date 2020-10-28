@@ -524,7 +524,7 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(
 
 bool ResourceManager::isAllocatorRegistered(const std::string& name)
 {
-  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
+  return isAllocator(name);
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
