@@ -105,7 +105,7 @@ blt_add_library(
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
 
-if (NOT WIN32 AND CMAKE_VERSION VERSION_GREATER 3.17)
+if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   target_link_options(
     umpire INTERFACE
     $<BUILD_INTERFACE:$<$<NOT:$<LINK_LANGUAGE:Fortran>>:-rdynamic>>
