@@ -18,7 +18,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a getParent functionality for retrieving the memory resource of an allocator.
 
+- Added add/removeAlias methods to control alias registration for Allocators.
+
 - Added GitLab testing of Umpire when MPI is enabled
+
 
 ### Changed
 
@@ -34,6 +37,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   release noted).
 
 - Fixed up broken source links in tutorial documentation.
+
+- registerAllocator is deprecated, addAlias should be used instead.
 
 ### Removed
 
