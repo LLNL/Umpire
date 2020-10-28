@@ -188,6 +188,8 @@ declarations:
 
 
       - decl: void registerAllocator(const std::string& name, Allocator allocator)
+      - decl: void addAlias(const std::string& name, Allocator allocator)
+      - decl: void removeAlias(const std::string& name, Allocator allocator)
 
       - decl: Allocator getAllocator(void* ptr)
         format:
