@@ -7,129 +7,93 @@
 #include "gtest/gtest.h"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/Umpire.hpp"
-#include "umpire/config.hpp"
-#include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-using umpire::MemoryResourceTraits;
+//
+//This test confirms that when an allocator is created with a specific
+//memory resource, that same memory resource can be quiered and returned
+//
+class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
+ public:
+  virtual void SetUp()
+  {
+    auto& rm = umpire::ResourceManager::getInstance();
+    
+    m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
+    m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
+        ("pool_" + GetParam(), *m_allocator));
+    
+    m_resource = GetParam();
+  }
 
-TEST(MemoryResourceTraitsTest, HOST_Resource)
+  virtual void TearDown()
+  {
+    if(m_allocator)
+      delete m_allocator;
+    if(m_allocator_pool)
+      delete m_allocator_pool;
+  }
+
+  umpire::Allocator* m_allocator;
+  umpire::Allocator* m_allocator_pool;
+  std::string m_resource;
+};
+
+umpire::MemoryResourceTraits::resource_type get_resource_trait(std::string resource)
 {
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc_one = rm.getAllocator("HOST");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "HOST_Limiter", alloc_one, 1024);
-
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
-
-  ASSERT_EQ(MemoryResourceTraits::resource_type::host,
-            alloc_two.getAllocationStrategy()->getTraits().resource);
-
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
+  if(resource == "HOST")
+    return umpire::MemoryResourceTraits::resource_type::host;
+  else if(resource.find("::") != std::string::npos ||
+          resource == "DEVICE")
+    return umpire::MemoryResourceTraits::resource_type::device;
+  else if(resource == "DEVICE_CONST")
+    return umpire::MemoryResourceTraits::resource_type::device_const;
+  else if(resource == "UM")
+    return umpire::MemoryResourceTraits::resource_type::um;
+  else if(resource == "PINNED")
+    return umpire::MemoryResourceTraits::resource_type::pinned;
+  else if(resource == "FILE")
+    return umpire::MemoryResourceTraits::resource_type::file;
+  else
+    return umpire::MemoryResourceTraits::resource_type::unknown;
 }
 
-#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
-TEST(MemoryResourceTraitsTest, FILE_Resource)
+TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
 {
-  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::MemoryResourceTraits::resource_type resource = get_resource_trait(m_resource);
 
-  auto alloc_one = rm.getAllocator("FILE");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "FILE_Limiter", alloc_one, 1024);
-
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
-
-  ASSERT_EQ(MemoryResourceTraits::resource_type::file,
-            alloc_two.getAllocationStrategy()->getTraits().resource);
-
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
+  ASSERT_EQ(resource, m_allocator_pool->getAllocationStrategy()->getTraits().resource);
+  ASSERT_EQ(resource, m_allocator->getAllocationStrategy()->getTraits().resource);
+  ASSERT_EQ(m_allocator->getName(), m_resource);
 }
-#endif
+
+//returns a vector of strings with the names of the
+//memory resources currently available.
+std::vector<std::string> memory_resource_strings()
+{
+  std::vector<std::string> resources;
+  
+  resources.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
-TEST(MemoryResourceTraitsTest, DEVICE_Resource)
-{
+  resources.push_back("DEVICE");
   auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc_one = rm.getAllocator("DEVICE");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "DEVICE_Limiter", alloc_one, 1024);
-
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
-
-  ASSERT_EQ(MemoryResourceTraits::resource_type::device,
-            alloc_two.getAllocationStrategy()->getTraits().resource);
-
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
-}
-#endif
-#if defined(UMPIRE_ENABLE_CONST)
-TEST(MemoryResourceTraitsTest, DEVICE_CONST_Resource)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc_one = rm.getAllocator("DEVICE_CONST");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "DEVICE_CONST_Limiter", alloc_one, 1024);
-
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
-
-  ASSERT_EQ(MemoryResourceTraits::resource_type::device_const,
-            alloc_two.getAllocationStrategy()->getTraits().resource);
-
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
-}
-#endif
-#if defined(UMPIRE_ENABLE_PINNED)
-TEST(MemoryResourceTraitsTest, PINNED_Resource)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc_one = rm.getAllocator("PINNED");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "PINNED_Limiter", alloc_one, 1024);
-
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
-
-  ASSERT_EQ(MemoryResourceTraits::resource_type::pinned,
-            alloc_two.getAllocationStrategy()->getTraits().resource);
-
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
-}
+  for (int id = 1; id == rm.getNumDevices(); id++) {
+    resources.push_back(std::string{"DEVICE::" + std::to_string(id)});
+  }
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-TEST(MemoryResourceTraitsTest, UM_Resource)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  auto alloc_one = rm.getAllocator("UM");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "UM_Limiter", alloc_one, 1024);
-
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
-
-  ASSERT_EQ(MemoryResourceTraits::resource_type::um,
-            alloc_two.getAllocationStrategy()->getTraits().resource);
-
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
-
-  ASSERT_NO_THROW(alloc_one.deallocate(data));
-}
+  resources.push_back("UM");
 #endif
+#if defined(UMPIRE_ENABLE_CONST)
+  resources.push_back("DEVICE_CONST");
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+  resources.push_back("PINNED");
+#endif
+
+  return resources;
+}
+
+INSTANTIATE_TEST_SUITE_P(MemoryResourceTraits, MemoryResourceTraitsTest,
+                         ::testing::ValuesIn(memory_resource_strings()));

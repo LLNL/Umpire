@@ -46,6 +46,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Corrected documentation: `ENABLE_TESTING` should be `ENABLE_TESTS`.
 
+- Cleaner and more efficient Memory Resource Trait test.
+
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
