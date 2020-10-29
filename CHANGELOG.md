@@ -33,6 +33,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
+- ENABLE_STATISTICS option and (optional) dependency on Conduit.
+
 ### Fixed
 
 - Corrected documentation: `ENABLE_TESTING` should be `ENABLE_TESTS`.
