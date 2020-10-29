@@ -117,4 +117,30 @@
 #define UMPIRE_RECORD_BACKTRACE(backtrace) ((void)0)
 #endif
 
+#if (__cplusplus >= 201402L)
+#if defined(__has_cpp_attribute)
+#if __has_cpp_attribute(deprecated)
+#define UMPIRE_HAS_CXX_ATTRIBUTE_DEPRECATED 1
+#endif
+#endif
+#endif
+
+#if defined(UMPIRE_HAS_CXX_ATTRIBUTE_DEPRECATED)
+#define UMPIRE_DEPRECATE(Msg) [[deprecated(Msg)]]
+#define UMPIRE_DEPRECATE_ALIAS(Msg) [[deprecated(Msg)]]
+
+#elif defined(_MSC_VER)
+
+// for MSVC, use __declspec
+#define UMPIRE_DEPRECATE(Msg) __declspec(deprecated(Msg))
+#define UMPIRE_DEPRECATE_ALIAS(Msg)
+
+#else
+
+// else use __attribute__(deprecated("Message"))
+#define UMPIRE_DEPRECATE(Msg) __attribute__((deprecated(Msg)))
+#define UMPIRE_DEPRECATE_ALIAS(Msg)
+
+#endif
+
 #endif // UMPIRE_Macros_HPP
