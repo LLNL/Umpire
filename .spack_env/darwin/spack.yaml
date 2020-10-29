@@ -1,0 +1,26 @@
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+spack:
+  include:
+  - ../../scripts/radiuss-spack-configs/spack_configs/darwin/compilers.yaml
+  - ../../scripts/radiuss-spack-configs/spack_configs/darwin/packages.yaml
+  specs: [umpire@develop]
+  view: true
+  packages:
+    camp:
+      version: [master]
+      target: []
+      compiler: []
+      buildable: true
+      providers: {}
+    blt:
+      version: [develop]
+      target: []
+      compiler: []
+      buildable: true
+      providers: {}
+  develop:
+    umpire:
+      path: ../../
+      spec: umpire@develop
