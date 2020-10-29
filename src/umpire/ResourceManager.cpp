@@ -436,11 +436,37 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 void ResourceManager::registerAllocator(const std::string& name,
                                         Allocator allocator)
 {
+  addAlias(name, allocator);
+}
+
+void ResourceManager::addAlias(const std::string& name,
+                                        Allocator allocator)
+{
   if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator " << name << " is already registered.");
+    auto ra = getAllocator(name);
+    UMPIRE_ERROR("Allocator " << name << " is already an alias for " << ra.getName());
   }
 
   m_allocators_by_name[name] = allocator.getAllocationStrategy();
+}
+
+void ResourceManager::removeAlias(const std::string& name,
+                                        Allocator allocator)
+{
+  if (!isAllocator(name)) {
+    UMPIRE_ERROR("Allocator " << name << " is not registered.");
+  }
+
+  auto a = m_allocators_by_name.find(name);
+  if (a->second->getName().compare(name) == 0) {
+    UMPIRE_ERROR(name << " is not an alias, so cannot be removed.")
+  }
+
+  if (a->second->getId() != allocator.getId()) {
+    UMPIRE_ERROR("Allocator " << name << " is not registered as an alias of " << allocator.getName());
+  }
+
+  m_allocators_by_name.erase(a);
 }
 
 Allocator ResourceManager::getAllocator(void* ptr)
@@ -498,7 +524,7 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(
 
 bool ResourceManager::isAllocatorRegistered(const std::string& name)
 {
-  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
+  return isAllocator(name);
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)

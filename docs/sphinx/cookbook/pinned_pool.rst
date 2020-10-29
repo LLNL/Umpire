@@ -12,7 +12,9 @@ Building the pool takes two steps: 1) getting a base "PINNED" allocator, and 2)
 creating the pool:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_pinned_pool.F
-                    :lines: 19-24
+   :start-after: _sphinx_tag_tut_pinned_fortran_start
+   :end-before: _sphinx_tag_tut_pinned_fortran_end
+   :language: FORTRAN
 
 The complete example is included below:
 
