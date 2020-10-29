@@ -22,10 +22,6 @@ void SyclMemsetOperation::apply(void* src_ptr,
   cl::sycl::queue sycl_queue = allocation->strategy->getTraits().queue;
   sycl_queue.memset(src_ptr, value, length);
   sycl_queue.wait();
-
-  
-                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
-                          "size", length, "event", "memset");
 }
 
 } // end of namespace op
