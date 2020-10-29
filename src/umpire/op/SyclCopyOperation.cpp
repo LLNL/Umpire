@@ -25,7 +25,7 @@ void SyclCopyOperation::transform(
   sycl_queue.memcpy(*dst_ptr, src_ptr, length);
   sycl_queue.wait();
 
-  UMPIRE_RECORD_STATISTIC("SyclCopyOperation", "src_ptr",
+  
                           reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
                           reinterpret_cast<uintptr_t>(*dst_ptr), "size", length,
                           "event", "copy");

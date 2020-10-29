@@ -24,10 +24,6 @@ void HipMemsetOperation::apply(
                  << src_ptr << ", value = " << value << ", length = " << length
                  << ") failed with error: " << hipGetErrorString(error));
   }
-
-  UMPIRE_RECORD_STATISTIC("HipMemsetOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
-                          "size", length, "event", "memset");
 }
 
 } // end of namespace op

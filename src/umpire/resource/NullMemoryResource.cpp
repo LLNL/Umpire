@@ -40,8 +40,6 @@ void* NullMemoryResource::allocate(std::size_t bytes)
 #endif
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
-                          "size", bytes, "event", "allocate");
 
   m_size_map.insert(ptr, bytes);
 
@@ -51,8 +49,6 @@ void* NullMemoryResource::allocate(std::size_t bytes)
 void NullMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
-                          "size", 0x0, "event", "deallocate");
 
   auto iter = m_size_map.find(ptr);
   auto size = iter->second;
