@@ -28,14 +28,6 @@ set (umpire_util_headers
   memory_sanitizers.hpp
   wrap_allocator.hpp)
 
-if (ENABLE_STATISTICS)
-  set (umpire_util_headers
-    ${umpire_util_headers}
-    statistic_helper.hpp
-    Statistic.hpp
-    StatisticsDatabase.hpp)
-endif ()
-
 if (ENABLE_NUMA)
   set (umpire_util_headers
     ${umpire_util_headers}
@@ -52,13 +44,6 @@ set (umpire_util_sources
   OutputBuffer.cpp
   allocation_statistics.cpp
   detect_vendor.cpp)
-
-if (ENABLE_STATISTICS)
-  set (umpire_util_sources
-    ${umpire_util_sources}
-    Statistic.cpp
-    StatisticsDatabase.cpp)
-endif ()
 
 if (ENABLE_NUMA)
   set (umpire_util_sources
@@ -78,12 +63,6 @@ if (ENABLE_NUMA)
   set (umpire_util_depends
     ${umpire_util_depends}
     numa)
-endif ()
-
-if (ENABLE_STATISTICS)
-  set (umpire_util_depends
-    ${umpire_util_depends}
-    conduit)
 endif ()
 
 if (ENABLE_SLIC AND ENABLE_LOGGING)

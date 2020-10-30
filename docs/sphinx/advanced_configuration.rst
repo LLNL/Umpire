@@ -21,7 +21,6 @@ Here is a summary of the configuration options, their default value, and meaning
     ``ENABLE_HIP``                Off      Enable HIP support
     ``ENABLE_NUMA``               Off      Enable NUMA support
     ``ENABLE_FILE_RESOURCE``      Off      Enable FILE support      
-    ``ENABLE_STATISTICS``         Off      Enable collection of memory statistics
     ``ENABLE_TESTS``              On       Build test executables
     ``ENABLE_BENCHMARKS``         On       Build benchmark programs
     ``ENABLE_LOGGING``            On       Enable Logging within Umpire
@@ -56,10 +55,6 @@ These arguments are explained in more detail below:
   This option will allow the build to make all File Memory Allocation files. 
   If Umpire is built without FILE, CUDA or HIP support, then only the ``HOST`` 
   allocator is available for use.
-
-* ``ENABLE_STATISTICS``
-  This option enables collection of memory statistics. If Umpire is built with
-  this option, the Conduit library will also be built.
 
 * ``ENABLE_TESTS``
   This option controls whether or not test executables will be built.
