@@ -534,6 +534,17 @@ bool umpire_resourcemanager_is_allocator_bufferify(
     // splicer end class.ResourceManager.method.is_allocator_bufferify
 }
 
+bool umpire_resourcemanager_is_allocator_id(
+    umpire_resourcemanager * self, int id)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.is_allocator_id
+    bool SHC_rv = SH_this->isAllocator(id);
+    return SHC_rv;
+    // splicer end class.ResourceManager.method.is_allocator_id
+}
+
 bool umpire_resourcemanager_has_allocator(umpire_resourcemanager * self,
     void * ptr)
 {

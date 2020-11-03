@@ -165,6 +165,7 @@ module umpire_mod
         procedure :: remove_alias => resourcemanager_remove_alias
         procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
         procedure :: is_allocator => resourcemanager_is_allocator
+        procedure :: is_allocator_id => resourcemanager_is_allocator_id
         procedure :: has_allocator => resourcemanager_has_allocator
         procedure :: copy_all => resourcemanager_copy_all
         procedure :: copy_with_size => resourcemanager_copy_with_size
@@ -179,6 +180,7 @@ module umpire_mod
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
             get_allocator_by_id, get_allocator_for_ptr
+        generic :: is_allocator => is_allocator, is_allocator_id
         generic :: memset => memset_all, memset_with_size
         generic :: reallocate => reallocate_default,  &
             reallocate_with_allocator
@@ -723,6 +725,17 @@ module umpire_mod
             integer(C_INT), value, intent(IN) :: Lname
             logical(C_BOOL) :: SHT_rv
         end function c_resourcemanager_is_allocator_bufferify
+
+        function c_resourcemanager_is_allocator_id(self, id) &
+                result(SHT_rv) &
+                bind(C, name="umpire_resourcemanager_is_allocator_id")
+            use iso_c_binding, only : C_BOOL, C_INT
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            integer(C_INT), value, intent(IN) :: id
+            logical(C_BOOL) :: SHT_rv
+        end function c_resourcemanager_is_allocator_id
 
         function c_resourcemanager_has_allocator(self, ptr) &
                 result(SHT_rv) &
@@ -1863,6 +1876,17 @@ contains
             name, len_trim(name, kind=C_INT))
         ! splicer end class.ResourceManager.method.is_allocator
     end function resourcemanager_is_allocator
+
+    function resourcemanager_is_allocator_id(obj, id) &
+            result(SHT_rv)
+        use iso_c_binding, only : C_BOOL, C_INT
+        class(UmpireResourceManager) :: obj
+        integer(C_INT), value, intent(IN) :: id
+        logical :: SHT_rv
+        ! splicer begin class.ResourceManager.method.is_allocator_id
+        SHT_rv = c_resourcemanager_is_allocator_id(obj%cxxmem, id)
+        ! splicer end class.ResourceManager.method.is_allocator_id
+    end function resourcemanager_is_allocator_id
 
     function resourcemanager_has_allocator(obj, ptr) &
             result(SHT_rv)

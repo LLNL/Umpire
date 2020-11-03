@@ -154,6 +154,9 @@ bool umpire_resourcemanager_is_allocator(umpire_resourcemanager * self,
 bool umpire_resourcemanager_is_allocator_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname);
 
+bool umpire_resourcemanager_is_allocator_id(
+    umpire_resourcemanager * self, int id);
+
 bool umpire_resourcemanager_has_allocator(umpire_resourcemanager * self,
     void * ptr);
 
