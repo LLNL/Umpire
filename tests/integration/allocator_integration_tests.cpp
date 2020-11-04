@@ -194,7 +194,10 @@ TEST(Allocator, registerAllocator)
     ASSERT_ANY_THROW(rm.addAlias(
         allocator_name, rm.getAllocator(allocator_copy_name)));
 
+    int id = rm.getAllocator(allocator_name).getId();
+
     ASSERT_TRUE(rm.isAllocator(allocator_name));
+    ASSERT_TRUE(rm.isAllocator(id));
   }
 
   ASSERT_FALSE(rm.isAllocator("BANANAS"));

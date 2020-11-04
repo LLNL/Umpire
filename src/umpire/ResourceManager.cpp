@@ -485,6 +485,11 @@ bool ResourceManager::isAllocator(const std::string& name) noexcept
   return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
 }
 
+bool ResourceManager::isAllocator(int id) noexcept
+{
+  return (m_allocators_by_id.find(id) != m_allocators_by_id.end());
+}
+
 bool ResourceManager::hasAllocator(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
