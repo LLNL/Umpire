@@ -14,8 +14,6 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/util/MemoryResourceTraits.hpp"
-#include "camp/resource/platform.hpp"
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
