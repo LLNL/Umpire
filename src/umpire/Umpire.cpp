@@ -22,10 +22,6 @@
   #include <cuda_runtime_api.h>
 #endif
 
-#if defined(UMPIRE_ENABLE_HIP)
-  #include <hip/hip_runtime.h>
-#endif
-
 #if !defined(_MSC_VER)
 #include <unistd.h>
 #endif
@@ -33,8 +29,6 @@
 #include <sstream>
 
 UMPIRE_EXPORT volatile int umpire_ver_4_found = 0;
-
-using MemResrc = umpire::resource::MemoryResource;
 
 namespace umpire {
 
