@@ -49,7 +49,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 
   if (m_offset > 1024 * 64)
   {
-    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes" << "and with actual bytes: " << bytes);
+    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
   ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
