@@ -166,6 +166,8 @@ class ResourceManager {
 
   bool isAllocator(const std::string& name) noexcept;
 
+  bool isAllocator(int id) noexcept;
+
   /*!
    * \brief Does the given pointer have an associated Allocator.
    *
