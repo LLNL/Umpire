@@ -43,6 +43,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - registerAllocator is deprecated, addAlias should be used instead.
 
+- `umpire_resourcemanager_is_allocator` C function is now
+  `umpire_resourcemanager_is_allocator_name`.
+
 ### Removed
 
 - ENABLE_STATISTICS option and (optional) dependency on Conduit.
