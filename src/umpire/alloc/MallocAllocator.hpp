@@ -63,7 +63,7 @@ struct MallocAllocator {
   {
 #if defined(UMPIRE_ENABLE_HIP)
     hipDeviceProp_t props;
-    int hdev = 0; //TODO: fix this 
+    int hdev = 0;
     hipGetDevice(&hdev);
 
     //Check whether HIP can map host memory.
@@ -75,7 +75,7 @@ struct MallocAllocator {
 #endif
 #if defined(UMPIRE_ENABLE_CUDA)
     int pageableMem = 0;
-    int cdev = 0; //TODO: fix this
+    int cdev = 0;
     cudaGetDevice(&cdev);
 
     //Device supports coherently accessing pageable memory

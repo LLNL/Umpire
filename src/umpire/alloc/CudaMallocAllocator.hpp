@@ -57,15 +57,6 @@ struct CudaMallocAllocator {
                                       << cudaGetErrorString(error));
     }
   }
-
-  bool isAccessible(umpire::Platform p)
-  {
-    if(p == umpire::Platform::cuda)
-      return true;
-    else
-      return false; //p is host or undefined
-  }
-
 };
 
 } // end of namespace alloc
