@@ -510,28 +510,28 @@ umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
     // splicer end class.ResourceManager.method.get_allocator_for_ptr
 }
 
-bool umpire_resourcemanager_is_allocator(umpire_resourcemanager * self,
-    const char * name)
+bool umpire_resourcemanager_is_allocator_name(
+    umpire_resourcemanager * self, const char * name)
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.is_allocator
+    // splicer begin class.ResourceManager.method.is_allocator_name
     const std::string SHCXX_name(name);
     bool SHC_rv = SH_this->isAllocator(SHCXX_name);
     return SHC_rv;
-    // splicer end class.ResourceManager.method.is_allocator
+    // splicer end class.ResourceManager.method.is_allocator_name
 }
 
-bool umpire_resourcemanager_is_allocator_bufferify(
+bool umpire_resourcemanager_is_allocator_name_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname)
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.is_allocator_bufferify
+    // splicer begin class.ResourceManager.method.is_allocator_name_bufferify
     const std::string SHCXX_name(name, Lname);
     bool SHC_rv = SH_this->isAllocator(SHCXX_name);
     return SHC_rv;
-    // splicer end class.ResourceManager.method.is_allocator_bufferify
+    // splicer end class.ResourceManager.method.is_allocator_name_bufferify
 }
 
 bool umpire_resourcemanager_is_allocator_id(

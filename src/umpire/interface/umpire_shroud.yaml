@@ -197,7 +197,7 @@ declarations:
 
       - decl: bool isAllocator(const std::string& name)
         format:
-          function_suffix:
+          function_suffix: _name
 
       - decl: bool isAllocator(int id)
         format:

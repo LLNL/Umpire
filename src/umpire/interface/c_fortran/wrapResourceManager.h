@@ -148,10 +148,10 @@ umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
     umpire_resourcemanager * self, void * ptr,
     umpire_allocator * SHC_rv);
 
-bool umpire_resourcemanager_is_allocator(umpire_resourcemanager * self,
-    const char * name);
+bool umpire_resourcemanager_is_allocator_name(
+    umpire_resourcemanager * self, const char * name);
 
-bool umpire_resourcemanager_is_allocator_bufferify(
+bool umpire_resourcemanager_is_allocator_name_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname);
 
 bool umpire_resourcemanager_is_allocator_id(

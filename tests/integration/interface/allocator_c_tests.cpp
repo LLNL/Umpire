@@ -134,7 +134,7 @@ TEST_P(AllocatorCTest, IsAllocator)
 {
   umpire_resourcemanager rm;
   umpire_resourcemanager_get_instance(&rm);
-  ASSERT_EQ(true, umpire_resourcemanager_is_allocator(&rm, GetParam()));
+  ASSERT_EQ(true, umpire_resourcemanager_is_allocator_name(&rm, GetParam()));
   int id = umpire_allocator_get_id(&m_allocator);
   ASSERT_EQ(true, umpire_resourcemanager_is_allocator_id(&rm, id));
 }
