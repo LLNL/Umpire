@@ -27,7 +27,7 @@ struct allocate_and_use<host_platform>
   {
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     data[0] = size * size;
-    alloc->release(); //alloc->deallocate(data);
+    alloc->deallocate(data);
   }
 };
 
@@ -53,7 +53,7 @@ struct allocate_and_use<cuda_platform>
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     tester<<<1, 16>>>(data, size);
     cudaDeviceSynchronize();
-    alloc->release(); //alloc->deallocate(data);
+    alloc->deallocate(data);
   }
 };
 #endif
