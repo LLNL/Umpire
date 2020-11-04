@@ -196,6 +196,12 @@ declarations:
           function_suffix: _for_ptr
 
       - decl: bool isAllocator(const std::string& name)
+        format:
+          function_suffix: _name
+
+      - decl: bool isAllocator(int id)
+        format:
+          function_suffix: _id
 
       - decl: bool hasAllocator(void* ptr)
 

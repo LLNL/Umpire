@@ -22,6 +22,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added GitLab testing of Umpire when MPI is enabled
 
+- Added 'isAllocator' method that takes integer ID, and returns true if that
+  ID corresponds to an Allocator.
+
 
 ### Changed
 
@@ -39,6 +42,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed up broken source links in tutorial documentation.
 
 - registerAllocator is deprecated, addAlias should be used instead.
+
+- `umpire_resourcemanager_is_allocator` C function is now
+  `umpire_resourcemanager_is_allocator_name`.
 
 ### Removed
 
