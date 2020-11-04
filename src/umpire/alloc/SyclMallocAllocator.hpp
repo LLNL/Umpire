@@ -63,6 +63,7 @@ struct SyclMallocAllocator {
       return true;
     else
       return false;
+  }
 };
 
 } // end of namespace alloc
