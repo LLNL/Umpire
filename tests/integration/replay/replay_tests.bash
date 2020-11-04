@@ -24,6 +24,7 @@ function cleanupandexit {
 }
 
 containing_dir=`dirname "${BASH_SOURCE[0]}"`
+echo "Running: bash ${containing_dir}/check_replay_coverage.bash"
 if ! bash ${containing_dir}/check_replay_coverage.bash
 then
   echo "Failed: Replay coverage test failed"

@@ -7,6 +7,7 @@
 ##############################################################################
 
 containing_dir=`dirname "${BASH_SOURCE[0]}"`
+echo "My containing dir is: ${containing_dir}"
 if ! cd ${containing_dir}
 then
   "Failed to go to containing test directory ${containing_dir}"
@@ -14,11 +15,14 @@ then
 fi
 
 root_dir=`git rev-parse --show-toplevel`
-if ! cd ${root_dir}
+echo "My root dir is: ${root_dir}/src"
+if ! cd ${root_dir}/src
 then
-  "Failed to go to source root directory ${root_dir}"
+  "Failed to go to source root directory ${root_dir}/src"
   exit 3
 fi
+
+pwd
 
 #
 # This script uses grep, awk, and sed to accomplish the following:
@@ -35,14 +39,18 @@ fi
 #
 
 ecode=0
+replay_using_files=`grep -rl -I --exclude-dir "./tools/replay" \
+  --exclude ./umpire/Replay.hpp UMPIRE_REPLAY .`
+echo ${replay_using_files}
+
 for event in $(\
-  grep -rl -I --exclude-dir "./tools/replay" --exclude-dir "./tests/integration/replay" --exclude-dir "./docs" --exclude ./src/umpire/Replay.hpp UMPIRE_REPLAY . |\
-  xargs cat |\
-  awk '/UMPIRE_REPLAY/,/;/ {print}' |\
-  sed -e 's/\\//g' -e 's/\"//g' -e 's/ *//g' -e 's/UMPIRE_REPLAY(//g' | grep "event" | sed -e 's/.*event://g' -e 's/,.*//g' -e 's/).*//' | sort | uniq)
+  echo ${replay_using_files} | xargs cat | awk '/UMPIRE_REPLAY/,/;/ {print}' |\
+    sed -e 's/\\//g' -e 's/\"//g' -e 's/ *//g' -e 's/UMPIRE_REPLAY(//g' |\
+    grep "event" | sed -e 's/.*event://g' -e 's/,.*//g' -e 's/).*//' |\
+    sort | uniq)
 do
   x='"'$event'"'
-  if ! grep -q $x ./tools/replay/ReplayInterpreter.cpp
+  if ! grep -q $x ../tools/replay/ReplayInterpreter.cpp
   then
     ecode=1
     echo "The replay program cannot handle the $x replay event"
