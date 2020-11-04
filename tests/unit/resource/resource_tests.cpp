@@ -20,7 +20,6 @@ struct TestAllocator {
     ::free(ptr);
   }
 
-  //placeholder for now
   bool isAccessible(umpire::Platform p)
   {
     if(p == umpire::Platform::host)
