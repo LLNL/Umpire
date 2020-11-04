@@ -58,30 +58,12 @@ struct CudaMallocAllocator {
     }
   }
 
-  bool isHostPageable()
-  {
-    int pageableMem = 0;
-    int cdev = 0;
-    cudaGetDevice(&cdev);
-
-    //Device supports coherently accessing pageable memory
-    //without calling cudaHostRegister on it
-    cudaDeviceGetAttribute(&pageableMem,
-              cudaDevAttrPageableMemoryAccess, cdev);
-    if(pageableMem)
-      return true;
-    else
-      return false;
-  }
-
   bool isAccessible(umpire::Platform p)
   {
     if(p == umpire::Platform::cuda)
-      return isHostPageable();
-    else if(p == umpire::Platform::host)
       return true;
     else
-      return false;
+      return false; //p is host or undefined
   }
 
 };

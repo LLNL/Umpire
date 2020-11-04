@@ -81,12 +81,12 @@ bool HipDeviceMemoryResource::isHostPageable() noexcept
 
 bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::undefined)
-    return false;
+  if(p == Platform::hip)
+    return true;
   else if(p == Platform::host)
     return isHostPageable();
   else
-    return true;
+    return false;
 }
 
 Platform HipDeviceMemoryResource::getPlatform() noexcept

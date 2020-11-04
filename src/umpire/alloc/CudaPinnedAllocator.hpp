@@ -41,10 +41,10 @@ struct CudaPinnedAllocator {
   
   bool isAccessible(Platform p)
   {
-    if(p == Platform::undefined)
-      return false;
-    else
+    if(p == Platform::cuda || p == Platform::host)
       return true;
+    else
+      return false; //p is undefined
   }
 };
 

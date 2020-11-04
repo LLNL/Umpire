@@ -59,10 +59,43 @@ struct MallocAllocator {
     ::free(ptr);
   }
 
+  bool isHostPageable()
+  {
+#if defined(UMPIRE_ENABLE_HIP)
+    hipDeviceProp_t props;
+    int hdev = 0; //TODO: fix this 
+    hipGetDevice(&hdev);
+
+    //Check whether HIP can map host memory.
+    hipGetDeviceProperties(&props, hdev);
+    if(props.canMapHostMemory)
+      return true;
+    else
+      return false;
+#endif
+#if defined(UMPIRE_ENABLE_CUDA)
+    int pageableMem = 0;
+    int cdev = 0; //TODO: fix this
+    cudaGetDevice(&cdev);
+
+    //Device supports coherently accessing pageable memory
+    //without calling cudaHostRegister on it
+    cudaDeviceGetAttribute(&pageableMem,
+              cudaDevAttrPageableMemoryAccess, cdev);
+    if(pageableMem)
+      return true;
+    else
+      return false;
+#endif
+    return false; //shouldn't reach this
+  }
+
   bool isAccessible(Platform p)
   {
-    if(p == Platform::host)
+    if(p == Platform::host || p == Platform::omp_target)
       return true;
+    else if(p == Platform::cuda || p == Platform::hip)
+      return isHostPageable();
     else  
       return false;
   }

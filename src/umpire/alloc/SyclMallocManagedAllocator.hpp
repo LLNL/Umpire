@@ -58,10 +58,10 @@ struct SyclMallocManagedAllocator {
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::undefined)
-      return false;
-    else
+    if(p == Platform::sycl || p == Platform::host)
       return true;
+    else
+      return false; //p is undefined
   }
 };
 

@@ -41,10 +41,10 @@ struct HipPinnedAllocator {
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::undefined)
-      return false;
-    else
+    if(p == Platform::hip || p == Platform::host)
       return true;
+    else
+      return false; //p is undefined
   }
 };
 

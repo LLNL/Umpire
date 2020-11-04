@@ -27,7 +27,7 @@ struct allocate_and_use<host_platform>
   {
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     data[0] = size * size;
-    alloc->deallocate(data);
+    alloc->release(); //alloc->deallocate(data);
   }
 };
 
@@ -53,7 +53,7 @@ struct allocate_and_use<cuda_platform>
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     tester<<<1, 16>>>(data, size);
     cudaDeviceSynchronize();
-    alloc->deallocate(data);
+    alloc->release(); //alloc->deallocate(data);
   }
 };
 #endif
@@ -104,7 +104,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
     auto& rm = umpire::ResourceManager::getInstance();
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
     m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
-        ("pool_" + GetParam(), *m_allocator));
+        ("pool_" + GetParam(), *m_allocator, 42 * sizeof(size_t), 1));
   }
 
   virtual void TearDown()

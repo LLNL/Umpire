@@ -67,10 +67,10 @@ std::size_t CudaDeviceMemoryResource::getHighWatermark() const noexcept
 
 bool CudaDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::undefined || p == Platform::host)
-    return false;
-  else
+  if(p == Platform::cuda)
     return true;
+  else
+    return false;
 }
 
 Platform CudaDeviceMemoryResource::getPlatform() noexcept

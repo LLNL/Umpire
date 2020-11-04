@@ -49,7 +49,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 
   if (m_offset > 1024 * 64)
   {
-    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
+    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes" << "and with actual bytes: " << bytes);
   }
 
   ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
@@ -98,10 +98,10 @@ std::size_t CudaConstantMemoryResource::getHighWatermark() const noexcept
 
 bool CudaConstantMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::undefined || p == Platform::host)
-    return false;
-  else
+  if(p == Platform::cuda)
     return true;
+  else
+    return false;
 }
 
 Platform CudaConstantMemoryResource::getPlatform() noexcept

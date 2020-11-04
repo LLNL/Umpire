@@ -57,10 +57,10 @@ struct OpenMPTargetAllocator {
   
   bool isAccessible(Platform p)
   {
-    if(p == Platform::host || p == Platform::undefined)
-      return false;
-    else
+    if(p == Platform::omp_target)
       return true;
+    else
+      return false; //p is host or undefined
   }
 
   int device;

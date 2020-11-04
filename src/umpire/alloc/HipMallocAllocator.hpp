@@ -61,7 +61,7 @@ struct HipMallocAllocator {
   bool isHostPageable()
   {
     hipDeviceProp_t props;
-    int hdev = 0;
+    int hdev = 0; //TODO: fix this
     hipGetDevice(&hdev);
 
     //Check whether HIP can map host memory.
@@ -75,11 +75,11 @@ struct HipMallocAllocator {
   bool isAccessible(umpire::Platform p)
   {
     if(p == umpire::Platform::hip)
-      return isHostPageable();
-    else if(p == umpire::Platform::host)
       return true;
+    else if(p == umpire::Platform::host)
+      return isHostPageable();
     else
-      return false;
+      return false; //p is undefined
   }
 };
 } // end of namespace alloc
