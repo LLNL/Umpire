@@ -23,6 +23,13 @@ function cleanupandexit {
   exit $1
 }
 
+containing_dir=`dirname "${BASH_SOURCE[0]}"`
+if ! bash ${containing_dir}/check_replay_coverage.bash
+then
+  echo "Failed: Replay coverage test failed"
+  exit 2
+fi
+
 #
 # The following program will generate a file of Umpire activity that
 # will be replayed.
