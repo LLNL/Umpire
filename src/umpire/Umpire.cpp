@@ -16,10 +16,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
 
-#if defined(UMPIRE_ENABLE_CUDA)
-  #include <cuda_runtime_api.h>
-#endif
-
 #if !defined(_MSC_VER)
 #include <unistd.h>
 #endif
