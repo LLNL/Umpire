@@ -6,17 +6,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-containing_dir=`dirname "${BASH_SOURCE[0]}"`
-echo "My containing dir is: ${containing_dir}"
-source_dir=$1
-
-echo "source dir is: ${source_dir}"
-if ! cd ${source_dir}/src
-then
-  "Failed to go to source directory ${source_dir}/src"
-  exit 3
-fi
-
 pwd
 
 #
