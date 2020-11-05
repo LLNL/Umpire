@@ -58,6 +58,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed CMake version check (checking for version >= 3.18)
 
+- Made replay test tool aware of `memset` operation and added CI tests to
+  find and report future missing replay operations in the tool.
+
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed

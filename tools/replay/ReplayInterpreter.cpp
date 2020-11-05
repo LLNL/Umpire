@@ -92,7 +92,13 @@ void ReplayInterpreter::buildOperations()
     }
 
     m_json.clear();
-    m_json = nlohmann::json::parse(m_line);
+    try {
+      m_json = nlohmann::json::parse(m_line);
+    }
+    catch (...) {
+      std::cerr << "Skipped truncated line #" << m_line_number << std::endl;
+      break;
+    }
 
     if ( m_json["event"] == "allocation_map_insert" ) {
       m_allocation_map_insert_ops++;
@@ -114,6 +120,10 @@ void ReplayInterpreter::buildOperations()
       m_allocation_map_clear_ops++;
       continue;
     }
+    else if ( m_json["event"] == "mpi" ) {
+      m_mpi_ops++;
+      continue;
+    }
     else if ( m_json["event"] == "makeAllocator" ) {
       m_make_allocator_ops++;
       if ( ! m_options.info_only )
@@ -128,6 +138,16 @@ void ReplayInterpreter::buildOperations()
       m_copy_ops++;
       if ( ! m_options.info_only )
         replay_compileCopy();
+    }
+    else if ( m_json["event"] == "memset" ) {
+      m_memset_ops++;
+      if ( ! m_options.info_only )
+        replay_compileMemset();
+    }
+    else if ( m_json["event"] == "move" ) {
+      m_move_ops++;
+      if ( ! m_options.info_only )
+        replay_compileMove();
     }
     else if ( m_json["event"] == "reallocate_ex" ) {
       m_reallocate_ex_ops++;
@@ -246,6 +266,7 @@ void ReplayInterpreter::buildOperations()
 
     std::cout
       << "Replay File Version: " << m_log_version_major << "." << m_log_version_minor << "." << m_log_version_patch << std::endl
+      << std::setw(12) << m_mpi_ops << " mpi rank identification operations" << std::endl
       << std::setw(12) << m_make_memory_resource_ops << " makeMemoryResource operations" << std::endl
       << std::setw(12) << m_make_allocator_ops/2 << " makeAllocator operations" << std::endl
       << std::endl
@@ -266,6 +287,8 @@ void ReplayInterpreter::buildOperations()
       << std::setw(12) << m_allocation_map_clear_ops << " allocation_map_clear operations" << std::endl
       << std::endl
       << std::setw(12) << m_copy_ops << " copy operations" << std::endl
+      << std::setw(12) << m_memset_ops << " memset operations" << std::endl
+      << std::setw(12) << m_move_ops << " move operations" << std::endl
       << std::setw(12) << m_reallocate_ex_ops << " reallocate_ex operations" << std::endl
       << std::setw(12) << m_reallocate_ops << " reallocate operations" << std::endl
       << std::setw(12) << m_set_default_allocator_ops << " setDefaultAllocator operations" << std::endl
@@ -904,6 +927,26 @@ void ReplayInterpreter::replay_compileCopy( void )
   op->op_offsets[1] = m_json["payload"]["dst_offset"];
   op->op_alloc_ops[0] = m_allocation_id[src_ptr];
   op->op_alloc_ops[1] = m_allocation_id[dst_ptr];
+}
+
+void ReplayInterpreter::replay_compileMove( void )
+{
+  // TODO: Need to think more about how to accomplish a move which is a
+  // composite allocate/copy/deallocate operation.  For now, we simply
+  // ignore the operation
+  //
+  return;
+}
+
+void ReplayInterpreter::replay_compileMemset( void )
+{
+  // TODO: Need to determine what to do with operations and whether to
+  // replay them or not.  This will be discussed in a Jira ticket and for
+  // now, the memset operation will be ignored (note: if/when we do decide to
+  // replay memset operations, we will need to also record the offset so that
+  // the replay tool can determine which allocator it belongs to.
+
+  return;
 }
 
 void ReplayInterpreter::replay_compileReallocate( void )
