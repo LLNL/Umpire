@@ -92,7 +92,13 @@ void ReplayInterpreter::buildOperations()
     }
 
     m_json.clear();
-    m_json = nlohmann::json::parse(m_line);
+    try {
+      m_json = nlohmann::json::parse(m_line);
+    }
+    catch (...) {
+      std::cerr << "Skipped truncated line #" << m_line_number << std::endl;
+      break;
+    }
 
     if ( m_json["event"] == "allocation_map_insert" ) {
       m_allocation_map_insert_ops++;
