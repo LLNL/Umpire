@@ -20,6 +20,8 @@ class MemoryResourceRegistry {
  public:
   static MemoryResourceRegistry& getInstance() noexcept;
 
+  const std::vector<std::string>& getResourceNames() noexcept;
+
   std::unique_ptr<resource::MemoryResource> makeMemoryResource(
       const std::string& name, int id);
 
@@ -38,6 +40,8 @@ class MemoryResourceRegistry {
   MemoryResourceRegistry() noexcept;
 
   std::vector<std::unique_ptr<MemoryResourceFactory>> m_allocator_factories;
+
+  std::vector<std::string> m_resource_names;
 };
 
 } // end of namespace resource

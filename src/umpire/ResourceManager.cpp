@@ -7,52 +7,7 @@
 #include "umpire/ResourceManager.hpp"
 
 #include "umpire/config.hpp"
-#include "umpire/resource/HostResourceFactory.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
-#include "umpire/resource/NullMemoryResourceFactory.hpp"
-
-#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
-#include "umpire/resource/FileMemoryResourceFactory.hpp"
-#endif
-
-#if defined(UMPIRE_ENABLE_NUMA)
-#include "umpire/strategy/NumaPolicy.hpp"
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA)
-#include <cuda_runtime_api.h>
-
-#include "umpire/resource/CudaDeviceResourceFactory.hpp"
-#include "umpire/resource/CudaPinnedMemoryResourceFactory.hpp"
-#include "umpire/resource/CudaUnifiedMemoryResourceFactory.hpp"
-#if defined(UMPIRE_ENABLE_CONST)
-#include "umpire/resource/CudaConstantMemoryResourceFactory.hpp"
-#endif
-#endif
-
-#if defined(UMPIRE_ENABLE_HIP)
-#include <hip/hip_runtime.h>
-
-#include "umpire/resource/HipDeviceResourceFactory.hpp"
-#include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
-#if defined(UMPIRE_ENABLE_CONST)
-#include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
-#endif
-#endif
-
-#if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
-
-#include "umpire/resource/SyclDeviceResourceFactory.hpp"
-#include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
-#include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
-#endif
-
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-#include <omp.h>
-
-#include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
-#endif
 
 #include <iterator>
 #include <memory>
@@ -103,135 +58,6 @@ ResourceManager::ResourceManager()
   const bool enable_log{env_enable_log != nullptr};
 
   util::initialize_io(enable_log, enable_replay);
-
-  resource::MemoryResourceRegistry& registry{
-      resource::MemoryResourceRegistry::getInstance()};
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::HostResourceFactory>());
-  m_resource_names.push_back("HOST");
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::NullMemoryResourceFactory>());
-
-#if defined(UMPIRE_ENABLE_FILE_RESOURCE)
-  registry.registerMemoryResource(
-      util::make_unique<resource::FileMemoryResourceFactory>());
-  m_resource_names.push_back("FILE");
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA)
-  {
-    int device_count{0};
-    auto error = ::cudaGetDeviceCount(&device_count);
-    if (error != cudaSuccess) {
-      UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
-    }
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::CudaDeviceResourceFactory>());
-    m_resource_names.push_back("DEVICE");
-
-    for (int device = 0; device < device_count; ++device) {
-      std::string name{"DEVICE::" + std::to_string(device)};
-      m_resource_names.push_back(name);
-    }
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
-    m_resource_names.push_back("UM");
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
-    m_resource_names.push_back("PINNED");
-
-#if defined(UMPIRE_ENABLE_CONST)
-    registry.registerMemoryResource(
-        util::make_unique<resource::CudaConstantMemoryResourceFactory>());
-    m_resource_names.push_back("DEVICE_CONST");
-#endif
-  }
-#endif
-
-#if defined(UMPIRE_ENABLE_HIP)
-  {
-    int device_count{0};
-    auto error = ::hipGetDeviceCount(&device_count);
-    if (error != hipSuccess) {
-      UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
-    }
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::HipDeviceResourceFactory>());
-    m_resource_names.push_back("DEVICE");
-
-    for (int device = 0; device < device_count; ++device) {
-      std::string name{"DEVICE::" + std::to_string(device)};
-      m_resource_names.push_back(name);
-    }
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::HipPinnedMemoryResourceFactory>());
-    m_resource_names.push_back("PINNED");
-
-#if defined(UMPIRE_ENABLE_CONST)
-    registry.registerMemoryResource(
-        util::make_unique<resource::HipConstantMemoryResourceFactory>());
-    m_resource_names.push_back("DEVICE_CONST");
-#endif
-  }
-#endif
-
-#if defined(UMPIRE_ENABLE_SYCL)
-  {
-    int device_count{0};
-    auto platforms = cl::sycl::platform::get_platforms();
-    for (auto& platform : platforms) {
-      auto devices = platform.get_devices();
-      for (auto& device : devices) {
-        const std::string deviceName =
-            device.get_info<cl::sycl::info::device::name>();
-        if (device.is_gpu() &&
-            (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
-             std::string::npos))
-          device_count++;
-      }
-    }
-
-    if (device_count == 0) {
-      UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
-    }
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::SyclDeviceResourceFactory>());
-    m_resource_names.push_back("DEVICE");
-
-    for (int device = 0; device < device_count; ++device) {
-      std::string name{"DEVICE::" + std::to_string(device)};
-      m_resource_names.push_back(name);
-    }
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
-    m_resource_names.push_back("UM");
-
-    registry.registerMemoryResource(
-        util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
-    m_resource_names.push_back("PINNED");
-  }
-#endif
-
-#if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  int device_count{device_count = omp_get_num_devices()};
-  for (int device = 0; device < device_count; ++device) {
-    std::string name{"DEVICE::" + std::to_string(device)};
-    m_resource_names.push_back(name);
-  }
-
-  registry.registerMemoryResource(
-      util::make_unique<resource::OpenMPTargetResourceFactory>());
-  m_resource_names.push_back("DEVICE");
-#endif
 
   initialize();
 
@@ -352,12 +178,16 @@ Allocator ResourceManager::makeResource(const std::string& name,
 strategy::AllocationStrategy* ResourceManager::getAllocationStrategy(
     const std::string& name)
 {
+  resource::MemoryResourceRegistry& registry{
+      resource::MemoryResourceRegistry::getInstance()};
+  auto resource_names = registry.getResourceNames();
+
   UMPIRE_LOG(Debug, "(\"" << name << "\")");
   auto allocator = m_allocators_by_name.find(name);
   if (allocator == m_allocators_by_name.end()) {
     auto resource_name =
-        std::find(m_resource_names.begin(), m_resource_names.end(), name);
-    if (resource_name != std::end(m_resource_names)) {
+        std::find(resource_names.begin(), resource_names.end(), name);
+    if (resource_name != std::end(resource_names)) {
       makeResource(name);
     } else {
       UMPIRE_ERROR("Allocator \"" << name
