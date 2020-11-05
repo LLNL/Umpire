@@ -6,8 +6,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-pwd
-
 #
 # This script uses grep, awk, and sed to accomplish the following:
 # 1) Find all UMPIRE_REPLAY calls in the umpire source code (uses 'git' to
@@ -25,7 +23,6 @@ pwd
 ecode=0
 replay_using_files=`grep -rl -I --exclude-dir "./tools/replay" \
   --exclude ./umpire/Replay.hpp UMPIRE_REPLAY .`
-echo ${replay_using_files}
 
 for event in $(\
   echo ${replay_using_files} | xargs cat | awk '/UMPIRE_REPLAY/,/;/ {print}' |\
