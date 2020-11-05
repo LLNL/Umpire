@@ -26,6 +26,18 @@
 #include "umpire/util/make_unique.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
+#if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+#endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+#include <CL/sycl.hpp>
+#endif
+
 static const char* s_null_resource_name{"__umpire_internal_null"};
 static const char* s_zero_byte_pool_name{"__umpire_internal_0_byte_pool"};
 
