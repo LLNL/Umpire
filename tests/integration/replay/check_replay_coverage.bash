@@ -8,17 +8,12 @@
 
 containing_dir=`dirname "${BASH_SOURCE[0]}"`
 echo "My containing dir is: ${containing_dir}"
-if ! cd ${containing_dir}
-then
-  "Failed to go to containing test directory ${containing_dir}"
-  exit 2
-fi
+source_dir=$1
 
-root_dir=`git rev-parse --show-toplevel`
-echo "My root dir is: ${root_dir}/src"
-if ! cd ${root_dir}/src
+echo "source dir is: ${source_dir}"
+if ! cd ${source_dir}/src
 then
-  "Failed to go to source root directory ${root_dir}/src"
+  "Failed to go to source directory ${source_dir}/src"
   exit 3
 fi
 
