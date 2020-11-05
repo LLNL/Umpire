@@ -15,7 +15,7 @@
 namespace umpire {
 namespace resource {
 
-HipDeviceMemoryResource::HipDeviceMemoryResource(Platform platform,
+HipDeviceMemoryResource::HipDeviceMemoryResource(camp::resources::Platform platform,
                                                    const std::string& name,
                                                    int id,
                                                    MemoryResourceTraits traits)
@@ -65,7 +65,7 @@ std::size_t HipDeviceMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
-Platform HipDeviceMemoryResource::getPlatform() noexcept
+camp::resources::Platform HipDeviceMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

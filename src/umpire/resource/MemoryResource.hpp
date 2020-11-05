@@ -77,14 +77,14 @@ class MemoryResource : public strategy::AllocationStrategy {
   virtual std::size_t getHighWatermark() const noexcept override = 0;
 
   /*!
-   * \brief Get the Platform assocatiated with this MemoryResource.
+   * \brief Get the camp::resources::Platform assocatiated with this MemoryResource.
    *
    * This function is pure virtual and must be implemented by the inheriting
    * class.
    *
-   * \return Platform associated with this MemoryResource.
+   * \return camp::resources::Platform associated with this MemoryResource.
    */
-  virtual Platform getPlatform() noexcept override = 0;
+  virtual camp::resources::Platform getPlatform() noexcept override = 0;
 
   MemoryResourceTraits getTraits() const noexcept override;
  

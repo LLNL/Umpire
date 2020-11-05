@@ -38,7 +38,7 @@ void AllocationPrefetcher::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-Platform AllocationPrefetcher::getPlatform() noexcept
+camp::resources::Platform AllocationPrefetcher::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

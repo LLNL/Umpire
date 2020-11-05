@@ -13,7 +13,7 @@
 #include <string>
 
 #include "umpire/util/MemoryResourceTraits.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -96,12 +96,12 @@ class AllocationStrategy {
   /*!
    * \brief Get the platform associated with this AllocationStrategy.
    *
-   * The Platform distinguishes the appropriate place to execute operations
+   * The camp::resources::Platform distinguishes the appropriate place to execute operations
    * on memory allocated by this AllocationStrategy.
    *
    * \return The platform associated with this AllocationStrategy.
    */
-  virtual Platform getPlatform() noexcept = 0;
+  virtual camp::resources::Platform getPlatform() noexcept = 0;
 
   /*!
    * \brief Get the name of this AllocationStrategy.

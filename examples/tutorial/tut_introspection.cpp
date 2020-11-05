@@ -42,7 +42,7 @@ int main(int, char**)
 
     // _sphinx_tag_tut_getinfo_start
     std::cout << "According to the ResourceManager, the Allocator used is "
-              << found_allocator.getName() << ", which has the Platform "
+              << found_allocator.getName() << ", which has the camp::resources::Platform "
               << static_cast<int>(found_allocator.getPlatform()) << std::endl;
     // _sphinx_tag_tut_getinfo_end
 

@@ -12,7 +12,7 @@
 #include <ostream>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 class AllocatorTest;
 
@@ -151,11 +151,11 @@ class Allocator {
   strategy::AllocationStrategy* getAllocationStrategy() noexcept;
 
   /*!
-   * \brief Get the Platform object appropriate for this Allocator.
+   * \brief Get the camp::resources::Platform object appropriate for this Allocator.
    *
-   * \return Platform for this Allocator.
+   * \return camp::resources::Platform for this Allocator.
    */
-  Platform getPlatform() noexcept;
+  camp::resources::Platform getPlatform() noexcept;
 
   Allocator() = default;
 

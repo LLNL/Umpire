@@ -726,11 +726,11 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size,
       }
 
       std::shared_ptr<umpire::op::MemoryOperation> op;
-      if (alloc_record->strategy->getPlatform() == Platform::host &&
+      if (alloc_record->strategy->getPlatform() == camp::resources::Platform::host &&
           getAllocator("HOST").getId() != alloc_record->strategy->getId()) {
         op = op_registry.find(
             "REALLOCATE",
-            std::make_pair(Platform::undefined, Platform::undefined));
+            std::make_pair(camp::resources::Platform::undefined, camp::resources::Platform::undefined));
       } else {
         op = op_registry.find("REALLOCATE", alloc_record->strategy,
                               alloc_record->strategy);

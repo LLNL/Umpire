@@ -74,7 +74,7 @@ strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept
   return m_allocator;
 }
 
-Platform Allocator::getPlatform() noexcept
+camp::resources::Platform Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

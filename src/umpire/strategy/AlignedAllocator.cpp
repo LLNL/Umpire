@@ -18,7 +18,7 @@ AlignedAllocator::AlignedAllocator(const std::string& name, int id,
       m_alignment{alignment},
       m_mask{static_cast<uintptr_t>(~(m_alignment - 1))}
 {
-  if (m_allocator->getPlatform() != Platform::host) {
+  if (m_allocator->getPlatform() != camp::resources::Platform::host) {
     UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
   }
 
@@ -58,7 +58,7 @@ void AlignedAllocator::deallocate(void* ptr)
   return m_allocator->deallocate(base_ptr);
 }
 
-Platform AlignedAllocator::getPlatform() noexcept
+camp::resources::Platform AlignedAllocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

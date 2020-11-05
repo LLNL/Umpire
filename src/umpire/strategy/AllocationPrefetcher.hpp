@@ -28,7 +28,7 @@ class AllocationPrefetcher : public AllocationStrategy {
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr) override;
 
-  Platform getPlatform() noexcept override;
+  camp::resources::Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
 

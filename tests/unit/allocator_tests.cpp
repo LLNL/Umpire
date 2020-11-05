@@ -22,7 +22,7 @@ class MockAllocationStrategy : public umpire::strategy::AllocationStrategy {
   MOCK_METHOD1(deallocate, void(void* ptr));
   MOCK_METHOD0(getCurrentSize, long() const noexcept);
   MOCK_METHOD0(getHighWatermark, long() const noexcept);
-  MOCK_METHOD0(getPlatform, umpire::Platform() noexcept);
+  MOCK_METHOD0(getPlatform, camp::resources::Platform() noexcept);
 };
 
 class AllocatorTest : public ::testing::Test {
@@ -38,7 +38,7 @@ class AllocatorTest : public ::testing::Test {
     data = malloc(100 * sizeof(char));
 
     ON_CALL(*m_strategy, getPlatform())
-        .WillByDefault(::testing::Return(umpire::Platform::host));
+        .WillByDefault(::testing::Return(camp::resources::Platform::host));
 
     // set up allocate return value
     ON_CALL(*m_strategy, allocate(::testing::_))
@@ -69,7 +69,7 @@ TEST_F(AllocatorTest, getPlatform)
 {
   EXPECT_CALL(*m_strategy, getPlatform());
 
-  ASSERT_EQ(m_allocator.getPlatform(), umpire::Platform::host);
+  ASSERT_EQ(m_allocator.getPlatform(), camp::resources::Platform::host);
 }
 
 TEST_F(AllocatorTest, allocate)

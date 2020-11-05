@@ -59,7 +59,7 @@ std::size_t MonotonicAllocationStrategy::getHighWatermark() const noexcept
   return m_capacity;
 }
 
-Platform MonotonicAllocationStrategy::getPlatform() noexcept
+camp::resources::Platform MonotonicAllocationStrategy::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

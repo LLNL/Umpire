@@ -13,13 +13,13 @@
 
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 namespace op {
 
 struct pair_hash {
-  std::size_t operator()(const std::pair<Platform, Platform>& p) const noexcept
+  std::size_t operator()(const std::pair<camp::resources::Platform, camp::resources::Platform>& p) const noexcept
   {
     auto h1 = std::hash<int>{}(static_cast<int>(p.first));
     auto h2 = std::hash<int>{}(static_cast<int>(p.second));
@@ -77,7 +77,7 @@ class MemoryOperationRegistry {
       strategy::AllocationStrategy* dst_allocator);
 
   std::shared_ptr<umpire::op::MemoryOperation> find(
-      const std::string& name, std::pair<Platform, Platform> platforms);
+      const std::string& name, std::pair<camp::resources::Platform, camp::resources::Platform> platforms);
   /*!
    * \brief Add a new MemoryOperation to the registry
    *
@@ -89,7 +89,7 @@ class MemoryOperationRegistry {
    * \param operation pointer to the MemoryOperation.
    */
   void registerOperation(const std::string& name,
-                         std::pair<Platform, Platform> platforms,
+                         std::pair<camp::resources::Platform, camp::resources::Platform> platforms,
                          std::shared_ptr<MemoryOperation>&& operation) noexcept;
 
   MemoryOperationRegistry(const MemoryOperationRegistry&) = delete;
@@ -102,11 +102,11 @@ class MemoryOperationRegistry {
  private:
   /*
    * Doubly-nested unordered_map that stores MemoryOperations by first name,
-   * then by Platform pair.
+   * then by camp::resources::Platform pair.
    */
   std::unordered_map<
       std::string,
-      std::unordered_map<std::pair<Platform, Platform>,
+      std::unordered_map<std::pair<camp::resources::Platform, camp::resources::Platform>,
                          std::shared_ptr<MemoryOperation>, pair_hash>>
       m_operators;
 };

@@ -62,8 +62,8 @@ TEST_P(AllocatorTest, AllocateDeallocateSmall)
 TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
-  if (m_allocator->getPlatform() == umpire::Platform::cuda ||
-      m_allocator->getPlatform() == umpire::Platform::hip) {
+  if (m_allocator->getPlatform() == camp::resources::Platform::cuda ||
+      m_allocator->getPlatform() == camp::resources::Platform::hip) {
     SUCCEED();
   } else {
     double* data =

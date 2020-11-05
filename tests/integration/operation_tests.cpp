@@ -750,7 +750,7 @@ TYPED_TEST(AdviceTest, ReadMostly)
 
   auto m_advice_operation = op_registry.find("READ_MOSTLY", strategy, strategy);
 
-  if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
+  if (this->dest_allocator->getPlatform() == camp::resources::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -770,7 +770,7 @@ TYPED_TEST(AdviceTest, PreferredLocation)
   auto m_advice_operation =
       op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
-  if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
+  if (this->dest_allocator->getPlatform() == camp::resources::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
@@ -789,7 +789,7 @@ TYPED_TEST(AdviceTest, AccessedBy)
 
   auto m_advice_operation = op_registry.find("ACCESSED_BY", strategy, strategy);
 
-  if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
+  if (this->dest_allocator->getPlatform() == camp::resources::Platform::host) {
     device = cudaCpuDeviceId;
   }
 

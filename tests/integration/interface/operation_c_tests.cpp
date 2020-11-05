@@ -366,7 +366,7 @@ INSTANTIATE_TEST_SUITE_P(
 //       strategy,
 //       strategy);
 //
-//   if (dest_allocator->getPlatform() == umpire::Platform::host) {
+//   if (dest_allocator->getPlatform() == camp::resources::Platform::host) {
 //     device = cudaCpuDeviceId;
 //   }
 //
@@ -391,7 +391,7 @@ INSTANTIATE_TEST_SUITE_P(
 //       strategy,
 //       strategy);
 //
-//   if (dest_allocator->getPlatform() == umpire::Platform::host) {
+//   if (dest_allocator->getPlatform() == camp::resources::Platform::host) {
 //     device = cudaCpuDeviceId;
 //   }
 //
@@ -416,7 +416,7 @@ INSTANTIATE_TEST_SUITE_P(
 //       strategy,
 //       strategy);
 //
-//   if (dest_allocator->getPlatform() == umpire::Platform::host) {
+//   if (dest_allocator->getPlatform() == camp::resources::Platform::host) {
 //     device = cudaCpuDeviceId;
 //   }
 //

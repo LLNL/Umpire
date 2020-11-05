@@ -65,150 +65,150 @@ MemoryOperationRegistry& MemoryOperationRegistry::getInstance() noexcept
 
 MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::host),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::host),
                     std::make_shared<HostCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::host, Platform::host),
+  registerOperation("MEMSET", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::host),
                     std::make_shared<HostMemsetOperation>());
 
   registerOperation("REALLOCATE",
-                    std::make_pair(Platform::host, Platform::host),
+                    std::make_pair(camp::resources::Platform::host, camp::resources::Platform::host),
                     std::make_shared<HostReallocateOperation>());
 
   registerOperation("REALLOCATE",
-                    std::make_pair(Platform::undefined, Platform::undefined),
+                    std::make_pair(camp::resources::Platform::undefined, camp::resources::Platform::undefined),
                     std::make_shared<GenericReallocateOperation>());
 
 #if defined(UMPIRE_ENABLE_NUMA)
-  registerOperation("MOVE", std::make_pair(Platform::host, Platform::host),
+  registerOperation("MOVE", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::host),
                     std::make_shared<NumaMoveOperation>());
 
   // NOTE: We don't use CUDA calls in the move operation so no guard is needed
-  registerOperation("MOVE", std::make_pair(Platform::host, Platform::cuda),
+  registerOperation("MOVE", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::cuda),
                     std::make_shared<NumaMoveOperation>());
 
-  registerOperation("MOVE", std::make_pair(Platform::cuda, Platform::host),
+  registerOperation("MOVE", std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::host),
                     std::make_shared<NumaMoveOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::cuda),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::cuda),
                     std::make_shared<CudaCopyToOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::host),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::host),
                     std::make_shared<CudaCopyFromOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("MEMSET", std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaMemsetOperation>());
 
   registerOperation("REALLOCATE",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<GenericReallocateOperation>());
 
   registerOperation("ACCESSED_BY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaAdviseAccessedByOperation>());
 
   registerOperation("PREFERRED_LOCATION",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaAdvisePreferredLocationOperation>());
 
   registerOperation("PREFERRED_LOCATION",
-                    std::make_pair(Platform::host, Platform::host),
+                    std::make_pair(camp::resources::Platform::host, camp::resources::Platform::host),
                     std::make_shared<CudaAdvisePreferredLocationOperation>());
 
   registerOperation("READ_MOSTLY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaAdviseReadMostlyOperation>());
 
   registerOperation("UNSET_ACCESSED_BY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaAdviseUnsetAccessedByOperation>());
 
   registerOperation(
       "UNSET_PREFERRED_LOCATION",
-      std::make_pair(Platform::cuda, Platform::cuda),
+      std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
       std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
   registerOperation(
       "UNSET_PREFERRED_LOCATION",
-      std::make_pair(Platform::host, Platform::host),
+      std::make_pair(camp::resources::Platform::host, camp::resources::Platform::host),
       std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
   registerOperation("UNSET_READ_MOSTLY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
 
-  registerOperation("PREFETCH", std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("PREFETCH", std::make_pair(camp::resources::Platform::cuda, camp::resources::Platform::cuda),
                     std::make_shared<CudaMemPrefetchOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::hip),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::hip),
                     std::make_shared<HipCopyToOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::host),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::hip, camp::resources::Platform::host),
                     std::make_shared<HipCopyFromOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::hip),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::hip, camp::resources::Platform::hip),
                     std::make_shared<HipCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip),
+  registerOperation("MEMSET", std::make_pair(camp::resources::Platform::hip, camp::resources::Platform::hip),
                     std::make_shared<HipMemsetOperation>());
 
-  registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
+  registerOperation("REALLOCATE", std::make_pair(camp::resources::Platform::hip, camp::resources::Platform::hip),
                     std::make_shared<GenericReallocateOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   registerOperation("COPY",
-                    std::make_pair(Platform::host, Platform::omp_target),
+                    std::make_pair(camp::resources::Platform::host, camp::resources::Platform::omp_target),
                     std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation("COPY",
-                    std::make_pair(Platform::omp_target, Platform::host),
+                    std::make_pair(camp::resources::Platform::omp_target, camp::resources::Platform::host),
                     std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation("COPY",
-                    std::make_pair(Platform::omp_target, Platform::omp_target),
+                    std::make_pair(camp::resources::Platform::omp_target, camp::resources::Platform::omp_target),
                     std::make_shared<OpenMPTargetCopyOperation>());
 
   registerOperation("MEMSET",
-                    std::make_pair(Platform::omp_target, Platform::omp_target),
+                    std::make_pair(camp::resources::Platform::omp_target, camp::resources::Platform::omp_target),
                     std::make_shared<OpenMPTargetMemsetOperation>());
 
   registerOperation("REALLOCATE",
-                    std::make_pair(Platform::omp_target, Platform::omp_target),
+                    std::make_pair(camp::resources::Platform::omp_target, camp::resources::Platform::omp_target),
                     std::make_shared<GenericReallocateOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::sycl),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::host, camp::resources::Platform::sycl),
                     std::make_shared<SyclCopyToOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::sycl, Platform::host),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::sycl, camp::resources::Platform::host),
                     std::make_shared<SyclCopyFromOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::sycl, Platform::sycl),
+  registerOperation("COPY", std::make_pair(camp::resources::Platform::sycl, camp::resources::Platform::sycl),
                     std::make_shared<SyclCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::sycl, Platform::sycl),
+  registerOperation("MEMSET", std::make_pair(camp::resources::Platform::sycl, camp::resources::Platform::sycl),
                     std::make_shared<SyclMemsetOperation>());
 
   registerOperation("REALLOCATE",
-                    std::make_pair(Platform::sycl, Platform::sycl),
+                    std::make_pair(camp::resources::Platform::sycl, camp::resources::Platform::sycl),
                     std::make_shared<GenericReallocateOperation>());
 
-  registerOperation("PREFETCH", std::make_pair(Platform::sycl, Platform::sycl),
+  registerOperation("PREFETCH", std::make_pair(camp::resources::Platform::sycl, camp::resources::Platform::sycl),
                     std::make_shared<SyclMemPrefetchOperation>());
 #endif
 }
 
 void MemoryOperationRegistry::registerOperation(
-    const std::string& name, std::pair<Platform, Platform> platforms,
+    const std::string& name, std::pair<camp::resources::Platform, camp::resources::Platform> platforms,
     std::shared_ptr<MemoryOperation>&& operation) noexcept
 {
   auto operations = m_operators.find(name);
@@ -217,7 +217,7 @@ void MemoryOperationRegistry::registerOperation(
     operations =
         m_operators
             .insert(std::make_pair(
-                name, std::unordered_map<std::pair<Platform, Platform>,
+                name, std::unordered_map<std::pair<camp::resources::Platform, camp::resources::Platform>,
                                          std::shared_ptr<MemoryOperation>,
                                          pair_hash>()))
             .first;
@@ -237,7 +237,7 @@ std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
 }
 
 std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
-    const std::string& name, std::pair<Platform, Platform> platforms)
+    const std::string& name, std::pair<camp::resources::Platform, camp::resources::Platform> platforms)
 {
   auto operations = m_operators.find(name);
 

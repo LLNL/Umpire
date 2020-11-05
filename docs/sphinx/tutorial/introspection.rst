@@ -18,7 +18,7 @@ associated with an address:
    :language: C++
 
 Once you have this, it's easy to query things like the name of the Allocator or
-find out the associated :class:`umpire::Platform`, which can help
+find out the associated :class:`camp::resources::Platform`, which can help
 you decide where to operate on this data:
 
 .. literalinclude:: ../../../examples/tutorial/tut_introspection.cpp

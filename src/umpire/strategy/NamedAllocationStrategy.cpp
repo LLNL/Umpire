@@ -28,7 +28,7 @@ void NamedAllocationStrategy::deallocate(void* ptr)
   return m_allocator->deallocate(ptr);
 }
 
-Platform NamedAllocationStrategy::getPlatform() noexcept
+camp::resources::Platform NamedAllocationStrategy::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

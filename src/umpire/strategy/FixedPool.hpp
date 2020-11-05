@@ -53,7 +53,7 @@ class FixedPool : public AllocationStrategy {
   std::size_t getHighWatermark() const noexcept override final;
   std::size_t getActualSize() const noexcept override final;
 
-  Platform getPlatform() noexcept override final;
+  camp::resources::Platform getPlatform() noexcept override final;
   MemoryResourceTraits getTraits() const noexcept override final;
 
   bool pointerIsFromPool(void* ptr) const noexcept;

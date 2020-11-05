@@ -19,7 +19,7 @@ namespace resource {
 
 int FileMemoryResource::s_file_counter{0};
 
-FileMemoryResource::FileMemoryResource(Platform platform,
+FileMemoryResource::FileMemoryResource(camp::resources::Platform platform,
                                        const std::string& name, int id,
                                        MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}, m_platform{platform}, m_size_map{}
@@ -119,7 +119,7 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
-Platform FileMemoryResource::getPlatform() noexcept
+camp::resources::Platform FileMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

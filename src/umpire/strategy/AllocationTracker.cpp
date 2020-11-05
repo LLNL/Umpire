@@ -66,7 +66,7 @@ std::size_t AllocationTracker::getAllocationCount() const noexcept
   return m_allocation_count;
 }
 
-Platform AllocationTracker::getPlatform() noexcept
+camp::resources::Platform AllocationTracker::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

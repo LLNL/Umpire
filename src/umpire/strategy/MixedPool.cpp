@@ -128,7 +128,7 @@ std::size_t MixedPool::getHighWatermark() const noexcept
   return size;
 }
 
-Platform MixedPool::getPlatform() noexcept
+camp::resources::Platform MixedPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

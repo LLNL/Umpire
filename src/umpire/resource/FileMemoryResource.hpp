@@ -11,7 +11,7 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/MemoryMap.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 namespace resource {
@@ -34,12 +34,12 @@ class FileMemoryResource : public MemoryResource {
   /*!
    * \brief Construct a new FileMemoryResource
    *
-   * \param platform Platform of this instance of the FileMemoryResource.
+   * \param platform camp::resources::Platform of this instance of the FileMemoryResource.
    * \param name Name of this instance of the FileMemoryResource.
    * \param id Id of this instance of the FileMemoryResource.
    * \param traits Traits of this instance of the FileMemoryResource.
    */
-  FileMemoryResource(Platform platform, const std::string& name, int id,
+  FileMemoryResource(camp::resources::Platform platform, const std::string& name, int id,
                      MemoryResourceTraits traits);
 
   /*!
@@ -84,11 +84,11 @@ class FileMemoryResource : public MemoryResource {
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
-  Platform getPlatform() noexcept;
+  camp::resources::Platform getPlatform() noexcept;
   static int s_file_counter;
 
  protected:
-  Platform m_platform;
+  camp::resources::Platform m_platform;
 
  private:
   /*!

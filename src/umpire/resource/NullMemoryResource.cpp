@@ -23,7 +23,7 @@
 namespace umpire {
 namespace resource {
 
-NullMemoryResource::NullMemoryResource(Platform platform,
+NullMemoryResource::NullMemoryResource(camp::resources::Platform platform,
                                        const std::string& name, int id,
                                        MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_platform{platform}, m_size_map{}
@@ -72,7 +72,7 @@ std::size_t NullMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
-Platform NullMemoryResource::getPlatform() noexcept
+camp::resources::Platform NullMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

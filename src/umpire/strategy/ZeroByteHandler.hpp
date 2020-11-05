@@ -30,7 +30,7 @@ class ZeroByteHandler : public AllocationStrategy {
   std::size_t getHighWatermark() const noexcept override;
   std::size_t getActualSize() const noexcept override;
 
-  Platform getPlatform() noexcept override;
+  camp::resources::Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
 

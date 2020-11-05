@@ -234,7 +234,7 @@ std::size_t DynamicPoolMap::getReleasableSize() const noexcept
   return releasable_bytes;
 }
 
-Platform DynamicPoolMap::getPlatform() noexcept
+camp::resources::Platform DynamicPoolMap::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

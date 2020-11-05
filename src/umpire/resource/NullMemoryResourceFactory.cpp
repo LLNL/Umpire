@@ -32,7 +32,7 @@ std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(
 std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(
     const std::string& name, int id, MemoryResourceTraits traits)
 {
-  return util::make_unique<NullMemoryResource>(Platform::undefined, name, id,
+  return util::make_unique<NullMemoryResource>(camp::resources::Platform::undefined, name, id,
                                                traits);
 }
 

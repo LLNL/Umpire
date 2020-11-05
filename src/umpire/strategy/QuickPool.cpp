@@ -264,7 +264,7 @@ std::size_t QuickPool::getReleasableSize() const noexcept
     return 0;
 }
 
-Platform QuickPool::getPlatform() noexcept
+camp::resources::Platform QuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

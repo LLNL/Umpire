@@ -12,14 +12,14 @@
 #include "gtest/gtest.h"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 template <typename Resource>
 class ResourceTest : public ::testing::Test {
  public:
   void SetUp() override
   {
-    auto platform = umpire::Platform::undefined;
+    auto platform = camp::resources::Platform::undefined;
     const std::string name{"test resource"};
     const int id{0};
     auto traits = umpire::MemoryResourceTraits{};
@@ -67,7 +67,7 @@ TYPED_TEST_P(ResourceTest, getHighWatermark)
 TYPED_TEST_P(ResourceTest, getPlatform)
 {
   auto platform = this->memory_resource->getPlatform();
-  ASSERT_EQ(platform, umpire::Platform::undefined);
+  ASSERT_EQ(platform, camp::resources::Platform::undefined);
 }
 
 TYPED_TEST_P(ResourceTest, getTraits)

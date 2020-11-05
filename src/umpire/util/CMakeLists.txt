@@ -21,7 +21,6 @@ set (umpire_util_headers
   MemoryMap.hpp
   MemoryMap.inl
   OutputBuffer.hpp
-  Platform.hpp
   allocation_statistics.hpp
   detect_vendor.hpp
   make_unique.hpp

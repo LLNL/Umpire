@@ -62,7 +62,7 @@ void NumaPolicy::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-Platform NumaPolicy::getPlatform() noexcept
+camp::resources::Platform NumaPolicy::getPlatform() noexcept
 {
   return m_platform;
 }

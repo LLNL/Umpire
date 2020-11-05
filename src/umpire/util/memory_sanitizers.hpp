@@ -35,12 +35,12 @@
 #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
 #define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)   \
-  if (allocator->getPlatform() == umpire::Platform::host) { \
+  if (allocator->getPlatform() == camp::resources::Platform::host) { \
     ASAN_POISON_MEMORY_REGION((ptr), (size));               \
   }
 
 #define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size) \
-  if (allocator->getPlatform() == umpire::Platform::host) { \
+  if (allocator->getPlatform() == camp::resources::Platform::host) { \
     ASAN_UNPOISON_MEMORY_REGION((ptr), (size));             \
   }
 

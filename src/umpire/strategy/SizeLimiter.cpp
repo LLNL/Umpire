@@ -39,7 +39,7 @@ void SizeLimiter::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-Platform SizeLimiter::getPlatform() noexcept
+camp::resources::Platform SizeLimiter::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

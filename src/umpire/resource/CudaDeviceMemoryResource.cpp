@@ -15,7 +15,7 @@
 namespace umpire {
 namespace resource {
 
-CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform,
+CudaDeviceMemoryResource::CudaDeviceMemoryResource(camp::resources::Platform platform,
                                                    const std::string& name,
                                                    int id,
                                                    MemoryResourceTraits traits)
@@ -65,7 +65,7 @@ std::size_t CudaDeviceMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
-Platform CudaDeviceMemoryResource::getPlatform() noexcept
+camp::resources::Platform CudaDeviceMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

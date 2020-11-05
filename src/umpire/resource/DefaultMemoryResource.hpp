@@ -10,7 +10,7 @@
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 namespace resource {
@@ -22,10 +22,10 @@ namespace resource {
 template <typename _allocator>
 class DefaultMemoryResource : public MemoryResource {
  public:
-  DefaultMemoryResource(Platform platform, const std::string& name, int id,
+  DefaultMemoryResource(camp::resources::Platform platform, const std::string& name, int id,
                         MemoryResourceTraits traits);
 
-  DefaultMemoryResource(Platform platform, const std::string& name, int id,
+  DefaultMemoryResource(camp::resources::Platform platform, const std::string& name, int id,
                         MemoryResourceTraits traits, _allocator alloc);
 
   void* allocate(std::size_t bytes);
@@ -34,12 +34,12 @@ class DefaultMemoryResource : public MemoryResource {
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
-  Platform getPlatform() noexcept;
+  camp::resources::Platform getPlatform() noexcept;
 
  protected:
   _allocator m_allocator;
 
-  Platform m_platform;
+  camp::resources::Platform m_platform;
 };
 
 } // end of namespace resource

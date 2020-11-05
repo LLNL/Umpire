@@ -209,7 +209,7 @@ std::size_t FixedPool::getHighWatermark() const noexcept
   return m_highwatermark;
 }
 
-Platform FixedPool::getPlatform() noexcept
+camp::resources::Platform FixedPool::getPlatform() noexcept
 {
   return m_strategy->getPlatform();
 }

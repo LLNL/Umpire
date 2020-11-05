@@ -67,7 +67,7 @@ std::size_t ZeroByteHandler::getActualSize() const noexcept
   return m_allocator->getActualSize();
 }
 
-Platform ZeroByteHandler::getPlatform() noexcept
+camp::resources::Platform ZeroByteHandler::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

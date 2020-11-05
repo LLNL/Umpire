@@ -9,14 +9,14 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/MemoryMap.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 namespace resource {
 
 class NullMemoryResource : public MemoryResource {
  public:
-  NullMemoryResource(Platform platform, const std::string& name, int id,
+  NullMemoryResource(camp::resources::Platform platform, const std::string& name, int id,
                      MemoryResourceTraits traits);
 
   void* allocate(std::size_t bytes);
@@ -25,10 +25,10 @@ class NullMemoryResource : public MemoryResource {
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
-  Platform getPlatform() noexcept;
+  camp::resources::Platform getPlatform() noexcept;
 
  protected:
-  Platform m_platform;
+  camp::resources::Platform m_platform;
 
  private:
   util::MemoryMap<size_t> m_size_map;

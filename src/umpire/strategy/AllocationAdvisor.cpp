@@ -62,7 +62,7 @@ void AllocationAdvisor::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-Platform AllocationAdvisor::getPlatform() noexcept
+camp::resources::Platform AllocationAdvisor::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

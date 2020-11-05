@@ -13,7 +13,7 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Platform.hpp"
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 namespace resource {
@@ -29,13 +29,13 @@ class HipConstantMemoryResource : public MemoryResource {
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
-  Platform getPlatform() noexcept;
+  camp::resources::Platform getPlatform() noexcept;
 
  private:
   std::size_t m_current_size;
   std::size_t m_highwatermark;
 
-  Platform m_platform;
+  camp::resources::Platform m_platform;
 
   std::size_t m_offset;
   void* m_ptr;

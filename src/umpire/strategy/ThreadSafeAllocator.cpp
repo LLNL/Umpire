@@ -34,7 +34,7 @@ void ThreadSafeAllocator::deallocate(void* ptr)
   m_allocator->deallocate(ptr);
 }
 
-Platform ThreadSafeAllocator::getPlatform() noexcept
+camp::resources::Platform ThreadSafeAllocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

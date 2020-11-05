@@ -49,7 +49,7 @@ std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
 #endif
 
   return util::make_unique<DefaultMemoryResource<HostAllocator>>(
-      Platform::host, name, id, traits);
+      camp::resources::Platform::host, name, id, traits);
 }
 
 MemoryResourceTraits HostResourceFactory::getDefaultTraits()

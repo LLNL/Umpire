@@ -19,7 +19,7 @@ namespace resource {
 
 template <typename _allocator>
 DefaultMemoryResource<_allocator>::DefaultMemoryResource(
-    Platform platform, const std::string& name, int id,
+    camp::resources::Platform platform, const std::string& name, int id,
     MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator(), m_platform(platform)
 {
@@ -27,7 +27,7 @@ DefaultMemoryResource<_allocator>::DefaultMemoryResource(
 
 template <typename _allocator>
 DefaultMemoryResource<_allocator>::DefaultMemoryResource(
-    Platform platform, const std::string& name, int id,
+    camp::resources::Platform platform, const std::string& name, int id,
     MemoryResourceTraits traits, _allocator alloc)
     : MemoryResource(name, id, traits), m_allocator(alloc), m_platform(platform)
 {
@@ -66,7 +66,7 @@ std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
 }
 
 template <typename _allocator>
-Platform DefaultMemoryResource<_allocator>::getPlatform() noexcept
+camp::resources::Platform DefaultMemoryResource<_allocator>::getPlatform() noexcept
 {
   return m_platform;
 }

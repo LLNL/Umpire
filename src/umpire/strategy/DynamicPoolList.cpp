@@ -90,7 +90,7 @@ std::size_t DynamicPoolList::getLargestAvailableBlock() const noexcept
   return LargestAvailableBlock;
 }
 
-Platform DynamicPoolList::getPlatform() noexcept
+camp::resources::Platform DynamicPoolList::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
 }

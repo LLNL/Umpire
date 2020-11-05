@@ -31,7 +31,7 @@ class NumaPolicy : public AllocationStrategy {
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr) override;
 
-  Platform getPlatform() noexcept override;
+  camp::resources::Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
 
@@ -39,7 +39,7 @@ class NumaPolicy : public AllocationStrategy {
 
  private:
   strategy::AllocationStrategy* m_allocator;
-  Platform m_platform;
+  camp::resources::Platform m_platform;
   int m_node;
 };
 
