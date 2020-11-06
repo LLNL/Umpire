@@ -330,8 +330,6 @@ class ResourceManager {
 
   std::mutex m_mutex;
 
-  std::vector<std::string> m_resource_names;
-
   // Methods that need access to m_allocations to print/filter records
   friend void print_allocator_records(Allocator, std::ostream&);
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
