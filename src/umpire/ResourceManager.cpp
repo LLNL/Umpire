@@ -34,7 +34,7 @@
 #include <hip/hip_runtime.h>
 #endif
 
-#if defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_SYCL)
 #include <CL/sycl.hpp>
 #endif
 
