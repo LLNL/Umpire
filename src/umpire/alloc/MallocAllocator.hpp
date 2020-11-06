@@ -61,18 +61,6 @@ struct MallocAllocator {
 
   bool isHostPageable()
   {
-#if defined(UMPIRE_ENABLE_HIP)
-    hipDeviceProp_t props;
-    int hdev = 0;
-    hipGetDevice(&hdev);
-
-    //Check whether HIP can map host memory.
-    hipGetDeviceProperties(&props, hdev);
-    if(props.canMapHostMemory)
-      return true;
-    else
-      return false;
-#endif
 #if defined(UMPIRE_ENABLE_CUDA)
     int pageableMem = 0;
     int cdev = 0;
@@ -94,7 +82,7 @@ struct MallocAllocator {
   {
     if(p == Platform::host || p == Platform::omp_target)
       return true;
-    else if(p == Platform::cuda || p == Platform::hip)
+    else if(p == Platform::cuda)
       return isHostPageable();
     else  
       return false;
