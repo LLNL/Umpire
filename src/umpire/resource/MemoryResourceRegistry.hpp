@@ -18,7 +18,7 @@ namespace resource {
 
 class MemoryResourceRegistry {
  public:
-  static MemoryResourceRegistry& getInstance() noexcept;
+  static MemoryResourceRegistry& getInstance();
 
   const std::vector<std::string>& getResourceNames() noexcept;
 
@@ -37,7 +37,7 @@ class MemoryResourceRegistry {
   ~MemoryResourceRegistry() = default;
 
  private:
-  MemoryResourceRegistry() noexcept;
+  MemoryResourceRegistry();
 
   std::vector<std::unique_ptr<MemoryResourceFactory>> m_allocator_factories;
 

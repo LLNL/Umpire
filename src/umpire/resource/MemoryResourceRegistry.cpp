@@ -62,7 +62,7 @@
 namespace umpire {
 namespace resource {
 
-MemoryResourceRegistry& MemoryResourceRegistry::getInstance() noexcept
+MemoryResourceRegistry& MemoryResourceRegistry::getInstance()
 {
   static MemoryResourceRegistry resource_registry;
 
@@ -75,7 +75,7 @@ MemoryResourceRegistry::getResourceNames() noexcept
   return m_resource_names;
 }
 
-MemoryResourceRegistry::MemoryResourceRegistry() noexcept
+MemoryResourceRegistry::MemoryResourceRegistry()
     : m_allocator_factories()
 {
   registerMemoryResource(
