@@ -64,11 +64,15 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})
       COPYONLY
     )
 
+    add_test(
+      NAME replay_coverage_tests
+      COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/check_replay_coverage.bash
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+
     if (NOT C_COMPILER_FAMILY_IS_PGI)
       add_test(
         NAME replay_tests
-        COMMAND ${BASH_PROGRAM}
-        ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+        COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/replay_tests.bash ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
     endif()
 
   else ()
