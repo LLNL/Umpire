@@ -37,6 +37,7 @@
 
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 #include "umpire/resource/HipPinnedMemoryResourceFactory.hpp"
+#include "umpire/resource/HipUnifiedMemoryResourceFactory.hpp"
 #if defined(UMPIRE_ENABLE_CONST)
 #include "umpire/resource/HipConstantMemoryResourceFactory.hpp"
 #endif
@@ -140,6 +141,10 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       std::string name{"DEVICE::" + std::to_string(device)};
       m_resource_names.push_back(name);
     }
+
+    registerMemoryResource(
+        util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
+    m_resource_names.push_back("UM");
 
     registerMemoryResource(
         util::make_unique<resource::HipPinnedMemoryResourceFactory>());
