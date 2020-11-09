@@ -37,13 +37,9 @@ int main()
   /* _sphinx_tag_tut_resource_types_start */
   allocate_and_deallocate("HOST");
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("UM");
-  allocate_and_deallocate("PINNED");
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-  allocate_and_deallocate("DEVICE");
   allocate_and_deallocate("PINNED");
 #endif
   /* _sphinx_tag_tut_resource_types_end */

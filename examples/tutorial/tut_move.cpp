@@ -47,13 +47,9 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   data = move_data(data, "HOST");
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   data = move_data(data, "DEVICE");
   data = move_data(data, "UM");
-  data = move_data(data, "PINNED");
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-  data = move_data(data, "DEVICE");
   data = move_data(data, "PINNED");
 #endif
 

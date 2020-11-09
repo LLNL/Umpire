@@ -40,15 +40,10 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
 }
 
 const std::string allocators[] = {"HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
                                   ,
                                   "DEVICE",
                                   "UM",
-                                  "PINNED"
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-                                  ,
-                                  "DEVICE",
                                   "PINNED"
 #endif
 };

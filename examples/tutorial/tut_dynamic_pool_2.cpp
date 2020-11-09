@@ -39,13 +39,9 @@ int main(int, char**)
 {
   // _sphinx_tag_tut_device_sized_pool_start
   allocate_and_deallocate_pool("HOST", 65536, 512);
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   allocate_and_deallocate_pool("DEVICE", (1024 * 1024 * 1024), (1024 * 1024));
   allocate_and_deallocate_pool("UM", (1024 * 64), 1024);
-  allocate_and_deallocate_pool("PINNED", (1024 * 16), 1024);
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-  allocate_and_deallocate_pool("DEVICE", (1024 * 1024 * 1024), (1024 * 1024));
   allocate_and_deallocate_pool("PINNED", (1024 * 16), 1024);
 #endif
   // _sphinx_tag_tut_device_sized_pool_end
