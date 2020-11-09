@@ -266,7 +266,10 @@ Allocator ResourceManager::getDefaultAllocator()
 
 std::vector<std::string> ResourceManager::getResourceNames()
 {
-  return m_resource_names;
+  resource::MemoryResourceRegistry& registry{
+      resource::MemoryResourceRegistry::getInstance()};
+
+  return registry.getResourceNames();
 }
 
 void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
