@@ -65,26 +65,10 @@ std::size_t HipDeviceMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
-bool HipDeviceMemoryResource::isHostPageable() noexcept
-{
-  hipDeviceProp_t props;
-  int hdev = m_traits.id;
-  hipGetDevice(&hdev);
-
-  //Check whether HIP can map host memory.
-  hipGetDeviceProperties(&props, hdev);
-  if(props.canMapHostMemory)
-    return true;
-  else
-    return false;
-}
-
 bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::hip)
+  if(p == Platform::hip || p == Platform::host)
     return true;
-  else if(p == Platform::host)
-    return isHostPageable();
   else
     return false;
 }

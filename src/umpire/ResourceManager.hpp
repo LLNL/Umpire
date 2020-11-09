@@ -87,11 +87,11 @@ class ResourceManager {
   /*!
    * \brief Get the names for existing Resources.
    *
-   * The Resource Manager dynamically populates available memory resource types with
-   * m_resource_names based on what's available. This is used for determining 
-   * allocator accessibility.
-   *
-   * \return The private member, m_resource_names.
+   * The Memory Resource Registry dynamically populates available memory resource
+   * types based on what's available. This function returns those names so they
+   * can be used to determine allocator accessibility.
+   * 
+   * \return The available resource names.
    */
    std::vector<std::string> getResourceNames();
 
