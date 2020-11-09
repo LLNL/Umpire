@@ -4,11 +4,11 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include <iostream>
-#include <iomanip>
 #include <cstdint>
-#include <vector>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <vector>
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "umpire/Allocator.hpp"
@@ -53,6 +53,11 @@ void ReplayOperationManager::runOperations()
 {
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
+
+  if (m_options.print_stats_on_release) {
+    std::cout << "Input,Release,Name,CurrentSize,ActualSize,Watermark"
+      << std::endl;
+  }
 
   for ( auto op = &m_ops_table->ops[1];
         op < &m_ops_table->ops[m_ops_table->num_operations];
@@ -131,6 +136,19 @@ void ReplayOperationManager::runOperations()
 
   if (m_options.print_statistics) {
     dumpStats();
+  }
+
+  if (m_options.print_stats_on_release) {
+    for (const auto& alloc_name : rm.getAllocatorNames()) {
+      auto alloc = rm.getAllocator(alloc_name);
+      std::cout << m_replay_file->getInputFileName() << ","
+              << "End,"
+              << alloc_name << ","
+              << alloc.getCurrentSize() << ","
+              << alloc.getActualSize() << ","
+              << alloc.getHighWatermark()
+              << std::endl;
+    }
   }
 }
 
@@ -991,6 +1009,15 @@ void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
 void ReplayOperationManager::makeRelease(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->op_allocator];
+  if (m_options.print_stats_on_release) {
+    std::cout << m_replay_file->getInputFileName() << ","
+              << "Pre Release,"
+              << alloc->allocator->getName() << ","
+              << alloc->allocator->getCurrentSize() << ","
+              << alloc->allocator->getActualSize() << ","
+              << alloc->allocator->getHighWatermark()
+              << std::endl;
+  }
   alloc->allocator->release();
 }
 
