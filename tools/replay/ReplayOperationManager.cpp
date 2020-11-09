@@ -49,8 +49,77 @@ ReplayOperationManager::~ReplayOperationManager()
   }
 }
 
+namespace {
+  struct TrackedCounter {
+    void increment() {
+      current_count++;
+      if (current_count > high_watermark)
+        high_watermark = current_count;
+    };
+
+    void decrement() {
+      current_count--;
+    };
+
+    std::size_t current_count{0};
+    std::size_t high_watermark{0};
+  };
+
+  //
+  // https://stackoverflow.com/questions/11376288/fast-computing-of-log2-for-64-bit-integers
+  //
+  const int tab64[64] = {
+    63,  0, 58,  1, 59, 47, 53,  2,
+    60, 39, 48, 27, 54, 33, 42,  3,
+    61, 51, 37, 40, 49, 18, 28, 20,
+    55, 30, 34, 11, 43, 14, 22,  4,
+    62, 57, 46, 52, 38, 26, 32, 41,
+    50, 36, 17, 19, 29, 10, 13, 21,
+    56, 45, 25, 31, 35, 16,  9, 12,
+    44, 24, 15,  8, 23,  7,  6,  5};
+
+  int log2_64 (std::size_t size)
+  {
+    uint64_t value{static_cast<uint64_t>(size)};
+    value |= value >> 1;
+    value |= value >> 2;
+    value |= value >> 4;
+    value |= value >> 8;
+    value |= value >> 16;
+    value |= value >> 32;
+    uint64_t multiplier = UINT64_C(0x07EDD5E59A4E28C2);
+    uint64_t shifter = UINT64_C(58);
+    value = value - (value >> 1);
+    int index = (value * multiplier) >> shifter;
+    return tab64[index];
+  }
+
+  struct TrackedHistogram {
+    void increment(std::size_t size) {
+      int index{ log2_64(size) };
+      log2_buckets[index].increment();
+    };
+
+    void decrement(std::size_t size) {
+      int index{ log2_64(size) };
+      log2_buckets[index].decrement();
+    };
+
+    void print() const {
+      std::cout << log2_buckets[0].high_watermark;
+      for ( int i = 1; i < 64; i++ ) {
+        std::cout << ", " << log2_buckets[i].high_watermark;
+      }
+      std::cout << std::endl;
+    };
+
+    TrackedCounter log2_buckets[64];
+  };
+};
+
 void ReplayOperationManager::runOperations()
 {
+  std::map<int, TrackedHistogram > size_histogram;
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -66,9 +135,15 @@ void ReplayOperationManager::runOperations()
     try {
       switch (op->op_type) {
         case ReplayFile::otype::ALLOCATOR_CREATION:
+          if (m_options.print_stats_on_release) {
+            size_histogram[op->op_allocator] = TrackedHistogram{};
+          }
           makeAllocator(op);
           break;
         case ReplayFile::otype::SETDEFAULTALLOCATOR:
+          if (m_options.print_stats_on_release) {
+            size_histogram[op->op_allocator] = TrackedHistogram{};
+          }
           makeSetDefaultAllocator(op);
           break;
         case ReplayFile::otype::COPY:
@@ -83,9 +158,18 @@ void ReplayOperationManager::runOperations()
           makeReallocate_ex(op);
           break;
         case ReplayFile::otype::ALLOCATE:
+          if (m_options.print_stats_on_release) {
+            size_histogram[op->op_allocator].increment(op->op_size);
+          }
           makeAllocate(op);
           break;
         case ReplayFile::otype::DEALLOCATE:
+          if (m_options.print_stats_on_release) {
+            auto alloc = &m_ops_table->allocators[op->op_allocator];
+            auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
+            size_histogram[op->op_allocator].decrement(
+                                                alloc->allocator->getSize(ptr));
+          }
           makeDeallocate(op);
           break;
         case ReplayFile::otype::COALESCE:
@@ -148,6 +232,13 @@ void ReplayOperationManager::runOperations()
               << alloc.getActualSize() << ","
               << alloc.getHighWatermark()
               << std::endl;
+    }
+
+    for (auto const& x : size_histogram)
+    {
+      auto alloc = &m_ops_table->allocators[x.first];
+      std::cout << alloc->allocator->getName() << ", ";
+      x.second.print();
     }
   }
 }
