@@ -46,6 +46,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - `umpire_resourcemanager_is_allocator` C function is now
   `umpire_resourcemanager_is_allocator_name`.
 
+- Move backend-specific resource code out of ResourceManager and into resource::MemoryResourceRegistry.
+
 ### Removed
 
 - ENABLE_STATISTICS option and (optional) dependency on Conduit.
