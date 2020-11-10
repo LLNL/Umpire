@@ -48,7 +48,7 @@ void* QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
-  const auto& best = m_size_map.lower_bound(rounded_bytes);
+  auto best = m_size_map.lower_bound(rounded_bytes);
 
   Chunk* chunk{nullptr};
 
@@ -95,6 +95,17 @@ void* QuickPool::allocate(std::size_t bytes)
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
   } else {
+    //
+    // Loop through and find the lowest allocation address
+    //
+    auto range = m_size_map.equal_range(rounded_bytes);
+    void* lowest_ptr{(*best).second->data};
+    for (auto it = range.first; it!=range.second; ++it) {
+      if ((*it).second->data < lowest_ptr) {
+        best = it;
+        lowest_ptr = (*it).second->data;
+      }
+    }
     chunk = (*best).second;
     m_size_map.erase(best);
   }
