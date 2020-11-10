@@ -32,9 +32,13 @@ int main(int, char**)
 {
   allocate_and_deallocate("HOST");
 
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_DEVICE)
   allocate_and_deallocate("DEVICE");
+#endif
+#if defined(UMPIRE_ENABLE_UM)
   allocate_and_deallocate("UM");
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   allocate_and_deallocate("PINNED");
 #endif
 

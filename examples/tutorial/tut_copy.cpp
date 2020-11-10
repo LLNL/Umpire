@@ -49,9 +49,13 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   copy_data(data, SIZE, "HOST");
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_DEVICE)
   copy_data(data, SIZE, "DEVICE");
+#endif
+#if defined(UMPIRE_ENABLE_UM)
   copy_data(data, SIZE, "UM");
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   copy_data(data, SIZE, "PINNED");
 #endif
 

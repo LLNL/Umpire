@@ -296,7 +296,7 @@ TEST(Allocation, DeallocateDifferent)
 }
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-TEST(Allocator, DeallocateDifferentCuda)
+TEST(Allocator, DeallocateDifferentUMDevice)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc_um = rm.getAllocator("UM");

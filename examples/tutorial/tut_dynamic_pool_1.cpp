@@ -41,9 +41,13 @@ int main(int, char**)
   // _sphinx_tag_tut_anyallocator_start
   allocate_and_deallocate_pool("HOST");
 
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_DEVICE)
   allocate_and_deallocate_pool("DEVICE");
+#endif
+#if defined(UMPIRE_ENABLE_UM)
   allocate_and_deallocate_pool("UM");
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   allocate_and_deallocate_pool("PINNED");
 #endif
   // _sphinx_tag_tut_anyallocator_end
