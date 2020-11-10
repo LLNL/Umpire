@@ -65,6 +65,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Made replay test tool aware of `memset` operation and added CI tests to
   find and report future missing replay operations in the tool.
 
+- Fixed accounting for number of releasable bytes in Quickpool that was causing
+  coalesce operations to not work properly.
+  
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
