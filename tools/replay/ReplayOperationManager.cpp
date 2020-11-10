@@ -115,7 +115,7 @@ namespace {
 
     TrackedCounter log2_buckets[64];
   };
-};
+}
 
 void ReplayOperationManager::runOperations()
 {
