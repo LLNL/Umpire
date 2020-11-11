@@ -113,7 +113,7 @@ namespace {
       std::cout << std::endl;
     };
 
-    TrackedCounter log2_buckets[64];
+    TrackedCounter log2_buckets[64]{ TrackedCounter{} };
   };
 }
 
