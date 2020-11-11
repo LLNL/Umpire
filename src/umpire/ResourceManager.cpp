@@ -20,6 +20,9 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/ZeroByteHandler.hpp"
+#if defined(UMPIRE_ENABLE_NUMA)
+#include "umpire/strategy/NumaPolicy.hpp"
+#endif
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/io.hpp"
