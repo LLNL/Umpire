@@ -12,9 +12,6 @@
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
-//using cPlatform = camp::resources::Platform;
-//using myResource = umpire::MemoryResourceTraits::resource_type;
-
 struct host_platform {};
 
 template <typename Platform>

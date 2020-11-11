@@ -10,7 +10,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 
-bool testAccess(umpire::Allocator a)
+bool is_accessible_from_host(umpire::Allocator a)
 {
   if(umpire::is_accessible(umpire::Platform::host, a)) {
     std::cout << "The allocator, " << a.getName()
@@ -23,13 +23,12 @@ bool testAccess(umpire::Allocator a)
   }
 }
 
-////////////////////////////////////////////////////////////////
-//Depending on how Umpire has been set up, several different 
-//allocators could be accessible from the host CAMP platform. 
-//This test will create a list of all currently available allocators 
-//and then test each individually to see if it can be accessed from 
-//the host platform. (To test other platforms, see test.)
-///////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+//Depending on how Umpire has been set up, several different allocators could be accessible
+//from the host CAMP platform. This example will create a list of all currently available 
+//allocators and then determine whether each can be accessed from the host platform.
+//(To test other platforms, see allocator accessibility test.)
+////////////////////////////////////////////////////////////////////////////////////////
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -47,23 +46,20 @@ int main()
       std::cout << a << " ";
     }
   }
-  std::cout<<std::endl<<std::endl;
+  std::cout << std::endl;
 
   ///////////////////////////////////////////////////
   //Test accessibility
   ///////////////////////////////////////////////////
-  std::cout << "Testing the available allocators for "
-            << "accessibility from the CAMP host platform:" 
-            << std::endl << std::endl;
+  std::cout << "Testing the available allocators for accessibility from the CAMP host platform:" << std::endl;
   const int size = 100;
   for(auto a : alloc) {
-    if(testAccess(a)) {
+    if(is_accessible_from_host(a)) {
       int* data = static_cast<int*>(a.allocate(size*sizeof(int)));
       for(int i = 0; i < size; i++) {
         data[i] = i * i;
       }
-      std::cout << "Testing: " << data[size-1] << " should be equal to " 
-                << (size-1)*(size-1) << std::endl << std::endl; 
+      UMPIRE_ASSERT(data[size-1] == (size-1) * (size-1) && "Inequality found in array that should be accessible");
     }
   }
  
