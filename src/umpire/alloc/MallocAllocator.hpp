@@ -72,10 +72,8 @@ struct MallocAllocator {
               cudaDevAttrPageableMemoryAccess, cdev);
     if(pageableMem)
       return true;
-    else
-      return false;
 #endif
-    return false; //shouldn't reach this
+    return false;
   }
 
   bool isAccessible(Platform p)
