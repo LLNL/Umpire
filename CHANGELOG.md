@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Memory Resource header and source files for HIP
 
+- Unified Memory support for HIP
+
 - Documentation on memory resources and configuring/running Leak Sanitizer CI tests.
 
 - GitLab CI now includes jobs testing HIP backend.
@@ -25,6 +27,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added 'isAllocator' method that takes integer ID, and returns true if that
   ID corresponds to an Allocator.
 
+- Added CI testing for ENABLE_NUMA=On
+
+- Added option to replay to display current/actual/watermark statistic for each
+  allocator.
 
 ### Changed
 
@@ -63,6 +69,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Made replay test tool aware of `memset` operation and added CI tests to
   find and report future missing replay operations in the tool.
 
+- Fixed accounting for number of releasable bytes in Quickpool that was causing
+  coalesce operations to not work properly.
+  
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
