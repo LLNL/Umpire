@@ -119,6 +119,14 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
+bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  if(p == Platform::host)
+    return true;
+  else
+    return false;
+}
+
 Platform FileMemoryResource::getPlatform() noexcept
 {
   return m_platform;

@@ -65,6 +65,14 @@ std::size_t HipDeviceMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
+bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  if(p == Platform::hip || p == Platform::host)
+    return true;
+  else
+    return false;
+}
+
 Platform HipDeviceMemoryResource::getPlatform() noexcept
 {
   return m_platform;

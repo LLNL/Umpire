@@ -85,6 +85,17 @@ class ResourceManager {
   Allocator getDefaultAllocator();
 
   /*!
+   * \brief Get the names for existing Resources.
+   *
+   * The Memory Resource Registry dynamically populates available memory resource
+   * types based on what's available. This function returns those names so they
+   * can be used to determine allocator accessibility.
+   * 
+   * \return The available resource names.
+   */
+   std::vector<std::string> getResourceNames();
+
+  /*!
    * \brief Set the default Allocator.
    *
    * The default Allocator is used whenever an Allocator is required and one

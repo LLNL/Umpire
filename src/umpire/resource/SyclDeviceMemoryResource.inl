@@ -64,6 +64,12 @@ std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark()
 }
 
 template <typename _allocator>
+bool SyclDeviceMemoryResource<_allocator>::isAccessibleFrom(Platform p) noexcept
+{
+  return m_allocator.isAccessible(p);
+}
+
+template <typename _allocator>
 Platform SyclDeviceMemoryResource<_allocator>::getPlatform() noexcept
 {
   return m_platform;

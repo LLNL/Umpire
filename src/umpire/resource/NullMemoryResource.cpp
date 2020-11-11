@@ -72,6 +72,13 @@ std::size_t NullMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
+bool NullMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  if(p != Platform::undefined)
+    UMPIRE_LOG(Debug, "NullMemoryResource: platform is not accessible");
+  return false;
+}
+
 Platform NullMemoryResource::getPlatform() noexcept
 {
   return m_platform;

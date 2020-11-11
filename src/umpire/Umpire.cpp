@@ -12,6 +12,7 @@
 #include <iterator>
 #include <sstream>
 
+#include "umpire/resource/MemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
 
@@ -96,6 +97,20 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
     UMPIRE_LOG(Error, "Unknown pointer in pointer_contains");
     throw;
   }
+}
+
+bool is_accessible(Platform p, Allocator a) 
+{
+  //get base (parent) resource 
+  umpire::strategy::AllocationStrategy* root = a.getAllocationStrategy();
+  while ((root->getParent() != nullptr)) {
+    root = root->getParent();
+  }
+
+  //unwrap the base MemoryResource and return whether or not it's accessible
+  umpire::resource::MemoryResource* resource = 
+              util::unwrap_allocation_strategy<umpire::resource::MemoryResource>(root);
+  return resource->isAccessibleFrom(p);
 }
 
 std::string get_backtrace(void* ptr)

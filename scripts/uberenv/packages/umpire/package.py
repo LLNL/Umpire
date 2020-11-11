@@ -319,6 +319,8 @@ class Umpire(CMakePackage, CudaPackage):
                                         hip_root))
             cfg.write(cmake_cache_entry("HIP_CLANG_PATH",
                                         rocm_root + '/llvm/bin'))
+            cfg.write(cmake_cache_entry("HIP_HIPCC_FLAGS",
+                                        '--amdgpu-target=gfx906'))
             cfg.write(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
                                         "{0}/include;{0}/../hsa/include".format(hip_root)))
             if '%gcc' in spec:

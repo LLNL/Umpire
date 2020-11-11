@@ -66,6 +66,12 @@ std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
 }
 
 template <typename _allocator>
+bool DefaultMemoryResource<_allocator>::isAccessibleFrom(Platform p) noexcept
+{
+  return m_allocator.isAccessible(p);
+}
+
+template <typename _allocator>
 Platform DefaultMemoryResource<_allocator>::getPlatform() noexcept
 {
   return m_platform;
