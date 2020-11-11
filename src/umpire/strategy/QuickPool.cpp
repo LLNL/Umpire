@@ -217,6 +217,7 @@ void QuickPool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
       m_actual_bytes -= chunk->chunk_size;
+      m_releasable_bytes -= chunk->chunk_size;
 
       try {
         aligned_deallocate(chunk->data);

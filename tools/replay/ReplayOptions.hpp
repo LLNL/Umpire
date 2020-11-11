@@ -27,6 +27,7 @@ struct ReplayOptions {
   bool time_replay_parse{false};  // --time-parse
   bool info_only{false};         // --info
   bool print_statistics{false};   // -s,--stats
+  bool print_stats_on_release{false};// --stats-on-release
   bool skip_operations{false};    // --skip-operations
   bool force_compile{false};      // -r,--recompile
   bool do_not_demangle{false};    // --no-demangle
