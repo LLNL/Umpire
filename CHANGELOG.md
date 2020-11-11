@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Memory Resource header and source files for HIP
 
+- Unified Memory support for HIP
+
 - Documentation on memory resources and configuring/running Leak Sanitizer CI tests.
 
 - GitLab CI now includes jobs testing HIP backend.
