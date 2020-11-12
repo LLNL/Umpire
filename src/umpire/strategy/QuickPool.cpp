@@ -239,6 +239,8 @@ void QuickPool::release()
     }
   }
 
+// PGI doesn't repsect our UMPIRE_USE_VAR macro here, so we let the if
+// statement perform the usage instead
 #if defined(UMPIRE_ENABLE_BACKTRACE) || defined(__PGI)
   if (prev_size > m_actual_bytes) {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
