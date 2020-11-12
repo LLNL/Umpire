@@ -56,6 +56,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Move backend-specific resource code out of ResourceManager and into resource::MemoryResourceRegistry.
 
+- Have build_and_tesh.sh script re-run make with verbose output if
+  compilation fails.
+
 ### Removed
 
 - ENABLE_STATISTICS option and (optional) dependency on Conduit.
@@ -64,7 +67,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Corrected documentation: `ENABLE_TESTING` should be `ENABLE_TESTS`.
 
-- Cleaner and more efficient Memory Resource Trait test.
+- Cleaner and more efficient Memory Resource Trait test and `copy_stress_test.cpp` benchmark.
 
 - Fixed CMake version check (checking for version >= 3.18)
 
@@ -73,6 +76,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed accounting for number of releasable bytes in Quickpool that was causing
   coalesce operations to not work properly.
+
+- Fixed struct object initialization within ReplayOperationManager
   
 ## [v4.1.2] - 2020-10-06
 
