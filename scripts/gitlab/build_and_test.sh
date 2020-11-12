@@ -106,7 +106,9 @@ then
     cmake \
       -C ${hostconfig_path} \
       ${project_dir}
-    cmake --build . -j
+    if ! cmake --build . -j; then
+      cmake --build . --verbose -j 1
+    fi
 fi
 
 # Test
