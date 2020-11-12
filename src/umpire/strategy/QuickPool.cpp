@@ -239,13 +239,15 @@ void QuickPool::release()
     }
   }
 
-#if defined(UMPIRE_ENABLE_BACKTRACE)
+#if defined(UMPIRE_ENABLE_BACKTRACE) || defined(__PGI)
   if (prev_size > m_actual_bytes) {
+#if defined(UMPIRE_ENABLE_BACKTRACE)
     umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size
                                     << ") "
                                     << umpire::util::backtracer<>::print(bt));
+#endif
   }
 #else
   UMPIRE_USE_VAR(prev_size);
