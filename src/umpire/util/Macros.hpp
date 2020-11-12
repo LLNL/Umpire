@@ -86,7 +86,7 @@
 
 #define UMPIRE_UNUSED_ARG(x)
 
-#define UMPIRE_USE_VAR(x) (void)(x)
+#define UMPIRE_USE_VAR(x) static_cast<void>(x)
 
 #if defined(__CUDA_ARCH__)
 #define UMPIRE_ERROR(msg) asm("trap;");
