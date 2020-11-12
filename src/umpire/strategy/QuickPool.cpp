@@ -208,7 +208,9 @@ void QuickPool::release()
                           << " chunks in free map, m_is_destructing set to "
                           << m_is_destructing);
 
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   std::size_t prev_size{m_actual_bytes};
+#endif
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end();) {
     auto chunk = (*pair).second;
@@ -239,20 +241,14 @@ void QuickPool::release()
     }
   }
 
-// PGI doesn't repsect our UMPIRE_USE_VAR macro here, so we let the if
-// statement perform the usage instead
-#if defined(UMPIRE_ENABLE_BACKTRACE) || defined(__PGI)
-  if (prev_size > m_actual_bytes) {
 #if defined(UMPIRE_ENABLE_BACKTRACE)
+  if (prev_size > m_actual_bytes) {
     umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
     UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size
                                     << ") "
                                     << umpire::util::backtracer<>::print(bt));
-#endif
   }
-#else
-  UMPIRE_USE_VAR(prev_size);
 #endif
 }
 
