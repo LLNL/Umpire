@@ -71,6 +71,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed accounting for number of releasable bytes in Quickpool that was causing
   coalesce operations to not work properly.
+
+- Fixed struct object initialization within ReplayOperationManager
   
 ## [v4.1.2] - 2020-10-06
 
