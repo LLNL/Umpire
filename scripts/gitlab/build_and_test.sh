@@ -107,6 +107,9 @@ then
       -C ${hostconfig_path} \
       ${project_dir}
     if ! cmake --build . -j; then
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      echo "Compilation failed, running make VERBOSE=1"
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       cmake --build . --verbose -j 1
     fi
 fi
