@@ -99,7 +99,7 @@ then
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Building Umpire"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # If building, then delete everything first
     rm -rf ${build_dir} 2>/dev/null
@@ -108,7 +108,6 @@ then
     $cmake_exe \
       -C ${hostconfig_path} \
       ${project_dir}
-
     if ! $cmake_exe --build . -j; then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       echo "Compilation failed, running make VERBOSE=1"
