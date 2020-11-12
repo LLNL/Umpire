@@ -32,6 +32,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added option to replay to display current/actual/watermark statistic for each
   allocator.
 
+- Use CMake 3.18.0 in blueos CI
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing
