@@ -26,8 +26,13 @@ int main(int argc, char const* argv[])
   double** ptr_to_data =
       static_cast<double**>(allocator.allocate(sizeof(double*)));
 
+#if defined(UMPIRE_ENABLE_CUDA)
   my_kernel<<<1, 16>>>(device_allocator, ptr_to_data);
   cudaDeviceSynchronize();
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(my_kernel, dim3(1), dim3(16), 0,0, device_allocator, ptr_to_data);
+  hipDeviceSynchronize();
+#endif
 
   std::cout << (*ptr_to_data)[7] << std::endl;
 }
