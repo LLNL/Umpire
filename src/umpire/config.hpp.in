@@ -51,7 +51,7 @@
 UMPIRE_EXPORT extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 
 namespace umpire {
-constexpr int invalid_allocator_id = 0xDEADBEEF;
+constexpr int invalid_allocator_id = 0xDEADBEE;
 }
 
 #endif

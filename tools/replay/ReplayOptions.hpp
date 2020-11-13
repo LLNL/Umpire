@@ -37,3 +37,4 @@ struct ReplayOptions {
 };
 
 #endif  // REPLAY_ReplayOptions_HPP
+
