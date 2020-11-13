@@ -495,6 +495,6 @@ TEST(Allocators, GetInvalidId)
   int id = UMPIRE_INVALID_ALLOCATOR_ID;
   int cpp_id = umpire::invalid_allocator_id;
 
-  ASSERT_EQ(0xDEADBEEF, id);
+  ASSERT_EQ(0xDEADBEE, id);
   ASSERT_EQ(id, cpp_id);
 }
