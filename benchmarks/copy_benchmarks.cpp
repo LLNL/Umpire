@@ -13,6 +13,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
+const int MIN = 4;
+const int MAX = 4096;
 
 static void benchmark_copy(benchmark::State& state, std::string src, std::string dest) {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -33,24 +35,23 @@ static void benchmark_copy(benchmark::State& state, std::string src, std::string
   dest_allocator.deallocate(dest_ptr);
 }
 
-BENCHMARK_CAPTURE(benchmark_copy, host_host, std::string("HOST"), std::string("HOST"))->Range(4, 4096);
+BENCHMARK_CAPTURE(benchmark_copy, host_host, std::string("HOST"), std::string("HOST"))->Range(MIN, MAX);
 
-#if defined(UMPIRE_ENABLE_CUDA)
-BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("DEVICE"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::string("HOST"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
-
-BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("UM"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("UM"), std::string("HOST"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("UM"))->Range(4, 4096);
-
-BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("UM"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("DEVICE"))->Range(4, 4096);
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("DEVICE"))->Range(MIN, MAX);
+BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::string("HOST"))->Range(MIN, MAX);
+BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(MIN, MAX);
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
-BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("DEVICE"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("DEVICE"), std::string("HOST"))->Range(4, 4096);
-BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("DEVICE"))->Range(4, 4096);
+
+#if defined(UMPIRE_ENABLE_UM)
+BENCHMARK_CAPTURE(benchmark_copy, host_device, std::string("HOST"), std::string("UM"))->Range(MIN, MAX);
+BENCHMARK_CAPTURE(benchmark_copy, device_host, std::string("UM"), std::string("HOST"))->Range(MIN, MAX);
+BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("UM"))->Range(MIN, MAX);
+#endif
+
+#if defined(UMPIRE_ENABLE_DEVICE) && defined(UMPIRE_ENABLE_UM)
+BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("DEVICE"), std::string("UM"))->Range(MIN, MAX);
+BENCHMARK_CAPTURE(benchmark_copy, device_device, std::string("UM"), std::string("DEVICE"))->Range(MIN, MAX);
 #endif
 
 BENCHMARK_MAIN();

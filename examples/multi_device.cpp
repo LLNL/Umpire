@@ -26,10 +26,6 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAllocatorNames()) {
-    std::cout << s << "  ";
-  }
-  std::cout << std::endl;
   for (auto s : rm.getResourceNames()) {
     std::cout << s << "  ";
   }
@@ -61,7 +57,7 @@ int main(int, char**)
   b = static_cast<double*>(rm.move(b, rm.getAllocator("HOST")));
 
   UMPIRE_ASSERT(b[BLOCK_SIZE] == (BLOCK_SIZE * MULTIPLE) && "Error: incorrect value!");
-  std::cout << "Kernel succeeded! Expected result returned" << std::endl;
+  std::cout << "Kernel succeeded! Expected result returned - " << b[BLOCK_SIZE] << std::endl;
 
   rm.deallocate(a);
   rm.deallocate(b);
