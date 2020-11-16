@@ -81,6 +81,10 @@ if (ENABLE_CUDA)
       PROPERTIES
       Fortran_FORMAT FREE)
 
+    if(ENABLE_HIP)
+      set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
+    endif()
+
     blt_add_executable(
       NAME recipe_prefetch_pool
       SOURCES recipe_prefetch_pool.F
@@ -92,7 +96,11 @@ if (ENABLE_CUDA)
       recipe_prefetch_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
-  endif ()
+
+    if(ENABLE_HIP)
+      set_target_properties(recipe_prefetch_pool PROPERTIES LINKER_LANGUAGE HIP)
+    endif()
+  endif()
 endif ()
 
 if (ENABLE_HIP)
@@ -113,6 +121,8 @@ if (ENABLE_HIP)
       recipe_pinned_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
+
+    set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()
 
@@ -163,6 +173,10 @@ if (ENABLE_FORTRAN)
     recipe_thread_safe.F
     PROPERTIES
     Fortran_FORMAT FREE)
+
+  if(ENABLE_HIP)
+    set_target_properties(recipe_thread_safe_F PROPERTIES LINKER_LANGUAGE HIP)
+  endif()
 endif ()
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)

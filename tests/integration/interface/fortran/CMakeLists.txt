@@ -50,6 +50,10 @@ blt_add_test(
   NAME allocator_fortran_tests
   COMMAND allocator_fortran_tests)
 
+if(ENABLE_HIP)
+  set_target_properties(allocator_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
+endif()
+
 blt_add_executable(
   NAME op_fortran_tests
   SOURCES op_fortran_tests.F
@@ -65,6 +69,10 @@ blt_add_test(
   NAME op_fortran_tests
   COMMAND op_fortran_tests)
 
+if(ENABLE_HIP)
+  set_target_properties(op_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
+endif()
+
 blt_add_executable(
   NAME introspection_fortran_tests
   SOURCES introspection_fortran_tests.F
@@ -79,3 +87,7 @@ set_source_files_properties(
 blt_add_test(
   NAME introspection_fortran_tests
   COMMAND introspection_fortran_tests)
+
+if(ENABLE_HIP)
+  set_target_properties(introspection_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
+endif()
