@@ -434,9 +434,8 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
         std::cerr << "    RHS: "
           << rh.m_ops->getLine(rh.m_ops->getOperationsTable()->ops[i].op_line_number)
           << std::endl;
-        break;
         rval = false;
-        mismatch = false;
+        break;
       }
     }
   }

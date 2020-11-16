@@ -29,6 +29,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added CI testing for ENABLE_NUMA=On
 
+- Added CI testing for replay tool
+
 - Added option to replay to display current/actual/watermark statistic for each
   allocator.
 
