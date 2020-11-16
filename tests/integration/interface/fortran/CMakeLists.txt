@@ -10,6 +10,10 @@ if (ENABLE_CUDA)
   set (fortran_test_defines -DUMPIRE_ENABLE_CUDA)
 endif ()
 
+if (ENABLE_HIP)
+  set (fortran_test_defines -DUMPIRE_ENABLE_HIP)
+endif ()
+
 set (fortran_tests_depends
   umpire fruit)
 
