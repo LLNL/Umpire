@@ -85,7 +85,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
     variant('numa', default=False, description='Enable NUMA support')
-    variant('shared', default=True, description='Enable Shared libs')
+    variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('openmp_target', default=False, description='Build with OpenMP 4.5 support')
     variant('deviceconst', default=False,
@@ -95,6 +95,8 @@ class Umpire(CMakePackage, CudaPackage):
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
     variant('hip', default=False, description='Build with HIP support')
+    variant('tools', default=True, description='Enable tools')
+    variant('werror', default=True, description='Enable warnings as errors')
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
@@ -353,6 +355,8 @@ class Umpire(CMakePackage, CudaPackage):
 
         cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
+        cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
 
         #######################
         # Close and save
