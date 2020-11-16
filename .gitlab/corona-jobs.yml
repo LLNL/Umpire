@@ -8,3 +8,8 @@ hip_gcc_8_1_0 (build and test on corona):
   variables:
     SPEC: "+hip~tools%gcc@8.1.0"
   extends: .build_and_test_on_corona
+
+hip_fortran_gcc_8_1_0 (build and test on corona):
+  variables:
+    SPEC: "+hip~tools%gcc@8.1.0+fortran"
+  extends: .build_and_test_on_corona
