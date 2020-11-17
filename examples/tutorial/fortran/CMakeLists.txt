@@ -5,19 +5,15 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 blt_add_executable(
-  NAME tut_allocator_f
-  SOURCES tut_allocator.f
-  DEPENDS_ON umpire)
-list(APPEND umpire_tutorials tut_allocator_f)
+  NAME tut_allocator_fortran
+  SOURCES tut_allocator.F
+  DEPENDS_ON umpire hip_runtime)
+list(APPEND umpire_tutorials tut_allocator_fortran)
 
 set_source_files_properties(
-  tut_allocator.f
+  tut_allocator.F
   PROPERTIES
   Fortran_FORMAT FREE)
-
-if(ENABLE_HIP)
-  set_target_properties(tut_allocator_f PROPERTIES LINKER_LANGUAGE HIP)
-endif()
 
 # blt_add_executable(
 #   NAME tut_resources_f
