@@ -102,6 +102,12 @@ if (ENABLE_HIP)
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_shrink)
 
+  blt_add_executable(
+    NAME recipe_move_to_managed
+    SOURCES recipe_move_to_managed.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_move_to_managed)
+
   if (ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
@@ -117,20 +123,6 @@ if (ENABLE_HIP)
     #Until more stable blt changes can be made, this is a temporary fix to allow
     #the fortran program to be linked with hip
     set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
-
-    blt_add_executable(
-      NAME recipe_prefetch_pool
-      SOURCES recipe_prefetch_pool.F
-      DEPENDS_ON ${cookbook_depends}
-      OUTPUT_DIR ${cookbook_output_dir})
-    list(APPEND umpire_cookbooks recipe_prefetch_pool)
-
-    set_source_files_properties(
-      recipe_prefetch_pool.F
-      PROPERTIES
-      Fortran_FORMAT FREE)
-
-    set_target_properties(recipe_prefetch_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()
 
