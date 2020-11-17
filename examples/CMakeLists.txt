@@ -36,11 +36,11 @@ blt_add_executable(
 list(APPEND umpire_examples malloc)
 
 if (ENABLE_HIP)
-blt_add_executable(
+  blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
     DEPENDS_ON umpire hip)
-list(APPEND umpire_examples multi_device)
+  list(APPEND umpire_examples multi_device)
 endif()
 
 blt_add_executable(
