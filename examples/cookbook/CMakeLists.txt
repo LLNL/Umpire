@@ -113,7 +113,9 @@ if (ENABLE_HIP)
       recipe_pinned_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
-
+    
+    #Until more stable blt changes can be made, this is a temporary fix to allow
+    #the fortran program to be linked with hip
     set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
 
     blt_add_executable(
