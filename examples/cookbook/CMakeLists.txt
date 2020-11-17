@@ -121,7 +121,7 @@ if (ENABLE_HIP)
       Fortran_FORMAT FREE)
     
     #Until more stable blt changes can be made, this is a temporary fix to allow
-    #the fortran program to be linked with hip
+    #the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
     set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()

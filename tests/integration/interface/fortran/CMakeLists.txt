@@ -51,7 +51,7 @@ blt_add_test(
   COMMAND allocator_fortran_tests)
 
 #Until more stable blt changes can be made, this is a temporary fix to allow
-#the fortran program to be linked with hip
+#the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
 if(ENABLE_HIP)
   set_target_properties(allocator_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
 endif()

@@ -8,9 +8,9 @@
 
 #include "umpire/ResourceManager.hpp"
 
-const int BLOCK_SIZE = 256;
-const int NUM_THREADS = 4096;
-const int MULTIPLE = 1024;
+constexpr int BLOCK_SIZE = 256;
+constexpr int NUM_THREADS = 4096;
+constexpr int MULTIPLE = 1024;
 
 __global__ void touch_data(double* data, int len)
 {

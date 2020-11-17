@@ -13,8 +13,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
-const int MIN = 4;
-const int MAX = 4096;
+constexpr int MIN = 4;
+constexpr int MAX = 4096;
 
 static void benchmark_copy(benchmark::State& state, std::string src, std::string dest) {
   auto& rm = umpire::ResourceManager::getInstance();
