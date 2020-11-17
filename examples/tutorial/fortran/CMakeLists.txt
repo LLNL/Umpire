@@ -15,6 +15,10 @@ set_source_files_properties(
   PROPERTIES
   Fortran_FORMAT FREE)
 
+if(ENABLE_HIP)
+  set_target_properties(tut_allocator_fortran PROPERTIES LINKER_LANGUAGE HIP)
+endif()
+
 # blt_add_executable(
 #   NAME tut_resources_f
 #   SOURCES tut_resources.f

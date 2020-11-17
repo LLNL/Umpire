@@ -81,10 +81,6 @@ if (ENABLE_CUDA)
       PROPERTIES
       Fortran_FORMAT FREE)
 
-    if(ENABLE_HIP)
-      set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
-    endif()
-
     blt_add_executable(
       NAME recipe_prefetch_pool
       SOURCES recipe_prefetch_pool.F
@@ -96,10 +92,6 @@ if (ENABLE_CUDA)
       recipe_prefetch_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
-
-    if(ENABLE_HIP)
-      set_target_properties(recipe_prefetch_pool PROPERTIES LINKER_LANGUAGE HIP)
-    endif()
   endif()
 endif ()
 
@@ -123,6 +115,20 @@ if (ENABLE_HIP)
       Fortran_FORMAT FREE)
 
     set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
+
+    blt_add_executable(
+      NAME recipe_prefetch_pool
+      SOURCES recipe_prefetch_pool.F
+      DEPENDS_ON ${cookbook_depends}
+      OUTPUT_DIR ${cookbook_output_dir})
+    list(APPEND umpire_cookbooks recipe_prefetch_pool)
+
+    set_source_files_properties(
+      recipe_prefetch_pool.F
+      PROPERTIES
+      Fortran_FORMAT FREE)
+
+    set_target_properties(recipe_prefetch_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()
 
