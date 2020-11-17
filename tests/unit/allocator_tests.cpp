@@ -50,7 +50,7 @@ class AllocatorTest : public ::testing::Test {
     free(data);
   }
 
-  strategy::AllocationStrategy* m_strategy;
+  umpire::Memory* m_strategy;
   umpire::Allocator m_allocator;
   void* data;
 };

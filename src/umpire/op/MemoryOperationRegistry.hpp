@@ -12,7 +12,7 @@
 #include <unordered_map>
 
 #include "umpire/op/MemoryOperation.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/Memory.hpp"
 #include "umpire/util/Platform.hpp"
 
 namespace umpire {
@@ -73,8 +73,7 @@ class MemoryOperationRegistry {
    *         found.
    */
   std::shared_ptr<umpire::op::MemoryOperation> find(
-      const std::string& name, strategy::AllocationStrategy* source_allocator,
-      strategy::AllocationStrategy* dst_allocator);
+      const std::string& name, Memory* source_allocator, Memory* dst_allocator);
 
   std::shared_ptr<umpire::op::MemoryOperation> find(
       const std::string& name, std::pair<Platform, Platform> platforms);

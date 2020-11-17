@@ -10,7 +10,7 @@
 #include <memory>
 
 #include "umpire/Allocator.hpp"
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/Memory.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
 
 namespace umpire {
@@ -18,7 +18,7 @@ namespace strategy {
 
 class AllocationTracker : public AllocationStrategy, private mixins::Inspector {
  public:
-  AllocationTracker(std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
+  AllocationTracker(std::unique_ptr<Memory>&& allocator) noexcept;
 
   void* allocate(std::size_t bytes) override;
 
@@ -33,12 +33,12 @@ class AllocationTracker : public AllocationStrategy, private mixins::Inspector {
 
   Platform getPlatform() noexcept override;
 
-  strategy::AllocationStrategy* getAllocationStrategy();
+  Memory* getAllocationStrategy();
 
   MemoryResourceTraits getTraits() const noexcept override;
 
  private:
-  std::unique_ptr<strategy::AllocationStrategy> m_allocator;
+  std::unique_ptr<Memory> m_allocator;
 };
 
 } // namespace strategy

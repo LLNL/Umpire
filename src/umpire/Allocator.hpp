@@ -11,7 +11,7 @@
 #include <memory>
 #include <ostream>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/Memory.hpp"
 #include "umpire/util/Platform.hpp"
 
 class AllocatorTest;
@@ -24,7 +24,7 @@ class ResourceManager;
  * \brief Provides a unified interface to allocate and free data.
  *
  * An Allocator encapsulates all the details of how and where allocations will
- * be made, and can also be used to introspect the memory resource. Allocator
+ * by made, and can also be used to introspect the memory resource. Allocator
  * objects do not return typed allocations, so the pointer returned from the
  * allocate method must be cast to the relevant type.
  *
@@ -139,7 +139,7 @@ class Allocator {
    */
   int getId() const noexcept;
 
-  strategy::AllocationStrategy* getParent() const noexcept;
+  Memory* getParent() const noexcept;
 
   /*!
    * \brief Get the AllocationStrategy object used by this Allocator.
@@ -148,7 +148,7 @@ class Allocator {
    *
    * \return Pointer to the AllocationStrategy.
    */
-  strategy::AllocationStrategy* getAllocationStrategy() noexcept;
+  Memory* getAllocationStrategy() noexcept;
 
   /*!
    * \brief Get the Platform object appropriate for this Allocator.
@@ -171,12 +171,12 @@ class Allocator {
    * \param allocator Pointer to the AllocationStrategy object to use for
    * Allocations.
    */
-  Allocator(strategy::AllocationStrategy* allocator) noexcept;
+  Allocator(Memory* allocator) noexcept;
 
   /*!
    * \brief Pointer to the AllocationStrategy used by this Allocator.
    */
-  umpire::strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 };
 
 } // end of namespace umpire

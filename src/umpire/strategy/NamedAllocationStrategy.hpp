@@ -25,7 +25,7 @@ class NamedAllocationStrategy : public AllocationStrategy {
   MemoryResourceTraits getTraits() const noexcept override;
 
  protected:
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 };
 
 } // end of namespace strategy

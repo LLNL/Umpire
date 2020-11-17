@@ -74,7 +74,7 @@ class MixedPool : public AllocationStrategy {
   std::vector<std::size_t> m_fixed_pool_map;
   std::vector<std::unique_ptr<FixedPool>> m_fixed_pool;
   DynamicPoolMap m_dynamic_pool;
-  AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 };
 
 } // end of namespace strategy

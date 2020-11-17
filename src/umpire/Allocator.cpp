@@ -12,8 +12,8 @@
 
 namespace umpire {
 
-Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
-    : m_allocator(allocator)
+Allocator::Allocator(Memory* m) noexcept
+    : m_allocator(m)
 {
 }
 
@@ -63,12 +63,12 @@ int Allocator::getId() const noexcept
   return m_allocator->getId();
 }
 
-strategy::AllocationStrategy* Allocator::getParent() const noexcept
+Memory* Allocator::getParent() const noexcept
 {
   return m_allocator->getParent();
 }
 
-strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept
+Memory* Allocator::getAllocationStrategy() noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_allocator);
   return m_allocator;

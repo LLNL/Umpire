@@ -7,7 +7,7 @@
 #ifndef UMPIRE_aligned_allocation_HPP
 #define UMPIRE_aligned_allocation_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/Memory.hpp"
 
 #include <unordered_map>
 
@@ -18,7 +18,7 @@ namespace mixins {
 class AlignedAllocation {
 public:
     AlignedAllocation() = delete;
-    AlignedAllocation(std::size_t alignment, strategy::AllocationStrategy* strategy);
+    AlignedAllocation(std::size_t alignment, Memory* strategy);
 
     //!
     //! \brief Round up the size to be an integral multple of configured
@@ -41,7 +41,7 @@ public:
     void aligned_deallocate(void* ptr);
 
 protected:
-    strategy::AllocationStrategy* m_allocator;
+    Memory* m_allocator;
 
 private:
     std::unordered_map<void*, void*> base_pointer_map;

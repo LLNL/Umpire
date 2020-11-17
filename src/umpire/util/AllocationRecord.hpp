@@ -14,14 +14,12 @@
 
 namespace umpire {
 
-namespace strategy {
-class AllocationStrategy;
-}
+class Memory;
 
 namespace util {
 
 struct AllocationRecord {
-  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
+  AllocationRecord(void* p, std::size_t s, Memory* strat)
       : ptr{p}, size{s}, strategy{strat}
   {
   }
@@ -32,7 +30,7 @@ struct AllocationRecord {
 
   void* ptr;
   std::size_t size;
-  strategy::AllocationStrategy* strategy;
+  Memory* strategy;
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   util::backtrace allocation_backtrace;
 #endif // UMPIRE_ENABLE_BACKTRACE

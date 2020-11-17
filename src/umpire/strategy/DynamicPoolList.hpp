@@ -102,7 +102,7 @@ class DynamicPoolList : public AllocationStrategy {
   void coalesce() noexcept;
 
  private:
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
   DynamicSizePool<> dpa;
   CoalesceHeuristic m_should_coalesce;
 };

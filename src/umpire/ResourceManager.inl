@@ -24,7 +24,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name,
                                          Args&&... args)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  std::unique_ptr<strategy::AllocationStrategy> allocator;
+  std::unique_ptr<Memory> allocator;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {
     UMPIRE_ERROR("Maximum number of concurrent allocators exceeded! "

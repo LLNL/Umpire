@@ -310,32 +310,32 @@ class ResourceManager {
  private:
   ResourceManager();
 
-  strategy::AllocationStrategy* findAllocatorForPointer(void* ptr);
-  strategy::AllocationStrategy* findAllocatorForId(int id);
-  strategy::AllocationStrategy* getAllocationStrategy(const std::string& name);
+  Memory* findAllocatorForPointer(void* ptr);
+  Memory* findAllocatorForId(int id);
+  Memory* getAllocationStrategy(const std::string& name);
 
   int getNextId() noexcept;
 
   std::string getAllocatorInformation() const noexcept;
 
-  strategy::AllocationStrategy* getZeroByteAllocator();
+  Memory* getZeroByteAllocator();
 
   void* reallocate_impl(void* current_ptr, std::size_t new_size,
                         Allocator allocator);
 
   util::AllocationMap m_allocations;
 
-  std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
+  std::list<std::unique_ptr<Memory>> m_allocators;
 
-  std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
-  std::unordered_map<std::string, strategy::AllocationStrategy*>
+  std::unordered_map<int, Memory*> m_allocators_by_id;
+  std::unordered_map<std::string, Memory*>
       m_allocators_by_name;
   std::unordered_map<resource::MemoryResourceType,
-                     strategy::AllocationStrategy*,
+                     Memory*,
                      resource::MemoryResourceTypeHash>
       m_memory_resources;
 
-  strategy::AllocationStrategy* m_default_allocator;
+  Memory* m_default_allocator;
 
   int m_id;
 

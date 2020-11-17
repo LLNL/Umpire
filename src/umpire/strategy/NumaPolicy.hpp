@@ -38,7 +38,7 @@ class NumaPolicy : public AllocationStrategy {
   int getNode() const noexcept;
 
  private:
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
   Platform m_platform;
   int m_node;
 };

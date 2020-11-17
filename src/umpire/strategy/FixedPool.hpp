@@ -62,11 +62,11 @@ class FixedPool : public AllocationStrategy {
 
  private:
   struct Pool {
-    AllocationStrategy* strategy;
+    Memory* strategy;
     char* data;
     int* avail;
     std::size_t num_avail;
-    Pool(AllocationStrategy* allocation_strategy,
+    Pool(Memory* allocation_strategy,
          const std::size_t object_bytes, const std::size_t objects_per_pool,
          const std::size_t avail_bytes);
   };
@@ -74,7 +74,7 @@ class FixedPool : public AllocationStrategy {
   void newPool();
   void* allocInPool(Pool& p);
 
-  AllocationStrategy* m_strategy;
+  Memory* m_strategy;
   std::size_t m_obj_bytes;
   std::size_t m_obj_per_pool;
   std::size_t m_data_bytes;

@@ -12,7 +12,7 @@ TEST(IntrospectionTest, Overlaps)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator allocator{rm.getAllocator("HOST")};
-  umpire::strategy::AllocationStrategy* strategy{
+  umpire::Memory* strategy{
       rm.getAllocator("HOST").getAllocationStrategy()};
 
   char* data{static_cast<char*>(allocator.allocate(4096))};
@@ -77,7 +77,7 @@ TEST(IntrospectionTest, Contains)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator allocator{rm.getAllocator("HOST")};
-  umpire::strategy::AllocationStrategy* strategy{
+  umpire::Memory* strategy{
       rm.getAllocator("HOST").getAllocationStrategy()};
 
   char* data{static_cast<char*>(allocator.allocate(4096))};
@@ -100,7 +100,7 @@ TEST(IntrospectionTest, RegisterNull)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  umpire::strategy::AllocationStrategy* strategy{
+  umpire::Memory* strategy{
       rm.getAllocator("HOST").getAllocationStrategy()};
 
   auto record = umpire::util::AllocationRecord{nullptr, 0, strategy};

@@ -23,7 +23,7 @@ void
 Inspector::registerAllocation(
     void* ptr,
     std::size_t size,
-    strategy::AllocationStrategy* strategy)
+    Memory* strategy)
 {
   m_current_size += size;
   m_allocation_count++;
@@ -36,7 +36,7 @@ Inspector::registerAllocation(
 }
 
 util::AllocationRecord
-Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strategy)
+Inspector::deregisterAllocation(void* ptr, Memory* strategy)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 

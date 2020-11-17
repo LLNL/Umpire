@@ -10,7 +10,7 @@
 
 void check_parent(umpire::Allocator alloc)
 {
-  umpire::strategy::AllocationStrategy* root = alloc.getAllocationStrategy();
+  umpire::Memory* root = alloc.getAllocationStrategy();
   while ((root->getParent() != nullptr)) {
     root = root->getParent();
     std::cout << root->getName() << std::endl;

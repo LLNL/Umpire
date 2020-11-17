@@ -26,11 +26,11 @@ class Inspector
     void registerAllocation(
         void* ptr,
         std::size_t size,
-        strategy::AllocationStrategy* strategy);
+        Memory* strategy);
 
     // Deregisters the allocation if the strategy matches, otherwise throws an error
     util::AllocationRecord deregisterAllocation(
-      void* ptr, strategy::AllocationStrategy* strategy);
+      void* ptr, Memory* strategy);
 
   protected:
     std::size_t m_current_size;

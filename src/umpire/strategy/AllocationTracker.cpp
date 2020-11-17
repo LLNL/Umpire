@@ -12,7 +12,7 @@ namespace umpire {
 namespace strategy {
 
 AllocationTracker::AllocationTracker(
-    std::unique_ptr<AllocationStrategy>&& allocator) noexcept
+    std::unique_ptr<Memory>&& allocator) noexcept
     : AllocationStrategy(allocator->getName(), allocator->getId(), allocator->getParent()),
       mixins::Inspector(),
       m_allocator(std::move(allocator))
@@ -76,7 +76,7 @@ MemoryResourceTraits AllocationTracker::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
-strategy::AllocationStrategy* AllocationTracker::getAllocationStrategy()
+Memory* AllocationTracker::getAllocationStrategy()
 {
   return m_allocator.get();
 }

@@ -34,7 +34,7 @@ class AllocationPrefetcher : public AllocationStrategy {
 
  private:
   std::shared_ptr<op::MemoryOperation> m_prefetch_operation;
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
   int m_device;
 };
 

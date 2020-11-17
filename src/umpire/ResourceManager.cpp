@@ -116,7 +116,7 @@ void ResourceManager::initialize()
       resource::MemoryResourceRegistry::getInstance()};
 
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{
+    std::unique_ptr<Memory> allocator{
         // util::wrap_allocator<strategy::AllocationTracker>(
         registry.makeMemoryResource(s_null_resource_name, getNextId())};
 
@@ -127,7 +127,7 @@ void ResourceManager::initialize()
   }
 
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{
+    std::unique_ptr<Memory> allocator{
         new strategy::FixedPool{
             s_zero_byte_pool_name, getNextId(),
             Allocator{m_allocators_by_name[s_null_resource_name]}, 1}};
@@ -163,7 +163,7 @@ Allocator ResourceManager::makeResource(const std::string& name,
   if (name.find("DEVICE") != std::string::npos) {
     traits.id = resource::resource_to_device_id(name);
   }
-  std::unique_ptr<strategy::AllocationStrategy> allocator{
+  std::unique_ptr<Memory> allocator{
       util::wrap_allocator<strategy::AllocationTracker,
                            strategy::ZeroByteHandler>(
           registry.makeMemoryResource(name, getNextId(), traits))};
@@ -190,7 +190,7 @@ Allocator ResourceManager::makeResource(const std::string& name,
   return Allocator{m_allocators_by_name[name]};
 }
 
-strategy::AllocationStrategy* ResourceManager::getAllocationStrategy(
+Memory* ResourceManager::getAllocationStrategy(
     const std::string& name)
 {
   resource::MemoryResourceRegistry& registry{
@@ -498,7 +498,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
 
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
-  strategy::AllocationStrategy* strategy;
+  Memory* strategy;
 
   UMPIRE_REPLAY(R"( "event": "reallocate", "payload": {)"
                 << R"( "ptr": ")" << current_ptr << R"(")"
@@ -682,7 +682,7 @@ std::size_t ResourceManager::getSize(void* ptr) const
   return record->size;
 }
 
-strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
+Memory* ResourceManager::findAllocatorForId(int id)
 {
   auto allocator_i = m_allocators_by_id.find(id);
 
@@ -694,7 +694,7 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
   return allocator_i->second;
 }
 
-strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(
+Memory* ResourceManager::findAllocatorForPointer(
     void* ptr)
 {
   auto allocation_record = m_allocations.find(ptr);
@@ -746,7 +746,7 @@ std::string ResourceManager::getAllocatorInformation() const noexcept
   return info.str();
 }
 
-strategy::AllocationStrategy* ResourceManager::getZeroByteAllocator()
+Memory* ResourceManager::getZeroByteAllocator()
 {
   return m_allocators_by_name[s_zero_byte_pool_name];
 }

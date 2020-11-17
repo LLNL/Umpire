@@ -102,7 +102,7 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
 bool is_accessible(Platform p, Allocator a) 
 {
   //get base (parent) resource 
-  umpire::strategy::AllocationStrategy* root = a.getAllocationStrategy();
+  umpire::Memory* root = a.getAllocationStrategy();
   while ((root->getParent() != nullptr)) {
     root = root->getParent();
   }

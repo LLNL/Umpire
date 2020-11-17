@@ -26,7 +26,7 @@ class AlignedAllocator : public AllocationStrategy {
   MemoryResourceTraits getTraits() const noexcept override;
 
  protected:
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 
  private:
   std::size_t m_alignment;

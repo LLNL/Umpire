@@ -44,7 +44,7 @@ class SlotPool : public AllocationStrategy {
 
   std::size_t m_slots;
 
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 };
 
 } // end of namespace strategy

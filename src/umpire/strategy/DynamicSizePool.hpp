@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 
-#include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/Memory.hpp"
 #include "umpire/strategy/FixedSizePool.hpp"
 #include "umpire/strategy/StdAllocator.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
@@ -271,7 +271,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   }
 
  public:
-  DynamicSizePool(umpire::strategy::AllocationStrategy *strat,
+  DynamicSizePool(umpire::Memory* strat,
                   const std::size_t first_minimum_pool_allocation_size = (16 *
                                                                           1024),
                   const std::size_t next_minimum_pool_allocation_size = 256,

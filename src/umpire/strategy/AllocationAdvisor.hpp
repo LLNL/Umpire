@@ -49,7 +49,7 @@ class AllocationAdvisor : public AllocationStrategy {
  private:
   std::shared_ptr<op::MemoryOperation> m_advice_operation;
 
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 
   int m_device;
 };

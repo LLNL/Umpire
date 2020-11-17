@@ -36,7 +36,7 @@ class SizeLimiter : public AllocationStrategy {
   MemoryResourceTraits getTraits() const noexcept override;
 
  private:
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 
   std::size_t m_size_limit;
   std::size_t m_total_size;

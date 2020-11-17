@@ -18,7 +18,7 @@ namespace strategy {
 
 class ZeroByteHandler : public AllocationStrategy {
  public:
-  ZeroByteHandler(std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
+  ZeroByteHandler(std::unique_ptr<Memory>&& allocator) noexcept;
 
   void* allocate(std::size_t bytes) override;
 
@@ -34,10 +34,10 @@ class ZeroByteHandler : public AllocationStrategy {
 
   MemoryResourceTraits getTraits() const noexcept override;
 
-  strategy::AllocationStrategy* getAllocationStrategy();
+  Memory* getAllocationStrategy();
 
  private:
-  std::unique_ptr<strategy::AllocationStrategy> m_allocator;
+  std::unique_ptr<Memory> m_allocator;
   FixedPool* m_zero_byte_pool;
 };
 

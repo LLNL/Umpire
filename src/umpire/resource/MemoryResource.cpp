@@ -11,7 +11,7 @@ namespace resource {
 
 MemoryResource::MemoryResource(const std::string& name, int id,
                                MemoryResourceTraits traits)
-    : strategy::AllocationStrategy(name, id, nullptr), m_traits(traits)
+    : Memory{name, id, nullptr}, m_traits(traits)
 {
 }
 

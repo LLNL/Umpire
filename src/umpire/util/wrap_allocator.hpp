@@ -30,16 +30,16 @@ std::unique_ptr<Base> do_wrap(std::unique_ptr<Base>&& allocator)
 }
 
 template <typename... Strategies>
-std::unique_ptr<strategy::AllocationStrategy> wrap_allocator(
-    std::unique_ptr<strategy::AllocationStrategy>&& allocator)
+std::unique_ptr<Memory> wrap_allocator(
+    std::unique_ptr<Memory>&& allocator)
 {
-  return umpire::util::do_wrap<umpire::strategy::AllocationStrategy,
+  return umpire::util::do_wrap<Memory,
                                Strategies...>(std::move(allocator));
 }
 
 template <typename Strategy>
 Strategy* unwrap_allocation_strategy(
-    strategy::AllocationStrategy* base_strategy)
+    Memory* base_strategy)
 {
   umpire::strategy::ZeroByteHandler* zero{nullptr};
   umpire::strategy::AllocationTracker* tracker{nullptr};

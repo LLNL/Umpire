@@ -13,7 +13,7 @@ namespace umpire {
 namespace strategy {
 
 ZeroByteHandler::ZeroByteHandler(
-    std::unique_ptr<AllocationStrategy>&& allocator) noexcept
+    std::unique_ptr<Memory>&& allocator) noexcept
     : AllocationStrategy(allocator->getName(), allocator->getId(), allocator->getParent()),
       m_allocator(std::move(allocator)),
       m_zero_byte_pool(nullptr)
@@ -77,7 +77,7 @@ MemoryResourceTraits ZeroByteHandler::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
-strategy::AllocationStrategy* ZeroByteHandler::getAllocationStrategy()
+Memory* ZeroByteHandler::getAllocationStrategy()
 {
   return m_allocator.get();
 }

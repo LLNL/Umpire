@@ -36,7 +36,7 @@ inline int find_first_set(int i)
 
 static constexpr std::size_t bits_per_int = sizeof(int) * 8;
 
-FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
+FixedPool::Pool::Pool(Memory* allocation_strategy,
                       const std::size_t object_bytes,
                       const std::size_t objects_per_pool,
                       const std::size_t avail_bytes)

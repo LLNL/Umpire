@@ -40,7 +40,7 @@ class MonotonicAllocationStrategy : public AllocationStrategy {
   std::size_t m_size;
   std::size_t m_capacity;
 
-  strategy::AllocationStrategy* m_allocator;
+  Memory* m_allocator;
 };
 
 } // end of namespace strategy
