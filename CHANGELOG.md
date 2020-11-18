@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+### Added
+
+- Spack environment files for developer builds.
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
