@@ -40,11 +40,6 @@ void OpenMPTargetCopyOperation::transform(
 
   omp_target_memcpy(dst_base_ptr, src_base_ptr, length, dst_offset, src_offset,
                     dst_device, src_device);
-
-  UMPIRE_RECORD_STATISTIC("OpenMPTargetCopyOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
-                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
-                          "event", "copy");
 }
 
 } // end of namespace op

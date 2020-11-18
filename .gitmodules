@@ -1,9 +1,6 @@
 [submodule "blt"]
 	path = blt
 	url = https://github.com/LLNL/blt.git
-[submodule "src/umpire/tpl/conduit"]
-	path = src/umpire/tpl/conduit
-	url = https://github.com/LLNL/conduit.git
 [submodule "src/umpire/tpl/camp"]
 	path = src/umpire/tpl/camp
 	url = https://github.com/LLNL/camp.git
@@ -11,3 +8,6 @@
 	path = .radiuss-ci
 	url = https://github.com/LLNL/radiuss-ci
 	branch = feature/umpire-ci
+[submodule "scripts/radiuss-spack-configs"]
+	path = scripts/radiuss-spack-configs
+	url = https://github.com/LLNL/radiuss-spack-configs

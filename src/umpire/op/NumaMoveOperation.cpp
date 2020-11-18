@@ -27,11 +27,6 @@ void NumaMoveOperation::transform(
 
   *dst_ptr = src_ptr;
   numa::move_to_node(*dst_ptr, length, numa_allocator->getNode());
-
-  UMPIRE_RECORD_STATISTIC("NumaMoveOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
-                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
-                          "event", "move");
 }
 
 } // end of namespace op

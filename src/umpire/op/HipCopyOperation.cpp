@@ -28,11 +28,6 @@ void HipCopyOperation::transform(
                  << length << ", hipMemcpyDeviceToDevice ) failed with error: "
                  << hipGetErrorString(error));
   }
-
-  UMPIRE_RECORD_STATISTIC("HipCopyOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
-                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
-                          "event", "copy");
 }
 
 } // end of namespace op

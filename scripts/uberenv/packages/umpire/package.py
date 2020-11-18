@@ -12,6 +12,8 @@ import os
 from os import environ as env
 from os.path import join as pjoin
 
+import re
+
 def cmake_cache_entry(name, value, comment=""):
     """Generate a string for a cmake cache variable"""
 
@@ -48,7 +50,6 @@ def get_spec_path(spec, package_name, path_replacements = {}, use_bin = False) :
 
     return path
 
-
 class Umpire(CMakePackage, CudaPackage):
     """An application-focused API for memory management on NUMA & GPU
     architectures"""
@@ -82,8 +83,9 @@ class Umpire(CMakePackage, CudaPackage):
 
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
+    variant('mpi', default=False, description='Enable MPI support')
     variant('numa', default=False, description='Enable NUMA support')
-    variant('shared', default=True, description='Enable Shared libs')
+    variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('openmp_target', default=False, description='Build with OpenMP 4.5 support')
     variant('deviceconst', default=False,
@@ -92,13 +94,22 @@ class Umpire(CMakePackage, CudaPackage):
             multi=False, description='Tests to run')
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
+    variant('hip', default=False, description='Build with HIP support')
+    variant('tools', default=True, description='Enable tools')
+    variant('werror', default=True, description='Enable warnings as errors')
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
+    depends_on('mpi', when='+mpi')
+    depends_on('hip', when='+hip')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
     conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
+    conflicts('+cuda', when='+hip')
+    conflicts('+openmp', when='+hip')
+    conflicts('+openmp_target', when='+hip')
+    conflicts('+deviceconst', when='~hip~cuda')
 
     phases = ['hostconfig', 'cmake', 'build', 'install']
 
@@ -159,6 +170,7 @@ class Umpire(CMakePackage, CudaPackage):
             if os.path.isfile(env["SPACK_FC"]):
                 f_compiler = env["SPACK_FC"]
 
+
         #######################################################################
         # By directly fetching the names of the actual compilers we appear
         # to doing something evil here, but this is necessary to create a
@@ -203,6 +215,8 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write("#------------------\n\n".format("-" * 60))
         cfg.write(cmake_cache_entry("CMAKE_C_COMPILER", c_compiler))
         cfg.write(cmake_cache_entry("CMAKE_CXX_COMPILER", cpp_compiler))
+        if '+fortran' in spec:
+          cfg.write(cmake_cache_entry("CMAKE_Fortran_COMPILER", f_compiler))
 
         # use global spack compiler flags
         cflags = ' '.join(spec.compiler_flags['cflags'])
@@ -217,7 +231,14 @@ class Umpire(CMakePackage, CudaPackage):
         if cxxflags:
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
 
-        if ("gfortran" in f_compiler) and ("clang" in cpp_compiler):
+        fflags = ' '.join(spec.compiler_flags['fflags'])
+        cfg.write(cmake_cache_entry("CMAKE_Fortran_FLAGS", fflags))
+
+        fortran_compilers = ["gfortran", "xlf"]
+        if any(compiler in f_compiler for compiler in fortran_compilers) and ("clang" in cpp_compiler):
+            cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+            "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
+
             libdir = pjoin(os.path.dirname(
                            os.path.dirname(f_compiler)), "lib")
             flags = ""
@@ -228,6 +249,18 @@ class Umpire(CMakePackage, CudaPackage):
             if flags:
                 cfg.write(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags,
                                             description))
+
+
+        gcc_toolchain_regex = re.compile(".*gcc-toolchain.*")
+        gcc_name_regex = re.compile(".*gcc-name.*")
+
+        using_toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags['cxxflags']))
+        using_gcc_name = list(filter(gcc_name_regex.match, spec.compiler_flags['cxxflags']))
+        compilers_using_toolchain = ["pgi", "xl", "icpc"]
+        if any(compiler in cpp_compiler for compiler in compilers_using_toolchain):
+            if using_toolchain or using_gcc_name:
+                cfg.write(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+                "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
         if "toss_3_x86_64_ib" in sys_type:
             release_flags = "-O3"
@@ -256,19 +289,63 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write(cmake_cache_entry("CMAKE_CUDA_COMPILER",
                                         cudacompiler))
 
+            cuda_flags = []
+
             if not spec.satisfies('cuda_arch=none'):
                 cuda_arch = spec.variants['cuda_arch'].value
-                flag = '-arch sm_{0}'.format(cuda_arch[0])
-                cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS", flag))
+                cuda_flags.append('-arch sm_{0}'.format(cuda_arch[0]))
+
+            if '+deviceconst' in spec:
+                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+
+            if using_toolchain:
+                cuda_flags.append("-Xcompiler {}".format(using_toolchain[0]))
+
+            cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
+
+        else:
+            cfg.write(cmake_cache_option("ENABLE_CUDA", False))
+
+        if "+hip" in spec:
+            cfg.write("#------------------{0}\n".format("-" * 60))
+            cfg.write("# HIP\n")
+            cfg.write("#------------------{0}\n\n".format("-" * 60))
+
+            cfg.write(cmake_cache_option("ENABLE_HIP", True))
+
+#            -DHIP_ROOT_DIR=/opt/rocm-3.6.0/hip -DHIP_CLANG_PATH=/opt/rocm-3.6.0/llvm/bin
+
+            hip_root = spec['hip'].prefix
+            rocm_root = hip_root + "/.."
+            cfg.write(cmake_cache_entry("HIP_ROOT_DIR",
+                                        hip_root))
+            cfg.write(cmake_cache_entry("HIP_CLANG_PATH",
+                                        rocm_root + '/llvm/bin'))
+            cfg.write(cmake_cache_entry("HIP_HIPCC_FLAGS",
+                                        '--amdgpu-target=gfx906'))
+            cfg.write(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
+                                        "{0}/include;{0}/../hsa/include".format(hip_root)))
+            if '%gcc' in spec:
+                gcc_bin = os.path.dirname(self.compiler.cxx)
+                gcc_prefix = join_path(gcc_bin, '..')
+                cfg.write(cmake_cache_entry("HIP_CLANG_FLAGS",
+                "--gcc-toolchain={0}".format(gcc_prefix))) 
+                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS",
+                "-Wl,-rpath {}/lib64".format(gcc_prefix)))
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
 
         else:
-            cfg.write(cmake_cache_option("ENABLE_CUDA", False))
+            cfg.write(cmake_cache_option("ENABLE_HIP", False))
 
         cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
+
+        if "+mpi" in spec:
+            cfg.write(cmake_cache_option("ENABLE_MPI", '+mpi' in spec))
+            cfg.write(cmake_cache_entry("MPI_CXX_COMPILER", spec['mpi'].mpicxx))
+
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         if "+openmp_target" in spec:
@@ -278,6 +355,8 @@ class Umpire(CMakePackage, CudaPackage):
 
         cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
+        cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
 
         #######################
         # Close and save

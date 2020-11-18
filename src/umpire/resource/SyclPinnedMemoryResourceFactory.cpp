@@ -55,10 +55,10 @@ MemoryResourceTraits SyclPinnedMemoryResourceFactory::getDefaultTraits()
 
     traits.id = 0;
 
-    traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
-    traits.kind = MemoryResourceTraits::memory_type::DDR;
+    traits.vendor = MemoryResourceTraits::vendor_type::intel;
+    traits.kind = MemoryResourceTraits::memory_type::ddr;
     traits.used_for = MemoryResourceTraits::optimized_for::access;
-    traits.resource = MemoryResourceTraits::resource_type::PINNED;
+    traits.resource = MemoryResourceTraits::resource_type::pinned;
   }
 
   return traits;

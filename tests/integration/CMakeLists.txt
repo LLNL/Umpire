@@ -6,6 +6,8 @@
 ##############################################################################
 set (integration_tests_depends
   umpire gtest)
+set (accessibility_test_depends
+  umpire gtest)
 
 if (ENABLE_CUDA)
   set (integration_tests_depends
@@ -25,6 +27,24 @@ if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+if (ENABLE_CUDA)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    cuda)
+endif ()
+
+if (ENABLE_HIP)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    hip)
+endif ()
+
+if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    openmp)
+endif ()
+
 blt_add_executable(
   NAME allocator_integration_tests
   SOURCES allocator_integration_tests.cpp
@@ -38,6 +58,20 @@ target_include_directories(
 blt_add_test(
   NAME allocator_integration_tests
   COMMAND allocator_integration_tests)
+
+blt_add_executable(
+  NAME allocator_accessibility_tests
+  SOURCES allocator_accessibility.cpp
+  DEPENDS_ON ${accessibility_test_depends})
+
+target_include_directories(
+  allocator_accessibility_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME allocator_accessibility_tests
+  COMMAND allocator_accessibility_tests)
 
 blt_add_executable(
   NAME memory_resource_traits_tests 
@@ -117,6 +151,17 @@ blt_add_executable(
 blt_add_test(
   NAME primary_pool_tests
   COMMAND primary_pool_tests)
+
+if (ENABLE_PERFORMANCE_TESTS)
+  blt_add_executable(
+    NAME primary_pool_performance_tests
+    SOURCES primary_pool_performance_tests.cpp
+    DEPENDS_ON ${integration_tests_depends})
+
+  blt_add_test(
+    NAME primary_pool_performance_tests
+    COMMAND primary_pool_performance_tests)
+endif()
 
 blt_add_executable(
   NAME static_initialization_test

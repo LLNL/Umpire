@@ -55,6 +55,14 @@ struct PosixMemalignAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::free(ptr);
   }
+
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::host)
+      return true;
+    else
+      return false;
+  }
 };
 
 } // end of namespace alloc

@@ -16,11 +16,13 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
+  // _sphinx_tag_tut_unwrap_start
   auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "pool", rm.getAllocator("HOST"));
 
   auto dynamic_pool =
       umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
+  // _sphinx_tag_tut_unwrap_end
 
   if (dynamic_pool == nullptr) {
     UMPIRE_ERROR(pool.getName() << " is not a DynamicPool");
@@ -28,9 +30,11 @@ int main(int, char**)
 
   auto ptr = pool.allocate(1024);
 
+  // _sphinx_tag_tut_get_info_start
   std::cout << "Largest available block in pool is "
             << dynamic_pool->getLargestAvailableBlock() << " bytes in size"
             << std::endl;
+  // _sphinx_tag_tut_get_info_end
 
   pool.deallocate(ptr);
 

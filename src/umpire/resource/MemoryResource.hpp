@@ -86,8 +86,16 @@ class MemoryResource : public strategy::AllocationStrategy {
    */
   virtual Platform getPlatform() noexcept override = 0;
 
-  MemoryResourceTraits getTraits() const noexcept override;
+  /*
+   * \brief Check whether the Platform is accessible from a Memory
+   * Resource
+   *
+   * \return true if the Platform p is accessible.
+   */
+  virtual bool isAccessibleFrom(Platform p) noexcept = 0;
 
+  MemoryResourceTraits getTraits() const noexcept override;
+ 
  protected:
   MemoryResourceTraits m_traits;
 };

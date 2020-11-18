@@ -27,10 +27,6 @@ void OpenMPTargetMemsetOperation::apply(void* src_ptr,
   for (std::size_t i = 0; i < length; ++i) {
     data_ptr[i] = static_cast<unsigned char>(val);
   }
-
-  UMPIRE_RECORD_STATISTIC("OpenMPTargetMemsetOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
-                          "size", length, "event", "memset");
 }
 
 } // end of namespace op

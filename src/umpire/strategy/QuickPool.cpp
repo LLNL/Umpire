@@ -4,9 +4,10 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include "umpire/strategy/QuickPool.hpp"
+
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
-#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -19,24 +20,21 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                      const std::size_t next_minimum_pool_allocation_size,
                      std::size_t alignment,
                      CoalesceHeuristic should_coalesce) noexcept
-    : AllocationStrategy{name, id},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
-      m_first_minimum_pool_allocation_size{
-            first_minimum_pool_allocation_size},
-      m_next_minimum_pool_allocation_size{
-            next_minimum_pool_allocation_size}
+      m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
+      m_next_minimum_pool_allocation_size{next_minimum_pool_allocation_size}
 {
   UMPIRE_LOG(Debug, " ( "
-    << "name=\"" << name << "\""
-    << ", id=" << id
-    << ", allocator=\"" << allocator.getName() << "\""
-    << ", first_minimum_pool_allocation_size="
-        << m_first_minimum_pool_allocation_size
-    << ", next_minimum_pool_allocation_size="
-        << m_next_minimum_pool_allocation_size
-    << ", alignment=" << alignment
-    << " )");
+                        << "name=\"" << name << "\""
+                        << ", id=" << id << ", allocator=\""
+                        << allocator.getName() << "\""
+                        << ", first_minimum_pool_allocation_size="
+                        << m_first_minimum_pool_allocation_size
+                        << ", next_minimum_pool_allocation_size="
+                        << m_next_minimum_pool_allocation_size
+                        << ", alignment=" << alignment << " )");
 }
 
 QuickPool::~QuickPool()
@@ -49,7 +47,7 @@ QuickPool::~QuickPool()
 void* QuickPool::allocate(std::size_t bytes)
 {
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
-  const std::size_t rounded_bytes{ aligned_round_up(bytes) };
+  const std::size_t rounded_bytes{aligned_round_up(bytes)};
   const auto& best = m_size_map.lower_bound(rounded_bytes);
 
   Chunk* chunk{nullptr};
@@ -59,7 +57,8 @@ void* QuickPool::allocate(std::size_t bytes)
                                  ? m_first_minimum_pool_allocation_size
                                  : m_next_minimum_pool_allocation_size};
 
-    std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
+    std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes
+                                                    : bytes_to_use};
 
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
 
@@ -102,7 +101,8 @@ void* QuickPool::allocate(std::size_t bytes)
 
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data
                                    << " and size " << chunk->size
-                                   << " for allocation of size " << rounded_bytes);
+                                   << " for allocation of size "
+                                   << rounded_bytes);
 
   if ((chunk->size == chunk->chunk_size) && chunk->free) {
     m_releasable_bytes -= chunk->chunk_size;
@@ -115,8 +115,9 @@ void* QuickPool::allocate(std::size_t bytes)
 
   if (rounded_bytes != chunk->size) {
     std::size_t remaining{chunk->size - rounded_bytes};
-    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << rounded_bytes
-                                         << " and " << remaining);
+    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into "
+                                         << rounded_bytes << " and "
+                                         << remaining);
 
     void* chunk_storage{m_chunk_pool.allocate()};
     Chunk* split_chunk{new (chunk_storage) Chunk{
@@ -204,9 +205,12 @@ void QuickPool::deallocate(void* ptr)
 void QuickPool::release()
 {
   UMPIRE_LOG(Debug, "() " << m_size_map.size()
-    << " chunks in free map, m_is_destructing set to " << m_is_destructing);
+                          << " chunks in free map, m_is_destructing set to "
+                          << m_is_destructing);
 
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   std::size_t prev_size{m_actual_bytes};
+#endif
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end();) {
     auto chunk = (*pair).second;
@@ -215,18 +219,17 @@ void QuickPool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
       m_actual_bytes -= chunk->chunk_size;
+      m_releasable_bytes -= chunk->chunk_size;
 
       try {
         aligned_deallocate(chunk->data);
-      }
-      catch (...) {
+      } catch (...) {
         if (m_is_destructing) {
           //
           // Ignore error in case the underlying vendor API has already shutdown
           //
           UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
-        }
-        else {
+        } else {
           throw;
         }
       }
@@ -246,8 +249,6 @@ void QuickPool::release()
                                     << ") "
                                     << umpire::util::backtracer<>::print(bt));
   }
-#else
-  UMPIRE_USE_VAR(prev_size);
 #endif
 }
 

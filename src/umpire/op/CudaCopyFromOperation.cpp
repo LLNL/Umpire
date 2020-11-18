@@ -35,11 +35,6 @@ void CudaCopyFromOperation::transform(
                  << length << ", cudaMemcpyDeviceToHost ) failed with error: "
                  << cudaGetErrorString(error));
   }
-
-  UMPIRE_RECORD_STATISTIC("CudaCopyFromOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
-                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
-                          "event", "copy");
 }
 
 camp::resources::Event CudaCopyFromOperation::transform_async(
@@ -60,11 +55,6 @@ camp::resources::Event CudaCopyFromOperation::transform_async(
                  << length << ", cudaMemcpyDeviceToHost ) failed with error: "
                  << cudaGetErrorString(error));
   }
-
-  UMPIRE_RECORD_STATISTIC("CudaCopyFromOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "dst_ptr",
-                          reinterpret_cast<uintptr_t>(dst_ptr), "size", length,
-                          "event", "copy");
 
   return ctx.get_event();
 }

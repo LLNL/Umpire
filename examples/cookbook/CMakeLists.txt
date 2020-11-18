@@ -92,7 +92,7 @@ if (ENABLE_CUDA)
       recipe_prefetch_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
-  endif ()
+  endif()
 endif ()
 
 if (ENABLE_HIP)
@@ -101,6 +101,12 @@ if (ENABLE_HIP)
     SOURCES recipe_shrink.cpp
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_shrink)
+
+  blt_add_executable(
+    NAME recipe_move_to_managed
+    SOURCES recipe_move_to_managed.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_move_to_managed)
 
   if (ENABLE_FORTRAN)
     blt_add_executable(
@@ -113,6 +119,10 @@ if (ENABLE_HIP)
       recipe_pinned_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
+    
+    #Until more stable blt changes can be made, this is a temporary fix to allow
+    #the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
+    set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()
 
@@ -163,6 +173,10 @@ if (ENABLE_FORTRAN)
     recipe_thread_safe.F
     PROPERTIES
     Fortran_FORMAT FREE)
+
+  if(ENABLE_HIP)
+    set_target_properties(recipe_thread_safe_F PROPERTIES LINKER_LANGUAGE HIP)
+  endif()
 endif ()
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)

@@ -16,15 +16,16 @@ int main(int, char**)
 
   const std::string destinations[] = {
     "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
     ,
-    "DEVICE",
-    "UM",
-    "PINNED"
+    "DEVICE"
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_UM)
     ,
-    "DEVICE",
+    "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+    ,
     "PINNED"
 #endif
   };
@@ -40,7 +41,9 @@ int main(int, char**)
     std::cout << "Reallocating data (" << data << ") to size "
               << REALLOCATED_SIZE << "...";
 
+    // _sphinx_tag_tut_realloc_start
     data = static_cast<double*>(rm.reallocate(data, REALLOCATED_SIZE));
+    // _sphinx_tag_tut_realloc_end
 
     std::cout << "done.  Reallocated data (" << data << ")" << std::endl;
 

@@ -14,8 +14,10 @@ double* move_data(double* source_data, const std::string& destination)
 
   std::cout << "Moved source data (" << source_data << ") to destination ";
 
+  // _sphinx_tag_tut_move_start
   double* dest_data =
       static_cast<double*>(rm.move(source_data, dest_allocator));
+  // _sphinx_tag_tut_move_end
 
   std::cout << destination << " (" << dest_data << ")" << std::endl;
 
@@ -45,13 +47,13 @@ int main(int, char**)
   std::cout << "done." << std::endl;
 
   data = move_data(data, "HOST");
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
   data = move_data(data, "DEVICE");
-  data = move_data(data, "UM");
-  data = move_data(data, "PINNED");
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
-  data = move_data(data, "DEVICE");
+#if defined(UMPIRE_ENABLE_UM)
+  data = move_data(data, "UM");
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   data = move_data(data, "PINNED");
 #endif
 

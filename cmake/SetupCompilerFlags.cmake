@@ -49,12 +49,6 @@ endif ()
 
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
-
-  if (ROCM_ROOT_DIR)
-    blt_register_library(NAME          hip_runtime
-                         INCLUDES      ${ROCM_ROOT_DIR}
-                         TREAT_INCLUDES_AS_SYSTEM ON)
-  endif ()
 endif()
 
 if (ENABLE_PEDANTIC_WARNINGS)
@@ -72,12 +66,5 @@ if (ENABLE_PEDANTIC_WARNINGS)
 
   if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  endif()
-endif()
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-  if (NOT ${CMAKE_CXX_EXTENSIONS} EQUAL ON)
-    message(STATUS "Setting CXX_EXTENSIONS to ON for PGI Compiler")
-    SET( CMAKE_CXX_EXTENSIONS ON )
   endif()
 endif()

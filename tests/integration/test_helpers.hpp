@@ -69,3 +69,4 @@ template <class... T>
 struct Test<camp::list<T...>> {
   using Types = ::testing::Types<T...>;
 };
+

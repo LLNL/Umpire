@@ -123,6 +123,19 @@ bool pointer_overlaps(void* left, void* right);
 bool pointer_contains(void* left, void* right);
 
 /*!
+ * \brief Check whether or not an Allocator is accessible from a given platform.
+ *
+ * This function describes which allocators should be accessible
+ * from which CAMP platforms. Information on platform/allocator
+ * accessibility can be found at
+ * <https://umpire.readthedocs.io/en/develop/features/allocator_accessibility.html>
+ *
+ *\param camp::Platform p  
+ *\param umpire::Allocator a 
+ */
+bool is_accessible(Platform p, Allocator a);
+
+/*!
  * \brief Get the backtrace associated with the allocation of ptr
  *
  * The string may be empty if backtraces are not enabled.

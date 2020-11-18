@@ -10,11 +10,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
-#if defined(UMPIRE_ENABLE_STATISTICS)
-#include "umpire/util/Statistic.hpp"
-#include "umpire/util/StatisticsDatabase.hpp"
-#endif
-
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
@@ -66,6 +61,11 @@ const std::string& Allocator::getName() const noexcept
 int Allocator::getId() const noexcept
 {
   return m_allocator->getId();
+}
+
+strategy::AllocationStrategy* Allocator::getParent() const noexcept
+{
+  return m_allocator->getParent();
 }
 
 strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept

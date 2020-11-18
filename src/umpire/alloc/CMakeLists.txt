@@ -25,6 +25,7 @@ if (ENABLE_HIP)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     HipMallocAllocator.hpp
+    HipMallocManagedAllocator.hpp
     HipPinnedAllocator.hpp)
 endif ()
 

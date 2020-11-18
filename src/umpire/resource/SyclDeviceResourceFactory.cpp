@@ -40,12 +40,14 @@ std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
     auto devices = platform.get_devices();
     for (auto& device : devices) {
       int device_count = 0; // SYCL multi.device count
-      const std::string deviceName = device.get_info<cl::sycl::info::device::name>();
+      const std::string deviceName =
+          device.get_info<cl::sycl::info::device::name>();
       if (device.is_gpu() &&
-        (deviceName.find("Intel(R) Gen9 HD Graphics NEO") != std::string::npos)) {
-          if (device_count == traits.id) {
-            d = device;
-          }
+          (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
+           std::string::npos)) {
+        if (device_count == traits.id) {
+          d = device;
+        }
         device_count++;
       }
     }
@@ -64,10 +66,10 @@ MemoryResourceTraits SyclDeviceResourceFactory::getDefaultTraits()
 
   traits.unified = false;
   traits.id = 0;
-  traits.vendor = MemoryResourceTraits::vendor_type::INTEL;
-  traits.kind = MemoryResourceTraits::memory_type::GDDR;
+  traits.vendor = MemoryResourceTraits::vendor_type::intel;
+  traits.kind = MemoryResourceTraits::memory_type::gddr;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::DEVICE;
+  traits.resource = MemoryResourceTraits::resource_type::device;
 
   return traits;
 }

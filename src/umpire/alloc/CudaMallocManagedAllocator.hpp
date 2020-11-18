@@ -59,6 +59,14 @@ struct CudaMallocManagedAllocator {
                                       << cudaGetErrorString(error));
     }
   }
+
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::cuda || p == Platform::host)
+      return true;
+    else
+      return false; //p is undefined
+  }
 };
 
 } // end of namespace alloc

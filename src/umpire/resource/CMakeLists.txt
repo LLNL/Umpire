@@ -79,12 +79,16 @@ endif ()
 if (ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}
+    HipDeviceMemoryResource.hpp
     HipDeviceResourceFactory.hpp
+    HipUnifiedMemoryResourceFactory.hpp
     HipPinnedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
+    HipDeviceMemoryResource.cpp
     HipDeviceResourceFactory.cpp
+    HipUnifiedMemoryResourceFactory.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
   set(umpire_resource_depends

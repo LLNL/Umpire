@@ -45,7 +45,7 @@ stages:
   - q_build_and_test
   - q_release_resources
   - l_build_and_test
-  - b_build_and_test
+  - c_build_and_test
   - multi_project
 
 configure_python:
@@ -63,6 +63,13 @@ configure_python:
     key: venv
     paths:
       - ${PYTHON_ENVIRONMENT_PATH}
+
+.venv:
+  cache:
+    key: venv
+    paths:
+      - ${PYTHON_ENVIRONMENT_PATH}
+    policy: pull
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
@@ -82,6 +89,10 @@ configure_python:
   artifacts:
     reports:
       junit: junit.xml
+
+.build_toss_3_x86_64_ib_corona_script:
+  script:
+    - srun -p mi60 -t 15 -N 1 scripts/gitlab/build_and_test.sh
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
@@ -112,5 +123,5 @@ include:
   - local: .gitlab/quartz-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-  - local: .gitlab/butte-templates.yml
-  - local: .gitlab/butte-jobs.yml
+  - local: .gitlab/corona-templates.yml
+  - local: .gitlab/corona-jobs.yml

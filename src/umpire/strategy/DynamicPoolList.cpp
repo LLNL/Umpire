@@ -19,7 +19,7 @@ DynamicPoolList::DynamicPoolList(
     const std::size_t first_minimum_pool_allocation_size,
     const std::size_t next_minimum_pool_allocation_size,
     const std::size_t alignment, CoalesceHeuristic should_coalesce) noexcept
-    : AllocationStrategy{name, id},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
       m_allocator{allocator.getAllocationStrategy()},
       dpa{m_allocator, first_minimum_pool_allocation_size,
           next_minimum_pool_allocation_size, alignment},
@@ -122,7 +122,7 @@ DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(
         [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
     return [=](const strategy::DynamicPoolList& pool) {
-      return ( pool.getCurrentSize() == 0 );
+      return (pool.getCurrentSize() == 0);
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
