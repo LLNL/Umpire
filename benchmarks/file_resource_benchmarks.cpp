@@ -107,35 +107,53 @@ void benchmark(std::string name){
     auto end = std::chrono::system_clock::now();
 
     std::cout << name << std::endl;
-    std::cout << "  Initialization:      " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_initialized - begin_initialized).count() << " MB/sec" <<std::endl;
-    std::cout << "  Initialization Time: " << std::chrono::duration<double>(end_initialized - begin_initialized).count() << " sec" <<std::endl;
+    std::cout << "  Initialization:      " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)
+              /std::chrono::duration<double>(end_initialized - begin_initialized).count() << " MB/sec" <<std::endl;
+    std::cout << "  Initialization Time: " << std::chrono::duration<double>
+              (end_initialized - begin_initialized).count() << " sec" <<std::endl;
     std::cout << "  ---------------------------------------\n";
-    std::cout << "  Copy:                " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
-    std::cout << "  Copy Time:           " << std::chrono::duration<double>(end_copy - begin_copy).count() << " sec" <<std::endl;
+    std::cout << "  Copy:                " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)
+              /std::chrono::duration<double>(end_copy - begin_copy).count() << " MB/sec" <<std::endl;
+    std::cout << "  Copy Time:           " << std::chrono::duration<double>
+              (end_copy - begin_copy).count() << " sec" <<std::endl;
     std::cout << "  ---------------------------------------\n";
-    std::cout << "  Scale:               " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
-    std::cout << "  Scale Time:          " << std::chrono::duration<double>(end_scale - begin_scale).count() << " sec" <<std::endl;
+    std::cout << "  Scale:               " << ((2 * sizeof(size_t) * iterations) * 1.0E-6)
+              /std::chrono::duration<double>(end_scale - begin_scale).count() << " MB/sec" << std::endl;
+    std::cout << "  Scale Time:          " << std::chrono::duration<double>
+              (end_scale - begin_scale).count() << " sec" <<std::endl;
     std::cout << "  ---------------------------------------\n";
-    std::cout << "  Add:                 " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
-    std::cout << "  Add Time:            " << std::chrono::duration<double>(end_add - begin_add).count() << " sec" <<std::endl;
+    std::cout << "  Add:                 " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)
+              /std::chrono::duration<double>(end_add - begin_add).count() << " MB/sec" << std::endl;
+    std::cout << "  Add Time:            " << std::chrono::duration<double>
+              (end_add - begin_add).count() << " sec" <<std::endl;
     std::cout << "  ---------------------------------------\n";
-    std::cout << "  Triad:               " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)/std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
-    std::cout << "  Triad Time:          " << std::chrono::duration<double>(end_triad - begin_triad).count() << " sec" <<std::endl;
+    std::cout << "  Triad:               " << ((3 * sizeof(size_t) * iterations) * 1.0E-6)
+              /std::chrono::duration<double>(end_triad - begin_triad).count() << " MB/sec" << std::endl;
+    std::cout << "  Triad Time:          " << std::chrono::duration<double>
+              (end_triad - begin_triad).count() << " sec" <<std::endl;
     std::cout << "  ---------------------------------------\n";
-    std::cout << "  Total Time:          " << std::chrono::duration<double>(end - begin).count() << " sec" <<std::endl<<std::endl;
+    std::cout << "  Total Time:          " << std::chrono::duration<double>(end - begin).count() 
+              << " sec" <<std::endl<<std::endl;
 }
 
 int main(int, char** argv) {
     iterations = atoi(argv[1]);
-    std::cout << "Array Size:   " << iterations << "        Memory Size: " << (double)((sizeof(size_t)*iterations)* 1.0E-6) << " MB" << std::endl;
-    std::cout << "Total Arrays: 3       " << "        Total Memory Size: " << (double)((3*sizeof(size_t)*iterations)* 1.0E-6) << " MB" << std::endl << std::endl;
+    std::cout << "Array Size:   " << iterations << "        Memory Size: " 
+              << (double)((sizeof(size_t)*iterations)* 1.0E-6) << " MB" << std::endl;
+    std::cout << "Total Arrays: 3       " << "        Total Memory Size: " 
+              << (double)((3*sizeof(size_t)*iterations)* 1.0E-6) << " MB" << std::endl << std::endl;
     
     benchmark("HOST");
     benchmark("FILE");
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
     benchmark("UM");
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_DEVICE)
     benchmark("DEVICE");
 #endif
+
+    return 0;
 }
+
+
+

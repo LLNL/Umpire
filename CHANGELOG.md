@@ -8,9 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+## [v5.0.0] - 2020-11-18
+
 ### Added
 
 - Memory Resource header and source files for HIP
+
+- Unified Memory support for HIP, including testing and benchmarking (temp support for Fortran).
 
 - Documentation on memory resources and configuring/running Leak Sanitizer CI tests.
 
@@ -22,6 +26,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added GitLab testing of Umpire when MPI is enabled
 
+- Added 'isAllocator' method that takes integer ID, and returns true if that
+  ID corresponds to an Allocator.
+
+- Added CI testing for ENABLE_NUMA=On
+
+- Added CI testing for replay tool
+
+- Added option to replay to display current/actual/watermark statistic for each
+  allocator.
+
+- Use CMake 3.18.0 in blueos CI
 
 ### Changed
 
@@ -40,14 +55,34 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - registerAllocator is deprecated, addAlias should be used instead.
 
+- `umpire_resourcemanager_is_allocator` C function is now
+  `umpire_resourcemanager_is_allocator_name`.
+
+- Move backend-specific resource code out of ResourceManager and into resource::MemoryResourceRegistry.
+
+- Have build_and_tesh.sh script re-run make with verbose output if
+  compilation fails.
+
 ### Removed
+
+- ENABLE_STATISTICS option and (optional) dependency on Conduit.
 
 ### Fixed
 
 - Corrected documentation: `ENABLE_TESTING` should be `ENABLE_TESTS`.
 
-- Cleaner and more efficient Memory Resource Trait test.
+- Cleaner and more efficient Memory Resource Trait test and `copy_stress_test.cpp` benchmark.
 
+- Fixed CMake version check (checking for version >= 3.18)
+
+- Made replay test tool aware of `memset` operation and added CI tests to
+  find and report future missing replay operations in the tool.
+
+- Fixed accounting for number of releasable bytes in Quickpool that was causing
+  coalesce operations to not work properly.
+
+- Fixed struct object initialization within ReplayOperationManager
+  
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
@@ -75,6 +110,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - OpenMP target test for XL on GitLab
 
 - QuickPool available via the C & Fortran APIs.
+
+- Allocator accessibility information and testing
 
 ### Changed
 

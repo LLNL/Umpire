@@ -85,6 +85,17 @@ class ResourceManager {
   Allocator getDefaultAllocator();
 
   /*!
+   * \brief Get the names for existing Resources.
+   *
+   * The Memory Resource Registry dynamically populates available memory resource
+   * types based on what's available. This function returns those names so they
+   * can be used to determine allocator accessibility.
+   * 
+   * \return The available resource names.
+   */
+   std::vector<std::string> getResourceNames();
+
+  /*!
    * \brief Set the default Allocator.
    *
    * The default Allocator is used whenever an Allocator is required and one
@@ -154,6 +165,8 @@ class ResourceManager {
   Allocator getAllocator(void* ptr);
 
   bool isAllocator(const std::string& name) noexcept;
+
+  bool isAllocator(int id) noexcept;
 
   /*!
    * \brief Does the given pointer have an associated Allocator.
@@ -327,8 +340,6 @@ class ResourceManager {
   int m_id;
 
   std::mutex m_mutex;
-
-  std::vector<std::string> m_resource_names;
 
   // Methods that need access to m_allocations to print/filter records
   friend void print_allocator_records(Allocator, std::ostream&);

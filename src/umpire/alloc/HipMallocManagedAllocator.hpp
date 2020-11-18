@@ -4,10 +4,10 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaMallocManagedAllocator_HPP
-#define UMPIRE_CudaMallocManagedAllocator_HPP
+#ifndef UMPIRE_HipMallocManagedAllocator_HPP
+#define UMPIRE_HipMallocManagedAllocator_HPP
 
-#include <cuda_runtime_api.h>
+#include "hip/hip_runtime_api.h"
 
 #include "umpire/util/Macros.hpp"
 
@@ -15,12 +15,12 @@ namespace umpire {
 namespace alloc {
 
 /*!
- * \brief Uses cudaMallocManaged and cudaFree to allocate and deallocate
- *        unified memory on NVIDIA GPUs.
+ * \brief Uses hipMallocManaged and hipFree to allocate and deallocate
+ *        unified memory on AMD GPUs.
  */
-struct CudaMallocManagedAllocator {
+struct HipMallocManagedAllocator {
   /*!
-   * \brief Allocate bytes of memory using cudaMallocManaged.
+   * \brief Allocate bytes of memory using hipMallocManaged.
    *
    * \param bytes Number of bytes to allocate.
    *
@@ -31,19 +31,19 @@ struct CudaMallocManagedAllocator {
   void* allocate(std::size_t bytes)
   {
     void* ptr = nullptr;
-    cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
+    hipError_t error = ::hipMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
-    if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMallocManaged( bytes = " << bytes
+    if (error != hipSuccess) {
+      UMPIRE_ERROR("hipMallocManaged( bytes = " << bytes
                                                  << " ) failed with error: "
-                                                 << cudaGetErrorString(error));
+                                                 << hipGetErrorString(error));
     } else {
       return ptr;
     }
   }
 
   /*!
-   * \brief Deallocate memory using cudaFree.
+   * \brief Deallocate memory using hipFree.
    *
    * \param ptr Address to deallocate.
    *
@@ -53,23 +53,23 @@ struct CudaMallocManagedAllocator {
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-    cudaError_t error = ::cudaFree(ptr);
-    if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: "
-                                      << cudaGetErrorString(error));
+    hipError_t error = ::hipFree(ptr);
+    if (error != hipSuccess) {
+      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: "
+                                      << hipGetErrorString(error));
     }
   }
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::cuda || p == Platform::host)
+    if(p == Platform::hip || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false;
   }
 };
 
 } // end of namespace alloc
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaMallocManagedAllocator_HPP
+#endif // UMPIRE_hipMallocManagedAllocator_HPP

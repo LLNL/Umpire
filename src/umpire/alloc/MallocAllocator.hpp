@@ -10,6 +10,14 @@
 #include <cstdlib>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
+
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime_api.h>
+#endif
+#if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+#endif
 
 namespace umpire {
 namespace alloc {
@@ -49,6 +57,33 @@ struct MallocAllocator {
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     ::free(ptr);
+  }
+
+  bool isHostPageable()
+  {
+#if defined(UMPIRE_ENABLE_CUDA)
+    int pageableMem = 0;
+    int cdev = 0;
+    cudaGetDevice(&cdev);
+
+    //Device supports coherently accessing pageable memory
+    //without calling cudaHostRegister on it
+    cudaDeviceGetAttribute(&pageableMem,
+              cudaDevAttrPageableMemoryAccess, cdev);
+    if(pageableMem)
+      return true;
+#endif
+    return false;
+  }
+
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::host || p == Platform::omp_target)
+      return true;
+    else if(p == Platform::cuda)
+      return isHostPageable();
+    else  
+      return false;
   }
 };
 
