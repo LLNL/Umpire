@@ -6,7 +6,7 @@ spack:
   - ../../scripts/radiuss-spack-configs/spack_configs/darwin/compilers.yaml
   - ../../scripts/radiuss-spack-configs/spack_configs/darwin/packages.yaml
   specs: [umpire@develop]
-  view: true
+  view: false
   packages:
     camp:
       version: [master]

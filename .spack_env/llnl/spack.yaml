@@ -5,8 +5,8 @@ spack:
   include:
   - ../../scripts/radiuss-spack-configs/spack_configs/$SYS_TYPE/compilers.yaml
   - ../../scripts/radiuss-spack-configs/spack_configs/$SYS_TYPE/packages.yaml
-  specs: [umpire@develop, umpire@develop%clang@10.0.1]
-  view: true
+  specs: [umpire@develop]
+  view: false
   packages:
     camp:
       version: [master]
