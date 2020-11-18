@@ -384,7 +384,7 @@ module umpire_fortran_generated_tests
       end subroutine test_allocate_double_host_array_4d
 
     
-#ifdef UMPIRE_ENABLE_CUDA
+#ifdef UMPIRE_ENABLE_DEVICE
 
       subroutine test_allocate_int_device_array_1d
         use iso_c_binding
@@ -752,7 +752,8 @@ module umpire_fortran_generated_tests
         call allocator%delete()
       end subroutine test_allocate_double_device_array_4d
 
-    
+#endif
+#ifdef UMPIRE_ENABLE_UM 
 
       subroutine test_allocate_int_um_array_1d
         use iso_c_binding
@@ -1151,7 +1152,7 @@ program fortran_test
   call test_allocate_double_host_array_2d
   call test_allocate_double_host_array_3d
   call test_allocate_double_host_array_4d
-#ifdef UMPIRE_ENABLE_CUDA
+#ifdef UMPIRE_ENABLE_DEVICE
   call test_allocate_int_device_array_1d
   call test_allocate_int_device_array_2d
   call test_allocate_int_device_array_3d
@@ -1168,6 +1169,8 @@ program fortran_test
   call test_allocate_double_device_array_2d
   call test_allocate_double_device_array_3d
   call test_allocate_double_device_array_4d
+#endif
+#ifdef UMPIRE_ENABLE_UM
   call test_allocate_int_um_array_1d
   call test_allocate_int_um_array_2d
   call test_allocate_int_um_array_3d

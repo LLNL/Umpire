@@ -22,7 +22,7 @@
 #include <fstream>
 #include <sstream>
 
-UMPIRE_EXPORT volatile int umpire_ver_4_found = 0;
+UMPIRE_EXPORT volatile int umpire_ver_5_found = 0;
 
 namespace umpire {
 

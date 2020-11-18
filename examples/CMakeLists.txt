@@ -35,6 +35,14 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
 
+if (ENABLE_HIP)
+  blt_add_executable(
+    NAME multi_device
+    SOURCES multi_device.cpp
+    DEPENDS_ON umpire hip)
+  list(APPEND umpire_examples multi_device)
+endif()
+
 blt_add_executable(
   NAME get_parent 
   SOURCES get_parent.cpp
