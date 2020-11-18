@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+## [v5.0.0] - 2020-11-18
+
 ### Added
 
 - Memory Resource header and source files for HIP

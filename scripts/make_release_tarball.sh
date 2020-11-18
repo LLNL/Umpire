@@ -7,7 +7,7 @@
 ##############################################################################
 
 TAR_CMD=gtar
-VERSION=4.1.2
+VERSION=5.0.0
 
 git archive --prefix=umpire-${VERSION}/ -o umpire-${VERSION}.tar HEAD 2> /dev/null
 
