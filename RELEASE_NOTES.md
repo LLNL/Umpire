@@ -1,3 +1,23 @@
+# v5.0.0
+
+- Memory Resource header and source files for HIP
+
+- Unified Memory support for HIP, including testing and benchmarking (temp support for Fortran).
+
+- Added a getParent functionality for retrieving the memory resource of an allocator.
+
+- Changed enumeration names from all upper case to all lower case in order to
+  avoid name collisions.
+
+- Fixed up broken source links in tutorial documentation.
+
+- registerAllocator is deprecated, addAlias should be used instead.
+
+- Moved backend-specific resource code out of ResourceManager and into resource::MemoryResourceRegistry.
+
+- Fixed accounting for number of releasable bytes in Quickpool that was causing
+  coalesce operations to not work properly. 
+
 # v4.1.2
 
 - Added workaround for incorrect nvcc compiler warning:
