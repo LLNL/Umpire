@@ -120,16 +120,28 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 };
 
 void run_access_test(umpire::Allocator* alloc, size_t size)
-{
+{::testing::FLAGS_gtest_death_test_style = "threadsafe";
+
   if(umpire::is_accessible(umpire::Platform::host, *alloc)) {
     allocate_and_use<host_platform> host;
     ASSERT_NO_THROW(host.test(alloc, size));
+  }
+  else {
+    allocate_and_use<host_platform> host;
+    ASSERT_DEATH(host.test(alloc, size), "");
   }
 
 #if defined(UMPIRE_ENABLE_CUDA)
   if (umpire::is_accessible(umpire::Platform::cuda, *alloc)) {
     allocate_and_use<cuda_platform> cuda;
     ASSERT_NO_THROW(cuda.test(alloc, size));
+  }
+  else if (alloc->getAllocationStrategy()->getTraits().resource
+           == umpire::MemoryResourceTraits::resource_type::file)
+    SUCCEED();
+  else {
+    allocate_and_use<cuda_platform> cuda;
+    ASSERT_DEATH(cuda.test(alloc, size), "");
   }
 #endif
   
@@ -138,12 +150,20 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     allocate_and_use<hip_platform> hip;
     ASSERT_NO_THROW(hip.test(alloc, size));
   }
+  else {
+    allocate_and_use<hip_platform> hip;
+    ASSERT_DEATH(hip.test(alloc, size), "");
+  }
 #endif
  
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   if (umpire::is_accessible(umpire::Platform::omp_target, *alloc)) {
     allocate_and_use<omp_target_platform> omp;
     ASSERT_NO_THROW(omp.test(alloc, size));
+  }
+  else {
+    allocate_and_use<omp_target_platform> omp;
+    ASSERT_DEATH(omp.test(alloc, size), "");
   }
 #endif
 
@@ -154,6 +174,8 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
   if(umpire::is_accessible(umpire::Platform::undefined, *alloc)) {
     FAIL() << "An Undefined platform is not accessible." << std::endl;
   }
+  else
+    SUCCEED();
 }
 
 TEST_P(AllocatorAccessibilityTest, AllocatorAccessibilityFromPlatform)
