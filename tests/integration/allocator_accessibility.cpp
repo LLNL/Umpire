@@ -120,15 +120,19 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 };
 
 void run_access_test(umpire::Allocator* alloc, size_t size)
-{::testing::FLAGS_gtest_death_test_style = "threadsafe";
-
+{
   if(umpire::is_accessible(umpire::Platform::host, *alloc)) {
     allocate_and_use<host_platform> host;
     ASSERT_NO_THROW(host.test(alloc, size));
   }
   else {
+#if defined(UMPIRE_ENABLE_CHECK_ACCESSIBILITY)
+    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     allocate_and_use<host_platform> host;
     ASSERT_DEATH(host.test(alloc, size), "");
+    //testing::AssertionFailure();
+std::cout << "HERE!!!!!!" << std::endl;
+#endif
   }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -136,12 +140,16 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     allocate_and_use<cuda_platform> cuda;
     ASSERT_NO_THROW(cuda.test(alloc, size));
   }
-  else if (alloc->getAllocationStrategy()->getTraits().resource
-           == umpire::MemoryResourceTraits::resource_type::file)
+  else if (alloc->getAllocationStrategy()->getTraits().resource ==
+           umpire::MemoryResourceTraits::resource_type::file)
     SUCCEED();
   else {
+#if defined(UMPIRE_ENABLE_CHECK_ACCESSIBILITY)
+    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     allocate_and_use<cuda_platform> cuda;
     ASSERT_DEATH(cuda.test(alloc, size), "");
+    //testing::AssertionFailure();
+#endif
   }
 #endif
   
@@ -151,8 +159,11 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     ASSERT_NO_THROW(hip.test(alloc, size));
   }
   else {
+#if defined(UMPIRE_ENABLE_CHECK_ACCESSIBILITY)
+    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     allocate_and_use<hip_platform> hip;
     ASSERT_DEATH(hip.test(alloc, size), "");
+#endif
   }
 #endif
  
@@ -162,8 +173,11 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     ASSERT_NO_THROW(omp.test(alloc, size));
   }
   else {
+#if defined(UMPIRE_ENABLE_CHECK_ACCESSIBILITY)
+    ::testing::FLAGS_gtest_death_test_style = "threadsafe";
     allocate_and_use<omp_target_platform> omp;
     ASSERT_DEATH(omp.test(alloc, size), "");
+#endif
   }
 #endif
 
