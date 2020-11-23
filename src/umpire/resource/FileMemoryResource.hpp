@@ -84,6 +84,8 @@ class FileMemoryResource : public MemoryResource {
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
+  bool isAccessibleFrom(Platform p) noexcept;
+  
   Platform getPlatform() noexcept;
   static int s_file_counter;
 

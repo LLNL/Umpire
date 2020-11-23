@@ -46,21 +46,20 @@ int do_copy(std::string src, std::string dst, std::size_t size = 4096) {
 int main(int, char**) {
   do_copy("HOST", "HOST");
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
   do_copy("HOST", "DEVICE");
   do_copy("DEVICE", "HOST");
   do_copy("DEVICE", "DEVICE");
+#endif
 
+#if defined(UMPIRE_ENABLE_UM)
   do_copy("HOST", "UM");
   do_copy("UM", "HOST");
   do_copy("UM", "UM");
+#endif
 
+#if defined(UMPIRE_ENABLE_DEVICE) && defined(UMPIRE_ENABLE_UM)
   do_copy("UM", "DEVICE");
   do_copy("DEVICE", "UM");
-#endif
-#if defined(UMPIRE_ENABLE_HIP)
-  do_copy("HOST", "DEVICE");
-  do_copy("DEVICE", "HOST");
-  do_copy("DEVICE", "DEVICE");
 #endif
 }

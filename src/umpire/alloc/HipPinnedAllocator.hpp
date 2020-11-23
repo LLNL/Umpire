@@ -38,6 +38,14 @@ struct HipPinnedAllocator {
                                          << hipGetErrorString(error));
     }
   }
+
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::hip || p == Platform::host)
+      return true;
+    else
+      return false; //p is undefined
+  }
 };
 
 } // end of namespace alloc

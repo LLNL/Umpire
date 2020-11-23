@@ -56,6 +56,14 @@ struct SyclPinnedAllocator {
 
     cl::sycl::free(ptr, queue_t);
   }
+  
+  bool isAccessible(Platform p)
+  {
+    if(p == Platform::sycl || p == Platform::host)
+      return true;
+    else
+      return false; //p is undefined
+  }
 };
 
 } // end of namespace alloc
