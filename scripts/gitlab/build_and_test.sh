@@ -108,7 +108,7 @@ then
     $cmake_exe \
       -C ${hostconfig_path} \
       ${project_dir}
-    if ! $cmake_exe --build . -j; then
+    if ! $cmake_exe --build . -j 12; then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       echo "Compilation failed, running make VERBOSE=1"
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
