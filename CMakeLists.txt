@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 4.1.2)
+  VERSION 5.0.0)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -40,7 +40,6 @@ option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
 option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
-option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)

@@ -15,15 +15,16 @@ int main(int, char**)
 
   const std::string destinations[] = {
     "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
     ,
-    "DEVICE",
-    "UM",
-    "PINNED"
+    "DEVICE"
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_UM)
     ,
-    "DEVICE",
+    "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+    ,
     "PINNED"
 #endif
   };

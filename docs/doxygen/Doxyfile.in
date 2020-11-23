@@ -1022,7 +1022,6 @@ PREDEFINED             = UMPIRE_ENABLE_BACKTRACE \
                          UMPIRE_ENABLE_CUDA \
                          UMPIRE_ENABLE_SLIC \
                          UMPIRE_ENABLE_LOGGING \
-                         UMPIRE_ENABLE_STATISTICS \
                          DOXYGEN_SKIP_THIS
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then 

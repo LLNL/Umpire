@@ -52,3 +52,8 @@ gcc_4_9_3:
   variables:
     SPEC: "%gcc@4.9.3"
   extends: .build_and_test_on_quartz
+
+gcc_8_1_0_numa:
+  variables:
+    SPEC: "+fortran+numa %gcc@8.1.0"
+  extends: .build_and_test_on_quartz

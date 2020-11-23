@@ -29,11 +29,6 @@ void GenericReallocateOperation::transform(
 
   ResourceManager::getInstance().copy(*new_ptr, current_ptr, copy_size);
 
-  UMPIRE_RECORD_STATISTIC("GenericReallocate", "current_ptr",
-                          reinterpret_cast<uintptr_t>(current_ptr), "new_ptr",
-                          reinterpret_cast<uintptr_t>(*new_ptr), "new_size",
-                          new_size, "event", "reallocate");
-
   allocator->deallocate(current_ptr);
 }
 
