@@ -12,10 +12,6 @@
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/io.hpp"
 
-#if defined(UMPIRE_ENABLE_STATISTICS)
-#include "umpire/util/statistic_helper.hpp"
-#endif
-
 #include <cassert>
 #include <iostream>
 #include <mutex>
@@ -113,23 +109,38 @@
   }
 #endif
 
-#if defined(UMPIRE_ENABLE_STATISTICS)
-
-#define UMPIRE_RECORD_STATISTIC(name, ...) \
-  umpire::util::detail::record_statistic(name, __VA_ARGS__);
-
-#else
-
-#define UMPIRE_RECORD_STATISTIC(name, ...) ((void)0)
-
-#endif // defined(UMPIRE_ENABLE_STATISTICS)
-
 #if defined(UMPIRE_ENABLE_BACKTRACE)
 #define UMPIRE_RECORD_BACKTRACE(record)                                  \
   umpire::util::backtracer<umpire::util::trace_optional>::get_backtrace( \
       record.allocation_backtrace)
 #else
 #define UMPIRE_RECORD_BACKTRACE(backtrace) ((void)0)
+#endif
+
+#if (__cplusplus >= 201402L)
+#if defined(__has_cpp_attribute)
+#if __has_cpp_attribute(deprecated)
+#define UMPIRE_HAS_CXX_ATTRIBUTE_DEPRECATED 1
+#endif
+#endif
+#endif
+
+#if defined(UMPIRE_HAS_CXX_ATTRIBUTE_DEPRECATED)
+#define UMPIRE_DEPRECATE(Msg) [[deprecated(Msg)]]
+#define UMPIRE_DEPRECATE_ALIAS(Msg) [[deprecated(Msg)]]
+
+#elif defined(_MSC_VER)
+
+// for MSVC, use __declspec
+#define UMPIRE_DEPRECATE(Msg) __declspec(deprecated(Msg))
+#define UMPIRE_DEPRECATE_ALIAS(Msg)
+
+#else
+
+// else use __attribute__(deprecated("Message"))
+#define UMPIRE_DEPRECATE(Msg) __attribute__((deprecated(Msg)))
+#define UMPIRE_DEPRECATE_ALIAS(Msg)
+
 #endif
 
 #endif // UMPIRE_Macros_HPP

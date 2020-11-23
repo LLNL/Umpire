@@ -10,11 +10,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
-#if defined(UMPIRE_ENABLE_STATISTICS)
-#include "umpire/util/Statistic.hpp"
-#include "umpire/util/StatisticsDatabase.hpp"
-#endif
-
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept

@@ -56,6 +56,7 @@ class ReplayInterpreter {
     int m_log_version_major;
     int m_log_version_minor;
     int m_log_version_patch;
+    std::size_t m_mpi_ops{0};
     std::size_t m_allocation_map_insert_ops{0};
     std::size_t m_allocation_map_insert_due_to_make_allocator{0};
     std::size_t m_allocation_map_insert_due_to_allocation{0};
@@ -70,6 +71,8 @@ class ReplayInterpreter {
     std::size_t m_make_allocator_ops{0};
     std::size_t m_make_memory_resource_ops{0};
     std::size_t m_copy_ops{0};
+    std::size_t m_memset_ops{0};
+    std::size_t m_move_ops{0};
     std::size_t m_reallocate_ex_ops{0};
     std::size_t m_reallocate_ops{0};
     std::size_t m_set_default_allocator_ops{0};
@@ -97,6 +100,8 @@ class ReplayInterpreter {
     void replay_compileCoalesce( void );
     void replay_compileRelease( void );
     void replay_compileCopy( void );
+    void replay_compileMove( void );
+    void replay_compileMemset( void );
     int getAllocatorIndex(std::string ref_s);
     uint64_t getPointer(std::string ptr_name);
     void printAllocators(ReplayFile* optable);

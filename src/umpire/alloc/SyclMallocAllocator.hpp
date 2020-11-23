@@ -56,6 +56,14 @@ struct SyclMallocAllocator {
 
     cl::sycl::free(ptr, queue_t);
   }
+
+  bool isAccessible(umpire::Platform p)
+  {
+    if (p == umpire::Platform::sycl) 
+      return true;
+    else
+      return false;
+  }
 };
 
 } // end of namespace alloc

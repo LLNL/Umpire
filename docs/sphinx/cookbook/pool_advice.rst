@@ -15,7 +15,9 @@ By creating a pool on top of an :class:`umpire::strategy::AllocationAdvisor`,
 you can amortize the cost of applying memory advice:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_pool_advice.cpp
-                    :lines: 26-36
+   :start-after: _sphinx_tag_tut_pool_advice_start
+   :end-before: _sphinx_tag_tut_pool_advice_end
+   :language: C++
 
 The complete example is included below:
 

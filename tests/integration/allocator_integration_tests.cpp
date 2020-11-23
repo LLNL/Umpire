@@ -186,18 +186,21 @@ TEST(Allocator, registerAllocator)
     const std::string allocator_copy_name =
         allocator_name + std::string{"_copy"};
 
-    rm.registerAllocator(allocator_copy_name, rm.getAllocator(allocator_name));
+    rm.addAlias(allocator_copy_name, rm.getAllocator(allocator_name));
 
     ASSERT_EQ(rm.getAllocator(allocator_name).getAllocationStrategy(),
               rm.getAllocator(allocator_copy_name).getAllocationStrategy());
 
-    ASSERT_ANY_THROW(rm.registerAllocator(
+    ASSERT_ANY_THROW(rm.addAlias(
         allocator_name, rm.getAllocator(allocator_copy_name)));
 
-    ASSERT_TRUE(rm.isAllocatorRegistered(allocator_name));
+    int id = rm.getAllocator(allocator_name).getId();
+
+    ASSERT_TRUE(rm.isAllocator(allocator_name));
+    ASSERT_TRUE(rm.isAllocator(id));
   }
 
-  ASSERT_FALSE(rm.isAllocatorRegistered("BANANAS"));
+  ASSERT_FALSE(rm.isAllocator("BANANAS"));
 }
 
 TEST(Allocator, GetSetDefault)
@@ -292,8 +295,8 @@ TEST(Allocation, DeallocateDifferent)
   ASSERT_NO_THROW(alloc_one.deallocate(data));
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
-TEST(Allocator, DeallocateDifferentCuda)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+TEST(Allocator, DeallocateDifferentUMDevice)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc_um = rm.getAllocator("UM");

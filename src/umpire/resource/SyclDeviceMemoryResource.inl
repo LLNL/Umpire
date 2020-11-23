@@ -33,8 +33,6 @@ void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
   void* ptr = m_allocator.allocate(bytes, sycl_queue);
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
-                          "size", bytes, "event", "allocate");
 
   return ptr;
 }
@@ -43,9 +41,6 @@ template <typename _allocator>
 void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
-                          "size", 0x0, "event", "deallocate");
 
   cl::sycl::queue sycl_queue(m_traits.queue);
 
@@ -66,6 +61,12 @@ std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark()
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;
+}
+
+template <typename _allocator>
+bool SyclDeviceMemoryResource<_allocator>::isAccessibleFrom(Platform p) noexcept
+{
+  return m_allocator.isAccessible(p);
 }
 
 template <typename _allocator>

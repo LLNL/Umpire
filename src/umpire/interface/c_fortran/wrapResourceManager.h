@@ -130,15 +130,32 @@ void umpire_resourcemanager_register_allocator_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator);
 
+void umpire_resourcemanager_add_alias(umpire_resourcemanager * self,
+    const char * name, umpire_allocator allocator);
+
+void umpire_resourcemanager_add_alias_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator);
+
+void umpire_resourcemanager_remove_alias(umpire_resourcemanager * self,
+    const char * name, umpire_allocator allocator);
+
+void umpire_resourcemanager_remove_alias_bufferify(
+    umpire_resourcemanager * self, const char * name, int Lname,
+    umpire_allocator allocator);
+
 umpire_allocator * umpire_resourcemanager_get_allocator_for_ptr(
     umpire_resourcemanager * self, void * ptr,
     umpire_allocator * SHC_rv);
 
-bool umpire_resourcemanager_is_allocator(umpire_resourcemanager * self,
-    const char * name);
+bool umpire_resourcemanager_is_allocator_name(
+    umpire_resourcemanager * self, const char * name);
 
-bool umpire_resourcemanager_is_allocator_bufferify(
+bool umpire_resourcemanager_is_allocator_name_bufferify(
     umpire_resourcemanager * self, const char * name, int Lname);
+
+bool umpire_resourcemanager_is_allocator_id(
+    umpire_resourcemanager * self, int id);
 
 bool umpire_resourcemanager_has_allocator(umpire_resourcemanager * self,
     void * ptr);

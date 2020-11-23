@@ -15,7 +15,6 @@
 #cmakedefine UMPIRE_ENABLE_LOGGING
 #cmakedefine UMPIRE_ENABLE_BACKTRACE
 #cmakedefine UMPIRE_ENABLE_BACKTRACE_SYMBOLS
-#cmakedefine UMPIRE_ENABLE_STATISTICS
 #cmakedefine UMPIRE_ENABLE_HIP
 #cmakedefine UMPIRE_ENABLE_SYCL
 #cmakedefine UMPIRE_ENABLE_OPENMP_TARGET
@@ -52,7 +51,7 @@
 UMPIRE_EXPORT extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 
 namespace umpire {
-constexpr int invalid_allocator_id = 0xDEADBEEF;
+constexpr int invalid_allocator_id = 0xDEADBEE;
 }
 
 #endif

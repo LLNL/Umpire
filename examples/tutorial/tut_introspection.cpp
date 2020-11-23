@@ -15,15 +15,16 @@ int main(int, char**)
 
   const std::string destinations[] = {
     "HOST"
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
     ,
-    "DEVICE",
-    "UM",
-    "PINNED"
+    "DEVICE"
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_UM)
     ,
-    "DEVICE",
+    "UM"
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
+    ,
     "PINNED"
 #endif
   };
@@ -36,14 +37,20 @@ int main(int, char**)
     std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
               << allocator.getName() << " allocator." << std::endl;
 
+    // _sphinx_tag_tut_getallocator_start
     auto found_allocator = rm.getAllocator(data);
+    // _sphinx_tag_tut_getallocator_end
 
+    // _sphinx_tag_tut_getinfo_start
     std::cout << "According to the ResourceManager, the Allocator used is "
               << found_allocator.getName() << ", which has the Platform "
               << static_cast<int>(found_allocator.getPlatform()) << std::endl;
+    // _sphinx_tag_tut_getinfo_end
 
+    // _sphinx_tag_tut_getsize_start
     std::cout << "The size of the allocation is << "
               << found_allocator.getSize(data) << std::endl;
+    // _sphinx_tag_tut_getsize_end
 
     allocator.deallocate(data);
   }
