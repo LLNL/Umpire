@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+### Changed
+
+- Uberenv uses environments to configure spack.
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
