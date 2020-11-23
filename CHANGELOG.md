@@ -50,6 +50,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Changed enumeration names from all upper case to all lower case in order to
   avoid name collisions.  (Note: this changes may be user visible so need to be
   release noted).
+  
+- Documentation of Uberenv is moved to a shared location (radiuss-ci), we
+  keep only the examples locally.
 
 - Fixed up broken source links in tutorial documentation.
 
