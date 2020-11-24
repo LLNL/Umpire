@@ -59,9 +59,8 @@ set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(CMAKE_CUDA_STANDARD 11)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-    message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
-    set( CMAKE_CXX_EXTENSIONS ON )
-  endif()
+  message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
+  set( CMAKE_CXX_EXTENSIONS ON )
 endif()
 
 if (ENABLE_ACCESS_CHECK)
