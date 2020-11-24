@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
-- Removed extraneous 'endif()' line in Umpire`s CMakeLists.txt
+- Removed extraneous 'endif()' line in Umpire CMakeLists.txt file
 
 ## [v5.0.0] - 2020-11-18
 
