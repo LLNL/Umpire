@@ -64,7 +64,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
 endif()
 
 if (ENABLE_ACCESS_CHECK)
-  set(ENABLE_GTEST_DEATH_TESTS On)
+  set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
 if (ENABLE_CUDA)
