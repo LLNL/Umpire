@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+### Removed
+
+- Removed extraneous 'endif()' line in Umpire`s CMakeLists.txt
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
