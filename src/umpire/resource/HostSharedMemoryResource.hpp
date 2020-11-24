@@ -4,12 +4,14 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#pragma once
+#ifndef __Host_Shared_Memory_Resource_HPP
+#define __Host_Shared_Memory_Resource_HPP
 
 #include <memory>
 #include <string>
 
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace resource {
@@ -30,6 +32,7 @@ class HostSharedMemoryResource : public MemoryResource {
     std::size_t getCurrentSize() const noexcept;
     std::size_t getHighWatermark() const noexcept;
 
+    bool isAccessibleFrom(Platform p) noexcept;
     Platform getPlatform() noexcept;
 
     void* find_pointer_from_name(std::string name);
@@ -42,3 +45,4 @@ class HostSharedMemoryResource : public MemoryResource {
 
 } // end of namespace resource
 } // end of namespace umpire
+#endif // __Host_Shared_Memory_Resource_HPP

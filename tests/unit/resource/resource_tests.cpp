@@ -7,6 +7,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "umpire/resource/DefaultMemoryResource.hpp"
+#include "umpire/util/Platform.hpp"
 
 struct TestAllocator {
   void* allocate(std::size_t bytes)
@@ -17,6 +18,14 @@ struct TestAllocator {
   void deallocate(void* ptr)
   {
     ::free(ptr);
+  }
+
+  bool isAccessible(umpire::Platform p)
+  {
+    if(p == umpire::Platform::host)
+      return true;
+    else
+      return false;
   }
 };
 

@@ -24,10 +24,24 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 
 blt_add_executable(
+  NAME alloc_access
+  SOURCES allocator_access.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples alloc_access)
+
+blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
+
+if (ENABLE_HIP)
+  blt_add_executable(
+    NAME multi_device
+    SOURCES multi_device.cpp
+    DEPENDS_ON umpire hip)
+  list(APPEND umpire_examples multi_device)
+endif()
 
 blt_add_executable(
   NAME get_parent 
@@ -78,14 +92,6 @@ blt_add_executable(
   SOURCES use_after_free.cpp
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples use_after_free)
-
-if (ENABLE_STATISTICS)
-  blt_add_executable(
-    NAME statistics_example
-    SOURCES statistics.cpp
-    DEPENDS_ON ${example_depends})
-  list(APPEND umpire_examples statistics_example)
-endif()
 
 if (ENABLE_CUDA)
   blt_add_executable(

@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/resource/FileMemoryResource.hpp"
+#include "umpire/util/Platform.hpp"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -117,6 +118,14 @@ std::size_t FileMemoryResource::getCurrentSize() const noexcept
 std::size_t FileMemoryResource::getHighWatermark() const noexcept
 {
   return 0;
+}
+
+bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  if(p == Platform::host)
+    return true;
+  else
+    return false;
 }
 
 Platform FileMemoryResource::getPlatform() noexcept

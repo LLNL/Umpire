@@ -83,8 +83,9 @@ class Umpire(CMakePackage, CudaPackage):
 
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
+    variant('mpi', default=False, description='Enable MPI support')
     variant('numa', default=False, description='Enable NUMA support')
-    variant('shared', default=True, description='Enable Shared libs')
+    variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('openmp_target', default=False, description='Build with OpenMP 4.5 support')
     variant('deviceconst', default=False,
@@ -94,9 +95,12 @@ class Umpire(CMakePackage, CudaPackage):
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
     variant('hip', default=False, description='Build with HIP support')
+    variant('tools', default=True, description='Enable tools')
+    variant('werror', default=True, description='Enable warnings as errors')
 
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
+    depends_on('mpi', when='+mpi')
     depends_on('hip', when='+hip')
 
     conflicts('+numa', when='@:0.3.2')
@@ -317,6 +321,8 @@ class Umpire(CMakePackage, CudaPackage):
                                         hip_root))
             cfg.write(cmake_cache_entry("HIP_CLANG_PATH",
                                         rocm_root + '/llvm/bin'))
+            cfg.write(cmake_cache_entry("HIP_HIPCC_FLAGS",
+                                        '--amdgpu-target=gfx906'))
             cfg.write(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
                                         "{0}/include;{0}/../hsa/include".format(hip_root)))
             if '%gcc' in spec:
@@ -335,6 +341,11 @@ class Umpire(CMakePackage, CudaPackage):
 
         cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
+
+        if "+mpi" in spec:
+            cfg.write(cmake_cache_option("ENABLE_MPI", '+mpi' in spec))
+            cfg.write(cmake_cache_entry("MPI_CXX_COMPILER", spec['mpi'].mpicxx))
+
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         if "+openmp_target" in spec:
@@ -344,6 +355,8 @@ class Umpire(CMakePackage, CudaPackage):
 
         cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
+        cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
 
         #######################
         # Close and save

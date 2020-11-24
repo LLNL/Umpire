@@ -82,6 +82,8 @@ fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
 
+cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
+
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
@@ -103,10 +105,15 @@ then
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
 
-    cmake \
+    $cmake_exe \
       -C ${hostconfig_path} \
       ${project_dir}
-    cmake --build . -j
+    if ! $cmake_exe --build . -j; then
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      echo "Compilation failed, running make VERBOSE=1"
+      echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      $cmake_exe --build . --verbose -j 1
+    fi
 fi
 
 # Test

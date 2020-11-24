@@ -20,11 +20,13 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/alloc/CudaMallocAllocator.hpp"
+#include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
 #include "umpire/alloc/HipMallocAllocator.hpp"
+#include "umpire/alloc/HipMallocManagedAllocator.hpp"
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
@@ -120,7 +122,7 @@ class CudaMalloc : public ResourceAllocator<umpire::alloc::CudaMallocAllocator> 
 BENCHMARK_DEFINE_F(CudaMalloc, cudaMalloc)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(CudaMalloc, cudaFree)(benchmark::State& st)   { deallocation(st); }
 
-class CudaMallocManaged : public ResourceAllocator<umpire::alloc::CudaMallocAllocator> {};
+class CudaMallocManaged : public ResourceAllocator<umpire::alloc::CudaMallocManagedAllocator> {};
 BENCHMARK_DEFINE_F(CudaMallocManaged, cudaMallocManaged)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(CudaMallocManaged, cudaFree)(benchmark::State& st)   { deallocation(st); }
 
@@ -133,6 +135,10 @@ BENCHMARK_DEFINE_F(CudaPinned, cudaFreeHost)(benchmark::State& st)   { deallocat
 class HipMalloc : public ResourceAllocator<umpire::alloc::HipMallocAllocator> {};
 BENCHMARK_DEFINE_F(HipMalloc, hipMalloc)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(HipMalloc, hipFree)(benchmark::State& st)   { deallocation(st); }
+
+class HipMallocManaged : public ResourceAllocator<umpire::alloc::HipMallocManagedAllocator> {};
+BENCHMARK_DEFINE_F(HipMallocManaged, hipMallocManaged)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(HipMallocManaged, hipFree)(benchmark::State& st)   { deallocation(st); }
 
 class HipPinned : public ResourceAllocator<umpire::alloc::HipPinnedAllocator> {};
 BENCHMARK_DEFINE_F(HipPinned, hipMallocHost)(benchmark::State& st) { allocation(st); }
@@ -174,7 +180,7 @@ BENCHMARK_DEFINE_F(DevicePinnedResource, allocate)(benchmark::State& st) { alloc
 BENCHMARK_DEFINE_F(DevicePinnedResource, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 class UnifiedResource : public MemoryResourceAllocator<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(UnifiedResource, allocate)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(UnifiedResource, deallocate)(benchmark::State& st) { deallocation(st); }
@@ -252,8 +258,8 @@ BENCHMARK_DEFINE_F(FixedPoolDevicePinned, allocate)(benchmark::State& st) { allo
 BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
-class FixedPoolUnified : public FixedPool<umpire::resource::Pinned> {};
+#if defined(UMPIRE_ENABLE_UM)
+class FixedPoolUnified : public FixedPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(FixedPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
@@ -373,7 +379,7 @@ BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, allocate)(benchmark::State& st) { al
 BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 class DynamicPoolUnified : public DynamicPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(DynamicPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate)(benchmark::State& st) { deallocation(st); }
@@ -424,7 +430,7 @@ BENCHMARK_DEFINE_F(MixedPoolDevicePinned, allocate)(benchmark::State& st) { allo
 BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 class MixedPoolUnified : public MixedPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(MixedPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate)(benchmark::State& st) { deallocation(st); }
@@ -451,6 +457,9 @@ BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(HipMalloc, hipFree)->Range(RangeLow, RangeHi);
 
+BENCHMARK_REGISTER_F(HipMallocManaged, hipMallocManaged)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMallocManaged, hipFree)->Range(RangeLow, RangeHi);
+
 BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->Range(RangeLow, RangeHi);
 #endif
@@ -467,7 +476,7 @@ BENCHMARK_REGISTER_F(DevicePinnedResource, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DevicePinnedResource, deallocate)->Range(RangeLow, RangeHi);
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(UnifiedResource, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(UnifiedResource, deallocate)->Range(RangeLow, RangeHi);
 #endif
@@ -489,7 +498,7 @@ BENCHMARK_REGISTER_F(FixedPoolDevicePinned, allocate)->Arg(256);
 BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate)->Arg(256);
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(FixedPoolUnified, allocate)->Arg(256);
 BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate)->Arg(256);
 #endif
@@ -505,7 +514,7 @@ BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, allocate)->Args({16, 1024});
 BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate)->Args({16, 1024});
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->Args({16, 1024});
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate)->Args({16, 1024});
 #endif
@@ -521,7 +530,7 @@ BENCHMARK_REGISTER_F(MixedPoolDevicePinned, allocate)->Args({16, 1024});
 BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate)->Args({16, 1024});
 #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(MixedPoolUnified, allocate)->Args({16, 1024});
 BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate)->Args({16, 1024});
 #endif

@@ -49,6 +49,15 @@ void HostSharedMemoryResource::deallocate(void* ptr)
   return pimpl->deallocate(ptr);
 }
 
+bool HostSharedMemoryResource::isAccessibleFrom(Platform p) noexcept
+{
+  // Todo: Need to determine how to update tests which require
+  // unnamed alloc to test.
+  //
+  UMPIRE_USE_VAR(p);
+  return false;
+}
+
 Platform HostSharedMemoryResource::getPlatform() noexcept
 {
   return m_platform;

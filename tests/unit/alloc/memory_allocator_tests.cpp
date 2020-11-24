@@ -17,6 +17,7 @@ using namespace umpire::alloc;
 
 #if defined(UMPIRE_ENABLE_HIP)
 #include "umpire/alloc/HipMallocAllocator.hpp"
+#include "umpire/alloc/HipMallocManagedAllocator.hpp"
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
@@ -48,7 +49,8 @@ using test_types =
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
                      ,
-                     HipMallocAllocator, HipPinnedAllocator
+                     HipMallocAllocator, HipMallocManagedAllocator,
+                     HipPinnedAllocator
 #endif
                      >;
 

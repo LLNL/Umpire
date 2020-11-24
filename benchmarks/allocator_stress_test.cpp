@@ -48,11 +48,10 @@ void benchmark_allocator(std::string name) {
 int main(int, char**) {
   benchmark_allocator("HOST");
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE) 
   benchmark_allocator("DEVICE");
-  benchmark_allocator("UM");
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
-  benchmark_allocator("DEVICE");
+#if defined(UMPIRE_ENABLE_UM) 
+  benchmark_allocator("UM");
 #endif
 }

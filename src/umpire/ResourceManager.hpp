@@ -85,6 +85,17 @@ class ResourceManager {
   Allocator getDefaultAllocator();
 
   /*!
+   * \brief Get the names for existing Resources.
+   *
+   * The Memory Resource Registry dynamically populates available memory resource
+   * types based on what's available. This function returns those names so they
+   * can be used to determine allocator accessibility.
+   * 
+   * \return The available resource names.
+   */
+   std::vector<std::string> getResourceNames();
+
+  /*!
    * \brief Set the default Allocator.
    *
    * The default Allocator is used whenever an Allocator is required and one
@@ -115,7 +126,35 @@ class ResourceManager {
    * \param name Name to register Allocator with.
    * \param allocator Allocator to register.
    */
+  UMPIRE_DEPRECATE("addAlias should be used instead")
   void registerAllocator(const std::string& name, Allocator allocator);
+
+  /*!
+   * \brief Add an Allocator alias.
+   *
+   * After this call, allocator can be retrieved by calling getAllocator(name).
+   *
+   * The same Allocator can have multiple aliases.
+   *
+   * \param name Name to alias Allocator with.
+   * \param allocator Allocator to register.
+   */
+  void addAlias(const std::string& name, Allocator allocator);
+
+  /*!
+   * \brief Remove an Allocator alias.
+   *
+   * After calling, allocator can no longer be accessed by calling
+   * getAllocator(name). If allocator is not registered under name, an error
+   * will be thrown.
+   *
+   * If one of the default resource names (e.g. HOST) is used, an error will be
+   * thrown.
+   *
+   * \param name Name to deregister Allocator with.
+   * \param allocator Allocator to deregister.
+   */
+  void removeAlias(const std::string& name, Allocator allocator);
 
   /*!
    * \brief Get the Allocator used to allocate ptr.
@@ -126,6 +165,8 @@ class ResourceManager {
   Allocator getAllocator(void* ptr);
 
   bool isAllocator(const std::string& name) noexcept;
+
+  bool isAllocator(int id) noexcept;
 
   /*!
    * \brief Does the given pointer have an associated Allocator.
@@ -157,6 +198,7 @@ class ResourceManager {
    * \brief Check whether the named Allocator exists.
    *
    */
+  UMPIRE_DEPRECATE("Use isAllocator instead.")
   bool isAllocatorRegistered(const std::string& name);
 
   /*!
@@ -299,8 +341,6 @@ class ResourceManager {
   int m_id;
 
   std::mutex m_mutex;
-
-  std::vector<std::string> m_resource_names;
 
   // Methods that need access to m_allocations to print/filter records
   friend void print_allocator_records(Allocator, std::ostream&);

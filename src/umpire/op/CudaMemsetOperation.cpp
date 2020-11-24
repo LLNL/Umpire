@@ -24,10 +24,6 @@ void CudaMemsetOperation::apply(
                  << src_ptr << ", value = " << value << ", length = " << length
                  << ") failed with error: " << cudaGetErrorString(error));
   }
-
-  UMPIRE_RECORD_STATISTIC("CudaMemsetOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
-                          "size", length, "event", "memset");
 }
 
 camp::resources::Event CudaMemsetOperation::apply_async(
@@ -44,10 +40,6 @@ camp::resources::Event CudaMemsetOperation::apply_async(
                  << src_ptr << ", value = " << value << ", length = " << length
                  << ") failed with error: " << cudaGetErrorString(error));
   }
-
-  UMPIRE_RECORD_STATISTIC("CudaMemsetOperation", "src_ptr",
-                          reinterpret_cast<uintptr_t>(src_ptr), "value", value,
-                          "size", length, "event", "memset");
 
   return ctx.get_event();
 }
