@@ -43,18 +43,18 @@ endif()
 set(umpire_resource_depends
   camp)
 
-if(ENABLE_BOOST_RESOURCE)
+if(ENABLE_HOST_SHARED_MEMORY)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    BoostMemoryResource.hpp
-    BoostMemoryResourceFactory.hpp
-    BoostMemoryResourceImpl.hpp
+    HostSharedMemoryResource.hpp
+    HostSharedMemoryResourceFactory.hpp
+    HostSharedMemoryResourceImpl.hpp
   )
 
   set (umpire_resource_sources
     ${umpire_resource_sources}
-    BoostMemoryResource.cpp
-    BoostMemoryResourceFactory.cpp
+    HostSharedMemoryResource.cpp
+    HostSharedMemoryResourceFactory.cpp
   )
 endif()
 
@@ -162,12 +162,6 @@ blt_add_library(
   SOURCES ${umpire_resource_sources}
   DEPENDS_ON ${umpire_resource_depends}
   OBJECT TRUE)
-
-if (ENABLE_BOOST_RESOURCE)
-  target_include_directories(umpire_resource BEFORE PRIVATE
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/umpire/tpl/boost_1_74_0>
-  )
-endif()
 
 target_include_directories(
   umpire_resource

@@ -49,10 +49,10 @@ option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
 option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
 if(WIN32 OR APPLE)
   set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
-  set(ENABLE_BOOST_RESOURCE Off CACHE BOOL "")
+  set(ENABLE_HOST_SHARED_MEMORY Off CACHE BOOL "")
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
-option(ENABLE_BOOST_RESOURCE "Enable Boost Shared Memory Resource" Off)
+option(ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off)
 
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL OFF)

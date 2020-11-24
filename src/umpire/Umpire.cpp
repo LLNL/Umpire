@@ -15,7 +15,7 @@
 
 #include "umpire/config.hpp"
 
-#include "umpire/resource/BoostMemoryResource.hpp"
+#include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
 
 #if !defined(_MSC_VER)
@@ -166,12 +166,12 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string name)
 void* find_pointer_from_name(Allocator allocator, const std::string name)
 {
   void* ptr{nullptr};
-#if defined(UMPIRE_ENABLE_BOOST_RESOURCE)
+#if defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   auto base_strategy =
           util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
 
-   umpire::resource::BoostMemoryResource* shared_resource =
-      reinterpret_cast<umpire::resource::BoostMemoryResource*>(base_strategy);
+   umpire::resource::HostSharedMemoryResource* shared_resource =
+      reinterpret_cast<umpire::resource::HostSharedMemoryResource*>(base_strategy);
 
   if (shared_resource != nullptr) {
     ptr = shared_resource->find_pointer_from_name(name);
@@ -179,7 +179,7 @@ void* find_pointer_from_name(Allocator allocator, const std::string name)
   else
 #else
   UMPIRE_USE_VAR(name);
-#endif // defined(UMPIRE_ENABLE_BOOST_RESOURCE)
+#endif // defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   {
     UMPIRE_ERROR(allocator.getName()
       << " Allocator is not a Shared Memory Allocator");

@@ -11,8 +11,8 @@
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
 
-#if defined(UMPIRE_ENABLE_BOOST_RESOURCE)
-#include "umpire/resource/BoostMemoryResourceFactory.hpp"
+#if defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
+#include "umpire/resource/HostSharedMemoryResourceFactory.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
@@ -118,9 +118,9 @@ ResourceManager::ResourceManager()
   registry.registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
-#if defined(UMPIRE_ENABLE_BOOST_RESOURCE)
+#if defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   registry.registerMemoryResource(
-      util::make_unique<resource::BoostMemoryResourceFactory>());
+      util::make_unique<resource::HostSharedMemoryResourceFactory>());
   m_resource_names.push_back("SHARED");
 #endif
 

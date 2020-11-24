@@ -7,7 +7,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/resource/BoostMemoryResource.hpp"
+#include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 #include "mpi.h"

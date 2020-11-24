@@ -33,7 +33,7 @@ Here is a summary of the configuration options, their default value, and meaning
     ``ENABLE_C``                  Off      Build the C API
     ``ENABLE_FORTRAN``            Off      Build the Fortran API
     ``ENABLE_PERFORMANCE_TESTS``  Off      Build and run performance tests
-    ``ENABLE_BOOST_RESOURCE``     Off      Enable BOOST Shared Memory support
+    ``ENABLE_HOST_SHARED_MEMORY`` Off      Enable Host Shared Memory support
     ============================  ======== ===========================================================================
 
 These arguments are explained in more detail below:
@@ -97,7 +97,7 @@ These arguments are explained in more detail below:
 * ``ENABLE_PERFORMANCE_TESTS``
   Build and run performance tests
 
-* ``ENABLE_BOOST_RESOURCE``
+* ``ENABLE_HOST_SHARED_MEMORY``
   This option enables support for interprocess shared memory on the ``HOST``
-  platform via Boost Interprocess
+  platform
 
