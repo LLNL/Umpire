@@ -54,15 +54,14 @@ option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 option(ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off)
 
 # Set benchmark installation to OFF
-set(BENCHMARK_ENABLE_INSTALL OFF)
+set(BENCHMARK_ENABLE_INSTALL Off CACHE BOOL "Turning benchmark installation Off")
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(CMAKE_CUDA_STANDARD 11)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-    message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
-    set( CMAKE_CXX_EXTENSIONS ON )
-  endif()
+  message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
+  set( CMAKE_CXX_EXTENSIONS ON )
 endif()
 
 if (ENABLE_CUDA)
