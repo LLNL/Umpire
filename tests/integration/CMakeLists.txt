@@ -66,7 +66,7 @@ blt_add_executable(
 
 target_include_directories(
   allocator_accessibility_tests
-  PUBLIC
+  PRIVATE 
   ${PROJECT_BINARY_DIR}/include)
 
 blt_add_test(
