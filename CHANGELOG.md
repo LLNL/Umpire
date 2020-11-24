@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
 
+- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
