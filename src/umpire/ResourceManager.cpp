@@ -16,10 +16,8 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
-#include "umpire/strategy/AllocationTracker.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
-#include "umpire/strategy/ZeroByteHandler.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #endif
@@ -27,7 +25,6 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/io.hpp"
 #include "umpire/util/make_unique.hpp"
-#include "umpire/util/wrap_allocator.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
@@ -164,9 +161,9 @@ Allocator ResourceManager::makeResource(const std::string& name,
     traits.id = resource::resource_to_device_id(name);
   }
   std::unique_ptr<strategy::AllocationStrategy> allocator{
-      util::wrap_allocator<strategy::AllocationTracker,
-                           strategy::ZeroByteHandler>(
-          registry.makeMemoryResource(name, getNextId(), traits))};
+      // util::wrap_allocator<//strategy::AllocationTracker,
+      //                      strategy::ZeroByteHandler>(
+          registry.makeMemoryResource(name, getNextId(), traits)};
 
   UMPIRE_REPLAY(R"( "event": "makeMemoryResource", "payload": { "name": ")"
                 << name << R"(" })"
@@ -670,9 +667,9 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
 void ResourceManager::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  auto allocator = findAllocatorForPointer(ptr);
+  auto allocator = Allocator(findAllocatorForPointer(ptr));
 
-  allocator->deallocate(ptr);
+  allocator.deallocate(ptr);
 }
 
 std::size_t ResourceManager::getSize(void* ptr) const

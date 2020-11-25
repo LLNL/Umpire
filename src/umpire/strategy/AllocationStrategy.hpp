@@ -53,6 +53,8 @@ class AllocationStrategy {
    */
   virtual void deallocate(void* ptr) = 0;
 
+  virtual void deallocate(void* ptr, std::size_t size);
+
   /*!
    * \brief Release any and all unused memory held by this AllocationStrategy
    */
@@ -129,10 +131,18 @@ class AllocationStrategy {
 
   virtual MemoryResourceTraits getTraits() const noexcept;
 
+  virtual bool tracksMemoryUse() const noexcept;
+
+  std::size_t m_current_size{0};
+  std::size_t m_high_watermark{0};
+  std::size_t m_allocation_count{0};
+
  protected:
   std::string m_name;
   int m_id;
+
   AllocationStrategy* m_parent; 
+
 };
 
 } // end of namespace strategy

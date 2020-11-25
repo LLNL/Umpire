@@ -84,18 +84,6 @@ void SlotPool::deallocate(void* ptr)
   }
 }
 
-std::size_t SlotPool::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << m_current_size);
-  return m_current_size;
-}
-
-std::size_t SlotPool::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << m_highwatermark);
-  return m_highwatermark;
-}
-
 Platform SlotPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();

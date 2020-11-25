@@ -100,6 +100,11 @@ MemoryResourceTraits DynamicPoolList::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+bool 
+DynamicPoolList::tracksMemoryUse() const noexcept {
+  return true;
+}
+
 void DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");

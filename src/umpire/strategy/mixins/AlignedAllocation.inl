@@ -31,16 +31,19 @@ inline void* AlignedAllocation::aligned_allocate(std::size_t size)
   uintptr_t mask{ m_mask };
   void *aligned_ptr{ reinterpret_cast<void*>( (ptr + alignment) & mask ) };
 
-  base_pointer_map[aligned_ptr] = reinterpret_cast<void*>(ptr);
+  base_pointer_map[aligned_ptr] = std::make_tuple(
+    reinterpret_cast<void*>(ptr), total_bytes);
 
   return aligned_ptr;
 }
 
 inline void AlignedAllocation::aligned_deallocate(void* ptr)
 {
-  void* buffer{ base_pointer_map[ptr] };
+  auto ptr_info = base_pointer_map[ptr];
+  void* buffer{ std::get<0>(ptr_info) };
+  std::size_t size = std::get<1>(ptr_info);
   base_pointer_map.erase(ptr);
-  m_allocator->deallocate(buffer);
+  m_allocator->deallocate(buffer, size);
 }
 
 } // namespace mixins

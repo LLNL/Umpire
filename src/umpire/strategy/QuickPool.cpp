@@ -275,6 +275,12 @@ MemoryResourceTraits QuickPool::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+bool 
+QuickPool::tracksMemoryUse() const noexcept
+{
+  return false;
+}
+
 std::size_t QuickPool::getBlocksInPool() const noexcept
 {
   return m_pointer_map.size() + m_size_map.size();

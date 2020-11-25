@@ -244,6 +244,12 @@ MemoryResourceTraits DynamicPoolMap::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+bool 
+DynamicPoolMap::tracksMemoryUse() const noexcept
+{
+  return false;
+}
+
 void DynamicPoolMap::coalesce()
 {
   UMPIRE_LOG(Debug, "()");

@@ -12,6 +12,8 @@
 #include <ostream>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/mixins/Inspector.hpp"
+#include "umpire/strategy/mixins/Zeroer.hpp"
 #include "umpire/util/Platform.hpp"
 
 class AllocatorTest;
@@ -19,6 +21,13 @@ class AllocatorTest;
 namespace umpire {
 
 class ResourceManager;
+
+namespace op {
+
+class HostReallocateOperation;
+class GenericReallocateOperation;
+
+}
 
 /*!
  * \brief Provides a unified interface to allocate and free data.
@@ -30,9 +39,13 @@ class ResourceManager;
  *
  * \see TypedAllocator
  */
-class Allocator {
+class Allocator : 
+  private strategy::mixins::Inspector, strategy::mixins::Zeroer
+{
   friend class ResourceManager;
   friend class ::AllocatorTest;
+  friend class umpire::op::HostReallocateOperation;
+  friend class umpire::op::GenericReallocateOperation;
 
  public:
   /*!
@@ -177,6 +190,8 @@ class Allocator {
    * \brief Pointer to the AllocationStrategy used by this Allocator.
    */
   umpire::strategy::AllocationStrategy* m_allocator;
+
+  bool m_tracking{true};
 };
 
 } // end of namespace umpire

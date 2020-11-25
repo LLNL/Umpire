@@ -16,6 +16,7 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 template <>
 struct tag_to_string<umpire::strategy::DynamicPoolList> {

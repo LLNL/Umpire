@@ -13,7 +13,10 @@
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
-    : m_allocator(allocator)
+    : strategy::mixins::Inspector{allocator},
+      strategy::mixins::Zeroer{},
+      m_allocator{allocator},
+      m_tracking{true}
 {
 }
 
@@ -35,7 +38,7 @@ std::size_t Allocator::getSize(void* ptr) const
 
 std::size_t Allocator::getHighWatermark() const noexcept
 {
-  return m_allocator->getHighWatermark();
+ return m_allocator->getHighWatermark();
 }
 
 std::size_t Allocator::getCurrentSize() const noexcept
@@ -45,7 +48,8 @@ std::size_t Allocator::getCurrentSize() const noexcept
 
 std::size_t Allocator::getActualSize() const noexcept
 {
-  return m_allocator->getActualSize();
+  auto actual_size = m_allocator->getActualSize();
+  return (actual_size > 0) ? actual_size : getCurrentSize();
 }
 
 std::size_t Allocator::getAllocationCount() const noexcept

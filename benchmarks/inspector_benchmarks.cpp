@@ -44,7 +44,7 @@ public:
   using ::benchmark::Fixture::SetUp;
   using ::benchmark::Fixture::TearDown;
 
-  umpire::strategy::mixins::Inspector inspector;
+  umpire::strategy::mixins::Inspector inspector{nullptr};
   uintptr_t ptr[MAX_REGISTRATIONS];
 };
 
@@ -77,7 +77,7 @@ public:
 
   void TearDown(const ::benchmark::State&) override final {}
 
-  umpire::strategy::mixins::Inspector inspector;
+  umpire::strategy::mixins::Inspector inspector{nullptr};
   uintptr_t ptr[MAX_REGISTRATIONS];
 };
 

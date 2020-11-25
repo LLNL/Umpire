@@ -124,7 +124,11 @@ TEST_P(AllocatorTest, get_allocator_records)
 
   auto records = umpire::get_allocator_records(*m_allocator);
 
-  ASSERT_EQ(records.size(), 1);
+  for (const auto& r : records) {
+    std::cout << r.ptr << " " << r.size << " " << r.strategy << std::endl;
+  }
+
+  EXPECT_EQ(records.size(), 1);
 
   m_allocator->deallocate(data);
 }

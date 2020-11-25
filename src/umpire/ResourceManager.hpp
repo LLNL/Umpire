@@ -28,6 +28,10 @@ class MemoryOperation;
 
 namespace strategy {
 class ZeroByteHandler;
+
+namespace mixins {
+class Zeroer;
+}
 }
 
 /*!
@@ -108,7 +112,7 @@ class ResourceManager {
   /*!
    * \brief Construct a new Allocator.
    */
-  template <typename Strategy, bool introspection = true, typename... Args>
+  template <typename Strategy, bool introspection = false, typename... Args>
   Allocator makeAllocator(const std::string& name, Args&&... args);
 
   Allocator makeResource(const std::string& name);
@@ -345,6 +349,7 @@ class ResourceManager {
   friend void print_allocator_records(Allocator, std::ostream&);
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
+  friend strategy::mixins::Zeroer;
 };
 
 } // end namespace umpire

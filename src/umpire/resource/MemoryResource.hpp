@@ -56,27 +56,6 @@ class MemoryResource : public strategy::AllocationStrategy {
   virtual void deallocate(void* ptr) override = 0;
 
   /*!
-   * \brief Return the current size of this MemoryResource.
-   *
-   * This is sum of the sizes of all the tracked allocations. Note that this
-   * doesn't ever have to be equal to getHighWatermark.
-   *
-   * \return current total size of active allocations in this MemoryResource.
-   */
-  virtual std::size_t getCurrentSize() const noexcept override = 0;
-
-  /*!
-   * \brief Return the memory high watermark for this MemoryResource.
-   *
-   * This is the largest amount of memory allocated by this Allocator. Note
-   * that this may be larger than the largest value returned by
-   * getCurrentSize.
-   *
-   * \return Memory high watermark.
-   */
-  virtual std::size_t getHighWatermark() const noexcept override = 0;
-
-  /*!
    * \brief Get the Platform assocatiated with this MemoryResource.
    *
    * This function is pure virtual and must be implemented by the inheriting

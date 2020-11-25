@@ -11,11 +11,8 @@
 
 #include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/AllocationTracker.hpp"
-#include "umpire/strategy/ZeroByteHandler.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
-#include "umpire/util/wrap_allocator.hpp"
 
 namespace umpire {
 
@@ -44,17 +41,8 @@ Allocator ResourceManager::makeAllocator(const std::string& name,
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
 
-  if (!introspection) {
-    allocator = util::wrap_allocator<strategy::ZeroByteHandler>(
-        util::make_unique<Strategy>(name, getNextId(),
-                                    std::forward<Args>(args)...));
-
-  } else {
-    allocator = util::wrap_allocator<strategy::AllocationTracker,
-                                     strategy::ZeroByteHandler>(
-        util::make_unique<Strategy>(name, getNextId(),
-                                    std::forward<Args>(args)...));
-  }
+  allocator = util::make_unique<Strategy>(name, getNextId(),
+                                  std::forward<Args>(args)...);
 
   UMPIRE_REPLAY(
       "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""

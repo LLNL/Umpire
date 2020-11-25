@@ -33,10 +33,16 @@ void* SizeLimiter::allocate(std::size_t bytes)
   return m_allocator->allocate(bytes);
 }
 
+
 void SizeLimiter::deallocate(void* ptr)
 {
-  m_total_size -= ResourceManager::getInstance().getSize(ptr);
   m_allocator->deallocate(ptr);
+}
+
+void SizeLimiter::deallocate(void* ptr, std::size_t n)
+{
+  m_total_size -= n;
+  deallocate(ptr);
 }
 
 Platform SizeLimiter::getPlatform() noexcept

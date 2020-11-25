@@ -71,6 +71,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   MemoryResourceTraits getTraits() const noexcept override;
 
+  bool tracksMemoryUse() const noexcept override;
+
   /*!
    * \brief Return the number of memory blocks -- both leased to application
    * and internal free memory -- that the pool holds.

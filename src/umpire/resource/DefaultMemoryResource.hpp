@@ -31,9 +31,6 @@ class DefaultMemoryResource : public MemoryResource {
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr);
 
-  std::size_t getCurrentSize() const noexcept;
-  std::size_t getHighWatermark() const noexcept;
-
   bool isAccessibleFrom(Platform p) noexcept;
 
   Platform getPlatform() noexcept;

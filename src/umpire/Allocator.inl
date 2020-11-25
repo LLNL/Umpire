@@ -25,7 +25,15 @@ inline void* Allocator::allocate(std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << " }");
 
-  ret = m_allocator->allocate(bytes);
+  if (0 == bytes) {
+    ret = allocateZero();
+  } else {
+    ret = m_allocator->allocate(bytes);
+  }
+
+  if (m_tracking) {
+    registerAllocation(ret, bytes, m_allocator);
+  }
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes
@@ -46,7 +54,16 @@ inline void Allocator::deallocate(void* ptr)
     UMPIRE_LOG(Info, "Deallocating a null pointer");
     return;
   } else {
-    m_allocator->deallocate(ptr);
+    if (m_tracking) {
+      auto record = deregisterAllocation(ptr, m_allocator);
+      if (! deallocateZero(ptr)) {
+        m_allocator->deallocate(ptr,record.size);
+      }
+    } else {
+      if (! deallocateZero(ptr)) {
+        m_allocator->deallocate(ptr);
+      }
+    }
   }
 }
 

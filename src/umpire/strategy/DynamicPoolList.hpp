@@ -71,6 +71,8 @@ class DynamicPoolList : public AllocationStrategy {
 
   MemoryResourceTraits getTraits() const noexcept final override;
 
+  bool tracksMemoryUse() const noexcept override;
+
   /*!
    * \brief Get the number of bytes that may be released back to resource
    *

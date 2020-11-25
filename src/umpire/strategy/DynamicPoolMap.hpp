@@ -77,6 +77,8 @@ class DynamicPoolMap : public AllocationStrategy,
 
   MemoryResourceTraits getTraits() const noexcept override;
 
+  bool tracksMemoryUse() const noexcept override;
+
   /*!
    * \brief Returns the number of bytes of unallocated data held by this pool
    * that could be immediately released back to the resource.

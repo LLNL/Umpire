@@ -16,6 +16,11 @@ AllocationStrategy::AllocationStrategy(const std::string& name, int id, Allocati
 {
 }
 
+void 
+AllocationStrategy::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(n)) {
+  deallocate(ptr);
+}
+
 const std::string& AllocationStrategy::getName() noexcept
 {
   return m_name;
@@ -33,17 +38,17 @@ int AllocationStrategy::getId() noexcept
 
 std::size_t AllocationStrategy::getCurrentSize() const noexcept
 {
-  return 0;
+  return m_current_size;
 }
 
 std::size_t AllocationStrategy::getHighWatermark() const noexcept
 {
-  return 0;
+  return m_high_watermark;
 }
 
 std::size_t AllocationStrategy::getAllocationCount() const noexcept
 {
-  return 0;
+  return m_allocation_count;
 }
 
 std::size_t AllocationStrategy::getActualSize() const noexcept
@@ -61,6 +66,11 @@ MemoryResourceTraits AllocationStrategy::getTraits() const noexcept
 AllocationStrategy* AllocationStrategy::getParent() const noexcept
 {
   return m_parent;
+}
+
+bool AllocationStrategy::tracksMemoryUse() const noexcept
+{
+  return false;
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)

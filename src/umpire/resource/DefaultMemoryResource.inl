@@ -52,20 +52,6 @@ void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
 }
 
 template <typename _allocator>
-std::size_t DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-template <typename _allocator>
-std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-template <typename _allocator>
 bool DefaultMemoryResource<_allocator>::isAccessibleFrom(Platform p) noexcept
 {
   return m_allocator.isAccessible(p);

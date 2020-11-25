@@ -9,7 +9,6 @@ set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationPrefetcher.hpp
   AllocationStrategy.hpp
-  AllocationTracker.hpp
   DynamicPool.hpp
   DynamicPoolList.hpp
   DynamicPoolMap.hpp
@@ -23,8 +22,7 @@ set (umpire_strategy_headers
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
-  ThreadSafeAllocator.hpp
-  ZeroByteHandler.hpp)
+  ThreadSafeAllocator.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_headers
@@ -35,27 +33,27 @@ endif ()
 set (umpire_strategy_mixin_headers
   mixins/AlignedAllocation.hpp
   mixins/AlignedAllocation.inl
-  mixins/Inspector.hpp)
+  mixins/Inspector.hpp
+  mixins/Zeroer.hpp)
 
 set (umpire_strategy_sources
   AlignedAllocator.cpp
   AllocationAdvisor.cpp
   AllocationPrefetcher.cpp
   AllocationStrategy.cpp
-  AllocationTracker.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp
   FixedPool.cpp
   MixedPool.cpp
   mixins/AlignedAllocation.cpp
   mixins/Inspector.cpp
+  mixins/Zeroer.cpp
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
   QuickPool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
-  ThreadSafeAllocator.cpp
-  ZeroByteHandler.cpp)
+  ThreadSafeAllocator.cpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_sources
