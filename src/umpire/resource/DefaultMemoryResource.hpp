@@ -20,7 +20,9 @@ namespace resource {
  * allocate and deallocate memory.
  */
 template <typename _allocator>
-class DefaultMemoryResource : public MemoryResource {
+class DefaultMemoryResource : 
+  public MemoryResource
+{
  public:
   DefaultMemoryResource(Platform platform, const std::string& name, int id,
                         MemoryResourceTraits traits);

@@ -48,7 +48,7 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
 
 void* NumaPolicy::allocate(std::size_t bytes)
 {
-  void* ret = m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate_tracked(bytes);
 
   numa::move_to_node(ret, bytes, m_node);
 

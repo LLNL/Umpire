@@ -143,4 +143,7 @@
 
 #endif
 
+#define UMPIRE_INTERNAL_TRACK(p, s) registerAllocation(p, s, this);
+#define UMPIRE_INTERNAL_UNTRACK(p) deregisterAllocation(p, this);
+
 #endif // UMPIRE_Macros_HPP

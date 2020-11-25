@@ -51,7 +51,7 @@ AllocationAdvisor::AllocationAdvisor(const std::string& name, int id,
 
 void* AllocationAdvisor::allocate(std::size_t bytes)
 {
-  void* ptr = m_allocator->allocate(bytes);
+  void* ptr = m_allocator->allocate_tracked(bytes);
   m_advice_operation->apply(ptr, nullptr, m_device, bytes);
 
   return ptr;
@@ -59,7 +59,7 @@ void* AllocationAdvisor::allocate(std::size_t bytes)
 
 void AllocationAdvisor::deallocate(void* ptr)
 {
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_tracked(ptr);
 }
 
 Platform AllocationAdvisor::getPlatform() noexcept

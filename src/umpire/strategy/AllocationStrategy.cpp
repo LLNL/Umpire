@@ -12,13 +12,32 @@ namespace umpire {
 namespace strategy {
 
 AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept
-    : m_name(name), m_id(id), m_parent(parent) 
+    : mixins::Inspector{}, m_name(name), m_id(id), m_parent(parent) 
 {
+}
+
+void*
+AllocationStrategy::allocate_tracked(std::size_t bytes) {
+  void* ret = allocate(bytes);
+  UMPIRE_INTERNAL_TRACK(ret, bytes);
+  return ret;
+}
+
+void 
+AllocationStrategy::deallocate_tracked(void* ptr) {
+  auto record = UMPIRE_INTERNAL_UNTRACK(ptr);
+  deallocate(ptr, record.size);
 }
 
 void 
 AllocationStrategy::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(n)) {
   deallocate(ptr);
+}
+
+void 
+AllocationStrategy::deallocate_tracked(void* ptr, std::size_t UMPIRE_UNUSED_ARG(n)) {
+  auto record = UMPIRE_INTERNAL_UNTRACK(ptr);
+  deallocate(ptr, record.size);
 }
 
 const std::string& AllocationStrategy::getName() noexcept

@@ -26,7 +26,7 @@ AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id,
 
 void* AllocationPrefetcher::allocate(std::size_t bytes)
 {
-  void* ptr = m_allocator->allocate(bytes);
+  void* ptr = m_allocator->allocate_tracked(bytes);
 
   m_prefetch_operation->apply(ptr, nullptr, m_device, bytes);
 
@@ -35,7 +35,7 @@ void* AllocationPrefetcher::allocate(std::size_t bytes)
 
 void AllocationPrefetcher::deallocate(void* ptr)
 {
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_tracked(ptr);
 }
 
 Platform AllocationPrefetcher::getPlatform() noexcept

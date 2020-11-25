@@ -12,44 +12,38 @@ namespace umpire {
 namespace strategy {
 namespace mixins {
 
-Inspector::Inspector(AllocationStrategy* s) :
-  m_strategy{s},
-  m_strategy_tracks_use{s->tracksMemoryUse()}
-{
-}
-
 void
 Inspector::registerAllocation(
     void* ptr,
     std::size_t size,
-    strategy::AllocationStrategy*) 
+    strategy::AllocationStrategy* s) 
 {
-  if (! m_strategy_tracks_use) {
-    m_strategy->m_current_size += size;
-    m_strategy->m_allocation_count++;
+  if (! false) {
+    s->m_current_size += size;
+    s->m_allocation_count++;
 
-    if (m_strategy->m_current_size > m_strategy->m_high_watermark) {
-      m_strategy->m_high_watermark = m_strategy->m_current_size;
+    if (s->m_current_size > s->m_high_watermark) {
+      s->m_high_watermark = s->m_current_size;
     }
   }
 
-  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, m_strategy});
+  ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, s});
 }
 
 util::AllocationRecord
-Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* strategy)
+Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* s)
 {
   auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
 
-  if (record.strategy == m_strategy) {
-    if (! m_strategy_tracks_use) {
-      m_strategy->m_current_size -= record.size;
-      m_strategy->m_allocation_count--;
+  if (record.strategy == s) {
+    if (! false) {
+      s->m_current_size -= record.size;
+      s->m_allocation_count--;
     }
   } else {
     // Re-register the pointer and throw an error
     ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy});
-    UMPIRE_ERROR(ptr << " was not allocated by " << strategy->getName());
+    UMPIRE_ERROR(ptr << " was not allocated by " << s->getName());
   }
 
   return record;

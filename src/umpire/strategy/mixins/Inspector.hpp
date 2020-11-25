@@ -23,8 +23,6 @@ class Inspector
   public:
     Inspector() = default;
 
-    Inspector(AllocationStrategy* strategy);
-
     void registerAllocation(
         void* ptr,
         std::size_t size,
@@ -33,10 +31,6 @@ class Inspector
     // Deregisters the allocation if the strategy matches, otherwise throws an error
     util::AllocationRecord deregisterAllocation(
       void* ptr, strategy::AllocationStrategy* strategy);
-
-  private:
-    AllocationStrategy* m_strategy{nullptr};
-    bool m_strategy_tracks_use{false};
 };
 
 } // end of namespace mixins

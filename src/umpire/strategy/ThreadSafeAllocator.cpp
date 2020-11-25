@@ -24,14 +24,14 @@ ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id,
 void* ThreadSafeAllocator::allocate(std::size_t bytes)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  void* ret = m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate_tracked(bytes);
   return ret;
 }
 
 void ThreadSafeAllocator::deallocate(void* ptr)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_tracked(ptr);
 }
 
 Platform ThreadSafeAllocator::getPlatform() noexcept
