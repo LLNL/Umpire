@@ -124,6 +124,12 @@ if (ENABLE_CUDA)
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   list(APPEND umpire_examples multi_device)
+
+  blt_add_executable(
+    NAME file_with_cuda
+    SOURCES file_with_cuda.cpp
+    DEPENDS_ON umpire cuda)
+  list(APPEND umpire_examples file_with_cuda)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
