@@ -53,7 +53,7 @@ endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
 # Set benchmark installation to OFF
-set(BENCHMARK_ENABLE_INSTALL OFF)
+set(BENCHMARK_ENABLE_INSTALL Off CACHE BOOL "Turning benchmark installation Off")
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(CMAKE_CUDA_STANDARD 11)
