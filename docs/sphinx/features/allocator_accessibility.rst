@@ -20,26 +20,10 @@ particular allocator (link example/test). Additionally, Umpire has a feature
 that exposes which allocators are accessible by which platforms (link example/
 test).
 
-Allocator Accessibility - Host
-------------------------------
 For example, if :class:`umpire::Allocator` ``alloc`` is created with the host memory 
 resource and I want to know if it should be accessible from the ``omp_target`` CAMP
 platform, then I can look at the corresponding entry in the table and find that it 
 should be accessible.
-
-Allocator Accessibility - CUDA
-------------------------------
-From the CUDA Camp platform, 
-
-Allocator Accessibility - HIP
-------------------------------
-
-Allocator Accessibility - OpenMP Target
----------------------------------------
-
-Allocator Accessibility - SYCL
-------------------------------
-
   
 Allocator Inaccessibility Configuration
 ---------------------------------------
