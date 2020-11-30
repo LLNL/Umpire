@@ -20,78 +20,26 @@ particular allocator (link example/test). Additionally, Umpire has a feature
 that exposes which allocators are accessible by which platforms (link example/
 test).
 
-Allocator Accessibility Table
------------------------------
-The following is a truth table showing whether or not an allocator will be accessible.
+Allocator Accessibility - Host
+------------------------------
 For example, if :class:`umpire::Allocator` ``alloc`` is created with the host memory 
 resource and I want to know if it should be accessible from the ``omp_target`` CAMP
 platform, then I can look at the corresponding entry in the table and find that it 
 should be accessible.
 
-.. list-table:: Allocator Accessibility
-   :header-rows: 1
-   :stub-columns: 1
+Allocator Accessibility - CUDA
+------------------------------
+From the CUDA Camp platform, 
 
-   * - 
-     - Undefined
-     - host
-     - cuda
-     - omp_target
-     - hip
-     - sycl
-   * - Unknown
-     - F
-     - F
-     - F
-     - F
-     - F
-     - F
-   * - host
-     - F
-     - T
-     - T*
-     - T
-     - T*
-     - F
-   * - device
-     - F
-     - T*
-     - T
-     - T
-     - T
-     - T
-   * - device_const
-     - F
-     - F
-     - T
-     - X
-     - T
-     - X
-   * - um
-     - F
-     - T
-     - T
-     - X
-     - T
-     - T
-   * - pinned
-     - F
-     - T
-     - T
-     - X
-     - T
-     - T
-   * - file
-     - F
-     - T
-     - F
-     - F
-     - F
-     - F
+Allocator Accessibility - HIP
+------------------------------
 
-.. note:: 
-  In the table, ``T`` means **true**, ``F`` means **false**, ``*`` means **conditional**,
-  and ``X`` means **does not exist**.
+Allocator Accessibility - OpenMP Target
+---------------------------------------
+
+Allocator Accessibility - SYCL
+------------------------------
+
   
 Allocator Inaccessibility Configuration
 ---------------------------------------
