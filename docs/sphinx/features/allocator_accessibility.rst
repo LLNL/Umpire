@@ -11,22 +11,23 @@ page.
 
 Additionally, the `platforms <https://github.com/LLNL/Umpire/blob/develop/src/umpire/util/Platform.hpp>`_ that Umpire supports is defined by the CAMP library.
 This means that there is also a selection of platforms for which an allocator can
-be associated with as well. For example, an Allocator created with the device memory
-resource can be used with the cuda, hip, openmp target, or sycl platforms.
+be associated with as well. For example, an Allocator created with the pinned memory
+resource can be used with the host, cuda, hip, or sycl platforms.
 
 Because of these options, it can be difficult to trace
 not only which memory resource an allocator has been created with but also
-which allocators can be accessed by which platforms. Umpire provides the ability to 
-query which memory resource is associated with a particular allocator (See example `here <https://github.com/LLNL/Umpire/blob/develop/tests/integration/memory_resource_traits_tests.cpp>`_). Additionally, Umpire has a feature
-that exposes which allocators are accessible by which platforms (See example `here <https://github.com/LLNL/Umpire/blob/develop/tests/integration/allocator_accessibility.cpp>`_). The ``allocator_accessibility.cpp`` file checks what 
-platforms are available and confirms that all memory resources which should be accessible 
-to that platform can actually be accessed.
+which allocators can be accessed by which platforms. Umpire has the memory resource
+trait, ``resource_type``, to provide the ability to query which memory resource is 
+associated with a particular allocator (See example `here <https://github.com/LLNL/Umpire/blob/develop/tests/integration/memory_resource_traits_tests.cpp>`_). 
 
-To determine if an allocator is accessible by a particular platform, there is a function,
-``is_accessible(Platform p, Allocator a)``. This function will return true if the allocator
-can indeed access memory on the given platform. For example, if :class:`umpire::Allocator` ``alloc`` 
-is created with the host memory resource and a developer wants to know if it should be 
-accessible from the ``omp_target`` CAMP platform, then they can use the ``is_accessible(p, a)`` 
+Additionally, Umpire has a function, ``is_accessible(Platform p, Allocator a)``, that determines 
+if a particular allocator is accessible by a particular platform 
+(See example `here <https://github.com/LLNL/Umpire/blob/develop/tests/integration/allocator_accessibility.cpp>`_). The ``allocator_accessibility.cpp`` test checks what platforms are available and confirms that all memory resources which should be accessible 
+to that platform can actually be accessed and used.
+
+For example, if a :class:`umpire::Allocator`, ``alloc``, 
+is created with the host memory resource and we want to know if it should be 
+accessible from the ``omp_target`` CAMP platform, then we can use the ``is_accessible(Platform::omp_target, alloc)`` 
 function and find that it should be accessible. The ``allocator_access.cpp`` file demonstrates this
 functionality for the *host* platform specifically.
   
@@ -41,8 +42,8 @@ Build and Run Configuration
 ---------------------------
 
 To build and run these files, either use uberenv or the appropriate cmake flags for the 
-desired platform and then run ``ctest -C test -R allocator_accessibility_tests --output-on-failure`` 
-for the test code and ``./bin/allocator_access`` for the example code.
+desired platform and then run ``ctest -T test -R allocator_accessibility_tests --output-on-failure`` 
+for the test code and ``./bin/alloc_access`` for the example code.
 
 .. note::
    The `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer/uberenv.html>`_ shows
