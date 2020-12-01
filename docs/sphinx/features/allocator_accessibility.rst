@@ -36,7 +36,7 @@ Allocator Inaccessibility Configuration
 
 On a different note, for those allocators that are deemed inaccessible, it may be useful to 
 double check or confirm that the allocator can in fact NOT access memory on that given platform. 
-In this case, the cmake flag, ``ENABLE_INACCESSIBILITY_TESTS`` will need to be turned on.
+In this case, the cmake flag, ``ENABLE_INACCESSIBILITY_TESTS``, will need to be turned on.
 
 Build and Run Configuration
 ---------------------------
