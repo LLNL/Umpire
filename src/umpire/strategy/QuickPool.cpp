@@ -20,7 +20,7 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                      const std::size_t next_minimum_pool_allocation_size,
                      std::size_t alignment,
                      CoalesceHeuristic should_coalesce) noexcept
-    : AllocationStrategy{name, id},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
@@ -208,7 +208,9 @@ void QuickPool::release()
                           << " chunks in free map, m_is_destructing set to "
                           << m_is_destructing);
 
+#if defined(UMPIRE_ENABLE_BACKTRACE)
   std::size_t prev_size{m_actual_bytes};
+#endif
 
   for (auto pair = m_size_map.begin(); pair != m_size_map.end();) {
     auto chunk = (*pair).second;
@@ -217,6 +219,7 @@ void QuickPool::release()
       UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
       m_actual_bytes -= chunk->chunk_size;
+      m_releasable_bytes -= chunk->chunk_size;
 
       try {
         aligned_deallocate(chunk->data);
@@ -246,8 +249,6 @@ void QuickPool::release()
                                     << ") "
                                     << umpire::util::backtracer<>::print(bt));
   }
-#else
-  UMPIRE_USE_VAR(prev_size);
 #endif
 }
 

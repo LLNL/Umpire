@@ -13,7 +13,7 @@ namespace strategy {
 
 NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name,
                                                  int id, Allocator allocator)
-    : AllocationStrategy(name, id),
+    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
       m_allocator(allocator.getAllocationStrategy())
 {
 }

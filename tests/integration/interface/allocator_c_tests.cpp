@@ -134,7 +134,9 @@ TEST_P(AllocatorCTest, IsAllocator)
 {
   umpire_resourcemanager rm;
   umpire_resourcemanager_get_instance(&rm);
-  ASSERT_EQ(true, umpire_resourcemanager_is_allocator(&rm, GetParam()));
+  ASSERT_EQ(true, umpire_resourcemanager_is_allocator_name(&rm, GetParam()));
+  int id = umpire_allocator_get_id(&m_allocator);
+  ASSERT_EQ(true, umpire_resourcemanager_is_allocator_id(&rm, id));
 }
 
 TEST_P(AllocatorCTest, HasAllocator)
@@ -493,6 +495,6 @@ TEST(Allocators, GetInvalidId)
   int id = UMPIRE_INVALID_ALLOCATOR_ID;
   int cpp_id = umpire::invalid_allocator_id;
 
-  ASSERT_EQ(0xDEADBEEF, id);
+  ASSERT_EQ(0xDEADBEE, id);
   ASSERT_EQ(id, cpp_id);
 }

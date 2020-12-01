@@ -18,7 +18,7 @@ inline void* Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
-  umpire_ver_4_found = 0;
+  umpire_ver_5_found = 0;
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
@@ -31,8 +31,6 @@ inline void* Allocator::allocate(std::size_t bytes)
                 << m_allocator << "\", \"size\": " << bytes
                 << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ret),
-                          "size", bytes, "event", "allocate");
   return ret;
 }
 
@@ -43,9 +41,6 @@ inline void Allocator::deallocate(void* ptr)
       << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
-
-  UMPIRE_RECORD_STATISTIC(getName(), "ptr", reinterpret_cast<uintptr_t>(ptr),
-                          "size", 0x0, "event", "deallocate");
 
   if (!ptr) {
     UMPIRE_LOG(Info, "Deallocating a null pointer");

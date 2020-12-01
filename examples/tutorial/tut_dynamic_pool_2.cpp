@@ -18,9 +18,11 @@ void allocate_and_deallocate_pool(const std::string& resource,
 
   auto allocator = rm.getAllocator(resource);
 
+  // _sphinx_tag_tut_allocator_tuning_start
   auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
       resource + "_pool", allocator, initial_size, /* default = 512Mb*/
       min_block_size /* default = 1Mb */);
+  // _sphinx_tag_tut_allocator_tuning_end
 
   double* data =
       static_cast<double*>(pooled_allocator.allocate(SIZE * sizeof(double)));
@@ -35,16 +37,18 @@ void allocate_and_deallocate_pool(const std::string& resource,
 
 int main(int, char**)
 {
+  // _sphinx_tag_tut_device_sized_pool_start
   allocate_and_deallocate_pool("HOST", 65536, 512);
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_DEVICE)
   allocate_and_deallocate_pool("DEVICE", (1024 * 1024 * 1024), (1024 * 1024));
+#endif
+#if defined(UMPIRE_ENABLE_UM)
   allocate_and_deallocate_pool("UM", (1024 * 64), 1024);
+#endif
+#if defined(UMPIRE_ENABLE_PINNED)
   allocate_and_deallocate_pool("PINNED", (1024 * 16), 1024);
 #endif
-#if defined(UMPIRE_ENABLE_HIP)
-  allocate_and_deallocate_pool("DEVICE", (1024 * 1024 * 1024), (1024 * 1024));
-  allocate_and_deallocate_pool("PINNED", (1024 * 16), 1024);
-#endif
+  // _sphinx_tag_tut_device_sized_pool_end
 
   return 0;
 }

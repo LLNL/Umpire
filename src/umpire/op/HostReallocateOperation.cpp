@@ -47,11 +47,6 @@ void HostReallocateOperation::transform(
     ResourceManager::getInstance().registerAllocation(
         *new_ptr, {*new_ptr, new_size, allocator});
   }
-
-  UMPIRE_RECORD_STATISTIC("HostReallocate", "current_ptr",
-                          reinterpret_cast<uintptr_t>(current_ptr), "new_ptr",
-                          reinterpret_cast<uintptr_t>(*new_ptr), "size",
-                          new_size, "event", "reallocate");
 }
 
 } // end of namespace op

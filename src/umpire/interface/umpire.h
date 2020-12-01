@@ -7,7 +7,7 @@
 #ifndef UMPIRE_H_
 #define UMPIRE_H_
 
-#define UMPIRE_INVALID_ALLOCATOR_ID 0xDEADBEEF
+#define UMPIRE_INVALID_ALLOCATOR_ID 0xDEADBEE
 
 #include "umpire/interface/c_fortran/wrapUmpire.h"
 #include "umpire/interface/c_fortran/wrapAllocator.h"

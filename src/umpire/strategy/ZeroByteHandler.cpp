@@ -14,7 +14,7 @@ namespace strategy {
 
 ZeroByteHandler::ZeroByteHandler(
     std::unique_ptr<AllocationStrategy>&& allocator) noexcept
-    : AllocationStrategy(allocator->getName(), allocator->getId()),
+    : AllocationStrategy(allocator->getName(), allocator->getId(), allocator->getParent()),
       m_allocator(std::move(allocator)),
       m_zero_byte_pool(nullptr)
 {

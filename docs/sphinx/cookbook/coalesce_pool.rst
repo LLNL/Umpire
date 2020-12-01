@@ -13,13 +13,17 @@ function, you must get the pointer to the
 :class:`umpire::Allocator`:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_coalesce_pool.cpp
-                    :lines: 24-25
+   :start-after: _sphinx_tag_tut_unwrap_strategy_start
+   :end-before: _sphinx_tag_tut_unwrap_strategy_end
+   :language: C++
 
 Once you have the pointer to the appropriate strategy, you can call the
 function:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_coalesce_pool.cpp
-                    :lines: 28
+   :start-after: _sphinx_tag_tut_call_coalesce_start
+   :end-before: _sphinx_tag_tut_call_coalesce_end
+   :language: C++
 
 The complete example is included below:
 
