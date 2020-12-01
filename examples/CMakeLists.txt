@@ -128,7 +128,7 @@ if (ENABLE_CUDA)
   blt_add_executable(
     NAME file_with_cuda
     SOURCES file_with_cuda.cpp
-    DEPENDS_ON umpire cuda)
+    DEPENDS_ON cuda)
   list(APPEND umpire_examples file_with_cuda)
 endif()
 
