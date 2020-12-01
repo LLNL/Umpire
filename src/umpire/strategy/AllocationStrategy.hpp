@@ -48,7 +48,7 @@ class AllocationStrategy :
    */
   virtual void* allocate(std::size_t bytes) = 0;
 
-  virtual void* allocate_tracked(std::size_t bytes);
+  void* allocate_tracked(std::size_t bytes);
 
   /*!
    * \brief Free the memory at ptr.
@@ -57,11 +57,11 @@ class AllocationStrategy :
    */
   virtual void deallocate(void* ptr) = 0;
 
-  virtual void deallocate_tracked(void* ptr);
+  void deallocate_tracked(void* ptr);
 
   virtual void deallocate(void* ptr, std::size_t size);
 
-  virtual void deallocate_tracked(void* ptr, std::size_t size);
+  void deallocate_tracked(void* ptr, std::size_t size);
 
   /*!
    * \brief Release any and all unused memory held by this AllocationStrategy
