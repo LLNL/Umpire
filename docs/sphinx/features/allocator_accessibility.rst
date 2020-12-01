@@ -5,40 +5,40 @@ Allocator Accessibility
 =========
 
 The Umpire library provides a variety of :class:`umpire::resource::MemoryResource` s 
-which can be used by :class:`umpire::Allocator` s depending on what's available on
+which can be used to create :class:`umpire::Allocator` s depending on what's available on
 your system. The resources are explained more on the `Resources <https://umpire.readthedocs.io/en/develop/tutorial/resources.html>`_
 page.
 
 Additionally, the `platforms <https://github.com/LLNL/Umpire/blob/develop/src/umpire/util/Platform.hpp>`_ that Umpire supports is defined by the CAMP library.
 This means that there is also a selection of platforms for which an allocator can
-be associated with as well. Because of these options, it can be difficult to trace
+be associated with as well. For example, an Allocator created with the device memory
+resource can be used with the cuda, hip, openmp target, or sycl platforms.
+
+Because of these options, it can be difficult to trace
 not only which memory resource an allocator has been created with but also
-which allocators can be accessed by which platforms.
+which allocators can be accessed by which platforms. Umpire provides the ability to 
+query which memory resource is associated with a particular allocator (See example `here <https://github.com/LLNL/Umpire/blob/develop/tests/integration/memory_resource_traits_tests.cpp>`_). Additionally, Umpire has a feature
+that exposes which allocators are accessible by which platforms (See example `here <https://github.com/LLNL/Umpire/blob/develop/tests/integration/allocator_accessibility.cpp>`_). The ``allocator_accessibility.cpp`` file checks what 
+platforms are available and confirms that all memory resources which should be accessible 
+to that platform can actually be accessed.
 
-Umpire provides the ability to query which memory resource is associated with a
-particular allocator (link example/test). Additionally, Umpire has a feature
-that exposes which allocators are accessible by which platforms (link example/
-test).
-
-For example, if :class:`umpire::Allocator` ``alloc`` is created with the host memory 
-resource and I want to know if it should be accessible from the ``omp_target`` CAMP
-platform, then I can look at the corresponding entry in the table and find that it 
-should be accessible.
+To determine if an allocator is accessible by a particular platform, there is a function,
+``is_accessible(Platform p, Allocator a)``. This function will return true if the allocator
+can indeed access memory on the given platform. For example, if :class:`umpire::Allocator` ``alloc`` 
+is created with the host memory resource and a developer wants to know if it should be 
+accessible from the ``omp_target`` CAMP platform, then they can use the ``is_accessible(p, a)`` 
+function and find that it should be accessible. The ``allocator_access.cpp`` file demonstrates this
+functionality for the *host* platform specifically.
   
 Allocator Inaccessibility Configuration
 ---------------------------------------
 
-This is where I will show how to configure Umpire to also double check that those memory 
-resources that should not be accessible given a specific platform are indeed not accessible.
-(They result in an exception using the EXPECT_DEATH gtest function.)
+On a different note, for those allocators that are deemed inaccessible, it may be useful to 
+double check or confirm that the allocator can in fact NOT access memory on that given platform. 
+In this case, the cmake flag, ``ENABLE_INACCESSIBILITY_TESTS`` will need to be turned on.
 
 Build and Run Configuration
 ---------------------------
-
-The ``allocator_integration_tests.cpp`` file checks what platforms are available and confirms
-that all memory resources which should be accessible to that platform can actually be 
-accessed. On the other hand, the ``allocator_access.cpp`` file shows all available memory 
-resource types for an allocator, given the *host* platform.
 
 To build and run these files, either use uberenv or the appropriate cmake flags for the 
 desired platform and then run ``ctest -C test -R allocator_accessibility_tests --output-on-failure`` 
@@ -51,6 +51,4 @@ for the test code and ``./bin/allocator_access`` for the example code.
 Below, the ``allocator_access.cpp`` code is shown to demonstrate how this functionality can be 
 used during development.
 
-CHANGE EXAMPLE LINK
-
-.. literalinclude:: ../../../examples/allocator.c
+.. literalinclude:: ../../../examples/allocator_access.cpp
