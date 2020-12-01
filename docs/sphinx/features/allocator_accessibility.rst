@@ -45,7 +45,7 @@ desired platform and then run ``ctest -C test -R allocator_accessibility_tests -
 for the test code and ``./bin/allocator_access`` for the example code.
 
 .. note::
-   The `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer_guide.html>`_ shows
+   The `Developer's Guide <https://umpire.readthedocs.io/en/develop/developer/uberenv.html>`_ shows
    how to configure Umpire with uberenv to build with different CAMP platforms.
 
 Below, the ``allocator_access.cpp`` code is shown to demonstrate how this functionality can be 
