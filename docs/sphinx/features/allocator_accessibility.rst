@@ -9,7 +9,7 @@ which can be used to create :class:`umpire::Allocator` s depending on what's ava
 your system. The resources are explained more on the `Resources <https://umpire.readthedocs.io/en/develop/tutorial/resources.html>`_
 page.
 
-Additionally, the `platforms <https://github.com/LLNL/Umpire/blob/develop/src/umpire/util/Platform.hpp>`_ that Umpire supports is defined by the CAMP library.
+Additionally, the `platforms <https://github.com/LLNL/Umpire/blob/develop/src/umpire/util/Platform.hpp>`_ that Umpire supports is defined by the `CAMP <https://github.com/LLNL/camp/blob/master/include/camp/resource/platform.hpp>`_ library.
 This means that there is also a selection of platforms for which an allocator can
 be associated with as well. For example, an Allocator created with the pinned memory
 resource can be used with the host, cuda, hip, or sycl platforms.
