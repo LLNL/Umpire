@@ -12,7 +12,6 @@
 #include <ostream>
 #include <string>
 
-#include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -23,8 +22,8 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy :
-  private mixins::Inspector {
+class AllocationStrategy
+{
  public:
   /*!
    * \brief Construct a new AllocationStrategy object.
@@ -48,8 +47,6 @@ class AllocationStrategy :
    */
   virtual void* allocate(std::size_t bytes) = 0;
 
-  void* allocate_tracked(std::size_t bytes);
-
   /*!
    * \brief Free the memory at ptr.
    *
@@ -57,11 +54,8 @@ class AllocationStrategy :
    */
   virtual void deallocate(void* ptr) = 0;
 
-  void deallocate_tracked(void* ptr);
-
   virtual void deallocate(void* ptr, std::size_t size);
 
-  void deallocate_tracked(void* ptr, std::size_t size);
 
   /*!
    * \brief Release any and all unused memory held by this AllocationStrategy

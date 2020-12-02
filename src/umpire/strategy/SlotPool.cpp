@@ -35,7 +35,7 @@ SlotPool::~SlotPool()
 {
   for (std::size_t i = 0; i < m_slots; ++i) {
     if (m_pointers[i]) {
-      m_allocator->deallocate_tracked(m_pointers[i]);
+      m_allocator->deallocate(m_pointers[i]);
       m_pointers[i] = nullptr;
       m_lengths[i] = 0;
     }
@@ -62,7 +62,7 @@ void* SlotPool::allocate(std::size_t bytes)
       break;
     } else if (m_lengths[i] == 0) {
       m_lengths[i] = -int_bytes;
-      m_pointers[i] = m_allocator->allocate_tracked(bytes);
+      m_pointers[i] = m_allocator->allocate(bytes);
       ptr = m_pointers[i];
       break;
     }

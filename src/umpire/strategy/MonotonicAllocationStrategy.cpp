@@ -20,12 +20,12 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
       m_capacity(capacity),
       m_allocator(allocator.getAllocationStrategy())
 {
-  m_block = m_allocator->allocate_tracked(m_capacity);
+  m_block = m_allocator->allocate(m_capacity);
 }
 
 MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
 {
-  m_allocator->deallocate_tracked(m_block);
+  m_allocator->deallocate(m_block);
 }
 
 void* MonotonicAllocationStrategy::allocate(std::size_t bytes)

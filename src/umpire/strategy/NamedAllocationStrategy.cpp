@@ -20,12 +20,12 @@ NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name,
 
 void* NamedAllocationStrategy::allocate(std::size_t bytes)
 {
-  return m_allocator->allocate_tracked(bytes);
+  return m_allocator->allocate(bytes);
 }
 
 void NamedAllocationStrategy::deallocate(void* ptr)
 {
-  return m_allocator->deallocate_tracked(ptr);
+  return m_allocator->deallocate(ptr);
 }
 
 Platform NamedAllocationStrategy::getPlatform() noexcept
