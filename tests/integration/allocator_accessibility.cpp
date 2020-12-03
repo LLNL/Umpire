@@ -142,10 +142,6 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     ASSERT_NO_THROW(cuda.test(alloc, size));
   }
 #if defined(UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
-  else if (alloc->getAllocationStrategy()->getTraits().resource ==
-           umpire::MemoryResourceTraits::resource_type::file) {
-    SUCCEED();
-  } 
   else {
     allocate_and_use<cuda_platform> cuda;
     ASSERT_DEATH(cuda.test(alloc, size), "");
@@ -172,10 +168,6 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     ASSERT_NO_THROW(omp.test(alloc, size));
   }
 #if defined(UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
-  else if (alloc->getAllocationStrategy()->getTraits().resource ==
-           umpire::MemoryResourceTraits::resource_type::file) {
-    SUCCEED();
-  }
   else {
     allocate_and_use<omp_target_platform> omp;
     ASSERT_DEATH(omp.test(alloc, size), "");

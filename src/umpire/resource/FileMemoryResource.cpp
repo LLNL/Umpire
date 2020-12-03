@@ -14,6 +14,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#if defined(UMPIRE_ENABLE_CUDA)
+  #include <cuda_runtime_api.h>
+#endif
+
 namespace umpire {
 namespace resource {
 
@@ -119,10 +123,32 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
+bool FileMemoryResource::isPageable() noexcept
+{
+#if defined(UMPIRE_ENABLE_CUDA)
+  int pageableMem = 0;
+  int cdev = 0;
+  cudaGetDevice(&cdev);
+
+  //Device supports coherently accessing pageable memory
+  //without calling cudaHostRegister on it
+  cudaDeviceGetAttribute(&pageableMem,
+     cudaDevAttrPageableMemoryAccess, cdev);
+  if(pageableMem)
+    return true;
+#endif
+#if defined(UMPIRE_ENABLE_OPENMP)
+  return true;
+#endif
+  return false;
+}
+
 bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if(p == Platform::host)
     return true;
+  else if (p == Platform::cuda || p == Platform::omp_target)
+    return isPageable();
   else
     return false;
 }
