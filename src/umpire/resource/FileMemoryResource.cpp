@@ -123,6 +123,12 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
+///////////////////////////////////////////////////////////////////
+// Because the File memory resource uses mmap (and therefore page-locked
+// memory), it could be possible that File memory is accessible from
+// the cuda platform. In certain cases, it could also be accessible,
+// by extension, from the omp_target platform.
+///////////////////////////////////////////////////////////////////
 bool FileMemoryResource::isPageable() noexcept
 {
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -138,6 +144,7 @@ bool FileMemoryResource::isPageable() noexcept
     return true;
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP)
+  //TODO: Implement omp_target test
   return true;
 #endif
   return false;
