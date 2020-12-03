@@ -123,16 +123,9 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
   return 0;
 }
 
-///////////////////////////////////////////////////////////////////
-// Because the File memory resource uses mmap (and therefore page-locked
-// memory), it could be possible that File memory is accessible from
-// the cuda platform. In certain cases, it could also be accessible,
-// by extension, from the omp_target platform.
-///////////////////////////////////////////////////////////////////
 bool FileMemoryResource::isPageable() noexcept
 {
 #if defined(UMPIRE_ENABLE_CUDA)
-  //TODO: Implement omp_target specific test
   int pageableMem = 0;
   int cdev = 0;
   cudaGetDevice(&cdev);
@@ -144,6 +137,8 @@ bool FileMemoryResource::isPageable() noexcept
   if(pageableMem)
     return true;
 #endif
+  // Note: Regarding omp_target, we pick a default of false here 
+  // until we can better determine which device omp_offload is using.
   return false;
 }
 
@@ -151,7 +146,7 @@ bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if(p == Platform::host)
     return true;
-  else if (p == Platform::cuda)
+  else if (p == Platform::cuda) // TODO: Implement omp_target specific test
     return isPageable();
   else
     return false;
