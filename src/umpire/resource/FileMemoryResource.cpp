@@ -131,7 +131,7 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
 ///////////////////////////////////////////////////////////////////
 bool FileMemoryResource::isPageable() noexcept
 {
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_OPENMP)
+#if defined(UMPIRE_ENABLE_CUDA)
   //TODO: Implement omp_target specific test
   int pageableMem = 0;
   int cdev = 0;
@@ -151,7 +151,7 @@ bool FileMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if(p == Platform::host)
     return true;
-  else if (p == Platform::cuda || p == Platform::omp_target)
+  else if (p == Platform::cuda)
     return isPageable();
   else
     return false;

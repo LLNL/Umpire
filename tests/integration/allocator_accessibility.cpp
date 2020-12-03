@@ -168,6 +168,15 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     ASSERT_NO_THROW(omp.test(alloc, size));
   }
 #if defined(UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
+  else if (alloc->getAllocationStrategy()->getTraits().resource ==
+           umpire::MemoryResourceTraits::resource_type::file) {
+    //////////////////////////////////////////////////////////////////////
+    // TODO: Implement a more robust omp_target + file accessibility check;
+    // Currently, never allowing omp_target to access FILE memory is a 
+    // placeholder until an appropriate OpenMP check is determined.
+    //////////////////////////////////////////////////////////////////////
+    SUCCEED();
+  }
   else {
     allocate_and_use<omp_target_platform> omp;
     ASSERT_DEATH(omp.test(alloc, size), "");
