@@ -131,7 +131,8 @@ std::size_t FileMemoryResource::getHighWatermark() const noexcept
 ///////////////////////////////////////////////////////////////////
 bool FileMemoryResource::isPageable() noexcept
 {
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_OPENMP)
+  //TODO: Implement omp_target specific test
   int pageableMem = 0;
   int cdev = 0;
   cudaGetDevice(&cdev);
@@ -142,9 +143,6 @@ bool FileMemoryResource::isPageable() noexcept
      cudaDevAttrPageableMemoryAccess, cdev);
   if(pageableMem)
     return true;
-#endif
-#if defined(UMPIRE_ENABLE_OPENMP)
-  //TODO: Implement omp_target test
 #endif
   return false;
 }
