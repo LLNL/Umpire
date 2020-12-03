@@ -37,9 +37,6 @@ class HipDeviceMemoryResource : public MemoryResource {
   alloc::HipMallocAllocator m_allocator;
 
   Platform m_platform;
-
- private:
-  bool isHostPageable() noexcept; 
 };
 
 } // end of namespace resource
