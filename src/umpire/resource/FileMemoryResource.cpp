@@ -145,7 +145,6 @@ bool FileMemoryResource::isPageable() noexcept
 #endif
 #if defined(UMPIRE_ENABLE_OPENMP)
   //TODO: Implement omp_target test
-  return true;
 #endif
   return false;
 }
