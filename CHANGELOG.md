@@ -13,7 +13,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
-- Documentation on allocator (in)accessibility.
+- Documentation on allocator (in)accessibility as well as getAllocator usage.
 
 ### Removed
 

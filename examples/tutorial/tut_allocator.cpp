@@ -23,13 +23,21 @@ int main(int, char**)
   // _sphinx_tag_tut_allocate_end
 
   std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-            << allocator.getName() << " allocator...";
+            << allocator.getName() << " allocator and HOST resource." << std::endl;
+
+  //_sphinx_tag_tut_getAllocator_start
+  auto addon_allocator = rm.getAllocator(allocator.getName());
+  //_sphinx_tag_tut_getAllocator_end
+  
+  std::cout << "Created an add-on allocator using the "
+            << allocator.getName() << " allocator that also has " 
+            << addon_allocator.getHighWatermark() << " bytes allocated." << std::endl;
 
   // _sphinx_tag_tut_deallocate_start
   allocator.deallocate(data);
   // _sphinx_tag_tut_deallocate_end
 
-  std::cout << " deallocated." << std::endl;
+  std::cout << "...Memory deallocated." << std::endl;
 
   return 0;
 }
