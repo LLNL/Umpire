@@ -26,8 +26,8 @@ Allocator we wish to use to grab memory.
    In the previous section on Allocators, we mentioned that you could build
    a new allocator off of an existing allocator using the ``getAllocator``
    function. Below is another example of this, but with the strategy as well.
-   ``Umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-   resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()));``
+   ``Umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(``
+   ``resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()));``
    Now, ``addon_allocator`` will be created with the same memory resource 
    as ``pooled_allocator`` created above.
 
