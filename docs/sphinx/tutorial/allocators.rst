@@ -24,9 +24,9 @@ You can also use an existing allocator to build another allocator off of it:
    :end-before: _sphinx_tag_tut_getAllocator_end
    :language: C++
 
-This "add-on" allocator will also be built with the same memory resource. More on this 
-in the next section. Additionally, once you have an :class:`umpire::Allocator` you can 
-use it to allocate and deallocate memory:
+This "add-on" allocator will also be built with the same memory resource. More on memory 
+resources in the next section. Additionally, once you have an :class:`umpire::Allocator`
+you can use it to allocate and deallocate memory:
 
 .. literalinclude:: ../../../examples/tutorial/tut_allocator.cpp
    :start-after: _sphinx_tag_tut_allocate_start
