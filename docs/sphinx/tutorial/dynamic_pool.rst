@@ -22,6 +22,14 @@ allocations of any size. To create a new ``Allocator`` using the
 We have to provide a new name for the Allocator, as well as the underlying
 Allocator we wish to use to grab memory.
 
+.. note::
+   In the previous section on Allocators, we mentioned that you could build
+   a new allocator off of an existing allocator using the ``getAllocator``
+   function. Below is another example this, but with the strategy as well.
+   .. code-block:: bash
+      auto addon_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+      resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()));
+
 Once you have an ``Allocator``, you can allocate and deallocate memory as
 before, without needing to worry about the underlying algorithm used for the
 allocations:
