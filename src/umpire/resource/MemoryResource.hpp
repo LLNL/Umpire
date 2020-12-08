@@ -53,7 +53,7 @@ class MemoryResource : public strategy::AllocationStrategy {
    *
    * \param ptr Pointer to free.
    */
-  virtual void deallocate(void* ptr) override = 0;
+  virtual void deallocate(void* ptr, std::size_t size) override = 0;
 
   /*!
    * \brief Get the Platform assocatiated with this MemoryResource.

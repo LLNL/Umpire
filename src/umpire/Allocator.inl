@@ -54,15 +54,9 @@ inline void Allocator::deallocate(void* ptr)
     UMPIRE_LOG(Info, "Deallocating a null pointer");
     return;
   } else {
-    if (m_tracking) {
-      auto record = deregisterAllocation(ptr, m_allocator);
-      if (! deallocateZero(ptr)) {
-        m_allocator->deallocate(ptr,record.size);
-      }
-    } else {
-      if (! deallocateZero(ptr)) {
-        m_allocator->deallocate(ptr);
-      }
+    auto record = deregisterAllocation(ptr, m_allocator);
+    if (! deallocateZero(ptr)) {
+      m_allocator->deallocate(ptr,record.size);
     }
   }
 }

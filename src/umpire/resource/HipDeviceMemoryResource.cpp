@@ -39,7 +39,7 @@ void* HipDeviceMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void HipDeviceMemoryResource::deallocate(void* ptr)
+void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   int old_device;
   hipGetDevice(&old_device);

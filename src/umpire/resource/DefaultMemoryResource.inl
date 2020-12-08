@@ -44,7 +44,7 @@ void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 }
 
 template <typename _allocator>
-void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
+void DefaultMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 

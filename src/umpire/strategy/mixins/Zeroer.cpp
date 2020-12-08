@@ -35,7 +35,7 @@ bool Zeroer::deallocateZero(void* ptr)
           ResourceManager::getInstance().getZeroByteAllocator());
 
   if (m_zero_byte_pool->pointerIsFromPool(ptr)) {
-    m_zero_byte_pool->deallocate(ptr);
+    m_zero_byte_pool->deallocate(ptr, 1);
     return true;
   } else {
     return false;

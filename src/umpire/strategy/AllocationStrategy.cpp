@@ -16,10 +16,26 @@ AllocationStrategy::AllocationStrategy(const std::string& name, int id, Allocati
 {
 }
 
-void 
-AllocationStrategy::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(n)) {
-  deallocate(ptr);
+void* AllocationStrategy::allocate_internal(std::size_t bytes)
+{
+  m_current_size += bytes;
+  m_allocation_count++;
+
+  if (m_current_size > m_high_watermark) {
+    m_high_watermark = m_current_size;
+  }
+
+  return allocate(bytes);
 }
+
+void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
+{
+  m_current_size -= size;
+  m_allocation_count--;
+
+  deallocate(ptr, size);
+}
+
 
 const std::string& AllocationStrategy::getName() noexcept
 {

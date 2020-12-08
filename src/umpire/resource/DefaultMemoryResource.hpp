@@ -31,7 +31,7 @@ class DefaultMemoryResource :
                         MemoryResourceTraits traits, _allocator alloc);
 
   void* allocate(std::size_t bytes);
-  void deallocate(void* ptr);
+  void deallocate(void* ptr, std::size_t size);
 
   bool isAccessibleFrom(Platform p) noexcept;
 

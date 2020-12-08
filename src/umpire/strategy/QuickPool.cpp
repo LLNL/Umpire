@@ -140,7 +140,7 @@ void* QuickPool::allocate(std::size_t bytes)
   return ret;
 }
 
-void QuickPool::deallocate(void* ptr)
+void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
@@ -316,7 +316,7 @@ void QuickPool::do_coalesce() noexcept
   if (alloc_size) {
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);
-    deallocate(ptr);
+    deallocate(ptr, alloc_size);
   }
 }
 

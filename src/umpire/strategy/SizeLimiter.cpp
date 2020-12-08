@@ -30,19 +30,13 @@ void* SizeLimiter::allocate(std::size_t bytes)
     UMPIRE_ERROR("Size limit exceeded.");
   }
 
-  return m_allocator->allocate(bytes);
+  return m_allocator->allocate_internal(bytes);
 }
 
-
-void SizeLimiter::deallocate(void* ptr)
+void SizeLimiter::deallocate(void* ptr, std::size_t size)
 {
-  m_allocator->deallocate(ptr);
-}
-
-void SizeLimiter::deallocate(void* ptr, std::size_t n)
-{
-  m_total_size -= n;
-  m_allocator->deallocate(ptr, n);
+  m_total_size -= size;
+  m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform SizeLimiter::getPlatform() noexcept

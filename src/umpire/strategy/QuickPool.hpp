@@ -61,7 +61,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   QuickPool(const QuickPool&) = delete;
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
   void release() override;
 
   std::size_t getActualSize() const noexcept override;

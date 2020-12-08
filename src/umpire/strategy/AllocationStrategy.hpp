@@ -52,10 +52,11 @@ class AllocationStrategy
    *
    * \param ptr Pointer to free.
    */
-  virtual void deallocate(void* ptr) = 0;
+  virtual void deallocate(void* ptr, std::size_t size=0) = 0;
 
-  virtual void deallocate(void* ptr, std::size_t size);
+  void* allocate_internal(std::size_t bytes);
 
+  void deallocate_internal(void* ptr, std::size_t size=0);
 
   /*!
    * \brief Release any and all unused memory held by this AllocationStrategy
