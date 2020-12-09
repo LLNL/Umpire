@@ -39,7 +39,7 @@ FileMemoryResource::~FileMemoryResource()
   }
 
   for (auto const& p : leaked_items) {
-    deallocate(p);
+    deallocate(p, 0);
   }
 }
 
