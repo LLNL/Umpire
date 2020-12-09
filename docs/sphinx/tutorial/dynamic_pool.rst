@@ -22,16 +22,19 @@ allocations of any size. To create a new ``Allocator`` using the
 We have to provide a new name for the Allocator, as well as the underlying
 Allocator we wish to use to grab memory.
 
-.. note::
-   In the previous section on Allocators, we mentioned that you could build
-   a new allocator off of an existing allocator using the ``getAllocator``
-   function. Here is another example of this, but using the strategy:
+Additionally, in the previous section on Allocators, we mentioned that you 
+could build a new allocator off of an existing one using the ``getAllocator``
+function. Here is another example of this, but using the strategy:
 
-   ``Umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(``
-   ``resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()));``
+.. code-block::
+   Umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+   resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()));
    
-   Now, ``addon_allocator`` will be created with the same memory resource 
-   as ``pooled_allocator`` was above.
+The purpose of this example is to show that the ``getAllocator`` function
+can be used more than just to get an initial allocator. Another good use case
+for this function is grabbing each allocator while looping through a list
+of them. (Note that ``addon_allocator`` will be created with the same memory resource 
+as ``pooled_allocator`` was.) 
 
 Once you have an ``Allocator``, you can allocate and deallocate memory as
 before, without needing to worry about the underlying algorithm used for the

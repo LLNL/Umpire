@@ -29,8 +29,8 @@ int main(int, char**)
   auto addon_allocator = rm.getAllocator(allocator.getName());
   //_sphinx_tag_tut_getAllocator_end
   
-  std::cout << "Created an add-on allocator using the " << addon_allocator.getName()
-            << " allocator." << std::endl;
+  std::cout << "Created an add-on allocator of size " << addon_allocator.getCurrentSize()
+            << " using the " << allocator.getName() << " allocator." << std::endl;
 
   // _sphinx_tag_tut_deallocate_start
   allocator.deallocate(data);
