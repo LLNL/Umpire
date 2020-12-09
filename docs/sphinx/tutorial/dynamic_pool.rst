@@ -26,7 +26,8 @@ Additionally, in the previous section on Allocators, we mentioned that you
 could build a new allocator off of an existing one using the ``getAllocator``
 function. Here is another example of this, but using the strategy:
 
-.. code-block::
+.. code-block:: bash
+
    Umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
    resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()));
    
