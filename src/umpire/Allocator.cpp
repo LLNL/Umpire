@@ -48,8 +48,7 @@ std::size_t Allocator::getCurrentSize() const noexcept
 
 std::size_t Allocator::getActualSize() const noexcept
 {
-  auto actual_size = m_allocator->getActualSize();
-  return (actual_size > 0) ? actual_size : getCurrentSize();
+  return m_allocator->getActualSize();
 }
 
 std::size_t Allocator::getAllocationCount() const noexcept

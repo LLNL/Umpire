@@ -136,6 +136,8 @@ void* QuickPool::allocate(std::size_t bytes)
         m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
+  m_current_bytes += rounded_bytes;
+
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
   return ret;
 }
@@ -145,6 +147,8 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
+
+  m_current_bytes -= chunk->size;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -255,6 +259,11 @@ void QuickPool::release()
 std::size_t QuickPool::getActualSize() const noexcept
 {
   return m_actual_bytes;
+}
+
+std::size_t QuickPool::getCurrentSize() const noexcept
+{
+  return m_current_bytes;
 }
 
 std::size_t QuickPool::getReleasableSize() const noexcept

@@ -262,7 +262,8 @@ TYPED_TEST(PrimaryPoolTest, Works)
     this->m_allocator->deallocate(ptr_two);
   });
 
-  ASSERT_EQ(this->m_allocator->getCurrentSize(), 62);
+  // NOTE: Size is 64 since it's rounded up
+  ASSERT_EQ(this->m_allocator->getCurrentSize(), 64);
   EXPECT_NO_THROW(this->m_allocator->release());
 
   ASSERT_LE(this->m_allocator->getActualSize(), this->m_initial_pool_size);
