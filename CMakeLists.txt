@@ -73,6 +73,10 @@ else ()
   cmake_minimum_required(VERSION 3.8.2)
 endif ()
 
+if (WIN32 OR MSVC)
+  cmake_minimum_required(VERSION 3.19.1)
+endif()
+
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
 if (ENABLE_FORTRAN)
