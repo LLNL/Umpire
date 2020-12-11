@@ -19,6 +19,10 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/OutputBuffer.hpp"
 
+#if defined(_MSC_VER)
+#define UMPIRE_ENABLE_FILESYSTEM
+#endif
+
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
 #include <filesystem>
 #else
