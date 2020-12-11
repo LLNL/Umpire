@@ -25,6 +25,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
 
+- Fixed Windows CI error due to out-of-date cmake policy
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
