@@ -8,7 +8,7 @@
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
-cmake_policy(SET CMP0054 OLD)
+cmake_policy(SET CMP0054 NEW)
 
 project(Umpire
   LANGUAGES CXX C
@@ -73,6 +73,10 @@ if (ENABLE_CUDA)
 else ()
   cmake_minimum_required(VERSION 3.8.2)
 endif ()
+
+if (WIN32 OR MSVC)
+  cmake_minimum_required(VERSION 3.19.1)
+endif()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
