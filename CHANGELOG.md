@@ -25,6 +25,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
 
+- Corrected accounting error in replay tool where allocation map operations
+  were not being accounted for and reported correctly.
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
