@@ -15,6 +15,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Documentation on allocator (in)accessibility as well as getAllocator usage.
 
+### Changed
+
+- Organized configuration options in config.hpp.in in alphabetical order
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource
@@ -28,6 +32,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
 
 - Fixed HIP CI test versioning error and added test for rocm/3.9.0 and rocm/3.10.0
+
+- Corrected accounting error in replay tool where allocation map operations
+  were not being accounted for and reported correctly.
 
 ## [v5.0.0] - 2020-11-18
 
