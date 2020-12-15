@@ -4,7 +4,12 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-hip_fortran_gcc_8_1_0 (build and test on corona):
+hip_3_9_fortran_gcc_8_1_0 (build and test on corona):
   variables:
-    SPEC: "+hip~tools+fortran%gcc@8.1.0"
+    SPEC: "+fortran+hip~tools %gcc@8.1.0 ^hip@3.9.0"
+  extends: .build_and_test_on_corona
+
+hip_3_10_fortran_gcc_8_1_0 (build and test on corona):
+  variables:
+    SPEC: "+fortran+hip~tools %gcc@8.1.0 ^hip@3.10.0"
   extends: .build_and_test_on_corona
