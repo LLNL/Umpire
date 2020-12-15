@@ -28,7 +28,7 @@ function. Here is another example of this, but using a strategy:
 
 .. code-block:: bash
 
-   Umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+   umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::SizeLimiter>(
    resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()), 2098);
    
 The purpose of this example is to show that the ``getAllocator`` function
