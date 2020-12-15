@@ -17,14 +17,14 @@ All :class:`umpire::Allocator` s are created and managed by Umpire's
    :end-before: _sphinx_tag_tut_get_allocator_end
    :language: C++
 
-You can also use an existing allocator to build an additional allocator off of it:
+You can also use an existing allocator to build a new allocator from it:
 
 .. literalinclude:: ../../../examples/tutorial/tut_allocator.cpp
    :start-after: _sphinx_tag_tut_getAllocator_start
    :end-before: _sphinx_tag_tut_getAllocator_end
    :language: C++
 
-This "add-on" allocator will also be built with the same memory resource. More information
+This new allocator will also be built with the same memory resource. More information
 on memory resources is provided in the next section. Additionally, once you have 
 an :class:`umpire::Allocator` you can use it to allocate and deallocate memory:
 
