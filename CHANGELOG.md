@@ -19,6 +19,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Organized configuration options in config.hpp.in in alphabetical order
 
+- Size Limiter example now has a try-catch statement to handle exception.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource

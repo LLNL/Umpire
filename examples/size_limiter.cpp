@@ -21,8 +21,14 @@ int main(int, char**)
       "pool", size_limited_alloc, 64, 64);
 
   // This will throw an exception because the pool is limited to 1024 bytes.
-  void* data = pool.allocate(2048);
-  UMPIRE_USE_VAR(data);
+  std::cout << "Attempting to allocate 2098 bytes..." << std::endl;
+  try {
+    void* data = pool.allocate(2048);
+    UMPIRE_USE_VAR(data);
+  } catch (...) {
+    std::cout << "Exception caught! Pool is limited to 1024 bytes."
+              << std::endl;
+  }
 
   return 0;
 }
