@@ -15,6 +15,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Documentation on allocator (in)accessibility.
 
+- Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order
