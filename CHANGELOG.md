@@ -21,6 +21,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Size Limiter example now has a try-catch statement to handle exception.
 
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource
