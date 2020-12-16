@@ -12,6 +12,7 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
+#include "umpire/resource/NoOpResourceFactory.hpp"
 
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
 #include "umpire/resource/FileMemoryResourceFactory.hpp"
@@ -83,6 +84,10 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       util::make_unique<resource::HostResourceFactory>());
   m_resource_names.push_back("HOST");
 
+  registerMemoryResource(
+      util::make_unique<resource::NoOpResourceFactory>());
+  m_resource_names.push_back("NO_OP");
+  
   registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
