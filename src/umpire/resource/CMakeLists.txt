@@ -12,6 +12,8 @@ set (umpire_resource_headers
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
+  NoOpMemoryResource.hpp
+  NoOpResourceFactory.hpp
   NullMemoryResource.hpp
   NullMemoryResourceFactory.hpp
 )
@@ -28,6 +30,8 @@ set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
+  NoOpMemoryResource.cpp
+  NoOpResourceFactory.cpp
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
 )
