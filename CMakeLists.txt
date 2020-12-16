@@ -8,6 +8,7 @@
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0054 NEW)
 
 project(Umpire
   LANGUAGES CXX C
@@ -42,6 +43,7 @@ option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
 option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
+option(ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
@@ -62,6 +64,10 @@ set(CMAKE_CUDA_STANDARD 11)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
   set( CMAKE_CXX_EXTENSIONS ON )
+endif()
+
+if (ENABLE_INACCESSIBILITY_TESTS)
+  set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
 if (ENABLE_CUDA)

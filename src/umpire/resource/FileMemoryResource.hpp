@@ -99,6 +99,8 @@ class FileMemoryResource : public MemoryResource {
    * \param std::pair Paring of the file name and the size of the file
    */
   util::MemoryMap<std::pair<const std::string, std::size_t>> m_size_map;
+
+  bool isPageable() noexcept;
 };
 
 } // end of namespace resource

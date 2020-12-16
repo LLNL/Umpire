@@ -8,11 +8,35 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+### Added
+
+- Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
+  is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
+
+- Documentation on allocator (in)accessibility.
+
+### Changed
+
+- Organized configuration options in config.hpp.in in alphabetical order
+
+- Size Limiter example now has a try-catch statement to handle exception.
+
+### Removed
+
+- Removed extraneous function definition in HipDeviceMemoryResource
+
+- Temporarily removed Windows CI tests due to out-of-date cmake policy
+
 ### Fixed
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
 
 - Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
+
+- Fixed HIP CI test versioning error and added test for rocm/3.9.0 and rocm/3.10.0
+
+- Corrected accounting error in replay tool where allocation map operations
+  were not being accounted for and reported correctly.
 
 ## [v5.0.0] - 2020-11-18
 
