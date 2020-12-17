@@ -66,7 +66,7 @@ class NoOpMemoryResource : public MemoryResource {
   alloc::NoOpAllocator m_allocator;
 
  private:
-  char* m_ptr;
+  char* m_ptr, *m_ptr_ref;
   size_t m_count;
 };
 

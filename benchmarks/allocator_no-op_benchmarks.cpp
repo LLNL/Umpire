@@ -20,11 +20,7 @@
 
 static const int RangeLow{4};
 static const int RangeHi{1024};
-
-static const bool Introspection{true};
-
 static const std::size_t Max_Allocations{100000};
-static const std::size_t Num_Random{1000};
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
