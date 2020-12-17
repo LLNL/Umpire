@@ -29,14 +29,14 @@ namespace resource {
 class NoOpMemoryResource : public MemoryResource {
  public:
   /*!
-   * \brief Construct a new NoOpMemoryResource and allocate a trivial 
-   * amount of memory.
+   * \brief Construct a new NoOpMemoryResource and allocate a certain 
+   * amount of memory (allocated memory won't be used). 
    */
   NoOpMemoryResource(Platform platform, const std::string& name, int id,
                      MemoryResourceTraits traits);
 
   /*!
-   * \brief Resets allocation counter, frees initial memory.
+   * \brief Resets allocation counter, frees any memory.
    */
   ~NoOpMemoryResource();
 
@@ -66,8 +66,8 @@ class NoOpMemoryResource : public MemoryResource {
   alloc::NoOpAllocator m_allocator;
 
  private:
-  void* m_ptr;
-  int m_count;
+  char* m_ptr;
+  size_t m_count;
 };
 
 } // end of namespace resource

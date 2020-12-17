@@ -15,26 +15,30 @@
 namespace umpire {
 namespace resource {
 
+static const std::size_t Max_Allocations{100000};
+
 NoOpMemoryResource::NoOpMemoryResource(Platform platform,
                                        const std::string& name, int id,
                                        MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}, m_platform{platform}
 {
-  m_ptr = m_allocator.allocate(42*sizeof(int)); 
+  //Do not change value of Max_Allocations unless it is also
+  //updated in NoOp benchmark.
+  m_ptr = static_cast<char*>(m_allocator.allocate(Max_Allocations*sizeof(char)));
   m_count = 0;
 }
 
 NoOpMemoryResource::~NoOpMemoryResource()
 {
-  m_allocator.deallocate(m_ptr);
+  m_allocator.deallocate((void*)m_ptr);
   m_count = 0;
 }
 
 void* NoOpMemoryResource::allocate(std::size_t bytes)
 {
   UMPIRE_USE_VAR(bytes);
-  m_count++; 
-  return ((int*)m_ptr+m_count);
+  m_ptr+=m_count++;
+  return (void*)m_ptr;
 }
 
 void NoOpMemoryResource::deallocate(void* ptr)
