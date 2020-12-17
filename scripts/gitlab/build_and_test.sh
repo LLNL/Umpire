@@ -23,6 +23,7 @@ sys_type=${SYS_TYPE:-""}
 py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
 
 # Dependencies
+date
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -47,6 +48,7 @@ then
     python scripts/uberenv/uberenv.py --spec="${spec}"
 
 fi
+date
 
 # Host config file
 if [[ -z ${hostconfig} ]]
@@ -87,6 +89,7 @@ cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 # Build
 if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
+    date
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~ Host-config: ${hostconfig_path}"
     echo "~ Build Dir:   ${build_dir}"
@@ -105,6 +108,7 @@ then
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
 
+    date
     $cmake_exe \
       -C ${hostconfig_path} \
       ${project_dir}
@@ -114,6 +118,7 @@ then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       $cmake_exe --build . --verbose -j 1
     fi
+    date
 fi
 
 # Test
@@ -130,7 +135,9 @@ then
 
     cd ${build_dir}
 
+    date
     ctest --output-on-failure -T test 2>&1 | tee tests_output.txt
+    date
 
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]

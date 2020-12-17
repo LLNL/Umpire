@@ -13,7 +13,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
-- Documentation on allocator (in)accessibility.
+- Documentation on allocator (in)accessibility as well as getAllocator usage.
 
 ### Changed
 
@@ -21,17 +21,19 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Size Limiter example now has a try-catch statement to handle exception.
 
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource
-
-- Temporarily removed Windows CI tests due to out-of-date cmake policy
 
 ### Fixed
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
 
 - Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
+
+- Fixed Windows CI errors by ensuring azure pipeline runs with the filesystem turned ON.
 
 - Fixed HIP CI test versioning error and added test for rocm/3.9.0 and rocm/3.10.0
 
