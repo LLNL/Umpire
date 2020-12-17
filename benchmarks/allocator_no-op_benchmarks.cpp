@@ -18,12 +18,6 @@
 
 #include "umpire/alloc/NoOpAllocator.hpp"
 
-#include "umpire/strategy/FixedPool.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/MixedPool.hpp"
-
-#include "umpire/util/FixedMallocPool.hpp"
-
 static const int RangeLow{4};
 static const int RangeHi{1024};
 
@@ -126,71 +120,9 @@ private:
   umpire::Allocator* m_alloc;
 };
 
-class HostResource : public MemoryResourceAllocator<umpire::resource::Host> {};
-BENCHMARK_DEFINE_F(HostResource, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(HostResource, deallocate)(benchmark::State& st) { deallocation(st); }
-
-class FixedMallocPool : public AllocatorBenchmark {
-public:
-  using AllocatorBenchmark::SetUp;
-  using AllocatorBenchmark::TearDown;
-
-  FixedMallocPool() : m_alloc{nullptr} {}
-
-  void SetUp(benchmark::State& st) override final {
-    const std::size_t bytes{static_cast<std::size_t>(st.range(0))};
-    m_alloc = new umpire::util::FixedMallocPool(bytes);
-  }
-  void TearDown(benchmark::State&) override final {
-    delete m_alloc;
-  }
-
-  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
-  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
-
-private:
-  umpire::util::FixedMallocPool* m_alloc;
-};
-
-BENCHMARK_DEFINE_F(FixedMallocPool, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(FixedMallocPool, deallocate)(benchmark::State& st) { deallocation(st); }
-
-static int namecnt = 0;   // Used to generate unique name per iteration
-template <umpire::resource::MemoryResourceType Resource>
-class FixedPool : public AllocatorBenchmark {
-public:
-  using AllocatorBenchmark::SetUp;
-  using AllocatorBenchmark::TearDown;
-
-  FixedPool() : m_alloc{nullptr} {}
-
-  void SetUp(benchmark::State& st) override final {
-    auto& rm = umpire::ResourceManager::getInstance();
-    const std::size_t bytes{static_cast<std::size_t>(st.range(0))};
-
-    std::stringstream ss;
-    ss << "fixed_pool-" << Resource << "-" << bytes << "." << namecnt;
-    ++namecnt;
-
-    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::FixedPool, Introspection>(
-        ss.str(), rm.getAllocator(Resource), bytes, 128 * sizeof(int) * 8)};
-  }
-
-  void TearDown(benchmark::State&) override final {
-    m_alloc->getAllocationStrategy()->release();
-    delete m_alloc;
-  }
-
-  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
-  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
-
-private:
-  umpire::Allocator* m_alloc;
-};
-
-class FixedPoolHost : public FixedPool<umpire::resource::Host> {};
-BENCHMARK_DEFINE_F(FixedPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(FixedPoolHost, deallocate)(benchmark::State& st) { deallocation(st); }
+class NoOpResource : public MemoryResourceAllocator<umpire::resource::NoOp> {};
+BENCHMARK_DEFINE_F(NoOpResource, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(NoOpResource, deallocate)(benchmark::State& st) { deallocation(st); }
 
 class AllocatorRandomSizeBenchmark : public benchmark::Fixture {
 public:
@@ -261,77 +193,6 @@ public:
   std::size_t m_bytes[Num_Random];
 };
 
-template <umpire::resource::MemoryResourceType Resource>
-class DynamicPool : public AllocatorRandomSizeBenchmark {
-public:
-  using AllocatorRandomSizeBenchmark::SetUp;
-  using AllocatorRandomSizeBenchmark::TearDown;
-
-  DynamicPool() : m_alloc{nullptr} {}
-
-  void SetUpPool() final {
-    auto& rm = umpire::ResourceManager::getInstance();
-
-    std::stringstream ss;
-    ss << "dynamic_pool-" << Resource << "." << namecnt;
-    ++namecnt;
-
-    m_alloc = new umpire::Allocator{
-      rm.makeAllocator<umpire::strategy::DynamicPool, Introspection>(
-        ss.str(), rm.getAllocator(Resource))};
-  }
-
-  void TearDown(benchmark::State&) override final {
-    m_alloc->getAllocationStrategy()->release();
-    delete m_alloc;
-  }
-
-  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
-  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
-
-private:
-  umpire::Allocator* m_alloc;
-};
-
-class DynamicPoolHost : public DynamicPool<umpire::resource::Host> {};
-BENCHMARK_DEFINE_F(DynamicPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate)(benchmark::State& st) { deallocation(st); }
-
-template <umpire::resource::MemoryResourceType Resource>
-class MixedPool : public AllocatorRandomSizeBenchmark {
-public:
-  using AllocatorRandomSizeBenchmark::SetUp;
-  using AllocatorRandomSizeBenchmark::TearDown;
-
-  MixedPool() : m_alloc{nullptr} {}
-
-  void SetUpPool() override {
-    auto& rm = umpire::ResourceManager::getInstance();
-
-    std::stringstream ss;
-    ss << "mixed_pool-" << Resource << "." << namecnt;
-    ++namecnt;
-
-    m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::MixedPool, Introspection>(
-        ss.str(), rm.getAllocator(Resource))};
-  }
-
-  void TearDown(benchmark::State&) override final {
-    m_alloc->getAllocationStrategy()->release();
-    delete m_alloc;
-  }
-
-  void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
-  void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
-
-private:
-  umpire::Allocator* m_alloc;
-};
-
-class MixedPoolHost : public MixedPool<umpire::resource::Host> {};
-BENCHMARK_DEFINE_F(MixedPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(MixedPoolHost, deallocate)(benchmark::State& st) { deallocation(st); }
-
 // Register all the benchmarks
 
 // Base allocators
@@ -339,25 +200,7 @@ BENCHMARK_REGISTER_F(NoOpMalloc, malloc)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(NoOpMalloc, free)->Range(RangeLow, RangeHi);
 
 // Resources
-BENCHMARK_REGISTER_F(HostResource, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HostResource, deallocate)->Range(RangeLow, RangeHi);
-
-// Pools
-
-// FixedMallocPool
-BENCHMARK_REGISTER_F(FixedMallocPool, allocate)->Arg(256);
-BENCHMARK_REGISTER_F(FixedMallocPool, deallocate)->Arg(256);
-
-// FixedPool
-BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->Arg(256);
-BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->Arg(256);
-
-// DynamicPool
-BENCHMARK_REGISTER_F(DynamicPoolHost, allocate)->Args({16, 1024});
-BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate)->Args({16, 1024});
-
-// MixedPool
-BENCHMARK_REGISTER_F(MixedPoolHost, allocate)->Args({16, 1024});
-BENCHMARK_REGISTER_F(MixedPoolHost, deallocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(NoOpResource, allocate)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(NoOpResource, deallocate)->Range(RangeLow, RangeHi);
 
 BENCHMARK_MAIN();

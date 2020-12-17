@@ -18,7 +18,7 @@ bool NoOpResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
   //may need to add a 'umpire_enable_benchmarks' to check here
-  if (name.find("NO_OP") == std::string::npos)
+  if (name.find("No_Op") == std::string::npos)
     return true;
   else 
     return false;

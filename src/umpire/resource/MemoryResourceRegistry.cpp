@@ -86,7 +86,7 @@ MemoryResourceRegistry::MemoryResourceRegistry()
 
   registerMemoryResource(
       util::make_unique<resource::NoOpResourceFactory>());
-  m_resource_names.push_back("NO_OP");
+  m_resource_names.push_back("NO_OP"); //another place for umpire no-op macro
   
   registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());

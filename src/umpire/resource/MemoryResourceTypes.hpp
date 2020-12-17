@@ -30,7 +30,8 @@ enum MemoryResourceType {
   Pinned,
   Constant,
   File,
-  Unknown
+  Unknown,
+  NoOp
 };
 
 inline std::string resource_to_string(MemoryResourceType type)
@@ -48,6 +49,8 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "DEVICE_CONST";
     case File:
       return "FILE";
+    case NoOp:
+      return "NO_OP";
     default:
       UMPIRE_ERROR("Unkown resource type: " << type);
       //
@@ -77,6 +80,8 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
     return MemoryResourceType::Constant;
   else if (resource == "FILE")
     return MemoryResourceType::File;
+  else if (resource == "NO_OP")
+    return MemoryResourceType::NoOp;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
 
