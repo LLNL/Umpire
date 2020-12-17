@@ -30,7 +30,7 @@ NoOpMemoryResource::NoOpMemoryResource(Platform platform,
 
 NoOpMemoryResource::~NoOpMemoryResource()
 {
-  m_allocator.deallocate((void*)m_ptr);
+  //m_allocator.deallocate(m_ptr);
   m_count = 0;
 }
 
