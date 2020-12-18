@@ -212,7 +212,7 @@ std::vector<std::string> get_allocators()
   
   std::cout << "Available allocators: ";
   for(auto a : all_allocators) {
-    if(a.find("::") == std::string::npos) { // && a.find("NO_OP") == std::string::npos) { 
+    if(a.find("::") == std::string::npos) {
       avail_allocators.push_back(a);
       std::cout << a << " ";
     }
