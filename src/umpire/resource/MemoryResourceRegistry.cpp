@@ -84,9 +84,11 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       util::make_unique<resource::HostResourceFactory>());
   m_resource_names.push_back("HOST");
 
+#if defined(UMPIRE_ENABLE_BENCHMARKS)
   registerMemoryResource(
       util::make_unique<resource::NoOpResourceFactory>());
   m_resource_names.push_back("NO_OP"); //another place for umpire no-op macro
+#endif
   
   registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
