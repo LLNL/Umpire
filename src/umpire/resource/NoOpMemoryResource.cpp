@@ -26,13 +26,12 @@ NoOpMemoryResource::NoOpMemoryResource(Platform platform,
 
 NoOpMemoryResource::~NoOpMemoryResource()
 {
-  m_count = (UINT64_C(1)<<48); //(m_count<<48);
+  m_count = (UINT64_C(1)<<48);
 }
 
 void* NoOpMemoryResource::allocate(std::size_t bytes)
 {
   void* ptr = (void*)m_count;
-std::cout<<"Pointer and count: " <<  ptr << "     "<< m_count<<std::endl;
   m_count += bytes;
   return ptr;
 }
