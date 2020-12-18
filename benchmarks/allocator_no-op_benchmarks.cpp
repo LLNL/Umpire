@@ -16,8 +16,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 
-#include "umpire/alloc/NoOpAllocator.hpp"
-
 static const int RangeLow{4};
 static const int RangeHi{1024};
 static const std::size_t Max_Allocations{100000};
@@ -80,21 +78,6 @@ public:
   void* m_allocations[Max_Allocations];
 };
 
-template <typename Alloc>
-class ResourceAllocator : public AllocatorBenchmark
-{
-public:
-  ResourceAllocator() : m_alloc{} {}
-  virtual void* allocate(std::size_t nbytes) final { return m_alloc.allocate(nbytes); }
-  virtual void deallocate(void* ptr) final { m_alloc.deallocate(ptr); }
-private:
-  Alloc m_alloc;
-};
-
-class NoOpMalloc : public ResourceAllocator<umpire::alloc::NoOpAllocator> {};
-BENCHMARK_DEFINE_F(NoOpMalloc, malloc)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(NoOpMalloc, free)(benchmark::State& st)   { deallocation(st); }
-
 template <umpire::resource::MemoryResourceType Resource>
 class MemoryResourceAllocator : public AllocatorBenchmark
 {
@@ -121,12 +104,6 @@ BENCHMARK_DEFINE_F(NoOpResource, allocate)(benchmark::State& st) { allocation(st
 BENCHMARK_DEFINE_F(NoOpResource, deallocate)(benchmark::State& st) { deallocation(st); }
 
 // Register all the benchmarks
-
-// Base allocators
-BENCHMARK_REGISTER_F(NoOpMalloc, malloc)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(NoOpMalloc, free)->Range(RangeLow, RangeHi);
-
-// Resources
 BENCHMARK_REGISTER_F(NoOpResource, allocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(NoOpResource, deallocate)->Range(RangeLow, RangeHi);
 

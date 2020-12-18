@@ -9,7 +9,6 @@
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/Platform.hpp"
-#include "umpire/alloc/NoOpAllocator.hpp"
 
 namespace umpire {
 namespace resource {
@@ -18,9 +17,8 @@ namespace resource {
  * \brief No-Op Memory allocator
  *
  * This NoOpMemoryResource has been created for benchmarking and
- * performance measurement purposes. This class will allocate a trivial amount
- * of memory in the constructor, and then increment pointers in the allocate
- * and deallocate functions. Thus, no malloc calls will be counted in the 
+ * performance measurement purposes. This class increments pointers in the 
+ * allocate function. Thus, no malloc calls will be counted in the 
  * benchmarks and other function calls (etc) will be counted instead. The hope
  * is that more informative measurements and tracking can be done in the
  * benchmark than just focusing on the memory malloc calls.
@@ -29,28 +27,26 @@ namespace resource {
 class NoOpMemoryResource : public MemoryResource {
  public:
   /*!
-   * \brief Construct a new NoOpMemoryResource and allocate a certain 
-   * amount of memory (allocated memory won't be used). 
+   * \brief Construct a new NoOpMemoryResource and initialize a counter
    */
   NoOpMemoryResource(Platform platform, const std::string& name, int id,
                      MemoryResourceTraits traits);
 
   /*!
-   * \brief Resets allocation counter, frees any memory.
+   * \brief Resets allocation counter.
    */
   ~NoOpMemoryResource();
 
   /*!
-   * \brief Takes the pointer which was used in the constructor to allocate
-   * trivial amount of memory and increments by n. Then increments n itself
-   * so that each allocation has a unique index.
+   * \brief Creates a pointer and increments it by bytes. 
+   * Then increments counter so that each allocation has a unique index.
    *
    * \return void* 
    */
   void* allocate(std::size_t bytes);
 
   /*!
-   * \brief Decrements the counter used by the allocate function.
+   * \brief Does nothing.
    */
   void deallocate(void* ptr);
 
@@ -63,10 +59,8 @@ class NoOpMemoryResource : public MemoryResource {
 
  protected:
   Platform m_platform;
-  alloc::NoOpAllocator m_allocator;
 
  private:
-  char* m_ptr, *m_ptr_ref;
   size_t m_count;
 };
 

@@ -17,7 +17,6 @@ namespace resource {
 bool NoOpResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  //may need to add a 'umpire_enable_benchmarks' to check here
   if (name.find("No_Op") == std::string::npos)
     return true;
   else 
