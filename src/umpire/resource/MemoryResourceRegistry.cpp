@@ -12,7 +12,10 @@
 
 #include "umpire/resource/HostResourceFactory.hpp"
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
+
+#if defined(UMPIRE_ENABLE_BENCHMARKS)
 #include "umpire/resource/NoOpResourceFactory.hpp"
+#endif
 
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
 #include "umpire/resource/FileMemoryResourceFactory.hpp"
