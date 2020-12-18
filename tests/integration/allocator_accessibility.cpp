@@ -22,7 +22,6 @@ struct allocate_and_use<host_platform>
 {
   void test(umpire::Allocator* alloc, size_t size)
   {
-std::cout<<"Alloc is "<<alloc->getName()<<std::endl;
     size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
     data[0] = size * size;
     alloc->deallocate(data);
@@ -100,7 +99,6 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-std::cout<<"Param is "<<GetParam()<<std::endl;
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
     m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
         ("pool_" + GetParam(), *m_allocator, 42 * sizeof(size_t), 1));
