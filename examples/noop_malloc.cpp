@@ -10,9 +10,9 @@
 
 int main() {
   auto &rm = umpire::ResourceManager::getInstance();
-  auto alloc = rm.getAllocator("No_Op");
+  auto alloc = rm.getAllocator("NO_OP");
 
-  double* my_array = static_cast<double*>(alloc.allocate(100 * sizeof(double)));
+  char* my_array = static_cast<char*>(alloc.allocate(100 * sizeof(char)));
 
   alloc.deallocate(my_array);
 }
