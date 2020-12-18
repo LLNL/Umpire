@@ -53,10 +53,8 @@ std::size_t NoOpMemoryResource::getHighWatermark() const noexcept
 
 bool NoOpMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::host)
-    return true;
-  else
-    return false;
+  UMPIRE_USE_VAR(p);
+  return false;
 }
 
 Platform NoOpMemoryResource::getPlatform() noexcept
