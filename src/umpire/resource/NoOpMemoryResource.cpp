@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/resource/NoOpMemoryResource.hpp"
-
+#include <cstdint>
 #include <stdlib.h>
 #include <string.h>
 #include "umpire/ResourceManager.hpp"
@@ -21,17 +21,18 @@ NoOpMemoryResource::NoOpMemoryResource(Platform platform,
                                        MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}, m_platform{platform}
 {
-  m_count = 1;
+  m_count = (UINT64_C(1)<<48);
 }
 
 NoOpMemoryResource::~NoOpMemoryResource()
 {
-  m_count = 1;
+  m_count = (UINT64_C(1)<<48); //(m_count<<48);
 }
 
 void* NoOpMemoryResource::allocate(std::size_t bytes)
 {
   void* ptr = (void*)m_count;
+std::cout<<"Pointer and count: " <<  ptr << "     "<< m_count<<std::endl;
   m_count += bytes;
   return ptr;
 }

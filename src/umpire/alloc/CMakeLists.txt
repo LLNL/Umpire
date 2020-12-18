@@ -5,8 +5,7 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set(umpire_alloc_headers
-  MallocAllocator.hpp
-  NoOpAllocator.hpp)
+  MallocAllocator.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_alloc_headers

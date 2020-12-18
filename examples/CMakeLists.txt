@@ -35,6 +35,12 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
 
+blt_add_executable(
+  NAME noop_malloc
+  SOURCES noop_malloc.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples noop_malloc)
+
 if (ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
