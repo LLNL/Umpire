@@ -53,7 +53,8 @@ std::size_t NoOpMemoryResource::getHighWatermark() const noexcept
 
 bool NoOpMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  UMPIRE_USE_VAR(p);
+  if(p != Platform::undefined)
+    UMPIRE_LOG(Debug, "NullMemoryResource: platform is not accessible");
   return false;
 }
 

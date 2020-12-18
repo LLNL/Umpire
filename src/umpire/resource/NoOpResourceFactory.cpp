@@ -44,10 +44,10 @@ MemoryResourceTraits NoOpResourceFactory::getDefaultTraits()
   traits.unified = false;
   traits.size = 0;
 
-  traits.vendor = cpu_vendor_type();
+  traits.vendor = MemoryResourceTraits::vendor_type::unknown;
   traits.kind = MemoryResourceTraits::memory_type::unknown;
   traits.used_for = MemoryResourceTraits::optimized_for::any;
-  traits.resource = MemoryResourceTraits::resource_type::host;
+  traits.resource = MemoryResourceTraits::resource_type::unknown;
 
   traits.id = 0;
 
