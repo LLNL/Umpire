@@ -33,13 +33,14 @@ class NoOpMemoryResource : public MemoryResource {
                      MemoryResourceTraits traits);
 
   /*!
-   * \brief Default constructor.
+   * \brief Default destructor.
    */
   ~NoOpMemoryResource();
 
   /*!
    * \brief Creates a pointer and increments it by bytes. 
-   * Then increments counter so that each allocation has a unique index.
+   * Then, increments counter so that each allocation has a unique index.
+   * NO MEMORY ALLOCATED!
    *
    * \return void* 
    */
