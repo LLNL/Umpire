@@ -30,8 +30,8 @@ enum MemoryResourceType {
   Pinned,
   Constant,
   File,
-  Unknown,
-  NoOp
+  NoOp,
+  Unknown
 };
 
 inline std::string resource_to_string(MemoryResourceType type)
