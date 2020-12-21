@@ -10,13 +10,6 @@
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 
-#include <errno.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <unistd.h>
-
 namespace umpire {
 namespace resource {
 
