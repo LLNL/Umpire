@@ -52,9 +52,9 @@ blt_add_test(
 
 #Until more stable blt changes can be made, this is a temporary fix to allow
 #the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
-#if(ENABLE_HIP)
-#  set_target_properties(allocator_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
-#endif()
+if(ENABLE_HIP)
+  set_target_properties(allocator_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
+endif()
 
 blt_add_executable(
   NAME op_fortran_tests
@@ -71,9 +71,9 @@ blt_add_test(
   NAME op_fortran_tests
   COMMAND op_fortran_tests)
 
-#if(ENABLE_HIP)
-#  set_target_properties(op_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
-#endif()
+if(ENABLE_HIP)
+  set_target_properties(op_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
+endif()
 
 blt_add_executable(
   NAME introspection_fortran_tests
@@ -90,6 +90,6 @@ blt_add_test(
   NAME introspection_fortran_tests
   COMMAND introspection_fortran_tests)
 
-#if(ENABLE_HIP)
-#  set_target_properties(introspection_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
-#endif()
+if(ENABLE_HIP)
+  set_target_properties(introspection_fortran_tests PROPERTIES LINKER_LANGUAGE HIP)
+endif()
