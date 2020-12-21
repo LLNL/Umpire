@@ -13,7 +13,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
-- Documentation on allocator (in)accessibility.
+- Documentation on allocator (in)accessibility as well as getAllocator usage.
 
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
@@ -22,6 +22,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Organized configuration options in config.hpp.in in alphabetical order
 
 - Size Limiter example now has a try-catch statement to handle exception.
+
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run
 
 ### Removed
 
