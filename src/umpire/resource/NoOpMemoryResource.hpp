@@ -62,7 +62,7 @@ class NoOpMemoryResource : public MemoryResource {
   Platform m_platform;
 
  private:
-  std::size_t m_count = (UINT64_C(1)<<48);
+  std::size_t m_count{ (UINT64_C(1)<<48) };
 };
 
 } // end of namespace resource
