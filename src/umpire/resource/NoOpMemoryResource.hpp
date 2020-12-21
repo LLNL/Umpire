@@ -27,13 +27,13 @@ namespace resource {
 class NoOpMemoryResource : public MemoryResource {
  public:
   /*!
-   * \brief Construct a new NoOpMemoryResource and initialize a counter
+   * \brief Construct a new NoOpMemoryResource.
    */
   NoOpMemoryResource(Platform platform, const std::string& name, int id,
                      MemoryResourceTraits traits);
 
   /*!
-   * \brief Resets allocation counter.
+   * \brief Default constructor.
    */
   ~NoOpMemoryResource();
 
@@ -61,7 +61,7 @@ class NoOpMemoryResource : public MemoryResource {
   Platform m_platform;
 
  private:
-  size_t m_count;
+  std::size_t m_count = (UINT64_C(1)<<48);
 };
 
 } // end of namespace resource

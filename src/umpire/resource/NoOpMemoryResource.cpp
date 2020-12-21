@@ -21,12 +21,10 @@ NoOpMemoryResource::NoOpMemoryResource(Platform platform,
                                        MemoryResourceTraits traits)
     : MemoryResource{name, id, traits}, m_platform{platform}
 {
-  m_count = (UINT64_C(1)<<48);
 }
 
 NoOpMemoryResource::~NoOpMemoryResource()
 {
-  m_count = (UINT64_C(1)<<48);
 }
 
 void* NoOpMemoryResource::allocate(std::size_t bytes)
