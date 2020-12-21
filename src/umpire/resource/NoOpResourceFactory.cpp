@@ -17,7 +17,7 @@ namespace resource {
 bool NoOpResourceFactory::isValidMemoryResourceFor(
     const std::string& name) noexcept
 {
-  if (name.find("No_Op") == std::string::npos)
+  if (name.find("NO_OP") == std::string::npos)
     return true;
   else 
     return false;
