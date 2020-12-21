@@ -36,10 +36,10 @@ blt_add_executable(
 list(APPEND umpire_examples malloc)
 
 blt_add_executable(
-  NAME noop_malloc
-  SOURCES noop_malloc.cpp
+  NAME noop_allocator
+  SOURCES noop_allocator.cpp
   DEPENDS_ON ${example_depends})
-list(APPEND umpire_examples noop_malloc)
+list(APPEND umpire_examples noop_allocator)
 
 if (ENABLE_HIP)
   blt_add_executable(
