@@ -12,11 +12,17 @@ set (umpire_resource_headers
   MemoryResourceFactory.hpp
   MemoryResourceRegistry.hpp
   MemoryResourceTypes.hpp
-  NoOpMemoryResource.hpp
-  NoOpResourceFactory.hpp
   NullMemoryResource.hpp
   NullMemoryResourceFactory.hpp
 )
+
+if(ENABLE_BENCHMARKS)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    NoOpMemoryResource.hpp
+    NoOpResourceFactory.hpp
+  )
+endif()
 
 if(ENABLE_FILE_RESOURCE)
   set (umpire_resource_headers
@@ -30,11 +36,17 @@ set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
   MemoryResourceRegistry.cpp
-  NoOpMemoryResource.cpp
-  NoOpResourceFactory.cpp
   NullMemoryResource.cpp
   NullMemoryResourceFactory.cpp
 )
+
+if(ENABLE_BENCHMARKS)
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    NoOpMemoryResource.cpp
+    NoOpResourceFactory.cpp
+  )
+endif()
 
 if(ENABLE_FILE_RESOURCE)
   set (umpire_resource_sources
