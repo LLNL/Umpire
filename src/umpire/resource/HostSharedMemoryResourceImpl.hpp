@@ -33,7 +33,7 @@ class HostSharedMemoryResource::impl {
 
       bool created{ false };
       bool completed{ false };
-      int handle{ 0 };
+      int shm_handle{ 0 };
       int err{ 0 };
 
       //
@@ -45,7 +45,7 @@ class HostSharedMemoryResource::impl {
       // assured of having a clean directory.
       //
       while (!completed) { // spin on opening shm
-        if ( open_shared_memory_segment(handle, err, (O_RDWR | O_CREAT | O_EXCL) ) ) {
+        if ( open_shared_memory_segment(shm_handle, err, (O_RDWR | O_CREAT | O_EXCL) ) ) {
           created = true;
           completed = true;
         }
@@ -54,7 +54,7 @@ class HostSharedMemoryResource::impl {
                         << m_segment_name << ": " << strerror(err));
         }
         else {
-          if (open_shared_memory_segment(handle, err, O_RDWR)) {
+          if (open_shared_memory_segment(shm_handle, err, O_RDWR)) {
             created = false;
             completed = true;
           }
@@ -68,13 +68,13 @@ class HostSharedMemoryResource::impl {
       }
 
       if (created) {
-        if ( 0 != ftruncate(handle, size) ) {
+        if ( 0 != ftruncate(shm_handle, size) ) {
           err = errno;
           UMPIRE_ERROR("Failed to set size for shared memory segment "
                           << m_segment_name << ": " << strerror(err));
         }
 
-        map_shared_memory_segment(handle);
+        map_shared_memory_segment(shm_handle);
       }
 
       if (completed) {
