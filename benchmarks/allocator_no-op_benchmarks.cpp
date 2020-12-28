@@ -26,22 +26,8 @@ public:
   }
  
   void TearDown(benchmark::State&) {
-    alloc.getAllocationStrategy()->release();
   }
   
-  void NoOpAllocate(benchmark::State& st) {
-    size = static_cast<std::size_t>(st.range(0));
-    while (st.KeepRunning()) {
-      allocation = alloc.allocate(size);
-    }
-  }
-
-  void NoOpDeallocate(benchmark::State& st) {
-    while (st.KeepRunning()) {
-      alloc.deallocate(allocation);
-    }
-  }
-
   void NoOpAllocDealloc(benchmark::State& st) {
     size = static_cast<std::size_t>(st.range(0));
     while (st.KeepRunning()) {
@@ -57,12 +43,7 @@ private:
 };
 
 class NoOpResource : public NoOpAllocatorBenchmark {};
-BENCHMARK_DEFINE_F(NoOpResource, allocate)(benchmark::State& st) { NoOpAllocate(st); }
-BENCHMARK_DEFINE_F(NoOpResource, deallocate)(benchmark::State& st) { NoOpDeallocate(st); }
 BENCHMARK_DEFINE_F(NoOpResource, allocate_deallocate)(benchmark::State& st) { NoOpAllocDealloc(st); }
-
-BENCHMARK_REGISTER_F(NoOpResource, allocate)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(NoOpResource, deallocate)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(NoOpResource, allocate_deallocate)->Range(RangeLow, RangeHi);
 
 BENCHMARK_MAIN();
