@@ -11,7 +11,7 @@
 
 static const int RangeLow{4};
 static const int RangeHi{1024};
-static const int Max_Allocations{10};
+static const int Max_Allocations{1000000};
 
 class NoOpAllocatorBenchmark : public benchmark::Fixture
 {
