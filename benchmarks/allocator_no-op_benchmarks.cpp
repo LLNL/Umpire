@@ -35,8 +35,9 @@ public:
     while (st.KeepRunning()) {
       m_allocations[i++] = alloc.allocate(size);
       if (i == Max_Allocations) {
-        for (int j{0}; j < i; j++) 
+        for (int j{0}; j < i; j++) {
           alloc.deallocate(m_allocations[j]);
+        }
         i = 0;
       }
     }
@@ -50,12 +51,13 @@ public:
     while (st.KeepRunning()) {
       m_allocations[i++] = alloc.allocate(size);
       if (i == Max_Allocations) {
-        for (int j{i}; j < 0; j--) 
+        for (int j{i-1}; j >= 0; j--) {
           alloc.deallocate(m_allocations[j]);
+        }
         i = 0;
       }
     }
-    for (int j{i};  j < 0; j--) {
+    for (int j{i-1};  j >= 0; j--) {
       alloc.deallocate(m_allocations[j]);
     }
   }
