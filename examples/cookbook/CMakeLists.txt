@@ -119,10 +119,6 @@ if (ENABLE_HIP)
       recipe_pinned_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
-    
-    #Until more stable blt changes can be made, this is a temporary fix to allow
-    #the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
-    set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()
 
@@ -173,10 +169,6 @@ if (ENABLE_FORTRAN)
     recipe_thread_safe.F
     PROPERTIES
     Fortran_FORMAT FREE)
-
-  if(ENABLE_HIP)
-    set_target_properties(recipe_thread_safe_F PROPERTIES LINKER_LANGUAGE HIP)
-  endif()
 endif ()
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
