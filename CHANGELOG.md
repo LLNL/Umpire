@@ -27,6 +27,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed extraneous function definition in HipDeviceMemoryResource
 
+- Removed the temporary fix for the HIP + fortran linker error (blt has been 
+  updated instead)
+
 ### Fixed
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
