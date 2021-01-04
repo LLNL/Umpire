@@ -73,14 +73,12 @@ public:
       if (i == Max_Allocations) {
         std::mt19937 g(Max_Allocations);
         std::shuffle(&m_allocations[0], &m_allocations[Max_Allocations], g);
-        //std::random_shuffle ( &m_allocations[0], &m_allocations[Max_Allocations]);
         for (int j{0}; j < i; j++) {
           alloc.deallocate(m_allocations[j]);
         }
         i = 0;
       }
     }
-    
     for(int j{0}; j < i; j++) {
       alloc.deallocate(m_allocations[j]);
     }
