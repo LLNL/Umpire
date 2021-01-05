@@ -43,7 +43,7 @@ inline void Allocator::deallocate(void* ptr)
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
   if (!ptr) {
-    UMPIRE_LOG(Info, "Deallocating a null pointer");
+    UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is purposefully allowed!)");
     return;
   } else {
     m_allocator->deallocate(ptr);
