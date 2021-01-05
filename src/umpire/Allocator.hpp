@@ -55,8 +55,8 @@ class Allocator {
    * \brief Free the memory at ptr.
    *
    * This method will throw an umpire::Exception if ptr was not allocated
-   * using this Allocator. If the pointer has not been used yet and is 
-   * a nullptr, this behavior is _allowed_, but it will be ignored. 
+   * using this Allocator. If the pointer hasn't been used (a nullptr), 
+   * this behavior is _allowed_, but it will be ignored. 
    * If you need to deallocate memory allocated by an unknown object, 
    * use the ResourceManager::deallocate method.
    *
