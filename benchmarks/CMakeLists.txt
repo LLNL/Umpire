@@ -48,6 +48,11 @@ blt_add_executable(
   DEPENDS_ON ${benchmark_depends})
 
 blt_add_executable(
+  NAME allocation_size_benchmarks
+  SOURCES allocation_size_benchmarks.cpp
+  DEPENDS_ON ${benchmark_depends})
+
+blt_add_executable(
   NAME debuglog_benchmarks
   SOURCES debuglog_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends})
@@ -66,6 +71,10 @@ endif()
 blt_add_benchmark(
   NAME allocator_benchmarks
   COMMAND allocator_benchmarks)
+
+blt_add_benchmark(
+  NAME allocation_size_benchmarks
+  COMMAND allocation_size_benchmarks)
 
 blt_add_executable(
   NAME copy_benchmarks
