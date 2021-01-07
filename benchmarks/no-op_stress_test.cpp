@@ -14,6 +14,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
+#define CONVERT 1000000 //convert sec (s) to microsec (us)
 #define ALLOCATIONS 1000000
 #define NUM_ITER 3
 
@@ -36,8 +37,8 @@ void same_order(std::size_t size, umpire::Allocator alloc)
   }
 
   std::cout << "    SAME_ORDER:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
+  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
+  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
 }
 
 void reverse_order(std::size_t size, umpire::Allocator alloc)
@@ -59,8 +60,8 @@ void reverse_order(std::size_t size, umpire::Allocator alloc)
   }
 
   std::cout << "    REVERSE_ORDER:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
+  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
+  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
 }
 
 void shuffle(std::size_t size, umpire::Allocator alloc)
@@ -85,20 +86,21 @@ void shuffle(std::size_t size, umpire::Allocator alloc)
   }
 
   std::cout << "    SHUFFLE:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
+  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
+  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
 }
 
 int main(int, char**) {
   std::mt19937 gen(ALLOCATIONS);
   std::uniform_int_distribution<std::size_t> dist(64, 4096);
   std::size_t size = dist(gen);
+  std::cout << std::fixed << std::setprecision(9);
 
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("NO_OP");
 
-  std::cout << "Testing allocating and deallocating " << std::endl
-            << "with NO_OP resource: " << std::endl << std::endl;
+  std::cout << "  Testing allocating and deallocating " << std::endl
+            << "  with NO_OP resource: " << std::endl << std::endl;
   same_order(size, alloc);
   reverse_order(size, alloc);
   shuffle(size, alloc);
