@@ -35,7 +35,7 @@ void same_order(std::size_t size, umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
-  std::cout << "    SAME ORDER:" << std::endl; 
+  std::cout << "    SAME_ORDER:" << std::endl; 
   std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
   std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
 }
