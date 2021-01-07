@@ -89,27 +89,20 @@ void shuffle(std::size_t size, umpire::Allocator alloc)
   std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
 }
 
-void benchmark_noop_allocator(std::string name) {
+int main(int, char**) {
   std::mt19937 gen(ALLOCATIONS);
   std::uniform_int_distribution<std::size_t> dist(64, 4096);
   std::size_t size = dist(gen);
 
   auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.getAllocator(name);
+  umpire::Allocator alloc = rm.getAllocator("NO_OP");
 
-  std::cout << name << std::endl;
+  std::cout << "Testing allocating and deallocating " << std::endl
+            << "with NO_OP resource: " << std::endl << std::endl;
   same_order(size, alloc);
   reverse_order(size, alloc);
   shuffle(size, alloc);
+
+  return 0;
 }
 
-int main(int, char**) {
-  benchmark_noop_allocator("HOST");
-
-#if defined(UMPIRE_ENABLE_DEVICE) 
-  benchmark_noop_allocator("DEVICE");
-#endif
-#if defined(UMPIRE_ENABLE_UM) 
-  benchmark_noop_allocator("UM");
-#endif
-}
