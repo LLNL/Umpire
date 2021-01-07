@@ -15,6 +15,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Documentation on allocator (in)accessibility as well as getAllocator usage.
 
+- Updated Umpire::Allocator 'deallocate' documentation brief on handling
+  deallocations on nullptr.
+
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
 ### Changed
