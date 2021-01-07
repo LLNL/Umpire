@@ -4,99 +4,112 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "benchmark/benchmark.h"
+#include <iostream>
+#include <chrono>
+
+#include <random>
+
 #include "umpire/config.hpp"
-#include "umpire/Allocator.hpp"
+
 #include "umpire/ResourceManager.hpp"
-#include "algorithm"
-#include "random"
+#include "umpire/Allocator.hpp"
 
-static const int RangeLow{4};
-static const int RangeHi{1024};
-static const int Max_Allocations{1000000};
+#define ALLOCATIONS 1000000
+#define NUM_ITER 3
 
-class NoOpAllocatorBenchmark : public benchmark::Fixture
+void same_order(std::size_t size, umpire::Allocator alloc)
 {
-public:
-  using ::benchmark::Fixture::SetUp;
-  using ::benchmark::Fixture::TearDown;
+  double time[2] = {0.0, 0.0};
+  void* allocations[ALLOCATIONS];
+  for(int i = 0; i < NUM_ITER; i++) {
+    auto begin_alloc = std::chrono::system_clock::now();
+    for (int j = 0; j < ALLOCATIONS; j++)
+      allocations[j] = alloc.allocate(size);
+    auto end_alloc = std::chrono::system_clock::now();
+    time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/ALLOCATIONS;
 
-  NoOpAllocatorBenchmark() {}
-
-  void SetUp(benchmark::State&) {
-    auto& rm = umpire::ResourceManager::getInstance();
-    alloc = rm.getAllocator("NO_OP");
-  }
- 
-  void TearDown(benchmark::State&) {
-  }
-  
-  void NoOpSameOrder(benchmark::State& st) {
-    size = static_cast<std::size_t>(st.range(0));
-    int i{0};
-    while (st.KeepRunning()) {
-      m_allocations[i++] = alloc.allocate(size);
-      if (i == Max_Allocations) {
-        for (int j{0}; j < i; j++) {
-          alloc.deallocate(m_allocations[j]);
-        }
-        i = 0;
-      }
-    }
-    for (int j{0}; j < i; j++) {
-      alloc.deallocate(m_allocations[j]);
-    }
+    auto begin_dealloc = std::chrono::system_clock::now();
+    for (int h = 0; h < ALLOCATIONS; h++)
+      alloc.deallocate(allocations[h]);
+    auto end_dealloc = std::chrono::system_clock::now();
+    time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
-  void NoOpReverseOrder(benchmark::State& st) {
-    size = static_cast<std::size_t>(st.range(0));
-    int i{0};
-    while (st.KeepRunning()) {
-      m_allocations[i++] = alloc.allocate(size);
-      if (i == Max_Allocations) {
-        for (int j{i-1}; j >= 0; j--) {
-          alloc.deallocate(m_allocations[j]);
-        }
-        i = 0;
-      }
-    }
-    for (int j{i-1};  j >= 0; j--) {
-      alloc.deallocate(m_allocations[j]);
-    }
+  std::cout << "    SAME ORDER:" << std::endl; 
+  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
+  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
+}
+
+void reverse_order(std::size_t size, umpire::Allocator alloc)
+{
+  double time[2] = {0.0, 0.0};
+  void* allocations[ALLOCATIONS];
+  for(int i = 0; i < NUM_ITER; i++) {
+    auto begin_alloc = std::chrono::system_clock::now();
+    for (int j = 0; j < ALLOCATIONS; j++)
+      allocations[j] = alloc.allocate(size);
+    auto end_alloc = std::chrono::system_clock::now();
+    time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/ALLOCATIONS;
+
+    auto begin_dealloc = std::chrono::system_clock::now();
+    for (int h = (ALLOCATIONS-1); h >=0; h--)
+      alloc.deallocate(allocations[h]);
+    auto end_dealloc = std::chrono::system_clock::now();
+    time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
-  
-  void NoOpShuffle(benchmark::State& st) {
-    size = static_cast<std::size_t>(st.range(0));
-    int i{0};
-    while (st.KeepRunning()) {
-      m_allocations[i++] = alloc.allocate(size);
-      if (i == Max_Allocations) {
-        std::mt19937 g(Max_Allocations);
-        std::shuffle(&m_allocations[0], &m_allocations[Max_Allocations], g);
-        for (int j{0}; j < i; j++) {
-          alloc.deallocate(m_allocations[j]);
-        }
-        i = 0;
-      }
-    }
-    for(int j{0}; j < i; j++) {
-      alloc.deallocate(m_allocations[j]);
-    }
+
+  std::cout << "    REVERSE_ORDER:" << std::endl; 
+  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
+  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
+}
+
+void shuffle(std::size_t size, umpire::Allocator alloc)
+{
+  std::mt19937 gen(ALLOCATIONS);
+  double time[2] = {0.0, 0.0};
+  void* allocations[ALLOCATIONS];
+
+  for(int i = 0; i < NUM_ITER; i++) {
+    auto begin_alloc = std::chrono::system_clock::now();
+    for (int j = 0; j < ALLOCATIONS; j++)
+      allocations[j] = alloc.allocate(size);
+    auto end_alloc = std::chrono::system_clock::now();
+    time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/ALLOCATIONS;
+
+    std::shuffle(&allocations[0], &allocations[ALLOCATIONS], gen);
+    auto begin_dealloc = std::chrono::system_clock::now();
+    for (int h = 0; h < ALLOCATIONS; h++)
+      alloc.deallocate(allocations[h]);
+    auto end_dealloc = std::chrono::system_clock::now();
+    time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
- 
-private: 
-  std::size_t size;
-  umpire::Allocator alloc;
-  void* m_allocations[Max_Allocations];
-};
 
-class NoOpResource : public NoOpAllocatorBenchmark {};
-BENCHMARK_DEFINE_F(NoOpResource, same_order)(benchmark::State& st) { NoOpSameOrder(st); }
-BENCHMARK_DEFINE_F(NoOpResource, reverse_order)(benchmark::State& st) { NoOpReverseOrder(st); }
-BENCHMARK_DEFINE_F(NoOpResource, shuffle)(benchmark::State& st) { NoOpShuffle(st); }
+  std::cout << "    SHUFFLE:" << std::endl; 
+  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)) << std::endl;
+  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)) << std::endl << std::endl;
+}
 
-BENCHMARK_REGISTER_F(NoOpResource, same_order)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(NoOpResource, reverse_order)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(NoOpResource, shuffle)->Range(RangeLow, RangeHi);
+void benchmark_noop_allocator(std::string name) {
+  std::mt19937 gen(ALLOCATIONS);
+  std::uniform_int_distribution<std::size_t> dist(64, 4096);
+  std::size_t size = dist(gen);
 
-BENCHMARK_MAIN();
+  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator alloc = rm.getAllocator(name);
+
+  std::cout << name << std::endl;
+  same_order(size, alloc);
+  reverse_order(size, alloc);
+  shuffle(size, alloc);
+}
+
+int main(int, char**) {
+  benchmark_noop_allocator("HOST");
+
+#if defined(UMPIRE_ENABLE_DEVICE) 
+  benchmark_noop_allocator("DEVICE");
+#endif
+#if defined(UMPIRE_ENABLE_UM) 
+  benchmark_noop_allocator("UM");
+#endif
+}
