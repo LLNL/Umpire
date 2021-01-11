@@ -18,6 +18,9 @@
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
 #define NUM_ITER 3
 
+#pragma GCC push_options
+#pragma GCC optimize ("-O0")
+
 void benchmark_allocator_together(umpire::Allocator alloc, std::size_t size = 0) {
   void* allocations[ALLOCATIONS];
   double time = 0.0;
@@ -74,6 +77,9 @@ void benchmark_allocator_separate(umpire::Allocator alloc, std::size_t size = 0)
 int main(int, char**) {
   //Set the output format
   std::cout << std::fixed << std::setprecision(9);
+  std::cout << "Conducting three rounds of allocations and " << std::endl; 
+  std::cout << "deallocations. Showing the average times:" << std::endl;
+  
   auto& rm = umpire::ResourceManager::getInstance();
 
   //Begin calling the tests
@@ -114,3 +120,5 @@ int main(int, char**) {
 
   return 0;
 }
+
+#pragma GCC pop_options
