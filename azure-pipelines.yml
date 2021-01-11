@@ -5,7 +5,7 @@ variables:
   COMPILER: 'g++'
 
 jobs:
-- job: Windows
+- job: Windows #temporarily commenting out until cmake/azure version issue resolved
   strategy:
     matrix:
       shared:
@@ -15,7 +15,7 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   variables:
-    CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=Off -DENABLE_TOOLS=Off -DENABLE_BENCHMARKS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
+    CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_FILESYSTEM=On -DENABLE_TOOLS=Off -DENABLE_BENCHMARKS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
   steps:
   - checkout: self
     clean: boolean
@@ -27,7 +27,7 @@ jobs:
   - task: CMake@1
     inputs:
       workingDir: 'build'
-      cmakeArgs: '--build . --config Release'
+      cmakeArgs: '--build . --config Release --verbose'
 #   - task: CmdLine@2
 #     inputs:
 #       script: 'ctest.exe -T test -C Release'

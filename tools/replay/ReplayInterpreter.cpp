@@ -257,13 +257,6 @@ void ReplayInterpreter::buildOperations()
     const std::size_t deallocations_performed{m_deallocate_ops - deallocations_skipped};
     const std::size_t leaked_allocations{allocations_performed - deallocations_performed};
 
-    const std::size_t allocation_map_insertions{ m_allocation_map_insert_ops +
-                          m_allocation_map_insert_due_to_make_allocator +
-                          m_allocation_map_insert_due_to_allocation +
-                          m_allocation_map_insert_due_to_reallocate +
-                          m_allocation_map_insert_rogue_ignored};
-    const std::size_t allocation_map_removals{m_allocation_map_remove_ops + m_allocation_map_remove_rogue_ignored};
-
     std::cout
       << "Replay File Version: " << m_log_version_major << "." << m_log_version_minor << "." << m_log_version_patch << std::endl
       << std::setw(12) << m_mpi_ops << " mpi rank identification operations" << std::endl
@@ -276,12 +269,13 @@ void ReplayInterpreter::buildOperations()
       << "    " << std::setw(12) << m_deallocate_due_to_reallocate << " skipped due to reallocate" << std::endl
       << "    " << std::setw(12) << m_deallocate_rogue_ignored << " skipped due to being external registration" << std::endl
       << std::endl
-      << std::setw(12) << allocation_map_insertions << " allocation_map_insert operations (not replayed)" << std::endl
+      << std::setw(12) << m_allocation_map_insert_ops << " allocation_map_insert operations (not replayed)" << std::endl
       << "    " << std::setw(12) << m_allocation_map_insert_due_to_make_allocator << " from makeAllocator" << std::endl
       << "    " << std::setw(12) << m_allocation_map_insert_due_to_allocation << " from allocate" << std::endl
       << "    " << std::setw(12) << m_allocation_map_insert_due_to_reallocate << " from reallocate" << std::endl
       << "    " << std::setw(12) << m_allocation_map_insert_rogue_ignored << " from external registration" << std::endl
-      << std::setw(12) << allocation_map_removals << " allocation_map_remove operations" << std::endl
+      << std::setw(12) << m_allocation_map_remove_ops << " allocation_map_remove operations" << std::endl
+      << "    " << std::setw(12) << m_allocation_map_remove_ops - m_allocation_map_remove_rogue_ignored << " from deallocate" << std::endl
       << "    " << std::setw(12) << m_allocation_map_remove_rogue_ignored << " from external registration" << std::endl
       << std::setw(12) << m_allocation_map_find_ops << " allocation_map_find operations" << std::endl
       << std::setw(12) << m_allocation_map_clear_ops << " allocation_map_clear operations" << std::endl

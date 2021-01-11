@@ -482,7 +482,7 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a 
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = 
+EXCLUDE                = ../../src/umpire/interface/c_fortran/genfumpiresplicer.f
                          
                          
 

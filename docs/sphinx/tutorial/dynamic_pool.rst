@@ -22,6 +22,22 @@ allocations of any size. To create a new ``Allocator`` using the
 We have to provide a new name for the Allocator, as well as the underlying
 Allocator we wish to use to grab memory.
 
+Additionally, in the previous section on Allocators, we mentioned that you 
+could build a new allocator off of an existing one using the ``getAllocator``
+function. Here is another example of this, but using a strategy:
+
+.. code-block:: bash
+
+   umpire::Allocator addon_allocator = rm.makeAllocator<umpire::strategy::SizeLimiter>(
+   resource + "_addon_pool", rm.getAllocator(pooled_allocator.getName()), 2098);
+   
+The purpose of this example is to show that the ``getAllocator`` function
+can be used more than just to get an initial allocator. The ``addon_allocator`` will
+be a dynamic pool allocator that is limited to 2098 bytes. Another good use case
+for the ``getAllocator``  function is grabbing each available allocator in a loop and
+querying some property. (Note that ``addon_allocator`` in the above example will be 
+created with the same memory resource as ``pooled_allocator`` was.) 
+
 Once you have an ``Allocator``, you can allocate and deallocate memory as
 before, without needing to worry about the underlying algorithm used for the
 allocations:

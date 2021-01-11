@@ -13,7 +13,18 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
-- Documentation on allocator (in)accessibility.
+- Documentation on allocator (in)accessibility as well as getAllocator usage.
+
+- Updated Umpire::Allocator 'deallocate' documentation brief on handling
+  deallocations on nullptr.
+
+### Changed
+
+- Organized configuration options in config.hpp.in in alphabetical order
+
+- Size Limiter example now has a try-catch statement to handle exception.
+
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run
 
 ### Removed
 
@@ -21,11 +32,21 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed all internal tracking, allocations are only tracked at the Allocator level.
 
+- Removed the temporary fix for the HIP + fortran linker error (blt has been 
+  updated instead)
+
 ### Fixed
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
 
 - Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
+
+- Fixed Windows CI errors by ensuring azure pipeline runs with the filesystem turned ON.
+
+- Fixed HIP CI test versioning error and added test for rocm/3.9.0 and rocm/3.10.0
+
+- Corrected accounting error in replay tool where allocation map operations
+  were not being accounted for and reported correctly.
 
 ## [v5.0.0] - 2020-11-18
 
