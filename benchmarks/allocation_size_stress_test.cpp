@@ -14,13 +14,11 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
-#define ALLOCATIONS 1000000
+#define ALLOCATIONS 1000
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
 #define NUM_ITER 3
 
-void benchmark_allocator_one(std::string name, std::size_t size = 0) {
-  auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.getAllocator(name);
+void benchmark_allocator_together(umpire::Allocator alloc, std::size_t size = 0) {
   void* allocations[ALLOCATIONS];
   double time = 0.0;
 
@@ -40,14 +38,11 @@ void benchmark_allocator_one(std::string name, std::size_t size = 0) {
     time += std::chrono::duration<double>(end_all_dealloc - begin_all_alloc).count()/ALLOCATIONS;
   }
 
-  std::cout << name << std::endl;
   std::cout << "  TOGETHER: " << std::endl;
   std::cout << "    alloc+dealloc: " <<  (time/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
 }
 
-void benchmark_allocator_two(std::string name, std::size_t size = 0) {
-  auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.getAllocator(name);
+void benchmark_allocator_separate(umpire::Allocator alloc, std::size_t size = 0) {
   void* allocations[ALLOCATIONS];
   double time[2] = {0.0, 0.0};
 
@@ -79,21 +74,42 @@ void benchmark_allocator_two(std::string name, std::size_t size = 0) {
 int main(int, char**) {
   //Set the output format
   std::cout << std::fixed << std::setprecision(9);
+  auto& rm = umpire::ResourceManager::getInstance();
 
   //Begin calling the tests
-  benchmark_allocator_one("HOST");
-  benchmark_allocator_two("HOST");
+  std::cout << "HOST" << std::endl;
+  umpire::Allocator alloc = rm.getAllocator("HOST");
+  benchmark_allocator_together(alloc);
+  benchmark_allocator_separate(alloc);
 #if defined(UMPIRE_ENABLE_DEVICE) 
-  benchmark_allocator_one("DEVICE");
-  benchmark_allocator_two("DEVICE");
+  std::cout << "DEVICE" << std::endl;
+  umpire::Allocator dalloc = rm.getAllocator("DEVICE");
+  benchmark_allocator_together(dalloc);
+  benchmark_allocator_separate(dalloc);
+#endif
+#if defined(UMPIRE_ENABLE_DEVICE_CONST) 
+  std::cout << "DEVICE_CONST" << std::endl;
+  umpire::Allocator dcalloc = rm.getAllocator("DEVICE_CONST");
+  benchmark_allocator_together(dcalloc);
+  benchmark_allocator_separate(dcalloc);
 #endif
 #if defined(UMPIRE_ENABLE_PINNED) 
-  benchmark_allocator_one("PINNED");
-  benchmark_allocator_two("PINNED");
+  std::cout << "PINNED" << std::endl;
+  umpire::Allocator palloc = rm.getAllocator("PINNED");
+  benchmark_allocator_together(palloc);
+  benchmark_allocator_separate(palloc);
 #endif
 #if defined(UMPIRE_ENABLE_UM) 
-  benchmark_allocator_one("UM");
-  benchmark_allocator_two("UM");
+  std::cout << "UM" << std::endl;
+  umpire::Allocator umalloc = rm.getAllocator("UM");
+  benchmark_allocator_together(umalloc);
+  benchmark_allocator_separate(umalloc);
+#endif
+#if defined(UMPIRE_ENABLE_FILE_RESOURCE) 
+  std::cout << "FILE" << std::endl;
+  umpire::Allocator falloc = rm.getAllocator("FILE");
+  benchmark_allocator_together(falloc);
+  benchmark_allocator_separate(falloc);
 #endif
 
   return 0;
