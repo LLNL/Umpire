@@ -20,26 +20,26 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
-### Changed 
+### Changed
 
-- Organized configuration options in config.hpp.in in alphabetical order
+- Organized configuration options in config.hpp.in in alphabetical order.
 
 - Size Limiter example now has a try-catch statement to handle exception.
 
-- Doubled timeout from 15 to 30 minutes for CI tests to build and run
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run.
 
 ### Removed
 
-- Removed extraneous function definition in HipDeviceMemoryResource
+- Removed extraneous function definition in HipDeviceMemoryResource.
 
 - Removed the temporary fix for the HIP + fortran linker error (blt has been 
-  updated instead)
+  updated instead).
 
 ### Fixed
 
-- Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
+- Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file.
 
-- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
+- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file.
 
 - Fixed Windows CI errors by ensuring azure pipeline runs with the filesystem turned ON.
 
