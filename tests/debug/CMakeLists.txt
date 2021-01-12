@@ -30,4 +30,3 @@ endif()
 
 install(TARGETS ${umpire_test_debug} RUNTIME DESTINATION bin)
 umpire_add_code_checks(PREFIX test_debug)
-blt_print_target_properties(TARGET allocate_deallocate)
