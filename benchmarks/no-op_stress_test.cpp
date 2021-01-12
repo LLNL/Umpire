@@ -15,13 +15,20 @@
 #include "umpire/Allocator.hpp"
 
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
-#define ALLOCATIONS 1000000
-#define NUM_ITER 3
+#define ALLOCATIONS 1000000 //number of allocations for each round
+#define NUM_ITER 3 //number of rounds (used to average timing)
 
-void same_order(std::size_t size, umpire::Allocator alloc)
+const int size = 4096;
+
+/*
+ * This functions measures the time it takes to do ALLOCATIONS no-op allocations and 
+ * then do ALLOCATIONS no-op deallocations in the same order. The time is averaged across 3 rounds. 
+ */
+void same_order(umpire::Allocator alloc)
 {
   double time[2] = {0.0, 0.0};
   void* allocations[ALLOCATIONS];
+
   for(int i = 0; i < NUM_ITER; i++) {
     auto begin_alloc = std::chrono::system_clock::now();
     for (int j = 0; j < ALLOCATIONS; j++)
@@ -36,15 +43,20 @@ void same_order(std::size_t size, umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
-  std::cout << "    SAME_ORDER:" << std::endl; 
+  std::cout << "  SAME_ORDER:" << std::endl; 
   std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
   std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
 }
 
-void reverse_order(std::size_t size, umpire::Allocator alloc)
+/*
+ * This functions measures the time it takes to do ALLOCATIONS no-op allocations and 
+ * then do ALLOCATIONS no-op deallocations in reverse order. The time is averaged across 3 rounds. 
+ */
+void reverse_order(umpire::Allocator alloc)
 {
   double time[2] = {0.0, 0.0};
   void* allocations[ALLOCATIONS];
+
   for(int i = 0; i < NUM_ITER; i++) {
     auto begin_alloc = std::chrono::system_clock::now();
     for (int j = 0; j < ALLOCATIONS; j++)
@@ -59,12 +71,17 @@ void reverse_order(std::size_t size, umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
-  std::cout << "    REVERSE_ORDER:" << std::endl; 
+  std::cout << "  REVERSE_ORDER:" << std::endl; 
   std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
   std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
 }
 
-void shuffle(std::size_t size, umpire::Allocator alloc)
+/*
+ * This functions measures the time it takes to do ALLOCATIONS no-op allocations, shuffle the 
+ * array of returned pointers, and then do ALLOCATIONS no-op deallocations. The time is averaged
+ * across 3 rounds. 
+ */
+void shuffle(umpire::Allocator alloc)
 {
   std::mt19937 gen(ALLOCATIONS);
   double time[2] = {0.0, 0.0};
@@ -85,25 +102,23 @@ void shuffle(std::size_t size, umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
-  std::cout << "    SHUFFLE:" << std::endl; 
+  std::cout << "  SHUFFLE:" << std::endl; 
   std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
   std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
 }
 
 int main(int, char**) {
-  std::mt19937 gen(ALLOCATIONS);
-  std::uniform_int_distribution<std::size_t> dist(64, 4096);
-  std::size_t size = dist(gen);
+  //Set up formatting for output
   std::cout << std::fixed << std::setprecision(9);
 
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("NO_OP");
 
-  std::cout << "  Testing allocating and deallocating " << std::endl
-            << "  with NO_OP resource: " << std::endl << std::endl;
-  same_order(size, alloc);
-  reverse_order(size, alloc);
-  shuffle(size, alloc);
+  std::cout << " Testing allocating and deallocating " << std::endl
+            << " with NO_OP resource: " << std::endl << std::endl;
+  same_order(alloc);
+  reverse_order(alloc);
+  shuffle(alloc);
 
   return 0;
 }
