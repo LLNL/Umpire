@@ -4,45 +4,27 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include <functional>
-#include <algorithm>
-#include <random>
-
 #include "benchmark/benchmark.h"
-
 #include "umpire/config.hpp"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/resource/MemoryResourceTypes.hpp"
 
 #include "umpire/alloc/MallocAllocator.hpp"
-
 #if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/alloc/CudaMallocAllocator.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include "umpire/alloc/CudaPinnedAllocator.hpp"
 #endif
-
 #if defined(UMPIRE_ENABLE_HIP)
 #include "umpire/alloc/HipMallocAllocator.hpp"
 #include "umpire/alloc/HipMallocManagedAllocator.hpp"
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
-#include "umpire/strategy/FixedPool.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
-#include "umpire/strategy/MixedPool.hpp"
-
-#include "umpire/util/FixedMallocPool.hpp"
-
-static const int RangeLow{4};
-static const int RangeHi{1024};
-
-static const bool Introspection{true};
-
+static const int RangeLow{16};
+static const int RangeHi{8192};
 static const std::size_t Max_Allocations{100000};
-static const std::size_t Num_Random{1000};
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -146,29 +128,29 @@ BENCHMARK_DEFINE_F(HipPinned, hipFreeHost)(benchmark::State& st)   { deallocatio
 #endif
 
 // Register all the benchmarks
-BENCHMARK_REGISTER_F(Malloc, malloc)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(Malloc, free)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, malloc)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, free)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-BENCHMARK_REGISTER_F(CudaMalloc, cudaMalloc)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(CudaMalloc, cudaFree)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMalloc, cudaMalloc)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMalloc, cudaFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(CudaMallocManaged, cudaMallocManaged)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(CudaMallocManaged, cudaFree)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMallocManaged, cudaMallocManaged)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMallocManaged, cudaFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(CudaPinned, cudaMallocHost)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaPinned, cudaMallocHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HipMalloc, hipFree)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMalloc, hipFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(HipMallocManaged, hipMallocManaged)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HipMallocManaged, hipFree)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMallocManaged, hipMallocManaged)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMallocManaged, hipFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
 #endif
 
 BENCHMARK_MAIN();
