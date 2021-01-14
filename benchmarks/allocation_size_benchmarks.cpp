@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "benchmark/benchmark.h"
-#include "umpire/config.hpp"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -25,7 +24,7 @@
 
 static const int RangeLow{1024};
 static const int RangeHi{1048576};
-static const std::size_t Max_Allocations{1000};
+static const std::size_t Max_Allocations{10000};
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -34,17 +33,6 @@ public:
 
   virtual void* allocate(std::size_t nbytes) = 0;
   virtual void deallocate(void* ptr) = 0;
-
-  void largeAllocDealloc(benchmark::State& st) {
-    const std::size_t size{
-      static_cast<std::size_t>(st.range(0)) * 1024 * 1024 * 1024};
-    void* allocation;
-
-    while (st.KeepRunning()) {
-      allocation = allocate(size);
-      deallocate(allocation);
-    }
-  }
 
   void allocation(benchmark::State& st) {
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
