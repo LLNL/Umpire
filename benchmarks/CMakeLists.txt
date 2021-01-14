@@ -83,6 +83,15 @@ blt_add_benchmark(
   COMMAND copy_benchmarks)
 
 blt_add_executable(
+  NAME pool_benchmarks
+  SOURCES pool_benchmarks.cpp
+  DEPENDS_ON ${benchmark_depends})
+
+blt_add_benchmark(
+  NAME pool_benchmarks
+  COMMAND pool_benchmarks)
+
+blt_add_executable(
   NAME inspector_benchmarks
   SOURCES inspector_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends})
