@@ -9,6 +9,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/resource/MemoryResourceTypes.hpp"
 
 #include "umpire/alloc/MallocAllocator.hpp"
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -22,9 +23,9 @@
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
-static const int RangeLow{16};
-static const int RangeHi{8192};
-static const std::size_t Max_Allocations{100000};
+static const int RangeLow{1024};
+static const int RangeHi{1048576};
+static const std::size_t Max_Allocations{1000};
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -127,30 +128,91 @@ BENCHMARK_DEFINE_F(HipPinned, hipMallocHost)(benchmark::State& st) { allocation(
 BENCHMARK_DEFINE_F(HipPinned, hipFreeHost)(benchmark::State& st)   { deallocation(st); }
 #endif
 
+template <umpire::resource::MemoryResourceType Resource>
+class MemoryResourceAllocator : public AllocatorBenchmark
+{
+public:
+  using ::benchmark::Fixture::SetUp;
+  using ::benchmark::Fixture::TearDown;
+
+  MemoryResourceAllocator() : m_alloc{nullptr} {}
+
+  void SetUp(benchmark::State&) override final {
+    m_alloc = new umpire::Allocator{umpire::ResourceManager::getInstance().getAllocator(Resource)};
+  }
+
+  void TearDown(benchmark::State&) override final { delete m_alloc; }
+
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+private:
+  umpire::Allocator* m_alloc;
+};
+
+class HostResource : public MemoryResourceAllocator<umpire::resource::Host> {};
+BENCHMARK_DEFINE_F(HostResource, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(HostResource, deallocate)(benchmark::State& st) { deallocation(st); }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+class DeviceResource : public MemoryResourceAllocator<umpire::resource::Device> {};
+BENCHMARK_DEFINE_F(DeviceResource, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(DeviceResource, deallocate)(benchmark::State& st)   { deallocation(st); }
+
+class DevicePinnedResource : public MemoryResourceAllocator<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(DevicePinnedResource, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(DevicePinnedResource, deallocate)(benchmark::State& st) { deallocation(st); }
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+class UnifiedResource : public MemoryResourceAllocator<umpire::resource::Unified> {};
+BENCHMARK_DEFINE_F(UnifiedResource, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(UnifiedResource, deallocate)(benchmark::State& st) { deallocation(st); }
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////
 // Register all the benchmarks
-BENCHMARK_REGISTER_F(Malloc, malloc)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(Malloc, free)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+// Base allocators
+BENCHMARK_REGISTER_F(Malloc, malloc)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(Malloc, free)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-BENCHMARK_REGISTER_F(CudaMalloc, cudaMalloc)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(CudaMalloc, cudaFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMalloc, cudaMalloc)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMalloc, cudaFree)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(CudaMallocManaged, cudaMallocManaged)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(CudaMallocManaged, cudaFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMallocManaged, cudaMallocManaged)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaMallocManaged, cudaFree)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(CudaPinned, cudaMallocHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaPinned, cudaMallocHost)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(CudaPinned, cudaFreeHost)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HipMalloc, hipFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMalloc, hipMalloc)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMalloc, hipFree)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(HipMallocManaged, hipMallocManaged)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HipMallocManaged, hipFree)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMallocManaged, hipMallocManaged)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipMallocManaged, hipFree)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipPinned, hipMallocHost)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HipPinned, hipFreeHost)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+#endif
+
+///////////////////////////////////////////////////////////////////////////////////
+// Resources
+BENCHMARK_REGISTER_F(HostResource, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(HostResource, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_REGISTER_F(DeviceResource, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DeviceResource, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(DevicePinnedResource, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DevicePinnedResource, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+BENCHMARK_REGISTER_F(UnifiedResource, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(UnifiedResource, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 BENCHMARK_MAIN();
