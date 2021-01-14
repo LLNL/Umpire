@@ -24,11 +24,6 @@ blt_add_executable(
   DEPENDS_ON ${stress_test_depends})
 
 blt_add_executable(
-  NAME allocation_size_stress_test
-  SOURCES allocation_size_stress_test.cpp
-  DEPENDS_ON ${stress_test_depends})
-
-blt_add_executable(
   NAME no-op_stress_test
   SOURCES no-op_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
