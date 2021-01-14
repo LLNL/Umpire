@@ -16,6 +16,7 @@
 #include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
