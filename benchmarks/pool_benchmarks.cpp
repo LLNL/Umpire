@@ -36,12 +36,12 @@
 
 #include "umpire/util/FixedMallocPool.hpp"
 
-static const int RangeLow{16};
-static const int RangeHi{64};
+static const int RangeLow{256};
+static const int RangeHi{8192};
 
 static const bool Introspection{true};
 
-static const std::size_t Max_Allocations{100000};
+static const std::size_t Max_Allocations{1000};
 static const std::size_t Num_Random{1000};
 
 class AllocatorBenchmark : public benchmark::Fixture {
@@ -102,74 +102,6 @@ public:
   void* m_allocations[Max_Allocations];
 };
 
-class AllocatorRandomSizeBenchmark : public benchmark::Fixture {
-public:
-  using ::benchmark::Fixture::SetUp;
-  using ::benchmark::Fixture::TearDown;
-
-  virtual void SetUpPool() = 0;
-
-  void SetUp(benchmark::State& st) {
-    const std::size_t range_lo{static_cast<std::size_t>(st.range(0))};
-    const std::size_t range_hi{static_cast<std::size_t>(st.range(1))};
-
-    std::default_random_engine generator;
-    generator.seed(0);
-
-    std::uniform_int_distribution<std::size_t> distribution{range_lo, range_hi};
-
-    auto random_number = std::bind(distribution, generator);
-
-    std::generate(m_bytes, m_bytes + Num_Random,
-                  [&random_number] () { return random_number(); });
-
-    SetUpPool();
-  }
-
-  virtual void* allocate(std::size_t nbytes) = 0;
-  virtual void deallocate(void* ptr) = 0;
-
-  void allocation(benchmark::State& st) {
-    std::size_t i{0};
-
-    while (st.KeepRunning()) {
-      if (i == Max_Allocations) {
-        st.PauseTiming();
-        for (std::size_t j{0}; j < Max_Allocations; j++) {
-          deallocate(m_allocations[j]);
-        }
-        i = 0;
-        st.ResumeTiming();
-      }
-      m_allocations[i] = allocate(m_bytes[i % Num_Random]);
-      ++i;
-    }
-    for (std::size_t j{0}; j < i; j++)
-      deallocate(m_allocations[j]);
-  }
-
-  void deallocation(benchmark::State& st) {
-    std::size_t i{0};
-
-    while (st.KeepRunning()) {
-      if (i == 0 || i == Max_Allocations) {
-        st.PauseTiming();
-        for (std::size_t j{0}; j < Max_Allocations; j++) {
-          m_allocations[j] = allocate(m_bytes[j % Num_Random]);
-        }
-        i = 0;
-        st.ResumeTiming();
-      }
-      deallocate(m_allocations[i]);
-      ++i;
-    }
-    for (std::size_t j{i}; j < Max_Allocations; j++)
-      deallocate(m_allocations[j]);
-  }
-
-  void* m_allocations[Max_Allocations];
-  std::size_t m_bytes[Num_Random];
-};
 
 class FixedMallocPool : public AllocatorBenchmark {
 public:
@@ -249,6 +181,75 @@ class FixedPoolUnified : public FixedPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(FixedPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
 BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
+
+class AllocatorRandomSizeBenchmark : public benchmark::Fixture {
+public:
+  using ::benchmark::Fixture::SetUp;
+  using ::benchmark::Fixture::TearDown;
+
+  virtual void SetUpPool() = 0;
+
+  void SetUp(benchmark::State& st) {
+    const std::size_t range_lo{static_cast<std::size_t>(st.range(0))};
+    const std::size_t range_hi{static_cast<std::size_t>(st.range(1))};
+
+    std::default_random_engine generator;
+    generator.seed(0);
+
+    std::uniform_int_distribution<std::size_t> distribution{range_lo, range_hi};
+
+    auto random_number = std::bind(distribution, generator);
+
+    std::generate(m_bytes, m_bytes + Num_Random,
+                  [&random_number] () { return random_number(); });
+
+    SetUpPool();
+  }
+
+  virtual void* allocate(std::size_t nbytes) = 0;
+  virtual void deallocate(void* ptr) = 0;
+
+  void allocation(benchmark::State& st) {
+    std::size_t i{0};
+
+    while (st.KeepRunning()) {
+      if (i == Max_Allocations) {
+        st.PauseTiming();
+        for (std::size_t j{0}; j < Max_Allocations; j++) {
+          deallocate(m_allocations[j]);
+        }
+        i = 0;
+        st.ResumeTiming();
+      }
+      m_allocations[i] = allocate(m_bytes[i % Num_Random]);
+      ++i;
+    }
+    for (std::size_t j{0}; j < i; j++)
+      deallocate(m_allocations[j]);
+  }
+
+  void deallocation(benchmark::State& st) {
+    std::size_t i{0};
+
+    while (st.KeepRunning()) {
+      if (i == 0 || i == Max_Allocations) {
+        st.PauseTiming();
+        for (std::size_t j{0}; j < Max_Allocations; j++) {
+          m_allocations[j] = allocate(m_bytes[j % Num_Random]);
+        }
+        i = 0;
+        st.ResumeTiming();
+      }
+      deallocate(m_allocations[i]);
+      ++i;
+    }
+    for (std::size_t j{i}; j < Max_Allocations; j++)
+      deallocate(m_allocations[j]);
+  }
+
+  void* m_allocations[Max_Allocations];
+  std::size_t m_bytes[Num_Random];
+};
 
 template <umpire::resource::MemoryResourceType Resource>
 class DynamicPool : public AllocatorRandomSizeBenchmark {
@@ -356,55 +357,55 @@ BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate)(benchmark::State& st) { dealloc
 // Register all the benchmarks
 
 // FixedMallocPool
-BENCHMARK_REGISTER_F(FixedMallocPool, allocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedMallocPool, deallocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedMallocPool, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedMallocPool, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
 // FixedPool
-BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #if defined(UMPIRE_ENABLE_DEVICE)
-BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
-BENCHMARK_REGISTER_F(FixedPoolDevicePinned, allocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolDevicePinned, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-BENCHMARK_REGISTER_F(FixedPoolUnified, allocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate)->RangeMultiplier(2)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolUnified, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 // DynamicPool
-BENCHMARK_REGISTER_F(DynamicPoolHost, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(DynamicPoolHost, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate)->Args({1024, 1048576});
 #if defined(UMPIRE_ENABLE_DEVICE)
-BENCHMARK_REGISTER_F(DynamicPoolDevice, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(DynamicPoolDevice, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate)->Args({1024, 1048576});
 
-BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate)->Args({1024, 1048576});
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate)->Args({1024, 1048576});
 #endif
 
 // MixedPool
-BENCHMARK_REGISTER_F(MixedPoolHost, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(MixedPoolHost, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(MixedPoolHost, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(MixedPoolHost, deallocate)->Args({1024, 1048576});
 #if defined(UMPIRE_ENABLE_DEVICE)
-BENCHMARK_REGISTER_F(MixedPoolDevice, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(MixedPoolDevice, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate)->Args({1024, 1048576});
 
-BENCHMARK_REGISTER_F(MixedPoolDevicePinned, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(MixedPoolDevicePinned, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate)->Args({1024, 1048576});
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-BENCHMARK_REGISTER_F(MixedPoolUnified, allocate)->Args({16, 8192});
-BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate)->Args({16, 8192});
+BENCHMARK_REGISTER_F(MixedPoolUnified, allocate)->Args({1024, 1048576});
+BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate)->Args({1024, 1048576});
 #endif
 
 
