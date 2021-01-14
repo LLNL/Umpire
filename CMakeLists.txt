@@ -17,7 +17,8 @@ project(Umpire
 set(UMPIRE_VERSION_RC "")
 
 option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
-mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS)
+option(ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
+mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS ENABLE_DEVELOPER_BENCHMARKS)
 
 if (ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")

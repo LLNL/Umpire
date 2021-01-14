@@ -20,13 +20,11 @@ if (ENABLE_OPENMP_TARGET)
       openmp)
 endif()
 
-if (ENABLE_BENCHMARKS)
 blt_add_executable(
   NAME allocate_deallocate
   SOURCES allocate_deallocate.cpp
   DEPENDS_ON ${test_debug_depends})
 list(APPEND umpire_test_debug allocate_deallocate)
-endif()
 
 install(TARGETS ${umpire_test_debug} RUNTIME DESTINATION bin)
 umpire_add_code_checks(PREFIX test_debug)
