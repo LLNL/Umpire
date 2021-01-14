@@ -53,18 +53,6 @@ void CudaDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_A
     cudaSetDevice(old_device);
 }
 
-std::size_t CudaDeviceMemoryResource::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-std::size_t CudaDeviceMemoryResource::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
 bool CudaDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if(p == Platform::cuda)
