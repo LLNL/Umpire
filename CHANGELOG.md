@@ -20,6 +20,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are specifically
+  meant for internal umpire development only (e.g. No-Op benchmark).
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
