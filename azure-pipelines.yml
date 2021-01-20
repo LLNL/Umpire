@@ -15,7 +15,8 @@ jobs:
   pool:
     vmImage: 'windows-2019'
   variables:
-    CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_FILESYSTEM=On -DENABLE_TOOLS=Off -DENABLE_BENCHMARKS=Off -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
+    CMAKE_EXTRA_FLAGS: '-DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_FILESYSTEM=On -DENABLE_TOOLS=Off -DENABLE_DEVELOPER_BENCHMARKS=On 
+                        -DBLT_CXX_STD="" -DCMAKE_CXX_STANDARD=17'
   steps:
   - checkout: self
     clean: boolean
@@ -64,7 +65,7 @@ jobs:
     vmImage: 'ubuntu-latest'
   variables:
     DOCKER_BUILDKIT: '1'
-    CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
+    CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_BENCHMARKS=On -DENABLE_DEVELOPER_DEFAULTS=On'
   steps:
   - checkout: self
     clean: boolean
@@ -93,7 +94,7 @@ jobs:
   pool:
     vmImage: 'macOS-latest'
   variables:
-    CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On'
+    CMAKE_EXTRA_FLAGS: '-DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_DEVELOPER_BENCHMARKS=On'
   steps:
   - checkout: self
     clean: boolean

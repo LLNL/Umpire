@@ -73,6 +73,10 @@ blt_add_benchmark(
   NAME allocator_benchmarks
   COMMAND allocator_benchmarks)
 
+blt_add_benchmark(
+  NAME no-op_stress_test
+  COMMAND no-op_stress_test)
+
 blt_add_executable(
   NAME copy_benchmarks
   SOURCES copy_benchmarks.cpp

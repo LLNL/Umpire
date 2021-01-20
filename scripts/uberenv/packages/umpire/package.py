@@ -96,6 +96,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
     variant('hip', default=False, description='Build with HIP support')
     variant('tools', default=True, description='Enable tools')
+    variant('dev_benchmarks', default=False, description='Enable Developer Benchmarks')
     variant('werror', default=True, description='Enable warnings as errors')
 
     depends_on('cmake@3.8:', type='build')
@@ -274,6 +275,16 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELEASE", release_flags))
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_RELWITHDEBINFO", reldebinf_flags))
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_DEBUG", debug_flags))
+
+        #Configuration to enable developer benchmarks (i.e. No-Op)
+        if "+dev_benchmark" in spec:
+            cfg.write("#------------------{0}\n".format("-" * 60))
+            cfg.write("# Developer Benchmarks\n")
+            cfg.write("#------------------{0}\n\n".format("-" * 60))
+            
+            cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", True))
+            cfg.write(cmake_cache_string("CMAKE_BUILD_TYPE", "Release")
+
 
         if "+cuda" in spec:
             cfg.write("#------------------{0}\n".format("-" * 60))
