@@ -46,7 +46,7 @@ stages:
   - q_release_resources
   - l_build_and_test
   - c_build_and_test
-  - multi_project
+#  - multi_project
 
 configure_python:
   variables:
@@ -106,16 +106,16 @@ configure_python:
 # If testing develop branch, trigger CHAI pipeline with this version of Umpire.
 # TODO: Once spack allows to clone a specific commit on demand, then point to the exact commit.
 #       This will prevent from sticking to a branch (here develop).
-trigger-chai:
-  stage: multi_project
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
-  variables:
-    UPDATE_UMPIRE: develop
-  trigger:
-    project: radiuss/chai
-    branch: develop
-    strategy: depend
+# trigger-chai:
+#  stage: multi_project
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
+#  variables:
+#    UPDATE_UMPIRE: develop
+#  trigger:
+#    project: radiuss/chai
+#    branch: develop
+#    strategy: depend
 
 # This is where jobs are included.
 include:
