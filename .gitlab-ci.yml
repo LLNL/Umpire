@@ -48,6 +48,9 @@ stages:
   - c_build_and_test
 #  - multi_project
 
+# This jobs creates a python env and caches it.
+# Note: The cache needs to be removed manually in CI if the python environment
+# is changed, by clicking "CI/CD - Pipelines - Clear Runner Caches".
 configure_python:
   variables:
     GIT_STRATEGY: none
@@ -56,7 +59,7 @@ configure_python:
     - quartz
   stage: environment
   script:
-    - virtualenv -p /usr/tce/packages/python/python-3.8.2/bin/python ${PYTHON_ENVIRONMENT_PATH}
+    - virtualenv -p /usr/tce/packages/python/python-3.8.2/bin/python3 ${PYTHON_ENVIRONMENT_PATH}
     - . ${PYTHON_ENVIRONMENT_PATH}/bin/activate
     - pip install lxml
   cache:

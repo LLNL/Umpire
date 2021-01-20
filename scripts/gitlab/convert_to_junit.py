@@ -1,4 +1,4 @@
-#!/usr/tce/packages/python/python-3.8.2/bin/python
+#!/usr/tce/packages/python/python-3.8.2/bin/python3
 
 from lxml import etree
 import sys
