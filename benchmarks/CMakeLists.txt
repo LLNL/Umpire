@@ -57,13 +57,13 @@ blt_add_benchmark(
   COMMAND allocator_benchmarks)
 
 blt_add_executable(
-  NAME allocation_size_benchmarks
-  SOURCES allocation_size_benchmarks.cpp
+  NAME vendor_allocator_benchmarks
+  SOURCES vendor_allocator_benchmarks.cpp
   DEPENDS_ON ${benchmark_depends})
 
 blt_add_benchmark(
-  NAME allocation_size_benchmarks
-  COMMAND allocation_size_benchmarks)
+  NAME vendor_allocator_benchmarks
+  COMMAND vendor_allocator_benchmarks)
 
 blt_add_executable(
   NAME debuglog_benchmarks
