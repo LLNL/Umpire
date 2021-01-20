@@ -48,6 +48,9 @@ stages:
   - c_build_and_test
 #  - multi_project
 
+# This jobs creates a python env and caches it.
+# Note: The cache needs to be removed manually in CI if the python environment
+# is changed, by clicking "CI/CD - Pipelines - Clear Runner Caches".
 configure_python:
   variables:
     GIT_STRATEGY: none
