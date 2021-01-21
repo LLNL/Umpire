@@ -53,18 +53,6 @@ void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_AR
     hipSetDevice(old_device);
 }
 
-std::size_t HipDeviceMemoryResource::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-std::size_t HipDeviceMemoryResource::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
 bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if(p == Platform::hip || p == Platform::host)
