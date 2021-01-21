@@ -24,6 +24,14 @@
 static const int RangeLow{1024};
 static const int RangeHi{1048576};
 
+/*
+ * Allocate either LARGE (about 12GB), MEDIUM (about 6GB)
+ * or SMALL (about 1GB) for benchmark measurements.
+ */
+//#define LARGE 12000000000
+#define MEDIUM 6000000000
+//#define SMALL 1000000000
+
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
   using ::benchmark::Fixture::SetUp;
@@ -36,7 +44,7 @@ public:
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
     std::size_t i{0};
     
-    Max_Allocations = (12000000000 / size);
+    Max_Allocations = setBounds(size);
     m_allocations.resize(Max_Allocations);
 
     while (st.KeepRunning()) {
@@ -57,7 +65,7 @@ public:
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
     std::size_t i{0};
     
-    Max_Allocations = (12000000000 / size);
+    Max_Allocations = setBounds(size);
     m_allocations.resize(Max_Allocations);
 
     while (st.KeepRunning()) {
@@ -72,6 +80,22 @@ public:
     }
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
+  }
+
+  /*
+  * This function figures out, given the RangeHi and RangeLo,
+  * what the value of Max_Allocations should be. The goal is
+  * to allocate more with a smaller range and less with a large
+  * range, while keeping the total bytes allocated about the same.
+  */
+  std::size_t setBounds(std::size_t size) {
+    #if defined(LARGE)
+      return(LARGE/size);
+    #elif defined(MEDIUM)
+      return(MEDIUM/size);
+    #else
+      return(SMALL/size);
+    #endif
   }
 
   std::vector<void*> m_allocations;
