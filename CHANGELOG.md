@@ -51,6 +51,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Corrected accounting error in replay tool where allocation map operations
   were not being accounted for and reported correctly.
 
+- Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added
