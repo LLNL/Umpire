@@ -25,6 +25,7 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/io.hpp"
 #include "umpire/util/make_unique.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
