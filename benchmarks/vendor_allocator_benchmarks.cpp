@@ -23,7 +23,6 @@
 
 static const int RangeLow{1024};
 static const int RangeHi{1048576};
-static const std::size_t Max_Allocations{10000};
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -36,6 +35,9 @@ public:
   void allocation(benchmark::State& st) {
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
     std::size_t i{0};
+    
+    Max_Allocations = (12000000000 / size);
+    m_allocations.resize(Max_Allocations);
 
     while (st.KeepRunning()) {
       if (i == Max_Allocations) {
@@ -54,6 +56,9 @@ public:
   void deallocation(benchmark::State& st) {
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
     std::size_t i{0};
+    
+    Max_Allocations = (12000000000 / size);
+    m_allocations.resize(Max_Allocations);
 
     while (st.KeepRunning()) {
       if (i == 0 || i == Max_Allocations) {
@@ -69,7 +74,8 @@ public:
       deallocate(m_allocations[j]);
   }
 
-  void* m_allocations[Max_Allocations];
+  std::vector<void*> m_allocations;
+  std::size_t Max_Allocations;
 };
 
 template <typename Alloc>
