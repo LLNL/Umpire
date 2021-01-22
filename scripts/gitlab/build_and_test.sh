@@ -143,7 +143,7 @@ then
     if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
     then
         date
-        ctest -C Benchmark -R no-op_stress_test
+        ctest -C Benchmark
         date
     fi
 
