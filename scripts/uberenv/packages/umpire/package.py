@@ -277,13 +277,15 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS_DEBUG", debug_flags))
 
         #Configuration to enable developer benchmarks (i.e. No-Op)
-        if "+dev_benchmark" in spec:
+        if "+dev_benchmarks" in spec:
             cfg.write("#------------------{0}\n".format("-" * 60))
             cfg.write("# Developer Benchmarks\n")
             cfg.write("#------------------{0}\n\n".format("-" * 60))
             
             cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", True))
             cfg.write(cmake_cache_string("CMAKE_BUILD_TYPE", "Release"))
+        else:
+            cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", False))
 
 
         if "+cuda" in spec:
