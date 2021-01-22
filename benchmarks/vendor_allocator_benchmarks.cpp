@@ -21,16 +21,16 @@
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
-static const int RangeLow{1024};
-static const int RangeHi{1048576};
+static const int RangeLow{1048576}; //2^20 or ~1MB
+static const int RangeHi{268435456}; //2^28 or ~256MB
 
 /*
  * Allocate either LARGE (about 12GB), MEDIUM (about 6GB)
  * or SMALL (about 1GB) for benchmark measurements.
  */
 //#define LARGE 12000000000
-#define MEDIUM 6000000000
-//#define SMALL 1000000000
+//#define MEDIUM 6000000000
+#define SMALL 1000000000
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -57,6 +57,10 @@ public:
       }
       m_allocations[i++] = allocate(size);
     }
+
+    // This says that we process with the rate of state.range(0) bytes every iteration:
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+    
     for (std::size_t j{0}; j < i; j++)
       deallocate(m_allocations[j]);
   }
@@ -78,6 +82,10 @@ public:
       }
       deallocate(m_allocations[i++]);
     }
+
+    // This says that we process with the rate of state.range(0) bytes every iteration:
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
   }
