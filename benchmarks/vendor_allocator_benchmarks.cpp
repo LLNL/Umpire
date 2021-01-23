@@ -28,9 +28,9 @@ static const int RangeHi{268435456}; //2^28 or ~256MB
  * Allocate either LARGE (about 12GB), MEDIUM (about 6GB)
  * or SMALL (about 1GB) for benchmark measurements.
  */
-//#define LARGE 12000000000
+#define LARGE 12000000000
 //#define MEDIUM 6000000000
-#define SMALL 1000000000
+//#define SMALL 1000000000
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
