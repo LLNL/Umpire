@@ -20,6 +20,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
+- Added a data race check with Thread Sanitizer for the Gitlab CI test
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
