@@ -14,11 +14,20 @@
 
 namespace umpire {
 
+#if defined(__has_feature)
+#  if __has_feature(thread_sanitizer)
+__attribute__((no_sanitize_thread))
+#  endif
+#endif
+inline void set_umpire_ver()
+{
+  umpire_ver_5_found = 0;
+}
+
 inline void* Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
-
-  umpire_ver_5_found = 0;
+  set_umpire_ver();
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 

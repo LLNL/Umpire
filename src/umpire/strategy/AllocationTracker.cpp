@@ -58,7 +58,7 @@ std::size_t AllocationTracker::getHighWatermark() const noexcept
 std::size_t AllocationTracker::getActualSize() const noexcept
 {
   auto actual_size = m_allocator->getActualSize();
-  return actual_size > 0 ? actual_size : m_current_size;
+  return actual_size > 0 ? actual_size : (unsigned long)m_current_size;
 }
 
 std::size_t AllocationTracker::getAllocationCount() const noexcept

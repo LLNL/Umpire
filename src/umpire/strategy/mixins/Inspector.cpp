@@ -29,7 +29,7 @@ Inspector::registerAllocation(
   m_allocation_count++;
 
   if (m_current_size > m_high_watermark) {
-    m_high_watermark = m_current_size;
+    m_high_watermark.store(m_current_size, std::memory_order_relaxed);
   }
 
   ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, strategy});
