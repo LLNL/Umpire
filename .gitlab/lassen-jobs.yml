@@ -112,6 +112,7 @@ clang_9_0_0_memleak (build and test on lassen):
 clang_9_0_0_datarace (build and test on lassen):
   variables:
     SPEC: "%clang@9.0.0 cxxflags=-fsanitize=thread"
+  allow_failure: true
   extends: .build_and_test_on_lassen
 
 xl_default_omp_target (build and test on lassen):

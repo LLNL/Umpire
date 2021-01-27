@@ -34,9 +34,9 @@ class Inspector
       void* ptr, strategy::AllocationStrategy* strategy);
 
   protected:
-    std::atomic<std::size_t> m_current_size;
-    std::atomic<std::size_t> m_high_watermark;
-    std::atomic<std::size_t> m_allocation_count;
+    std::size_t m_current_size;
+    std::size_t m_high_watermark;
+    std::size_t m_allocation_count;
 };
 
 } // end of namespace mixins
