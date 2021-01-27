@@ -9,7 +9,6 @@
 
 #include "umpire/util/AllocationRecord.hpp"
 
-#include <atomic>
 #include <memory>
 
 namespace umpire {
