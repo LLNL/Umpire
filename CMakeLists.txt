@@ -165,11 +165,12 @@ endif ()
 
 if (ENABLE_DEVELOPER_BENCHMARKS)
   add_subdirectory(benchmarks)
-  if (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release")
-    message("Please set CMAKE_BUILD_TYPE=Release when benchmarking!")
+  if ((NOT CMAKE_BUILD_TYPE) OR (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
+    message("-- Warning: Please set CMAKE_BUILD_TYPE=Release when benchmarking!")
   endif()
 else()
-  message("Benchmarks will not be built. If you want to build with benchmarks, set ENABLE_DEVELOPER_BENCHMARKS to On.")
+  message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
+          "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
 endif ()
 
 if (ENABLE_EXAMPLES)
