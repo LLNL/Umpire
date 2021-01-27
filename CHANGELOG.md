@@ -24,7 +24,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
   internal umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
-  BLT support for google benchmarks.
+  BLT support for GoogleBenchmark.
 
 ### Changed
 
