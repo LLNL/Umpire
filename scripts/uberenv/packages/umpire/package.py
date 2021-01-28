@@ -284,7 +284,7 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write("#------------------{0}\n\n".format("-" * 60))
             
             cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", True))
-            cfg.write(cmake_cache_string("CMAKE_BUILD_TYPE", "Release"))
+            cfg.write(cmake_cache_string("CMAKE_BUILD_TYPE", spec.variants['build_type'].value)) 
         else:
             cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", False))
 

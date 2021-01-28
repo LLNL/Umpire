@@ -55,10 +55,6 @@ if(WIN32 OR APPLE)
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
-if(WIN32)
-  set(ENABLE_BENCHMARKS Off CACHE BOOL "")
-endif()
-
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL Off CACHE BOOL "Turning benchmark installation Off")
 
@@ -169,8 +165,10 @@ if (ENABLE_DEVELOPER_BENCHMARKS)
     message("-- Warning: Please set CMAKE_BUILD_TYPE=Release when benchmarking!")
   endif()
 else()
-  message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
+  if (ENABLE_BENCHMARKS)
+    message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
           "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
+  endif()
 endif ()
 
 if (ENABLE_EXAMPLES)
