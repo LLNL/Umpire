@@ -22,6 +22,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a data race check with Thread Sanitizer for the Gitlab CI test
 
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
+  internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
+  BLT support for GoogleBenchmark.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
