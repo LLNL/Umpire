@@ -20,6 +20,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
+- Added a data race check with Thread Sanitizer for the Gitlab CI test
+
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
+  internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
+  BLT support for GoogleBenchmark.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -47,6 +53,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Corrected accounting error in replay tool where allocation map operations
   were not being accounted for and reported correctly.
+
+- Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+- Fixed incorrect option causing sanitizer tests to be skipped.
 
 ## [v5.0.0] - 2020-11-18
 

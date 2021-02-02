@@ -16,7 +16,7 @@ set (umpire_resource_headers
   NullMemoryResourceFactory.hpp
 )
 
-if(ENABLE_BENCHMARKS)
+if(ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     NoOpMemoryResource.hpp
@@ -40,7 +40,7 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
-if(ENABLE_BENCHMARKS)
+if(ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_sources
     ${umpire_resource_sources}
     NoOpMemoryResource.cpp
