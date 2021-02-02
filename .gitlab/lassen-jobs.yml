@@ -103,10 +103,15 @@ clang_9_0_0_libcpp (build and test on lassen):
     SPEC: "%clang@9.0.0+libcpp"
   extends: .build_and_test_on_lassen
 
-clang_9_0_0_memleak (build and test on lassen):
+clang_9_0_0_addrleak (build and test on lassen):
   variables:
-    SPEC: "+sanitizer_tests %clang@9.0.0 cxxflags=-fsanitize=address"
+    SPEC: "+sanitizer_tests %clang@9.0.0 cxxflags='-fsanitize=address -fsanitize=leak -g -fno-omit-frame-pointer'"
     ASAN_OPTIONS: "detect_leaks=1"
+  extends: .build_and_test_on_lassen
+
+clang_9_0_0_mem (build and test on lassen):
+  variables:
+    SPEC: "+sanitizer_tests %clang@9.0.0 cxxflags='-fsanitize=memory -g -fno-omit-frame-pointer'"
   extends: .build_and_test_on_lassen
 
 clang_9_0_0_datarace (build and test on lassen):
