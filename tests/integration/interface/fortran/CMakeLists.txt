@@ -80,3 +80,17 @@ blt_add_test(
   NAME introspection_fortran_tests
   COMMAND introspection_fortran_tests)
 
+blt_add_executable(
+  NAME version_fortran_tests
+  SOURCES version_fortran_tests.F
+  DEFINES ${fortran_test_defines}
+  DEPENDS_ON ${fortran_tests_depends})
+
+set_source_files_properties(
+  version_fortran_tests.F
+  PROPERTIES
+  Fortran_FORMAT FREE)
+
+blt_add_test(
+  NAME version_fortran_tests
+  COMMAND version_fortran_tests)

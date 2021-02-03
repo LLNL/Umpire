@@ -7,6 +7,8 @@
 #ifndef UMPIRE_H_
 #define UMPIRE_H_
 
+#include "umpire/config.hpp"
+
 #define UMPIRE_INVALID_ALLOCATOR_ID 0xDEADBEE
 
 #include "umpire/interface/c_fortran/wrapUmpire.h"

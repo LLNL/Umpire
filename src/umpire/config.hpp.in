@@ -7,10 +7,6 @@
 #ifndef UMPIRE_config_HPP
 #define UMPIRE_config_HPP
 
-#ifdef __cplusplus
-#include <string>
-#endif
-
 //
 // Please keep the list below organized in alphabetical order.
 //
