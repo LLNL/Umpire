@@ -21,8 +21,8 @@
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
-static const int RangeLow{1048576}; //2^20 or ~1MB
-static const int RangeHi{268435456}; //2^28 or ~256MB
+static const int RangeLow{1<<10}; //1kB
+static const int RangeHi{1<<28}; //256MB
 
 /*
  * Allocate either LARGE (about 12GB), MEDIUM (about 6GB)
