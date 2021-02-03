@@ -62,6 +62,15 @@ if (ENABLE_BENCHMARKS)
     COMMAND allocator_benchmarks)
 
   blt_add_executable(
+    NAME vendor_allocator_benchmarks
+    SOURCES vendor_allocator_benchmarks.cpp
+    DEPENDS_ON ${benchmark_depends})
+
+  blt_add_benchmark(
+    NAME vendor_allocator_benchmarks
+    COMMAND vendor_allocator_benchmarks)
+
+  blt_add_executable(
     NAME debuglog_benchmarks
     SOURCES debuglog_benchmarks.cpp
     DEPENDS_ON ${benchmark_depends})

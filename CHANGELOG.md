@@ -26,6 +26,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
   BLT support for GoogleBenchmark.
 
+- Benchmark that measures the performance of different allocator vendor types across
+  various allocation sizes.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
