@@ -45,7 +45,7 @@ then
         prefix_opt="--prefix=${prefix}"
     fi
 
-    python scripts/uberenv/uberenv.py --spec="${spec}"
+    python3 scripts/uberenv/uberenv.py --spec="${spec}"
 
 fi
 date
