@@ -6,12 +6,16 @@
 ##############################################################################
 set (fortran_test_defines)
 
+set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MAJOR=${Umpire_VERSION_MAJOR})
+set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MINOR=${Umpire_VERSION_MINOR})
+set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_PATCH=${Umpire_VERSION_PATCH})
+
 if (ENABLE_CUDA)
-  set (fortran_test_defines -DUMPIRE_ENABLE_CUDA)
+  set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_CUDA)
 endif ()
 
 if (ENABLE_HIP)
-  set (fortran_test_defines -DUMPIRE_ENABLE_HIP)
+  set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_HIP)
 endif ()
 
 set (fortran_tests_depends

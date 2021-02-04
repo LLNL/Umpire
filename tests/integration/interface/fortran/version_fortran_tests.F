@@ -23,9 +23,9 @@ module umpire_fortran_version_tests
           minor_ver = get_minor_version()
           patch_ver = get_patch_version()
 
-          call assert_true(major_ver .eq. 5)
-          call assert_true(minor_ver .eq. 0)
-          call assert_true(patch_ver .eq. 0)
+          call assert_true(major_ver .eq. UMPIRE_VERSION_MAJOR)
+          call assert_true(minor_ver .eq. UMPIRE_VERSION_MINOR)
+          call assert_true(patch_ver .eq. UMPIRE_VERSION_PATCH)
 
       end subroutine test_version
 
