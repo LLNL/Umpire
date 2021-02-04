@@ -900,6 +900,30 @@ module umpire_mod
             integer(C_SIZE_T) :: SHT_rv
         end function get_device_memory_usage
 
+        function get_major_version() &
+                result(SHT_rv) &
+                bind(C, name="umpire_get_major_version")
+            use iso_c_binding, only : C_INT
+            implicit none
+            integer(C_INT) :: SHT_rv
+        end function get_major_version
+
+        function get_minor_version() &
+                result(SHT_rv) &
+                bind(C, name="umpire_get_minor_version")
+            use iso_c_binding, only : C_INT
+            implicit none
+            integer(C_INT) :: SHT_rv
+        end function get_minor_version
+
+        function get_patch_version() &
+                result(SHT_rv) &
+                bind(C, name="umpire_get_patch_version")
+            use iso_c_binding, only : C_INT
+            implicit none
+            integer(C_INT) :: SHT_rv
+        end function get_patch_version
+
         ! splicer begin additional_interfaces
         ! splicer end additional_interfaces
     end interface
