@@ -42,6 +42,12 @@ size_t umpire_get_process_memory_usage(void);
 
 size_t umpire_get_device_memory_usage(int device_id);
 
+int umpire_get_major_version(void);
+
+int umpire_get_minor_version(void);
+
+int umpire_get_patch_version(void);
+
 #ifdef __cplusplus
 }
 #endif

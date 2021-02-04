@@ -6,12 +6,16 @@
 ##############################################################################
 set (fortran_test_defines)
 
+set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MAJOR=${Umpire_VERSION_MAJOR})
+set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MINOR=${Umpire_VERSION_MINOR})
+set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_PATCH=${Umpire_VERSION_PATCH})
+
 if (ENABLE_CUDA)
-  set (fortran_test_defines -DUMPIRE_ENABLE_CUDA)
+  set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_CUDA)
 endif ()
 
 if (ENABLE_HIP)
-  set (fortran_test_defines -DUMPIRE_ENABLE_HIP)
+  set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_HIP)
 endif ()
 
 set (fortran_tests_depends
@@ -80,3 +84,17 @@ blt_add_test(
   NAME introspection_fortran_tests
   COMMAND introspection_fortran_tests)
 
+blt_add_executable(
+  NAME version_fortran_tests
+  SOURCES version_fortran_tests.F
+  DEFINES ${fortran_test_defines}
+  DEPENDS_ON ${fortran_tests_depends})
+
+set_source_files_properties(
+  version_fortran_tests.F
+  PROPERTIES
+  Fortran_FORMAT FREE)
+
+blt_add_test(
+  NAME version_fortran_tests
+  COMMAND version_fortran_tests)

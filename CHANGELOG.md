@@ -26,6 +26,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
   BLT support for GoogleBenchmark.
 
+- Added version macros to C API, and added version functions to C and FORTRAN APIs.
+
 - Benchmark that measures the performance of different allocator vendor types across
   various allocation sizes.
 
