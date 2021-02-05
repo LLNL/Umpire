@@ -7,8 +7,6 @@
 #ifndef UMPIRE_config_HPP
 #define UMPIRE_config_HPP
 
-#include <string>
-
 //
 // Please keep the list below organized in alphabetical order.
 //
@@ -37,6 +35,8 @@
 #define UMPIRE_VERSION_PATCH @Umpire_VERSION_PATCH@
 #define UMPIRE_VERSION_RC "@UMPIRE_VERSION_RC@"
 
+#ifdef __cplusplus
+
 // umpire_EXPORTS gets defined by CMake when we use
 // -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=On
 #if (defined(_WIN32) || defined(_WIN64)) && !defined(UMPIRE_WIN_STATIC_BUILD)
@@ -54,5 +54,7 @@ UMPIRE_EXPORT extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
 namespace umpire {
 constexpr int invalid_allocator_id = 0xDEADBEE;
 }
+
+#endif
 
 #endif
