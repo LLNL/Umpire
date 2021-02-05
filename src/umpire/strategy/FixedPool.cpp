@@ -194,6 +194,16 @@ void FixedPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
+void FixedPool::release() 
+{ 
+  for (auto& p : m_pool) {
+    if (m_obj_per_pool == p.num_avail) {
+      p.strategy->deallocate(p.data);
+      std::free(p.avail);
+    } 
+  } 
+}
+
 std::size_t FixedPool::getCurrentSize() const noexcept
 {
   return m_current_bytes;
