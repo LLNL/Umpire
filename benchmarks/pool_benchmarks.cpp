@@ -18,7 +18,7 @@
 #include "umpire/util/FixedMallocPool.hpp"
 
 static const int RangeLow{1<<10}; //1kB
-static const int RangeHi{1<<28}; //256MB
+static const int RangeHi{1<<26}; //256MB
 static const bool Introspection{false};
 
 /*
@@ -54,6 +54,10 @@ public:
       }
       m_allocations[i++] = allocate(size);
     }
+
+   // This says that we process with the rate of state.range(0) bytes every iteration:
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+
     for (std::size_t j{0}; j < i; j++)
       deallocate(m_allocations[j]);
   }
@@ -75,6 +79,10 @@ public:
       }
       deallocate(m_allocations[i++]);
     }
+
+   // This says that we process with the rate of state.range(0) bytes every iteration:
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
   }
@@ -96,6 +104,10 @@ public:
       }
       deallocate(m_allocations[--i]);
     }
+
+   // This says that we process with the rate of state.range(0) bytes every iteration:
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+
     //for (int j{i}; j < int(Max_Allocations); j++)
     //  deallocate(m_allocations[j]);
   }
@@ -119,6 +131,10 @@ public:
       }
       deallocate(m_allocations[i++]);
     }
+
+   // This says that we process with the rate of state.range(0) bytes every iteration:
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
   }
@@ -164,7 +180,7 @@ public:
     ++namecnt;
 
     m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::FixedPool, Introspection>(
-        ss.str(), rm.getAllocator(Resource), bytes, (bytes+1) * sizeof(int))};
+        ss.str(), rm.getAllocator(Resource), bytes, 128 * sizeof(int) * 8)};
   }
 
   void TearDown(benchmark::State&) override {
@@ -335,10 +351,10 @@ BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate_random_order)(benchmark::State& 
 // Register all the benchmarks
 
 // FixedPool
-//BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-//BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-//BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-//BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #if defined(UMPIRE_ENABLE_DEVICE)
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
