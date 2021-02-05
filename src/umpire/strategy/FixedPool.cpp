@@ -201,7 +201,8 @@ void FixedPool::release()
       p.strategy->deallocate(p.data);
       std::free(p.avail);
     } 
-  } 
+  }
+  m_pool.clear(); 
 }
 
 std::size_t FixedPool::getCurrentSize() const noexcept

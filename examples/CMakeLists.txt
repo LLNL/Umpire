@@ -35,6 +35,12 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
 
+blt_add_executable(
+  NAME fixed_pool_test
+  SOURCES fixed_pool_test.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples fixed_pool_test)
+
 if (ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
