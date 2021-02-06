@@ -276,6 +276,78 @@ TYPED_TEST(StrategyTest, getActualSize)
   this->m_allocator->deallocate(data);
 }
 
+template <typename T>
+class ReleaseTest : public ::testing::Test {
+ public:
+  void SetUp() override
+  {
+    auto& rm = umpire::ResourceManager::getInstance();
+    std::string name{"release_test_" + std::to_string(unique_strategy_id++)};
+    std::string limiter_name{"limiter_" + std::to_string(unique_strategy_id++)};
+    
+    m_limiter_allocator = 
+        new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
+        limiter_name, rm.getAllocator("HOST"), m_max_pool_size * m_num_pools));
+
+    m_allocator = new umpire::Allocator(
+        rm.makeAllocator<T>(name, rm.getAllocator(limiter_name)));
+  }
+
+  void TearDown() override
+  {
+    delete m_allocator;
+    m_allocator = nullptr;
+
+    delete m_limiter_allocator;
+    m_limiter_allocator = nullptr;
+  }
+
+  umpire::Allocator* m_allocator;
+  umpire::Allocator* m_limiter_allocator;
+
+  const static int m_max_pool_size = 1024;
+  const static int m_num_pools = 8;
+  void* test[m_num_pools];
+};
+
+template <>
+void ReleaseTest<umpire::strategy::FixedPool>::SetUp()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  std::string name{"release_test_" + std::to_string(unique_strategy_id++)};
+  std::string limiter_name{"limiter_" + std::to_string(unique_strategy_id++)};
+  
+  m_limiter_allocator = 
+        new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
+        limiter_name, rm.getAllocator("HOST"), 1024 *8));
+  
+  m_allocator =
+      new umpire::Allocator(rm.makeAllocator<umpire::strategy::FixedPool>(
+          name, rm.getAllocator(limiter_name), 1024, 1));
+}
+
+using ReleaseStrategies = ::testing::Types<
+  umpire::strategy::DynamicPool, umpire::strategy::DynamicPoolList,
+  umpire::strategy::DynamicPoolMap, umpire::strategy::FixedPool, 
+  umpire::strategy::QuickPool>;
+
+TYPED_TEST_SUITE(ReleaseTest, ReleaseStrategies, );
+
+TYPED_TEST(ReleaseTest, ReleaseCheck)
+{
+  for (int i = 0; i < this->m_num_pools; i++) {
+    this->test[i] = this->m_allocator->allocate(this->m_max_pool_size);
+  }
+  for (int i = 0; i < this->m_num_pools; i++) {
+    this->m_allocator->deallocate(this->test[i]);
+  }
+
+  this->m_allocator->release();
+
+  ASSERT_NO_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->m_max_pool_size));
+  ASSERT_NO_THROW(this->m_limiter_allocator->deallocate(this->test[0])); 
+}
+
 TEST(DynamicPool, LimitedResource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
