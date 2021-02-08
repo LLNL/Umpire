@@ -539,32 +539,6 @@ TEST(FixedPool, Host)
   allocator.deallocate(alloc);
 }
 
-TEST(FixedPool, Release)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-  const int MAX_POOL = 1024;
-  const int NUM_POOL = 8;
-  void* test[NUM_POOL];
-
-  auto limiter_alloc = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "size_limiter", rm.getAllocator("HOST"), MAX_POOL * NUM_POOL);
-  
-  auto fixed_alloc = rm.makeAllocator<umpire::strategy::FixedPool>(
-        "fixed_pool", rm.getAllocator("size_limiter"), MAX_POOL, 1);
-  
-  for (int i = 0; i < NUM_POOL; i++) {
-    test[i] = fixed_alloc.allocate(MAX_POOL);
-  }
-  for (int i = 0; i < NUM_POOL; i++) {
-    fixed_alloc.deallocate(test[i]);
-  }
-
-  fixed_alloc.release();
- 
-  ASSERT_NO_THROW(test[0] = limiter_alloc.allocate(MAX_POOL));
-  ASSERT_NO_THROW(limiter_alloc.deallocate(test[0]));
-}
-
 TEST(MixedPool, Host)
 {
   auto& rm = umpire::ResourceManager::getInstance();
