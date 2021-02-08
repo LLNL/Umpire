@@ -166,7 +166,13 @@ blt_add_library(
   DEPENDS_ON ${umpire_resource_depends}
   OBJECT TRUE)
 
-set_property(TARGET umpire_resource PROPERTY CXX_STANDARD 14)
+#
+# Disable C++14 support in PGI for now since things break with
+# PGI+GCC<5
+#
+if (NOT C_COMPILER_FAMILY_IS_PGI)
+  set_property(TARGET umpire_resource PROPERTY CXX_STANDARD 14)
+endif()
 
 target_include_directories(
   umpire_resource
