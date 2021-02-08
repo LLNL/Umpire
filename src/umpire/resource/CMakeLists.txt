@@ -166,6 +166,8 @@ blt_add_library(
   DEPENDS_ON ${umpire_resource_depends}
   OBJECT TRUE)
 
+set_property(TARGET umpire_resource PROPERTY CXX_STANDARD 14)
+
 target_include_directories(
   umpire_resource
   PUBLIC
