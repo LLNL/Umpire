@@ -39,6 +39,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Doubled timeout from 15 to 30 minutes for CI tests to build and run.
 
+- Changed to C++ 14
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
