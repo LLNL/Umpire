@@ -284,7 +284,7 @@ class ReleaseTest : public ::testing::Test {
     auto& rm = umpire::ResourceManager::getInstance();
     std::string name{"release_test_" + std::to_string(unique_strategy_id++)};
     std::string limiter_name{"limiter_" + std::to_string(unique_strategy_id++)};
-    
+   
     m_limiter_allocator = 
         new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
         limiter_name, rm.getAllocator("HOST"), max_alloc_size * num_allocs + padding));
@@ -309,9 +309,11 @@ class ReleaseTest : public ::testing::Test {
   //padding: Some strategies have built-in alignment handling which will
   //  interfere will this test. Padding helps make sure we account for that.
   ////////////////////////////////////////////////////////////////////////
-  static const int max_alloc_size = 1024;
+  const int max_alloc_size = 1024;
   static const int num_allocs = 8;
-  static const int padding = 64;
+  const int padding = 64;
+  void* test[num_allocs] = {0};
+
 
   umpire::Allocator* m_allocator;
   umpire::Allocator* m_limiter_allocator;
@@ -325,9 +327,6 @@ void ReleaseTest<umpire::strategy::FixedPool>::SetUp()
   std::string name{"release_test_" + std::to_string(unique_strategy_id++)};
   std::string limiter_name{"limiter_" + std::to_string(unique_strategy_id++)};
   
-  static const int max_alloc_size = 1024;
-  static const int num_allocs = 8;
-
   m_limiter_allocator = 
         new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter>(
         limiter_name, rm.getAllocator("HOST"), max_alloc_size * num_allocs));
@@ -346,20 +345,18 @@ TYPED_TEST_SUITE(ReleaseTest, ReleaseStrategies, );
 
 TYPED_TEST(ReleaseTest, ReleaseCheck)
 {
-  void* test[this->num_allocs];
-
   for (int i = 0; i < this->num_allocs; i++) {
-    test[i] = this->m_allocator->allocate(this->max_alloc_size);
+    this->test[i] = this->m_allocator->allocate(this->max_alloc_size);
   }
   for (int i = 0; i < this->num_allocs; i++) {
-    this->m_allocator->deallocate(test[i]);
+    this->m_allocator->deallocate(this->test[i]);
   }
 
-  ASSERT_THROW(test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::util::Exception);
+  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::util::Exception);
   this->m_allocator->release();
 
-  ASSERT_NO_THROW(test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size));
-  ASSERT_NO_THROW(this->m_limiter_allocator->deallocate(test[0])); 
+  ASSERT_NO_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size));
+  ASSERT_NO_THROW(this->m_limiter_allocator->deallocate(this->test[0])); 
 }
 
 TEST(DynamicPool, LimitedResource)
