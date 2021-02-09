@@ -38,16 +38,16 @@ struct MemoryResourceTraits {
 
   // variables for only SYCL devices (i.e., Intel GPUs)
 #if defined(UMPIRE_ENABLE_SYCL)
-  cl::sycl::queue queue;
+  cl::sycl::queue queue{};
 #endif
 
-  bool unified = false;
-  std::size_t size = 0;
+  bool unified{false};
+  std::size_t size{0};
 
-  vendor_type vendor = vendor_type::unknown;
-  memory_type kind = memory_type::unknown;
-  optimized_for used_for = optimized_for::any;
-  resource_type resource = resource_type::unknown;
+  vendor_type vendor{vendor_type::unknown};
+  memory_type kind{memory_type::unknown};
+  optimized_for used_for{optimized_for::any};
+  resource_type resource{resource_type::unknown};
 };
 
 } // end of namespace umpire
