@@ -54,8 +54,8 @@ if(WIN32 OR APPLE)
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
-set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
-set(CMAKE_CUDA_STANDARD 11)
+set(BLT_CXX_STD "c++14" CACHE STRING "Version of C++ standard")
+set(CMAKE_CUDA_STANDARD 14)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")

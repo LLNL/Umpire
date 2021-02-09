@@ -26,11 +26,6 @@ gcc_8_3_1:
     SPEC: "+fortran%gcc@8.3.1 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
 
-pgi_19_10:
-  variables:
-    SPEC: "+fortran%pgi@19.10"
-  extends: .build_and_test_on_lassen
-
 pgi_19_10_gcc_8_3_1:
   variables:
     SPEC: "+fortran%pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
@@ -66,11 +61,6 @@ ibm_clang_9_gcc_8_cuda:
 gcc_8_3_1_cuda:
   variables:
     SPEC: "+fortran+cuda %gcc@8.3.1 ^cuda@10.1.168"
-  extends: .build_and_test_on_lassen
-
-pgi_19_10_cuda:
-  variables:
-    SPEC: "+fortran+cuda %pgi@19.10 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 pgi_19_10_gcc_8_3_1_cuda:
