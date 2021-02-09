@@ -348,6 +348,9 @@ TYPED_TEST(ReleaseTest, ReleaseCheck)
   for (int i = 0; i < this->num_allocs; i++) {
     this->test[i] = this->m_allocator->allocate(this->max_alloc_size);
   }
+
+  //this->m_allocator->release(); //this should have no effect
+
   for (int i = 0; i < this->num_allocs; i++) {
     this->m_allocator->deallocate(this->test[i]);
   }

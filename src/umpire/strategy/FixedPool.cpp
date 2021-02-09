@@ -202,7 +202,8 @@ void FixedPool::release()
       std::free(p.avail);
     } 
   }
-  m_pool.clear(); 
+  m_pool.erase(std::remove_if(m_pool.begin(), m_pool.end(), 
+                          [=] (Pool& p) {return m_obj_per_pool == p.num_avail;})); 
 }
 
 std::size_t FixedPool::getCurrentSize() const noexcept
