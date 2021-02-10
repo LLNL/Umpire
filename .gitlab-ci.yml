@@ -39,7 +39,6 @@ variables:
 # In practice q_*, l_* and b_* stages are independently run and start immediately.
 
 stages:
-  - environment
   - q_allocate_resources
   - q_build_and_test
   - q_release_resources
