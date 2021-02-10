@@ -41,6 +41,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Doubled timeout from 15 to 30 minutes for CI tests to build and run.
 
+- Uberenv is now used as a submodule
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
@@ -64,6 +66,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
 
 - Fixed incorrect option causing sanitizer tests to be skipped.
+
+- Python is now explicitly python3 or python2 (most likely python3)
 
 ## [v5.0.0] - 2020-11-18
 
