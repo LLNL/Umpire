@@ -17,10 +17,27 @@
 #include <string>
 #include <thread>
 
+//
+// For debugging purposes, this program uses the number of command line
+// as a flag to indicate the mode it should run in.  The modes are:
+//
+// 1) If run with no argument (ac==1), it will run as an MPI program.
+// 2) If run with 1 argument (ac==2), it will run as the parent non-mpi program.
+// 3) If run with 2 arguments (ac==3), it will run as the child non-mpi program.
+//
+// This will allow someone to launch this program as a Parent and Child in two
+// separate debugger session windows (possible in gdb or vscode).  When running
+// in the debugger session windows, no MPI will be used and the debugger must
+// be used for synchronization (by setting breakpoints).
+//
 int main(int ac, char** av)
 {
-  MPI_Init(&ac, &av);
-  const int foreman_rank{0};
+  const bool use_mpi{ ac == 1 };
+  const bool i_am_parent{ ac == 2 };
+
+  if (use_mpi) {
+    MPI_Init(&ac, &av);
+  }
 
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -49,35 +66,45 @@ int main(int ac, char** av)
   //
   // Get communicator for this allocator
   //
-  auto shared_allocator_comm = umpire::get_communicator_for_allocator(
-      node_allocator, MPI_COMM_WORLD);
+  MPI_Comm shared_allocator_comm;
+  int foreman_rank{0};
+  int shared_rank{0};
 
-  int shared_rank;
-
-  MPI_Comm_rank(shared_allocator_comm, &shared_rank);
+  if (use_mpi) {
+    shared_allocator_comm = umpire::get_communicator_for_allocator(
+                                      node_allocator, MPI_COMM_WORLD);
+    MPI_Comm_rank(shared_allocator_comm, &shared_rank);
+  }
+  else { // Running non-mpi in debugger
+    shared_rank = i_am_parent ? foreman_rank : foreman_rank + 1;
+  }
 
   //
   // Allocate shared memory
   //
-  void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
-  uint64_t* data{static_cast<uint64_t*>(ptr)};
+  void* ptr{ node_allocator.allocate("allocation_name_2", sizeof(uint64_t)) };
+  uint64_t* data{ static_cast<uint64_t*>(ptr) };
 
   if ( shared_rank == foreman_rank )
     *data = 0xDEADBEEF;
 
-  //
-  // Allocation pointers may also be obtained given the allocation name
-  //
-  UMPIRE_ASSERT(
-    umpire::find_pointer_from_name(node_allocator, "allocation_name_2") == ptr);
-
-  MPI_Barrier(shared_allocator_comm);
+  if (use_mpi) {
+    MPI_Barrier(shared_allocator_comm);
+  }
+  else {
+    if ( !i_am_parent ) {
+      shared_rank++;    // Set a breakpoint here to synchronize
+    }
+  }
 
   UMPIRE_ASSERT(*data == 0xDEADBEEF);
 
   node_allocator.deallocate(ptr);
 
-  MPI_Finalize();
+  if (use_mpi) {
+    MPI_Finalize();
+  }
 
   return 0;
 }
+

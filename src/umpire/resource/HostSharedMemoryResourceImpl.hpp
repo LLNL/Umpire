@@ -10,12 +10,12 @@
 #include <string>
 #include <thread>
 
-#include <string.h>           /* strerror */
-#include <sys/mman.h>         /* mmap */
-#include <sys/stat.h>         /* For mode constants */
-#include <fcntl.h>            /* For O_* constants */
-#include <unistd.h>           /* ftruncate,fstat */
-#include <sys/types.h>        /* ftruncate, fstat*/
+#include <string.h>           // strerror
+#include <sys/mman.h>         // mmap
+#include <sys/stat.h>         // For mode constants, fstat
+#include <fcntl.h>            // For O_* constants
+#include <unistd.h>           // ftruncate, fstat
+#include <sys/types.h>        // ftruncate, fstat
 
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
@@ -25,11 +25,21 @@ namespace umpire {
 namespace resource {
 
 class HostSharedMemoryResource::impl {
+
+  struct shared_memory_header {
+    uint32_t init_flag;
+    uint32_t reserved;
+    std::size_t segment_size;    // Full segment size, excluding this header
+    std::size_t in_use;
+    std::size_t high_watermark;
+  };
+
   public:
-    impl(const std::string& name, std::size_t size) :
-      m_segment_name{ std::string{"/dev/shm/"} + name }
+    impl(const std::string& name, std::size_t size)
     {
-      // TODO: Check if the requested size is enough for our metadata
+      m_segment_name = ( name[0] != '/' ) ? std::string{"/"} + name : name;
+      const uint32_t Initializing{1};
+      const uint32_t Initialized{2};
 
       bool created{ false };
       bool completed{ false };
@@ -63,7 +73,6 @@ class HostSharedMemoryResource::impl {
                     << m_segment_name << ": " << strerror(err));
           }
         }
-
         std::this_thread::yield();
       }
 
@@ -75,97 +84,36 @@ class HostSharedMemoryResource::impl {
         }
 
         map_shared_memory_segment(shm_handle);
-      }
 
-      if (completed) {
-        UMPIRE_ERROR("Not implemented yet");
+        // volatile uint32_t* init_flag = &shared_mem_header->init_flag;
+        __atomic_store_n(&shared_mem_header->init_flag, Initializing, __ATOMIC_SEQ_CST);
+      }
+      else {
+        // Wait for the file size to change
+        off_t filesize{0};
+        while ( filesize == 0 ) {
+          struct stat st;
+
+          if ( fstat(shm_handle, &st) < 0 ) {
+            err = errno;
+            UMPIRE_ERROR("Failed fstat for shared memory segment "
+                          << m_segment_name << ": " << strerror(err));
+          }
+          filesize = st.st_size;
+          std::this_thread::yield();
+        }
+
+        map_shared_memory_segment(shm_handle);
+
+        uint32_t value{ __atomic_load_n(&shared_mem_header->init_flag, __ATOMIC_SEQ_CST) };
+
+        // Wait for the memory segment header to be initialized
+        while ( value != Initialized ) {
+          std::this_thread::yield();
+          value = __atomic_load_n(&shared_mem_header->init_flag, __ATOMIC_SEQ_CST);
+        }
       }
     }
-
-#if 0
-{
-  DeviceAbstraction dev;
-  if(created){
-      try{
-        //If this throws, we are lost
-        truncate_device<FileBased>(dev, size, file_like_t());
-
-        //If the following throws, we will truncate the file to 1
-        mapped_region        region(dev, read_write, 0, 0, addr);
-        boost::uint32_t *patomic_word = 0;  //avoid gcc warning
-        patomic_word = static_cast<boost::uint32_t*>(region.get_address());
-        boost::uint32_t previous = atomic_cas32(patomic_word, InitializingSegment, UninitializedSegment);
-
-        if(previous == UninitializedSegment){
-            try{
-              construct_func( static_cast<char*>(region.get_address()) + ManagedOpenOrCreateUserOffset
-                            , size - ManagedOpenOrCreateUserOffset, true);
-              //All ok, just move resources to the external mapped region
-              m_mapped_region.swap(region);
-            }
-            catch(...){
-              atomic_write32(patomic_word, CorruptedSegment);
-              throw;
-            }
-            atomic_write32(patomic_word, InitializedSegment);
-        }
-        else if(previous == InitializingSegment || previous == InitializedSegment){
-            throw interprocess_exception(error_info(already_exists_error));
-        }
-        else{
-            throw interprocess_exception(error_info(corrupted_error));
-        }
-      }
-      catch(...){
-        try{
-            truncate_device<FileBased>(dev, 1u, file_like_t());
-        }
-        catch(...){
-        }
-        throw;
-      }
-  }
-  else{
-      if(FileBased){
-        offset_t filesize = 0;
-        spin_wait swait;
-        while(filesize == 0){
-            if(!get_file_size(file_handle_from_mapping_handle(dev.get_mapping_handle()), filesize)){
-              error_info err = system_error_code();
-              throw interprocess_exception(err);
-            }
-            swait.yield();
-        }
-        if(filesize == 1){
-            throw interprocess_exception(error_info(corrupted_error));
-        }
-      }
-
-      mapped_region  region(dev, ronly ? read_only : (cow ? copy_on_write : read_write), 0, 0, addr);
-
-      boost::uint32_t *patomic_word = static_cast<boost::uint32_t*>(region.get_address());
-      boost::uint32_t value = atomic_read32(patomic_word);
-
-      spin_wait swait;
-      while(value == InitializingSegment || value == UninitializedSegment){
-        swait.yield();
-        value = atomic_read32(patomic_word);
-      }
-
-      if(value != InitializedSegment)
-        throw interprocess_exception(error_info(corrupted_error));
-
-      construct_func( static_cast<char*>(region.get_address()) + ManagedOpenOrCreateUserOffset
-                    , region.get_size() - ManagedOpenOrCreateUserOffset
-                    , false);
-      //All ok, just move resources to the external mapped region
-      m_mapped_region.swap(region);
-  }
-  if(StoreDevice){
-      this->DevHolder::get_device() = boost::move(dev);
-  }
-}
-#endif
 
   ~impl()
   {
@@ -192,9 +140,7 @@ class HostSharedMemoryResource::impl {
 
 private:
   std::string m_segment_name;
-  std::size_t m_current_size{0};
-  std::size_t m_high_watermark{0};
-  char* m_base{nullptr};
+  shared_memory_header* shared_mem_header{nullptr};
   std::size_t m_size{0};
 
   bool open_shared_memory_segment(int& handle, int& err, int oflag)
@@ -239,7 +185,7 @@ private:
       UMPIRE_ERROR("Failed to map shared object " << m_segment_name << ": " << strerror(err) );
     }
 
-    m_base = static_cast<char*>(base);
+    shared_mem_header = static_cast<shared_memory_header*>(base);
     m_size   = size;
   }
 };
