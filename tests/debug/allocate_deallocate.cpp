@@ -4,15 +4,15 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_H_
-#define UMPIRE_H_
+#include "umpire/ResourceManager.hpp"
+#include "umpire/Allocator.hpp"
+#include <iostream>
 
-#include "umpire/config.hpp"
+int main() {
+  auto &rm = umpire::ResourceManager::getInstance();
+  auto alloc = rm.getAllocator("NO_OP");
 
-#define UMPIRE_INVALID_ALLOCATOR_ID 0xDEADBEE
+  char* my_array = static_cast<char*>(alloc.allocate(100 * sizeof(char)));
 
-#include "umpire/interface/c_fortran/wrapUmpire.h"
-#include "umpire/interface/c_fortran/wrapAllocator.h"
-#include "umpire/interface/c_fortran/wrapResourceManager.h"
-
-#endif // UMPIRE_H_
+  alloc.deallocate(my_array);
+}

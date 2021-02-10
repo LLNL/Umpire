@@ -82,6 +82,30 @@ size_t umpire_get_device_memory_usage(int device_id)
     // splicer end function.get_device_memory_usage
 }
 
+int umpire_get_major_version(void)
+{
+    // splicer begin function.get_major_version
+    int SHC_rv = umpire::get_major_version();
+    return SHC_rv;
+    // splicer end function.get_major_version
+}
+
+int umpire_get_minor_version(void)
+{
+    // splicer begin function.get_minor_version
+    int SHC_rv = umpire::get_minor_version();
+    return SHC_rv;
+    // splicer end function.get_minor_version
+}
+
+int umpire_get_patch_version(void)
+{
+    // splicer begin function.get_patch_version
+    int SHC_rv = umpire::get_patch_version();
+    return SHC_rv;
+    // splicer end function.get_patch_version
+}
+
 // Release library allocated memory.
 void umpire_SHROUD_memory_destructor(umpire_SHROUD_capsule_data *cap)
 {

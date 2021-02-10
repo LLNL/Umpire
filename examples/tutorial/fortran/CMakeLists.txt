@@ -29,11 +29,6 @@ set_source_files_properties(
   PROPERTIES
   Fortran_FORMAT FREE)
 
-  #Until more stable blt changes can be made, this is a temporary fix to allow
-  #the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
-if(ENABLE_HIP)
-  set_target_properties(tut_allocator_fortran PROPERTIES LINKER_LANGUAGE HIP)
-endif()
 
 # blt_add_executable(
 #   NAME tut_resources_f

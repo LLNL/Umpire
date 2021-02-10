@@ -15,23 +15,44 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Documentation on allocator (in)accessibility as well as getAllocator usage.
 
+- Updated Umpire::Allocator 'deallocate' documentation brief on handling
+  deallocations on nullptr.
+
+- Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
+
+- Added a data race check with Thread Sanitizer for the Gitlab CI test
+
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
+  internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
+  BLT support for GoogleBenchmark.
+
+- Added version macros to C API, and added version functions to C and FORTRAN APIs.
+
+- Benchmark that measures the performance of different allocator vendor types across
+  various allocation sizes.
+
 ### Changed
 
-- Organized configuration options in config.hpp.in in alphabetical order
+- Organized configuration options in config.hpp.in in alphabetical order.
 
 - Size Limiter example now has a try-catch statement to handle exception.
 
-- Doubled timeout from 15 to 30 minutes for CI tests to build and run
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run.
+
+- Uberenv is now used as a submodule
 
 ### Removed
 
-- Removed extraneous function definition in HipDeviceMemoryResource
+- Removed extraneous function definition in HipDeviceMemoryResource.
+
+- Removed the temporary fix for the HIP + fortran linker error (blt has been 
+  updated instead).
 
 ### Fixed
 
-- Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file
+- Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file.
 
-- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file
+- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file.
 
 - Fixed Windows CI errors by ensuring azure pipeline runs with the filesystem turned ON.
 
@@ -39,6 +60,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Corrected accounting error in replay tool where allocation map operations
   were not being accounted for and reported correctly.
+
+- Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+- Fixed incorrect option causing sanitizer tests to be skipped.
+
+- Python is now explicitly python3 or python2 (most likely python3)
 
 ## [v5.0.0] - 2020-11-18
 

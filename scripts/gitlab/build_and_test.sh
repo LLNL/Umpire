@@ -45,7 +45,7 @@ then
         prefix_opt="--prefix=${prefix}"
     fi
 
-    python scripts/uberenv/uberenv.py --spec="${spec}"
+    python3 scripts/uberenv/uberenv.py --spec="${spec}"
 
 fi
 date
@@ -138,6 +138,14 @@ then
     date
     ctest --output-on-failure -T test 2>&1 | tee tests_output.txt
     date
+
+    # If Developer benchmarks enabled, run the no-op benchmark and show output
+    if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
+    then
+        date
+        ctest --verbose -C Benchmark -R no-op_stress_test
+        date
+    fi
 
     no_test_str="No tests were found!!!"
     if [[ "$(tail -n 1 tests_output.txt)" == "${no_test_str}" ]]
