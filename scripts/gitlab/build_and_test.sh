@@ -155,7 +155,7 @@ then
 
     echo "Copying Testing xml reports for export"
     tree Testing
-    xsltproc -o junit.xml ../blt/tests/ctest-to-junit.xsl Testing/*/Test.xml ${project_dir}
+    xsltproc -o junit.xml ${project_dir}/blt/tests/ctest-to-junit.xsl Testing/*/Test.xml
     mv junit.xml ${project_dir}/junit.xml
 
     if grep -q "Errors while running CTest" ./tests_output.txt
