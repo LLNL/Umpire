@@ -136,7 +136,7 @@ then
     cd ${build_dir}
 
     date
-    ctest --output-on-failure --no-compress-output -T test -VV -j 12 2>&1 | tee tests_output.txt
+    ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
     date
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
