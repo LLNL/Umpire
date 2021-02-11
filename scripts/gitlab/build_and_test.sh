@@ -136,7 +136,7 @@ then
     cd ${build_dir}
 
     date
-    ctest --output-on-failure -T test 2>&1 | tee tests_output.txt
+    ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
     date
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
@@ -155,20 +155,8 @@ then
 
     echo "Copying Testing xml reports for export"
     tree Testing
-    cp Testing/*/Test.xml ${project_dir}
-
-    # Convert CTest xml to JUnit (on toss3 only)
-    if [[ ${sys_type} == *toss_3* ]]; then
-        if [[ -n ${py_env_path} ]]; then
-            . ${py_env_path}/bin/activate
-
-            python3 ${project_dir}/scripts/gitlab/convert_to_junit.py \
-            ${project_dir}/Test.xml \
-            ${project_dir}/scripts/gitlab/junit.xslt > ${project_dir}/junit.xml
-        else
-            echo "ERROR: needs python env with lxml, please set PYTHON_ENVIRONMENT_PATH"
-        fi
-    fi
+    xsltproc -o junit.xml ${project_dir}/blt/tests/ctest-to-junit.xsl Testing/*/Test.xml
+    mv junit.xml ${project_dir}/junit.xml
 
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
