@@ -91,9 +91,20 @@ class HostSharedMemoryResource::impl {
         __atomic_store_n(&shared_mem_header->init_flag, Initializing, __ATOMIC_SEQ_CST);
 
         pthread_mutexattr_t mattr;
-        pthread_mutexattr_init(&mattr);
-        pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
-        pthread_mutex_init(&shared_mem_header->mutex, &mattr);
+        if ( ( err = pthread_mutexattr_init(&mattr) ) != 0 ) {
+          UMPIRE_ERROR("Failed to initialize mutex attributes for shared memory segment "
+                          << m_segment_name << ": " << strerror(err));
+        }
+
+        if ( ( err = pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED) ) != 0 ) {
+          UMPIRE_ERROR("Failed to set shared atributes for mutex for shared memory segment "
+                          << m_segment_name << ": " << strerror(err));
+        }
+
+        if ( ( err = pthread_mutex_init(&shared_mem_header->mutex, &mattr) ) != 0 ) {
+          UMPIRE_ERROR("Failed to initialize mutex for shared memory segment "
+                          << m_segment_name << ": " << strerror(err));
+        }
 
         __atomic_store_n(&shared_mem_header->init_flag, Initialized, __ATOMIC_SEQ_CST);
       }
