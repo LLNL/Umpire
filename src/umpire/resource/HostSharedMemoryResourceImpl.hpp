@@ -17,6 +17,8 @@
 #include <unistd.h>           // ftruncate, fstat
 #include <sys/types.h>        // ftruncate, fstat
 
+#include <pthread.h>
+
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
@@ -29,6 +31,7 @@ class HostSharedMemoryResource::impl {
   struct shared_memory_header {
     uint32_t init_flag;
     uint32_t reserved;
+    pthread_mutex_t mutex;
     std::size_t segment_size;    // Full segment size, excluding this header
     std::size_t in_use;
     std::size_t high_watermark;
@@ -85,8 +88,14 @@ class HostSharedMemoryResource::impl {
 
         map_shared_memory_segment(shm_handle);
 
-        // volatile uint32_t* init_flag = &shared_mem_header->init_flag;
         __atomic_store_n(&shared_mem_header->init_flag, Initializing, __ATOMIC_SEQ_CST);
+
+        pthread_mutexattr_t mattr;
+        pthread_mutexattr_init(&mattr);
+        pthread_mutexattr_setpshared(&mattr, PTHREAD_PROCESS_SHARED);
+        pthread_mutex_init(&shared_mem_header->mutex, &mattr);
+
+        __atomic_store_n(&shared_mem_header->init_flag, Initialized, __ATOMIC_SEQ_CST);
       }
       else {
         // Wait for the file size to change
