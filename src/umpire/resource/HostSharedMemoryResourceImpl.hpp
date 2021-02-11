@@ -28,13 +28,24 @@ namespace resource {
 
 class HostSharedMemoryResource::impl {
 
-  struct shared_memory_header {
+  struct SharedMemoryBlock {
+    std::size_t next_block_offset;  // Offset == 0 is same as nullptr
+    std::size_t prev_block_offset;
+    std::size_t name_offset;
+    std::size_t memory_offset;
+    std::size_t size;               // Includes header+name+memory
+    std::size_t reference_count;
+  };
+
+  struct SharedMemorySegmentHeader {
     uint32_t init_flag;
     uint32_t reserved;
     pthread_mutex_t mutex;
     std::size_t segment_size;    // Full segment size, excluding this header
     std::size_t in_use;
     std::size_t high_watermark;
+    SharedMemoryBlock free_memory;
+    SharedMemoryBlock allocated_memory;
   };
 
   public:
@@ -106,6 +117,16 @@ class HostSharedMemoryResource::impl {
                           << m_segment_name << ": " << strerror(err));
         }
 
+        shared_mem_header->segment_size = size;
+
+        pointer_to_offset(nullptr, shared_mem_header->free_memory.next_block_offset);
+        pointer_to_offset(nullptr, shared_mem_header->free_memory.prev_block_offset);
+        pointer_to_offset(nullptr, shared_mem_header->free_memory.name_offset);
+        pointer_to_offset(&shared_mem_header[1], shared_mem_header->free_memory.memory_offset);
+
+        shared_mem_header->free_memory.size = size - sizeof(SharedMemorySegmentHeader);
+        shared_mem_header->free_memory.reference_count = 0;
+
         __atomic_store_n(&shared_mem_header->init_flag, Initialized, __ATOMIC_SEQ_CST);
       }
       else {
@@ -139,8 +160,40 @@ class HostSharedMemoryResource::impl {
   {
   }
 
-  void* allocate(const std::string& /* name */, std::size_t /* bytes */)
+  SharedMemoryBlock* find_allocation( std::string name )
   {
+    SharedMemoryBlock* mblock_ptr{ nullptr };
+    return mblock_ptr;
+  }
+
+  void* allocate(const std::string& name, std::size_t requested_size)
+  {
+    std::size_t header_size{ (sizeof(SharedMemoryBlock) + m_alignment) & ~(m_alignment - 1) };
+    std::size_t name_size{ (name.length() + 1 + m_alignment) & ~(m_alignment - 1) };
+    std::size_t mem_size{ (requested_size + m_alignment) & ~(m_alignment - 1) };
+    std::size_t adjusted_size{ header_size + name_size + mem_size };
+
+    int err{0};
+    if ( ( err = pthread_mutex_lock(&shared_mem_header->mutex) ) != 0 ) {
+      UMPIRE_ERROR("Failed to lock mutex for shared memory segment "
+                          << m_segment_name << ": " << strerror(err));
+    }
+
+    // First let's see if the allaction already exists
+    SharedMemoryBlock* mblock_ptr{ find_allocation(name) };
+
+#if 0
+    //
+    // Find amount available memory
+    //
+    shared_mem_header->free_memory.next_block_offset = 0;
+    shared_mem_header->free_memory.prev_block_offset = 0;
+    shared_mem_header->free_memory.name_offset = 0;
+    shared_mem_header->free_memory.size = size - sizeof(SharedMemorySegmentHeader);
+    shared_mem_header->free_memory.reference_count = 0;
+#endif
+    pthread_mutex_unlock(&shared_mem_header->mutex);
+
     return static_cast<void*>(nullptr);
   }
 
@@ -160,8 +213,32 @@ class HostSharedMemoryResource::impl {
 
 private:
   std::string m_segment_name;
-  shared_memory_header* shared_mem_header{nullptr};
+  SharedMemorySegmentHeader* shared_mem_header{nullptr};
   std::size_t m_size{0};
+  std::size_t m_alignment{16};
+
+  template <class OFF_T, class PTR_T>
+  void offset_to_pointer(OFF_T offset, PTR_T& ptr) {
+    if ( offset == 0 ) {
+      ptr = nullptr;
+    }
+    else {
+      ptr = reinterpret_cast<PTR_T>(reinterpret_cast<char*>(shared_mem_header) + offset);
+    }
+  }
+
+  void pointer_to_offset(std::nullptr_t, std::size_t& offset)
+  {
+      offset = 0;
+  }
+
+  template <class PTR_T, class OFF_T>
+  void pointer_to_offset(PTR_T ptr, OFF_T& offset)
+  {
+    char* base{ reinterpret_cast<char*>(shared_mem_header) };
+
+    offset = static_cast<OFF_T>(reinterpret_cast<char*>(ptr) - base);
+  }
 
   bool open_shared_memory_segment(int& handle, int& err, int oflag)
   {
@@ -205,7 +282,7 @@ private:
       UMPIRE_ERROR("Failed to map shared object " << m_segment_name << ": " << strerror(err) );
     }
 
-    shared_mem_header = static_cast<shared_memory_header*>(base);
+    shared_mem_header = static_cast<SharedMemorySegmentHeader*>(base);
     m_size   = size;
   }
 };
