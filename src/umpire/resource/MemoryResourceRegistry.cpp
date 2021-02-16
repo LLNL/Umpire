@@ -177,9 +177,7 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       for (auto& device : devices) {
         const std::string deviceName =
             device.get_info<cl::sycl::info::device::name>();
-        if (device.is_gpu() &&
-            (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
-             std::string::npos))
+        if (device.is_gpu())
           device_count++;
       }
     }
