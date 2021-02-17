@@ -15,8 +15,6 @@
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
-#include "umpire/util/FixedMallocPool.hpp"
-
 static const int RangeLow{1<<10}; //1kB
 static const int RangeHi{1<<28}; //256MB
 static const bool Introspection{false};
@@ -36,6 +34,7 @@ public:
 
   virtual void* allocate(std::size_t nbytes) = 0;
   virtual void deallocate(void* ptr) = 0;
+  virtual void release() = 0;
 
   void allocation(benchmark::State& st) {
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
@@ -60,9 +59,11 @@ public:
 
     for (std::size_t j{0}; j < i; j++)
       deallocate(m_allocations[j]);
+    
+    release();
   }
 
-  void deallocation_in_order(benchmark::State& st) {
+  void deallocation_same_order(benchmark::State& st) {
     const std::size_t size{static_cast<std::size_t>(st.range(0))};
     std::size_t i{0};
 
@@ -85,6 +86,8 @@ public:
 
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
+    
+    release();
   }
 
   void deallocation_reverse_order(benchmark::State& st) {
@@ -110,6 +113,8 @@ public:
 
     //for (int j{i}; j < int(Max_Allocations); j++)
     //  deallocate(m_allocations[j]);
+    
+    release();
   }
 
   void deallocation_random_order(benchmark::State& st) {
@@ -137,6 +142,8 @@ public:
 
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
+    
+    release();
   }
 
   /*
@@ -190,6 +197,7 @@ public:
 
   virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
   virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+  virtual void release() final { m_alloc->getAllocationStrategy()->release(); }
 
 private:
   umpire::Allocator* m_alloc;
@@ -197,20 +205,20 @@ private:
 
 class FixedPoolHost : public FixedPool<umpire::resource::Host> {};
 BENCHMARK_DEFINE_F(FixedPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(FixedPoolHost, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(FixedPoolHost, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolHost, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolHost, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 class FixedPoolDevice : public FixedPool<umpire::resource::Device> {};
 BENCHMARK_DEFINE_F(FixedPoolDevice, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevice, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 
 class FixedPoolDevicePinned : public FixedPool<umpire::resource::Pinned> {};
 BENCHMARK_DEFINE_F(FixedPoolDevicePinned, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 #endif
@@ -218,7 +226,7 @@ BENCHMARK_DEFINE_F(FixedPoolDevicePinned, deallocate_random_order)(benchmark::St
 #if defined(UMPIRE_ENABLE_UM)
 class FixedPoolUnified : public FixedPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(FixedPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(FixedPoolUnified, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 #endif
@@ -253,6 +261,7 @@ public:
 
   virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
   virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+  virtual void release() final { m_alloc->release(); }
 
 private:
   umpire::Allocator* m_alloc;
@@ -260,20 +269,20 @@ private:
 
 class DynamicPoolHost : public DynamicPool<umpire::resource::Host> {};
 BENCHMARK_DEFINE_F(DynamicPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 class DynamicPoolDevice : public DynamicPool<umpire::resource::Device> {};
 BENCHMARK_DEFINE_F(DynamicPoolDevice, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 
 class DynamicPoolDevicePinned : public DynamicPool<umpire::resource::Pinned> {};
 BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 #endif
@@ -281,7 +290,7 @@ BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate_random_order)(benchmark::
 #if defined(UMPIRE_ENABLE_UM)
 class DynamicPoolUnified : public DynamicPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(DynamicPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 #endif
@@ -315,6 +324,7 @@ public:
 
   void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
   void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+  virtual void release() final { m_alloc->release(); }
 
 private:
   umpire::Allocator* m_alloc;
@@ -322,20 +332,20 @@ private:
 
 class MixedPoolHost : public MixedPool<umpire::resource::Host> {};
 BENCHMARK_DEFINE_F(MixedPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(MixedPoolHost, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(MixedPoolHost, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolHost, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolHost, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 class MixedPoolDevice : public MixedPool<umpire::resource::Device> {};
 BENCHMARK_DEFINE_F(MixedPoolDevice, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(MixedPoolDevice, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(MixedPoolDevice, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolDevice, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolDevice, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 
 class MixedPoolDevicePinned : public MixedPool<umpire::resource::Pinned> {};
 BENCHMARK_DEFINE_F(MixedPoolDevicePinned, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 #endif
@@ -343,7 +353,7 @@ BENCHMARK_DEFINE_F(MixedPoolDevicePinned, deallocate_random_order)(benchmark::St
 #if defined(UMPIRE_ENABLE_UM)
 class MixedPoolUnified : public MixedPool<umpire::resource::Unified> {};
 BENCHMARK_DEFINE_F(MixedPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate_in_order)(benchmark::State& st) { deallocation_in_order(st); }
+BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
 BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
 #endif
@@ -352,72 +362,72 @@ BENCHMARK_DEFINE_F(MixedPoolUnified, deallocate_random_order)(benchmark::State& 
 
 // FixedPool
 BENCHMARK_REGISTER_F(FixedPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolHost, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #if defined(UMPIRE_ENABLE_DEVICE)
 BENCHMARK_REGISTER_F(FixedPoolDevice, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolDevice, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
 BENCHMARK_REGISTER_F(FixedPoolDevicePinned, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolDevicePinned, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(FixedPoolUnified, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 // DynamicPool
 BENCHMARK_REGISTER_F(DynamicPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #if defined(UMPIRE_ENABLE_DEVICE)
 BENCHMARK_REGISTER_F(DynamicPoolDevice, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
 BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 // MixedPool
 BENCHMARK_REGISTER_F(MixedPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(MixedPoolHost, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(MixedPoolHost, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolHost, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolHost, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #if defined(UMPIRE_ENABLE_DEVICE)
 BENCHMARK_REGISTER_F(MixedPoolDevice, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolDevice, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 
 BENCHMARK_REGISTER_F(MixedPoolDevicePinned, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolDevicePinned, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
 BENCHMARK_REGISTER_F(MixedPoolUnified, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
-BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate_in_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(MixedPoolUnified, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
