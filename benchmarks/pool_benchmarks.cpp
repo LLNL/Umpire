@@ -111,8 +111,8 @@ public:
     st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
                                     benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
 
-    //for (int j{i}; j < int(Max_Allocations); j++)
-    //  deallocate(m_allocations[j]);
+    for (int j{i}; j < int(Max_Allocations); j++)
+      deallocate(m_allocations[j]);
     
     release();
   }
@@ -296,6 +296,71 @@ BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate_random_order)(benchmark::State
 #endif
 
 /*
+ * QuickPool
+ */
+template <umpire::resource::MemoryResourceType Resource>
+class QuickPool : public AllocatorBenchmark {
+public:
+  using AllocatorBenchmark::SetUp;
+  using AllocatorBenchmark::TearDown;
+
+  QuickPool() : m_alloc{nullptr} {}
+
+  void SetUp(benchmark::State& st) override final{
+    auto& rm = umpire::ResourceManager::getInstance();
+    const std::size_t bytes{static_cast<std::size_t>(st.range(0))};
+
+    std::stringstream ss;
+    ss << "quick_pool-" << Resource << "." << namecnt;
+    ++namecnt;
+
+    m_alloc = new umpire::Allocator{
+      rm.makeAllocator<umpire::strategy::QuickPool, Introspection>(
+        ss.str(), rm.getAllocator(Resource), bytes)};
+  }
+
+  void TearDown(benchmark::State&) override final {
+    m_alloc->getAllocationStrategy()->release();
+    delete m_alloc;
+  }
+
+  virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
+  virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
+  virtual void release() final { m_alloc->release(); }
+
+private:
+  umpire::Allocator* m_alloc;
+};
+
+class QuickPoolHost : public QuickPool<umpire::resource::Host> {};
+BENCHMARK_DEFINE_F(QuickPoolHost, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(QuickPoolHost, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolHost, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolHost, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+class QuickPoolDevice : public QuickPool<umpire::resource::Device> {};
+BENCHMARK_DEFINE_F(QuickPoolDevice, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(QuickPoolDevice, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolDevice, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolDevice, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
+
+class QuickPoolDevicePinned : public QuickPool<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(QuickPoolDevicePinned, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(QuickPoolDevicePinned, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolDevicePinned, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolDevicePinned, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+class QuickPoolUnified : public QuickPool<umpire::resource::Unified> {};
+BENCHMARK_DEFINE_F(QuickPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(QuickPoolUnified, deallocate_same_order)(benchmark::State& st) { deallocation_same_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolUnified, deallocate_reverse_order)(benchmark::State& st) { deallocation_reverse_order(st); }
+BENCHMARK_DEFINE_F(QuickPoolUnified, deallocate_random_order)(benchmark::State& st) { deallocation_random_order(st); }
+#endif
+
+/*
  * MixedPool
  */
 template <umpire::resource::MemoryResourceType Resource>
@@ -406,6 +471,30 @@ BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->RangeMultiplier(4)->Range(Ra
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+#endif
+
+// QuickPool
+BENCHMARK_REGISTER_F(QuickPoolHost, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolHost, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolHost, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolHost, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+#if defined(UMPIRE_ENABLE_DEVICE)
+BENCHMARK_REGISTER_F(QuickPoolDevice, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolDevice, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolDevice, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolDevice, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+
+BENCHMARK_REGISTER_F(QuickPoolDevicePinned, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolDevicePinned, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolDevicePinned, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolDevicePinned, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+#endif
+
+#if defined(UMPIRE_ENABLE_UM)
+BENCHMARK_REGISTER_F(QuickPoolUnified, allocate)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolUnified, deallocate_same_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolUnified, deallocate_reverse_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
+BENCHMARK_REGISTER_F(QuickPoolUnified, deallocate_random_order)->RangeMultiplier(4)->Range(RangeLow, RangeHi);
 #endif
 
 // MixedPool
