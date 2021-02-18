@@ -21,11 +21,11 @@ static const bool Introspection{false};
 
 /*
  * Allocate either LARGE (about 12GB), MEDIUM (about 6GB)
- * or SMALL (about 1GB) for benchmark measurements.
+ * or SMALL (about 1GB) in total for benchmark measurements.
  */
-//#define LARGE 12000000000
+#define LARGE 12000000000
 //#define MEDIUM 6000000000
-#define SMALL 1000000000
+//#define SMALL 1000000000
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
@@ -54,12 +54,12 @@ public:
       m_allocations[i++] = allocate(size);
     }
 
-    // This says that we process with the rate of state.range(0) bytes every iteration:
-    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
+                                    benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
 
     for (std::size_t j{0}; j < i; j++)
       deallocate(m_allocations[j]);
-    
+
     release();
   }
 
@@ -81,8 +81,8 @@ public:
       deallocate(m_allocations[i++]);
     }
 
-    // This says that we process with the rate of state.range(0) bytes every iteration:
-    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
+                                    benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
 
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
@@ -108,8 +108,8 @@ public:
       deallocate(m_allocations[--i]);
     }
 
-    // This says that we process with the rate of state.range(0) bytes every iteration:
-    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
+                                    benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
 
     //for (int j{i}; j < int(Max_Allocations); j++)
     //  deallocate(m_allocations[j]);
@@ -137,8 +137,8 @@ public:
       deallocate(m_allocations[i++]);
     }
 
-    // This says that we process with the rate of state.range(0) bytes every iteration:
-    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
+    st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
+                                    benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
 
     for (std::size_t j{i}; j < Max_Allocations; j++)
       deallocate(m_allocations[j]);
@@ -187,7 +187,7 @@ public:
     ++namecnt;
 
     m_alloc = new umpire::Allocator{rm.makeAllocator<umpire::strategy::FixedPool, Introspection>(
-        ss.str(), rm.getAllocator(Resource), bytes)};
+        ss.str(), rm.getAllocator(Resource), bytes, sizeof(int) * 8)};
   }
 
   void TearDown(benchmark::State&) override {
@@ -197,7 +197,7 @@ public:
 
   virtual void* allocate(std::size_t nbytes) final { return m_alloc->allocate(nbytes); }
   virtual void deallocate(void* ptr) final { m_alloc->deallocate(ptr); }
-  virtual void release() final { m_alloc->getAllocationStrategy()->release(); }
+  virtual void release() final { m_alloc->release(); }
 
 private:
   umpire::Allocator* m_alloc;
