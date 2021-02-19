@@ -590,7 +590,7 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
     ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
   }
 
-  // ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[3]); }); // 25% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[2]); }); // 50% releasable
