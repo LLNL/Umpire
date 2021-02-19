@@ -120,7 +120,7 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
                  false, alloc_bytes);
   }
 
-  m_current_bytes += bytes;
+  m_current_bytes += rounded_bytes;
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ptr, bytes);
   return ptr;
