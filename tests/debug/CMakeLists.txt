@@ -20,7 +20,7 @@ if (ENABLE_OPENMP_TARGET)
       openmp)
 endif()
 
-if (ENABLE_BENCHMARKS)
+if(ENABLE_DEVELOPER_BENCHMARKS)
 blt_add_executable(
   NAME allocate_deallocate
   SOURCES allocate_deallocate.cpp

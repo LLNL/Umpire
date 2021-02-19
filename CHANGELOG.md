@@ -20,6 +20,19 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
 
+- Added a data race check with Thread Sanitizer for the Gitlab CI test
+
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
+  internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
+  BLT support for GoogleBenchmark.
+
+- Added version macros to C API, and added version functions to C and FORTRAN APIs.
+
+- Benchmark that measures the performance of different allocator vendor types across
+  various allocation sizes.
+
+- Added a Release function to FixedPool and corresponding gtest in strategy_tests
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -27,6 +40,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Size Limiter example now has a try-catch statement to handle exception.
 
 - Doubled timeout from 15 to 30 minutes for CI tests to build and run.
+
+- Uberenv is now used as a submodule.
+
+- CI on Gitlab does not require a python environment anymore.
+
+- BLT was updated.
 
 ### Removed
 
@@ -51,6 +70,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   were not being accounted for and reported correctly.
 
 - Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+- Fixed incorrect option causing sanitizer tests to be skipped.
+
+- Python is now explicitly python3 or python2 (most likely python3)
+
+- Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
+  issue that would mean the pool would never coalesce automatically.
 
 ## [v5.0.0] - 2020-11-18
 
