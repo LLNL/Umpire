@@ -13,6 +13,7 @@
 
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
 static const int RangeLow{1<<10}; //1kB
@@ -111,8 +112,8 @@ public:
     st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
                                     benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
 
-    for (int j{i}; j < int(Max_Allocations); j++)
-      deallocate(m_allocations[j]);
+    //for (int j{i}; j < int(Max_Allocations); j++)
+    //  deallocate(m_allocations[j]);
     
     release();
   }

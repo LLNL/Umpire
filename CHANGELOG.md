@@ -31,6 +31,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Benchmark that measures the performance of different allocator vendor types across
   various allocation sizes.
 
+- Benchmark that measures the performance of different memory pools across various
+  allocation sizes.
+
 - Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
 ### Changed
