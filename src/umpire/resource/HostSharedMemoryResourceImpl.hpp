@@ -7,6 +7,7 @@
 #ifndef __HOST_SHARED_MEMORY_RESOURCE_HPP__
 #define __HOST_SHARED_MEMORY_RESOURCE_HPP__
 
+#include <limits>
 #include <string>
 #include <thread>
 
@@ -160,50 +161,124 @@ class HostSharedMemoryResource::impl {
   {
   }
 
-  SharedMemoryBlock* find_allocation( std::string name )
+  void* allocate(const std::string& name, std::size_t requested_size )
   {
-    SharedMemoryBlock* mblock_ptr{ nullptr };
-    return mblock_ptr;
-  }
-
-  void* allocate(const std::string& name, std::size_t requested_size)
-  {
-    std::size_t header_size{ (sizeof(SharedMemoryBlock) + m_alignment) & ~(m_alignment - 1) };
-    std::size_t name_size{ (name.length() + 1 + m_alignment) & ~(m_alignment - 1) };
-    std::size_t mem_size{ (requested_size + m_alignment) & ~(m_alignment - 1) };
-    std::size_t adjusted_size{ header_size + name_size + mem_size };
-
     int err{0};
+    void* ptr{nullptr};
+
     if ( ( err = pthread_mutex_lock(&shared_mem_header->mutex) ) != 0 ) {
       UMPIRE_ERROR("Failed to lock mutex for shared memory segment "
                           << m_segment_name << ": " << strerror(err));
     }
 
     // First let's see if the allaction already exists
-    SharedMemoryBlock* mblock_ptr{ find_allocation(name) };
+    SharedMemoryBlock* mblock_ptr{ find_existing_allocation(name) };
 
-#if 0
-    //
-    // Find amount available memory
-    //
-    shared_mem_header->free_memory.next_block_offset = 0;
-    shared_mem_header->free_memory.prev_block_offset = 0;
-    shared_mem_header->free_memory.name_offset = 0;
-    shared_mem_header->free_memory.size = size - sizeof(SharedMemorySegmentHeader);
-    shared_mem_header->free_memory.reference_count = 0;
-#endif
+    if ( mblock_ptr != nullptr ) {
+      mblock_ptr->reference_count++;
+      offset_to_pointer(mblock_ptr->memory_offset, ptr);
+    }
+    else {
+      // New allocation
+
+      std::size_t header_size{ (sizeof(SharedMemoryBlock) + m_alignment) & ~(m_alignment - 1) };
+      std::size_t name_size{ (name.length() + 1 + m_alignment) & ~(m_alignment - 1) };
+      std::size_t mem_size{ (requested_size + m_alignment) & ~(m_alignment - 1) };
+      std::size_t adjusted_size{ header_size + name_size + mem_size };
+
+      // Find the best sized block
+      SharedMemoryBlock* found_block_ptr{ nullptr };
+      std::size_t smallest_block{ std::numeric_limits<std::size_t>::max() };
+
+      mblock_ptr = &shared_mem_header->free_memory;
+      while ( mblock_ptr != nullptr && mblock_ptr->size != 0 ) {
+        if (mblock_ptr->size >= adjusted_size && mblock_ptr->size < smallest_block) {
+          smallest_block = mblock_ptr->size;
+          found_block_ptr = mblock_ptr;
+        }
+        offset_to_pointer(mblock_ptr->next_block_offset, mblock_ptr);
+      }
+
+      if ( found_block_ptr != nullptr ) {
+        std::size_t block_offset;
+        pointer_to_offset(found_block_ptr, block_offset);
+
+        //
+        // Split block off of free list
+        //
+        if (found_block_ptr->size >= adjusted_size+header_size) {
+          SharedMemoryBlock* split_block_ptr;
+          std::size_t split_block_offset{block_offset+adjusted_size};
+          offset_to_pointer(split_block_offset, split_block_ptr);
+          split_block_ptr->memory_offset = 0;
+          split_block_ptr->name_offset = 0;
+          split_block_ptr->next_block_offset = found_block_ptr->next_block_offset;
+          split_block_ptr->prev_block_offset = found_block_ptr->prev_block_offset;
+          split_block_ptr->reference_count = 0;
+          split_block_ptr->size = found_block_ptr->size - adjusted_size;
+
+          // Link split block pointer in
+          SharedMemoryBlock* next_block_ptr;
+          offset_to_pointer(split_block_ptr->next_block_offset, next_block_ptr);
+          if (next_block_ptr != nullptr)
+            next_block_ptr->prev_block_offset = split_block_offset;
+
+          SharedMemoryBlock* prev_block_ptr;
+          offset_to_pointer(split_block_ptr->prev_block_offset, prev_block_ptr);
+          if (prev_block_ptr != nullptr)
+            prev_block_ptr->next_block_offset = split_block_offset;
+
+          found_block_ptr->size = adjusted_size;
+        }
+
+        // Set up block header
+        found_block_ptr->memory_offset = block_offset + header_size + name_size;
+        found_block_ptr->next_block_offset = found_block_ptr->next_block_offset;
+        found_block_ptr->prev_block_offset = found_block_ptr->prev_block_offset;
+        found_block_ptr->reference_count = 1;
+
+        found_block_ptr->name_offset = block_offset + header_size;
+        char* name_ptr;
+        offset_to_pointer(found_block_ptr->name_offset, name_ptr);
+        name.copy(name_ptr, name.length(), 0);
+        name_ptr[name.length()] = '\0';
+
+        // Set up return ptr
+        offset_to_pointer(found_block_ptr->memory_offset, ptr);
+      }
+    }
+
     pthread_mutex_unlock(&shared_mem_header->mutex);
 
-    return static_cast<void*>(nullptr);
+    if ( ptr == nullptr ) {
+      UMPIRE_ERROR("shared memory allocation( bytes = " << requested_size << " ) failed");
+    }
+    return ptr;
   }
 
   void deallocate(void* /* ptr */)
   {
   }
 
-  void* find_pointer_from_name(std::string /* name */)
+  void* find_pointer_from_name(std::string name)
   {
-    return nullptr;
+    void* ptr{nullptr};
+    int err{0};
+
+    if ( ( err = pthread_mutex_lock(&shared_mem_header->mutex) ) != 0 ) {
+      UMPIRE_ERROR("Failed to lock mutex for shared memory segment "
+                          << m_segment_name << ": " << strerror(err));
+    }
+
+    // First let's see if the allaction already exists
+    SharedMemoryBlock* mblock_ptr{ find_existing_allocation(name) };
+
+    if ( mblock_ptr != nullptr ) {
+      offset_to_pointer(mblock_ptr->memory_offset, ptr);
+    }
+
+    pthread_mutex_unlock(&shared_mem_header->mutex);
+    return ptr;
   }
 
   std::size_t getCurrentSize() const noexcept;
@@ -238,6 +313,21 @@ private:
     char* base{ reinterpret_cast<char*>(shared_mem_header) };
 
     offset = static_cast<OFF_T>(reinterpret_cast<char*>(ptr) - base);
+  }
+
+  SharedMemoryBlock* find_existing_allocation( std::string name )
+  {
+    SharedMemoryBlock* mblock_ptr{ &shared_mem_header->free_memory };
+
+    while ( mblock_ptr != nullptr ) {
+      char* allocation_name;
+      offset_to_pointer(mblock_ptr->name_offset, allocation_name);
+      if ( allocation_name != nullptr && 0 == name.compare(allocation_name) )
+        break;
+      offset_to_pointer(mblock_ptr->next_block_offset, mblock_ptr);
+    }
+
+    return mblock_ptr;
   }
 
   bool open_shared_memory_segment(int& handle, int& err, int oflag)
