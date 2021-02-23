@@ -43,7 +43,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Doubled timeout from 15 to 30 minutes for CI tests to build and run.
 
-- Uberenv is now used as a submodule
+- Uberenv is now used as a submodule.
+
+- CI on Gitlab does not require a python environment anymore.
+
+- BLT was updated.
 
 ### Removed
 
@@ -70,6 +74,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed incorrect option causing sanitizer tests to be skipped.
 
 - Python is now explicitly python3 or python2 (most likely python3)
+
+- Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
+  issue that would mean the pool would never coalesce automatically.
 
 ## [v5.0.0] - 2020-11-18
 
