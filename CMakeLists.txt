@@ -32,11 +32,20 @@ set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
-set(ENABLE_TESTS On CACHE BOOL "")
+
+cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On 
+                       "ENABLE_TESTS" Off )
+
 set(ENABLE_GMOCK On CACHE BOOL "")
-set(ENABLE_DOCS Off CACHE BOOL "")
+
+cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
+                        "ENABLE_DOCS" Off )
+
 set(ENABLE_CLANGQUERY Off CACHE BOOL "")
-option(ENABLE_EXAMPLES "Build Umpire examples" On)
+
+cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On 
+                        "ENABLE_EXAMPLES" Off )
+
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
@@ -153,7 +162,7 @@ install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
 add_subdirectory(src)
 
-if (ENABLE_TESTS)
+if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 
@@ -169,7 +178,7 @@ else()
   endif()
 endif ()
 
-if (ENABLE_EXAMPLES)
+if (UMPIRE_ENABLE_EXAMPLES)
   add_subdirectory(examples)
 endif ()
 
@@ -177,6 +186,6 @@ if (ENABLE_TOOLS)
   add_subdirectory(tools)
 endif ()
 
-if (ENABLE_DOCS)
+if (UMPIRE_ENABLE_DOCS)
   add_subdirectory(docs)
 endif ()
