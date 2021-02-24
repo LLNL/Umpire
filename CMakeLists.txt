@@ -104,6 +104,8 @@ if (ENABLE_SYCL)
    endif()
 endif()
 
+set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
+
 ################################
 # BLT
 ################################
