@@ -10,6 +10,8 @@ cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
 
+include(CMakeDependentOption)
+
 project(Umpire
   LANGUAGES CXX C
   VERSION 5.0.0)
