@@ -57,6 +57,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
 
+- Renamed'ENABLE_TESTS', 'ENABLE_EXAMPLES' and 'ENABLE_DOCS' to
+  'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
+  made those options dependant on the corresponding BLT options.
+  
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
