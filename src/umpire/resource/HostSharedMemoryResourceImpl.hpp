@@ -45,6 +45,7 @@ class HostSharedMemoryResource::impl {
     std::size_t in_use;
     std::size_t high_watermark;
     std::size_t free_blocks_off;
+    std::size_t used_blocks_off;
   };
 
   public:
@@ -121,6 +122,7 @@ class HostSharedMemoryResource::impl {
         shared_mem_header->segment_size = size;
 
         pointer_to_offset(&shared_mem_header[1], shared_mem_header->free_blocks_off);
+        pointer_to_offset(nullptr, shared_mem_header->used_blocks_off);
         SharedMemoryBlock* block_ptr;
         offset_to_pointer(shared_mem_header->free_blocks_off, block_ptr);
         pointer_to_offset(nullptr, block_ptr->next_block_off);
@@ -191,6 +193,10 @@ class HostSharedMemoryResource::impl {
           // Split the free block
           splitBlock(best, prev, adjusted_size);
 
+          // Push node to the list of used nodes
+          best->next_block_off = shared_mem_header->used_blocks_off;
+          pointer_to_offset(best, shared_mem_header->used_blocks_off);
+
           // Set up block header
           std::size_t block_offset;
           pointer_to_offset(best, block_offset);
@@ -236,8 +242,19 @@ class HostSharedMemoryResource::impl {
 
       block_ptr->reference_count--;
 
-      if ( block_ptr->reference_count == 0 )
-        releaseBlock(block_ptr);
+      if ( block_ptr->reference_count == 0 ) {
+        SharedMemoryBlock* curr;
+        SharedMemoryBlock* prev{nullptr};
+
+        offset_to_pointer(shared_mem_header->used_blocks_off, curr);
+
+        while ( curr != nullptr && curr != block_ptr) {
+          prev = curr;
+          offset_to_pointer(curr->next_block_off, curr);
+        }
+
+        releaseBlock(block_ptr, prev);
+      }
 
       pthread_mutex_unlock(&shared_mem_header->mutex);
     }
@@ -294,13 +311,13 @@ class HostSharedMemoryResource::impl {
     {
       char* base{ reinterpret_cast<char*>(shared_mem_header) };
 
-      offset = static_cast<OFF_T>(reinterpret_cast<char*>(ptr) - base);
+      offset = ptr == nullptr ? 0 : static_cast<OFF_T>(reinterpret_cast<char*>(ptr) - base);
     }
 
     SharedMemoryBlock* find_existing_allocation( std::string name )
     {
       SharedMemoryBlock* block_ptr;
-      offset_to_pointer(shared_mem_header->free_blocks_off, block_ptr);
+      offset_to_pointer(shared_mem_header->used_blocks_off, block_ptr);
 
       while ( block_ptr != nullptr ) {
         char* allocation_name;
@@ -333,14 +350,19 @@ class HostSharedMemoryResource::impl {
       }
     }
 
-    void releaseBlock(SharedMemoryBlock* curr)
+    void releaseBlock(SharedMemoryBlock* curr, SharedMemoryBlock* prev)
     {
+      if (prev)
+        prev->next_block_off = curr->next_block_off;
+      else
+        shared_mem_header->used_blocks_off = curr->next_block_off;
+
       // Find location to put this block in the freeBlocks list
-      SharedMemoryBlock* prev{ nullptr };
+      prev = nullptr;
       SharedMemoryBlock* iter;
       offset_to_pointer(shared_mem_header->free_blocks_off, iter);
 
-      while ( iter != nullptr && iter->size < curr->size) {
+      while ( iter != nullptr && iter < curr) {
         prev = iter;
         offset_to_pointer(iter->next_block_off, iter);
       }
@@ -387,7 +409,7 @@ class HostSharedMemoryResource::impl {
         pointer_to_offset(curr, curr_block_off);
 
         SharedMemoryBlock *newBlock;
-        offset_to_pointer(curr_block_off + curr->size, newBlock);
+        offset_to_pointer(curr_block_off + size, newBlock);
 
         newBlock->memory_offset = 0;
         newBlock->name_offset = 0;
