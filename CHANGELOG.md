@@ -36,6 +36,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
+- Install thirdparty exports in CMake configuration file
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
