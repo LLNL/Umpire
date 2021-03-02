@@ -250,13 +250,15 @@ void ReplayOperationManager::runOperations()
   if (m_options.print_size_stats) {
     for (const auto& alloc_name : rm.getAllocatorNames()) {
       auto alloc = rm.getAllocator(alloc_name);
-      std::cout
-        << std::setw(name_width) << std::left << m_replay_file->getInputFileName()
-        << std::setw(name_width) << std::left << alloc_name
-        << std::setw(num_width) << std::left << alloc.getCurrentSize()
-        << std::setw(num_width) << std::left << alloc.getActualSize()
-        << std::setw(num_width) << std::left << alloc.getHighWatermark()
-        << std::endl;
+      if (alloc.getHighWatermark()) {
+        std::cout
+          << std::setw(name_width) << std::left << m_replay_file->getInputFileName()
+          << std::setw(name_width) << std::left << alloc_name
+          << std::setw(num_width) << std::left << alloc.getCurrentSize()
+          << std::setw(num_width) << std::left << alloc.getActualSize()
+          << std::setw(num_width) << std::left << alloc.getHighWatermark()
+          << std::endl;
+      }
     }
 
     for (auto const& x : size_histogram)
