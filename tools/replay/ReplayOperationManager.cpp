@@ -97,6 +97,10 @@ namespace {
   struct TrackedHistogram {
     void increment(std::size_t size) {
       int index{ log2_64(size) };
+
+      if ( size > largest_allocation )
+        largest_allocation = size;
+
       log2_buckets[index].increment();
     };
 
@@ -106,14 +110,27 @@ namespace {
     };
 
     void print() const {
-      std::cout << log2_buckets[0].high_watermark;
-      for ( int i = 1; i < 64; i++ ) {
-        std::cout << ", " << log2_buckets[i].high_watermark;
+      std::cout << std::endl << "    ";
+      std::cout << "Largest Allocation: " << largest_allocation << std::endl;
+      std::cout << std::endl << "    ";
+      bool print_comma{false};
+
+      for ( int i = 0; i < 64; i++ ) {
+        if (print_comma)
+          std::cout << ", ";
+        if (log2_buckets[i].high_watermark) {
+          print_comma = true;
+          std::cout << "[2^" << i << " - 2^" << i+1 << ") = ";
+          std::cout << log2_buckets[i].high_watermark;
+        }
       }
       std::cout << std::endl;
     };
 
     TrackedCounter log2_buckets[64]{};
+    std::size_t largest_allocation{0};
+    std::size_t allocations{0};
+    std::size_t deallocations{0};
   };
 }
 
