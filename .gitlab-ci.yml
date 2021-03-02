@@ -32,7 +32,6 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   BUILD_ROOT: ${CI_PROJECT_DIR}
-  PYTHON_ENVIRONMENT_PATH: ${CI_PROJECT_DIR}/.venv
 
 # Normally, stages are blocking in Gitlab. However, using the keyword "needs" we
 # can express dependencies between job that break the ordering of stages, in
@@ -40,39 +39,12 @@ variables:
 # In practice q_*, l_* and b_* stages are independently run and start immediately.
 
 stages:
-  - environment
   - q_allocate_resources
   - q_build_and_test
   - q_release_resources
   - l_build_and_test
   - c_build_and_test
 #  - multi_project
-
-# This jobs creates a python env and caches it.
-# Note: The cache needs to be removed manually in CI if the python environment
-# is changed, by clicking "CI/CD - Pipelines - Clear Runner Caches".
-configure_python:
-  variables:
-    GIT_STRATEGY: none
-  tags:
-    - shell
-    - quartz
-  stage: environment
-  script:
-    - /usr/tce/packages/python/python-3.8.2/bin/virtualenv -p /usr/tce/packages/python/python-3.8.2/bin/python3 ${PYTHON_ENVIRONMENT_PATH}
-    - . ${PYTHON_ENVIRONMENT_PATH}/bin/activate
-    - pip install lxml
-  cache:
-    key: venv
-    paths:
-      - ${PYTHON_ENVIRONMENT_PATH}
-
-.venv:
-  cache:
-    key: venv
-    paths:
-      - ${PYTHON_ENVIRONMENT_PATH}
-    policy: pull
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
