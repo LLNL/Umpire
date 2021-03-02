@@ -113,7 +113,7 @@ namespace {
 
     void print(std::string name) const {
       if (largest_allocation > 0) {
-        std::cout << std::endl << name << ":";
+        std::cout << std::endl << name << ":" << std::endl;
         std::cout << "    Total Deallocations:  " << deallocations << std::endl;
         std::cout << "    Total Allocations:    " << allocations << std::endl;
         std::cout << "    Largest Allocation:   " << largest_allocation << std::endl;
@@ -124,6 +124,7 @@ namespace {
             std::cout << log2_buckets[i].high_watermark << std::endl;
           }
         }
+        std::cout << std::endl;
       }
     };
 
