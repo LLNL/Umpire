@@ -112,8 +112,7 @@ public:
 
     st.counters["BytesProcessed"] = benchmark::Counter(st.range(0), 
                                     benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1024);
-
-    for (int j{i-1}; j < int(Max_Allocations); j++)
+    for (int j{i-1}; j >= 0; j--)
       deallocate(m_allocations[j]);
     
     release();
