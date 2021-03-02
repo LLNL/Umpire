@@ -109,22 +109,17 @@ namespace {
       log2_buckets[index].decrement();
     };
 
-    void print() const {
-      std::cout << std::endl << "    ";
-      std::cout << "Largest Allocation: " << largest_allocation << std::endl;
-      std::cout << std::endl << "    ";
-      bool print_comma{false};
-
-      for ( int i = 0; i < 64; i++ ) {
-        if (print_comma)
-          std::cout << ", ";
-        if (log2_buckets[i].high_watermark) {
-          print_comma = true;
-          std::cout << "[2^" << i << " - 2^" << i+1 << ") = ";
-          std::cout << log2_buckets[i].high_watermark;
+    void print(std::string name) const {
+      if (largest_allocation > 0) {
+        std::cout << std::endl << name << ":" << std::endl << "    ";
+        std::cout << "Largest Allocation: " << largest_allocation << std::endl;
+        for ( int i = 0; i < 64; i++ ) {
+          if (log2_buckets[i].high_watermark) {
+            std::cout << "    [2^" << i << " - 2^" << i+1 << ") = ";
+            std::cout << log2_buckets[i].high_watermark << std::endl;
+          }
         }
       }
-      std::cout << std::endl;
     };
 
     TrackedCounter log2_buckets[64]{};
@@ -140,8 +135,15 @@ void ReplayOperationManager::runOperations()
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
 
+  const int name_width{40};
+  const int num_width{16};
   if (m_options.print_stats_on_release) {
-    std::cout << "Input,Release,Name,CurrentSize,ActualSize,Watermark"
+    std::cout 
+      << std::setw(name_width) << std::left << "Filename"
+      << std::setw(name_width) << std::left << "Allocator"
+      << std::setw(num_width) << std::left << "Current Size"
+      << std::setw(num_width) << std::left << "Actual Size"
+      << std::setw(num_width) << std::left << "High Watermark"
       << std::endl;
   }
 
@@ -242,20 +244,19 @@ void ReplayOperationManager::runOperations()
   if (m_options.print_stats_on_release) {
     for (const auto& alloc_name : rm.getAllocatorNames()) {
       auto alloc = rm.getAllocator(alloc_name);
-      std::cout << m_replay_file->getInputFileName() << ","
-              << "End,"
-              << alloc_name << ","
-              << alloc.getCurrentSize() << ","
-              << alloc.getActualSize() << ","
-              << alloc.getHighWatermark()
-              << std::endl;
+      std::cout
+        << std::setw(name_width) << std::left << m_replay_file->getInputFileName()
+        << std::setw(name_width) << std::left << alloc_name
+        << std::setw(num_width) << std::left << alloc.getCurrentSize()
+        << std::setw(num_width) << std::left << alloc.getActualSize()
+        << std::setw(num_width) << std::left << alloc.getHighWatermark()
+        << std::endl;
     }
 
     for (auto const& x : size_histogram)
     {
       auto alloc = &m_ops_table->allocators[x.first];
-      std::cout << alloc->allocator->getName() << ", ";
-      x.second.print();
+      x.second.print(alloc->allocator->getName());
     }
   }
 }
