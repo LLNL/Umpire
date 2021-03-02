@@ -112,12 +112,12 @@ class ResourceManager {
   /*!
    * \brief Construct a new Allocator.
    */
-  template <typename Strategy, bool introspection = false, typename... Args>
+  template <typename Strategy, bool introspection = true, typename... Args>
   Allocator makeAllocator(const std::string& name, Args&&... args);
 
   Allocator makeResource(const std::string& name);
 
-  Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
+  Allocator makeResource(const std::string& name, MemoryResourceTraits traits, bool tracking=true);
 
   /*!
    * \brief Register an Allocator with the ResourceManager.

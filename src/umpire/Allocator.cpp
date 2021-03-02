@@ -16,7 +16,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
     : strategy::mixins::Inspector{},
       strategy::mixins::Zeroer{},
       m_allocator{allocator},
-      m_tracking{true}
+      m_tracking{allocator->isTracked()}
 {
 }
 

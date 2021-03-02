@@ -16,6 +16,9 @@
 #include "umpire/util/Platform.hpp"
 
 namespace umpire {
+
+class ResourceManager;
+
 namespace strategy {
 
 /*!
@@ -24,6 +27,7 @@ namespace strategy {
  */
 class AllocationStrategy
 {
+  friend class umpire::ResourceManager;
  public:
   /*!
    * \brief Construct a new AllocationStrategy object.
@@ -136,13 +140,18 @@ class AllocationStrategy
 
   virtual bool tracksMemoryUse() const noexcept;
 
+  bool isTracked() const noexcept;
+
   std::size_t m_current_size{0};
   std::size_t m_high_watermark{0};
   std::size_t m_allocation_count{0};
 
  protected:
+  void setTracking(bool) noexcept;
+
   std::string m_name;
   int m_id;
+  bool m_tracked{true};
 
   AllocationStrategy* m_parent; 
 

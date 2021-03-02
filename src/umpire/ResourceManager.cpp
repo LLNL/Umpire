@@ -148,7 +148,8 @@ Allocator ResourceManager::makeResource(const std::string& name)
 }
 
 Allocator ResourceManager::makeResource(const std::string& name,
-                                        MemoryResourceTraits traits)
+                                        MemoryResourceTraits traits,
+                                        bool tracking)
 {
   if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
     UMPIRE_ERROR("Allocator " << name
@@ -163,6 +164,7 @@ Allocator ResourceManager::makeResource(const std::string& name,
   }
   std::unique_ptr<strategy::AllocationStrategy> allocator{
           registry.makeMemoryResource(name, getNextId(), traits)};
+  allocator->setTracking(tracking);
 
   UMPIRE_REPLAY(R"( "event": "makeMemoryResource", "payload": { "name": ")"
                 << name << R"(" })"

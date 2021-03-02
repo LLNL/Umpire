@@ -12,7 +12,7 @@ namespace umpire {
 namespace strategy {
 
 AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept
-    : m_name(name), m_id(id), m_parent(parent) 
+    : m_name(name), m_id(id), m_parent(parent)
 {
 }
 
@@ -87,6 +87,16 @@ AllocationStrategy* AllocationStrategy::getParent() const noexcept
 bool AllocationStrategy::tracksMemoryUse() const noexcept
 {
   return false;
+}
+
+void AllocationStrategy::setTracking(bool tracking) noexcept
+{
+  m_tracked = tracking;
+}
+
+bool AllocationStrategy::isTracked() const noexcept
+{
+  return m_tracked;
 }
 
 std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy)

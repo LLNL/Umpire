@@ -41,8 +41,12 @@ Allocator ResourceManager::makeAllocator(const std::string& name,
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
 
-  allocator = util::make_unique<Strategy>(name, getNextId(),
-                                  std::forward<Args>(args)...);
+  allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
+  if (introspection) {
+    allocator->setTracking(true);
+  } else {
+    allocator->setTracking(false);
+  }
 
   UMPIRE_REPLAY(
       "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
