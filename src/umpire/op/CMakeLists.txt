@@ -67,7 +67,7 @@ if (ENABLE_CUDA)
 
   set (umpire_op_depends
     ${umpire_op_depends}
-    cuda_runtime)
+    cuda)
 endif ()
 
 if (ENABLE_HIP)

@@ -90,6 +90,8 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
+blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
+
 set (umpire_defines)
 
 if (COMPILER_FAMILY_IS_MSVC AND NOT BUILD_SHARED_LIBS)
