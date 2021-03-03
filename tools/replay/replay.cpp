@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
       "Dump ULTRA file containing memory usage stats for each Allocator");
 
   app.add_flag("--size-stats", options.print_size_stats,
-      "Display pool allocaiton size statistics");
+      "Display pool allocation size statistics");
 
   app.add_flag("--info-only" , options.info_only,
       "Information about replay file, no actual replay performed");
