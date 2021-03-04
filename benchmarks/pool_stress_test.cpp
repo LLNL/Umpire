@@ -16,10 +16,10 @@
 #include "umpire/strategy/MixedPool.hpp"
 
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
-#define NUM_RND 100 //number of rounds (used to average timing)
+#define NUM_RND 1000 //number of rounds (used to average timing)
 
-const unsigned long long int ALLOC_SIZE = 17179869184; //~17GB - total SIZE of all allocations together
-const int SIZE{1<<25}; //~33MB - size of each allocation
+const unsigned long long int ALLOC_SIZE = 137438953472; //137GiB, total SIZE of all allocations together
+const int SIZE{1<<28}; //268MiB, size of each allocation
 const int NUM_ALLOC = ALLOC_SIZE/SIZE; //number of allocations for each round
 
 /*
@@ -46,10 +46,13 @@ void same_order(umpire::Allocator alloc, std::string name)
   }
 
   alloc.release();
+  double alloc_t{(time[0]/double(NUM_RND)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_RND)*CONVERT)};
 
   std::cout << "  SAME_ORDER (" << name << "):" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_RND)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_RND)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 /*
@@ -76,10 +79,13 @@ void reverse_order(umpire::Allocator alloc, std::string name)
   }
 
   alloc.release();
+  double alloc_t{(time[0]/double(NUM_RND)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_RND)*CONVERT)};
 
   std::cout << "  REVERSE_ORDER (" << name << "):" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_RND)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_RND)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 /*
@@ -109,10 +115,13 @@ void shuffle(umpire::Allocator alloc, std::string name)
   }
 
   alloc.release();
+  double alloc_t{(time[0]/double(NUM_RND)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_RND)*CONVERT)};
 
   std::cout << "  SHUFFLE (" << name << "):" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_RND)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_RND)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 int main(int, char**) {
@@ -122,37 +131,30 @@ int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
   
-  //FixedPool
-  umpire::Allocator fixed_pool_alloc = rm.makeAllocator<
-                    umpire::strategy::FixedPool, false>("fixed_pool", alloc, SIZE);
-  same_order(fixed_pool_alloc, "FixedPool");
-  reverse_order(fixed_pool_alloc, "FixedPool");
-  shuffle(fixed_pool_alloc, "FixedPool");
-
   //DynamicPoolMap
   umpire::Allocator dynamic_pool_map_alloc = rm.makeAllocator<
-                    umpire::strategy::DynamicPoolMap, false>("dynamic_pool_map", alloc, SIZE);
+                    umpire::strategy::DynamicPoolMap, false>("dynamic_pool_map", alloc, ALLOC_SIZE);
   same_order(dynamic_pool_map_alloc, "DynamicPoolMap");
   reverse_order(dynamic_pool_map_alloc, "DynamicPoolMap");
   shuffle(dynamic_pool_map_alloc, "DynamicPoolMap");
 
   //DynamicPooList
   umpire::Allocator dynamic_pool_list_alloc = rm.makeAllocator<
-                    umpire::strategy::DynamicPoolList, false>("dynamic_pool_list", alloc, SIZE);
+                    umpire::strategy::DynamicPoolList, false>("dynamic_pool_list", alloc, ALLOC_SIZE);
   same_order(dynamic_pool_list_alloc, "DynamicPoolList");
   reverse_order(dynamic_pool_list_alloc, "DynamicPoolList");
   shuffle(dynamic_pool_list_alloc, "DynamicPoolList");
 
   //QuickPool
   umpire::Allocator quick_pool_alloc = rm.makeAllocator<
-                    umpire::strategy::QuickPool, false>("quick_pool", alloc, SIZE);
+                    umpire::strategy::QuickPool, false>("quick_pool", alloc, ALLOC_SIZE);
   same_order(quick_pool_alloc, "QuickPool");
   reverse_order(quick_pool_alloc, "QuickPool");
   shuffle(quick_pool_alloc, "QuickPool");
 
   //MixedPool
   umpire::Allocator mixed_pool_alloc = rm.makeAllocator<
-                    umpire::strategy::MixedPool, false>("mixed_pool", alloc, SIZE);
+                    umpire::strategy::MixedPool, false>("mixed_pool", alloc, ALLOC_SIZE);
   same_order(mixed_pool_alloc, "MixedPool");
   reverse_order(mixed_pool_alloc, "MixedPool");
   shuffle(mixed_pool_alloc, "MixedPool");

@@ -38,8 +38,8 @@ blt_add_benchmark(
   COMMAND no-op_stress_test)
 
 blt_add_executable(
-  NAME pools_stress_test
-  SOURCES pools_stress_test.cpp
+  NAME pool_stress_test
+  SOURCES pool_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
 
 if (ENABLE_BENCHMARKS)
