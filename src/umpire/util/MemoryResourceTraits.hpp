@@ -48,6 +48,7 @@ struct MemoryResourceTraits {
   memory_type kind = memory_type::unknown;
   optimized_for used_for = optimized_for::any;
   resource_type resource = resource_type::unknown;
+  bool tracking{true};
 };
 
 } // end of namespace umpire

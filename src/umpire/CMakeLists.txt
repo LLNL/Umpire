@@ -7,6 +7,7 @@
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
+  AllocatorTraits.hpp
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl

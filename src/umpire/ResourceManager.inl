@@ -14,11 +14,12 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
+#include "camp/list.hpp"
+
 namespace umpire {
 
-template <typename Strategy, bool introspection, typename... Args>
-Allocator ResourceManager::makeAllocator(const std::string& name,
-                                         Args&&... args)
+template<typename Strategy, typename... Args>
+Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTraits traits, Allocator alloc, Args&&... args)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
@@ -32,7 +33,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name,
   UMPIRE_REPLAY(
       "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()
-      << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+      << "\", \"with_introspection\":" << (traits.tracked ? "true" : "false")
       << ", \"allocator_name\":\"" << name << "\""
       << ", \"args\": [ "
       << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
@@ -41,17 +42,13 @@ Allocator ResourceManager::makeAllocator(const std::string& name,
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
 
-  allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
-  if (introspection) {
-    allocator->setTracking(true);
-  } else {
-    allocator->setTracking(false);
-  }
+  allocator = util::make_unique<Strategy>(name, getNextId(), alloc, std::forward<Args>(args)...);
+  allocator->setTracking(traits.tracked);
 
   UMPIRE_REPLAY(
       "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()
-      << "\", \"with_introspection\":" << (introspection ? "true" : "false")
+      << "\", \"with_introspection\":" << (traits.tracked ? "true" : "false")
       << ", \"allocator_name\":\"" << name << "\""
       << ", \"args\": [ "
       << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
@@ -63,6 +60,16 @@ Allocator ResourceManager::makeAllocator(const std::string& name,
   m_allocators.emplace_front(std::move(allocator));
 
   return Allocator(m_allocators_by_name[name]);
+}
+
+template <typename Strategy, bool introspection, typename... Args>
+Allocator ResourceManager::makeAllocator(const std::string& name,
+                                         Allocator allocator,
+                                         Args&&... args)
+{
+  AllocatorTraits traits;
+  traits.tracked = introspection;
+  return makeAllocator<Strategy>(name, traits, allocator, std::forward<Args>(args)...);
 }
 
 } // end of namespace umpire
