@@ -16,11 +16,12 @@
 #include "umpire/strategy/MixedPool.hpp"
 
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
-#define NUM_RND 1000 //number of rounds (used to average timing)
 
-const unsigned long long int ALLOC_SIZE = 137438953472; //137GiB, total SIZE of all allocations together
+//Set up test factors
+const unsigned long long int ALLOC_SIZE = 137438953472; //137GiB, total size of all allocations together
 const int SIZE{1<<28}; //268MiB, size of each allocation
 const int NUM_ALLOC = ALLOC_SIZE/SIZE; //number of allocations for each round
+const int NUM_RND = 1000; //number of rounds (used to average timing)
 
 /*
  * This functions measures the time it takes to do NUM_ALLOC allocations and 
@@ -124,40 +125,27 @@ void shuffle(umpire::Allocator alloc, std::string name)
   std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
+template <class T>
+void run_test(std::string name)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::Allocator alloc = rm.getAllocator("HOST");
+  umpire::Allocator pool_alloc = rm.makeAllocator<T, false>(name, alloc, ALLOC_SIZE);
+
+  same_order(pool_alloc, name);
+  reverse_order(pool_alloc, name);
+  shuffle(pool_alloc, name);
+}
+
 int main(int, char**) {
   //Set up formatting for output
   std::cout << std::fixed << std::setprecision(9);
 
-  auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.getAllocator("HOST");
-  
-  //DynamicPoolMap
-  umpire::Allocator dynamic_pool_map_alloc = rm.makeAllocator<
-                    umpire::strategy::DynamicPoolMap, false>("dynamic_pool_map", alloc, ALLOC_SIZE);
-  same_order(dynamic_pool_map_alloc, "DynamicPoolMap");
-  reverse_order(dynamic_pool_map_alloc, "DynamicPoolMap");
-  shuffle(dynamic_pool_map_alloc, "DynamicPoolMap");
-
-  //DynamicPooList
-  umpire::Allocator dynamic_pool_list_alloc = rm.makeAllocator<
-                    umpire::strategy::DynamicPoolList, false>("dynamic_pool_list", alloc, ALLOC_SIZE);
-  same_order(dynamic_pool_list_alloc, "DynamicPoolList");
-  reverse_order(dynamic_pool_list_alloc, "DynamicPoolList");
-  shuffle(dynamic_pool_list_alloc, "DynamicPoolList");
-
-  //QuickPool
-  umpire::Allocator quick_pool_alloc = rm.makeAllocator<
-                    umpire::strategy::QuickPool, false>("quick_pool", alloc, ALLOC_SIZE);
-  same_order(quick_pool_alloc, "QuickPool");
-  reverse_order(quick_pool_alloc, "QuickPool");
-  shuffle(quick_pool_alloc, "QuickPool");
-
-  //MixedPool
-  umpire::Allocator mixed_pool_alloc = rm.makeAllocator<
-                    umpire::strategy::MixedPool, false>("mixed_pool", alloc, ALLOC_SIZE);
-  same_order(mixed_pool_alloc, "MixedPool");
-  reverse_order(mixed_pool_alloc, "MixedPool");
-  shuffle(mixed_pool_alloc, "MixedPool");
+  //Call template function to run tests for each pool
+  run_test<umpire::strategy::DynamicPoolMap>("DynamicPoolMap");
+  run_test<umpire::strategy::DynamicPoolList>("DynamicPoolList");
+  run_test<umpire::strategy::QuickPool>("QuickPool");
+  run_test<umpire::strategy::MixedPool>("MixedPool");
 
   return 0;
 }
