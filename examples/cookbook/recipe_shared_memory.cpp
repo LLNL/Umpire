@@ -4,13 +4,18 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+
+#include "umpire/config.hpp"
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
+#if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
+#endif
 
 #include <chrono>
 #include <iostream>
@@ -30,14 +35,26 @@
 // in the debugger session windows, no MPI will be used and the debugger must
 // be used for synchronization (by setting breakpoints).
 //
-int main(int ac, char** av)
+int main(
+  int
+  ac
+  ,
+  char**
+#if defined(UMPIRE_ENABLE_MPI)
+  av
+#endif
+)
 {
+#if defined(UMPIRE_ENABLE_MPI)
   const bool use_mpi{ ac == 1 };
+#endif
   const bool i_am_parent{ ac == 2 };
 
+#if defined(UMPIRE_ENABLE_MPI)
   if (use_mpi) {
     MPI_Init(&ac, &av);
   }
+#endif
 
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -66,16 +83,21 @@ int main(int ac, char** av)
   //
   // Get communicator for this allocator
   //
+#if defined(UMPIRE_ENABLE_MPI)
   MPI_Comm shared_allocator_comm;
+#endif
   int foreman_rank{0};
   int shared_rank{0};
 
+#if defined(UMPIRE_ENABLE_MPI)
   if (use_mpi) {
     shared_allocator_comm = umpire::get_communicator_for_allocator(
                                       node_allocator, MPI_COMM_WORLD);
     MPI_Comm_rank(shared_allocator_comm, &shared_rank);
   }
-  else { // Running non-mpi in debugger
+  else
+#endif
+  { // Running non-mpi in debugger
     shared_rank = i_am_parent ? foreman_rank : foreman_rank + 1;
   }
 
@@ -88,10 +110,13 @@ int main(int ac, char** av)
   if ( shared_rank == foreman_rank )
     *data = 0xDEADBEEF;
 
+#if defined(UMPIRE_ENABLE_MPI)
   if (use_mpi) {
     MPI_Barrier(shared_allocator_comm);
   }
-  else {
+  else
+#endif
+  {
     if ( !i_am_parent ) {
       shared_rank++;    // Set a breakpoint here to synchronize
     }
@@ -101,9 +126,11 @@ int main(int ac, char** av)
 
   node_allocator.deallocate(ptr);
 
+#if defined(UMPIRE_ENABLE_MPI)
   if (use_mpi) {
     MPI_Finalize();
   }
+#endif
 
   return 0;
 }

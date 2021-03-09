@@ -57,7 +57,6 @@ class HostSharedMemoryResource::impl {
 
       bool created{ false };
       bool completed{ false };
-      int shm_handle{ 0 };
       int err{ 0 };
 
       UMPIRE_LOG(Debug, " ( " << "name=\"" << name << "\"" << ", size=" << size << ")");
@@ -71,7 +70,7 @@ class HostSharedMemoryResource::impl {
       // assured of having a clean directory.
       //
       while (!completed) { // spin on opening shm
-        if ( open_shared_memory_segment(shm_handle, err, (O_RDWR | O_CREAT | O_EXCL) ) ) {
+        if ( open_shared_memory_segment(err, (O_RDWR | O_CREAT | O_EXCL) ) ) {
           created = true;
           completed = true;
         }
@@ -80,7 +79,7 @@ class HostSharedMemoryResource::impl {
                         << m_segment_name << ": " << strerror(err));
         }
         else {
-          if (open_shared_memory_segment(shm_handle, err, O_RDWR)) {
+          if (open_shared_memory_segment(err, O_RDWR)) {
             created = false;
             completed = true;
           }
@@ -93,15 +92,15 @@ class HostSharedMemoryResource::impl {
       }
 
       if (created) {
-        if ( 0 != ftruncate(shm_handle, size) ) {
+        if ( 0 != ftruncate(m_segment_fd, size) ) {
           err = errno;
           UMPIRE_ERROR("Failed to set size for shared memory segment "
                           << m_segment_name << ": " << strerror(err));
         }
 
-        map_shared_memory_segment(shm_handle);
+        map_shared_memory_segment();
 
-        __atomic_store_n(&shared_mem_header->init_flag, Initializing, __ATOMIC_SEQ_CST);
+        __atomic_store_n(&m_segment->init_flag, Initializing, __ATOMIC_SEQ_CST);
 
         pthread_mutexattr_t mattr;
         if ( ( err = pthread_mutexattr_init(&mattr) ) != 0 ) {
@@ -114,23 +113,23 @@ class HostSharedMemoryResource::impl {
                           << m_segment_name << ": " << strerror(err));
         }
 
-        if ( ( err = pthread_mutex_init(&shared_mem_header->mutex, &mattr) ) != 0 ) {
+        if ( ( err = pthread_mutex_init(&m_segment->mutex, &mattr) ) != 0 ) {
           UMPIRE_ERROR("Failed to initialize mutex for shared memory segment "
                           << m_segment_name << ": " << strerror(err));
         }
 
-        shared_mem_header->segment_size = size;
+        m_segment->segment_size = size;
 
-        pointer_to_offset(&shared_mem_header[1], shared_mem_header->free_blocks_off);
-        pointer_to_offset(nullptr, shared_mem_header->used_blocks_off);
+        pointer_to_offset(&m_segment[1], m_segment->free_blocks_off);
+        pointer_to_offset(nullptr, m_segment->used_blocks_off);
         SharedMemoryBlock* block_ptr;
-        offset_to_pointer(shared_mem_header->free_blocks_off, block_ptr);
+        offset_to_pointer(m_segment->free_blocks_off, block_ptr);
         pointer_to_offset(nullptr, block_ptr->next_block_off);
         pointer_to_offset(nullptr, block_ptr->name_offset);
         block_ptr->size = size - sizeof(SharedMemorySegmentHeader);
         block_ptr->reference_count = 0;
 
-        __atomic_store_n(&shared_mem_header->init_flag, Initialized, __ATOMIC_SEQ_CST);
+        __atomic_store_n(&m_segment->init_flag, Initialized, __ATOMIC_SEQ_CST);
       }
       else {
         // Wait for the file size to change
@@ -138,7 +137,7 @@ class HostSharedMemoryResource::impl {
         while ( filesize == 0 ) {
           struct stat st;
 
-          if ( fstat(shm_handle, &st) < 0 ) {
+          if ( fstat(m_segment_fd, &st) < 0 ) {
             err = errno;
             UMPIRE_ERROR("Failed fstat for shared memory segment "
                           << m_segment_name << ": " << strerror(err));
@@ -147,20 +146,38 @@ class HostSharedMemoryResource::impl {
           std::this_thread::yield();
         }
 
-        map_shared_memory_segment(shm_handle);
+        map_shared_memory_segment();
 
-        uint32_t value{ __atomic_load_n(&shared_mem_header->init_flag, __ATOMIC_SEQ_CST) };
+        uint32_t value{ __atomic_load_n(&m_segment->init_flag, __ATOMIC_SEQ_CST) };
 
         // Wait for the memory segment header to be initialized
         while ( value != Initialized ) {
           std::this_thread::yield();
-          value = __atomic_load_n(&shared_mem_header->init_flag, __ATOMIC_SEQ_CST);
+          value = __atomic_load_n(&m_segment->init_flag, __ATOMIC_SEQ_CST);
         }
       }
     }
 
     ~impl()
     {
+      int err{0};
+
+      if ( ( err = munmap(m_segment, m_segment_size) ) != 0 ) {
+        err = errno;
+        UMPIRE_LOG(Error, "Failed to unmap(m_segment=" << m_segment
+          << ", m_segment_size=" << m_segment_size
+          << ") for segment " << m_segment_name << ": " << strerror(err));
+      }
+
+      if ( ( err = shm_unlink(m_segment_name.c_str()) ) != 0 ) {
+        err = errno;
+        UMPIRE_LOG(Error, "Failed to shm_unlink segment " << m_segment_name << ": " << strerror(err));
+      }
+
+      if ( ( err = close(m_segment_fd) ) != 0 ) {
+        err = errno;
+        UMPIRE_LOG(Error, "Failed to close shared memory object " << m_segment_name << ": " << strerror(err));
+      }
     }
 
     void* allocate(const std::string& name, std::size_t requested_size )
@@ -174,7 +191,7 @@ class HostSharedMemoryResource::impl {
 
       UMPIRE_LOG(Debug, "(name=\"" << name << ", requested_size=" << requested_size << ")");
 
-      if ( ( err = pthread_mutex_lock(&shared_mem_header->mutex) ) != 0 ) {
+      if ( ( err = pthread_mutex_lock(&m_segment->mutex) ) != 0 ) {
         UMPIRE_ERROR("Failed to lock mutex for shared memory segment "
                             << m_segment_name << ": " << strerror(err));
       }
@@ -194,8 +211,8 @@ class HostSharedMemoryResource::impl {
           splitBlock(best, prev, adjusted_size);
 
           // Push node to the list of used nodes
-          best->next_block_off = shared_mem_header->used_blocks_off;
-          pointer_to_offset(best, shared_mem_header->used_blocks_off);
+          best->next_block_off = m_segment->used_blocks_off;
+          pointer_to_offset(best, m_segment->used_blocks_off);
 
           // Set up block header
           std::size_t block_offset;
@@ -213,7 +230,7 @@ class HostSharedMemoryResource::impl {
 
       offset_to_pointer(best->memory_offset, ptr);
 
-      pthread_mutex_unlock(&shared_mem_header->mutex);
+      pthread_mutex_unlock(&m_segment->mutex);
 
       if ( ptr == nullptr ) {
         UMPIRE_ERROR("shared memory allocation( bytes = " << requested_size << " ) failed");
@@ -235,7 +252,7 @@ class HostSharedMemoryResource::impl {
       offset_to_pointer(block_off, block_ptr);
 
       int err{0};
-      if ( ( err = pthread_mutex_lock(&shared_mem_header->mutex) ) != 0 ) {
+      if ( ( err = pthread_mutex_lock(&m_segment->mutex) ) != 0 ) {
         UMPIRE_ERROR("Failed to lock mutex for shared memory segment "
                             << m_segment_name << ": " << strerror(err));
       }
@@ -246,7 +263,7 @@ class HostSharedMemoryResource::impl {
         SharedMemoryBlock* curr;
         SharedMemoryBlock* prev{nullptr};
 
-        offset_to_pointer(shared_mem_header->used_blocks_off, curr);
+        offset_to_pointer(m_segment->used_blocks_off, curr);
 
         while ( curr != nullptr && curr != block_ptr) {
           prev = curr;
@@ -256,7 +273,7 @@ class HostSharedMemoryResource::impl {
         releaseBlock(block_ptr, prev);
       }
 
-      pthread_mutex_unlock(&shared_mem_header->mutex);
+      pthread_mutex_unlock(&m_segment->mutex);
     }
 
     void* find_pointer_from_name(std::string name)
@@ -264,7 +281,7 @@ class HostSharedMemoryResource::impl {
       void* ptr{nullptr};
       int err{0};
 
-      if ( ( err = pthread_mutex_lock(&shared_mem_header->mutex) ) != 0 ) {
+      if ( ( err = pthread_mutex_lock(&m_segment->mutex) ) != 0 ) {
         UMPIRE_ERROR("Failed to lock mutex for shared memory segment "
                             << m_segment_name << ": " << strerror(err));
       }
@@ -276,7 +293,7 @@ class HostSharedMemoryResource::impl {
         offset_to_pointer(block_ptr->memory_offset, ptr);
       }
 
-      pthread_mutex_unlock(&shared_mem_header->mutex);
+      pthread_mutex_unlock(&m_segment->mutex);
       return ptr;
     }
 
@@ -287,8 +304,9 @@ class HostSharedMemoryResource::impl {
 
   private:
     std::string m_segment_name;
-    SharedMemorySegmentHeader* shared_mem_header{nullptr};
-    std::size_t m_size{0};
+    int m_segment_fd{-1};
+    std::size_t m_segment_size{0};
+    SharedMemorySegmentHeader* m_segment{nullptr};
     std::size_t m_alignment{16};
 
     template <class OFF_T, class PTR_T>
@@ -297,7 +315,7 @@ class HostSharedMemoryResource::impl {
         ptr = nullptr;
       }
       else {
-        ptr = reinterpret_cast<PTR_T>(reinterpret_cast<char*>(shared_mem_header) + offset);
+        ptr = reinterpret_cast<PTR_T>(reinterpret_cast<char*>(m_segment) + offset);
       }
     }
 
@@ -309,7 +327,7 @@ class HostSharedMemoryResource::impl {
     template <class PTR_T, class OFF_T>
     void pointer_to_offset(PTR_T ptr, OFF_T& offset)
     {
-      char* base{ reinterpret_cast<char*>(shared_mem_header) };
+      char* base{ reinterpret_cast<char*>(m_segment) };
 
       offset = ptr == nullptr ? 0 : static_cast<OFF_T>(reinterpret_cast<char*>(ptr) - base);
     }
@@ -317,7 +335,7 @@ class HostSharedMemoryResource::impl {
     SharedMemoryBlock* find_existing_allocation( std::string name )
     {
       SharedMemoryBlock* block_ptr;
-      offset_to_pointer(shared_mem_header->used_blocks_off, block_ptr);
+      offset_to_pointer(m_segment->used_blocks_off, block_ptr);
 
       while ( block_ptr != nullptr ) {
         char* allocation_name;
@@ -335,7 +353,7 @@ class HostSharedMemoryResource::impl {
       best = prev = nullptr;
 
       SharedMemoryBlock* iter;
-      offset_to_pointer(shared_mem_header->free_blocks_off, iter);
+      offset_to_pointer(m_segment->free_blocks_off, iter);
       SharedMemoryBlock* iterPrev{nullptr};
 
       while ( iter != nullptr ) {
@@ -355,19 +373,19 @@ class HostSharedMemoryResource::impl {
       if (prev)
         prev->next_block_off = curr->next_block_off;
       else
-        shared_mem_header->used_blocks_off = curr->next_block_off;
+        m_segment->used_blocks_off = curr->next_block_off;
 
       // Find location to put this block in the freeBlocks list
       prev = nullptr;
       SharedMemoryBlock* iter;
-      offset_to_pointer(shared_mem_header->free_blocks_off, iter);
+      offset_to_pointer(m_segment->free_blocks_off, iter);
 
       while ( iter != nullptr && iter < curr) {
         prev = iter;
         offset_to_pointer(iter->next_block_off, iter);
       }
       // Keep track of the successor
-      std::size_t next_offset = prev ? prev->next_block_off : shared_mem_header->free_blocks_off;
+      std::size_t next_offset = prev ? prev->next_block_off : m_segment->free_blocks_off;
       SharedMemoryBlock* next;
       offset_to_pointer(next_offset, next);
       std::size_t prev_offset;
@@ -383,7 +401,7 @@ class HostSharedMemoryResource::impl {
       } else if (prev) {
         prev->next_block_off = curr_offset;
       } else {
-        shared_mem_header->free_blocks_off = curr_offset;
+        m_segment->free_blocks_off = curr_offset;
       }
 
       // Check if curr and next can be merged
@@ -429,30 +447,30 @@ class HostSharedMemoryResource::impl {
       else {
         std::size_t offset;
         pointer_to_offset(next, offset);
-        shared_mem_header->free_blocks_off = offset;
+        m_segment->free_blocks_off = offset;
       }
     }
 
-    bool open_shared_memory_segment(int& handle, int& err, int oflag)
+    bool open_shared_memory_segment(int& err, int oflag)
     {
       constexpr int omode{ S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH };
 
-      handle = shm_open(m_segment_name.c_str(), oflag, omode);
+      m_segment_fd = shm_open(m_segment_name.c_str(), oflag, omode);
       err = errno;
 
-      bool rval{ handle >= 0 };
+      bool rval{ m_segment_fd >= 0 };
 
       if ( rval && (oflag & O_CREAT) ) {
-        ::fchmod(handle, omode);
+        ::fchmod(m_segment_fd, omode);
       }
 
       return rval;
     }
 
-    void map_shared_memory_segment(int handle)
+    void map_shared_memory_segment()
     {
       struct ::stat buf;
-      if ( 0 != fstat(handle, &buf) ) {
+      if ( 0 != fstat(m_segment_fd, &buf) ) {
         int err = errno;
         UMPIRE_ERROR("Failed to obtain size of shared object "
                             << m_segment_name << ": " << strerror(err));
@@ -467,7 +485,7 @@ class HostSharedMemoryResource::impl {
                         , static_cast<std::size_t>(size)
                         , prot
                         , flags
-                        , handle
+                        , m_segment_fd
                         , 0);
 
       if (base == MAP_FAILED) {
@@ -475,8 +493,8 @@ class HostSharedMemoryResource::impl {
         UMPIRE_ERROR("Failed to map shared object " << m_segment_name << ": " << strerror(err) );
       }
 
-      shared_mem_header = static_cast<SharedMemorySegmentHeader*>(base);
-      m_size   = size;
+      m_segment = static_cast<SharedMemorySegmentHeader*>(base);
+      m_segment_size   = size;
     }
 };
 
