@@ -29,6 +29,11 @@ blt_add_executable(
   DEPENDS_ON ${stress_test_depends})
 
 blt_add_executable(
+  NAME fixed_pool_stress_test
+  SOURCES fixed_pool_stress_test.cpp
+  DEPENDS_ON ${stress_test_depends})
+
+blt_add_executable(
   NAME no-op_stress_test
   SOURCES no-op_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
