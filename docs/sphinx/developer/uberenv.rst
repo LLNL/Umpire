@@ -44,20 +44,20 @@ Vetted specs
 
   $ ls -c1 .gitlab/*jobs.yml
   .gitlab/lassen-jobs.yml
-  .gitlab/quartz-jobs.yml
+  .gitlab/ruby-jobs.yml
 
-CI contains jobs for quartz.
+CI contains jobs for ruby.
 
 .. code-block:: bash
 
-  $ git grep -h "SPEC" .gitlab/quartz-jobs.yml | grep "gcc"
+  $ git grep -h "SPEC" .gitlab/ruby-jobs.yml | grep "gcc"
       SPEC: "%gcc@4.9.3"
       SPEC: "%gcc@6.1.0"
       SPEC: "%gcc@7.1.0"
       SPEC: "%gcc@7.3.0"
       SPEC: "%gcc@8.1.0"
 
-We now have a list of the specs vetted on ``quartz``/``toss_3_x86_64_ib``.
+We now have a list of the specs vetted on ``ruby``/``toss_3_x86_64_ib``.
 
 .. note::
   In practice, one should check if the job is not *allowed to fail*, or even deactivated.
@@ -71,7 +71,7 @@ In Umpire, the Spack configuration for MacOS contains the default compilers depe
 Using Uberenv to generate the host-config file
 ----------------------------------------------
 
-We have seen that we can safely use `gcc@8.1.0` on quartz. Let us ask for the default configuration first, and then produce static libs, have OpenMP support and run the benchmarks:
+We have seen that we can safely use `gcc@8.1.0` on ruby. Let us ask for the default configuration first, and then produce static libs, have OpenMP support and run the benchmarks:
 
 .. code-block:: bash
 
@@ -82,7 +82,7 @@ Each will generate a CMake cache file, e.g.:
 
 .. code-block:: bash
 
-  hc-quartz-toss_3_x86_64_ib-gcc@8.1.0-fjcjwd6ec3uen5rh6msdqujydsj74ubf.cmake
+  hc-ruby-toss_3_x86_64_ib-gcc@8.1.0-fjcjwd6ec3uen5rh6msdqujydsj74ubf.cmake
 
 Using host-config files to build Umpire
 ---------------------------------------
@@ -109,12 +109,12 @@ During development, it may be beneficial to regularly check for memory leaks. Th
 
   $ srun -ppdebug -N1 --exclusive python scripts/uberenv/uberenv.py --spec="%clang@9.0.0 cxxflags=-fsanitize=address"
   $ cd build
-  $ cmake -C <path_to>/hc-quartz-toss_3_x86_64_ib-clang@9.0.0.cmake ..
+  $ cmake -C <path_to>/hc-ruby-toss_3_x86_64_ib-clang@9.0.0.cmake ..
   $ cmake --build -j
   $ ASAN_OPTIONS=detect_leaks=1 make test
 
 .. note::
-  The host config file (i.e., ``hc-quartz-...cmake``) can be reused in order to rebuild with the same configuration if needed.
+  The host config file (i.e., ``hc-ruby-...cmake``) can be reused in order to rebuild with the same configuration if needed.
 
 This will configure a build with Clang 9.0.0 and the Leak Sanitizer. If there is a leak in one of the tests, it can be useful to gather more information about what happened and more details about where it happened. One way to do this is to run:
 
