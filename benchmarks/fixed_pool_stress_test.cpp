@@ -1,7 +1,6 @@
 #include <iostream>
 #include <chrono>
 #include <string>
-#include <vector>
 #include <random>
 
 #include "umpire/config.hpp"
@@ -12,9 +11,19 @@
 
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
 const int NUM_RND = 1000; //number of rounds (used to average timing)
-const int NUM_ALLOC = 512;
-const int NUM_SIZES = 5;
+const int NUM_ALLOC = 512; //number of allocations used for testing (consistent with pools)
+const int NUM_SIZES = 5; //number of different sizes used during testing
+const int FACTOR = 2048; //Default size used when creating FixedPool (64*sizeof(int)*8)
 
+////////////////////////////////////////////////////////////////////
+//Note: the total size of allocated memory is the multiplication of
+//SIZE and FACTOR, the default objects_per_pool value of 2048.
+////////////////////////////////////////////////////////////////////
+
+/*
+ * This function measures the time it takes to do NUM_ALLOC allocations and 
+ * then do NUM_ALLOC deallocations in the same order. The time is averaged across NUM_RND rounds. 
+ */
 void same_order(umpire::Allocator alloc, int SIZE)
 {
   double time[2] = {0.0, 0.0};
@@ -38,12 +47,16 @@ void same_order(umpire::Allocator alloc, int SIZE)
   double alloc_t{(time[0]/double(NUM_RND)*CONVERT)};
   double dealloc_t{(time[1]/double(NUM_RND)*CONVERT)};
 
-  std::cout << "  SAME_ORDER (FixedPool - " << (long long int)NUM_ALLOC*SIZE << "):" << std::endl; 
+  std::cout << "  SAME_ORDER (FixedPool - " << (long long int)SIZE*FACTOR << "):" << std::endl; 
   std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
   std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
   std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
+/*
+ * This function measures the time it takes to do NUM_ALLOC allocations and 
+ * then do NUM_ALLOC deallocations in reverse order. The time is averaged across NUM_RND rounds. 
+ */
 void reverse_order(umpire::Allocator alloc, int SIZE)
 {
   double time[2] = {0.0, 0.0};
@@ -67,12 +80,17 @@ void reverse_order(umpire::Allocator alloc, int SIZE)
   double alloc_t{(time[0]/double(NUM_RND)*CONVERT)};
   double dealloc_t{(time[1]/double(NUM_RND)*CONVERT)};
 
-  std::cout << "  REVERSE_ORDER (FixedPool - " << (long long int)NUM_ALLOC*SIZE << "):" << std::endl; 
+  std::cout << "  REVERSE_ORDER (FixedPool - " << (long long int)SIZE*FACTOR << "):" << std::endl; 
   std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
   std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
   std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
+/*
+ * This function measures the time it takes to do NUM_ALLOC allocations, shuffle the 
+ * array of returned pointers, and then do NUM_ALLOC deallocations. The time is averaged
+ * across NUM_RND rounds. 
+ */
 void shuffle(umpire::Allocator alloc, int SIZE)
 {
   std::mt19937 gen(NUM_ALLOC);
@@ -98,16 +116,12 @@ void shuffle(umpire::Allocator alloc, int SIZE)
   double alloc_t{(time[0]/double(NUM_RND)*CONVERT)};
   double dealloc_t{(time[1]/double(NUM_RND)*CONVERT)};
 
-  std::cout << "  SHUFFLE (FixedPool - " << (long long int)NUM_ALLOC*SIZE << "):" << std::endl; 
+  std::cout << "  SHUFFLE (FixedPool - " << (long long int)SIZE*FACTOR << "):" << std::endl; 
   std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
   std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
   std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
-////////////////////////////////////////////////////////////////////
-//Note: the total size of allocated memory is the multiplication of
-//SIZE and the default objects_per_pool value of 2048.
-////////////////////////////////////////////////////////////////////
 int main(int, char**)
 {
   //Set up formatting for output
