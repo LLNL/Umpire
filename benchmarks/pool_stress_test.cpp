@@ -24,7 +24,7 @@ const int NUM_ALLOC = ALLOC_SIZE/SIZE; //number of allocations for each round
 const int NUM_RND = 1000; //number of rounds (used to average timing)
 
 /*
- * This functions measures the time it takes to do NUM_ALLOC allocations and 
+ * This function measures the time it takes to do NUM_ALLOC allocations and 
  * then do NUM_ALLOC deallocations in the same order. The time is averaged across NUM_RND rounds. 
  */
 void same_order(umpire::Allocator alloc, std::string name)
@@ -57,7 +57,7 @@ void same_order(umpire::Allocator alloc, std::string name)
 }
 
 /*
- * This functions measures the time it takes to do NUM_ALLOC allocations and 
+ * This function measures the time it takes to do NUM_ALLOC allocations and 
  * then do NUM_ALLOC deallocations in reverse order. The time is averaged across NUM_RND rounds. 
  */
 void reverse_order(umpire::Allocator alloc, std::string name)
@@ -90,7 +90,7 @@ void reverse_order(umpire::Allocator alloc, std::string name)
 }
 
 /*
- * This functions measures the time it takes to do NUM_ALLOC allocations, shuffle the 
+ * This function measures the time it takes to do NUM_ALLOC allocations, shuffle the 
  * array of returned pointers, and then do NUM_ALLOC deallocations. The time is averaged
  * across NUM_RND rounds. 
  */
