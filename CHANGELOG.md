@@ -35,6 +35,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Vendor allocator benchmarking results for RZWhamo, Corona, and RZAnsel.
 
+- Install thirdparty exports in CMake configuration file
+
+- UM-837 - Replay will now display high water mark statistics per allocator.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
