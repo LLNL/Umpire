@@ -228,12 +228,13 @@ class HostSharedMemoryResource::impl {
         }
       }
 
-      offset_to_pointer(best->memory_offset, ptr);
-
       pthread_mutex_unlock(&m_segment->mutex);
 
-      if ( ptr == nullptr ) {
+      if ( best == nullptr ) {
         UMPIRE_ERROR("shared memory allocation( bytes = " << requested_size << " ) failed");
+      }
+      else {
+        offset_to_pointer(best->memory_offset, ptr);
       }
 
       return ptr;
@@ -260,6 +261,8 @@ class HostSharedMemoryResource::impl {
       block_ptr->reference_count--;
 
       if ( block_ptr->reference_count == 0 ) {
+        block_ptr->memory_offset = 0;
+        block_ptr->name_offset = 0;
         SharedMemoryBlock* curr;
         SharedMemoryBlock* prev{nullptr};
 
