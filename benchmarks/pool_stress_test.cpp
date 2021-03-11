@@ -18,11 +18,7 @@
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
 
 //Set up test factors
-#if defined(UMPIRE_ENABLE_CUDA)
-const unsigned long long int ALLOC_SIZE = 8589934592; //8GiB, total size of all allocations together
-#else
 const unsigned long long int ALLOC_SIZE = 137438953472; //137GiB, total size of all allocations together
-#endif
 const int SIZE{1<<28}; //268MiB, size of each allocation
 const int NUM_ALLOC = ALLOC_SIZE/SIZE; //number of allocations for each round
 const int NUM_RND = 1000; //number of rounds (used to average timing)
@@ -133,7 +129,7 @@ template <class T>
 void run_test(std::string name)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  umpire::Allocator alloc = rm.getAllocator("DEVICE");
+  umpire::Allocator alloc = rm.getAllocator("HOST");
   umpire::Allocator pool_alloc = rm.makeAllocator<T, false>(name, alloc, ALLOC_SIZE);
 
   same_order(pool_alloc, name);
