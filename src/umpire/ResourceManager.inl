@@ -19,7 +19,7 @@
 namespace umpire {
 
 template<typename Strategy, typename... Args>
-Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTraits traits, Allocator alloc, Args&&... args)
+Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTraits traits, Args&&... args)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
@@ -42,7 +42,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTrait
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
 
-  allocator = util::make_unique<Strategy>(name, getNextId(), alloc, std::forward<Args>(args)...);
+  allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
   allocator->setTracking(traits.tracked);
 
   UMPIRE_REPLAY(
@@ -64,12 +64,11 @@ Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTrait
 
 template <typename Strategy, bool introspection, typename... Args>
 Allocator ResourceManager::makeAllocator(const std::string& name,
-                                         Allocator allocator,
                                          Args&&... args)
 {
   AllocatorTraits traits;
   traits.tracked = introspection;
-  return makeAllocator<Strategy>(name, traits, allocator, std::forward<Args>(args)...);
+  return makeAllocator<Strategy>(name, traits, std::forward<Args>(args)...);
 }
 
 } // end of namespace umpire
