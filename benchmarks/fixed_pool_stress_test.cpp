@@ -10,9 +10,9 @@
 #include "umpire/strategy/FixedPool.hpp"
 
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
+
 const int NUM_RND = 1000; //number of rounds (used to average timing)
-const int NUM_ALLOC = 512; //number of allocations used for testing (consistent with pools)
-const int NUM_SIZES = 5; //number of different sizes used during testing
+const int NUM_ALLOC = 512; //number of allocations used for testing
 const int FACTOR = 2048; //Default size used when creating FixedPool (64*sizeof(int)*8)
 
 ////////////////////////////////////////////////////////////////////
@@ -130,8 +130,10 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
   
-  //array of all sizes used: 2^26, 2^24, 2^20, 2^15, 2^11
-  static int SIZE[NUM_SIZES] = {67108864, 16777216, 1048576, 32768, 2048};
+  //NUM_SIZES: Using two different sizes to show average times don't vary much.
+  //SIZE: Array of sizes used: 2^26, 2^11 (large vs. small)
+  const int NUM_SIZES = 2; 
+  static int SIZE[NUM_SIZES] = {67108864, 2048};
 
   //create the FixedPool allocator and run stress tests for all sizes
   for(int i = 0; i < NUM_SIZES; i++)
