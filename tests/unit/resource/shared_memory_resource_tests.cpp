@@ -24,6 +24,8 @@ namespace {
   std::size_t largest_allocation_size{0};
 
   class SharedMemoryTest : public ::testing::Test {
+    using ArrayElement = int;
+    using ShapedArray = std::pair<ArrayElement*, std::size_t>;
   public:
     virtual void SetUp()
     {
@@ -77,9 +79,14 @@ namespace {
       return allocation_size;
     }
 
-    const std::size_t m_small{  1ULL << 18ULL };  //  1 MiB
+    const std::size_t m_small{  1ULL << 26ULL };  //  256 MiB
     // const std::size_t m_big  {  1ULL << 42ULL };  // 64 GiB
   };
+
+  TEST_F(SharedMemoryTest, Construct)
+  {
+    SUCCEED();
+  }
 
   TEST_F(SharedMemoryTest, AllocateTooMuch)
   {

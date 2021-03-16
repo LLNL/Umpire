@@ -33,7 +33,7 @@ class HostSharedMemoryResource::impl {
     std::size_t next_block_off;  // Offset == 0 is same as nullptr
     std::size_t name_offset;
     std::size_t memory_offset;
-    std::size_t size;               // Includes header+name+memory
+    std::size_t block_size;               // Includes header+name+memory
     std::size_t reference_count;
   };
 
@@ -42,7 +42,6 @@ class HostSharedMemoryResource::impl {
     uint32_t reserved;
     pthread_mutex_t mutex;
     std::size_t segment_size;    // Full segment size, excluding this header
-    std::size_t in_use;
     std::size_t high_watermark;
     std::size_t free_blocks_off;
     std::size_t used_blocks_off;
@@ -126,7 +125,7 @@ class HostSharedMemoryResource::impl {
         offset_to_pointer(m_segment->free_blocks_off, block_ptr);
         pointer_to_offset(nullptr, block_ptr->next_block_off);
         pointer_to_offset(nullptr, block_ptr->name_offset);
-        block_ptr->size = size - sizeof(SharedMemorySegmentHeader);
+        block_ptr->block_size = size - sizeof(SharedMemorySegmentHeader);
         block_ptr->reference_count = 0;
 
         __atomic_store_n(&m_segment->init_flag, Initialized, __ATOMIC_SEQ_CST);
@@ -360,10 +359,10 @@ class HostSharedMemoryResource::impl {
       SharedMemoryBlock* iterPrev{nullptr};
 
       while ( iter != nullptr ) {
-        if (iter->size >= size && (best == nullptr || iter->size < best->size) ) {
+        if (iter->block_size >= size && (best == nullptr || iter->block_size < best->block_size) ) {
           best = iter;
           prev = iterPrev;
-          if (iter->size == size)
+          if (iter->block_size == size)
             break;  // Exact match, won't find a better one, look no further
         }
         iterPrev = iter;
@@ -397,8 +396,8 @@ class HostSharedMemoryResource::impl {
       pointer_to_offset(curr, curr_offset);
 
       // Check if prev and curr can be merged
-      if (prev && prev_offset + prev->size == curr_offset) {
-        prev->size = prev->size + curr->size;
+      if (prev && prev_offset + prev->block_size == curr_offset) {
+        prev->block_size = prev->block_size + curr->block_size;
         curr = prev;
         pointer_to_offset(curr, curr_offset);
       } else if (prev) {
@@ -408,8 +407,8 @@ class HostSharedMemoryResource::impl {
       }
 
       // Check if curr and next can be merged
-      if ( next && ( curr_offset + curr->size == next_offset ) ) {
-        curr->size = curr->size + next->size;
+      if ( next && ( curr_offset + curr->block_size == next_offset ) ) {
+        curr->block_size = curr->block_size + next->block_size;
         curr->next_block_off = next->next_block_off;
       } else {
         curr->next_block_off = next_offset;
@@ -419,13 +418,13 @@ class HostSharedMemoryResource::impl {
     void splitBlock(SharedMemoryBlock *&curr, SharedMemoryBlock *&prev, const std::size_t size)
     {
       SharedMemoryBlock *next{nullptr};
+      std::size_t remaining{ curr->block_size - size };
 
-      if (curr->size == size) {
+      if (curr->block_size == size || remaining < sizeof(SharedMemoryBlock)) {
         // Keep it
         offset_to_pointer(curr->next_block_off, next);
       } else {
         // Split the block
-        std::size_t remaining = curr->size - size;
         std::size_t curr_block_off;
         pointer_to_offset(curr, curr_block_off);
 
@@ -436,10 +435,10 @@ class HostSharedMemoryResource::impl {
         newBlock->name_offset = 0;
         newBlock->next_block_off = curr->next_block_off;
         newBlock->reference_count = 0;
-        newBlock->size = remaining;
+        newBlock->block_size = remaining;
 
         next = newBlock;
-        curr->size = size;
+        curr->block_size = size;
       }
 
       if ( prev != nullptr ) {
