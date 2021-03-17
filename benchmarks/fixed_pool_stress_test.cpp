@@ -11,7 +11,7 @@
 
 const int NUM_RND {1000}; //number of rounds (used to average timing)
 const int NUM_ALLOC {512}; //number of allocations used for testing
-const int OBJECTS_PER_BLOCK {1<<11}; //2^11 == 2048 blocks of object_bytes size
+const int OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes size (2048)
 
 void run_test(umpire::Allocator alloc, int SIZE, std::vector<int> indices, std::string test_name)
 {
