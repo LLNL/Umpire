@@ -58,12 +58,12 @@ Platform HostSharedMemoryResource::getPlatform() noexcept
 
 std::size_t HostSharedMemoryResource::getCurrentSize() const noexcept
 {
-  return 0;
+  return pimpl->getCurrentSize();
 }
 
 std::size_t HostSharedMemoryResource::getHighWatermark() const noexcept
 {
-  return 0;
+  return pimpl->getHighWatermark();
 }
 
 void* HostSharedMemoryResource::find_pointer_from_name(std::string name)

@@ -7,8 +7,11 @@
 
 #include "gtest/gtest.h"
 
+#include <algorithm>
+#include <random>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -18,15 +21,22 @@
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
+
 namespace {
   bool initialized{false};
   umpire::Allocator allocator;
   std::size_t largest_allocation_size{0};
+  std::size_t initial_size{0};
+  umpire::resource::HostSharedMemoryResource* shmem_resource{nullptr};
 
   class SharedMemoryTest : public ::testing::Test {
-    using ArrayElement = int;
-    using ShapedArray = std::pair<ArrayElement*, std::size_t>;
   public:
+    using ArrayElement = int;
+
+    const std::size_t m_segment_size{  512ULL * 1024ULL * 1024ULL };
+    const std::size_t m_max_allocs{ 1024 };
+    const std::size_t m_max_size{ m_segment_size / m_max_allocs };
+
     virtual void SetUp()
     {
       if (!initialized) {
@@ -35,15 +45,20 @@ namespace {
         ASSERT_EQ(traits.scope, umpire::MemoryResourceTraits::shared_scope::node);
         ASSERT_EQ(traits.resource, umpire::MemoryResourceTraits::resource_type::shared);
 
-        traits.size = m_small;
+        traits.size = m_segment_size;
         allocator = rm.makeResource("SHARED::node_allocator", traits);
-        initialized = true;
+        auto base_strategy = umpire::util::unwrap_allocator<umpire::strategy::AllocationStrategy>(allocator);
+        shmem_resource = dynamic_cast<umpire::resource::HostSharedMemoryResource*>(base_strategy);
+
+        initial_size = shmem_resource->getCurrentSize();
         largest_allocation_size = find_largest_allocation_size();
+        initialized = true;
       }
     }
 
     virtual void TearDown()
     {
+      ASSERT_EQ( initial_size, shmem_resource->getCurrentSize() );
       ASSERT_EQ( largest_allocation_size, find_largest_allocation_size() );
     }
 
@@ -55,12 +70,12 @@ namespace {
       // linked list, etc).  Consequently, the size used to create the allocator
       // will be too large.
       //
-      // This test will continue allocating until it finds the largest size.  As a
-      // unit test, this test will then (de)allocate that amount in a loop to
+      // This test will continue allocating until it finds the largest size.  As
+      // a unit test, this test will then (de)allocate that amount in a loop to
       // insure that there are no problems within the internal accounting in the
       // implementation.
       //
-      std::size_t allocation_size{m_small};
+      std::size_t allocation_size{m_segment_size};
       void* ptr{nullptr};
 
       while (allocation_size != 0) {
@@ -79,8 +94,36 @@ namespace {
       return allocation_size;
     }
 
-    const std::size_t m_small{  1ULL << 26ULL };  //  256 MiB
-    // const std::size_t m_big  {  1ULL << 42ULL };  // 64 GiB
+    std::vector< std::pair< ArrayElement*, std::size_t > > allocs_until_full()
+    {
+      std::random_device rd;
+      std::mt19937 gen{ rd() };
+      std::uniform_int_distribution<std::size_t> distrib(1, m_max_size);
+      std::vector< std::pair<ArrayElement*, std::size_t> > allocs;
+
+      for ( std::size_t i = 0; i < m_max_allocs; ++i) {
+        try {
+          std::size_t size{ distrib(gen) };
+          std::stringstream name;
+          name << "size_" << size;
+          void* ptr{ allocator.allocate(name.str(), size) };
+          allocs.push_back( std::make_pair(reinterpret_cast<int*>(ptr), size) );
+        } catch (...) {
+          break;
+        }
+      }
+
+      return allocs;
+    }
+
+    void
+    do_deallocations(std::vector<std::pair<ArrayElement*, std::size_t>>& allocs)
+    {
+      for ( auto& x : allocs ) {
+        ASSERT_NO_THROW( allocator.deallocate(x.first); );
+      }
+    }
+
   };
 
   TEST_F(SharedMemoryTest, Construct)
@@ -90,7 +133,7 @@ namespace {
 
   TEST_F(SharedMemoryTest, AllocateTooMuch)
   {
-    std::size_t allocation_size{m_small+1};
+    std::size_t allocation_size{m_segment_size+1};
 
     ASSERT_THROW( allocator.allocate("AllocTooMuch", allocation_size), umpire::util::Exception);
   }
@@ -104,6 +147,33 @@ namespace {
       ASSERT_NO_THROW( ptr = allocator.allocate("AllocLargest", largest_allocation_size); );
       ASSERT_NE(ptr, nullptr);
       ASSERT_NO_THROW( allocator.deallocate(ptr); );
+    }
+  }
+
+  TEST_F(SharedMemoryTest, MixedAllocationSizes)
+  {
+    // Do deallocations in same order
+    {
+      auto allocs = allocs_until_full();
+      ASSERT_EQ( allocs.size(), m_max_allocs );
+      ASSERT_GT(shmem_resource->getCurrentSize(), initial_size);
+
+      do_deallocations(allocs);
+      ASSERT_EQ( allocs.size(), m_max_allocs );
+      ASSERT_EQ(shmem_resource->getCurrentSize(), initial_size);
+    }
+
+    // Do deallocations in random order
+    {
+      auto allocs = allocs_until_full();
+      ASSERT_EQ( allocs.size(), m_max_allocs );
+      ASSERT_GT(shmem_resource->getCurrentSize(), initial_size);
+
+      std::random_shuffle(allocs.begin(), allocs.end());
+
+      do_deallocations(allocs);
+      ASSERT_EQ( allocs.size(), m_max_allocs );
+      ASSERT_EQ(shmem_resource->getCurrentSize(), initial_size);
     }
   }
 }
