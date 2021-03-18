@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <random>
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -35,7 +36,7 @@ namespace {
 
     const std::size_t m_segment_size{  512ULL * 1024ULL * 1024ULL };
     const std::size_t m_max_allocs{ 1024 };
-    const std::size_t m_max_size{ m_segment_size / (m_max_allocs*sizeof(ArrayElement)) };
+    const std::size_t m_max_elems{ m_segment_size / (m_max_allocs*sizeof(ArrayElement)) };
 
     virtual void SetUp()
     {
@@ -98,14 +99,14 @@ namespace {
     {
       std::random_device rd;
       std::mt19937 gen{ rd() };
-      std::uniform_int_distribution<std::size_t> distrib(1, m_max_size);
+      std::uniform_int_distribution<std::size_t> distrib(1, m_max_elems);
       std::vector< std::pair<ArrayElement*, std::size_t> > allocs;
 
       for ( std::size_t i = 0; i < m_max_allocs; ++i) {
         try {
           std::size_t num_elems{ distrib(gen) };
           std::stringstream name;
-          name << "size_" << num_elems;
+          name << "size_" << i;
           void* ptr{ allocator.allocate(name.str(), num_elems * sizeof(ArrayElement)) };
           allocs.push_back( std::make_pair(reinterpret_cast<int*>(ptr), num_elems) );
         } catch (...) {
@@ -196,8 +197,8 @@ namespace {
     for ( auto& x : allocs ) {
       ArrayElement* p{ reinterpret_cast<ArrayElement*>(x.first) };
       std::size_t elems{x.second};
-      for (std::size_t i{0}; i < elems; ++i) {
-        ASSERT_EQ(p[i], counter);
+      for (std::size_t j{0}; j < elems; ++j) {
+        ASSERT_EQ(p[j], counter);
       }
       counter++;
     }
