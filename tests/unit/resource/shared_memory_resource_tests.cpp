@@ -35,7 +35,7 @@ namespace {
 
     const std::size_t m_segment_size{  512ULL * 1024ULL * 1024ULL };
     const std::size_t m_max_allocs{ 1024 };
-    const std::size_t m_max_size{ m_segment_size / m_max_allocs };
+    const std::size_t m_max_size{ m_segment_size / (m_max_allocs*sizeof(ArrayElement)) };
 
     virtual void SetUp()
     {
@@ -103,11 +103,11 @@ namespace {
 
       for ( std::size_t i = 0; i < m_max_allocs; ++i) {
         try {
-          std::size_t size{ distrib(gen) };
+          std::size_t num_elems{ distrib(gen) };
           std::stringstream name;
-          name << "size_" << size;
-          void* ptr{ allocator.allocate(name.str(), size) };
-          allocs.push_back( std::make_pair(reinterpret_cast<int*>(ptr), size) );
+          name << "size_" << num_elems;
+          void* ptr{ allocator.allocate(name.str(), num_elems * sizeof(ArrayElement)) };
+          allocs.push_back( std::make_pair(reinterpret_cast<int*>(ptr), num_elems) );
         } catch (...) {
           break;
         }
@@ -175,5 +175,35 @@ namespace {
       ASSERT_EQ( allocs.size(), m_max_allocs );
       ASSERT_EQ(shmem_resource->getCurrentSize(), initial_size);
     }
+  }
+
+  TEST_F(SharedMemoryTest, MixedAllocationSizesAndData)
+  {
+    auto allocs = allocs_until_full();
+    ArrayElement counter{1};
+
+    for ( auto& x : allocs ) {
+      ArrayElement* p{ reinterpret_cast<ArrayElement*>(x.first) };
+      std::size_t elems{x.second};
+      for (std::size_t i{0}; i < elems; ++i) {
+        p[i] = counter;
+      }
+      counter++;
+    }
+
+    // Now validate the data
+    counter = 1;
+    for ( auto& x : allocs ) {
+      ArrayElement* p{ reinterpret_cast<ArrayElement*>(x.first) };
+      std::size_t elems{x.second};
+      for (std::size_t i{0}; i < elems; ++i) {
+        ASSERT_EQ(p[i], counter);
+      }
+      counter++;
+    }
+
+    do_deallocations(allocs);
+    ASSERT_EQ( allocs.size(), m_max_allocs );
+    ASSERT_EQ(shmem_resource->getCurrentSize(), initial_size);
   }
 }
