@@ -23,7 +23,7 @@ const int SIZE {1<<28}; //268MiB, size of each allocation
 const int NUM_ALLOC {512}; //number of allocations for each round
 const int NUM_RND {1000}; //number of rounds (used to average timing)
 
-void run_test(umpire::Allocator alloc, std::vector<int> indices, std::string test_name, std::string pool_name)
+void run_test(umpire::Allocator alloc, std::vector<int> &indices, std::string test_name, std::string pool_name)
 {
   double time[2] = {0.0, 0.0};
   void* allocations[NUM_ALLOC];
@@ -31,7 +31,7 @@ void run_test(umpire::Allocator alloc, std::vector<int> indices, std::string tes
   for(int i = 0; i < NUM_RND; i++) {
     auto begin_alloc {std::chrono::system_clock::now()};
     for (int j = 0; j < NUM_ALLOC; j++)
-      allocations[indices[j]] = alloc.allocate(SIZE);
+      allocations[j] = alloc.allocate(SIZE);
     auto end_alloc {std::chrono::system_clock::now()};
     time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/NUM_ALLOC;
 
