@@ -13,7 +13,7 @@ const int NUM_RND {1000}; //number of rounds (used to average timing)
 const int NUM_ALLOC {512}; //number of allocations used for testing
 const int OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes size (2048)
 
-void run_test(umpire::Allocator alloc, int SIZE, std::vector<int> indices, std::string test_name)
+void run_test(umpire::Allocator alloc, int SIZE, std::vector<int> &indices, std::string test_name)
 {
   double time[2] = {0.0, 0.0};
   void* allocations[NUM_ALLOC];
@@ -21,7 +21,7 @@ void run_test(umpire::Allocator alloc, int SIZE, std::vector<int> indices, std::
   for(int i = 0; i < NUM_RND; i++) {
     auto begin_alloc{std::chrono::system_clock::now()};
     for (int j = 0; j < NUM_ALLOC; j++)
-      allocations[indices[j]] = alloc.allocate(SIZE);
+      allocations[j] = alloc.allocate(SIZE);
     auto end_alloc{std::chrono::system_clock::now()};
     time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/NUM_ALLOC;
 
@@ -50,11 +50,11 @@ int main(int, char**)
   auto& rm{umpire::ResourceManager::getInstance()};
   umpire::Allocator alloc{rm.getAllocator("HOST")};
   
-  //Using two different sizes to show average times don't vary much.
-  const int NUM_SIZES {2}; 
+  //Using a few different sizes to show average times don't vary much.
+  const int NUM_SIZES {3}; 
 
-  //Array of sizes used are 67108864 vs. 2048 (large vs. small)
-  static int SIZE[NUM_SIZES] {1<<26, 1<<11};
+  //Array of sizes used: 67108864, 1048576, 2048 (large vs. medium vs. small)
+  static int SIZE[NUM_SIZES] {1<<26, 1<<20, 1<<11};
 
   //create vector of indices for "same_order" tests
   std::vector<int> same_order_index(NUM_ALLOC);
