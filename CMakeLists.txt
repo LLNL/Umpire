@@ -34,19 +34,8 @@ set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
-
-cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On 
-                       "ENABLE_TESTS" Off )
-
 set(ENABLE_GMOCK On CACHE BOOL "")
-
-cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
-                        "ENABLE_DOCS" Off )
-
 set(ENABLE_CLANGQUERY Off CACHE BOOL "")
-
-cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On 
-                        "ENABLE_EXAMPLES" Off )
 
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
@@ -140,6 +129,16 @@ if (NOT BLT_LOADED)
 
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
+
+#######################################
+# Options that depend on BLT Options
+#######################################
+cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
+                       "ENABLE_TESTS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
+                        "ENABLE_DOCS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
+                        "ENABLE_EXAMPLES" Off )
 
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
