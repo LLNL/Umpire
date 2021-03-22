@@ -82,6 +82,11 @@ Platform Allocator::getPlatform() noexcept
   return m_allocator->getPlatform();
 }
 
+bool Allocator::isTracked() const noexcept
+{
+  return m_allocator->isTracked();
+}
+
 std::ostream& operator<<(std::ostream& os, const Allocator& allocator)
 {
   os << *allocator.m_allocator;

@@ -16,7 +16,7 @@
 
 #include "camp/resource.hpp"
 #include "umpire/Allocator.hpp"
-#include "umpire/AllocatorTraits.hpp"
+#include "umpire/Tracking.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
@@ -117,7 +117,7 @@ class ResourceManager {
   Allocator makeAllocator(const std::string& name, Args&&... args);
 
   template<typename Strategy, typename... Args>
-  Allocator makeAllocator(const std::string& name, AllocatorTraits traits, Args&&... args);
+  Allocator makeAllocator(const std::string& name, Tracking tracked, Args&&... args);
 
   Allocator makeResource(const std::string& name);
 

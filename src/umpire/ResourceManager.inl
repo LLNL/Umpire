@@ -19,10 +19,11 @@
 namespace umpire {
 
 template<typename Strategy, typename... Args>
-Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTraits traits, Args&&... args)
+Allocator ResourceManager::makeAllocator(const std::string& name, Tracking tracked, Args&&... args)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
   std::unique_ptr<strategy::AllocationStrategy> allocator;
+  bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {
     UMPIRE_ERROR("Maximum number of concurrent allocators exceeded! "
@@ -33,7 +34,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTrait
   UMPIRE_REPLAY(
       "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()
-      << "\", \"with_introspection\":" << (traits.tracked ? "true" : "false")
+      << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
       << ", \"allocator_name\":\"" << name << "\""
       << ", \"args\": [ "
       << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
@@ -43,12 +44,12 @@ Allocator ResourceManager::makeAllocator(const std::string& name, AllocatorTrait
   }
 
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
-  allocator->setTracking(traits.tracked);
+  allocator->setTracking(is_tracked);
 
   UMPIRE_REPLAY(
       "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
       << typeid(Strategy).name()
-      << "\", \"with_introspection\":" << (traits.tracked ? "true" : "false")
+      << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
       << ", \"allocator_name\":\"" << name << "\""
       << ", \"args\": [ "
       << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
@@ -66,9 +67,8 @@ template <typename Strategy, bool introspection, typename... Args>
 Allocator ResourceManager::makeAllocator(const std::string& name,
                                          Args&&... args)
 {
-  AllocatorTraits traits;
-  traits.tracked = introspection;
-  return makeAllocator<Strategy>(name, traits, std::forward<Args>(args)...);
+  Tracking tracked = introspection ? Tracking::Tracked : Tracking::Untracked;
+  return makeAllocator<Strategy>(name, tracked, std::forward<Args>(args)...);
 }
 
 } // end of namespace umpire

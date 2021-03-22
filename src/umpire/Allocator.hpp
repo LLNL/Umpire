@@ -172,6 +172,8 @@ class Allocator :
    */
   Platform getPlatform() noexcept;
 
+  bool isTracked() const noexcept;
+
   Allocator() = default;
 
   friend std::ostream& operator<<(std::ostream&, const Allocator&);

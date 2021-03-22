@@ -7,10 +7,10 @@
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
-  AllocatorTraits.hpp
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
+  Tracking.hpp
   TypedAllocator.hpp
   TypedAllocator.inl
   Umpire.hpp)

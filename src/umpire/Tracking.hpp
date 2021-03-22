@@ -4,11 +4,16 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_AllocatorTraits_HPP
-#define UMPIRE_AllocatorTraits_HPP
+#ifndef UMPIRE_Tracking_HPP
+#define UMPIRE_Tracking_HPP
 
-struct AllocatorTraits {
-  bool tracked;
+namespace umpire {
+
+enum class Tracking {
+  Tracked,
+  Untracked
 };
 
-#endif // UMPIRE_AllocatorTraits_HPP
+}
+
+#endif // UMPIRE_Tracking_HPP
