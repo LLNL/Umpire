@@ -25,7 +25,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::siz
 
   for(int i = 0; i < num_rnd; i++) {
     auto begin_alloc {std::chrono::system_clock::now()};
-    for (int j = 0; j < num_indices; j++) {
+    for (std::size_t j{0}; j < num_indices; j++) {
       allocations[j] = alloc.allocate(size);
     }
     auto end_alloc {std::chrono::system_clock::now()};
