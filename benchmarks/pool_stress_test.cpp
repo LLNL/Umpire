@@ -62,7 +62,7 @@ void do_test(std::string pool_name)
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, alloc_size)};
 
   //create vector of indices for "same_order" tests
-  std::vector<int> ordering_index;
+  std::vector<std::size_t> ordering_index;
   for(std::size_t i{0}; i < num_alloc; i++) {
     ordering_index.push_back(i);
   }
