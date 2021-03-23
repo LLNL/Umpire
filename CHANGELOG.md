@@ -8,6 +8,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Develop Branch]
 
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+
+- Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
+  as not being found
+
 ## [v5.0.0] - 2020-11-18
 
 ### Added

@@ -25,3 +25,12 @@ blt_add_executable(
 blt_add_test(
   NAME fixed_pool_tests
   COMMAND fixed_pool_tests)
+
+blt_add_executable(
+  NAME zero_byte_handler_tests
+  SOURCES zero_byte_handler_tests.cpp
+  DEPENDS_ON ${strategy_tests_depends})
+
+blt_add_test(
+  NAME zero_byte_handler_tests
+  COMMAND zero_byte_handler_tests)

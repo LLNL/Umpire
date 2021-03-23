@@ -14,6 +14,15 @@ blt_add_test(
   COMMAND judy_smoke_tests)
 
 blt_add_executable(
+  NAME judy_test
+  SOURCES judy_test.cpp
+  DEPENDS_ON umpire_tpl_judy gtest)
+
+blt_add_test(
+  NAME judy_test
+  COMMAND judy_test)
+
+blt_add_executable(
   NAME cli11_smoke_test
   SOURCES cli11_smoke_test.cpp
   DEPENDS_ON umpire_tpl_CLI11 gtest)
