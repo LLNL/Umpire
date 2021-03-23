@@ -20,7 +20,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::siz
   double time[] = {0.0, 0.0};
   constexpr int convert {1000000}; //convert sec (s) to microsec (us)
   constexpr int num_rnd {1000}; //number of rounds (used to average timing)
-  int num_indices = (int)indices.size();
+  std::size_t num_indices{indices.size()};
   std::vector<void*> allocations(num_indices);
 
   for(int i = 0; i < num_rnd; i++) {
