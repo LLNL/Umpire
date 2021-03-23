@@ -15,15 +15,27 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
+/*
+ * Function that tests the deallocation pattern performance of a given pool allocator. 
+ *    The allocation, deallocation, and "lifespan" times are calculated and printed out for each allocator.
+ * 
+ * Uses the following arguments:
+ *   - alloc: a given pool allocator
+ *   - indices: a vector of indices which are either structured in same_order, reverse_order, or
+ *    shuffle_order, depending on the deallocation pattern being measured.
+ *   - test_name: name of the deallocation pattern, used for output
+ *   - pool_name: name of the pool strategy, used for output
+ *   - size: number of bytes to allocate during timed test
+ */
 void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::size_t> &indices, std::string test_name, std::string pool_name, std::size_t size)
 {
   double time[] = {0.0, 0.0};
-  constexpr int convert {1000000}; //convert sec (s) to microsec (us)
-  constexpr int num_rnd {1000}; //number of rounds (used to average timing)
+  constexpr size_t convert {1000000}; //convert sec (s) to microsec (us)
+  constexpr size_t num_rnd {1000}; //number of rounds (used to average timing)
   std::size_t num_indices{indices.size()};
   std::vector<void*> allocations(num_indices);
 
-  for(int i = 0; i < num_rnd; i++) {
+  for(std::size_t i{0}; i < num_rnd; i++) {
     auto begin_alloc {std::chrono::system_clock::now()};
     for (std::size_t j{0}; j < num_indices; j++) {
       allocations[j] = alloc.allocate(size);
