@@ -63,7 +63,7 @@ void do_test(std::string pool_name)
 
   //create vector of indices for "same_order" tests
   std::vector<int> ordering_index;
-  for(int i = 0; i < num_alloc; i++) {
+  for(std::size_t i{0}; i < num_alloc; i++) {
     ordering_index.push_back(i);
   }
   test_deallocation_performance(pool_alloc, ordering_index, "SAME_ORDER", pool_name, size);
