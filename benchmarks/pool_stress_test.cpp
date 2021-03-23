@@ -53,7 +53,7 @@ template <class T>
 void do_test(std::string pool_name)
 {
   //Set up test factors
-  constexpr long long unsigned int alloc_size {137438953472}; //137GiB, total size of all allocations together
+  constexpr std::size_t alloc_size {137438953472ULL}; //137GiB, total size of all allocations together
   constexpr int size {268435456}; //268MiB, size of each allocation
   constexpr int num_alloc {alloc_size/size}; //number of allocations for each round
 
