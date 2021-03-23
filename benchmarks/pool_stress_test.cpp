@@ -32,7 +32,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::siz
     time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/num_indices;
 
     auto begin_dealloc {std::chrono::system_clock::now()};
-    for (int h = 0; h < num_indices; h++) {
+    for (std::size_t h{0}; h < num_indices; h++) {
       alloc.deallocate(allocations[indices[h]]);
     }
     auto end_dealloc {std::chrono::system_clock::now()};
