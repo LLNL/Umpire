@@ -16,16 +16,16 @@
 #include "umpire/strategy/MixedPool.hpp"
 
 /*
- * Function that tests the deallocation pattern performance of a given pool allocator. 
- *    The allocation, deallocation, and "lifespan" times are calculated and printed out for each allocator.
+ * \brief Function that tests the deallocation pattern performance of a given pool allocator. 
+ *       The allocation, deallocation, and "lifespan" times are calculated and printed out for
+ *       each allocator.
  * 
- * Uses the following arguments:
- *   - alloc: a given pool allocator
- *   - indices: a vector of indices which are either structured in same_order, reverse_order, or
- *    shuffle_order, depending on the deallocation pattern being measured.
- *   - test_name: name of the deallocation pattern, used for output
- *   - pool_name: name of the pool strategy, used for output
- *   - size: number of bytes to allocate during timed test
+ * \param alloc, a given pool allocator
+ * \param indices, a vector of indices which are either structured in same_order, reverse_order, or
+ *        shuffle_order, depending on the deallocation pattern being measured.
+ * \param test_name, name of the deallocation pattern, used for output
+ * \param pool_name, name of the pool strategy, used for output
+ * \param size, number of bytes to allocate during timed test
  */
 void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::size_t> &indices, std::string test_name, std::string pool_name, std::size_t size)
 {
