@@ -55,7 +55,7 @@ void do_test(std::string pool_name)
   //Set up test factors
   constexpr std::size_t alloc_size {137438953472ULL}; //137GiB, total size of all allocations together
   constexpr std::size_t size {268435456}; //268MiB, size of each allocation
-  constexpr int num_alloc {alloc_size/size}; //number of allocations for each round
+  constexpr std::size_t num_alloc {alloc_size/size}; //number of allocations for each round
 
   auto& rm {umpire::ResourceManager::getInstance()};
   umpire::Allocator alloc {rm.getAllocator("HOST")};
