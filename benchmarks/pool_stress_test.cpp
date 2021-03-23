@@ -15,7 +15,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
-void test_deallocation_performance(umpire::Allocator alloc, std::vector<int> &indices, std::string test_name, std::string pool_name, int size)
+void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::size_t> &indices, std::string test_name, std::string pool_name, std::size_t size)
 {
   double time[] = {0.0, 0.0};
   constexpr int convert {1000000}; //convert sec (s) to microsec (us)
@@ -90,4 +90,3 @@ int main(int, char**) {
 
   return 0;
 }
-
