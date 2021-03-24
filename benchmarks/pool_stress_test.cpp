@@ -27,7 +27,7 @@
  * \param pool_name, name of the pool strategy, used for output
  * \param size, number of bytes to allocate during timed test
  */
-void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::size_t> &indices, std::string test_name, std::string pool_name, std::size_t size)
+void test_deallocation_performance(umpire::Allocator alloc, std::string pool_name, std::vector<std::size_t> &indices, std::string test_name, std::size_t size)
 {
   double time[] = {0.0, 0.0};
   constexpr size_t convert {1000000}; //convert sec (s) to microsec (us)
@@ -62,43 +62,41 @@ void test_deallocation_performance(umpire::Allocator alloc, std::vector<std::siz
 }
 
 template <class T>
-void do_test(std::string pool_name)
+void do_test(std::string pool_name, std::map<std::string, std::vector<std::size_t>> indexing_pairs, size_t alloc_size, size_t size)
 {
-  //Set up test factors
-  constexpr std::size_t alloc_size {137438953472ULL}; //137GiB, total size of all allocations together
-  constexpr std::size_t size {268435456}; //268MiB, size of each allocation
-  constexpr std::size_t num_alloc {alloc_size/size}; //number of allocations for each round
-
   auto& rm {umpire::ResourceManager::getInstance()};
   umpire::Allocator alloc {rm.getAllocator("HOST")};
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, alloc_size)};
 
-  //create vector of indices for "same_order" tests
-  std::vector<std::size_t> ordering_index;
-  for(std::size_t i{0}; i < num_alloc; i++) {
-    ordering_index.push_back(i);
-  }
-  test_deallocation_performance(pool_alloc, ordering_index, "SAME_ORDER", pool_name, size);
-  
-  //create vector of indices for "reverse_order" tests
-  std::reverse(ordering_index.begin(), ordering_index.end());
-  test_deallocation_performance(pool_alloc, ordering_index, "REVERSE_ORDER", pool_name, size);
-  
-  //create vector of indices for "shuffle_order" tests
-  std::mt19937 gen(num_alloc);
-  std::shuffle(ordering_index.begin(), ordering_index.end(), gen);
-  test_deallocation_performance(pool_alloc, ordering_index, "SHUFFLE_ORDER", pool_name, size);
+  for(auto i : indexing_pairs)
+    test_deallocation_performance(pool_alloc, pool_name, i.second, i.first, size);
 }
 
 int main(int, char**) {
   //Set up formatting for output
   std::cout << std::fixed << std::setprecision(9);
 
+  //Set up test factors
+  constexpr std::size_t alloc_size {137438953472ULL}; //137GiB, total size of all allocations together
+  constexpr std::size_t size {268435456}; //268MiB, size of each allocation
+  constexpr std::size_t num_alloc {alloc_size/size}; //number of allocations for each round
+  std::mt19937 gen(num_alloc);
+
+  //create vector of indices for tests
+  std::map<std::string, std::vector<std::size_t>> indexing_pairs;  
+  for(std::size_t i{0}; i < num_alloc; i++) {
+    indexing_pairs["SAME_ORDER"].push_back(i);
+    indexing_pairs["REVERSE_ORDER"].push_back(i);
+    indexing_pairs["SHUFFLE_ORDER"].push_back(i);
+  }
+  std::reverse(indexing_pairs["REVERSE_ORDER"].begin(), indexing_pairs["REVERSE_ORDER"].end());
+  std::shuffle(indexing_pairs["SHUFFLE_ORDER"].begin(), indexing_pairs["SHUFFLE_ORDER"].end(), gen);
+
   //Call template function to run tests for each pool
-  do_test<umpire::strategy::DynamicPoolMap>("DynamicPoolMap");
-  do_test<umpire::strategy::DynamicPoolList>("DynamicPoolList");
-  do_test<umpire::strategy::QuickPool>("QuickPool");
-  do_test<umpire::strategy::MixedPool>("MixedPool");
+  do_test<umpire::strategy::DynamicPoolMap> ("DynamicPoolMap", indexing_pairs, alloc_size, size);
+  do_test<umpire::strategy::DynamicPoolList> ("DynamicPoolList", indexing_pairs, alloc_size, size);
+  do_test<umpire::strategy::QuickPool> ("QuickPool", indexing_pairs, alloc_size, size);
+  do_test<umpire::strategy::MixedPool> ("MixedPool", indexing_pairs, alloc_size, size);
 
   return 0;
 }
