@@ -32,14 +32,20 @@ NullMemoryResource::NullMemoryResource(Platform platform,
 
 void* NullMemoryResource::allocate(std::size_t bytes)
 {
+#if 0
 #if !defined(_MSC_VER)
   void* ptr{mmap(NULL, bytes, PROT_NONE,
                  (MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE), -1, 0)};
 #else
   void* ptr{VirtualAlloc(NULL, bytes, MEM_RESERVE, PAGE_NOACCESS)};
 #endif
+#else
+  // void* ptr = reinterpret_cast<void*>(0x200000070030);
+  void* ptr = reinterpret_cast<void*>(0x200000070000);
+#endif
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
+  std::cout << "NullMemoryResource: " << bytes << " allocated at " << ptr << std::endl;
 
   m_size_map.insert(ptr, bytes);
 
@@ -50,15 +56,19 @@ void NullMemoryResource::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
+#if 0
   auto iter = m_size_map.find(ptr);
   auto size = iter->second;
+#endif
 
   m_size_map.erase(ptr);
 
+#if 0
 #if !defined(_MSC_VER)
   munmap(ptr, *size);
 #else
   VirtualFree(ptr, *size, MEM_RELEASE);
+#endif
 #endif
 }
 
