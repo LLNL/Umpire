@@ -35,6 +35,12 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
 
+blt_add_executable(
+  NAME hipMalloc
+  SOURCES hipMalloc_test.cpp
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples hipMalloc)
+
 if (ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
