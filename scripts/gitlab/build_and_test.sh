@@ -176,10 +176,10 @@ then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ CLEAN UP"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~ Before:"
-    ls -1 | wc -l
+    echo "~~~~~ Space used BEFORE clean:"
+    du -sh
     make clean
-    echo "~~~~~ After:"
-    ls -1 | wc -l
+    echo "~~~~~ Space used AFTER clean:"
+    du -sh
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 fi
