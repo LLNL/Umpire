@@ -39,9 +39,16 @@
 
 #include <memory.h>
 #include <stdlib.h>
+#include <stdio.h>
 #if defined(_MSC_VER)
 #include <string.h>
 #endif
+
+#define TRACE_ENTRY(...) 
+// #define TRACE_ENTRY(...) printf("%s %s:%d ", __FILE__, __FUNCTION__, __LINE__); printf(__VA_ARGS__)
+
+#define TRACE_DEBUG(...) 
+//#define TRACE_DEBUG(...) printf("%s %s:%d ", __FILE__, __FUNCTION__, __LINE__); printf(__VA_ARGS__)
 
 #ifdef linux
 #  define _FILE_OFFSET_BITS 64
@@ -100,11 +107,34 @@ judyvalue JudyMask[9] = {
 #endif
 };
 
+static void print_nodetype( JudySlot slot )
+{
+  TRACE_DEBUG("node 0x%016llx type: ", (unsigned long long)slot);
+  if (slot) {
+    switch( slot & 0x07 ) {
+      case JUDY_1:      TRACE_DEBUG("JUDY_1");     break;
+      case JUDY_2:      TRACE_DEBUG("JUDY_2");     break;
+      case JUDY_4:      TRACE_DEBUG("JUDY_4");     break;
+      case JUDY_8:      TRACE_DEBUG("JUDY_8");     break;
+      case JUDY_16:     TRACE_DEBUG("JUDY_16");    break;
+      case JUDY_32:     TRACE_DEBUG("JUDY_32");    break;
+#ifdef ASKITIS
+      case JUDY_64:     TRACE_DEBUG("JUDY_64");    break;
+#endif
+      case JUDY_radix:  TRACE_DEBUG("JUDY_radix"); break;
+      case JUDY_span:   TRACE_DEBUG("JUDY_span");  break;
+      default:          TRACE_DEBUG("???");        break;
+
+    }
+  }
+}
+
 //    open judy object
 //        call with max key size
 //        and Integer tree depth.
 
-Judy * judy_open( unsigned int max, unsigned int depth ) {
+Judy * judy_open( unsigned int max, unsigned int depth )
+{
     JudySeg * seg;
     Judy * judy;
     unsigned int amt;
@@ -141,10 +171,23 @@ Judy * judy_open( unsigned int max, unsigned int depth ) {
     judy->depth = depth;
     judy->seg = seg;
     judy->max = max;
+
+    TRACE_ENTRY("max=%u, depth=%u,"
+           " Segment: 0x%016llx - 0x%016llx "
+           " Judy: 0x%016llx - 0x%016llx\n"
+        , max, depth
+        , (unsigned long long)seg
+        , (unsigned long long)((unsigned long long)seg+JUDY_seg)
+        , (unsigned long long)judy
+        , (unsigned long long)((unsigned long long)seg+JUDY_seg)
+    );
+
     return judy;
 }
 
-void judy_close( Judy * judy ) {
+void judy_close( Judy * judy )
+{
+    TRACE_ENTRY("judy=%p\n", judy);
     JudySeg * seg, *nxt = judy->seg;
 
     for( seg = nxt; seg; seg = nxt ) {
@@ -154,7 +197,8 @@ void judy_close( Judy * judy ) {
 
 //    allocate judy node
 
-void * judy_alloc( Judy * judy, unsigned int type ) {
+void * judy_alloc( Judy * judy, unsigned int type )
+{
     unsigned int amt, idx, min;
     JudySeg * seg;
     void ** block;
@@ -187,6 +231,12 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
 
     block = judy->reuse[type];
     if( block ) {
+        TRACE_DEBUG("judy_alloc(judy=0x%016llx, type=%u): amt-%3u "
+            "               Block found: 0x%016llx - 0x%016llx\n"
+          , (unsigned long long)judy, type, amt
+          , (unsigned long long)block
+          , (unsigned long long)((unsigned long long)block + amt)
+        );
         judy->reuse[type] = *block;
         memset( block, 0, amt );
         return ( void * )block;
@@ -195,7 +245,7 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
     //    break down available larger block
     //    for reuse into smaller blocks
 
-    if( type >= JUDY_1 )
+    if( type >= JUDY_1 ) {
         for( idx = type; idx++ < JUDY_max; ) {
             block = judy->reuse[idx];
             if( block ) {
@@ -204,10 +254,17 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
                     judy->reuse[idx] = block + JudySize[idx] / sizeof( void * );
                     block[JudySize[idx] / sizeof( void * )] = 0;
                 }
+                TRACE_DEBUG("judy_alloc(judy=0x%016llx, type=%u): amt-%3u "
+                    "Block obtained from larger: 0x%016llx - 0x%016llx\n"
+                  , (unsigned long long)judy, type, amt
+                  , (unsigned long long)block
+                  , (unsigned long long)((unsigned long long)block + amt)
+                );
                 memset( block, 0, amt );
                 return ( void * )block;
             }
         }
+    }
 
     min = amt < JUDY_cache_line ? JUDY_cache_line : amt;
 
@@ -244,26 +301,34 @@ void * judy_alloc( Judy * judy, unsigned int type ) {
 
     judy->seg->next -= amt;
     memset( rtn, 0, JudySize[type] );
+    TRACE_DEBUG("judy_alloc(judy=0x%016llx, type=%u): amt-%3u "
+        "        NEW Block obtained: 0x%016llx - 0x%016llx\n"
+      , (unsigned long long)judy, type, amt
+      , (unsigned long long)rtn
+      , (unsigned long long)((unsigned long long)rtn + JudySize[type])
+    );
     return ( void * )rtn;
 }
 
 void * judy_data( Judy * judy, unsigned int amt )
-
 {
     JudySeg * seg;
     void * block;
 
-    if( !judy->seg )
+    if( !judy->seg ) {
+        TRACE_DEBUG("judy_data: OUT OF MEMORY\n");
 #if defined(STANDALONE) || defined(ASKITIS)
         judy_abort( "illegal allocation from judy clone" );
 #else
         return NULL;
 #endif
+    }
 
     if( amt & ( JUDY_cache_line - 1 ) ) {
         amt |= ( JUDY_cache_line - 1 ), amt += 1;
     }
 
+    TRACE_ENTRY("judy=0x%016llx, amt=%u\n", (unsigned long long)judy, amt);
     if( judy->seg->next < amt + sizeof( *seg ) ) {
         seg = malloc( JUDY_seg );
         if( seg ) {
@@ -271,7 +336,12 @@ void * judy_data( Judy * judy, unsigned int amt )
             seg->seg = judy->seg;
             judy->seg = seg;
             seg->next -= ( JudySlot )seg & ( JUDY_cache_line - 1 );
+            TRACE_DEBUG("allocated 0x%016llx - 0x%016llx "
+                , (unsigned long long)seg
+                , (unsigned long long)((unsigned long long)seg + JUDY_seg)
+            );
         } else {
+            TRACE_DEBUG("OUT OF MEMORY\n");
 #if defined(STANDALONE) || defined(ASKITIS)
             judy_abort( "Out of virtual memory" );
 #else
@@ -288,13 +358,19 @@ void * judy_data( Judy * judy, unsigned int amt )
 
     block = ( void * )( ( unsigned char * )judy->seg + judy->seg->next );
     memset( block, 0, amt );
+    TRACE_DEBUG("zeroing out and returning block = 0x%016llx - 0x%016llx\n"
+        , (unsigned long long)block
+        , (unsigned long long)((unsigned long long)block + amt)
+    );
     return block;
 }
 
-Judy * judy_clone( Judy * judy ) {
+Judy * judy_clone( Judy * judy )
+{
     Judy * clone;
     unsigned int amt;
 
+    TRACE_ENTRY("judy=%p\n", judy);
     amt = sizeof( Judy ) + judy->max * sizeof( JudyStack );
     clone = judy_data( judy, amt );
     memcpy( clone, judy, amt );
@@ -302,7 +378,9 @@ Judy * judy_clone( Judy * judy ) {
     return clone;
 }
 
-void judy_free( Judy * judy, void * block, int type ) {
+void judy_free( Judy * judy, void * block, int type )
+{
+    TRACE_DEBUG("judy=%p, block=%p, type=%d\n", judy, block, type);
     if( type == JUDY_radix ) {
         type = JUDY_radix_equiv;
     }
@@ -320,7 +398,8 @@ void judy_free( Judy * judy, void * block, int type ) {
 
 //    assemble key from current path
 
-unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
+unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max )
+{
     judyvalue * dest = ( judyvalue * )buff;
     unsigned int len = 0, idx = 0, depth;
     int slot, off, type;
@@ -334,15 +413,26 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
         max--;    // leave room for zero terminator
     }
 
+    TRACE_ENTRY("judy=%p, buff/key=0x%016llx, max=%u, len=%u, judy->level=%u\n"
+        , judy
+        , *(unsigned long long*)buff
+        , max
+        , len
+        , judy->level
+    );
     while( len < max && ++idx <= judy->level ) {
         type = judy->stack[idx].next & 0x07;
         slot = judy->stack[idx].slot;
         depth = len / JUDY_key_size;
 
-        if( judy->depth )
+        if( judy->depth ) {
             if( !( len & JUDY_key_mask ) ) {
                 dest[depth] = 0;
             }
+        }
+
+        TRACE_DEBUG("    len=%u, idx=%u, depth=%u, judy->depth=%u, key=0x%016llx, ", len, idx, depth, judy->depth, *(unsigned long long*)buff);
+        print_nodetype(judy->stack[idx].next);
 
         switch( type ) {
             case JUDY_1:
@@ -360,15 +450,19 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
                 if( judy->depth ) {
                     value = *( judyvalue * )( base + slot * keysize );
                     value &= JudyMask[keysize];
+                    TRACE_DEBUG(", value=%02llx", value);
                     dest[depth++] |= value;
                     len += keysize;
 
                     if( depth < judy->depth ) {
+                        TRACE_DEBUG(", key=0x%016llx, continuing\n", *(unsigned long long*)buff);
                         continue;
                     }
 
+                    TRACE_DEBUG(", key=0x%016llx, returning %u\n", *(unsigned long long*)buff, len);
                     return len;
                 }
+                TRACE_DEBUG("\n");
 
 #if BYTE_ORDER != BIG_ENDIAN
                 off = keysize;
@@ -376,19 +470,25 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
                 while( off-- && len < max ) {
                     buff[len] = base[slot * keysize + off];
                     if( buff[len] ) {
+                        TRACE_DEBUG("        LE - Morphing key to 0x%016llx\n", *(unsigned long long*)buff);
                         len++;
                     } else {
+                        TRACE_DEBUG("        LE - Morphing key to 0x%016llx\n", *(unsigned long long*)buff);
                         break;
                     }
                 }
 #else
-                for( off = 0; off < keysize && len < max; off++ )
+                for( off = 0; off < keysize && len < max; off++ ) {
                     if( (buff[len] = base[slot * keysize + off]) ) {
+                        TRACE_DEBUG("        BE - Morphing key to 0x%016llx\n", *(unsigned long long*)buff);
                         len++;
                     } else {
+                        TRACE_DEBUG("        BE - Morphing key to 0x%016llx\n", *(unsigned long long*)buff);
                         break;
                     }
+                }
 #endif
+                TRACE_DEBUG("        Key after iteration is now: 0x%016llx\n", *(unsigned long long*)buff);
                 continue;
 
             case JUDY_radix:
@@ -398,16 +498,20 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
                         depth++;
                     }
                     if( depth < judy->depth ) {
+                        TRACE_DEBUG(", key=0x%016llx, continuing\n", *(unsigned long long*)buff);
                         continue;
                     }
 
+                    TRACE_DEBUG(", key=0x%016llx, returning %u\n", *(unsigned long long*)buff, len);
                     return len;
                 }
 
                 if( !slot ) {
+                    TRACE_DEBUG(", key=0x%016llx, breaking\n", *(unsigned long long*)buff);
                     break;
                 }
                 buff[len++] = ( unsigned char )slot;
+                TRACE_DEBUG("        Key after iteration is now: 0x%016llx\n", *(unsigned long long*)buff);
                 continue;
 
 #ifndef ASKITIS
@@ -423,12 +527,14 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
         }
     }
     buff[len] = 0;
+    TRACE_DEBUG(", key=0x%016llx, returning %u\n", *(unsigned long long*)buff, len);
     return len;
 }
 
 //    find slot & setup cursor
 
-JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max ) {
+JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max )
+{
     judyvalue * src = ( judyvalue * )buff;
     int slot, size, keysize, tst, cnt;
     JudySlot next = *judy->root;
@@ -438,6 +544,11 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
     unsigned int depth = 0;
     unsigned int off = 0;
     unsigned char * base;
+ 
+    TRACE_ENTRY("judy=%p, buff/key=0x%016llx, max=%u\n"
+        , judy , *(unsigned long long*)buff , max);
+    print_nodetype(next);
+    TRACE_DEBUG("\n");
 
 #ifndef ASKITIS
     judy->level = 0;
@@ -453,6 +564,10 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
         judy->stack[judy->level].off = off;
 #endif
         size = JudySize[next & 0x07];
+
+        TRACE_DEBUG("    ");
+        print_nodetype(next);
+        TRACE_DEBUG(", level=%u, off=%u, size=%u", judy->level, off, size);
 
         switch( next & 0x07 ) {
 
@@ -472,18 +587,26 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
                 slot = cnt;
                 value = 0;
 
+                TRACE_DEBUG( ", "
+                        "base=%p, node=%p, keysize=%u, cnt=slot=%u, depth=%u"
+                    , base, node, keysize, cnt, depth
+                );
+
                 if( judy->depth ) {
                     value = src[depth++];
                     off |= JUDY_key_mask;
                     off++;
                     value &= JudyMask[keysize];
-                } else
+                } else {
+                    TRACE_DEBUG(", ADJUSTING VALUE");
                     do {
                         value <<= 8;
                         if( off < max ) {
                             value |= buff[off];
                         }
                     } while( ++off & JUDY_key_mask );
+                }
+                TRACE_DEBUG(", off=%u, value=0x%02llx\n", off, value);
 
                 //  find slot > key
 
@@ -494,6 +617,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
 #else
                     test &= JudyMask[keysize];
 #endif
+                    TRACE_DEBUG("        test=0x%02llx, value=%02llx\n", test, value);
                     if( test <= value ) {
                         break;
                     }
@@ -501,11 +625,13 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
 #ifndef ASKITIS
                 judy->stack[judy->level].slot = slot;
 #endif
+                TRACE_DEBUG("    judy->stack[%u].slot = %u\n", judy->level, slot);
                 if( test == value ) {
 
                     // is this a leaf?
 
                     if( (!judy->depth && !( value & 0xFF )) || ( judy->depth && depth == judy->depth ) ) {
+                        TRACE_DEBUG("    LEAF hit\n");
                         return &node[-slot - 1];
                     }
 
@@ -513,6 +639,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
                     continue;
                 }
 
+                TRACE_DEBUG("    NO MATCH Found\n");
                 return NULL;
 
             case JUDY_radix:
@@ -525,15 +652,19 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
                 } else {
                     slot = 0;
                 }
+                TRACE_DEBUG(", judy->depth=%u, off=%u, max=%u, slot=0x%02x "
+                    , judy->depth, off, max, slot);
 #ifndef ASKITIS
                 //    put radix slot on judy stack
 
                 judy->stack[judy->level].slot = slot;
 #endif
                 next = table[slot >> 4];
+                TRACE_DEBUG(", table[%d] = 0x%016llx", slot >> 4, (unsigned long long)next);
                 if( next ) {
                     table = ( JudySlot * )( next & JUDY_mask );    // inner radix
                 } else {
+                    TRACE_DEBUG(" RETURNING NULL\n");
                     return NULL;
                 }
 
@@ -544,11 +675,14 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
 
                 if( ( !judy->depth && !slot ) || ( judy->depth && depth == judy->depth ) ) {    // leaf?
                     if( table[slot & 0x0F] ) {  // occupied?
+                        TRACE_DEBUG(", Leaf: returning %p\n", &table[slot & 0x0F]);
                         return &table[slot & 0x0F];
                     } else {
+                        TRACE_DEBUG(", Leaf: returning NULL\n");
                         return NULL;
                     }
                 }
+                TRACE_DEBUG("\n");
         
 
                 next = table[slot & 0x0F];
@@ -556,6 +690,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
 
 #ifndef ASKITIS
             case JUDY_span:
+                TRACE_DEBUG("    JUDY_span: Need more information\n");
                 node = ( JudySlot * )( ( next & JUDY_mask ) + JudySize[JUDY_span] );
                 base = ( unsigned char * )( next & JUDY_mask );
                 cnt = tst = JUDY_span_bytes;
@@ -582,7 +717,8 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
 
 //    promote full nodes to next larger size
 
-JudySlot * judy_promote( Judy * judy, JudySlot * next, int idx, judyvalue value, int keysize ) {
+JudySlot * judy_promote( Judy * judy, JudySlot * next, int idx, judyvalue value, int keysize )
+{
     unsigned char * base = ( unsigned char * )( *next & JUDY_mask );
     int oldcnt, newcnt, slot;
 #if BYTE_ORDER == BIG_ENDIAN
@@ -593,6 +729,7 @@ JudySlot * judy_promote( Judy * judy, JudySlot * next, int idx, judyvalue value,
     unsigned char * newbase;
     unsigned int type;
 
+    TRACE_ENTRY("judy=%p\n", judy);
     type = ( *next & 0x07 ) + 1;
     node = ( JudySlot * )( ( *next & JUDY_mask ) + JudySize[type - 1] );
     oldcnt = JudySize[type - 1] / ( sizeof( JudySlot ) + keysize );
@@ -645,29 +782,44 @@ JudySlot * judy_promote( Judy * judy, JudySlot * next, int idx, judyvalue value,
 //    make node with slot - start entries
 //    moving key over one offset
 
-void judy_radix( Judy * judy, JudySlot * radix, unsigned char * old, int start, int slot, int keysize, unsigned char key, unsigned int depth ) {
+void judy_radix( Judy * judy, JudySlot * radix, unsigned char * old, int start, int slot, int keysize, unsigned char key, unsigned int depth )
+{
     int size, idx, cnt = slot - start, newcnt;
     JudySlot * node, *oldnode;
     unsigned int type = JUDY_1 - 1;
     JudySlot * table;
     unsigned char * base;
 
+    TRACE_DEBUG("judy=0x%016llx, radix=0x%016llx, old=0x%016llx, start=%d, slot=%d, keysize=%d, key=%02x, depth=%u"
+        , (unsigned long long)judy
+        , (unsigned long long)radix
+        , (unsigned long long)old
+        , start, slot, keysize, key, depth);
+
     //    if necessary, setup inner radix node
 
     table = ( JudySlot * )( radix[key >> 4] & JUDY_mask );
+
     if( !table ) {
         table = judy_alloc( judy, JUDY_radix );
         radix[key >> 4] = ( JudySlot )table | JUDY_radix;
+        TRACE_DEBUG(", table = %p", table);
+    }
+    else {
+        TRACE_DEBUG(", table=radix[%02x]=%p", key>>4, table);
     }
 
     oldnode = ( JudySlot * )( old + JudySize[JUDY_max] );
+    TRACE_DEBUG(", oldnode=%p", oldnode);
 
     // is this slot a leaf?
 
     if( ( !judy->depth && ( !key || !keysize ) ) || ( judy->depth && !keysize && depth == judy->depth ) ) {
         table[key & 0x0F] = oldnode[-start - 1];
+        TRACE_DEBUG(", slot is a leaf, *table(%p) = *oldnode%p\n", &table[key&0x0f], &oldnode[-start - 1]);
         return;
     }
+    TRACE_DEBUG("\n");
 
     //    calculate new node big enough to contain slots
 
@@ -688,22 +840,33 @@ void judy_radix( Judy * judy, JudySlot * radix, unsigned char * old, int start, 
 
     for( idx = 0; idx < cnt; idx++ ) {
 #if BYTE_ORDER != BIG_ENDIAN
+        TRACE_DEBUG("   memcpy(%p, %p, %u)\n", base + ( newcnt - idx - 1 ) * keysize, old + ( start + cnt - idx - 1 ) * ( keysize + 1 ), keysize );
         memcpy( base + ( newcnt - idx - 1 ) * keysize, old + ( start + cnt - idx - 1 ) * ( keysize + 1 ), keysize );
 #else
+        TRACE_DEBUG("   memcpy(%p, %p, %u)\n", base + ( newcnt - idx - 1 ) * keysize, old + ( start + cnt - idx - 1 ) * ( keysize + 1 ) + 1, keysize );
         memcpy( base + ( newcnt - idx - 1 ) * keysize, old + ( start + cnt - idx - 1 ) * ( keysize + 1 ) + 1, keysize );
 #endif
         node[-( newcnt - idx )] = oldnode[-( start + cnt - idx )];
+
+        TRACE_DEBUG("node[%d](%p) = oldnode[%d](%p)\n"
+          , -( newcnt - idx )
+          , &node[-( newcnt - idx )]
+          , -( start + cnt - idx )
+          , &oldnode[-( start + cnt - idx )]
+        );
     }
 }
 
 //    decompose full node to radix nodes
 
-void judy_splitnode( Judy * judy, JudySlot * next, unsigned int size, unsigned int keysize, unsigned int depth ) {
+void judy_splitnode( Judy * judy, JudySlot * next, unsigned int size, unsigned int keysize, unsigned int depth )
+{
     int cnt, slot, start = 0;
     unsigned int key = 0x0100, nxt;
     JudySlot * newradix;
     unsigned char * base;
 
+    TRACE_DEBUG("judy=0x%016llx\n", (unsigned long long)judy);
     base = ( unsigned char * )( *next & JUDY_mask );
     cnt = size / ( sizeof( JudySlot ) + keysize );
 
@@ -739,7 +902,8 @@ void judy_splitnode( Judy * judy, JudySlot * next, unsigned int size, unsigned i
 
 //    return first leaf
 
-JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned int depth ) {
+JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned int depth )
+{
     JudySlot * table, *inner;
     unsigned int keysize, size;
     JudySlot * node;
@@ -833,13 +997,15 @@ JudySlot * judy_first( Judy * judy, JudySlot next, unsigned int off, unsigned in
 
 //    return last leaf cell pointer
 
-JudySlot * judy_last( Judy * judy, JudySlot next, unsigned int off, unsigned int depth ) {
+JudySlot * judy_last( Judy * judy, JudySlot next, unsigned int off, unsigned int depth )
+{
     JudySlot * table, *inner;
     unsigned int keysize, size;
     JudySlot * node;
     int slot, cnt;
     unsigned char * base;
 
+    TRACE_ENTRY("judy=%p\n", judy);
     while( next ) {
         if( judy->level < judy->max ) {
             judy->level++;
@@ -921,13 +1087,16 @@ JudySlot * judy_last( Judy * judy, JudySlot next, unsigned int off, unsigned int
 
 //    judy_end: return last entry
 
-JudySlot * judy_end( Judy * judy ) {
+JudySlot * judy_end( Judy * judy )
+{
+    TRACE_ENTRY("judy=%p\n", judy);
     judy->level = 0;
     return judy_last( judy, *judy->root, 0, 0 );
 }
 
 //    judy_nxt: return next entry
-JudySlot * judy_nxt( Judy * judy ) {
+JudySlot * judy_nxt( Judy * judy )
+{
     JudySlot * table, *inner;
     int slot, size, cnt;
     JudySlot * node;
@@ -937,6 +1106,7 @@ JudySlot * judy_nxt( Judy * judy ) {
     unsigned int depth;
     unsigned int off;
 
+    TRACE_ENTRY("judy=%p\n", judy);
     if( !judy->level ) {
         return judy_first( judy, *judy->root, 0, 0 );
     }
@@ -1016,7 +1186,8 @@ JudySlot * judy_nxt( Judy * judy ) {
 
 //    judy_prv: return ptr to previous entry
 
-JudySlot * judy_prv( Judy * judy ) {
+JudySlot * judy_prv( Judy * judy )
+{
     int slot, size, keysize;
     JudySlot * table, *inner;
     JudySlot * node, next;
@@ -1024,6 +1195,7 @@ JudySlot * judy_prv( Judy * judy ) {
     unsigned int depth;
     unsigned int off;
 
+    TRACE_ENTRY("judy=%p\n", judy);
     if( !judy->level ) {
         return judy_last( judy, *judy->root, 0, 0 );
     }
@@ -1101,7 +1273,8 @@ JudySlot * judy_prv( Judy * judy ) {
 //    judy_del: delete string from judy array
 //        returning previous entry.
 
-JudySlot * judy_del( Judy * judy ) {
+JudySlot * judy_del( Judy * judy )
+{
     // int slot, off, size, type, high;
     int slot, off, size, type;
     JudySlot * table, *inner;
@@ -1109,6 +1282,7 @@ JudySlot * judy_del( Judy * judy ) {
     int keysize, cnt;
     unsigned char * base;
 
+    TRACE_ENTRY("judy=%p\n", judy);
     while( judy->level ) {
         next = judy->stack[judy->level].next;
         slot = judy->stack[judy->level].slot;
@@ -1196,27 +1370,39 @@ JudySlot * judy_del( Judy * judy ) {
 
 //    return cell for first key greater than or equal to given key
 
-JudySlot * judy_strt( Judy * judy, const unsigned char * buff, unsigned int max ) {
+JudySlot * judy_strt( Judy * judy, const unsigned char * buff, unsigned int max )
+{
     JudySlot * cell;
+
+    TRACE_ENTRY("judy=%p, buf/key=0x%016llx, max=%u\n"
+        , judy
+        , *(unsigned long long*)buff
+        , max
+    );
 
     judy->level = 0;
 
     if( !max ) {
+        TRACE_DEBUG(" Returning from judy_first\n");
         return judy_first( judy, *judy->root, 0, 0 );
     }
+    TRACE_DEBUG("\n");
 
     cell = judy_slot( judy, buff, max );
     if( cell ) {
+        TRACE_DEBUG(" Returning %p from judy_slot\n", cell);
         return cell;
     }
 
+    TRACE_DEBUG(" judy_slot returned null, returning judy_nxt\n");
     return judy_nxt( judy );
 }
 
 //    split open span node
 
 #ifndef ASKITIS
-void judy_splitspan( Judy * judy, JudySlot * next, unsigned char * base ) {
+void judy_splitspan( Judy * judy, JudySlot * next, unsigned char * base )
+{
     JudySlot * node = ( JudySlot * )( base + JudySize[JUDY_span] );
     unsigned int cnt = JUDY_span_bytes;
     unsigned char * newbase;
@@ -1225,6 +1411,7 @@ void judy_splitspan( Judy * judy, JudySlot * next, unsigned char * base ) {
     int i;
 #endif
 
+    TRACE_DEBUG("judy_splitspan(judy=0x%016llx) More Instrumentation Needed\n", (unsigned long long)judy);
     do {
         newbase = judy_alloc( judy, JUDY_1 );
         *next = ( JudySlot )newbase | JUDY_1;
@@ -1251,7 +1438,8 @@ void judy_splitspan( Judy * judy, JudySlot * next, unsigned char * base ) {
 
 //    judy_cell: add string to judy array
 
-JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max ) {
+JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max )
+{
     judyvalue * src = ( judyvalue * )buff;
     int size, idx, slot, cnt, tst;
     JudySlot * next = judy->root;
@@ -1264,12 +1452,22 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
     unsigned int keysize;
     unsigned char * base;
 
+    TRACE_ENTRY("judy=%p, buf/key=0x%016llx, max=%u\n"
+        , judy
+        , *(unsigned long long*)buff
+        , max
+    );
+    print_nodetype(*next);
+    TRACE_DEBUG("\n");
+
     judy->level = 0;
 #ifdef ASKITIS
     Words++;
 #endif
 
     while( *next ) {
+        TRACE_DEBUG("    level=%u, max=%u, ", judy->level, judy->max);
+
 #ifndef ASKITIS
         if( judy->level < judy->max ) {
             judy->level++;
@@ -1278,6 +1476,8 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
         judy->stack[judy->level].next = *next;
         judy->stack[judy->level].off = off;
 #endif
+        print_nodetype(*next);
+        TRACE_DEBUG(", ");
         switch( *next & 0x07 ) {
             default:
                 size = JudySize[*next & 0x07];
@@ -1294,13 +1494,17 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                     off |= JUDY_key_mask;
                     off++;
                     value &= JudyMask[keysize];
-                } else
+                } else {
                     do {
                         value <<= 8;
                         if( off < max ) {
                             value |= buff[off];
                         }
                     } while( ++off & JUDY_key_mask );
+                }
+
+                TRACE_DEBUG("size=%u, keysize=%u, cnt=%u, base=0x%016llx, slot=%u, value=0x%02llx",
+                    size, keysize, cnt, (unsigned long long)base, slot, value);
 
                 //  find slot > key
 
@@ -1319,6 +1523,7 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                 judy->stack[judy->level].slot = slot;
 #endif
                 if( test == value ) {        // new key is equal to slot key
+                    TRACE_DEBUG(", test0x%02llx == value0x%02llx", test, value);
                     next = &node[-slot - 1];
 
                     // is this a leaf?
@@ -1331,6 +1536,7 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                             Inserts++;
                         }
 #endif
+                        TRACE_DEBUG(", leaf found\n");
                         return next;
                     }
 
@@ -1341,8 +1547,18 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                 //    open up cell after slot
 
                 if( !node[-1] ) {
+                    TRACE_DEBUG(", moving %u bytes from base=0x%016llx --> 0x%016llx"
+                        , slot * keysize
+                        , (unsigned long long)base
+                        , (unsigned long long)(base + keysize)
+                    );
                     memmove( base, base + keysize, slot * keysize );  // move keys less than new key down one slot
 #if BYTE_ORDER != BIG_ENDIAN
+                    TRACE_DEBUG(", copying %u bytes from value=0x%016llx --> 0x%016llx"
+                        , keysize
+                        , (unsigned long long)&value
+                        , (unsigned long long)(base + slot * keysize)
+                    );
                     memcpy( base + slot * keysize, &value, keysize );  // copy new key into slot
 #else
                     test = value;
@@ -1367,13 +1583,16 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                             Inserts++;
                         }
 #endif
+                        TRACE_DEBUG(", inserted\n");
                         return next;
                     }
 
+                    TRACE_DEBUG("\n");
                     continue;
                 }
 
                 if( size < JudySize[JUDY_max] ) {
+                    TRACE_DEBUG(", promoting");
                     next = judy_promote( judy, next, slot + 1, value, keysize );
 
                     if( ( !judy->depth && !( value & 0xFF ) ) || ( judy->depth && depth == judy->depth ) ) {
@@ -1384,15 +1603,18 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                             Inserts++;
                         }
 #endif
+                        TRACE_DEBUG(", inserted/Found\n");
                         return next;
                     }
 
+                    TRACE_DEBUG("\n");
                     continue;
                 }
 
                 //    split full maximal node into JUDY_radix nodes
                 //  loop to reprocess new insert
 
+                TRACE_DEBUG(", splitting to JUDY_radix nodes\n");
                 judy_splitnode( judy, next, size, keysize, depth );
 #ifndef ASKITIS
                 judy->level--;
@@ -1439,9 +1661,11 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
                         Inserts++;
                     }
 #endif
+                    TRACE_DEBUG(", inserted/Found\n");
                     return next;
                 }
 
+                TRACE_DEBUG("\n");
                 continue;
 
 #ifndef ASKITIS
@@ -1477,6 +1701,7 @@ JudySlot * judy_cell( Judy * judy, const unsigned char * buff, unsigned int max 
         }
     }
 
+    TRACE_DEBUG("    place JUDY_1 node under JUDY_radix node(s)\n");
     // place JUDY_1 node under JUDY_radix node(s)
 
 #ifndef ASKITIS
