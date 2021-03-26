@@ -16,26 +16,37 @@
 int main(int, char**)
 // TEST(ZeroByteHandlerTest, Construction)
 {
-  std::size_t max_allocations{1024};
+  std::size_t max_allocations{56};
   auto& rm = umpire::ResourceManager::getInstance();
   auto alloc = rm.getAllocator("HOST");
   std::vector<void*> allocations;
 
-  for (std::size_t i{0}; i < max_allocations; i++) {
+  std::size_t i{0};
+  for ( ; i < max_allocations; i++) {
     allocations.push_back( alloc.allocate(0) );
-    for (std::size_t j{0}; j <= i; j++) {
-      if ( rm.hasAllocator(allocations[j]) != true ) {
-        std::cout << allocations[j] << " Not found" << std::endl;
-        return 1;
-      }
-      else {
-        if ( j == i ) {
-          std::cout << allocations[j] << " Allocated and Found" << std::endl;
-        }
-      }
-    }
   }
-  std::cout << "Done!" << std::endl;
+
+  if (i != max_allocations) {
+    std::cout << "Allocation #" << i << " failed" << std::endl;
+  }
+
+  if ( rm.hasAllocator(allocations[1]) != true ) {
+    std::cout << "OOPS, Allocation " << allocations[i] << " already missing" << std::endl;
+    return 1;
+  }
+
+  //
+  // This should cause a failure
+  //
+  allocations.push_back( alloc.allocate(0) );
+
+  if ( rm.hasAllocator(allocations[1]) != true ) {
+    std::cout << allocations[1] << " Not found" << std::endl;
+    return 2;
+  }
+  else {
+    std::cout << allocations[1] << " Hmm, Allocated and Found" << std::endl;
+  }
 
 #if 0
   for ( auto& a : allocations ) {

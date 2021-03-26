@@ -9,6 +9,11 @@ blt_add_executable(
   SOURCES judy_smoke_tests.cpp
   DEPENDS_ON umpire_tpl_judy gtest)
 
+blt_add_executable(
+  NAME judy_test
+  SOURCES judy_test.cpp
+  DEPENDS_ON umpire_tpl_judy)
+
 blt_add_test(
   NAME judy_smoke_tests
   COMMAND judy_smoke_tests)
