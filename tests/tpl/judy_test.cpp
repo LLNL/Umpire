@@ -50,6 +50,10 @@ struct JudyTest {
       // judy_key:   retrieve the string value for the most recent judy query.
       uint64_t* val{ reinterpret_cast<uint64_t*>(cell) };
       assert(*val == key+1 && "value from judy_strt is wrong!"); // WILL FAIL
+
+      // k = 0;
+      judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
+      assert(k == key && "Key from judy_strt wrong!");
     }
 
     {
@@ -63,6 +67,10 @@ struct JudyTest {
       // judy_key:   retrieve the string value for the most recent judy query.
       uint64_t* val{ reinterpret_cast<uint64_t*>(cell) };
       assert(*val == key+1 && "value from judy_slot is wrong!"); // WILL FAIL
+
+      // k = 0;
+      judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
+      assert(k == key && "Key from judy_strt wrong!");
     }
   }
 
