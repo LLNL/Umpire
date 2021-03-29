@@ -54,6 +54,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - BLT was updated.
 
+- Quartz is no longer used for gitlab CI tests. Instead, those tests are
+  now run on Ruby.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
