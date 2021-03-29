@@ -14,18 +14,37 @@
 #include "umpire/tpl/judy/judy.h"
 
 struct JudyTest {
-  void addkey(uint64_t key)
+  void write_key_value(const uint64_t key)
   {
+    uint64_t k{ key };
+
     // judy_cell:  insert a string into the judy array, return cell pointer.
-    JudySlot* cell{ judy_cell(array, reinterpret_cast<unsigned char*>(&key), key_length) };
+    JudySlot* cell{ judy_cell(array, reinterpret_cast<unsigned char*>(&k), key_length) };
+    assert( cell != nullptr && "write_key_value: judy_cell returned NULL!" );
 
-    if ( cell == nullptr ) {
-      std::cout << std::setfill('0') << std::setw(16) << std::hex << key;
-    }
-
-    assert( cell != nullptr && "addkey: judy_cell returned NULL!" );
     uint64_t* val{ reinterpret_cast<uint64_t*>(cell) };
     *val = key+1;    // Just make up a non-zero value, doesn't matter what
+
+    // perform check immediately, this should always work..
+    //
+    k = 0;
+    judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
+    if ( k != key ) {
+      std::cout
+        << "Unexpected Key Returned" << std::endl
+        << "    Key:          " << hex_format(key) << std::endl
+        << "    Returned Key: " << hex_format(key) << std::endl
+        << "    Value:        " << hex_format(key+1) << std::endl
+        << "    Cell:         " << hex_format(reinterpret_cast<uint64_t>(cell)) << std::endl;
+    }
+    else {
+      std::cout
+        << "Key=" << hex_format(key) << ", "
+        << "Value=" << hex_format(key+1) << ", "
+        << "Cell=" << hex_format(reinterpret_cast<uint64_t>(cell))
+        << std::endl;
+    }
+    assert(k == key && "Key from judy_strt wrong!");
   }
 
   void check_value_and_key(uint64_t key)
@@ -51,7 +70,7 @@ struct JudyTest {
       uint64_t* val{ reinterpret_cast<uint64_t*>(cell) };
       assert(*val == key+1 && "value from judy_strt is wrong!"); // WILL FAIL
 
-      // k = 0;
+      k = 0;
       judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
       assert(k == key && "Key from judy_strt wrong!");
     }
@@ -84,6 +103,13 @@ struct JudyTest {
     judy_close(array);
   }
 
+  std::string hex_format(uint64_t n)
+  {
+    std::stringstream ss;
+    ss << std::setfill('0') << std::setw(16) << std::hex << n;
+    return ss.str();
+  }
+
   const unsigned int key_depth{1};
   const unsigned int key_length{sizeof(uintptr_t)};
   const uint64_t bad_judy_base{ 0x0000200000070000 };
@@ -96,7 +122,7 @@ int main(int, char**)
   uint64_t key;
 
   for (key = judy.bad_judy_base; key < judy.bad_judy_base+0x10000; key++) {
-    judy.addkey(key);
+    judy.write_key_value(key);
   }
 
   for (key = judy.bad_judy_base; key < judy.bad_judy_base+0x10000; key++) {
