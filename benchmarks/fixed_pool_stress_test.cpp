@@ -13,7 +13,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
-constexpr size_t OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes size (2048)
+constexpr std::size_t OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes size (2048)
 
 /*
  * \brief Function that tests the deallocation pattern performance of the FixedPool allocator. 
@@ -25,24 +25,26 @@ constexpr size_t OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes s
  *        shuffle_order, depending on the deallocation pattern being measured.
  * \param test_name, name of the deallocation pattern, used for output
  */
-void test_deallocation_performance(umpire::Allocator alloc, size_t size, std::vector<size_t> &indices, std::string test_name)
+void test_deallocation_performance(umpire::Allocator alloc, std::size_t size, const std::vector<std::size_t> &indices, const std::string test_name)
 {
   double time[] = {0.0, 0.0};
-  constexpr size_t convert{1000000}; //convert sec (s) to microsec (us)
-  constexpr size_t num_rnd{1000}; //number of rounds (used to average timing)
-  std::size_t num_indices{indices.size()};
+  constexpr std::size_t convert{1000000}; //convert sec (s) to microsec (us)
+  constexpr std::size_t num_rnd{1000}; //number of rounds (used to average timing)
+  const std::size_t num_indices{indices.size()};
   std::vector<void*> allocations(num_indices);
 
-  for(size_t i{0}; i < num_rnd; i++) {
+  for(std::size_t i{0}; i < num_rnd; i++) {
     auto begin_alloc{std::chrono::system_clock::now()};
-    for (size_t j{0}; j < indices.size(); j++)
+    for (std::size_t j{0}; j < indices.size(); j++) {
       allocations[j] = alloc.allocate(size);
+    }
     auto end_alloc{std::chrono::system_clock::now()};
     time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/num_indices;
 
     auto begin_dealloc {std::chrono::system_clock::now()};
-    for (size_t h{0}; h < indices.size(); h++)
+    for (std::size_t h{0}; h < indices.size(); h++) {
       alloc.deallocate(allocations[indices[h]]);
+    }
     auto end_dealloc {std::chrono::system_clock::now()};
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/num_indices;
   }
@@ -60,24 +62,24 @@ void test_deallocation_performance(umpire::Allocator alloc, size_t size, std::ve
 void do_test(umpire::Allocator pool_alloc, std::size_t size)
 {
   //number of allocations used for testing
-  constexpr size_t num_alloc {512};
+  constexpr std::size_t num_alloc {512};
+  std::mt19937 gen(num_alloc);
 
   //create vector of indices for "same_order" tests
-  std::vector<size_t> ordering_index;
-  for(size_t i {0}; i < num_alloc; i++) {
+  std::map<const std::string, const std::vector<std::size_t>> indexing_pairs;  
+  std::vector<std::size_t> ordering_index;
+  for(std::size_t i{0}; i < num_alloc; i++) {
     ordering_index.push_back(i);
   }
-  test_deallocation_performance(pool_alloc, size, ordering_index, "SAME_ORDER");
-
-  //create vector of indices for "reverse_order" tests
+  indexing_pairs.insert({"SAME_ORDER", ordering_index});
   std::reverse(ordering_index.begin(), ordering_index.end());
-  test_deallocation_performance(pool_alloc, size, ordering_index, "REVERSE_ORDER");
-
-  //create vector of indices for "shuffle_order" tests
-  std::mt19937 gen(num_alloc);
+  indexing_pairs.insert({"REVERSE_ORDER", ordering_index});
   std::shuffle(ordering_index.begin(), ordering_index.end(), gen);
-  test_deallocation_performance(pool_alloc, size, ordering_index, "SHUFFLE_ORDER");
+  indexing_pairs.insert({"SHUFFLE_ORDER", ordering_index}); 
 
+  for(auto i : indexing_pairs) {
+    test_deallocation_performance(pool_alloc, size, i.second, i.first);
+  }
 }
 
 int main(int, char**)
@@ -89,15 +91,12 @@ int main(int, char**)
   umpire::Allocator alloc{rm.getAllocator("HOST")};
   
   //Array of sizes used (large vs. medium vs. small)
-  std::vector<size_t> sizes {67108864, 1048576, 2048};
+  std::vector<std::size_t> sizes {67108864, 1048576, 2048};
 
-  //call do_test function for each size
-  for(auto size : sizes)
-  {
-    //create the FixedPool allocator and run stress tests for all sizes
+  //create FixedPool allocator for each size and call do_test function
+  for(auto size : sizes) {
     umpire::Allocator pool_alloc = rm.makeAllocator<umpire::strategy::FixedPool, false>
                  ("fixed_pool" + std::to_string(size), alloc, size, OBJECTS_PER_BLOCK);
-  
     do_test(pool_alloc, size);
   }
 
