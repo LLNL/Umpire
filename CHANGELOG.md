@@ -37,6 +37,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - UM-837 - Replay will now display high water mark statistics per allocator.
 
+- Clean-up stage and build prefix for Gitlab CI script that will help us avoid
+  disk quota problems.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -50,6 +53,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - CI on Gitlab does not require a python environment anymore.
 
 - BLT was updated.
+
+- Quartz is no longer used for gitlab CI tests. Instead, those tests are
+  now run on Ruby.
 
 ### Removed
 
