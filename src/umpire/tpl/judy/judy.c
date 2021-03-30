@@ -44,10 +44,10 @@
 #include <string.h>
 #endif
 
-#define TRACE_ENTRY(...) 
+#define TRACE_ENTRY(...)
 // #define TRACE_ENTRY(...) printf("%s %s:%d ", __FILE__, __FUNCTION__, __LINE__); printf(__VA_ARGS__)
 
-#define TRACE_DEBUG(...) 
+#define TRACE_DEBUG(...)
 //#define TRACE_DEBUG(...) printf("%s %s:%d ", __FILE__, __FUNCTION__, __LINE__); printf(__VA_ARGS__)
 
 #ifdef linux
@@ -406,6 +406,7 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max )
     judyvalue value;
     unsigned char * base;
     int keysize;
+    char* label;
 
     if( judy->depth ) {
         max = judy->depth * JUDY_key_size;
@@ -434,32 +435,34 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max )
         TRACE_DEBUG("    len=%u, idx=%u, depth=%u, judy->depth=%u, key=0x%016llx, ", len, idx, depth, judy->depth, *(unsigned long long*)buff);
         print_nodetype(judy->stack[idx].next);
 
+
         switch( type ) {
-            case JUDY_1:
-            case JUDY_2:
-            case JUDY_4:
-            case JUDY_8:
-            case JUDY_16:
-            case JUDY_32:
+            case JUDY_1: label="JUDY_1"; goto mjm_label;
+            case JUDY_2: label="JUDY_2"; goto mjm_label;
+            case JUDY_4: label="JUDY_4"; goto mjm_label;
+            case JUDY_8: label="JUDY_8"; goto mjm_label;
+            case JUDY_16: label="JUDY_16"; goto mjm_label;
+            case JUDY_32: label="JUDY_32"; goto mjm_label;
 #ifdef ASKITIS
             case JUDY_64:
 #endif
+mjm_label:
                 keysize = JUDY_key_size - ( judy->stack[idx].off & JUDY_key_mask );
                 base = ( unsigned char * )( judy->stack[idx].next & JUDY_mask );
 
                 if( judy->depth ) {
                     value = *( judyvalue * )( base + slot * keysize );
                     value &= JudyMask[keysize];
-                    TRACE_DEBUG(", value=%02llx", value);
+                    printf("buff (%016llx) |= %016llx",
+                            *(unsigned long long*)buff, value);
                     dest[depth++] |= value;
+                    printf(" = %016llx : %s\n",
+                            *(unsigned long long*)buff, label);
                     len += keysize;
 
                     if( depth < judy->depth ) {
-                        TRACE_DEBUG(", key=0x%016llx, continuing\n", *(unsigned long long*)buff);
                         continue;
                     }
-
-                    TRACE_DEBUG(", key=0x%016llx, returning %u\n", *(unsigned long long*)buff, len);
                     return len;
                 }
                 TRACE_DEBUG("\n");
@@ -493,7 +496,19 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max )
 
             case JUDY_radix:
                 if( judy->depth ) {
+                    printf("buff (%016llx) |= %016llx << (%d - (%u & %d)) * 8 = (0x%016llx)",
+                            *(unsigned long long*)buff,
+                            ( judyvalue )slot,
+                            JUDY_key_size,
+                            len+1,
+                            JUDY_key_mask,
+                            ( judyvalue )slot << ( JUDY_key_size - ( len+1 & JUDY_key_mask ) ) * 8
+                    );
+
                     dest[depth] |= ( judyvalue )slot << ( JUDY_key_size - ( ++len & JUDY_key_mask ) ) * 8;
+
+                    printf(" = %016llx : JUDY_radix\n", *(unsigned long long*)buff);
+
                     if( !( len & JUDY_key_mask ) ) {
                         depth++;
                     }
@@ -520,6 +535,7 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max )
 
                 for( slot = 0; slot < JUDY_span_bytes && base[slot]; slot++ )
                     if( len < max ) {
+                        printf("dest[%u] |= %02x - JUDY_span\n", len, base[slot]);
                         buff[len++] = base[slot];
                     }
                 continue;
@@ -544,7 +560,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
     unsigned int depth = 0;
     unsigned int off = 0;
     unsigned char * base;
- 
+
     TRACE_ENTRY("judy=%p, buff/key=0x%016llx, max=%u\n"
         , judy , *(unsigned long long*)buff , max);
     print_nodetype(next);
@@ -683,7 +699,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
                     }
                 }
                 TRACE_DEBUG("\n");
-        
+
 
                 next = table[slot & 0x0F];
                 continue;
