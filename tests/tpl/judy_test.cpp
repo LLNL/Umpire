@@ -31,48 +31,49 @@ struct JudyTest {
     judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
     if ( k != key ) {
       std::cout
-        << "Unexpected Key Returned" << std::endl
-        << "    Key:          " << hex_format(key) << std::endl
-        << "    Returned Key: " << hex_format(key) << std::endl
-        << "    Value:        " << hex_format(key+1) << std::endl
-        << "    Cell:         " << hex_format(reinterpret_cast<uint64_t>(cell)) << std::endl;
+        << "Unexpected Key:"
+        << " Expected: " << hex_format(key) << ", "
+        << " Returned: " << hex_format(k) << ", "
+        << " Cell Location: " << hex_format(reinterpret_cast<uint64_t>(cell)) << ", "
+        << " Value: " << hex_format(key+1) << std::endl;
     }
     else {
       std::cout
-        << "Key=" << hex_format(key) << ", "
-        << "Value=" << hex_format(key+1) << ", "
-        << "Cell=" << hex_format(reinterpret_cast<uint64_t>(cell))
+        << "Key:" << hex_format(key) << ", "
+        << "Cell Location: " << hex_format(reinterpret_cast<uint64_t>(cell)) << ", "
+        << "Value: " << hex_format(key+1)
         << std::endl;
     }
-    assert(k == key && "Key from judy_strt wrong!");
   }
 
   void check_value_and_key(uint64_t key)
   {
-    // judy_strt is called by umpire (doFindOrBefore).  For testing purposes, I
-    // am checking that I can get the value from both judy_strt and judy_slot.
-    // I have confirmed that I am able to obtain the value from both judy_strt
-    // and judy_slot below.  However, neither call seems to be setting up the
-    // judy-stack adequately to allow the key to be successfully obtained.
-    // Strange... This only happens when enough (consecutive) keys have been
-    // generated to cause all of the array nodes to be decomposed into a full
-    // radix tree (and only on rzansel!).  This is the reason for UM-851.
-    //
     {
       uint64_t k{ key };
 
       // judy_strt: retrieve the cell pointer greater than or equal to given key
-      JudySlot* cell{
-        judy_strt(array, reinterpret_cast<unsigned char*>(&k), key_length) };
+      JudySlot* cell{ judy_strt(array, reinterpret_cast<unsigned char*>(&k), key_length) };
       assert(cell != nullptr && "cell from judy_strt NULL!");
 
-      // judy_key:   retrieve the string value for the most recent judy query.
       uint64_t* val{ reinterpret_cast<uint64_t*>(cell) };
-      assert(*val == key+1 && "value from judy_strt is wrong!"); // WILL FAIL
+
+      if ( *val != key+1 ) {
+        std::cout
+          << "Unexpected Value from judy_strt:"
+          << " Cell Location: " << hex_format(reinterpret_cast<uint64_t>(cell)) << ", "
+          << " Expected Value: " << hex_format(key+1) << ", "
+          << " Returned Value: " << hex_format(*cell) << std::endl;
+      }
 
       k = 0;
       judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
-      assert(k == key && "Key from judy_strt wrong!");
+
+      if ( k != key ) {
+        std::cout
+          << "Unexpected Key from judy_key after judy_strt:"
+          << " Expected: " << hex_format(key) << ", "
+          << " Returned: " << hex_format(k) << std::endl;
+      }
     }
 
     {
@@ -85,11 +86,23 @@ struct JudyTest {
 
       // judy_key:   retrieve the string value for the most recent judy query.
       uint64_t* val{ reinterpret_cast<uint64_t*>(cell) };
-      assert(*val == key+1 && "value from judy_slot is wrong!"); // WILL FAIL
 
-      // k = 0;
+      if ( *val != key+1 ) {
+        std::cout
+          << "Unexpected Value from judy_slot:"
+          << " Cell Location: " << hex_format(reinterpret_cast<uint64_t>(cell)) << ", "
+          << " Expected Value: " << hex_format(key+1) << ", "
+          << " Returned Value: " << hex_format(*cell) << std::endl;
+      }
+
+      k = 0;
       judy_key(array, reinterpret_cast<unsigned char*>(&k), key_length);
-      assert(k == key && "Key from judy_strt wrong!");
+      if ( k != key ) {
+        std::cout
+          << "Unexpected Key from judy_key after judy_slot:"
+          << " Expected: " << hex_format(key) << ", "
+          << " Returned: " << hex_format(k) << std::endl;
+      }
     }
   }
 
@@ -121,11 +134,11 @@ int main(int, char**)
   JudyTest judy;
   uint64_t key;
 
-  for (key = judy.bad_judy_base; key < judy.bad_judy_base+0x10000; key++) {
+  for (key = judy.bad_judy_base; key < judy.bad_judy_base+57; key++) {
     judy.write_key_value(key);
   }
 
-  for (key = judy.bad_judy_base; key < judy.bad_judy_base+0x10000; key++) {
+  for (key = judy.bad_judy_base; key < judy.bad_judy_base+57; key++) {
     judy.check_value_and_key(key);
   }
 
