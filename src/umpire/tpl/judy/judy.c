@@ -37,10 +37,6 @@
 //  judy_prv:   retrieve the cell pointer for the prev string in the array.
 //  judy_del:   delete the key and cell for the current stack entry.
 
-#if 0
-#include <stdio.h>
-#endif
-
 #include <memory.h>
 #include <stdlib.h>
 #if defined(_MSC_VER)
@@ -326,7 +322,7 @@ void judy_free( Judy * judy, void * block, int type ) {
 
 unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
     judyvalue * dest = ( judyvalue * )buff;
-    judyvalue shift, shifted;
+    judyvalue number_of_bits_to_shift;
     unsigned int len = 0, idx = 0, depth;
     int slot, off, type;
     judyvalue value;
@@ -398,22 +394,21 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
 
             case JUDY_radix:
                 if( judy->depth ) {
-                    shift = ( ( JUDY_key_size - ( ++len & JUDY_key_mask ) ) * 8 ) & ((JUDY_key_size*8)-1);
-                    shifted = ( judyvalue )slot << shift;
+                    //
+                    // Convert key and len sizes, specified in # of bytes, to
+                    // the number of bits for a bit shift operation. This is
+                    // the reason for the '* 8' multipliers below.
+                    //
+                    number_of_bits_to_shift =
+                      ( ( JUDY_key_size - ( ++len & JUDY_key_mask ) ) * 8 )
+                        & ( ( JUDY_key_size * 8 ) - 1 );
 
-#if 0
-                    printf("0x%016llx |= ((0x%02llx << %02llu) = 0x%016llx))"
-                        , *(unsigned long long *)buff
-                        , ( judyvalue )slot
-                        , shift
-                        , shifted);
-#endif
+                    //
+                    // Insure shift amount stays within JUDY_key_size word
+                    //
+                    number_of_bits_to_shift &= ( JUDY_key_size * 8 ) - 1;
 
-                    dest[depth] |= shifted;
-
-#if 0
-                    printf(" -> 0x%016llx\n", *(unsigned long long *)buff);
-#endif
+                    dest[depth] |= ( judyvalue )slot << number_of_bits_to_shift;
 
                     if( !( len & JUDY_key_mask ) ) {
                         depth++;
