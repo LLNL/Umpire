@@ -33,6 +33,43 @@ std::unique_ptr<resource::MemoryResource>
 SyclPinnedMemoryResourceFactory::create(const std::string& name, int id,
                                         MemoryResourceTraits traits)
 {
+  auto sycl_asynchandler = [] (sycl::exception_list exceptions) {
+    for (std::exception_ptr const& e : exceptions) {
+      try {
+	std::rethrow_exception(e);
+      } catch (sycl::exception const& ex) {
+	std::cout << "Caught asynchronous SYCL exception:" << std::endl
+	<< ex.what() << ", OpenCL code: " << ex.get_cl_code() << std::endl;
+      }
+    }
+  };
+
+  sycl::platform platform(sycl::gpu_selector{});
+
+  int device_count = 0; // SYCL multi.device count
+  auto const& devices = platform.get_devices();
+  for (auto& device : devices) {
+    if (device.is_gpu()) {
+      if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
+	auto subDevicesDomainNuma = device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(sycl::info::partition_affinity_domain::numa);
+	for (auto& subDev : subDevicesDomainNuma) {
+	  device_count++;
+	  if ((device_count-1) == traits.id) {
+	    sycl::context syclctxt(subDev, sycl_asynchandler);
+	    traits.queue = new sycl::queue(syclctxt, subDev, sycl::property_list{sycl::property::queue::in_order{}});
+	  }
+	}
+      }
+      else {
+	device_count++;
+	if ((device_count-1) == traits.id) {
+	  sycl::context syclctxt(device, sycl_asynchandler);
+	  traits.queue = new sycl::queue(syclctxt, device, sycl::property_list{sycl::property::queue::in_order{}});
+	}
+      }
+    }
+  }
+
   return util::make_unique<
       resource::SyclDeviceMemoryResource<alloc::SyclPinnedAllocator>>(
       Platform::sycl, name, id, traits);
@@ -42,24 +79,15 @@ MemoryResourceTraits SyclPinnedMemoryResourceFactory::getDefaultTraits()
 {
   MemoryResourceTraits traits;
 
-  cl::sycl::gpu_selector gpuSelect;
-  cl::sycl::device sycl_device(gpuSelect);
-  const std::string deviceName =
-      sycl_device.get_info<cl::sycl::info::device::name>();
-  if (sycl_device.is_gpu()) {
-    traits.size =
-        0; // sycl_device.get_info<cl::sycl::info::device::global_mem_size>();
-           // // in bytes
-    traits.unified = false;
+  traits.size = 0;
+  traits.unified = false;
 
-    traits.id = 0;
+  traits.id = 0;
 
-    traits.vendor = MemoryResourceTraits::vendor_type::intel;
-    traits.kind = MemoryResourceTraits::memory_type::ddr;
-    traits.used_for = MemoryResourceTraits::optimized_for::access;
-    traits.resource = MemoryResourceTraits::resource_type::pinned;
-  }
-
+  traits.vendor = MemoryResourceTraits::vendor_type::intel;
+  traits.kind = MemoryResourceTraits::memory_type::ddr;
+  traits.used_for = MemoryResourceTraits::optimized_for::access;
+  traits.resource = MemoryResourceTraits::resource_type::pinned;
   return traits;
 }
 

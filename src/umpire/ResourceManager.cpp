@@ -145,7 +145,6 @@ Allocator ResourceManager::makeResource(const std::string& name)
 {
   resource::MemoryResourceRegistry& registry{
       resource::MemoryResourceRegistry::getInstance()};
-
   return makeResource(name, registry.getDefaultTraitsForResource(name));
 }
 
@@ -167,7 +166,6 @@ Allocator ResourceManager::makeResource(const std::string& name,
       util::wrap_allocator<strategy::AllocationTracker,
                            strategy::ZeroByteHandler>(
           registry.makeMemoryResource(name, getNextId(), traits))};
-
   UMPIRE_REPLAY(R"( "event": "makeMemoryResource", "payload": { "name": ")"
                 << name << R"(" })"
                 << R"(, "result": ")" << allocator.get() << R"(")");
@@ -769,14 +767,17 @@ int ResourceManager::getNumDevices() const
 #elif defined(UMPIRE_ENABLE_HIP)
   hipGetDeviceCount(&device_count);
 #elif defined(UMPIRE_ENABLE_SYCL)
-  auto platforms = cl::sycl::platform::get_platforms();
-  for (auto& platform : platforms) {
-    auto devices = platform.get_devices();
-    for (auto& device : devices) {
-      const std::string deviceName =
-          device.get_info<cl::sycl::info::device::name>();
-      if (device.is_gpu())
+  sycl::platform platform(sycl::gpu_selector{});
+
+  auto devices = platform.get_devices();
+  for (auto& device : devices) {
+    if (device.is_gpu()) {
+      if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
+        device_count += device.get_info<sycl::info::device::partition_max_sub_devices>();
+      }
+      else {
         device_count++;
+      }
     }
   }
 #endif
