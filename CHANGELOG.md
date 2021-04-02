@@ -6,6 +6,86 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Develop Branch]
+
+### Added
+
+- Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
+  is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
+
+- Documentation on allocator (in)accessibility as well as getAllocator usage.
+
+- Updated Umpire::Allocator 'deallocate' documentation brief on handling
+  deallocations on nullptr.
+
+- Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
+
+- Added a data race check with Thread Sanitizer for the Gitlab CI test
+
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
+  internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
+  BLT support for GoogleBenchmark.
+
+- Added version macros to C API, and added version functions to C and FORTRAN APIs.
+
+- Benchmark that measures the performance of different allocator vendor types across
+  various allocation sizes.
+
+- Added a Release function to FixedPool and corresponding gtest in strategy_tests
+
+- Install thirdparty exports in CMake configuration file
+
+- UM-837 - Replay will now display high water mark statistics per allocator.
+
+- Clean-up stage and build prefix for Gitlab CI script that will help us avoid
+  disk quota problems.
+
+### Changed
+
+- Organized configuration options in config.hpp.in in alphabetical order.
+
+- Size Limiter example now has a try-catch statement to handle exception.
+
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run.
+
+- Uberenv is now used as a submodule.
+
+- CI on Gitlab does not require a python environment anymore.
+
+- BLT was updated.
+
+- Quartz is no longer used for gitlab CI tests. Instead, those tests are
+  now run on Ruby.
+
+### Removed
+
+- Removed extraneous function definition in HipDeviceMemoryResource.
+
+- Removed the temporary fix for the HIP + fortran linker error (blt has been 
+  updated instead).
+
+### Fixed
+
+- Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file.
+
+- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file.
+
+- Fixed Windows CI errors by ensuring azure pipeline runs with the filesystem turned ON.
+
+- Fixed HIP CI test versioning error and added test for rocm/3.9.0 and rocm/3.10.0
+
+- Corrected accounting error in replay tool where allocation map operations
+  were not being accounted for and reported correctly.
+
+- Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+- Fixed incorrect option causing sanitizer tests to be skipped.
+
+- Python is now explicitly python3 or python2 (most likely python3)
+
+- Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
+  issue that would mean the pool would never coalesce automatically.
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
@@ -55,6 +135,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Changed enumeration names from all upper case to all lower case in order to
   avoid name collisions.  (Note: this changes may be user visible so need to be
   release noted).
+  
+- Documentation of Uberenv is moved to a shared location (radiuss-ci), we
+  keep only the examples locally.
 
 - Fixed up broken source links in tutorial documentation.
 
