@@ -11,7 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 5.0.0)
+  VERSION 5.0.1)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -60,7 +60,6 @@ set(CMAKE_CUDA_STANDARD 11)
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
     message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
     set( CMAKE_CXX_EXTENSIONS ON )
-  endif()
 endif()
 
 if (ENABLE_CUDA)

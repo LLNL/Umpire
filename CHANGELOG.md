@@ -6,7 +6,12 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Develop Branch]
+## [v5.0.1] - 2021-03-31
+
+### Fixed
+
+- Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
+  as not being found
 
 ## [v5.0.0] - 2020-11-18
 
