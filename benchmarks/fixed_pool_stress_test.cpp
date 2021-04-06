@@ -59,29 +59,6 @@ void test_deallocation_performance(umpire::Allocator alloc, std::size_t size, co
   std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
-void do_test(umpire::Allocator pool_alloc, std::size_t size)
-{
-  //number of allocations used for testing
-  constexpr std::size_t num_alloc {512};
-  std::mt19937 gen(num_alloc);
-
-  //create vector of indices for "same_order" tests
-  std::map<const std::string, const std::vector<std::size_t>> indexing_pairs;  
-  std::vector<std::size_t> ordering_index;
-  for(std::size_t i{0}; i < num_alloc; i++) {
-    ordering_index.push_back(i);
-  }
-  indexing_pairs.insert({"SAME_ORDER", ordering_index});
-  std::reverse(ordering_index.begin(), ordering_index.end());
-  indexing_pairs.insert({"REVERSE_ORDER", ordering_index});
-  std::shuffle(ordering_index.begin(), ordering_index.end(), gen);
-  indexing_pairs.insert({"SHUFFLE_ORDER", ordering_index}); 
-
-  for(auto i : indexing_pairs) {
-    test_deallocation_performance(pool_alloc, size, i.second, i.first);
-  }
-}
-
 int main(int, char**)
 {
   //Set up formatting for output
@@ -93,11 +70,33 @@ int main(int, char**)
   //Array of sizes used (large vs. medium vs. small)
   std::vector<std::size_t> sizes {67108864, 1048576, 2048};
 
-  //create FixedPool allocator for each size and call do_test function
+  //number of allocations used for testing
+  constexpr std::size_t num_alloc {512};
+  std::mt19937 gen(num_alloc);
+
+  //create map with name and vector of indices for tests
+  std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs;  
+  std::vector<std::size_t> same_order(num_alloc);
+  std::iota(same_order.begin(), same_order.end(), 0);
+
+  std::vector<std::size_t> reverse_order(same_order.begin(), same_order.end());
+  std::reverse(reverse_order.begin(), reverse_order.end());
+
+  std::vector<std::size_t> shuffle_order(same_order.begin(), same_order.end());
+  std::shuffle(shuffle_order.begin(), shuffle_order.end(), gen);
+
+  //insert index vectors into map
+  indexing_pairs.insert({"SAME_ORDER", same_order});
+  indexing_pairs.insert({"REVERSE_ORDER", reverse_order});
+  indexing_pairs.insert({"SHUFFLE_ORDER", shuffle_order});
+
+  //create FixedPool allocator for each size and run test for each indexing pair
   for(auto size : sizes) {
     umpire::Allocator pool_alloc = rm.makeAllocator<umpire::strategy::FixedPool, false>
                  ("fixed_pool" + std::to_string(size), alloc, size, OBJECTS_PER_BLOCK);
-    do_test(pool_alloc, size);
+    for(auto i : indexing_pairs) {
+      test_deallocation_performance(pool_alloc, size, i.second, i.first);
+    }
   }
 
   return 0;
