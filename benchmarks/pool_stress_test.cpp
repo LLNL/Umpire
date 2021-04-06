@@ -64,7 +64,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::string pool_nam
 }
 
 template <class T>
-void do_test(std::string pool_name, std::map<const std::string, const std::vector<std::size_t>> indexing_pairs)
+void do_test(std::string pool_name, std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs)
 {
   auto& rm {umpire::ResourceManager::getInstance()};
   umpire::Allocator alloc {rm.getAllocator("HOST")};
@@ -84,16 +84,20 @@ int main(int, char**) {
   std::mt19937 gen(num_alloc);
 
   //create map with name and vector of indices for tests
-  std::map<const std::string, const std::vector<std::size_t>> indexing_pairs;  
-  std::vector<std::size_t> ordering_index;
-  for(std::size_t i{0}; i < num_alloc; i++) {
-    ordering_index.push_back(i);
-  }
-  indexing_pairs.insert({"SAME_ORDER", ordering_index});
-  std::reverse(ordering_index.begin(), ordering_index.end());
-  indexing_pairs.insert({"REVERSE_ORDER", ordering_index});
-  std::shuffle(ordering_index.begin(), ordering_index.end(), gen);
-  indexing_pairs.insert({"SHUFFLE_ORDER", ordering_index});
+  std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs;  
+  std::vector<std::size_t> same_order(num_alloc);
+  std::iota(same_order.begin(), same_order.end(), 0);
+
+  std::vector<std::size_t> reverse_order(same_order.begin(), same_order.end());
+  std::reverse(reverse_order.begin(), reverse_order.end());
+
+  std::vector<std::size_t> shuffle_order(same_order.begin(), same_order.end());
+  std::shuffle(shuffle_order.begin(), shuffle_order.end(), gen);
+
+  //insert indexing vectoring into map
+  indexing_pairs.insert({"SAME_ORDER", same_order});
+  indexing_pairs.insert({"REVERSE_ORDER", reverse_order});
+  indexing_pairs.insert({"SHUFFLE_ORDER", shuffle_order});
 
   //Call template function to run tests for each pool
   do_test<umpire::strategy::DynamicPoolMap> ("DynamicPoolMap", indexing_pairs);
