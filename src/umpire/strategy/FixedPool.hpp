@@ -24,6 +24,8 @@ namespace strategy {
  */
 class FixedPool : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   /*!
    * \brief Constructs a FixedPool.
    *

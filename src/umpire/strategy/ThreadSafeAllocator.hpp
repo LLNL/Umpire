@@ -24,6 +24,8 @@ namespace strategy {
  */
 class ThreadSafeAllocator : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   ThreadSafeAllocator(const std::string& name, int id, Allocator allocator);
 
   void* allocate(std::size_t bytes) override;

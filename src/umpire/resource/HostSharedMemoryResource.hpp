@@ -18,6 +18,8 @@ namespace resource {
 
 class HostSharedMemoryResource : public MemoryResource {
   public:
+    using MemoryResource::allocate;
+
     HostSharedMemoryResource(Platform platform, const std::string& name, int id,
                       MemoryResourceTraits traits);
 

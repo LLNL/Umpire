@@ -179,6 +179,7 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string name)
 void* find_pointer_from_name(Allocator allocator, const std::string name)
 {
   void* ptr{nullptr};
+
 #if defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   auto base_strategy =
           util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
@@ -191,11 +192,14 @@ void* find_pointer_from_name(Allocator allocator, const std::string name)
   }
   else
 #else
-  UMPIRE_USE_VAR(name);
+    UMPIRE_USE_VAR(name);
 #endif // defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
+
   {
-    UMPIRE_ERROR(allocator.getName()
-      << " Allocator is not a Shared Memory Allocator");
+    if (ptr == nullptr) {
+      UMPIRE_ERROR(allocator.getName()
+        << " Allocator is not a Shared Memory Allocator");
+    }
   }
   return ptr;
 }

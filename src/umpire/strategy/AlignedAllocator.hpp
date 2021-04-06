@@ -15,6 +15,8 @@ namespace strategy {
 
 class AlignedAllocator : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   AlignedAllocator(const std::string& name, int id, Allocator allocator,
                    std::size_t alignment = 16);
 

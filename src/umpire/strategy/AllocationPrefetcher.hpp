@@ -22,6 +22,8 @@ namespace strategy {
  */
 class AllocationPrefetcher : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   AllocationPrefetcher(const std::string& name, int id, Allocator allocator,
                        int device_id = 0);
 

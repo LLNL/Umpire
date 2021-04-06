@@ -19,6 +19,8 @@ namespace strategy {
 
 class AllocationTracker : public AllocationStrategy, private mixins::Inspector {
  public:
+  using AllocationStrategy::allocate;
+
   AllocationTracker(std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
   void* allocate(std::size_t bytes) override;

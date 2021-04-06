@@ -19,6 +19,8 @@ namespace strategy {
 
 class ZeroByteHandler : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   ZeroByteHandler(std::unique_ptr<AllocationStrategy>&& allocator) noexcept;
 
   void* allocate(std::size_t bytes) override;

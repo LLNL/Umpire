@@ -31,6 +31,8 @@ namespace strategy {
 
 class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
  public:
+  using AllocationStrategy::allocate;
+
   using Pointer = void*;
   using CoalesceHeuristic = std::function<bool(const strategy::QuickPool&)>;
 

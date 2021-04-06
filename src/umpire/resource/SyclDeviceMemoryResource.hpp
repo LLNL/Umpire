@@ -19,6 +19,8 @@ namespace resource {
 template <typename _allocator>
 class SyclDeviceMemoryResource : public MemoryResource {
  public:
+  using MemoryResource::allocate;
+
   SyclDeviceMemoryResource(Platform platform, const std::string& name, int id,
                            MemoryResourceTraits traits);
 
