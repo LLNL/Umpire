@@ -37,7 +37,7 @@ __global__ void only_the_first(umpire::DeviceAllocator alloc, double** data_ptr)
 __global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < N) {
+  if (idx < 1019) {
     double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
     *data_ptr = data;
 
@@ -48,7 +48,7 @@ __global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = umpire::DeviceAllocator(allocator, N);
+  auto device_allocator = umpire::DeviceAllocator(allocator, N * sizeof(double));
 
   cudaStream_t stream1, stream2, stream3;
   cudaStreamCreate(&stream1);
@@ -82,7 +82,7 @@ int main(int, char**) {
   std::cout << "Time: " << milliseconds << "ms" << std::endl;
 
   cudaEventRecord(start);
-  one_per_block<<<(N+NUM_THREADS-1)/NUM_THREADS, NUM_THREADS, 0, stream2>>>(device_allocator, ptr_to_data);
+  only_the_first<<<(N+NUM_THREADS-1)/NUM_THREADS, NUM_THREADS, 0, stream2>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
 
   err = cudaGetLastError();
@@ -95,11 +95,11 @@ int main(int, char**) {
   cudaEventElapsedTime(&milliseconds, start, stop);
   
   cudaStreamDestroy(stream2);
-  std::cout << "Retrieved value: " << (*ptr_to_data)[1] << std::endl;
+  std::cout << "Retrieved value: " << (*ptr_to_data)[0] << std::endl;
   std::cout << "Time: " << milliseconds << "ms" << std::endl;
 
   cudaEventRecord(start);
-  one_per_block<<<(N+NUM_THREADS-1)/NUM_THREADS, NUM_THREADS, 0, stream3>>>(device_allocator, ptr_to_data);
+  each_one<<<(N+NUM_THREADS-1)/NUM_THREADS, NUM_THREADS, 0, stream3>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
 
   err = cudaGetLastError();
@@ -112,7 +112,7 @@ int main(int, char**) {
   cudaEventElapsedTime(&milliseconds, start, stop);
   
   cudaStreamDestroy(stream3);
-  std::cout << "Retrieved value: " << (*ptr_to_data)[3] << std::endl;
+  std::cout << "Retrieved value: " << (*ptr_to_data)[0] << std::endl;
   std::cout << "Time: " << milliseconds << "ms" << std::endl;
 
   return 0;
