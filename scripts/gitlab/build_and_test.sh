@@ -18,6 +18,7 @@ project_dir="$(pwd)"
 build_root=${BUILD_ROOT:-""}
 hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
+job_unique_id=${CI_JOB_ID:-""}
 
 sys_type=${SYS_TYPE:-""}
 py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
@@ -40,12 +41,21 @@ then
 
     if [[ -d /dev/shm ]]
     then
-        prefix="/dev/shm/${hostname}/${spec// /_}"
+        prefix="/dev/shm/${hostname}"
+        if [[ -z ${job_unique_id} ]]; then
+          job_unique_id=manual_job_$(date +%s)
+          while [[ -d ${prefix}/${job_unique_id} ]] ; do
+              sleep 1
+              job_unique_id=manual_job_$(date +%s)
+          done
+        fi
+
+        prefix="${prefix}/${job_unique_id}"
         mkdir -p ${prefix}
         prefix_opt="--prefix=${prefix}"
     fi
 
-    python3 scripts/uberenv/uberenv.py --spec="${spec}"
+    python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
 date
@@ -162,4 +172,9 @@ then
     then
         echo "ERROR: failure(s) while running CTest" && exit 1
     fi
+
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~~~~~ CLEAN UP"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    make clean
 fi

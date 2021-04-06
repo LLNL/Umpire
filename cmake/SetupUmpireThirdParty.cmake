@@ -54,3 +54,21 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     LIBRARIES ${CMAKE_DL_LIBS}
     )
 endif ()
+
+set(TPL_DEPS)
+blt_list_append(TO TPL_DEPS ELEMENTS cuda cuda_runtime IF ENABLE_CUDA)
+blt_list_append(TO TPL_DEPS ELEMENTS hip hip_runtime IF ENABLE_HIP)
+blt_list_append(TO TPL_DEPS ELEMENTS openmp IF ENABLE_OPENMP)
+blt_list_append(TO TPL_DEPS ELEMENTS mpi IF ENABLE_MPI)
+
+foreach(dep ${TPL_DEPS})
+    # If the target is EXPORTABLE, add it to the export set
+    get_target_property(_is_imported ${dep} IMPORTED)
+    if(NOT ${_is_imported})
+        install(TARGETS              ${dep}
+                EXPORT               umpire-targets
+                DESTINATION          lib)
+        # Namespace target to avoid conflicts
+        set_target_properties(${dep} PROPERTIES EXPORT_NAME umpire::${dep})
+    endif()
+endforeach()

@@ -33,6 +33,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
+- Install thirdparty exports in CMake configuration file
+
+- UM-837 - Replay will now display high water mark statistics per allocator.
+
+- Clean-up stage and build prefix for Gitlab CI script that will help us avoid
+  disk quota problems.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -46,6 +53,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - CI on Gitlab does not require a python environment anymore.
 
 - BLT was updated.
+
+- Quartz is no longer used for gitlab CI tests. Instead, those tests are
+  now run on Ruby.
 
 ### Removed
 
@@ -72,6 +82,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed incorrect option causing sanitizer tests to be skipped.
 
 - Python is now explicitly python3 or python2 (most likely python3)
+
+- Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
+  issue that would mean the pool would never coalesce automatically.
+
+## [v5.0.1] - 2021-03-31
+
+### Fixed
+
+- Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
+  as not being found
 
 ## [v5.0.0] - 2020-11-18
 
