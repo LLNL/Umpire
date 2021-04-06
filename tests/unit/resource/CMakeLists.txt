@@ -30,15 +30,16 @@ if(ENABLE_FILE_RESOURCE)
     COMMAND file_resource_tests)
 endif()
 
-if(ENABLE_HOST_SHARED_MEMORY)
+if(ENABLE_HOST_SHARED_MEMORY AND ENABLE_MPI)
   blt_add_executable(
     NAME shared_memory_resource_tests
     SOURCES shared_memory_resource_tests.cpp
     DEPENDS_ON ${resource_depends})
 
-  blt_add_test(
+  umpire_add_test_with_mpi(
     NAME shared_memory_resource_tests
-    COMMAND shared_memory_resource_tests)
+    COMMAND shared_memory_resource_tests
+    NUM_MPI_TASKS 4)
 endif()
 
 if (ENABLE_GMOCK)
