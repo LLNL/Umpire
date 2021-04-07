@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/resource/FileMemoryResource.hpp"
+#include "umpire/util/Platform.hpp"
 
 #include <errno.h>
 #include <fcntl.h>

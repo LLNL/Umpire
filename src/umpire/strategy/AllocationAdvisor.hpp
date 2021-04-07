@@ -32,6 +32,8 @@ namespace strategy {
  */
 class AllocationAdvisor : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   AllocationAdvisor(const std::string& name, int id, Allocator allocator,
                     const std::string& advice_operation, int device_id = 0);
 

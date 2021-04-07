@@ -15,6 +15,8 @@ namespace strategy {
 
 class NamedAllocationStrategy : public AllocationStrategy {
  public:
+  using AllocationStrategy::allocate;
+
   NamedAllocationStrategy(const std::string& name, int id, Allocator allocator);
 
   void* allocate(std::size_t bytes) override;

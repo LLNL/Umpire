@@ -21,6 +21,10 @@ const std::string& AllocationStrategy::getName() noexcept
   return m_name;
 }
 
+void* AllocationStrategy::allocate(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t bytes) {
+  return this->allocate(bytes);
+}
+
 void AllocationStrategy::release()
 {
   UMPIRE_LOG(Info, "AllocationStrategy::release is a no-op");
