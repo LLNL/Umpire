@@ -15,7 +15,12 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
-constexpr std::size_t ALLOC_SIZE {137438953472ULL}; //137GiB, total size of all allocations together
+#if defined (UMPIRE_ENABLE_CUDA)
+  constexpr std::size_t ALLOC_SIZE {8589934592ULL}; //8GiB total size of all allocations together
+#else
+  constexpr std::size_t ALLOC_SIZE {137438953472ULL}; //137GiB total size of all allocations together
+#endif
+
 constexpr std::size_t SIZE {268435456}; //268MiB, size of each allocation
 
 /*
@@ -67,7 +72,7 @@ template <class T>
 void do_test(std::string pool_name, std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs)
 {
   auto& rm {umpire::ResourceManager::getInstance()};
-  umpire::Allocator alloc {rm.getAllocator("HOST")};
+  umpire::Allocator alloc {rm.getAllocator("DEVICE")};
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, ALLOC_SIZE)};
 
   for(auto i : indexing_pairs) {
