@@ -40,6 +40,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Clean-up stage and build prefix for Gitlab CI script that will help us avoid
   disk quota problems.
 
+- UM-854 - Updated release tarball generation script to pull the version
+  version number from the git tag.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
