@@ -21,8 +21,13 @@
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
+/*
+ * Note: HIP runs need their own RangeLow since hipMalloc 
+ * makes allocations aligned along 4k pages. HIP UM and 
+ * PINNED memory currently have a bug which may require
+ * further modification of the ranges used.
+ */
 #if defined(UMPIRE_ENABLE_HIP)
-  //hipMalloc makes allocations aligned along 4k pages
   static const int RangeLow{1<<12}; //1kB
 #else
   static const int RangeLow{1<<10}; //1kB
