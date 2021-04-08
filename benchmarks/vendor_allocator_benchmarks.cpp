@@ -21,16 +21,21 @@
 #include "umpire/alloc/HipPinnedAllocator.hpp"
 #endif
 
-static const int RangeLow{1<<10}; //1kB
+#if defined(UMPIRE_ENABLE_HIP)
+  //hipMalloc makes allocations aligned along 4k pages
+  static const int RangeLow{1<<12}; //1kB
+#else
+  static const int RangeLow{1<<10}; //1kB
+#endif
 static const int RangeHi{1<<28}; //256MB
 
 /*
- * Allocate either LARGE (about 12GB), MEDIUM (about 6GB)
- * or SMALL (about 1GB) for benchmark measurements.
+ * Allocate either LARGE (about 17GiB), MEDIUM (about 8GiB)
+ * or SMALL (about 4GiB) for benchmark measurements.
  */
-#define LARGE 12000000000
-//#define MEDIUM 6000000000
-//#define SMALL 1000000000
+#define LARGE 17179869184
+//#define MEDIUM 8589934592
+//#define SMALL 4294967296 
 
 class AllocatorBenchmark : public benchmark::Fixture {
 public:
