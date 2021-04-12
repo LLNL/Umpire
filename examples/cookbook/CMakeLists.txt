@@ -30,7 +30,7 @@ if (ENABLE_NUMA)
   list(APPEND umpire_cookbooks recipe_move_between_numa)
 endif ()
 
-if (ENABLE_HOST_SHARED_MEMORY)
+if (ENABLE_HOST_SHARED_MEMORY AND ENABLE_MPI)
   blt_add_executable(
     NAME recipe_shared_memory
     SOURCES recipe_shared_memory.cpp
