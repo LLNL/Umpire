@@ -19,9 +19,9 @@ void SyclCopyToOperation::transform(
     util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* dst_allocation, std::size_t length)
 {
-  cl::sycl::queue sycl_queue(dst_allocation->strategy->getTraits().queue);
-  sycl_queue.memcpy(*dst_ptr, src_ptr, length);
-  sycl_queue.wait();
+  auto sycl_queue = dst_allocation->strategy->getTraits().queue;
+  sycl_queue->memcpy(*dst_ptr, src_ptr, length);
+  sycl_queue->wait();
 }
 
 } // end of namespace op
