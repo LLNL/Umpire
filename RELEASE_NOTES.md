@@ -1,3 +1,8 @@
+# v5.0.1
+
+- Fixed bug where zero-byte allocations from Umpire were sometimes incorrectly
+  reported as not being Umpire allocations
+
 # v5.0.0
 
 - Memory Resource header and source files for HIP

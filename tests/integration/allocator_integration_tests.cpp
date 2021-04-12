@@ -299,7 +299,7 @@ TEST(Allocation, DeallocateDifferent)
   ASSERT_NO_THROW(alloc_one.deallocate(data));
 }
 
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_SYCL)
 TEST(Allocator, DeallocateDifferentUMDevice)
 {
   auto& rm = umpire::ResourceManager::getInstance();

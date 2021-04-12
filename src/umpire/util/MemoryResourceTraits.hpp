@@ -38,7 +38,7 @@ struct MemoryResourceTraits {
 
   // variables for only SYCL devices (i.e., Intel GPUs)
 #if defined(UMPIRE_ENABLE_SYCL)
-  cl::sycl::queue queue;
+  sycl::queue* queue=nullptr;
 #endif
 
   bool unified = false;
