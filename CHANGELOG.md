@@ -86,6 +86,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
   issue that would mean the pool would never coalesce automatically.
 
+- Fixed ranges used in the vendor allocator benchmark when HIP is enabled given 
+  that hipMalloc allocates on 4k aligned pages.
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
