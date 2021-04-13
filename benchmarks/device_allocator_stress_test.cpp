@@ -17,9 +17,10 @@ __global__ void one_per_block(umpire::DeviceAllocator alloc, double** data_ptr)
 {
   if (threadIdx.x == 0) {
     double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
-    *data_ptr = data;
+    //*data_ptr = data;
 
     data[0] = 1024;
+    //*data = 1024;
   }
 }
 
@@ -39,17 +40,21 @@ __global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < 1019) {
     double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
-    *data_ptr = data;
+    //*data_ptr = data;
 
     data[0] = 256;
   }
 }
 
+//make threads_per_block evenly divisible by num_blocks - else throw error
+//rename variables for threads, n, etc
+//use functions!
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = umpire::DeviceAllocator(allocator, N * sizeof(double));
 
+  //try using only stream, but double check sync
   cudaStream_t stream1, stream2, stream3;
   cudaStreamCreate(&stream1);
   cudaStreamCreate(&stream2);
