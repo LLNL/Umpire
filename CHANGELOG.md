@@ -42,6 +42,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Clean-up stage and build prefix for Gitlab CI script that will help us avoid
   disk quota problems.
 
+- Added a benchmark that measures the performance of FixedPool across two allocation sizes.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
