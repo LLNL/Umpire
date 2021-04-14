@@ -11,7 +11,7 @@
 #include "umpire/Allocator.hpp"
 
 //constexpr int ALLOCATIONS {1<<10}; //testing over const number of allocations (1024)
-constexpr int N {1<<10};
+constexpr int N {1<<10}; //number of allocations for device allocator (1024)
 constexpr int THREADS_PER_BLOCK {256};
 
 __global__ void one_per_block(umpire::DeviceAllocator alloc, double** data_ptr)
@@ -57,7 +57,7 @@ static void CudaTest(const char *msg)
 void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr)
 {
   float milliseconds {0};
-  CudaTest("Checking for error just after kernel: ");
+  CudaTest("Checking for error just after kernel...");
 
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&milliseconds, start, stop);
