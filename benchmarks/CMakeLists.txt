@@ -44,6 +44,11 @@ blt_add_executable(
   DEPENDS_ON ${stress_test_depends})
 
 blt_add_executable(
+  NAME fixed_pool_stress_test
+  SOURCES fixed_pool_stress_test.cpp
+  DEPENDS_ON ${stress_test_depends})
+
+blt_add_executable(
   NAME no-op_stress_test
   SOURCES no-op_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
@@ -51,6 +56,11 @@ blt_add_executable(
 blt_add_benchmark(
   NAME no-op_stress_test
   COMMAND no-op_stress_test)
+
+blt_add_executable(
+  NAME pool_stress_test
+  SOURCES pool_stress_test.cpp
+  DEPENDS_ON ${stress_test_depends})
 
 if (ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)

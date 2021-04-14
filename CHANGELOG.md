@@ -31,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Benchmark that measures the performance of different allocator vendor types across
   various allocation sizes.
 
+- Benchmark that measures the performance of different memory pools
+
 - Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
 - Install thirdparty exports in CMake configuration file
@@ -39,6 +41,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Clean-up stage and build prefix for Gitlab CI script that will help us avoid
   disk quota problems.
+
+- Added a benchmark that measures the performance of FixedPool across two allocation sizes.
 
 ### Changed
 
