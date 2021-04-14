@@ -43,15 +43,6 @@ __global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
   }
 }
 
-void event_timing(cudaEvent_t start, cudaEvent_t stop)
-{
-  float milliseconds {0};
-  cudaEventSynchronize(stop);
-  cudaEventElapsedTime(&milliseconds, start, stop);
-
-  std::cout << "Time: " << milliseconds << "ms" << std::endl;
-}
-
 static void CudaTest(const char *msg)
 {
   cudaError_t e = cudaGetLastError();
@@ -63,48 +54,51 @@ static void CudaTest(const char *msg)
   }
 }
 
+void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr)
+{
+  float milliseconds {0};
+  CudaTest("Checking for error just after kernel: ");
+
+  cudaEventSynchronize(stop);
+  cudaEventElapsedTime(&milliseconds, start, stop);
+
+  std::cout << "Time: " << milliseconds << "ms" << std::endl;
+  std::cout << "Retrieved value: " << (*ptr)[0] << std::endl;
+}
+
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = umpire::DeviceAllocator(allocator, N * sizeof(double));
+  double** ptr_to_data =
+      static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   assert((N % THREADS_PER_BLOCK) != 0);
 
+  //create cuda streams and events
   cudaStream_t stream;
   cudaStreamCreate(&stream);
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
 
-  double** ptr_to_data =
-      static_cast<double**>(allocator.allocate(sizeof(double*)));
-
   //Run kernel to allocate per first thread per block
   cudaEventRecord(start);
   one_per_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
-
-  CudaTest("Error!");
-  event_timing(start, stop); 
-  std::cout << "Retrieved value: " << (*ptr_to_data)[0] << std::endl;
+  event_timing_reporting(start, stop, ptr_to_data); 
 
   //Run kernel to allocate with only thread 0
   cudaEventRecord(start);
   only_the_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
-
-  CudaTest("Error!");
-  event_timing(start, stop); 
-  std::cout << "Retrieved value: " << (*ptr_to_data)[0] << std::endl;
+  event_timing_reporting(start, stop, ptr_to_data); 
 
   //Run kernel to allocate per each thread
   cudaEventRecord(start);
   each_one<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
-  
-  CudaTest("Error!");
-  event_timing(start, stop); 
-  std::cout << "Retrieved value: " << (*ptr_to_data)[0] << std::endl;
+  event_timing_reporting(start, stop, ptr_to_data); 
 
   cudaStreamDestroy(stream);
   return 0;
