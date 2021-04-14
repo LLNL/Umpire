@@ -25,14 +25,14 @@
  * Note: HIP runs need their own RangeLow since hipMalloc 
  * makes allocations aligned along 4k pages. HIP UM and 
  * PINNED memory currently have a bug which may require
- * further modification of the ranges used.
+ * further modification of the HIP ranges used.
  */
 #if defined(UMPIRE_ENABLE_HIP)
-  static const int RangeLow{1<<12}; //1kB
+  static const int RangeLow{1<<12}; //4kiB
 #else
-  static const int RangeLow{1<<10}; //1kB
+  static const int RangeLow{1<<10}; //1kiB
 #endif
-static const int RangeHi{1<<28}; //256MB
+static const int RangeHi{1<<28}; //256MiB
 
 /*
  * Allocate either LARGE (about 17GiB), MEDIUM (about 8GiB)
