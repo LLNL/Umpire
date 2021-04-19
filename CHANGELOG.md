@@ -68,6 +68,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Removed the temporary fix for the HIP + fortran linker error (blt has been 
   updated instead).
 
+- Doxygen from Sphinx to fix auto documentation generation bug.
+
 ### Fixed
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file.

@@ -46,27 +46,8 @@ if read_the_docs_build:
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.mathjax',
-    'breathe',
-    'exhale'
+    'sphinx.ext.mathjax'
 ]
-
-#breathe_projects = { 'umpire': "../../build/docs/doxygen/xml/" }
-breathe_projects = { 'umpire': "../doxygen/xml/" }
-breathe_default_project = "umpire"
-
-exhale_args = {
-    # These arguments are required
-    "containmentFolder":     "./api/",
-    "rootFileName":          "api.rst",
-    "rootFileTitle":         "API",
-    "doxygenStripFromPath":  "..",
-    # Suggested optional arguments
-    "createTreeView":        True,
-    # TIP: if using the sphinx-bootstrap-theme, you need
-    # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": False,
-}
 
 # Tell sphinx what the primary language being documented is.
 primary_domain = 'cpp'
