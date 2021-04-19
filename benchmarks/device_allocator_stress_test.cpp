@@ -36,7 +36,7 @@ __global__ void only_the_first(umpire::DeviceAllocator alloc, double** data_ptr)
 __global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < 1019) {
+  if (idx < N) {
     double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
     *data_ptr = data;
     *data = 256;
@@ -69,7 +69,7 @@ void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr)
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = umpire::DeviceAllocator(allocator, N * sizeof(double));
+  auto device_allocator = umpire::DeviceAllocator(allocator, (N+5) * sizeof(double));
   double** ptr_to_data =
       static_cast<double**>(allocator.allocate(sizeof(double*)));
 
