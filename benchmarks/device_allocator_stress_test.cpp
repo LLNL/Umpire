@@ -11,7 +11,7 @@
 #include "umpire/Allocator.hpp"
 
 //constexpr int ALLOCATIONS {1<<10}; //testing over const number of allocations (1024)
-constexpr int N {1<<10}; //number of allocations for device allocator (1024)
+constexpr int N {1<<20}; //number of allocations for device allocator (1024)
 constexpr int THREADS_PER_BLOCK {256};
 
 __global__ void one_per_block(umpire::DeviceAllocator alloc, double** data_ptr)
@@ -70,9 +70,7 @@ void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, s
 int main(int, char**) {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = umpire::DeviceAllocator(allocator, (N+5) * sizeof(double));
-  double** ptr_to_data =
-      static_cast<double**>(allocator.allocate(sizeof(double*)));
+  double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   assert((N % THREADS_PER_BLOCK) != 0);
 
@@ -84,20 +82,23 @@ int main(int, char**) {
   cudaEventCreate(&stop);
 
   //Run kernel to allocate per first thread per block
+  auto device_allocator_opb = umpire::DeviceAllocator(allocator, (N/THREADS_PER_BLOCK) * sizeof(double));
   cudaEventRecord(start);
-  one_per_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
+  one_per_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator_opb, ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, "Kernel: One thread per block"); 
 
   //Run kernel to allocate with only thread 0
+  auto device_allocator_otf = umpire::DeviceAllocator(allocator, 1 * sizeof(double));
   cudaEventRecord(start);
-  only_the_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
+  only_the_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator_otf, ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, "Kernel: Only thread idx 0"); 
 
   //Run kernel to allocate per each thread
+  auto device_allocator_eo = umpire::DeviceAllocator(allocator, (N) * sizeof(double));
   cudaEventRecord(start);
-  each_one<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
+  each_one<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator_eo, ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, "Kernel: Each thread"); 
 
