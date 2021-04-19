@@ -54,7 +54,7 @@ static void CudaTest(const char *msg)
   }
 }
 
-void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr)
+void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, std::string name)
 {
   float milliseconds {0};
   CudaTest("Checking for error just after kernel...");
@@ -62,8 +62,9 @@ void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr)
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&milliseconds, start, stop);
 
+  std::cout << name << std::endl;
   std::cout << "Time: " << milliseconds << "ms" << std::endl;
-  std::cout << "Retrieved value: " << (*ptr)[0] << std::endl;
+  std::cout << "Retrieved value: " << (*ptr)[0] << std::endl << std::endl;
 }
 
 int main(int, char**) {
@@ -86,19 +87,19 @@ int main(int, char**) {
   cudaEventRecord(start);
   one_per_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data); 
+  event_timing_reporting(start, stop, ptr_to_data, "Kernel: One thread per block"); 
 
   //Run kernel to allocate with only thread 0
   cudaEventRecord(start);
   only_the_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data); 
+  event_timing_reporting(start, stop, ptr_to_data, "Kernel: Only thread idx 0"); 
 
   //Run kernel to allocate per each thread
   cudaEventRecord(start);
   each_one<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(device_allocator, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data); 
+  event_timing_reporting(start, stop, ptr_to_data, "Kernel: Each thread"); 
 
   cudaStreamDestroy(stream);
   return 0;
