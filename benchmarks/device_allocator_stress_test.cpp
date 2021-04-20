@@ -11,7 +11,7 @@
 #include "umpire/Allocator.hpp"
 
 //constexpr int ALLOCATIONS {1<<10}; //testing over const number of allocations (1024)
-constexpr int N {1<<20}; //number of allocations for device allocator (1024)
+constexpr int N {1<<30}; //number of allocations for device allocator (1024)
 constexpr int THREADS_PER_BLOCK {256};
 
 __global__ void one_per_block(umpire::DeviceAllocator alloc, double** data_ptr)
@@ -40,6 +40,16 @@ __global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
     double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
     *data_ptr = data;
     *data = 256;
+  }
+}
+
+__global__ void warm_up(umpire::DeviceAllocator alloc, double** data_ptr)
+{
+  int idx = blockIdx.x * blockDim.x + threadIdx.x;
+  if (idx < N) {
+    double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
+    *data_ptr = data;
+    *data = idx * idx - idx;
   }
 }
 
@@ -80,6 +90,13 @@ int main(int, char**) {
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
+
+  //Run warm-up kernel
+  auto dev_warmup_alloc = umpire::DeviceAllocator(allocator, N * sizeof(double));
+  cudaEventRecord(start);
+  warm_up<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_warmup_alloc, ptr_to_data);
+  cudaEventRecord(stop);
+  event_timing_reporting(start, stop, ptr_to_data, "Kernel: Warm-up"); 
 
   //Run kernel to allocate per first thread per block
   auto device_allocator_opb = umpire::DeviceAllocator(allocator, (N/THREADS_PER_BLOCK) * sizeof(double));
