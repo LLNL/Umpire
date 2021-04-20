@@ -31,8 +31,21 @@ import os, subprocess
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    print 'Running on read the docs'
-    subprocess.call('cd ../doxygen; doxygen', shell=True)
+  # Makes sure directory exists for doxygen output
+  cwd=os.getcwd()
+  buildpath=os.path.join(cwd,"_build")
+  if (os.path.isdir(buildpath) == 0):
+    os.mkdir(buildpath)
+  htmlpath=os.path.join(buildpath,"html")
+  if (os.path.isdir(htmlpath) == 0):
+    os.mkdir(htmlpath)
+
+  # Call doxygen
+  from subprocess import call
+  call(['doxygen', "../doxygen/Doxyfile"])
+
+# Get current directory
+conf_directory = os.path.dirname(os.path.realpath(__file__))
 
 # -- General configuration ------------------------------------------------
 
