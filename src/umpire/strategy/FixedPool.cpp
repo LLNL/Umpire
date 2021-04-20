@@ -198,7 +198,7 @@ void FixedPool::release()
 { 
   for (auto& p : m_pool) {
     if (m_obj_per_pool == p.num_avail) {
-      p.strategy->deallocate(p.data);
+      p.strategy->deallocate_internal(p.data, m_data_bytes);
       std::free(p.avail);
     } 
   }
