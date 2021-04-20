@@ -54,7 +54,11 @@ if(WIN32 OR APPLE)
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
-set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+if (ENABLE_SYCL)
+  set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+else()
+  set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+endif()
 set(CMAKE_CUDA_STANDARD 11)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
