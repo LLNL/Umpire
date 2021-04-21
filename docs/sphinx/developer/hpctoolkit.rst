@@ -44,9 +44,9 @@ Below is the basic (Umpire-specific) set up to load, build with, and run with HP
 After running the ``hpcrun`` command, a ``hpctoolkit-executable-measurements-<job_id>/`` folder
 will be generated. After running the ``hpcstruct`` command, a ``executable.hpcstruct`` file will
 be generated. These two generated items will then become input used with ``hpcprof``, as shown
-above. If the file that you are analyzing is large or using a lot of resources, then 
-``hpcprof-mpi`` could be better to use. The ``hpcprof`` command looks the same otherwise. The
-result of the ``hpcprof`` command is a generated database folder.
+above. If the file that you are analyzing is large or is using a lot of resources, then 
+``hpcprof-mpi`` could be better to use. The ``hpcprof-mpi`` command looks the same otherwise. The
+result of either ``hpcprof`` command is a generated "database" folder.
 
 At this point, we need the HPCViewer program to view the resulting database. The easiest way
 to engage with the HPCViewer is to do it locally. Therefore, we can tar up the generated 
@@ -58,8 +58,8 @@ database folder and use ``scp`` to send it to a local machine. For example:
    $ scp username@lassen.llnl.gov:path/to/database.tar .
    $ tar -xzvf database.tar
 
-From here, you can open the HPCViewer and select the untarred database folder we just sent over.
-More information on how to use HPCViewer will be provided in a later section.
+From here, you can open the HPCViewer and select the untarred database folder we just sent over
+to be viewed. More information on how to use HPCViewer will be provided in a later section.
 
 Otherwise, using HPCViewer from the command line can be tricky since we need X11 forwarding. 
 In order to have X11 forwarding available, we have to ssh into the LC machine and compute node 
@@ -98,7 +98,7 @@ can do, the instruction manual is `here <http://hpctoolkit.org/download/hpcviewe
 Running with Hatchet
 ^^^^^^^^^^^^^^^^^^^^
 
-Hatchet is a tool that can better analyze performance metrics given from a variety of tools,
+`Hatchet<https://hatchet.readthedocs.io/en/latest/index.html>`_ is a tool that can better analyze performance metrics given from a variety of tools,
 including HPCToolKit. Using Hatchet to analyze the output from HPCToolKit can help visualize
 the performance of different parts of the same program.
 
@@ -170,9 +170,23 @@ of inclusive time).
 Analyzing results
 ------------------
 
-This section still needs to be done. Will talk about what to do with results from HPCToolKit and Hatchet.
+After opening up a database folder in HPCViewer or analyzing the call paths in Hatchet, we can compare the performance
+(or whatever measurement we are looking at) of different parts of the program against other parts and try to find 
+performance trends. In Umpire's use case, we plan to use Hatchet as part of our CI to find out if integrating a new
+commit into our repository increases the performance by a certain threshold or more. If so, our CI test will fail. Our
+process looks something like:
+
+* Grab the example program's database from the develop branch
+* Grab the example program's database from a different branch I want to compare against
+* Create a graphframe for each database
+* Create a filtered graphframe for each that focuses on the specific part of the program I want to measure against
+* Compare the inclusive time for each filtered graphframe (or whatever metric I want to analyze)
+* If the metric (e.g., inclusive time) of the new branch's filtered graphframe is more than ``threshold`` more than that of develop's, then fail the test!
+
+This is just one example of how analyzing results from HPCToolKit and Hatchet can be used to improve performance of Umpire.
+There are many other ways to do this - once we have more interesting use cases, this page will be updated!
 
 .. note::
   The JIRA ticket about HPCToolKit and Hatchet has more information about the process I went through to 
-  come up with the series of steps I outlined above. That can be found `here <https://rzlc.llnl.gov/jira/browse/UM-798>`_
-  on UM-798. Output test results and screenshots are also included in the ticket (as well as links to related tickets). 
+  come up with the series of steps I outlined above. That can be found at `UM-798 <https://rzlc.llnl.gov/jira/browse/UM-798>`_.
+  Output test results and screenshots are also included in the ticket (as well as links to related tickets). 
