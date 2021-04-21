@@ -31,6 +31,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Benchmark that measures the performance of different allocator vendor types across
   various allocation sizes.
 
+- Benchmark that measures the performance of different memory pools
+
 - Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
 - Install thirdparty exports in CMake configuration file
@@ -39,6 +41,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Clean-up stage and build prefix for Gitlab CI script that will help us avoid
   disk quota problems.
+
+- Added a benchmark that measures the performance of FixedPool across two allocation sizes.
 
 ### Changed
 
@@ -52,7 +56,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI on Gitlab does not require a python environment anymore.
 
-- BLT was updated.
+- BLT submodule updated to v0.4.0
 
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
@@ -63,6 +67,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed the temporary fix for the HIP + fortran linker error (blt has been 
   updated instead).
+
+- Doxygen from Sphinx to fix auto documentation generation bug.
 
 ### Fixed
 

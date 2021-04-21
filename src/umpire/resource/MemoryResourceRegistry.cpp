@@ -96,7 +96,7 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       util::make_unique<resource::NoOpResourceFactory>());
   m_resource_names.push_back("NO_OP");
 #endif
-  
+
   registerMemoryResource(
       util::make_unique<resource::NullMemoryResourceFactory>());
 
@@ -181,16 +181,19 @@ MemoryResourceRegistry::MemoryResourceRegistry()
 #if defined(UMPIRE_ENABLE_SYCL)
   {
     int device_count{0};
-    auto platforms = cl::sycl::platform::get_platforms();
+    auto platforms = sycl::platform::get_platforms();
     for (auto& platform : platforms) {
       auto devices = platform.get_devices();
       for (auto& device : devices) {
-        const std::string deviceName =
-            device.get_info<cl::sycl::info::device::name>();
-        if (device.is_gpu() &&
-            (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
-             std::string::npos))
-          device_count++;
+	if (device.is_gpu()) {
+	  if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
+	    auto subDevicesDomainNuma = device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
+	      sycl::info::partition_affinity_domain::numa);
+	    device_count += subDevicesDomainNuma.size();
+	  }
+	  else
+	    device_count++;
+	}
       }
     }
 
