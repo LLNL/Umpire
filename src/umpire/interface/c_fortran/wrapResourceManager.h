@@ -29,6 +29,12 @@ extern "C" {
 #endif
 
 // splicer begin class.ResourceManager.C_declarations
+
+void umpire_resourcemanager_register_allocation(umpire_resourcemanager * self,
+    void* ptr, size_t size, umpire_allocator allocator);
+
+void umpire_resourcemanager_deregister_allocation(umpire_resourcemanager * self, void* ptr);
+
 // splicer end class.ResourceManager.C_declarations
 
 umpire_resourcemanager * umpire_resourcemanager_get_instance(

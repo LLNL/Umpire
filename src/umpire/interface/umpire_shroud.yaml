@@ -235,3 +235,5 @@ declarations:
 splicer:
   f:
   - c_fortran/genfumpiresplicer.f
+  c:
+  - c_fortran/umpiresplicer.c
