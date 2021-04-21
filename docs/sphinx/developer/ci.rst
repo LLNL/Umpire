@@ -14,5 +14,5 @@ configurations that run on different LC machines.
 
 
 Umpire shares its Gitlab CI workflow with other projects. The documentation is
-therefore `shared <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#ci)`_.
+therefore `shared <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#ci>`_.
 
