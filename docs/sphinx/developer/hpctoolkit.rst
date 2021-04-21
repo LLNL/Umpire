@@ -59,7 +59,7 @@ database folder and use ``scp`` to send it to a local machine. For example:
    $ tar -xzvf database.tar
 
 From here, you can open the HPCViewer and select the untarred database folder we just sent over
-to be viewed. More information on how to use HPCViewer will be provided in a later section.
+to be viewed. More information on how to use HPCViewer will be provided in the next section.
 
 Otherwise, using HPCViewer from the command line can be tricky since we need X11 forwarding. 
 In order to have X11 forwarding available, we have to ssh into the LC machine and compute node 
