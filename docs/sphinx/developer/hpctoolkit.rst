@@ -5,7 +5,7 @@ HPCToolKit
 ==========
 
 This page will describes the process and series of steps to analyze Umpire specific 
-applications with HPCToolKit.
+applications with `HPCToolKit <https://github.com/HPCToolkit/hpctoolkit>`_.
 
 Using HPCToolKit
 ----------------
@@ -98,7 +98,7 @@ can do, the instruction manual is `here <http://hpctoolkit.org/download/hpcviewe
 Running with Hatchet
 ^^^^^^^^^^^^^^^^^^^^
 
-`Hatchet <https://hatchet.readthedocs.io/en/latest/index.html>`_ is a tool that can better analyze performance metrics given from a variety of tools,
+`Hatchet <https://github.com/hatchet/hatchet>`_ is a tool that can better analyze performance metrics given from a variety of tools,
 including HPCToolKit. Using Hatchet to analyze the output from HPCToolKit can help visualize
 the performance of different parts of the same program.
 
@@ -182,9 +182,6 @@ process looks something like:
 * Create a filtered graphframe for each that focuses on the specific part of the program I want to measure against
 * Compare the inclusive time for each filtered graphframe (or whatever metric I want to analyze)
 * If the metric (e.g., inclusive time) of the new branch's filtered graphframe is more than ``threshold`` more than that of develop's, then fail the test!
-
-This is just one example of how analyzing results from HPCToolKit and Hatchet can be used to improve performance of Umpire.
-There are many other ways to do this - once we have more interesting use cases, this page will be updated!
 
 .. note::
   The JIRA ticket about HPCToolKit and Hatchet has more information about the process I went through to 
