@@ -98,7 +98,7 @@ can do, the instruction manual is `here <http://hpctoolkit.org/download/hpcviewe
 Running with Hatchet
 ^^^^^^^^^^^^^^^^^^^^
 
-`Hatchet<https://hatchet.readthedocs.io/en/latest/index.html>`_ is a tool that can better analyze performance metrics given from a variety of tools,
+`Hatchet <https://hatchet.readthedocs.io/en/latest/index.html>`_ is a tool that can better analyze performance metrics given from a variety of tools,
 including HPCToolKit. Using Hatchet to analyze the output from HPCToolKit can help visualize
 the performance of different parts of the same program.
 
