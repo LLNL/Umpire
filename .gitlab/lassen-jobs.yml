@@ -21,6 +21,11 @@ clang_10_0_1_mpi (build and test on lassen):
     SPEC: "%clang@10.0.1ibm +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
+clang_10_0_1_mpi_shmem:
+  variables:
+    SPEC: "%clang@10.0.1ibm +posix_shmem +mpi ^spectrum-mpi"
+  extends: .build_and_test_on_lassen
+
 gcc_8_3_1:
   variables:
     SPEC: "+fortran%gcc@8.3.1 ^cmake@3.14.5"

@@ -9,7 +9,6 @@
       "%clang@4.0.0+cuda",
       "%clang@6.0.0",
       "%clang@9.0.0",
-      "%clang@9.0.0+mpi+posix_shmem",
       "%gcc@4.9.3",
       "%gcc@4.9.3+cuda",
       "%gcc@6.1.0",
