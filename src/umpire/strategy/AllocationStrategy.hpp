@@ -18,6 +18,7 @@
 namespace umpire {
 
 class ResourceManager;
+class Allocator;
 
 namespace strategy {
 
@@ -28,6 +29,7 @@ namespace strategy {
 class AllocationStrategy
 {
   friend class umpire::ResourceManager;
+  friend class umpire::Allocator;
  public:
   /*!
    * \brief Construct a new AllocationStrategy object.
@@ -42,21 +44,6 @@ class AllocationStrategy
 
   virtual ~AllocationStrategy() = default;
 
-  /*!
-   * \brief Allocate bytes of memory.
-   *
-   * \param bytes Number of bytes to allocate.
-   *
-   * \return Pointer to start of allocated bytes.
-   */
-  virtual void* allocate(std::size_t bytes) = 0;
-
-  /*!
-   * \brief Free the memory at ptr.
-   *
-   * \param ptr Pointer to free.
-   */
-  virtual void deallocate(void* ptr, std::size_t size=0) = 0;
 
   void* allocate_internal(std::size_t bytes);
 
@@ -154,6 +141,23 @@ class AllocationStrategy
   bool m_tracked{true};
 
   AllocationStrategy* m_parent; 
+  private:
+
+  /*!
+   * \brief Allocate bytes of memory.
+   *
+   * \param bytes Number of bytes to allocate.
+   *
+   * \return Pointer to start of allocated bytes.
+   */
+  virtual void* allocate(std::size_t bytes) = 0;
+
+  /*!
+   * \brief Free the memory at ptr.
+   *
+   * \param ptr Pointer to free.
+   */
+  virtual void deallocate(void* ptr, std::size_t size=0) = 0;
 
 };
 
