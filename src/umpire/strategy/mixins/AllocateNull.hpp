@@ -15,13 +15,13 @@ class FixedPool;
 
 namespace mixins {
 
-class Zeroer
+class AllocateNull
 {
   public:
-    Zeroer();
+    AllocateNull();
 
-    void* allocateZero();
-    bool deallocateZero(void* ptr);
+    void* allocateNull();
+    bool deallocateNull(void* ptr);
 
   private:
     FixedPool* m_zero_byte_pool;

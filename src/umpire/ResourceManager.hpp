@@ -31,7 +31,7 @@ namespace strategy {
 class ZeroByteHandler;
 
 namespace mixins {
-class Zeroer;
+class AllocateNull;
 }
 }
 
@@ -353,7 +353,7 @@ class ResourceManager {
   friend void print_allocator_records(Allocator, std::ostream&);
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
-  friend strategy::mixins::Zeroer;
+  friend strategy::mixins::AllocateNull;
 };
 
 } // end namespace umpire

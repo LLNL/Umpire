@@ -26,7 +26,7 @@ inline void* Allocator::allocate(std::size_t bytes)
                 << m_allocator << "\", \"size\": " << bytes << " }");
 
   if (0 == bytes) {
-    ret = allocateZero();
+    ret = allocateNull();
   } else {
     ret = m_allocator->allocate(bytes);
   }
@@ -56,11 +56,11 @@ inline void Allocator::deallocate(void* ptr)
   } else {
     if (m_tracking) {
       auto record = deregisterAllocation(ptr, m_allocator);
-      if (! deallocateZero(ptr)) {
+      if (! deallocateNull(ptr)) {
         m_allocator->deallocate(ptr,record.size);
       } 
     } else {
-      if (! deallocateZero(ptr)) {
+      if (! deallocateNull(ptr)) {
         m_allocator->deallocate(ptr);
       }
     }

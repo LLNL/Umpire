@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/strategy/mixins/Zeroer.hpp"
+#include "umpire/strategy/mixins/AllocateNull.hpp"
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/FixedPool.hpp"
@@ -14,12 +14,12 @@ namespace umpire {
 namespace strategy {
 namespace mixins {
 
-Zeroer::Zeroer() :
+AllocateNull::AllocateNull() :
   m_zero_byte_pool{nullptr}
 {
 }
 
-void* Zeroer::allocateZero()
+void* AllocateNull::allocateNull()
 {
   if (!m_zero_byte_pool)
     m_zero_byte_pool = static_cast<FixedPool*>(
@@ -28,7 +28,7 @@ void* Zeroer::allocateZero()
   return m_zero_byte_pool->allocate(1);
 }
 
-bool Zeroer::deallocateZero(void* ptr)
+bool AllocateNull::deallocateNull(void* ptr)
 {
   if (!m_zero_byte_pool)
     m_zero_byte_pool = static_cast<FixedPool*>(

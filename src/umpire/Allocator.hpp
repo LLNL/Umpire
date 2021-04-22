@@ -13,7 +13,7 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
-#include "umpire/strategy/mixins/Zeroer.hpp"
+#include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/util/Platform.hpp"
 
 class AllocatorTest;
@@ -40,7 +40,7 @@ class GenericReallocateOperation;
  * \see TypedAllocator
  */
 class Allocator : 
-  private strategy::mixins::Inspector, strategy::mixins::Zeroer
+  private strategy::mixins::Inspector, strategy::mixins::AllocateNull
 {
   friend class ResourceManager;
   friend class ::AllocatorTest;

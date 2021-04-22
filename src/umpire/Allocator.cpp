@@ -14,7 +14,7 @@ namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
     : strategy::mixins::Inspector{},
-      strategy::mixins::Zeroer{},
+      strategy::mixins::AllocateNull{},
       m_allocator{allocator},
       m_tracking{allocator->isTracked()}
 {

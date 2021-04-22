@@ -33,8 +33,8 @@ endif ()
 set (umpire_strategy_mixin_headers
   mixins/AlignedAllocation.hpp
   mixins/AlignedAllocation.inl
-  mixins/Inspector.hpp
-  mixins/Zeroer.hpp)
+  mixins/AllocateNull.hpp
+  mixins/Inspector.hpp)
 
 set (umpire_strategy_sources
   AlignedAllocator.cpp
@@ -46,8 +46,8 @@ set (umpire_strategy_sources
   FixedPool.cpp
   MixedPool.cpp
   mixins/AlignedAllocation.cpp
+  mixins/AllocateNull.cpp
   mixins/Inspector.cpp
-  mixins/Zeroer.cpp
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
   QuickPool.cpp
