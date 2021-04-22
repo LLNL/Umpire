@@ -44,6 +44,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a benchmark that measures the performance of FixedPool across two allocation sizes.
 
+- In Gitlab CI, upload junit reports for corona and lassen.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
