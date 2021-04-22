@@ -56,7 +56,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI on Gitlab does not require a python environment anymore.
 
-- BLT was updated.
+- BLT submodule updated to v0.4.0
 
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
@@ -71,6 +71,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed the temporary fix for the HIP + fortran linker error (blt has been 
   updated instead).
+
+- Doxygen from Sphinx to fix auto documentation generation bug.
 
 ### Fixed
 
