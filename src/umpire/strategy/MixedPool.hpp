@@ -60,9 +60,7 @@ class MixedPool : public AllocationStrategy {
 
   void release() override;
 
-  //std::size_t getCurrentSize() const noexcept override;
   std::size_t getActualSize() const noexcept override;
-  //std::size_t getHighWatermark() const noexcept override;
 
   Platform getPlatform() noexcept override;
 

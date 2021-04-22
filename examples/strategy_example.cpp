@@ -27,7 +27,7 @@ int main(int, char**)
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
    */
-  umpire::Tracking tracking = umpire::Tracking::Untracked;
+  umpire::Tracking tracking{umpire::Tracking::Untracked};
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
       "host_dynamic_pool", tracking, rm.getAllocator("HOST"));
 

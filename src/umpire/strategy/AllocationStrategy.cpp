@@ -12,7 +12,7 @@ namespace umpire {
 namespace strategy {
 
 AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept
-    : m_name(name), m_id(id), m_parent(parent)
+    : m_name{name}, m_id{id}, m_parent{parent}
 {
 }
 

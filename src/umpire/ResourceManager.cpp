@@ -665,7 +665,7 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
 void ResourceManager::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-  auto allocator = Allocator(findAllocatorForPointer(ptr));
+  Allocator allocator{findAllocatorForPointer(ptr)};
 
   allocator.deallocate(ptr);
 }

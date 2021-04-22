@@ -21,7 +21,7 @@ void GenericReallocateOperation::transform(
     util::AllocationRecord* current_allocation,
     util::AllocationRecord* new_allocation, std::size_t new_size)
 {
-  auto allocator = Allocator(new_allocation->strategy);
+  Allocator allocator{new_allocation->strategy};
   *new_ptr = allocator.allocate(new_size);
 
   const std::size_t old_size = current_allocation->size;
