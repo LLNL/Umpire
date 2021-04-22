@@ -46,6 +46,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added HPCToolKit page (with some Hatchet instructions) to ReadTheDocs Developer Guide.
 
+- In Gitlab CI, upload junit reports for corona and lassen.
+
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
