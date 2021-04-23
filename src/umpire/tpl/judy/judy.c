@@ -322,6 +322,7 @@ void judy_free( Judy * judy, void * block, int type ) {
 
 unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
     judyvalue * dest = ( judyvalue * )buff;
+    judyvalue num_bits;
     unsigned int len = 0, idx = 0, depth;
     int slot, off, type;
     judyvalue value;
@@ -393,7 +394,20 @@ unsigned int judy_key( Judy * judy, unsigned char * buff, unsigned int max ) {
 
             case JUDY_radix:
                 if( judy->depth ) {
-                    dest[depth] |= ( judyvalue )slot << ( JUDY_key_size - ( ++len & JUDY_key_mask ) ) * 8;
+                    //
+                    // Convert key and len sizes, specified in # of bytes, to
+                    // the number of bits for a bit shift operation. This is
+                    // the reason for the '* 8' multipliers below.
+                    //
+                    num_bits = (JUDY_key_size - ( ++len & JUDY_key_mask )) * 8;
+
+                    //
+                    // Insure shift amount stays within JUDY_key_size word
+                    //
+                    num_bits &= (JUDY_key_size * 8) - 1;
+
+                    dest[depth] |= ( judyvalue )slot << num_bits;
+
                     if( !( len & JUDY_key_mask ) ) {
                         depth++;
                     }
@@ -549,7 +563,7 @@ JudySlot * judy_slot( Judy * judy, const unsigned char * buff, unsigned int max 
                         return NULL;
                     }
                 }
-        
+
 
                 next = table[slot & 0x0F];
                 continue;
