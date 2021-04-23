@@ -32,6 +32,7 @@ Here is a summary of the configuration options, their default value, and meaning
     ``ENABLE_C``                  Off      Build the C API
     ``ENABLE_FORTRAN``            Off      Build the Fortran API
     ``ENABLE_PERFORMANCE_TESTS``  Off      Build and run performance tests
+    ``ENABLE_ASAN``               Off      Enable ASAN support
     ============================  ======== ===========================================================================
 
 These arguments are explained in more detail below:
@@ -90,4 +91,8 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_PERFORMANCE_TESTS``
   Build and run performance tests
+
+* ``ENABLE_ASAN``
+  This option enables address sanitization checks within Umpire by compilers
+  that support options like -fsanitize=address
 
