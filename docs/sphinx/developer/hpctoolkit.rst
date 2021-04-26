@@ -182,8 +182,3 @@ process looks something like:
 * Create a filtered graphframe for each that focuses on the specific part of the program I want to measure against
 * Compare the inclusive time for each filtered graphframe (or whatever metric I want to analyze)
 * If the metric (e.g., inclusive time) of the new branch's filtered graphframe is more than ``threshold`` more than that of develop's, then fail the test!
-
-.. note::
-  The JIRA ticket about HPCToolKit and Hatchet has more information about the process I went through to 
-  come up with the series of steps I outlined above. That can be found at `UM-798 <https://rzlc.llnl.gov/jira/browse/UM-798>`_.
-  Output test results and screenshots are also included in the ticket (as well as links to related tickets). 
