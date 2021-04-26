@@ -94,5 +94,4 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_ASAN``
   This option enables address sanitization checks within Umpire by compilers
-  that support options like -fsanitize=address
-
+  that support options like ``-fsanitize=address``
