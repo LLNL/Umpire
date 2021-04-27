@@ -126,7 +126,7 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
   return ptr;
 }
 
-void DynamicPoolMap::deallocate(void* ptr)
+void DynamicPoolMap::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
@@ -242,6 +242,12 @@ Platform DynamicPoolMap::getPlatform() noexcept
 MemoryResourceTraits DynamicPoolMap::getTraits() const noexcept
 {
   return m_allocator->getTraits();
+}
+
+bool 
+DynamicPoolMap::tracksMemoryUse() const noexcept
+{
+  return false;
 }
 
 void DynamicPoolMap::coalesce()

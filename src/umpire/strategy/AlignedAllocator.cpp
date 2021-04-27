@@ -36,7 +36,7 @@ void* AlignedAllocator::allocate(std::size_t bytes)
              "requested: " << bytes << " actual: " << bytes + m_alignment - 1);
 
   uintptr_t ptr{
-      reinterpret_cast<uintptr_t>(m_allocator->allocate(total_bytes))};
+      reinterpret_cast<uintptr_t>(m_allocator->allocate_internal(total_bytes))};
   uintptr_t aligned_ptr{static_cast<uintptr_t>(
       (ptr + sizeof(void*) + (m_alignment - 1)) & m_mask)};
   uintptr_t* header = (uintptr_t*)(aligned_ptr - sizeof(void*));
@@ -47,7 +47,7 @@ void* AlignedAllocator::allocate(std::size_t bytes)
   return reinterpret_cast<void*>(aligned_ptr);
 }
 
-void AlignedAllocator::deallocate(void* ptr)
+void AlignedAllocator::deallocate(void* ptr, std::size_t size)
 {
   uintptr_t aligned_ptr{reinterpret_cast<uintptr_t>(ptr)};
   uintptr_t* header = (uintptr_t*)(aligned_ptr - sizeof(void*));
@@ -55,7 +55,8 @@ void AlignedAllocator::deallocate(void* ptr)
 
   UMPIRE_LOG(Debug, "ptr: " << reinterpret_cast<void*>(ptr) << " base_ptr: "
                             << reinterpret_cast<void*>(base_ptr));
-  return m_allocator->deallocate(base_ptr);
+  std::size_t total_bytes = size + sizeof(void*) + m_alignment - 1;
+  return m_allocator->deallocate_internal(base_ptr, total_bytes);
 }
 
 Platform AlignedAllocator::getPlatform() noexcept
