@@ -42,7 +42,7 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
                       const std::size_t avail_bytes)
     : strategy(allocation_strategy),
       data(reinterpret_cast<char*>(
-          strategy->allocate(object_bytes * objects_per_pool))),
+          strategy->allocate_internal(object_bytes * objects_per_pool))),
       avail(reinterpret_cast<int*>(std::malloc(avail_bytes))),
       num_avail(objects_per_pool)
 {
@@ -103,7 +103,7 @@ FixedPool::~FixedPool()
     UMPIRE_LOG(Warning, ss.str());
   } else {
     for (auto& p : m_pool) {
-      p.strategy->deallocate(p.data);
+      p.strategy->deallocate_internal(p.data, m_data_bytes);
       std::free(p.avail);
     }
   }
@@ -169,7 +169,7 @@ void* FixedPool::allocate(std::size_t bytes)
   return ptr;
 }
 
-void FixedPool::deallocate(void* ptr)
+void FixedPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   for (auto& p : m_pool) {
     const char* t_ptr = reinterpret_cast<char*>(ptr);
@@ -198,7 +198,7 @@ void FixedPool::release()
 { 
   for (auto& p : m_pool) {
     if (m_obj_per_pool == p.num_avail) {
-      p.strategy->deallocate(p.data);
+      p.strategy->deallocate_internal(p.data, m_data_bytes);
       std::free(p.avail);
     } 
   }

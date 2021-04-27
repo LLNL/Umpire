@@ -48,7 +48,7 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
 
 void* NumaPolicy::allocate(std::size_t bytes)
 {
-  void* ret = m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate_internal(bytes);
 
   numa::move_to_node(ret, bytes, m_node);
 
@@ -57,9 +57,9 @@ void* NumaPolicy::allocate(std::size_t bytes)
   return ret;
 }
 
-void NumaPolicy::deallocate(void* ptr)
+void NumaPolicy::deallocate(void* ptr, std::size_t size)
 {
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform NumaPolicy::getPlatform() noexcept
