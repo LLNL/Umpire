@@ -136,15 +136,19 @@ void* QuickPool::allocate(std::size_t bytes)
         m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
+  m_current_bytes += rounded_bytes;
+
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
   return ret;
 }
 
-void QuickPool::deallocate(void* ptr)
+void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
+
+  m_current_bytes -= chunk->size;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -257,6 +261,11 @@ std::size_t QuickPool::getActualSize() const noexcept
   return m_actual_bytes;
 }
 
+std::size_t QuickPool::getCurrentSize() const noexcept
+{
+  return m_current_bytes;
+}
+
 std::size_t QuickPool::getReleasableSize() const noexcept
 {
   if (m_size_map.size() > 1)
@@ -273,6 +282,12 @@ Platform QuickPool::getPlatform() noexcept
 MemoryResourceTraits QuickPool::getTraits() const noexcept
 {
   return m_allocator->getTraits();
+}
+
+bool 
+QuickPool::tracksMemoryUse() const noexcept
+{
+  return false;
 }
 
 std::size_t QuickPool::getBlocksInPool() const noexcept
@@ -310,7 +325,7 @@ void QuickPool::do_coalesce() noexcept
   if (alloc_size) {
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);
-    deallocate(ptr);
+    deallocate(ptr, alloc_size);
   }
 }
 

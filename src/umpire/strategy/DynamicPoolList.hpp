@@ -61,7 +61,7 @@ class DynamicPoolList : public AllocationStrategy {
   DynamicPoolList(const DynamicPoolList&) = delete;
 
   void* allocate(size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
@@ -70,6 +70,8 @@ class DynamicPoolList : public AllocationStrategy {
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept final override;
+
+  bool tracksMemoryUse() const noexcept override;
 
   /*!
    * \brief Get the number of bytes that may be released back to resource

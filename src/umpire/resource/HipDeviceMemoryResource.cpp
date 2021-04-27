@@ -39,7 +39,7 @@ void* HipDeviceMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void HipDeviceMemoryResource::deallocate(void* ptr)
+void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   int old_device;
   hipGetDevice(&old_device);
@@ -51,18 +51,6 @@ void HipDeviceMemoryResource::deallocate(void* ptr)
   m_allocator.deallocate(ptr);
   if (old_device != m_traits.id)
     hipSetDevice(old_device);
-}
-
-std::size_t HipDeviceMemoryResource::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-std::size_t HipDeviceMemoryResource::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
 }
 
 bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept

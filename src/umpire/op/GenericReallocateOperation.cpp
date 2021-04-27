@@ -21,15 +21,15 @@ void GenericReallocateOperation::transform(
     util::AllocationRecord* current_allocation,
     util::AllocationRecord* new_allocation, std::size_t new_size)
 {
-  auto allocator = new_allocation->strategy;
-  *new_ptr = allocator->allocate(new_size);
+  Allocator allocator{new_allocation->strategy};
+  *new_ptr = allocator.allocate(new_size);
 
   const std::size_t old_size = current_allocation->size;
   const std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
 
   ResourceManager::getInstance().copy(*new_ptr, current_ptr, copy_size);
 
-  allocator->deallocate(current_ptr);
+  allocator.deallocate(current_ptr);
 }
 
 } // end of namespace op

@@ -13,7 +13,10 @@
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
-    : m_allocator(allocator)
+    : strategy::mixins::Inspector{},
+      strategy::mixins::AllocateNull{},
+      m_allocator{allocator},
+      m_tracking{allocator->isTracked()}
 {
 }
 
@@ -35,7 +38,7 @@ std::size_t Allocator::getSize(void* ptr) const
 
 std::size_t Allocator::getHighWatermark() const noexcept
 {
-  return m_allocator->getHighWatermark();
+ return m_allocator->getHighWatermark();
 }
 
 std::size_t Allocator::getCurrentSize() const noexcept
@@ -77,6 +80,11 @@ strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept
 Platform Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+bool Allocator::isTracked() const noexcept
+{
+  return m_allocator->isTracked();
 }
 
 std::ostream& operator<<(std::ostream& os, const Allocator& allocator)

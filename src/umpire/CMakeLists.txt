@@ -10,6 +10,7 @@ set (umpire_headers
   Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
+  Tracking.hpp
   TypedAllocator.hpp
   TypedAllocator.inl
   Umpire.hpp)

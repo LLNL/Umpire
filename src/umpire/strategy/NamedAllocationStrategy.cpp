@@ -20,12 +20,12 @@ NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name,
 
 void* NamedAllocationStrategy::allocate(std::size_t bytes)
 {
-  return m_allocator->allocate(bytes);
+  return m_allocator->allocate_internal(bytes);
 }
 
-void NamedAllocationStrategy::deallocate(void* ptr)
+void NamedAllocationStrategy::deallocate(void* ptr, std::size_t size)
 {
-  return m_allocator->deallocate(ptr);
+  return m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform NamedAllocationStrategy::getPlatform() noexcept

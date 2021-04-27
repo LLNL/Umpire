@@ -67,6 +67,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
 
+- Removed all internal tracking, allocations are only tracked at the Allocator level.
+
 - Removed the temporary fix for the HIP + fortran linker error (blt has been 
   updated instead).
 

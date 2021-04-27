@@ -18,6 +18,7 @@
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 template <typename T>
 void report_and_deallocate(int iteration, std::vector<void*>& ptrs,
