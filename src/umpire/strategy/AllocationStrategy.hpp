@@ -16,13 +16,20 @@
 #include "umpire/util/Platform.hpp"
 
 namespace umpire {
+
+class ResourceManager;
+class Allocator;
+
 namespace strategy {
 
 /*!
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy {
+class AllocationStrategy
+{
+  friend class umpire::ResourceManager;
+  friend class umpire::Allocator;
  public:
   /*!
    * \brief Construct a new AllocationStrategy object.
@@ -37,21 +44,10 @@ class AllocationStrategy {
 
   virtual ~AllocationStrategy() = default;
 
-  /*!
-   * \brief Allocate bytes of memory.
-   *
-   * \param bytes Number of bytes to allocate.
-   *
-   * \return Pointer to start of allocated bytes.
-   */
-  virtual void* allocate(std::size_t bytes) = 0;
 
-  /*!
-   * \brief Free the memory at ptr.
-   *
-   * \param ptr Pointer to free.
-   */
-  virtual void deallocate(void* ptr) = 0;
+  void* allocate_internal(std::size_t bytes);
+
+  void deallocate_internal(void* ptr, std::size_t size=0);
 
   /*!
    * \brief Release any and all unused memory held by this AllocationStrategy
@@ -129,10 +125,40 @@ class AllocationStrategy {
 
   virtual MemoryResourceTraits getTraits() const noexcept;
 
+  virtual bool tracksMemoryUse() const noexcept;
+
+  bool isTracked() const noexcept;
+
+  std::size_t m_current_size{0};
+  std::size_t m_high_watermark{0};
+  std::size_t m_allocation_count{0};
+
  protected:
+  void setTracking(bool) noexcept;
+
   std::string m_name;
   int m_id;
+  bool m_tracked{true};
+
   AllocationStrategy* m_parent; 
+  private:
+
+  /*!
+   * \brief Allocate bytes of memory.
+   *
+   * \param bytes Number of bytes to allocate.
+   *
+   * \return Pointer to start of allocated bytes.
+   */
+  virtual void* allocate(std::size_t bytes) = 0;
+
+  /*!
+   * \brief Free the memory at ptr.
+   *
+   * \param ptr Pointer to free.
+   */
+  virtual void deallocate(void* ptr, std::size_t size=0) = 0;
+
 };
 
 } // end of namespace strategy
