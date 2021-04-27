@@ -58,6 +58,7 @@ struct MemoryResourceTraits {
   optimized_for used_for = optimized_for::any;
   resource_type resource = resource_type::unknown;
   shared_scope scope = shared_scope::unknown;
+  bool tracking{true};
 };
 
 } // end of namespace umpire

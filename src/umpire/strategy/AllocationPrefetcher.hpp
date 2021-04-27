@@ -28,7 +28,7 @@ class AllocationPrefetcher : public AllocationStrategy {
                        int device_id = 0);
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;
 

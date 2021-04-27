@@ -12,6 +12,7 @@
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 
 constexpr std::size_t OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes size (2048)
 

@@ -63,15 +63,18 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   QuickPool(const QuickPool&) = delete;
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
+  std::size_t getCurrentSize() const noexcept override;
   std::size_t getReleasableSize() const noexcept;
 
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
+
+  bool tracksMemoryUse() const noexcept override;
 
   /*!
    * \brief Return the number of memory blocks -- both leased to application
@@ -155,6 +158,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   const std::size_t m_next_minimum_pool_allocation_size;
 
   std::size_t m_actual_bytes{0};
+  std::size_t m_current_bytes{0};
   std::size_t m_releasable_bytes{0};
   bool m_is_destructing{false};
 };

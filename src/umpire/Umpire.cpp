@@ -13,9 +13,11 @@
 #include <sstream>
 #include <string>
 
+#include "umpire/config.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>

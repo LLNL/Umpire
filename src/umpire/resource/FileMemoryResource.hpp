@@ -81,7 +81,7 @@ class FileMemoryResource : public MemoryResource {
    *
    * \param ptr Pointer location used to look up its information in m_size_map
    */
-  void deallocate(void* ptr);
+  void deallocate(void* ptr, std::size_t size);
 
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;

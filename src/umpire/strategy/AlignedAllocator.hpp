@@ -21,7 +21,7 @@ class AlignedAllocator : public AllocationStrategy {
                    std::size_t alignment = 16);
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;
 

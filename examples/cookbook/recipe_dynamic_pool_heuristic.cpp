@@ -8,6 +8,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 int main(int, char**)
 {

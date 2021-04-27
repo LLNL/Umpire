@@ -46,7 +46,7 @@ void* NullMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void NullMemoryResource::deallocate(void* ptr)
+void NullMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 

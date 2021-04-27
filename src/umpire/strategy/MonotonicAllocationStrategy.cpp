@@ -20,12 +20,12 @@ MonotonicAllocationStrategy::MonotonicAllocationStrategy(
       m_capacity(capacity),
       m_allocator(allocator.getAllocationStrategy())
 {
-  m_block = m_allocator->allocate(m_capacity);
+  m_block = m_allocator->allocate_internal(m_capacity);
 }
 
 MonotonicAllocationStrategy::~MonotonicAllocationStrategy()
 {
-  m_allocator->deallocate(m_block);
+  m_allocator->deallocate_internal(m_block, m_capacity);
 }
 
 void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
@@ -43,7 +43,7 @@ void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
   return ret;
 }
 
-void MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr))
+void MonotonicAllocationStrategy::deallocate(void* UMPIRE_UNUSED_ARG(ptr), std::size_t UMPIRE_UNUSED_ARG(size))
 {
 }
 

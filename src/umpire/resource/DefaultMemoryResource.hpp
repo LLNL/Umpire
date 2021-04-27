@@ -20,7 +20,9 @@ namespace resource {
  * allocate and deallocate memory.
  */
 template <typename _allocator>
-class DefaultMemoryResource : public MemoryResource {
+class DefaultMemoryResource : 
+  public MemoryResource
+{
  public:
   using MemoryResource::allocate;
 
@@ -31,10 +33,7 @@ class DefaultMemoryResource : public MemoryResource {
                         MemoryResourceTraits traits, _allocator alloc);
 
   void* allocate(std::size_t bytes);
-  void deallocate(void* ptr);
-
-  std::size_t getCurrentSize() const noexcept;
-  std::size_t getHighWatermark() const noexcept;
+  void deallocate(void* ptr, std::size_t size);
 
   bool isAccessibleFrom(Platform p) noexcept;
 

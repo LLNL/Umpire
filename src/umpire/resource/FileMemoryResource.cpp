@@ -40,7 +40,7 @@ FileMemoryResource::~FileMemoryResource()
   }
 
   for (auto const& p : leaked_items) {
-    deallocate(p);
+    deallocate(p, 0);
   }
 }
 
@@ -96,7 +96,7 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void FileMemoryResource::deallocate(void* ptr)
+void FileMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   // Find information about ptr for deallocation
   auto iter = m_size_map.find(ptr);

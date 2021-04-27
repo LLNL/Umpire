@@ -44,6 +44,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a benchmark that measures the performance of FixedPool across two allocation sizes.
 
+- Added HPCToolKit page (with some Hatchet instructions) to ReadTheDocs Developer Guide.
+
+- In Gitlab CI, upload junit reports for corona and lassen.
+
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -64,6 +69,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
+
+- Removed all internal tracking, allocations are only tracked at the Allocator level.
 
 - Removed the temporary fix for the HIP + fortran linker error (blt has been 
   updated instead).

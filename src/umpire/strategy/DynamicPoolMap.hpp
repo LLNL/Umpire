@@ -69,7 +69,7 @@ class DynamicPoolMap : public AllocationStrategy,
   DynamicPoolMap(const DynamicPoolMap&) = delete;
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
   void release() override;
 
   std::size_t getActualSize() const noexcept override;
@@ -78,6 +78,8 @@ class DynamicPoolMap : public AllocationStrategy,
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept override;
+
+  bool tracksMemoryUse() const noexcept override;
 
   /*!
    * \brief Returns the number of bytes of unallocated data held by this pool

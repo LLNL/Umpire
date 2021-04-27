@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 
 static auto& rm = umpire::ResourceManager::getInstance();
 

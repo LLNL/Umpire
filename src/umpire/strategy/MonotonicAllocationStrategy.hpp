@@ -27,7 +27,7 @@ class MonotonicAllocationStrategy : public AllocationStrategy {
 
   void* allocate(std::size_t bytes) override;
 
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
 
   std::size_t getCurrentSize() const noexcept override;
   std::size_t getHighWatermark() const noexcept override;
