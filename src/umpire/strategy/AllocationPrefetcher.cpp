@@ -26,16 +26,16 @@ AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id,
 
 void* AllocationPrefetcher::allocate(std::size_t bytes)
 {
-  void* ptr = m_allocator->allocate(bytes);
+  void* ptr = m_allocator->allocate_internal(bytes);
 
   m_prefetch_operation->apply(ptr, nullptr, m_device, bytes);
 
   return ptr;
 }
 
-void AllocationPrefetcher::deallocate(void* ptr)
+void AllocationPrefetcher::deallocate(void* ptr, std::size_t size)
 {
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform AllocationPrefetcher::getPlatform() noexcept

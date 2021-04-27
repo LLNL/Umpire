@@ -36,7 +36,7 @@ void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
 }
 
 template <typename _allocator>
-void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
+void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
