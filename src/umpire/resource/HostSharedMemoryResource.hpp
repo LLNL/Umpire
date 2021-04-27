@@ -29,10 +29,9 @@ class HostSharedMemoryResource : public MemoryResource {
 
     void* allocate(const std::string& name, std::size_t bytes);
 
-    void deallocate(void* ptr);
+    void deallocate(void* ptr, std::size_t size);
 
-    std::size_t getCurrentSize() const noexcept;
-    std::size_t getHighWatermark() const noexcept;
+    std::size_t getActualSize() const noexcept;
 
     bool isAccessibleFrom(Platform p) noexcept;
     Platform getPlatform() noexcept;

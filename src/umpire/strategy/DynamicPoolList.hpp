@@ -33,8 +33,6 @@ namespace strategy {
  */
 class DynamicPoolList : public AllocationStrategy {
  public:
-  using AllocationStrategy::allocate;
-
   using CoalesceHeuristic =
       std::function<bool(const strategy::DynamicPoolList&)>;
 

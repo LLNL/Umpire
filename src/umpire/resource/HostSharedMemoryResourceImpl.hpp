@@ -42,8 +42,7 @@ class HostSharedMemoryResource::impl {
     uint32_t reserved;
     pthread_mutex_t mutex;
     std::size_t segment_size;    // Full segment size, including this header
-    std::size_t current_size;    // Total current size of allocations+metadata
-    std::size_t high_watermark;
+    std::size_t actual_size;    // Total current size of allocations+metadata
     std::size_t free_blocks_off;
     std::size_t used_blocks_off;
   };
@@ -121,7 +120,7 @@ class HostSharedMemoryResource::impl {
         m_segment->segment_size = size;
 
         pointer_to_offset(&m_segment[1], m_segment->free_blocks_off);
-        m_segment->current_size = m_segment->free_blocks_off;
+        m_segment->actual_size = m_segment->free_blocks_off;
 
         pointer_to_offset(nullptr, m_segment->used_blocks_off);
         SharedMemoryBlock* block_ptr;
@@ -212,10 +211,7 @@ class HostSharedMemoryResource::impl {
           // Split the free block
           splitBlock(best, prev, adjusted_size);
 
-          m_segment->current_size += best->block_size;
-
-          if (best->block_size > m_segment->high_watermark)
-            m_segment->high_watermark = best->block_size;
+          m_segment->actual_size += best->block_size;
 
           // Push node to the list of used nodes
           best->next_block_off = m_segment->used_blocks_off;
@@ -268,7 +264,7 @@ class HostSharedMemoryResource::impl {
       block_ptr->reference_count--;
 
       if ( block_ptr->reference_count == 0 ) {
-        m_segment->current_size -= block_ptr->block_size;
+        m_segment->actual_size -= block_ptr->block_size;
 
         block_ptr->memory_offset = 0;
         block_ptr->name_offset = 0;
@@ -311,7 +307,7 @@ class HostSharedMemoryResource::impl {
       return ptr;
     }
 
-    std::size_t getCurrentSize() const noexcept
+    std::size_t getActualSize() const noexcept
     {
       int err{0};
       std::size_t rval{0};
@@ -322,25 +318,7 @@ class HostSharedMemoryResource::impl {
                                     << m_segment_name << ": " << strerror(err));
       }
 
-      rval = m_segment->current_size;
-
-      pthread_mutex_unlock(&m_segment->mutex);
-
-      return rval;
-    }
-
-    std::size_t getHighWatermark() const noexcept
-    {
-      int err{0};
-      std::size_t rval{0};
-
-      if ( ( err = pthread_mutex_lock(&m_segment->mutex) ) != 0 ) {
-        UMPIRE_LOG(Error,
-          "Failed to lock mutex. size not reliable for shared memory segment "
-                                    << m_segment_name << ": " << strerror(err));
-      }
-
-      rval = m_segment->high_watermark;
+      rval = m_segment->actual_size;
 
       pthread_mutex_unlock(&m_segment->mutex);
 

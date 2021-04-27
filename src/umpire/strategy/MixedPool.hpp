@@ -27,8 +27,6 @@ namespace strategy {
  */
 class MixedPool : public AllocationStrategy {
  public:
-  using AllocationStrategy::allocate;
-
   /**
    * \brief Creates a MixedPool of one or more fixed pools and a dynamic pool
    * for large allocations.

@@ -34,10 +34,13 @@ void* HostSharedMemoryResource::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 
 void* HostSharedMemoryResource::allocate(const std::string& name, std::size_t bytes)
 {
-  return pimpl->allocate(name, bytes);
+  void* ptr{ pimpl->allocate(name, bytes) };
+
+  UMPIRE_LOG(Debug, "(name=\"" << name << ", requested_size=" << bytes << ") returning: " << ptr);
+  return ptr;
 }
 
-void HostSharedMemoryResource::deallocate(void* ptr)
+void HostSharedMemoryResource::deallocate(void* ptr, std::size_t)
 {
   return pimpl->deallocate(ptr);
 }
@@ -56,14 +59,9 @@ Platform HostSharedMemoryResource::getPlatform() noexcept
   return m_platform;
 }
 
-std::size_t HostSharedMemoryResource::getCurrentSize() const noexcept
+std::size_t HostSharedMemoryResource::getActualSize() const noexcept
 {
-  return pimpl->getCurrentSize();
-}
-
-std::size_t HostSharedMemoryResource::getHighWatermark() const noexcept
-{
-  return pimpl->getHighWatermark();
+  return pimpl->getActualSize();
 }
 
 void* HostSharedMemoryResource::find_pointer_from_name(std::string name)

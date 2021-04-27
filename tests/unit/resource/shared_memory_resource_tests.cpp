@@ -21,7 +21,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
@@ -60,7 +59,7 @@ namespace {
 
         traits.size = m_segment_size;
         ASSERT_NO_THROW( allocator = rm.makeResource("SHARED::node_allocator", traits); );
-        auto base_strategy = umpire::util::unwrap_allocator<umpire::strategy::AllocationStrategy>(allocator);
+        auto base_strategy = allocator.getAllocationStrategy();
         shmem_resource = dynamic_cast<umpire::resource::HostSharedMemoryResource*>(base_strategy);
         MPI_Barrier(MPI_COMM_WORLD);
       }
@@ -69,7 +68,8 @@ namespace {
       ASSERT_NO_THROW( shmem_state = static_cast<SharedMemoryState*>(allocator.allocate(shmem_state_name, state_size)); );
 
       if (m_rank == 0) {
-        shmem_state->initial_size = shmem_resource->getCurrentSize();
+        shmem_state->initial_size = shmem_resource->getActualSize();
+        std::cout << "Initialial size is: " << shmem_state->initial_size << std::endl;
         shmem_state->largest_allocation_size = find_largest_allocation_size();
 
         std::random_device rd;
@@ -86,14 +86,14 @@ namespace {
       }
 
       MPI_Barrier(MPI_COMM_WORLD);
-      ASSERT_EQ(shmem_resource->getCurrentSize(), shmem_state->initial_size);
+      ASSERT_EQ(shmem_resource->getActualSize(), shmem_state->initial_size);
       MPI_Barrier(MPI_COMM_WORLD);
     }
 
     virtual void TearDown()
     {
       MPI_Barrier(MPI_COMM_WORLD);
-      ASSERT_EQ( shmem_state->initial_size, shmem_resource->getCurrentSize() );
+      ASSERT_EQ( shmem_state->initial_size, shmem_resource->getActualSize() );
 
       MPI_Barrier(MPI_COMM_WORLD);
 
@@ -193,7 +193,7 @@ namespace {
       int size;
 
       ASSERT_EQ( allocs.size(), m_max_allocs );
-      ASSERT_GT(shmem_resource->getCurrentSize(), shmem_state->initial_size);
+      ASSERT_GT(shmem_resource->getActualSize(), shmem_state->initial_size);
 
       MPI_Comm_size(MPI_COMM_WORLD, &size);
       for ( std::size_t i{0}; i < allocs.size(); i++ ) {
@@ -221,7 +221,7 @@ namespace {
       do_deallocations(allocs);
 
       MPI_Barrier(MPI_COMM_WORLD);
-      ASSERT_EQ(shmem_resource->getCurrentSize(), shmem_state->initial_size);
+      ASSERT_EQ(shmem_resource->getActualSize(), shmem_state->initial_size);
 
       MPI_Barrier(MPI_COMM_WORLD);
     }

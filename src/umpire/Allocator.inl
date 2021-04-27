@@ -51,7 +51,15 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
 
-  ret = m_allocator->allocate(name, bytes);
+  if (0 == bytes) {
+    ret = allocateNull();
+  } else {
+    ret = m_allocator->allocate(name, bytes);
+  }
+
+  if (m_tracking) {
+    registerAllocation(ret, bytes, m_allocator);
+  }
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
