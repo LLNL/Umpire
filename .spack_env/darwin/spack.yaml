@@ -3,9 +3,10 @@
 # configuration settings.
 spack:
   include:
-  - ../../scripts/radiuss-spack-configs/spack_configs/darwin/compilers.yaml
-  - ../../scripts/radiuss-spack-configs/spack_configs/darwin/packages.yaml
-  specs: [umpire@develop]
+  - ../../scripts/radiuss-spack-configs/darwin/compilers.yaml
+  - ../../scripts/radiuss-spack-configs/darwin/packages.yaml
+  repos: [.spack_packages/]
+  specs: [umpire@develop, umpire@develop%gcc@10.2.0]
   view: false
   packages:
     camp:
