@@ -512,6 +512,8 @@ TEST(Allocators, RegisterAllocation)
     umpire_resourcemanager_register_allocation(&rm, &d, sizeof(double), allocator)
   );
 
+  ASSERT_TRUE(umpire_resourcemanager_has_allocator(&rm, &d));
+
   ASSERT_NO_THROW(
     umpire_resourcemanager_deregister_allocation(&rm, &d)
   );
