@@ -232,6 +232,15 @@ declarations:
 
       - decl: size_t getSize(void* ptr)
 
+      - decl: void registerAllocation(void* ptr, size_t size, Allocator allocator)
+        splicer:
+          c: |
+            umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+            umpire::strategy::AllocationStrategy *SHCXX_strategy = SHCXX_allocator->getAllocationStrategy();
+            SH_this->registerAllocation(ptr, umpire::util::AllocationRecord{ptr, size, SHCXX_strategy});
+
+      - decl: void deregisterAllocation(void* ptr)
+
 splicer:
   f:
   - c_fortran/genfumpiresplicer.f
