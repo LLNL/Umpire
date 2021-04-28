@@ -16,6 +16,7 @@
 
 #include "camp/resource.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/Tracking.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
@@ -28,6 +29,10 @@ class MemoryOperation;
 
 namespace strategy {
 class ZeroByteHandler;
+
+namespace mixins {
+class AllocateNull;
+}
 }
 
 /*!
@@ -110,6 +115,9 @@ class ResourceManager {
    */
   template <typename Strategy, bool introspection = true, typename... Args>
   Allocator makeAllocator(const std::string& name, Args&&... args);
+
+  template<typename Strategy, typename... Args>
+  Allocator makeAllocator(const std::string& name, Tracking tracked, Args&&... args);
 
   Allocator makeResource(const std::string& name);
 
@@ -345,6 +353,7 @@ class ResourceManager {
   friend void print_allocator_records(Allocator, std::ostream&);
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
+  friend strategy::mixins::AllocateNull;
 };
 
 } // end namespace umpire

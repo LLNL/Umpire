@@ -16,6 +16,7 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 template <>
 struct tag_to_string<umpire::strategy::DynamicPoolList> {
@@ -261,7 +262,8 @@ TYPED_TEST(PrimaryPoolTest, Works)
     this->m_allocator->deallocate(ptr_two);
   });
 
-  ASSERT_EQ(this->m_allocator->getCurrentSize(), 62);
+  // NOTE: Size is 64 since it's rounded up
+  ASSERT_EQ(this->m_allocator->getCurrentSize(), 64);
   EXPECT_NO_THROW(this->m_allocator->release());
 
   ASSERT_LE(this->m_allocator->getActualSize(), this->m_initial_pool_size);
@@ -560,6 +562,43 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[1]); });  // 75% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2); // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
+}
+
+TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
+{
+  const int initial_size{1024};
+  const int subsequent_min_size{1024};
+  const int alignment{1024};
+  using Pool = typename TestFixture::Pool;
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto h_fun = Pool::percent_releasable(100);
+  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_100"},
+                                      rm.getAllocator(this->m_resource_name),
+                                      initial_size, subsequent_min_size,
+                                      alignment, h_fun);
+
+  auto dynamic_pool = umpire::util::unwrap_allocator<Pool>(alloc);
+
+  ASSERT_NE(dynamic_pool, nullptr);
+
+  void* a[4];
+  for (int i{0}; i < 4; ++i) {
+    ASSERT_NO_THROW({ a[i] = alloc.allocate(768); });
+    ASSERT_EQ(alloc.getActualSize(), (1024 * (i + 1)));
+    ASSERT_EQ(dynamic_pool->getBlocksInPool(), (i + 1));
+    ASSERT_EQ(dynamic_pool->getReleasableSize(), 0);
+  }
+
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_NO_THROW({ alloc.deallocate(a[3]); }); // 25% releasable
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_NO_THROW({ alloc.deallocate(a[2]); }); // 50% releasable
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4);
+  ASSERT_NO_THROW({ alloc.deallocate(a[1]); });  // 75% releasable
+  ASSERT_EQ(dynamic_pool->getBlocksInPool(), 4); // Collapse happened
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
 }

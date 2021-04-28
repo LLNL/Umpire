@@ -35,7 +35,7 @@ void* DynamicPoolList::allocate(size_t bytes)
   return ptr;
 }
 
-void DynamicPoolList::deallocate(void* ptr)
+void DynamicPoolList::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa.deallocate(ptr);
@@ -98,6 +98,11 @@ Platform DynamicPoolList::getPlatform() noexcept
 MemoryResourceTraits DynamicPoolList::getTraits() const noexcept
 {
   return m_allocator->getTraits();
+}
+
+bool 
+DynamicPoolList::tracksMemoryUse() const noexcept {
+  return true;
 }
 
 void DynamicPoolList::coalesce() noexcept

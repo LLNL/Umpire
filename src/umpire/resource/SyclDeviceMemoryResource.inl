@@ -28,9 +28,7 @@ SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(
 template <typename _allocator>
 void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
 {
-  cl::sycl::queue sycl_queue(m_traits.queue);
-
-  void* ptr = m_allocator.allocate(bytes, sycl_queue);
+  void* ptr = m_allocator.allocate(bytes, *(m_traits.queue));
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
 
@@ -38,13 +36,11 @@ void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
 }
 
 template <typename _allocator>
-void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
+void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  cl::sycl::queue sycl_queue(m_traits.queue);
-
-  m_allocator.deallocate(ptr, sycl_queue);
+  m_allocator.deallocate(ptr, *(m_traits.queue));
 }
 
 template <typename _allocator>

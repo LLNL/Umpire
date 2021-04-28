@@ -8,7 +8,6 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/AllocationTracker.hpp"
 #include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/util/Exception.hpp"
 #include "umpire/util/wrap_allocator.hpp"

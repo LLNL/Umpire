@@ -1,7 +1,7 @@
 { 
   "toss_3_x86_64_ib":
   { 
-    "quartz":
+    "ruby":
     [
       "%clang@3.9.1",
       "%clang@3.9.1+cuda",

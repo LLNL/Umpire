@@ -7,53 +7,53 @@
 clang_10:
   variables:
     SPEC: "+fortran %clang@10.0.1"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 clang_9:
   variables:
     SPEC: "+fortran %clang@9.0.0"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 gcc_8_1_0:
   variables:
     SPEC: "+fortran %gcc@8.1.0"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 icpc_17_0_2:
   variables:
     SPEC: "+fortran %intel@17.0.2"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 icpc_18_0_2:
   variables:
     SPEC: "+fortran tests=none %intel@18.0.2"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 icpc_19_1_0:
   variables:
     SPEC: "+fortran %intel@19.1.0"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 pgi_19_7:
   variables:
     SPEC: "+fortran %pgi@19.7 cxxflags=-I/usr/tce/packages/gcc/gcc-4.9.3/include/c++/4.9.3"
     PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 pgi_20_1:
   variables:
     SPEC: "+fortran %pgi@20.1"
     PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 # EXTRAS
 
 gcc_4_9_3:
   variables:
     SPEC: "%gcc@4.9.3"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby
 
 gcc_8_1_0_numa:
   variables:
     SPEC: "+fortran+numa %gcc@8.1.0"
-  extends: .build_and_test_on_quartz
+  extends: .build_and_test_on_ruby

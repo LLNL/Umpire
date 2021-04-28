@@ -46,5 +46,5 @@ TEST(DefaultMemoryResource, AllocateDeallocate)
   double* pointer = (double*)alloc->allocate(10 * sizeof(double));
   ASSERT_NE(pointer, nullptr);
 
-  alloc->deallocate(pointer);
+  alloc->deallocate(pointer, 0);
 }

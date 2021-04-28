@@ -38,7 +38,7 @@ struct MemoryResourceTraits {
 
   // variables for only SYCL devices (i.e., Intel GPUs)
 #if defined(UMPIRE_ENABLE_SYCL)
-  cl::sycl::queue queue;
+  sycl::queue* queue=nullptr;
 #endif
 
   bool unified = false;
@@ -48,6 +48,7 @@ struct MemoryResourceTraits {
   memory_type kind = memory_type::unknown;
   optimized_for used_for = optimized_for::any;
   resource_type resource = resource_type::unknown;
+  bool tracking{true};
 };
 
 } // end of namespace umpire

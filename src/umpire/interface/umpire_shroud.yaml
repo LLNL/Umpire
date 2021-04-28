@@ -36,6 +36,9 @@ declarations:
   - decl: string get_backtrace(void* ptr)
   - decl: size_t get_process_memory_usage()
   - decl: size_t get_device_memory_usage(int device_id)
+  - decl: int get_major_version()
+  - decl: int get_minor_version()
+  - decl: int get_patch_version()
 
   - decl: namespace strategy
     options:

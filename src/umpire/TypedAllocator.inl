@@ -37,4 +37,16 @@ void TypedAllocator<T>::deallocate(T* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 
 } // end of namespace umpire
 
+template <typename U, typename V>
+bool operator==(const umpire::TypedAllocator<U>& lhs, const umpire::TypedAllocator<V>& rhs)
+{
+ return lhs.m_allocator.getId() == rhs.m_allocator.getId();
+}
+
+template <typename U, typename V>
+bool operator!=(const umpire::TypedAllocator<U>& lhs, const umpire::TypedAllocator<V>& rhs)
+{
+ return !(lhs == rhs);
+}
+
 #endif // UMPIRE_TypedAllocator_INL
