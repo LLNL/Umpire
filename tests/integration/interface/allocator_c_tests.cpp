@@ -517,4 +517,6 @@ TEST(Allocators, RegisterAllocation)
   ASSERT_NO_THROW(
     umpire_resourcemanager_deregister_allocation(&rm, &d)
   );
+
+  umpire_allocator_delete(&allocator);
 }
