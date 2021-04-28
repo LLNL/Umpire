@@ -44,6 +44,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a benchmark that measures the performance of FixedPool across two allocation sizes.
 
+- Added (de)registerAllocation to C/FORTRAN API.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
