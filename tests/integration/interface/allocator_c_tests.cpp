@@ -498,3 +498,21 @@ TEST(Allocators, GetInvalidId)
   ASSERT_EQ(0xDEADBEE, id);
   ASSERT_EQ(id, cpp_id);
 }
+
+TEST(Allocators, RegisterAllocation)
+{
+  umpire_resourcemanager rm;
+  umpire_allocator allocator;
+  umpire_resourcemanager_get_instance(&rm);
+  umpire_resourcemanager_get_allocator_by_name(&rm, "HOST", &allocator);
+
+  double d = 1.0;
+
+  ASSERT_NO_THROW(
+    umpire_resourcemanager_register_allocation(&rm, &d, sizeof(double), allocator)
+  );
+
+  ASSERT_NO_THROW(
+    umpire_resourcemanager_deregister_allocation(&rm, &d)
+  );
+}
