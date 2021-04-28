@@ -5,9 +5,7 @@ Uberenv
 =======
 
 Umpire shares its Uberenv workflow with other projects. The documentation is
-therefore `shared`_.
-
-.. shared: <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#uberenv-guide)
+therefore `shared <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#uberenv-guide>`_.
 
 This page will provides some Umpire specific examples to illustrate the
 workflow described in the documentation.

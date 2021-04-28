@@ -73,25 +73,25 @@ void* MixedPool::allocate(std::size_t bytes)
 
   if (static_cast<std::size_t>(index) < m_fixed_pool.size()) {
     // allocate in fixed pool
-    mem = m_fixed_pool[index]->allocate();
+    mem = m_fixed_pool[index]->allocate_internal(m_fixed_pool_map[index]);
     m_map[reinterpret_cast<uintptr_t>(mem)] = index;
   } else {
     // allocate in dynamic pool
-    mem = m_dynamic_pool.allocate(bytes);
+    mem = m_dynamic_pool.allocate_internal(bytes);
     m_map[reinterpret_cast<uintptr_t>(mem)] = -1;
   }
   return mem;
 }
 
-void MixedPool::deallocate(void* ptr)
+void MixedPool::deallocate(void* ptr, std::size_t size)
 {
   auto iter = m_map.find(reinterpret_cast<uintptr_t>(ptr));
   if (iter != m_map.end()) {
     const int index = iter->second;
     if (index < 0) {
-      m_dynamic_pool.deallocate(ptr);
+      m_dynamic_pool.deallocate_internal(ptr, size);
     } else {
-      m_fixed_pool[index]->deallocate(ptr);
+      m_fixed_pool[index]->deallocate_internal(ptr, size);
     }
   }
 }
@@ -101,30 +101,12 @@ void MixedPool::release()
   UMPIRE_LOG(Debug, "MixedPool::release(): Not yet implemented");
 }
 
-std::size_t MixedPool::getCurrentSize() const noexcept
-{
-  std::size_t size = 0;
-  for (auto& fp : m_fixed_pool)
-    size += fp->getCurrentSize();
-  size += m_dynamic_pool.getCurrentSize();
-  return size;
-}
-
 std::size_t MixedPool::getActualSize() const noexcept
 {
   std::size_t size = 0;
   for (auto& fp : m_fixed_pool)
     size += fp->getActualSize();
   size += m_dynamic_pool.getActualSize();
-  return size;
-}
-
-std::size_t MixedPool::getHighWatermark() const noexcept
-{
-  std::size_t size = 0;
-  for (auto& fp : m_fixed_pool)
-    size += fp->getHighWatermark();
-  size += m_dynamic_pool.getHighWatermark();
   return size;
 }
 

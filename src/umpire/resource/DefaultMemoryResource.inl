@@ -44,25 +44,11 @@ void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 }
 
 template <typename _allocator>
-void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
+void DefaultMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
-}
-
-template <typename _allocator>
-std::size_t DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-template <typename _allocator>
-std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
 }
 
 template <typename _allocator>
