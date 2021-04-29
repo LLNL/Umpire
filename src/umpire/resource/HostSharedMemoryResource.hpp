@@ -25,16 +25,16 @@ class HostSharedMemoryResource : public MemoryResource {
 
     ~HostSharedMemoryResource();
 
-    void* allocate(std::size_t bytes);
+    void* allocate(std::size_t bytes) override;
 
-    void* allocate(const std::string& name, std::size_t bytes);
+    void* allocate_named(const std::string& name, std::size_t bytes) override;
 
-    void deallocate(void* ptr, std::size_t size);
+    void deallocate(void* ptr, std::size_t size) override;
 
-    std::size_t getActualSize() const noexcept;
+    std::size_t getActualSize() const noexcept override;
 
-    bool isAccessibleFrom(Platform p) noexcept;
-    Platform getPlatform() noexcept;
+    bool isAccessibleFrom(Platform p) noexcept override;
+    Platform getPlatform() noexcept override;
 
     void* find_pointer_from_name(std::string name);
   protected:

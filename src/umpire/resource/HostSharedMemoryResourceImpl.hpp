@@ -181,7 +181,7 @@ class HostSharedMemoryResource::impl {
       }
     }
 
-    void* allocate(const std::string& name, std::size_t requested_size )
+    void* allocate_named(const std::string& name, std::size_t requested_size)
     {
       int err{0};
       void* ptr{nullptr};

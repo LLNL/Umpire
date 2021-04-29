@@ -54,7 +54,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   if (0 == bytes) {
     ret = allocateNull();
   } else {
-    ret = m_allocator->allocate(name, bytes);
+    ret = m_allocator->allocate_named(name, bytes);
   }
 
   if (m_tracking) {

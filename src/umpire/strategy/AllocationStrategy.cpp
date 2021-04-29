@@ -28,6 +28,25 @@ void* AllocationStrategy::allocate_internal(std::size_t bytes)
   return allocate(bytes);
 }
 
+void* AllocationStrategy::allocate_named_internal(const std::string& name, std::size_t bytes)
+{
+  m_current_size += bytes;
+  m_allocation_count++;
+
+  if (m_current_size > m_high_watermark) {
+    m_high_watermark = m_current_size;
+  }
+
+  return this->allocate_named(name, bytes);
+}
+
+void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
+{
+  UMPIRE_LOG(Error, "AllocationStrategy::allocate_named() not implemented");
+  return nullptr;
+}
+
+
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
   m_current_size -= size;
@@ -40,10 +59,6 @@ void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 const std::string& AllocationStrategy::getName() noexcept
 {
   return m_name;
-}
-
-void* AllocationStrategy::allocate(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t bytes) {
-  return this->allocate(bytes);
 }
 
 void AllocationStrategy::release()

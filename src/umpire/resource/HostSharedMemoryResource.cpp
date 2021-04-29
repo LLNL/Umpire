@@ -32,9 +32,9 @@ void* HostSharedMemoryResource::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
   UMPIRE_ERROR("Shared memory allocation without name is not supported");
 }
 
-void* HostSharedMemoryResource::allocate(const std::string& name, std::size_t bytes)
+void* HostSharedMemoryResource::allocate_named(const std::string& name, std::size_t bytes)
 {
-  void* ptr{ pimpl->allocate(name, bytes) };
+  void* ptr{ pimpl->allocate_named(name, bytes) };
 
   UMPIRE_LOG(Debug, "(name=\"" << name << ", requested_size=" << bytes << ") returning: " << ptr);
   return ptr;
