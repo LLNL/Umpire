@@ -35,7 +35,7 @@ std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::creat
   if (traits.scope != MemoryResourceTraits::shared_scope::node) {
     UMPIRE_ERROR("HostSharedMemoryResource only supports shared_scope::node");
   }
-  return util::make_unique<HostSharedMemoryResource>(Platform::undefined, name, id,
+  return util::make_unique<HostSharedMemoryResource>(Platform::host, name, id,
                                                traits);
 }
 
