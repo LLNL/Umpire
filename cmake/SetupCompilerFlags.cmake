@@ -57,7 +57,7 @@ if (ENABLE_PEDANTIC_WARNINGS)
     DEFAULT  ""
     GNU "-Wpedantic"
     CLANG "-Wpedantic"
-    INTEL "-Wall -Wcheck -wd2259 -wd654"
+    INTEL "-Wall -Wcheck -wd2259"
     XL "-Wpedantic"
     MSVC "/Wall /WX"
   )
