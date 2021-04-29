@@ -48,6 +48,11 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
+  if (getAllocationStrategy()->getTraits().resource
+              != MemoryResourceTraits::resource_type::shared) {
+    UMPIRE_ERROR("This allocator does not support named allocations");
+  }
+
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
 
