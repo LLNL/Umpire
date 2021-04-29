@@ -20,8 +20,6 @@ namespace resource {
 
 class CudaConstantMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   CudaConstantMemoryResource(const std::string& name, int id,
                              MemoryResourceTraits traits);
 

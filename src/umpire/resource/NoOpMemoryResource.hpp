@@ -26,8 +26,6 @@ namespace resource {
  */
 class NoOpMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   /*!
    * \brief Construct a new NoOpMemoryResource.
    */

@@ -21,8 +21,6 @@ namespace resource {
  */
 class HipDeviceMemoryResource : public MemoryResource {
  public:
-  using MemoryResource::allocate;
-
   HipDeviceMemoryResource(Platform platform, const std::string& name, int id,
                            MemoryResourceTraits traits);
 
