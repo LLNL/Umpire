@@ -118,10 +118,13 @@ if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
 endif()
 
 if (ENABLE_HOST_SHARED_MEMORY)
+  message(STATUS "Host Shared Memory Enabled")
   target_link_libraries(
     umpire INTERFACE $<BUILD_INTERFACE:-lrt>
                      $<BUILD_INTERFACE:-pthread>
   )
+else()
+  message(STATUS "Host Shared Memory Disabled")
 endif()
 
 set_target_properties(umpire PROPERTIES
