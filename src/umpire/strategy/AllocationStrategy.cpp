@@ -30,7 +30,7 @@ void* AllocationStrategy::allocate_internal(std::size_t bytes)
 
 void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
-  UMPIRE_LOG(Error, "AllocationStrategy::allocate_named() not implemented");
+  UMPIRE_ERROR("AllocationStrategy::allocate_named() not implemented");
   return nullptr;
 }
 
