@@ -11,8 +11,7 @@
 #include "umpire/Allocator.hpp"
 
 constexpr int ITER {100}; //number of iterations, used for averaging time
-constexpr unsigned long int N {1<<30}; //number of allocations for device allocator
-constexpr int THREADS_PER_BLOCK {256};
+constexpr int THREADS_PER_BLOCK {1024};
 
 __global__ void first_in_block(umpire::DeviceAllocator alloc, double** data_ptr)
 {
@@ -37,7 +36,7 @@ __global__ void only_first(umpire::DeviceAllocator alloc, double** data_ptr)
   }
 }
 
-__global__ void each_thread(umpire::DeviceAllocator alloc, double** data_ptr)
+__global__ void each_thread(umpire::DeviceAllocator alloc, double** data_ptr, unsigned int N)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   for (int i = 0; i < ITER; i++) {
@@ -49,7 +48,7 @@ __global__ void each_thread(umpire::DeviceAllocator alloc, double** data_ptr)
   }
 }
 
-__global__ void warm_up(umpire::DeviceAllocator alloc, double** data_ptr)
+__global__ void warm_up(umpire::DeviceAllocator alloc, double** data_ptr, unsigned int N)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < N) {
@@ -87,8 +86,22 @@ int main(int, char**) {
   auto allocator = rm.getAllocator("UM");
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
+  unsigned int total_allocations {0};
+  unsigned int N {0};
+
+  cudaDeviceProp devProp;
+  cudaSetDevice(0);
+  cudaGetDeviceProperties(&devProp, 0);
+  //TODO: fix me!
+  if (devProp.concurrentKernels == 1) {
+    N = 128 * THREADS_PER_BLOCK;
+  } else {
+    N = 32 * THREADS_PER_BLOCK;
+  }
+  std::cout<<"Running on device: "<<devProp.name<<std::endl;
+  std::cout<<"Number of threads: "<<N<<std::endl;
+
   assert((N % THREADS_PER_BLOCK) != 0);
-  unsigned long int total_allocations {0};
 
   //create cuda streams and events
   cudaStream_t stream;
@@ -102,7 +115,7 @@ int main(int, char**) {
   total_allocations = N;
   auto dev_alloc_warmup = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  warm_up<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_warmup, ptr_to_data);
+  warm_up<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_warmup, ptr_to_data, N);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: Warm-up"); 
   /////////////////////////////////////////////////
@@ -132,7 +145,7 @@ int main(int, char**) {
   total_allocations = N * ITER;
   auto dev_alloc_eachThread = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  each_thread<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_eachThread, ptr_to_data);
+  each_thread<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_eachThread, ptr_to_data, N);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: Each thread"); 
   /////////////////////////////////////////////////
