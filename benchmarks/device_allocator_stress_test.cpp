@@ -11,35 +11,41 @@
 #include "umpire/Allocator.hpp"
 
 constexpr int ITER {100}; //number of iterations, used for averaging time
-constexpr unsigned long int N {1<<30}; //number of allocations for device allocator (1024)
+constexpr unsigned long int N {1<<30}; //number of allocations for device allocator
 constexpr int THREADS_PER_BLOCK {256};
 
-__global__ void one_per_block(umpire::DeviceAllocator alloc, double** data_ptr)
+__global__ void first_in_block(umpire::DeviceAllocator alloc, double** data_ptr)
 {
-  if (threadIdx.x == 0) {
-    double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
-    *data_ptr = data;
-    *data = 1024;
+  for (int i = 0; i < ITER; i++) {
+    if (threadIdx.x == 0) {
+      double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
+      *data_ptr = data;
+      *data = 1024;
+    }
   }
 }
 
-__global__ void only_the_first(umpire::DeviceAllocator alloc, double** data_ptr)
+__global__ void only_first(umpire::DeviceAllocator alloc, double** data_ptr)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx == 0) {
-    double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
-    *data_ptr = data;
-    data[0] = 512;
+  for (int i = 0; i < ITER; i++) {
+    if (idx == 0) {
+      double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
+      *data_ptr = data;
+      *data = 512;
+    }
   }
 }
 
-__global__ void each_one(umpire::DeviceAllocator alloc, double** data_ptr)
+__global__ void each_thread(umpire::DeviceAllocator alloc, double** data_ptr)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < N) {
-    double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
-    *data_ptr = data;
-    *data = 256;
+  for (int i = 0; i < ITER; i++) {
+    if (idx < N) {
+      double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
+      *data_ptr = data;
+      *data = 256;
+    }
   }
 }
 
@@ -49,7 +55,7 @@ __global__ void warm_up(umpire::DeviceAllocator alloc, double** data_ptr)
   if (idx < N) {
     double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
     *data_ptr = data;
-    *data = idx * idx - idx;
+    *data = 42;
   }
 }
 
@@ -64,16 +70,15 @@ static void CudaTest(const char *msg)
   }
 }
 
-void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, std::string name)
+void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, unsigned long int total, std::string name)
 {
   float milliseconds {0};
-  CudaTest("Checking for error just after kernel...");
-
   cudaEventSynchronize(stop);
   cudaEventElapsedTime(&milliseconds, start, stop);
+  CudaTest("Checking for error just after kernel...");
 
   std::cout << name << std::endl;
-  std::cout << "Time: " << (milliseconds/ITER) << "ms" << std::endl;
+  std::cout << "Time: " << (milliseconds/total*1000.0) << "us" << std::endl;
   std::cout << "Retrieved value: " << (*ptr)[0] << std::endl << std::endl;
 }
 
@@ -83,6 +88,7 @@ int main(int, char**) {
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   assert((N % THREADS_PER_BLOCK) != 0);
+  unsigned long int total_allocations {0};
 
   //create cuda streams and events
   cudaStream_t stream;
@@ -92,38 +98,44 @@ int main(int, char**) {
   cudaEventCreate(&stop);
 
   //Run warm-up kernel
-  auto dev_warmup_alloc = umpire::DeviceAllocator(allocator, (N) * sizeof(double));
+  /////////////////////////////////////////////////
+  total_allocations = N;
+  auto dev_alloc_warmup = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  warm_up<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_warmup_alloc, ptr_to_data);
+  warm_up<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_warmup, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data, "Kernel: Warm-up"); 
+  event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: Warm-up"); 
+  /////////////////////////////////////////////////
 
   //Run kernel to allocate per first thread per block
-  auto dev_alloc_firstInBlk = umpire::DeviceAllocator(allocator, (N/THREADS_PER_BLOCK*ITER) * sizeof(double));
+  /////////////////////////////////////////////////
+  total_allocations = (N/THREADS_PER_BLOCK*ITER);
+  auto dev_alloc_firstInBlk = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  for (int i = 0; i < ITER; i++) {
-    one_per_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_firstInBlk, ptr_to_data);
-  }
+  first_in_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_firstInBlk, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data, "Kernel: One thread per block"); 
+  event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: First thread per block"); 
+  /////////////////////////////////////////////////
 
   //Run kernel to allocate with only thread 0
-  auto dev_alloc_onlyFirst = umpire::DeviceAllocator(allocator, (1*ITER) * sizeof(double));
+  /////////////////////////////////////////////////
+  total_allocations = ITER;
+  auto dev_alloc_onlyFirst = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  for (int i = 0; i < ITER; i++) {
-    only_the_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_onlyFirst, ptr_to_data);
-  }
+  only_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_onlyFirst, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data, "Kernel: Only thread idx 0"); 
+  event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: Only thread idx 0"); 
+  /////////////////////////////////////////////////
 
   //Run kernel to allocate per each thread
-  auto dev_alloc_eachThread = umpire::DeviceAllocator(allocator, (N*ITER) * sizeof(double));
+  /////////////////////////////////////////////////
+  total_allocations = N * ITER;
+  auto dev_alloc_eachThread = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  for (int i = 0; i < ITER; i++) {
-    each_one<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_eachThread, ptr_to_data);
-  }
+  each_thread<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_eachThread, ptr_to_data);
   cudaEventRecord(stop);
-  event_timing_reporting(start, stop, ptr_to_data, "Kernel: Each thread"); 
+  event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: Each thread"); 
+  /////////////////////////////////////////////////
 
   cudaStreamDestroy(stream);
   return 0;
