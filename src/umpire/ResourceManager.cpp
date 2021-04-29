@@ -160,7 +160,6 @@ Allocator ResourceManager::makeResource(const std::string& name,
   if (name.find("DEVICE") != std::string::npos) {
     traits.id = resource::resource_to_device_id(name);
   }
-
   std::unique_ptr<strategy::AllocationStrategy> allocator{
           registry.makeMemoryResource(name, getNextId(), traits)};
   allocator->setTracking(traits.tracking);
