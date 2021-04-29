@@ -5,6 +5,6 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-if (UMPIRE_HAS_ASAN AND ENABLE_SANITIZER_TESTS)
+if (ENABLE_ASAN AND ENABLE_SANITIZER_TESTS)
     add_subdirectory(sanitizers)
 endif ()

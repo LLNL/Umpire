@@ -99,6 +99,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('tools', default=True, description='Enable tools')
     variant('dev_benchmarks', default=False, description='Enable Developer Benchmarks')
     variant('werror', default=True, description='Enable warnings as errors')
+    variant('asan', default=False, description='Enable ASAN')
     variant('sanitizer_tests', default=False, description='Enable address sanitizer tests')
 
     depends_on('cmake@3.8:', type='build')
@@ -115,6 +116,7 @@ class Umpire(CMakePackage, CudaPackage):
     conflicts('+deviceconst', when='~hip~cuda')
     conflicts('~mpi', when='+posix_shmem', msg='Shared Memory Allocator requires MPI')
     conflicts('+posix_shmem', when='@:5.0.1')
+    conflicts('+sanitizer_tests', when='~asan')
 
     phases = ['hostconfig', 'cmake', 'build', 'install']
 
@@ -381,6 +383,7 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
         cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
         cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
+        cfg.write(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
         cfg.write(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
 
         #######################
