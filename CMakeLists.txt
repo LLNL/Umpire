@@ -141,6 +141,10 @@ cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
 cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 
+cmake_dependent_option(
+  ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
+  "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
                     RETURN_CODE rc

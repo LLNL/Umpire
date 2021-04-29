@@ -44,7 +44,6 @@ class AllocationStrategy
 
   virtual ~AllocationStrategy() = default;
 
-
   void* allocate_internal(std::size_t bytes);
 
   void deallocate_internal(void* ptr, std::size_t size=0);
@@ -151,6 +150,7 @@ class AllocationStrategy
    * \return Pointer to start of allocated bytes.
    */
   virtual void* allocate(std::size_t bytes) = 0;
+  virtual void* allocate_named(const std::string& name, std::size_t bytes);
 
   /*!
    * \brief Free the memory at ptr.

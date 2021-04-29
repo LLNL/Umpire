@@ -117,6 +117,16 @@ if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   )
 endif()
 
+if (ENABLE_HOST_SHARED_MEMORY)
+  message(STATUS "Host Shared Memory Enabled")
+  target_link_libraries(
+    umpire INTERFACE $<BUILD_INTERFACE:-lrt>
+                     $<BUILD_INTERFACE:-pthread>
+  )
+else()
+  message(STATUS "Host Shared Memory Disabled")
+endif()
+
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
 
@@ -132,6 +142,7 @@ set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
 set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
 set(UMPIRE_ENABLE_OPENMP_TARGET ${ENABLE_OPENMP_TARGET})
+set(UMPIRE_ENABLE_HOST_SHARED_MEMORY ${ENABLE_HOST_SHARED_MEMORY})
 set(UMPIRE_ENABLE_FILE_RESOURCE ${ENABLE_FILE_RESOURCE})
 
 if (ENABLE_CUDA OR ENABLE_HIP)

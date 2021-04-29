@@ -28,6 +28,23 @@ void* AllocationStrategy::allocate_internal(std::size_t bytes)
   return allocate(bytes);
 }
 
+void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
+{
+  UMPIRE_ERROR("This allocation strategy does not support named allocations");
+
+  //
+  // The UMPIRE_ERROR macro above does not return.  It instead throws
+  // an exception.  However, for some reason, nvcc throws a warning
+  // "warning: missing return statement at end of non-void function"
+  // even though the following line cannot be reached.  Adding this
+  // fake return statement to work around the incorrect warning.
+  //
+#if defined(__CUDACC__) && defined(__CUDA_ARCH__)
+  return nullptr;
+#endif
+}
+
+
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
   m_current_size -= size;
