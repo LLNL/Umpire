@@ -52,33 +52,20 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
     UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
-  ResourceManager::getInstance().registerAllocation(ret, {ret, bytes, this});
-
-  m_current_size += bytes;
-  if (m_current_size > m_highwatermark)
-    m_highwatermark = m_current_size;
-
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
   return ret;
 }
 
-void CudaConstantMemoryResource::deallocate(void* ptr)
+void CudaConstantMemoryResource::deallocate(void* ptr, std::size_t size)
 {
   std::lock_guard<std::mutex> lock{m_mutex};
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  auto record = ResourceManager::getInstance().deregisterAllocation(ptr);
-  m_current_size -= record.size;
-
-  if (record.strategy != this) {
-    UMPIRE_ERROR(ptr << " was not allocated by " << getName());
-  }
-
-  if ( (static_cast<char*>(m_ptr) + (m_offset - record.size))
+  if ( (static_cast<char*>(m_ptr) + (m_offset - size))
       == static_cast<char*>(ptr)) {
-    m_offset -= record.size;
+    m_offset -= size;
   } else {
     UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
   }

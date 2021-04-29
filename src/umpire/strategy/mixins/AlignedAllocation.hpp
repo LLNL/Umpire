@@ -44,7 +44,7 @@ protected:
     strategy::AllocationStrategy* m_allocator;
 
 private:
-    std::unordered_map<void*, void*> base_pointer_map;
+    std::unordered_map<void*, std::tuple<void*, std::size_t> > base_pointer_map;
     std::size_t m_alignment;
     std::size_t m_mask;
 };

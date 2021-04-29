@@ -24,18 +24,12 @@ int main(int, char**)
   /*
    * Build some new Allocators from the named AllocationStrategies.
    *
-   * Allocator makeAllocator(
-   *     const std::string& name,  // Allocator name
-   *     const std::string& strategy,  // Strategy name
-   *     AllocatorTraits traits, // Traits object
-   *     std::vector<Allocator> providers); // Vector of providers (parent)
-   * Allocators
-   *
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
    */
+  umpire::Tracking tracking{umpire::Tracking::Untracked};
   auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_dynamic_pool", rm.getAllocator("HOST"));
+      "host_dynamic_pool", tracking, rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
       "MONOTONIC 1024", rm.getAllocator("HOST"), 1024);
