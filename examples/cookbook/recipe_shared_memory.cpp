@@ -33,13 +33,7 @@
 // in the debugger session windows, no MPI will be used and the debugger must
 // be used for synchronization (by setting breakpoints).
 //
-int main(
-  int
-  ac
-  ,
-  char**
-  av
-)
+int main(int ac, char** av)
 {
   const bool use_mpi{ ac == 1 };
   const bool i_am_parent{ ac == 2 };
