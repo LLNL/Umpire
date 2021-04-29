@@ -176,6 +176,8 @@ module umpire_mod
         procedure :: move => resourcemanager_move
         procedure :: deallocate => resourcemanager_deallocate
         procedure :: get_size => resourcemanager_get_size
+        procedure :: register_allocation => resourcemanager_register_allocation
+        procedure :: deregister_allocation => resourcemanager_deregister_allocation
         procedure :: associated => resourcemanager_associated
         generic :: copy => copy_all, copy_with_size
         generic :: get_allocator => get_allocator_by_name,  &
@@ -850,6 +852,27 @@ module umpire_mod
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_SIZE_T) :: SHT_rv
         end function c_resourcemanager_get_size
+
+        subroutine c_resourcemanager_register_allocation(self, ptr, &
+                size, allocator) &
+                bind(C, name="umpire_resourcemanager_register_allocation")
+            use iso_c_binding, only : C_PTR, C_SIZE_T
+            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(C_PTR), value, intent(IN) :: ptr
+            integer(C_SIZE_T), value, intent(IN) :: size
+            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+        end subroutine c_resourcemanager_register_allocation
+
+        subroutine c_resourcemanager_deregister_allocation(self, ptr) &
+                bind(C, name="umpire_resourcemanager_deregister_allocation")
+            use iso_c_binding, only : C_PTR
+            import :: umpire_SHROUD_resourcemanager_capsule
+            implicit none
+            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(C_PTR), value, intent(IN) :: ptr
+        end subroutine c_resourcemanager_deregister_allocation
 
         ! splicer begin class.ResourceManager.additional_interfaces
         ! splicer end class.ResourceManager.additional_interfaces
@@ -2028,6 +2051,28 @@ contains
         SHT_rv = c_resourcemanager_get_size(obj%cxxmem, ptr)
         ! splicer end class.ResourceManager.method.get_size
     end function resourcemanager_get_size
+
+    subroutine resourcemanager_register_allocation(obj, ptr, size, &
+            allocator)
+        use iso_c_binding, only : C_PTR, C_SIZE_T
+        class(UmpireResourceManager) :: obj
+        type(C_PTR), intent(IN) :: ptr
+        integer(C_SIZE_T), value, intent(IN) :: size
+        type(UmpireAllocator), value, intent(IN) :: allocator
+        ! splicer begin class.ResourceManager.method.register_allocation
+        call c_resourcemanager_register_allocation(obj%cxxmem, ptr, &
+            size, allocator%cxxmem)
+        ! splicer end class.ResourceManager.method.register_allocation
+    end subroutine resourcemanager_register_allocation
+
+    subroutine resourcemanager_deregister_allocation(obj, ptr)
+        use iso_c_binding, only : C_PTR
+        class(UmpireResourceManager) :: obj
+        type(C_PTR), intent(IN) :: ptr
+        ! splicer begin class.ResourceManager.method.deregister_allocation
+        call c_resourcemanager_deregister_allocation(obj%cxxmem, ptr)
+        ! splicer end class.ResourceManager.method.deregister_allocation
+    end subroutine resourcemanager_deregister_allocation
 
     function resourcemanager_associated(obj) result (rv)
         use iso_c_binding, only: c_associated

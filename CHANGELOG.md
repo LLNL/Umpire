@@ -44,10 +44,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added a benchmark that measures the performance of FixedPool across two allocation sizes.
 
+- Added (de)registerAllocation to C/FORTRAN API.
+
 - Added HPCToolKit page (with some Hatchet instructions) to ReadTheDocs Developer Guide.
 
 - In Gitlab CI, upload junit reports for corona and lassen.
-
 
 ### Changed
 
@@ -102,6 +103,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
   issue that would mean the pool would never coalesce automatically.
+
+- Added ENABLE_ASAN (default=Off) for guarding address sanitization check to
+  address compilation problems on some configurations.
 
 ## [v5.0.1] - 2021-03-31
 
