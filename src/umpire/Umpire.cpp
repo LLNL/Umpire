@@ -12,9 +12,10 @@
 #include <iterator>
 #include <sstream>
 
+#include "umpire/config.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/config.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>

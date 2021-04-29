@@ -23,7 +23,7 @@ class SyclDeviceMemoryResource : public MemoryResource {
                            MemoryResourceTraits traits);
 
   void* allocate(std::size_t bytes);
-  void deallocate(void* ptr);
+  void deallocate(void* ptr, std::size_t size);
 
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
