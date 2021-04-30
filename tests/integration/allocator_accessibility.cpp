@@ -17,6 +17,17 @@
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace {
+  const size_t allocation_size = 42;
+
+  std::string unique_name()
+  {
+    static int unique_name_id{0};
+    std::stringstream ss;
+
+    ss << "_Unique_Name_" << unique_name_id++;
+    return ss.str();
+  }
+
   size_t* do_allocate(umpire::Allocator* alloc, size_t size)
   {
     size_t* data;
@@ -52,7 +63,7 @@ struct allocate_and_use<host_platform>
 __global__ void tester(size_t* d_data, size_t size)
 {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
-   
+
   if (idx == 0) {
     d_data[0] = size * size;
   }
@@ -99,7 +110,7 @@ struct allocate_and_use<omp_target_platform>
 {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    int dev = alloc->getAllocationStrategy()->getTraits().id; 
+    int dev = alloc->getAllocationStrategy()->getTraits().id;
     size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
     size_t* d_data{static_cast<size_t*>(data)};
 
@@ -129,41 +140,41 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
 
       traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
       m_allocator = new umpire::Allocator(rm.makeResource("SHARED::node_allocator"+unique_name(), traits));
-      m_allocator_pool = nullptr;
     }
     else {
       m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
-      m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
-          ("pool_" + GetParam() + unique_name(), *m_allocator, 42 * sizeof(size_t), 1));
     }
   }
 
   virtual void TearDown()
   {
-    if(m_allocator) {
-      m_allocator->release();
-      delete m_allocator;
-    }
-
-    if(m_allocator_pool) {
-      m_allocator_pool->release();
-      delete m_allocator_pool;
-    }
+    m_allocator->release();
+    delete m_allocator;
   }
 
   umpire::Allocator* m_allocator;
-  umpire::Allocator* m_allocator_pool;
-  size_t m_size = 42;
+};
 
- private:
-  std::string unique_name()
+class PoolAccessibilityTest : public ::testing::TestWithParam<std::string> {
+ public:
+  virtual void SetUp()
   {
-    static int unique_name_id{0};
-    std::stringstream ss;
+    auto& rm = umpire::ResourceManager::getInstance();
 
-    ss << "_Unique_Name_" << unique_name_id++;
-    return ss.str();
+    m_allocator = new umpire::Allocator(
+                        rm.makeAllocator<umpire::strategy::QuickPool>(
+                          "pool_" + GetParam() + unique_name(),
+                          rm.getAllocator(GetParam()),
+                          42 * sizeof(size_t), 1));
   }
+
+  virtual void TearDown()
+  {
+    m_allocator->release();
+    delete m_allocator;
+  }
+
+  umpire::Allocator* m_allocator;
 };
 
 void run_access_test(umpire::Allocator* alloc, size_t size)
@@ -195,7 +206,7 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
   }
 #endif
 #endif
-  
+
 #if defined(UMPIRE_ENABLE_HIP)
   if (umpire::is_accessible(umpire::Platform::hip, *alloc)) {
     allocate_and_use<hip_platform> hip;
@@ -208,7 +219,7 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
   }
 #endif
 #endif
- 
+
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
   if (umpire::is_accessible(umpire::Platform::omp_target, *alloc)) {
     allocate_and_use<omp_target_platform> omp;
@@ -219,7 +230,7 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
            umpire::MemoryResourceTraits::resource_type::file) {
     //////////////////////////////////////////////////////////////////////
     // TODO: Implement a more robust omp_target + file accessibility check;
-    // Currently, never allowing omp_target to access FILE memory is a 
+    // Currently, never allowing omp_target to access FILE memory is a
     // placeholder until an appropriate OpenMP check is determined.
     //////////////////////////////////////////////////////////////////////
     SUCCEED();
@@ -245,25 +256,25 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
 
 TEST_P(AllocatorAccessibilityTest, AllocatorAccessibilityFromPlatform)
 {
-  run_access_test(m_allocator, m_size);
+  run_access_test(m_allocator, allocation_size);
 }
 
-TEST_P(AllocatorAccessibilityTest, PoolAccessibilityFromPlatform)
+TEST_P(PoolAccessibilityTest, PoolAccessibilityFromPlatform)
 {
-  if (m_allocator_pool) {
-    run_access_test(m_allocator_pool, m_size);
-  }
+  run_access_test(m_allocator, allocation_size);
 }
 
-std::vector<std::string> get_allocators()
+std::vector<std::string> get_allocators(bool ignore_shared_memory)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   std::vector<std::string> all_allocators = rm.getResourceNames();
   std::vector<std::string> avail_allocators;
-  
+
   std::cout << "Available allocators: ";
   for(auto a : all_allocators) {
     if(a.find("::") == std::string::npos) {
+      if ( ignore_shared_memory && a == "SHARED")
+        continue;
       avail_allocators.push_back(a);
       std::cout << a << " ";
     }
@@ -273,6 +284,7 @@ std::vector<std::string> get_allocators()
   return avail_allocators;
 }
 
-INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators()));
+INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
+INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(true)));
 
 //END gtest
