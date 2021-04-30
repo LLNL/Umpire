@@ -50,6 +50,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - In Gitlab CI, upload junit reports for corona and lassen.
 
+- Initial support for IPC Shared Memory via a "SHARED" resource allocator.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -220,8 +222,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - OpenMP target test for XL on GitLab
-
-- Initial support for IPC Shared Memory via a "SHARED" resource allocator.
 
 - QuickPool available via the C & Fortran APIs.
 
