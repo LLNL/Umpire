@@ -16,12 +16,9 @@
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-struct host_platform {};
-
-template <typename Platform>
-struct allocate_and_use{};
-
 namespace {
+  int unique_name_id{0};
+
   size_t* do_allocate(umpire::Allocator* alloc, size_t size)
   {
     size_t* data;
@@ -35,7 +32,12 @@ namespace {
     }
     return data;
   }
-};
+}
+
+struct host_platform {};
+
+template <typename Platform>
+struct allocate_and_use{};
 
 template<>
 struct allocate_and_use<host_platform>
@@ -113,10 +115,6 @@ struct allocate_and_use<omp_target_platform>
   }
 };
 #endif
-
-namespace {
-  int unique_name_id{0};
-};
 
 class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> {
  public:
