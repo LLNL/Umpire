@@ -40,6 +40,8 @@ class HostSharedMemoryResource : public MemoryResource {
   private:
     class impl;
     std::unique_ptr<impl> pimpl;
+
+    bool isPageable() noexcept;
 };
 
 } // end of namespace resource
