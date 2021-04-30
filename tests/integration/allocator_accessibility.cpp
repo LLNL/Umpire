@@ -17,8 +17,6 @@
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace {
-  int unique_name_id{0};
-
   size_t* do_allocate(umpire::Allocator* alloc, size_t size)
   {
     size_t* data;
@@ -160,6 +158,7 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
  private:
   std::string unique_name()
   {
+    static int unique_name_id{0};
     std::stringstream ss;
 
     ss << "_Unique_Name_" << unique_name_id++;
