@@ -5,24 +5,44 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
+
+#include <string>
+#include <sstream>
+
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
-#include "umpire/util/MemoryResourceTraits.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 struct host_platform {};
 
 template <typename Platform>
 struct allocate_and_use{};
 
+namespace {
+  size_t* do_allocate(umpire::Allocator* alloc, size_t size)
+  {
+    size_t* data;
+
+    if (alloc->getAllocationStrategy()->getTraits().resource
+                    == umpire::MemoryResourceTraits::resource_type::shared) {
+      data = static_cast<size_t*>(alloc->allocate("named_allocation", size * sizeof(size_t)));
+    }
+    else {
+      data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
+    }
+    return data;
+  }
+};
+
 template<>
 struct allocate_and_use<host_platform>
 {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
+    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
     data[0] = size * size;
     alloc->deallocate(data);
   }
@@ -47,7 +67,7 @@ struct allocate_and_use<cuda_platform>
 {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
+    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
     tester<<<1, 16>>>(data, size);
     cudaDeviceSynchronize();
     alloc->deallocate(data);
@@ -63,7 +83,7 @@ struct allocate_and_use<hip_platform>
 {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
+    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
     hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0,0, data, size);
     hipDeviceSynchronize();
     alloc->deallocate(data);
@@ -80,7 +100,7 @@ struct allocate_and_use<omp_target_platform>
   void test(umpire::Allocator* alloc, size_t size)
   {
     int dev = alloc->getAllocationStrategy()->getTraits().id; 
-    size_t* data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
+    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
     size_t* d_data{static_cast<size_t*>(data)};
 
 #pragma omp target is_device_ptr(d_data) device(dev)
@@ -94,29 +114,59 @@ struct allocate_and_use<omp_target_platform>
 };
 #endif
 
+namespace {
+  int unique_name_id{0};
+};
+
 class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> {
  public:
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
-    m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
-        ("pool_" + GetParam(), *m_allocator, 42 * sizeof(size_t), 1));
+
+    if (rm.getAllocator(GetParam()).getAllocationStrategy()->getTraits().resource
+                            == umpire::MemoryResourceTraits::resource_type::shared) {
+
+      umpire::MemoryResourceTraits traits{umpire::get_default_resource_traits("SHARED")};
+
+      traits.size = 1*1024*1024;  // Maximum size of this Allocator
+
+      traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
+      m_allocator = new umpire::Allocator(rm.makeResource("SHARED::node_allocator"+unique_name(), traits));
+      m_allocator_pool = nullptr;
+    }
+    else {
+      m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
+      m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
+          ("pool_" + GetParam() + unique_name(), *m_allocator, 42 * sizeof(size_t), 1));
+    }
   }
 
   virtual void TearDown()
   {
-    m_allocator->release();
-    m_allocator_pool->release();
-    if(m_allocator)
+    if(m_allocator) {
+      m_allocator->release();
       delete m_allocator;
-    if(m_allocator_pool)
+    }
+
+    if(m_allocator_pool) {
+      m_allocator_pool->release();
       delete m_allocator_pool;
+    }
   }
-  
+
   umpire::Allocator* m_allocator;
   umpire::Allocator* m_allocator_pool;
   size_t m_size = 42;
+
+ private:
+  std::string unique_name()
+  {
+    std::stringstream ss;
+
+    ss << "_Unique_Name_" << unique_name_id++;
+    return ss.str();
+  }
 };
 
 void run_access_test(umpire::Allocator* alloc, size_t size)
@@ -199,7 +249,13 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
 TEST_P(AllocatorAccessibilityTest, AllocatorAccessibilityFromPlatform)
 {
   run_access_test(m_allocator, m_size);
-  run_access_test(m_allocator_pool, m_size);
+}
+
+TEST_P(AllocatorAccessibilityTest, PoolAccessibilityFromPlatform)
+{
+  if (m_allocator_pool) {
+    run_access_test(m_allocator_pool, m_size);
+  }
 }
 
 std::vector<std::string> get_allocators()

@@ -10,6 +10,10 @@
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 
+#if defined(UMPIRE_ENABLE_CUDA)
+  #include <cuda_runtime_api.h>
+#endif
+
 namespace umpire {
 namespace resource {
 
@@ -45,13 +49,33 @@ void HostSharedMemoryResource::deallocate(void* ptr, std::size_t)
   return pimpl->deallocate(ptr);
 }
 
+bool HostSharedMemoryResource::isPageable() noexcept
+{
+#if defined(UMPIRE_ENABLE_CUDA)
+  int pageableMem = 0;
+  int cdev = 0;
+  cudaGetDevice(&cdev);
+
+  //Device supports coherently accessing pageable memory
+  //without calling cudaHostRegister on it
+  cudaDeviceGetAttribute(&pageableMem,
+     cudaDevAttrPageableMemoryAccess, cdev);
+  if(pageableMem)
+    return true;
+#endif
+  // Note: Regarding omp_target, we pick a default of false here 
+  // until we can better determine which device omp_offload is using.
+  return false;
+}
+
 bool HostSharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  // Todo: Need to determine how to update tests which require
-  // unnamed alloc to test.
-  //
-  UMPIRE_USE_VAR(p);
-  return false;
+  if(p == Platform::host)
+    return true;
+  else if (p == Platform::cuda) // TODO: Implement omp_target specific test
+    return isPageable();
+  else
+    return false;
 }
 
 Platform HostSharedMemoryResource::getPlatform() noexcept
