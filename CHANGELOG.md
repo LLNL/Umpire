@@ -112,6 +112,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed ranges used in the vendor allocator benchmark when HIP is enabled given 
   that hipMalloc allocates on 4k aligned pages.
 
+- Fixed broken allocation test with DEVICE_CONST memory
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
