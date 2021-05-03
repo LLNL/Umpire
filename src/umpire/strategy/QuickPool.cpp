@@ -46,13 +46,15 @@ QuickPool::~QuickPool()
 
 void* QuickPool::allocate(std::size_t bytes)
 {
+  SizeMap& size_map = (bytes > 16384) ? m_size_map : m_small_size_map;
+
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
-  const auto& best = m_size_map.lower_bound(rounded_bytes);
+  const auto& best = size_map.lower_bound(rounded_bytes);
 
   Chunk* chunk{nullptr};
 
-  if (best == m_size_map.end()) {
+  if (best == size_map.end()) {
     std::size_t bytes_to_use{(m_actual_bytes == 0)
                                  ? m_first_minimum_pool_allocation_size
                                  : m_next_minimum_pool_allocation_size};
@@ -96,7 +98,7 @@ void* QuickPool::allocate(std::size_t bytes)
     chunk = new (chunk_storage) Chunk{ret, size, size};
   } else {
     chunk = (*best).second;
-    m_size_map.erase(best);
+    size_map.erase(best);
   }
 
   UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data
@@ -133,7 +135,7 @@ void* QuickPool::allocate(std::size_t bytes)
 
     chunk->size = rounded_bytes;
     split_chunk->size_map_it =
-        m_size_map.insert(std::make_pair(remaining, split_chunk));
+        size_map.insert(std::make_pair(remaining, split_chunk));
   }
 
   m_current_bytes += rounded_bytes;
@@ -148,7 +150,10 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
 
+  const auto size = chunk->size;
   m_current_bytes -= chunk->size;
+
+  SizeMap& size_map = (size > 16384) ? m_size_map : m_small_size_map;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -158,7 +163,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     auto prev = chunk->prev;
     UMPIRE_LOG(Debug, "Removing chunk" << prev << " from size map");
 
-    m_size_map.erase(prev->size_map_it);
+    size_map.erase(prev->size_map_it);
 
     prev->size += chunk->size;
     prev->next = chunk->next;
@@ -184,7 +189,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     UMPIRE_LOG(Debug, "New size: " << chunk->size);
 
     UMPIRE_LOG(Debug, "Removing chunk" << next << " from size map");
-    m_size_map.erase(next->size_map_it);
+    size_map.erase(next->size_map_it);
 
     m_chunk_pool.deallocate(next);
   }
@@ -196,7 +201,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     m_releasable_bytes += chunk->chunk_size;
   }
 
-  chunk->size_map_it = m_size_map.insert(std::make_pair(chunk->size, chunk));
+  chunk->size_map_it = size_map.insert(std::make_pair(chunk->size, chunk));
   // can do this with iterator?
   m_pointer_map.erase(ptr);
 
@@ -216,34 +221,39 @@ void QuickPool::release()
   std::size_t prev_size{m_actual_bytes};
 #endif
 
-  for (auto pair = m_size_map.begin(); pair != m_size_map.end();) {
-    auto chunk = (*pair).second;
-    UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
-    if ((chunk->size == chunk->chunk_size) && chunk->free) {
-      UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
+  const auto releaser = [&](SizeMap& map){
+    for (auto pair = map.begin(); pair != map.end();) {
+      auto chunk = (*pair).second;
+      UMPIRE_LOG(Debug, "Found chunk @ " << chunk->data);
+      if ((chunk->size == chunk->chunk_size) && chunk->free) {
+        UMPIRE_LOG(Debug, "Releasing chunk " << chunk->data);
 
-      m_actual_bytes -= chunk->chunk_size;
-      m_releasable_bytes -= chunk->chunk_size;
+        m_actual_bytes -= chunk->chunk_size;
+        m_releasable_bytes -= chunk->chunk_size;
 
-      try {
-        aligned_deallocate(chunk->data);
-      } catch (...) {
-        if (m_is_destructing) {
-          //
-          // Ignore error in case the underlying vendor API has already shutdown
-          //
-          UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
-        } else {
-          throw;
+        try {
+          aligned_deallocate(chunk->data);
+        } catch (...) {
+          if (m_is_destructing) {
+            //
+            // Ignore error in case the underlying vendor API has already shutdown
+            //
+            UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+          } else {
+            throw;
+          }
         }
-      }
 
-      m_chunk_pool.deallocate(chunk);
-      pair = m_size_map.erase(pair);
-    } else {
-      ++pair;
+        m_chunk_pool.deallocate(chunk);
+        pair = map.erase(pair);
+      } else {
+        ++pair;
+      }
     }
-  }
+  };
+
+  releaser(m_size_map);
+  releaser(m_small_size_map);
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   if (prev_size > m_actual_bytes) {

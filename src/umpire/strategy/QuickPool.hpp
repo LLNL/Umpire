@@ -147,6 +147,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   PointerMap m_pointer_map{};
   SizeMap m_size_map{};
+  SizeMap m_small_size_map{};
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
