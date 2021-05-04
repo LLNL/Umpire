@@ -56,4 +56,12 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   return static_cast<void*>(m_ptr + counter);
 }
 
+__device__ void* DeviceAllocator::getDeviceAllocator(unsigned int id)
+{
+  if(!m_child) {
+    //use m_ptr to match up to original deviceAllocator pointer
+    return static_cast<void*>m_ptr;
+  }
+}
+
 } // end of namespace umpire

@@ -38,11 +38,14 @@ class DeviceAllocator {
    */
   __device__ void* allocate(size_t size);
 
+  __device__ DeviceAllocator getDeviceAllocator(unsigned int id);
+
  private:
   umpire::Allocator m_allocator;
 
   char* m_ptr;
   unsigned int* m_counter;
+  unsigned int m_id;
 
   size_t m_size;
 
