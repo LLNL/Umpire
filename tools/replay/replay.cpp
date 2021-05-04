@@ -41,11 +41,11 @@ int main(int argc, char* argv[])
   app.add_flag("-t,--time-run", options.time_replay_run,
         "Display time information for replay running operations");
 
-  app.add_flag("-s,--stats", options.print_statistics,
-      "Dump ULTRA file containing memory usage stats for each Allocator");
+  app.add_flag("-d,--dump", options.dump_statistics,
+      "Dump ULTRA file containing memory usage trace for each Allocator");
 
-  app.add_flag("--size-stats", options.print_size_stats,
-      "Display pool allocation size statistics");
+  app.add_flag("-s,--stats", options.track_stats,
+      "Track/Display pool allocation size statistics");
 
   app.add_flag("--info-only" , options.info_only,
       "Information about replay file, no actual replay performed");

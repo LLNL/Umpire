@@ -100,6 +100,7 @@ namespace {
       int index{ log2_64(size) };
 
       allocations++;
+      allocation_count++;
       if ( size > largest_allocation )
         largest_allocation = size;
 
@@ -109,6 +110,7 @@ namespace {
     void decrement(std::size_t size) {
       int index{ log2_64(size) };
       deallocations++;
+      allocation_count--;
       log2_buckets[index].decrement();
     };
 
@@ -118,7 +120,7 @@ namespace {
         std::cout << "    Total Deallocations:  " << deallocations << std::endl;
         std::cout << "    Total Allocations:    " << allocations << std::endl;
         std::cout << "    Largest Allocation:   " << largest_allocation << std::endl;
-        std::cout << "    Allocation Sizes Histogram:" << std::endl;
+        std::cout << "    Allocation Sizes Histogram (High watermark of allocations):" << std::endl;
         for ( int i = 0; i < 64; i++ ) {
           if (log2_buckets[i].high_watermark) {
             std::cout << "    [2^" << i << " - 2^" << i+1 << ") = ";
@@ -133,6 +135,7 @@ namespace {
     std::size_t largest_allocation{0};
     std::size_t allocations{0};
     std::size_t deallocations{0};
+    std::size_t allocation_count{0};
   };
 }
 
@@ -144,7 +147,7 @@ void ReplayOperationManager::runOperations()
 
   const int name_width{40};
   const int num_width{16};
-  if (m_options.print_size_stats) {
+  if (m_options.track_stats) {
     std::cout 
       << std::setw(name_width) << std::left << "Filename"
       << std::setw(name_width) << std::left << "Allocator"
@@ -161,13 +164,13 @@ void ReplayOperationManager::runOperations()
     try {
       switch (op->op_type) {
         case ReplayFile::otype::ALLOCATOR_CREATION:
-          if (m_options.print_size_stats) {
+          if (m_options.track_stats) {
             size_histogram[op->op_allocator] = TrackedHistogram{};
           }
           makeAllocator(op);
           break;
         case ReplayFile::otype::SETDEFAULTALLOCATOR:
-          if (m_options.print_size_stats) {
+          if (m_options.track_stats) {
             size_histogram[op->op_allocator] = TrackedHistogram{};
           }
           makeSetDefaultAllocator(op);
@@ -184,17 +187,16 @@ void ReplayOperationManager::runOperations()
           makeReallocate_ex(op);
           break;
         case ReplayFile::otype::ALLOCATE:
-          if (m_options.print_size_stats) {
+          if (m_options.track_stats || m_options.dump_statistics) {
             size_histogram[op->op_allocator].increment(op->op_size);
           }
           makeAllocate(op);
           break;
         case ReplayFile::otype::DEALLOCATE:
-          if (m_options.print_size_stats) {
+          if (m_options.track_stats || m_options.dump_statistics) {
             auto alloc = &m_ops_table->allocators[op->op_allocator];
             auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
-            size_histogram[op->op_allocator].decrement(
-                                                alloc->allocator->getSize(ptr));
+            size_histogram[op->op_allocator].decrement(alloc->allocator->getSize(ptr));
           }
           makeDeallocate(op);
           break;
@@ -217,38 +219,48 @@ void ReplayOperationManager::runOperations()
       throw;
     }
 
-    if (m_options.print_statistics) {
-      for (const auto& alloc_name : rm.getAllocatorNames()) {
-        auto alloc = rm.getAllocator(alloc_name);
+    if (m_options.dump_statistics) {
+      for (std::size_t i = 0; i < m_ops_table->num_allocators; i++) {
+        auto alloc = &m_ops_table->allocators[i];
+        if (alloc->allocator == nullptr)
+          continue;
+
+        auto alloc_name{ alloc->allocator->getName() };
 
         std::string cur_stat_name{alloc_name + " current_size"};
         std::string actual_stat_name{alloc_name + " actual_size"};
         std::string hwm_stat_name{alloc_name + " hwm"};
+        std::string allocs_stat_name{alloc_name + " allocation count"};
 
         m_stat_series[cur_stat_name].push_back(
             std::make_pair(
               op_counter,
-              alloc.getCurrentSize()));
+              alloc->allocator->getCurrentSize()));
 
         m_stat_series[actual_stat_name].push_back(
             std::make_pair(
               op_counter,
-              alloc.getActualSize()));
+              alloc->allocator->getActualSize()));
 
         m_stat_series[hwm_stat_name].push_back(
             std::make_pair(
               op_counter,
-              alloc.getHighWatermark()));
+              alloc->allocator->getHighWatermark()));
+
+        m_stat_series[allocs_stat_name].push_back(
+            std::make_pair(
+              op_counter,
+              size_histogram[i].allocation_count));
       }
     }
     op_counter++;
   }
 
-  if (m_options.print_statistics) {
+  if (m_options.dump_statistics) {
     dumpStats();
   }
 
-  if (m_options.print_size_stats) {
+  if (m_options.track_stats) {
     for (const auto& alloc_name : rm.getAllocatorNames()) {
       auto alloc = rm.getAllocator(alloc_name);
       if (alloc.getHighWatermark()) {
