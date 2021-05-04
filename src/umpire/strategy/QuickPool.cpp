@@ -35,6 +35,9 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                         << ", next_minimum_pool_allocation_size="
                         << m_next_minimum_pool_allocation_size
                         << ", alignment=" << alignment << " )");
+  if (m_first_minimum_pool_allocation_size < 64 * 1024 * 1024) {
+    m_should_coalesce = releasable_blocks(2);
+  }
 }
 
 QuickPool::~QuickPool()
@@ -91,6 +94,8 @@ void* QuickPool::allocate(std::size_t bytes)
 
     m_actual_bytes += size;
     m_releasable_bytes += size;
+    m_releasable_blocks++;
+    m_total_blocks++;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
@@ -106,6 +111,7 @@ void* QuickPool::allocate(std::size_t bytes)
 
   if ((chunk->size == chunk->chunk_size) && chunk->free) {
     m_releasable_bytes -= chunk->chunk_size;
+    m_releasable_blocks--;
   }
 
   void* ret = chunk->data;
@@ -189,6 +195,7 @@ void QuickPool::deallocate(void* ptr)
              "Inserting chunk " << chunk << " with size " << chunk->size);
 
   if (chunk->size == chunk->chunk_size) {
+    m_releasable_blocks++;
     m_releasable_bytes += chunk->chunk_size;
   }
 
@@ -220,6 +227,8 @@ void QuickPool::release()
 
       m_actual_bytes -= chunk->chunk_size;
       m_releasable_bytes -= chunk->chunk_size;
+      m_releasable_blocks--;
+      m_total_blocks--;
 
       try {
         aligned_deallocate(chunk->data);
@@ -250,6 +259,16 @@ void QuickPool::release()
                                     << umpire::util::backtracer<>::print(bt));
   }
 #endif
+}
+
+std::size_t QuickPool::numReleasableBlocks() const noexcept
+{
+  return m_releasable_blocks;
+}
+
+std::size_t QuickPool::totalBlocks() const noexcept
+{
+  return m_total_blocks;
 }
 
 std::size_t QuickPool::getActualSize() const noexcept
@@ -312,6 +331,13 @@ void QuickPool::do_coalesce() noexcept
     auto ptr = allocate(alloc_size);
     deallocate(ptr);
   }
+}
+
+QuickPool::CoalesceHeuristic QuickPool::releasable_blocks(std::size_t nblocks)
+{
+  return [=](const strategy::QuickPool& pool) {
+    return (pool.numReleasableBlocks() > nblocks);
+  };
 }
 
 QuickPool::CoalesceHeuristic QuickPool::percent_releasable(int percentage)
