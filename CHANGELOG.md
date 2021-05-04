@@ -43,6 +43,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Use CMake 3.18.0 in blueos CI
 
+- Added new coalesce heuristic to QuickPool based on the number of releasable
+  blocks for use with small-block-sized pools.
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing

@@ -35,6 +35,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   using CoalesceHeuristic = std::function<bool(const strategy::QuickPool&)>;
 
   static CoalesceHeuristic percent_releasable(int percentage);
+  static CoalesceHeuristic releasable_blocks(std::size_t nblocks);
 
   /*!
    * \brief Construct a new QuickPool.
@@ -85,6 +86,9 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * causing pool growth
    */
   std::size_t getLargestAvailableBlock() noexcept;
+
+  std::size_t numReleasableBlocks() const noexcept;
+  std::size_t totalBlocks() const noexcept;
 
   void coalesce() noexcept;
   void do_coalesce() noexcept;
@@ -152,6 +156,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   const std::size_t m_first_minimum_pool_allocation_size;
   const std::size_t m_next_minimum_pool_allocation_size;
 
+  std::size_t m_total_blocks{0};
+  std::size_t m_releasable_blocks{0};
   std::size_t m_actual_bytes{0};
   std::size_t m_releasable_bytes{0};
   bool m_is_destructing{false};
