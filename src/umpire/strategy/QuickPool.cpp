@@ -35,13 +35,6 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                         << ", next_minimum_pool_allocation_size="
                         << m_next_minimum_pool_allocation_size
                         << ", alignment=" << alignment << " )");
-
-  // Commenting this out for the moment to see if this can be handled instead
-  // by adjusting the percent_releasable heuristic
-  //
-  // if (m_first_minimum_pool_allocation_size < 64 * 1024 * 1024) {
-  //   m_should_coalesce = releasable_blocks(2);
-  // }
 }
 
 QuickPool::~QuickPool()
@@ -340,12 +333,10 @@ void QuickPool::do_coalesce() noexcept
   std::size_t size_pre{getActualSize()};
   release();
   std::size_t size_post{getActualSize()};
-  std::size_t alloc_size{size_pre - size_post};
 
-  //
-  // Only perform the coalesce if there were bytes found to coalesce
-  //
-  if (alloc_size) {
+  if (size_post < size_pre) {
+    std::size_t alloc_size{size_pre - size_post};
+
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);
     deallocate(ptr, alloc_size);
