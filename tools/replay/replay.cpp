@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
   app.add_flag("--no-demangle" , options.do_not_demangle,
       "Disable demangling of replay file");
 
-  app.add_flag("--skip-operations" , options.skip_operations,
-      "Skip Umpire Operations during replays");
+  app.add_flag("--replay-operations" , options.replay_operations,
+      "Replay Umpire Operations during replays (default is not to replay)");
 
   app.add_flag("-r,--recompile" , options.force_compile,
       "Force recompile replay binary");

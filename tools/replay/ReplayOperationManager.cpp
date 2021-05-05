@@ -176,7 +176,7 @@ void ReplayOperationManager::runOperations()
           makeSetDefaultAllocator(op);
           break;
         case ReplayFile::otype::COPY:
-          if (m_options.skip_operations == false) {
+          if (m_options.replay_operations) {
             makeCopy(op);
           }
           break;
