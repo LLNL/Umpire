@@ -3,8 +3,8 @@
 # configuration settings.
 spack:
   include:
-  - ../../scripts/radiuss-spack-configs/spack_configs/$SYS_TYPE/compilers.yaml
-  - ../../scripts/radiuss-spack-configs/spack_configs/$SYS_TYPE/packages.yaml
+  - ../../scripts/radiuss-spack-configs/$SYS_TYPE/compilers.yaml
+  - ../../scripts/radiuss-spack-configs/$SYS_TYPE/packages.yaml
   specs: [umpire@develop]
   view: false
   packages:
