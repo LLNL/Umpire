@@ -11,7 +11,11 @@
 #include "umpire/Allocator.hpp"
 
 constexpr int ITER {100}; //number of iterations, used for averaging time
+
+//Set device details given LC gpu compute capability
 constexpr int THREADS_PER_BLOCK {1024};
+constexpr int BLOCKS_PER_SM {32}; 
+constexpr int NUM_SM {80}; 
 
 __global__ void first_in_block(umpire::DeviceAllocator alloc, double** data_ptr)
 {
@@ -77,7 +81,8 @@ void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, u
   CudaTest("Checking for error just after kernel...");
 
   std::cout << name << std::endl;
-  std::cout << "Time: " << (milliseconds/total*1000.0) << "us" << std::endl;
+  std::cout << "Total time: " << (milliseconds*1000.0) << "us" << std::endl;
+  std::cout << "Time per allocation: " << (milliseconds/total*1000.0) << "us" << std::endl;
   std::cout << "Retrieved value: " << (*ptr)[0] << std::endl << std::endl;
 }
 
@@ -89,18 +94,20 @@ int main(int, char**) {
   unsigned int total_allocations {0};
   unsigned int N {0};
 
+  //Set up the device and get properties
   cudaDeviceProp devProp;
   cudaSetDevice(0);
   cudaGetDeviceProperties(&devProp, 0);
-  //TODO: fix me!
-  if (devProp.concurrentKernels == 1) {
-    N = 128 * THREADS_PER_BLOCK;
-  } else {
-    N = 32 * THREADS_PER_BLOCK;
-  }
-  std::cout<<"Running on device: "<<devProp.name<<std::endl;
-  std::cout<<"Number of threads: "<<N<<std::endl;
 
+  //Determine value of N depending upon device support for concurrent kernels
+  if (devProp.concurrentKernels == 1) {
+    N = NUM_SM * BLOCKS_PER_SM * THREADS_PER_BLOCK; 
+  } else { 
+    N = BLOCKS_PER_SM * THREADS_PER_BLOCK;
+  }
+
+  std::cout << "Running on device: " << devProp.name << std::endl;
+  std::cout << "Number of threads: " << N << std::endl << std::endl;
   assert((N % THREADS_PER_BLOCK) != 0);
 
   //create cuda streams and events
