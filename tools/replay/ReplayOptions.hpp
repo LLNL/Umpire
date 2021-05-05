@@ -25,9 +25,9 @@ struct ReplayUsePoolValidator : public CLI::Validator {
 struct ReplayOptions {
   bool time_replay_run{false};    // -t,--time-run
   bool time_replay_parse{false};  // --time-parse
-  bool info_only{false};         // --info
-  bool print_statistics{false};   // -s,--stats
-  bool print_size_stats{false};// --size-stats
+  bool info_only{false};          // --info
+  bool dump_statistics{false};    // -d, --dump
+  bool track_stats{false};        // -s, --stats
   bool skip_operations{false};    // --skip-operations
   bool force_compile{false};      // -r,--recompile
   bool do_not_demangle{false};    // --no-demangle
