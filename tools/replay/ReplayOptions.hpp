@@ -28,7 +28,7 @@ struct ReplayOptions {
   bool info_only{false};          // --info
   bool dump_statistics{false};    // -d, --dump
   bool track_stats{false};        // -s, --stats
-  bool replay_operations{false};  // --replay-operations
+  bool skip_operations{false};    // --skip-operations
   bool force_compile{false};      // -r,--recompile
   bool do_not_demangle{false};    // --no-demangle
   bool quiet{false};              // -q,--quiet
