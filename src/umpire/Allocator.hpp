@@ -177,6 +177,8 @@ class Allocator :
 
   bool isTracked() const noexcept;
 
+  const std::string& getStrategyName() const noexcept; 
+
   Allocator() = default;
 
   friend std::ostream& operator<<(std::ostream&, const Allocator&);

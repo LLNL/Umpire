@@ -179,6 +179,12 @@ if (ENABLE_FORTRAN)
     Fortran_FORMAT FREE)
 endif ()
 
+blt_add_executable(
+  NAME recipe_strategy_name
+  SOURCES recipe_strategy_name.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_strategy_name)
+
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
 
 umpire_add_code_checks(PREFIX cookbook)

@@ -181,7 +181,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
 
     // Find location to put this block in the freeBlocks list
     prev = NULL;
-    for (struct Block *temp = freeBlocks; temp && temp->data < curr->data;
+    for (struct Block *temp = freeBlocks; temp && (temp->data < curr->data);
          temp = temp->next)
       prev = temp;
 
