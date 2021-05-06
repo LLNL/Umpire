@@ -114,6 +114,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed broken allocation test with DEVICE_CONST memory
 
+- Fixed compile error in DynamicSizePool with CUDA 11 and C++17
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
