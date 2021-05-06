@@ -32,7 +32,7 @@ namespace strategy {
  * and the minimum size controls the lower bound on all future chunk
  * allocations.
  */
-class DynamicPoolMap : public AllocationStrategy,
+class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public AllocationStrategy,
                        private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
