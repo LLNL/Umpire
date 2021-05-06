@@ -123,8 +123,6 @@ void DynamicPoolList::coalesce() noexcept
   dpa.coalesce();
 }
 
-const DynamicPoolList::CoalesceHeuristic DynamicPoolList::s_default_heuristic{DynamicPoolList::percent_releasable(100)};
-
 DynamicPoolList::CoalesceHeuristic DynamicPoolList::blocks_releasable(std::size_t nblocks)
 {
   return [=](const strategy::DynamicPoolList& pool) {

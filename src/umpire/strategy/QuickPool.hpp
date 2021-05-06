@@ -40,7 +40,6 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
   static constexpr std::size_t s_default_alignment{16};
-  static const CoalesceHeuristic s_default_heuristic; // percent_releasable(100)
 
   /*!
    * \brief Construct a new QuickPool.
@@ -65,7 +64,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     const std::size_t
       alignment = s_default_alignment,
     CoalesceHeuristic
-      should_coalesce = s_default_heuristic) noexcept;
+      should_coalesce = percent_releasable(100)) noexcept;
 
   ~QuickPool();
 

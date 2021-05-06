@@ -343,8 +343,6 @@ void QuickPool::do_coalesce() noexcept
   }
 }
 
-const QuickPool::CoalesceHeuristic QuickPool::s_default_heuristic{QuickPool::percent_releasable(100)};
-
 QuickPool::CoalesceHeuristic QuickPool::blocks_releasable(std::size_t nblocks)
 {
   return [=](const strategy::QuickPool& pool) {

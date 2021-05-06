@@ -495,7 +495,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
       std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
       std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
-      umpire::strategy::QuickPool::CoalesceHeuristic heuristic{umpire::strategy::QuickPool::s_default_heuristic};
+      umpire::strategy::QuickPool::CoalesceHeuristic heuristic{umpire::strategy::QuickPool::percent_releasable(100)};
 
       if (alloc->argc == 1) {
         init_alloc_size = umpire::strategy::QuickPool::s_default_first_block_size;
@@ -628,7 +628,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
       std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
       std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
-      umpire::strategy::DynamicPoolList::CoalesceHeuristic heuristic{umpire::strategy::DynamicPoolList::s_default_heuristic};
+      umpire::strategy::DynamicPoolList::CoalesceHeuristic heuristic{umpire::strategy::DynamicPoolList::percent_releasable(100)};
 
       if (alloc->argc == 1) {
         init_alloc_size = umpire::strategy::DynamicPoolList::s_default_first_block_size;
