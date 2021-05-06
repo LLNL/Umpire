@@ -9,7 +9,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "umpire/util/Macros.hpp"
 
 int main(int, char**)
 {
@@ -18,7 +17,7 @@ int main(int, char**)
 
   // _sphinx_tag_tut_strategy_name_start
   //
-  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
       "POOL", allocator);
   std::cout << pool.getStrategyName() << std::endl;
   // _sphinx_tag_tut_strategy_name_end
