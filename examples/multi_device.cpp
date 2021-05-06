@@ -31,10 +31,10 @@ int main(int, char**)
   }
   std::cout << std::endl;
 
-  auto pool0 = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pool0 = rm.makeAllocator<umpire::strategy::QuickPool>(
       "pool0", rm.getAllocator("DEVICE::0"));
 
-  auto pool1 = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pool1 = rm.makeAllocator<umpire::strategy::QuickPool>(
       "pool1", rm.getAllocator("DEVICE::1"));
 
   double* a = static_cast<double*>(pool0.allocate(NUM_THREADS * sizeof(double)));

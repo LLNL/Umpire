@@ -8,7 +8,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/Exception.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
@@ -17,22 +17,22 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   // _sphinx_tag_tut_unwrap_start
-  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
       "pool", rm.getAllocator("HOST"));
 
-  auto dynamic_pool =
-      umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(pool);
+  auto quick_pool =
+      umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(pool);
   // _sphinx_tag_tut_unwrap_end
 
-  if (dynamic_pool == nullptr) {
-    UMPIRE_ERROR(pool.getName() << " is not a DynamicPool");
+  if (quick_pool == nullptr) {
+    UMPIRE_ERROR(pool.getName() << " is not a QuickPool");
   }
 
   auto ptr = pool.allocate(1024);
 
   // _sphinx_tag_tut_get_info_start
   std::cout << "Largest available block in pool is "
-            << dynamic_pool->getLargestAvailableBlock() << " bytes in size"
+            << quick_pool->getLargestAvailableBlock() << " bytes in size"
             << std::endl;
   // _sphinx_tag_tut_get_info_end
 

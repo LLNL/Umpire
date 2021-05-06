@@ -9,7 +9,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 int main(int, char**)
 {
@@ -18,7 +18,7 @@ int main(int, char**)
   auto prefetcher = rm.makeAllocator<umpire::strategy::AllocationPrefetcher>(
       "prefetcher", rm.getAllocator("UM"));
 
-  auto pool = rm.makeAllocator<umpire::strategy::DynamicPool>("prefetch_pool",
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("prefetch_pool",
                                                               prefetcher);
 
   void* data_one = pool.allocate(1024);

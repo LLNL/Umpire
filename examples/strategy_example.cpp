@@ -7,7 +7,7 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 
@@ -28,7 +28,7 @@ int main(int, char**)
    *  getAllocator function.
    */
   umpire::Tracking tracking{umpire::Tracking::Untracked};
-  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto alloc = rm.makeAllocator<umpire::strategy::QuickPool>(
       "host_dynamic_pool", tracking, rm.getAllocator("HOST"));
 
   alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(

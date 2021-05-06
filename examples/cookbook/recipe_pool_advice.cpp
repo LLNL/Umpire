@@ -9,7 +9,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/Macros.hpp"
 
 int main(int, char**)
@@ -31,7 +31,7 @@ int main(int, char**)
   // Create a pool using the preferred_location_allocator. This makes all
   // allocations in the pool have the same preferred location, the GPU.
   //
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
       "GPU_POOL", preferred_location_allocator);
   // _sphinx_tag_tut_pool_advice_end
 
