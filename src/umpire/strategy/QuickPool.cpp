@@ -262,12 +262,12 @@ void QuickPool::release()
 #endif
 }
 
-std::size_t QuickPool::numReleasableBlocks() const noexcept
+std::size_t QuickPool::getReleasableBlocks() const noexcept
 {
   return m_releasable_blocks;
 }
 
-std::size_t QuickPool::totalBlocks() const noexcept
+std::size_t QuickPool::getTotalBlocks() const noexcept
 {
   return m_total_blocks;
 }
@@ -343,12 +343,12 @@ void QuickPool::do_coalesce() noexcept
   }
 }
 
-QuickPool::CoalesceHeuristic QuickPool::default_heuristic{percent_releasable(100)};
+const QuickPool::CoalesceHeuristic QuickPool::s_default_heuristic{QuickPool::percent_releasable(100)};
 
-QuickPool::CoalesceHeuristic QuickPool::releasable_blocks(std::size_t nblocks)
+QuickPool::CoalesceHeuristic QuickPool::blocks_releasable(std::size_t nblocks)
 {
   return [=](const strategy::QuickPool& pool) {
-    return (pool.numReleasableBlocks() > nblocks);
+    return (pool.getReleasableBlocks() > nblocks);
   };
 }
 

@@ -364,12 +364,12 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     freeReleasedBlocks();
   }
 
-  std::size_t numReleasableBlocks() const noexcept
+  std::size_t getReleasableBlocks() const noexcept
   {
     return m_releasable_blocks;
   }
 
-  std::size_t totalBlocks() const noexcept
+  std::size_t getTotalBlocks() const noexcept
   {
     return m_total_blocks;
   }

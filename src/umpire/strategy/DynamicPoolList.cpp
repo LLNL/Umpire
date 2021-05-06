@@ -55,14 +55,14 @@ void DynamicPoolList::release()
   dpa.release();
 }
 
-std::size_t DynamicPoolList::numReleasableBlocks() const noexcept
+std::size_t DynamicPoolList::getReleasableBlocks() const noexcept
 {
-  return dpa.numReleasableBlocks();
+  return dpa.getReleasableBlocks();
 }
 
-std::size_t DynamicPoolList::totalBlocks() const noexcept
+std::size_t DynamicPoolList::getTotalBlocks() const noexcept
 {
-  return dpa.totalBlocks();
+  return dpa.getTotalBlocks();
 }
 
 std::size_t DynamicPoolList::getCurrentSize() const noexcept
@@ -123,12 +123,12 @@ void DynamicPoolList::coalesce() noexcept
   dpa.coalesce();
 }
 
-DynamicPoolList::CoalesceHeuristic DynamicPoolList::default_heuristic{percent_releasable(100)};
+const DynamicPoolList::CoalesceHeuristic DynamicPoolList::s_default_heuristic{DynamicPoolList::percent_releasable(100)};
 
-DynamicPoolList::CoalesceHeuristic DynamicPoolList::releasable_blocks(std::size_t nblocks)
+DynamicPoolList::CoalesceHeuristic DynamicPoolList::blocks_releasable(std::size_t nblocks)
 {
   return [=](const strategy::DynamicPoolList& pool) {
-    return (pool.numReleasableBlocks() > nblocks);
+    return (pool.getReleasableBlocks() > nblocks);
   };
 }
 

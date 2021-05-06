@@ -35,12 +35,12 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   using CoalesceHeuristic = std::function<bool(const strategy::QuickPool&)>;
 
   static CoalesceHeuristic percent_releasable(int percentage);
-  static CoalesceHeuristic releasable_blocks(std::size_t nblocks);
+  static CoalesceHeuristic blocks_releasable(std::size_t nblocks);
 
-  static constexpr std::size_t default_first_block_size{512 * 1024 * 1024};
-  static constexpr std::size_t default_next_block_size{1 * 1024 * 1024};
-  static constexpr std::size_t default_alignment{16};
-  static CoalesceHeuristic default_heuristic; // percent_releasable(100)
+  static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
+  static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
+  static constexpr std::size_t s_default_alignment{16};
+  static const CoalesceHeuristic s_default_heuristic; // percent_releasable(100)
 
   /*!
    * \brief Construct a new QuickPool.
@@ -59,13 +59,13 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     int id,
     Allocator allocator,
     const std::size_t
-      first_minimum_pool_allocation_size = default_first_block_size,
+      first_minimum_pool_allocation_size = s_default_first_block_size,
     const std::size_t
-      next_minimum_pool_allocation_size = default_next_block_size,
+      next_minimum_pool_allocation_size = s_default_next_block_size,
     const std::size_t
-      alignment = default_alignment,
+      alignment = s_default_alignment,
     CoalesceHeuristic
-      should_coalesce = default_heuristic) noexcept;
+      should_coalesce = s_default_heuristic) noexcept;
 
   ~QuickPool();
 
@@ -100,8 +100,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    */
   std::size_t getLargestAvailableBlock() noexcept;
 
-  std::size_t numReleasableBlocks() const noexcept;
-  std::size_t totalBlocks() const noexcept;
+  std::size_t getReleasableBlocks() const noexcept;
+  std::size_t getTotalBlocks() const noexcept;
 
   void coalesce() noexcept;
   void do_coalesce() noexcept;
