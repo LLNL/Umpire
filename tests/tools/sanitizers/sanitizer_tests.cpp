@@ -8,7 +8,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 void test_read_after_free()
 {
@@ -58,8 +58,8 @@ int main(int argc, char* argv[])
 
   auto& rm = umpire::ResourceManager::getInstance();
 
-  if (strategy.find("DynamicPoolMap") != std::string::npos) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
+  if (strategy.find("QuickPool") != std::string::npos) {
+    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
         "test_allocator", rm.getAllocator("HOST"));
     UMPIRE_USE_VAR(pool);
   } else if (strategy.find("DynamicPoolList") != std::string::npos) {
