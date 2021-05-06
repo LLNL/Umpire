@@ -17,8 +17,6 @@
 #include "umpire/util/MemoryMap.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
-#define QUICKPOOL_DEFAULT_HEURISTIC_FUN       umpire::strategy::QuickPool::percent_releasable(100)
-
 namespace umpire {
 
 class Allocator;
@@ -38,9 +36,11 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   static CoalesceHeuristic percent_releasable(int percentage);
   static CoalesceHeuristic releasable_blocks(std::size_t nblocks);
-  static constexpr std::size_t default_alignment{16};
+
   static constexpr std::size_t default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t default_next_block_size{1 * 1024 * 1024};
+  static constexpr std::size_t default_alignment{16};
+  static CoalesceHeuristic default_heuristic; // percent_releasable(100)
 
   /*!
    * \brief Construct a new QuickPool.
@@ -65,7 +65,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     const std::size_t
       alignment = default_alignment,
     CoalesceHeuristic
-      should_coalesce = QUICKPOOL_DEFAULT_HEURISTIC_FUN) noexcept;
+      should_coalesce = default_heuristic) noexcept;
 
   ~QuickPool();
 

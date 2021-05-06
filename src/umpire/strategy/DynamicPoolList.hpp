@@ -14,8 +14,6 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicSizePool.hpp"
 
-#define DYNAMICPOOL_LIST_DEFAULT_HEURISTIC_FUN       umpire::strategy::DynamicPoolList::percent_releasable(100)
-
 namespace umpire {
 
 class Allocator;
@@ -40,9 +38,11 @@ class DynamicPoolList : public AllocationStrategy {
 
   static CoalesceHeuristic percent_releasable(int percentage);
   static CoalesceHeuristic releasable_blocks(std::size_t nblocks);
-  static constexpr std::size_t default_alignment{16};
+
   static constexpr std::size_t default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t default_next_block_size{1 * 1024 * 1024};
+  static constexpr std::size_t default_alignment{16};
+  static CoalesceHeuristic default_heuristic; // percent_releasable(100)
 
   /*!
    * \brief Construct a new DynamicPoolList.
@@ -61,7 +61,7 @@ class DynamicPoolList : public AllocationStrategy {
       const std::size_t first_minimum_pool_allocation_size = default_first_block_size,
       const std::size_t next_minimum_pool_allocation_size = default_next_block_size,
       const std::size_t alignment = default_alignment,
-      CoalesceHeuristic should_coalesce = DYNAMICPOOL_LIST_DEFAULT_HEURISTIC_FUN) noexcept;
+      CoalesceHeuristic should_coalesce = default_heuristic) noexcept;
 
   DynamicPoolList(const DynamicPoolList&) = delete;
 
