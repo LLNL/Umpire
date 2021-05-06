@@ -52,6 +52,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator.
 
+- Allocator::getStrategyName() to get name of the strategy used.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
