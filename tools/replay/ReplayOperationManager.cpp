@@ -477,7 +477,53 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     break;
 
   case ReplayFile::rtype::QUICKPOOL:
-    if (alloc->argc >= 4) {
+    if (!m_options.heuristic_to_use.empty()) {
+      std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
+      std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
+      std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
+      umpire::strategy::QuickPool::CoalesceHeuristic heuristic{QUICKPOOL_DEFAULT_HEURISTIC_FUN};
+
+      if (alloc->argc == 1) {
+        init_alloc_size = umpire::strategy::QuickPool::default_first_block_size;
+        min_alloc_size = umpire::strategy::QuickPool::default_next_block_size;
+        alignment = umpire::strategy::QuickPool::default_alignment;
+      }
+      else if (alloc->argc == 2) {
+        min_alloc_size = umpire::strategy::QuickPool::default_next_block_size;
+        alignment = umpire::strategy::QuickPool::default_alignment;
+      }
+      if (alloc->argc == 3) {
+        alignment = umpire::strategy::QuickPool::default_alignment;
+      }
+
+      if (m_options.heuristic_to_use == "Block") {
+        heuristic = umpire::strategy::QuickPool::releasable_blocks(m_options.heuristic_parm);
+      }
+      else if (m_options.heuristic_to_use == "FreePercentage") {
+        heuristic = umpire::strategy::QuickPool::percent_releasable(m_options.heuristic_parm);
+      }
+
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, true>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , init_alloc_size
+              , min_alloc_size
+              , alignment
+              , heuristic));
+      }
+      else {
+        alloc->allocator = new umpire::Allocator(
+          rm.makeAllocator<umpire::strategy::QuickPool, false>
+            (   alloc->name
+              , rm.getAllocator(alloc->base_name)
+              , init_alloc_size
+              , min_alloc_size
+              , alignment));
+      }
+    }
+    else if (alloc->argc >= 4) {
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(
           rm.makeAllocator<umpire::strategy::QuickPool, true>

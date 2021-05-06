@@ -22,6 +22,18 @@ struct ReplayUsePoolValidator : public CLI::Validator {
   }
 };
 
+struct ReplayUseHeuristicValidator : public CLI::Validator {
+  ReplayUseHeuristicValidator() {
+    func_ = [](const std::string &str) {
+      if (str != "Block" && str != "FreePercentage") {
+        return std::string("Invalid heuristic name, must be Block or FreePercentage");
+      }
+      else
+        return std::string();
+    };
+  }
+};
+
 struct ReplayOptions {
   bool time_replay_run{false};    // -t,--time-run
   bool time_replay_parse{false};  // --time-parse
@@ -34,6 +46,8 @@ struct ReplayOptions {
   bool quiet{false};              // -q,--quiet
   std::string input_file;         // -i,-infile input_file
   std::string pool_to_use;        // -p,--use-pool
+  std::string heuristic_to_use{}; // --use-heuristic
+  int heuristic_parm{2};          // --heuristic-parm
 };
 
 #endif  // REPLAY_ReplayOptions_HPP
