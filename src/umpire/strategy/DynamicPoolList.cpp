@@ -55,6 +55,16 @@ void DynamicPoolList::release()
   dpa.release();
 }
 
+std::size_t DynamicPoolList::numReleasableBlocks() const noexcept
+{
+  return dpa.numReleasableBlocks();
+}
+
+std::size_t DynamicPoolList::totalBlocks() const noexcept
+{
+  return dpa.totalBlocks();
+}
+
 std::size_t DynamicPoolList::getCurrentSize() const noexcept
 {
   std::size_t CurrentSize = dpa.getCurrentSize();
@@ -113,8 +123,14 @@ void DynamicPoolList::coalesce() noexcept
   dpa.coalesce();
 }
 
-DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(
-    int percentage)
+DynamicPoolList::CoalesceHeuristic DynamicPoolList::releasable_blocks(std::size_t nblocks)
+{
+  return [=](const strategy::DynamicPoolList& pool) {
+    return (pool.numReleasableBlocks() > nblocks);
+  };
+}
+
+DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR("Invalid percentage of "
