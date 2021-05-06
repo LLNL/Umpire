@@ -53,3 +53,11 @@ if (ENABLE_PEDANTIC_WARNINGS)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   endif()
 endif()
+
+if (ENABLE_DEVELOPER_DEFAULTS)
+  blt_append_custom_compiler_flag(
+    FLAGS_VAR UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG
+    DEFAULT  "-Wno-deprecated-declarations")
+
+    set (CMAKE_CXX_FLAGS "${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG}" ${CMAKE_CXX_FLAGS})
+endif ()
