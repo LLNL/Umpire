@@ -54,9 +54,8 @@ TYPED_TEST(PoolHeuristicsTest, PercentReleasable)
 
   CoalesceHeuristic heuristic{myPoolType::percent_releasable(100)};
 
-  auto pool{
-    rm.makeAllocator<myPoolType>
-      (pool_name, resource, first_block, next_block, alignment, heuristic)};
+  auto pool = rm.makeAllocator<myPoolType>
+      (pool_name, resource, first_block, next_block, alignment, heuristic);
 
   auto strategy = pool.getAllocationStrategy();
   myPoolType* qp_strat{dynamic_cast<myPoolType*>(strategy)};
@@ -98,9 +97,8 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasable)
 
   CoalesceHeuristic heuristic{myPoolType::blocks_releasable(2)};
 
-  auto pool{
-    rm.makeAllocator<myPoolType>
-      (pool_name, resource, first_block, next_block, alignment, heuristic)};
+  auto pool = rm.makeAllocator<myPoolType>
+      (pool_name, resource, first_block, next_block, alignment, heuristic);
 
   auto strategy = pool.getAllocationStrategy();
   myPoolType* qp_strat{dynamic_cast<myPoolType*>(strategy)};
