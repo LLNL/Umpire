@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <memory>
 #include <ostream>
+#include <string>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
@@ -63,6 +64,8 @@ class Allocator :
    * \return Pointer to start of the allocation.
    */
   inline void* allocate(std::size_t bytes);
+
+  inline void* allocate(const std::string& name, std::size_t bytes);
 
   /*!
    * \brief Free the memory at ptr.
@@ -173,6 +176,8 @@ class Allocator :
   Platform getPlatform() noexcept;
 
   bool isTracked() const noexcept;
+
+  const std::string& getStrategyName() const noexcept; 
 
   Allocator() = default;
 

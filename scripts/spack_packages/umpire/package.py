@@ -84,6 +84,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
+    variant('posix_shmem', default=False, description='Enable POSIX shared memory')
     variant('numa', default=False, description='Enable NUMA support')
     variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
@@ -113,6 +114,8 @@ class Umpire(CMakePackage, CudaPackage):
     conflicts('+openmp', when='+hip')
     conflicts('+openmp_target', when='+hip')
     conflicts('+deviceconst', when='~hip~cuda')
+    conflicts('~mpi', when='+posix_shmem', msg='Shared Memory Allocator requires MPI')
+    conflicts('+posix_shmem', when='@:5.0.1')
     conflicts('+sanitizer_tests', when='~asan')
 
     phases = ['hostconfig', 'cmake', 'build', 'install']
@@ -290,6 +293,12 @@ class Umpire(CMakePackage, CudaPackage):
         else:
             cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", False))
             cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", False))
+
+
+        if "+posix_shmem" in spec:
+            cfg.write(cmake_cache_option("ENABLE_HOST_SHARED_MEMORY", True))
+        else:
+            cfg.write(cmake_cache_option("ENABLE_HOST_SHARED_MEMORY", False))
 
 
         if "+cuda" in spec:
