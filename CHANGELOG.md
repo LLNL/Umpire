@@ -52,6 +52,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator.
 
+- Allocator::getStrategyName() to get name of the strategy used.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -116,6 +118,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   that hipMalloc allocates on 4k aligned pages.
 
 - Fixed broken allocation test with DEVICE_CONST memory
+
+- Fixed compile error in DynamicSizePool with CUDA 11 and C++17
 
 ## [v5.0.1] - 2021-03-31
 
