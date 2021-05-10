@@ -54,6 +54,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Allocator::getStrategyName() to get name of the strategy used.
 
+- Benchmark for measuring performance of the Device Allocator.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
