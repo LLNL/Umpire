@@ -8,10 +8,12 @@
 #define UMPIRE_Umpire_HPP
 
 #include <iostream>
+#include <string>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
@@ -158,6 +160,20 @@ std::size_t get_device_memory_usage(int device_id);
  * \brief Get all the leaked (active) allocations associated with allocator.
  */
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
+
+/*!
+ * \brief Return the default traits for the given allocator string
+ */
+umpire::MemoryResourceTraits get_default_resource_traits(const std::string name);
+
+/*!
+ * \brief Return the pointer of an allocation for the given allocator and name
+ */
+void* find_pointer_from_name(Allocator allocator, const std::string name);
+
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
+#endif
 
 } // end of namespace umpire
 

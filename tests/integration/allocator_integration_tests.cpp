@@ -155,6 +155,11 @@ TEST_P(AllocatorTest, getActualSize)
   m_allocator->deallocate(data);
 }
 
+TEST_P(AllocatorTest, getStrategyName)
+{
+  ASSERT_EQ(m_allocator->getStrategyName(), "MemoryResource");
+}
+
 std::vector<std::string> allocator_strings()
 {
   std::vector<std::string> allocators;

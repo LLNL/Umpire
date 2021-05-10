@@ -21,6 +21,11 @@ clang_10_0_1_mpi (build and test on lassen):
     SPEC: "%clang@10.0.1ibm +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
+clang_10_0_1_mpi_shmem:
+  variables:
+    SPEC: "%clang@10.0.1ibm +posix_shmem +mpi ^spectrum-mpi"
+  extends: .build_and_test_on_lassen
+
 gcc_8_3_1:
   variables:
     SPEC: "+fortran%gcc@8.3.1 ^cmake@3.14.5"
@@ -105,7 +110,7 @@ clang_9_0_0_libcpp (build and test on lassen):
 
 clang_9_0_0_memleak (build and test on lassen):
   variables:
-    SPEC: "+sanitizer_tests %clang@9.0.0 cxxflags=-fsanitize=address"
+    SPEC: "+asan +sanitizer_tests %clang@9.0.0 cxxflags=-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 

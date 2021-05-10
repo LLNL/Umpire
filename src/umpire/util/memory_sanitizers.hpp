@@ -11,7 +11,7 @@
 
 #undef __UMPIRE_USE_MEMORY_SANITIZER__ // This may be defined below
 
-#if defined(UMPIRE_HAS_ASAN)
+#if defined(UMPIRE_ENABLE_ASAN)
 //
 // When a user compiles with "-fsanitize=memory", a couple of macros may be
 // set depending upon compiler and version.
@@ -30,7 +30,7 @@
 #endif // __has_feature(address_sanitizer)
 #endif // defined(__has_feature)
 
-#endif // defined(UMPIRE_HAS_ASAN)
+#endif // defined(UMPIRE_ENABLE_ASAN)
 
 #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
