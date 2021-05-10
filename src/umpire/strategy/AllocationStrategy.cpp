@@ -11,8 +11,8 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept
-    : m_name{name}, m_id{id}, m_parent{parent}
+AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent, const std::string& strategy_name) noexcept
+    : m_name{name}, m_strategy_name{strategy_name}, m_id{id}, m_parent{parent}
 {
 }
 
@@ -57,6 +57,11 @@ void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 const std::string& AllocationStrategy::getName() noexcept
 {
   return m_name;
+}
+
+const std::string& AllocationStrategy::getStrategyName() const noexcept
+{
+  return m_strategy_name;
 }
 
 void AllocationStrategy::release()
