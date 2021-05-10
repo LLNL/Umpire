@@ -93,22 +93,21 @@ int main(int, char**) {
 
   unsigned int total_allocations {0};
   unsigned int N {0};
+  N = NUM_SM * BLOCKS_PER_SM * THREADS_PER_BLOCK; 
 
   //Set up the device and get properties
   cudaDeviceProp devProp;
   cudaSetDevice(0);
   cudaGetDeviceProperties(&devProp, 0);
 
-  //Determine value of N depending upon device support for concurrent kernels
-  if (devProp.concurrentKernels == 1) {
-    N = NUM_SM * BLOCKS_PER_SM * THREADS_PER_BLOCK; 
-  } else { 
-    N = BLOCKS_PER_SM * THREADS_PER_BLOCK;
-  }
-
   std::cout << "Running on device: " << devProp.name << std::endl;
   std::cout << "Number of threads: " << N << std::endl << std::endl;
-  assert((N % THREADS_PER_BLOCK) != 0);
+
+  //Give warning if device doesn't support concurrent kernels
+  if (devProp.concurrentKernels != 1) {
+    std::cout << std::endl << "**Current device does not support concurrent kernels. " << 
+                 "Timing won't be as accurate. Continuing anyways... **" << std::endl;
+  }
 
   //create cuda streams and events
   cudaStream_t stream;
