@@ -40,7 +40,7 @@ class AllocationStrategy
    * \param name The name of this AllocationStrategy object.
    * \param id The id of this AllocationStrategy object.
    */
-  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept;
+  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent, const std::string& strategy_name) noexcept;
 
   virtual ~AllocationStrategy() = default;
 
@@ -105,6 +105,8 @@ class AllocationStrategy
    */
   const std::string& getName() noexcept;
 
+  const std::string& getStrategyName() const noexcept;
+
   /*!
    * \brief Get the id of this AllocationStrategy.
    *
@@ -136,6 +138,7 @@ class AllocationStrategy
   void setTracking(bool) noexcept;
 
   std::string m_name;
+  std::string m_strategy_name;
   int m_id;
   bool m_tracked{true};
 
