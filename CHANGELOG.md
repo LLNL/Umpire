@@ -118,6 +118,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed compile error in DynamicSizePool with CUDA 11 and C++17
 
+- Fixed outdated HIP versions used in CI (pushed updated versions)
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
