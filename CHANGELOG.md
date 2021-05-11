@@ -155,6 +155,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Use CMake 3.18.0 in blueos CI
 
+- Added option to replay to dump the total number of blocks in a pool as the
+  well as the number of blocks that are releasable.
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing
