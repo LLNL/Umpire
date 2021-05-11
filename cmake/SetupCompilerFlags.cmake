@@ -57,7 +57,8 @@ endif()
 if (ENABLE_DEVELOPER_DEFAULTS)
   blt_append_custom_compiler_flag(
     FLAGS_VAR UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG
-    DEFAULT  "-Wno-deprecated-declarations")
+    DEFAULT  "-Wno-deprecated-declarations"
+    MSVC "/wd4996")
 
     set (CMAKE_CXX_FLAGS "${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG} ${CMAKE_CXX_FLAGS}")
 endif ()
