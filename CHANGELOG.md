@@ -120,6 +120,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed outdated HIP versions used in CI (pushed updated versions)
 
+- Fixed how the memory resoure is set for the pool benchmark
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
