@@ -72,7 +72,7 @@ template <class T>
 void do_test(std::string pool_name, std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs)
 {
   auto& rm {umpire::ResourceManager::getInstance()};
-  umpire::Allocator alloc {rm.getAllocator("DEVICE")};
+  umpire::Allocator alloc {rm.getAllocator("HOST")};
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, ALLOC_SIZE)};
 
   for(auto i : indexing_pairs) {
