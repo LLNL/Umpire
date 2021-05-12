@@ -35,6 +35,11 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   using CoalesceHeuristic = std::function<bool(const strategy::QuickPool&)>;
 
   static CoalesceHeuristic percent_releasable(int percentage);
+  static CoalesceHeuristic blocks_releasable(std::size_t nblocks);
+
+  static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
+  static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
+  static constexpr std::size_t s_default_alignment{16};
 
   /*!
    * \brief Construct a new QuickPool.
@@ -49,12 +54,17 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * coalesce operation
    */
   QuickPool(
-      const std::string& name, int id, Allocator allocator,
-      const std::size_t first_minimum_pool_allocation_size = (512 * 1024 *
-                                                              1024),
-      const std::size_t next_minimum_pool_allocation_size = (1 * 1024 * 1024),
-      const std::size_t alignment = 16,
-      CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
+    const std::string& name,
+    int id,
+    Allocator allocator,
+    const std::size_t
+      first_minimum_pool_allocation_size = s_default_first_block_size,
+    const std::size_t
+      next_minimum_pool_allocation_size = s_default_next_block_size,
+    const std::size_t
+      alignment = s_default_alignment,
+    CoalesceHeuristic
+      should_coalesce = percent_releasable(100)) noexcept;
 
   ~QuickPool();
 
@@ -88,6 +98,9 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * causing pool growth
    */
   std::size_t getLargestAvailableBlock() noexcept;
+
+  std::size_t getReleasableBlocks() const noexcept;
+  std::size_t getTotalBlocks() const noexcept;
 
   void coalesce() noexcept;
   void do_coalesce() noexcept;
@@ -155,6 +168,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   const std::size_t m_first_minimum_pool_allocation_size;
   const std::size_t m_next_minimum_pool_allocation_size;
 
+  std::size_t m_total_blocks{0};
+  std::size_t m_releasable_blocks{0};
   std::size_t m_actual_bytes{0};
   std::size_t m_current_bytes{0};
   std::size_t m_releasable_bytes{0};
