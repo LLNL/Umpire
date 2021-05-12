@@ -52,16 +52,6 @@ __global__ void each_thread(umpire::DeviceAllocator alloc, double** data_ptr, un
   }
 }
 
-__global__ void warm_up(umpire::DeviceAllocator alloc, double** data_ptr, unsigned int N)
-{
-  int idx = blockIdx.x * blockDim.x + threadIdx.x;
-  if (idx < N) {
-    double* data = static_cast<double*>(alloc.allocate(sizeof(double)));
-    *data_ptr = data;
-    *data = 42;
-  }
-}
-
 static void CudaTest(const char *msg)
 {
   cudaError_t e = cudaGetLastError();
@@ -118,10 +108,10 @@ int main(int, char**) {
 
   //Run warm-up kernel
   /////////////////////////////////////////////////
-  total_allocations = N;
+  total_allocations = ITER;
   auto dev_alloc_warmup = umpire::DeviceAllocator(allocator, (total_allocations) * sizeof(double));
   cudaEventRecord(start);
-  warm_up<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_warmup, ptr_to_data, N);
+  only_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(dev_alloc_warmup, ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, total_allocations, "Kernel: Warm-up"); 
   /////////////////////////////////////////////////
