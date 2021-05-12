@@ -120,6 +120,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed compile error in DynamicSizePool with CUDA 11 and C++17
 
+- Fixed outdated HIP versions used in CI (pushed updated versions)
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
@@ -156,6 +158,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   allocator.
 
 - Use CMake 3.18.0 in blueos CI
+
+- Added option to replay to dump the total number of blocks in a pool as the
+  well as the number of blocks that are releasable.
 
 ### Changed
 
