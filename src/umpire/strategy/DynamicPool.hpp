@@ -7,7 +7,7 @@
 #ifndef UMPIRE_DynamicPool_HPP
 #define UMPIRE_DynamicPool_HPP
 
-#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/DynamicPoolMap.hpp"
 
 namespace umpire {
 namespace strategy {
