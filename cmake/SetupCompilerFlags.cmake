@@ -54,7 +54,7 @@ if (ENABLE_PEDANTIC_WARNINGS)
   endif()
 endif()
 
-if (ENABLE_DEVELOPER_DEFAULTS)
+if (ENABLE_WARNINGS_AS_ERRORS)
   blt_append_custom_compiler_flag(
     FLAGS_VAR UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG
     DEFAULT  "-Wno-deprecated-declarations"
