@@ -242,7 +242,7 @@ static void runTest()
         1024; // Minimum size of all future allocations in the dynamic pool
     auto mpa7 = 128; // Size with which to align allocations
     auto mpa8 =
-        umpire::strategy::DynamicPool::percent_releasable(75); // Heuristic
+        umpire::strategy::DynamicPoolMap::percent_releasable(75); // Heuristic
     name = basename + "_MixedPool_spec_";
     testAllocator<umpire::strategy::MixedPool, true>(name + "0", base_alloc);
     testAllocator<umpire::strategy::MixedPool, true>(name + "1", base_alloc,

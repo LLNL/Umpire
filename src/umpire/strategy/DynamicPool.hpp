@@ -12,7 +12,7 @@
 namespace umpire {
 namespace strategy {
 
-using DynamicPool = DynamicPoolList;
+using DynamicPool = DynamicPoolMap;
 
 } // end of namespace strategy
 } // end of namespace umpire
