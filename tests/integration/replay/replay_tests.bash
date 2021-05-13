@@ -15,7 +15,7 @@ topdir=$tools_dir/..
 function cleanupandexit {
   mydir=`pwd`
   cd $topdir
-  for f in `find . -name '*.replaybin' ; find -name '*.replay'`;
+  for f in `find . -name '*.replay.bin' ; find -name '*.replay'`;
   do
     rm -f $f
   done
@@ -42,7 +42,7 @@ if [ $? -ne 0 ]; then
 fi
 
 /bin/mv umpire*replay replay.replay
-echo UMPIRE_REPLAY="On" $replayprogram -i replay.replay
+echo UMPIRE_REPLAY="On" $replayprogram -i replay.replay --recompile
 UMPIRE_REPLAY="On" $replayprogram -i replay.replay
 if [ $? -ne 0 ]; then
     echo "$replayprogram Failed"

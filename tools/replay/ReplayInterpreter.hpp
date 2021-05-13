@@ -33,14 +33,11 @@ class ReplayInterpreter {
     using AllocatorIndex = int;
     using AllocatorFromLog = uint64_t;
     using AllocationFromLog = uint64_t;
-    using AllocatorIndexMap = std::unordered_map<AllocatorFromLog,
-                                                  AllocatorIndex>;
-    using AllocationAllocatorMap = std::unordered_map<AllocationFromLog,
-                                                  AllocatorIndex>;
+    using AllocatorIndexMap = std::unordered_map<AllocatorFromLog, AllocatorIndex>;
+    using AllocationAllocatorMap = std::unordered_map<AllocationFromLog, AllocatorIndex>;
 
     ReplayOptions m_options;
     std::ifstream m_input_file;
-    std::unordered_map<std::string, void*> m_allocated_ptrs;
     std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;
     nlohmann::json m_json;
@@ -80,6 +77,7 @@ class ReplayInterpreter {
     std::size_t m_deallocate_ops{0};
     std::size_t m_deallocate_due_to_reallocate{0};
     std::size_t m_deallocate_rogue_ignored{0};
+    std::size_t m_deallocate_external_ignored{0};
 
     std::size_t m_coalesce_ops{0};
     std::size_t m_release_ops{0};

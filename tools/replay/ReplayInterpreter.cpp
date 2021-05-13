@@ -253,7 +253,7 @@ void ReplayInterpreter::buildOperations()
 
   if ( ! m_options.quiet ) {
     const std::size_t allocations_performed{m_allocate_ops/2};
-    const std::size_t deallocations_skipped{m_deallocate_due_to_reallocate + m_deallocate_rogue_ignored};
+    const std::size_t deallocations_skipped{m_deallocate_due_to_reallocate + m_deallocate_external_ignored + m_deallocate_rogue_ignored};
     const std::size_t deallocations_performed{m_deallocate_ops - deallocations_skipped};
     const std::size_t leaked_allocations{allocations_performed - deallocations_performed};
 
@@ -267,7 +267,8 @@ void ReplayInterpreter::buildOperations()
       << std::setw(12) << deallocations_performed << " deallocate performed (" << leaked_allocations << " leaked)" << std::endl
       << std::setw(12) << deallocations_skipped << " deallocate skipped " << std::endl
       << "    " << std::setw(12) << m_deallocate_due_to_reallocate << " skipped due to reallocate" << std::endl
-      << "    " << std::setw(12) << m_deallocate_rogue_ignored << " skipped due to being external registration" << std::endl
+      << "    " << std::setw(12) << m_deallocate_external_ignored << " skipped due to being external registration" << std::endl
+      << "    " << std::setw(12) << m_deallocate_rogue_ignored << " skipped due to being rogue" << std::endl
       << std::endl
       << std::setw(12) << m_allocation_map_insert_ops << " allocation_map_insert operations (not replayed)" << std::endl
       << "    " << std::setw(12) << m_allocation_map_insert_due_to_make_allocator << " from makeAllocator" << std::endl
@@ -395,10 +396,6 @@ bool ReplayInterpreter::compareOperations(ReplayInterpreter& rh)
       }
       if ( m_ops->getOperationsTable()->ops[i].op_allocator != rh.m_ops->getOperationsTable()->ops[i].op_allocator ) {
         std::cerr << "Operation Allocator mismatch" << std::endl;
-        mismatch = true;
-      }
-      if ( m_ops->getOperationsTable()->ops[i].op_allocated_ptr != rh.m_ops->getOperationsTable()->ops[i].op_allocated_ptr ) {
-        std::cerr << "Operation Allocated Ptr mismatch" << std::endl;
         mismatch = true;
       }
       if ( m_ops->getOperationsTable()->ops[i].op_size != rh.m_ops->getOperationsTable()->ops[i].op_size ) {
@@ -828,13 +825,17 @@ void ReplayInterpreter::replay_processMapRemove()
 
 void ReplayInterpreter::replay_compileAllocate( void )
 {
-  if (m_replaying_reallocate)
-    return;
-
-  m_make_allocation_in_progress = true;
-
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+  std::string allocator_ref_string{std::string{m_json["payload"]["allocator_ref"]}};
+  const std::size_t alloc_size{m_json["payload"]["size"]};
+
+  if (m_replaying_reallocate) {
+    REPLAY_TRACE("Skipping reallocate: " << m_ops->getLine(m_line_number));
+    return;
+  }
+
+  m_make_allocation_in_progress = true;
 
   //
   // For allocations, two records are written.  The first record simply
@@ -846,23 +847,26 @@ void ReplayInterpreter::replay_compileAllocate( void )
   // replayed.
   //
   if ( m_json["result"].is_null() ) {
-    const std::size_t alloc_size{m_json["payload"]["size"]};
     memset(op, 0, sizeof(*op));
 
     op->op_type = ReplayFile::otype::ALLOCATE;
     op->op_line_number = m_line_number;
-    op->op_allocator = getAllocatorIndex(std::string{m_json["payload"]["allocator_ref"]});
+    op->op_allocator = getAllocatorIndex(allocator_ref_string);
     op->op_size = alloc_size;
   }
   else {
-    const uint64_t memory_ptr{
-      getPointer( std::string{m_json["result"]["memory_ptr"]} )
-    };
+    std::string memory_ptr_string{m_json["result"]["memory_ptr"]};
+    const uint64_t memory_ptr{ getPointer( memory_ptr_string ) };
+    const std::string memory_ptr_key{allocator_ref_string + memory_ptr_string};
+    m_make_allocation_in_progress = false;
+
+    if ( m_allocation_id.find(memory_ptr) != m_allocation_id.end() ) {
+      REPLAY_ERROR("Pointer already allocated: " << m_ops->getLine(m_line_number) << std::endl);
+    }
 
     op->op_line_number = m_line_number;
-    m_allocation_id[memory_ptr] = hdr->num_operations;
+    m_allocation_id.insert({memory_ptr, hdr->num_operations});
     hdr->num_operations++;
-    m_make_allocation_in_progress = false;
   }
 }
 
@@ -913,6 +917,14 @@ void ReplayInterpreter::replay_compileCopy( void )
   src_ptr -= src_off;
   dst_ptr -= dst_off;
 
+  if ( m_allocation_id.find(src_ptr) == m_allocation_id.end() ) {
+      REPLAY_ERROR("Rogue source: " << m_ops->getLine(m_line_number) << std::endl);
+  }
+
+  if ( m_allocation_id.find(dst_ptr) == m_allocation_id.end() ) {
+      REPLAY_ERROR("Rogue destination: " << m_ops->getLine(m_line_number) << std::endl);
+  }
+
   op->op_type = ReplayFile::otype::COPY;
   op->op_line_number = m_line_number;
   op->op_size = m_json["payload"]["size"];
@@ -955,18 +967,27 @@ void ReplayInterpreter::replay_compileReallocate( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   if ( m_json["result"].is_null() ) {
+    if ( ptr != 0 && (m_allocation_id.find(ptr) == m_allocation_id.end()) ) {
+        REPLAY_ERROR("Rogue: " << m_ops->getLine(m_line_number) << std::endl);
+    }
+
     memset(op, 0, sizeof(*op));
     op->op_type = ReplayFile::otype::REALLOCATE;
     op->op_line_number = m_line_number;
     op->op_alloc_ops[1] = (ptr == 0) ? 0 : m_allocation_id[ptr];
     op->op_size = alloc_size;
+    if (ptr != 0)
+      m_allocation_id.erase(ptr);
   }
   else {
     const uint64_t memory_ptr{
       getPointer( std::string{m_json["result"]["memory_ptr"]} )
     };
 
-    m_allocation_id[memory_ptr] = hdr->num_operations;
+    if ( m_allocation_id.find(memory_ptr) != m_allocation_id.end() ) {
+        REPLAY_ERROR("Pointer already allocated: " << m_ops->getLine(m_line_number) << std::endl);
+    }
+    m_allocation_id.insert({memory_ptr, hdr->num_operations});
     hdr->num_operations++;
     m_replaying_reallocate = false;
   }
@@ -985,12 +1006,18 @@ void ReplayInterpreter::replay_compileReallocate_ex( void )
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
 
   if ( m_json["result"].is_null() ) {
+    if ( ptr != 0 && (m_allocation_id.find(ptr) == m_allocation_id.end()) ) {
+        REPLAY_ERROR("Rogue: " << m_ops->getLine(m_line_number) << std::endl);
+    }
+
     memset(op, 0, sizeof(*op));
     op->op_type = ReplayFile::otype::REALLOCATE_EX;
     op->op_line_number = m_line_number;
     op->op_alloc_ops[1] = (ptr == 0) ? 0 : m_allocation_id[ptr];
     op->op_size = alloc_size;
     op->op_allocator = getAllocatorIndex(std::string{m_json["payload"]["allocator_ref"]});
+    if (ptr != 0)
+      m_allocation_id.erase(ptr);
   }
   else {
     const std::string memory_str{m_json["result"]["memory_ptr"]};
@@ -998,7 +1025,10 @@ void ReplayInterpreter::replay_compileReallocate_ex( void )
       getPointer( std::string{m_json["result"]["memory_ptr"]} )
     };
 
-    m_allocation_id[memory_ptr] = hdr->num_operations;
+    if ( m_allocation_id.find(memory_ptr) != m_allocation_id.end() ) {
+        REPLAY_ERROR("Pointer already allocated: " << m_ops->getLine(m_line_number) << std::endl);
+    }
+    m_allocation_id.insert({memory_ptr, hdr->num_operations});
     hdr->num_operations++;
     m_replaying_reallocate = false;
   }
@@ -1006,31 +1036,50 @@ void ReplayInterpreter::replay_compileReallocate_ex( void )
 
 bool ReplayInterpreter::replay_compileDeallocate( void )
 {
+  std::string allocator_ref_string{m_json["payload"]["allocator_ref"]};
+  std::string memory_ptr_string{m_json["payload"]["memory_ptr"]};
+  const std::string memory_ptr_key{allocator_ref_string + memory_ptr_string};
+  const uint64_t memory_ptr{ getPointer( memory_ptr_string ) };
+
   if (m_replaying_reallocate) {
+    REPLAY_TRACE("Skipping reallocate: " << m_ops->getLine(m_line_number));
     m_deallocate_due_to_reallocate++;
     return false;
   }
 
-  const uint64_t memory_ptr {
-      getPointer( std::string{m_json["payload"]["memory_ptr"]} )
-  };
-
   if ( m_external_registrations.find(memory_ptr) != m_external_registrations.end() ) {
-    m_deallocate_rogue_ignored++;
+    std::cout << "Skipping external: " << memory_ptr_string << std::endl;
+    m_deallocate_external_ignored++;
     return false; // Skip this as it is external
   }
 
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
+
+  if ( m_allocation_id.find(memory_ptr) == m_allocation_id.end() ) {
+    int id{getAllocatorIndex(allocator_ref_string)};
+
+    std::cerr
+      << "[IGNORED] Rogue deallocate ptr= " << memory_ptr_string
+      << ", base_name=" << hdr->allocators[id].base_name
+      << ", name= " << hdr->allocators[id].name << " "
+      << m_ops->getLine(m_line_number)
+      << std::endl;
+
+    m_deallocate_rogue_ignored++;
+    return false;
+  }
+
   ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+
   memset(op, 0, sizeof(*op));
 
   op->op_type = ReplayFile::otype::DEALLOCATE;
   op->op_line_number = m_line_number;
-  op->op_allocator = getAllocatorIndex(std::string{m_json["payload"]["allocator_ref"]});
-
+  op->op_allocator = getAllocatorIndex(allocator_ref_string);
   op->op_alloc_ops[0] = m_allocation_id[memory_ptr];
   hdr->num_operations++;
 
+  m_allocation_id.erase(memory_ptr);
   return true;
 }
 
