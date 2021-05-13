@@ -139,7 +139,8 @@ cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
                         "ENABLE_DOCS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
-
+cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
+                        "ENABLE_BENCHMARKS" Off )
 cmake_dependent_option(
   ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
   "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
@@ -177,7 +178,7 @@ if (ENABLE_DEVELOPER_BENCHMARKS)
     message("-- Warning: CMAKE_BUILD_TYPE not set to Release, benchmark information will not be reliable for this build!")
   endif()
 else()
-  if (ENABLE_BENCHMARKS)
+  if (UMPIRE_ENABLE_BENCHMARKS)
     message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
           "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
   endif()

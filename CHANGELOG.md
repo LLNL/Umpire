@@ -74,7 +74,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Renamed'ENABLE_TESTS', 'ENABLE_EXAMPLES' and 'ENABLE_DOCS' to
   'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
   made those options dependant on the corresponding BLT options.
-  
+
+- Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
+  on the corresponding BLT options.  
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
