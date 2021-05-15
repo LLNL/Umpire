@@ -1041,15 +1041,18 @@ bool ReplayInterpreter::replay_compileDeallocate( void )
     return false;
   }
 
-  if ( m_external_registrations.find(memory_ptr) != m_external_registrations.end() ) {
-    std::cout << "Skipping external: " << memory_ptr_string << std::endl;
-    m_deallocate_external_ignored++;
-    return false; // Skip this as it is external
-  }
-
   ReplayFile::Header* hdr = m_ops->getOperationsTable();
 
   if ( m_allocation_id.find(memory_ptr_key) == m_allocation_id.end() ) {
+    //
+    // Check to see if this is an externally registered pointer
+    //
+    if ( m_external_registrations.find(memory_ptr) != m_external_registrations.end() ) {
+      std::cout << "Skipping external: " << m_ops->getLine(m_line_number) << std::endl;
+      m_deallocate_external_ignored++;
+      return false; // Skip this as it is external
+    }
+
     int id{getAllocatorIndex(allocator_ref_string)};
 
     std::cerr
