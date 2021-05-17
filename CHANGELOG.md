@@ -122,6 +122,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed how the memory resoure is set for the pool benchmark
 
+- Fixed corona gitlab CI build + link errors
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed

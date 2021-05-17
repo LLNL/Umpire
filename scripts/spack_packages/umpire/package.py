@@ -351,13 +351,16 @@ class Umpire(CMakePackage, CudaPackage):
                                         '--amdgpu-target=gfx906'))
             cfg.write(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
                                         "{0}/include;{0}/../hsa/include".format(hip_root)))
+            hip_link_flags = "-Wl,--disable-new-dtags -L{0}/lib -L{0}/../lib64 -L{0}/../lib -Wl,-rpath,{0}/lib:{0}/../lib:{0}/../lib64 -lamdhip64 -lhsakmt -lhsa-runtime64".format(hip_root)
             if '%gcc' in spec:
                 gcc_bin = os.path.dirname(self.compiler.cxx)
                 gcc_prefix = join_path(gcc_bin, '..')
                 cfg.write(cmake_cache_entry("HIP_CLANG_FLAGS",
                 "--gcc-toolchain={0}".format(gcc_prefix))) 
                 cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS",
-                "-Wl,-rpath {}/lib64".format(gcc_prefix)))
+                hip_link_flags + " -Wl,-rpath {}/lib64".format(gcc_prefix)))
+            else:
+                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags)
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
