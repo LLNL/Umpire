@@ -360,7 +360,7 @@ class Umpire(CMakePackage, CudaPackage):
                 cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS",
                 hip_link_flags + " -Wl,-rpath {}/lib64".format(gcc_prefix)))
             else:
-                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags)
+                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
