@@ -54,6 +54,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Allocator::getStrategyName() to get name of the strategy used.
 
+- Added lifespan timing info for no-op benchmark.
+
 - Benchmark for measuring performance of the Device Allocator.
 
 ### Changed
@@ -123,6 +125,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed outdated HIP versions used in CI (pushed updated versions)
 
 - Fixed how the memory resoure is set for the pool benchmark
+
+- Fixed corona gitlab CI build + link errors
 
 ## [v5.0.1] - 2021-03-31
 
