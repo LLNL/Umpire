@@ -122,6 +122,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed how the memory resoure is set for the pool benchmark
 
+- Fixed CUDA dependencies in build system.
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
