@@ -23,7 +23,7 @@ namespace strategy {
  * \brief A faster pool that pulls from a series of pools
  *
  * Pool implementation using a series of FixedPools for small sizes,
- * and a DynamicPool for sizes larger than (1 << LastFixed) bytes.
+ * and a DynamicPoolMap for sizes larger than (1 << LastFixed) bytes.
  */
 class MixedPool : public AllocationStrategy {
  public:
