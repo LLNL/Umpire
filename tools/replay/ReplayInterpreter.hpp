@@ -33,14 +33,11 @@ class ReplayInterpreter {
     using AllocatorIndex = int;
     using AllocatorFromLog = uint64_t;
     using AllocationFromLog = uint64_t;
-    using AllocatorIndexMap = std::unordered_map<AllocatorFromLog,
-                                                  AllocatorIndex>;
-    using AllocationAllocatorMap = std::unordered_map<AllocationFromLog,
-                                                  AllocatorIndex>;
+    using AllocatorIndexMap = std::unordered_map<AllocatorFromLog, AllocatorIndex>;
+    using AllocationAllocatorMap = std::unordered_map<std::string, AllocatorIndex>;
 
     ReplayOptions m_options;
     std::ifstream m_input_file;
-    std::unordered_map<std::string, void*> m_allocated_ptrs;
     std::unordered_map<std::string, AllocatorIndex> m_allocator_index;
     std::string m_line;
     nlohmann::json m_json;
@@ -80,6 +77,7 @@ class ReplayInterpreter {
     std::size_t m_deallocate_ops{0};
     std::size_t m_deallocate_due_to_reallocate{0};
     std::size_t m_deallocate_rogue_ignored{0};
+    std::size_t m_deallocate_external_ignored{0};
 
     std::size_t m_coalesce_ops{0};
     std::size_t m_release_ops{0};
@@ -87,6 +85,8 @@ class ReplayInterpreter {
 
     template <typename T> void get_from_string( const std::string& s, T& val );
 
+    std::string get_json_str(const std::string& arg1, const std::string& arg2);
+    std::string get_json_str(const std::string& arg1);
     void strip_off_base(std::string& s);
     void replay_compileMemoryResource( void );
     void replay_compileSetDefaultAllocator( void );
@@ -102,7 +102,7 @@ class ReplayInterpreter {
     void replay_compileCopy( void );
     void replay_compileMove( void );
     void replay_compileMemset( void );
-    int getAllocatorIndex(std::string ref_s);
+    int getAllocatorIndex(const std::string& ref_s);
     uint64_t getPointer(std::string ptr_name);
     void printAllocators(ReplayFile* optable);
 };
