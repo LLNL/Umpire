@@ -495,10 +495,6 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
   strategy::AllocationStrategy* strategy;
 
-  UMPIRE_REPLAY(R"( "event": "reallocate", "payload": {)"
-                << R"( "ptr": ")" << current_ptr << R"(")"
-                << R"(, "size": )" << new_size << R"( } )");
-
   if (current_ptr != nullptr) {
     auto alloc_record = m_allocations.find(current_ptr);
     strategy = alloc_record->strategy;
@@ -506,11 +502,17 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
     strategy = getDefaultAllocator().getAllocationStrategy();
   }
 
+  UMPIRE_REPLAY(R"( "event": "reallocate", "payload": {)"
+                << R"( "ptr": ")" << current_ptr << R"(")"
+                << R"(, "size": )" << new_size << R"(, "allocator_ref": ")"
+                << strategy << R"(" } )");
+
   void* new_ptr{reallocate_impl(current_ptr, new_size, Allocator(strategy))};
 
   UMPIRE_REPLAY(R"( "event": "reallocate", "payload": {)"
                 << R"( "ptr": ")" << current_ptr << R"(")"
-                << R"(, "size": )" << new_size << R"( })"
+                << R"(, "size": )" << new_size << R"(, "allocator_ref": ")"
+                << strategy << R"(" } )"
                 << R"(, "result": { "memory_ptr": ")" << new_ptr << R"(" } )");
 
   return new_ptr;
