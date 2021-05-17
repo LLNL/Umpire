@@ -12,7 +12,6 @@
 #include <sstream>
 #include <string>
 
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"

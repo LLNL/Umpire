@@ -21,7 +21,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/util/io.hpp"
 
 namespace umpire {
