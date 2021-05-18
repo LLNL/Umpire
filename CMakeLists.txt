@@ -31,21 +31,16 @@ set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
 set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
-set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
-set(ENABLE_GMOCK On CACHE BOOL "")
-set(ENABLE_CLANGQUERY Off CACHE BOOL "")
 
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
 option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
-option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
-option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
 option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
 option(ENABLE_ASAN "Enable use with address sanitizer tools" Off)
 option(ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
@@ -141,6 +136,16 @@ cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
+                        "ENABLE_OPENMP" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
+                        "ENABLE_OPENMP_TARGET" Off )
+cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
+                        "ENABLE_GMOCK" Off )
+cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang-query" On
+                        "ENABLE_CLANGQUERY" Off )
+cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with code coverage (with GCC)" On
+                        "ENABLE_COVERAGE" Off )
 cmake_dependent_option(
   ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
   "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
