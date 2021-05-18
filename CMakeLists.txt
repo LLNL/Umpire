@@ -28,9 +28,6 @@ if (ENABLE_DEVELOPER_DEFAULTS)
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
-set(ENABLE_HIP Off CACHE BOOL "")
-set(ENABLE_SYCL Off CACHE BOOL "")
-set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
@@ -69,34 +66,12 @@ endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
-if (ENABLE_FORTRAN)
-  set(ENABLE_C On)
-endif()
-
-if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
-  message(FATAL_ERROR "\
-  Sphinx documentation requires Doxygen, \
-  please re-configure with ENABLE_DOXYGEN=ON")
-endif ()
-
-if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
-  message(FATAL_ERROR "\
-  NUMA support unavailable. \
-  Please re-configure with ENABLE_NUMA=Off (default value)")
-endif ()
-
 if (ENABLE_CUDA)
   if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
     endif ()
   endif ()
-endif()
-
-if (ENABLE_SYCL)
-   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
-   endif()
 endif()
 
 set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
@@ -136,19 +111,52 @@ cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
-cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
-                        "ENABLE_OPENMP" Off )
-cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
-                        "ENABLE_OPENMP_TARGET" Off )
+
+cmake_dependent_option( UMPIRE_ENABLE_FORTRAN "Build Umpire with FORTRAN" On
+                        "ENABLE_FORTRAN" Off )
+
 cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
                         "ENABLE_GMOCK" Off )
 cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang-query" On
                         "ENABLE_CLANGQUERY" Off )
 cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with code coverage (with GCC)" On
                         "ENABLE_COVERAGE" Off )
+
+cmake_dependent_option( UMPIRE_ENABLE_SYCL "Build Umpire with SYCL support" On
+                        "ENABLE_SYCL" Off )
+cmake_dependent_option( UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" On
+                        "ENABLE_NUMA" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
+                        "ENABLE_OPENMP" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
+                        "ENABLE_OPENMP_TARGET" Off )
+cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP support" On
+                        "ENABLE_HIP" Off )
 cmake_dependent_option(
   ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
   "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+
+if (ENABLE_FORTRAN)
+  set(ENABLE_C On)
+endif()
+
+if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
+  message(FATAL_ERROR "\
+  Sphinx documentation requires Doxygen, \
+  please re-configure with ENABLE_DOXYGEN=ON")
+endif ()
+
+if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+  message(FATAL_ERROR "\
+  NUMA support unavailable. \
+  Please re-configure with ENABLE_NUMA=Off (default value)")
+endif ()
+
+if (ENABLE_SYCL)
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
+   endif()
+endif()
 
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
