@@ -10,7 +10,6 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
 class TypedAllocatorTest : public ::testing::TestWithParam<std::string> {

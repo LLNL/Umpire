@@ -13,7 +13,6 @@
 #include "umpire/strategy/AlignedAllocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
@@ -158,7 +157,7 @@ using Strategies = ::testing::Types<
 #if defined(UMPIRE_ENABLE_CUDA)
     umpire::strategy::AllocationAdvisor,
 #endif
-    umpire::strategy::DynamicPool, umpire::strategy::DynamicPoolList,
+    umpire::strategy::DynamicPoolList,
     umpire::strategy::DynamicPoolMap, umpire::strategy::FixedPool,
     umpire::strategy::MixedPool, umpire::strategy::MonotonicAllocationStrategy,
     umpire::strategy::NamedAllocationStrategy, umpire::strategy::QuickPool,
@@ -363,7 +362,7 @@ TYPED_TEST(ReleaseTest, ReleaseCheck)
   ASSERT_NO_THROW(this->m_limiter_allocator->deallocate(this->test[0])); 
 }
 
-TEST(DynamicPool, LimitedResource)
+TEST(DynamicPoolMap, LimitedResource)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
@@ -372,7 +371,7 @@ TEST(DynamicPool, LimitedResource)
   auto limited_resource = rm.makeAllocator<umpire::strategy::SizeLimiter>(
       "limited_resource", rm.getAllocator("HOST"), max_mem);
 
-  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
       "host_dyn_pool", limited_resource, 0, 1024);
 
   ASSERT_EQ(allocator.getName(), "host_dyn_pool");

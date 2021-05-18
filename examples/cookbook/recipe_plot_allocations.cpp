@@ -9,14 +9,14 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator("HOST");
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
       "HOST_POOL", allocator, 1024 * 16);
 
   void* a[4];
