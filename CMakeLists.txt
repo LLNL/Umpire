@@ -27,7 +27,6 @@ if (ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_TOOLS On CACHE BOOL "")
 endif ()
 
-set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
@@ -41,39 +40,8 @@ option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
 option(ENABLE_ASAN "Enable use with address sanitizer tools" Off)
 option(ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
-if(WIN32 OR APPLE)
-  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
-endif()
-option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
-set(CMAKE_CUDA_STANDARD 11)
-
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-  message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
-  set( CMAKE_CXX_EXTENSIONS ON )
-endif()
-
-if (ENABLE_INACCESSIBILITY_TESTS)
-  set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
-endif()
-
-if (ENABLE_CUDA)
-  cmake_minimum_required(VERSION 3.9)
-else ()
-  cmake_minimum_required(VERSION 3.8.2)
-endif ()
-
-message(STATUS "Using CMake version ${CMAKE_VERSION}")
-
-if (ENABLE_CUDA)
-  if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
-      set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
-    endif ()
-  endif ()
-endif()
-
 set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
 
 ################################
@@ -103,6 +71,22 @@ endif()
 #######################################
 # Options that depend on BLT Options
 #######################################
+cmake_dependent_option( UMPIRE_ENABLE_CUDA "Build Umpire with CUDA support" On
+                        "ENABLE_CUDA" Off )
+cmake_dependent_option( UMPIRE_ENABLE_SYCL "Build Umpire with SYCL support" On
+                        "ENABLE_SYCL" Off )
+cmake_dependent_option( UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" On
+                        "ENABLE_NUMA" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
+                        "ENABLE_OPENMP" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
+                        "ENABLE_OPENMP_TARGET" Off )
+cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP support" On
+                        "ENABLE_HIP" Off )
+cmake_dependent_option(
+  ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
+  "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
@@ -122,19 +106,24 @@ cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang-query"
 cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with code coverage (with GCC)" On
                         "ENABLE_COVERAGE" Off )
 
-cmake_dependent_option( UMPIRE_ENABLE_SYCL "Build Umpire with SYCL support" On
-                        "ENABLE_SYCL" Off )
-cmake_dependent_option( UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" On
-                        "ENABLE_NUMA" Off )
-cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
-                        "ENABLE_OPENMP" Off )
-cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
-                        "ENABLE_OPENMP_TARGET" Off )
-cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP support" On
-                        "ENABLE_HIP" Off )
-cmake_dependent_option(
-  ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
-  "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+set(CMAKE_CUDA_STANDARD 11)
+
+if (ENABLE_CUDA)
+  cmake_minimum_required(VERSION 3.9)
+else ()
+  cmake_minimum_required(VERSION 3.8.2)
+endif ()
+
+message(STATUS "Using CMake version ${CMAKE_VERSION}")
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+  message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
+  set( CMAKE_CXX_EXTENSIONS ON )
+endif()
+
+if (ENABLE_INACCESSIBILITY_TESTS)
+  set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
+endif()
 
 if (ENABLE_FORTRAN)
   set(ENABLE_C On)
@@ -151,6 +140,19 @@ if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
   NUMA support unavailable. \
   Please re-configure with ENABLE_NUMA=Off (default value)")
 endif ()
+
+if(WIN32 OR APPLE)
+  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
+endif()
+option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
+
+if (ENABLE_CUDA)
+  if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
+      set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
+    endif ()
+  endif ()
+endif()
 
 if (ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
