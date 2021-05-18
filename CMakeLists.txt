@@ -34,6 +34,7 @@ set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
+set(ENABLE_CLANGQUERY Off CACHE BOOL "")
 
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
@@ -140,34 +141,6 @@ cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
-
-cmake_dependent_option( UMPIRE_ENABLE_SPHINX "Build Umpire with SPHINX" On
-                        "ENABLE_SPHINX" Off )
-cmake_dependent_option( UMPIRE_ENABLE_DOXYGEN "Build Umpire with DOXYGEN" On
-                        "ENABLE_DOXYGEN" Off )
-cmake_dependent_option( UMPIRE_ENABLE_GIT "Build Umpire with git" On
-                        "ENABLE_GIT" Off )
-
-cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with clang-query" On
-                        "ENABLE_CLANGQUERY" Off )
-cmake_dependent_option( UMPIRE_ENABLE_CLANGTIDY "Build Umpire with clang-tidy" On
-                        "ENABLE_CLANGTIDY" Off )
-cmake_dependent_option( UMPIRE_ENABLE_CPPCHECK "Build Umpire with CPPCHECK support" On
-                        "ENABLE_CPPCHECK" Off )
-cmake_dependent_option( UMPIRE_ENABLE_VALGRIND "Build Umpire with Valgrind support" On
-                        "ENABLE_VALGRIND" Off )
-
-cmake_dependent_option( UMPIRE_ENABLE_ASTYLE "Build Umpire with astyle support" On
-                        "ENABLE_ASTYLE" Off )
-cmake_dependent_option( UMPIRE_ENABLE_CLANGFORMAT "Build Umpire with Clang Format" On
-                        "ENABLE_CLANGFORMAT" Off )
-cmake_dependent_option( UMPIRE_ENABLE_UNCRUSTIFY "Build Umpire with UNCRUSTIFY" On
-                        "ENABLE_UNCRUSTIFY" Off )
-cmake_dependent_option( UMPIRE_ENABLE_CMAKEFORMAT "Build Umpire with Cmake Format" On
-                        "ENABLE_CMAKEFORMAT" Off )
-cmake_dependent_option( UMPIRE_ENABLE_YAPF "Build Umpire with YAPF support" On
-                        "ENABLE_YAPF" Off )
-
 cmake_dependent_option(
   ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
   "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
