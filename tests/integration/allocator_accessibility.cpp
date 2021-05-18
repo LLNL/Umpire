@@ -116,7 +116,7 @@ struct allocate_and_use<omp_target_platform>
 
 #pragma omp target is_device_ptr(d_data) device(dev)
 #pragma omp teams distribute parallel for schedule(static, 1)
-    for (auto i = 0; i < size; ++i) {
+    for (std::size_t i = 0; i < size; ++i) {
       d_data[i] = static_cast<size_t>(i);
     }
 
