@@ -77,8 +77,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
   made those options dependant on the corresponding BLT options.
 
-- Changed most uses of DynamicPoolMap to QuickPool instead since DynamicPoolMap
-  will be deprecated.
+- `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
+
+- Changed most uses of DynamicPoolMap to QuickPool.
   
 ### Removed
 

@@ -12,6 +12,7 @@
 namespace umpire {
 namespace strategy {
 
+UMPIRE_DEPRECATE_ALIAS("use QuickPool instead")
 using DynamicPool = DynamicPoolMap;
 
 } // end of namespace strategy

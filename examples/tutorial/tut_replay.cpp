@@ -10,6 +10,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/DynamicPool.hpp"
 
 int main(int, char**)
 {
