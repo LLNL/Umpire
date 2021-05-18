@@ -54,6 +54,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Allocator::getStrategyName() to get name of the strategy used.
 
+- Added lifespan timing info for no-op benchmark.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -74,14 +76,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Renamed'ENABLE_TESTS', 'ENABLE_EXAMPLES' and 'ENABLE_DOCS' to
   'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
   made those options dependant on the corresponding BLT options.
-  
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
 
 - Removed all internal tracking, allocations are only tracked at the Allocator level.
 
-- Removed the temporary fix for the HIP + fortran linker error (blt has been 
+- Removed the temporary fix for the HIP + fortran linker error (blt has been
   updated instead).
 
 - Doxygen from Sphinx to fix auto documentation generation bug.
@@ -110,8 +112,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added ENABLE_ASAN (default=Off) for guarding address sanitization check to
   address compilation problems on some configurations.
-  
-- Fixed ranges used in the vendor allocator benchmark when HIP is enabled given 
+
+- Fixed ranges used in the vendor allocator benchmark when HIP is enabled given
   that hipMalloc allocates on 4k aligned pages.
 
 - Fixed broken allocation test with DEVICE_CONST memory
@@ -123,6 +125,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed how the memory resoure is set for the pool benchmark
 
 - Fixed CUDA dependencies in build system.
+
+- Fixed corona gitlab CI build + link errors
+
+- Replay tool now handles rogue deallocate calls that may be present in
+  replay files.
 
 ## [v5.0.1] - 2021-03-31
 
@@ -176,7 +183,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Changed enumeration names from all upper case to all lower case in order to
   avoid name collisions.  (Note: this changes may be user visible so need to be
   release noted).
-  
+
 - Documentation of Uberenv is moved to a shared location (radiuss-ci), we
   keep only the examples locally.
 
@@ -211,7 +218,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   coalesce operations to not work properly.
 
 - Fixed struct object initialization within ReplayOperationManager
-  
+
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
