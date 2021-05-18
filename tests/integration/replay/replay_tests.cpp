@@ -15,7 +15,6 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
@@ -139,7 +138,7 @@ void testAllocation(std::string name)
 
   try {
     auto dynamic_pool =
-        umpire::util::unwrap_allocator<umpire::strategy::DynamicPool>(alloc);
+        umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(alloc);
 
     dynamic_pool->coalesce();
     alloc.release();
@@ -308,28 +307,7 @@ static void runTest()
     auto dpa1 = 16 * 1024; // min initial allocation size
     auto dpa2 = 1 * 1024;  // min allocation size
     auto dpa3 = 128;       // byte alignment
-    auto dpa4 = umpire::strategy::DynamicPool::percent_releasable(50);
-    name = basename + "_DynamicPool_spec_";
-    testAllocator<umpire::strategy::DynamicPool, true>(name + "0", base_alloc);
-    testAllocator<umpire::strategy::DynamicPool, true>(name + "1", base_alloc,
-                                                       dpa1);
-    testAllocator<umpire::strategy::DynamicPool, true>(name + "2", base_alloc,
-                                                       dpa1, dpa2);
-    testAllocator<umpire::strategy::DynamicPool, true>(name + "3", base_alloc,
-                                                       dpa1, dpa2, dpa3);
-    testAllocator<umpire::strategy::DynamicPool, true>(name + "4", base_alloc,
-                                                       dpa1, dpa2, dpa3, dpa4);
-    name = basename + "_DynamicPool_no_instrospection_spec_";
-    testAllocator<umpire::strategy::DynamicPool, false>(name + "0", base_alloc);
-    testAllocator<umpire::strategy::DynamicPool, false>(name + "1", base_alloc,
-                                                        dpa1);
-    testAllocator<umpire::strategy::DynamicPool, false>(name + "2", base_alloc,
-                                                        dpa1, dpa2);
-    testAllocator<umpire::strategy::DynamicPool, false>(name + "3", base_alloc,
-                                                        dpa1, dpa2, dpa3);
-    testAllocator<umpire::strategy::DynamicPool, false>(name + "4", base_alloc,
-                                                        dpa1, dpa2, dpa3, dpa4);
-
+    auto dpa4 = umpire::strategy::DynamicPoolMap::percent_releasable(50);
     name = basename + "_DynamicPoolMap_spec_";
     testAllocator<umpire::strategy::DynamicPoolMap, true>(name + "0",
                                                           base_alloc);
