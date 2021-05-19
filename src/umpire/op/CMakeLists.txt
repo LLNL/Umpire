@@ -22,7 +22,7 @@ set (umpire_op_sources
 
 set (umpire_op_depends camp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_op_headers
     ${umpire_op_headers}
     NumaMoveOperation.hpp)
@@ -36,7 +36,7 @@ if (ENABLE_NUMA)
     umpire_strategy)
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
     CudaAdviseAccessedByOperation.hpp
@@ -70,7 +70,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (umpire_op_headers
     ${umpire_op_headers}
     HipCopyOperation.hpp
@@ -90,7 +90,7 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
   set (umpire_op_headers
     ${umpire_op_headers}
     SyclCopyOperation.hpp
@@ -112,7 +112,7 @@ if (ENABLE_SYCL)
 
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   message(STATUS "Adding OpenMP Target operations")
   set (umpire_op_headers
     ${umpire_op_headers}

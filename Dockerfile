@@ -73,5 +73,5 @@ FROM axom/compilers:oneapi AS sycl
 ENV GTEST_COLOR=1
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
-RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && mkdir build && cd build && cmake -DCMAKE_CXX_COMPILER=dpcpp -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_SYCL=On .."
+RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && mkdir build && cd build && cmake -DCMAKE_CXX_COMPILER=dpcpp -DENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On .."
 RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && cd build && make -j 16"
