@@ -30,19 +30,21 @@ if (ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_TOOLS On CACHE BOOL "")
 endif ()
 
-set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
+set(UMPIRE_ENABLE_SYCL Off CACHE BOOL "")
+set(UMPIRE_ENABLE_NUMA Off CACHE BOOL "")
+set(UMPIRE_ENABLE_COPY_HEADERS Off CACHE BOOL "")
 
-option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
-option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
-option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
-option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
-option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
-option(ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
-option(ENABLE_TOOLS "Enable Umpire development tools" Off)
-option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
-option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
-option(ENABLE_ASAN "Enable use with address sanitizer tools" Off)
-option(ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
+option(UMPIRE_ENABLE_LOGGING "Build Umpire with Logging enabled" On)
+option(UMPIRE_ENABLE_SLIC "Build Umpire with SLIC logging" Off)
+option(UMPIRE_ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
+option(UMPIRE_ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
+option(UMPIRE_ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
+option(UMPIRE_ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
+option(UMPIRE_ENABLE_TOOLS "Enable Umpire development tools" Off)
+option(UMPIRE_ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
+option(UMPIRE_ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
+option(UMPIRE_ENABLE_ASAN "Enable use with address sanitizer tools" Off)
+option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
@@ -78,10 +80,6 @@ cmake_dependent_option( UMPIRE_ENABLE_CUDA "Build Umpire with CUDA support" On
                         "ENABLE_CUDA" Off )
 cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP support" On
                         "ENABLE_HIP" Off )
-cmake_dependent_option( UMPIRE_ENABLE_SYCL "Build Umpire with SYCL support" On
-                        "ENABLE_SYCL" Off )
-cmake_dependent_option( UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" On
-                        "ENABLE_NUMA" Off )
 cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
                         "ENABLE_OPENMP" Off )
 
@@ -109,9 +107,9 @@ cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
 
 if(WIN32 OR APPLE)
-  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
+  set(UMPIRE_ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
-option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
+option(UMPIRE_ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
 set(CMAKE_CUDA_STANDARD 11)
 
@@ -120,7 +118,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   set( CMAKE_CXX_EXTENSIONS ON )
 endif()
 
-if (ENABLE_INACCESSIBILITY_TESTS)
+if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
@@ -145,7 +143,7 @@ endif ()
 if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
-  Please re-configure with ENABLE_NUMA=Off (default value)")
+  Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
 if (UMPIRE_ENABLE_CUDA)
@@ -205,7 +203,7 @@ if (UMPIRE_ENABLE_EXAMPLES)
   add_subdirectory(examples)
 endif ()
 
-if (ENABLE_TOOLS)
+if (UMPIRE_ENABLE_TOOLS)
   add_subdirectory(tools)
 endif ()
 
