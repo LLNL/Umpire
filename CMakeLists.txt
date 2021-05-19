@@ -9,6 +9,9 @@ cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
+cmake_policy(SET CMP0003 NEW)
+cmake_policy(SET CMP0012 NEW)
+cmake_policy(SET CMP0011 NEW)
 
 include(CMakeDependentOption)
 
@@ -73,19 +76,28 @@ endif()
 #######################################
 cmake_dependent_option( UMPIRE_ENABLE_CUDA "Build Umpire with CUDA support" On
                         "ENABLE_CUDA" Off )
+cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP support" On
+                        "ENABLE_HIP" Off )
 cmake_dependent_option( UMPIRE_ENABLE_SYCL "Build Umpire with SYCL support" On
                         "ENABLE_SYCL" Off )
 cmake_dependent_option( UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" On
                         "ENABLE_NUMA" Off )
 cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP support" On
                         "ENABLE_OPENMP" Off )
+
+cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
+                        "ENABLE_GMOCK" Off )
+cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang-query" On
+                        "ENABLE_CLANGQUERY" Off )
+cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with code coverage (with GCC)" On
+                        "ENABLE_COVERAGE" Off )
+
 cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
                         "ENABLE_OPENMP_TARGET" Off )
-cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP support" On
-                        "ENABLE_HIP" Off )
-cmake_dependent_option(
-  ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
-  "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+cmake_dependent_option( ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
+                        "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+cmake_dependent_option( UMPIRE_ENABLE_FORTRAN "Build Umpire with FORTRAN" On
+                        "ENABLE_FORTRAN" Off )
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
@@ -96,25 +108,12 @@ cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
 cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
 
-cmake_dependent_option( UMPIRE_ENABLE_FORTRAN "Build Umpire with FORTRAN" On
-                        "ENABLE_FORTRAN" Off )
-
-cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
-                        "ENABLE_GMOCK" Off )
-cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang-query" On
-                        "ENABLE_CLANGQUERY" Off )
-cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with code coverage (with GCC)" On
-                        "ENABLE_COVERAGE" Off )
+if(WIN32 OR APPLE)
+  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
+endif()
+option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
 set(CMAKE_CUDA_STANDARD 11)
-
-if (ENABLE_CUDA)
-  cmake_minimum_required(VERSION 3.9)
-else ()
-  cmake_minimum_required(VERSION 3.8.2)
-endif ()
-
-message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
@@ -125,28 +124,31 @@ if (ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
-if (ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_CUDA)
+  cmake_minimum_required(VERSION 3.9)
+else ()
+  cmake_minimum_required(VERSION 3.8.2)
+endif ()
+
+message(STATUS "Using CMake version ${CMAKE_VERSION}")
+
+if (UMPIRE_ENABLE_FORTRAN)
   set(ENABLE_C On)
 endif()
 
-if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
+if (UMPIRE_ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
   message(FATAL_ERROR "\
   Sphinx documentation requires Doxygen, \
   please re-configure with ENABLE_DOXYGEN=ON")
 endif ()
 
-if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
   Please re-configure with ENABLE_NUMA=Off (default value)")
 endif ()
 
-if(WIN32 OR APPLE)
-  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
-endif()
-option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
-
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
@@ -154,7 +156,7 @@ if (ENABLE_CUDA)
   endif ()
 endif()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
