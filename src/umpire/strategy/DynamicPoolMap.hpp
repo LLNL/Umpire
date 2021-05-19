@@ -72,6 +72,7 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
 
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
+  std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
 
@@ -183,6 +184,7 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
   std::size_t m_actual_bytes{0};
   std::size_t m_current_bytes{0};
   bool m_is_destructing{false};
+  std::size_t m_actual_highwatermark{0};
 };
 
 } // end of namespace strategy
