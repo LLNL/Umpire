@@ -42,6 +42,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   // Total size allocated (bytes)
   std::size_t m_actual_bytes{0};
   std::size_t m_current_size{0};
+  std::size_t m_actual_highwatermark{0};
 
   // Minimum size of initial allocation
   std::size_t m_first_minimum_pool_allocation_size;
@@ -113,6 +114,8 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     }
 
     m_actual_bytes += size;
+    m_actual_highwatermark =
+      (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
     m_releasable_blocks++;
     m_total_blocks++;
 
@@ -382,6 +385,11 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
   std::size_t getCurrentSize() const
   {
     return m_current_size;
+  }
+
+  std::size_t getActualHighwaterMark() const noexcept
+  {
+    return m_actual_highwatermark;
   }
 
   std::size_t getBlocksInPool() const
