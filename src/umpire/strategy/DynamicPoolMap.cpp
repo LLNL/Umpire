@@ -185,6 +185,11 @@ std::size_t DynamicPoolMap::getCurrentSize() const noexcept
   return m_current_bytes;
 }
 
+std::size_t DynamicPoolMap::getActualHighwaterMark() const noexcept
+{
+  return m_actual_highwatermark;
+}
+
 std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
 {
   return m_free_map.size();
@@ -346,6 +351,8 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
   }
 
   m_actual_bytes += bytes;
+  m_actual_highwatermark =
+    (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
 
   return ptr;
 }

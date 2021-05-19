@@ -192,12 +192,16 @@ TYPED_TEST(PrimaryPoolTest, Sizes)
   void* data{nullptr};
   const std::size_t size{this->m_initial_pool_size - 1};
 
+  using Pool = typename TestFixture::Pool;
+  auto pool = umpire::util::unwrap_allocator<Pool>(*this->m_allocator);
+
   ASSERT_NO_THROW(data = this->m_allocator->allocate(size););
 
   ASSERT_EQ(this->m_allocator->getSize(data), size);
   ASSERT_GE(this->m_allocator->getCurrentSize(), size);
   ASSERT_EQ(this->m_allocator->getHighWatermark(), size);
   ASSERT_EQ(this->m_allocator->getActualSize(), this->m_initial_pool_size);
+  ASSERT_EQ(pool->getActualHighwaterMark(), this->m_initial_pool_size);
 
   void* data2{nullptr};
 
@@ -215,6 +219,8 @@ TYPED_TEST(PrimaryPoolTest, Sizes)
             this->m_initial_pool_size + this->m_min_pool_growth_size);
 
   ASSERT_EQ(this->m_allocator->getSize(data2), this->m_initial_pool_size);
+
+  ASSERT_EQ(pool->getActualHighwaterMark(), this->m_initial_pool_size*2);
 
   ASSERT_NO_THROW({ this->m_allocator->deallocate(data2); });
 }
