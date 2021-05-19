@@ -56,6 +56,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added lifespan timing info for no-op benchmark.
 
+- Added `getActualHighwatermark` to all pool strategies, returns the high water
+  value of `getActualSize`.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
