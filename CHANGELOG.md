@@ -129,6 +129,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed how the memory resoure is set for the pool benchmark
 
+- Fixed CUDA dependencies in build system.
+
 - Fixed corona gitlab CI build + link errors
 
 - Replay tool now handles rogue deallocate calls that may be present in
