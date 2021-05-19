@@ -9,13 +9,13 @@ find_program (BASH_PROGRAM bash)
 set (replay_integration_tests_depends
   umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (replay_integration_tests_depends
       ${replay_integration_tests_depends}
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (replay_integration_tests_depends
       ${replay_integration_tests_depends}
       openmp)
@@ -24,11 +24,11 @@ endif()
 set(raw_replay_file "output" )
 set(replay_config "")
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set(replay_config "${replay_config}numa_" )
 endif()
 
-if (ENABLE_CUDA OR ENABLE_HIP)
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(replay_config "${replay_config}devices_" )
 
   if (ENABLE_DEVICE_CONST)
@@ -36,7 +36,7 @@ if (ENABLE_CUDA OR ENABLE_HIP)
   endif ()
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(replay_config "${replay_config}omp_")
 endif ()
 

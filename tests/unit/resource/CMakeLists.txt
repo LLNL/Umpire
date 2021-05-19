@@ -6,7 +6,7 @@
 ##############################################################################
 set (resource_depends umpire gtest gmock)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (resource_depends ${resource_depends} hip_runtime)
 endif()
 
@@ -19,7 +19,7 @@ blt_add_test(
   NAME null_resource_tests
   COMMAND null_resource_tests)
 
-if(ENABLE_FILE_RESOURCE)
+if(UMPIRE_ENABLE_FILE_RESOURCE)
   blt_add_executable(
     NAME file_resource_tests
     SOURCES file_resource_tests.cpp
@@ -30,7 +30,7 @@ if(ENABLE_FILE_RESOURCE)
     COMMAND file_resource_tests)
 endif()
 
-if(ENABLE_HOST_SHARED_MEMORY)
+if(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   blt_add_executable(
     NAME shared_memory_resource_tests
     SOURCES shared_memory_resource_tests.cpp

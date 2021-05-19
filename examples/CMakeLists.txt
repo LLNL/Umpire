@@ -6,13 +6,13 @@
 ##############################################################################
 set (example_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (example_depends
       ${example_depends}
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (example_depends
       ${example_depends}
       openmp)
@@ -35,7 +35,7 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
@@ -67,7 +67,7 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples backtrace_example)
 
-if (ENABLE_C)
+if (UMPIRE_ENABLE_C)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c
@@ -93,7 +93,7 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples use_after_free)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME device_allocator_example
     SOURCES device-allocator.cpp

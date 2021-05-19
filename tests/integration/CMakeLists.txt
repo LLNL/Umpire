@@ -9,37 +9,37 @@ set (integration_tests_depends
 set (accessibility_test_depends
   umpire gtest)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (integration_tests_depends
     ${integration_tests_depends}
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (integration_tests_depends
     ${integration_tests_depends}
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (integration_tests_depends
     ${integration_tests_depends}
     openmp)
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     cuda)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     hip)
 endif ()
 
-if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     openmp)
@@ -166,7 +166,7 @@ blt_add_test(
   NAME primary_pool_tests
   COMMAND primary_pool_tests)
 
-if (ENABLE_PERFORMANCE_TESTS)
+if (UMPIRE_ENABLE_PERFORMANCE_TESTS)
   blt_add_executable(
     NAME primary_pool_performance_tests
     SOURCES primary_pool_performance_tests.cpp
@@ -199,7 +199,7 @@ if (ENABLE_TOOLS)
   add_subdirectory(replay)
 endif()
 
-if (ENABLE_C OR ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_C OR UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(interface)
 endif()
 
