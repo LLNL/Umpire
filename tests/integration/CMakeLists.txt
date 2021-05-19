@@ -195,7 +195,7 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
-if (ENABLE_TOOLS)
+if (UMPIRE_ENABLE_TOOLS)
   add_subdirectory(replay)
 endif()
 
