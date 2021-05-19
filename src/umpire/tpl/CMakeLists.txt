@@ -13,10 +13,10 @@
 # Please also see the LICENSE file for MIT license.
 ##############################################################################
 
-set(OLD_ENABLE_TESTS ${ENABLE_TESTS})
-set(OLD_ENABLE_FORTRAN ${ENABLE_FORTRAN})
-set(ENABLE_TESTS Off)
-set(ENABLE_FORTRAN Off)
+set(OLD_ENABLE_TESTS ${UMPIRE_ENABLE_TESTS})
+set(OLD_ENABLE_FORTRAN ${UMPIRE_ENABLE_FORTRAN})
+set(UMPIRE_ENABLE_TESTS Off)
+set(UMPIRE_ENABLE_FORTRAN Off)
 
 #
 # Json
@@ -85,7 +85,7 @@ if (NOT TARGET camp)
     add_subdirectory(camp)
   endif()
 
-  if(ENABLE_CUDA)
+  if(UMPIRE_ENABLE_CUDA)
     blt_add_target_definitions(
       TO camp
       SCOPE INTERFACE
@@ -94,5 +94,5 @@ if (NOT TARGET camp)
 
 endif ()
 
-set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
-set(ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
+set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
+set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})
