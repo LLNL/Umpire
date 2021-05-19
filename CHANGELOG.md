@@ -77,10 +77,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
   made those options dependant on the corresponding BLT options.
 
+- Use CMake 3.18.0 in CI
+
 - `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
 
 - Changed most uses of DynamicPoolMap to QuickPool.
-  
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
@@ -91,6 +93,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   updated instead).
 
 - Doxygen from Sphinx to fix auto documentation generation bug.
+
+- DynamicPool and DynamicPoolMap removed from replay tests since they share the
+  same signature as QuickPool.
 
 ### Fixed
 
@@ -127,6 +132,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed outdated HIP versions used in CI (pushed updated versions)
 
 - Fixed how the memory resoure is set for the pool benchmark
+
+- Fixed CUDA dependencies in build system.
 
 - Fixed corona gitlab CI build + link errors
 
