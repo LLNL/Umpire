@@ -28,7 +28,7 @@ clang_10_0_1_mpi_shmem:
 
 gcc_8_3_1:
   variables:
-    SPEC: "+fortran%gcc@8.3.1 ^cmake@3.14.5"
+    SPEC: "+fortran%gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
 pgi_19_10:
@@ -97,7 +97,7 @@ xl_16_1_1_7_cuda:
 
 xl_16_1_1_7_gcc_8_3_1_cuda_11:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.7 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2 ^cmake@3.14.5"
+    SPEC: "+fortran+cuda %xl@16.1.1.7 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
   allow_failure: true
   extends: .build_and_test_on_lassen
 
@@ -122,7 +122,7 @@ clang_9_0_0_datarace (build and test on lassen):
 
 gcc_8_3_1_dev_benchmarks:
   variables:
-    SPEC: "+dev_benchmarks %gcc@8.3.1 build_type=Release ^cmake@3.14.5"
+    SPEC: "+dev_benchmarks %gcc@8.3.1 build_type=Release"
   extends: .build_and_test_on_lassen
 
 xl_default_omp_target (build and test on lassen):
