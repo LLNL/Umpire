@@ -288,17 +288,17 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write("# Developer Benchmarks\n")
             cfg.write("#------------------{0}\n\n".format("-" * 60))
             
-            cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", True))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVELOPER_BENCHMARKS", True))
             cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", True)) #Enable BLT GoogleBenchmark support
         else:
-            cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", False))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVELOPER_BENCHMARKS", False))
             cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", False))
 
 
         if "+posix_shmem" in spec:
-            cfg.write(cmake_cache_option("ENABLE_HOST_SHARED_MEMORY", True))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_HOST_SHARED_MEMORY", True))
         else:
-            cfg.write(cmake_cache_option("ENABLE_HOST_SHARED_MEMORY", False))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_HOST_SHARED_MEMORY", False))
 
 
         if "+cuda" in spec:
@@ -322,7 +322,7 @@ class Umpire(CMakePackage, CudaPackage):
                 cuda_flags.append('-arch sm_{0}'.format(cuda_arch[0]))
 
             if '+deviceconst' in spec:
-                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+                cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVICE_CONST", True))
 
             if using_toolchain:
                 cuda_flags.append("-Xcompiler {}".format(using_toolchain[0]))
@@ -363,12 +363,12 @@ class Umpire(CMakePackage, CudaPackage):
                 cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
             if '+deviceconst' in spec:
-                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+                cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVICE_CONST", True))
 
         else:
             cfg.write(cmake_cache_option("ENABLE_HIP", False))
 
-        cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_C", '+c' in spec))
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
 
         if "+mpi" in spec:
@@ -378,16 +378,16 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         cfg.write(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         if "+openmp_target" in spec:
-            cfg.write(cmake_cache_option("ENABLE_OPENMP_TARGET", True))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_OPENMP_TARGET", True))
             if ('%xl' in spec):
                 cfg.write(cmake_cache_entry("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
 
         cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
-        cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_TOOLS", '+tools' in spec))
         cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
-        cfg.write(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
-        cfg.write(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_ASAN", '+asan' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
 
         #######################
         # Close and save
