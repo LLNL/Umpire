@@ -33,7 +33,7 @@ else ()
 endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-  set (ENABLE_WARNINGS_AS_ERRORS false)
+  set (ENABLE_WARNINGS_AS_ERRORS OFF)
 endif()
 
 if (ENABLE_HIP)
