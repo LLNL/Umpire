@@ -10,6 +10,10 @@ allocate in an array of :class:`umpire::strategy::FixedPool` for small
 allocations, because these have simpler bookkeeping and are very fast,
 and a :class:`umpire::strategy::DynamicPoolMap` for larger allocations.
 
+.. note::
+   The `DynamicPoolMap` strategy has been deprecated. The `MixedPool`
+   strategy is still supported, but using `QuickPool` is encouraged.
+
 The class :class:`umpire::strategy::MixedPool` uses a generic choice
 of :class:`umpire::strategy::FixedPool` of size 256 bytes to 4MB in
 increments of powers of 2, while
