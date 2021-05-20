@@ -21,14 +21,16 @@ project(Umpire
 
 set(UMPIRE_VERSION_RC "")
 
-option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
-option(ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
-mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS ENABLE_DEVELOPER_BENCHMARKS)
+option(UMPIRE_ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
+option(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
+mark_as_advanced(UMPIRE_ENABLE_DEVELOPER_DEFAULTS UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
 
-if (ENABLE_DEVELOPER_DEFAULTS)
+if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
-  set(ENABLE_TOOLS On CACHE BOOL "")
+  set(UMPIRE_ENABLE_TOOLS On CACHE BOOL "")
 endif ()
+
+set(ENABLE_GMOCK On CACHE BOOL "")
 
 option(UMPIRE_ENABLE_SYCL "Build Umpire with SYCL enabled" Off)
 option(UMPIRE_ENABLE_NUMA "Build Umpire with NUMA enabled" Off)
@@ -130,7 +132,7 @@ endif ()
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
 if (UMPIRE_ENABLE_FORTRAN)
-  set(ENABLE_C On)
+  set(UMPIRE_ENABLE_C On)
 endif()
 
 if (UMPIRE_ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
@@ -186,7 +188,7 @@ if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 
-if (ENABLE_DEVELOPER_BENCHMARKS)
+if (UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   add_subdirectory(benchmarks)
   if ((NOT CMAKE_BUILD_TYPE) OR (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
     message("-- Warning: CMAKE_BUILD_TYPE not set to Release, benchmark information will not be reliable for this build!")
@@ -194,7 +196,7 @@ if (ENABLE_DEVELOPER_BENCHMARKS)
 else()
   if (UMPIRE_ENABLE_BENCHMARKS)
     message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
-          "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
+          "     set UMPIRE_ENABLE_DEVELOPER_BENCHMARKS to On.")
   endif()
 endif ()
 
