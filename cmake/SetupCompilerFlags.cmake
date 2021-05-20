@@ -32,10 +32,6 @@ else ()
   message(STATUS "std::filesystem NOT found, using POSIX")
 endif ()
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-  set (ENABLE_WARNINGS_AS_ERRORS OFF)
-endif()
-
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 endif()
