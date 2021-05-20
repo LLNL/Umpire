@@ -82,6 +82,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Use CMake 3.18.0 in CI
 
+- Replay testing disabled during HIP builds with `ENABLE_TOOLS`=On
+
 - Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
   on the corresponding BLT options.  
 
