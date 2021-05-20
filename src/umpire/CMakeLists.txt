@@ -150,10 +150,6 @@ else ()
   set(UMPIRE_ENABLE_UM Off)
 endif()
 
-if (ENABLE_ASAN)
-  set(UMPIRE_ENABLE_ASAN On)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(UMPIRE_ENABLE_DEVICE On)
 endif ()

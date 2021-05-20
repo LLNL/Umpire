@@ -40,7 +40,7 @@ blt_add_executable(
   DEPENDS_ON ${tools_depends})
 list(APPEND replay_tools replaydiff)
 
-if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND ENABLE_BACKTRACE_SYMBOLS)
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   blt_add_target_link_flags(
     TO replay
     FLAGS "-rdynamic")

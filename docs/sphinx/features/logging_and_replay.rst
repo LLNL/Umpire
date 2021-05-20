@@ -8,7 +8,7 @@ Logging
 -------
 When debugging memory operation problems, it is sometimes helpful to enable
 Umpire's logging facility.  The logging functionality is enabled for default
-builds unless -DENABLE_LOGGING='Off' has been specified in which case it is
+builds unless -DUMPIRE_ENABLE_LOGGING='Off' has been specified in which case it is
 disabled.
 
 If Umpire logging is enabled, it may be controlled by setting the

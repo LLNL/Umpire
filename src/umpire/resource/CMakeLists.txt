@@ -90,7 +90,7 @@ if (UMPIRE_ENABLE_CUDA)
     CudaPinnedMemoryResourceFactory.cpp
     CudaUnifiedMemoryResourceFactory.cpp)
 
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers
       ${umpire_resource_headers}
       CudaConstantMemoryResource.hpp
@@ -126,7 +126,7 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_resource_depends}
     hip_runtime)
 
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers
       ${umpire_resource_headers}
       HipConstantMemoryResourceFactory.hpp
