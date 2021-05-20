@@ -32,6 +32,7 @@ endif ()
 
 set(UMPIRE_ENABLE_SYCL Off CACHE BOOL "")
 set(UMPIRE_ENABLE_NUMA Off CACHE BOOL "")
+set(ENABLE_GMOCK On CACHE BOOL "")
 
 option(UMPIRE_ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(UMPIRE_ENABLE_SLIC "Build Umpire with SLIC logging" Off)
