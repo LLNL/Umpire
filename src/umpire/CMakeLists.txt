@@ -21,7 +21,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (ENABLE_FORTRAN OR ENABLE_C)
+if (UMPIRE_ENABLE_FORTRAN OR UMPIRE_ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
 
@@ -31,14 +31,14 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     interface/c_fortran/wrapUmpire.h
     interface/c_fortran/typesUmpire.h)
 
-  if (ENABLE_C)
+  if (UMPIRE_ENABLE_C)
     set (umpire_interface_sources
       interface/c_fortran/utilUmpire.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp)
 
-    if (ENABLE_FORTRAN)
+    if (UMPIRE_ENABLE_FORTRAN)
       set (umpire_interface_sources
         ${umpire_interface_sources}
         interface/c_fortran/wrapfumpire.f)
@@ -85,7 +85,7 @@ set (umpire_depends
   umpire_util
   umpire_tpl_judy)
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_depends
     ${umpire_depends}
     openmp)
@@ -119,7 +119,7 @@ if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   )
 endif()
 
-if (ENABLE_HOST_SHARED_MEMORY)
+if (UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   message(STATUS "Host Shared Memory Enabled")
   target_link_libraries(
     umpire INTERFACE $<BUILD_INTERFACE:-lrt>
@@ -136,7 +136,7 @@ if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
   set(UMPIRE_ENABLE_UM On)
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set(UMPIRE_ENABLE_CONST On)
   endif()
 elseif (UMPIRE_ENABLE_SYCL)
@@ -154,7 +154,7 @@ if (ENABLE_ASAN)
   set(UMPIRE_ENABLE_ASAN On)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(UMPIRE_ENABLE_DEVICE On)
 endif ()
 

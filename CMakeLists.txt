@@ -30,10 +30,9 @@ if (ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_TOOLS On CACHE BOOL "")
 endif ()
 
-set(UMPIRE_ENABLE_SYCL Off CACHE BOOL "")
-set(UMPIRE_ENABLE_NUMA Off CACHE BOOL "")
-set(ENABLE_GMOCK On CACHE BOOL "")
-
+option(UMPIRE_ENABLE_SYCL "Build Umpire with SYCL enabled" Off)
+option(UMPIRE_ENABLE_NUMA "Build Umpire with NUMA enabled" Off)
+option(UMPIRE_ENABLE_GMOCK "Build Umpire with GMOCK support" On)
 option(UMPIRE_ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(UMPIRE_ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(UMPIRE_ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
