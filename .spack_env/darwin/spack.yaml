@@ -5,8 +5,8 @@ spack:
   include:
   - ../../scripts/radiuss-spack-configs/darwin/compilers.yaml
   - ../../scripts/radiuss-spack-configs/darwin/packages.yaml
-  repos: [.spack_packages/]
-  specs: [umpire@develop, umpire@develop%gcc@10.2.0]
+  repos: [../../.spack_packages/]
+  specs: [umpire@develop]
   view: false
   packages:
     camp:
@@ -25,3 +25,30 @@ spack:
     umpire:
       path: ../../
       spec: umpire@develop
+  compilers:
+  - compiler:
+      spec: apple-clang@12.0.0
+      paths:
+        cc: /usr/bin/clang
+        cxx: /usr/bin/clang++
+        f77: /usr/local/bin/gfortran
+        fc: /usr/local/bin/gfortran
+      flags: {}
+      operating_system: catalina
+      target: x86_64
+      modules: []
+      environment: {unset: []}
+      extra_rpaths: []
+  - compiler:
+      spec: gcc@10.2.0
+      paths:
+        cc: /usr/local/bin/gcc-10
+        cxx: /usr/local/bin/g++-10
+        f77: /usr/local/bin/gfortran-10
+        fc: /usr/local/bin/gfortran-10
+      flags: {}
+      operating_system: catalina
+      target: x86_64
+      modules: []
+      environment: {}
+      extra_rpaths: []
