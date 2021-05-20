@@ -36,13 +36,13 @@ icpc_19_1_0:
 
 pgi_19_7:
   variables:
-    SPEC: "+fortran %pgi@19.7 cxxflags=-I/usr/tce/packages/gcc/gcc-4.9.3/include/c++/4.9.3"
+    SPEC: "+fortran %pgi@19.7 cxxflags='-I/usr/tce/packages/gcc/gcc-4.9.3/include/c++/4.9.3 -Minform=severe'"
     PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
   extends: .build_and_test_on_ruby
 
 pgi_20_1:
   variables:
-    SPEC: "+fortran %pgi@20.1"
+    SPEC: "+fortran %pgi@20.1 cxxflags=-Minform=severe"
     PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
   extends: .build_and_test_on_ruby
 
