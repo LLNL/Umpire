@@ -32,6 +32,10 @@ else ()
   message(STATUS "std::filesystem NOT found, using POSIX")
 endif ()
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+  set (ENABLE_WARNINGS_AS_ERRORS false)
+endif()
+
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 endif()
@@ -59,7 +63,6 @@ if (ENABLE_WARNINGS_AS_ERRORS OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     FLAGS_VAR UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG
     DEFAULT  "-Wno-deprecated-declarations"
     INTEL "-diag-disable=1786"
-    PGI "-diag-disable=1786"
     MSVC "/wd4996")
 
     set (CMAKE_CXX_FLAGS "${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG} ${CMAKE_CXX_FLAGS}")
