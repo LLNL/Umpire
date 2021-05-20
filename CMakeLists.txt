@@ -12,6 +12,7 @@ cmake_policy(SET CMP0054 NEW)
 cmake_policy(SET CMP0003 NEW)
 cmake_policy(SET CMP0012 NEW)
 cmake_policy(SET CMP0011 NEW)
+cmake_policy(SET CMP0022 NEW)
 
 include(CMakeDependentOption)
 
@@ -93,7 +94,7 @@ cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with code coverage 
 
 cmake_dependent_option( UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OpenMP target support" On
                         "ENABLE_OPENMP_TARGET" Off )
-cmake_dependent_option( ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
+cmake_dependent_option( UMPIRE_ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
                         "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_FORTRAN "Build Umpire with FORTRAN" On
                         "ENABLE_FORTRAN" Off )
