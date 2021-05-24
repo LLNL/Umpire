@@ -37,7 +37,7 @@ sections.
 
 We also have a tutorial for the C interface to Umpire. Complete example
 listings are available, and will be compiled if you have configured Umpire with
-``-DENABLE_C=On``. 
+``-DUMPIRE_ENABLE_C=On``. 
 
 The C tutorial assumes an understanding of C, and it would be useful to have
 some knowledge of C++ to understand how the C API maps to the native C++
@@ -52,7 +52,7 @@ classes that Umpire provides.
    tutorial/c/pools.rst
 
 Finally, we have a tutorial for Umpire's FORTRAN API. These examples will be
-compiled when configuring with ``-DENABLE_FORTRAN=On``. The FORTRAN tutorial
+compiled when configuring with ``-DUMPIRE_ENABLE_FORTRAN=On``. The FORTRAN tutorial
 assumes an understanding of FORTRAN. Familiarity with the FORTRAN's ISO C
 bindings can be useful for understanding why the interface looks the way it
 does.
