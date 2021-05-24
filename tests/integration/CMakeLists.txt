@@ -195,9 +195,11 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
-if (UMPIRE_ENABLE_TOOLS)
+if (UMPIRE_ENABLE_TOOLS AND NOT UMPIRE_ENABLE_HIP)
   add_subdirectory(replay)
-endif()
+else ()
+  message(STATUS "Disabling replay tests for HIP build.")
+endif ()
 
 if (UMPIRE_ENABLE_C OR UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(interface)
