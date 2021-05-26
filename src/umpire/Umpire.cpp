@@ -143,7 +143,7 @@ std::size_t get_process_memory_usage()
 #endif
 }
 
-void mark_event(const std::string event)
+void mark_event(const std::string& event)
 {
   UMPIRE_REPLAY(R"( "event": "mark", "payload": { "event": ")" << event << R"(" })");
 }

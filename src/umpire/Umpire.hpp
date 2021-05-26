@@ -153,7 +153,7 @@ std::size_t get_process_memory_usage();
 /*!
  * \brief Mark an application-specific event string within Umpire life cycle.
  */
-void mark_event(const std::string event);
+void mark_event(const std::string& event);
 
 /*!
  * \brief Get memory usage of device device_id, using appropriate underlying
