@@ -16,7 +16,7 @@ set (umpire_resource_headers
   NullMemoryResourceFactory.hpp
 )
 
-if(ENABLE_DEVELOPER_BENCHMARKS)
+if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     NoOpMemoryResource.hpp
@@ -24,7 +24,7 @@ if(ENABLE_DEVELOPER_BENCHMARKS)
   )
 endif()
 
-if(ENABLE_FILE_RESOURCE)
+if(UMPIRE_ENABLE_FILE_RESOURCE)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     FileMemoryResource.hpp
@@ -40,7 +40,7 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
-if(ENABLE_DEVELOPER_BENCHMARKS)
+if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_sources
     ${umpire_resource_sources}
     NoOpMemoryResource.cpp
@@ -48,7 +48,7 @@ if(ENABLE_DEVELOPER_BENCHMARKS)
   )
 endif()
 
-if(ENABLE_FILE_RESOURCE)
+if(UMPIRE_ENABLE_FILE_RESOURCE)
   set (umpire_resource_sources
     ${umpire_resource_sources}
     FileMemoryResource.cpp

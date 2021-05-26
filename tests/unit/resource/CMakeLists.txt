@@ -19,7 +19,7 @@ blt_add_test(
   NAME null_resource_tests
   COMMAND null_resource_tests)
 
-if(ENABLE_FILE_RESOURCE)
+if(UMPIRE_ENABLE_FILE_RESOURCE)
   blt_add_executable(
     NAME file_resource_tests
     SOURCES file_resource_tests.cpp

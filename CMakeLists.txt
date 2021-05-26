@@ -30,10 +30,7 @@ if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
-set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
-set(ENABLE_CLANGQUERY Off CACHE BOOL "")
-option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 
 include(cmake/SetupUmpireOptions.cmake)
 
@@ -125,6 +122,10 @@ cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
                         "ENABLE_DOCS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang query" On
+                        "ENABLE_CLANGQUERY" Off )
+cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with Coverage support (with GCC)" On
+                        "ENABLE_COVERAGE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 

@@ -288,10 +288,10 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write("# Developer Benchmarks\n")
             cfg.write("#------------------{0}\n\n".format("-" * 60))
             
-            cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", True))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVELOPER_BENCHMARKS", True))
             cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", True)) #Enable BLT GoogleBenchmark support
         else:
-            cfg.write(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", False))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVELOPER_BENCHMARKS", False))
             cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", False))
 
 
