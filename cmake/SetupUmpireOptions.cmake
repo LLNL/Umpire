@@ -4,6 +4,11 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+if(WIN32 OR APPLE)
+  set(UMPIRE_ENABLE_FILE_RESOURCE Off CACHE BOOL "")
+endif()
+option(UMPIRE_ENABLE_FILE_RESOURCE "Enable File Resource" On)
+
 option(UMPIRE_ENABLE_SYCL "Build Umpire with SYCL" Off)
 option(UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" Off)
 option(UMPIRE_ENABLE_OPENMP_TARGET "Build Umpire with OPENMP target" Off)
