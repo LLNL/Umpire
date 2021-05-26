@@ -208,17 +208,25 @@ void* find_pointer_from_name(Allocator allocator, const std::string name)
 
 #if defined(UMPIRE_ENABLE_MPI)
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
-  auto scope = a.getAllocationStrategy()->getTraits().scope;
-  MPI_Comm c;
+  static std::map<int, MPI_Comm> cached_communicators{};
 
-  if (scope == MemoryResourceTraits::shared_scope::node) {
-    MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
-  } else {
-    c = MPI_COMM_WORLD;
+  MPI_Comm c;
+  auto scope = a.getAllocationStrategy()->getTraits().scope;
+  int id = a.getId();
+
+  auto cached_comm = cached_communicators.find(id);
+  if (cached_comm != cached_communicators.end()) { 
+    c = cached_comm->second;
+  } else { 
+    if (scope == MemoryResourceTraits::shared_scope::node) {
+      MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
+    } else {
+      c = MPI_COMM_NULL;
+    }
+    cached_communicators[id] = c;
   }
 
   return c;
-
 }
 #endif
 
