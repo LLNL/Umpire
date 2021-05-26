@@ -84,6 +84,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Replay testing disabled during HIP builds with `ENABLE_TOOLS`=On
 
+- Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
+  on the corresponding BLT options. 
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
