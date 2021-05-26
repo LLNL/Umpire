@@ -59,6 +59,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added `getActualHighwatermark` to all pool strategies, returns the high water
   value of `getActualSize`.
 
+- `umpire::mark_event()` to mark an event during Umpire lifecycle
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
