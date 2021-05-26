@@ -6,7 +6,7 @@
 ##############################################################################
 set (tutorial_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (tutorial_depends
       ${tutorial_depends}
       hip_runtime)

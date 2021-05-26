@@ -107,7 +107,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     HipDeviceMemoryResource.hpp

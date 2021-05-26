@@ -22,7 +22,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (allocation_map_tests_depends
     ${allocation_map_tests_depends}
     hip_runtime)

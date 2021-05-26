@@ -14,7 +14,7 @@ if (ENABLE_C)
       cuda_runtime)
   endif ()
 
-  if (ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP)
     set (interface_tests_depends
       ${interface_tests_depends}
       hip_runtime)

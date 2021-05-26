@@ -12,7 +12,7 @@ if (ENABLE_CUDA)
     ${memory_allocator_tests_depends}
     cuda_runtime)
 endif ()
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (memory_allocator_tests_depends
     ${memory_allocator_tests_depends}
     hip_runtime)

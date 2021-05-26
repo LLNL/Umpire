@@ -28,7 +28,6 @@ if (ENABLE_DEVELOPER_DEFAULTS)
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
-set(ENABLE_HIP Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
@@ -122,6 +121,8 @@ endif()
 #######################################
 # Options that depend on BLT Options
 #######################################
+cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP" On
+                       "ENABLE_HIP" Off )
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On

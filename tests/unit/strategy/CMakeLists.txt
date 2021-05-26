@@ -7,7 +7,7 @@
 set (strategy_tests_depends
   umpire gtest)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (strategy_tests_depends ${strategy_tests_depends} hip_runtime)
 endif()
 

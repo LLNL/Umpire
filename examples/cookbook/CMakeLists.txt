@@ -6,7 +6,7 @@
 ##############################################################################
 set (cookbook_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (cookbook_depends ${cookbook_depends} hip_runtime)
 endif()
 
@@ -103,7 +103,7 @@ if (ENABLE_CUDA)
   endif()
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp

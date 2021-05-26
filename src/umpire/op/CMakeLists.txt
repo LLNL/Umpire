@@ -70,7 +70,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (umpire_op_headers
     ${umpire_op_headers}
     HipCopyOperation.hpp

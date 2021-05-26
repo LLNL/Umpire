@@ -14,7 +14,7 @@ if (ENABLE_CUDA)
   set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_CUDA)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_HIP)
 endif ()
 
@@ -27,7 +27,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (fortran_tests_depends
     ${fortran_tests_depends}
     hip_runtime)

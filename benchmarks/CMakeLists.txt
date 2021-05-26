@@ -6,7 +6,7 @@
 ##############################################################################
 set (stress_test_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (stress_test_depends
       ${stress_test_depends}
       hip_runtime)
@@ -50,7 +50,7 @@ blt_add_executable(
 if (ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)
 
-  if (ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP)
     set (benchmark_depends
       ${benchmark_depends}
       hip_runtime)

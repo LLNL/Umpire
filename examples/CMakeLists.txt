@@ -6,7 +6,7 @@
 ##############################################################################
 set (example_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (example_depends
       ${example_depends}
       hip_runtime)
@@ -35,7 +35,7 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples malloc)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp

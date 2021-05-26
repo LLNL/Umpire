@@ -6,7 +6,7 @@
 ##############################################################################
 set (test_applications_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (test_applications_depends
       ${test_applications_depends}
       hip_runtime)

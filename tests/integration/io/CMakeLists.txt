@@ -43,7 +43,7 @@ endif ()
 
 set (log_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (log_depends
     ${log_depends}
     hip_runtime)

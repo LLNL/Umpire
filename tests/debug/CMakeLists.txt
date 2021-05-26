@@ -8,7 +8,7 @@
 #Intend to add more debug helper tests like this, so setting a variable specifically
 set (test_debug_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (test_debug_depends
       ${test_debug_depends}
       hip_runtime)

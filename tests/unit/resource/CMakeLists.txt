@@ -6,7 +6,7 @@
 ##############################################################################
 set (resource_depends umpire gtest gmock)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (resource_depends ${resource_depends} hip_runtime)
 endif()
 

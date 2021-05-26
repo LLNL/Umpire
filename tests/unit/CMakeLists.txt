@@ -6,7 +6,7 @@
 ##############################################################################
 set (unit_depends umpire gtest)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (unit_depends ${unit_depends} hip_runtime)
 endif()
 
