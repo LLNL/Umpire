@@ -102,16 +102,16 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
   }
 }
 
-bool is_accessible(Platform p, Allocator a) 
+bool is_accessible(Platform p, Allocator a)
 {
-  //get base (parent) resource 
+  //get base (parent) resource
   umpire::strategy::AllocationStrategy* root = a.getAllocationStrategy();
   while ((root->getParent() != nullptr)) {
     root = root->getParent();
   }
 
   //unwrap the base MemoryResource and return whether or not it's accessible
-  umpire::resource::MemoryResource* resource = 
+  umpire::resource::MemoryResource* resource =
               util::unwrap_allocation_strategy<umpire::resource::MemoryResource>(root);
   return resource->isAccessibleFrom(p);
 }
@@ -141,6 +141,11 @@ std::size_t get_process_memory_usage()
   long page_size{::sysconf(_SC_PAGE_SIZE)};
   return std::size_t{resident * page_size};
 #endif
+}
+
+void mark_event(const std::string event)
+{
+  UMPIRE_REPLAY(R"( "event": "mark", "payload": { "event": ")" << event << R"(" })");
 }
 
 std::size_t get_device_memory_usage(int device_id)
