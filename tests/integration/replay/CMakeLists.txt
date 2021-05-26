@@ -31,7 +31,7 @@ endif()
 if (ENABLE_CUDA OR ENABLE_HIP)
   set(replay_config "${replay_config}devices_" )
 
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set(replay_config "${replay_config}const_")
   endif ()
 endif ()

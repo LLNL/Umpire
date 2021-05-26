@@ -322,7 +322,7 @@ class Umpire(CMakePackage, CudaPackage):
                 cuda_flags.append('-arch sm_{0}'.format(cuda_arch[0]))
 
             if '+deviceconst' in spec:
-                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+                cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVICE_CONST", True))
 
             if using_toolchain:
                 cuda_flags.append("-Xcompiler {}".format(using_toolchain[0]))
@@ -363,7 +363,7 @@ class Umpire(CMakePackage, CudaPackage):
                 cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
             if '+deviceconst' in spec:
-                cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
+                cfg.write(cmake_cache_option("UMPIRE_ENABLE_DEVICE_CONST", True))
 
         else:
             cfg.write(cmake_cache_option("ENABLE_HIP", False))
@@ -384,7 +384,7 @@ class Umpire(CMakePackage, CudaPackage):
 
         cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec))
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
-        cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_TOOLS", '+tools' in spec))
         cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
         cfg.write(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
         cfg.write(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))

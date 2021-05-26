@@ -195,7 +195,7 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
-if (ENABLE_TOOLS AND NOT ENABLE_HIP)
+if (UMPIRE_ENABLE_TOOLS AND NOT ENABLE_HIP)
   add_subdirectory(replay)
 else ()
   message(STATUS "Disabling replay tests for HIP build.")
