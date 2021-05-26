@@ -386,8 +386,8 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
         cfg.write(cmake_cache_option("UMPIRE_ENABLE_TOOLS", '+tools' in spec))
         cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
-        cfg.write(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
-        cfg.write(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_ASAN", '+asan' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
 
         #######################
         # Close and save
