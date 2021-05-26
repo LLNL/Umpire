@@ -28,7 +28,6 @@ if (ENABLE_DEVELOPER_DEFAULTS)
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
-set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
 set(ENABLE_CLANGQUERY Off CACHE BOOL "")
@@ -36,7 +35,6 @@ option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 
 include(cmake/SetupUmpireOptions.cmake)
 
-option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
 if(WIN32 OR APPLE)
   set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
@@ -123,6 +121,9 @@ endif()
 #######################################
 cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP" On
                        "ENABLE_HIP" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP" On
+                       "ENABLE_OPENMP" Off )
+
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On

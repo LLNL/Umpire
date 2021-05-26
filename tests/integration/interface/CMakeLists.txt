@@ -20,7 +20,7 @@ if (ENABLE_C)
       hip_runtime)
   endif ()
 
-  if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+  if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
     set (interface_tests_depends
       ${interface_tests_depends}
       openmp)

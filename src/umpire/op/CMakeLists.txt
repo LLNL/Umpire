@@ -112,7 +112,7 @@ if (UMPIRE_ENABLE_SYCL)
 
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   message(STATUS "Adding OpenMP Target operations")
   set (umpire_op_headers
     ${umpire_op_headers}

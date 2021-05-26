@@ -77,7 +77,7 @@ if (ENABLE_MPI)
     mpi)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_util_depends
     ${umpire_util_depends}
     openmp)

@@ -15,7 +15,7 @@ if (UMPIRE_ENABLE_HIP)
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (replay_integration_tests_depends
       ${replay_integration_tests_depends}
       openmp)
@@ -36,7 +36,7 @@ if (ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   endif ()
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(replay_config "${replay_config}omp_")
 endif ()
 

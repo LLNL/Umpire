@@ -10,7 +10,7 @@ if (UMPIRE_ENABLE_HIP)
   set (unit_depends ${unit_depends} hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (unit_depends ${unit_depends} openmp)
 endif ()
 

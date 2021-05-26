@@ -14,7 +14,7 @@ if (UMPIRE_ENABLE_HIP)
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (test_debug_depends
       ${test_debug_depends}
       openmp)

@@ -33,7 +33,7 @@ if (UMPIRE_ENABLE_HIP)
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (fortran_tests_depends
     ${fortran_tests_depends}
     openmp)

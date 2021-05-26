@@ -69,7 +69,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set( umpire_strategy_depends
     ${umpire_strategy_depends}
     openmp)

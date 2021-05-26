@@ -12,7 +12,7 @@ if (UMPIRE_ENABLE_HIP)
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (stress_test_depends
       ${stress_test_depends}
       openmp)
@@ -56,7 +56,7 @@ if (ENABLE_BENCHMARKS)
       hip_runtime)
   endif()
 
-  if (ENABLE_OPENMP_TARGET)
+  if (UMPIRE_ENABLE_OPENMP_TARGET)
     set (benchmark_depends
       ${benchmark_depends}
       openmp)
@@ -85,7 +85,7 @@ if (ENABLE_BENCHMARKS)
     SOURCES debuglog_benchmarks.cpp
     DEPENDS_ON ${benchmark_depends})
 
-  if (ENABLE_OPENMP)
+  if (UMPIRE_ENABLE_OPENMP)
     set (benchmark_depends
       ${benchmark_depends}
       openmp)

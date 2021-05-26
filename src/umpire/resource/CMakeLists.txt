@@ -160,7 +160,7 @@ if (UMPIRE_ENABLE_SYCL)
     ${umpire_resource_depends})
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     OpenMPTargetMemoryResourceFactory.hpp)

@@ -37,7 +37,7 @@ if (UMPIRE_ENABLE_SYCL)
     SyclPinnedAllocator.hpp)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     OpenMPTargetAllocator.hpp)

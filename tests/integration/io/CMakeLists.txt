@@ -49,7 +49,7 @@ if (UMPIRE_ENABLE_HIP)
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (log_depends
     ${log_depends}
     openmp)

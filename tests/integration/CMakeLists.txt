@@ -21,7 +21,7 @@ if (UMPIRE_ENABLE_HIP)
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (integration_tests_depends
     ${integration_tests_depends}
     openmp)
@@ -39,7 +39,7 @@ if (UMPIRE_ENABLE_HIP)
     hip)
 endif ()
 
-if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     openmp)
