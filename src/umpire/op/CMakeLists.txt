@@ -22,7 +22,7 @@ set (umpire_op_sources
 
 set (umpire_op_depends camp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_op_headers
     ${umpire_op_headers}
     NumaMoveOperation.hpp)
@@ -90,7 +90,7 @@ if (ENABLE_HIP)
     hip_runtime)
 endif ()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
   set (umpire_op_headers
     ${umpire_op_headers}
     SyclCopyOperation.hpp

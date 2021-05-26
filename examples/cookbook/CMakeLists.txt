@@ -22,7 +22,7 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_no_introspection)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   blt_add_executable(
     NAME recipe_move_between_numa
     SOURCES recipe_move_between_numa.cpp

@@ -7,7 +7,7 @@
 set(umpire_alloc_headers
   MallocAllocator.hpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     PosixMemalignAllocator.hpp)
@@ -29,7 +29,7 @@ if (ENABLE_HIP)
     HipPinnedAllocator.hpp)
 endif ()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     SyclMallocAllocator.hpp

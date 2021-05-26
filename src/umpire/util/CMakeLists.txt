@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
+set(UMPIRE_ENABLE_SYCL ${UMPIRE_ENABLE_SYCL})
 
 set (umpire_util_headers
   AllocationMap.hpp
@@ -28,7 +28,7 @@ set (umpire_util_headers
   memory_sanitizers.hpp
   wrap_allocator.hpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_util_headers
     ${umpire_util_headers}
     numa.hpp)
@@ -45,7 +45,7 @@ set (umpire_util_sources
   allocation_statistics.cpp
   detect_vendor.cpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_util_sources
     ${umpire_util_sources}
     numa.cpp)
@@ -59,13 +59,13 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     backtrace_symbols)
 endif ()
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_util_depends
     ${umpire_util_depends}
     numa)
 endif ()
 
-if (ENABLE_SLIC AND ENABLE_LOGGING)
+if (UMPIRE_ENABLE_SLIC AND UMPIRE_ENABLE_LOGGING)
   set (umpire_util_depends
     ${umpire_util_depends}
     slic)

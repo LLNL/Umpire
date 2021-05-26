@@ -18,7 +18,7 @@ if (ENABLE_OPENMP_TARGET)
       openmp)
 endif()
 
-if (ENABLE_BACKTRACE_SYMBOLS)
+if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set (test_applications_depends
       ${test_applications_depends}
       ${CMAKE_DL_LIBS})

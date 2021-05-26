@@ -29,17 +29,20 @@ endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
 set(ENABLE_HIP Off CACHE BOOL "")
-set(ENABLE_SYCL Off CACHE BOOL "")
-set(ENABLE_NUMA Off CACHE BOOL "")
+
+option(UMPIRE_ENABLE_SYCL "Build Umpire with SYCL" Off)
+option(UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" Off)
+
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
 set(ENABLE_CLANGQUERY Off CACHE BOOL "")
 
-option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
-option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
-option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
-option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
+option(UMPIRE_ENABLE_LOGGING "Build Umpire with Logging enabled" On)
+option(UMPIRE_ENABLE_SLIC "Build Umpire with SLIC logging" Off)
+option(UMPIRE_ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
+option(UMPIRE_ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
+
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
@@ -84,10 +87,10 @@ if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
   please re-configure with ENABLE_DOXYGEN=ON")
 endif ()
 
-if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
-  Please re-configure with ENABLE_NUMA=Off (default value)")
+  Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
 if (ENABLE_CUDA)
@@ -98,7 +101,7 @@ if (ENABLE_CUDA)
   endif ()
 endif()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()

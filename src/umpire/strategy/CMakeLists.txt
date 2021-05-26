@@ -24,7 +24,7 @@ set (umpire_strategy_headers
   StdAllocator.hpp
   ThreadSafeAllocator.hpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_headers
     ${umpire_strategy_headers}
     NumaPolicy.hpp)
@@ -55,7 +55,7 @@ set (umpire_strategy_sources
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_sources
     ${umpire_strategy_sources}
     NumaPolicy.cpp)

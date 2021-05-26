@@ -24,7 +24,7 @@ endif()
 set(raw_replay_file "output" )
 set(replay_config "")
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set(replay_config "${replay_config}numa_" )
 endif()
 

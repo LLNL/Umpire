@@ -139,7 +139,7 @@ if (ENABLE_HIP)
   endif ()
 endif ()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     SyclDeviceMemoryResource.hpp
