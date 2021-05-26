@@ -28,14 +28,17 @@ int main(int argc, char* argv[])
                 " by Umpire library with UMPIRE_REPLAY=On"};
 
   std::vector<std::string> positional_args;
-  bool recompile{false};
+
+  app.add_flag("-r,--recompile" , lhs_options.force_compile,
+      "Force recompile replay binary");
+
+  app.add_flag("-q,--quiet", lhs_options.quiet,
+        "Only errors will be displayed.");
 
   app.add_option("files", positional_args, "replay_file_1 replay_file_2")
     ->required()
     ->expected(2)
     ->check(CLI::ExistingFile);
-
-  app.add_flag("-r,--recompile" , recompile, "Recompile replay binaries");
 
   CLI11_PARSE(app, argc, argv);
 

@@ -79,6 +79,12 @@ std::size_t DynamicPoolList::getActualSize() const noexcept
   return ActualSize;
 }
 
+std::size_t DynamicPoolList::getActualHighwaterMark() const noexcept
+{
+  return dpa.getActualHighwaterMark();
+}
+
+
 std::size_t DynamicPoolList::getReleasableSize() const noexcept
 {
   std::size_t SparseBlockSize = dpa.getReleasableSize();

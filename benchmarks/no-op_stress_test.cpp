@@ -43,9 +43,13 @@ void same_order(umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
+  double alloc_t{(time[0]/double(NUM_ITER)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_ITER)*CONVERT)};
+
   std::cout << "  SAME_ORDER:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 /*
@@ -71,9 +75,13 @@ void reverse_order(umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
+  double alloc_t{(time[0]/double(NUM_ITER)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_ITER)*CONVERT)};
+
   std::cout << "  REVERSE_ORDER:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 /*
@@ -102,9 +110,13 @@ void shuffle(umpire::Allocator alloc)
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
+  double alloc_t{(time[0]/double(NUM_ITER)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_ITER)*CONVERT)};
+
   std::cout << "  SHUFFLE:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 int main(int, char**) {

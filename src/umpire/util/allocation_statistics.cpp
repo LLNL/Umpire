@@ -8,6 +8,7 @@
 #include "umpire/util/allocation_statistics.hpp"
 
 #include <algorithm>
+#include <limits>     // for std::numeric_limits
 
 namespace umpire {
 namespace util {
