@@ -143,6 +143,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Replay tool now handles rogue deallocate calls that may be present in
   replay files.
 
+- Fixed `const std::string` to be `const std::string&`  instead of copies for
+  newly added shared memory resource functions.
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed

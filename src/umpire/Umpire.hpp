@@ -169,12 +169,12 @@ std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
 /*!
  * \brief Return the default traits for the given allocator string
  */
-umpire::MemoryResourceTraits get_default_resource_traits(const std::string name);
+umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name);
 
 /*!
  * \brief Return the pointer of an allocation for the given allocator and name
  */
-void* find_pointer_from_name(Allocator allocator, const std::string name);
+void* find_pointer_from_name(Allocator allocator, const std::string& name);
 
 #if defined(UMPIRE_ENABLE_MPI)
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
