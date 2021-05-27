@@ -34,7 +34,7 @@ class HostSharedMemoryResource : public MemoryResource {
     bool isAccessibleFrom(Platform p) noexcept override;
     Platform getPlatform() noexcept override;
 
-    void* find_pointer_from_name(std::string name);
+    void* find_pointer_from_name(const std::string& name);
   protected:
     Platform m_platform;
   private:

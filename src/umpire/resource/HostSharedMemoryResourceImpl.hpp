@@ -286,7 +286,7 @@ class HostSharedMemoryResource::impl {
       pthread_mutex_unlock(&m_segment->mutex);
     }
 
-    void* find_pointer_from_name(std::string name)
+    void* find_pointer_from_name(const std::string& name)
     {
       void* ptr{nullptr};
       int err{0};
