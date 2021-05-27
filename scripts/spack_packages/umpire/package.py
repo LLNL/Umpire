@@ -296,9 +296,9 @@ class Umpire(CMakePackage, CudaPackage):
 
 
         if "+posix_shmem" in spec:
-            cfg.write(cmake_cache_option("ENABLE_HOST_SHARED_MEMORY", True))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_HOST_SHARED_MEMORY", True))
         else:
-            cfg.write(cmake_cache_option("ENABLE_HOST_SHARED_MEMORY", False))
+            cfg.write(cmake_cache_option("UMPIRE_ENABLE_HOST_SHARED_MEMORY", False))
 
 
         if "+cuda" in spec:

@@ -30,7 +30,7 @@ if(UMPIRE_ENABLE_FILE_RESOURCE)
     COMMAND file_resource_tests)
 endif()
 
-if(ENABLE_HOST_SHARED_MEMORY)
+if(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   blt_add_executable(
     NAME shared_memory_resource_tests
     SOURCES shared_memory_resource_tests.cpp

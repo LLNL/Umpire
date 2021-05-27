@@ -52,6 +52,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator.
 
+- get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
+
 - Allocator::getStrategyName() to get name of the strategy used.
 
 - Added lifespan timing info for no-op benchmark.
@@ -73,7 +75,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI on Gitlab does not require a python environment anymore.
 
-- BLT submodule updated to v0.4.0
+- BLT submodule updated to v0.4.0.
 
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
@@ -145,6 +147,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Replay tool now handles rogue deallocate calls that may be present in
   replay files.
+
+- Fixed shared memory signature that had `const std::string` to use
+  `const std::string&` instead of a copy of the string.
 
 ## [v5.0.1] - 2021-03-31
 
