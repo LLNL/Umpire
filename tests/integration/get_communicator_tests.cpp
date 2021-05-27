@@ -7,6 +7,7 @@
 
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 
 #include "gtest/gtest.h"
 
@@ -14,7 +15,7 @@
 
 TEST(GetCommunicator, Null)
 {
-  auto& rm = umpire::ResourceManager::getInstance()
+  auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("HOST");
 
   ASSERT_EQ(umpire::get_communicator_for_allocator(allocator, MPI_COMM_WORLD), MPI_COMM_NULL);
@@ -22,7 +23,7 @@ TEST(GetCommunicator, Null)
 
 TEST(GetCommunicator, SharedAndCached)
 {
-  auto& rm = umpire::ResourceManager::getInstance()
+  auto& rm = umpire::ResourceManager::getInstance();
 
   auto traits{umpire::get_default_resource_traits("SHARED")};
   traits.size = 4096;
