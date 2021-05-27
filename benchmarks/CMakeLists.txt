@@ -47,7 +47,7 @@ blt_add_executable(
   SOURCES pool_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
 
-if (ENABLE_BENCHMARKS)
+if (UMPIRE_ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)
 
   if (UMPIRE_ENABLE_HIP)

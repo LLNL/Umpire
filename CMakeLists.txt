@@ -124,6 +124,8 @@ cmake_dependent_option( UMPIRE_ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Mem
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
+                        "ENABLE_BENCHMARKS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
                         "ENABLE_DOCS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang query" On
@@ -162,15 +164,15 @@ if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 
-if (ENABLE_DEVELOPER_BENCHMARKS)
+if (UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   add_subdirectory(benchmarks)
   if ((NOT CMAKE_BUILD_TYPE) OR (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
     message("-- Warning: CMAKE_BUILD_TYPE not set to Release, benchmark information will not be reliable for this build!")
   endif()
 else()
-  if (ENABLE_BENCHMARKS)
+  if (UMPIRE_ENABLE_BENCHMARKS)
     message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
-          "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
+          "     set UMPIRE_ENABLE_DEVELOPER_BENCHMARKS to On.")
   endif()
 endif ()
 
