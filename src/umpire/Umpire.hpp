@@ -132,8 +132,8 @@ bool pointer_contains(void* left, void* right);
  * accessibility can be found at
  * <https://umpire.readthedocs.io/en/develop/features/allocator_accessibility.html>
  *
- *\param camp::Platform p  
- *\param umpire::Allocator a 
+ *\param camp::Platform p
+ *\param umpire::Allocator a
  */
 bool is_accessible(Platform p, Allocator a);
 
@@ -149,6 +149,11 @@ std::string get_backtrace(void* ptr);
  * system-dependent calls)
  */
 std::size_t get_process_memory_usage();
+
+/*!
+ * \brief Mark an application-specific event string within Umpire life cycle.
+ */
+void mark_event(const std::string& event);
 
 /*!
  * \brief Get memory usage of device device_id, using appropriate underlying
