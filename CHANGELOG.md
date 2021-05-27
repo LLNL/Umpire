@@ -52,6 +52,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator.
 
+- get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
+
 - Allocator::getStrategyName() to get name of the strategy used.
 
 - Added lifespan timing info for no-op benchmark.
