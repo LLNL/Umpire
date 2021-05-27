@@ -151,6 +151,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed shared memory signature that had `const std::string` to use
   `const std::string&` instead of a copy of the string.
 
+- Fixed cmake warning for HIP+tools builds
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
