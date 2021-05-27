@@ -34,7 +34,7 @@ TEST(GetCommunicator, SharedAndCached)
 
   auto cached_comm = umpire::get_communicator_for_allocator(allocator, MPI_COMM_WORLD);
   int result;
-  MPI_Comm_compare(comm, cached_comm, &result)
+  MPI_Comm_compare(comm, cached_comm, &result);
   ASSERT_EQ(result, MPI_IDENT);
 }
 
