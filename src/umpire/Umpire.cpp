@@ -175,7 +175,7 @@ std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
   return get_allocator_records(allocator);
 }
 
-umpire::MemoryResourceTraits get_default_resource_traits(const std::string name)
+umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name)
 {
   umpire::resource::MemoryResourceRegistry&
     registry{ umpire::resource::MemoryResourceRegistry::getInstance() };
@@ -183,7 +183,7 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string name)
   return traits;
 }
 
-void* find_pointer_from_name(Allocator allocator, const std::string name)
+void* find_pointer_from_name(Allocator allocator, const std::string& name)
 {
   void* ptr{nullptr};
 

@@ -88,7 +88,7 @@ std::size_t HostSharedMemoryResource::getActualSize() const noexcept
   return pimpl->getActualSize();
 }
 
-void* HostSharedMemoryResource::find_pointer_from_name(std::string name)
+void* HostSharedMemoryResource::find_pointer_from_name(const std::string& name)
 {
   return pimpl->find_pointer_from_name(name);
 }
