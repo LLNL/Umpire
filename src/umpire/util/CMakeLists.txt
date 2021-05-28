@@ -71,7 +71,7 @@ if (UMPIRE_ENABLE_SLIC AND UMPIRE_ENABLE_LOGGING)
     slic)
 endif()
 
-if (ENABLE_MPI)
+if (UMPIRE_ENABLE_MPI)
   set (umpire_util_depends
     ${umpire_util_depends}
     mpi)
