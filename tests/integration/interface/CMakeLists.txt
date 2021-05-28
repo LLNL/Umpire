@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-if (ENABLE_C)
+if (UMPIRE_ENABLE_C)
   set (interface_tests_depends
     umpire gtest)
 
@@ -68,7 +68,7 @@ if (ENABLE_C)
     NAME version_c_tests
     COMMAND version_c_tests)
 
-  if (ENABLE_FORTRAN)
+  if (UMPIRE_ENABLE_FORTRAN)
     add_subdirectory(fortran)
   endif()
 endif()

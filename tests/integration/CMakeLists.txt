@@ -215,7 +215,7 @@ if (UMPIRE_ENABLE_TOOLS)
   endif ()
 endif ()
 
-if (ENABLE_C OR ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_C OR UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(interface)
 endif()
 

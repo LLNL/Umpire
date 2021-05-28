@@ -84,11 +84,11 @@ blt_add_executable(
   DEPENDS_ON ${tutorial_depends})
 list(APPEND umpire_tutorials tut_replay)
 
-if (ENABLE_C)
+if (UMPIRE_ENABLE_C)
   add_subdirectory(c)
 endif ()
 
-if (ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(fortran)
 endif ()
 

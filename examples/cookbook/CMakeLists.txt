@@ -77,7 +77,7 @@ if (UMPIRE_ENABLE_CUDA)
     OUTPUT_DIR ${cookbook_output_dir})
   list(APPEND umpire_cookbooks recipe_memprefetch_pool)
 
-  if (ENABLE_FORTRAN)
+  if (UMPIRE_ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
       SOURCES recipe_pinned_pool.F
@@ -116,7 +116,7 @@ if (UMPIRE_ENABLE_HIP)
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_move_to_managed)
 
-  if (ENABLE_FORTRAN)
+  if (UMPIRE_ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
       SOURCES recipe_pinned_pool.F
@@ -167,7 +167,7 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_mixed_pool)
 
-if (ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_FORTRAN)
   blt_add_executable(
     NAME recipe_thread_safe_F
     SOURCES recipe_thread_safe.F

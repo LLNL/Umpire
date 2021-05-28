@@ -21,7 +21,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (ENABLE_FORTRAN OR ENABLE_C)
+if (UMPIRE_ENABLE_FORTRAN OR UMPIRE_ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
 
@@ -31,14 +31,14 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     interface/c_fortran/wrapUmpire.h
     interface/c_fortran/typesUmpire.h)
 
-  if (ENABLE_C)
+  if (UMPIRE_ENABLE_C)
     set (umpire_interface_sources
       interface/c_fortran/utilUmpire.cpp
       interface/c_fortran/wrapAllocator.cpp
       interface/c_fortran/wrapResourceManager.cpp
       interface/c_fortran/wrapUmpire.cpp)
 
-    if (ENABLE_FORTRAN)
+    if (UMPIRE_ENABLE_FORTRAN)
       set (umpire_interface_sources
         ${umpire_interface_sources}
         interface/c_fortran/wrapfumpire.f)

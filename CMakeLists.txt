@@ -57,10 +57,6 @@ endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
-if (ENABLE_FORTRAN)
-  set(ENABLE_C On)
-endif()
-
 if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
@@ -134,6 +130,12 @@ cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with Coverage suppo
                         "ENABLE_COVERAGE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
                         "ENABLE_GMOCK" Off )
+cmake_dependent_option( UMPIRE_ENABLE_FORTRAN "Build Umpire with FORTRAN" On
+                        "ENABLE_FORTRAN" Off )
+
+if (UMPIRE_ENABLE_FORTRAN)
+  set(UMPIRE_ENABLE_C On)
+endif()
 
 if (UMPIRE_ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
   message(FATAL_ERROR "\

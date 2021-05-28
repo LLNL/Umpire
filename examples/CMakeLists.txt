@@ -67,7 +67,7 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples backtrace_example)
 
-if (ENABLE_C)
+if (UMPIRE_ENABLE_C)
   blt_add_executable(
     NAME allocator_c
     SOURCES allocator.c

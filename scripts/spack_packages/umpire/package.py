@@ -368,7 +368,7 @@ class Umpire(CMakePackage, CudaPackage):
         else:
             cfg.write(cmake_cache_option("ENABLE_HIP", False))
 
-        cfg.write(cmake_cache_option("ENABLE_C", '+c' in spec))
+        cfg.write(cmake_cache_option("UMPIRE_ENABLE_C", '+c' in spec))
         cfg.write(cmake_cache_option("ENABLE_FORTRAN", '+fortran' in spec))
 
         if "+mpi" in spec:
