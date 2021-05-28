@@ -51,7 +51,7 @@ if (ENABLE_FORTRAN OR ENABLE_C)
   endif ()
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set(umpire_headers
     ${umpire_headers}
     DeviceAllocator.hpp)
@@ -91,7 +91,7 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
-blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
+blt_list_append( TO umpire_depends ELEMENTS cuda IF UMPIRE_ENABLE_CUDA )
 
 set (umpire_defines)
 
@@ -132,10 +132,9 @@ endif()
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
 
-set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 
-if (ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
   set(UMPIRE_ENABLE_UM On)

@@ -38,7 +38,7 @@ if (UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   list(APPEND umpire_cookbooks recipe_shared_memory)
 endif()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp

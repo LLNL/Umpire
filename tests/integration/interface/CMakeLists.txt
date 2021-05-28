@@ -8,7 +8,7 @@ if (ENABLE_C)
   set (interface_tests_depends
     umpire gtest)
 
-  if (ENABLE_CUDA)
+  if (UMPIRE_ENABLE_CUDA)
     set (interface_tests_depends
       ${interface_tests_depends}
       cuda_runtime)

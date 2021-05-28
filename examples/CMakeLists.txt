@@ -93,7 +93,7 @@ blt_add_executable(
   DEPENDS_ON ${example_depends})
 list(APPEND umpire_examples use_after_free)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME device_allocator_example
     SOURCES device-allocator.cpp

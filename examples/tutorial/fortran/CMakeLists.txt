@@ -12,7 +12,7 @@ if (UMPIRE_ENABLE_HIP)
       hip_runtime)
 endif()
 
-if(ENABLE_CUDA)
+if(UMPIRE_ENABLE_CUDA)
   set (tutorial_fortran_depends
       ${tutorial_fortran_depends}
       cuda_runtime)

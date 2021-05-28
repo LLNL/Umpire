@@ -28,7 +28,7 @@ if (UMPIRE_ENABLE_NUMA)
   set(replay_config "${replay_config}numa_" )
 endif()
 
-if (ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(replay_config "${replay_config}devices_" )
 
   if (UMPIRE_ENABLE_DEVICE_CONST)

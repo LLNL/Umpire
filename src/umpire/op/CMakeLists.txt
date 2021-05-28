@@ -36,7 +36,7 @@ if (UMPIRE_ENABLE_NUMA)
     umpire_strategy)
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
     CudaAdviseAccessedByOperation.hpp

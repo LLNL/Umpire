@@ -74,7 +74,7 @@ if(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
   )
 endif()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     CudaDeviceMemoryResource.hpp

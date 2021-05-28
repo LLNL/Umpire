@@ -30,6 +30,7 @@ if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
+option(UMPIRE_ENABLE_CUDA "Build Umpire with CUDA" Off)
 
 set(ENABLE_GMOCK On CACHE BOOL "")
 option(UMPIRE_ENABLE_GMOCK "Build Umpire with GMOCK support" On)
@@ -48,7 +49,7 @@ if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
 else ()
   cmake_minimum_required(VERSION 3.8.2)
@@ -66,7 +67,7 @@ if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
@@ -109,6 +110,8 @@ endif()
 #######################################
 # Options that depend on BLT Options
 #######################################
+cmake_dependent_option( UMPIRE_ENABLE_CUDA "Build Umpire with CUDA support" On
+                        "ENABLE_CUDA" Off )
 cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP" On
                        "ENABLE_HIP" Off )
 cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP" On

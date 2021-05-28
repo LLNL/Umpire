@@ -10,7 +10,7 @@ set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MAJOR=${Umpir
 set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MINOR=${Umpire_VERSION_MINOR})
 set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_PATCH=${Umpire_VERSION_PATCH})
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_CUDA)
 endif ()
 
@@ -21,7 +21,7 @@ endif ()
 set (fortran_tests_depends
   umpire fruit)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (fortran_tests_depends
     ${fortran_tests_depends}
     cuda_runtime)

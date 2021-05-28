@@ -7,7 +7,7 @@
 set (memory_allocator_tests_depends
   umpire gtest)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (memory_allocator_tests_depends
     ${memory_allocator_tests_depends}
     cuda_runtime)

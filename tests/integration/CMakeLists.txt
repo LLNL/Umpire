@@ -9,7 +9,7 @@ set (integration_tests_depends
 set (accessibility_test_depends
   umpire gtest)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (integration_tests_depends
     ${integration_tests_depends}
     cuda_runtime)
@@ -27,7 +27,7 @@ if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (accessibility_test_depends
     ${accessibility_test_depends}
     cuda)

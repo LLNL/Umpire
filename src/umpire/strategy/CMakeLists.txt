@@ -63,7 +63,7 @@ endif ()
 
 set(umpire_strategy_depends camp)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set(umpire_strategy_depends
     ${umpire_strategy_depends}
     cuda_runtime)

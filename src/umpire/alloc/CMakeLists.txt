@@ -13,7 +13,7 @@ if (UMPIRE_ENABLE_NUMA)
     PosixMemalignAllocator.hpp)
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
     CudaMallocAllocator.hpp
