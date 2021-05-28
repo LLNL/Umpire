@@ -60,12 +60,6 @@ if (ENABLE_FORTRAN)
   set(ENABLE_C On)
 endif()
 
-if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
-  message(FATAL_ERROR "\
-  Sphinx documentation requires Doxygen, \
-  please re-configure with ENABLE_DOXYGEN=ON")
-endif ()
-
 if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
@@ -126,6 +120,9 @@ cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
                         "ENABLE_BENCHMARKS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
+                        "ENABLE_EXAMPLES" Off )
+
 cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
                         "ENABLE_DOCS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang query" On
@@ -134,8 +131,12 @@ cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with Coverage suppo
                         "ENABLE_COVERAGE" Off )
 cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
                         "ENABLE_GMOCK" Off )
-cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
-                        "ENABLE_EXAMPLES" Off )
+
+if (UMPIRE_ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
+  message(FATAL_ERROR "\
+  Sphinx documentation requires Doxygen, \
+  please re-configure with ENABLE_DOXYGEN=ON")
+endif ()
 
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
