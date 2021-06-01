@@ -195,9 +195,25 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
+if (ENABLE_HOST_SHARED_MEMORY AND ENABLE_MPI)
+  blt_add_executable(
+    NAME get_communicator_tests
+    SOURCES get_communicator_tests.cpp
+    DEPENDS_ON ${integration_tests_depends})
+
+  umpire_add_test_with_mpi(
+    NAME get_communicator_tests
+    COMMAND get_communicator_tests
+    NUM_MPI_TASKS 2)
+endif ()
+
 if (ENABLE_TOOLS)
-  add_subdirectory(replay)
-endif()
+  if (NOT ENABLE_HIP)
+    add_subdirectory(replay)
+  else ()
+    message(STATUS "Disabling replay tests for HIP build.")
+  endif ()
+endif ()
 
 if (ENABLE_C OR ENABLE_FORTRAN)
   add_subdirectory(interface)
