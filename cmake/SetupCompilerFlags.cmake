@@ -60,6 +60,7 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
       FLAGS_VAR UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG
       DEFAULT  "-Wno-deprecated-declarations"
       INTEL "-diag-disable=1786"
+      PGI "-Minform=severe"
       MSVC "/wd4996")
 
       set (CMAKE_CXX_FLAGS "${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG} ${CMAKE_CXX_FLAGS}")
