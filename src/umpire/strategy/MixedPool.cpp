@@ -21,20 +21,20 @@ MixedPool::MixedPool(const std::string& name, int id, Allocator allocator,
                      std::size_t largest_fixed_obj_size,
                      std::size_t max_initial_fixed_pool_size,
                      std::size_t fixed_size_multiplier,
-                     const std::size_t dynamic_initial_alloc_size,
-                     const std::size_t dynamic_min_alloc_size,
-                     const std::size_t dynamic_align_bytes,
-                     DynamicPoolMap::CoalesceHeuristic should_coalesce) noexcept
+                     const std::size_t quick_pool_initial_alloc_size,
+                     const std::size_t quick_pool_min_alloc_size,
+                     const std::size_t quick_pool_align_bytes,
+                     QuickPool::CoalesceHeuristic should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "MixedPool"},
       m_map{},
       m_fixed_pool_map{},
       m_fixed_pool{},
-      m_dynamic_pool{"internal_dynamic_pool",
+      m_quick_pool{"internal_quick_pool",
                      -1,
                      allocator,
-                     dynamic_initial_alloc_size,
-                     dynamic_min_alloc_size,
-                     dynamic_align_bytes,
+                     quick_pool_initial_alloc_size,
+                     quick_pool_min_alloc_size,
+                     quick_pool_align_bytes,
                      should_coalesce},
       m_allocator{allocator.getAllocationStrategy()}
 {
@@ -53,7 +53,7 @@ MixedPool::MixedPool(const std::string& name, int id, Allocator allocator,
   }
 
   if (m_fixed_pool.size() == 0) {
-    UMPIRE_LOG(Debug, "Mixed Pool is reverting to a dynamic pool");
+    UMPIRE_LOG(Debug, "Mixed Pool is reverting to a quick pool");
   }
 }
 
@@ -76,8 +76,8 @@ void* MixedPool::allocate(std::size_t bytes)
     mem = m_fixed_pool[index]->allocate_internal(m_fixed_pool_map[index]);
     m_map[reinterpret_cast<uintptr_t>(mem)] = index;
   } else {
-    // allocate in dynamic pool
-    mem = m_dynamic_pool.allocate_internal(bytes);
+    // allocate in quick pool
+    mem = m_quick_pool.allocate_internal(bytes);
     m_map[reinterpret_cast<uintptr_t>(mem)] = -1;
   }
   return mem;
@@ -89,7 +89,7 @@ void MixedPool::deallocate(void* ptr, std::size_t size)
   if (iter != m_map.end()) {
     const int index = iter->second;
     if (index < 0) {
-      m_dynamic_pool.deallocate_internal(ptr, size);
+      m_quick_pool.deallocate_internal(ptr, size);
     } else {
       m_fixed_pool[index]->deallocate_internal(ptr, size);
     }
@@ -106,7 +106,7 @@ std::size_t MixedPool::getActualSize() const noexcept
   std::size_t size = 0;
   for (auto& fp : m_fixed_pool)
     size += fp->getActualSize();
-  size += m_dynamic_pool.getActualSize();
+  size += m_quick_pool.getActualSize();
   return size;
 }
 
