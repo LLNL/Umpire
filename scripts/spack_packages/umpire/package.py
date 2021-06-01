@@ -327,6 +327,9 @@ class Umpire(CMakePackage, CudaPackage):
             if using_toolchain:
                 cuda_flags.append("-Xcompiler {}".format(using_toolchain[0]))
 
+            if "pgi" in cpp_compiler:
+                cuda_flags.append("--forward-unknown-to-host-linker")
+
             cfg.write(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
         else:
