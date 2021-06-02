@@ -220,3 +220,20 @@ if (ENABLE_C OR ENABLE_FORTRAN)
 endif()
 
 add_subdirectory(io)
+
+if (ENABLE_WARNINGS_AS_ERRORS AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+  blt_add_target_compile_flags(
+    TO strategy_tests
+    FLAGS "-Minform=severe")
+  blt_add_target_compile_flags(
+    TO operation_tests
+    FLAGS "-Minform=severe")
+  blt_add_target_compile_flags(
+    TO primary_pool_tests
+    FLAGS "-Minform=severe")
+  if (ENABLE_PERFORMANCE_TESTS)
+    blt_add_target_compile_flags(
+      TO primary_pool_performance_tests 
+      FLAGS "-Minform=severe")
+  endif()
+endif ()

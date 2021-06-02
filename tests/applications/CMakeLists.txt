@@ -42,4 +42,13 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     FLAGS "-rdynamic")
 endif ()
 
+if (ENABLE_WARNINGS_AS_ERRORS AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+  blt_add_target_compile_flags(
+    TO pool_allocator_stress
+    FLAGS "-Minform=severe")
+  blt_add_target_compile_flags(
+    TO poison_memory_checks 
+    FLAGS "-Minform=severe")
+endif ()
+
 install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)

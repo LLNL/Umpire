@@ -49,4 +49,13 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND ENABLE_BACKTRACE_SYMBOLS)
     FLAGS "-rdynamic")
 endif ()
 
+if (ENABLE_WARNINGS_AS_ERRORS AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+  blt_add_target_compile_flags(
+    TO replay
+    FLAGS "-Minform=severe")
+  blt_add_target_compile_flags(
+    TO replaydiff
+    FLAGS "-Minform=severe")
+endif ()
+
 install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)
