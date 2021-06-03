@@ -425,7 +425,7 @@ void umpire_resourcemanager_register_allocator(
     const std::string SHCXX_name(name);
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
-    SH_this->registerAllocator(SHCXX_name, *SHCXX_allocator);
+    SH_this->addAlias(SHCXX_name, *SHCXX_allocator);
     // splicer end class.ResourceManager.method.register_allocator
 }
 
@@ -439,7 +439,7 @@ void umpire_resourcemanager_register_allocator_bufferify(
     const std::string SHCXX_name(name, Lname);
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
-    SH_this->registerAllocator(SHCXX_name, *SHCXX_allocator);
+    SH_this->addAlias(SHCXX_name, *SHCXX_allocator);
     // splicer end class.ResourceManager.method.register_allocator_bufferify
 }
 
