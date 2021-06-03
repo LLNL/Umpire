@@ -52,10 +52,10 @@ endif ()
 if (ENABLE_WARNINGS_AS_ERRORS)
   blt_add_target_compile_flags(
     TO replay
-    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
   blt_add_target_compile_flags(
     TO replaydiff
-    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 endif ()
 
 install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)

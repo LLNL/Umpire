@@ -45,10 +45,10 @@ endif ()
 if (ENABLE_WARNINGS_AS_ERRORS)
   blt_add_target_compile_flags(
     TO pool_allocator_stress
-    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
   blt_add_target_compile_flags(
     TO poison_memory_checks 
-    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 endif ()
 
 install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)
