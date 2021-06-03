@@ -58,6 +58,7 @@ if (ENABLE_WARNINGS_AS_ERRORS OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   blt_append_custom_compiler_flag(
     FLAGS_VAR UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG
     DEFAULT  "-Wno-deprecated-declarations"
+    PGI "-Minform=severe"
     INTEL "-diag-disable=1786"
     MSVC "/wd4996")
 endif ()

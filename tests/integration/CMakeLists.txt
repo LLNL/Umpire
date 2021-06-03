@@ -221,19 +221,19 @@ endif()
 
 add_subdirectory(io)
 
-if (ENABLE_WARNINGS_AS_ERRORS AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
+if (ENABLE_WARNINGS_AS_ERRORS)
   blt_add_target_compile_flags(
     TO strategy_tests
-    FLAGS "-Minform=severe")
+    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
   blt_add_target_compile_flags(
     TO operation_tests
-    FLAGS "-Minform=severe")
+    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
   blt_add_target_compile_flags(
     TO primary_pool_tests
-    FLAGS "-Minform=severe")
+    FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
   if (ENABLE_PERFORMANCE_TESTS)
     blt_add_target_compile_flags(
       TO primary_pool_performance_tests 
-      FLAGS "-Minform=severe")
+      FLAGS UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG)
   endif()
 endif ()
