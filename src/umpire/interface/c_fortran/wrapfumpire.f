@@ -26,7 +26,7 @@ module umpire_mod
     end type SHROUD_capsule_data
 
     ! helper array_context
-    type, bind(C) :: umpire_SHROUD_array
+    type, bind(C) :: SHROUD_array
         ! address of C++ memory
         type(SHROUD_capsule_data) :: cxx
         ! address of data in cxx
@@ -40,15 +40,15 @@ module umpire_mod
         ! number of dimensions
         integer(C_INT) :: rank = -1
         integer(C_LONG) :: shape(7) = 0
-    end type umpire_SHROUD_array
+    end type SHROUD_array
 
-    type, bind(C) :: umpire_SHROUD_allocator_capsule
+    type, bind(C) :: SHROUD_allocator_capsule
         type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
         integer(C_INT) :: idtor = 0       ! index of destructor
-    end type umpire_SHROUD_allocator_capsule
+    end type SHROUD_allocator_capsule
 
     type UmpireAllocator
-        type(umpire_SHROUD_allocator_capsule) :: cxxmem
+        type(SHROUD_allocator_capsule) :: cxxmem
         ! splicer begin class.Allocator.component_part
         ! splicer end class.Allocator.component_part
     contains
@@ -139,20 +139,20 @@ module umpire_mod
         ! splicer end class.Allocator.type_bound_procedure_part
     end type UmpireAllocator
 
-    type, bind(C) :: umpire_SHROUD_resourcemanager_capsule
+    type, bind(C) :: SHROUD_resourcemanager_capsule
         type(C_PTR) :: addr = C_NULL_PTR  ! address of C++ memory
         integer(C_INT) :: idtor = 0       ! index of destructor
-    end type umpire_SHROUD_resourcemanager_capsule
+    end type SHROUD_resourcemanager_capsule
 
     type UmpireResourceManager
-        type(umpire_SHROUD_resourcemanager_capsule) :: cxxmem
+        type(SHROUD_resourcemanager_capsule) :: cxxmem
         ! splicer begin class.ResourceManager.component_part
         ! splicer end class.ResourceManager.component_part
     contains
         procedure, nopass :: get_instance => resourcemanager_get_instance
         procedure :: get_allocator_by_name => resourcemanager_get_allocator_by_name
         procedure :: get_allocator_by_id => resourcemanager_get_allocator_by_id
-        procedure :: make_allocator_pool => resourcemanager_make_allocator_pool
+        procedure :: make_allocator_map_pool => resourcemanager_make_allocator_map_pool
         procedure :: make_allocator_list_pool => resourcemanager_make_allocator_list_pool
         procedure :: make_allocator_quick_pool => resourcemanager_make_allocator_quick_pool
         procedure :: make_allocator_advisor => resourcemanager_make_allocator_advisor
@@ -204,18 +204,18 @@ module umpire_mod
 
         subroutine c_allocator_delete(self) &
                 bind(C, name="umpire_allocator_delete")
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
         end subroutine c_allocator_delete
 
         function c_allocator_allocate(self, bytes) &
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_allocate")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T), value, intent(IN) :: bytes
             type(C_PTR) :: SHT_rv
         end function c_allocator_allocate
@@ -223,26 +223,26 @@ module umpire_mod
         subroutine c_allocator_deallocate(self, ptr) &
                 bind(C, name="umpire_allocator_deallocate")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
         end subroutine c_allocator_deallocate
 
         subroutine c_allocator_release(self) &
                 bind(C, name="umpire_allocator_release")
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
         end subroutine c_allocator_release
 
         function c_allocator_get_size(self, ptr) &
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_size")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_size
@@ -251,9 +251,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_high_watermark")
             use iso_c_binding, only : C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_high_watermark
 
@@ -261,9 +261,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_current_size")
             use iso_c_binding, only : C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_current_size
 
@@ -271,9 +271,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_actual_size")
             use iso_c_binding, only : C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_actual_size
 
@@ -281,9 +281,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_allocation_count")
             use iso_c_binding, only : C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_allocation_count
 
@@ -291,27 +291,27 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_name")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             type(C_PTR) SHT_rv
         end function c_allocator_get_name
 
         subroutine c_allocator_get_name_bufferify(self, DSHF_rv) &
                 bind(C, name="umpire_allocator_get_name_bufferify")
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_array
+            import :: SHROUD_allocator_capsule, SHROUD_array
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
-            type(umpire_SHROUD_array), intent(OUT) :: DSHF_rv
+            type(SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_array), intent(OUT) :: DSHF_rv
         end subroutine c_allocator_get_name_bufferify
 
         function c_allocator_get_id(self) &
                 result(SHT_rv) &
                 bind(C, name="umpire_allocator_get_id")
             use iso_c_binding, only : C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule
+            import :: SHROUD_allocator_capsule
             implicit none
-            type(umpire_SHROUD_allocator_capsule), intent(IN) :: self
+            type(SHROUD_allocator_capsule), intent(IN) :: self
             integer(C_SIZE_T) :: SHT_rv
         end function c_allocator_get_id
 
@@ -322,9 +322,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_get_instance")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_resourcemanager_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_instance
 
@@ -333,11 +333,11 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_get_allocator_by_name")
             use iso_c_binding, only : C_CHAR, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_name
 
@@ -346,12 +346,12 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_get_allocator_by_name_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_name_bufferify
 
@@ -360,60 +360,61 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_get_allocator_by_id")
             use iso_c_binding, only : C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             integer(C_INT), value, intent(IN) :: id
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_id
 
-        function c_resourcemanager_make_allocator_pool(self, name, &
+        function c_resourcemanager_make_allocator_map_pool(self, name, &
                 allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_pool")
+                bind(C, name="umpire_resourcemanager_make_allocator_map_pool")
             use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: initial_size
             integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_pool
+        end function c_resourcemanager_make_allocator_map_pool
 
-        function c_resourcemanager_make_allocator_bufferify_pool(self, &
-                name, Lname, allocator, initial_size, block, SHT_crv) &
+        function c_resourcemanager_make_allocator_bufferify_map_pool( &
+                self, name, Lname, allocator, initial_size, block, &
+                SHT_crv) &
                 result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_pool")
+                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_map_pool")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: initial_size
             integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_bufferify_pool
+        end function c_resourcemanager_make_allocator_bufferify_map_pool
 
         function c_resourcemanager_make_allocator_list_pool(self, name, &
                 allocator, initial_size, block, SHT_crv) &
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_list_pool")
             use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: initial_size
             integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_list_pool
 
@@ -423,15 +424,15 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_list_pool")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: initial_size
             integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_list_pool
 
@@ -440,14 +441,14 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_quick_pool")
             use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: initial_size
             integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_quick_pool
 
@@ -457,15 +458,15 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_quick_pool")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: initial_size
             integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_quick_pool
 
@@ -474,14 +475,14 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_advisor")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             character(kind=C_CHAR), intent(IN) :: advice_op(*)
             integer(C_INT), value, intent(IN) :: device_id
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_advisor
 
@@ -491,16 +492,16 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_advisor")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             character(kind=C_CHAR), intent(IN) :: advice_op(*)
             integer(C_INT), value, intent(IN) :: Ladvice_op
             integer(C_INT), value, intent(IN) :: device_id
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_advisor
 
@@ -509,12 +510,12 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_named")
             use iso_c_binding, only : C_CHAR, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_named
 
@@ -523,13 +524,13 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_named")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_named
 
@@ -538,12 +539,12 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_thread_safe")
             use iso_c_binding, only : C_CHAR, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_thread_safe
 
@@ -552,13 +553,13 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_thread_safe")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_thread_safe
 
@@ -567,13 +568,13 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_fixed_pool")
             use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: object_size
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_fixed_pool
 
@@ -582,14 +583,14 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_fixed_pool")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_SIZE_T), value, intent(IN) :: object_size
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_fixed_pool
 
@@ -598,13 +599,13 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_prefetcher")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_INT), value, intent(IN) :: device_id
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_prefetcher
 
@@ -613,14 +614,14 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_make_allocator_bufferify_prefetcher")
             use iso_c_binding, only : C_CHAR, C_INT, C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             integer(C_INT), value, intent(IN) :: device_id
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_prefetcher
 
@@ -628,67 +629,67 @@ module umpire_mod
                 allocator) &
                 bind(C, name="umpire_resourcemanager_register_allocator")
             use iso_c_binding, only : C_CHAR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_register_allocator
 
         subroutine c_resourcemanager_register_allocator_bufferify(self, &
                 name, Lname, allocator) &
                 bind(C, name="umpire_resourcemanager_register_allocator_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_register_allocator_bufferify
 
         subroutine c_resourcemanager_add_alias(self, name, allocator) &
                 bind(C, name="umpire_resourcemanager_add_alias")
             use iso_c_binding, only : C_CHAR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_add_alias
 
         subroutine c_resourcemanager_add_alias_bufferify(self, name, &
                 Lname, allocator) &
                 bind(C, name="umpire_resourcemanager_add_alias_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_add_alias_bufferify
 
         subroutine c_resourcemanager_remove_alias(self, name, allocator) &
                 bind(C, name="umpire_resourcemanager_remove_alias")
             use iso_c_binding, only : C_CHAR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_remove_alias
 
         subroutine c_resourcemanager_remove_alias_bufferify(self, name, &
                 Lname, allocator) &
                 bind(C, name="umpire_resourcemanager_remove_alias_bufferify")
             use iso_c_binding, only : C_CHAR, C_INT
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_remove_alias_bufferify
 
         function c_resourcemanager_get_allocator_for_ptr(self, ptr, &
@@ -696,11 +697,11 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_get_allocator_for_ptr")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
+            type(SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_for_ptr
 
@@ -708,9 +709,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_is_allocator_name")
             use iso_c_binding, only : C_BOOL, C_CHAR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             logical(C_BOOL) :: SHT_rv
         end function c_resourcemanager_is_allocator_name
@@ -720,9 +721,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_is_allocator_name_bufferify")
             use iso_c_binding, only : C_BOOL, C_CHAR, C_INT
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             character(kind=C_CHAR), intent(IN) :: name(*)
             integer(C_INT), value, intent(IN) :: Lname
             logical(C_BOOL) :: SHT_rv
@@ -732,9 +733,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_is_allocator_id")
             use iso_c_binding, only : C_BOOL, C_INT
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             integer(C_INT), value, intent(IN) :: id
             logical(C_BOOL) :: SHT_rv
         end function c_resourcemanager_is_allocator_id
@@ -743,9 +744,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_has_allocator")
             use iso_c_binding, only : C_BOOL, C_PTR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             logical(C_BOOL) :: SHT_rv
         end function c_resourcemanager_has_allocator
@@ -753,9 +754,9 @@ module umpire_mod
         subroutine c_resourcemanager_copy_all(self, src_ptr, dst_ptr) &
                 bind(C, name="umpire_resourcemanager_copy_all")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: src_ptr
             type(C_PTR), value, intent(IN) :: dst_ptr
         end subroutine c_resourcemanager_copy_all
@@ -764,9 +765,9 @@ module umpire_mod
                 dst_ptr, size) &
                 bind(C, name="umpire_resourcemanager_copy_with_size")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: src_ptr
             type(C_PTR), value, intent(IN) :: dst_ptr
             integer(C_SIZE_T), value, intent(IN) :: size
@@ -775,9 +776,9 @@ module umpire_mod
         subroutine c_resourcemanager_memset_all(self, ptr, val) &
                 bind(C, name="umpire_resourcemanager_memset_all")
             use iso_c_binding, only : C_INT, C_PTR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_INT), value, intent(IN) :: val
         end subroutine c_resourcemanager_memset_all
@@ -786,9 +787,9 @@ module umpire_mod
                 length) &
                 bind(C, name="umpire_resourcemanager_memset_with_size")
             use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_INT), value, intent(IN) :: val
             integer(C_SIZE_T), value, intent(IN) :: length
@@ -799,9 +800,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_reallocate_default")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: src_ptr
             integer(C_SIZE_T), value, intent(IN) :: size
             type(C_PTR) :: SHT_rv
@@ -812,12 +813,12 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_reallocate_with_allocator")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: src_ptr
             integer(C_SIZE_T), value, intent(IN) :: size
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             type(C_PTR) :: SHT_rv
         end function c_resourcemanager_reallocate_with_allocator
 
@@ -825,20 +826,20 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_move")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: src_ptr
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
             type(C_PTR) :: SHT_rv
         end function c_resourcemanager_move
 
         subroutine c_resourcemanager_deallocate(self, ptr) &
                 bind(C, name="umpire_resourcemanager_deallocate")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
         end subroutine c_resourcemanager_deallocate
 
@@ -846,9 +847,9 @@ module umpire_mod
                 result(SHT_rv) &
                 bind(C, name="umpire_resourcemanager_get_size")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_SIZE_T) :: SHT_rv
         end function c_resourcemanager_get_size
@@ -857,20 +858,20 @@ module umpire_mod
                 size, allocator) &
                 bind(C, name="umpire_resourcemanager_register_allocation")
             use iso_c_binding, only : C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_allocator_capsule, SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
             integer(C_SIZE_T), value, intent(IN) :: size
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
+            type(SHROUD_allocator_capsule), intent(IN), value :: allocator
         end subroutine c_resourcemanager_register_allocation
 
         subroutine c_resourcemanager_deregister_allocation(self, ptr) &
                 bind(C, name="umpire_resourcemanager_deregister_allocation")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_resourcemanager_capsule
+            import :: SHROUD_resourcemanager_capsule
             implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
+            type(SHROUD_resourcemanager_capsule), intent(IN) :: self
             type(C_PTR), value, intent(IN) :: ptr
         end subroutine c_resourcemanager_deregister_allocation
 
@@ -900,10 +901,10 @@ module umpire_mod
         subroutine c_get_backtrace_bufferify(ptr, DSHF_rv) &
                 bind(C, name="umpire_get_backtrace_bufferify")
             use iso_c_binding, only : C_PTR
-            import :: umpire_SHROUD_array
+            import :: SHROUD_array
             implicit none
             type(C_PTR), value, intent(IN) :: ptr
-            type(umpire_SHROUD_array), intent(OUT) :: DSHF_rv
+            type(SHROUD_array), intent(OUT) :: DSHF_rv
         end subroutine c_get_backtrace_bufferify
 
         function get_process_memory_usage() &
@@ -954,14 +955,14 @@ module umpire_mod
     interface
         ! helper copy_string
         ! Copy the char* or std::string in context into c_var.
-        subroutine umpire_SHROUD_copy_string_and_free(context, c_var, c_var_size) &
+        subroutine SHROUD_copy_string_and_free(context, c_var, c_var_size) &
              bind(c,name="umpire_ShroudCopyStringAndFree")
             use, intrinsic :: iso_c_binding, only : C_CHAR, C_SIZE_T
-            import umpire_SHROUD_array
-            type(umpire_SHROUD_array), intent(IN) :: context
+            import SHROUD_array
+            type(SHROUD_array), intent(IN) :: context
             character(kind=C_CHAR), intent(OUT) :: c_var(*)
             integer(C_SIZE_T), value :: c_var_size
-        end subroutine umpire_SHROUD_copy_string_and_free
+        end subroutine SHROUD_copy_string_and_free
     end interface
 
 contains
@@ -1054,12 +1055,12 @@ contains
     function allocator_get_name(obj) &
             result(SHT_rv)
         class(UmpireAllocator) :: obj
-        type(umpire_SHROUD_array) :: DSHF_rv
+        type(SHROUD_array) :: DSHF_rv
         character(len=:), allocatable :: SHT_rv
         ! splicer begin class.Allocator.method.get_name
         call c_allocator_get_name_bufferify(obj%cxxmem, DSHF_rv)
         allocate(character(len=DSHF_rv%elem_len):: SHT_rv)
-        call umpire_SHROUD_copy_string_and_free(DSHF_rv, SHT_rv, DSHF_rv%elem_len)
+        call SHROUD_copy_string_and_free(DSHF_rv, SHT_rv, DSHF_rv%elem_len)
         ! splicer end class.Allocator.method.get_name
     end function allocator_get_name
 
@@ -1728,8 +1729,8 @@ contains
         ! splicer end class.ResourceManager.method.get_allocator_by_id
     end function resourcemanager_get_allocator_by_id
 
-    function resourcemanager_make_allocator_pool(obj, name, allocator, &
-            initial_size, block) &
+    function resourcemanager_make_allocator_map_pool(obj, name, &
+            allocator, initial_size, block) &
             result(SHT_rv)
         use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
         class(UmpireResourceManager) :: obj
@@ -1738,13 +1739,13 @@ contains
         integer(C_SIZE_T), value, intent(IN) :: initial_size
         integer(C_SIZE_T), value, intent(IN) :: block
         type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_pool
+        ! splicer begin class.ResourceManager.method.make_allocator_map_pool
         type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_allocator_bufferify_pool(obj%cxxmem, &
+        SHT_prv = c_resourcemanager_make_allocator_bufferify_map_pool(obj%cxxmem, &
             name, len_trim(name, kind=C_INT), allocator%cxxmem, &
             initial_size, block, SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_pool
-    end function resourcemanager_make_allocator_pool
+        ! splicer end class.ResourceManager.method.make_allocator_map_pool
+    end function resourcemanager_make_allocator_map_pool
 
     function resourcemanager_make_allocator_list_pool(obj, name, &
             allocator, initial_size, block) &
@@ -2110,12 +2111,12 @@ contains
             result(SHT_rv)
         use iso_c_binding, only : C_PTR
         type(C_PTR), intent(IN) :: ptr
-        type(umpire_SHROUD_array) :: DSHF_rv
+        type(SHROUD_array) :: DSHF_rv
         character(len=:), allocatable :: SHT_rv
         ! splicer begin function.get_backtrace
         call c_get_backtrace_bufferify(ptr, DSHF_rv)
         allocate(character(len=DSHF_rv%elem_len):: SHT_rv)
-        call umpire_SHROUD_copy_string_and_free(DSHF_rv, SHT_rv, DSHF_rv%elem_len)
+        call SHROUD_copy_string_and_free(DSHF_rv, SHT_rv, DSHF_rv%elem_len)
         ! splicer end function.get_backtrace
     end function get_backtrace
 
