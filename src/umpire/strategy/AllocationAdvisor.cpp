@@ -31,7 +31,7 @@ AllocationAdvisor::AllocationAdvisor(const std::string& name, int id,
                                      const std::string& advice_operation,
                                      Allocator accessing_allocator,
                                      int device_id)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "AllocationAdvisor"},
       m_allocator{allocator.getAllocationStrategy()},
       m_device{device_id}
 {

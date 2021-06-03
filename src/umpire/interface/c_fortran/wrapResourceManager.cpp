@@ -657,4 +657,27 @@ size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
     // splicer end class.ResourceManager.method.get_size
 }
 
+void umpire_resourcemanager_register_allocation(
+    umpire_resourcemanager * self, void * ptr, size_t size,
+    umpire_allocator allocator)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.register_allocation
+    umpire::Allocator *SHCXX_allocator = static_cast<umpire::Allocator *>(allocator.addr);
+    umpire::strategy::AllocationStrategy *SHCXX_strategy = SHCXX_allocator->getAllocationStrategy();
+    SH_this->registerAllocation(ptr, umpire::util::AllocationRecord{ptr, size, SHCXX_strategy});
+    // splicer end class.ResourceManager.method.register_allocation
+}
+
+void umpire_resourcemanager_deregister_allocation(
+    umpire_resourcemanager * self, void * ptr)
+{
+    umpire::ResourceManager *SH_this =
+        static_cast<umpire::ResourceManager *>(self->addr);
+    // splicer begin class.ResourceManager.method.deregister_allocation
+    SH_this->deregisterAllocation(ptr);
+    // splicer end class.ResourceManager.method.deregister_allocation
+}
+
 }  // extern "C"

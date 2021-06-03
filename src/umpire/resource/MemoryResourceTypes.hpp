@@ -31,6 +31,7 @@ enum MemoryResourceType {
   Constant,
   File,
   NoOp,
+  Shared,
   Unknown
 };
 
@@ -51,6 +52,8 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "FILE";
     case NoOp:
       return "NO_OP";
+    case Shared:
+      return "SHARED";
     default:
       UMPIRE_ERROR("Unkown resource type: " << type);
       //
@@ -82,6 +85,8 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
     return MemoryResourceType::File;
   else if (resource == "NO_OP")
     return MemoryResourceType::NoOp;
+  else if (resource == "SHARED")
+    return MemoryResourceType::Shared;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
 

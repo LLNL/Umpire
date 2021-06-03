@@ -13,7 +13,7 @@ namespace strategy {
 
 AlignedAllocator::AlignedAllocator(const std::string& name, int id,
                                    Allocator allocator, std::size_t alignment)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "AlignedAllocator"},
       m_allocator(allocator.getAllocationStrategy()),
       m_alignment{alignment},
       m_mask{static_cast<uintptr_t>(~(m_alignment - 1))}

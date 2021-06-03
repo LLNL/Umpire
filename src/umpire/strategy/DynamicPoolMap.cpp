@@ -27,7 +27,7 @@ DynamicPoolMap::DynamicPoolMap(
     const std::size_t first_minimum_pool_allocation_size,
     const std::size_t next_minimum_pool_allocation_size,
     const std::size_t alignment, CoalesceHeuristic should_coalesce) noexcept
-    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "DynamicPoolMap"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
@@ -183,6 +183,11 @@ std::size_t DynamicPoolMap::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << m_current_bytes);
   return m_current_bytes;
+}
+
+std::size_t DynamicPoolMap::getActualHighwaterMark() const noexcept
+{
+  return m_actual_highwatermark;
 }
 
 std::size_t DynamicPoolMap::getFreeBlocks() const noexcept
@@ -346,6 +351,8 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
   }
 
   m_actual_bytes += bytes;
+  m_actual_highwatermark =
+    (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
 
   return ptr;
 }

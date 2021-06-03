@@ -87,6 +87,11 @@ bool Allocator::isTracked() const noexcept
   return m_allocator->isTracked();
 }
 
+const std::string& Allocator::getStrategyName() const noexcept
+{
+  return m_allocator->getStrategyName();
+}
+
 std::ostream& operator<<(std::ostream& os, const Allocator& allocator)
 {
   os << *allocator.m_allocator;

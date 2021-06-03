@@ -40,10 +40,9 @@ class AllocationStrategy
    * \param name The name of this AllocationStrategy object.
    * \param id The id of this AllocationStrategy object.
    */
-  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent) noexcept;
+  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent, const std::string& strategy_name) noexcept;
 
   virtual ~AllocationStrategy() = default;
-
 
   void* allocate_internal(std::size_t bytes);
 
@@ -106,6 +105,8 @@ class AllocationStrategy
    */
   const std::string& getName() noexcept;
 
+  const std::string& getStrategyName() const noexcept;
+
   /*!
    * \brief Get the id of this AllocationStrategy.
    *
@@ -137,6 +138,7 @@ class AllocationStrategy
   void setTracking(bool) noexcept;
 
   std::string m_name;
+  std::string m_strategy_name;
   int m_id;
   bool m_tracked{true};
 
@@ -151,6 +153,7 @@ class AllocationStrategy
    * \return Pointer to start of allocated bytes.
    */
   virtual void* allocate(std::size_t bytes) = 0;
+  virtual void* allocate_named(const std::string& name, std::size_t bytes);
 
   /*!
    * \brief Free the memory at ptr.
