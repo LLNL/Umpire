@@ -85,14 +85,14 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
     // splicer end class.ResourceManager.method.get_allocator_by_id
 }
 
-umpire_allocator * umpire_resourcemanager_make_allocator_map_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     umpire_resourcemanager * self, const char * name,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv)
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.make_allocator_map_pool
+    // splicer begin class.ResourceManager.method.make_allocator_pool
     const std::string SHCXX_name(name);
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
@@ -103,17 +103,17 @@ umpire_allocator * umpire_resourcemanager_make_allocator_map_pool(
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
-    // splicer end class.ResourceManager.method.make_allocator_map_pool
+    // splicer end class.ResourceManager.method.make_allocator_pool
 }
 
-umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_map_pool(
+umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     umpire_resourcemanager * self, const char * name, int Lname,
     umpire_allocator allocator, size_t initial_size, size_t block,
     umpire_allocator * SHC_rv)
 {
     umpire::ResourceManager *SH_this =
         static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.make_allocator_bufferify_map_pool
+    // splicer begin class.ResourceManager.method.make_allocator_bufferify_pool
     const std::string SHCXX_name(name, Lname);
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
@@ -124,7 +124,7 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_map_pool(
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
     return SHC_rv;
-    // splicer end class.ResourceManager.method.make_allocator_bufferify_map_pool
+    // splicer end class.ResourceManager.method.make_allocator_bufferify_pool
 }
 
 umpire_allocator * umpire_resourcemanager_make_allocator_list_pool(

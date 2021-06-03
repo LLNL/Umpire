@@ -138,7 +138,7 @@ declarations:
         cxx_template:
         - instantiation: <umpire::strategy::DynamicPoolMap>
           format:
-            template_suffix: _map_pool
+            template_suffix: _pool
             function_suffix: ""
         - instantiation: <umpire::strategy::DynamicPoolList>
           format:
