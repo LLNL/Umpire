@@ -31,7 +31,7 @@ import os, subprocess
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    print 'Running on read the docs'
+    print('Running on read the docs')
     subprocess.call('cd ../doxygen; doxygen', shell=True)
 
 # -- General configuration ------------------------------------------------
