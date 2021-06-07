@@ -14,27 +14,27 @@ argument is a boolean option, and  can be turned on or off:
 
 Here is a summary of the configuration options, their default value, and meaning:
 
-    ============================  ========        ===========================================================================
-    Variable                      Default         Meaning
-    ============================  ========        ===========================================================================
-    ``ENABLE_CUDA``               Off             Enable CUDA support
-    ``ENABLE_HIP``                Off             Enable HIP support
-    ``ENABLE_NUMA``               Off             Enable NUMA support
-    ``ENABLE_FILE_RESOURCE``      Off             Enable FILE support      
-    ``ENABLE_TESTS``              On              Build test executables
-    ``ENABLE_BENCHMARKS``         On              Build benchmark programs
-    ``ENABLE_LOGGING``            On              Enable Logging within Umpire
-    ``ENABLE_SLIC``               Off             Enable SLIC logging
-    ``ENABLE_BACKTRACE``          Off             Enable backtraces for allocations
-    ``ENABLE_BACKTRACE_SYMBOLS``  Off             Enable symbol lookup for backtraces
-    ``ENABLE_TOOLS``              Off             Enable tools like replay
-    ``ENABLE_DOCS``               Off             Build documentation (requires Sphinx and/or Doxygen)
-    ``ENABLE_C``                  Off             Build the C API
-    ``ENABLE_FORTRAN``            Off             Build the Fortran API
-    ``ENABLE_PERFORMANCE_TESTS``  Off             Build and run performance tests
-    ``ENABLE_HOST_SHARED_MEMORY`` ``ENABLE_MPI``  Enable Host Shared Memory support
-    ``ENABLE_ASAN``               Off             Enable ASAN support
-    ============================  ========        ===========================================================================
+    =============================  ==========  ===========================================================================
+    Variable                       Default     Meaning
+    =============================  ==========  ===========================================================================
+    ``ENABLE_CUDA``                Off         Enable CUDA support
+    ``ENABLE_HIP``                 Off         Enable HIP support
+    ``ENABLE_NUMA``                Off         Enable NUMA support
+    ``ENABLE_FILE_RESOURCE``       Off         Enable FILE support      
+    ``ENABLE_TESTS``               On          Build test executables
+    ``ENABLE_BENCHMARKS``          On          Build benchmark programs
+    ``ENABLE_LOGGING``             On          Enable Logging within Umpire
+    ``ENABLE_SLIC``                Off         Enable SLIC logging
+    ``ENABLE_BACKTRACE``           Off         Enable backtraces for allocations
+    ``ENABLE_BACKTRACE_SYMBOLS``   Off         Enable symbol lookup for backtraces
+    ``ENABLE_TOOLS``               Off         Enable tools like replay
+    ``ENABLE_DOCS``                Off         Build documentation (requires Sphinx and/or Doxygen)
+    ``ENABLE_C``                   Off         Build the C API
+    ``ENABLE_FORTRAN``             Off         Build the Fortran API
+    ``ENABLE_PERFORMANCE_TESTS``   Off         Build and run performance tests
+    ``ENABLE_HOST_SHARED_MEMORY``  ENABLE_MPI  Enable Host Shared Memory support
+    ``ENABLE_ASAN``                Off         Enable ASAN support
+    =============================  ==========  ===========================================================================
 
 These arguments are explained in more detail below:
 
