@@ -51,7 +51,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('numa', default=False, description='Enable NUMA support')
-    variant('shared', default=True, description='Enable Shared libs')
+    variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
     variant('deviceconst', default=False,
             description='Enables support for constant device memory')
@@ -71,6 +71,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     for val in ROCmPackage.amdgpu_targets:
         depends_on('camp amdgpu_target=%s' % val, when='amdgpu_target=%s' % val)
 
+    depends_on('camp+cuda', when='+cuda')
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on('camp cuda_arch={0}'.format(sm_),
                    when='cuda_arch={0}'.format(sm_))
