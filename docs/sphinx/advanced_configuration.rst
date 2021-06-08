@@ -32,7 +32,7 @@ Here is a summary of the configuration options, their default value, and meaning
     ``ENABLE_C``                   Off         Build the C API
     ``ENABLE_FORTRAN``             Off         Build the Fortran API
     ``ENABLE_PERFORMANCE_TESTS``   Off         Build and run performance tests
-    ``ENABLE_HOST_SHARED_MEMORY``  ENABLE_MPI  Enable Host Shared Memory support
+    ``ENABLE_IPC_SHARED_MEMORY``   ENABLE_MPI  Enable Shared Memory support
     ``ENABLE_ASAN``                Off         Enable ASAN support
     =============================  ==========  ===========================================================================
 
@@ -93,9 +93,9 @@ These arguments are explained in more detail below:
 * ``ENABLE_PERFORMANCE_TESTS``
   Build and run performance tests
 
-* ``ENABLE_HOST_SHARED_MEMORY``
-  This option enables support for interprocess shared memory on the ``HOST``
-  platform
+* ``ENABLE_IPC_SHARED_MEMORY``
+  This option enables support for interprocess shared memory.  Currently, this
+  feature only exists for for ``HOST`` memory.
 
 * ``ENABLE_ASAN``
   This option enables address sanitization checks within Umpire by compilers

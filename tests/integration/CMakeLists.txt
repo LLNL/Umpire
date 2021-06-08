@@ -195,7 +195,7 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
-if (ENABLE_HOST_SHARED_MEMORY AND ENABLE_MPI)
+if (ENABLE_IPC_SHARED_MEMORY AND ENABLE_MPI)
   blt_add_executable(
     NAME get_communicator_tests
     SOURCES get_communicator_tests.cpp
