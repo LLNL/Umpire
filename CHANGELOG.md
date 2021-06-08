@@ -52,8 +52,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - In Gitlab CI, upload junit reports for corona and lassen.
 
-- Initial support for IPC Shared Memory via a "SHARED" resource allocator. Host
-  Shared memory will default to the value of `ENABLE_MPI`.
+- Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC
+  Shared memory is initially available on the Host resource and will default
+  to the value of `ENABLE_MPI`. 
 
 - get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
 

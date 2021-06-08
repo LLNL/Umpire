@@ -141,7 +141,7 @@ cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 
 cmake_dependent_option(
-  ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
+  ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
   "NOT WIN32;NOT APPLE" Off )
 
 if (Git_FOUND)

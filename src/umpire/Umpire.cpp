@@ -187,7 +187,7 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
 {
   void* ptr{nullptr};
 
-#if defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   auto base_strategy =
           util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
 
@@ -200,7 +200,7 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
   else
 #else
     UMPIRE_USE_VAR(name);
-#endif // defined(UMPIRE_ENABLE_HOST_SHARED_MEMORY)
+#endif // defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 
   {
     if (ptr == nullptr) {
