@@ -59,7 +59,7 @@ endif()
 set(umpire_resource_depends
   camp)
 
-if(ENABLE_HOST_SHARED_MEMORY)
+if(ENABLE_IPC_SHARED_MEMORY)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     HostSharedMemoryResource.hpp
