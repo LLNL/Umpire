@@ -21,6 +21,9 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
+set_source_files_properties(Replay.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(Replay.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
@@ -97,8 +100,6 @@ if (ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
-set_source_files_properties(Replay.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(Replay.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 set (umpire_defines)
 
