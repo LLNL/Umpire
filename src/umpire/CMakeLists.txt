@@ -92,6 +92,7 @@ if (ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
+set_source_files_properties(Replay.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 set (umpire_defines)
 
