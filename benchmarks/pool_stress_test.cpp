@@ -15,13 +15,15 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
-#if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP)
+#if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP) //device
   constexpr std::size_t ALLOC_SIZE {8589934592ULL}; //8GiB total size of all allocations together
-#else
+#else //host
   constexpr std::size_t ALLOC_SIZE {137438953472ULL}; //137GiB total size of all allocations together
 #endif
 
-constexpr std::size_t SIZE {268435456}; //268MiB, size of each allocation
+//constexpr std::size_t SIZE {32768}; //32KB, size of each allocation
+constexpr std::size_t SIZE {1048576}; //1MB, size of each allocation
+//constexpr std::size_t SIZE {268435456}; //268MB, size of each allocation
 
 /*
  * \brief Function that tests the deallocation pattern performance of a given pool allocator. 
@@ -38,7 +40,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::string pool_nam
 {
   double time[] = {0.0, 0.0};
   constexpr std::size_t convert {1000000}; //convert sec (s) to microsec (us)
-  constexpr std::size_t num_rnd {1000}; //number of rounds (used to average timing)
+  constexpr std::size_t num_rnd {1000000}; //number of rounds (used to average timing)
   const std::size_t num_indices{indices.size()};
   std::vector<void*> allocations(num_indices);
 
@@ -72,7 +74,11 @@ template <class T>
 void do_test(std::string pool_name, std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs)
 {
   auto& rm {umpire::ResourceManager::getInstance()};
+#if defined (UMPIRE_ENABLE_DEVICE)
+  umpire::Allocator alloc {rm.getAllocator("DEVICE")};
+#elif
   umpire::Allocator alloc {rm.getAllocator("HOST")};
+#endif
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, ALLOC_SIZE)};
 
   for(auto i : indexing_pairs) {
