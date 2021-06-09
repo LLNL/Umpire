@@ -48,6 +48,11 @@ if (ENABLE_FORTRAN OR ENABLE_C)
         PROPERTIES
         Fortran_FORMAT FREE)
     endif ()
+    
+    set_source_files_properties(
+      interface/c_fortran/wrapResourceManager.cpp 
+      PROPERTIES 
+      COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
   endif ()
 endif ()
 
