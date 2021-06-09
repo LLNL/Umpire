@@ -61,22 +61,4 @@ std::ostream& operator<<(std::ostream& out, umpire::Allocator& alloc)
   return out;
 }
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&)
-{
-  return out;
-}
-
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&)
-{
-  return out;
-}
-
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::QuickPool::CoalesceHeuristic&)
-{
-  return out;
-}
-
 } /* namespace umpire */

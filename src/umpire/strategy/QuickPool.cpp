@@ -383,5 +383,11 @@ QuickPool::CoalesceHeuristic QuickPool::percent_releasable(int percentage)
   }
 }
 
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::QuickPool::CoalesceHeuristic&)
+{
+  return out;
+}
+
 } // end of namespace strategy
 } // end namespace umpire

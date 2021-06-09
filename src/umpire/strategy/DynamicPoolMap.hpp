@@ -187,6 +187,9 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
   std::size_t m_actual_highwatermark{0};
 };
 
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&);
+
 } // end of namespace strategy
 } // end namespace umpire
 

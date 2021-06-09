@@ -117,6 +117,9 @@ class DynamicPoolList : public AllocationStrategy {
   CoalesceHeuristic m_should_coalesce;
 };
 
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&);
+
 } // end of namespace strategy
 } // end namespace umpire
 
