@@ -21,8 +21,8 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-set_source_files_properties(Replay.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(Replay.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(Replay.cpp PROPERTIES CXX_COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(Replay.hpp PROPERTIES CXX_COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers

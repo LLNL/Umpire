@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <chrono>
+#include <map>
 #include <string>
 #include <random>
 #include <numeric>
