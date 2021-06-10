@@ -220,9 +220,9 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
   int id = a.getId();
 
   auto cached_comm = cached_communicators.find(id);
-  if (cached_comm != cached_communicators.end()) { 
+  if (cached_comm != cached_communicators.end()) {
     c = cached_comm->second;
-  } else { 
+  } else {
     if (scope == MemoryResourceTraits::shared_scope::node) {
       MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
     } else {
@@ -234,5 +234,48 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
   return c;
 }
 #endif
+
+std::vector<AllocatorStatistics> get_all_allocator_stats()
+{
+  std::vector<AllocatorStatistics> rval;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  for (const auto& alloc_name : rm.getAllocatorNames()) {
+    std::size_t total_blocks{0};
+    std::size_t releasable_blocks{0};
+
+    auto alloc = rm.getAllocator(alloc_name);
+    umpire::strategy::AllocationStrategy* root = alloc.getAllocationStrategy();
+
+    // Is this a pool?
+    umpire::strategy::QuickPool* qp_strat{dynamic_cast<umpire::strategy::QuickPool*>(root)};
+    if (qp_strat != nullptr) {
+      releasable_blocks = qp_strat->getReleasableBlocks();
+      total_blocks = qp_strat->getTotalBlocks();
+    }
+    else {
+      umpire::strategy::DynamicPoolList* dpl_strat{dynamic_cast<umpire::strategy::DynamicPoolList*>(root)};
+
+      if (dpl_strat != nullptr) {
+        releasable_blocks = dpl_strat->getReleasableBlocks();
+        total_blocks = dpl_strat->getTotalBlocks();
+      }
+    }
+
+    // Find the resource for this allocator
+    while ((root->getParent() != nullptr)) {
+      root = root->getParent();
+    }
+
+    rval.push_back  (
+      AllocatorStatistics { alloc_name, root->getName(), alloc.getCurrentSize(),
+                            alloc.getActualSize(), alloc.getHighWatermark(),
+                            total_blocks, releasable_blocks
+                          }
+                    );
+  }
+  return rval;
+}
 
 } // end namespace umpire

@@ -65,6 +65,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `umpire::mark_event()` to mark an event during Umpire lifecycle
 
+- `umpire::get_all_allocator_stats()`to return vector of statistics for all
+   allocators.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.

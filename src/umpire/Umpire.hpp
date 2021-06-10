@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -179,6 +180,23 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name);
 #if defined(UMPIRE_ENABLE_MPI)
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 #endif
+
+/*!
+ * \brief Returns vector of AllocationRecords created by the allocator.
+ *
+ * \param allocator source Allocator.
+ */
+struct AllocatorStatistics {
+  std::string allocator_name;
+  std::string resource_name;
+  std::size_t current_size;
+  std::size_t actual_size;
+  std::size_t high_watermark;
+  std::size_t total_blocks;
+  std::size_t releasable_blocks;
+};
+
+std::vector<AllocatorStatistics> get_all_allocator_stats();
 
 } // end of namespace umpire
 

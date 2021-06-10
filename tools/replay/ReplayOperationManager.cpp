@@ -11,18 +11,19 @@
 #include <vector>
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
+#include "ReplayMacros.hpp"
+#include "ReplayOperationManager.hpp"
+#include "ReplayOptions.hpp"
+#include "ReplayOptions.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/wrap_allocator.hpp"
-#include "umpire/ResourceManager.hpp"
-#include "ReplayMacros.hpp"
-#include "ReplayOperationManager.hpp"
-#include "ReplayOptions.hpp"
 
-#include "ReplayOptions.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #include "umpire/util/numa.hpp"
@@ -142,13 +143,14 @@ namespace {
 void ReplayOperationManager::runOperations()
 {
   std::map<int, TrackedHistogram > size_histogram;
+  std::map<std::string, int> size_histogram_index;
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
 
   const int name_width{40};
   const int num_width{16};
   if (m_options.track_stats) {
-    std::cout 
+    std::cout
       << std::setw(name_width) << std::left << "Filename"
       << std::setw(name_width) << std::left << "Allocator"
       << std::setw(num_width) << std::left << "Current Size"
@@ -166,12 +168,14 @@ void ReplayOperationManager::runOperations()
         case ReplayFile::otype::ALLOCATOR_CREATION:
           if (m_options.track_stats) {
             size_histogram[op->op_allocator] = TrackedHistogram{};
+            size_histogram_index[std::string{m_ops_table->allocators[op->op_allocator].name}] = op->op_allocator;
           }
           makeAllocator(op);
           break;
         case ReplayFile::otype::SETDEFAULTALLOCATOR:
           if (m_options.track_stats) {
             size_histogram[op->op_allocator] = TrackedHistogram{};
+            size_histogram_index[std::string{m_ops_table->allocators[op->op_allocator].name}] = op->op_allocator;
           }
           makeSetDefaultAllocator(op);
           break;
@@ -220,65 +224,33 @@ void ReplayOperationManager::runOperations()
     }
 
     if (m_options.dump_statistics) {
-      for (std::size_t i = 0; i < m_ops_table->num_allocators; i++) {
-        auto alloc = &m_ops_table->allocators[i];
-        if (alloc->allocator == nullptr)
-          continue;
-
-        auto alloc_name = alloc->allocator->getName();
-
-        std::string cur_stat_name{alloc_name + " current_size"};
-        std::string actual_stat_name{alloc_name + " actual_size"};
-        std::string hwm_stat_name{alloc_name + " hwm"};
-        std::string allocs_stat_name{alloc_name + " allocation count"};
+      for ( auto stats : umpire::get_all_allocator_stats() ) {
+        std::string cur_stat_name{stats.allocator_name + " current_size"};
+        std::string actual_stat_name{stats.allocator_name + " actual_size"};
+        std::string hwm_stat_name{stats.allocator_name + " hwm"};
+        std::string allocs_stat_name{stats.allocator_name + " allocation count"};
 
         m_stat_series[cur_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              alloc->allocator->getCurrentSize()));
+            std::make_pair(op_counter, stats.current_size));
 
         m_stat_series[actual_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              alloc->allocator->getActualSize()));
+            std::make_pair(op_counter, stats.actual_size));
 
         m_stat_series[hwm_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              alloc->allocator->getHighWatermark()));
+            std::make_pair(op_counter, stats.high_watermark));
 
         m_stat_series[allocs_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              size_histogram[i].allocation_count));
+            std::make_pair(op_counter,
+              size_histogram[size_histogram_index[stats.allocator_name]].allocation_count));
 
-        auto strategy = alloc->allocator->getAllocationStrategy();
-        umpire::strategy::QuickPool* qp_strat{dynamic_cast<umpire::strategy::QuickPool*>(strategy)};
+        std::string blocks_name{stats.allocator_name + " total blocks"};
+        std::string releasable_blocks_name{stats.allocator_name + " releasable blocks"};
 
-        if (qp_strat != nullptr) {
-          std::string blocks_name{alloc_name + " total blocks"};
-          std::string releasable_blocks_name{alloc_name + " releasable blocks"};
-
-          m_stat_series[releasable_blocks_name].push_back(
-              std::make_pair(op_counter, qp_strat->getReleasableBlocks()));
+        m_stat_series[releasable_blocks_name].push_back(
+            std::make_pair(op_counter, stats.releasable_blocks));
 
           m_stat_series[blocks_name].push_back(
-              std::make_pair(op_counter, qp_strat->getTotalBlocks()));
-        }
-        else {
-          umpire::strategy::DynamicPoolList* dpl_strat{dynamic_cast<umpire::strategy::DynamicPoolList*>(strategy)};
-
-          if (dpl_strat != nullptr) {
-            std::string blocks_name{alloc_name + " total blocks"};
-            std::string releasable_blocks_name{alloc_name + " releasable blocks"};
-
-            m_stat_series[releasable_blocks_name].push_back(
-                std::make_pair(op_counter, dpl_strat->getReleasableBlocks()));
-
-            m_stat_series[blocks_name].push_back(
-                std::make_pair(op_counter, dpl_strat->getTotalBlocks()));
-          }
-        }
+            std::make_pair(op_counter, stats.total_blocks));
       }
     }
     op_counter++;
