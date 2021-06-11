@@ -75,9 +75,11 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
-set_source_files_properties(DynamicPoolMap.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(DynamicPoolMap.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(DynamicPool.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+if (ENABLE_WARINNGS_AS_ERRORS)
+  set_source_files_properties(DynamicPoolMap.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+  set_source_files_properties(DynamicPoolMap.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+  set_source_files_properties(DynamicPool.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+endif()
 
 blt_add_library(
   NAME umpire_strategy

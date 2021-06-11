@@ -47,11 +47,9 @@ blt_add_executable(
   SOURCES pool_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
 
-if (ENABLE_WARNINGS_AS_ERRORS)
-  blt_add_target_compile_flags(
-    TO pool_stress_test
-    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-endif()
+blt_add_target_compile_flags(
+  TO pool_stress_test
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 if (ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)

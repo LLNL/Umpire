@@ -64,6 +64,9 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
   set(umpire_interface_depends camp)
+  blt_list_append( TO umpire_interface_depends ELEMENTS cuda_runtime IF ENABLE_CUDA )
+  blt_list_append( TO umpire_interface_depends ELEMENTS hip_runtime IF ENABLE_HIP )
+  blt_list_append( TO umpire_interface_depends ELEMENTS mpi IF ENABLE_MPI )
 
   blt_add_library(
     NAME umpire_interface
@@ -109,8 +112,8 @@ if (ENABLE_OPENMP_TARGET)
     openmp)
 endif ()
 
-blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_C )
+blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
 
 set (umpire_defines)
 
