@@ -4,6 +4,16 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+add_subdirectory(tpl)
+add_subdirectory(resource)
+add_subdirectory(alloc)
+add_subdirectory(op)
+add_subdirectory(util)
+add_subdirectory(strategy)
+if (SHROUD_FOUND)
+  add_subdirectory(interface)
+endif ()
+
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
@@ -31,45 +41,43 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     interface/c_fortran/wrapUmpire.h
     interface/c_fortran/typesUmpire.h)
 
-  if (ENABLE_C)
+  set (umpire_interface_sources
+    interface/c_fortran/utilUmpire.cpp
+    interface/c_fortran/wrapAllocator.cpp
+    interface/c_fortran/wrapResourceManager.cpp
+    interface/c_fortran/wrapUmpire.cpp)
+
+  if (ENABLE_FORTRAN)
     set (umpire_interface_sources
-      interface/c_fortran/utilUmpire.cpp
-      interface/c_fortran/wrapAllocator.cpp
-      interface/c_fortran/wrapResourceManager.cpp
-      interface/c_fortran/wrapUmpire.cpp)
+      ${umpire_interface_sources}
+      interface/c_fortran/wrapfumpire.f)
 
-    if (ENABLE_FORTRAN)
-      set (umpire_interface_sources
-        ${umpire_interface_sources}
-        interface/c_fortran/wrapfumpire.f)
-
-      set_source_files_properties(
-        interface/c_fortran/wrapfumpire.f
-        PROPERTIES
-        Fortran_FORMAT FREE)
+    set_source_files_properties(
+      interface/c_fortran/wrapfumpire.f
+      PROPERTIES
+      Fortran_FORMAT FREE)
     endif ()
     
-    set_source_files_properties(
-      interface/c_fortran/wrapResourceManager.cpp 
-      PROPERTIES 
-      COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+  set_source_files_properties(
+    interface/c_fortran/wrapResourceManager.cpp 
+    PROPERTIES 
+    COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-    set(umpire_interface_depends)
+  set(umpire_interface_depends camp)
 
-    blt_add_library(
-      NAME umpire_interface
-      HEADERS ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
-      SOURCES ${umpire_interface_sources}
-      DEPENDS_ON ${umpire_interface_depends}
-      OBJECT TRUE)
+  blt_add_library(
+    NAME umpire_interface
+    HEADERS ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
+    SOURCES ${umpire_interface_sources}
+    DEPENDS_ON ${umpire_interface_depends}
+    OBJECT TRUE)
 
-    target_include_directories(
-      umpire_interface
-      PUBLIC
-      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-      $<INSTALL_INTERFACE:include>)
-  endif ()
+  target_include_directories(
+    umpire_interface
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 endif ()
 
 if (ENABLE_CUDA)
@@ -85,17 +93,6 @@ if (ENABLE_CUDA)
                               PROPERTIES
                               LANGUAGE CUDA)
 endif()
-
-add_subdirectory(tpl)
-
-add_subdirectory(resource)
-add_subdirectory(alloc)
-add_subdirectory(op)
-add_subdirectory(util)
-add_subdirectory(strategy)
-if (SHROUD_FOUND)
-  add_subdirectory(interface)
-endif ()
 
 set (umpire_depends
   camp
@@ -113,7 +110,7 @@ if (ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
-blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_FORTRAN OR ENABLE_C )
+blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_C )
 
 set (umpire_defines)
 

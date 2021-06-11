@@ -8,6 +8,7 @@
 #include <string>
 #include <random>
 #include <numeric>
+#include <map>
 
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
