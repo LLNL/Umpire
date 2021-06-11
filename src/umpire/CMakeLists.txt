@@ -21,9 +21,6 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-set_source_files_properties(Replay.cpp PROPERTIES CXX_COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(Replay.hpp PROPERTIES CXX_COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
@@ -56,6 +53,22 @@ if (ENABLE_FORTRAN OR ENABLE_C)
       interface/c_fortran/wrapResourceManager.cpp 
       PROPERTIES 
       COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
+    set(umpire_interface_depends)
+
+    blt_add_library(
+      NAME umpire_interface
+      HEADERS ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
+      SOURCES ${umpire_interface_sources}
+      DEPENDS_ON ${umpire_interface_depends}
+      OBJECT TRUE)
+
+    target_include_directories(
+      umpire_interface
+      PUBLIC
+      $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+      $<INSTALL_INTERFACE:include>)
   endif ()
 endif ()
 
@@ -100,6 +113,7 @@ if (ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
+blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_FORTRAN OR ENABLE_C )
 
 set (umpire_defines)
 
@@ -111,8 +125,8 @@ endif ()
 
 blt_add_library(
   NAME umpire
-  HEADERS ${umpire_headers} ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
-  SOURCES ${umpire_sources} ${umpire_interface_sources}
+  HEADERS ${umpire_headers}
+  SOURCES ${umpire_sources}
   DEPENDS_ON ${umpire_depends}
   DEFINES ${umpire_defines})
 
