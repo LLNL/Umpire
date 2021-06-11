@@ -34,6 +34,10 @@
 #endif
 static const int RangeHi{1<<28}; //256MiB
 
+//TODO: use #if defined HOST and DEVICE to set these to 
+//similar values as the other benchmarks
+//TODO: set the range multiplier according to how it will 
+//match up with the values in the other benchmarks
 /*
  * Allocate either LARGE (about 17GiB), MEDIUM (about 8GiB)
  * or SMALL (about 4GiB) for benchmark measurements.

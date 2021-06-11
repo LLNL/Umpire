@@ -21,9 +21,15 @@
   constexpr std::size_t ALLOC_SIZE {137438953472ULL}; //137GiB total size of all allocations together
 #endif
 
-//constexpr std::size_t SIZE {32768}; //32KB, size of each allocation
-constexpr std::size_t SIZE {1048576}; //1MB, size of each allocation
-//constexpr std::size_t SIZE {268435456}; //268MB, size of each allocation
+/*
+ * Setting up a wide range of sizes to test for both host and device runs. The total number of
+ * allocations within the pool should stay around 10k ideally.
+ */
+constexpr std::size_t SIZE {1048576}; //1MB, size of each allocation - dev only (~8k allocs total)
+//constexpr std::size_t SIZE {524288}; //524KB, size of each allocation - dev only (~16k allocs total)
+//constexpr std::size_t SIZE {65536}; //65KB, size of each allocation - dev only (~131k allocs total)
+//constexpr std::size_t SIZE {16777216}; //16MB, size of each allocation - host only (~8k allocs total)
+//constexpr std::size_t SIZE {8388608}; //8MB, size of each allocation - host only (~16k allocs total)
 
 /*
  * \brief Function that tests the deallocation pattern performance of a given pool allocator. 

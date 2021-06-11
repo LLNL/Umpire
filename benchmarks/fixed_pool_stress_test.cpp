@@ -30,7 +30,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::size_t size, co
 {
   double time[] = {0.0, 0.0};
   constexpr std::size_t convert{1000000}; //convert sec (s) to microsec (us)
-  constexpr std::size_t num_rnd{1000}; //number of rounds (used to average timing)
+  constexpr std::size_t num_rnd{1000000}; //number of rounds (used to average timing)
   const std::size_t num_indices{indices.size()};
   std::vector<void*> allocations(num_indices);
 
@@ -68,9 +68,10 @@ int main(int, char**)
   auto& rm{umpire::ResourceManager::getInstance()};
   umpire::Allocator alloc{rm.getAllocator("HOST")};
   
-  //Array of sizes used (large vs. medium vs. small)
-  std::vector<std::size_t> sizes {67108864, 1048576, 2048};
+  //Array of sizes used: (large vs. med-large vs. medium vs. small)
+  std::vector<std::size_t> sizes {16777216, 8388608, 1048576, 2048};
 
+  //Idea: make a tuple - depending on size used each loop iter, use corresponding num_alloc size
   //number of allocations used for testing
   constexpr std::size_t num_alloc {512};
   std::mt19937 gen(num_alloc);
