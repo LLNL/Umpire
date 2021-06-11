@@ -120,6 +120,8 @@ blt_add_executable(
   SOURCES operation_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
 
+set_source_files_properties(operation_tests.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
 target_include_directories(
   operation_tests
   PRIVATE
