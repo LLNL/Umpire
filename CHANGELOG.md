@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Spack environment files for developer builds.
+
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
@@ -158,6 +160,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
   as not being found
+
 
 ## [v5.0.0] - 2020-11-18
 
