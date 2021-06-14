@@ -107,19 +107,19 @@ struct s_umpire_strategy_allocationprefetcher {
 };
 typedef struct s_umpire_strategy_allocationprefetcher umpire_strategy_allocationprefetcher;
 
-// helper capsule_umpire_strategy_dynamicpool
-struct s_umpire_strategy_dynamicpool {
-    void *addr;     /* address of C++ memory */
-    int idtor;      /* index of destructor */
-};
-typedef struct s_umpire_strategy_dynamicpool umpire_strategy_dynamicpool;
-
 // helper capsule_umpire_strategy_dynamicpoollist
 struct s_umpire_strategy_dynamicpoollist {
     void *addr;     /* address of C++ memory */
     int idtor;      /* index of destructor */
 };
 typedef struct s_umpire_strategy_dynamicpoollist umpire_strategy_dynamicpoollist;
+
+// helper capsule_umpire_strategy_dynamicpoolmap
+struct s_umpire_strategy_dynamicpoolmap {
+    void *addr;     /* address of C++ memory */
+    int idtor;      /* index of destructor */
+};
+typedef struct s_umpire_strategy_dynamicpoolmap umpire_strategy_dynamicpoolmap;
 
 // helper capsule_umpire_strategy_fixedpool
 struct s_umpire_strategy_fixedpool {

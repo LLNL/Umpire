@@ -506,5 +506,12 @@ DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(
   }
 }
 
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&)
+{
+  return out;
+}
+
+
 } // end of namespace strategy
 } // end of namespace umpire

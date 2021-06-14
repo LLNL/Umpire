@@ -92,6 +92,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Replay testing disabled during HIP builds with `ENABLE_TOOLS`=On
 
+- `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
+
+- Changed most internal and test uses of DynamicPoolMap to QuickPool.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.

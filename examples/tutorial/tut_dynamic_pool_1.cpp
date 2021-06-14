@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
 
 void allocate_and_deallocate_pool(const std::string& resource)
 {
@@ -15,7 +15,7 @@ void allocate_and_deallocate_pool(const std::string& resource)
   auto allocator = rm.getAllocator(resource);
 
   // _sphinx_tag_tut_makepool_start
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
       resource + "_pool", allocator);
   // _sphinx_tag_tut_makepool_end
 

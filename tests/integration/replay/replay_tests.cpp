@@ -138,7 +138,6 @@ void testAllocation(std::string name)
   try {
     auto dynamic_pool =
         umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(alloc);
-
     dynamic_pool->coalesce();
     alloc.release();
   } catch (...) {

@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <chrono>
+#include <map>
 #include <string>
 #include <random>
 #include <numeric>
@@ -14,6 +15,9 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
+#include "umpire/strategy/DynamicPoolMap.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 #if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP)
   constexpr std::size_t ALLOC_SIZE {8589934592ULL}; //8GiB total size of all allocations together

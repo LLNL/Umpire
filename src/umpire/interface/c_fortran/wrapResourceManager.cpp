@@ -11,8 +11,8 @@
 
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/QuickPool.hpp"
@@ -97,7 +97,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_pool(
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPool>(
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::DynamicPoolMap>(
         SHCXX_name, *SHCXX_allocator, initial_size, block);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;
@@ -117,7 +118,8 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
     umpire::Allocator * SHCXX_allocator =
         static_cast<umpire::Allocator *>(allocator.addr);
     umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv = SH_this->makeAllocator<umpire::strategy::DynamicPool>(
+    *SHCXX_rv =
+        SH_this->makeAllocator<umpire::strategy::DynamicPoolMap>(
         SHCXX_name, *SHCXX_allocator, initial_size, block);
     SHC_rv->addr = SHCXX_rv;
     SHC_rv->idtor = 1;

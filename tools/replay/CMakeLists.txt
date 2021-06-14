@@ -49,4 +49,11 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND ENABLE_BACKTRACE_SYMBOLS)
     FLAGS "-rdynamic")
 endif ()
 
+blt_add_target_compile_flags(
+  TO replay
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+blt_add_target_compile_flags(
+  TO replaydiff
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
 install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)

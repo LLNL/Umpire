@@ -32,7 +32,7 @@ namespace strategy {
  * and the minimum size controls the lower bound on all future chunk
  * allocations.
  */
-class DynamicPoolMap : public AllocationStrategy,
+class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public AllocationStrategy,
                        private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
@@ -186,6 +186,9 @@ class DynamicPoolMap : public AllocationStrategy,
   bool m_is_destructing{false};
   std::size_t m_actual_highwatermark{0};
 };
+
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&);
 
 } // end of namespace strategy
 } // end namespace umpire
