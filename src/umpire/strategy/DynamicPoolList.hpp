@@ -73,6 +73,7 @@ class DynamicPoolList : public AllocationStrategy {
 
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
+  std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
 
@@ -115,6 +116,9 @@ class DynamicPoolList : public AllocationStrategy {
   DynamicSizePool<> dpa;
   CoalesceHeuristic m_should_coalesce;
 };
+
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&);
 
 } // end of namespace strategy
 } // end namespace umpire

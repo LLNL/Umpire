@@ -8,7 +8,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/Macros.hpp"
 
 int main(int, char**)
@@ -22,7 +22,7 @@ int main(int, char**)
   //
   // _sphinx_tag_tut_nointro_start
   auto pooled_allocator =
-      rm.makeAllocator<umpire::strategy::DynamicPool, false>(
+      rm.makeAllocator<umpire::strategy::QuickPool, false>(
           "NO_INTROSPECTION_POOL", allocator);
   // _sphinx_tag_tut_nointro_end
 

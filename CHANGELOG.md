@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Spack environment files for developer builds.
+
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
@@ -50,11 +52,20 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - In Gitlab CI, upload junit reports for corona and lassen.
 
-- Initial support for IPC Shared Memory via a "SHARED" resource allocator.
+- Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC
+  Shared memory is initially available on the Host resource and will default
+  to the value of `ENABLE_MPI`. 
+
+- get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
 
 - Allocator::getStrategyName() to get name of the strategy used.
 
 - Added lifespan timing info for no-op benchmark.
+
+- Added `getActualHighwatermark` to all pool strategies, returns the high water
+  value of `getActualSize`.
+
+- `umpire::mark_event()` to mark an event during Umpire lifecycle
 
 - Benchmark for measuring performance of the Device Allocator.
 
@@ -70,7 +81,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI on Gitlab does not require a python environment anymore.
 
-- BLT submodule updated to v0.4.0
+- BLT submodule updated to v0.4.0.
 
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
@@ -78,6 +89,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Renamed'ENABLE_TESTS', 'ENABLE_EXAMPLES' and 'ENABLE_DOCS' to
   'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
   made those options dependant on the corresponding BLT options.
+
+- Use CMake 3.18.0 in CI
+
+- Replay testing disabled during HIP builds with `ENABLE_TOOLS`=On
+
+- `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
+
+- Changed most internal and test uses of DynamicPoolMap to QuickPool.
 
 ### Removed
 
@@ -89,6 +108,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   updated instead).
 
 - Doxygen from Sphinx to fix auto documentation generation bug.
+
+- DynamicPool and DynamicPoolMap removed from replay tests since they share the
+  same signature as QuickPool.
 
 ### Fixed
 
@@ -126,10 +148,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed how the memory resoure is set for the pool benchmark
 
+- Fixed CUDA dependencies in build system.
+
 - Fixed corona gitlab CI build + link errors
 
 - Replay tool now handles rogue deallocate calls that may be present in
   replay files.
+
+- Fixed shared memory signature that had `const std::string` to use
+  `const std::string&` instead of a copy of the string.
+
+- Fixed cmake warning for HIP+tools builds
 
 ## [v5.0.1] - 2021-03-31
 
@@ -137,6 +166,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
   as not being found
+
 
 ## [v5.0.0] - 2020-11-18
 

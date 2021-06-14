@@ -9,10 +9,10 @@ when you are making large allocations or allocating on different memory
 resources. To mitigate this, Umpire provides allocation strategies that can be
 used to customize how data is obtained from the system.
 
-In this example, we will look at the :class:`umpire::strategy::DynamicPool`
+In this example, we will look at the :class:`umpire::strategy::DynamicPoolList`
 strategy. This is a simple pooling algorithm that can fulfill requests for
 allocations of any size. To create a new ``Allocator`` using the
-:class:`umpire::strategy::DynamicPool` strategy:
+:class:`umpire::strategy::DynamicPoolList` strategy:
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
    :start-after: _sphinx_tag_tut_makepool_start
@@ -60,10 +60,10 @@ Don't forget, these strategies can be created on top of any valid Allocator:
    :language: C++
 
 Most Umpire users will make allocations that use the GPU via the
-:class:`umpire::strategy::DynamicPool`, to help mitigate the cost of allocating
+:class:`umpire::strategy::DynamicPoolList`, to help mitigate the cost of allocating
 memory on these devices.
 
-You can tune the way that :class:`umpire::strategy::DynamicPool` allocates
+You can tune the way that :class:`umpire::strategy::DynamicPoolList` allocates
 memory using two parameters: the initial size, and the minimum size. The
 initial size controls how large the first underly allocation made will be,
 regardless of the requested size. The minimum size controls the minimum size of

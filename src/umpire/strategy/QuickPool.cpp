@@ -93,6 +93,8 @@ void* QuickPool::allocate(std::size_t bytes)
     m_releasable_bytes += size;
     m_releasable_blocks++;
     m_total_blocks++;
+    m_actual_highwatermark = 
+      (m_actual_bytes > m_actual_highwatermark) ?  m_actual_bytes : m_actual_highwatermark;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
@@ -290,6 +292,11 @@ std::size_t QuickPool::getReleasableSize() const noexcept
     return 0;
 }
 
+std::size_t QuickPool::getActualHighwaterMark() const noexcept
+{
+  return m_actual_highwatermark;
+}
+
 Platform QuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
@@ -374,6 +381,12 @@ QuickPool::CoalesceHeuristic QuickPool::percent_releasable(int percentage)
       return (pool.getReleasableSize() >= threshold);
     };
   }
+}
+
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::QuickPool::CoalesceHeuristic&)
+{
+  return out;
 }
 
 } // end of namespace strategy

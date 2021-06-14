@@ -27,7 +27,7 @@ namespace strategy {
  * - op::CudaAdvisePreferredLocationOperation
  * - op::CudaAdviseReadMostlyOperation
  *
- * Using this AllocationStrategy when combined with a pool like DynamicPool is
+ * Using this AllocationStrategy when combined with a pool like DynamicPoolList is
  * a good way to mitigate the overhead of applying the memory advice.
  */
 class AllocationAdvisor : public AllocationStrategy {

@@ -31,7 +31,7 @@
 #endif
 
 #include "umpire/strategy/FixedPool.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
 #include "umpire/util/FixedMallocPool.hpp"
@@ -334,12 +334,12 @@ public:
 };
 
 template <umpire::resource::MemoryResourceType Resource>
-class DynamicPool : public AllocatorRandomSizeBenchmark {
+class DynamicPoolList : public AllocatorRandomSizeBenchmark {
 public:
   using AllocatorRandomSizeBenchmark::SetUp;
   using AllocatorRandomSizeBenchmark::TearDown;
 
-  DynamicPool() : m_alloc{nullptr} {}
+  DynamicPoolList() : m_alloc{nullptr} {}
 
   void SetUpPool() final {
     auto& rm = umpire::ResourceManager::getInstance();
@@ -349,7 +349,7 @@ public:
     ++namecnt;
 
     m_alloc = new umpire::Allocator{
-      rm.makeAllocator<umpire::strategy::DynamicPool, Introspection>(
+      rm.makeAllocator<umpire::strategy::DynamicPoolList, Introspection>(
         ss.str(), rm.getAllocator(Resource))};
   }
 
@@ -365,24 +365,24 @@ private:
   umpire::Allocator* m_alloc;
 };
 
-class DynamicPoolHost : public DynamicPool<umpire::resource::Host> {};
-BENCHMARK_DEFINE_F(DynamicPoolHost, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolHost, deallocate)(benchmark::State& st) { deallocation(st); }
+class DynamicPoolListHost : public DynamicPoolList<umpire::resource::Host> {};
+BENCHMARK_DEFINE_F(DynamicPoolListHost, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolListHost, deallocate)(benchmark::State& st) { deallocation(st); }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-class DynamicPoolDevice : public DynamicPool<umpire::resource::Device> {};
-BENCHMARK_DEFINE_F(DynamicPoolDevice, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolDevice, deallocate)(benchmark::State& st) { deallocation(st); }
+class DynamicPoolListDevice : public DynamicPoolList<umpire::resource::Device> {};
+BENCHMARK_DEFINE_F(DynamicPoolListDevice, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolListDevice, deallocate)(benchmark::State& st) { deallocation(st); }
 
-class DynamicPoolDevicePinned : public DynamicPool<umpire::resource::Pinned> {};
-BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolDevicePinned, deallocate)(benchmark::State& st) { deallocation(st); }
+class DynamicPoolListDevicePinned : public DynamicPoolList<umpire::resource::Pinned> {};
+BENCHMARK_DEFINE_F(DynamicPoolListDevicePinned, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolListDevicePinned, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-class DynamicPoolUnified : public DynamicPool<umpire::resource::Unified> {};
-BENCHMARK_DEFINE_F(DynamicPoolUnified, allocate)(benchmark::State& st) { allocation(st); }
-BENCHMARK_DEFINE_F(DynamicPoolUnified, deallocate)(benchmark::State& st) { deallocation(st); }
+class DynamicPoolListUnified : public DynamicPoolList<umpire::resource::Unified> {};
+BENCHMARK_DEFINE_F(DynamicPoolListUnified, allocate)(benchmark::State& st) { allocation(st); }
+BENCHMARK_DEFINE_F(DynamicPoolListUnified, deallocate)(benchmark::State& st) { deallocation(st); }
 #endif
 
 template <umpire::resource::MemoryResourceType Resource>
@@ -503,20 +503,20 @@ BENCHMARK_REGISTER_F(FixedPoolUnified, allocate)->Arg(256);
 BENCHMARK_REGISTER_F(FixedPoolUnified, deallocate)->Arg(256);
 #endif
 
-// DynamicPool
-BENCHMARK_REGISTER_F(DynamicPoolHost, allocate)->Args({16, 1024});
-BENCHMARK_REGISTER_F(DynamicPoolHost, deallocate)->Args({16, 1024});
+// DynamicPoolList
+BENCHMARK_REGISTER_F(DynamicPoolListHost, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListHost, deallocate)->Args({16, 1024});
 #if defined(UMPIRE_ENABLE_DEVICE)
-BENCHMARK_REGISTER_F(DynamicPoolDevice, allocate)->Args({16, 1024});
-BENCHMARK_REGISTER_F(DynamicPoolDevice, deallocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListDevice, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListDevice, deallocate)->Args({16, 1024});
 
-BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, allocate)->Args({16, 1024});
-BENCHMARK_REGISTER_F(DynamicPoolDevicePinned, deallocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListDevicePinned, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListDevicePinned, deallocate)->Args({16, 1024});
 #endif
 
 #if defined(UMPIRE_ENABLE_UM)
-BENCHMARK_REGISTER_F(DynamicPoolUnified, allocate)->Args({16, 1024});
-BENCHMARK_REGISTER_F(DynamicPoolUnified, deallocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListUnified, allocate)->Args({16, 1024});
+BENCHMARK_REGISTER_F(DynamicPoolListUnified, deallocate)->Args({16, 1024});
 #endif
 
 // MixedPool

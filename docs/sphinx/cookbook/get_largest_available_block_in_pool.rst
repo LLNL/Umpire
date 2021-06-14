@@ -4,8 +4,8 @@
 Determining the Largest Block of Available Memory in Pool
 =========================================================
 
-The :class:`umpire::strategy::DynamicPool` provides a
-:func:`umpire::strategy::DynamicPool::getLargestAvailableBlock` that may be
+The :class:`umpire::strategy::QuickPool` provides a
+:func:`umpire::strategy::QuickPool::getLargestAvailableBlock` that may be
 used to determine the size of the largest block currently available for
 allocation within the pool.
 To call this

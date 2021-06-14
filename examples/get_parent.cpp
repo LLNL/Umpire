@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 void check_parent(umpire::Allocator alloc)
 {
@@ -38,7 +38,7 @@ int main ()
   Alloc[0] = rm.getAllocator("HOST");
 
   for(int i = 1; i < SIZE; i++) {
-    Alloc[i] = rm.makeAllocator<umpire::strategy::DynamicPool>(
+    Alloc[i] = rm.makeAllocator<umpire::strategy::QuickPool>(
       "HOST_pool_" + std::to_string(i), Alloc[i-1]);
   }
 

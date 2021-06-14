@@ -79,6 +79,12 @@ std::size_t DynamicPoolList::getActualSize() const noexcept
   return ActualSize;
 }
 
+std::size_t DynamicPoolList::getActualHighwaterMark() const noexcept
+{
+  return dpa.getActualHighwaterMark();
+}
+
+
 std::size_t DynamicPoolList::getReleasableSize() const noexcept
 {
   std::size_t SparseBlockSize = dpa.getReleasableSize();
@@ -156,6 +162,13 @@ DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(int perce
     };
   }
 }
+
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&)
+{
+  return out;
+}
+
 
 } // end of namespace strategy
 } // end of namespace umpire

@@ -5,3 +5,5 @@ CMakeFiles
 *.tar.gz
 .vscode
 .devcontainer
+*spack.lock*
+.spack_env/*/.spack-env
