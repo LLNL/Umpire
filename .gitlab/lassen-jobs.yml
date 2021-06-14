@@ -80,13 +80,13 @@ pgi_19_10_cuda:
 
 pgi_19_10_gcc_8_3_1_cuda:
   variables:
-    SPEC: "+fortran+cuda %pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cuda_arch=70 ^cuda@11.0.2"
+    SPEC: "+fortran+cuda %pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
   allow_failure: true
   extends: .build_and_test_on_lassen
 
 pgi_20_4_gcc_8_3_1_cuda_11:
   variables:
-    SPEC: "+fortran+cuda %pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cuda_arch=70 ^cuda@11.0.2"
+    SPEC: "+fortran+cuda %pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
   allow_failure: true
   extends: .build_and_test_on_lassen
 
