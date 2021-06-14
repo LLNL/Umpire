@@ -94,7 +94,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
 
-- Changed most uses of DynamicPoolMap to QuickPool.
+- Changed most internal and test uses of DynamicPoolMap to QuickPool.
 
 ### Removed
 
