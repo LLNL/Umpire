@@ -8,7 +8,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/Macros.hpp"
 
 int main(int, char**)
@@ -21,7 +21,7 @@ int main(int, char**)
   // Create a 4 Gb pool and reserve one word (to maintain aligment)
   //
   // _sphinx_tag_tut_create_pool_start
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
       "GPU_POOL", allocator, 4ul * 1024ul * 1024ul * 1024ul + 1);
   // _sphinx_tag_tut_create_pool_end
 

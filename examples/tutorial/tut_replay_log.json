@@ -15,8 +15,8 @@
 { "kind":"replay", "uid":27494, "timestamp":1558388052595814979, "event": "makeMemoryResource", "payload": { "name": "DEVICE_CONST" }, "result": "0x101d7bb0" }
 # _sphinx_tag_doc_makememoryresource_end
 # _sphinx_tag_doc_makeallocator_start
-{ "kind":"replay", "uid":27494, "timestamp":1558388052595864262, "event": "makeAllocator", "payload": { "type":"umpire::strategy::DynamicPool", "with_introspection":true, "allocator_name":"pool", "args": [ "HOST" ] } }
-{ "kind":"replay", "uid":27494, "timestamp":1558388052595903505, "event": "makeAllocator", "payload": { "type":"umpire::strategy::DynamicPool", "with_introspection":true, "allocator_name":"pool", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x108a8730" } }
+{ "kind":"replay", "uid":27494, "timestamp":1558388052595864262, "event": "makeAllocator", "payload": { "type":"umpire::strategy::QuickPool", "with_introspection":true, "allocator_name":"pool", "args": [ "HOST" ] } }
+{ "kind":"replay", "uid":27494, "timestamp":1558388052595903505, "event": "makeAllocator", "payload": { "type":"umpire::strategy::QuickPool", "with_introspection":true, "allocator_name":"pool", "args": [ "HOST" ] }, "result": { "allocator_ref":"0x108a8730" } }
 # _sphinx_tag_doc_makeallocator_end
 # _sphinx_tag_doc_allocate_start
 { "kind":"replay", "uid":27494, "timestamp":1558388052595911583, "event": "allocate", "payload": { "allocator_ref": "0x108a8730", "size": 0 } }

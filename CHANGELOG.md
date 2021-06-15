@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Spack environment files for developer builds.
+
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
   is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
 
@@ -50,7 +52,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - In Gitlab CI, upload junit reports for corona and lassen.
 
-- Initial support for IPC Shared Memory via a "SHARED" resource allocator.
+- Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC
+  Shared memory is initially available on the Host resource and will default
+  to the value of `ENABLE_MPI`. 
 
 - get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
 
@@ -87,6 +91,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Use CMake 3.18.0 in CI
 
 - Replay testing disabled during HIP builds with `ENABLE_TOOLS`=On
+
+- `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
+
+- Changed most internal and test uses of DynamicPoolMap to QuickPool.
 
 - Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
   on the corresponding BLT options. 
@@ -159,6 +167,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
   as not being found
+
 
 ## [v5.0.0] - 2020-11-18
 

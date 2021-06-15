@@ -178,6 +178,9 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   bool m_is_destructing{false};
 };
 
+std::ostream& operator<<(std::ostream& out,
+                         umpire::strategy::QuickPool::CoalesceHeuristic&);
+
 } // end of namespace strategy
 } // end namespace umpire
 

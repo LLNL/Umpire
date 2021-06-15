@@ -14,27 +14,27 @@ argument is a boolean option, and  can be turned on or off:
 
 Here is a summary of the configuration options, their default value, and meaning:
 
-    ================================    ========   ===========================================================================
-    Variable                            Default      Meaning
-    ================================    ========   ===========================================================================
-    ``ENABLE_CUDA``                       Off        Enable CUDA support
-    ``ENABLE_HIP``                        Off        Enable HIP support
-    ``UMPIRE_ENABLE_NUMA``                Off        Enable NUMA support
-    ``UMPIRE_ENABLE_FILE_RESOURCE``       Off        Enable FILE support      
-    ``ENABLE_TESTS``                      On         Build test executables
-    ``ENABLE_BENCHMARKS``                 On         Build benchmark programs
-    ``UMPIRE_ENABLE_LOGGING``             On         Enable Logging within Umpire
-    ``UMPIRE_ENABLE_SLIC``                Off        Enable SLIC logging
-    ``UMPIRE_ENABLE_BACKTRACE``           Off        Enable backtraces for allocations
-    ``UMPIRE_ENABLE_BACKTRACE_SYMBOLS``   Off        Enable symbol lookup for backtraces
-    ``UMPIRE_ENABLE_TOOLS``               Off        Enable tools like replay
-    ``ENABLE_DOCS``                       Off        Build documentation (requires Sphinx and/or Doxygen)
-    ``UMPIRE_ENABLE_C``                   Off        Build the C API
-    ``ENABLE_FORTRAN``                    Off        Build the Fortran API
-    ``UMPIRE_ENABLE_PERFORMANCE_TESTS``   Off        Build and run performance tests
-    ``UMPIRE_ENABLE_HOST_SHARED_MEMORY``  Off        Enable Host Shared Memory support
-    ``UMPIRE_ENABLE_ASAN``                Off        Enable ASAN support
-    ================================    ========   ===========================================================================
+    ================================    ========    ===========================================================================
+    Variable                            Default     Meaning
+    ================================    ========    ===========================================================================
+    ``ENABLE_CUDA``                     Off         Enable CUDA support
+    ``ENABLE_HIP``                      Off         Enable HIP support
+    ``UMPIRE_ENABLE_NUMA``              Off         Enable NUMA support
+    ``UMPIRE_ENABLE_FILE_RESOURCE``     Off         Enable FILE support      
+    ``ENABLE_TESTS``                    On          Build test executables
+    ``ENABLE_BENCHMARKS``               On          Build benchmark programs
+    ``UMPIRE_ENABLE_LOGGING``           On          Enable Logging within Umpire
+    ``UMPIRE_ENABLE_SLIC``              Off         Enable SLIC logging
+    ``UMPIRE_ENABLE_BACKTRACE``         Off         Enable backtraces for allocations
+    ``UMPIRE_ENABLE_BACKTRACE_SYMBOLS`` Off         Enable symbol lookup for backtraces
+    ``UMPIRE_ENABLE_TOOLS``             Off         Enable tools like replay
+    ``ENABLE_DOCS``                     Off         Build documentation (requires Sphinx and/or Doxygen)
+    ``UMPIRE_ENABLE_C``                 Off         Build the C API
+    ``ENABLE_FORTRAN``                  Off         Build the Fortran API
+    ``UMPIRE_ENABLE_PERFORMANCE_TESTS`` Off         Build and run performance tests
+    ``UMPIRE_ENABLE_IPC_SHARED_MEMORY`` ENABLE_MPI  Enable Shared Memory support
+    ``UMPIRE_ENABLE_ASAN``              Off         Enable ASAN support
+    ==================================  ==========  ===========================================================================
 
 These arguments are explained in more detail below:
 
@@ -93,9 +93,9 @@ These arguments are explained in more detail below:
 * ``UMPIRE_ENABLE_PERFORMANCE_TESTS``
   Build and run performance tests
 
-* ``UMPIRE_ENABLE_HOST_SHARED_MEMORY``
-  This option enables support for interprocess shared memory on the ``HOST``
-  platform
+* ``UMPIRE_ENABLE_IPC_SHARED_MEMORY``
+  This option enables support for interprocess shared memory.  Currently, this
+  feature only exists for for ``HOST`` memory.
 
 * ``UMPIRE_ENABLE_ASAN``
   This option enables address sanitization checks within Umpire by compilers

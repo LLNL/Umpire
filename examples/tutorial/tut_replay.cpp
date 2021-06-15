@@ -10,6 +10,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 int main(int, char**)
 {
@@ -27,7 +28,7 @@ int main(int, char**)
   // _sphinx_tag_tut_replay_make_allocate_start
   auto allocator = rm.getAllocator("HOST");
   auto pool =
-      rm.makeAllocator<umpire::strategy::DynamicPool>("pool", allocator);
+      rm.makeAllocator<umpire::strategy::QuickPool>("pool", allocator);
   // _sphinx_tag_tut_replay_make_allocate_end
 
   // Do some allocations

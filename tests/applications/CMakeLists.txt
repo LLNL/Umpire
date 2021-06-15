@@ -42,4 +42,11 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     FLAGS "-rdynamic")
 endif ()
 
+blt_add_target_compile_flags(
+  TO pool_allocator_stress
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+blt_add_target_compile_flags(
+  TO poison_memory_checks 
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
 install(TARGETS ${umpire_test_applications} RUNTIME DESTINATION bin)

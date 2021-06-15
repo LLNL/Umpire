@@ -114,8 +114,9 @@ cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP" On
                        "ENABLE_OPENMP" Off )
 cmake_dependent_option( UMPIRE_ENABLE_MPI "Build Umpire with MPI" On
                        "ENABLE_MPI" Off )
-cmake_dependent_option( UMPIRE_ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" On
-                        "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+cmake_dependent_option( ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
+                       "NOT WIN32;NOT APPLE" Off )
+
 
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
