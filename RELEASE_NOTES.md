@@ -1,3 +1,39 @@
+# v6.0.0
+
+Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
+
+Added a Release function to FixedPool and corresponding gtest in strategy_tests
+
+Replay will now display high water mark statistics per allocator.
+
+Added (de)registerAllocation to C/FORTRAN API.
+
+Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC Shared memory is initially available on the Host resource and will default to the value of ENABLE_MPI.
+
+get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
+
+Allocator::getStrategyName() to get name of the strategy used.
+
+Added getActualHighwatermark to all pool strategies, returns the high water value of getActualSize.
+
+umpire::mark_event() to mark an event during Umpire lifecycle
+
+DynamicPoolMap marked deprecated. QuickPool should be used instead.
+
+Removed all internal tracking, allocations are only tracked at the Allocator level.
+
+Corrected accounting error in replay tool where allocation map operations were not being accounted for and reported correctly.
+
+Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an issue that would mean the pool would never coalesce automatically.
+
+Added ENABLE_ASAN (default=Off) for guarding address sanitization check to address compilation problems on some configurations.
+
+Replay tool now handles rogue deallocate calls that may be present in replay files.
+
+Fixed shared memory signature that had const std::string to use const std::string& instead of a copy of the string.
+
 # v5.0.1
 
 - Fixed bug where zero-byte allocations from Umpire were sometimes incorrectly
