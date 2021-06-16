@@ -1,4 +1,4 @@
-# Copyright 2013-2020 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2021 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -198,7 +198,7 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write("###################\n".format("#" * 60))
         cfg.write("# Generated host-config - Edit at own risk!\n")
         cfg.write("###################\n".format("#" * 60))
-        cfg.write("# Copyright (c) 2020, Lawrence Livermore National Security, LLC and\n")
+        cfg.write("# Copyright (c) 2021, Lawrence Livermore National Security, LLC and\n")
         cfg.write("# other Umpire Project Developers. See the top-level LICENSE file for\n")
         cfg.write("# details.\n")
         cfg.write("#\n")
