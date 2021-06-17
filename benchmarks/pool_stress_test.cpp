@@ -15,21 +15,24 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 
-#if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP) //device
+#if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP)
   constexpr std::size_t ALLOC_SIZE {8589934592ULL}; //8GiB total size of all allocations together
-#else //host
+#else
   constexpr std::size_t ALLOC_SIZE {137438953472ULL}; //137GiB total size of all allocations together
 #endif
 
 /*
- * Setting up a wide range of sizes to test for both host and device runs. The total number of
- * allocations within the pool should stay around 10k ideally.
+ * Setting up a wide range of sizes (size of each allocation) to test for both host and device runs. 
+ * The total number of allocations within the pool should stay around 10k ideally.
  */
-constexpr std::size_t SIZE {1048576}; //1MB, size of each allocation - dev only (~8k allocs total)
-//constexpr std::size_t SIZE {524288}; //524KB, size of each allocation - dev only (~16k allocs total)
-//constexpr std::size_t SIZE {65536}; //65KB, size of each allocation - dev only (~131k allocs total)
-//constexpr std::size_t SIZE {16777216}; //16MB, size of each allocation - host only (~8k allocs total)
-//constexpr std::size_t SIZE {8388608}; //8MB, size of each allocation - host only (~16k allocs total)
+#if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP)
+  constexpr std::size_t SIZE {1048576}; //1MB, ~8k allocs total
+  //constexpr std::size_t SIZE {524288}; //524KB, ~16k allocs total
+  //constexpr std::size_t SIZE {65536}; //65KB, ~131k allocs total
+#else
+  constexpr std::size_t SIZE {16777216}; //16MB, ~8k allocs total
+  //constexpr std::size_t SIZE {8388608}; //8MB, ~16k allocs total
+#endif
 
 /*
  * \brief Function that tests the deallocation pattern performance of a given pool allocator. 
@@ -46,7 +49,7 @@ void test_deallocation_performance(umpire::Allocator alloc, std::string pool_nam
 {
   double time[] = {0.0, 0.0};
   constexpr std::size_t convert {1000000}; //convert sec (s) to microsec (us)
-  constexpr std::size_t num_rnd {1000000}; //number of rounds (used to average timing)
+  constexpr std::size_t num_rnd {1000}; //number of rounds (used to average timing)
   const std::size_t num_indices{indices.size()};
   std::vector<void*> allocations(num_indices);
 
@@ -82,7 +85,7 @@ void do_test(std::string pool_name, std::map<const std::string, const std::vecto
   auto& rm {umpire::ResourceManager::getInstance()};
 #if defined (UMPIRE_ENABLE_DEVICE)
   umpire::Allocator alloc {rm.getAllocator("DEVICE")};
-#elif
+#else
   umpire::Allocator alloc {rm.getAllocator("HOST")};
 #endif
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, ALLOC_SIZE)};
@@ -95,9 +98,12 @@ void do_test(std::string pool_name, std::map<const std::string, const std::vecto
 int main(int, char**) {
   //Set up formatting for output
   std::cout << std::fixed << std::setprecision(9);
+  std::cout << "Total size of all allocations together: " << ALLOC_SIZE << std::endl;
+  std::cout << "Size of each allocation: " << SIZE << std::endl;
 
   //Set up test factors
   constexpr std::size_t num_alloc {ALLOC_SIZE/SIZE}; //number of allocations for each round
+  std::cout << "Total number of allocations in the pool: " << num_alloc << std::endl;
   std::mt19937 gen(num_alloc);
 
   //create map with name and vector of indices for tests
