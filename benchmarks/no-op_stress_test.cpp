@@ -15,14 +15,16 @@
 #include "umpire/Allocator.hpp"
 
 #define CONVERT 1000000 //convert sec (s) to microsec (us)
-#define ALLOCATIONS 1000000 //number of allocations for each round
-#define NUM_ITER 3 //number of rounds (used to average timing)
+#define ALLOCATIONS 10000 //number of allocations for each round
+#define NUM_ITER 1000 //number of rounds (used to average timing)
 
+//since no memory is actually being allocated, this value will only be used
+//to increment a counter in the No Op resource
 const int size = 4096;
 
 /*
  * This functions measures the time it takes to do ALLOCATIONS no-op allocations and 
- * then do ALLOCATIONS no-op deallocations in the same order. The time is averaged across 3 rounds. 
+ * then do ALLOCATIONS no-op deallocations in the same order. The time is averaged across NUM_ITER rounds. 
  */
 void same_order(umpire::Allocator alloc)
 {
@@ -54,7 +56,7 @@ void same_order(umpire::Allocator alloc)
 
 /*
  * This functions measures the time it takes to do ALLOCATIONS no-op allocations and 
- * then do ALLOCATIONS no-op deallocations in reverse order. The time is averaged across 3 rounds. 
+ * then do ALLOCATIONS no-op deallocations in reverse order. The time is averaged across NUM_ITER rounds. 
  */
 void reverse_order(umpire::Allocator alloc)
 {
@@ -87,7 +89,7 @@ void reverse_order(umpire::Allocator alloc)
 /*
  * This functions measures the time it takes to do ALLOCATIONS no-op allocations, shuffle the 
  * array of returned pointers, and then do ALLOCATIONS no-op deallocations. The time is averaged
- * across 3 rounds. 
+ * across NUM_ITER rounds. 
  */
 void shuffle(umpire::Allocator alloc)
 {
@@ -122,6 +124,10 @@ void shuffle(umpire::Allocator alloc)
 int main(int, char**) {
   //Set up formatting for output
   std::cout << std::fixed << std::setprecision(9);
+  std::cout << "Total number of allocations: " << ALLOCATIONS << std::endl;
+  std::cout << "(Both the size per allocation and total amount of memory " 
+            << "allocated do not matter since this is the No-Op benchmark)"
+            << std::endl;
 
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("NO_OP");
