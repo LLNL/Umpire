@@ -8,6 +8,7 @@
 #include <chrono>
 #include <random>
 #include <map>
+#include <numeric>
 
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
