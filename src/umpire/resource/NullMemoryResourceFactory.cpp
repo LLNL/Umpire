@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool NullMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool NullMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.compare("__umpire_internal_null") == 0) {
     return true;
@@ -23,17 +22,16 @@ bool NullMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(
-    const std::string& UMPIRE_UNUSED_ARG(name), int id)
+std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(const std::string& UMPIRE_UNUSED_ARG(name),
+                                                                            int id)
 {
   return create("__umpire_internal_null", id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> NullMemoryResourceFactory::create(const std::string& name, int id,
+                                                                            MemoryResourceTraits traits)
 {
-  return util::make_unique<NullMemoryResource>(Platform::undefined, name, id,
-                                               traits);
+  return util::make_unique<NullMemoryResource>(Platform::undefined, name, id, traits);
 }
 
 MemoryResourceTraits NullMemoryResourceFactory::getDefaultTraits()

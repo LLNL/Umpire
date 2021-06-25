@@ -24,11 +24,9 @@ class CudaMemsetOperation : public MemoryOperation {
    *
    * @copydetails MemoryOperation::apply
    */
-  void apply(void* src_ptr, util::AllocationRecord* ptr, int value,
-             std::size_t length);
+  void apply(void* src_ptr, util::AllocationRecord* ptr, int value, std::size_t length);
 
-  camp::resources::Event apply_async(void* src_ptr, util::AllocationRecord* ptr,
-                                     int value, std::size_t length,
+  camp::resources::Event apply_async(void* src_ptr, util::AllocationRecord* ptr, int value, std::size_t length,
                                      camp::resources::Resource& ctx);
 };
 

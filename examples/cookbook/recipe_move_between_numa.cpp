@@ -30,16 +30,16 @@ int main(int, char**)
   }
 
   // Create an allocator on the first NUMA node
-  auto host_src_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-      "host_numa_src_alloc", rm.getAllocator("HOST"), host_nodes[0]);
+  auto host_src_alloc =
+      rm.makeAllocator<umpire::strategy::NumaPolicy>("host_numa_src_alloc", rm.getAllocator("HOST"), host_nodes[0]);
 
   // Create an allocation on that node
   void* src_ptr = host_src_alloc.allocate(alloc_size);
 
   if (host_nodes.size() > 1) {
     // Create an allocator on another host NUMA node.
-    auto host_dst_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-        "host_numa_dst_alloc", rm.getAllocator("HOST"), host_nodes[1]);
+    auto host_dst_alloc =
+        rm.makeAllocator<umpire::strategy::NumaPolicy>("host_numa_dst_alloc", rm.getAllocator("HOST"), host_nodes[1]);
 
     // Move the memory
     void* dst_ptr = rm.move(src_ptr, host_dst_alloc);
@@ -66,8 +66,8 @@ int main(int, char**)
     // Create an allocator on the first device NUMA node. Note that
     // this still requires using the "HOST" allocator. The allocations
     // are moved after the address space is reserved.
-    auto device_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>(
-        "device_numa_src_alloc", rm.getAllocator("HOST"), device_nodes[0]);
+    auto device_alloc = rm.makeAllocator<umpire::strategy::NumaPolicy>("device_numa_src_alloc", rm.getAllocator("HOST"),
+                                                                       device_nodes[0]);
 
     // Move the memory
     void* dst_ptr = rm.move(src_ptr, device_alloc);

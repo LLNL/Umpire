@@ -30,8 +30,7 @@ static int test_parse_fun(int argc, const char** argv)
 
   // variables for command line options
   bool opt_bool{false};
-  app.add_flag("-b,--some-bool,!--no-some-bool", opt_bool, "boolean flag")
-      ->capture_default_str();
+  app.add_flag("-b,--some-bool,!--no-some-bool", opt_bool, "boolean flag")->capture_default_str();
 
   int opt_int{0};
   app.add_option("-i,--some-int", opt_int, "integer input")->required();
@@ -48,8 +47,7 @@ static int test_parse_fun(int argc, const char** argv)
 
   // Output information about command line options
   // some-bool is always available
-  std::cout << "Boolean input was '" << std::boolalpha << opt_bool << "'"
-            << std::endl;
+  std::cout << "Boolean input was '" << std::boolalpha << opt_bool << "'" << std::endl;
 
   // some-int is always available
   std::cout << "Integer input was '" << opt_int << "'" << std::endl;
@@ -80,9 +78,7 @@ static int test_parse_fun(int argc, const char** argv)
 TEST(CLI11, Parsing)
 {
   int argc{7};
-  const char* argv[] = {
-      "cli11_smoke_test", "-b",         "-i", "42", "--some-float=3.14",
-      "--some-string",    "hello world"};
+  const char* argv[] = {"cli11_smoke_test", "-b", "-i", "42", "--some-float=3.14", "--some-string", "hello world"};
 
   ASSERT_EQ(0, test_parse_fun(argc, argv));
 }

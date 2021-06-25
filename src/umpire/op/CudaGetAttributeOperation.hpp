@@ -27,9 +27,7 @@ class CudaGetAttributeOperation : public MemoryOperation {
    *
    * @copydetails MemoryOperation::transform
    */
-  bool check_apply(void* src_ptr,
-                   umpire::util::AllocationRecord* src_allocation, int val,
-                   std::size_t length) override;
+  bool check_apply(void* src_ptr, umpire::util::AllocationRecord* src_allocation, int val, std::size_t length) override;
 };
 
 #include "umpire/op/CudaGetAttributeOperation.inl"

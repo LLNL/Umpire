@@ -18,8 +18,7 @@ namespace strategy {
 
 class MonotonicAllocationStrategy : public AllocationStrategy {
  public:
-  MonotonicAllocationStrategy(const std::string& name, int id,
-                              Allocator allocator, std::size_t capacity);
+  MonotonicAllocationStrategy(const std::string& name, int id, Allocator allocator, std::size_t capacity);
 
   ~MonotonicAllocationStrategy();
 

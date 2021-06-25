@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("PINNED") != std::string::npos) {
     return true;
@@ -23,19 +22,16 @@ bool CudaPinnedMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaPinnedMemoryResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> CudaPinnedMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaPinnedMemoryResourceFactory::create(const std::string& name, int id,
-                                        MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> CudaPinnedMemoryResourceFactory::create(const std::string& name, int id,
+                                                                                  MemoryResourceTraits traits)
 {
-  return util::make_unique<
-      resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(
-      Platform::cuda, name, id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaPinnedAllocator>>(Platform::cuda, name, id,
+                                                                                        traits);
 }
 
 MemoryResourceTraits CudaPinnedMemoryResourceFactory::getDefaultTraits()

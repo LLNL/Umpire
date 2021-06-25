@@ -150,8 +150,7 @@ class AllocationMap {
   std::size_t size() const;
 
   // Print methods -- either matching a predicate or all records
-  void print(const std::function<bool(const AllocationRecord&)>&& predicate,
-             std::ostream& os = std::cout) const;
+  void print(const std::function<bool(const AllocationRecord&)>&& predicate, std::ostream& os = std::cout) const;
 
   void printAll(std::ostream& os = std::cout) const;
 

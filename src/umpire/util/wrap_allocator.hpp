@@ -23,27 +23,22 @@ std::unique_ptr<Base> do_wrap(std::unique_ptr<Base>&& allocator)
 template <typename Base, typename Strategy, typename... Strategies>
 std::unique_ptr<Base> do_wrap(std::unique_ptr<Base>&& allocator)
 {
-  return std::unique_ptr<Base>(new Strategy(
-      umpire::util::do_wrap<Base, Strategies...>(std::move(allocator))));
+  return std::unique_ptr<Base>(new Strategy(umpire::util::do_wrap<Base, Strategies...>(std::move(allocator))));
 }
 
 template <typename... Strategies>
-std::unique_ptr<strategy::AllocationStrategy> wrap_allocator(
-    std::unique_ptr<strategy::AllocationStrategy>&& allocator)
+std::unique_ptr<strategy::AllocationStrategy> wrap_allocator(std::unique_ptr<strategy::AllocationStrategy>&& allocator)
 {
-  return umpire::util::do_wrap<umpire::strategy::AllocationStrategy,
-                               Strategies...>(std::move(allocator));
+  return umpire::util::do_wrap<umpire::strategy::AllocationStrategy, Strategies...>(std::move(allocator));
 }
 
 template <typename Strategy>
-Strategy* unwrap_allocation_strategy(
-    strategy::AllocationStrategy* base_strategy)
+Strategy* unwrap_allocation_strategy(strategy::AllocationStrategy* base_strategy)
 {
   Strategy* strategy{dynamic_cast<Strategy*>(base_strategy)};
 
   if (!strategy) {
-    UMPIRE_ERROR("Couldn't unwrap " << base_strategy->getName() << " to "
-                                    << typeid(Strategy).name());
+    UMPIRE_ERROR("Couldn't unwrap " << base_strategy->getName() << " to " << typeid(Strategy).name());
   }
 
   return strategy;
@@ -52,8 +47,7 @@ Strategy* unwrap_allocation_strategy(
 template <typename Strategy>
 Strategy* unwrap_allocator(Allocator allocator)
 {
-  return unwrap_allocation_strategy<Strategy>(
-      allocator.getAllocationStrategy());
+  return unwrap_allocation_strategy<Strategy>(allocator.getAllocationStrategy());
 }
 
 } // end of namespace util

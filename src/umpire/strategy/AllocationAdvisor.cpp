@@ -17,28 +17,21 @@
 namespace umpire {
 namespace strategy {
 
-AllocationAdvisor::AllocationAdvisor(const std::string& name, int id,
-                                     Allocator allocator,
-                                     const std::string& advice_operation,
-                                     int device_id)
-    : AllocationAdvisor(name, id, allocator, advice_operation, allocator,
-                        device_id)
+AllocationAdvisor::AllocationAdvisor(const std::string& name, int id, Allocator allocator,
+                                     const std::string& advice_operation, int device_id)
+    : AllocationAdvisor(name, id, allocator, advice_operation, allocator, device_id)
 {
 }
 
-AllocationAdvisor::AllocationAdvisor(const std::string& name, int id,
-                                     Allocator allocator,
-                                     const std::string& advice_operation,
-                                     Allocator accessing_allocator,
-                                     int device_id)
+AllocationAdvisor::AllocationAdvisor(const std::string& name, int id, Allocator allocator,
+                                     const std::string& advice_operation, Allocator accessing_allocator, int device_id)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "AllocationAdvisor"},
       m_allocator{allocator.getAllocationStrategy()},
       m_device{device_id}
 {
   auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
-  m_advice_operation =
-      op_registry.find(advice_operation, m_allocator, m_allocator);
+  m_advice_operation = op_registry.find(advice_operation, m_allocator, m_allocator);
 
 #if defined(UMPIRE_ENABLE_CUDA)
   if (accessing_allocator.getPlatform() == Platform::host) {

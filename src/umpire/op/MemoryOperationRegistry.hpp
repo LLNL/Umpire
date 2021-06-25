@@ -72,12 +72,11 @@ class MemoryOperationRegistry {
    * \throws umpire::util::Exception if the requested MemoryOperation is not
    *         found.
    */
-  std::shared_ptr<umpire::op::MemoryOperation> find(
-      const std::string& name, strategy::AllocationStrategy* source_allocator,
-      strategy::AllocationStrategy* dst_allocator);
+  std::shared_ptr<umpire::op::MemoryOperation> find(const std::string& name,
+                                                    strategy::AllocationStrategy* source_allocator,
+                                                    strategy::AllocationStrategy* dst_allocator);
 
-  std::shared_ptr<umpire::op::MemoryOperation> find(
-      const std::string& name, std::pair<Platform, Platform> platforms);
+  std::shared_ptr<umpire::op::MemoryOperation> find(const std::string& name, std::pair<Platform, Platform> platforms);
   /*!
    * \brief Add a new MemoryOperation to the registry
    *
@@ -88,8 +87,7 @@ class MemoryOperationRegistry {
    * \param platforms pair of Platforms for the source and destination.
    * \param operation pointer to the MemoryOperation.
    */
-  void registerOperation(const std::string& name,
-                         std::pair<Platform, Platform> platforms,
+  void registerOperation(const std::string& name, std::pair<Platform, Platform> platforms,
                          std::shared_ptr<MemoryOperation>&& operation) noexcept;
 
   MemoryOperationRegistry(const MemoryOperationRegistry&) = delete;
@@ -104,10 +102,8 @@ class MemoryOperationRegistry {
    * Doubly-nested unordered_map that stores MemoryOperations by first name,
    * then by Platform pair.
    */
-  std::unordered_map<
-      std::string,
-      std::unordered_map<std::pair<Platform, Platform>,
-                         std::shared_ptr<MemoryOperation>, pair_hash>>
+  std::unordered_map<std::string,
+                     std::unordered_map<std::pair<Platform, Platform>, std::shared_ptr<MemoryOperation>, pair_hash>>
       m_operators;
 };
 
