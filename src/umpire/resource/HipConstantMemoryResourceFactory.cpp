@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool HipConstantMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool HipConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.compare("DEVICE_CONST") == 0) {
     return true;
@@ -23,18 +22,15 @@ bool HipConstantMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-HipConstantMemoryResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> HipConstantMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-HipConstantMemoryResourceFactory::create(const std::string& name, int id,
-                                         MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> HipConstantMemoryResourceFactory::create(const std::string& name, int id,
+                                                                                   MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::HipConstantMemoryResource>(name, id,
-                                                                traits);
+  return util::make_unique<resource::HipConstantMemoryResource>(name, id, traits);
 }
 
 MemoryResourceTraits HipConstantMemoryResourceFactory::getDefaultTraits()

@@ -84,8 +84,7 @@ void forall(hip, int begin, int end, LOOP_BODY&& body)
   std::size_t blockSize = 32;
   std::size_t gridSize = (end - begin + blockSize - 1) / blockSize;
 
-  hipLaunchKernelGGL(forall_kernel_gpu, dim3(gridSize), dim3(blockSize), 0, 0,
-                     begin, end - begin, body);
+  hipLaunchKernelGGL(forall_kernel_gpu, dim3(gridSize), dim3(blockSize), 0, 0, begin, end - begin, body);
 }
 #endif
 

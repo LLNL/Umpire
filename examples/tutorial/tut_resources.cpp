@@ -17,11 +17,9 @@ void allocate_and_deallocate(const std::string& resource)
 
   constexpr std::size_t SIZE = 1024;
 
-  double* data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-            << allocator.getName() << " allocator...";
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the " << allocator.getName() << " allocator...";
 
   allocator.deallocate(data);
 

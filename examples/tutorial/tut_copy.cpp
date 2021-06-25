@@ -7,21 +7,19 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 
-void copy_data(double* source_data, std::size_t size,
-               const std::string& destination)
+void copy_data(double* source_data, std::size_t size, const std::string& destination)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto dest_allocator = rm.getAllocator(destination);
 
-  double* dest_data =
-      static_cast<double*>(dest_allocator.allocate(size * sizeof(double)));
+  double* dest_data = static_cast<double*>(dest_allocator.allocate(size * sizeof(double)));
 
   // _sphinx_tag_tut_copy_start
   rm.copy(dest_data, source_data);
   // _sphinx_tag_tut_copy_end
 
-  std::cout << "Copied source data (" << source_data << ") to destination "
-            << destination << " (" << dest_data << ")" << std::endl;
+  std::cout << "Copied source data (" << source_data << ") to destination " << destination << " (" << dest_data << ")"
+            << std::endl;
 
   dest_allocator.deallocate(dest_data);
 }
@@ -34,11 +32,10 @@ int main(int, char**)
 
   auto allocator = rm.getAllocator("HOST");
 
-  double* data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-            << allocator.getName() << " allocator." << std::endl;
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the " << allocator.getName() << " allocator."
+            << std::endl;
 
   std::cout << "Filling with 0.0...";
 

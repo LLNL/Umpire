@@ -18,8 +18,7 @@ namespace strategy {
 
 class SlotPool : public AllocationStrategy {
  public:
-  SlotPool(const std::string& name, int id, Allocator allocator,
-           std::size_t slots);
+  SlotPool(const std::string& name, int id, Allocator allocator, std::size_t slots);
 
   ~SlotPool();
 

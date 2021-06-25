@@ -15,9 +15,7 @@
 namespace umpire {
 namespace resource {
 
-CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform,
-                                                   const std::string& name,
-                                                   int id,
+CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform, const std::string& name, int id,
                                                    MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
 {
@@ -55,7 +53,7 @@ void CudaDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_A
 
 bool CudaDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::cuda)
+  if (p == Platform::cuda)
     return true;
   else
     return false;

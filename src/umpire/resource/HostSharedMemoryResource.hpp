@@ -17,31 +17,32 @@ namespace umpire {
 namespace resource {
 
 class HostSharedMemoryResource : public MemoryResource {
-  public:
-    HostSharedMemoryResource(Platform platform, const std::string& name, int id,
-                      MemoryResourceTraits traits);
+ public:
+  HostSharedMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
-    ~HostSharedMemoryResource();
+  ~HostSharedMemoryResource();
 
-    void* allocate(std::size_t bytes) override;
+  void* allocate(std::size_t bytes) override;
 
-    void* allocate_named(const std::string& name, std::size_t bytes) override;
+  void* allocate_named(const std::string& name, std::size_t bytes) override;
 
-    void deallocate(void* ptr, std::size_t size) override;
+  void deallocate(void* ptr, std::size_t size) override;
 
-    std::size_t getActualSize() const noexcept override;
+  std::size_t getActualSize() const noexcept override;
 
-    bool isAccessibleFrom(Platform p) noexcept override;
-    Platform getPlatform() noexcept override;
+  bool isAccessibleFrom(Platform p) noexcept override;
+  Platform getPlatform() noexcept override;
 
-    void* find_pointer_from_name(const std::string& name);
-  protected:
-    Platform m_platform;
-  private:
-    class impl;
-    std::unique_ptr<impl> pimpl;
+  void* find_pointer_from_name(const std::string& name);
 
-    bool isPageable() noexcept;
+ protected:
+  Platform m_platform;
+
+ private:
+  class impl;
+  std::unique_ptr<impl> pimpl;
+
+  bool isPageable() noexcept;
 };
 
 } // end of namespace resource

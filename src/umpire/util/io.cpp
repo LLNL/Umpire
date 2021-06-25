@@ -57,8 +57,7 @@ std::ostream& error()
 
 namespace util {
 
-static std::string make_unique_filename(const std::string& base_dir,
-                                        const std::string& name, const int pid,
+static std::string make_unique_filename(const std::string& base_dir, const std::string& name, const int pid,
                                         const std::string& extension);
 
 static inline bool file_exists(const std::string& file);
@@ -91,14 +90,11 @@ void initialize_io(const bool enable_log, const bool enable_replay)
 
   const int pid{getpid()};
 
-  const std::string log_filename{
-      make_unique_filename(root_io_dir, file_basename, pid, "log")};
+  const std::string log_filename{make_unique_filename(root_io_dir, file_basename, pid, "log")};
 
-  const std::string replay_filename{
-      make_unique_filename(root_io_dir, file_basename, pid, "replay")};
+  const std::string replay_filename{make_unique_filename(root_io_dir, file_basename, pid, "replay")};
 
-  const std::string error_filename{
-      make_unique_filename(root_io_dir, file_basename, pid, "error")};
+  const std::string error_filename{make_unique_filename(root_io_dir, file_basename, pid, "error")};
 
   if (!directory_exists(root_io_dir)) {
     if (MPI::isInitialized()) {
@@ -106,8 +102,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
         std::filesystem::path root_io_dir_path{root_io_dir};
 
-        if (!std::filesystem::exists(root_io_dir_path) &&
-            (enable_log || enable_replay)) {
+        if (!std::filesystem::exists(root_io_dir_path) && (enable_log || enable_replay)) {
           std::filesystem::create_directories(root_io_dir_path);
         }
 #else
@@ -115,8 +110,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
         if (stat(root_io_dir.c_str(), &info)) {
           if (enable_log || enable_replay) {
 #ifndef WIN32
-            if (mkdir(root_io_dir.c_str(),
-                      S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) {
+            if (mkdir(root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) {
               UMPIRE_ERROR("mkdir(" << root_io_dir << ") failed");
             }
 #else
@@ -168,16 +162,14 @@ void flush_files()
   error().flush();
 }
 
-static std::string make_unique_filename(const std::string& base_dir,
-                                        const std::string& name, const int pid,
+static std::string make_unique_filename(const std::string& base_dir, const std::string& name, const int pid,
                                         const std::string& extension)
 {
   int unique_id{0};
   std::string filename;
 
   do {
-    filename = base_dir + "/" + name + "." + std::to_string(pid) + "." +
-               std::to_string(unique_id++) + "." + extension;
+    filename = base_dir + "/" + name + "." + std::to_string(pid) + "." + std::to_string(unique_id++) + "." + extension;
   } while (file_exists(filename));
 
   return filename;

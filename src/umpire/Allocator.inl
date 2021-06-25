@@ -22,8 +22,8 @@ inline void* Allocator::allocate(std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << " }");
+  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator
+                                                                                << "\", \"size\": " << bytes << " }");
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -36,8 +36,7 @@ inline void* Allocator::allocate(std::size_t bytes)
   }
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes
-                << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+                << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
 
   return ret;
 }
@@ -48,8 +47,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  if (m_allocator->getTraits().resource
-              != MemoryResourceTraits::resource_type::shared) {
+  if (m_allocator->getTraits().resource != MemoryResourceTraits::resource_type::shared) {
     UMPIRE_ERROR("This allocator does not support named allocations");
   }
 
@@ -75,9 +73,8 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
 inline void Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY(
-      "\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \""
-      << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
+  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \""
+                << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
@@ -87,11 +84,11 @@ inline void Allocator::deallocate(void* ptr)
   } else {
     if (m_tracking) {
       auto record = deregisterAllocation(ptr, m_allocator);
-      if (! deallocateNull(ptr)) {
-        m_allocator->deallocate(ptr,record.size);
-      } 
+      if (!deallocateNull(ptr)) {
+        m_allocator->deallocate(ptr, record.size);
+      }
     } else {
-      if (! deallocateNull(ptr)) {
+      if (!deallocateNull(ptr)) {
         m_allocator->deallocate(ptr);
       }
     }

@@ -15,8 +15,7 @@
 namespace umpire {
 namespace resource {
 
-bool CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("UM") != std::string::npos) {
     return true;
@@ -25,19 +24,16 @@ bool CudaUnifiedMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id,
-                                         MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> CudaUnifiedMemoryResourceFactory::create(const std::string& name, int id,
+                                                                                   MemoryResourceTraits traits)
 {
-  return util::make_unique<
-      resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(
-      Platform::cuda, name, id, traits);
+  return util::make_unique<resource::DefaultMemoryResource<alloc::CudaMallocManagedAllocator>>(Platform::cuda, name, id,
+                                                                                               traits);
 }
 
 MemoryResourceTraits CudaUnifiedMemoryResourceFactory::getDefaultTraits()
@@ -48,8 +44,7 @@ MemoryResourceTraits CudaUnifiedMemoryResourceFactory::getDefaultTraits()
   auto error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: "
-                 << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
   }
 
   traits.unified = true;

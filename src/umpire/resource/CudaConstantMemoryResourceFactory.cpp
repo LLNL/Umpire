@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.compare("DEVICE_CONST") == 0) {
     return true;
@@ -23,18 +22,15 @@ bool CudaConstantMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaConstantMemoryResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> CudaConstantMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-CudaConstantMemoryResourceFactory::create(const std::string& name, int id,
-                                          MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> CudaConstantMemoryResourceFactory::create(const std::string& name, int id,
+                                                                                    MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::CudaConstantMemoryResource>(name, id,
-                                                                 traits);
+  return util::make_unique<resource::CudaConstantMemoryResource>(name, id, traits);
 }
 
 MemoryResourceTraits CudaConstantMemoryResourceFactory::getDefaultTraits()

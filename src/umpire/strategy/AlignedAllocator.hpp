@@ -15,8 +15,7 @@ namespace strategy {
 
 class AlignedAllocator : public AllocationStrategy {
  public:
-  AlignedAllocator(const std::string& name, int id, Allocator allocator,
-                   std::size_t alignment = 16);
+  AlignedAllocator(const std::string& name, int id, Allocator allocator, std::size_t alignment = 16);
 
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;

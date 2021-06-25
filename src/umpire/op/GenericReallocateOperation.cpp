@@ -16,10 +16,9 @@
 namespace umpire {
 namespace op {
 
-void GenericReallocateOperation::transform(
-    void* current_ptr, void** new_ptr,
-    util::AllocationRecord* current_allocation,
-    util::AllocationRecord* new_allocation, std::size_t new_size)
+void GenericReallocateOperation::transform(void* current_ptr, void** new_ptr,
+                                           util::AllocationRecord* current_allocation,
+                                           util::AllocationRecord* new_allocation, std::size_t new_size)
 {
   Allocator allocator{new_allocation->strategy};
   *new_ptr = allocator.allocate(new_size);

@@ -21,8 +21,7 @@ class AllocationStrategy;
 namespace util {
 
 struct AllocationRecord {
-  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
-      : ptr{p}, size{s}, strategy{strat}
+  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat) : ptr{p}, size{s}, strategy{strat}
   {
   }
 

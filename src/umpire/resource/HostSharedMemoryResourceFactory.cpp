@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool HostSharedMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool HostSharedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("SHARED") != std::string::npos) {
     return true;
@@ -23,20 +22,18 @@ bool HostSharedMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::create(const std::string& name, int id,
+                                                                                  MemoryResourceTraits traits)
 {
   if (traits.scope != MemoryResourceTraits::shared_scope::node) {
     UMPIRE_ERROR("HostSharedMemoryResource only supports shared_scope::node");
   }
-  return util::make_unique<HostSharedMemoryResource>(Platform::host, name, id,
-                                               traits);
+  return util::make_unique<HostSharedMemoryResource>(Platform::host, name, id, traits);
 }
 
 MemoryResourceTraits HostSharedMemoryResourceFactory::getDefaultTraits()

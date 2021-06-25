@@ -27,18 +27,15 @@ int main(int, char**)
   const int device_id = 2;
 
   try {
-    auto preferred_location_allocator =
-        rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-            "preferred_location_device_2", allocator, "PREFERRED_LOCATION",
-            device_id);
+    auto preferred_location_allocator = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+        "preferred_location_device_2", allocator, "PREFERRED_LOCATION", device_id);
 
     // _sphinx_tag_tut_device_advice_end
     void* data = preferred_location_allocator.allocate(1024);
 
     preferred_location_allocator.deallocate(data);
   } catch (umpire::util::Exception& e) {
-    std::cout << "Couldn't create Allocator with device_id = " << device_id
-              << std::endl;
+    std::cout << "Couldn't create Allocator with device_id = " << device_id << std::endl;
 
     std::cout << e.message() << std::endl;
   }

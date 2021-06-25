@@ -24,8 +24,7 @@ class SyclMemsetOperation : public MemoryOperation {
    *
    * @copydetails MemoryOperation::apply
    */
-  void apply(void* src_ptr, util::AllocationRecord* ptr, int value,
-             std::size_t length);
+  void apply(void* src_ptr, util::AllocationRecord* ptr, int value, std::size_t length);
 };
 
 } // namespace op

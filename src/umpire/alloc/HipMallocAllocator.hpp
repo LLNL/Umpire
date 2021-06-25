@@ -33,8 +33,7 @@ struct HipMallocAllocator {
     hipError_t error = ::hipMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipMalloc( bytes = " << size << " ) failed with error: "
-                                         << hipGetErrorString(error));
+      UMPIRE_ERROR("hipMalloc( bytes = " << size << " ) failed with error: " << hipGetErrorString(error));
     } else {
       return ptr;
     }
@@ -52,8 +51,7 @@ struct HipMallocAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: "
-                                     << hipGetErrorString(error));
+      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
     }
   }
 };

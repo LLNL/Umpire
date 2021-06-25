@@ -22,11 +22,10 @@
 namespace umpire {
 namespace strategy {
 
-DynamicPoolMap::DynamicPoolMap(
-    const std::string& name, int id, Allocator allocator,
-    const std::size_t first_minimum_pool_allocation_size,
-    const std::size_t next_minimum_pool_allocation_size,
-    const std::size_t alignment, CoalesceHeuristic should_coalesce) noexcept
+DynamicPoolMap::DynamicPoolMap(const std::string& name, int id, Allocator allocator,
+                               const std::size_t first_minimum_pool_allocation_size,
+                               const std::size_t next_minimum_pool_allocation_size, const std::size_t alignment,
+                               CoalesceHeuristic should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "DynamicPoolMap"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
@@ -35,12 +34,9 @@ DynamicPoolMap::DynamicPoolMap(
 {
   UMPIRE_LOG(Debug, " ( "
                         << "name=\"" << name << "\""
-                        << ", id=" << id << ", allocator=\""
-                        << allocator.getName() << "\""
-                        << ", first_minimum_pool_allocation_size="
-                        << m_first_minimum_pool_allocation_size
-                        << ", next_minimum_pool_allocation_size="
-                        << m_next_minimum_pool_allocation_size
+                        << ", id=" << id << ", allocator=\"" << allocator.getName() << "\""
+                        << ", first_minimum_pool_allocation_size=" << m_first_minimum_pool_allocation_size
+                        << ", next_minimum_pool_allocation_size=" << m_next_minimum_pool_allocation_size
                         << ", alignment=" << alignment << " )");
 }
 
@@ -60,8 +56,7 @@ DynamicPoolMap::~DynamicPoolMap()
     std::tie(addr, is_head, whole_bytes) = rec.second;
     // Deallocate if this is a whole block
     if (is_head && bytes == whole_bytes) {
-      UMPIRE_LOG(Debug,
-                 "Releasing " << whole_bytes << " size chunk @ " << addr);
+      UMPIRE_LOG(Debug, "Releasing " << whole_bytes << " size chunk @ " << addr);
       deallocateBlock(addr, bytes);
     }
   }
@@ -97,13 +92,11 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
     const std::size_t left_bytes{free_size - rounded_bytes};
 
     if (left_bytes > 0) {
-      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
-                 false, whole_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes, false, whole_bytes);
     }
   } else {
     const std::size_t min_block_size =
-        (m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
-                              : m_next_minimum_pool_allocation_size;
+        (m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size : m_next_minimum_pool_allocation_size;
 
     const std::size_t alloc_bytes{std::max(rounded_bytes, min_block_size)};
     ptr = allocateBlock(alloc_bytes);
@@ -116,8 +109,7 @@ void* DynamicPoolMap::allocate(std::size_t bytes)
 
     // Add free
     if (left_bytes > 0)
-      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes,
-                 false, alloc_bytes);
+      insertFree(static_cast<unsigned char*>(ptr) + rounded_bytes, left_bytes, false, alloc_bytes);
   }
 
   m_current_bytes += rounded_bytes;
@@ -249,8 +241,7 @@ MemoryResourceTraits DynamicPoolMap::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
-bool 
-DynamicPoolMap::tracksMemoryUse() const noexcept
+bool DynamicPoolMap::tracksMemoryUse() const noexcept
 {
   return false;
 }
@@ -260,8 +251,7 @@ void DynamicPoolMap::coalesce()
   UMPIRE_LOG(Debug, "()");
   // Coalesce differs from release in that it puts back a single block of the
   // size it released
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \""
-                << getName() << "\" }");
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
   do_coalesce();
 }
@@ -286,22 +276,17 @@ void DynamicPoolMap::do_coalesce()
   }
 }
 
-void DynamicPoolMap::insertUsed(Pointer addr, std::size_t bytes, bool is_head,
-                                std::size_t whole_bytes)
+void DynamicPoolMap::insertUsed(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes)
 {
-  m_used_map.insert(
-      std::make_pair(addr, std::make_tuple(bytes, is_head, whole_bytes)));
+  m_used_map.insert(std::make_pair(addr, std::make_tuple(bytes, is_head, whole_bytes)));
 }
 
-void DynamicPoolMap::insertFree(Pointer addr, std::size_t bytes, bool is_head,
-                                std::size_t whole_bytes)
+void DynamicPoolMap::insertFree(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes)
 {
-  m_free_map.insert(
-      std::make_pair(bytes, std::make_tuple(addr, is_head, whole_bytes)));
+  m_free_map.insert(std::make_pair(bytes, std::make_tuple(addr, is_head, whole_bytes)));
 }
 
-DynamicPoolMap::SizeMap::const_iterator DynamicPoolMap::findFreeBlock(
-    std::size_t bytes) const
+DynamicPoolMap::SizeMap::const_iterator DynamicPoolMap::findFreeBlock(std::size_t bytes) const
 {
   SizeMap::const_iterator iter{m_free_map.upper_bound(bytes)};
 
@@ -328,10 +313,8 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
     {
       umpire::util::backtrace bt;
       umpire::util::backtracer<>::get_backtrace(bt);
-      UMPIRE_LOG(Info,
-                 "actual_size: " << (m_actual_bytes + bytes)
-                                 << " (prev: " << m_actual_bytes << ") "
-                                 << umpire::util::backtracer<>::print(bt));
+      UMPIRE_LOG(Info, "actual_size: " << (m_actual_bytes + bytes) << " (prev: " << m_actual_bytes << ") "
+                                       << umpire::util::backtracer<>::print(bt));
     }
 #endif
     ptr = aligned_allocate(bytes); // Will POISON
@@ -351,8 +334,7 @@ void* DynamicPoolMap::allocateBlock(std::size_t bytes)
   }
 
   m_actual_bytes += bytes;
-  m_actual_highwatermark =
-    (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
+  m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
 
   return ptr;
 }
@@ -393,8 +375,7 @@ void DynamicPoolMap::mergeFreeBlocks()
     bool is_head;
     std::size_t whole_bytes;
     std::tie(ptr, is_head, whole_bytes) = rec.second;
-    free_pointer_map.insert(
-        std::make_pair(ptr, std::make_tuple(bytes, is_head, whole_bytes)));
+    free_pointer_map.insert(std::make_pair(ptr, std::make_tuple(bytes, is_head, whole_bytes)));
   }
 
   // this map is iterated over from low to high in terms of key = pointer
@@ -469,49 +450,39 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
   if (released_bytes > 0) {
     umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
-    UMPIRE_LOG(
-        Info, "actual_size: " << m_actual_bytes
-                              << " (prev: " << (m_actual_bytes + released_bytes)
-                              << ") " << umpire::util::backtracer<>::print(bt));
+    UMPIRE_LOG(Info, "actual_size: " << m_actual_bytes << " (prev: " << (m_actual_bytes + released_bytes) << ") "
+                                     << umpire::util::backtracer<>::print(bt));
   }
 #endif
 
   return released_bytes;
 }
 
-DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(
-    int percentage)
+DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR("Invalid percentage of "
-                 << percentage
-                 << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
   }
 
   if (percentage == 0) {
     return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
-    return [=](const strategy::DynamicPoolMap& pool) {
-      return (pool.getCurrentSize() == 0);
-    };
+    return [=](const strategy::DynamicPoolMap& pool) { return (pool.getCurrentSize() == 0); };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
     return [=](const strategy::DynamicPoolMap& pool) {
       // Calculate threshold in bytes from the percentage
-      const std::size_t threshold =
-          static_cast<std::size_t>(f * pool.getActualSize());
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return (pool.getReleasableSize() >= threshold);
     };
   }
 }
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&)
+std::ostream& operator<<(std::ostream& out, umpire::strategy::DynamicPoolMap::CoalesceHeuristic&)
 {
   return out;
 }
-
 
 } // end of namespace strategy
 } // end of namespace umpire

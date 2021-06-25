@@ -9,7 +9,6 @@
 
 #include "umpire/Allocator.hpp"
 
-
 // forward declarations
 
 namespace umpire {

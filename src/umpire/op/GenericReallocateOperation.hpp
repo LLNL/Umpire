@@ -27,8 +27,7 @@ class GenericReallocateOperation : public MemoryOperation {
    *
    * \copydetails MemoryOperation::transform
    */
-  void transform(void* current_ptr, void** new_ptr,
-                 util::AllocationRecord* current_allocation,
+  void transform(void* current_ptr, void** new_ptr, util::AllocationRecord* current_allocation,
                  util::AllocationRecord* new_allocation, std::size_t new_size);
 };
 

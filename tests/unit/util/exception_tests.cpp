@@ -10,9 +10,7 @@
 
 TEST(Exception, ThrowException)
 {
-  ASSERT_THROW(
-      throw umpire::util::Exception("Test Exception", __FILE__, __LINE__),
-      umpire::util::Exception);
+  ASSERT_THROW(throw umpire::util::Exception("Test Exception", __FILE__, __LINE__), umpire::util::Exception);
 }
 
 TEST(Exception, ThrowFromErrorMacro)

@@ -44,8 +44,7 @@ bool backtrace_enabled()
     const char* enval{getenv("UMPIRE_BACKTRACE")};
     if (enval) {
       std::string env_str{enval};
-      std::transform(env_str.begin(), env_str.end(), env_str.begin(),
-                     ::toupper);
+      std::transform(env_str.begin(), env_str.end(), env_str.begin(), ::toupper);
       if (env_str.find("ON") != std::string::npos) {
         enabled = true;
       }
@@ -91,12 +90,8 @@ std::string stringify(const std::vector<void*>& frames)
         demangled = abi::__cxa_demangle(info.dli_sname, NULL, 0, &status);
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
-      backtrace_stream << (status == 0 ? demangled
-                                       : (info.dli_sname == 0 ? symbols[index]
-                                                              : info.dli_sname))
-                       << "+0x" << std::hex
-                       << static_cast<int>(static_cast<char*>(it) -
-                                           static_cast<char*>(info.dli_saddr));
+      backtrace_stream << (status == 0 ? demangled : (info.dli_sname == 0 ? symbols[index] : info.dli_sname)) << "+0x"
+                       << std::hex << static_cast<int>(static_cast<char*>(it) - static_cast<char*>(info.dli_saddr));
 
 #if !defined(_LIBCPP_VERSION)
       free(demangled);

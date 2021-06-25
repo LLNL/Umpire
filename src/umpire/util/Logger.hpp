@@ -27,8 +27,7 @@ class Logger {
  public:
   void setLoggingMsgLevel(message::Level level) noexcept;
 
-  void logMessage(message::Level level, const std::string& message,
-                  const std::string& fileName, int line) noexcept;
+  void logMessage(message::Level level, const std::string& message, const std::string& fileName, int line) noexcept;
 
   static void initialize();
 
@@ -38,8 +37,7 @@ class Logger {
 
   inline bool logLevelEnabled(message::Level level)
   {
-    if (level < 0 || level >= message::Num_Levels ||
-        m_is_enabled[level] == false)
+    if (level < 0 || level >= message::Num_Levels || m_is_enabled[level] == false)
       return false;
     else
       return true;

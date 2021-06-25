@@ -53,8 +53,7 @@ using ResourceTypes = camp::list<host_resource_tag
                                  >;
 
 using PoolTypes =
-    camp::list<umpire::strategy::DynamicPoolList,
-               umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
+    camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;
@@ -71,14 +70,11 @@ class PrimaryPoolTest : public ::testing::Test {
     auto& rm = umpire::ResourceManager::getInstance();
     m_resource_name = std::string(tag_to_string<ResourceType>::value);
 
-    m_pool_name = std::string{"pool_test"} + std::string{"_"} +
-                  std::string{tag_to_string<Pool>::value} + std::string{"_"} +
-                  std::string{m_resource_name} + std::string{"_"} +
-                  std::to_string(unique_counter++);
+    m_pool_name = std::string{"pool_test"} + std::string{"_"} + std::string{tag_to_string<Pool>::value} +
+                  std::string{"_"} + std::string{m_resource_name} + std::string{"_"} + std::to_string(unique_counter++);
 
     m_allocator = new umpire::Allocator(rm.makeAllocator<Pool>(
-        m_pool_name, rm.getAllocator(m_resource_name), m_initial_pool_size,
-        m_min_pool_growth_size, m_alignment));
+        m_pool_name, rm.getAllocator(m_resource_name), m_initial_pool_size, m_min_pool_growth_size, m_alignment));
   }
 
   void TearDown() override
@@ -101,24 +97,21 @@ TYPED_TEST_SUITE(PrimaryPoolTest, PoolTestTypes, );
 
 TYPED_TEST(PrimaryPoolTest, Allocate)
 {
-  ASSERT_NO_THROW(
-      this->m_allocator->deallocate(this->m_allocator->allocate(100)););
+  ASSERT_NO_THROW(this->m_allocator->deallocate(this->m_allocator->allocate(100)););
 }
 
 TYPED_TEST(PrimaryPoolTest, LazyFirstAllocation)
 {
   ASSERT_EQ(this->m_allocator->getActualSize(), 0);
 
-  ASSERT_NO_THROW(
-      this->m_allocator->deallocate(this->m_allocator->allocate(100)););
+  ASSERT_NO_THROW(this->m_allocator->deallocate(this->m_allocator->allocate(100)););
 
   ASSERT_EQ(this->m_allocator->getActualSize(), this->m_initial_pool_size);
 }
 
 TYPED_TEST(PrimaryPoolTest, AllocateDeallocateBig)
 {
-  ASSERT_NO_THROW(this->m_allocator->deallocate(
-      this->m_allocator->allocate(this->m_big * sizeof(double))););
+  ASSERT_NO_THROW(this->m_allocator->deallocate(this->m_allocator->allocate(this->m_big * sizeof(double))););
 }
 
 TYPED_TEST(PrimaryPoolTest, Duplicate)
@@ -128,8 +121,7 @@ TYPED_TEST(PrimaryPoolTest, Duplicate)
 
   ASSERT_TRUE(rm.isAllocator(this->m_allocator->getName()));
 
-  ASSERT_ANY_THROW(rm.makeAllocator<Pool>(
-      this->m_allocator->getName(), rm.getAllocator(this->m_resource_name)));
+  ASSERT_ANY_THROW(rm.makeAllocator<Pool>(this->m_allocator->getName(), rm.getAllocator(this->m_resource_name)));
 }
 
 //
@@ -149,15 +141,13 @@ TYPED_TEST(PrimaryPoolTest, BlocksStatistic)
 
   // 2 Blocks (0 free, 2 allocated)
   for (int i{0}; i < 2; ++i) {
-    ASSERT_NO_THROW(allocs[i] = this->m_allocator->allocate(
-                        this->m_initial_pool_size / 2););
+    ASSERT_NO_THROW(allocs[i] = this->m_allocator->allocate(this->m_initial_pool_size / 2););
   }
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 2);
 
   // 5 Blocks (1 Free, 4 allocated)
   for (int i{2}; i <= 3; ++i) {
-    ASSERT_NO_THROW(allocs[i] = this->m_allocator->allocate(
-                        this->m_min_pool_growth_size / 8););
+    ASSERT_NO_THROW(allocs[i] = this->m_allocator->allocate(this->m_min_pool_growth_size / 8););
   }
 
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 5);
@@ -205,22 +195,19 @@ TYPED_TEST(PrimaryPoolTest, Sizes)
 
   void* data2{nullptr};
 
-  ASSERT_NO_THROW(data2 =
-                      this->m_allocator->allocate(this->m_initial_pool_size););
+  ASSERT_NO_THROW(data2 = this->m_allocator->allocate(this->m_initial_pool_size););
 
   ASSERT_NO_THROW(this->m_allocator->deallocate(data););
 
   ASSERT_GE(this->m_allocator->getCurrentSize(), this->m_initial_pool_size);
 
-  ASSERT_EQ(this->m_allocator->getHighWatermark(),
-            this->m_initial_pool_size + size);
+  ASSERT_EQ(this->m_allocator->getHighWatermark(), this->m_initial_pool_size + size);
 
-  ASSERT_GE(this->m_allocator->getActualSize(),
-            this->m_initial_pool_size + this->m_min_pool_growth_size);
+  ASSERT_GE(this->m_allocator->getActualSize(), this->m_initial_pool_size + this->m_min_pool_growth_size);
 
   ASSERT_EQ(this->m_allocator->getSize(data2), this->m_initial_pool_size);
 
-  ASSERT_EQ(pool->getActualHighwaterMark(), this->m_initial_pool_size*2);
+  ASSERT_EQ(pool->getActualHighwaterMark(), this->m_initial_pool_size * 2);
 
   ASSERT_NO_THROW({ this->m_allocator->deallocate(data2); });
 }
@@ -239,15 +226,11 @@ TYPED_TEST(PrimaryPoolTest, Alignment)
 
     ASSERT_NO_THROW({ ptr = this->m_allocator->allocate(size); });
 
-    EXPECT_TRUE(0 ==
-                (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment))
-        << "Allocation for size: " << size << " : " << ptr << " mod "
-        << this->m_alignment << " = "
-        << (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment)
-        << std::endl;
+    EXPECT_TRUE(0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment))
+        << "Allocation for size: " << size << " : " << ptr << " mod " << this->m_alignment << " = "
+        << (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment) << std::endl;
 
-    ASSERT_TRUE(0 ==
-                (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment));
+    ASSERT_TRUE(0 == (reinterpret_cast<std::ptrdiff_t>(ptr) % this->m_alignment));
 
     allocations.push_back(ptr);
   }
@@ -319,16 +302,14 @@ TYPED_TEST(PrimaryPoolTest, largestavailable)
     this->m_allocator->deallocate(ptr);
   });
 
-  ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(),
-            this->m_initial_pool_size);
+  ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), this->m_initial_pool_size);
 
   void* ptrs[num_allocs];
 
   for (int i{0}; i < num_allocs; ++i) {
     ASSERT_NO_THROW(ptrs[i] = this->m_allocator->allocate(1024););
 
-    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(),
-              ((num_allocs - (i + 1)) * 1024));
+    ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), ((num_allocs - (i + 1)) * 1024));
   }
 
   for (int i{0}; i < num_allocs; i += 2) {
@@ -337,8 +318,7 @@ TYPED_TEST(PrimaryPoolTest, largestavailable)
   }
 
   for (int i{1}; i < num_allocs; i += 2) {
-    const int largest_block{((i + 2) < num_allocs) ? (i + 2) * 1024
-                                                   : (i + 1) * 1024};
+    const int largest_block{((i + 2) < num_allocs) ? (i + 2) * 1024 : (i + 1) * 1024};
     ASSERT_NO_THROW(this->m_allocator->deallocate(ptrs[i]););
     ASSERT_EQ(dynamic_pool->getLargestAvailableBlock(), largest_block);
   }
@@ -356,8 +336,7 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
   void* ptr_two{nullptr};
 
   ASSERT_NO_THROW({
-    ptr_one = this->m_allocator->allocate(1 + this->m_initial_pool_size -
-                                          this->m_min_pool_growth_size);
+    ptr_one = this->m_allocator->allocate(1 + this->m_initial_pool_size - this->m_min_pool_growth_size);
     ptr_two = this->m_allocator->allocate(this->m_min_pool_growth_size);
   });
 
@@ -375,10 +354,8 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
 
   ASSERT_EQ(this->m_allocator->getCurrentSize(), 0);
-  ASSERT_EQ(dynamic_pool->getActualSize(),
-            this->m_initial_pool_size + this->m_min_pool_growth_size);
-  ASSERT_EQ(this->m_allocator->getHighWatermark(),
-            1 + this->m_initial_pool_size);
+  ASSERT_EQ(dynamic_pool->getActualSize(), this->m_initial_pool_size + this->m_min_pool_growth_size);
+  ASSERT_EQ(this->m_allocator->getHighWatermark(), 1 + this->m_initial_pool_size);
 }
 
 TYPED_TEST(PrimaryPoolTest, heuristic_bounds)
@@ -407,10 +384,8 @@ TYPED_TEST(PrimaryPoolTest, heuristic_0_percent)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto h_fun = Pool::percent_releasable(0);
-  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_0"},
-                                      rm.getAllocator(this->m_resource_name),
-                                      initial_size, subsequent_min_size,
-                                      this->m_alignment, h_fun);
+  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_0"}, rm.getAllocator(this->m_resource_name),
+                                      initial_size, subsequent_min_size, this->m_alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<Pool>(alloc);
 
@@ -544,10 +519,8 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto h_fun = Pool::percent_releasable(75);
-  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_75"},
-                                      rm.getAllocator(this->m_resource_name),
-                                      initial_size, subsequent_min_size,
-                                      this->m_alignment, h_fun);
+  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_75"}, rm.getAllocator(this->m_resource_name),
+                                      initial_size, subsequent_min_size, this->m_alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<Pool>(alloc);
 
@@ -581,10 +554,8 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto h_fun = Pool::percent_releasable(100);
-  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_100"},
-                                      rm.getAllocator(this->m_resource_name),
-                                      initial_size, subsequent_min_size,
-                                      alignment, h_fun);
+  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_100"}, rm.getAllocator(this->m_resource_name),
+                                      initial_size, subsequent_min_size, alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<Pool>(alloc);
 

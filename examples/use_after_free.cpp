@@ -8,13 +8,11 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "umpire/strategy/QuickPool.hpp"
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
-      "pool", rm.getAllocator("HOST"));
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("pool", rm.getAllocator("HOST"));
 
   double* data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
   data[256] = 100;

@@ -7,7 +7,6 @@
 #include "umpire/resource/HipDeviceResourceFactory.hpp"
 
 #include "hip/hip_runtime_api.h"
-
 #include "umpire/resource/HipDeviceMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
@@ -15,28 +14,24 @@
 namespace umpire {
 namespace resource {
 
-bool HipDeviceResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool HipDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if ((name.find("CONST") == std::string::npos) &&
-      (name.find("DEVICE") != std::string::npos)) {
+  if ((name.find("CONST") == std::string::npos) && (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
   }
 }
 
-std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> HipDeviceResourceFactory::create(const std::string& name, int id,
+                                                                           MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::HipDeviceMemoryResource>(
-     Platform::hip, name, id, traits);
+  return util::make_unique<resource::HipDeviceMemoryResource>(Platform::hip, name, id, traits);
 }
 
 MemoryResourceTraits HipDeviceResourceFactory::getDefaultTraits()
@@ -47,8 +42,7 @@ MemoryResourceTraits HipDeviceResourceFactory::getDefaultTraits()
   auto error = ::hipGetDeviceProperties(&properties, 0);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipGetDeviceProperties failed with error: "
-                 << hipGetErrorString(error));
+    UMPIRE_ERROR("hipGetDeviceProperties failed with error: " << hipGetErrorString(error));
   }
 
   traits.unified = false;

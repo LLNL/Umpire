@@ -22,11 +22,10 @@ class MemoryResourceRegistry {
 
   const std::vector<std::string>& getResourceNames() noexcept;
 
-  std::unique_ptr<resource::MemoryResource> makeMemoryResource(
-      const std::string& name, int id);
+  std::unique_ptr<resource::MemoryResource> makeMemoryResource(const std::string& name, int id);
 
-  std::unique_ptr<resource::MemoryResource> makeMemoryResource(
-      const std::string& name, int id, MemoryResourceTraits traits);
+  std::unique_ptr<resource::MemoryResource> makeMemoryResource(const std::string& name, int id,
+                                                               MemoryResourceTraits traits);
 
   void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 

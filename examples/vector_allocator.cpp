@@ -15,8 +15,7 @@ int main(int, char**)
 
   umpire::TypedAllocator<double> vector_allocator(alloc);
 
-  std::vector<double, umpire::TypedAllocator<double>> my_vector(
-      vector_allocator);
+  std::vector<double, umpire::TypedAllocator<double>> my_vector(vector_allocator);
 
   my_vector.resize(100);
 

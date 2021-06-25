@@ -25,8 +25,7 @@ class SyclCopyFromOperation : public MemoryOperation {
    *
    * @copydetails MemoryOperation::transform
    */
-  void transform(void* src_ptr, void** dst_ptr,
-                 util::AllocationRecord* src_allocation,
+  void transform(void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
                  util::AllocationRecord* dst_allocation, std::size_t length);
 };
 

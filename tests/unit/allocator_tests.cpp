@@ -13,8 +13,7 @@
 
 class MockAllocationStrategy : public umpire::strategy::AllocationStrategy {
  public:
-  MockAllocationStrategy()
-      : umpire::strategy::AllocationStrategy("MockAllocationStrategy", 12345)
+  MockAllocationStrategy() : umpire::strategy::AllocationStrategy("MockAllocationStrategy", 12345)
   {
   }
 
@@ -27,9 +26,7 @@ class MockAllocationStrategy : public umpire::strategy::AllocationStrategy {
 
 class AllocatorTest : public ::testing::Test {
  protected:
-  AllocatorTest()
-      : m_strategy(std::make_shared<MockAllocationStrategy>()),
-        m_allocator(m_strategy)
+  AllocatorTest() : m_strategy(std::make_shared<MockAllocationStrategy>()), m_allocator(m_strategy)
   {
   }
 
@@ -37,12 +34,10 @@ class AllocatorTest : public ::testing::Test {
   {
     data = malloc(100 * sizeof(char));
 
-    ON_CALL(*m_strategy, getPlatform())
-        .WillByDefault(::testing::Return(umpire::Platform::host));
+    ON_CALL(*m_strategy, getPlatform()).WillByDefault(::testing::Return(umpire::Platform::host));
 
     // set up allocate return value
-    ON_CALL(*m_strategy, allocate(::testing::_))
-        .WillByDefault(::testing::Return(data));
+    ON_CALL(*m_strategy, allocate(::testing::_)).WillByDefault(::testing::Return(data));
   }
 
   virtual void TearDown()
@@ -108,8 +103,7 @@ TEST_F(AllocatorTest, getCurrentSize)
 
 TEST_F(AllocatorTest, getHighWatermark)
 {
-  EXPECT_CALL(*m_strategy, getHighWatermark())
-      .WillOnce(::testing::Return(4096));
+  EXPECT_CALL(*m_strategy, getHighWatermark()).WillOnce(::testing::Return(4096));
 
   int size = m_allocator.getHighWatermark();
 

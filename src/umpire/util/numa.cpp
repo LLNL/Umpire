@@ -38,11 +38,9 @@ void move_to_node(void* ptr, std::size_t bytes, int node)
   numa_bitmask_clearall(mask);
   numa_bitmask_setbit(mask, node);
 
-  if (mbind(ptr, bytes, MPOL_BIND, mask->maskp, mask->size + 1,
-            MPOL_MF_MOVE | MPOL_MF_STRICT) != 0) {
-    UMPIRE_ERROR("numa::move_to_node error: mbind( ptr = "
-                 << ptr << ", bytes = " << bytes << ", node = " << node
-                 << " ) failed");
+  if (mbind(ptr, bytes, MPOL_BIND, mask->maskp, mask->size + 1, MPOL_MF_MOVE | MPOL_MF_STRICT) != 0) {
+    UMPIRE_ERROR("numa::move_to_node error: mbind( ptr = " << ptr << ", bytes = " << bytes << ", node = " << node
+                                                           << " ) failed");
   }
 
   numa_bitmask_free(mask);
@@ -52,8 +50,7 @@ int get_location(void* ptr)
 {
   int numa_node = -1;
   if (get_mempolicy(&numa_node, NULL, 0, ptr, MPOL_F_NODE | MPOL_F_ADDR) != 0) {
-    UMPIRE_ERROR(
-        "numa::get_location error: get_mempolicy( ptr = " << ptr << ") failed");
+    UMPIRE_ERROR("numa::get_location error: get_mempolicy( ptr = " << ptr << ") failed");
   }
   return numa_node;
 }

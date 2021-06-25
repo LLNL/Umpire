@@ -12,8 +12,7 @@
 namespace umpire {
 namespace strategy {
 
-SizeLimiter::SizeLimiter(const std::string& name, int id, Allocator allocator,
-                         std::size_t size_limit)
+SizeLimiter::SizeLimiter(const std::string& name, int id, Allocator allocator, std::size_t size_limit)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "SizeLimiter"},
       m_allocator(allocator.getAllocationStrategy()),
       m_size_limit(size_limit),

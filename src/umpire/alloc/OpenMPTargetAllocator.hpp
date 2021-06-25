@@ -35,8 +35,7 @@ struct OpenMPTargetAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR("omp_target_alloc( bytes = " << bytes << ", device = "
-                                                << device << " ) failed");
+      UMPIRE_ERROR("omp_target_alloc( bytes = " << bytes << ", device = " << device << " ) failed");
     } else {
       return ret;
     }
@@ -54,13 +53,13 @@ struct OpenMPTargetAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     omp_target_free(ptr, device);
   }
-  
+
   bool isAccessible(Platform p)
   {
-    if(p == Platform::omp_target)
+    if (p == Platform::omp_target)
       return true;
     else
-      return false; //p is host or undefined
+      return false; // p is host or undefined
   }
 
   int device;

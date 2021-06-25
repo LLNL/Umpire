@@ -6,24 +6,21 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/resource/HostSharedMemoryResource.hpp"
+
 #include "umpire/resource/HostSharedMemoryResourceImpl.hpp"
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  #include <cuda_runtime_api.h>
+#include <cuda_runtime_api.h>
 #endif
 
 namespace umpire {
 namespace resource {
 
-HostSharedMemoryResource::HostSharedMemoryResource(Platform platform,
-                                       const std::string& name, int id,
-                                       MemoryResourceTraits traits)
-    :
-      MemoryResource{name, id, traits},
-      m_platform{platform},
-      pimpl{ new impl{ name, traits.size } }
+HostSharedMemoryResource::HostSharedMemoryResource(Platform platform, const std::string& name, int id,
+                                                   MemoryResourceTraits traits)
+    : MemoryResource{name, id, traits}, m_platform{platform}, pimpl{new impl{name, traits.size}}
 {
 }
 
@@ -38,7 +35,7 @@ void* HostSharedMemoryResource::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 
 void* HostSharedMemoryResource::allocate_named(const std::string& name, std::size_t bytes)
 {
-  void* ptr{ pimpl->allocate_named(name, bytes) };
+  void* ptr{pimpl->allocate_named(name, bytes)};
 
   UMPIRE_LOG(Debug, "(name=\"" << name << ", requested_size=" << bytes << ") returning: " << ptr);
   return ptr;
@@ -56,21 +53,20 @@ bool HostSharedMemoryResource::isPageable() noexcept
   int cdev = 0;
   cudaGetDevice(&cdev);
 
-  //Device supports coherently accessing pageable memory
-  //without calling cudaHostRegister on it
-  cudaDeviceGetAttribute(&pageableMem,
-     cudaDevAttrPageableMemoryAccess, cdev);
-  if(pageableMem)
+  // Device supports coherently accessing pageable memory
+  // without calling cudaHostRegister on it
+  cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
+  if (pageableMem)
     return true;
 #endif
-  // Note: Regarding omp_target, we pick a default of false here 
+  // Note: Regarding omp_target, we pick a default of false here
   // until we can better determine which device omp_offload is using.
   return false;
 }
 
 bool HostSharedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::host)
+  if (p == Platform::host)
     return true;
   else if (p == Platform::cuda) // TODO: Implement omp_target specific test
     return isPageable();

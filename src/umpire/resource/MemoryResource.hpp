@@ -74,7 +74,7 @@ class MemoryResource : public strategy::AllocationStrategy {
   virtual bool isAccessibleFrom(Platform p) noexcept = 0;
 
   MemoryResourceTraits getTraits() const noexcept override;
- 
+
  protected:
   MemoryResourceTraits m_traits;
 };

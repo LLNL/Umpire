@@ -16,10 +16,10 @@ macro(umpire_add_code_checks)
         set(_sources)
         if (DEFINED arg_RECURSIVE AND arg_RECURSIVE) 
           file(GLOB_RECURSE _sources
-               "*.cpp" "*.hpp" "*.inl" "*.c" "*.h" "*.F" "*.f" "*.f90" "*.F90")
+               "*.cpp" "*.hpp" "*.inl" "*.c" ".cu" "*.h" "*.F" "*.f" "*.f90" "*.F90")
          else ()
            file(GLOB _sources
-               "*.cpp" "*.hpp" "*.inl" "*.c" "*.h" "*.F" "*.f" "*.f90" "*.F90")
+               "*.cpp" "*.hpp" "*.inl" "*.c" ".cu" "*.h" "*.F" "*.f" "*.f90" "*.F90")
          endif ()
 
         blt_add_code_checks(PREFIX    ${arg_PREFIX}

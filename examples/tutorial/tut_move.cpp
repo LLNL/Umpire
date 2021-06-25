@@ -15,8 +15,7 @@ double* move_data(double* source_data, const std::string& destination)
   std::cout << "Moved source data (" << source_data << ") to destination ";
 
   // _sphinx_tag_tut_move_start
-  double* dest_data =
-      static_cast<double*>(rm.move(source_data, dest_allocator));
+  double* dest_data = static_cast<double*>(rm.move(source_data, dest_allocator));
   // _sphinx_tag_tut_move_end
 
   std::cout << destination << " (" << dest_data << ")" << std::endl;
@@ -32,11 +31,10 @@ int main(int, char**)
 
   auto allocator = rm.getAllocator("HOST");
 
-  double* data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-            << allocator.getName() << " allocator." << std::endl;
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the " << allocator.getName() << " allocator."
+            << std::endl;
 
   std::cout << "Filling with 0.0...";
 

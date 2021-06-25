@@ -13,9 +13,8 @@
 namespace umpire {
 namespace op {
 
-void HostMemsetOperation::apply(
-    void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
-    int value, std::size_t length)
+void HostMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value,
+                                std::size_t length)
 {
   std::memset(src_ptr, value, length);
 }

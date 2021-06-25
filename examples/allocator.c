@@ -26,10 +26,8 @@ int main(int argc, char* argv[])
   int i;
 
   printf("Allocating memory on HOST...");
-  alloc_one =
-      (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
-  alloc_two =
-      (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
+  alloc_one = (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
+  alloc_two = (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
 
   for (i = 0; i < ELEMS; i++) {
     alloc_one[i] = 1.0 * i;

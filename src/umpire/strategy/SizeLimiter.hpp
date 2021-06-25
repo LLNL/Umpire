@@ -25,8 +25,7 @@ namespace strategy {
  */
 class SizeLimiter : public AllocationStrategy {
  public:
-  SizeLimiter(const std::string& name, int id, Allocator allocator,
-              std::size_t size_limit);
+  SizeLimiter(const std::string& name, int id, Allocator allocator, std::size_t size_limit);
 
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;

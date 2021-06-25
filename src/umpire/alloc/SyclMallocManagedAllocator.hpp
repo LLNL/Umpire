@@ -35,8 +35,7 @@ struct SyclMallocManagedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
 
     if (usm_ptr == nullptr) {
-      UMPIRE_ERROR("sycl::malloc_shared( bytes = "
-                   << bytes << " ) failed with error!");
+      UMPIRE_ERROR("sycl::malloc_shared( bytes = " << bytes << " ) failed with error!");
     } else {
       return usm_ptr;
     }
@@ -58,10 +57,10 @@ struct SyclMallocManagedAllocator {
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::sycl || p == Platform::host)
+    if (p == Platform::sycl || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false; // p is undefined
   }
 };
 

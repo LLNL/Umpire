@@ -53,18 +53,11 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * sizes (power-of-2) \param should_coalesce Heuristic for when to perform
    * coalesce operation
    */
-  QuickPool(
-    const std::string& name,
-    int id,
-    Allocator allocator,
-    const std::size_t
-      first_minimum_pool_allocation_size = s_default_first_block_size,
-    const std::size_t
-      next_minimum_pool_allocation_size = s_default_next_block_size,
-    const std::size_t
-      alignment = s_default_alignment,
-    CoalesceHeuristic
-      should_coalesce = percent_releasable(100)) noexcept;
+  QuickPool(const std::string& name, int id, Allocator allocator,
+            const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
+            const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
+            const std::size_t alignment = s_default_alignment,
+            CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
   ~QuickPool();
 
@@ -141,12 +134,10 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
   using SizeMap =
-      std::multimap<std::size_t, Chunk*, std::less<std::size_t>,
-                    pool_allocator<std::pair<const std::size_t, Chunk*>>>;
+      std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
   struct Chunk {
-    Chunk(void* ptr, std::size_t s, std::size_t cs)
-        : data{ptr}, size{s}, chunk_size{cs}
+    Chunk(void* ptr, std::size_t s, std::size_t cs) : data{ptr}, size{s}, chunk_size{cs}
     {
     }
 
@@ -178,8 +169,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   bool m_is_destructing{false};
 };
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::QuickPool::CoalesceHeuristic&);
+std::ostream& operator<<(std::ostream& out, umpire::strategy::QuickPool::CoalesceHeuristic&);
 
 } // end of namespace strategy
 } // end namespace umpire

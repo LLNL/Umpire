@@ -22,10 +22,7 @@ static std::size_t size_by_iterator(Map& map)
 
 class MemoryMapTest : public ::testing::Test {
  protected:
-  MemoryMapTest()
-      : a{reinterpret_cast<void*>(1)},
-        b{reinterpret_cast<void*>(2)},
-        c{reinterpret_cast<void*>(3)}
+  MemoryMapTest() : a{reinterpret_cast<void*>(1)}, b{reinterpret_cast<void*>(2)}, c{reinterpret_cast<void*>(3)}
   {
   }
 

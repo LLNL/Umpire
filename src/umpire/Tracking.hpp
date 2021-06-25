@@ -9,10 +9,7 @@
 
 namespace umpire {
 
-enum class Tracking {
-  Tracked,
-  Untracked
-};
+enum class Tracking { Tracked, Untracked };
 
 }
 

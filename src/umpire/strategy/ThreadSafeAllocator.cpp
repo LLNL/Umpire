@@ -13,8 +13,7 @@
 namespace umpire {
 namespace strategy {
 
-ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id,
-                                         Allocator allocator)
+ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id, Allocator allocator)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "ThreadSafeAllocator"},
       m_allocator(allocator.getAllocationStrategy()),
       m_mutex()

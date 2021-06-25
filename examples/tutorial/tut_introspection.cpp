@@ -31,25 +31,22 @@ int main(int, char**)
 
   for (auto& destination : destinations) {
     auto allocator = rm.getAllocator(destination);
-    double* data =
-        static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+    double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-    std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-              << allocator.getName() << " allocator." << std::endl;
+    std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the " << allocator.getName() << " allocator."
+              << std::endl;
 
     // _sphinx_tag_tut_getallocator_start
     auto found_allocator = rm.getAllocator(data);
     // _sphinx_tag_tut_getallocator_end
 
     // _sphinx_tag_tut_getinfo_start
-    std::cout << "According to the ResourceManager, the Allocator used is "
-              << found_allocator.getName() << ", which has the Platform "
-              << static_cast<int>(found_allocator.getPlatform()) << std::endl;
+    std::cout << "According to the ResourceManager, the Allocator used is " << found_allocator.getName()
+              << ", which has the Platform " << static_cast<int>(found_allocator.getPlatform()) << std::endl;
     // _sphinx_tag_tut_getinfo_end
 
     // _sphinx_tag_tut_getsize_start
-    std::cout << "The size of the allocation is << "
-              << found_allocator.getSize(data) << std::endl;
+    std::cout << "The size of the allocation is << " << found_allocator.getSize(data) << std::endl;
     // _sphinx_tag_tut_getsize_end
 
     allocator.deallocate(data);

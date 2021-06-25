@@ -21,8 +21,7 @@ class CudaAdviseUnsetAccessedByOperation : public MemoryOperation {
    *
    * @copydetails MemoryOperation::apply
    */
-  void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val,
-             std::size_t length);
+  void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length);
 };
 
 } // end of namespace op

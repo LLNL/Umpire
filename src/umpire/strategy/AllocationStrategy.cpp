@@ -11,7 +11,8 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent, const std::string& strategy_name) noexcept
+AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent,
+                                       const std::string& strategy_name) noexcept
     : m_name{name}, m_strategy_name{strategy_name}, m_id{id}, m_parent{parent}
 {
 }
@@ -28,7 +29,8 @@ void* AllocationStrategy::allocate_internal(std::size_t bytes)
   return allocate(bytes);
 }
 
-void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
+void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name),
+                                         std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
   UMPIRE_ERROR("This allocation strategy does not support named allocations");
 
@@ -44,7 +46,6 @@ void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(na
 #endif
 }
 
-
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
   m_current_size -= size;
@@ -52,7 +53,6 @@ void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 
   deallocate(ptr, size);
 }
-
 
 const std::string& AllocationStrategy::getName() noexcept
 {

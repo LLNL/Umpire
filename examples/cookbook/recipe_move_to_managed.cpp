@@ -17,8 +17,7 @@ int main(int, char**)
   //
   // Allocate host data
   //
-  double* host_data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* host_data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
   //
   // Move data to unified memory
