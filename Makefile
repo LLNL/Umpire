@@ -47,6 +47,9 @@ else
 	DOCKER_BUILDKIT=1 docker build --target check --no-cache .
 endif
 
+style:
+	scripts/docker/apply-style.sh
+
 help:
 	@echo 'usage: make [variable] [target]'
 	@echo ''
