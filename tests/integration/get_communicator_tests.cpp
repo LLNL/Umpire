@@ -5,13 +5,11 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/config.hpp"
+#include "gtest/gtest.h"
+#include "mpi.h"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-
-#include "gtest/gtest.h"
-
-#include "mpi.h"
+#include "umpire/config.hpp"
 
 TEST(GetCommunicator, Null)
 {
@@ -38,7 +36,7 @@ TEST(GetCommunicator, SharedAndCached)
   ASSERT_EQ(result, MPI_IDENT);
 }
 
-int main(int argc, char * argv[])
+int main(int argc, char* argv[])
 {
   int result = 0;
 

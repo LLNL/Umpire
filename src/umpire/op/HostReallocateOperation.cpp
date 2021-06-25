@@ -15,10 +15,8 @@
 namespace umpire {
 namespace op {
 
-void HostReallocateOperation::transform(
-    void* current_ptr, void** new_ptr,
-    util::AllocationRecord* current_allocation,
-    util::AllocationRecord* new_allocation, std::size_t new_size)
+void HostReallocateOperation::transform(void* current_ptr, void** new_ptr, util::AllocationRecord* current_allocation,
+                                        util::AllocationRecord* new_allocation, std::size_t new_size)
 {
   auto allocator = umpire::Allocator(new_allocation->strategy);
   const std::size_t old_size = current_allocation->size;
@@ -34,18 +32,15 @@ void HostReallocateOperation::transform(
     ResourceManager::getInstance().copy(*new_ptr, current_ptr, copy_size);
     allocator.deallocate(current_ptr);
   } else {
-    auto old_record =
-        ResourceManager::getInstance().deregisterAllocation(current_ptr);
+    auto old_record = ResourceManager::getInstance().deregisterAllocation(current_ptr);
     *new_ptr = ::realloc(current_ptr, new_size);
 
     if (!*new_ptr) {
-      UMPIRE_ERROR("::realloc(current_ptr="
-                   << current_ptr << ", old_size=" << old_record.size
-                   << ", new_size=" << new_size << ") failed");
+      UMPIRE_ERROR("::realloc(current_ptr=" << current_ptr << ", old_size=" << old_record.size
+                                            << ", new_size=" << new_size << ") failed");
     }
 
-    ResourceManager::getInstance().registerAllocation(
-        *new_ptr, {*new_ptr, new_size, new_allocation->strategy});
+    ResourceManager::getInstance().registerAllocation(*new_ptr, {*new_ptr, new_size, new_allocation->strategy});
   }
 }
 

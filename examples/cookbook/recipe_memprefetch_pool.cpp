@@ -15,11 +15,9 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto prefetcher = rm.makeAllocator<umpire::strategy::AllocationPrefetcher>(
-      "prefetcher", rm.getAllocator("UM"));
+  auto prefetcher = rm.makeAllocator<umpire::strategy::AllocationPrefetcher>("prefetcher", rm.getAllocator("UM"));
 
-  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("prefetch_pool",
-                                                              prefetcher);
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("prefetch_pool", prefetcher);
 
   void* data_one = pool.allocate(1024);
   void* data_two = pool.allocate(4096);

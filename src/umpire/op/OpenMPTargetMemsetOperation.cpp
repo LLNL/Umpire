@@ -15,9 +15,8 @@
 namespace umpire {
 namespace op {
 
-void OpenMPTargetMemsetOperation::apply(void* src_ptr,
-                                        util::AllocationRecord* src_allocation,
-                                        int val, std::size_t length)
+void OpenMPTargetMemsetOperation::apply(void* src_ptr, util::AllocationRecord* src_allocation, int val,
+                                        std::size_t length)
 {
   int device = src_allocation->strategy->getTraits().id;
   unsigned char* data_ptr{static_cast<unsigned char*>(src_ptr)};

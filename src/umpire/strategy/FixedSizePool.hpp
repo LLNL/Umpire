@@ -51,13 +51,11 @@ class FixedSizePool {
 
   void newPool(struct Pool **pnew)
   {
-    struct Pool *p = static_cast<struct Pool *>(
-        IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
+    struct Pool *p = static_cast<struct Pool *>(IA::allocate(sizeof(struct Pool) + NP * sizeof(unsigned int)));
     p->numAvail = numPerPool;
     p->next = NULL;
 
-    p->data =
-        reinterpret_cast<unsigned char *>(MA::allocate(numPerPool * sizeof(T)));
+    p->data = reinterpret_cast<unsigned char *>(MA::allocate(numPerPool * sizeof(T)));
     p->avail = reinterpret_cast<unsigned int *>(p + 1);
     for (int i = 0; i < NP; i++)
       p->avail[i] = (~0);
@@ -92,8 +90,7 @@ class FixedSizePool {
 
   FixedSizePool()
       : numPerPool(NP * sizeof(unsigned int) * 8),
-        totalPoolSize(sizeof(struct Pool) + numPerPool * sizeof(T) +
-                      NP * sizeof(unsigned int)),
+        totalPoolSize(sizeof(struct Pool) + numPerPool * sizeof(T) + NP * sizeof(unsigned int)),
         numBlocks(0)
   {
     newPool(&pool);

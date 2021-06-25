@@ -24,28 +24,15 @@ struct MemoryResourceTraits {
 
   enum class memory_type { unknown, ddr, gddr, hbm, nvme };
 
-  enum class resource_type {
-    unknown,
-    host,
-    device,
-    device_const,
-    pinned,
-    um,
-    file,
-    shared
-  };
+  enum class resource_type { unknown, host, device, device_const, pinned, um, file, shared };
 
-  enum class shared_scope {
-    unknown,
-    node,
-    socket
-  };
+  enum class shared_scope { unknown, node, socket };
 
   int id;
 
   // variables for only SYCL devices (i.e., Intel GPUs)
 #if defined(UMPIRE_ENABLE_SYCL)
-  sycl::queue* queue=nullptr;
+  sycl::queue* queue = nullptr;
 #endif
 
   bool unified = false;

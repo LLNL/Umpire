@@ -13,8 +13,8 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/FixedPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 namespace umpire {
 namespace strategy {
@@ -48,12 +48,11 @@ class MixedPool : public AllocationStrategy {
             std::size_t smallest_fixed_obj_size = (1 << 8),            // 256B
             std::size_t largest_fixed_obj_size = (1 << 17),            // 1024K
             std::size_t max_initial_fixed_pool_size = 1024 * 1024 * 2, // 2MB
-            std::size_t fixed_size_multiplier = 16, // 16x over previous size
+            std::size_t fixed_size_multiplier = 16,                    // 16x over previous size
             const std::size_t quick_pool_initial_alloc_size = (512 * 1024 * 1024),
             const std::size_t quick_pool_min_alloc_size = (1 * 1024 * 1024),
             const std::size_t quick_pool_align_bytes = 16,
-            QuickPool::CoalesceHeuristic should_coalesce =
-                QuickPool::percent_releasable(100)) noexcept;
+            QuickPool::CoalesceHeuristic should_coalesce = QuickPool::percent_releasable(100)) noexcept;
 
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;

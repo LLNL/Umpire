@@ -27,14 +27,12 @@ int main(int, char**)
   // Make an allocator
   // _sphinx_tag_tut_replay_make_allocate_start
   auto allocator = rm.getAllocator("HOST");
-  auto pool =
-      rm.makeAllocator<umpire::strategy::QuickPool>("pool", allocator);
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("pool", allocator);
   // _sphinx_tag_tut_replay_make_allocate_end
 
   // Do some allocations
   // _sphinx_tag_tut_replay_allocate_start
-  std::generate(allocations.begin(), allocations.end(),
-                [&]() { return pool.allocate(random_number()); });
+  std::generate(allocations.begin(), allocations.end(), [&]() { return pool.allocate(random_number()); });
   // _sphinx_tag_tut_replay_allocate_end
 
   // Clean up

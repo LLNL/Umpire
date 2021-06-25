@@ -33,12 +33,11 @@ namespace strategy {
  * allocations.
  */
 class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public AllocationStrategy,
-                       private mixins::AlignedAllocation {
+                                                                 private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
 
-  using CoalesceHeuristic =
-      std::function<bool(const strategy::DynamicPoolMap&)>;
+  using CoalesceHeuristic = std::function<bool(const strategy::DynamicPoolMap&)>;
 
   static CoalesceHeuristic percent_releasable(int percentage);
 
@@ -54,13 +53,10 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
    * allocation sizes (power-of-2) \param should_coalesce Heuristic for when to
    * perform coalesce operation
    */
-  DynamicPoolMap(
-      const std::string& name, int id, Allocator allocator,
-      const std::size_t first_minimum_pool_allocation_size = (512 * 1024 *
-                                                              1024),
-      const std::size_t min_alloc_size = (1 * 1024 * 1024),
-      const std::size_t align_bytes = 16,
-      CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
+  DynamicPoolMap(const std::string& name, int id, Allocator allocator,
+                 const std::size_t first_minimum_pool_allocation_size = (512 * 1024 * 1024),
+                 const std::size_t min_alloc_size = (1 * 1024 * 1024), const std::size_t align_bytes = 16,
+                 CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
   ~DynamicPoolMap();
 
@@ -143,14 +139,12 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
   /*!
    * \brief Insert a block to the used map.
    */
-  void insertUsed(Pointer addr, std::size_t bytes, bool is_head,
-                  std::size_t whole_bytes);
+  void insertUsed(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
 
   /*!
    * \brief Insert a block to the free map.
    */
-  void insertFree(Pointer addr, std::size_t bytes, bool is_head,
-                  std::size_t whole_bytes);
+  void insertFree(Pointer addr, std::size_t bytes, bool is_head, std::size_t whole_bytes);
 
   /*!
    * \brief Find a free block with (length <= bytes) as close to bytes in
@@ -187,8 +181,7 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
   std::size_t m_actual_highwatermark{0};
 };
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::DynamicPoolMap::CoalesceHeuristic&);
+std::ostream& operator<<(std::ostream& out, umpire::strategy::DynamicPoolMap::CoalesceHeuristic&);
 
 } // end of namespace strategy
 } // end namespace umpire

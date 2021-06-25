@@ -22,8 +22,7 @@ int main(int, char**)
   // _sphinx_tag_tut_typed_alloc_end
 
   // _sphinx_tag_tut_vector_alloc_start
-  std::vector<double, umpire::TypedAllocator<double>> my_vector{
-      double_allocator};
+  std::vector<double, umpire::TypedAllocator<double>> my_vector{double_allocator};
   // _sphinx_tag_tut_vector_alloc_end
 
   my_vector.resize(100);

@@ -33,8 +33,7 @@ namespace strategy {
  */
 class DynamicPoolList : public AllocationStrategy {
  public:
-  using CoalesceHeuristic =
-      std::function<bool(const strategy::DynamicPoolList&)>;
+  using CoalesceHeuristic = std::function<bool(const strategy::DynamicPoolList&)>;
 
   static CoalesceHeuristic percent_releasable(int percentage);
   static CoalesceHeuristic blocks_releasable(std::size_t nblocks);
@@ -55,12 +54,11 @@ class DynamicPoolList : public AllocationStrategy {
    * allocation sizes (power-of-2) \param do_heuristic Heuristic for when to
    * perform coalesce operation
    */
-  DynamicPoolList(
-      const std::string& name, int id, Allocator allocator,
-      const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
-      const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
-      const std::size_t alignment = s_default_alignment,
-      CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
+  DynamicPoolList(const std::string& name, int id, Allocator allocator,
+                  const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
+                  const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
+                  const std::size_t alignment = s_default_alignment,
+                  CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
   DynamicPoolList(const DynamicPoolList&) = delete;
 
@@ -117,8 +115,7 @@ class DynamicPoolList : public AllocationStrategy {
   CoalesceHeuristic m_should_coalesce;
 };
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&);
+std::ostream& operator<<(std::ostream& out, umpire::strategy::DynamicPoolList::CoalesceHeuristic&);
 
 } // end of namespace strategy
 } // end namespace umpire
