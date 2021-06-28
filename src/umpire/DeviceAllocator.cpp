@@ -20,10 +20,14 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto device_alloc = rm.getAllocator(umpire::resource::Device);
+  static size_t m_i{0};
 
   m_counter =
       static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
+
+  m_id = m_i;
+  m_dev_alloc_objs[m_i++] = &this;
 }
 
 __host__ __device__
@@ -56,12 +60,14 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   return static_cast<void*>(m_ptr + counter);
 }
 
-__device__ void* DeviceAllocator::getDeviceAllocator(unsigned int id)
+__device__ DeviceAllocator DeviceAllocator::getDeviceAllocator(size_t id)
 {
-  if(!m_child) {
-    //use m_ptr to match up to original deviceAllocator pointer
-    return static_cast<void*>m_ptr;
-  }
+  return m_dev_alloc_objs[id];
+}
+
+__host__ __device__ size_t DeviceAllocator::getID()
+{
+  return m_id;
 }
 
 } // end of namespace umpire
