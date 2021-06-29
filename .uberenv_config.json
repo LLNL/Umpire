@@ -5,7 +5,7 @@
 "package_source_dir" : "../..",
 "spack_url": "https://github.com/davidbeckingsale/spack",
 "spack_branch": "feature/allow-untested-cuda-versions",
-"spack_commit": "f96e256bee1948aa030916aae0c1b2645230fb9f",
+"spack_commit": "1c92d832b6eefaf2cf1d053ff621ddd44de7606e",
 "spack_activate" : {},
 "spack_configs_path": "scripts/radiuss-spack-configs",
 "spack_packages_path": "scripts/spack_packages"
