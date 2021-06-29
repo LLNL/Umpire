@@ -83,8 +83,6 @@ class Umpire(CachedCMakePackage, CudaPackage):
     conflicts('+ipc_shmem', when='@:5.0.1')
     conflicts('+sanitizer_tests', when='~asan')
 
-    phases = ['hostconfig', 'cmake', 'build', 'install']
-
     def _get_sys_type(self, spec):
         sys_type = str(spec.architecture)
         # if on llnl systems, we can use the SYS_TYPE
@@ -173,7 +171,7 @@ class Umpire(CachedCMakePackage, CudaPackage):
 
             entries.append(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
-        cfg.write(cmake_cache_option("ENABLE_HIP", "+hip" in spec))
+        entries.append(cmake_cache_option("ENABLE_HIP", "+hip" in spec))
         if "+hip" in spec:
             hip_root = spec['hip'].prefix
             rocm_root = hip_root + "/.."
@@ -192,14 +190,16 @@ class Umpire(CachedCMakePackage, CudaPackage):
                 entries.append(cmake_cache_entry("HIP_CLANG_FLAGS", "--gcc-toolchain={0}".format(gcc_prefix))) 
                 entries.append(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags + " -Wl,-rpath {}/lib64".format(gcc_prefix)))
             else:
-                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
+                entries.append(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
         entries.append(cmake_cache_option("ENABLE_DEVICE_CONST", "+deviceconst" in spec))
 
-        cfg.write(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
+        entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
             if ('%xl' in spec):
-                cfg.write(cmake_cache_entry("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
+                entries.append(cmake_cache_entry("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
+
+        return entries
 
 
     def initconfig_mpi_entries(self):
