@@ -12,22 +12,19 @@
 
 namespace umpire {
 
-__host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size)
+__host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, size_t id)
     : m_allocator(allocator),
+      m_id(id),
       m_ptr(static_cast<char*>(m_allocator.allocate(size))),
       m_size(size),
       m_child(false)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto device_alloc = rm.getAllocator(umpire::resource::Device);
-  static size_t m_i{0};
 
   m_counter =
       static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
-
-  m_id = m_i;
-  m_dev_alloc_objs[m_i++] = &this;
 }
 
 __host__ __device__
@@ -58,11 +55,6 @@ __device__ void* DeviceAllocator::allocate(size_t size)
     UMPIRE_ERROR("DeviceAllocator out of space");
   }
   return static_cast<void*>(m_ptr + counter);
-}
-
-__device__ DeviceAllocator DeviceAllocator::getDeviceAllocator(size_t id)
-{
-  return m_dev_alloc_objs[id];
 }
 
 __host__ __device__ size_t DeviceAllocator::getID()

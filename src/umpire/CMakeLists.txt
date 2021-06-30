@@ -63,6 +63,9 @@ if (ENABLE_CUDA)
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+  set_source_files_properties(Umpire.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
 endif()
 
 add_subdirectory(tpl)
@@ -90,6 +93,12 @@ if (ENABLE_OPENMP_TARGET)
     ${umpire_depends}
     openmp)
 endif ()
+
+#if (ENABLE_CUDA)
+#  set (umpire_depends
+#    ${umpire_depends}
+#    cuda)
+#endif ()
 
 set (umpire_defines)
 

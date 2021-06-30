@@ -355,6 +355,16 @@ void ResourceManager::registerAllocation(void* ptr,
   m_allocations.insert(ptr, record);
 }
 
+DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size)
+{
+  static size_t i{0};
+  auto device_allocator = DeviceAllocator(allocator, size, i);
+
+  m_dev_allocs[i++] = &device_allocator;
+
+  return device_allocator;
+}
+
 util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

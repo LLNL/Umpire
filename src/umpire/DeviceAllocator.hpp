@@ -23,7 +23,7 @@ class DeviceAllocator {
    *
    * \param allocator Allocator to use for allocating memory.
    */
-  __host__ DeviceAllocator(Allocator allocator, size_t size);
+  __host__ DeviceAllocator(Allocator allocator, size_t size, size_t id);
 
   __host__ ~DeviceAllocator();
 
@@ -38,13 +38,10 @@ class DeviceAllocator {
    */
   __device__ void* allocate(size_t size);
 
-  __device__ DeviceAllocator getDeviceAllocator(size_t id);
-
   __host__ __device__ size_t getID();
 
  private:
   umpire::Allocator m_allocator;
-  DeviceAllocator* m_dev_alloc_objs = (DeviceAllocator*) malloc(10*sizeof(DeviceAllocator));
 
   char* m_ptr;
   unsigned int* m_counter;

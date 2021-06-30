@@ -17,6 +17,7 @@
 #include "camp/resource.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/Tracking.hpp"
+#include "umpire/DeviceAllocator.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
@@ -122,6 +123,9 @@ class ResourceManager {
   Allocator makeResource(const std::string& name);
 
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
+
+  DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
+  DeviceAllocator* m_dev_allocs[10];
 
   /*!
    * \brief Register an Allocator with the ResourceManager.
@@ -346,7 +350,6 @@ class ResourceManager {
   strategy::AllocationStrategy* m_default_allocator;
 
   int m_id;
-
   std::mutex m_mutex;
 
   // Methods that need access to m_allocations to print/filter records
