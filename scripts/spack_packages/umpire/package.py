@@ -124,12 +124,6 @@ class Umpire(CachedCMakePackage, CudaPackage):
             ('+fortran' in spec) and (self.compiler.fc is not None)))
         entries.append(cmake_cache_option("ENABLE_C", '+c' in spec))
         
-        if "+libcpp" in spec:
-            cflags += ' '.join([cflags,"-DGTEST_HAS_CXXABI_H_=0"])
-
-        if "+libcpp" in spec:
-            cxxflags += ' '.join([cxxflags,"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0"])
-
         fortran_compilers = ["gfortran", "xlf"]
         if any(compiler in self.compiler.fc for compiler in fortran_compilers) and ("clang" in self.compiler.cxx):
             entries.append(cmake_cache_string("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",

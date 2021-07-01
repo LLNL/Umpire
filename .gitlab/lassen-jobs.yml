@@ -105,7 +105,7 @@ xl_16_1_1_7_gcc_8_3_1_cuda_11:
 
 clang_9_0_0_libcpp (build and test on lassen):
   variables:
-    SPEC: "%clang@9.0.0+libcpp"
+    SPEC: "%clang@9.0.0+libcpp cxxflags='-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0' cflags='-DGTEST_HAS_CXXABI_H_=0'"
   extends: .build_and_test_on_lassen
 
 clang_9_0_0_memleak (build and test on lassen):
