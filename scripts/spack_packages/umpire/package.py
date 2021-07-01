@@ -132,7 +132,7 @@ class Umpire(CachedCMakePackage, CudaPackage):
 
         fortran_compilers = ["gfortran", "xlf"]
         if any(compiler in self.compiler.fc for compiler in fortran_compilers) and ("clang" in self.compiler.cxx):
-            entries.append(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+            entries.append(cmake_cache_string("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
             "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
             libdir = pjoin(os.path.dirname(
@@ -143,13 +143,13 @@ class Umpire(CachedCMakePackage, CudaPackage):
                     flags += " -Wl,-rpath,{0}".format(_libpath)
             description = ("Adds a missing libstdc++ rpath")
             if flags:
-                entries.append(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags, description))
+                entries.append(cmake_cache_string("BLT_EXE_LINKER_FLAGS", flags, description))
 
 
         compilers_using_toolchain = ["pgi", "xl", "icpc"]
         if any(compiler in self.compiler.cxx for compiler in compilers_using_toolchain):
             if self.spec_uses_toolchain(self.spec) or self.spec_uses_gccname(self.spec):
-                entries.append(cmake_cache_entry("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
+                entries.append(cmake_cache_string("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
                 "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
         return entries
@@ -175,29 +175,29 @@ class Umpire(CachedCMakePackage, CudaPackage):
         if "+hip" in spec:
             hip_root = spec['hip'].prefix
             rocm_root = hip_root + "/.."
-            entries.append(cmake_cache_entry("HIP_ROOT_DIR",
+            entries.append(cmake_cache_string("HIP_ROOT_DIR",
                                         hip_root))
-            entries.append(cmake_cache_entry("HIP_CLANG_PATH",
+            entries.append(cmake_cache_string("HIP_CLANG_PATH",
                                         rocm_root + '/llvm/bin'))
-            entries.append(cmake_cache_entry("HIP_HIPCC_FLAGS",
+            entries.append(cmake_cache_string("HIP_HIPCC_FLAGS",
                                         '--amdgpu-target=gfx906'))
-            entries.append(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
+            entries.append(cmake_cache_string("HIP_RUNTIME_INCLUDE_DIRS",
                                         "{0}/include;{0}/../hsa/include".format(hip_root)))
             hip_link_flags = "-Wl,--disable-new-dtags -L{0}/lib -L{0}/../lib64 -L{0}/../lib -Wl,-rpath,{0}/lib:{0}/../lib:{0}/../lib64 -lamdhip64 -lhsakmt -lhsa-runtime64".format(hip_root)
             if '%gcc' in spec:
                 gcc_bin = os.path.dirname(self.compiler.cxx)
                 gcc_prefix = join_path(gcc_bin, '..')
-                entries.append(cmake_cache_entry("HIP_CLANG_FLAGS", "--gcc-toolchain={0}".format(gcc_prefix))) 
-                entries.append(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags + " -Wl,-rpath {}/lib64".format(gcc_prefix)))
+                entries.append(cmake_cache_string("HIP_CLANG_FLAGS", "--gcc-toolchain={0}".format(gcc_prefix))) 
+                entries.append(cmake_cache_string("CMAKE_EXE_LINKER_FLAGS", hip_link_flags + " -Wl,-rpath {}/lib64".format(gcc_prefix)))
             else:
-                entries.append(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
+                entries.append(cmake_cache_string("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
         entries.append(cmake_cache_option("ENABLE_DEVICE_CONST", "+deviceconst" in spec))
 
         entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
             if ('%xl' in spec):
-                entries.append(cmake_cache_entry("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
+                entries.append(cmake_cache_string("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
 
         return entries
 
