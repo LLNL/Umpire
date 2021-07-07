@@ -10,11 +10,15 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <map>
 #include <sstream>
+#include <string>
 
-#include "umpire/resource/MemoryResource.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#include "umpire/resource/HostSharedMemoryResource.hpp"
+#include "umpire/resource/MemoryResource.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>
@@ -33,16 +37,10 @@ void print_allocator_records(Allocator allocator, std::ostream& os)
 
   auto strategy = allocator.getAllocationStrategy();
 
-  rm.m_allocations.print(
-      [strategy](const util::AllocationRecord& rec) {
-        return rec.strategy == strategy;
-      },
-      ss);
+  rm.m_allocations.print([strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; }, ss);
 
   if (!ss.str().empty()) {
-    os << "Allocations for " << allocator.getName()
-       << " allocator:" << std::endl
-       << ss.str() << std::endl;
+    os << "Allocations for " << allocator.getName() << " allocator:" << std::endl << ss.str() << std::endl;
   }
 }
 
@@ -52,11 +50,8 @@ std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
   auto strategy = allocator.getAllocationStrategy();
 
   std::vector<util::AllocationRecord> recs;
-  std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
-               std::back_inserter(recs),
-               [strategy](const util::AllocationRecord& rec) {
-                 return rec.strategy == strategy;
-               });
+  std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(), std::back_inserter(recs),
+               [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
 
   return recs;
 }
@@ -99,17 +94,16 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
   }
 }
 
-bool is_accessible(Platform p, Allocator a) 
+bool is_accessible(Platform p, Allocator a)
 {
-  //get base (parent) resource 
+  // get base (parent) resource
   umpire::strategy::AllocationStrategy* root = a.getAllocationStrategy();
   while ((root->getParent() != nullptr)) {
     root = root->getParent();
   }
 
-  //unwrap the base MemoryResource and return whether or not it's accessible
-  umpire::resource::MemoryResource* resource = 
-              util::unwrap_allocation_strategy<umpire::resource::MemoryResource>(root);
+  // unwrap the base MemoryResource and return whether or not it's accessible
+  umpire::resource::MemoryResource* resource = util::unwrap_allocation_strategy<umpire::resource::MemoryResource>(root);
   return resource->isAccessibleFrom(p);
 }
 
@@ -140,6 +134,11 @@ std::size_t get_process_memory_usage()
 #endif
 }
 
+void mark_event(const std::string& event)
+{
+  UMPIRE_REPLAY(R"( "event": "mark", "payload": { "event": ")" << event << R"(" })");
+}
+
 std::size_t get_device_memory_usage(int device_id)
 {
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -166,5 +165,62 @@ std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
 {
   return get_allocator_records(allocator);
 }
+
+umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name)
+{
+  umpire::resource::MemoryResourceRegistry& registry{umpire::resource::MemoryResourceRegistry::getInstance()};
+  umpire::MemoryResourceTraits traits{registry.getDefaultTraitsForResource(name)};
+  return traits;
+}
+
+void* find_pointer_from_name(Allocator allocator, const std::string& name)
+{
+  void* ptr{nullptr};
+
+#if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+  auto base_strategy = util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
+
+  umpire::resource::HostSharedMemoryResource* shared_resource =
+      reinterpret_cast<umpire::resource::HostSharedMemoryResource*>(base_strategy);
+
+  if (shared_resource != nullptr) {
+    ptr = shared_resource->find_pointer_from_name(name);
+  } else
+#else
+  UMPIRE_USE_VAR(name);
+#endif // defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
+
+  {
+    if (ptr == nullptr) {
+      UMPIRE_ERROR(allocator.getName() << " Allocator is not a Shared Memory Allocator");
+    }
+  }
+  return ptr;
+}
+
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
+{
+  static std::map<int, MPI_Comm> cached_communicators{};
+
+  MPI_Comm c;
+  auto scope = a.getAllocationStrategy()->getTraits().scope;
+  int id = a.getId();
+
+  auto cached_comm = cached_communicators.find(id);
+  if (cached_comm != cached_communicators.end()) {
+    c = cached_comm->second;
+  } else {
+    if (scope == MemoryResourceTraits::shared_scope::node) {
+      MPI_Comm_split_type(comm, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &c);
+    } else {
+      c = MPI_COMM_NULL;
+    }
+    cached_communicators[id] = c;
+  }
+
+  return c;
+}
+#endif
 
 } // end namespace umpire

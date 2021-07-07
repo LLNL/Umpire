@@ -25,11 +25,10 @@ namespace strategy {
  */
 class NumaPolicy : public AllocationStrategy {
  public:
-  NumaPolicy(const std::string& name, int id, Allocator allocator,
-             int numa_node);
+  NumaPolicy(const std::string& name, int id, Allocator allocator, int numa_node);
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;
 

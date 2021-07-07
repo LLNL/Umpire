@@ -16,21 +16,20 @@
 
 TYPED_TEST_P(ResourceTest, AllocateDeallocate)
 {
-  auto pointer_1 =
-      this->memory_resource->allocate(sysconf(_SC_PAGE_SIZE) + 5000);
+  const auto page_size = sysconf(_SC_PAGE_SIZE);
+
+  auto pointer_1 = this->memory_resource->allocate(page_size + 5000);
   ASSERT_NE(pointer_1, nullptr);
 
-  auto pointer_2 =
-      this->memory_resource->allocate(sysconf(_SC_PAGE_SIZE) - 1010);
+  auto pointer_2 = this->memory_resource->allocate(page_size - 1010);
   ASSERT_NE(pointer_2, nullptr);
 
-  auto pointer_3 =
-      this->memory_resource->allocate(sysconf(_SC_PAGE_SIZE) + 1010);
+  auto pointer_3 = this->memory_resource->allocate(page_size + 1010);
   ASSERT_NE(pointer_3, nullptr);
 
-  this->memory_resource->deallocate(pointer_1);
-  this->memory_resource->deallocate(pointer_2);
-  this->memory_resource->deallocate(pointer_3);
+  this->memory_resource->deallocate(pointer_1, page_size + 5000);
+  this->memory_resource->deallocate(pointer_2, page_size - 1010);
+  this->memory_resource->deallocate(pointer_3, page_size + 1010);
 }
 
 TYPED_TEST_P(ResourceTest, ZeroFile)
@@ -41,16 +40,14 @@ TYPED_TEST_P(ResourceTest, ZeroFile)
 TYPED_TEST_P(ResourceTest, LargeFile)
 {
   std::size_t* ptr = nullptr;
-  ASSERT_NO_THROW(ptr = (std::size_t*)this->memory_resource->allocate(
-                      10000000000ULL * sizeof(std::size_t)));
-  this->memory_resource->deallocate(ptr);
+  ASSERT_NO_THROW(ptr = (std::size_t*)this->memory_resource->allocate(10000000000ULL * sizeof(std::size_t)));
+  this->memory_resource->deallocate(ptr, 10000000000ULL * sizeof(std::size_t));
 }
 
 TYPED_TEST_P(ResourceTest, MmapFile)
 {
   std::size_t* ptr = nullptr;
-  ASSERT_NO_THROW(ptr = (std::size_t*)this->memory_resource->allocate(
-                      1000000000ULL * sizeof(std::size_t)));
+  ASSERT_NO_THROW(ptr = (std::size_t*)this->memory_resource->allocate(1000000000ULL * sizeof(std::size_t)));
 
   std::size_t* start = ptr;
   for (int i = 0; i <= 9; i++) {
@@ -65,12 +62,10 @@ TYPED_TEST_P(ResourceTest, MmapFile)
     start += sizeof(size_t);
   }
 
-  this->memory_resource->deallocate(ptr);
+  this->memory_resource->deallocate(ptr, 1000000000ULL * sizeof(std::size_t));
 }
 
-REGISTER_TYPED_TEST_SUITE_P(ResourceTest, Constructor, Allocate, getCurrentSize,
-                            getHighWatermark, getPlatform, getTraits,
-                            AllocateDeallocate, ZeroFile, LargeFile, MmapFile);
+REGISTER_TYPED_TEST_SUITE_P(ResourceTest, Constructor, Allocate, getCurrentSize, getHighWatermark, getPlatform,
+                            getTraits, AllocateDeallocate, ZeroFile, LargeFile, MmapFile);
 
-INSTANTIATE_TYPED_TEST_SUITE_P(Mmap, ResourceTest,
-                               umpire::resource::FileMemoryResource, );
+INSTANTIATE_TYPED_TEST_SUITE_P(Mmap, ResourceTest, umpire::resource::FileMemoryResource, );

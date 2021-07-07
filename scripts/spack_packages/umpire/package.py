@@ -84,6 +84,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
+    variant('ipc_shmem', default=False, description='Enable POSIX shared memory')
     variant('numa', default=False, description='Enable NUMA support')
     variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
@@ -98,6 +99,7 @@ class Umpire(CMakePackage, CudaPackage):
     variant('tools', default=True, description='Enable tools')
     variant('dev_benchmarks', default=False, description='Enable Developer Benchmarks')
     variant('werror', default=True, description='Enable warnings as errors')
+    variant('asan', default=False, description='Enable ASAN')
     variant('sanitizer_tests', default=False, description='Enable address sanitizer tests')
 
     depends_on('cmake@3.8:', type='build')
@@ -112,6 +114,9 @@ class Umpire(CMakePackage, CudaPackage):
     conflicts('+openmp', when='+hip')
     conflicts('+openmp_target', when='+hip')
     conflicts('+deviceconst', when='~hip~cuda')
+    conflicts('~mpi', when='+ipc_shmem', msg='Shared Memory Allocator requires MPI')
+    conflicts('+ipc_shmem', when='@:5.0.1')
+    conflicts('+sanitizer_tests', when='~asan')
 
     phases = ['hostconfig', 'cmake', 'build', 'install']
 
@@ -290,6 +295,12 @@ class Umpire(CMakePackage, CudaPackage):
             cfg.write(cmake_cache_option("ENABLE_BENCHMARKS", False))
 
 
+        if "+ipc_shmem" in spec:
+            cfg.write(cmake_cache_option("ENABLE_IPC_SHARED_MEMORY", True))
+        else:
+            cfg.write(cmake_cache_option("ENABLE_IPC_SHARED_MEMORY", False))
+
+
         if "+cuda" in spec:
             cfg.write("#------------------{0}\n".format("-" * 60))
             cfg.write("# Cuda\n")
@@ -340,13 +351,16 @@ class Umpire(CMakePackage, CudaPackage):
                                         '--amdgpu-target=gfx906'))
             cfg.write(cmake_cache_entry("HIP_RUNTIME_INCLUDE_DIRS",
                                         "{0}/include;{0}/../hsa/include".format(hip_root)))
+            hip_link_flags = "-Wl,--disable-new-dtags -L{0}/lib -L{0}/../lib64 -L{0}/../lib -Wl,-rpath,{0}/lib:{0}/../lib:{0}/../lib64 -lamdhip64 -lhsakmt -lhsa-runtime64".format(hip_root)
             if '%gcc' in spec:
                 gcc_bin = os.path.dirname(self.compiler.cxx)
                 gcc_prefix = join_path(gcc_bin, '..')
                 cfg.write(cmake_cache_entry("HIP_CLANG_FLAGS",
                 "--gcc-toolchain={0}".format(gcc_prefix))) 
                 cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS",
-                "-Wl,-rpath {}/lib64".format(gcc_prefix)))
+                hip_link_flags + " -Wl,-rpath {}/lib64".format(gcc_prefix)))
+            else:
+                cfg.write(cmake_cache_entry("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
             if '+deviceconst' in spec:
                 cfg.write(cmake_cache_option("ENABLE_DEVICE_CONST", True))
@@ -372,6 +386,7 @@ class Umpire(CMakePackage, CudaPackage):
         cfg.write(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
         cfg.write(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
         cfg.write(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
+        cfg.write(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
         cfg.write(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
 
         #######################

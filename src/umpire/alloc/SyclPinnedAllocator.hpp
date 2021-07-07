@@ -35,8 +35,7 @@ struct SyclPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR("SYCL malloc_host( bytes = " << size
-                                                << " ) failed with error!");
+      UMPIRE_ERROR("SYCL malloc_host( bytes = " << size << " ) failed with error!");
     } else {
       return ptr;
     }
@@ -56,13 +55,13 @@ struct SyclPinnedAllocator {
 
     sycl::free(ptr, queue_t);
   }
-  
+
   bool isAccessible(Platform p)
   {
-    if(p == Platform::sycl || p == Platform::host)
+    if (p == Platform::sycl || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false; // p is undefined
   }
 };
 

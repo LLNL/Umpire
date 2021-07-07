@@ -189,6 +189,13 @@ void umpire_resourcemanager_deallocate(umpire_resourcemanager * self,
 size_t umpire_resourcemanager_get_size(umpire_resourcemanager * self,
     void * ptr);
 
+void umpire_resourcemanager_register_allocation(
+    umpire_resourcemanager * self, void * ptr, size_t size,
+    umpire_allocator allocator);
+
+void umpire_resourcemanager_deregister_allocation(
+    umpire_resourcemanager * self, void * ptr);
+
 #ifdef __cplusplus
 }
 #endif

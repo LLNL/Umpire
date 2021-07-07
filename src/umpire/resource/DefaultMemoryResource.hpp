@@ -22,17 +22,13 @@ namespace resource {
 template <typename _allocator>
 class DefaultMemoryResource : public MemoryResource {
  public:
-  DefaultMemoryResource(Platform platform, const std::string& name, int id,
-                        MemoryResourceTraits traits);
+  DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
-  DefaultMemoryResource(Platform platform, const std::string& name, int id,
-                        MemoryResourceTraits traits, _allocator alloc);
+  DefaultMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits,
+                        _allocator alloc);
 
   void* allocate(std::size_t bytes);
-  void deallocate(void* ptr);
-
-  std::size_t getCurrentSize() const noexcept;
-  std::size_t getHighWatermark() const noexcept;
+  void deallocate(void* ptr, std::size_t size);
 
   bool isAccessibleFrom(Platform p) noexcept;
 

@@ -45,11 +45,11 @@ TEST(FixedPoolTest, Allocate)
   EXPECT_EQ(pool.getCurrentSize(), 2 * sizeof(int));
   EXPECT_EQ(pool.getHighWatermark(), 2 * sizeof(int));
 
-  pool.deallocate(ptr1);
+  pool.deallocate(ptr1, sizeof(int));
 
   EXPECT_EQ(pool.getCurrentSize(), 1 * sizeof(int));
 
-  pool.deallocate(ptr2);
+  pool.deallocate(ptr2, sizeof(int));
 
   EXPECT_EQ(pool.getCurrentSize(), 0);
   EXPECT_EQ(pool.getHighWatermark(), 2 * sizeof(int));
@@ -73,12 +73,12 @@ TEST(FixedPoolTest, Allocate_2_pools)
   EXPECT_EQ(pool.getCurrentSize(), 3 * sizeof(int));
   EXPECT_EQ(pool.getHighWatermark(), 3 * sizeof(int));
 
-  pool.deallocate(ptr1);
+  pool.deallocate(ptr1, sizeof(int));
 
   EXPECT_EQ(pool.getCurrentSize(), 2 * sizeof(int));
 
-  pool.deallocate(ptr2);
-  pool.deallocate(ptr3);
+  pool.deallocate(ptr2, sizeof(int));
+  pool.deallocate(ptr3, sizeof(int));
 
   EXPECT_EQ(pool.getCurrentSize(), 0);
   EXPECT_EQ(pool.getHighWatermark(), 3 * sizeof(int));

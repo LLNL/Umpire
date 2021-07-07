@@ -17,10 +17,9 @@ namespace strategy {
 
 QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                      const std::size_t first_minimum_pool_allocation_size,
-                     const std::size_t next_minimum_pool_allocation_size,
-                     std::size_t alignment,
+                     const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
                      CoalesceHeuristic should_coalesce) noexcept
-    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "QuickPool"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
       m_first_minimum_pool_allocation_size{first_minimum_pool_allocation_size},
@@ -28,12 +27,9 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
 {
   UMPIRE_LOG(Debug, " ( "
                         << "name=\"" << name << "\""
-                        << ", id=" << id << ", allocator=\""
-                        << allocator.getName() << "\""
-                        << ", first_minimum_pool_allocation_size="
-                        << m_first_minimum_pool_allocation_size
-                        << ", next_minimum_pool_allocation_size="
-                        << m_next_minimum_pool_allocation_size
+                        << ", id=" << id << ", allocator=\"" << allocator.getName() << "\""
+                        << ", first_minimum_pool_allocation_size=" << m_first_minimum_pool_allocation_size
+                        << ", next_minimum_pool_allocation_size=" << m_next_minimum_pool_allocation_size
                         << ", alignment=" << alignment << " )");
 }
 
@@ -53,12 +49,10 @@ void* QuickPool::allocate(std::size_t bytes)
   Chunk* chunk{nullptr};
 
   if (best == m_size_map.end()) {
-    std::size_t bytes_to_use{(m_actual_bytes == 0)
-                                 ? m_first_minimum_pool_allocation_size
-                                 : m_next_minimum_pool_allocation_size};
+    std::size_t bytes_to_use{(m_actual_bytes == 0) ? m_first_minimum_pool_allocation_size
+                                                   : m_next_minimum_pool_allocation_size};
 
-    std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes
-                                                    : bytes_to_use};
+    std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
 
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
 
@@ -68,10 +62,8 @@ void* QuickPool::allocate(std::size_t bytes)
       {
         umpire::util::backtrace bt;
         umpire::util::backtracer<>::get_backtrace(bt);
-        UMPIRE_LOG(Info,
-                   "actual_size:" << (m_actual_bytes + rounded_bytes)
-                                  << " (prev: " << m_actual_bytes << ") "
-                                  << umpire::util::backtracer<>::print(bt));
+        UMPIRE_LOG(Info, "actual_size:" << (m_actual_bytes + rounded_bytes) << " (prev: " << m_actual_bytes << ") "
+                                        << umpire::util::backtracer<>::print(bt));
       }
 #endif
       ret = aligned_allocate(size); // Will Poison
@@ -91,6 +83,9 @@ void* QuickPool::allocate(std::size_t bytes)
 
     m_actual_bytes += size;
     m_releasable_bytes += size;
+    m_releasable_blocks++;
+    m_total_blocks++;
+    m_actual_highwatermark = (m_actual_bytes > m_actual_highwatermark) ? m_actual_bytes : m_actual_highwatermark;
 
     void* chunk_storage{m_chunk_pool.allocate()};
     chunk = new (chunk_storage) Chunk{ret, size, size};
@@ -99,13 +94,12 @@ void* QuickPool::allocate(std::size_t bytes)
     m_size_map.erase(best);
   }
 
-  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data
-                                   << " and size " << chunk->size
-                                   << " for allocation of size "
-                                   << rounded_bytes);
+  UMPIRE_LOG(Debug, "Using chunk " << chunk << " with data " << chunk->data << " and size " << chunk->size
+                                   << " for allocation of size " << rounded_bytes);
 
   if ((chunk->size == chunk->chunk_size) && chunk->free) {
     m_releasable_bytes -= chunk->chunk_size;
+    m_releasable_blocks--;
   }
 
   void* ret = chunk->data;
@@ -115,13 +109,11 @@ void* QuickPool::allocate(std::size_t bytes)
 
   if (rounded_bytes != chunk->size) {
     std::size_t remaining{chunk->size - rounded_bytes};
-    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into "
-                                         << rounded_bytes << " and "
-                                         << remaining);
+    UMPIRE_LOG(Debug, "Splitting chunk " << chunk->size << "into " << rounded_bytes << " and " << remaining);
 
     void* chunk_storage{m_chunk_pool.allocate()};
-    Chunk* split_chunk{new (chunk_storage) Chunk{
-        static_cast<char*>(ret) + rounded_bytes, remaining, chunk->chunk_size}};
+    Chunk* split_chunk{new (chunk_storage)
+                           Chunk{static_cast<char*>(ret) + rounded_bytes, remaining, chunk->chunk_size}};
 
     auto old_next = chunk->next;
     chunk->next = split_chunk;
@@ -132,19 +124,22 @@ void* QuickPool::allocate(std::size_t bytes)
       split_chunk->next->prev = split_chunk;
 
     chunk->size = rounded_bytes;
-    split_chunk->size_map_it =
-        m_size_map.insert(std::make_pair(remaining, split_chunk));
+    split_chunk->size_map_it = m_size_map.insert(std::make_pair(remaining, split_chunk));
   }
+
+  m_current_bytes += rounded_bytes;
 
   UMPIRE_UNPOISON_MEMORY_REGION(m_allocator, ret, bytes);
   return ret;
 }
 
-void QuickPool::deallocate(void* ptr)
+void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   auto chunk = (*m_pointer_map.find(ptr)).second;
   chunk->free = true;
+
+  m_current_bytes -= chunk->size;
 
   UMPIRE_LOG(Debug, "Deallocating data held by " << chunk);
 
@@ -185,10 +180,10 @@ void QuickPool::deallocate(void* ptr)
     m_chunk_pool.deallocate(next);
   }
 
-  UMPIRE_LOG(Debug,
-             "Inserting chunk " << chunk << " with size " << chunk->size);
+  UMPIRE_LOG(Debug, "Inserting chunk " << chunk << " with size " << chunk->size);
 
   if (chunk->size == chunk->chunk_size) {
+    m_releasable_blocks++;
     m_releasable_bytes += chunk->chunk_size;
   }
 
@@ -204,9 +199,7 @@ void QuickPool::deallocate(void* ptr)
 
 void QuickPool::release()
 {
-  UMPIRE_LOG(Debug, "() " << m_size_map.size()
-                          << " chunks in free map, m_is_destructing set to "
-                          << m_is_destructing);
+  UMPIRE_LOG(Debug, "() " << m_size_map.size() << " chunks in free map, m_is_destructing set to " << m_is_destructing);
 
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   std::size_t prev_size{m_actual_bytes};
@@ -220,6 +213,8 @@ void QuickPool::release()
 
       m_actual_bytes -= chunk->chunk_size;
       m_releasable_bytes -= chunk->chunk_size;
+      m_releasable_blocks--;
+      m_total_blocks--;
 
       try {
         aligned_deallocate(chunk->data);
@@ -245,16 +240,30 @@ void QuickPool::release()
   if (prev_size > m_actual_bytes) {
     umpire::util::backtrace bt;
     umpire::util::backtracer<>::get_backtrace(bt);
-    UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size
-                                    << ") "
+    UMPIRE_LOG(Info, "actual_size:" << m_actual_bytes << " (prev: " << prev_size << ") "
                                     << umpire::util::backtracer<>::print(bt));
   }
 #endif
 }
 
+std::size_t QuickPool::getReleasableBlocks() const noexcept
+{
+  return m_releasable_blocks;
+}
+
+std::size_t QuickPool::getTotalBlocks() const noexcept
+{
+  return m_total_blocks;
+}
+
 std::size_t QuickPool::getActualSize() const noexcept
 {
   return m_actual_bytes;
+}
+
+std::size_t QuickPool::getCurrentSize() const noexcept
+{
+  return m_current_bytes;
 }
 
 std::size_t QuickPool::getReleasableSize() const noexcept
@@ -265,6 +274,11 @@ std::size_t QuickPool::getReleasableSize() const noexcept
     return 0;
 }
 
+std::size_t QuickPool::getActualHighwaterMark() const noexcept
+{
+  return m_actual_highwatermark;
+}
+
 Platform QuickPool::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
@@ -273,6 +287,11 @@ Platform QuickPool::getPlatform() noexcept
 MemoryResourceTraits QuickPool::getTraits() const noexcept
 {
   return m_allocator->getTraits();
+}
+
+bool QuickPool::tracksMemoryUse() const noexcept
+{
+  return false;
 }
 
 std::size_t QuickPool::getBlocksInPool() const noexcept
@@ -291,8 +310,7 @@ std::size_t QuickPool::getLargestAvailableBlock() noexcept
 void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \""
-                << getName() << "\" }");
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
   do_coalesce();
 }
 
@@ -302,42 +320,45 @@ void QuickPool::do_coalesce() noexcept
   std::size_t size_pre{getActualSize()};
   release();
   std::size_t size_post{getActualSize()};
-  std::size_t alloc_size{size_pre - size_post};
 
-  //
-  // Only perform the coalesce if there were bytes found to coalesce
-  //
-  if (alloc_size) {
+  if (size_post < size_pre) {
+    std::size_t alloc_size{size_pre - size_post};
+
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);
-    deallocate(ptr);
+    deallocate(ptr, alloc_size);
   }
+}
+
+QuickPool::CoalesceHeuristic QuickPool::blocks_releasable(std::size_t nblocks)
+{
+  return [=](const strategy::QuickPool& pool) { return (pool.getReleasableBlocks() > nblocks); };
 }
 
 QuickPool::CoalesceHeuristic QuickPool::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR("Invalid percentage of "
-                 << percentage
-                 << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
   }
 
   if (percentage == 0) {
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
-    return [=](const strategy::QuickPool& pool) {
-      return (pool.getActualSize() == pool.getReleasableSize());
-    };
+    return [=](const strategy::QuickPool& pool) { return (pool.getActualSize() == pool.getReleasableSize()); };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
-      const std::size_t threshold =
-          static_cast<std::size_t>(f * pool.getActualSize());
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return (pool.getReleasableSize() >= threshold);
     };
   }
+}
+
+std::ostream& operator<<(std::ostream& out, umpire::strategy::QuickPool::CoalesceHeuristic&)
+{
+  return out;
 }
 
 } // end of namespace strategy

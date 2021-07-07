@@ -15,9 +15,7 @@
 namespace umpire {
 namespace resource {
 
-CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform,
-                                                   const std::string& name,
-                                                   int id,
+CudaDeviceMemoryResource::CudaDeviceMemoryResource(Platform platform, const std::string& name, int id,
                                                    MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
 {
@@ -39,7 +37,7 @@ void* CudaDeviceMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void CudaDeviceMemoryResource::deallocate(void* ptr)
+void CudaDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   int old_device;
   cudaGetDevice(&old_device);
@@ -53,21 +51,9 @@ void CudaDeviceMemoryResource::deallocate(void* ptr)
     cudaSetDevice(old_device);
 }
 
-std::size_t CudaDeviceMemoryResource::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-std::size_t CudaDeviceMemoryResource::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
 bool CudaDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::cuda)
+  if (p == Platform::cuda)
     return true;
   else
     return false;

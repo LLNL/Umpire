@@ -21,7 +21,7 @@ namespace mixins {
 class Inspector
 {
   public:
-    Inspector();
+    Inspector() = default;
 
     void registerAllocation(
         void* ptr,
@@ -31,11 +31,6 @@ class Inspector
     // Deregisters the allocation if the strategy matches, otherwise throws an error
     util::AllocationRecord deregisterAllocation(
       void* ptr, strategy::AllocationStrategy* strategy);
-
-  protected:
-    std::size_t m_current_size;
-    std::size_t m_high_watermark;
-    std::size_t m_allocation_count;
 };
 
 } // end of namespace mixins

@@ -42,8 +42,7 @@ class MemoryResourceFactory {
    * \param id ID of the MemoryResource.
    * \param traits Traits for the MemoryResource
    */
-  virtual std::unique_ptr<resource::MemoryResource> create(
-      const std::string& name, int id) = 0;
+  virtual std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id) = 0;
 
   /*!
    * \brief Construct a MemoryResource with the given name and id.
@@ -52,8 +51,8 @@ class MemoryResourceFactory {
    * \param id ID of the MemoryResource.
    * \param traits Traits for the MemoryResource
    */
-  virtual std::unique_ptr<resource::MemoryResource> create(
-      const std::string& name, int id, MemoryResourceTraits traits) = 0;
+  virtual std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id,
+                                                           MemoryResourceTraits traits) = 0;
 
   virtual MemoryResourceTraits getDefaultTraits() = 0;
 };

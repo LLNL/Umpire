@@ -16,9 +16,8 @@ namespace umpire {
 
 namespace strategy {
 
-NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
-                       int numa_node)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator, int numa_node)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "NumaPolicy"},
       m_allocator(allocator.getAllocationStrategy()),
       m_platform(Platform::host),
       m_node(numa_node)
@@ -32,8 +31,7 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   auto host_nodes = numa::get_host_nodes();
-  if (std::find(host_nodes.begin(), host_nodes.end(), m_node) ==
-      host_nodes.end()) {
+  if (std::find(host_nodes.begin(), host_nodes.end(), m_node) == host_nodes.end()) {
     // This is a device node
 #if defined(UMPIRE_ENABLE_CUDA)
     m_platform = Platform::cuda;
@@ -48,7 +46,7 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
 
 void* NumaPolicy::allocate(std::size_t bytes)
 {
-  void* ret = m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate_internal(bytes);
 
   numa::move_to_node(ret, bytes, m_node);
 
@@ -57,9 +55,9 @@ void* NumaPolicy::allocate(std::size_t bytes)
   return ret;
 }
 
-void NumaPolicy::deallocate(void* ptr)
+void NumaPolicy::deallocate(void* ptr, std::size_t size)
 {
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform NumaPolicy::getPlatform() noexcept

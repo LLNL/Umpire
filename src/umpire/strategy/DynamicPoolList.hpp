@@ -33,10 +33,14 @@ namespace strategy {
  */
 class DynamicPoolList : public AllocationStrategy {
  public:
-  using CoalesceHeuristic =
-      std::function<bool(const strategy::DynamicPoolList&)>;
+  using CoalesceHeuristic = std::function<bool(const strategy::DynamicPoolList&)>;
 
   static CoalesceHeuristic percent_releasable(int percentage);
+  static CoalesceHeuristic blocks_releasable(std::size_t nblocks);
+
+  static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
+  static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
+  static constexpr std::size_t s_default_alignment{16};
 
   /*!
    * \brief Construct a new DynamicPoolList.
@@ -50,26 +54,30 @@ class DynamicPoolList : public AllocationStrategy {
    * allocation sizes (power-of-2) \param do_heuristic Heuristic for when to
    * perform coalesce operation
    */
-  DynamicPoolList(
-      const std::string& name, int id, Allocator allocator,
-      const std::size_t first_minimum_pool_allocation_size = (512 * 1024 *
-                                                              1024),
-      const std::size_t next_minimum_pool_allocation_size = (1 * 1024 * 1024),
-      const std::size_t alignment = 16,
-      CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
+  DynamicPoolList(const std::string& name, int id, Allocator allocator,
+                  const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
+                  const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
+                  const std::size_t alignment = s_default_alignment,
+                  CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
 
   DynamicPoolList(const DynamicPoolList&) = delete;
 
   void* allocate(size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
   void release() override;
+
+  std::size_t getReleasableBlocks() const noexcept;
+  std::size_t getTotalBlocks() const noexcept;
 
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
+  std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
 
   MemoryResourceTraits getTraits() const noexcept final override;
+
+  bool tracksMemoryUse() const noexcept override;
 
   /*!
    * \brief Get the number of bytes that may be released back to resource
@@ -106,6 +114,8 @@ class DynamicPoolList : public AllocationStrategy {
   DynamicSizePool<> dpa;
   CoalesceHeuristic m_should_coalesce;
 };
+
+std::ostream& operator<<(std::ostream& out, umpire::strategy::DynamicPoolList::CoalesceHeuristic&);
 
 } // end of namespace strategy
 } // end namespace umpire

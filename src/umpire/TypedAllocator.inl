@@ -18,8 +18,7 @@ TypedAllocator<T>::TypedAllocator(Allocator allocator) : m_allocator(allocator)
 
 template <typename T>
 template <typename U>
-TypedAllocator<T>::TypedAllocator(const TypedAllocator<U>& other)
-    : m_allocator(other.m_allocator)
+TypedAllocator<T>::TypedAllocator(const TypedAllocator<U>& other) : m_allocator(other.m_allocator)
 {
 }
 
@@ -40,13 +39,13 @@ void TypedAllocator<T>::deallocate(T* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 template <typename U, typename V>
 bool operator==(const umpire::TypedAllocator<U>& lhs, const umpire::TypedAllocator<V>& rhs)
 {
- return lhs.m_allocator.getId() == rhs.m_allocator.getId();
+  return lhs.m_allocator.getId() == rhs.m_allocator.getId();
 }
 
 template <typename U, typename V>
 bool operator!=(const umpire::TypedAllocator<U>& lhs, const umpire::TypedAllocator<V>& rhs)
 {
- return !(lhs == rhs);
+  return !(lhs == rhs);
 }
 
 #endif // UMPIRE_TypedAllocator_INL

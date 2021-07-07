@@ -13,9 +13,8 @@
 namespace umpire {
 namespace strategy {
 
-ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id,
-                                         Allocator allocator)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id, Allocator allocator)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "ThreadSafeAllocator"},
       m_allocator(allocator.getAllocationStrategy()),
       m_mutex()
 {
@@ -24,14 +23,14 @@ ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id,
 void* ThreadSafeAllocator::allocate(std::size_t bytes)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  void* ret = m_allocator->allocate(bytes);
+  void* ret = m_allocator->allocate_internal(bytes);
   return ret;
 }
 
-void ThreadSafeAllocator::deallocate(void* ptr)
+void ThreadSafeAllocator::deallocate(void* ptr, std::size_t size)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
-  m_allocator->deallocate(ptr);
+  m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform ThreadSafeAllocator::getPlatform() noexcept

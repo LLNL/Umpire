@@ -18,16 +18,12 @@ namespace strategy {
 
 class SlotPool : public AllocationStrategy {
  public:
-  SlotPool(const std::string& name, int id, Allocator allocator,
-           std::size_t slots);
+  SlotPool(const std::string& name, int id, Allocator allocator, std::size_t slots);
 
   ~SlotPool();
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
-
-  std::size_t getCurrentSize() const noexcept override;
-  std::size_t getHighWatermark() const noexcept override;
+  void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;
 

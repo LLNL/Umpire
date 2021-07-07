@@ -18,9 +18,8 @@ namespace umpire {
 namespace resource {
 
 template <typename _allocator>
-SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(
-    Platform platform, const std::string& name, int id,
-    MemoryResourceTraits traits)
+SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(Platform platform, const std::string& name, int id,
+                                                               MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator(), m_platform(platform)
 {
 }
@@ -36,7 +35,7 @@ void* SyclDeviceMemoryResource<_allocator>::allocate(std::size_t bytes)
 }
 
 template <typename _allocator>
-void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
+void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
@@ -44,16 +43,14 @@ void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr)
 }
 
 template <typename _allocator>
-std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize()
-    const noexcept
+std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;
 }
 
 template <typename _allocator>
-std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark()
-    const noexcept
+std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;

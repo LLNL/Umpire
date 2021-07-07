@@ -9,9 +9,8 @@
 namespace umpire {
 namespace resource {
 
-MemoryResource::MemoryResource(const std::string& name, int id,
-                               MemoryResourceTraits traits)
-    : strategy::AllocationStrategy(name, id, nullptr), m_traits(traits)
+MemoryResource::MemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
+    : strategy::AllocationStrategy{name, id, nullptr, "MemoryResource"}, m_traits(traits)
 {
 }
 

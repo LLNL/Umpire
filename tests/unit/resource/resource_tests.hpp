@@ -49,7 +49,7 @@ TYPED_TEST_P(ResourceTest, Allocate)
 
   ASSERT_NE(data, nullptr);
 
-  this->memory_resource->deallocate(data);
+  this->memory_resource->deallocate(data, 64);
 }
 
 TYPED_TEST_P(ResourceTest, getCurrentSize)

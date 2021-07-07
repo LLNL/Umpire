@@ -23,9 +23,7 @@
 namespace umpire {
 namespace resource {
 
-NullMemoryResource::NullMemoryResource(Platform platform,
-                                       const std::string& name, int id,
-                                       MemoryResourceTraits traits)
+NullMemoryResource::NullMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_platform{platform}, m_size_map{}
 {
 }
@@ -33,8 +31,7 @@ NullMemoryResource::NullMemoryResource(Platform platform,
 void* NullMemoryResource::allocate(std::size_t bytes)
 {
 #if !defined(_MSC_VER)
-  void* ptr{mmap(NULL, bytes, PROT_NONE,
-                 (MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE), -1, 0)};
+  void* ptr{mmap(NULL, bytes, PROT_NONE, (MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE), -1, 0)};
 #else
   void* ptr{VirtualAlloc(NULL, bytes, MEM_RESERVE, PAGE_NOACCESS)};
 #endif
@@ -46,7 +43,7 @@ void* NullMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void NullMemoryResource::deallocate(void* ptr)
+void NullMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
@@ -74,7 +71,7 @@ std::size_t NullMemoryResource::getHighWatermark() const noexcept
 
 bool NullMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p != Platform::undefined)
+  if (p != Platform::undefined)
     UMPIRE_LOG(Debug, "NullMemoryResource: platform is not accessible");
   return false;
 }

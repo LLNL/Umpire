@@ -12,9 +12,8 @@
 namespace umpire {
 namespace strategy {
 
-SizeLimiter::SizeLimiter(const std::string& name, int id, Allocator allocator,
-                         std::size_t size_limit)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+SizeLimiter::SizeLimiter(const std::string& name, int id, Allocator allocator, std::size_t size_limit)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "SizeLimiter"},
       m_allocator(allocator.getAllocationStrategy()),
       m_size_limit(size_limit),
       m_total_size(0)
@@ -30,13 +29,13 @@ void* SizeLimiter::allocate(std::size_t bytes)
     UMPIRE_ERROR("Size limit exceeded.");
   }
 
-  return m_allocator->allocate(bytes);
+  return m_allocator->allocate_internal(bytes);
 }
 
-void SizeLimiter::deallocate(void* ptr)
+void SizeLimiter::deallocate(void* ptr, std::size_t size)
 {
-  m_total_size -= ResourceManager::getInstance().getSize(ptr);
-  m_allocator->deallocate(ptr);
+  m_total_size -= size;
+  m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform SizeLimiter::getPlatform() noexcept

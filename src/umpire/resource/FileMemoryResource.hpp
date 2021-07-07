@@ -39,8 +39,7 @@ class FileMemoryResource : public MemoryResource {
    * \param id Id of this instance of the FileMemoryResource.
    * \param traits Traits of this instance of the FileMemoryResource.
    */
-  FileMemoryResource(Platform platform, const std::string& name, int id,
-                     MemoryResourceTraits traits);
+  FileMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
   /*!
    * \brief Dallocates and removes all files created by the code meant for
@@ -79,13 +78,13 @@ class FileMemoryResource : public MemoryResource {
    *
    * \param ptr Pointer location used to look up its information in m_size_map
    */
-  void deallocate(void* ptr);
+  void deallocate(void* ptr, std::size_t size);
 
   std::size_t getCurrentSize() const noexcept;
   std::size_t getHighWatermark() const noexcept;
 
   bool isAccessibleFrom(Platform p) noexcept;
-  
+
   Platform getPlatform() noexcept;
   static int s_file_counter;
 

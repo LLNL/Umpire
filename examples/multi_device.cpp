@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 constexpr int BLOCK_SIZE = 256;
 constexpr int NUM_THREADS = 4096;
@@ -31,11 +32,9 @@ int main(int, char**)
   }
   std::cout << std::endl;
 
-  auto pool0 = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "pool0", rm.getAllocator("DEVICE::0"));
+  auto pool0 = rm.makeAllocator<umpire::strategy::QuickPool>("pool0", rm.getAllocator("DEVICE::0"));
 
-  auto pool1 = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "pool1", rm.getAllocator("DEVICE::1"));
+  auto pool1 = rm.makeAllocator<umpire::strategy::QuickPool>("pool1", rm.getAllocator("DEVICE::1"));
 
   double* a = static_cast<double*>(pool0.allocate(NUM_THREADS * sizeof(double)));
   double* b = static_cast<double*>(pool1.allocate(NUM_THREADS * sizeof(double)));
@@ -49,7 +48,7 @@ int main(int, char**)
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
   hipSetDevice(0);
-  hipLaunchKernelGGL(touch_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0,0, a, NUM_THREADS);
+  hipLaunchKernelGGL(touch_data, dim3(NUM_BLOCKS), dim3(BLOCK_SIZE), 0, 0, a, NUM_THREADS);
   hipDeviceSynchronize();
 #endif
 
