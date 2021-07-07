@@ -125,7 +125,6 @@ class ResourceManager {
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
   DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
-  DeviceAllocator* m_dev_allocs[10];
 
   /*!
    * \brief Register an Allocator with the ResourceManager.

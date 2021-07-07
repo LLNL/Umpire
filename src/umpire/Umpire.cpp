@@ -223,10 +223,9 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-__host__ __device__ DeviceAllocator getDeviceAllocator(size_t id)
+__device__ DeviceAllocator getDeviceAllocator(size_t id)
 {
-  auto& rm = umpire::ResourceManager::getInstance();
-  return *rm.m_dev_allocs[id];
+  return *UMPIRE_DEV_ALLOCS[id];
 }
 #endif
 

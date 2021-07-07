@@ -12,6 +12,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/DeviceAllocator.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
@@ -19,6 +20,11 @@
 #include "umpire/util/io.hpp"
 
 namespace umpire {
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+extern __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS[10];
+extern __device__ DeviceAllocator getDeviceAllocator(size_t id);
+#endif
 
 inline void initialize(
 #if defined(UMPIRE_ENABLE_MPI)
@@ -173,10 +179,6 @@ void* find_pointer_from_name(Allocator allocator, const std::string name);
 
 #if defined(UMPIRE_ENABLE_MPI)
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
-#endif
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-__host__ __device__ DeviceAllocator getDeviceAllocator(size_t id);
 #endif
 
 } // end of namespace umpire

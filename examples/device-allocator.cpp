@@ -8,10 +8,10 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/ResourceManager.hpp"
 
-__global__ void my_kernel(umpire::DeviceAllocator alloc, double** data_ptr)
+__global__ void my_kernel(int id, double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    //auto alloc = umpire::getDeviceAllocator(id);
+    auto alloc = umpire::getDeviceAllocator(id);
     double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
     *data_ptr = data;
 
@@ -31,15 +31,14 @@ int main(int argc, char const* argv[])
 
   size_t id = device_allocator.getID();
 
-  my_kernel<<<1, 16>>>(device_allocator, ptr_to_data);
+  my_kernel<<<1, 16>>>(0, ptr_to_data);
   cudaDeviceSynchronize();
-  //my_kernel<<<1, 16>>>(device_allocator2, ptr_to_data);
-  //cudaDeviceSynchronize();
-  //my_kernel<<<1, 16>>>(device_allocator3, ptr_to_data);
-  //cudaDeviceSynchronize();
+  my_kernel<<<1, 16>>>(1, ptr_to_data);
+  cudaDeviceSynchronize();
 
   std::cout << (*ptr_to_data)[7] << std::endl;
   std::cout << "DA1 with ID:" << device_allocator.getID() << std::endl;
   std::cout << "DA2 with ID:" << device_allocator2.getID() << std::endl;
-  //std::cout << "DA3 with ID:" << device_allocator3.getID() << std::endl;
+
+  return 0;
 }
