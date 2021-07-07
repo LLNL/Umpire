@@ -20,22 +20,21 @@ Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
   :maxdepth: 2
   :caption: Basics
 
-  getting_started
-  tutorial
+  sphinx/getting_started
+  sphinx/tutorial
 
 .. toctree::
   :maxdepth: 2
   :caption: Reference
 
-  advanced_configuration
-  cookbook
-  features
-  code_documentation
-  api/api
+  sphinx/advanced_configuration
+  sphinx/cookbook
+  sphinx/features
+  sphinx/code_documentation
 
 .. toctree::
   :maxdepth: 2
   :caption: Contributing
 
-  contribution_guide
-  developer_guide
+  sphinx/contribution_guide
+  sphinx/developer_guide
