@@ -16,6 +16,8 @@ memory hierarchies.
 
 Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
 
+* `Source Documentation <doxygen/html/index.html>`_
+
 .. toctree::
   :maxdepth: 2
   :caption: Basics

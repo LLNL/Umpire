@@ -42,7 +42,7 @@ if read_the_docs_build:
 
   # Call doxygen
   from subprocess import call
-  call(['doxygen', "../doxygen/Doxyfile"])
+  call(['doxygen', "./doxygen/Doxyfile"])
 
 # Get current directory
 conf_directory = os.path.dirname(os.path.realpath(__file__))
