@@ -222,11 +222,4 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
 }
 #endif
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-__device__ DeviceAllocator getDeviceAllocator(size_t id)
-{
-  return *UMPIRE_DEV_ALLOCS[id];
-}
-#endif
-
 } // end namespace umpire

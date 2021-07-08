@@ -12,7 +12,6 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/DeviceAllocator.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
@@ -20,11 +19,6 @@
 #include "umpire/util/io.hpp"
 
 namespace umpire {
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-extern __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS[10];
-extern __device__ DeviceAllocator getDeviceAllocator(size_t id);
-#endif
 
 inline void initialize(
 #if defined(UMPIRE_ENABLE_MPI)

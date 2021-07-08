@@ -27,6 +27,10 @@
 #include "umpire/util/make_unique.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
+#if defined(UMPIRE_ENABLE_DEVICE)
+#include "umpire/util/device_allocator_helper.hpp"
+#endif
+
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 #endif
@@ -355,15 +359,17 @@ void ResourceManager::registerAllocation(void* ptr,
   m_allocations.insert(ptr, record);
 }
 
+#if defined(UMPIRE_ENABLE_DEVICE)
 DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size)
 {
   static size_t i{0};
   auto device_allocator = DeviceAllocator(allocator, size, i);
 
-  umpire::UMPIRE_DEV_ALLOCS[i++] = &device_allocator;
+  umpire::util::UMPIRE_DEV_ALLOCS[i++] = &device_allocator;
 
   return device_allocator;
 }
+#endif
 
 util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {

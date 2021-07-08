@@ -4,14 +4,14 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/DeviceAllocator.hpp"
-#include "umpire/Umpire.hpp"
+//#include "umpire/DeviceAllocator.hpp"
+#include "umpire/util/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
 
 __global__ void my_kernel(int id, double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    auto alloc = umpire::getDeviceAllocator(id);
+    auto alloc = umpire::util::getDeviceAllocator(id);
     double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
     *data_ptr = data;
 

@@ -17,10 +17,13 @@
 #include "camp/resource.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/Tracking.hpp"
-#include "umpire/DeviceAllocator.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+#include "umpire/DeviceAllocator.hpp"
+#endif
 
 namespace umpire {
 
@@ -124,7 +127,9 @@ class ResourceManager {
 
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
+#if defined(UMPIRE_ENABLE_DEVICE)
   DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
+#endif
 
   /*!
    * \brief Register an Allocator with the ResourceManager.
