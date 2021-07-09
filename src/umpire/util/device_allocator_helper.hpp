@@ -13,8 +13,10 @@ namespace umpire {
 
 namespace util {
 
-extern __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS[10] = {nullptr};
-extern __device__ DeviceAllocator getDeviceAllocator(size_t id);
+extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
+
+void dev_alloc_init();
+__device__ DeviceAllocator getDeviceAllocator(size_t id);
 
 } // end of namespace util
 

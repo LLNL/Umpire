@@ -16,14 +16,7 @@ namespace umpire {
  */
 class DeviceAllocator {
  public:
-  /*!
-   *
-   * \brief Construct a new DeviceAllocator that will use allocator to allocate
-   * data
-   *
-   * \param allocator Allocator to use for allocating memory.
-   */
-  __host__ DeviceAllocator(Allocator allocator, size_t size, size_t id);
+  //__host__ DeviceAllocator();
 
   __host__ ~DeviceAllocator();
 
@@ -40,7 +33,18 @@ class DeviceAllocator {
 
   __host__ __device__ size_t getID();
 
- private:
+  friend class ResourceManager;
+
+ private: //protected:
+  /*!
+   * \brief Construct a new DeviceAllocator that will use allocator to allocate
+   * data
+   *
+   * \param allocator Allocator to use for allocating memory.
+   */
+  __host__ DeviceAllocator(Allocator allocator, size_t size, size_t id);
+
+ //private:
   umpire::Allocator m_allocator;
 
   char* m_ptr;

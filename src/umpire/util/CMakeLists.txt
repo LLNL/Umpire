@@ -63,6 +63,9 @@ if (ENABLE_CUDA)
   set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    cuda_runtime)
 endif()
 
 set (umpire_util_depends camp umpire_tpl_judy)

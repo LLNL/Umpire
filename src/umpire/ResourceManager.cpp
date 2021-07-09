@@ -26,7 +26,6 @@
 #include "umpire/util/io.hpp"
 #include "umpire/util/make_unique.hpp"
 #include "umpire/util/wrap_allocator.hpp"
-
 #if defined(UMPIRE_ENABLE_DEVICE)
 #include "umpire/util/device_allocator_helper.hpp"
 #endif
@@ -365,6 +364,7 @@ DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t
   static size_t i{0};
   auto device_allocator = DeviceAllocator(allocator, size, i);
 
+  umpire::util::dev_alloc_init();
   umpire::util::UMPIRE_DEV_ALLOCS[i++] = &device_allocator;
 
   return device_allocator;
