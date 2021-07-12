@@ -112,6 +112,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - DynamicPool and DynamicPoolMap removed from replay tests since they share the
   same signature as QuickPool.
 
+- Removed replay of internal address_map operations.
+
 ### Fixed
 
 - Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file.
