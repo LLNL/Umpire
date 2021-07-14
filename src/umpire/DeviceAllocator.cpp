@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
-
+#include "umpire/Umpire.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
@@ -46,6 +46,18 @@ __host__ DeviceAllocator::~DeviceAllocator()
     device_alloc.deallocate(m_counter);
     m_allocator.deallocate(m_ptr);
   }
+}
+
+__host__ bool DeviceAllocator::is_initialized()
+{
+  return m_init;
+}
+
+__host__ void DeviceAllocator::initialize()
+{
+  cudaMallocManaged(&UMPIRE_DEV_ALLOCS, 10*sizeof(DeviceAllocator));
+  UMPIRE_DEV_ALLOCS = {0};
+  m_init = true;
 }
 
 __device__ void* DeviceAllocator::allocate(size_t size)

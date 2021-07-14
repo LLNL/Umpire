@@ -63,6 +63,9 @@ if (ENABLE_CUDA)
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+  set_source_files_properties(Umpire.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
 endif()
 
 add_subdirectory(tpl)

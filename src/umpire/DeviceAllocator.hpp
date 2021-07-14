@@ -33,9 +33,13 @@ class DeviceAllocator {
 
   __host__ __device__ size_t getID();
 
+  __host__ void initialize();
+
+  __host__ bool is_initialized();
+
   friend class ResourceManager;
 
- private: //protected:
+ private:
   /*!
    * \brief Construct a new DeviceAllocator that will use allocator to allocate
    * data
@@ -44,7 +48,6 @@ class DeviceAllocator {
    */
   __host__ DeviceAllocator(Allocator allocator, size_t size, size_t id);
 
- //private:
   umpire::Allocator m_allocator;
 
   char* m_ptr;
@@ -53,6 +56,7 @@ class DeviceAllocator {
   size_t m_id;
   size_t m_size;
   bool m_child;
+  bool m_init{false};
 };
 
 } // end of namespace umpire
