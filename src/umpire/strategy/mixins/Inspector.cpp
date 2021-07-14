@@ -12,7 +12,7 @@ namespace umpire {
 namespace strategy {
 namespace mixins {
 
-void
+void*
 Inspector::registerAllocation(
     void* ptr,
     std::size_t size,
@@ -26,6 +26,8 @@ Inspector::registerAllocation(
   }
 
   ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, s});
+
+  return ptr;
 }
 
 util::AllocationRecord

@@ -25,6 +25,12 @@ inline void* Allocator::allocate(std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator
                                                                                 << "\", \"size\": " << bytes << " }");
 
+#if defined(UMPIRE_ENABLE_ALLOCATION_HEADERS)
+  if (m_tracking && 0 != bytes) {
+    bytes += sizeof(umpire::util::AllocationRecord);
+  }
+#endif
+
   if (0 == bytes) {
     ret = allocateNull();
   } else {
@@ -32,7 +38,7 @@ inline void* Allocator::allocate(std::size_t bytes)
   }
 
   if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator);
+    ret = registerAllocation(ret, bytes, m_allocator);
   }
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
@@ -54,6 +60,12 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
                 << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
 
+#if defined(UMPIRE_ENABLE_ALLOCATION_HEADERS)
+  if (m_tracking && 0 != bytes) {
+    bytes += sizeof(umpire::util::AllocationRecord);
+  }
+#endif
+
   if (0 == bytes) {
     ret = allocateNull();
   } else {
@@ -61,7 +73,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   }
 
   if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator);
+    ret = registerAllocation(ret, bytes, m_allocator);
   }
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""

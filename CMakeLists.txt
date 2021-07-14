@@ -53,6 +53,7 @@ if(WIN32 OR APPLE)
   set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
+option(ENABLE_ALLOCATION_HEADERS "Track metadata in allocation headers" On)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(CMAKE_CUDA_STANDARD 11)

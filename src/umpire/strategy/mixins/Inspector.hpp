@@ -23,7 +23,7 @@ class Inspector
   public:
     Inspector() = default;
 
-    void registerAllocation(
+    void* registerAllocation(
         void* ptr,
         std::size_t size,
         strategy::AllocationStrategy* strategy);
