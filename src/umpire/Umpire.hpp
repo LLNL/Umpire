@@ -100,7 +100,7 @@ void print_allocator_records(Allocator allocator, std::ostream& os = std::cout);
  *
  * \param allocator source Allocator.
  */
-std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator);
+std::vector<const util::AllocationRecord*> get_allocator_records(Allocator allocator);
 
 /*!
  * \brief Check whether the right allocation overlaps the left.
@@ -164,7 +164,7 @@ std::size_t get_device_memory_usage(int device_id);
 /*!
  * \brief Get all the leaked (active) allocations associated with allocator.
  */
-std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
+std::vector<const util::AllocationRecord*> get_leaked_allocations(Allocator allocator);
 
 /*!
  * \brief Return the default traits for the given allocator string

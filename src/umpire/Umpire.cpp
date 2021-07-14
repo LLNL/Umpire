@@ -44,14 +44,23 @@ void print_allocator_records(Allocator allocator, std::ostream& os)
   }
 }
 
-std::vector<util::AllocationRecord> get_allocator_records(Allocator allocator)
+std::vector<const util::AllocationRecord*> get_allocator_records(Allocator allocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto strategy = allocator.getAllocationStrategy();
 
+<<<<<<< Updated upstream
   std::vector<util::AllocationRecord> recs;
   std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(), std::back_inserter(recs),
                [strategy](const util::AllocationRecord& rec) { return rec.strategy == strategy; });
+=======
+  std::vector<const util::AllocationRecord*> recs;
+  std::copy_if(rm.m_allocations.begin(), rm.m_allocations.end(),
+               std::back_inserter(recs),
+               [strategy](const util::AllocationRecord& rec) {
+                 return rec.strategy == strategy;
+               });
+>>>>>>> Stashed changes
 
   return recs;
 }
@@ -161,7 +170,7 @@ std::size_t get_device_memory_usage(int device_id)
 #endif
 }
 
-std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
+std::vector<const util::AllocationRecord*> get_leaked_allocations(Allocator allocator)
 {
   return get_allocator_records(allocator);
 }
