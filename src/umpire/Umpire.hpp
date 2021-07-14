@@ -177,6 +177,7 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
 extern DeviceAllocator *UMPIRE_DEV_ALLOCS;
+__host__ void initializeDevAlloc();
 __device__ DeviceAllocator getDeviceAllocator(size_t id);
 #endif
 

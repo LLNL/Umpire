@@ -33,8 +33,6 @@ class DeviceAllocator {
 
   __host__ __device__ size_t getID();
 
-  __host__ void initialize();
-
   __host__ bool is_initialized();
 
   friend class ResourceManager;

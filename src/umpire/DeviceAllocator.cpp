@@ -53,13 +53,6 @@ __host__ bool DeviceAllocator::is_initialized()
   return m_init;
 }
 
-__host__ void DeviceAllocator::initialize()
-{
-  cudaMallocManaged(&UMPIRE_DEV_ALLOCS, 10*sizeof(DeviceAllocator));
-  UMPIRE_DEV_ALLOCS = {0};
-  m_init = true;
-}
-
 __device__ void* DeviceAllocator::allocate(size_t size)
 {
   std::size_t counter = atomicAdd(m_counter, size);

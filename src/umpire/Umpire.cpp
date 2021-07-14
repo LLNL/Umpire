@@ -227,6 +227,12 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
 #endif
 
 #if defined(UMPIRE_ENABLE_DEVICE)
+__host__ void initializeDevAlloc()
+{
+  cudaMallocManaged(&UMPIRE_DEV_ALLOCS, 10*sizeof(DeviceAllocator));
+  UMPIRE_DEV_ALLOCS = {0};
+}
+
 __device__ DeviceAllocator getDeviceAllocator(size_t id)
 {
   return UMPIRE_DEV_ALLOCS[id];
