@@ -7,8 +7,8 @@
 #include "umpire/strategy/QuickPool.hpp"
 
 #include "umpire/Allocator.hpp"
-#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -192,7 +192,7 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   // can do this with iterator?
   m_pointer_map.erase(ptr);
 
-  std::size_t suggested_size{ m_should_coalesce(*this) };
+  std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
@@ -333,7 +333,8 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::QuickPool& pool) {return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0;};
+  return
+      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
@@ -343,9 +344,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
   }
 
   if (percentage == 0) {
-    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) {
-        return 0;
-      };
+    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
     return [=](const strategy::QuickPool& pool) {
       return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualSize() : 0;

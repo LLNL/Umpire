@@ -14,8 +14,8 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -146,7 +146,7 @@ void DynamicPoolMap::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
 
-  std::size_t suggested_size{ m_should_coalesce(*this) };
+  std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
@@ -470,9 +470,7 @@ PoolCoalesceHeuristic<DynamicPoolMap> DynamicPoolMap::percent_releasable(int per
   if (percentage == 0) {
     return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return [=](const strategy::DynamicPoolMap& pool) {
-      return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0;
-    };
+    return [=](const strategy::DynamicPoolMap& pool) { return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0; };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 

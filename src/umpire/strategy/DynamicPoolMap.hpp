@@ -12,8 +12,8 @@
 #include <tuple>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 
 namespace umpire {

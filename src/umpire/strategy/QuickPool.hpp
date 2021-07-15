@@ -13,8 +13,8 @@
 #include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 

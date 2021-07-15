@@ -13,7 +13,7 @@ namespace umpire {
 
 namespace strategy {
 
-template<typename T>
+template <typename T>
 using PoolCoalesceHeuristic = std::function<std::size_t(const T&)>;
 
 } // end of namespace strategy

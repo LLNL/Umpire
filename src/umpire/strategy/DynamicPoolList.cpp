@@ -5,11 +5,11 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 
 #include "umpire/Allocator.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -39,7 +39,7 @@ void DynamicPoolList::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa.deallocate(ptr);
 
-  std::size_t suggested_size{ m_should_coalesce(*this) };
+  std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug,
                "Heuristic returned true, "
@@ -143,9 +143,7 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int p
   if (percentage == 0) {
     return [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return [=](const strategy::DynamicPoolList& pool) {
-      return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0;
-    };
+    return [=](const strategy::DynamicPoolList& pool) { return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0; };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 

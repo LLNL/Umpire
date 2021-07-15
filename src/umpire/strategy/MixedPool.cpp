@@ -6,12 +6,12 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/MixedPool.hpp"
-#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
-#include "umpire/strategy/QuickPool.hpp"
 
 #include <algorithm>
 #include <cstdint>
 
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
