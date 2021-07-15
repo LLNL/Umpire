@@ -10,7 +10,6 @@
 #include <sstream>
 
 #include "camp/list.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
@@ -30,10 +29,6 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   }
 
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
-  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-                << typeid(Strategy).name() << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
-                << ", \"allocator_name\":\"" << name << "\""
-                << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }");
   if (isAllocator(name)) {
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
@@ -41,11 +36,16 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
   allocator->setTracking(is_tracked);
 
-  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-                << typeid(Strategy).name() << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
-                << ", \"allocator_name\":\"" << name << "\""
-                << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }"
-                << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }");
+  umpire::event::event::builder()
+      .name("make_allocator")
+      .category(event::category::operation)
+      .arg("allocator_ref", (void*)allocator.get())
+      .arg("type", typeid(Strategy).name())
+      .arg("introspection", is_tracked)
+      .args(args...)
+      .tag("allocator_name", allocator->getName())
+      .tag("replay", "true")
+      .record();
 
   m_allocators_by_name[name] = allocator.get();
   m_allocators_by_id[allocator->getId()] = allocator.get();

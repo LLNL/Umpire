@@ -1,17 +1,17 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_Allocator_HPP
-#define UMPIRE_Allocator_HPP
+#ifndef UMPIRE_AllocatorBase_HPP
+#define UMPIRE_AllocatorBase_HPP
 
 #include <cstddef>
 #include <memory>
 #include <ostream>
-#include <string>
 
+#include "umpire/Tracking.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
@@ -40,7 +40,8 @@ class GenericReallocateOperation;
  *
  * \see TypedAllocator
  */
-class Allocator : private strategy::mixins::Inspector, strategy::mixins::AllocateNull {
+template <typename Tracking>
+class AllocatorBase : private strategy::mixins::Inspector, strategy::mixins::AllocateNull {
   friend class ResourceManager;
   friend class ::AllocatorTest;
   friend class umpire::op::HostReallocateOperation;
@@ -62,8 +63,6 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \return Pointer to start of the allocation.
    */
   inline void* allocate(std::size_t bytes);
-
-  inline void* allocate(const std::string& name, std::size_t bytes);
 
   /*!
    * \brief Free the memory at ptr.
@@ -173,13 +172,9 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   Platform getPlatform() noexcept;
 
-  bool isTracked() const noexcept;
+  AllocatorBase() = default;
 
-  const std::string& getStrategyName() const noexcept;
-
-  Allocator() = default;
-
-  friend std::ostream& operator<<(std::ostream&, const Allocator&);
+  friend std::ostream& operator<<(std::ostream&, const AllocatorBase<Tracking>&);
 
  private:
   /*!
@@ -191,7 +186,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \param allocator Pointer to the AllocationStrategy object to use for
    * Allocations.
    */
-  Allocator(strategy::AllocationStrategy* allocator) noexcept;
+  AllocatorBase(strategy::AllocationStrategy* allocator) noexcept;
 
   /*!
    * \brief Pointer to the AllocationStrategy used by this Allocator.
@@ -201,13 +196,8 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   bool m_tracking{true};
 };
 
-inline std::string to_string(const Allocator& a)
-{
-  return a.getName();
-}
-
 } // end of namespace umpire
 
-#include "umpire/Allocator.inl"
+#include "umpire/AllocatorBase.inl"
 
-#endif // UMPIRE_Allocator_HPP
+#endif // UMPIRE_AllocatorBase_HPP

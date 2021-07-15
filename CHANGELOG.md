@@ -17,6 +17,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Added documentation of the DeviceAllocator.
 
+- Added event mechanism for collecting stats that may be used by performance and replay tools.
+
 ### Changed
 
 - Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking

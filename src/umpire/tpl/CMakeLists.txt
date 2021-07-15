@@ -98,7 +98,7 @@ if (NOT TARGET camp)
       TARGET_DEFINITIONS CAMP_HAVE_CUDA)
   endif()
 
-  if(ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP)
     blt_add_target_definitions(
       TO camp
       SCOPE INTERFACE

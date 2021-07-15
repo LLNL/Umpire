@@ -58,7 +58,7 @@ def check_file_not_exists(filename):
         errors += errors + 1
 
 
-def run_io_test(test_env, file_uid, expect_logging, expect_replay):
+def run_io_test(test_env, file_uid, expect_logging):
     import subprocess
     import os
 
@@ -67,9 +67,6 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
     cmd_args = ['./io_tests']
     if expect_logging:
         cmd_args.append('--enable-logging')
-
-    if expect_replay:
-        cmd_args.append('--enable-replay')
 
     test_program = subprocess.Popen(cmd_args,
             env=dict(os.environ, **test_env),
@@ -89,11 +86,9 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
         check_output('stderr', error, 'testing error stream')
 
         output_filename = 'umpire_io_tests.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
-        replay_filename = 'umpire_io_tests.{pid}.{uid}.replay'.format(uid=file_uid, pid=pid)
 
         if 'UMPIRE_OUTPUT_DIR' in test_env.keys():
             output_filename = '{dir}/umpire_io_tests.{pid}.{uid}.log'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
-            replay_filename = '{dir}/umpire_io_tests.{pid}.{uid}.replay'.format(dir=test_env['UMPIRE_OUTPUT_DIR'], uid=file_uid, pid=pid)
 
         if expect_logging:
             check_file_exists(output_filename)
@@ -102,35 +97,20 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
         else:
             check_file_not_exists(output_filename)
 
-        if expect_replay:
-            check_file_exists(replay_filename)
-            with open(replay_filename) as replay_file:
-                check_output(replay_filename, replay_file, 'testing replay stream')
-        else:
-            check_file_not_exists(replay_filename)
-
 
 if __name__ == '__main__':
     import sys
 
-    if sys.argv[1] == 'Basename +logging +replay' and errors == 0:
-        print("{BLUE}[--------]{END} io_test 1/5 Basename +logging +replay Test".format(**formatters))
-        run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, True)
+    if sys.argv[1] == 'Basename +logging' and errors == 0:
+        print("{BLUE}[--------]{END} io_test 1/3 Basename +logging".format(**formatters))
+        run_io_test({'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True)
 
-    if sys.argv[1] == 'Basename +Directory +logging +replay' and errors == 0:
-        print("{BLUE}[--------]{END} io_test 2/5 Basename + Directory +logging +replay Test".format(**formatters))
-        run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, True)
+    if sys.argv[1] == 'Basename +Directory +logging' and errors == 0:
+        print("{BLUE}[--------]{END} io_test 2/3 Basename +Directory +logging Test".format(**formatters))
+        run_io_test({'UMPIRE_OUTPUT_DIR': './io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True)
 
-    if sys.argv[1] == 'Basename +Directory -logging -replay' and errors == 0:
-        print("{BLUE}[--------]{END} io_test 3/5 Basename + Directory -logging -replay Test".format(**formatters))
-        run_io_test({'UMPIRE_OUTPUT_DIR': './optional_io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, False, False)
-
-    if sys.argv[1] == 'Basename +Directory +logging -replay' and errors == 0:
-        print("{BLUE}[--------]{END} io_test 4/5 Basename + Directory +logging -replay Test".format(**formatters))
-        run_io_test({'UMPIRE_OUTPUT_DIR': './optional_io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, True, False)
-
-    if sys.argv[1] == 'Basename +Directory -logging +replay' and errors == 0:
-        print("{BLUE}[--------]{END} io_test 5/5 Basename + Directory -logging +replay Test".format(**formatters))
-        run_io_test({'UMPIRE_OUTPUT_DIR': './optional_io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, False, True)
+    if sys.argv[1] == 'Basename +Directory -logging' and errors == 0:
+        print("{BLUE}[--------]{END} io_test 3/3 Basename + Directory -logging Test".format(**formatters))
+        run_io_test({'UMPIRE_OUTPUT_DIR': './optional_io_test_dir', 'UMPIRE_OUTPUT_BASENAME' : 'umpire_io_tests'}, 0, False)
 
     sys.exit(errors)
