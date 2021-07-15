@@ -54,7 +54,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC
   Shared memory is initially available on the Host resource and will default
-  to the value of `ENABLE_MPI`. 
+  to the value of `ENABLE_MPI`.
 
 - get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
 
@@ -97,6 +97,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Changed most internal and test uses of DynamicPoolMap to QuickPool.
 
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
+
+- Refactored pool coalesce heuristic API to return either 0 or the minimum
+  pool size to allocate when a coalesce is to be performed.  No functional
+  change yet.
 
 ### Removed
 

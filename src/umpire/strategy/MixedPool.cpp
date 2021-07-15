@@ -6,6 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "umpire/strategy/MixedPool.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 #include <algorithm>
 #include <cstdint>
@@ -20,7 +22,7 @@ MixedPool::MixedPool(const std::string& name, int id, Allocator allocator, std::
                      std::size_t largest_fixed_obj_size, std::size_t max_initial_fixed_pool_size,
                      std::size_t fixed_size_multiplier, const std::size_t quick_pool_initial_alloc_size,
                      const std::size_t quick_pool_min_alloc_size, const std::size_t quick_pool_align_bytes,
-                     QuickPool::CoalesceHeuristic should_coalesce) noexcept
+                     PoolCoalesceHeuristic<QuickPool> should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "MixedPool"},
       m_map{},
       m_fixed_pool_map{},

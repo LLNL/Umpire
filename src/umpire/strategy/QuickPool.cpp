@@ -8,6 +8,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
@@ -18,7 +19,7 @@ namespace strategy {
 QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
                      const std::size_t first_minimum_pool_allocation_size,
                      const std::size_t next_minimum_pool_allocation_size, std::size_t alignment,
-                     CoalesceHeuristic should_coalesce) noexcept
+                     PoolCoalesceHeuristic<QuickPool> should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "QuickPool"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
@@ -191,9 +192,10 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   // can do this with iterator?
   m_pointer_map.erase(ptr);
 
-  if (m_should_coalesce(*this)) {
+  std::size_t min_pool_size{ m_should_coalesce(*this) };
+  if (min_pool_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
-    do_coalesce();
+    do_coalesce(min_pool_size);
   }
 }
 
@@ -311,18 +313,17 @@ void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
-  do_coalesce();
+  do_coalesce(getActualSize());
 }
 
-void QuickPool::do_coalesce() noexcept
+void QuickPool::do_coalesce(std::size_t min_pool_size) noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  std::size_t size_pre{getActualSize()};
   release();
   std::size_t size_post{getActualSize()};
 
-  if (size_post < size_pre) {
-    std::size_t alloc_size{size_pre - size_post};
+  if (size_post < min_pool_size) {
+    std::size_t alloc_size{min_pool_size - size_post};
 
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);
@@ -330,33 +331,37 @@ void QuickPool::do_coalesce() noexcept
   }
 }
 
-QuickPool::CoalesceHeuristic QuickPool::blocks_releasable(std::size_t nblocks)
+PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::QuickPool& pool) { return (pool.getReleasableBlocks() > nblocks); };
+  return [=](const strategy::QuickPool& pool) {return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0;};
 }
 
-QuickPool::CoalesceHeuristic QuickPool::percent_releasable(int percentage)
+PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
   }
 
   if (percentage == 0) {
-    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return false; };
+    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) {
+        return 0;
+      };
   } else if (percentage == 100) {
-    return [=](const strategy::QuickPool& pool) { return (pool.getActualSize() == pool.getReleasableSize()); };
+    return [=](const strategy::QuickPool& pool) {
+      return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualSize() : 0;
+    };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return (pool.getReleasableSize() >= threshold);
+      return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
     };
   }
 }
 
-std::ostream& operator<<(std::ostream& out, umpire::strategy::QuickPool::CoalesceHeuristic&)
+std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&)
 {
   return out;
 }

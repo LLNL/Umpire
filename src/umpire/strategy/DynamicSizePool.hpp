@@ -432,13 +432,17 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
     return nb;
   }
 
-  void coalesce()
+  void coalesce(std::size_t min_pool_size)
   {
     if (getFreeBlocks() > 1) {
-      std::size_t size_to_coalesce = freeReleasedBlocks();
+      freeReleasedBlocks();
+      std::size_t size_post{getActualSize()};
 
-      UMPIRE_LOG(Debug, "coalescing " << size_to_coalesce << " bytes.");
-      coalesceFreeBlocks(size_to_coalesce);
+      if (size_post < min_pool_size) {
+        std::size_t alloc_size{min_pool_size - size_post};
+        UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
+        coalesceFreeBlocks(alloc_size);
+      }
     }
   }
 };
