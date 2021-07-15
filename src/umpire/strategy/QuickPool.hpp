@@ -97,7 +97,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t getTotalBlocks() const noexcept;
 
   void coalesce() noexcept;
-  void do_coalesce(std::size_t min_pool_size) noexcept;
+  void do_coalesce(std::size_t suggested_size) noexcept;
 
  private:
   struct Chunk;

@@ -164,7 +164,7 @@ class UMPIRE_DEPRECATE("use QuickPool instead") DynamicPoolMap : public Allocati
    */
   std::size_t releaseFreeBlocks();
 
-  void do_coalesce(std::size_t min_pool_size);
+  void do_coalesce(std::size_t suggested_size);
 
   AddressMap m_used_map{};
   SizeMap m_free_map{};

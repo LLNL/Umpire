@@ -192,10 +192,10 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   // can do this with iterator?
   m_pointer_map.erase(ptr);
 
-  std::size_t min_pool_size{ m_should_coalesce(*this) };
-  if (min_pool_size) {
+  std::size_t suggested_size{ m_should_coalesce(*this) };
+  if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
-    do_coalesce(min_pool_size);
+    do_coalesce(suggested_size);
   }
 }
 
@@ -316,14 +316,14 @@ void QuickPool::coalesce() noexcept
   do_coalesce(getActualSize());
 }
 
-void QuickPool::do_coalesce(std::size_t min_pool_size) noexcept
+void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
   UMPIRE_LOG(Debug, "()");
   release();
   std::size_t size_post{getActualSize()};
 
-  if (size_post < min_pool_size) {
-    std::size_t alloc_size{min_pool_size - size_post};
+  if (size_post < suggested_size) {
+    std::size_t alloc_size{suggested_size - size_post};
 
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);

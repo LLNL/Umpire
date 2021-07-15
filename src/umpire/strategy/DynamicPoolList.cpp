@@ -39,13 +39,13 @@ void DynamicPoolList::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
   dpa.deallocate(ptr);
 
-  std::size_t min_pool_size{ m_should_coalesce(*this) };
-  if (min_pool_size) {
+  std::size_t suggested_size{ m_should_coalesce(*this) };
+  if (0 != suggested_size) {
     UMPIRE_LOG(Debug,
                "Heuristic returned true, "
                "performing coalesce operation for "
                    << this << "\n");
-    dpa.coalesce(min_pool_size);
+    dpa.coalesce(suggested_size);
   }
 }
 

@@ -146,10 +146,10 @@ void DynamicPoolMap::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
 
-  std::size_t min_pool_size{ m_should_coalesce(*this) };
-  if (min_pool_size) {
+  std::size_t suggested_size{ m_should_coalesce(*this) };
+  if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
-    do_coalesce(min_pool_size);
+    do_coalesce(suggested_size);
   }
 }
 
@@ -258,7 +258,7 @@ void DynamicPoolMap::coalesce()
   do_coalesce(getActualSize());
 }
 
-void DynamicPoolMap::do_coalesce(std::size_t min_pool_size)
+void DynamicPoolMap::do_coalesce(std::size_t suggested_size)
 {
   mergeFreeBlocks();
   // Now all possible the free blocks that could be merged have been
@@ -270,8 +270,8 @@ void DynamicPoolMap::do_coalesce(std::size_t min_pool_size)
 
     // If this removed anything from the map, re-allocate a single large chunk
     // and insert to free map
-    if (size_post < min_pool_size) {
-      std::size_t alloc_size{min_pool_size - size_post};
+    if (size_post < suggested_size) {
+      std::size_t alloc_size{suggested_size - size_post};
       UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
       Pointer ptr{allocateBlock(alloc_size)};
       insertFree(ptr, alloc_size, true, alloc_size);
