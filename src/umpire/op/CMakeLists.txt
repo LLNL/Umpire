@@ -5,20 +5,11 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_op_headers
-  GenericReallocateOperation.hpp
-  HostCopyOperation.hpp
-  HostMemsetOperation.hpp
-  HostReallocateOperation.hpp
-  MemoryOperation.hpp
-  MemoryOperationRegistry.hpp)
+  operations.hpp
+  dispatch.hpp
+  host.hpp)
 
-set (umpire_op_sources
-  GenericReallocateOperation.cpp
-  HostCopyOperation.cpp
-  HostMemsetOperation.cpp
-  HostReallocateOperation.cpp
-  MemoryOperation.cpp
-  MemoryOperationRegistry.cpp)
+set (umpire_op_source)
 
 set (umpire_op_depends camp)
 
@@ -109,17 +100,30 @@ endif ()
 
 blt_add_library(
   NAME umpire_op
-  HEADERS ${umpire_op_headers}
-  SOURCES ${umpire_op_sources}
-  DEPENDS_ON ${umpire_op_depends}
-  OBJECT TRUE)
+  HEADERS ${umpire_op_headers})
+  # SOURCES ${umpire_op_sources}
+  #DEPENDS_ON ${umpire_op_depends}
+  #OBJECT TRUE)
+
+target_link_libraries(
+  umpire_op
+  INTERFACE
+  ${umpire_op_depends}
+)
 
 target_include_directories(
   umpire_op
-  PUBLIC
+  INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+
+install(TARGETS
+  umpire_op
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
 
 install(FILES
   ${umpire_op_headers}

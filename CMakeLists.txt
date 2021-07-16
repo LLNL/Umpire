@@ -37,7 +37,6 @@ option(ENABLE_EXAMPLES "Build Umpire examples" On)
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
-option(ENABLE_STATISTICS "Track statistics for allocations and operations" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
@@ -48,7 +47,7 @@ option(ENABLE_SANITIZERS "Enable manual memory poisoning of pools" Off)
 # Set benchmark installation to OFF
 set(BENCHMARK_ENABLE_INSTALL OFF)
 
-set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
 
 if (ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)

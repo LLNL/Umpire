@@ -4,36 +4,51 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/Allocator.hpp"
-#include "umpire/ResourceManager.hpp"
+#include "umpire/umpire.hpp"
 
-#include "umpire/strategy/DynamicPool.hpp"
+template<typename Resource>
+void allocate_and_deallocate_pool_t()
+{
+  using pool_t = umpire::strategy::slot_pool<Resource>;
+  using allocator_t = umpire::allocator<double, pool_t>;
+
+  constexpr std::size_t SIZE = 1024;
+
+  allocator_t pool = umpire::make_allocator<double, pool_t>(
+    Resource::get()->get_name() + "_typed_pool", Resource::get(), 8); 
+
+  double* data = pool.allocate(SIZE);
+
+  std::cout << "Allocated " << SIZE*sizeof(typename decltype(pool)::value_type)
+   << " using the " << pool.get_name() << " allocator...";
+
+  pool.deallocate(data);
+
+  std::cout << " deallocated." << std::endl;
+}
 
 void allocate_and_deallocate_pool(const std::string& resource)
 {
   constexpr std::size_t SIZE = 1024;
 
-  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::allocator<double> pool = 
+    umpire::make_allocator<double, umpire::strategy::slot_pool<>>(
+    resource + "_pool", umpire::get_strategy(resource), 8);
 
-  auto allocator = rm.getAllocator(resource);
+  double* data = pool.allocate(SIZE);
 
-  auto pooled_allocator =
-    rm.makeAllocator<umpire::strategy::DynamicPool>(resource + "_pool",
-                                                    allocator);
+  std::cout << "Allocated " << SIZE*sizeof(typename decltype(pool)::value_type)
+   << " using the " << pool.get_name() << " allocator...";
 
-  double* data = static_cast<double*>(
-      pooled_allocator.allocate(SIZE*sizeof(double)));
-
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << pooled_allocator.getName() << " allocator...";
-
-  pooled_allocator.deallocate(data);
+  pool.deallocate(data);
 
   std::cout << " deallocated." << std::endl;
 }
 
 int main(int, char**) {
+  umpire::initialize();
   allocate_and_deallocate_pool("HOST");
+  allocate_and_deallocate_pool_t<umpire::resource::host_memory<>>();
 
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate_pool("DEVICE");

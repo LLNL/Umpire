@@ -4,22 +4,21 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/Allocator.hpp"
-#include "umpire/ResourceManager.hpp"
+#include "umpire/allocator.hpp"
+#include "umpire/umpire.hpp"
+
+#include <iostream>
 
 int main(int, char**) {
-
   constexpr std::size_t SIZE = 1024;
 
-  auto& rm = umpire::ResourceManager::getInstance();
+  umpire::initialize();
 
-  umpire::Allocator allocator = rm.getAllocator("HOST");
+  auto strategy = umpire::get_strategy("HOST");
+  umpire::allocator<double>  allocator{strategy};
 
-  double* data = static_cast<double*>(
-      allocator.allocate(SIZE*sizeof(double)));
-
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << allocator.getName() << " allocator...";
+  double* data = allocator.allocate(SIZE);
+  std::cout << "Allocated " << SIZE << typeid(umpire::allocator<double>::value_type).name() << " using the " << allocator.get_name() << " allocator...";
 
   allocator.deallocate(data);
 

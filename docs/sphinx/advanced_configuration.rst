@@ -20,7 +20,6 @@ Here is a summary of the configuration options, their default value, and meaning
       ``ENABLE_CUDA``              Off      Enable CUDA support
       ``ENABLE_HIP``               Off      Enable HIP support
       ``ENABLE_NUMA``              Off      Enable NUMA support
-      ``ENABLE_STATISTICS``        Off      Enable collection of memory statistics
       ``ENABLE_TESTING``           On       Build test executables
       ``ENABLE_BENCHMARKS``        On       Build benchmark programs
       ``ENABLE_LOGGING``           On       Enable Logging within Umpire
@@ -48,10 +47,6 @@ These arguments are explained in more detail below:
   This option enables support for NUMA. The
   :class:`umpire::strategy::NumaPolicy` is available when built with this
   option, which may be used to locate the allocation to a specific node.
-
-* ``ENABLE_STATISTICS``
-  This option enables collection of memory statistics. If Umpire is built with
-  this option, the Conduit library will also be built.
 
 * ``ENABLE_TESTING``
   This option controls whether or not test executables will be built.

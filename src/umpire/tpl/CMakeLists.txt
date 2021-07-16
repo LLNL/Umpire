@@ -20,26 +20,6 @@ set(ENABLE_COPY_HEADERS Off)
 set(ENABLE_TESTS Off)
 set(ENABLE_FORTRAN Off)
 
-if (ENABLE_STATISTICS)
-  add_subdirectory(conduit/src)
-  set (conduit_includes
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/c>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/conduit/src/libs/conduit/python>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs/conduit>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/conduit/src/libs/conduit/python>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>)
-
-  blt_register_library(
-    NAME conduit
-    INCLUDES ${conduit_includes}
-    TREAT_INCLUDES_AS_SYSTEM On
-    LIBRARIES conduit)
-endif()
-
-#
 # Json
 set (json_headers
   ./json/json.hpp )

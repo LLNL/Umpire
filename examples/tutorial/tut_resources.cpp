@@ -4,30 +4,46 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/Allocator.hpp"
-#include "umpire/ResourceManager.hpp"
+#include "umpire/umpire.hpp"
+
+template<typename Resource>
+void allocate_and_deallocate_t()
+{
+  constexpr std::size_t SIZE = 1024;
+
+  Resource* strategy = Resource::get();
+  umpire::allocator<double, Resource> allocator{strategy};
+
+  double* data = allocator.allocate(SIZE*sizeof(double));
+
+  std::cout << "Allocated " << SIZE*sizeof(typename decltype(allocator)::value_type)
+   << " using the " << allocator.get_name() << " allocator...";
+
+  allocator.deallocate(data);
+  std::cout << " deallocated." << std::endl;
+}
 
 void allocate_and_deallocate(const std::string& resource)
 {
   constexpr std::size_t SIZE = 1024;
 
-  auto& rm = umpire::ResourceManager::getInstance();
+  auto strategy = umpire::get_strategy(resource);
+  umpire::allocator<double>  allocator{strategy};
 
-  umpire::Allocator allocator = rm.getAllocator(resource);
+  double* data = allocator.allocate(SIZE*sizeof(double));
 
-  double* data = static_cast<double*>(
-      allocator.allocate(SIZE*sizeof(double)));
-
-  std::cout << "Allocated " << (SIZE*sizeof(double)) << " bytes using the "
-    << allocator.getName() << " allocator...";
+  std::cout << "Allocated " << SIZE*sizeof(typename decltype(allocator)::value_type)
+   << " using the " << allocator.get_name() << " allocator...";
 
   allocator.deallocate(data);
-
   std::cout << " deallocated." << std::endl;
 }
 
 int main(int, char**) {
+  umpire::initialize();
+
   allocate_and_deallocate("HOST");
+  allocate_and_deallocate_t<umpire::resource::host_memory<>>();
 
 #if defined(UMPIRE_ENABLE_CUDA)
   allocate_and_deallocate("DEVICE");

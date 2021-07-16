@@ -5,26 +5,12 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_strategy_headers
-  AllocationAdvisor.hpp
-  AllocationPrefetcher.hpp
-  AllocationStrategy.hpp
-  AllocationTracker.hpp
-  DynamicPool.hpp
-  DynamicPoolHeuristic.hpp
-  DynamicPoolList.hpp
-  DynamicPoolMap.hpp
-  DynamicSizePool.hpp
-  FixedPool.hpp
-  FixedSizePool.hpp
-  MixedPool.hpp
-  MonotonicAllocationStrategy.hpp
-  NamedAllocationStrategy.hpp
-  QuickPool.hpp
-  SizeLimiter.hpp
-  SlotPool.hpp
-  StdAllocator.hpp
-  ThreadSafeAllocator.hpp
-  ZeroByteHandler.hpp)
+  allocation_strategy.hpp
+  slot_pool.hpp
+  dynamic_pool_map.hpp
+  dynamic_pool_list.hpp
+  quick_pool.hpp
+  thread_safe.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_headers
@@ -35,24 +21,7 @@ endif ()
 set (umpire_strategy_mixin_headers
   mixins/Inspector.hpp)
 
-set (umpire_strategy_sources
-  AllocationAdvisor.cpp
-  AllocationPrefetcher.cpp
-  AllocationStrategy.cpp
-  AllocationTracker.cpp
-  DynamicPoolHeuristic.cpp
-  DynamicPoolList.cpp
-  DynamicPoolMap.cpp
-  FixedPool.cpp
-  MixedPool.cpp
-  MonotonicAllocationStrategy.cpp
-  NamedAllocationStrategy.cpp
-  QuickPool.cpp
-  SizeLimiter.cpp
-  SlotPool.cpp
-  ThreadSafeAllocator.cpp
-  mixins/Inspector.cpp
-  ZeroByteHandler.cpp)
+set (umpire_strategy_sources)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_sources
@@ -76,18 +45,30 @@ endif ()
 
 blt_add_library(
   NAME umpire_strategy
-  HEADERS ${umpire_strategy_headers} ${umpire_strategy_mixin_headers}
-  SOURCES ${umpire_strategy_sources}
-  DEPENDS_ON ${umpire_strategy_depends}
-  OBJECT TRUE)
+  HEADERS ${umpire_strategy_headers})
+  # SOURCES ${umpire_strategy_sources}
+  # DEPENDS_ON ${umpire_strategy_depends}
+  # OBJECT TRUE)
 
 target_include_directories(
   umpire_strategy
-  PUBLIC
+  INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+target_link_libraries(
+  umpire_strategy
+  INTERFACE
+  ${umpire_strategy_depends})
+
+install(TARGETS
+  umpire_strategy
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+  
 install(FILES
   ${umpire_strategy_headers}
   DESTINATION include/umpire/strategy)

@@ -5,21 +5,21 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (umpire_headers
-  Allocator.hpp
-  Allocator.inl
-  Replay.hpp
-  ResourceManager.hpp
-  ResourceManager.inl
-  TypedAllocator.hpp
-  TypedAllocator.inl
-  Umpire.hpp)
+  alloc.hpp
+  allocation_record.hpp
+  allocator.hpp
+  exception.hpp
+  op.hpp
+  platform.hpp
+  resource.hpp
+  strategy.hpp
+  umpire.hpp)
 
 set (umpire_sources
-  Allocator.cpp
-  Replay.cpp
-  ResourceManager.cpp
-  Umpire.cpp)
-
+  exception.cpp
+  memory.cpp
+  umpire.cpp)
+  
 if (ENABLE_FORTRAN OR ENABLE_C)
   set (umpire_interface_headers
     interface/umpire.h)
@@ -52,23 +52,15 @@ endif ()
 if (ENABLE_CUDA)
   set(umpire_headers
     ${umpire_headers}
-    DeviceAllocator.hpp)
-
-  set(umpire_sources
-    ${umpire_sources}
-    DeviceAllocator.cpp)
-
-  set_source_files_properties(DeviceAllocator.cpp
-                              PROPERTIES
-                              LANGUAGE CUDA)
+    device_allocator.hpp)
 endif()
 
 add_subdirectory(tpl)
 
 add_subdirectory(resource)
 add_subdirectory(alloc)
+add_subdirectory(detail)
 add_subdirectory(op)
-add_subdirectory(util)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
@@ -78,9 +70,9 @@ set (umpire_depends
   camp
   umpire_resource
   umpire_strategy
+  umpire_detail
   umpire_alloc
   umpire_op
-  umpire_util
   umpire_tpl_judy)
 
 if (ENABLE_OPENMP_TARGET)
@@ -103,7 +95,6 @@ set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
 set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
 set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
 set(UMPIRE_ENABLE_BACKTRACE ${ENABLE_BACKTRACE})
-set(UMPIRE_ENABLE_STATISTICS ${ENABLE_STATISTICS})
 set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
 set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
 set(UMPIRE_ENABLE_OPENMP_TARGET ${ENABLE_OPENMP_TARGET})

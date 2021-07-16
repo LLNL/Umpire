@@ -4,49 +4,16 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (umpire_resource_headers
-  DefaultMemoryResource.hpp
-  DefaultMemoryResource.inl
-  HostResourceFactory.hpp
-  MemoryResource.hpp
-  MemoryResourceFactory.hpp
-  MemoryResourceRegistry.hpp
-  MemoryResourceTypes.hpp
-  NullMemoryResource.hpp
-  NullMemoryResourceFactory.hpp
-)
-
-set (umpire_resource_sources
-  HostResourceFactory.cpp
-  MemoryResource.cpp
-  MemoryResourceRegistry.cpp
-  NullMemoryResource.cpp
-  NullMemoryResourceFactory.cpp
-)
-
-set(umpire_resource_depends
-  camp)
+set (umpire_resource_headers host_memory.hpp)
+set (umpire_resource_depends camp umpire_alloc umpire_detail)
 
 if (ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    CudaConstantMemoryResource.hpp
-    CudaConstantMemoryResourceFactory.hpp
-    CudaDeviceMemoryResource.hpp
-    CudaDeviceResourceFactory.hpp
-    CudaPinnedMemoryResourceFactory.hpp
-    CudaUnifiedMemoryResourceFactory.hpp
+    cuda_device_memory.hpp
+    cuda_managed_memory.hpp
+    cuda_pinned_memory.hpp
     )
-
-  set (umpire_resource_sources
-    ${umpire_resource_sources}
-    CudaConstantMemoryResource.cu
-    CudaConstantMemoryResourceFactory.cpp
-    CudaDeviceMemoryResource.cpp
-    CudaDeviceResourceFactory.cpp
-    CudaPinnedMemoryResourceFactory.cpp
-    CudaUnifiedMemoryResourceFactory.cpp)
-
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
@@ -56,17 +23,8 @@ endif ()
 if (ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    HipDeviceResourceFactory.hpp
-    HipPinnedMemoryResourceFactory.hpp
-    HipConstantMemoryResourceFactory.hpp
-    HipConstantMemoryResource.hpp)
-
-  set (umpire_resource_sources
-    ${umpire_resource_sources}
-    HipConstantMemoryResourceFactory.cpp
-    HipConstantMemoryResource.cpp
-    HipDeviceResourceFactory.cpp
-    HipPinnedMemoryResourceFactory.cpp)
+    hip_device_memory.hpp
+    hip_pinned_memory.hpp)
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
@@ -76,11 +34,7 @@ endif ()
 if (ENABLE_OPENMP_TARGET)
   set (umpire_resource_headers
     ${umpire_resource_headers}
-    OpenMPTargetMemoryResourceFactory.hpp)
-
-  set (umpire_resource_sources
-    ${umpire_resource_sources}
-    OpenMPTargetMemoryResourceFactory.cpp)
+    omp_target_memory.hpp)
 
   set (umpire_resource_depends
     ${umpire_resource_depends}
@@ -89,17 +43,27 @@ endif ()
 
 blt_add_library(
   NAME umpire_resource
-  HEADERS ${umpire_resource_headers}
-  SOURCES ${umpire_resource_sources}
-  DEPENDS_ON ${umpire_resource_depends}
-  OBJECT TRUE)
+  HEADERS ${umpire_resource_headers})
 
 target_include_directories(
   umpire_resource
-  PUBLIC
+  INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
+
+target_link_libraries(
+  umpire_resource
+  INTERFACE
+  ${umpire_resource_depends}
+)
+
+install(TARGETS
+  umpire_resource
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
 
 install(FILES
   ${umpire_resource_headers}

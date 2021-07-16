@@ -32,8 +32,5 @@ blt_add_test(
   NAME version_tests
   COMMAND version_tests)
 
-add_subdirectory(alloc)
 add_subdirectory(op)
-add_subdirectory(resource)
-add_subdirectory(util)
 add_subdirectory(strategy)

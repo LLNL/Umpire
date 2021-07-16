@@ -5,33 +5,33 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set(umpire_alloc_headers
-  MallocAllocator.hpp)
+  malloc_allocator.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
-    PosixMemalignAllocator.hpp)
+    posix_memalign_allocator.hpp)
 endif ()
 
 if (ENABLE_CUDA)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
-    CudaMallocAllocator.hpp
-    CudaMallocManagedAllocator.hpp
-    CudaPinnedAllocator.hpp)
+    cuda_malloc_allocator.hpp
+    cuda_malloc_managed_allocator.hpp
+    cuda_pinned_allocator.hpp)
 endif ()
 
 if (ENABLE_HIP)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
-    HipMallocAllocator.hpp
-    HipPinnedAllocator.hpp)
+    hip_malloc_allocator.hpp
+    hip_pinned_allocator.hpp)
 endif ()
 
 if (ENABLE_OPENMP_TARGET)
   set (umpire_alloc_headers
     ${umpire_alloc_headers}
-    OpenMPTargetAllocator.hpp)
+    omp_target_allocator.hpp)
 endif ()
 
 blt_add_library(

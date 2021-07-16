@@ -21,13 +21,13 @@ endif ()
 blt_add_executable(
   NAME tut_allocator
   SOURCES tut_allocator.cpp
-  DEPENDS_ON ${tutorial_depends})
+  DEPENDS_ON umpire_strategy)
 list(APPEND umpire_tutorials tut_allocator)
 
 blt_add_executable(
   NAME tut_resources
   SOURCES tut_resources.cpp
-  DEPENDS_ON ${tutorial_depends})
+  DEPENDS_ON umpire)
 list(APPEND umpire_tutorials tut_resources)
 
 blt_add_executable(

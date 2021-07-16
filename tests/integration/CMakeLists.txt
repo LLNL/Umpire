@@ -39,19 +39,19 @@ blt_add_test(
   NAME allocator_integration_tests
   COMMAND allocator_integration_tests)
 
-blt_add_executable(
-  NAME strategy_tests
-  SOURCES strategy_tests.cpp
-  DEPENDS_ON ${integration_tests_depends})
-
-target_include_directories(
-  strategy_tests
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
-
-blt_add_test(
-  NAME strategy_tests
-  COMMAND strategy_tests)
+# blt_add_executable(
+#   NAME strategy_tests
+#   SOURCES strategy_tests.cpp
+#   DEPENDS_ON ${integration_tests_depends})
+# 
+# target_include_directories(
+#   strategy_tests
+#   PRIVATE
+#   ${PROJECT_BINARY_DIR}/include)
+# 
+# blt_add_test(
+#   NAME strategy_tests
+#   COMMAND strategy_tests)
 
 blt_add_executable(
   NAME operation_tests
