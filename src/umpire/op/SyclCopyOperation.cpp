@@ -14,10 +14,9 @@
 namespace umpire {
 namespace op {
 
-void SyclCopyOperation::transform(
-    void* src_ptr, void** dst_ptr,
-    umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-    umpire::util::AllocationRecord* dst_allocation, std::size_t length)
+void SyclCopyOperation::transform(void* src_ptr, void** dst_ptr,
+                                  umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+                                  umpire::util::AllocationRecord* dst_allocation, std::size_t length)
 {
   auto sycl_queue = dst_allocation->strategy->getTraits().queue;
 

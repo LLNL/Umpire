@@ -21,8 +21,7 @@ namespace resource {
  */
 class HipDeviceMemoryResource : public MemoryResource {
  public:
-  HipDeviceMemoryResource(Platform platform, const std::string& name, int id,
-                           MemoryResourceTraits traits);
+  HipDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr, std::size_t size);

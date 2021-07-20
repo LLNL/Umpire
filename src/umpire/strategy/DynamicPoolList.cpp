@@ -14,15 +14,13 @@
 namespace umpire {
 namespace strategy {
 
-DynamicPoolList::DynamicPoolList(
-    const std::string& name, int id, Allocator allocator,
-    const std::size_t first_minimum_pool_allocation_size,
-    const std::size_t next_minimum_pool_allocation_size,
-    const std::size_t alignment, CoalesceHeuristic should_coalesce) noexcept
+DynamicPoolList::DynamicPoolList(const std::string& name, int id, Allocator allocator,
+                                 const std::size_t first_minimum_pool_allocation_size,
+                                 const std::size_t next_minimum_pool_allocation_size, const std::size_t alignment,
+                                 CoalesceHeuristic should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "DynamicPoolList"},
       m_allocator{allocator.getAllocationStrategy()},
-      dpa{m_allocator, first_minimum_pool_allocation_size,
-          next_minimum_pool_allocation_size, alignment},
+      dpa{m_allocator, first_minimum_pool_allocation_size, next_minimum_pool_allocation_size, alignment},
       m_should_coalesce{should_coalesce}
 {
 }
@@ -84,7 +82,6 @@ std::size_t DynamicPoolList::getActualHighwaterMark() const noexcept
   return dpa.getActualHighwaterMark();
 }
 
-
 std::size_t DynamicPoolList::getReleasableSize() const noexcept
 {
   std::size_t SparseBlockSize = dpa.getReleasableSize();
@@ -116,59 +113,48 @@ MemoryResourceTraits DynamicPoolList::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
-bool 
-DynamicPoolList::tracksMemoryUse() const noexcept {
+bool DynamicPoolList::tracksMemoryUse() const noexcept
+{
   return true;
 }
 
 void DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \""
-                << getName() << "\" }");
+  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
   dpa.coalesce();
 }
 
 DynamicPoolList::CoalesceHeuristic DynamicPoolList::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::DynamicPoolList& pool) {
-    return (pool.getReleasableBlocks() > nblocks);
-  };
+  return [=](const strategy::DynamicPoolList& pool) { return (pool.getReleasableBlocks() > nblocks); };
 }
 
 DynamicPoolList::CoalesceHeuristic DynamicPoolList::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR("Invalid percentage of "
-                 << percentage
-                 << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
   }
 
   if (percentage == 0) {
-    return
-        [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return false; };
+    return [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return false; };
   } else if (percentage == 100) {
-    return [=](const strategy::DynamicPoolList& pool) {
-      return (pool.getCurrentSize() == 0);
-    };
+    return [=](const strategy::DynamicPoolList& pool) { return (pool.getCurrentSize() == 0); };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
     return [=](const strategy::DynamicPoolList& pool) {
       // Calculate threshold in bytes from the percentage
-      const std::size_t threshold =
-          static_cast<std::size_t>(f * pool.getActualSize());
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
       return (pool.getReleasableSize() >= threshold);
     };
   }
 }
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::DynamicPoolList::CoalesceHeuristic&)
+std::ostream& operator<<(std::ostream& out, umpire::strategy::DynamicPoolList::CoalesceHeuristic&)
 {
   return out;
 }
-
 
 } // end of namespace strategy
 } // end of namespace umpire

@@ -11,27 +11,27 @@
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 //
-//This test confirms that when an allocator is created with a specific
-//memory resource, that same memory resource can be quiered and returned
+// This test confirms that when an allocator is created with a specific
+// memory resource, that same memory resource can be quiered and returned
 //
 class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
  public:
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    
+
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
-    m_allocator_pool = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>
-        ("pool_" + GetParam(), *m_allocator));
-    
+    m_allocator_pool =
+        new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>("pool_" + GetParam(), *m_allocator));
+
     m_resource = GetParam();
   }
 
   virtual void TearDown()
   {
-    if(m_allocator)
+    if (m_allocator)
       delete m_allocator;
-    if(m_allocator_pool)
+    if (m_allocator_pool)
       delete m_allocator_pool;
   }
 
@@ -42,18 +42,17 @@ class MemoryResourceTraitsTest : public ::testing::TestWithParam<std::string> {
 
 umpire::MemoryResourceTraits::resource_type get_resource_trait(std::string resource)
 {
-  if(resource == "HOST")
+  if (resource == "HOST")
     return umpire::MemoryResourceTraits::resource_type::host;
-  else if(resource.find("::") != std::string::npos ||
-          resource == "DEVICE")
+  else if (resource.find("::") != std::string::npos || resource == "DEVICE")
     return umpire::MemoryResourceTraits::resource_type::device;
-  else if(resource == "DEVICE_CONST")
+  else if (resource == "DEVICE_CONST")
     return umpire::MemoryResourceTraits::resource_type::device_const;
-  else if(resource == "UM")
+  else if (resource == "UM")
     return umpire::MemoryResourceTraits::resource_type::um;
-  else if(resource == "PINNED")
+  else if (resource == "PINNED")
     return umpire::MemoryResourceTraits::resource_type::pinned;
-  else if(resource == "FILE")
+  else if (resource == "FILE")
     return umpire::MemoryResourceTraits::resource_type::file;
   else
     return umpire::MemoryResourceTraits::resource_type::unknown;
@@ -68,12 +67,12 @@ TEST_P(MemoryResourceTraitsTest, ResourceTraitTest)
   ASSERT_EQ(m_allocator->getName(), m_resource);
 }
 
-//returns a vector of strings with the names of the
-//memory resources currently available.
+// returns a vector of strings with the names of the
+// memory resources currently available.
 std::vector<std::string> memory_resource_strings()
 {
   std::vector<std::string> resources;
-  
+
   resources.push_back("HOST");
 #if defined(UMPIRE_ENABLE_DEVICE)
   resources.push_back("DEVICE");

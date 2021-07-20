@@ -99,6 +99,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Reorganized the way that the no-op benchmark is structured to match the
   pool benchmarks.
 
+- Formatting changed to 120 col, and added CI check to ensure style is applied.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.

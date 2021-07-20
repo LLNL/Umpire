@@ -21,9 +21,7 @@ struct CudaPinnedAllocator {
     cudaError_t error = ::cudaMallocHost(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMallocHost( bytes = " << bytes
-                                              << " ) failed with error: "
-                                              << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMallocHost( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
     } else {
       return ptr;
     }
@@ -34,17 +32,16 @@ struct CudaPinnedAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFreeHost(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFreeHost( ptr = " << ptr << " ) failed with error: "
-                                          << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaFreeHost( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
     }
   }
-  
+
   bool isAccessible(Platform p)
   {
-    if(p == Platform::cuda || p == Platform::host)
+    if (p == Platform::cuda || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false; // p is undefined
   }
 };
 

@@ -14,8 +14,7 @@ namespace op {
 
 class CudaMemPrefetchOperation : public MemoryOperation {
  public:
-  void apply(void* src_ptr, umpire::util::AllocationRecord* src_allocation,
-             int value, std::size_t length);
+  void apply(void* src_ptr, umpire::util::AllocationRecord* src_allocation, int value, std::size_t length);
 };
 
 } // end of namespace op

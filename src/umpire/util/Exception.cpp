@@ -11,8 +11,7 @@
 namespace umpire {
 namespace util {
 
-Exception::Exception(const std::string& message, const std::string& file,
-                     int line)
+Exception::Exception(const std::string& message, const std::string& file, int line)
     : m_message(message), m_file(file), m_line(line)
 {
   m_what = this->message();
