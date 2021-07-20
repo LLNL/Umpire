@@ -98,6 +98,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
 
+- Use CMakeCachedPackage in uberenv.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
