@@ -25,8 +25,8 @@ void HipMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNU
 }
 
 camp::resources::Event HipMemsetOperation::apply_async(void* src_ptr,
-                                                        util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
-                                                        int value, std::size_t length, camp::resources::Resource& ctx)
+                                                       util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value,
+                                                       std::size_t length, camp::resources::Resource& ctx)
 {
   auto device = ctx.get<camp::resources::Hip>();
   auto stream = device.get_stream();
@@ -35,7 +35,7 @@ camp::resources::Event HipMemsetOperation::apply_async(void* src_ptr,
 
   if (error != hipSuccess) {
     UMPIRE_ERROR("hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
-                                          << ") failed with error: " << hipGetErrorString(error));
+                                         << ") failed with error: " << hipGetErrorString(error));
   }
 
   return ctx.get_event();

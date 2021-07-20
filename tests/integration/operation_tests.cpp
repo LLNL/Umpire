@@ -708,13 +708,17 @@ TYPED_TEST(AdviceTest, AccessedBy)
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
-  using resource_type = 
-  #if defined(UMPIRE_ENABLE_CUDA)
-    camp::resources::Cuda{}
-  #elif defined(UMPIRE_ENABLE_HIP)
-    camp::resources::Hip{}
-  #endif
-  ;
+using resource_type =
+#if defined(UMPIRE_ENABLE_CUDA)
+    camp::resources::Cuda
+{
+}
+#elif defined(UMPIRE_ENABLE_HIP)
+    camp::resources::Hip
+{
+}
+#endif
+;
 
 TEST(AsyncTest, Copy)
 {
