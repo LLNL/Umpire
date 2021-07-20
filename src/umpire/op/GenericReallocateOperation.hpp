@@ -29,6 +29,9 @@ class GenericReallocateOperation : public MemoryOperation {
    */
   void transform(void* current_ptr, void** new_ptr, util::AllocationRecord* current_allocation,
                  util::AllocationRecord* new_allocation, std::size_t new_size);
+
+  camp::resources::Event transform_async(void* current_ptr, void** new_ptr, util::AllocationRecord* current_allocation,
+                 util::AllocationRecord* new_allocation, std::size_t new_size, camp::resources::Resource& ctx);
 };
 
 } // namespace op

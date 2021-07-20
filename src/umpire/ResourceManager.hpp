@@ -234,6 +234,8 @@ class ResourceManager {
    */
   void memset(void* ptr, int val, std::size_t length = 0);
 
+  camp::resources::Event memset(void* ptr, int val, camp::resources::Resource& ctx, std::size_t length = 0);
+
   /*!
    * \brief Reallocate current_ptr to new_size.
    *

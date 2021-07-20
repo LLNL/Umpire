@@ -444,6 +444,36 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
   op->apply(ptr, alloc_record, value, length);
 }
 
+camp::resources::Event ResourceManager::memset(void* ptr, int value, camp::resources::Resource& ctx, std::size_t length)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", value=" << value << ", length=" << length << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+
+  auto alloc_record = m_allocations.find(ptr);
+
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
+
+  if (length == 0) {
+    length = size;
+  }
+
+  UMPIRE_REPLAY(R"( "event": "memset", "payload": { )"
+                << R"( "ptr": ")" << ptr << R"(")"
+                << R"(, "value": )" << value << R"(, "size": )" << size << R"(, "allocator_ref": ")"
+                << alloc_record->strategy << R"(")"
+                << R"( })");
+
+  if (length > size) {
+    UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
+  }
+
+  auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
+
+  return op->apply_async(ptr, alloc_record, value, length, ctx);
+}
+
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size)
 {
   strategy::AllocationStrategy* strategy;

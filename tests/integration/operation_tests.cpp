@@ -738,3 +738,38 @@ TEST(AsyncTest, Copy)
 }
 
 #endif
+
+#if defined(UMPIRE_ENABLE_HIP)
+TEST(AsyncTest, Copy)
+{
+  auto resource = camp::resources::Resource{camp::resources::Hip{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto host_alloc = rm.getAllocator("HOST");
+  auto device_alloc = rm.getAllocator("DEVICE");
+
+  float* source_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
+  float* check_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
+
+  float* dest_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+
+  for (std::size_t i = 0; i < size; i++) {
+    source_array[i] = static_cast<float>(i);
+  }
+
+  auto event = rm.copy(dest_array, source_array, resource);
+  event = rm.copy(check_array, dest_array, resource);
+
+  event.wait();
+
+  for (std::size_t i = 0; i < size; i++) {
+    ASSERT_FLOAT_EQ(source_array[i], check_array[i]);
+  }
+
+  host_alloc.deallocate(source_array);
+  host_alloc.deallocate(check_array);
+  device_alloc.deallocate(dest_array);
+}
+#endif

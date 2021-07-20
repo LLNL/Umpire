@@ -31,5 +31,23 @@ void GenericReallocateOperation::transform(void* current_ptr, void** new_ptr,
   allocator.deallocate(current_ptr);
 }
 
+camp::resources::Event GenericReallocateOperation::transform_async(void* current_ptr, void** new_ptr,
+                                           util::AllocationRecord* current_allocation,
+                                           util::AllocationRecord* new_allocation, std::size_t new_size,
+                                           camp::resources::Resource& ctx)
+{
+  Allocator allocator{new_allocation->strategy};
+  *new_ptr = allocator.allocate(new_size);
+
+  const std::size_t old_size = current_allocation->size;
+  const std::size_t copy_size = (old_size > new_size) ? new_size : old_size;
+
+  auto event = ResourceManager::getInstance().copy(*new_ptr, current_ptr, ctx, copy_size);
+
+  allocator.deallocate(current_ptr);
+
+  return event;
+}
+
 } // end of namespace op
 } // end of namespace umpire
