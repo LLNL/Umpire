@@ -107,6 +107,16 @@ class Umpire(CMakePackage, CudaPackage):
     depends_on('mpi', when='+mpi')
     depends_on('hip', when='+hip')
 
+    depends_on('camp+rocm', when='+rocm')
+    for val in ROCmPackage.amdgpu_targets:
+        depends_on('camp amdgpu_target=%s' % val, when='amdgpu_target=%s' % val)
+
+    depends_on('camp+cuda', when='+cuda')
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on('camp cuda_arch={0}'.format(sm_),
+                   when='cuda_arch={0}'.format(sm_))
+    depends_on('camp@master')
+
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
     conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
