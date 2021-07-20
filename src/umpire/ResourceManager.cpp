@@ -459,12 +459,6 @@ camp::resources::Event ResourceManager::memset(void* ptr, int value, camp::resou
     length = size;
   }
 
-  UMPIRE_REPLAY(R"( "event": "memset", "payload": { )"
-                << R"( "ptr": ")" << ptr << R"(")"
-                << R"(, "value": )" << value << R"(, "size": )" << size << R"(, "allocator_ref": ")"
-                << alloc_record->strategy << R"(")"
-                << R"( })");
-
   if (length > size) {
     UMPIRE_ERROR("Cannot memset over the end of allocation: " << length << " -> " << size);
   }
@@ -510,16 +504,7 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, camp:
     strategy = getDefaultAllocator().getAllocationStrategy();
   }
 
-  UMPIRE_REPLAY(R"( "event": "reallocate", "payload": {)"
-                << R"( "ptr": ")" << current_ptr << R"(")"
-                << R"(, "size": )" << new_size << R"(, "allocator_ref": ")" << strategy << R"(" } )");
-
   void* new_ptr{reallocate_impl(current_ptr, new_size, Allocator(strategy), ctx)};
-
-  UMPIRE_REPLAY(R"( "event": "reallocate", "payload": {)"
-                << R"( "ptr": ")" << current_ptr << R"(")"
-                << R"(, "size": )" << new_size << R"(, "allocator_ref": ")" << strategy << R"(" } )"
-                << R"(, "result": { "memory_ptr": ")" << new_ptr << R"(" } )");
 
   return new_ptr;
 }
@@ -545,18 +530,7 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
 void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc,
                                   camp::resources::Resource& ctx)
 {
-  UMPIRE_REPLAY(R"( "event": "reallocate_ex", "payload": {)"
-                << R"( "ptr": ")" << current_ptr << R"(")"
-                << R"(, "size": )" << new_size << R"(, "allocator_ref": ")" << alloc.getAllocationStrategy()
-                << R"(" } )");
-
   void* new_ptr{reallocate_impl(current_ptr, new_size, alloc, ctx)};
-
-  UMPIRE_REPLAY(R"( "event": "reallocate_ex", "payload": {)"
-                << R"( "ptr": ")" << current_ptr << R"(")"
-                << R"(, "size": )" << new_size << R"(, "allocator_ref": ")" << alloc.getAllocationStrategy()
-                << R"(" } )"
-                << R"(, "result": { "memory_ptr": ")" << new_ptr << R"(" } )");
 
   return new_ptr;
 }
