@@ -16,7 +16,7 @@ void
 Inspector::registerAllocation(
     void* ptr,
     std::size_t size,
-    strategy::AllocationStrategy* s) 
+    strategy::AllocationStrategy* s)
 {
   s->m_current_size += size;
   s->m_allocation_count++;
@@ -26,6 +26,25 @@ Inspector::registerAllocation(
   }
 
   ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, s});
+}
+
+void
+Inspector::registerAllocation(
+    void* ptr,
+    std::size_t size,
+    strategy::AllocationStrategy* s,
+    const std::string& name) 
+{
+  s->m_current_size += size;
+  s->m_allocation_count++;
+
+  if (s->m_current_size > s->m_high_watermark) {
+    s->m_high_watermark = s->m_current_size;
+  }
+
+  util::AllocationRecord record{ptr, size, s, name};
+  ResourceManager::getInstance().registerAllocation(ptr, record);
+  ResourceManager::getInstance().registerAllocation(name, record);
 }
 
 util::AllocationRecord

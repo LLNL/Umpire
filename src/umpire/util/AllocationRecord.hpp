@@ -25,6 +25,10 @@ struct AllocationRecord {
   {
   }
 
+  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat, const std::string& n) : ptr{p}, size{s}, strategy{strat}, name{n}
+  {
+  }
+
   AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}
   {
   }
@@ -32,6 +36,7 @@ struct AllocationRecord {
   void* ptr;
   std::size_t size;
   strategy::AllocationStrategy* strategy;
+  std::string name{"unnamed"};
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   util::backtrace allocation_backtrace;
 #endif // UMPIRE_ENABLE_BACKTRACE
