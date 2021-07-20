@@ -31,6 +31,15 @@
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
 
+#if defined(UMPIRE_ENABLE_CUDA)
+using resource_type = camp::resources::Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+using resource_type = camp::resources::Hip;
+#else
+using resource_type = camp::resources::Host;
+#endif
+
+
 static int s_counter{0};
 
 struct NullStrategy {
@@ -275,6 +284,23 @@ TYPED_TEST(CopyTest, InvalidSize)
   ASSERT_THROW(rm.copy(small_dest_array, this->source_array), umpire::util::Exception);
 
   this->dest_allocator->deallocate(small_dest_array);
+}
+
+TYPED_TEST(CopyTest, Async)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto resource = camp::resources::Resource{resource_type{}};
+
+  for (std::size_t i = 0; i < this->m_size; i++) {
+    this->source_array[i] = static_cast<float>(i);
+  }
+
+  auto event = rm.copy(this->dest_array, this->source_array, resource);
+  event = rm.copy(this->check_array, this->dest_array, resource);
+
+  for (std::size_t i = 0; i < this->m_size; i++) {
+    ASSERT_FLOAT_EQ(this->source_array[i], this->check_array[i]);
+  }
 }
 
 template <typename T>
@@ -707,12 +733,6 @@ TYPED_TEST(AdviceTest, AccessedBy)
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
-
-#if defined(UMPIRE_ENABLE_CUDA)
-using resource_type = camp::resources::Cuda;
-#elif defined(UMPIRE_ENABLE_HIP)
-using resource_type = camp::resources::Hip;
-#endif
 
 TEST(AsyncTest, Copy)
 {
