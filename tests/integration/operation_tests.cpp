@@ -782,7 +782,7 @@ TEST(AsyncTest, Reallocate)
 
   auto device_alloc = rm.getAllocator("DEVICE");
   float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
-  source_array = rm.reallocate(source_array, 50, resource);
+  source_array = static_cast<float*>(rm.reallocate(source_array, 50, resource));
 
   resource.get_event().wait();
 
