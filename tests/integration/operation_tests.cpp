@@ -39,7 +39,6 @@ using resource_type = camp::resources::Hip;
 using resource_type = camp::resources::Host;
 #endif
 
-
 static int s_counter{0};
 
 struct NullStrategy {
