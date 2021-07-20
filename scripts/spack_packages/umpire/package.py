@@ -170,9 +170,9 @@ class Umpire(CachedCMakePackage, CudaPackage):
         if "+hip" in spec:
             hip_root = spec['hip'].prefix
             rocm_root = hip_root + "/.."
-            entries.append(cmake_cache_string("HIP_ROOT_DIR",
+            entries.append(cmake_cache_path("HIP_ROOT_DIR",
                                         hip_root))
-            entries.append(cmake_cache_string("HIP_CLANG_PATH",
+            entries.append(cmake_cache_path("HIP_CLANG_PATH",
                                         rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("HIP_HIPCC_FLAGS",
                                         '--amdgpu-target=gfx906'))
