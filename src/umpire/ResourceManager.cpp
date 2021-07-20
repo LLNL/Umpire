@@ -542,7 +542,8 @@ void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Alloc
   return new_ptr;
 }
 
-void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc, camp::resources::Resource& ctx)
+void* ResourceManager::reallocate(void* current_ptr, std::size_t new_size, Allocator alloc,
+                                  camp::resources::Resource& ctx)
 {
   UMPIRE_REPLAY(R"( "event": "reallocate_ex", "payload": {)"
                 << R"( "ptr": ")" << current_ptr << R"(")"
@@ -609,7 +610,8 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
   return new_ptr;
 }
 
-void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx)
+void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator,
+                                       camp::resources::Resource& ctx)
 {
   UMPIRE_LOG(Debug, "(current_ptr=" << current_ptr << ", new_size=" << new_size << ", with Allocator "
                                     << allocator.getName() << ")");
@@ -652,7 +654,6 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
         op = op_registry.find("REALLOCATE", alloc_record->strategy, alloc_record->strategy);
         op->transform_async(current_ptr, &new_ptr, alloc_record, alloc_record, new_size, ctx);
       }
-
     }
   }
 
