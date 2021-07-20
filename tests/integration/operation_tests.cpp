@@ -778,4 +778,20 @@ TEST(AsyncTest, Memset)
   device_alloc.deallocate(source_array);
   host_alloc.deallocate(check_array);
 }
+
+TEST(AsyncTest, Reallocate)
+{
+  auto resource = camp::resources::Resource{resource_type{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto device_alloc = rm.getAllocator("DEVICE");
+  float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+  source_array = rm.reallocate(source_array, 50, resource);
+
+  ctx.get_event().wait();
+
+  device_alloc.deallocate(source_array);
+}
 #endif
