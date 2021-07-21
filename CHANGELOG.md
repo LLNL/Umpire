@@ -103,6 +103,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
 
+
+- Use CMakeCachedPackage in uberenv.
+
 - Refactored pool coalesce heuristic API to return either 0 or the minimum
   pool size to allocate when a coalesce is to be performed.  No functional
   change yet.
