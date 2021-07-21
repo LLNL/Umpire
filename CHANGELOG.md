@@ -79,7 +79,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI on Gitlab does not require a python environment anymore.
 
-- BLT submodule updated to v0.4.0.
+- BLT submodule updated to v0.4.1.
 
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
