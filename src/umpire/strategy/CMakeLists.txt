@@ -18,6 +18,7 @@ set (umpire_strategy_headers
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
+  PoolCoalesceHeuristic.hpp
   QuickPool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
