@@ -54,7 +54,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC
   Shared memory is initially available on the Host resource and will default
-  to the value of `ENABLE_MPI`. 
+  to the value of `ENABLE_MPI`.
 
 - get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
 
@@ -66,6 +66,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   value of `getActualSize`.
 
 - `umpire::mark_event()` to mark an event during Umpire lifecycle
+
+- Asynchronous memset and reallocate operations for CUDA and HIP.
 
 ### Changed
 
@@ -79,7 +81,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - CI on Gitlab does not require a python environment anymore.
 
-- BLT submodule updated to v0.4.0.
+- BLT submodule updated to v0.4.1.
 
 - Quartz is no longer used for gitlab CI tests. Instead, those tests are
   now run on Ruby.
@@ -96,9 +98,20 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Changed most internal and test uses of DynamicPoolMap to QuickPool.
 
+- Reorganized the way that the no-op benchmark is structured to match the
+  pool benchmarks.
+
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
 
 - Update camp to latest commit.
+
+- Use CMakeCachedPackage in uberenv.
+
+- Refactored pool coalesce heuristic API to return either 0 or the minimum
+  pool size to allocate when a coalesce is to be performed.  No functional
+  change yet.
+
+- Turn documentation off by default.
 
 ### Removed
 
@@ -113,6 +126,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - DynamicPool and DynamicPoolMap removed from replay tests since they share the
   same signature as QuickPool.
+
+- Removed replay of internal address_map operations.
 
 ### Fixed
 

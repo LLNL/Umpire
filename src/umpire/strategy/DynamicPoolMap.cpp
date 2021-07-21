@@ -14,6 +14,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
@@ -25,7 +26,7 @@ namespace strategy {
 DynamicPoolMap::DynamicPoolMap(const std::string& name, int id, Allocator allocator,
                                const std::size_t first_minimum_pool_allocation_size,
                                const std::size_t next_minimum_pool_allocation_size, const std::size_t alignment,
-                               CoalesceHeuristic should_coalesce) noexcept
+                               PoolCoalesceHeuristic<DynamicPoolMap> should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "DynamicPoolMap"},
       mixins::AlignedAllocation{alignment, allocator.getAllocationStrategy()},
       m_should_coalesce{should_coalesce},
@@ -145,9 +146,10 @@ void DynamicPoolMap::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     UMPIRE_ERROR("Cound not found ptr = " << ptr);
   }
 
-  if (m_should_coalesce(*this)) {
+  std::size_t suggested_size{m_should_coalesce(*this)};
+  if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
-    do_coalesce();
+    do_coalesce(suggested_size);
   }
 }
 
@@ -253,25 +255,26 @@ void DynamicPoolMap::coalesce()
   // size it released
   UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
 
-  do_coalesce();
+  do_coalesce(getActualSize());
 }
 
-void DynamicPoolMap::do_coalesce()
+void DynamicPoolMap::do_coalesce(std::size_t suggested_size)
 {
   mergeFreeBlocks();
   // Now all possible the free blocks that could be merged have been
 
   // Only release and create new block if more than one block is present
   if (m_free_map.size() > 1) {
-    const std::size_t released_bytes{releaseFreeBlocks()};
-    // Deallocated and removed released_bytes from m_free_map
+    releaseFreeBlocks(); // Deallocated and removed released_bytes from m_free_map
+    std::size_t size_post{getActualSize()};
 
     // If this removed anything from the map, re-allocate a single large chunk
     // and insert to free map
-    if (released_bytes > 0) {
-      UMPIRE_LOG(Debug, "coalescing " << released_bytes << " bytes.");
-      Pointer ptr{allocateBlock(released_bytes)};
-      insertFree(ptr, released_bytes, true, released_bytes);
+    if (size_post < suggested_size) {
+      std::size_t alloc_size{suggested_size - size_post};
+      UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
+      Pointer ptr{allocateBlock(alloc_size)};
+      insertFree(ptr, alloc_size, true, alloc_size);
     }
   }
 }
@@ -458,28 +461,28 @@ std::size_t DynamicPoolMap::releaseFreeBlocks()
   return released_bytes;
 }
 
-DynamicPoolMap::CoalesceHeuristic DynamicPoolMap::percent_releasable(int percentage)
+PoolCoalesceHeuristic<DynamicPoolMap> DynamicPoolMap::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
   }
 
   if (percentage == 0) {
-    return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return false; };
+    return [=](const DynamicPoolMap& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return [=](const strategy::DynamicPoolMap& pool) { return (pool.getCurrentSize() == 0); };
+    return [=](const strategy::DynamicPoolMap& pool) { return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0; };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
     return [=](const strategy::DynamicPoolMap& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return (pool.getReleasableSize() >= threshold);
+      return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
     };
   }
 }
 
-std::ostream& operator<<(std::ostream& out, umpire::strategy::DynamicPoolMap::CoalesceHeuristic&)
+std::ostream& operator<<(std::ostream& out, PoolCoalesceHeuristic<DynamicPoolMap>&)
 {
   return out;
 }

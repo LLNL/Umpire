@@ -234,6 +234,8 @@ class ResourceManager {
    */
   void memset(void* ptr, int val, std::size_t length = 0);
 
+  camp::resources::Event memset(void* ptr, int val, camp::resources::Resource& ctx, std::size_t length = 0);
+
   /*!
    * \brief Reallocate current_ptr to new_size.
    *
@@ -258,6 +260,8 @@ class ResourceManager {
    */
   void* reallocate(void* current_ptr, std::size_t new_size);
 
+  void* reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx);
+
   /*!
    * \brief Reallocate current_ptr to new_size.
    *
@@ -275,6 +279,8 @@ class ResourceManager {
    *
    */
   void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
+
+  void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   /*!
    * \brief Move src_ptr to memory from allocator
@@ -325,6 +331,8 @@ class ResourceManager {
   strategy::AllocationStrategy* getZeroByteAllocator();
 
   void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator);
+
+  void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   util::AllocationMap m_allocations;
 
