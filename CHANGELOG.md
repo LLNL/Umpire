@@ -67,6 +67,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `umpire::mark_event()` to mark an event during Umpire lifecycle
 
+- Asynchronous memset and reallocate operations for CUDA and HIP.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
