@@ -9,7 +9,7 @@ set(UMPIRE_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
 
 if (NOT TARGET camp)
   if (NOT DEFINED camp_DIR)
-    set(camp_DIR @CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
+    set(camp_DIR @camp_DIR@)
   endif ()
   find_package(camp REQUIRED)
 endif ()
