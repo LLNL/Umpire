@@ -92,6 +92,13 @@ if (NOT TARGET camp)
       TARGET_DEFINITIONS CAMP_HAVE_CUDA)
   endif()
 
+  if(ENABLE_HIP)
+    blt_add_target_definitions(
+      TO camp
+      SCOPE INTERFACE
+      TARGET_DEFINITIONS CAMP_HAVE_HIP)
+  endif()
+
 endif ()
 
 set(ENABLE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
