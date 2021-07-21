@@ -14,7 +14,9 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -148,7 +150,7 @@ void ReplayOperationManager::runOperations()
   const int name_width{40};
   const int num_width{16};
   if (m_options.track_stats) {
-    std::cout 
+    std::cout
       << std::setw(name_width) << std::left << "Filename"
       << std::setw(name_width) << std::left << "Allocator"
       << std::setw(num_width) << std::left << "Current Size"
@@ -495,7 +497,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
       std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
       std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
-      umpire::strategy::QuickPool::CoalesceHeuristic heuristic{umpire::strategy::QuickPool::percent_releasable(100)};
+      umpire::strategy::PoolCoalesceHeuristic<umpire::strategy::QuickPool> heuristic{umpire::strategy::QuickPool::percent_releasable(100)};
 
       if (alloc->argc == 1) {
         init_alloc_size = umpire::strategy::QuickPool::s_default_first_block_size;
@@ -628,7 +630,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
       std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
       std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
-      umpire::strategy::DynamicPoolList::CoalesceHeuristic heuristic{umpire::strategy::DynamicPoolList::percent_releasable(100)};
+      umpire::strategy::PoolCoalesceHeuristic<umpire::strategy::DynamicPoolList> heuristic{umpire::strategy::DynamicPoolList::percent_releasable(100)};
 
       if (alloc->argc == 1) {
         init_alloc_size = umpire::strategy::DynamicPoolList::s_default_first_block_size;
