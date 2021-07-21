@@ -27,5 +27,24 @@ void HipCopyToOperation::transform(void* src_ptr, void** dst_ptr,
   }
 }
 
+camp::resources::Event HipCopyToOperation::transform_async(
+    void* src_ptr, void** dst_ptr, umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation), std::size_t length,
+    camp::resources::Resource& ctx)
+{
+  auto device = ctx.get<camp::resources::Hip>();
+  auto stream = device.get_stream();
+
+  hipError_t error = ::hipMemcpyAsync(*dst_ptr, src_ptr, length, hipMemcpyHostToDevice, stream);
+
+  if (error != hipSuccess) {
+    UMPIRE_ERROR("hipMemcpyAsync( dest_ptr = "
+                 << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length << ", hipMemcpyHostToDevice "
+                 << ", stream = " << stream << ") failed with error: " << hipGetErrorString(error));
+  }
+
+  return ctx.get_event();
+}
+
 } // end of namespace op
 } // end of namespace umpire
