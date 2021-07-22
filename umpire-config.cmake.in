@@ -11,7 +11,11 @@ if (NOT TARGET camp)
   if (NOT DEFINED camp_DIR)
     set(camp_DIR @camp_DIR@)
   endif ()
-  find_package(camp REQUIRED)
+  find_package(camp REQUIRED
+    NO_DEFAULT_PATH
+    PATHS ${camp_DIR}
+    ${camp_DIR}/lib/cmake/camp
+  )
 endif ()
 
 set(Umpire_VERSION_MAJOR  @Umpire_VERSION_MAJOR@)

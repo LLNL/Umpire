@@ -79,7 +79,11 @@ add_subdirectory(judy)
 
 if (NOT TARGET camp)
   if (DEFINED camp_DIR)
-    find_package(camp REQUIRED)
+    find_package(camp REQUIRED
+      NO_DEFAULT_PATH
+      PATHS ${camp_DIR}
+      ${camp_DIR}/lib/cmake/camp
+    )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
     add_subdirectory(camp)
