@@ -175,6 +175,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fixed cmake warning for HIP+tools builds
 
+- Export external camp_DIR if one is provided when building Umpire.
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
