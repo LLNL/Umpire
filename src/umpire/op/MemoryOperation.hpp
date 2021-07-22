@@ -40,7 +40,7 @@ class MemoryOperation {
   virtual void transform(void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
                          util::AllocationRecord* dst_allocation, std::size_t length);
 
-  virtual camp::resources::Event transform_async(void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
+  virtual camp::resources::EventProxy<camp::resources::Resource> transform_async(void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
                                                  util::AllocationRecord* dst_allocation, std::size_t length,
                                                  camp::resources::Resource& ctx);
 
@@ -56,7 +56,7 @@ class MemoryOperation {
    */
   virtual void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length);
 
-  virtual camp::resources::Event apply_async(void* src_ptr, util::AllocationRecord* src_allocation, int val,
+  virtual camp::resources::EventProxy<camp::resources::Resource> apply_async(void* src_ptr, util::AllocationRecord* src_allocation, int val,
                                              std::size_t length, camp::resources::Resource& ctx);
 };
 

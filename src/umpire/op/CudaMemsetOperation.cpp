@@ -24,7 +24,7 @@ void CudaMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
   }
 }
 
-camp::resources::Event CudaMemsetOperation::apply_async(void* src_ptr,
+camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::apply_async(void* src_ptr,
                                                         util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
                                                         int value, std::size_t length, camp::resources::Resource& ctx)
 {
@@ -38,7 +38,7 @@ camp::resources::Event CudaMemsetOperation::apply_async(void* src_ptr,
                                           << ") failed with error: " << cudaGetErrorString(error));
   }
 
-  return ctx.get_event();
+  return camp::resources::EventProxy<camp::resources::Resource>{ctx};
 }
 
 } // end of namespace op

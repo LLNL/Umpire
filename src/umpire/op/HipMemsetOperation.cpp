@@ -24,7 +24,7 @@ void HipMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNU
   }
 }
 
-camp::resources::Event HipMemsetOperation::apply_async(void* src_ptr,
+camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply_async(void* src_ptr,
                                                        util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value,
                                                        std::size_t length, camp::resources::Resource& ctx)
 {
@@ -38,7 +38,7 @@ camp::resources::Event HipMemsetOperation::apply_async(void* src_ptr,
                                          << ") failed with error: " << hipGetErrorString(error));
   }
 
-  return ctx.get_event();
+  return camp::resources::EventProxy<camp::resources::Resource>{ctx};
 }
 
 } // end of namespace op

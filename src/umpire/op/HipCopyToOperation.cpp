@@ -27,7 +27,7 @@ void HipCopyToOperation::transform(void* src_ptr, void** dst_ptr,
   }
 }
 
-camp::resources::Event HipCopyToOperation::transform_async(
+camp::resources::EventProxy<camp::resources::Resource> HipCopyToOperation::transform_async(
     void* src_ptr, void** dst_ptr, umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation), std::size_t length,
     camp::resources::Resource& ctx)
@@ -43,7 +43,7 @@ camp::resources::Event HipCopyToOperation::transform_async(
                  << ", stream = " << stream << ") failed with error: " << hipGetErrorString(error));
   }
 
-  return ctx.get_event();
+  return camp::resources::EventProxy<camp::resources::Resource>{ctx};
 }
 
 } // end of namespace op
