@@ -79,10 +79,15 @@ add_subdirectory(judy)
 
 if (NOT TARGET camp)
   if (DEFINED camp_DIR)
-    find_package(camp REQUIRED)
+    find_package(camp REQUIRED
+      NO_DEFAULT_PATH
+      PATHS ${camp_DIR}
+      ${camp_DIR}/lib/cmake/camp
+    )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
     add_subdirectory(camp)
+    set(camp_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/camp CACHE PATH "")
   endif()
 
   if(ENABLE_CUDA)
