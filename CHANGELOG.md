@@ -103,6 +103,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
 
+- Update camp to latest commit.
+
 - Use CMakeCachedPackage in uberenv.
 
 - Refactored pool coalesce heuristic API to return either 0 or the minimum
