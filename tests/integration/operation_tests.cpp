@@ -294,7 +294,7 @@ TYPED_TEST(CopyTest, Async)
     this->source_array[i] = static_cast<float>(i);
   }
 
-  camp::resources::Event event{rm.copy(this->dest_array, this->source_array, resource)};
+  camp::resources::Event event = rm.copy(this->dest_array, this->source_array, resource);
   event = rm.copy(this->check_array, this->dest_array, resource);
 
   for (std::size_t i = 0; i < this->m_size; i++) {
