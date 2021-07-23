@@ -85,9 +85,10 @@ if (NOT TARGET camp)
       ${camp_DIR}/lib/cmake/camp
     )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
+    set(umpire_camp_DIR ${camp_DIR} CACHE PATH "")
   else ()
     add_subdirectory(camp)
-    set(camp_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/camp CACHE PATH "")
+    set(umpire_camp_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/camp CACHE PATH "")
   endif()
 
   if(ENABLE_CUDA)
