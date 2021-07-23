@@ -113,6 +113,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Turn documentation off by default.
 
+- All asynchronous operations now return a camp::resources::EventProxy to avoid
+  the overhead of creating Events when they are unused.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.
