@@ -752,7 +752,7 @@ TEST(AsyncTest, Copy)
     source_array[i] = static_cast<float>(i);
   }
 
-  camp::resources::Event event{rm.copy(dest_array, source_array, resource)};
+  camp::resources::Event event = rm.copy(dest_array, source_array, resource);
   event = rm.copy(check_array, dest_array, resource);
 
   event.wait();
@@ -780,7 +780,7 @@ TEST(AsyncTest, Memset)
   float* check_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
 
   auto event_proxy = rm.memset(source_array, 0, resource);
-  camp::resources::Event event{rm.copy(check_array, source_array, resource)};
+  camp::resources::Event event = rm.copy(check_array, source_array, resource);
 
   event.wait();
 
