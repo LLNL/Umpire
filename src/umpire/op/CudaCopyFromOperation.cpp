@@ -33,10 +33,9 @@ void CudaCopyFromOperation::transform(void* src_ptr, void** dst_ptr, util::Alloc
   }
 }
 
-camp::resources::EventProxy<camp::resources::Resource> CudaCopyFromOperation::transform_async(void* src_ptr, void** dst_ptr,
-                                                              util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-                                                              util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
-                                                              std::size_t length, camp::resources::Resource& ctx)
+camp::resources::EventProxy<camp::resources::Resource> CudaCopyFromOperation::transform_async(
+    void* src_ptr, void** dst_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
+    util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation), std::size_t length, camp::resources::Resource& ctx)
 {
   auto device = ctx.get<camp::resources::Cuda>();
   auto stream = device.get_stream();

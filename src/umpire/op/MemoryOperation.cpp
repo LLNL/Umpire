@@ -19,10 +19,9 @@ void MemoryOperation::transform(void* UMPIRE_UNUSED_ARG(src_ptr), void** UMPIRE_
   UMPIRE_ERROR("MemoryOperation::transform() is not implemented");
 }
 
-camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::transform_async(void* src_ptr, void** dst_ptr,
-                                                        util::AllocationRecord* src_allocation,
-                                                        util::AllocationRecord* dst_allocation, std::size_t length,
-                                                        camp::resources::Resource& ctx)
+camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::transform_async(
+    void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation, util::AllocationRecord* dst_allocation,
+    std::size_t length, camp::resources::Resource& ctx)
 {
   UMPIRE_LOG(Warning, "MemoryOperation::transform_async() calling synchronous transform()");
   ctx.get_event().wait();
@@ -36,8 +35,8 @@ void MemoryOperation::apply(void* UMPIRE_UNUSED_ARG(src_ptr), util::AllocationRe
   UMPIRE_ERROR("MemoryOperation::apply() is not implemented");
 }
 
-camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::apply_async(void* src_ptr, util::AllocationRecord* src_allocation, int val,
-                                                    std::size_t length, camp::resources::Resource& ctx)
+camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::apply_async(
+    void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length, camp::resources::Resource& ctx)
 {
   UMPIRE_LOG(Warning, "MemoryOperation::apply_async() calling synchronous apply()");
   ctx.get_event().wait();

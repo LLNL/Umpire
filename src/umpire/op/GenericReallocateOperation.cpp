@@ -31,10 +31,9 @@ void GenericReallocateOperation::transform(void* current_ptr, void** new_ptr,
   allocator.deallocate(current_ptr);
 }
 
-camp::resources::EventProxy<camp::resources::Resource> GenericReallocateOperation::transform_async(void* current_ptr, void** new_ptr,
-                                                                   util::AllocationRecord* current_allocation,
-                                                                   util::AllocationRecord* new_allocation,
-                                                                   std::size_t new_size, camp::resources::Resource& ctx)
+camp::resources::EventProxy<camp::resources::Resource> GenericReallocateOperation::transform_async(
+    void* current_ptr, void** new_ptr, util::AllocationRecord* current_allocation,
+    util::AllocationRecord* new_allocation, std::size_t new_size, camp::resources::Resource& ctx)
 {
   Allocator allocator{new_allocation->strategy};
   *new_ptr = allocator.allocate(new_size);

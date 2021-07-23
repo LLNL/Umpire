@@ -24,9 +24,9 @@ void CudaMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
   }
 }
 
-camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::apply_async(void* src_ptr,
-                                                        util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation),
-                                                        int value, std::size_t length, camp::resources::Resource& ctx)
+camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::apply_async(
+    void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value, std::size_t length,
+    camp::resources::Resource& ctx)
 {
   auto device = ctx.get<camp::resources::Cuda>();
   auto stream = device.get_stream();
