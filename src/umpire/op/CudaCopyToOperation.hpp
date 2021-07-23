@@ -28,9 +28,11 @@ class CudaCopyToOperation : public MemoryOperation {
   void transform(void* src_ptr, void** dst_ptr, umpire::util::AllocationRecord* src_allocation,
                  umpire::util::AllocationRecord* dst_allocation, std::size_t length);
 
-  camp::resources::Event transform_async(void* src_ptr, void** dst_ptr, umpire::util::AllocationRecord* src_allocation,
-                                         umpire::util::AllocationRecord* dst_allocation, std::size_t length,
-                                         camp::resources::Resource& ctx);
+  camp::resources::EventProxy<camp::resources::Resource> transform_async(void* src_ptr, void** dst_ptr,
+                                                                         umpire::util::AllocationRecord* src_allocation,
+                                                                         umpire::util::AllocationRecord* dst_allocation,
+                                                                         std::size_t length,
+                                                                         camp::resources::Resource& ctx);
 };
 
 } // end of namespace op

@@ -294,7 +294,7 @@ TYPED_TEST(CopyTest, Async)
     this->source_array[i] = static_cast<float>(i);
   }
 
-  auto event = rm.copy(this->dest_array, this->source_array, resource);
+  camp::resources::Event event = rm.copy(this->dest_array, this->source_array, resource);
   event = rm.copy(this->check_array, this->dest_array, resource);
 
   for (std::size_t i = 0; i < this->m_size; i++) {
@@ -752,7 +752,7 @@ TEST(AsyncTest, Copy)
     source_array[i] = static_cast<float>(i);
   }
 
-  auto event = rm.copy(dest_array, source_array, resource);
+  camp::resources::Event event = rm.copy(dest_array, source_array, resource);
   event = rm.copy(check_array, dest_array, resource);
 
   event.wait();
@@ -779,8 +779,8 @@ TEST(AsyncTest, Memset)
   float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
   float* check_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
 
-  auto event = rm.memset(source_array, 0, resource);
-  event = rm.copy(check_array, source_array, resource);
+  auto event_proxy = rm.memset(source_array, 0, resource);
+  camp::resources::Event event = rm.copy(check_array, source_array, resource);
 
   event.wait();
 

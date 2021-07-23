@@ -223,7 +223,8 @@ class ResourceManager {
    */
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
-  camp::resources::Event copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size = 0);
+  camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
+                                                              camp::resources::Resource& ctx, std::size_t size = 0);
 
   /*!
    * \brief Set the first length bytes of ptr to the value val.
@@ -234,7 +235,8 @@ class ResourceManager {
    */
   void memset(void* ptr, int val, std::size_t length = 0);
 
-  camp::resources::Event memset(void* ptr, int val, camp::resources::Resource& ctx, std::size_t length = 0);
+  camp::resources::EventProxy<camp::resources::Resource> memset(void* ptr, int val, camp::resources::Resource& ctx,
+                                                                std::size_t length = 0);
 
   /*!
    * \brief Reallocate current_ptr to new_size.
