@@ -69,6 +69,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Asynchronous memset and reallocate operations for CUDA and HIP.
 
+- Added support for named allocations.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
