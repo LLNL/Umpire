@@ -22,8 +22,7 @@ namespace util {
  */
 class FixedMallocPool {
  public:
-  FixedMallocPool(const std::size_t object_bytes,
-                  const std::size_t objects_per_pool = 1024 * 1024);
+  FixedMallocPool(const std::size_t object_bytes, const std::size_t objects_per_pool = 1024 * 1024);
 
   ~FixedMallocPool();
 

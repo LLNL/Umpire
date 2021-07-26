@@ -31,6 +31,14 @@
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
 
+#if defined(UMPIRE_ENABLE_CUDA)
+using resource_type = camp::resources::Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+using resource_type = camp::resources::Hip;
+#else
+using resource_type = camp::resources::Host;
+#endif
+
 static int s_counter{0};
 
 struct NullStrategy {
@@ -64,33 +72,27 @@ using AllResources = camp::list<host_resource_tag
 #endif
                                 >;
 
-using Strategies = camp::list<
-    NullStrategy
-#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) ||           \
-      defined(UMPIRE_ENABLE_SYCL) || defined(UMPIRE_ENABLE_OPENMP_TARGET) || \
-      defined(__PGI))
-    ,
-    umpire::strategy::AlignedAllocator, umpire::strategy::DynamicPoolList,
-    umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool,
-    umpire::strategy::MixedPool, umpire::strategy::NamedAllocationStrategy,
-    umpire::strategy::SizeLimiter, umpire::strategy::SlotPool,
-    umpire::strategy::ThreadSafeAllocator
+using Strategies =
+    camp::list<NullStrategy
+#if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || \
+      defined(UMPIRE_ENABLE_OPENMP_TARGET) || defined(__PGI))
+               ,
+               umpire::strategy::AlignedAllocator, umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap,
+               umpire::strategy::QuickPool, umpire::strategy::MixedPool, umpire::strategy::NamedAllocationStrategy,
+               umpire::strategy::SizeLimiter, umpire::strategy::SlotPool, umpire::strategy::ThreadSafeAllocator
 #endif
-    >;
+               >;
 
-using TestTypes = camp::cartesian_product<HostAccessibleResources, AllResources,
-                                          Strategies, Strategies>;
+using TestTypes = camp::cartesian_product<HostAccessibleResources, AllResources, Strategies, Strategies>;
 using SourceTypes =
-    camp::cartesian_product<AllResources, camp::list<host_resource_tag>,
-                            Strategies, camp::list<NullStrategy>>;
+    camp::cartesian_product<AllResources, camp::list<host_resource_tag>, Strategies, camp::list<NullStrategy>>;
 
 using AllTestTypes = Test<TestTypes>::Types;
 using SourceTestTypes = Test<SourceTypes>::Types;
 
 template <typename Strategy>
 struct make_allocator_helper {
-  static umpire::Allocator make(const std::string& name,
-                                const std::string& resource_name)
+  static umpire::Allocator make(const std::string& name, const std::string& resource_name)
   {
     auto& rm = umpire::ResourceManager::getInstance();
     return rm.makeAllocator<Strategy>(name, rm.getAllocator(resource_name));
@@ -99,8 +101,7 @@ struct make_allocator_helper {
 
 template <>
 struct make_allocator_helper<NullStrategy> {
-  static umpire::Allocator make(const std::string&,
-                                const std::string& resource_name)
+  static umpire::Allocator make(const std::string&, const std::string& resource_name)
   {
     auto& rm = umpire::ResourceManager::getInstance();
     return rm.getAllocator(resource_name);
@@ -109,80 +110,62 @@ struct make_allocator_helper<NullStrategy> {
 
 template <>
 struct make_allocator_helper<umpire::strategy::SlotPool> {
-  static umpire::Allocator make(const std::string& name,
-                                const std::string& resource_name)
+  static umpire::Allocator make(const std::string& name, const std::string& resource_name)
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    return rm.makeAllocator<umpire::strategy::SlotPool>(
-        name, rm.getAllocator(resource_name), 256);
+    return rm.makeAllocator<umpire::strategy::SlotPool>(name, rm.getAllocator(resource_name), 256);
   }
 };
 
 template <>
 struct make_allocator_helper<umpire::strategy::SizeLimiter> {
-  static umpire::Allocator make(const std::string& name,
-                                const std::string& resource_name)
+  static umpire::Allocator make(const std::string& name, const std::string& resource_name)
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    return rm.makeAllocator<umpire::strategy::SizeLimiter>(
-        name, rm.getAllocator(resource_name), 1024 * 1024 * 1024);
+    return rm.makeAllocator<umpire::strategy::SizeLimiter>(name, rm.getAllocator(resource_name), 1024 * 1024 * 1024);
   }
 };
 
 template <>
 struct make_allocator_helper<umpire::strategy::AllocationAdvisor> {
-  static umpire::Allocator make(const std::string& name,
-                                const std::string& resource_name)
+  static umpire::Allocator make(const std::string& name, const std::string& resource_name)
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    return rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-        name, rm.getAllocator(resource_name), "PREFERRED_LOCATION");
+    return rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator(resource_name),
+                                                                 "PREFERRED_LOCATION");
   }
 };
 
 template <typename LocationStrategyTuple>
 class OperationTest : public ::testing::Test {
  public:
-  using SourceResource =
-      typename camp::at<LocationStrategyTuple, camp::num<0>>::type;
-  using DestResource =
-      typename camp::at<LocationStrategyTuple, camp::num<1>>::type;
+  using SourceResource = typename camp::at<LocationStrategyTuple, camp::num<0>>::type;
+  using DestResource = typename camp::at<LocationStrategyTuple, camp::num<1>>::type;
 
-  using SourceStrategy =
-      typename camp::at<LocationStrategyTuple, camp::num<2>>::type;
-  using DestStrategy =
-      typename camp::at<LocationStrategyTuple, camp::num<3>>::type;
+  using SourceStrategy = typename camp::at<LocationStrategyTuple, camp::num<2>>::type;
+  using DestStrategy = typename camp::at<LocationStrategyTuple, camp::num<3>>::type;
 
   void SetUp() override
   {
-    const std::string source_resource_name{
-        tag_to_string<SourceResource>::value};
+    const std::string source_resource_name{tag_to_string<SourceResource>::value};
     const std::string dest_resource_name{tag_to_string<DestResource>::value};
 
-    std::string source_name = std::string{"operation_test_"} +
-                              source_resource_name + std::string{"_"} +
-                              std::to_string(s_counter++);
-    std::string dest_name = std::string{"operation_test_"} +
-                            dest_resource_name + std::string{"_"} +
-                            std::to_string(s_counter++);
+    std::string source_name =
+        std::string{"operation_test_"} + source_resource_name + std::string{"_"} + std::to_string(s_counter++);
+    std::string dest_name =
+        std::string{"operation_test_"} + dest_resource_name + std::string{"_"} + std::to_string(s_counter++);
 
     auto& rm = umpire::ResourceManager::getInstance();
 
     source_allocator =
-        new umpire::Allocator(make_allocator_helper<SourceStrategy>::make(
-            source_name, source_resource_name));
+        new umpire::Allocator(make_allocator_helper<SourceStrategy>::make(source_name, source_resource_name));
 
-    dest_allocator =
-        new umpire::Allocator(make_allocator_helper<DestStrategy>::make(
-            dest_name, dest_resource_name));
+    dest_allocator = new umpire::Allocator(make_allocator_helper<DestStrategy>::make(dest_name, dest_resource_name));
 
-    source_array =
-        static_cast<float*>(source_allocator->allocate(m_size * sizeof(float)));
-    dest_array =
-        static_cast<float*>(dest_allocator->allocate(m_size * sizeof(float)));
+    source_array = static_cast<float*>(source_allocator->allocate(m_size * sizeof(float)));
+    dest_array = static_cast<float*>(dest_allocator->allocate(m_size * sizeof(float)));
 
-    check_array = static_cast<float*>(
-        rm.getAllocator("HOST").allocate(m_size * sizeof(float)));
+    check_array = static_cast<float*>(rm.getAllocator("HOST").allocate(m_size * sizeof(float)));
   }
 
   void TearDown() override
@@ -292,17 +275,31 @@ TYPED_TEST(CopyTest, InvalidSize)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(rm.copy(this->dest_array, this->source_array,
-                       (this->m_size + 100) * sizeof(float)),
+  ASSERT_THROW(rm.copy(this->dest_array, this->source_array, (this->m_size + 100) * sizeof(float)),
                umpire::util::Exception);
 
-  float* small_dest_array =
-      static_cast<float*>(this->dest_allocator->allocate(10 * sizeof(float)));
+  float* small_dest_array = static_cast<float*>(this->dest_allocator->allocate(10 * sizeof(float)));
 
-  ASSERT_THROW(rm.copy(small_dest_array, this->source_array),
-               umpire::util::Exception);
+  ASSERT_THROW(rm.copy(small_dest_array, this->source_array), umpire::util::Exception);
 
   this->dest_allocator->deallocate(small_dest_array);
+}
+
+TYPED_TEST(CopyTest, Async)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto resource = camp::resources::Resource{resource_type{}};
+
+  for (std::size_t i = 0; i < this->m_size; i++) {
+    this->source_array[i] = static_cast<float>(i);
+  }
+
+  camp::resources::Event event = rm.copy(this->dest_array, this->source_array, resource);
+  event = rm.copy(this->check_array, this->dest_array, resource);
+
+  for (std::size_t i = 0; i < this->m_size; i++) {
+    ASSERT_FLOAT_EQ(this->source_array[i], this->check_array[i]);
+  }
 }
 
 template <typename T>
@@ -339,8 +336,7 @@ TYPED_TEST(MemsetTest, Offset)
     ASSERT_EQ(1, check_chars[i]);
   }
 
-  for (std::size_t i = this->m_size / 2 * sizeof(float);
-       i < this->m_size * sizeof(float); ++i) {
+  for (std::size_t i = this->m_size / 2 * sizeof(float); i < this->m_size * sizeof(float); ++i) {
     ASSERT_EQ(2, check_chars[i]);
   }
 }
@@ -349,9 +345,7 @@ TYPED_TEST(MemsetTest, InvalidSize)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(
-      rm.memset(this->source_array, 0, (this->m_size + 100) * sizeof(float)),
-      umpire::util::Exception);
+  ASSERT_THROW(rm.memset(this->source_array, 0, (this->m_size + 100) * sizeof(float)), umpire::util::Exception);
 }
 
 TYPED_TEST(MemsetTest, InvalidPointer)
@@ -374,17 +368,13 @@ constexpr int SIZE = 5345;
 TYPED_TEST(ReallocateTest, ReallocateSweep)
 {
   umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
-  const bool hostAccessible =
-      this->source_allocator->getId() == rm.getAllocator("HOST").getId();
+  const bool hostAccessible = this->source_allocator->getId() == rm.getAllocator("HOST").getId();
 
   for (int size = 0; size <= SIZE; size = size * 2 + 1) {
     int buffer_size = size;
     int* buffer = nullptr;
 
-    ASSERT_NO_THROW({
-      buffer = static_cast<int*>(
-          this->source_allocator->allocate(buffer_size * sizeof(*buffer)));
-    });
+    ASSERT_NO_THROW({ buffer = static_cast<int*>(this->source_allocator->allocate(buffer_size * sizeof(*buffer))); });
 
     ASSERT_EQ(this->source_allocator->getId(), rm.getAllocator(buffer).getId());
 
@@ -402,13 +392,9 @@ TYPED_TEST(ReallocateTest, ReallocateSweep)
 
     // Reallocate to a larger size.
     buffer_size *= 3;
-    ASSERT_NO_THROW({
-      buffer = static_cast<int*>(
-          rm.reallocate(buffer, buffer_size * sizeof(*buffer)));
-    });
+    ASSERT_NO_THROW({ buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size * sizeof(*buffer))); });
     if (buffer_size > 0) {
-      ASSERT_EQ(this->source_allocator->getId(),
-                rm.getAllocator(buffer).getId());
+      ASSERT_EQ(this->source_allocator->getId(), rm.getAllocator(buffer).getId());
     }
 
     if (hostAccessible) {
@@ -425,13 +411,9 @@ TYPED_TEST(ReallocateTest, ReallocateSweep)
 
     // Reallocate to a smaller size.
     buffer_size /= 5;
-    ASSERT_NO_THROW({
-      buffer = static_cast<int*>(
-          rm.reallocate(buffer, buffer_size * sizeof(*buffer)));
-    });
+    ASSERT_NO_THROW({ buffer = static_cast<int*>(rm.reallocate(buffer, buffer_size * sizeof(*buffer))); });
     if (buffer_size > 0) {
-      ASSERT_EQ(this->source_allocator->getId(),
-                rm.getAllocator(buffer).getId());
+      ASSERT_EQ(this->source_allocator->getId(), rm.getAllocator(buffer).getId());
     }
 
     if (hostAccessible) {
@@ -455,18 +437,14 @@ TYPED_TEST(ReallocateTest, Reallocate)
 
   rm.memset(this->source_array, 1);
 
-  this->source_array = static_cast<float*>(
-      rm.reallocate(this->source_array, reallocated_size * sizeof(float)));
+  this->source_array = static_cast<float*>(rm.reallocate(this->source_array, reallocated_size * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(this->source_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(this->source_array), reallocated_size * sizeof(float));
 
-  rm.copy(this->check_array, this->source_array,
-          reallocated_size * sizeof(float));
+  rm.copy(this->check_array, this->source_array, reallocated_size * sizeof(float));
 
   auto checker = reinterpret_cast<char*>(this->check_array);
-  for (std::size_t i = 0; i < reallocated_size * (sizeof(float) / sizeof(char));
-       i++) {
+  for (std::size_t i = 0; i < reallocated_size * (sizeof(float) / sizeof(char)); i++) {
     ASSERT_FLOAT_EQ(checker[i], 1);
   }
 }
@@ -479,28 +457,23 @@ TYPED_TEST(ReallocateTest, ReallocateLarger)
 
   rm.memset(this->source_array, 1);
 
-  this->source_array = static_cast<float*>(
-      rm.reallocate(this->source_array, reallocated_size * sizeof(float)));
+  this->source_array = static_cast<float*>(rm.reallocate(this->source_array, reallocated_size * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(this->source_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(this->source_array), reallocated_size * sizeof(float));
 
   rm.memset(this->source_array + this->m_size, 2);
 
-  this->check_array = static_cast<float*>(
-      rm.reallocate(this->check_array, reallocated_size * sizeof(float)));
+  this->check_array = static_cast<float*>(rm.reallocate(this->check_array, reallocated_size * sizeof(float)));
 
-  rm.copy(this->check_array, this->source_array,
-          reallocated_size * sizeof(float));
+  rm.copy(this->check_array, this->source_array, reallocated_size * sizeof(float));
 
   char* check_interrogator = reinterpret_cast<char*>(this->check_array);
-  for (std::size_t i = 0; i < this->m_size * sizeof(float) / sizeof(char);
-       i++) {
+  for (std::size_t i = 0; i < this->m_size * sizeof(float) / sizeof(char); i++) {
     ASSERT_EQ(check_interrogator[i], 1);
   }
 
-  for (std::size_t i = this->m_size * sizeof(float) / sizeof(char);
-       i < reallocated_size * sizeof(float) / sizeof(char); i++) {
+  for (std::size_t i = this->m_size * sizeof(float) / sizeof(char); i < reallocated_size * sizeof(float) / sizeof(char);
+       i++) {
     ASSERT_EQ(check_interrogator[i], 2);
   }
 }
@@ -515,11 +488,9 @@ TYPED_TEST(ReallocateTest, RealocateNull)
 
   void* null_array = nullptr;
 
-  float* reallocated_array = static_cast<float*>(
-      rm.reallocate(null_array, reallocated_size * sizeof(float)));
+  float* reallocated_array = static_cast<float*>(rm.reallocate(null_array, reallocated_size * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size * sizeof(float));
 
   rm.deallocate(reallocated_array);
   rm.setDefaultAllocator(rm.getAllocator("HOST"));
@@ -539,53 +510,41 @@ TYPED_TEST(ReallocateTest, ReallocateNullZero)
 
   // nullptr, zero size
   reallocated_array =
-      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
-                                        reallocated_zero_size * sizeof(float)));
+      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array), reallocated_zero_size * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_zero_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_zero_size * sizeof(float));
   rm.deallocate(reallocated_array);
   reallocated_array = nullptr;
 
   // nullptr, non-zero size
   reallocated_array =
-      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
-                                        reallocated_size_1 * sizeof(float)));
+      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array), reallocated_size_1 * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_1 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_1 * sizeof(float));
 
   // valid ptr (size > 0), non-zero increment
   reallocated_array =
-      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
-                                        reallocated_size_2 * sizeof(float)));
+      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array), reallocated_size_2 * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_2 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_2 * sizeof(float));
 
   // valid ptr (size > 0), non-zero decrement
   reallocated_array =
-      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
-                                        reallocated_size_1 * sizeof(float)));
+      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array), reallocated_size_1 * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_1 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_1 * sizeof(float));
 
   // valid ptr (size > 0), zero size
   reallocated_array =
-      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
-                                        reallocated_zero_size * sizeof(float)));
+      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array), reallocated_zero_size * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_zero_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_zero_size * sizeof(float));
 
   // valid ptr (size == 0), non-zero size
   reallocated_array =
-      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
-                                        reallocated_size_1 * sizeof(float)));
+      static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array), reallocated_size_1 * sizeof(float)));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_1 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_1 * sizeof(float));
 
   rm.deallocate(reallocated_array);
   rm.setDefaultAllocator(rm.getAllocator("HOST"));
@@ -604,45 +563,35 @@ TYPED_TEST(ReallocateTest, ReallocateNullZeroWithAllocator)
 
   // nullptr, zero size
   reallocated_array = static_cast<float*>(rm.reallocate(
-      static_cast<void*>(reallocated_array),
-      reallocated_zero_size * sizeof(float), *this->source_allocator));
+      static_cast<void*>(reallocated_array), reallocated_zero_size * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_zero_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_zero_size * sizeof(float));
   rm.deallocate(reallocated_array);
   reallocated_array = nullptr;
 
   // nullptr, non-zero size
-  reallocated_array = static_cast<float*>(rm.reallocate(
-      static_cast<void*>(reallocated_array), reallocated_size_1 * sizeof(float),
-      *this->source_allocator));
+  reallocated_array = static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
+                                                        reallocated_size_1 * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_1 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_1 * sizeof(float));
 
   // valid ptr, non-zero increment
-  reallocated_array = static_cast<float*>(rm.reallocate(
-      static_cast<void*>(reallocated_array), reallocated_size_2 * sizeof(float),
-      *this->source_allocator));
+  reallocated_array = static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
+                                                        reallocated_size_2 * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_2 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_2 * sizeof(float));
 
   // valid ptr, non-zero decrement
-  reallocated_array = static_cast<float*>(rm.reallocate(
-      static_cast<void*>(reallocated_array), reallocated_size_1 * sizeof(float),
-      *this->source_allocator));
+  reallocated_array = static_cast<float*>(rm.reallocate(static_cast<void*>(reallocated_array),
+                                                        reallocated_size_1 * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size_1 * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size_1 * sizeof(float));
 
   // valid ptr, zero size
   reallocated_array = static_cast<float*>(rm.reallocate(
-      static_cast<void*>(reallocated_array),
-      reallocated_zero_size * sizeof(float), *this->source_allocator));
+      static_cast<void*>(reallocated_array), reallocated_zero_size * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_zero_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_zero_size * sizeof(float));
 
   rm.deallocate(reallocated_array);
 }
@@ -655,11 +604,10 @@ TYPED_TEST(ReallocateTest, ReallocateNullWithAllocator)
 
   void* null_array = nullptr;
 
-  float* reallocated_array = static_cast<float*>(rm.reallocate(
-      null_array, reallocated_size * sizeof(float), *this->source_allocator));
+  float* reallocated_array =
+      static_cast<float*>(rm.reallocate(null_array, reallocated_size * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size * sizeof(float));
 
   rm.deallocate(reallocated_array);
 }
@@ -670,12 +618,10 @@ TYPED_TEST(ReallocateTest, ReallocateWithAllocator)
 
   const std::size_t reallocated_size = (this->m_size + 50);
 
-  float* reallocated_array = static_cast<float*>(
-      rm.reallocate(this->source_array, reallocated_size * sizeof(float),
-                    *this->source_allocator));
+  float* reallocated_array =
+      static_cast<float*>(rm.reallocate(this->source_array, reallocated_size * sizeof(float), *this->source_allocator));
 
-  ASSERT_EQ(this->source_allocator->getSize(reallocated_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(this->source_allocator->getSize(reallocated_array), reallocated_size * sizeof(float));
 
   rm.deallocate(reallocated_array);
   this->source_array = nullptr;
@@ -687,9 +633,7 @@ TYPED_TEST(ReallocateTest, ReallocateWithAllocatorFail)
     SUCCEED();
   } else {
     umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
-    ASSERT_THROW(
-        rm.reallocate(this->source_array, this->m_size, *this->dest_allocator),
-        umpire::util::Exception);
+    ASSERT_THROW(rm.reallocate(this->source_array, this->m_size, *this->dest_allocator), umpire::util::Exception);
   }
 }
 
@@ -708,11 +652,9 @@ TYPED_TEST(MoveTest, Move)
     this->source_array[i] = static_cast<float>(i);
   }
 
-  float* moved_array =
-      static_cast<float*>(rm.move(this->source_array, *this->dest_allocator));
+  float* moved_array = static_cast<float*>(rm.move(this->source_array, *this->dest_allocator));
 
-  if (this->dest_allocator->getAllocationStrategy() ==
-      this->source_allocator->getAllocationStrategy()) {
+  if (this->dest_allocator->getAllocationStrategy() == this->source_allocator->getAllocationStrategy()) {
     ASSERT_EQ(moved_array, this->source_array);
   }
 
@@ -732,8 +674,7 @@ class AdviceTest : public OperationTest<T> {
 };
 
 using AdviceTypes =
-    camp::cartesian_product<camp::list<um_resource_tag>,
-                            camp::list<host_resource_tag, device_resource_tag>,
+    camp::cartesian_product<camp::list<um_resource_tag>, camp::list<host_resource_tag, device_resource_tag>,
                             camp::list<NullStrategy>, camp::list<NullStrategy>>;
 
 using AdviceTestTypes = Test<AdviceTypes>::Types;
@@ -753,10 +694,7 @@ TYPED_TEST(AdviceTest, ReadMostly)
     device = cudaCpuDeviceId;
   }
 
-  ASSERT_NO_THROW({
-    m_advice_operation->apply(this->source_array, nullptr, device,
-                              this->m_size);
-  });
+  ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
 
 TYPED_TEST(AdviceTest, PreferredLocation)
@@ -766,17 +704,13 @@ TYPED_TEST(AdviceTest, PreferredLocation)
 
   int device = 0;
 
-  auto m_advice_operation =
-      op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto m_advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
   }
 
-  ASSERT_NO_THROW({
-    m_advice_operation->apply(this->source_array, nullptr, device,
-                              this->m_size);
-  });
+  ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
 
 TYPED_TEST(AdviceTest, AccessedBy)
@@ -792,15 +726,16 @@ TYPED_TEST(AdviceTest, AccessedBy)
     device = cudaCpuDeviceId;
   }
 
-  ASSERT_NO_THROW({
-    m_advice_operation->apply(this->source_array, nullptr, device,
-                              this->m_size);
-  });
+  ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
+
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
 TEST(AsyncTest, Copy)
 {
-  auto resource = camp::resources::Resource{camp::resources::Cuda{}};
+  auto resource = camp::resources::Resource{resource_type{}};
   auto& rm = umpire::ResourceManager::getInstance();
 
   constexpr std::size_t size = 1024;
@@ -808,19 +743,16 @@ TEST(AsyncTest, Copy)
   auto host_alloc = rm.getAllocator("HOST");
   auto device_alloc = rm.getAllocator("DEVICE");
 
-  float* source_array =
-      static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
-  float* check_array =
-      static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
+  float* source_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
+  float* check_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
 
-  float* dest_array =
-      static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+  float* dest_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
 
   for (std::size_t i = 0; i < size; i++) {
     source_array[i] = static_cast<float>(i);
   }
 
-  auto event = rm.copy(dest_array, source_array, resource);
+  camp::resources::Event event = rm.copy(dest_array, source_array, resource);
   event = rm.copy(check_array, dest_array, resource);
 
   event.wait();
@@ -834,5 +766,45 @@ TEST(AsyncTest, Copy)
   device_alloc.deallocate(dest_array);
 }
 
-#endif
+TEST(AsyncTest, Memset)
+{
+  auto resource = camp::resources::Resource{resource_type{}};
+  auto& rm = umpire::ResourceManager::getInstance();
 
+  constexpr std::size_t size = 1024;
+
+  auto host_alloc = rm.getAllocator("HOST");
+  auto device_alloc = rm.getAllocator("DEVICE");
+
+  float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+  float* check_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
+
+  auto event_proxy = rm.memset(source_array, 0, resource);
+  camp::resources::Event event = rm.copy(check_array, source_array, resource);
+
+  event.wait();
+
+  for (std::size_t i = 0; i < size; i++) {
+    ASSERT_FLOAT_EQ(0, check_array[i]);
+  }
+
+  device_alloc.deallocate(source_array);
+  host_alloc.deallocate(check_array);
+}
+
+TEST(AsyncTest, Reallocate)
+{
+  auto resource = camp::resources::Resource{resource_type{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto device_alloc = rm.getAllocator("DEVICE");
+  float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+  source_array = static_cast<float*>(rm.reallocate(source_array, 50, resource));
+
+  resource.get_event().wait();
+
+  device_alloc.deallocate(source_array);
+}
+#endif

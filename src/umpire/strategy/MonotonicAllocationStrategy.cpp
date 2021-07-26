@@ -13,8 +13,8 @@ namespace umpire {
 
 namespace strategy {
 
-MonotonicAllocationStrategy::MonotonicAllocationStrategy(
-    const std::string& name, int id, Allocator allocator, std::size_t capacity)
+MonotonicAllocationStrategy::MonotonicAllocationStrategy(const std::string& name, int id, Allocator allocator,
+                                                         std::size_t capacity)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "MonotonicAllocationStrategy"},
       m_size(0),
       m_capacity(capacity),
@@ -34,8 +34,7 @@ void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
   m_size += bytes;
 
   if (m_size > m_capacity) {
-    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded "
-                 << m_size << " > " << m_capacity);
+    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

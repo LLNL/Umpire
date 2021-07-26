@@ -13,8 +13,7 @@
 namespace umpire {
 namespace strategy {
 
-AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id,
-                                           Allocator allocator, int device_id)
+AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id, Allocator allocator, int device_id)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "AllocationPrefetcher"},
       m_allocator{allocator.getAllocationStrategy()},
       m_device{device_id}

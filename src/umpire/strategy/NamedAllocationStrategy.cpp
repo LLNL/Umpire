@@ -11,8 +11,7 @@
 namespace umpire {
 namespace strategy {
 
-NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name,
-                                                 int id, Allocator allocator)
+NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name, int id, Allocator allocator)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "NamedAllocationStrategy"},
       m_allocator(allocator.getAllocationStrategy())
 {

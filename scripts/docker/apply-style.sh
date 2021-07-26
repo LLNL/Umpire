@@ -1,15 +1,9 @@
+#!/bin/bash
 ##############################################################################
 # Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-hip_4_1_fortran_gcc_8_1_0 (build and test on corona):
-  variables:
-    SPEC: "+fortran+hip~tools %gcc@8.1.0 ^hip@4.1.0"
-  extends: .build_and_test_on_corona
 
-hip_4_2_fortran_gcc_8_1_0 (build and test on corona):
-  variables:
-    SPEC: "+fortran+hip %gcc@8.1.0 ^hip@4.2.0"
-  extends: .build_and_test_on_corona
+docker run -v `pwd`:/home/axom/workspace axom/compilers:clang-10 bash -c "cd workspace && mkdir -p docker-build-style && cd docker-build-style && cmake -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_CLANGQUERY=Off -DENABLE_CLANGTIDY=Off -DENABLE_CPPCHECK=Off -DCMAKE_CXX_COMPILER=clang++ .. && make style"

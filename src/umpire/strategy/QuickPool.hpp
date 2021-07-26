@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_PoolMap_HPP
-#define UMPIRE_PoolMap_HPP
+#ifndef UMPIRE_QuickPool_HPP
+#define UMPIRE_QuickPool_HPP
 
 #include <functional>
 #include <map>
@@ -13,6 +13,7 @@
 #include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
 #include "umpire/util/MemoryMap.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
@@ -32,10 +33,9 @@ namespace strategy {
 class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
  public:
   using Pointer = void*;
-  using CoalesceHeuristic = std::function<bool(const strategy::QuickPool&)>;
 
-  static CoalesceHeuristic percent_releasable(int percentage);
-  static CoalesceHeuristic blocks_releasable(std::size_t nblocks);
+  static PoolCoalesceHeuristic<QuickPool> percent_releasable(int percentage);
+  static PoolCoalesceHeuristic<QuickPool> blocks_releasable(std::size_t nblocks);
 
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
@@ -53,18 +53,11 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    * sizes (power-of-2) \param should_coalesce Heuristic for when to perform
    * coalesce operation
    */
-  QuickPool(
-    const std::string& name,
-    int id,
-    Allocator allocator,
-    const std::size_t
-      first_minimum_pool_allocation_size = s_default_first_block_size,
-    const std::size_t
-      next_minimum_pool_allocation_size = s_default_next_block_size,
-    const std::size_t
-      alignment = s_default_alignment,
-    CoalesceHeuristic
-      should_coalesce = percent_releasable(100)) noexcept;
+  QuickPool(const std::string& name, int id, Allocator allocator,
+            const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
+            const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
+            const std::size_t alignment = s_default_alignment,
+            PoolCoalesceHeuristic<QuickPool> should_coalesce = percent_releasable(100)) noexcept;
 
   ~QuickPool();
 
@@ -104,7 +97,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   std::size_t getTotalBlocks() const noexcept;
 
   void coalesce() noexcept;
-  void do_coalesce() noexcept;
+  void do_coalesce(std::size_t suggested_size) noexcept;
 
  private:
   struct Chunk;
@@ -141,12 +134,10 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
   using SizeMap =
-      std::multimap<std::size_t, Chunk*, std::less<std::size_t>,
-                    pool_allocator<std::pair<const std::size_t, Chunk*>>>;
+      std::multimap<std::size_t, Chunk*, std::less<std::size_t>, pool_allocator<std::pair<const std::size_t, Chunk*>>>;
 
   struct Chunk {
-    Chunk(void* ptr, std::size_t s, std::size_t cs)
-        : data{ptr}, size{s}, chunk_size{cs}
+    Chunk(void* ptr, std::size_t s, std::size_t cs) : data{ptr}, size{s}, chunk_size{cs}
     {
     }
 
@@ -164,7 +155,7 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
   util::FixedMallocPool m_chunk_pool{sizeof(Chunk)};
 
-  CoalesceHeuristic m_should_coalesce;
+  PoolCoalesceHeuristic<QuickPool> m_should_coalesce;
 
   const std::size_t m_first_minimum_pool_allocation_size;
   const std::size_t m_next_minimum_pool_allocation_size;
@@ -178,10 +169,9 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   bool m_is_destructing{false};
 };
 
-std::ostream& operator<<(std::ostream& out,
-                         umpire::strategy::QuickPool::CoalesceHeuristic&);
+std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&);
 
 } // end of namespace strategy
 } // end namespace umpire
 
-#endif // UMPIRE_Pool_HPP
+#endif // UMPIRE_QuickPool_HPP

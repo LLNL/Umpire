@@ -54,17 +54,9 @@ class ReplayInterpreter {
     int m_log_version_minor;
     int m_log_version_patch;
     std::size_t m_mpi_ops{0};
-    std::size_t m_allocation_map_insert_ops{0};
-    std::size_t m_allocation_map_insert_due_to_make_allocator{0};
-    std::size_t m_allocation_map_insert_due_to_allocation{0};
-    std::size_t m_allocation_map_insert_due_to_reallocate{0};
-    std::size_t m_allocation_map_insert_rogue_ignored{0};
+    std::size_t m_register_external_pointer{0};
+    std::size_t m_deregister_external_pointer{0};
 
-    std::size_t m_allocation_map_remove_ops{0};
-    std::size_t m_allocation_map_remove_rogue_ignored{0};
-
-    std::size_t m_allocation_map_find_ops{0};
-    std::size_t m_allocation_map_clear_ops{0};
     std::size_t m_make_allocator_ops{0};
     std::size_t m_make_memory_resource_ops{0};
     std::size_t m_copy_ops{0};

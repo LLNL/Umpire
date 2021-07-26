@@ -4,11 +4,10 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "gtest/gtest.h"
-
-#include <string>
 #include <sstream>
+#include <string>
 
+#include "gtest/gtest.h"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
@@ -17,43 +16,42 @@
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace {
-  const size_t allocation_size = 42;
+const size_t allocation_size = 42;
 
-  std::string unique_name()
-  {
-    static int unique_name_id{0};
-    std::stringstream ss;
+std::string unique_name()
+{
+  static int unique_name_id{0};
+  std::stringstream ss;
 
-    ss << "_Unique_Name_" << unique_name_id++;
-    return ss.str();
-  }
-
-  size_t* do_allocate(umpire::Allocator* alloc, size_t size)
-  {
-    size_t* data;
-
-    if (alloc->getAllocationStrategy()->getTraits().resource
-                    == umpire::MemoryResourceTraits::resource_type::shared) {
-      data = static_cast<size_t*>(alloc->allocate("named_allocation", size * sizeof(size_t)));
-    }
-    else {
-      data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
-    }
-    return data;
-  }
+  ss << "_Unique_Name_" << unique_name_id++;
+  return ss.str();
 }
 
-struct host_platform {};
+size_t* do_allocate(umpire::Allocator* alloc, size_t size)
+{
+  size_t* data;
+
+  if (alloc->getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::shared) {
+    data = static_cast<size_t*>(alloc->allocate("named_allocation", size * sizeof(size_t)));
+  } else {
+    data = static_cast<size_t*>(alloc->allocate(size * sizeof(size_t)));
+  }
+  return data;
+}
+} // namespace
+
+struct host_platform {
+};
 
 template <typename Platform>
-struct allocate_and_use{};
+struct allocate_and_use {
+};
 
-template<>
-struct allocate_and_use<host_platform>
-{
+template <>
+struct allocate_and_use<host_platform> {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
+    size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     data[0] = size * size;
     alloc->deallocate(data);
   }
@@ -71,14 +69,14 @@ __global__ void tester(size_t* d_data, size_t size)
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-struct cuda_platform {};
+struct cuda_platform {
+};
 
-template<>
-struct allocate_and_use<cuda_platform>
-{
+template <>
+struct allocate_and_use<cuda_platform> {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
+    size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     tester<<<1, 16>>>(data, size);
     cudaDeviceSynchronize();
     alloc->deallocate(data);
@@ -87,15 +85,15 @@ struct allocate_and_use<cuda_platform>
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-struct hip_platform{};
+struct hip_platform {
+};
 
-template<>
-struct allocate_and_use<hip_platform>
-{
+template <>
+struct allocate_and_use<hip_platform> {
   void test(umpire::Allocator* alloc, size_t size)
   {
-    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
-    hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0,0, data, size);
+    size_t* data{do_allocate(alloc, size * sizeof(size_t))};
+    hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data, size);
     hipDeviceSynchronize();
     alloc->deallocate(data);
   }
@@ -103,15 +101,15 @@ struct allocate_and_use<hip_platform>
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-struct omp_target_platform{};
+struct omp_target_platform {
+};
 
-template<>
-struct allocate_and_use<omp_target_platform>
-{
+template <>
+struct allocate_and_use<omp_target_platform> {
   void test(umpire::Allocator* alloc, size_t size)
   {
     int dev = alloc->getAllocationStrategy()->getTraits().id;
-    size_t* data{ do_allocate(alloc, size * sizeof(size_t)) };
+    size_t* data{do_allocate(alloc, size * sizeof(size_t))};
     size_t* d_data{static_cast<size_t*>(data)};
 
 #pragma omp target is_device_ptr(d_data) device(dev)
@@ -131,17 +129,15 @@ class AllocatorAccessibilityTest : public ::testing::TestWithParam<std::string> 
   {
     auto& rm = umpire::ResourceManager::getInstance();
 
-    if (rm.getAllocator(GetParam()).getAllocationStrategy()->getTraits().resource
-                            == umpire::MemoryResourceTraits::resource_type::shared) {
-
+    if (rm.getAllocator(GetParam()).getAllocationStrategy()->getTraits().resource ==
+        umpire::MemoryResourceTraits::resource_type::shared) {
       umpire::MemoryResourceTraits traits{umpire::get_default_resource_traits("SHARED")};
 
-      traits.size = 1*1024*1024;  // Maximum size of this Allocator
+      traits.size = 1 * 1024 * 1024; // Maximum size of this Allocator
 
       traits.scope = umpire::MemoryResourceTraits::shared_scope::node;
-      m_allocator = new umpire::Allocator(rm.makeResource("SHARED::node_allocator"+unique_name(), traits));
-    }
-    else {
+      m_allocator = new umpire::Allocator(rm.makeResource("SHARED::node_allocator" + unique_name(), traits));
+    } else {
       m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
     }
   }
@@ -161,11 +157,8 @@ class PoolAccessibilityTest : public ::testing::TestWithParam<std::string> {
   {
     auto& rm = umpire::ResourceManager::getInstance();
 
-    m_allocator = new umpire::Allocator(
-                        rm.makeAllocator<umpire::strategy::QuickPool>(
-                          "pool_" + GetParam() + unique_name(),
-                          rm.getAllocator(GetParam()),
-                          42 * sizeof(size_t), 1));
+    m_allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool>(
+        "pool_" + GetParam() + unique_name(), rm.getAllocator(GetParam()), 42 * sizeof(size_t), 1));
   }
 
   virtual void TearDown()
@@ -183,7 +176,7 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
   ::testing::FLAGS_gtest_death_test_style = "threadsafe";
 #endif
 
-  if(umpire::is_accessible(umpire::Platform::host, *alloc)) {
+  if (umpire::is_accessible(umpire::Platform::host, *alloc)) {
     allocate_and_use<host_platform> host;
     ASSERT_NO_THROW(host.test(alloc, size));
   }
@@ -226,30 +219,27 @@ void run_access_test(umpire::Allocator* alloc, size_t size)
     ASSERT_NO_THROW(omp.test(alloc, size));
   }
 #if defined(UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
-  else if (alloc->getAllocationStrategy()->getTraits().resource ==
-           umpire::MemoryResourceTraits::resource_type::file) {
+  else if (alloc->getAllocationStrategy()->getTraits().resource == umpire::MemoryResourceTraits::resource_type::file) {
     //////////////////////////////////////////////////////////////////////
     // TODO: Implement a more robust omp_target + file accessibility check;
     // Currently, never allowing omp_target to access FILE memory is a
     // placeholder until an appropriate OpenMP check is determined.
     //////////////////////////////////////////////////////////////////////
     SUCCEED();
-  }
-  else {
+  } else {
     allocate_and_use<omp_target_platform> omp;
     ASSERT_DEATH(omp.test(alloc, size), "");
   }
 #endif
 #endif
 
-/////////////////////////////
-//Sycl test not yet available
-/////////////////////////////
+  /////////////////////////////
+  // Sycl test not yet available
+  /////////////////////////////
 
-  if(umpire::is_accessible(umpire::Platform::undefined, *alloc)) {
+  if (umpire::is_accessible(umpire::Platform::undefined, *alloc)) {
     FAIL() << "An Undefined platform is not accessible." << std::endl;
-  }
-  else {
+  } else {
     SUCCEED();
   }
 }
@@ -271,9 +261,9 @@ std::vector<std::string> get_allocators(bool ignore_shared_memory)
   std::vector<std::string> avail_allocators;
 
   std::cout << "Available allocators: ";
-  for(auto a : all_allocators) {
-    if(a.find("::") == std::string::npos) {
-      if ( ignore_shared_memory && a == "SHARED")
+  for (auto a : all_allocators) {
+    if (a.find("::") == std::string::npos) {
+      if (ignore_shared_memory && a == "SHARED")
         continue;
       avail_allocators.push_back(a);
       std::cout << a << " ";
@@ -287,4 +277,4 @@ std::vector<std::string> get_allocators(bool ignore_shared_memory)
 INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorAccessibilityTest, ::testing::ValuesIn(get_allocators(false)));
 INSTANTIATE_TEST_SUITE_P(Pools, PoolAccessibilityTest, ::testing::ValuesIn(get_allocators(true)));
 
-//END gtest
+// END gtest

@@ -23,17 +23,7 @@ struct MemoryResourceTypeHash {
   }
 };
 
-enum MemoryResourceType {
-  Host,
-  Device,
-  Unified,
-  Pinned,
-  Constant,
-  File,
-  NoOp,
-  Shared,
-  Unknown
-};
+enum MemoryResourceType { Host, Device, Unified, Pinned, Constant, File, NoOp, Shared, Unknown };
 
 inline std::string resource_to_string(MemoryResourceType type)
 {

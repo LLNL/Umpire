@@ -4,13 +4,19 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_Tracking_HPP
-#define UMPIRE_Tracking_HPP
+#ifndef UMPIRE_PoolCoalesceHeuristic_HPP
+#define UMPIRE_PoolCoalesceHeuristic_HPP
+
+#include <functional>
 
 namespace umpire {
 
-enum class Tracking { Tracked, Untracked };
+namespace strategy {
 
-}
+template <typename T>
+using PoolCoalesceHeuristic = std::function<std::size_t(const T&)>;
 
-#endif // UMPIRE_Tracking_HPP
+} // end of namespace strategy
+} // end namespace umpire
+
+#endif // UMPIRE_PoolCoalesceHeuristic_HPP

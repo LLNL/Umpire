@@ -15,8 +15,7 @@ int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("HOST");
-  auto pool_allocator = rm.makeAllocator<umpire::strategy::QuickPool>(
-      "host_quick_pool", allocator);
+  auto pool_allocator = rm.makeAllocator<umpire::strategy::QuickPool>("host_quick_pool", allocator);
 
   allocator.allocate(16);
   allocator.allocate(32);

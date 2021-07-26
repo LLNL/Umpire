@@ -19,13 +19,11 @@ namespace util {
 static const char* env_name = "UMPIRE_LOG_LEVEL";
 static message::Level defaultLevel = message::Info;
 
-static const char* MessageLevelName[message::Num_Levels] = {"ERROR", "WARNING",
-                                                            "INFO", "DEBUG"};
+static const char* MessageLevelName[message::Num_Levels] = {"ERROR", "WARNING", "INFO", "DEBUG"};
 
 static int case_insensitive_match(const std::string s1, const std::string s2)
 {
-  return (s1.size() == s2.size()) &&
-         std::equal(s1.begin(), s1.end(), s2.begin(), [](char c1, char c2) {
+  return (s1.size() == s2.size()) && std::equal(s1.begin(), s1.end(), s2.begin(), [](char c1, char c2) {
            return (std::toupper(c1) == std::toupper(c2));
          });
 }
@@ -55,15 +53,14 @@ void Logger::setLoggingMsgLevel(message::Level level) noexcept
     m_is_enabled[i] = (i <= level);
 }
 
-void Logger::logMessage(message::Level level, const std::string& message,
-                        const std::string& fileName, int line) noexcept
+void Logger::logMessage(message::Level level, const std::string& message, const std::string& fileName,
+                        int line) noexcept
 {
   if (!logLevelEnabled(level))
     return;
 
   umpire::log() << "[" << MessageLevelName[level] << "]"
-                << "[" << fileName << ":" << line << "]:" << message
-                << std::endl;
+                << "[" << fileName << ":" << line << "]:" << message << std::endl;
 }
 
 Logger* Logger::getActiveLogger()

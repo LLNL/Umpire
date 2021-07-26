@@ -25,9 +25,14 @@ class HipCopyFromOperation : public MemoryOperation {
    *
    * @copydetails MemoryOperation::transform
    */
-  void transform(void* src_ptr, void** dst_ptr,
-                 util::AllocationRecord* src_allocation,
+  void transform(void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
                  util::AllocationRecord* dst_allocation, std::size_t length);
+
+  camp::resources::EventProxy<camp::resources::Resource> transform_async(void* src_ptr, void** dst_ptr,
+                                                                         util::AllocationRecord* src_allocation,
+                                                                         util::AllocationRecord* dst_allocation,
+                                                                         std::size_t length,
+                                                                         camp::resources::Resource& ctx);
 };
 
 } // end of namespace op
