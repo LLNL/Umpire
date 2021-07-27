@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -298,8 +299,9 @@ void AllocationMap::print(const std::function<bool(const AllocationRecord&)>&& p
         any_match = true;
         auto end_ptr = static_cast<unsigned char*>(iter->ptr) + iter->size;
         ss << iter->size << " [ " << reinterpret_cast<void*>(iter->ptr) << " -- " << reinterpret_cast<void*>(end_ptr)
-           << " ] " << std::endl
+           << " ] " << ((iter->name != nullptr) ? *(iter->name) : std::string(""))
 #if defined(UMPIRE_ENABLE_BACKTRACE)
+           << std::endl
            << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
 #endif // UMPIRE_ENABLE_BACKTRACE
            << std::endl;
