@@ -100,6 +100,7 @@ TYPED_TEST(PrimaryPoolTest, Allocate)
   ASSERT_NO_THROW(this->m_allocator->deallocate(this->m_allocator->allocate(100)););
 }
 
+#if 0
 TYPED_TEST(PrimaryPoolTest, NamedAllocation)
 {
   const std::string myname{"Mi nombre es Marty"};
@@ -118,6 +119,7 @@ TYPED_TEST(PrimaryPoolTest, NamedAllocation)
 
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr));
 }
+#endif
 
 TYPED_TEST(PrimaryPoolTest, LazyFirstAllocation)
 {
