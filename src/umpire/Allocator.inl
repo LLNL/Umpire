@@ -45,6 +45,8 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
 
+  umpire_ver_5_found = 0;
+
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
   UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
