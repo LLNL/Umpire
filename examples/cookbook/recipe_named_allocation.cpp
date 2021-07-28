@@ -17,7 +17,7 @@ int main(int, char**)
   auto allocator = rm.getAllocator("HOST");
 
   // _sphinx_tag_tut_unwrap_strategy_start
-  void* ptr{ allocator.allocate("My Allocation Name", 100) };
+  void* ptr{allocator.allocate("My Allocation Name", 100)};
 
   auto record = rm.findAllocationRecord(ptr);
   std::cout << "The name of my allocation is: " << *(record->name) << std::endl;
