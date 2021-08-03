@@ -13,3 +13,9 @@ hip_4_2_fortran_gcc_8_1_0 (build and test on corona):
   variables:
     SPEC: "+fortran+hip %gcc@8.1.0 ^hip@4.2.0"
   extends: .build_and_test_on_corona
+
+# Develop builds against specific tpl versions
+hip_4_2_fortran_gcc_8_1_0 (build and test on corona):
+  variables:
+    SPEC: "+fortran+hip %gcc@8.1.0 ^camp@0.1.0 ^blt@0.4.0 ^hip@4.2.0"
+  extends: .build_and_test_on_corona

@@ -116,6 +116,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - All asynchronous operations now return a camp::resources::EventProxy to avoid
   the overhead of creating Events when they are unused.
 
+- CI builds against latest version of TPLs.
+
 ### Removed
 
 - Removed extraneous function definition in HipDeviceMemoryResource.

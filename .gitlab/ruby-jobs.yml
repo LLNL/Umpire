@@ -57,3 +57,22 @@ gcc_8_1_0_numa:
   variables:
     SPEC: "+fortran+numa %gcc@8.1.0"
   extends: .build_and_test_on_ruby
+
+
+  # Develop builds against specific tpl version
+
+pgi_20_1:
+  variables:
+    SPEC: "+fortran %pgi@20.1 ^camp@0.1.0 ^blt@0.4.0"
+    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
+  extends: .build_and_test_on_ruby
+
+clang_10:
+  variables:
+    SPEC: "+fortran %clang@10.0.1 ^camp@0.1.0 ^blt@0.4.0"
+  extends: .build_and_test_on_ruby
+
+gcc_8_1_0:
+  variables:
+    SPEC: "+fortran %gcc@8.1.0 ^camp@0.1.0 ^blt@0.4.0"
+  extends: .build_and_test_on_ruby
