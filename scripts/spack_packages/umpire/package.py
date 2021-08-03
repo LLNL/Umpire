@@ -15,7 +15,7 @@ from os.path import join as pjoin
 import re
 
 
-class Umpire(CachedCMakePackage, CudaPackage):
+class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     """An application-focused API for memory management on NUMA & GPU
     architectures"""
 
@@ -71,6 +71,21 @@ class Umpire(CachedCMakePackage, CudaPackage):
     depends_on('cmake@3.9:', when='+cuda', type='build')
     depends_on('mpi', when='+mpi')
     depends_on('hip', when='+hip')
+
+    depends_on('blt@develop', type='build', when='@4.1.3:')
+
+    # variants +rocm and amdgpu_targets are not automatically passed to
+    # dependencies, so do it manually.
+    depends_on('camp+rocm', when='+rocm')
+    for val in ROCmPackage.amdgpu_targets:
+        depends_on('camp amdgpu_target=%s' % val, when='amdgpu_target=%s' % val)
+
+    depends_on('camp+cuda', when='+cuda')
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on('camp cuda_arch={0}'.format(sm_),
+                   when='cuda_arch={0}'.format(sm_))
+
+    depends_on('camp@master')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
@@ -210,6 +225,8 @@ class Umpire(CachedCMakePackage, CudaPackage):
         spec = self.spec
         entries = []
 
+        entries.append(cmake_cache_path("BLT_SOURCE_DIR", spec['blt'].prefix))
+        entries.append(cmake_cache_path("camp_DIR" ,spec['camp'].prefix))
         entries.append(cmake_cache_string("CMAKE_BUILD_TYPE", spec.variants['build_type'].value))
         entries.append(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec or '+dev_benchmarks' in spec))
         entries.append(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", '+dev_benchmarks' in spec))
