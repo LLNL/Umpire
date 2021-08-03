@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>

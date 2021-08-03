@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 int main(int argc, char* argv[])
 {
