@@ -73,7 +73,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('hip', when='+hip')
 
     depends_on('blt@0.4.1', type='build', when='@main')
-    depends_on('blt@develop', type='build', when='@develop:')
+    depends_on('blt@0.4.1:', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.
@@ -86,8 +86,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         depends_on('camp cuda_arch={0}'.format(sm_),
                    when='cuda_arch={0}'.format(sm_))
 
-    depends_on('camp@master', when='@develop')
     depends_on('camp@0.1.0', when='@main')
+    depends_on('camp@0.1.0:')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
