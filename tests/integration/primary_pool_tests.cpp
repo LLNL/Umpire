@@ -103,7 +103,7 @@ TYPED_TEST(PrimaryPoolTest, Allocate)
 TYPED_TEST(PrimaryPoolTest, NamedAllocation)
 {
   const std::string myname{"Mi nombre es Marty"};
-  void* ptr;
+  void* ptr{nullptr};
 
   ASSERT_NO_THROW(ptr = this->m_allocator->allocate(myname, 100));
 
