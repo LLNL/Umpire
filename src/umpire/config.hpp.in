@@ -50,7 +50,9 @@
 #define UMPIRE_EXPORT
 #endif
 
-UMPIRE_EXPORT extern volatile int umpire_ver_@Umpire_VERSION_MAJOR@_found;
+#define UMPIRE_VERSION_SYM  umpire_ver_@Umpire_VERSION_MAJOR@_found
+UMPIRE_EXPORT extern int    UMPIRE_VERSION_SYM;
+#define UMPIRE_VERSION_OK() UMPIRE_VERSION_SYM == 0
 
 namespace umpire {
 constexpr int invalid_allocator_id = 0xDEADBEE;

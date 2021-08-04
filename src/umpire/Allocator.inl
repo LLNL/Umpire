@@ -18,26 +18,25 @@ inline void* Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
-  umpire_ver_5_found = 0;
+  if (UMPIRE_VERSION_OK()) {
+    UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_LOG(Debug, "(" << bytes << ")");
+    UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator
+                                                                                  << "\", \"size\": " << bytes << " }");
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator
-                                                                                << "\", \"size\": " << bytes << " }");
+    if (0 == bytes) {
+      ret = allocateNull();
+    } else {
+      ret = m_allocator->allocate(bytes);
+    }
 
-  if (0 == bytes) {
-    ret = allocateNull();
-  } else {
-    ret = m_allocator->allocate(bytes);
+    if (m_tracking) {
+      registerAllocation(ret, bytes, m_allocator);
+    }
+
+    UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                  << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
   }
-
-  if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator);
-  }
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
-
   return ret;
 }
 
@@ -45,27 +44,27 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
 
-  umpire_ver_5_found = 0;
+  if (UMPIRE_VERSION_OK()) {
+    UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_LOG(Debug, "(" << bytes << ")");
+    UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                  << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
+    if (0 == bytes) {
+      ret = allocateNull();
+    } else {
+      ret = m_allocator->allocate_named(name, bytes);
+    }
 
-  if (0 == bytes) {
-    ret = allocateNull();
-  } else {
-    ret = m_allocator->allocate_named(name, bytes);
+    if (m_tracking) {
+      registerAllocation(ret, bytes, m_allocator, name);
+    }
+
+    UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
+                  << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
+                  << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+
   }
-
-  if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator, name);
-  }
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
-                << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
-
   return ret;
 }
 
