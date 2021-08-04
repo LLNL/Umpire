@@ -67,10 +67,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant('asan', default=False, description='Enable ASAN')
     variant('sanitizer_tests', default=False, description='Enable address sanitizer tests')
 
-    depends_on('cmake@3.8:', type='build')
-    depends_on('cmake@3.9:', when='+cuda', type='build')
+    depends_on('cmake@3.14:', type='build')
     depends_on('mpi', when='+mpi')
-    depends_on('hip', when='+hip')
 
     depends_on('blt@0.4.1', type='build', when='@main')
     depends_on('blt@0.4.1:', type='build')
