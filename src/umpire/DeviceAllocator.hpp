@@ -16,8 +16,6 @@ namespace umpire {
  */
 class DeviceAllocator {
  public:
-  //__host__ DeviceAllocator();
-
   __host__ ~DeviceAllocator();
 
   __host__ __device__ DeviceAllocator(const DeviceAllocator& other);
@@ -32,8 +30,6 @@ class DeviceAllocator {
   __device__ void* allocate(size_t size);
 
   __host__ __device__ size_t getID();
-
-  __host__ bool is_initialized();
 
   friend class ResourceManager;
 
@@ -54,7 +50,6 @@ class DeviceAllocator {
   size_t m_id;
   size_t m_size;
   bool m_child;
-  bool m_init{false};
 };
 
 } // end of namespace umpire

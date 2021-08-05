@@ -128,7 +128,8 @@ class ResourceManager {
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
+  void syncDeviceAllocator();
+  int makeDeviceAllocator(Allocator allocator, size_t size);
 #endif
 
   /*!

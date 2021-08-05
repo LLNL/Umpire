@@ -19,10 +19,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-#include "umpire/DeviceAllocator.hpp"
-#endif
-
 #if !defined(_MSC_VER)
 #include <unistd.h>
 #endif
@@ -223,19 +219,6 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm) {
 
   return c;
 
-}
-#endif
-
-#if defined(UMPIRE_ENABLE_DEVICE)
-__host__ void initializeDevAlloc()
-{
-  cudaMallocManaged(&UMPIRE_DEV_ALLOCS, 10*sizeof(DeviceAllocator));
-  UMPIRE_DEV_ALLOCS = {0};
-}
-
-__device__ DeviceAllocator getDeviceAllocator(size_t id)
-{
-  return UMPIRE_DEV_ALLOCS[id];
 }
 #endif
 

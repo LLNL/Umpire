@@ -65,7 +65,7 @@ if (ENABLE_CUDA)
                               LANGUAGE CUDA)
   set (umpire_util_depends
     ${umpire_util_depends}
-    cuda_runtime)
+    cuda)
 endif()
 
 set (umpire_util_depends camp umpire_tpl_judy)

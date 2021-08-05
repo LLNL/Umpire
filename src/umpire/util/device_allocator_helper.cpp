@@ -11,6 +11,10 @@ namespace umpire {
 
 namespace util {
 
+__device__ int getDeviceAllocator(int id)
+{
+  return umpire::util::UMPIRE_DEV_ALLOCS[id];
+}
 
 } // end namespace util
 

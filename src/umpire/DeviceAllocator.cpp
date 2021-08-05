@@ -48,11 +48,6 @@ __host__ DeviceAllocator::~DeviceAllocator()
   }
 }
 
-__host__ bool DeviceAllocator::is_initialized()
-{
-  return m_init;
-}
-
 __device__ void* DeviceAllocator::allocate(size_t size)
 {
   std::size_t counter = atomicAdd(m_counter, size);
