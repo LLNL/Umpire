@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <vector>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
@@ -13,19 +14,27 @@
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-
   auto allocator = rm.getAllocator("HOST");
+  std::vector<void*> allocations;
 
-  // _sphinx_tag_tut_unwrap_strategy_start
-  void* ptr{allocator.allocate("My Allocation Name", 100)};
+  allocations.push_back(allocator.allocate("My Allocation Name", 100));
+  allocations.push_back(allocator.allocate(1024));
 
-  auto record = rm.findAllocationRecord(ptr);
-  std::cout << "The name of my allocation is: " << *(record->name) << std::endl;
+  for (auto ptr : allocations) {
+    auto record = rm.findAllocationRecord(ptr);
+    std::cout << "Allocation: " << record->ptr << ", Size: " << record->size
+              << ", Name: " << (record->name != nullptr ? *(record->name) : "Unnamed") << std::endl;
+  }
 
+  //
+  // Dump out all allocations for our allocator
+  //
   std::stringstream ss;
   umpire::print_allocator_records(allocator, ss);
   std::cout << "Tracked allocators are: " << std::endl << ss.str() << std::endl;
 
-  allocator.deallocate(ptr);
+  for (auto ptr : allocations) {
+    allocator.deallocate(ptr);
+  }
   return 0;
 }

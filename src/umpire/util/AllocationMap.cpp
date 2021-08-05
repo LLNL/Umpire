@@ -298,11 +298,11 @@ void AllocationMap::print(const std::function<bool(const AllocationRecord&)>&& p
       if (pred(*iter)) {
         any_match = true;
         auto end_ptr = static_cast<unsigned char*>(iter->ptr) + iter->size;
-        ss << iter->size << " [ " << reinterpret_cast<void*>(iter->ptr) << " -- " << reinterpret_cast<void*>(end_ptr)
-           << " ] " << ((iter->name != nullptr) ? *(iter->name) : std::string(""))
+        ss << "  size: " << iter->size << ", "
+           << "range: " << reinterpret_cast<void*>(iter->ptr) << " -- " << reinterpret_cast<void*>(end_ptr) << ", "
+           << "name: " << ((iter->name != nullptr) ? *(iter->name) : std::string("_unnamed_")) << ", "
 #if defined(UMPIRE_ENABLE_BACKTRACE)
-           << std::endl
-           << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
+           << "backtrace: " << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
 #endif // UMPIRE_ENABLE_BACKTRACE
            << std::endl;
       }
