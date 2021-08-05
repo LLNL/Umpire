@@ -252,6 +252,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Have build_and_tesh.sh script re-run make with verbose output if
   compilation fails.
 
+- Updated copyright date to 2021
+
 ### Removed
 
 - ENABLE_STATISTICS option and (optional) dependency on Conduit.
