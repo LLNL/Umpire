@@ -26,9 +26,8 @@ void Inspector::registerAllocation(void* ptr, std::size_t size, strategy::Alloca
   ResourceManager::getInstance().registerAllocation(ptr, {ptr, size, s});
 }
 
-void Inspector::registerAllocation(void* ptr, std::size_t size, strategy::AllocationStrategy* s, const std::string& n)
+void Inspector::registerAllocation(void* ptr, std::size_t size, strategy::AllocationStrategy* s, const std::string& name)
 {
-  std::string* name{ new std::string{n} };
   s->m_current_size += size;
   s->m_allocation_count++;
 
@@ -47,10 +46,6 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* s)
   if (record.strategy == s) {
     s->m_current_size -= record.size;
     s->m_allocation_count--;
-    if (record.name != nullptr) {
-      delete record.name;
-      record.name = nullptr;
-    }
   } else {
     // Re-register the pointer and throw an error
     ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy, record.name});

@@ -23,7 +23,7 @@ int main(int, char**)
   for (auto ptr : allocations) {
     auto record = rm.findAllocationRecord(ptr);
     std::cout << "Allocation: " << record->ptr << ", Size: " << record->size
-              << ", Name: " << (record->name != nullptr ? *(record->name) : "Unnamed") << std::endl;
+              << ", Name: " << record->name << std::endl;
   }
 
   //

@@ -23,11 +23,11 @@ namespace util {
 
 struct AllocationRecord {
   AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
-      : ptr{p}, size{s}, strategy{strat}, name{nullptr}
+      : ptr{p}, size{s}, strategy{strat}, name{}
   {
   }
 
-  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat, std::string* _name)
+  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat, const std::string& _name)
       : ptr{p}, size{s}, strategy{strat}, name{_name}
   {
   }
@@ -39,7 +39,7 @@ struct AllocationRecord {
   void* ptr;
   std::size_t size;
   strategy::AllocationStrategy* strategy;
-  std::string* name;
+  std::string name;
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   util::backtrace allocation_backtrace;
 #endif // UMPIRE_ENABLE_BACKTRACE

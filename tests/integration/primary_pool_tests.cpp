@@ -112,9 +112,7 @@ TYPED_TEST(PrimaryPoolTest, NamedAllocation)
 
   ASSERT_NO_THROW(record = rm.findAllocationRecord(ptr));
   ASSERT_NE(record, nullptr);
-  ASSERT_NE(record->name, nullptr);
-
-  ASSERT_EQ(myname, *(record->name));
+  ASSERT_EQ(myname, record->name);
 
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr));
 }
