@@ -13,9 +13,13 @@ namespace umpire {
 
 namespace util {
 
-int* UMPIRE_DEV_ALLOCS_h;
-__device__ int* UMPIRE_DEV_ALLOCS;
-__device__ int getDeviceAllocator(int id);
+static int* UMPIRE_DEV_ALLOCS_h;
+__device__ static int* UMPIRE_DEV_ALLOCS;
+
+__device__ static int getDeviceAllocator(int id)
+{
+  return umpire::util::UMPIRE_DEV_ALLOCS[id];
+}
 
 } // end of namespace util
 
