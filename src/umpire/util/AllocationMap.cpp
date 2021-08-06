@@ -32,6 +32,7 @@ AllocationMap::RecordList::~RecordList()
   RecordBlock* curr = m_tail;
   while (curr) {
     RecordBlock* prev = curr->prev;
+    curr->~RecordBlock();
     m_map.m_block_pool.deallocate(curr);
     curr = prev;
   }
@@ -39,7 +40,7 @@ AllocationMap::RecordList::~RecordList()
 
 void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 {
-  RecordBlock* curr = static_cast<RecordBlock*>(m_map.m_block_pool.allocate());
+  RecordBlock* curr = new (m_map.m_block_pool.allocate()) RecordBlock{};
   curr->prev = m_tail;
   curr->rec = rec;
   m_tail = curr;
@@ -56,6 +57,7 @@ AllocationRecord AllocationMap::RecordList::pop_back()
   RecordBlock* prev = m_tail->prev;
 
   // Deallocate and move tail pointer
+  m_tail->~RecordBlock();
   m_map.m_block_pool.deallocate(m_tail);
   m_tail = prev;
 
