@@ -32,7 +32,7 @@ struct AllocationRecord {
   {
   }
 
-  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}, name{nullptr}
+  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}, name{}
   {
   }
 
