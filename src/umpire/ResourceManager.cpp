@@ -363,21 +363,20 @@ void ResourceManager::syncDeviceAllocator()
 {
   //need to make sure there actually is a device allocator available to sync
   cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS, &umpire::util::UMPIRE_DEV_ALLOCS_h,
-                     sizeof(int*));
+                     sizeof(DeviceAllocator*));
 }
 
-int ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size)
+DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size)
 {
   static size_t i{0};
-  //auto device_allocator = DeviceAllocator(allocator, size, i);
+  auto device_allocator = DeviceAllocator(allocator, size, i);
 
   if (i == 0) {
-    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(int));
+    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
   }
 
-  umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = i; //device_allocator;
-  //return device_allocator;
-  return i;
+  *umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = device_allocator;
+  return device_allocator;
 }
 #endif
 

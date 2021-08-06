@@ -56,13 +56,6 @@ if (ENABLE_CUDA)
     ${umpire_util_headers}
     device_allocator_helper.hpp)
 
-  set(umpire_util_sources
-    ${umpire_util_sources}
-    device_allocator_helper.cpp)
-
-  set_source_files_properties(device_allocator_helper.cpp
-                              PROPERTIES
-                              LANGUAGE CUDA)
   set (umpire_util_depends
     ${umpire_util_depends}
     cuda)

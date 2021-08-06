@@ -129,7 +129,7 @@ class ResourceManager {
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   void syncDeviceAllocator();
-  int makeDeviceAllocator(Allocator allocator, size_t size);
+  DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
 #endif
 
   /*!
