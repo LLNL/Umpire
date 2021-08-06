@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -132,4 +132,21 @@ xl_default_omp_target (build and test on lassen):
 gcc_8_3_1_numa:
   variables:
     SPEC: "+fortran+numa%gcc@8.3.1"
+  extends: .build_and_test_on_lassen
+
+# Develop/main builds against specific tpl versions
+
+gcc_8_3_1_tpls:
+  variables:
+    SPEC: "+fortran%gcc@8.3.1 ^blt@develop"
+  extends: .build_and_test_on_lassen
+
+ibm_clang_9_gcc_8_cuda_tpls:
+  variables:
+    SPEC: "+fortran+cuda %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
+  extends: .build_and_test_on_lassen
+
+xl_16_1_1_7_cuda_tpls:
+  variables:
+    SPEC: "+fortran+cuda %xl@16.1.1.7 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
