@@ -60,7 +60,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             multi=False, description='Tests to run')
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
-    variant('hip', default=False, description='Build with HIP support')
     variant('tools', default=True, description='Enable tools')
     variant('dev_benchmarks', default=False, description='Enable Developer Benchmarks')
     variant('werror', default=True, description='Enable warnings as errors')
@@ -90,10 +89,10 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
     conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
-    conflicts('+cuda', when='+hip')
-    conflicts('+openmp', when='+hip')
-    conflicts('+openmp_target', when='+hip')
-    conflicts('+deviceconst', when='~hip~cuda')
+    conflicts('+cuda', when='+rocm')
+    conflicts('+openmp', when='+rocm')
+    conflicts('+openmp_target', when='+rocm')
+    conflicts('+deviceconst', when='~rocm~cuda')
     conflicts('~mpi', when='+ipc_shmem', msg='Shared Memory Allocator requires MPI')
     conflicts('+ipc_shmem', when='@:5.0.1')
     conflicts('+sanitizer_tests', when='~asan')
@@ -181,8 +180,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
             entries.append(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
-        entries.append(cmake_cache_option("ENABLE_HIP", "+hip" in spec))
-        if "+hip" in spec:
+        entries.append(cmake_cache_option("ENABLE_HIP", "+rocm" in spec))
+        if "+rocm" in spec:
             hip_root = spec['hip'].prefix
             rocm_root = hip_root + "/.."
             entries.append(cmake_cache_path("HIP_ROOT_DIR",
