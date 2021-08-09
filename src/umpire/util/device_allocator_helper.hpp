@@ -13,10 +13,10 @@ namespace umpire {
 
 namespace util {
 
-static DeviceAllocator** UMPIRE_DEV_ALLOCS_h;
-__device__ static DeviceAllocator** UMPIRE_DEV_ALLOCS;
+static DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
+__device__ static DeviceAllocator* UMPIRE_DEV_ALLOCS;
 
-__device__ static DeviceAllocator* getDeviceAllocator(int id)
+__device__ static DeviceAllocator getDeviceAllocator(int id)
 {
   return umpire::util::UMPIRE_DEV_ALLOCS[id];
 }
