@@ -100,6 +100,23 @@ TYPED_TEST(PrimaryPoolTest, Allocate)
   ASSERT_NO_THROW(this->m_allocator->deallocate(this->m_allocator->allocate(100)););
 }
 
+TYPED_TEST(PrimaryPoolTest, NamedAllocation)
+{
+  const std::string myname{"Mi nombre es Marty"};
+  void* ptr{nullptr};
+
+  ASSERT_NO_THROW(ptr = this->m_allocator->allocate(myname, 100));
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  const umpire::util::AllocationRecord* record;
+
+  ASSERT_NO_THROW(record = rm.findAllocationRecord(ptr));
+  ASSERT_NE(record, nullptr);
+  ASSERT_EQ(myname, record->name);
+
+  ASSERT_NO_THROW(this->m_allocator->deallocate(ptr));
+}
+
 TYPED_TEST(PrimaryPoolTest, LazyFirstAllocation)
 {
   ASSERT_EQ(this->m_allocator->getActualSize(), 0);

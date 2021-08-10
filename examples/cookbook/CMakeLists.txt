@@ -185,6 +185,12 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_strategy_name)
 
+blt_add_executable(
+  NAME recipe_named_allocation
+  SOURCES recipe_named_allocation.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_named_allocation)
+
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
 
 umpire_add_code_checks(PREFIX cookbook)
