@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,9 +13,8 @@
 namespace umpire {
 namespace strategy {
 
-ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id,
-                                         Allocator allocator)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id, Allocator allocator)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "ThreadSafeAllocator"},
       m_allocator(allocator.getAllocationStrategy()),
       m_mutex()
 {

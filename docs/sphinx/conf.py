@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -31,7 +31,7 @@ import os, subprocess
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 if read_the_docs_build:
-    print 'Running on read the docs'
+    print('Running on read the docs')
     subprocess.call('cd ../doxygen; doxygen', shell=True)
 
 # -- General configuration ------------------------------------------------
@@ -69,7 +69,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Umpire'
-copyright = u'2016-20, Lawrence Livermore National Security, LLC and Umpire project contributors'
+copyright = u'2016-21, Lawrence Livermore National Security, LLC and Umpire project contributors'
 author = u'David Beckingsale'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -186,6 +186,5 @@ texinfo_documents = [
      author, 'Umpire', 'One line description of project.',
      'Miscellaneous'),
 ]
-
 
 

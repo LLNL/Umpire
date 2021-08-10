@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -21,9 +21,7 @@ struct HipPinnedAllocator {
     hipError_t error = ::hipHostMalloc(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipMallocHost( bytes = " << bytes
-                                             << " ) failed with error: "
-                                             << hipGetErrorString(error));
+      UMPIRE_ERROR("hipMallocHost( bytes = " << bytes << " ) failed with error: " << hipGetErrorString(error));
     } else {
       return ptr;
     }
@@ -34,17 +32,16 @@ struct HipPinnedAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipHostFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipFreeHost( ptr = " << ptr << " ) failed with error: "
-                                         << hipGetErrorString(error));
+      UMPIRE_ERROR("hipFreeHost( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
     }
   }
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::hip || p == Platform::host)
+    if (p == Platform::hip || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false; // p is undefined
   }
 };
 

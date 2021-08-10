@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -32,9 +32,7 @@ std::cout << "size of DA: " << sizeof(device_allocator) << " compared to global 
 std::cout << "global var has: " << my_alloc.getID() <<std::endl;
 
 //  rm.syncDeviceAllocator();
-//  double** ptr_to_data =
-//      static_cast<double**>(allocator.allocate(sizeof(double*)));
-
+//  double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   //my_kernel<<<1, 16>>>(ptr_to_data);
   //cudaDeviceSynchronize();

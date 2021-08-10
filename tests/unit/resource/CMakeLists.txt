@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -30,7 +30,7 @@ if(ENABLE_FILE_RESOURCE)
     COMMAND file_resource_tests)
 endif()
 
-if(ENABLE_HOST_SHARED_MEMORY)
+if(ENABLE_IPC_SHARED_MEMORY)
   blt_add_executable(
     NAME shared_memory_resource_tests
     SOURCES shared_memory_resource_tests.cpp

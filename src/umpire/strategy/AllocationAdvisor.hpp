@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -27,16 +27,15 @@ namespace strategy {
  * - op::CudaAdvisePreferredLocationOperation
  * - op::CudaAdviseReadMostlyOperation
  *
- * Using this AllocationStrategy when combined with a pool like DynamicPool is
+ * Using this AllocationStrategy when combined with a pool like DynamicPoolList is
  * a good way to mitigate the overhead of applying the memory advice.
  */
 class AllocationAdvisor : public AllocationStrategy {
  public:
-  AllocationAdvisor(const std::string& name, int id, Allocator allocator,
-                    const std::string& advice_operation, int device_id = 0);
+  AllocationAdvisor(const std::string& name, int id, Allocator allocator, const std::string& advice_operation,
+                    int device_id = 0);
 
-  AllocationAdvisor(const std::string& name, int id, Allocator allocator,
-                    const std::string& advice_operation,
+  AllocationAdvisor(const std::string& name, int id, Allocator allocator, const std::string& advice_operation,
                     Allocator accessing_allocator, int device_id = 0);
 
   void* allocate(std::size_t bytes) override;

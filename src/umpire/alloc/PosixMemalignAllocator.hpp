@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -35,9 +35,7 @@ struct PosixMemalignAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = "
-                                              << get_page_size()
-                                              << " ) failed");
+      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << get_page_size() << " ) failed");
     }
 
     return ret;
@@ -58,7 +56,7 @@ struct PosixMemalignAllocator {
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::host)
+    if (p == Platform::host)
       return true;
     else
       return false;

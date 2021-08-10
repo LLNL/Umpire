@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -33,11 +33,10 @@ TEST(CudaAdviseAccessedBy, Apply)
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
 
-  ASSERT_NO_THROW(
-      advice_operation->apply(data,
-                              nullptr, // AllocationRecord* is unused
-                              0,       // val is unused
-                              1024 * sizeof(float)));
+  ASSERT_NO_THROW(advice_operation->apply(data,
+                                          nullptr, // AllocationRecord* is unused
+                                          0,       // val is unused
+                                          1024 * sizeof(float)));
 }
 
 TEST(CudaAdvisePreferredLocation, Find)
@@ -59,12 +58,10 @@ TEST(CudaAdvisePreferredLocation, Apply)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation =
-      op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
-  auto record =
-      new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
+  auto record = new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
 
   ASSERT_NO_THROW(advice_operation->apply(data, record,
                                           0, // val is unused
@@ -82,12 +79,10 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation =
-      op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
-  auto record =
-      new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
+  auto record = new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
 
   ASSERT_NO_THROW(advice_operation->apply(data, record,
                                           0, // val is unused
@@ -120,9 +115,8 @@ TEST(CudaAdviseReadMostly, Apply)
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
 
-  ASSERT_NO_THROW(
-      advice_operation->apply(data,
-                              nullptr, // AllocationRecord* is unused
-                              0,       // val is unused
-                              1024 * sizeof(float)));
+  ASSERT_NO_THROW(advice_operation->apply(data,
+                                          nullptr, // AllocationRecord* is unused
+                                          0,       // val is unused
+                                          1024 * sizeof(float)));
 }

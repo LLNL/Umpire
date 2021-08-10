@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -34,9 +34,7 @@ struct CudaMallocManagedAllocator {
     cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMallocManaged( bytes = " << bytes
-                                                 << " ) failed with error: "
-                                                 << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMallocManaged( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
     } else {
       return ptr;
     }
@@ -55,17 +53,16 @@ struct CudaMallocManagedAllocator {
 
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: "
-                                      << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
     }
   }
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::cuda || p == Platform::host)
+    if (p == Platform::cuda || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false; // p is undefined
   }
 };
 

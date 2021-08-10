@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -12,9 +12,8 @@
 namespace umpire {
 namespace strategy {
 
-SlotPool::SlotPool(const std::string& name, int id, Allocator allocator,
-                   std::size_t slots)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+SlotPool::SlotPool(const std::string& name, int id, Allocator allocator, std::size_t slots)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "SlotPool"},
       m_current_size(0),
       m_highwatermark(0),
       m_slots(slots),
@@ -51,8 +50,7 @@ void* SlotPool::allocate(std::size_t bytes)
   int64_t int_bytes = static_cast<int64_t>(bytes);
 
   if (int_bytes < 0) {
-    UMPIRE_ERROR("allocation request of size: "
-                 << bytes << " bytes is too large for this pool");
+    UMPIRE_ERROR("allocation request of size: " << bytes << " bytes is too large for this pool");
   }
 
   for (std::size_t i = 0; i < m_slots; ++i) {

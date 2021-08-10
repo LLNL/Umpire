@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -18,6 +18,7 @@ set (umpire_strategy_headers
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
+  PoolCoalesceHeuristic.hpp
   QuickPool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
@@ -69,11 +70,21 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
+if (ENABLE_HIP)
+  set(umpire_strategy_depends
+    ${umpire_strategy_depends}
+    hip_runtime)
+endif ()
+
 if (ENABLE_OPENMP_TARGET)
   set( umpire_strategy_depends
     ${umpire_strategy_depends}
     openmp)
 endif ()
+
+set_source_files_properties(DynamicPoolMap.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(DynamicPoolMap.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(DynamicPool.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 blt_add_library(
   NAME umpire_strategy

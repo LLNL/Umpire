@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,7 +10,6 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
 class AllocatorTest : public ::testing::TestWithParam<std::string> {
@@ -35,24 +34,22 @@ class AllocatorTest : public ::testing::TestWithParam<std::string> {
 
 TEST_P(AllocatorTest, AllocateDeallocateBig)
 {
-  double* data =
-      static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
+  double* data = static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
-  
+
   m_allocator->deallocate(data);
 }
 
 TEST_P(AllocatorTest, GetParentCheck)
 {
-  //Parent of default allocator should be nullptr 
+  // Parent of default allocator should be nullptr
   ASSERT_EQ(nullptr, m_allocator->getParent());
 }
 
 TEST_P(AllocatorTest, AllocateDeallocateSmall)
 {
-  double* data =
-      static_cast<double*>(m_allocator->allocate(m_small * sizeof(double)));
+  double* data = static_cast<double*>(m_allocator->allocate(m_small * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
 
@@ -62,12 +59,10 @@ TEST_P(AllocatorTest, AllocateDeallocateSmall)
 TEST_P(AllocatorTest, AllocateDeallocateNothing)
 {
   // CUDA doesn't support allocating 0 bytes
-  if (m_allocator->getPlatform() == umpire::Platform::cuda ||
-      m_allocator->getPlatform() == umpire::Platform::hip) {
+  if (m_allocator->getPlatform() == umpire::Platform::cuda || m_allocator->getPlatform() == umpire::Platform::hip) {
     SUCCEED();
   } else {
-    double* data =
-        static_cast<double*>(m_allocator->allocate(m_nothing * sizeof(double)));
+    double* data = static_cast<double*>(m_allocator->allocate(m_nothing * sizeof(double)));
 
     ASSERT_NE(nullptr, data);
 
@@ -111,16 +106,14 @@ TEST_P(AllocatorTest, GetById)
 
   auto allocator_by_id = rm.getAllocator(id);
 
-  ASSERT_EQ(m_allocator->getAllocationStrategy(),
-            allocator_by_id.getAllocationStrategy());
+  ASSERT_EQ(m_allocator->getAllocationStrategy(), allocator_by_id.getAllocationStrategy());
 
   ASSERT_THROW(rm.getAllocator(-25), umpire::util::Exception);
 }
 
 TEST_P(AllocatorTest, get_allocator_records)
 {
-  double* data =
-      static_cast<double*>(m_allocator->allocate(m_small * sizeof(double)));
+  double* data = static_cast<double*>(m_allocator->allocate(m_small * sizeof(double)));
 
   auto records = umpire::get_allocator_records(*m_allocator);
 
@@ -155,6 +148,11 @@ TEST_P(AllocatorTest, getActualSize)
   m_allocator->deallocate(data);
 }
 
+TEST_P(AllocatorTest, getStrategyName)
+{
+  ASSERT_EQ(m_allocator->getStrategyName(), "MemoryResource");
+}
+
 std::vector<std::string> allocator_strings()
 {
   std::vector<std::string> allocators;
@@ -179,24 +177,21 @@ std::vector<std::string> allocator_strings()
   return allocators;
 }
 
-INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest,
-                         ::testing::ValuesIn(allocator_strings()));
+INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorTest, ::testing::ValuesIn(allocator_strings()));
 
 TEST(Allocator, registerAllocator)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   for (const std::string& allocator_name : allocator_strings()) {
-    const std::string allocator_copy_name =
-        allocator_name + std::string{"_copy"};
+    const std::string allocator_copy_name = allocator_name + std::string{"_copy"};
 
     rm.addAlias(allocator_copy_name, rm.getAllocator(allocator_name));
 
     ASSERT_EQ(rm.getAllocator(allocator_name).getAllocationStrategy(),
               rm.getAllocator(allocator_copy_name).getAllocationStrategy());
 
-    ASSERT_ANY_THROW(rm.addAlias(
-        allocator_name, rm.getAllocator(allocator_copy_name)));
+    ASSERT_ANY_THROW(rm.addAlias(allocator_name, rm.getAllocator(allocator_copy_name)));
 
     int id = rm.getAllocator(allocator_name).getId();
 
@@ -211,14 +206,12 @@ TEST(Allocator, GetSetDefault)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_NO_THROW(auto alloc = rm.getDefaultAllocator();
-                  UMPIRE_USE_VAR(alloc););
+  ASSERT_NO_THROW(auto alloc = rm.getDefaultAllocator(); UMPIRE_USE_VAR(alloc););
 
   ASSERT_NO_THROW(rm.setDefaultAllocator(rm.getDefaultAllocator()););
 }
 
-class AllocatorByResourceTest
-    : public ::testing::TestWithParam<umpire::resource::MemoryResourceType> {
+class AllocatorByResourceTest : public ::testing::TestWithParam<umpire::resource::MemoryResourceType> {
  public:
   virtual void SetUp()
   {
@@ -240,8 +233,7 @@ class AllocatorByResourceTest
 
 TEST_P(AllocatorByResourceTest, AllocateDeallocate)
 {
-  double* data =
-      static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
+  double* data = static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
 
@@ -250,8 +242,7 @@ TEST_P(AllocatorByResourceTest, AllocateDeallocate)
 
 TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
 {
-  double* data =
-      static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
+  double* data = static_cast<double*>(m_allocator->allocate(m_big * sizeof(double)));
 
   ASSERT_NE(nullptr, data);
 
@@ -260,39 +251,35 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
   ASSERT_THROW(m_allocator->deallocate(data), umpire::util::Exception);
 }
 
-const umpire::resource::MemoryResourceType resource_types[] = {
-    umpire::resource::Host
+const umpire::resource::MemoryResourceType resource_types[] = {umpire::resource::Host
 #if defined(UMPIRE_ENABLE_DEVICE)
-    ,
-    umpire::resource::Device
+                                                               ,
+                                                               umpire::resource::Device
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-    ,
-    umpire::resource::Unified
+                                                               ,
+                                                               umpire::resource::Unified
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-    ,
-    umpire::resource::Pinned
+                                                               ,
+                                                               umpire::resource::Pinned
 #endif
 #if defined(UMPIRE_ENABLE_CONST)
-    ,
-    umpire::resource::Constant
+                                                               ,
+                                                               umpire::resource::Constant
 #endif
 };
 
-INSTANTIATE_TEST_SUITE_P(Resources, AllocatorByResourceTest,
-                         ::testing::ValuesIn(resource_types));
+INSTANTIATE_TEST_SUITE_P(Resources, AllocatorByResourceTest, ::testing::ValuesIn(resource_types));
 
 TEST(Allocation, DeallocateDifferent)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc_one = rm.getAllocator("HOST");
-  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "Limiter", alloc_one, 1024);
+  auto alloc_two = rm.makeAllocator<umpire::strategy::SizeLimiter>("Limiter", alloc_one, 1024);
 
-  double* data =
-      static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
+  double* data = static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
   ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,6 +13,7 @@
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicSizePool.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 
 namespace umpire {
 
@@ -33,10 +34,12 @@ namespace strategy {
  */
 class DynamicPoolList : public AllocationStrategy {
  public:
-  using CoalesceHeuristic =
-      std::function<bool(const strategy::DynamicPoolList&)>;
+  static PoolCoalesceHeuristic<DynamicPoolList> percent_releasable(int percentage);
+  static PoolCoalesceHeuristic<DynamicPoolList> blocks_releasable(std::size_t nblocks);
 
-  static CoalesceHeuristic percent_releasable(int percentage);
+  static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
+  static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
+  static constexpr std::size_t s_default_alignment{16};
 
   /*!
    * \brief Construct a new DynamicPoolList.
@@ -50,13 +53,11 @@ class DynamicPoolList : public AllocationStrategy {
    * allocation sizes (power-of-2) \param do_heuristic Heuristic for when to
    * perform coalesce operation
    */
-  DynamicPoolList(
-      const std::string& name, int id, Allocator allocator,
-      const std::size_t first_minimum_pool_allocation_size = (512 * 1024 *
-                                                              1024),
-      const std::size_t next_minimum_pool_allocation_size = (1 * 1024 * 1024),
-      const std::size_t alignment = 16,
-      CoalesceHeuristic should_coalesce = percent_releasable(100)) noexcept;
+  DynamicPoolList(const std::string& name, int id, Allocator allocator,
+                  const std::size_t first_minimum_pool_allocation_size = s_default_first_block_size,
+                  const std::size_t next_minimum_pool_allocation_size = s_default_next_block_size,
+                  const std::size_t alignment = s_default_alignment,
+                  PoolCoalesceHeuristic<DynamicPoolList> should_coalesce = percent_releasable(100)) noexcept;
 
   DynamicPoolList(const DynamicPoolList&) = delete;
 
@@ -64,8 +65,12 @@ class DynamicPoolList : public AllocationStrategy {
   void deallocate(void* ptr, std::size_t size) override;
   void release() override;
 
+  std::size_t getReleasableBlocks() const noexcept;
+  std::size_t getTotalBlocks() const noexcept;
+
   std::size_t getActualSize() const noexcept override;
   std::size_t getCurrentSize() const noexcept override;
+  std::size_t getActualHighwaterMark() const noexcept;
 
   Platform getPlatform() noexcept override;
 
@@ -106,8 +111,10 @@ class DynamicPoolList : public AllocationStrategy {
  private:
   strategy::AllocationStrategy* m_allocator;
   DynamicSizePool<> dpa;
-  CoalesceHeuristic m_should_coalesce;
+  PoolCoalesceHeuristic<DynamicPoolList> m_should_coalesce;
 };
+
+std::ostream& operator<<(std::ostream& out, PoolCoalesceHeuristic<DynamicPoolList>&);
 
 } // end of namespace strategy
 } // end namespace umpire

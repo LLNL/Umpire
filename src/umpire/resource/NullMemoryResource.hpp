@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -16,8 +16,7 @@ namespace resource {
 
 class NullMemoryResource : public MemoryResource {
  public:
-  NullMemoryResource(Platform platform, const std::string& name, int id,
-                     MemoryResourceTraits traits);
+  NullMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
   void* allocate(std::size_t bytes);
   void deallocate(void* ptr, std::size_t size);

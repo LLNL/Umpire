@@ -1,16 +1,16 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <chrono>
-
 #include <random>
+#include <map>
+#include <numeric>
 
 #include "umpire/config.hpp"
-
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
@@ -21,90 +21,41 @@
 const int size = 4096;
 
 /*
- * This functions measures the time it takes to do ALLOCATIONS no-op allocations and 
- * then do ALLOCATIONS no-op deallocations in the same order. The time is averaged across 3 rounds. 
+ * \brief Function that tests the deallocation pattern performance of the no-op allocator. 
+ *   The allocation, deallocation, and "lifespan" times are calculated and printed out for
+ *   each allocator.
+ *   
+ * \param alloc, the no-op allocator
+ * \param test_name, name of the deallocation pattern, used for output
+ * \param indices, a vector of indices which are either structured in same_order, reverse_order, or
+ *   shuffle_order, depending on the deallocation pattern being measured.
  */
-void same_order(umpire::Allocator alloc)
+void test_deallocation_performance(umpire::Allocator alloc, const std::string test_name, const std::vector<std::size_t> &indices)
 {
   double time[2] = {0.0, 0.0};
-  void* allocations[ALLOCATIONS];
+  std::vector<void*> allocations(ALLOCATIONS);
 
   for(int i = 0; i < NUM_ITER; i++) {
     auto begin_alloc = std::chrono::system_clock::now();
-    for (int j = 0; j < ALLOCATIONS; j++)
+    for (size_t j{0}; j < ALLOCATIONS; j++)
       allocations[j] = alloc.allocate(size);
     auto end_alloc = std::chrono::system_clock::now();
     time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/ALLOCATIONS;
 
     auto begin_dealloc = std::chrono::system_clock::now();
-    for (int h = 0; h < ALLOCATIONS; h++)
-      alloc.deallocate(allocations[h]);
+    for (size_t h{0}; h < ALLOCATIONS; h++)
+      alloc.deallocate(allocations[indices[h]]);
     auto end_dealloc = std::chrono::system_clock::now();
     time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
   }
 
-  std::cout << "  SAME_ORDER:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
-}
+  double alloc_t{(time[0]/double(NUM_ITER)*CONVERT)};
+  double dealloc_t{(time[1]/double(NUM_ITER)*CONVERT)};
 
-/*
- * This functions measures the time it takes to do ALLOCATIONS no-op allocations and 
- * then do ALLOCATIONS no-op deallocations in reverse order. The time is averaged across 3 rounds. 
- */
-void reverse_order(umpire::Allocator alloc)
-{
-  double time[2] = {0.0, 0.0};
-  void* allocations[ALLOCATIONS];
-
-  for(int i = 0; i < NUM_ITER; i++) {
-    auto begin_alloc = std::chrono::system_clock::now();
-    for (int j = 0; j < ALLOCATIONS; j++)
-      allocations[j] = alloc.allocate(size);
-    auto end_alloc = std::chrono::system_clock::now();
-    time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/ALLOCATIONS;
-
-    auto begin_dealloc = std::chrono::system_clock::now();
-    for (int h = (ALLOCATIONS-1); h >=0; h--)
-      alloc.deallocate(allocations[h]);
-    auto end_dealloc = std::chrono::system_clock::now();
-    time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
-  }
-
-  std::cout << "  REVERSE_ORDER:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
-}
-
-/*
- * This functions measures the time it takes to do ALLOCATIONS no-op allocations, shuffle the 
- * array of returned pointers, and then do ALLOCATIONS no-op deallocations. The time is averaged
- * across 3 rounds. 
- */
-void shuffle(umpire::Allocator alloc)
-{
-  std::mt19937 gen(ALLOCATIONS);
-  double time[2] = {0.0, 0.0};
-  void* allocations[ALLOCATIONS];
-
-  for(int i = 0; i < NUM_ITER; i++) {
-    auto begin_alloc = std::chrono::system_clock::now();
-    for (int j = 0; j < ALLOCATIONS; j++)
-      allocations[j] = alloc.allocate(size);
-    auto end_alloc = std::chrono::system_clock::now();
-    time[0] += std::chrono::duration<double>(end_alloc - begin_alloc).count()/ALLOCATIONS;
-
-    std::shuffle(&allocations[0], &allocations[ALLOCATIONS], gen);
-    auto begin_dealloc = std::chrono::system_clock::now();
-    for (int h = 0; h < ALLOCATIONS; h++)
-      alloc.deallocate(allocations[h]);
-    auto end_dealloc = std::chrono::system_clock::now();
-    time[1] += std::chrono::duration<double>(end_dealloc - begin_dealloc).count()/ALLOCATIONS;
-  }
-
-  std::cout << "  SHUFFLE:" << std::endl; 
-  std::cout << "    alloc: " << (time[0]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl;
-  std::cout << "    dealloc: " << (time[1]/double(NUM_ITER)*CONVERT) << "(us)" << std::endl << std::endl;
+  std::cout << "  " << test_name << ":" << std::endl; 
+  std::cout << "    alloc: " << alloc_t << "(us)" << std::endl;
+  std::cout << "    dealloc: " << dealloc_t << "(us)" << std::endl;
+  std::cout << "    lifetime: " << alloc_t+dealloc_t << "(us)" << std::endl << std::endl;
 }
 
 int main(int, char**) {
@@ -113,12 +64,30 @@ int main(int, char**) {
 
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("NO_OP");
+  std::mt19937 gen(ALLOCATIONS);
+
+  //create map with name and vector of indices for tests
+  std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs;  
+  std::vector<std::size_t> same_order(ALLOCATIONS);
+  std::iota(same_order.begin(), same_order.end(), 0);
+  
+  std::vector<std::size_t> reverse_order(same_order.begin(), same_order.end());
+  std::reverse(reverse_order.begin(), reverse_order.end());
+  
+  std::vector<std::size_t> shuffle_order(same_order.begin(), same_order.end());
+  std::shuffle(shuffle_order.begin(), shuffle_order.end(), gen);
+  
+  //insert indexing vectoring into map
+  indexing_pairs.insert({"SAME_ORDER", same_order});
+  indexing_pairs.insert({"REVERSE_ORDER", reverse_order});
+  indexing_pairs.insert({"SHUFFLE_ORDER", shuffle_order});
 
   std::cout << " Testing allocating and deallocating " << std::endl
             << " with NO_OP resource: " << std::endl << std::endl;
-  same_order(alloc);
-  reverse_order(alloc);
-  shuffle(alloc);
+ 
+  for(auto i : indexing_pairs) {
+    test_deallocation_performance(alloc, i.first, i.second);
+  }
 
   return 0;
 }

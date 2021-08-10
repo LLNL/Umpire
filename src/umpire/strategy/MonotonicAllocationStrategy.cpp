@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,9 +13,9 @@ namespace umpire {
 
 namespace strategy {
 
-MonotonicAllocationStrategy::MonotonicAllocationStrategy(
-    const std::string& name, int id, Allocator allocator, std::size_t capacity)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+MonotonicAllocationStrategy::MonotonicAllocationStrategy(const std::string& name, int id, Allocator allocator,
+                                                         std::size_t capacity)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "MonotonicAllocationStrategy"},
       m_size(0),
       m_capacity(capacity),
       m_allocator(allocator.getAllocationStrategy())
@@ -34,8 +34,7 @@ void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
   m_size += bytes;
 
   if (m_size > m_capacity) {
-    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded "
-                 << m_size << " > " << m_capacity);
+    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

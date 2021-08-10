@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -30,7 +30,7 @@ if (ENABLE_NUMA)
   list(APPEND umpire_cookbooks recipe_move_between_numa)
 endif ()
 
-if (ENABLE_HOST_SHARED_MEMORY)
+if (ENABLE_IPC_SHARED_MEMORY)
   blt_add_executable(
     NAME recipe_shared_memory
     SOURCES recipe_shared_memory.cpp
@@ -178,6 +178,18 @@ if (ENABLE_FORTRAN)
     PROPERTIES
     Fortran_FORMAT FREE)
 endif ()
+
+blt_add_executable(
+  NAME recipe_strategy_name
+  SOURCES recipe_strategy_name.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_strategy_name)
+
+blt_add_executable(
+  NAME recipe_named_allocation
+  SOURCES recipe_named_allocation.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_named_allocation)
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
 

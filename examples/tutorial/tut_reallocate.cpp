@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -32,14 +32,12 @@ int main(int, char**)
 
   for (auto& destination : destinations) {
     auto allocator = rm.getAllocator(destination);
-    double* data =
-        static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+    double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-    std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-              << allocator.getName() << " allocator." << std::endl;
+    std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the " << allocator.getName() << " allocator."
+              << std::endl;
 
-    std::cout << "Reallocating data (" << data << ") to size "
-              << REALLOCATED_SIZE << "...";
+    std::cout << "Reallocating data (" << data << ") to size " << REALLOCATED_SIZE << "...";
 
     // _sphinx_tag_tut_realloc_start
     data = static_cast<double*>(rm.reallocate(data, REALLOCATED_SIZE));

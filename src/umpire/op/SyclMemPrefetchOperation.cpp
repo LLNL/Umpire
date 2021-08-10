@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -14,9 +14,7 @@
 namespace umpire {
 namespace op {
 
-void SyclMemPrefetchOperation::apply(void* src_ptr,
-                                     util::AllocationRecord* allocation,
-                                     int value, std::size_t length)
+void SyclMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* allocation, int value, std::size_t length)
 {
   if (allocation->strategy->getTraits().id != value) {
     UMPIRE_ERROR("SYCL memPrefetch failed with invalid deviceID  = " << value);

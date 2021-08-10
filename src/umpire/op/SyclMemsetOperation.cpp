@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,9 +15,7 @@
 namespace umpire {
 namespace op {
 
-void SyclMemsetOperation::apply(void* src_ptr,
-                                util::AllocationRecord* allocation, int value,
-                                std::size_t length)
+void SyclMemsetOperation::apply(void* src_ptr, util::AllocationRecord* allocation, int value, std::size_t length)
 {
   auto sycl_queue = allocation->strategy->getTraits().queue;
   sycl_queue->memset(src_ptr, value, length);

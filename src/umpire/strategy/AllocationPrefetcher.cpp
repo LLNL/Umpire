@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,9 +13,8 @@
 namespace umpire {
 namespace strategy {
 
-AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id,
-                                           Allocator allocator, int device_id)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+AllocationPrefetcher::AllocationPrefetcher(const std::string& name, int id, Allocator allocator, int device_id)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "AllocationPrefetcher"},
       m_allocator{allocator.getAllocationStrategy()},
       m_device{device_id}
 {

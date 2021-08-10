@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 void check_parent(umpire::Allocator alloc)
 {
@@ -29,7 +29,7 @@ void check_parent(umpire::Allocator alloc)
  * the parent will be whatever allocator was used by the resource manager
  * to create the next allocator in the chain.
  */
-int main ()
+int main()
 {
   const int SIZE = 5;
   auto& rm = umpire::ResourceManager::getInstance();
@@ -37,13 +37,12 @@ int main ()
   std::vector<umpire::Allocator> Alloc(SIZE);
   Alloc[0] = rm.getAllocator("HOST");
 
-  for(int i = 1; i < SIZE; i++) {
-    Alloc[i] = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "HOST_pool_" + std::to_string(i), Alloc[i-1]);
+  for (int i = 1; i < SIZE; i++) {
+    Alloc[i] = rm.makeAllocator<umpire::strategy::QuickPool>("HOST_pool_" + std::to_string(i), Alloc[i - 1]);
   }
 
-  for(int c = 0; c < SIZE; c++) {
-    std::cout << "Starting tree: " << (c+1) << "/" << SIZE << std::endl;
+  for (int c = 0; c < SIZE; c++) {
+    std::cout << "Starting tree: " << (c + 1) << "/" << SIZE << std::endl;
     check_parent(Alloc[c]);
   }
 

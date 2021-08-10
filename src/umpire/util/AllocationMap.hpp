@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -150,8 +150,7 @@ class AllocationMap {
   std::size_t size() const;
 
   // Print methods -- either matching a predicate or all records
-  void print(const std::function<bool(const AllocationRecord&)>&& predicate,
-             std::ostream& os = std::cout) const;
+  void print(const std::function<bool(const AllocationRecord&)>&& predicate, std::ostream& os = std::cout) const;
 
   void printAll(std::ostream& os = std::cout) const;
 

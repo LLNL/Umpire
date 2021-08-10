@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -35,6 +35,7 @@ set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
 set(ENABLE_CLANGQUERY Off CACHE BOOL "")
+set(ENABLE_DOCS Off CACHE BOOL "")
 
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
@@ -141,8 +142,8 @@ cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 
 cmake_dependent_option(
-  ENABLE_HOST_SHARED_MEMORY "Enable Host Shared Memory Resource" Off
-  "ENABLE_MPI;NOT WIN32;NOT APPLE" Off )
+  ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
+  "NOT WIN32;NOT APPLE" Off )
 
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
@@ -155,6 +156,8 @@ include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
+add_subdirectory(src)
+
 configure_file(
   umpire-config.cmake.in
   "${PROJECT_BINARY_DIR}/umpire-config.cmake" @ONLY)
@@ -164,8 +167,6 @@ install(FILES
   DESTINATION share/umpire/cmake)
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
-
-add_subdirectory(src)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)

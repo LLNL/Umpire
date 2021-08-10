@@ -1,24 +1,22 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/config.hpp"
-
-#include "umpire/Allocator.hpp"
-#include "umpire/ResourceManager.hpp"
-#include "umpire/Umpire.hpp"
-#include "umpire/resource/HostSharedMemoryResource.hpp"
-#include "umpire/util/MemoryResourceTraits.hpp"
-
-#include "mpi.h"
-
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <thread>
+
+#include "mpi.h"
+#include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
+#include "umpire/config.hpp"
+#include "umpire/resource/HostSharedMemoryResource.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
 
 //
 // For debugging purposes, this program uses the number of command line
@@ -35,8 +33,8 @@
 //
 int main(int ac, char** av)
 {
-  const bool use_mpi{ ac == 1 };
-  const bool i_am_parent{ ac == 2 };
+  const bool use_mpi{ac == 1};
+  const bool i_am_parent{ac == 2};
 
   if (use_mpi) {
     MPI_Init(&ac, &av);
@@ -48,12 +46,12 @@ int main(int ac, char** av)
   // Set up the traits for the allocator
   //
   auto traits{umpire::get_default_resource_traits("SHARED")};
-  traits.size = 1*1024*1024;  // Maximum size of this Allocator
+  traits.size = 1 * 1024 * 1024; // Maximum size of this Allocator
 
   //
   // Default scope for allocator is NODE.  SOCKET is another option of interest
   //
-  traits.scope = umpire::MemoryResourceTraits::shared_scope::node;  // default
+  traits.scope = umpire::MemoryResourceTraits::shared_scope::node; // default
 
   //
   // Create (or attach to) the allocator
@@ -63,8 +61,8 @@ int main(int ac, char** av)
   //
   // Resource of this allocator is SHARED
   //
-  UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource
-                        == umpire::MemoryResourceTraits::resource_type::shared);
+  UMPIRE_ASSERT(node_allocator.getAllocationStrategy()->getTraits().resource ==
+                umpire::MemoryResourceTraits::resource_type::shared);
 
   //
   // Get communicator for this allocator
@@ -74,30 +72,26 @@ int main(int ac, char** av)
   int shared_rank{0};
 
   if (use_mpi) {
-    shared_allocator_comm = umpire::get_communicator_for_allocator(
-                                      node_allocator, MPI_COMM_WORLD);
+    shared_allocator_comm = umpire::get_communicator_for_allocator(node_allocator, MPI_COMM_WORLD);
     MPI_Comm_rank(shared_allocator_comm, &shared_rank);
-  }
-  else
-  { // Running non-mpi in debugger
+  } else { // Running non-mpi in debugger
     shared_rank = i_am_parent ? foreman_rank : foreman_rank + 1;
   }
 
   //
   // Allocate shared memory
   //
-  void* ptr{ node_allocator.allocate("allocation_name_2", sizeof(uint64_t)) };
-  uint64_t* data{ static_cast<uint64_t*>(ptr) };
+  void* ptr{node_allocator.allocate("allocation_name_2", sizeof(uint64_t))};
+  uint64_t* data{static_cast<uint64_t*>(ptr)};
 
-  if ( shared_rank == foreman_rank )
+  if (shared_rank == foreman_rank)
     *data = 0xDEADBEEF;
 
   if (use_mpi) {
     MPI_Barrier(shared_allocator_comm);
-  }
-  else {
-    if ( !i_am_parent ) {
-      shared_rank++;    // Set a breakpoint here to synchronize
+  } else {
+    if (!i_am_parent) {
+      shared_rank++; // Set a breakpoint here to synchronize
     }
   }
 
@@ -111,4 +105,3 @@ int main(int ac, char** av)
 
   return 0;
 }
-

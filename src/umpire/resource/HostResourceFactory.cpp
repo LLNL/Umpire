@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,8 +23,7 @@
 namespace umpire {
 namespace resource {
 
-bool HostResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool HostResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("HOST") != std::string::npos) {
     return true;
@@ -33,14 +32,13 @@ bool HostResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(const std::string& name, int id,
+                                                                      MemoryResourceTraits traits)
 {
 #if defined(UMPIRE_ENABLE_NUMA)
   using HostAllocator = alloc::PosixMemalignAllocator;
@@ -48,8 +46,7 @@ std::unique_ptr<resource::MemoryResource> HostResourceFactory::create(
   using HostAllocator = alloc::MallocAllocator;
 #endif
 
-  return util::make_unique<DefaultMemoryResource<HostAllocator>>(
-      Platform::host, name, id, traits);
+  return util::make_unique<DefaultMemoryResource<HostAllocator>>(Platform::host, name, id, traits);
 }
 
 MemoryResourceTraits HostResourceFactory::getDefaultTraits()

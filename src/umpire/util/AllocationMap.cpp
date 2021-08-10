@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -20,8 +21,7 @@ namespace umpire {
 namespace util {
 
 // Record List
-AllocationMap::RecordList::RecordList(AllocationMap& map,
-                                      AllocationRecord record)
+AllocationMap::RecordList::RecordList(AllocationMap& map, AllocationRecord record)
     : m_map{map}, m_tail{nullptr}, m_length{0}
 {
   push_back(record);
@@ -32,6 +32,7 @@ AllocationMap::RecordList::~RecordList()
   RecordBlock* curr = m_tail;
   while (curr) {
     RecordBlock* prev = curr->prev;
+    curr->~RecordBlock();
     m_map.m_block_pool.deallocate(curr);
     curr = prev;
   }
@@ -39,7 +40,7 @@ AllocationMap::RecordList::~RecordList()
 
 void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 {
-  RecordBlock* curr = static_cast<RecordBlock*>(m_map.m_block_pool.allocate());
+  RecordBlock* curr = new (m_map.m_block_pool.allocate()) RecordBlock{};
   curr->prev = m_tail;
   curr->rec = rec;
   m_tail = curr;
@@ -56,6 +57,7 @@ AllocationRecord AllocationMap::RecordList::pop_back()
   RecordBlock* prev = m_tail->prev;
 
   // Deallocate and move tail pointer
+  m_tail->~RecordBlock();
   m_map.m_block_pool.deallocate(m_tail);
   m_tail = prev;
 
@@ -65,8 +67,7 @@ AllocationRecord AllocationMap::RecordList::pop_back()
   return ret;
 }
 
-AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::begin()
-    const
+AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::begin() const
 {
   return AllocationMap::RecordList::ConstIterator{this, iterator_begin{}};
 }
@@ -96,19 +97,16 @@ const AllocationRecord* AllocationMap::RecordList::back() const
   return &m_tail->rec;
 }
 
-AllocationMap::RecordList::ConstIterator::ConstIterator()
-    : m_list(nullptr), m_curr(nullptr)
+AllocationMap::RecordList::ConstIterator::ConstIterator() : m_list(nullptr), m_curr(nullptr)
 {
 }
 
-AllocationMap::RecordList::ConstIterator::ConstIterator(const RecordList* list,
-                                                        iterator_begin)
+AllocationMap::RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_begin)
     : m_list(list), m_curr(m_list->m_tail)
 {
 }
 
-AllocationMap::RecordList::ConstIterator::ConstIterator(const RecordList* list,
-                                                        iterator_end)
+AllocationMap::RecordList::ConstIterator::ConstIterator(const RecordList* list, iterator_end)
     : m_list(list), m_curr(nullptr)
 {
 }
@@ -125,8 +123,7 @@ const AllocationRecord* AllocationMap::RecordList::ConstIterator::operator->()
   return &m_curr->rec;
 }
 
-AllocationMap::RecordList::ConstIterator&
-AllocationMap::RecordList::ConstIterator::operator++()
+AllocationMap::RecordList::ConstIterator& AllocationMap::RecordList::ConstIterator::operator++()
 {
   if (!m_curr)
     UMPIRE_ERROR("Cannot dereference nullptr");
@@ -134,32 +131,25 @@ AllocationMap::RecordList::ConstIterator::operator++()
   return *this;
 }
 
-AllocationMap::RecordList::ConstIterator
-AllocationMap::RecordList::ConstIterator::operator++(int)
+AllocationMap::RecordList::ConstIterator AllocationMap::RecordList::ConstIterator::operator++(int)
 {
   ConstIterator tmp{*this};
   this->operator++();
   return tmp;
 }
 
-bool AllocationMap::RecordList::ConstIterator::operator==(
-    const AllocationMap::RecordList::ConstIterator& other) const
+bool AllocationMap::RecordList::ConstIterator::operator==(const AllocationMap::RecordList::ConstIterator& other) const
 {
   return m_list == other.m_list && m_curr == other.m_curr;
 }
 
-bool AllocationMap::RecordList::ConstIterator::operator!=(
-    const AllocationMap::RecordList::ConstIterator& other) const
+bool AllocationMap::RecordList::ConstIterator::operator!=(const AllocationMap::RecordList::ConstIterator& other) const
 {
   return !(*this == other);
 }
 
 // AllocationMap
-AllocationMap::AllocationMap()
-    : m_block_pool{sizeof(RecordList::RecordBlock)},
-      m_map{},
-      m_size{0},
-      m_mutex{}
+AllocationMap::AllocationMap() : m_block_pool{sizeof(RecordList::RecordBlock)}, m_map{}, m_size{0}, m_mutex{}
 {
 }
 
@@ -168,11 +158,9 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
-  UMPIRE_REPLAY(
-      "\"event\": \"allocation_map_insert\", \"payload\": { \"ptr\": \""
-      << ptr << "\", \"record_ptr\": \"" << record.ptr
-      << "\", \"record_size\": \"" << record.size
-      << "\", \"record_strategy\": \"" << record.strategy << "\" }");
+  UMPIRE_REPLAY("\"event\": \"allocation_map_insert\", \"payload\": { \"ptr\": \""
+                << ptr << "\", \"record_ptr\": \"" << record.ptr << "\", \"record_size\": \"" << record.size
+                << "\", \"record_strategy\": \"" << record.strategy << "\" }");
 
   auto pair = m_map.insert(ptr, *this, record);
 
@@ -194,8 +182,7 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Searching for " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_find\", \"payload\": { \"ptr\": \""
-                << ptr << "\" }");
+  UMPIRE_REPLAY("\"event\": \"allocation_map_find\", \"payload\": { \"ptr\": \"" << ptr << "\" }");
 
   const AllocationRecord* alloc_record = doFindRecord(ptr);
 
@@ -212,8 +199,7 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
 
 AllocationRecord* AllocationMap::find(void* ptr)
 {
-  return const_cast<AllocationRecord*>(
-      const_cast<const AllocationMap*>(this)->find(ptr));
+  return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->find(ptr));
 }
 
 const AllocationRecord* AllocationMap::doFindRecord(void* ptr) const noexcept
@@ -228,13 +214,11 @@ const AllocationRecord* AllocationMap::doFindRecord(void* ptr) const noexcept
     UMPIRE_ASSERT(candidate->ptr <= ptr);
 
     // Check if ptr is inside candidate's allocation
-    const bool in_candidate = (static_cast<char*>(candidate->ptr) +
-                               candidate->size) > static_cast<char*>(ptr) ||
-                              (candidate->ptr == ptr);
+    const bool in_candidate =
+        (static_cast<char*>(candidate->ptr) + candidate->size) > static_cast<char*>(ptr) || (candidate->ptr == ptr);
 
     if (in_candidate) {
-      UMPIRE_LOG(Debug, "Found " << ptr << " at " << candidate->ptr
-                                 << " with size " << candidate->size);
+      UMPIRE_LOG(Debug, "Found " << ptr << " at " << candidate->ptr << " with size " << candidate->size);
       alloc_record = candidate;
     } else {
       alloc_record = nullptr;
@@ -254,8 +238,7 @@ const AllocationRecord* AllocationMap::findRecord(void* ptr) const noexcept
 
 AllocationRecord* AllocationMap::findRecord(void* ptr) noexcept
 {
-  return const_cast<AllocationRecord*>(
-      const_cast<const AllocationMap*>(this)->findRecord(ptr));
+  return const_cast<AllocationRecord*>(const_cast<const AllocationMap*>(this)->findRecord(ptr));
 }
 
 AllocationRecord AllocationMap::remove(void* ptr)
@@ -265,9 +248,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
   AllocationRecord ret;
 
   UMPIRE_LOG(Debug, "Removing " << ptr);
-  UMPIRE_REPLAY(
-      "\"event\": \"allocation_map_remove\", \"payload\": { \"ptr\": \""
-      << ptr << "\" }");
+  UMPIRE_REPLAY("\"event\": \"allocation_map_remove\", \"payload\": { \"ptr\": \"" << ptr << "\" }");
 
   auto iter = m_map.find(ptr);
 
@@ -307,9 +288,7 @@ std::size_t AllocationMap::size() const
   return m_size;
 }
 
-void AllocationMap::print(
-    const std::function<bool(const AllocationRecord&)>&& pred,
-    std::ostream& os) const
+void AllocationMap::print(const std::function<bool(const AllocationRecord&)>&& pred, std::ostream& os) const
 {
   for (auto p : m_map) {
     std::stringstream ss;
@@ -321,11 +300,11 @@ void AllocationMap::print(
       if (pred(*iter)) {
         any_match = true;
         auto end_ptr = static_cast<unsigned char*>(iter->ptr) + iter->size;
-        ss << iter->size << " [ " << reinterpret_cast<void*>(iter->ptr)
-           << " -- " << reinterpret_cast<void*>(end_ptr) << " ] " << std::endl
+        ss << "  size: " << iter->size << ", "
+           << "range: " << reinterpret_cast<void*>(iter->ptr) << " -- " << reinterpret_cast<void*>(end_ptr) << ", "
+           << "name: " << iter->name << ", "
 #if defined(UMPIRE_ENABLE_BACKTRACE)
-           << umpire::util::backtracer<trace_optional>::print(
-                  iter->allocation_backtrace)
+           << "backtrace: " << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
 #endif // UMPIRE_ENABLE_BACKTRACE
            << std::endl;
       }
@@ -356,23 +335,16 @@ AllocationMap::ConstIterator AllocationMap::end() const
   return AllocationMap::ConstIterator{this, iterator_end{}};
 }
 
-AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map,
-                                            iterator_begin)
+AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_begin)
     : m_outer_iter(map->m_map.begin()),
-      m_inner_iter(m_outer_iter->first ? m_outer_iter->second->begin()
-                                       : InnerIter{}),
-      m_inner_end(m_outer_iter->first ? m_outer_iter->second->end()
-                                      : InnerIter{}),
+      m_inner_iter(m_outer_iter->first ? m_outer_iter->second->begin() : InnerIter{}),
+      m_inner_end(m_outer_iter->first ? m_outer_iter->second->end() : InnerIter{}),
       m_outer_end(map->m_map.end())
 {
 }
 
-AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map,
-                                            iterator_end)
-    : m_outer_iter(map->m_map.end()),
-      m_inner_iter(InnerIter{}),
-      m_inner_end(InnerIter{}),
-      m_outer_end(map->m_map.end())
+AllocationMap::ConstIterator::ConstIterator(const AllocationMap* map, iterator_end)
+    : m_outer_iter(map->m_map.end()), m_inner_iter(InnerIter{}), m_inner_end(InnerIter{}), m_outer_end(map->m_map.end())
 {
 }
 
@@ -408,15 +380,12 @@ AllocationMap::ConstIterator AllocationMap::ConstIterator::operator++(int)
   return tmp;
 }
 
-bool AllocationMap::ConstIterator::operator==(
-    const AllocationMap::ConstIterator& other) const
+bool AllocationMap::ConstIterator::operator==(const AllocationMap::ConstIterator& other) const
 {
-  return m_outer_iter == other.m_outer_iter &&
-         m_inner_iter == other.m_inner_iter;
+  return m_outer_iter == other.m_outer_iter && m_inner_iter == other.m_inner_iter;
 }
 
-bool AllocationMap::ConstIterator::operator!=(
-    const AllocationMap::ConstIterator& other) const
+bool AllocationMap::ConstIterator::operator!=(const AllocationMap::ConstIterator& other) const
 {
   return !(*this == other);
 }
