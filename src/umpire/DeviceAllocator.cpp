@@ -28,6 +28,7 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, size
 
 __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& other)
     : m_allocator(other.m_allocator),
+      m_id(other.m_id),
       m_ptr(other.m_ptr),
       m_counter(other.m_counter),
       m_size(other.m_size),
@@ -35,8 +36,9 @@ __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& othe
 {
 }
 
-__host__ DeviceAllocator::~DeviceAllocator()
+__host__ __device__ DeviceAllocator::~DeviceAllocator()
 {
+#if !defined(__CUDA_ARCH__)
   if (!m_child) {
     auto& rm = umpire::ResourceManager::getInstance();
     auto device_alloc = rm.getAllocator(umpire::resource::Device);
@@ -44,6 +46,7 @@ __host__ DeviceAllocator::~DeviceAllocator()
     device_alloc.deallocate(m_counter);
     m_allocator.deallocate(m_ptr);
   }
+#endif
 }
 
 __device__ void* DeviceAllocator::allocate(size_t size)

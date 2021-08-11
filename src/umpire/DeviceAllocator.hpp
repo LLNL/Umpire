@@ -16,7 +16,7 @@ namespace umpire {
  */
 class DeviceAllocator {
  public:
-  __host__ ~DeviceAllocator();
+  __host__ __device__ ~DeviceAllocator();
 
   __host__ __device__ DeviceAllocator(const DeviceAllocator& other);
 

@@ -95,9 +95,6 @@ if (ENABLE_CUDA)
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-  set_source_files_properties(Umpire.cpp
-                              PROPERTIES
-                              LANGUAGE CUDA)
 endif()
 
 set (umpire_depends
@@ -114,12 +111,6 @@ if (ENABLE_OPENMP_TARGET)
     ${umpire_depends}
     openmp)
 endif ()
-
-#if (ENABLE_CUDA)
-#  set (umpire_depends
-#    ${umpire_depends}
-#    cuda)
-#endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_C )
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )

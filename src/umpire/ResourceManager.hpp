@@ -128,7 +128,7 @@ class ResourceManager {
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  void syncDeviceAllocator();
+  cudaError_t syncDeviceAllocator();
   DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
 #endif
 

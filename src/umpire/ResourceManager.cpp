@@ -331,10 +331,10 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
 }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-void ResourceManager::syncDeviceAllocator()
+cudaError_t ResourceManager::syncDeviceAllocator()
 {
   //need to make sure there actually is a device allocator available to sync
-  cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS, &umpire::util::UMPIRE_DEV_ALLOCS_h,
+  return cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS, &umpire::util::UMPIRE_DEV_ALLOCS_h,
                      sizeof(DeviceAllocator*));
 }
 
@@ -343,12 +343,14 @@ DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t
   static size_t i{0};
 
   if (i == 0) {
-    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
+    cudaError_t err;
+    err = cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
+    if (err != cudaSuccess)
+      std::cout<<"ERROR in mallocManaged"<<std::endl;
   }
 
-  DeviceAllocator device_allocator = DeviceAllocator(allocator, size, i);
-  umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = device_allocator;
-  return device_allocator;
+  umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = DeviceAllocator(allocator, size, i);
+  return umpire::util::UMPIRE_DEV_ALLOCS_h[i]; 
 }
 #endif
 
