@@ -8,15 +8,13 @@
 #include "umpire/util/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
 
-__global__ void my_kernel(double* data_ptr)
+__global__ void my_kernel()
 {
   if (threadIdx.x == 0) {
     umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator(0);
-    double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
 
-    //*data_ptr = data;
-    //data[0] = 1024;
-    *data_ptr = (double)alloc.getID();
+    double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
+    data[0] = 1024.5;
   }
 }
 
@@ -25,21 +23,18 @@ int main(int argc, char const* argv[])
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = rm.makeDeviceAllocator(allocator, 1024);
+  auto device_allocator2 = rm.makeDeviceAllocator(allocator, 42);
+  auto device_allocator3 = rm.makeDeviceAllocator(allocator, 42);
 
-
-  if (cudaSuccess != rm.syncDeviceAllocator())
-    std::cout<<"ERROR!"<<std::endl;
+  rm.syncDeviceAllocator();
   
-  double* ptr_to_data = static_cast<double*>(allocator.allocate(sizeof(double)));
-
-  my_kernel<<<1, 16>>>(ptr_to_data);
-
-  if (cudaSuccess != cudaGetLastError())
-    std::cout<<"kernel ERROR!"<<std::endl;
+  my_kernel<<<1, 16>>>();
   cudaDeviceSynchronize();
 
-  std::cout << (*ptr_to_data) << std::endl;
+  //std::cout << device_allocator << std::endl;
   std::cout << "DA1 with ID:" << device_allocator.getID() << std::endl;
+  std::cout << "DA2 with ID:" << device_allocator2.getID() << std::endl;
+  std::cout << "DA3 with ID:" << device_allocator3.getID() << std::endl;
 
   return 0;
 }

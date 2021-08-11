@@ -343,14 +343,11 @@ DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t
   static size_t i{0};
 
   if (i == 0) {
-    cudaError_t err;
-    err = cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
-    if (err != cudaSuccess)
-      std::cout<<"ERROR in mallocManaged"<<std::endl;
+    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
   }
 
-  umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = DeviceAllocator(allocator, size, i);
-  return umpire::util::UMPIRE_DEV_ALLOCS_h[i]; 
+  umpire::util::UMPIRE_DEV_ALLOCS_h[i] = DeviceAllocator(allocator, size, i);
+  return umpire::util::UMPIRE_DEV_ALLOCS_h[i++]; 
 }
 #endif
 
