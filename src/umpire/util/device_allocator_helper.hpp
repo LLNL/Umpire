@@ -21,6 +21,14 @@ __device__ static DeviceAllocator getDeviceAllocator(int id)
   return umpire::util::UMPIRE_DEV_ALLOCS[id];
 }
 
+/*
+__device__ static size_t getCurrentSize(int id)
+{
+  auto alloc = getDeviceAllocator(id);
+  //size_t total_size = alloc.getSize();
+  char* ptr_cpy = 
+}
+*/
 } // end of namespace util
 
 } // end of namespace umpire

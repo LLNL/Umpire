@@ -17,6 +17,7 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, size
       m_id(id),
       m_ptr(static_cast<char*>(m_allocator.allocate(size))),
       m_size(size),
+      m_bytes_used(0),
       m_child(false)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -32,13 +33,14 @@ __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& othe
       m_ptr(other.m_ptr),
       m_counter(other.m_counter),
       m_size(other.m_size),
+      m_bytes_used(other.m_bytes_used),
       m_child(true)
 {
 }
 
 __host__ __device__ DeviceAllocator::~DeviceAllocator()
 {
-#if !defined(__CUDA_ARCH__)
+/*#if !defined(__CUDA_ARCH__)
   if (!m_child) {
     auto& rm = umpire::ResourceManager::getInstance();
     auto device_alloc = rm.getAllocator(umpire::resource::Device);
@@ -46,7 +48,7 @@ __host__ __device__ DeviceAllocator::~DeviceAllocator()
     device_alloc.deallocate(m_counter);
     m_allocator.deallocate(m_ptr);
   }
-#endif
+#endif*/
 }
 
 __device__ void* DeviceAllocator::allocate(size_t size)
@@ -55,12 +57,19 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   if (*m_counter > m_size) {
     UMPIRE_ERROR("DeviceAllocator out of space");
   }
+
+  m_bytes_used += (size);
   return static_cast<void*>(m_ptr + counter);
 }
 
 __host__ __device__ size_t DeviceAllocator::getID()
 {
   return m_id;
+}
+
+__host__ __device__ size_t DeviceAllocator::getBytesUsed()
+{
+  return m_bytes_used;
 }
 
 } // end of namespace umpire

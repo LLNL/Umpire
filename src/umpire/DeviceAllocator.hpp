@@ -30,6 +30,7 @@ class DeviceAllocator {
   __device__ void* allocate(size_t size);
 
   __host__ __device__ size_t getID();
+  __host__ __device__ size_t getBytesUsed();
 
   friend class ResourceManager;
 
@@ -48,6 +49,7 @@ class DeviceAllocator {
   unsigned int* m_counter;
 
   size_t m_id;
+  size_t m_bytes_used;
   size_t m_size;
   bool m_child;
 };
