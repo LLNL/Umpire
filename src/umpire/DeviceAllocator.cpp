@@ -18,6 +18,7 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, size
       m_ptr(static_cast<char*>(m_allocator.allocate(size))),
       m_size(size),
       m_bytes_used(0),
+      m_initialized(false),
       m_child(false)
 {
   auto& rm = umpire::ResourceManager::getInstance();

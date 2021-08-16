@@ -51,6 +51,7 @@ class DeviceAllocator {
   size_t m_id;
   size_t m_bytes_used;
   size_t m_size;
+  bool m_initialized;
   bool m_child;
 };
 

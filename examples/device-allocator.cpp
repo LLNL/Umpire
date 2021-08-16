@@ -4,14 +4,13 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-//#include "umpire/DeviceAllocator.hpp"
 #include "umpire/util/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
 
 __global__ void my_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator(0);
+    umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator(1);
     double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
     *data_ptr = data;
     data[7] = 1024;
@@ -31,9 +30,8 @@ int main(int argc, char const* argv[])
       static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   std::cout << "Bytes Used: " << device_allocator.getBytesUsed() << std::endl;
-  if (cudaSuccess != rm.syncDeviceAllocator())
-    std::cout<<"ERROR!"<<std::endl;  
-  
+
+  UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY();
   my_kernel<<<1, 16>>>(ptr_to_data);
   
   if (cudaSuccess != cudaGetLastError())

@@ -13,12 +13,19 @@ namespace umpire {
 
 namespace util {
 
-static DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
-__device__ static DeviceAllocator* UMPIRE_DEV_ALLOCS;
+extern DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
+__device__ extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
 
-__device__ static DeviceAllocator getDeviceAllocator(int id)
+__device__ inline DeviceAllocator getDeviceAllocator(int id)
 {
   return umpire::util::UMPIRE_DEV_ALLOCS[id];
+}
+
+#define UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY()            \
+{							  \
+  cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS,	  \
+                    &umpire::util::UMPIRE_DEV_ALLOCS_h,   \
+                    sizeof(umpire::DeviceAllocator*));	 	  \
 }
 
 /*

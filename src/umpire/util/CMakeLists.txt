@@ -56,6 +56,10 @@ if (ENABLE_CUDA)
     ${umpire_util_headers}
     device_allocator_helper.hpp)
 
+  set (umpire_util_sources
+    ${umpire_util_sources}
+    device_allocator_helper.cu)
+
   set (umpire_util_depends
     ${umpire_util_depends}
     cuda)
