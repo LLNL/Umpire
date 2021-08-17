@@ -105,7 +105,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
 
-- Update camp to latest commit.
+- Update camp to v0.2.2.
 
 - Use CMakeCachedPackage in uberenv.
 
