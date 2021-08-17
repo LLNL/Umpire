@@ -10,6 +10,10 @@ if (ENABLE_HIP)
   set (cookbook_depends ${cookbook_depends} hip_runtime)
 endif()
 
+if (ENABLE_CUDA)
+  set (cookbook_depends ${cookbook_depends} cuda)
+endif()
+
 if (ENABLE_OPENMP_TARGET)
   set (cookbook_depends
     ${cookbook_depends}
@@ -50,6 +54,12 @@ if (ENABLE_CUDA)
     SOURCES recipe_advice_device_id.cpp
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_advice_device_id)
+
+  blt_add_executable(
+    NAME recipe_device_allocator
+    SOURCES recipe_device_allocator.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_device_allocator)
 
   blt_add_executable(
     NAME recipe_pool_advice
