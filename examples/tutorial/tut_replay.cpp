@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,6 +10,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 int main(int, char**)
 {
@@ -26,14 +27,12 @@ int main(int, char**)
   // Make an allocator
   // _sphinx_tag_tut_replay_make_allocate_start
   auto allocator = rm.getAllocator("HOST");
-  auto pool =
-      rm.makeAllocator<umpire::strategy::DynamicPool>("pool", allocator);
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("pool", allocator);
   // _sphinx_tag_tut_replay_make_allocate_end
 
   // Do some allocations
   // _sphinx_tag_tut_replay_allocate_start
-  std::generate(allocations.begin(), allocations.end(),
-                [&]() { return pool.allocate(random_number()); });
+  std::generate(allocations.begin(), allocations.end(), [&]() { return pool.allocate(random_number()); });
   // _sphinx_tag_tut_replay_allocate_end
 
   // Clean up

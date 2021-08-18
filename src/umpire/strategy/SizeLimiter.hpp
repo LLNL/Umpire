@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -25,11 +25,10 @@ namespace strategy {
  */
 class SizeLimiter : public AllocationStrategy {
  public:
-  SizeLimiter(const std::string& name, int id, Allocator allocator,
-              std::size_t size_limit);
+  SizeLimiter(const std::string& name, int id, Allocator allocator, std::size_t size_limit);
 
   void* allocate(std::size_t bytes) override;
-  void deallocate(void* ptr) override;
+  void deallocate(void* ptr, std::size_t size) override;
 
   Platform getPlatform() noexcept override;
 

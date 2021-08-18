@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -65,81 +65,59 @@ MemoryOperationRegistry& MemoryOperationRegistry::getInstance() noexcept
 
 MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 {
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<HostCopyOperation>());
+  registerOperation("COPY", std::make_pair(Platform::host, Platform::host), std::make_shared<HostCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<HostMemsetOperation>());
+  registerOperation("MEMSET", std::make_pair(Platform::host, Platform::host), std::make_shared<HostMemsetOperation>());
 
-  registerOperation("REALLOCATE",
-                    std::make_pair(Platform::host, Platform::host),
+  registerOperation("REALLOCATE", std::make_pair(Platform::host, Platform::host),
                     std::make_shared<HostReallocateOperation>());
 
-  registerOperation("REALLOCATE",
-                    std::make_pair(Platform::undefined, Platform::undefined),
+  registerOperation("REALLOCATE", std::make_pair(Platform::undefined, Platform::undefined),
                     std::make_shared<GenericReallocateOperation>());
 
 #if defined(UMPIRE_ENABLE_NUMA)
-  registerOperation("MOVE", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<NumaMoveOperation>());
+  registerOperation("MOVE", std::make_pair(Platform::host, Platform::host), std::make_shared<NumaMoveOperation>());
 
   // NOTE: We don't use CUDA calls in the move operation so no guard is needed
-  registerOperation("MOVE", std::make_pair(Platform::host, Platform::cuda),
-                    std::make_shared<NumaMoveOperation>());
+  registerOperation("MOVE", std::make_pair(Platform::host, Platform::cuda), std::make_shared<NumaMoveOperation>());
 
-  registerOperation("MOVE", std::make_pair(Platform::cuda, Platform::host),
-                    std::make_shared<NumaMoveOperation>());
+  registerOperation("MOVE", std::make_pair(Platform::cuda, Platform::host), std::make_shared<NumaMoveOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::cuda),
-                    std::make_shared<CudaCopyToOperation>());
+  registerOperation("COPY", std::make_pair(Platform::host, Platform::cuda), std::make_shared<CudaCopyToOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::host),
-                    std::make_shared<CudaCopyFromOperation>());
+  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::host), std::make_shared<CudaCopyFromOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaCopyOperation>());
+  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::cuda), std::make_shared<CudaCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaMemsetOperation>());
+  registerOperation("MEMSET", std::make_pair(Platform::cuda, Platform::cuda), std::make_shared<CudaMemsetOperation>());
 
-  registerOperation("REALLOCATE",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("REALLOCATE", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<GenericReallocateOperation>());
 
-  registerOperation("ACCESSED_BY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("ACCESSED_BY", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaAdviseAccessedByOperation>());
 
-  registerOperation("PREFERRED_LOCATION",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("PREFERRED_LOCATION", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaAdvisePreferredLocationOperation>());
 
-  registerOperation("PREFERRED_LOCATION",
-                    std::make_pair(Platform::host, Platform::host),
+  registerOperation("PREFERRED_LOCATION", std::make_pair(Platform::host, Platform::host),
                     std::make_shared<CudaAdvisePreferredLocationOperation>());
 
-  registerOperation("READ_MOSTLY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("READ_MOSTLY", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaAdviseReadMostlyOperation>());
 
-  registerOperation("UNSET_ACCESSED_BY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("UNSET_ACCESSED_BY", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaAdviseUnsetAccessedByOperation>());
 
-  registerOperation(
-      "UNSET_PREFERRED_LOCATION",
-      std::make_pair(Platform::cuda, Platform::cuda),
-      std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
+  registerOperation("UNSET_PREFERRED_LOCATION", std::make_pair(Platform::cuda, Platform::cuda),
+                    std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
-  registerOperation(
-      "UNSET_PREFERRED_LOCATION",
-      std::make_pair(Platform::host, Platform::host),
-      std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
+  registerOperation("UNSET_PREFERRED_LOCATION", std::make_pair(Platform::host, Platform::host),
+                    std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
 
-  registerOperation("UNSET_READ_MOSTLY",
-                    std::make_pair(Platform::cuda, Platform::cuda),
+  registerOperation("UNSET_READ_MOSTLY", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
 
   registerOperation("PREFETCH", std::make_pair(Platform::cuda, Platform::cuda),
@@ -147,59 +125,45 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::hip),
-                    std::make_shared<HipCopyToOperation>());
+  registerOperation("COPY", std::make_pair(Platform::host, Platform::hip), std::make_shared<HipCopyToOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::host),
-                    std::make_shared<HipCopyFromOperation>());
+  registerOperation("COPY", std::make_pair(Platform::hip, Platform::host), std::make_shared<HipCopyFromOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::hip),
-                    std::make_shared<HipCopyOperation>());
+  registerOperation("COPY", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip),
-                    std::make_shared<HipMemsetOperation>());
+  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipMemsetOperation>());
 
   registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
                     std::make_shared<GenericReallocateOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-  registerOperation("COPY",
-                    std::make_pair(Platform::host, Platform::omp_target),
+  registerOperation("COPY", std::make_pair(Platform::host, Platform::omp_target),
                     std::make_shared<OpenMPTargetCopyOperation>());
 
-  registerOperation("COPY",
-                    std::make_pair(Platform::omp_target, Platform::host),
+  registerOperation("COPY", std::make_pair(Platform::omp_target, Platform::host),
                     std::make_shared<OpenMPTargetCopyOperation>());
 
-  registerOperation("COPY",
-                    std::make_pair(Platform::omp_target, Platform::omp_target),
+  registerOperation("COPY", std::make_pair(Platform::omp_target, Platform::omp_target),
                     std::make_shared<OpenMPTargetCopyOperation>());
 
-  registerOperation("MEMSET",
-                    std::make_pair(Platform::omp_target, Platform::omp_target),
+  registerOperation("MEMSET", std::make_pair(Platform::omp_target, Platform::omp_target),
                     std::make_shared<OpenMPTargetMemsetOperation>());
 
-  registerOperation("REALLOCATE",
-                    std::make_pair(Platform::omp_target, Platform::omp_target),
+  registerOperation("REALLOCATE", std::make_pair(Platform::omp_target, Platform::omp_target),
                     std::make_shared<GenericReallocateOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::sycl),
-                    std::make_shared<SyclCopyToOperation>());
+  registerOperation("COPY", std::make_pair(Platform::host, Platform::sycl), std::make_shared<SyclCopyToOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::sycl, Platform::host),
-                    std::make_shared<SyclCopyFromOperation>());
+  registerOperation("COPY", std::make_pair(Platform::sycl, Platform::host), std::make_shared<SyclCopyFromOperation>());
 
-  registerOperation("COPY", std::make_pair(Platform::sycl, Platform::sycl),
-                    std::make_shared<SyclCopyOperation>());
+  registerOperation("COPY", std::make_pair(Platform::sycl, Platform::sycl), std::make_shared<SyclCopyOperation>());
 
-  registerOperation("MEMSET", std::make_pair(Platform::sycl, Platform::sycl),
-                    std::make_shared<SyclMemsetOperation>());
+  registerOperation("MEMSET", std::make_pair(Platform::sycl, Platform::sycl), std::make_shared<SyclMemsetOperation>());
 
-  registerOperation("REALLOCATE",
-                    std::make_pair(Platform::sycl, Platform::sycl),
+  registerOperation("REALLOCATE", std::make_pair(Platform::sycl, Platform::sycl),
                     std::make_shared<GenericReallocateOperation>());
 
   registerOperation("PREFETCH", std::make_pair(Platform::sycl, Platform::sycl),
@@ -207,9 +171,8 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 }
 
-void MemoryOperationRegistry::registerOperation(
-    const std::string& name, std::pair<Platform, Platform> platforms,
-    std::shared_ptr<MemoryOperation>&& operation) noexcept
+void MemoryOperationRegistry::registerOperation(const std::string& name, std::pair<Platform, Platform> platforms,
+                                                std::shared_ptr<MemoryOperation>&& operation) noexcept
 {
   auto operations = m_operators.find(name);
 
@@ -217,27 +180,24 @@ void MemoryOperationRegistry::registerOperation(
     operations =
         m_operators
             .insert(std::make_pair(
-                name, std::unordered_map<std::pair<Platform, Platform>,
-                                         std::shared_ptr<MemoryOperation>,
-                                         pair_hash>()))
+                name, std::unordered_map<std::pair<Platform, Platform>, std::shared_ptr<MemoryOperation>, pair_hash>()))
             .first;
   }
 
   operations->second.insert(std::make_pair(platforms, operation));
 }
 
-std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
-    const std::string& name, strategy::AllocationStrategy* src_allocator,
-    strategy::AllocationStrategy* dst_allocator)
+std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(const std::string& name,
+                                                                           strategy::AllocationStrategy* src_allocator,
+                                                                           strategy::AllocationStrategy* dst_allocator)
 {
-  auto platforms = std::make_pair(src_allocator->getPlatform(),
-                                  dst_allocator->getPlatform());
+  auto platforms = std::make_pair(src_allocator->getPlatform(), dst_allocator->getPlatform());
 
   return find(name, platforms);
 }
 
-std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
-    const std::string& name, std::pair<Platform, Platform> platforms)
+std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(const std::string& name,
+                                                                           std::pair<Platform, Platform> platforms)
 {
   auto operations = m_operators.find(name);
 
@@ -248,9 +208,7 @@ std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(
   auto op = operations->second.find(platforms);
 
   if (op == operations->second.end()) {
-    UMPIRE_ERROR("Cannot find operator" << name << " for platforms "
-                                        << static_cast<int>(platforms.first)
-                                        << ", "
+    UMPIRE_ERROR("Cannot find operator" << name << " for platforms " << static_cast<int>(platforms.first) << ", "
                                         << static_cast<int>(platforms.second));
   }
 

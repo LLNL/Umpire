@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,10 +8,12 @@
 #define UMPIRE_Umpire_HPP
 
 #include <iostream>
+#include <string>
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
+#include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/io.hpp"
@@ -130,8 +132,8 @@ bool pointer_contains(void* left, void* right);
  * accessibility can be found at
  * <https://umpire.readthedocs.io/en/develop/features/allocator_accessibility.html>
  *
- *\param camp::Platform p  
- *\param umpire::Allocator a 
+ *\param camp::Platform p
+ *\param umpire::Allocator a
  */
 bool is_accessible(Platform p, Allocator a);
 
@@ -149,6 +151,11 @@ std::string get_backtrace(void* ptr);
 std::size_t get_process_memory_usage();
 
 /*!
+ * \brief Mark an application-specific event string within Umpire life cycle.
+ */
+void mark_event(const std::string& event);
+
+/*!
  * \brief Get memory usage of device device_id, using appropriate underlying
  * vendor API.
  */
@@ -158,6 +165,20 @@ std::size_t get_device_memory_usage(int device_id);
  * \brief Get all the leaked (active) allocations associated with allocator.
  */
 std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator);
+
+/*!
+ * \brief Return the default traits for the given allocator string
+ */
+umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name);
+
+/*!
+ * \brief Return the pointer of an allocation for the given allocator and name
+ */
+void* find_pointer_from_name(Allocator allocator, const std::string& name);
+
+#if defined(UMPIRE_ENABLE_MPI)
+MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
+#endif
 
 } // end of namespace umpire
 

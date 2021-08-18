@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -66,11 +66,10 @@ struct MallocAllocator {
     int cdev = 0;
     cudaGetDevice(&cdev);
 
-    //Device supports coherently accessing pageable memory
-    //without calling cudaHostRegister on it
-    cudaDeviceGetAttribute(&pageableMem,
-              cudaDevAttrPageableMemoryAccess, cdev);
-    if(pageableMem)
+    // Device supports coherently accessing pageable memory
+    // without calling cudaHostRegister on it
+    cudaDeviceGetAttribute(&pageableMem, cudaDevAttrPageableMemoryAccess, cdev);
+    if (pageableMem)
       return true;
 #endif
     return false;
@@ -78,11 +77,11 @@ struct MallocAllocator {
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::host || p == Platform::omp_target)
+    if (p == Platform::host || p == Platform::omp_target)
       return true;
-    else if(p == Platform::cuda)
+    else if (p == Platform::cuda)
       return isHostPageable();
-    else  
+    else
       return false;
   }
 };

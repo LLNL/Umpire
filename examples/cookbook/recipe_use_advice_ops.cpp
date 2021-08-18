@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -17,8 +17,7 @@ int main(int, char**)
   auto allocator = rm.getAllocator("UM");
   auto set_advice_op = rm.getOperation("READ_MOSTLY", allocator, allocator);
 
-  auto unset_advice_op =
-      rm.getOperation("UNSET_READ_MOSTLY", allocator, allocator);
+  auto unset_advice_op = rm.getOperation("UNSET_READ_MOSTLY", allocator, allocator);
 
   constexpr size_t size = 1024 * sizeof(double);
   double* data = static_cast<double*>(allocator.allocate(size));

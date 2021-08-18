@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,14 +13,16 @@
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
-    : m_allocator(allocator)
+    : strategy::mixins::Inspector{},
+      strategy::mixins::AllocateNull{},
+      m_allocator{allocator},
+      m_tracking{allocator->isTracked()}
 {
 }
 
 void Allocator::release()
 {
-  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\" }");
+  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\" }");
 
   UMPIRE_LOG(Debug, "");
 
@@ -77,6 +79,16 @@ strategy::AllocationStrategy* Allocator::getAllocationStrategy() noexcept
 Platform Allocator::getPlatform() noexcept
 {
   return m_allocator->getPlatform();
+}
+
+bool Allocator::isTracked() const noexcept
+{
+  return m_allocator->isTracked();
+}
+
+const std::string& Allocator::getStrategyName() const noexcept
+{
+  return m_allocator->getStrategyName();
 }
 
 std::ostream& operator<<(std::ostream& os, const Allocator& allocator)

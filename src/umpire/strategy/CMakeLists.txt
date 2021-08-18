@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -9,7 +9,6 @@ set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationPrefetcher.hpp
   AllocationStrategy.hpp
-  AllocationTracker.hpp
   DynamicPool.hpp
   DynamicPoolList.hpp
   DynamicPoolMap.hpp
@@ -19,12 +18,12 @@ set (umpire_strategy_headers
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
+  PoolCoalesceHeuristic.hpp
   QuickPool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
-  ThreadSafeAllocator.hpp
-  ZeroByteHandler.hpp)
+  ThreadSafeAllocator.hpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_headers
@@ -35,6 +34,7 @@ endif ()
 set (umpire_strategy_mixin_headers
   mixins/AlignedAllocation.hpp
   mixins/AlignedAllocation.inl
+  mixins/AllocateNull.hpp
   mixins/Inspector.hpp)
 
 set (umpire_strategy_sources
@@ -42,20 +42,19 @@ set (umpire_strategy_sources
   AllocationAdvisor.cpp
   AllocationPrefetcher.cpp
   AllocationStrategy.cpp
-  AllocationTracker.cpp
   DynamicPoolList.cpp
   DynamicPoolMap.cpp
   FixedPool.cpp
   MixedPool.cpp
   mixins/AlignedAllocation.cpp
+  mixins/AllocateNull.cpp
   mixins/Inspector.cpp
   MonotonicAllocationStrategy.cpp
   NamedAllocationStrategy.cpp
   QuickPool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
-  ThreadSafeAllocator.cpp
-  ZeroByteHandler.cpp)
+  ThreadSafeAllocator.cpp)
 
 if (ENABLE_NUMA)
   set (umpire_strategy_sources
@@ -71,11 +70,21 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
+if (ENABLE_HIP)
+  set(umpire_strategy_depends
+    ${umpire_strategy_depends}
+    hip_runtime)
+endif ()
+
 if (ENABLE_OPENMP_TARGET)
   set( umpire_strategy_depends
     ${umpire_strategy_depends}
     openmp)
 endif ()
+
+set_source_files_properties(DynamicPoolMap.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(DynamicPoolMap.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+set_source_files_properties(DynamicPool.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 blt_add_library(
   NAME umpire_strategy

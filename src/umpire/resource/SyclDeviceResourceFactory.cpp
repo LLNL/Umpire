@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,51 +13,63 @@
 namespace umpire {
 namespace resource {
 
-bool SyclDeviceResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool SyclDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if ((name.find("CONST") == std::string::npos) &&
-      (name.find("DEVICE") != std::string::npos)) {
+  if ((name.find("CONST") == std::string::npos) && (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
   }
 }
 
-std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> SyclDeviceResourceFactory::create(const std::string& name, int id,
+                                                                            MemoryResourceTraits traits)
 {
-  auto platforms = cl::sycl::platform::get_platforms();
-  cl::sycl::device d;
+  auto sycl_asynchandler = [](sycl::exception_list exceptions) {
+    for (std::exception_ptr const& e : exceptions) {
+      try {
+        std::rethrow_exception(e);
+      } catch (sycl::exception const& ex) {
+        std::cout << "Caught asynchronous SYCL exception:" << std::endl
+                  << ex.what() << ", OpenCL code: " << ex.get_cl_code() << std::endl;
+      }
+    }
+  };
 
-  for (auto& platform : platforms) {
-    auto devices = platform.get_devices();
-    for (auto& device : devices) {
-      int device_count = 0; // SYCL multi.device count
-      const std::string deviceName =
-          device.get_info<cl::sycl::info::device::name>();
-      if (device.is_gpu() &&
-          (deviceName.find("Intel(R) Gen9 HD Graphics NEO") !=
-           std::string::npos)) {
-        if (device_count == traits.id) {
-          d = device;
+  sycl::platform platform(sycl::gpu_selector{});
+
+  int device_count = 0; // SYCL multi.device count
+  auto const& devices = platform.get_devices();
+  for (auto& device : devices) {
+    if (device.is_gpu()) {
+      if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
+        auto subDevicesDomainNuma =
+            device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
+                sycl::info::partition_affinity_domain::numa);
+        for (auto& subDev : subDevicesDomainNuma) {
+          device_count++;
+          if ((device_count - 1) == traits.id) {
+            sycl::context syclctxt(subDev, sycl_asynchandler);
+            traits.queue = new sycl::queue(syclctxt, subDev, sycl::property_list{sycl::property::queue::in_order{}});
+          }
         }
+      } else {
         device_count++;
+        if ((device_count - 1) == traits.id) {
+          sycl::context syclctxt(device, sycl_asynchandler);
+          traits.queue = new sycl::queue(syclctxt, device, sycl::property_list{sycl::property::queue::in_order{}});
+        }
       }
     }
   }
 
-  cl::sycl::queue sycl_queue(d);
-  traits.queue = sycl_queue;
-  return util::make_unique<
-      resource::SyclDeviceMemoryResource<alloc::SyclMallocAllocator>>(
-      Platform::sycl, name, id, traits);
+  return util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclMallocAllocator>>(Platform::sycl, name, id,
+                                                                                           traits);
 }
 
 MemoryResourceTraits SyclDeviceResourceFactory::getDefaultTraits()

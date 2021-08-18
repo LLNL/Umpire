@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -53,6 +53,20 @@ if (ENABLE_C)
   blt_add_test(
     NAME operation_c_tests
     COMMAND operation_c_tests)
+
+  blt_add_executable(
+    NAME version_c_tests
+    SOURCES version_c_tests.cpp
+    DEPENDS_ON ${interface_tests_depends})
+
+  target_include_directories(
+    version_c_tests
+    PRIVATE
+    ${PROJECT_BINARY_DIR}/include)
+
+  blt_add_test(
+    NAME version_c_tests
+    COMMAND version_c_tests)
 
   if (ENABLE_FORTRAN)
     add_subdirectory(fortran)

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -27,10 +27,8 @@ class NumaMoveOperation : public MemoryOperation {
    *
    * \copydetails MemoryOperation::transform
    */
-  void transform(void* src_ptr, void** dst_ptr,
-                 umpire::util::AllocationRecord* src_allocation,
-                 umpire::util::AllocationRecord* dst_allocation,
-                 std::size_t length);
+  void transform(void* src_ptr, void** dst_ptr, umpire::util::AllocationRecord* src_allocation,
+                 umpire::util::AllocationRecord* dst_allocation, std::size_t length);
 };
 
 } // end of namespace op

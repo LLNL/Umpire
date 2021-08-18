@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -8,20 +8,23 @@
 cmake_policy(SET CMP0025 NEW)
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0057 NEW)
+cmake_policy(SET CMP0054 NEW)
+
+include(CMakeDependentOption)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 5.0.1)
+  VERSION 6.0.0)
 
 set(UMPIRE_VERSION_RC "")
 
 option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
-mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS)
+option(ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
+mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS ENABLE_DEVELOPER_BENCHMARKS)
 
 if (ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
   set(ENABLE_TOOLS On CACHE BOOL "")
-  set(ENABLE_DEVICE_CONST On CACHE BOOL "")
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
@@ -30,36 +33,38 @@ set(ENABLE_SYCL Off CACHE BOOL "")
 set(ENABLE_NUMA Off CACHE BOOL "")
 set(ENABLE_OPENMP Off CACHE BOOL "")
 set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
-set(ENABLE_TESTS On CACHE BOOL "")
-set(ENABLE_BENCHMARKS On CACHE BOOL "")
 set(ENABLE_GMOCK On CACHE BOOL "")
-set(ENABLE_DOCS Off CACHE BOOL "")
 set(ENABLE_CLANGQUERY Off CACHE BOOL "")
-option(ENABLE_EXAMPLES "Build Umpire examples" On)
+set(ENABLE_DOCS Off CACHE BOOL "")
+
 option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
 option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
 option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
 option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
 option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
 option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
+option(ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
 option(ENABLE_TOOLS "Enable Umpire development tools" Off)
 option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
 option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
+option(ENABLE_ASAN "Enable use with address sanitizer tools" Off)
+option(ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 if(WIN32 OR APPLE)
   set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
 option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
 
-# Set benchmark installation to OFF
-set(BENCHMARK_ENABLE_INSTALL OFF)
-
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(CMAKE_CUDA_STANDARD 11)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
-    message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
-    set( CMAKE_CXX_EXTENSIONS ON )
+  message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
+  set( CMAKE_CXX_EXTENSIONS ON )
+endif()
+
+if (ENABLE_INACCESSIBILITY_TESTS)
+  set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
 if (ENABLE_CUDA)
@@ -100,6 +105,8 @@ if (ENABLE_SYCL)
    endif()
 endif()
 
+set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
+
 ################################
 # BLT
 ################################
@@ -124,6 +131,20 @@ if (NOT BLT_LOADED)
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
 
+#######################################
+# Options that depend on BLT Options
+#######################################
+cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
+                       "ENABLE_TESTS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
+                        "ENABLE_DOCS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
+                        "ENABLE_EXAMPLES" Off )
+
+cmake_dependent_option(
+  ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
+  "NOT WIN32;NOT APPLE" Off )
+
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
                     RETURN_CODE rc
@@ -135,6 +156,8 @@ include(cmake/SetupCMakeBasics.cmake)
 include(cmake/SetupCompilerFlags.cmake)
 include(cmake/SetupUmpireThirdParty.cmake)
 
+add_subdirectory(src)
+
 configure_file(
   umpire-config.cmake.in
   "${PROJECT_BINARY_DIR}/umpire-config.cmake" @ONLY)
@@ -145,15 +168,23 @@ install(FILES
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
-add_subdirectory(src)
-
-if (ENABLE_TESTS)
+if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
-if (ENABLE_BENCHMARKS)
+
+if (ENABLE_DEVELOPER_BENCHMARKS)
   add_subdirectory(benchmarks)
+  if ((NOT CMAKE_BUILD_TYPE) OR (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
+    message("-- Warning: CMAKE_BUILD_TYPE not set to Release, benchmark information will not be reliable for this build!")
+  endif()
+else()
+  if (ENABLE_BENCHMARKS)
+    message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
+          "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
+  endif()
 endif ()
-if (ENABLE_EXAMPLES)
+
+if (UMPIRE_ENABLE_EXAMPLES)
   add_subdirectory(examples)
 endif ()
 
@@ -161,6 +192,6 @@ if (ENABLE_TOOLS)
   add_subdirectory(tools)
 endif ()
 
-if (ENABLE_DOCS)
+if (UMPIRE_ENABLE_DOCS)
   add_subdirectory(docs)
 endif ()

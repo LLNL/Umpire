@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -21,15 +21,12 @@ class OpenMPTargetResourceFactory : public MemoryResourceFactory {
   using Allocator = alloc::OpenMPTargetAllocator;
 
  public:
-  bool isValidMemoryResourceFor(
-      const std::string& name) noexcept final override;
+  bool isValidMemoryResourceFor(const std::string& name) noexcept final override;
 
-  std::unique_ptr<resource::MemoryResource> create(const std::string& name,
-                                                   int id) final override;
+  std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id) final override;
 
-  std::unique_ptr<resource::MemoryResource> create(
-      const std::string& name, int id,
-      MemoryResourceTraits traits) final override;
+  std::unique_ptr<resource::MemoryResource> create(const std::string& name, int id,
+                                                   MemoryResourceTraits traits) final override;
 
   MemoryResourceTraits getDefaultTraits() final override;
 };

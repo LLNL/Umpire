@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -9,9 +9,8 @@
 namespace umpire {
 namespace resource {
 
-MemoryResource::MemoryResource(const std::string& name, int id,
-                               MemoryResourceTraits traits)
-    : strategy::AllocationStrategy(name, id, nullptr), m_traits(traits)
+MemoryResource::MemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
+    : strategy::AllocationStrategy{name, id, nullptr, "MemoryResource"}, m_traits(traits)
 {
 }
 

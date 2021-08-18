@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,8 +13,8 @@
 int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto aligned_alloc = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
-      "aligned_allocator", rm.getAllocator("HOST"), 256);
+  auto aligned_alloc =
+      rm.makeAllocator<umpire::strategy::AlignedAllocator>("aligned_allocator", rm.getAllocator("HOST"), 256);
 
   void* data = aligned_alloc.allocate(1234);
   aligned_alloc.deallocate(data);

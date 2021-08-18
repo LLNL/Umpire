@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -33,8 +33,7 @@ struct CudaMallocAllocator {
     cudaError_t error = ::cudaMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMalloc( bytes = " << size << " ) failed with error: "
-                                          << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
     } else {
       return ptr;
     }
@@ -52,8 +51,7 @@ struct CudaMallocAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: "
-                                      << cudaGetErrorString(error));
+      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
     }
   }
 };

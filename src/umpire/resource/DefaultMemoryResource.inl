@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,17 +18,15 @@ namespace umpire {
 namespace resource {
 
 template <typename _allocator>
-DefaultMemoryResource<_allocator>::DefaultMemoryResource(
-    Platform platform, const std::string& name, int id,
-    MemoryResourceTraits traits)
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id,
+                                                         MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator(), m_platform(platform)
 {
 }
 
 template <typename _allocator>
-DefaultMemoryResource<_allocator>::DefaultMemoryResource(
-    Platform platform, const std::string& name, int id,
-    MemoryResourceTraits traits, _allocator alloc)
+DefaultMemoryResource<_allocator>::DefaultMemoryResource(Platform platform, const std::string& name, int id,
+                                                         MemoryResourceTraits traits, _allocator alloc)
     : MemoryResource(name, id, traits), m_allocator(alloc), m_platform(platform)
 {
 }
@@ -44,25 +42,11 @@ void* DefaultMemoryResource<_allocator>::allocate(std::size_t bytes)
 }
 
 template <typename _allocator>
-void DefaultMemoryResource<_allocator>::deallocate(void* ptr)
+void DefaultMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
-}
-
-template <typename _allocator>
-std::size_t DefaultMemoryResource<_allocator>::getCurrentSize() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
-}
-
-template <typename _allocator>
-std::size_t DefaultMemoryResource<_allocator>::getHighWatermark() const noexcept
-{
-  UMPIRE_LOG(Debug, "() returning " << 0);
-  return 0;
 }
 
 template <typename _allocator>

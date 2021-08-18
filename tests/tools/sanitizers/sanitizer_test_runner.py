@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -59,7 +59,7 @@ if __name__ == '__main__':
     print("{BLUE}[--------]{END}".format(**formatters))
     run_sanitizer_test('DynamicPoolList', 'read')
     run_sanitizer_test('DynamicPoolList', 'write')
-    run_sanitizer_test('DynamicPoolMap', 'read')
-    run_sanitizer_test('DynamicPoolMap', 'write')
+    run_sanitizer_test('QuickPool', 'read')
+    run_sanitizer_test('QuickPool', 'write')
     print("{BLUE}[--------]{END}".format(**formatters))
     sys.exit(errors)

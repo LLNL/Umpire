@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,8 +15,7 @@ TEST_P(FreeFunctionsTest, DefaultMallocFree)
 {
   double* test_alloc;
 
-  ASSERT_NO_THROW(
-      test_alloc = static_cast<double*>(umpire::malloc(100 * sizeof(double))));
+  ASSERT_NO_THROW(test_alloc = static_cast<double*>(umpire::malloc(100 * sizeof(double))));
 
   ASSERT_NE(nullptr, test_alloc);
 
@@ -31,8 +30,7 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
 
   double* test_alloc;
 
-  ASSERT_NO_THROW(
-      test_alloc = static_cast<double*>(umpire::malloc(100 * sizeof(double))));
+  ASSERT_NO_THROW(test_alloc = static_cast<double*>(umpire::malloc(100 * sizeof(double))));
 
   ASSERT_NE(nullptr, test_alloc);
 
@@ -41,18 +39,17 @@ TEST_P(FreeFunctionsTest, SetDefaultAndMallocFree)
 
 const std::string allocators[] = {"HOST"
 #if defined(UMPIRE_ENABLE_DEVICE)
-    ,
-    "DEVICE"
+                                  ,
+                                  "DEVICE"
 #endif
 #if defined(UMPIRE_ENABLE_UM)
-    ,
-    "UM"
+                                  ,
+                                  "UM"
 #endif
 #if defined(UMPIRE_ENABLE_PINNED)
-    ,
-    "PINNED"
+                                  ,
+                                  "PINNED"
 #endif
 };
 
-INSTANTIATE_TEST_SUITE_P(FreeFunctions, FreeFunctionsTest,
-                         ::testing::ValuesIn(allocators));
+INSTANTIATE_TEST_SUITE_P(FreeFunctions, FreeFunctionsTest, ::testing::ValuesIn(allocators));

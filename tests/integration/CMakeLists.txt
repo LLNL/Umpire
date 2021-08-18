@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -60,6 +60,20 @@ blt_add_test(
   COMMAND allocator_integration_tests)
 
 blt_add_executable(
+  NAME typed_allocator_integration_tests
+  SOURCES typed_allocator_integration_tests.cpp
+  DEPENDS_ON ${integration_tests_depends})
+
+target_include_directories(
+  typed_allocator_integration_tests
+  PRIVATE
+  ${PROJECT_BINARY_DIR}/include)
+
+blt_add_test(
+  NAME typed_allocator_integration_tests
+  COMMAND typed_allocator_integration_tests)
+
+blt_add_executable(
   NAME allocator_accessibility_tests
   SOURCES allocator_accessibility.cpp
   DEPENDS_ON ${accessibility_test_depends})
@@ -74,7 +88,7 @@ blt_add_test(
   COMMAND allocator_accessibility_tests)
 
 blt_add_executable(
-  NAME memory_resource_traits_tests 
+  NAME memory_resource_traits_tests
   SOURCES memory_resource_traits_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
 
@@ -105,6 +119,8 @@ blt_add_executable(
   NAME operation_tests
   SOURCES operation_tests.cpp
   DEPENDS_ON ${integration_tests_depends})
+
+set_source_files_properties(operation_tests.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 target_include_directories(
   operation_tests
@@ -181,12 +197,43 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
+if (ENABLE_IPC_SHARED_MEMORY AND ENABLE_MPI)
+  blt_add_executable(
+    NAME get_communicator_tests
+    SOURCES get_communicator_tests.cpp
+    DEPENDS_ON ${integration_tests_depends})
+
+  umpire_add_test_with_mpi(
+    NAME get_communicator_tests
+    COMMAND get_communicator_tests
+    NUM_MPI_TASKS 2)
+endif ()
+
 if (ENABLE_TOOLS)
-  add_subdirectory(replay)
-endif()
+  if (NOT ENABLE_HIP)
+    add_subdirectory(replay)
+  else ()
+    message(STATUS "Disabling replay tests for HIP build.")
+  endif ()
+endif ()
 
 if (ENABLE_C OR ENABLE_FORTRAN)
   add_subdirectory(interface)
 endif()
 
 add_subdirectory(io)
+
+blt_add_target_compile_flags(
+  TO strategy_tests
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+blt_add_target_compile_flags(
+  TO operation_tests
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+blt_add_target_compile_flags(
+  TO primary_pool_tests
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+if (ENABLE_PERFORMANCE_TESTS)
+  blt_add_target_compile_flags(
+    TO primary_pool_performance_tests 
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+endif()

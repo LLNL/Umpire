@@ -13,7 +13,7 @@ A log can be captured and stored as a JSON file, then used as input to the
 program will read the replay log, and recreate the events that occured as part
 of the run that generated the log.
 
-The file ``tut_replay.cpp`` makes a :class:`umpire::strategy::DynamicPool`:
+The file ``tut_replay.cpp`` makes a :class:`umpire::strategy::QuickPool`:
 
 .. literalinclude:: ../../../examples/tutorial/tut_replay.cpp
    :start-after: _sphinx_tag_tut_replay_make_allocate_start

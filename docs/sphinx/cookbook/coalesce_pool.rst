@@ -4,8 +4,8 @@
 Coalescing Pool Memory
 ======================
 
-The :class:`umpire::strategy::DynamicPool` provides a
-:func:`umpire::strategy::DynamicPool::coalesce` that can be used to release
+The :class:`umpire::strategy::QuickPool` provides a
+:func:`umpire::strategy::QuickPool::coalesce` that can be used to release
 unused memory and allocate a single large block that will be able to satisfy
 allocations up to the previously observed high-watermark. To call this
 function, you must get the pointer to the

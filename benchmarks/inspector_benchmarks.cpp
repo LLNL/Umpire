@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -44,7 +44,7 @@ public:
   using ::benchmark::Fixture::SetUp;
   using ::benchmark::Fixture::TearDown;
 
-  umpire::strategy::mixins::Inspector inspector;
+  umpire::strategy::mixins::Inspector inspector{};
   uintptr_t ptr[MAX_REGISTRATIONS];
 };
 
@@ -77,7 +77,7 @@ public:
 
   void TearDown(const ::benchmark::State&) override final {}
 
-  umpire::strategy::mixins::Inspector inspector;
+  umpire::strategy::mixins::Inspector inspector{};
   uintptr_t ptr[MAX_REGISTRATIONS];
 };
 

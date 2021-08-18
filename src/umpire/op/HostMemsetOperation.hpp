@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -24,8 +24,7 @@ class HostMemsetOperation : public MemoryOperation {
    *
    * \copydetails MemoryOperation::apply
    */
-  void apply(void* src_ptr, util::AllocationRecord* allocation, int value,
-             std::size_t length);
+  void apply(void* src_ptr, util::AllocationRecord* allocation, int value, std::size_t length);
 };
 
 } // end of namespace op

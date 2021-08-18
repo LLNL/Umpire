@@ -6,12 +6,196 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v6.0.0 - 2021-08-18]
+
+### Added
+
+- Spack environment files for developer builds.
+
+- Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
+  is deemed inaccessible by the is_accessible function, it indeed can not be accessed/used.
+
+- Documentation on allocator (in)accessibility as well as getAllocator usage.
+
+- Updated Umpire::Allocator 'deallocate' documentation brief on handling
+  deallocations on nullptr.
+
+- Benchmark that overlooks overhead of malloc calls with No-Op memory resource.
+
+- Added a data race check with Thread Sanitizer for the Gitlab CI test
+
+- Created 'ENABLE_DEVELOPER_BENCHMARKS' cmake flag to enable benchmarks that are meant for
+  internal Umpire development only (e.g. No-Op benchmark). Now 'ENABLE_BENCHMARKS' only enables
+  BLT support for GoogleBenchmark.
+
+- Added version macros to C API, and added version functions to C and FORTRAN APIs.
+
+- Benchmark that measures the performance of different allocator vendor types across
+  various allocation sizes.
+
+- Benchmark that measures the performance of different memory pools
+
+- Added a Release function to FixedPool and corresponding gtest in strategy_tests
+
+- Install thirdparty exports in CMake configuration file
+
+- UM-837 - Replay will now display high water mark statistics per allocator.
+
+- Clean-up stage and build prefix for Gitlab CI script that will help us avoid
+  disk quota problems.
+
+- Added a benchmark that measures the performance of FixedPool across two allocation sizes.
+
+- Added (de)registerAllocation to C/FORTRAN API.
+
+- Added HPCToolKit page (with some Hatchet instructions) to ReadTheDocs Developer Guide.
+
+- In Gitlab CI, upload junit reports for corona and lassen.
+
+- Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC
+  Shared memory is initially available on the Host resource and will default
+  to the value of `ENABLE_MPI`.
+
+- get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
+
+- Allocator::getStrategyName() to get name of the strategy used.
+
+- Added lifespan timing info for no-op benchmark.
+
+- Added `getActualHighwatermark` to all pool strategies, returns the high water
+  value of `getActualSize`.
+
+- `umpire::mark_event()` to mark an event during Umpire lifecycle
+
+- Asynchronous memset and reallocate operations for CUDA and HIP.
+
+- Added support for named allocations.
+
+### Changed
+
+- Organized configuration options in config.hpp.in in alphabetical order.
+
+- Size Limiter example now has a try-catch statement to handle exception.
+
+- Doubled timeout from 15 to 30 minutes for CI tests to build and run.
+
+- Uberenv is now used as a submodule.
+
+- CI on Gitlab does not require a python environment anymore.
+
+- BLT submodule updated to v0.4.1.
+
+- Quartz is no longer used for gitlab CI tests. Instead, those tests are
+  now run on Ruby.
+
+- Renamed'ENABLE_TESTS', 'ENABLE_EXAMPLES' and 'ENABLE_DOCS' to
+  'UMPIRE_ENABLE_TESTS', 'UMPIRE_ENABLE_EXAMPLES' and 'UMPIRE_ENABLE_DOCS' and
+  made those options dependant on the corresponding BLT options.
+
+- Use CMake 3.18.0 in CI
+
+- Replay testing disabled during HIP builds with `ENABLE_TOOLS`=On
+
+- `DynamicPoolMap` marked deprecated. `QuickPool` should be used instead.
+
+- Changed most internal and test uses of DynamicPoolMap to QuickPool.
+
+- Reorganized the way that the no-op benchmark is structured to match the
+  pool benchmarks.
+
+- Formatting changed to 120 col, and added CI check to ensure style is applied.
+
+- Update camp to v0.2.2.
+
+- Use CMakeCachedPackage in uberenv.
+
+- Refactored pool coalesce heuristic API to return either 0 or the minimum
+  pool size to allocate when a coalesce is to be performed.  No functional
+  change yet.
+
+- Turn documentation off by default.
+
+- All asynchronous operations now return a camp::resources::EventProxy to avoid
+  the overhead of creating Events when they are unused.
+
+- CI builds against latest version of TPLs.
+
+- Removed CI jobs that were allowed to fail.
+
+### Removed
+
+- Removed extraneous function definition in HipDeviceMemoryResource.
+
+- Removed all internal tracking, allocations are only tracked at the Allocator level.
+
+- Removed the temporary fix for the HIP + fortran linker error (blt has been
+  updated instead).
+
+- Doxygen from Sphinx to fix auto documentation generation bug.
+
+- DynamicPool and DynamicPoolMap removed from replay tests since they share the
+  same signature as QuickPool.
+
+- Removed replay of internal address_map operations.
+
+### Fixed
+
+- Deleted the extraneous 'endif()' line in Umpire CMakeLists.txt file.
+
+- Fixed the warning about Benchmark installation in Umpire CMakeLists.txt file.
+
+- Fixed Windows CI errors by ensuring azure pipeline runs with the filesystem turned ON.
+
+- Fixed HIP CI test versioning error and added test for rocm/3.9.0 and rocm/3.10.0
+
+- Corrected accounting error in replay tool where allocation map operations
+  were not being accounted for and reported correctly.
+
+- Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+- Fixed incorrect option causing sanitizer tests to be skipped.
+
+- Python is now explicitly python3 or python2 (most likely python3)
+
+- Fix incorrect accounting for m_current_bytes in DynamicPoolMap, this addresses an
+  issue that would mean the pool would never coalesce automatically.
+
+- Added ENABLE_ASAN (default=Off) for guarding address sanitization check to
+  address compilation problems on some configurations.
+
+- Fixed ranges used in the vendor allocator benchmark when HIP is enabled given
+  that hipMalloc allocates on 4k aligned pages.
+
+- Fixed broken allocation test with DEVICE_CONST memory
+
+- Fixed compile error in DynamicSizePool with CUDA 11 and C++17
+
+- Fixed outdated HIP versions used in CI (pushed updated versions)
+
+- Fixed how the memory resoure is set for the pool benchmark
+
+- Fixed CUDA dependencies in build system.
+
+- Fixed corona gitlab CI build + link errors
+
+- Replay tool now handles rogue deallocate calls that may be present in
+  replay files.
+
+- Fixed shared memory signature that had `const std::string` to use
+  `const std::string&` instead of a copy of the string.
+
+- Fixed cmake warning for HIP+tools builds
+
+- Export external camp_DIR if one is provided when building Umpire, and check
+  both camp_DIR and camp_DIR/lib/cmake/camp when looking for the package.
+
 ## [v5.0.1] - 2021-03-31
 
 ### Fixed
 
 - Fixed UM-851 where zero-byte allocations were sometimes incorrectly reported
   as not being found
+
 
 ## [v5.0.0] - 2020-11-18
 
@@ -43,6 +227,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Use CMake 3.18.0 in blueos CI
 
+- Added option to replay to dump the total number of blocks in a pool as the
+  well as the number of blocks that are releasable.
+
 ### Changed
 
 - Made primary pool performance tests optional by introducing
@@ -56,6 +243,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   avoid name collisions.  (Note: this changes may be user visible so need to be
   release noted).
 
+- Documentation of Uberenv is moved to a shared location (radiuss-ci), we
+  keep only the examples locally.
+
 - Fixed up broken source links in tutorial documentation.
 
 - registerAllocator is deprecated, addAlias should be used instead.
@@ -67,6 +257,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Have build_and_tesh.sh script re-run make with verbose output if
   compilation fails.
+
+- Updated copyright date to 2021
 
 ### Removed
 
@@ -87,7 +279,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   coalesce operations to not work properly.
 
 - Fixed struct object initialization within ReplayOperationManager
-  
+
 ## [v4.1.2] - 2020-10-06
 
 ### Fixed
