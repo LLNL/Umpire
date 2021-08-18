@@ -4,8 +4,6 @@ Added documentation on allocator (in)accessibility as well as getAllocator usage
 
 Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
-Installed thirdparty exports in CMake configuration file
-
 Replay will now display high water mark statistics per allocator.
 
 Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC Shared memory is initially available on the Host resource and will default to the value of ENABLE_MPI.
@@ -29,14 +27,6 @@ Refactored pool coalesce heuristic API to return either 0 or the minimum pool si
 All asynchronous operations now return a camp::resources::EventProxy to avoid the overhead of creating Events when they are unused.
 
 Removed all internal tracking, allocations are only tracked at the Allocator level.
-
-Corrected accounting error in replay tool where allocation map operations were not being accounted for and reported correctly.
-
-Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
-
-Replay tool now handles rogue deallocate calls that may be present in replay files.
-
-Removed replay of internal address_map operations.
 
 # v5.0.1
 
