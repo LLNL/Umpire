@@ -1,3 +1,43 @@
+# v6.0.0
+
+Added documentation on allocator (in)accessibility as well as getAllocator usage.
+
+Added a Release function to FixedPool and corresponding gtest in strategy_tests
+
+Installed thirdparty exports in CMake configuration file
+
+Replay will now display high water mark statistics per allocator.
+
+Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC Shared memory is initially available on the Host resource and will default to the value of ENABLE_MPI.
+
+Added get_communicator_for_allocator to get an MPI Communicator for the scope of a shared allocator.
+
+Added Allocator::getStrategyName() to get name of the strategy used.
+
+Added getActualHighwatermark to all pool strategies, returns the high water value of getActualSize.
+
+Added umpire::mark_event() to mark an event during Umpire lifecycle
+
+Added asynchronous memset and reallocate operations for CUDA and HIP.
+
+Added support for named allocations.
+
+DynamicPoolMap marked deprecated. QuickPool should be used instead.
+
+Refactored pool coalesce heuristic API to return either 0 or the minimum pool size to allocate when a coalesce is to be performed. No functional change yet.
+
+All asynchronous operations now return a camp::resources::EventProxy to avoid the overhead of creating Events when they are unused.
+
+Removed all internal tracking, allocations are only tracked at the Allocator level.
+
+Corrected accounting error in replay tool where allocation map operations were not being accounted for and reported correctly.
+
+Fixed TypedAllocator to be comparable via ==, != operators per C++ requirements.
+
+Replay tool now handles rogue deallocate calls that may be present in replay files.
+
+Removed replay of internal address_map operations.
+
 # v5.0.1
 
 - Fixed bug where zero-byte allocations from Umpire were sometimes incorrectly

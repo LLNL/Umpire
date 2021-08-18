@@ -14,7 +14,7 @@ include(CMakeDependentOption)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 5.0.1)
+  VERSION 6.0.0)
 
 set(UMPIRE_VERSION_RC "")
 
