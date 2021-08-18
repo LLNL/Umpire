@@ -4,6 +4,8 @@ Added documentation on allocator (in)accessibility as well as getAllocator usage
 
 Added a Release function to FixedPool and corresponding gtest in strategy_tests
 
+Installed thirdparty exports in CMake configuration file
+
 Replay will now display high water mark statistics per allocator.
 
 Initial support for IPC Shared Memory via a "SHARED" resource allocator. IPC Shared memory is initially available on the Host resource and will default to the value of ENABLE_MPI.
