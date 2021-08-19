@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -40,18 +40,15 @@ TYPED_TEST_P(MemoryAllocatorTest, Allocate)
 
 REGISTER_TYPED_TEST_SUITE_P(MemoryAllocatorTest, Allocate);
 
-using test_types =
-    ::testing::Types<MallocAllocator
+using test_types = ::testing::Types<MallocAllocator
 #if defined(UMPIRE_ENABLE_CUDA)
-                     ,
-                     CudaMallocAllocator, CudaMallocManagedAllocator,
-                     CudaPinnedAllocator
+                                    ,
+                                    CudaMallocAllocator, CudaMallocManagedAllocator, CudaPinnedAllocator
 #endif
 #if defined(UMPIRE_ENABLE_HIP)
-                     ,
-                     HipMallocAllocator, HipMallocManagedAllocator,
-                     HipPinnedAllocator
+                                    ,
+                                    HipMallocAllocator, HipMallocManagedAllocator, HipPinnedAllocator
 #endif
-                     >;
+                                    >;
 
 INSTANTIATE_TYPED_TEST_SUITE_P(Default, MemoryAllocatorTest, test_types, );

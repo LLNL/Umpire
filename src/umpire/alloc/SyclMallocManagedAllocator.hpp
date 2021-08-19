@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -20,7 +20,7 @@ namespace alloc {
  */
 struct SyclMallocManagedAllocator {
   /*!
-   * \brief Allocate bytes of memory using cl::sycl::malloc_shared.
+   * \brief Allocate bytes of memory using sycl::malloc_shared.
    *
    * \param bytes Number of bytes to allocate.
    *
@@ -28,40 +28,39 @@ struct SyclMallocManagedAllocator {
    *
    * \throws umpire::util::Exception if memory cannot be allocated.
    */
-  void* allocate(std::size_t bytes, const cl::sycl::queue& queue_t)
+  void* allocate(std::size_t bytes, const sycl::queue& queue_t)
   {
-    void* usm_ptr = cl::sycl::malloc_shared(bytes, queue_t);
+    void* usm_ptr = sycl::malloc_shared(bytes, queue_t);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
 
     if (usm_ptr == nullptr) {
-      UMPIRE_ERROR("cl::sycl::malloc_shared( bytes = "
-                   << bytes << " ) failed with error!");
+      UMPIRE_ERROR("sycl::malloc_shared( bytes = " << bytes << " ) failed with error!");
     } else {
       return usm_ptr;
     }
   }
 
   /*!
-   * \brief Deallocate memory using cl::sycl::free.
+   * \brief Deallocate memory using sycl::free.
    *
    * \param usm_ptr Address to deallocate.
    *
    * \throws umpire::util::Exception if memory be free'd.
    */
-  void deallocate(void* usm_ptr, const cl::sycl::queue& queue_t)
+  void deallocate(void* usm_ptr, const sycl::queue& queue_t)
   {
     UMPIRE_LOG(Debug, "(usm_ptr=" << usm_ptr << ")");
 
-    cl::sycl::free(usm_ptr, queue_t);
+    sycl::free(usm_ptr, queue_t);
   }
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::sycl || p == Platform::host)
+    if (p == Platform::sycl || p == Platform::host)
       return true;
     else
-      return false; //p is undefined
+      return false; // p is undefined
   }
 };
 

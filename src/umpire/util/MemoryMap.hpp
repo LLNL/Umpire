@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -47,16 +47,12 @@ class MemoryMap {
     using pointer = value_type*;
     using reference = value_type&;
 
-    using Map = typename std::conditional<Const, const MemoryMap<Value>,
-                                          MemoryMap<Value>>::type;
-    using ValuePtr =
-        typename std::conditional<Const, const Value*, Value*>::type;
+    using Map = typename std::conditional<Const, const MemoryMap<Value>, MemoryMap<Value>>::type;
+    using ValuePtr = typename std::conditional<Const, const Value*, Value*>::type;
 
     using Content = std::pair<Key, ValuePtr>;
-    using Reference =
-        typename std::conditional<Const, const Content&, Content&>::type;
-    using Pointer =
-        typename std::conditional<Const, const Content*, Content*>::type;
+    using Reference = typename std::conditional<Const, const Content&, Content&>::type;
+    using Pointer = typename std::conditional<Const, const Content*, Content*>::type;
 
     Iterator_(Map* map, Key ptr);
     Iterator_(Map* map, iterator_begin);

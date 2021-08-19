@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,7 +8,6 @@
 #define UMPIRE_HipMallocManagedAllocator_HPP
 
 #include "hip/hip_runtime_api.h"
-
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -34,9 +33,7 @@ struct HipMallocManagedAllocator {
     hipError_t error = ::hipMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipMallocManaged( bytes = " << bytes
-                                                 << " ) failed with error: "
-                                                 << hipGetErrorString(error));
+      UMPIRE_ERROR("hipMallocManaged( bytes = " << bytes << " ) failed with error: " << hipGetErrorString(error));
     } else {
       return ptr;
     }
@@ -55,14 +52,13 @@ struct HipMallocManagedAllocator {
 
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: "
-                                      << hipGetErrorString(error));
+      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
     }
   }
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::hip || p == Platform::host)
+    if (p == Platform::hip || p == Platform::host)
       return true;
     else
       return false;

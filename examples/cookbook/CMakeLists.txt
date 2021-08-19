@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -29,6 +29,14 @@ if (ENABLE_NUMA)
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_move_between_numa)
 endif ()
+
+if (ENABLE_IPC_SHARED_MEMORY)
+  blt_add_executable(
+    NAME recipe_shared_memory
+    SOURCES recipe_shared_memory.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_shared_memory)
+endif()
 
 if (ENABLE_CUDA)
   blt_add_executable(
@@ -119,10 +127,6 @@ if (ENABLE_HIP)
       recipe_pinned_pool.F
       PROPERTIES
       Fortran_FORMAT FREE)
-    
-    #Until more stable blt changes can be made, this is a temporary fix to allow
-    #the fortran program to be linked with hip (https://rzlc.llnl.gov/jira/browse/UM-790)
-    set_target_properties(recipe_pinned_pool PROPERTIES LINKER_LANGUAGE HIP)
   endif ()
 endif ()
 
@@ -173,11 +177,19 @@ if (ENABLE_FORTRAN)
     recipe_thread_safe.F
     PROPERTIES
     Fortran_FORMAT FREE)
-
-  if(ENABLE_HIP)
-    set_target_properties(recipe_thread_safe_F PROPERTIES LINKER_LANGUAGE HIP)
-  endif()
 endif ()
+
+blt_add_executable(
+  NAME recipe_strategy_name
+  SOURCES recipe_strategy_name.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_strategy_name)
+
+blt_add_executable(
+  NAME recipe_named_allocation
+  SOURCES recipe_named_allocation.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_named_allocation)
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
 

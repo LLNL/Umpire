@@ -40,6 +40,16 @@ else
 	DOCKER_BUILDKIT=1 docker build --target sycl --no-cache .
 endif
 
+check:
+ifeq ($(DEBUG),1)
+	DOCKER_BUILDKIT=1 docker build --target check --no-cache --progress plain .
+else
+	DOCKER_BUILDKIT=1 docker build --target check --no-cache .
+endif
+
+style:
+	scripts/docker/apply-style.sh
+
 help:
 	@echo 'usage: make [variable] [target]'
 	@echo ''

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -11,21 +11,20 @@
 namespace umpire {
 namespace strategy {
 
-NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name,
-                                                 int id, Allocator allocator)
-    : AllocationStrategy(name, id, allocator.getAllocationStrategy()),
+NamedAllocationStrategy::NamedAllocationStrategy(const std::string& name, int id, Allocator allocator)
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "NamedAllocationStrategy"},
       m_allocator(allocator.getAllocationStrategy())
 {
 }
 
 void* NamedAllocationStrategy::allocate(std::size_t bytes)
 {
-  return m_allocator->allocate(bytes);
+  return m_allocator->allocate_internal(bytes);
 }
 
-void NamedAllocationStrategy::deallocate(void* ptr)
+void NamedAllocationStrategy::deallocate(void* ptr, std::size_t size)
 {
-  return m_allocator->deallocate(ptr);
+  return m_allocator->deallocate_internal(ptr, size);
 }
 
 Platform NamedAllocationStrategy::getPlatform() noexcept

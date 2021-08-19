@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -22,8 +22,7 @@ namespace util {
  */
 class FixedMallocPool {
  public:
-  FixedMallocPool(const std::size_t object_bytes,
-                  const std::size_t objects_per_pool = 1024 * 1024);
+  FixedMallocPool(const std::size_t object_bytes, const std::size_t objects_per_pool = 1024 * 1024);
 
   ~FixedMallocPool();
 

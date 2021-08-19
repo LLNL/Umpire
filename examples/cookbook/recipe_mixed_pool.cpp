@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,8 +18,7 @@ int main(int, char **)
   /*
    * Create a default mixed pool.
    */
-  auto default_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
-      "default_mixed_pool", allocator);
+  auto default_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPool>("default_mixed_pool", allocator);
 
   UMPIRE_USE_VAR(default_mixed_allocator);
 
@@ -28,8 +27,8 @@ int main(int, char **)
    * to 2^14 = 16 kB in increments of 5x, where each individual fixed
    * pool is kept under 4MB in size to begin.
    */
-  auto custom_mixed_allocator = rm.makeAllocator<umpire::strategy::MixedPool>(
-      "custom_mixed_pool", allocator, 256, 16 * 1024, 4 * 1024 * 1024, 5);
+  auto custom_mixed_allocator =
+      rm.makeAllocator<umpire::strategy::MixedPool>("custom_mixed_pool", allocator, 256, 16 * 1024, 4 * 1024 * 1024, 5);
 
   /*
    * Although this calls for only 4*4=16 bytes, this allocation will

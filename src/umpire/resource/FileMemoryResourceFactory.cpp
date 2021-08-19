@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool FileMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool FileMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("FILE") != std::string::npos) {
     return true;
@@ -23,17 +22,15 @@ bool FileMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource> FileMemoryResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> FileMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> FileMemoryResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> FileMemoryResourceFactory::create(const std::string& name, int id,
+                                                                            MemoryResourceTraits traits)
 {
-  return util::make_unique<FileMemoryResource>(Platform::undefined, name, id,
-                                               traits);
+  return util::make_unique<FileMemoryResource>(Platform::undefined, name, id, traits);
 }
 
 MemoryResourceTraits FileMemoryResourceFactory::getDefaultTraits()

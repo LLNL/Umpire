@@ -18,7 +18,7 @@ Provided Strategies
 
 .. doxygenclass:: umpire::strategy::AllocationAdvisor
 
-.. doxygenclass:: umpire::strategy::DynamicPool
+.. doxygenclass:: umpire::strategy::DynamicPoolList
 
 .. doxygenclass:: umpire::strategy::FixedPool
 

@@ -1,0 +1,27 @@
+#
+# It describes a set of packages to be installed, along with
+# configuration settings.
+spack:
+  include:
+  - ../../scripts/radiuss-spack-configs/$SYS_TYPE/compilers.yaml
+  - ../../scripts/radiuss-spack-configs/$SYS_TYPE/packages.yaml
+  repos: [../../.spack_packages/]
+  specs: [umpire@develop+cuda cuda_arch=70]
+  view: false
+  packages:
+    camp:
+      version: [0.1.0]
+      target: []
+      compiler: []
+      buildable: true
+      providers: {}
+    blt:
+      version: [develop]
+      target: []
+      compiler: []
+      buildable: true
+      providers: {}
+  develop:
+    umpire:
+      path: ../../
+      spec: umpire@develop
