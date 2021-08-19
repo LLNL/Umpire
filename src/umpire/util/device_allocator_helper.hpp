@@ -21,21 +21,18 @@ __device__ inline DeviceAllocator getDeviceAllocator(int id)
   return umpire::util::UMPIRE_DEV_ALLOCS[id];
 }
 
-#define UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY()            \
-{							  \
-  cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS,	  \
-                    &umpire::util::UMPIRE_DEV_ALLOCS_h,   \
-                    sizeof(umpire::DeviceAllocator*));	 	  \
+inline bool existsDeviceAllocator()
+{
+  return (UMPIRE_DEV_ALLOCS_h != nullptr) ? true : false;
 }
 
-/*
-__device__ static size_t getCurrentSize(int id)
-{
-  auto alloc = getDeviceAllocator(id);
-  //size_t total_size = alloc.getSize();
-  char* ptr_cpy = 
+#define UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY()           \
+{                                                        \
+  cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS,    \
+                    &umpire::util::UMPIRE_DEV_ALLOCS_h,  \
+                    sizeof(umpire::DeviceAllocator*));   \
 }
-*/
+
 } // end of namespace util
 
 } // end of namespace umpire
