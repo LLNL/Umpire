@@ -59,7 +59,7 @@ __device__ void* DeviceAllocator::allocate(size_t size)
     UMPIRE_ERROR("DeviceAllocator out of space");
   }
 
-  //m_bytes_used = atomicAdd(m_bytes_used, size);
+  m_bytes_used += atomicAdd(&m_bytes_used, size);
   return static_cast<void*>(m_ptr + counter);
 }
 

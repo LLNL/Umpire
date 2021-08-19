@@ -38,8 +38,9 @@ int main(int argc, char const* argv[])
   auto device_allocator2 = rm.makeDeviceAllocator(allocator, 2048);
 
   //Checking that now a DeviceAllocator exists
-  if(umpire::util::existsDeviceAllocator)
+  if(umpire::util::existsDeviceAllocator) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
+  }
 
   double** ptr_to_data =
       static_cast<double**>(allocator.allocate(sizeof(double*)));
@@ -51,6 +52,7 @@ int main(int argc, char const* argv[])
   cudaDeviceSynchronize();
 
   //Printing out the kernel result, plus the IDs for my DeviceAllocators
+  std::cout << "Bytes used: " << device_allocator.getBytesUsed() << std::endl;
   std::cout << "Found value: " << (*ptr_to_data)[7] << std::endl;
   std::cout << "DA1 with ID: " << device_allocator.getID() << std::endl;
   std::cout << "DA2 with ID: " << device_allocator2.getID() << std::endl;
