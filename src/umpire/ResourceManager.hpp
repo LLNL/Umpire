@@ -128,7 +128,13 @@ class ResourceManager {
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-  cudaError_t syncDeviceAllocator();
+  /*!
+   * \brief Construct a new DeviceAllocator. Calls the private Device
+   * Allocator constructor that records the associated id.
+   *
+   * \param allocator Allocator to build the DeviceAllocator from.
+   * \param size Total size of the DeviceAllocator.
+   */
   DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
 #endif
 

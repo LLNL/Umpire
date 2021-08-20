@@ -12,6 +12,7 @@ namespace util {
 
 DeviceAllocator* UMPIRE_DEV_ALLOCS_h{nullptr};
 __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
+__device__ const int DEFAULT_DEVICE_ALLOCATOR_ID{0};
 
 } // end of namespace util
 

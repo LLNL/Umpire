@@ -341,8 +341,7 @@ DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t
     dev_alloc.m_initialized = true;
   }
 
-  umpire::util::UMPIRE_DEV_ALLOCS_h[i] = dev_alloc;
-  i++;
+  umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = dev_alloc;
   return dev_alloc; 
 }
 #endif

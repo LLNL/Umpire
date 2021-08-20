@@ -15,6 +15,7 @@ namespace util {
 
 extern DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
 __device__ extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
+__device__ extern const int DEFAULT_DEVICE_ALLOCATOR_ID;
 
 __device__ inline DeviceAllocator getDeviceAllocator(int id)
 {

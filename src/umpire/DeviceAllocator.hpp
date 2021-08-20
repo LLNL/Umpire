@@ -29,8 +29,20 @@ class DeviceAllocator {
    */
   __device__ void* allocate(size_t size);
 
+  /*
+   * \brief Get the id associated with the
+   *  current DeviceAllocator object.
+   *
+   * \return Returns the id. 
+   */
   __host__ __device__ size_t getID();
-  __host__ __device__ size_t getBytesUsed();
+  /*
+   * \brief Get the current number of bytes that
+   * have been allocated thus far. 
+   *
+   * \return Number of bytes used.
+   */
+  __host__ __device__ unsigned int getBytesUsed();
 
   friend class ResourceManager;
 
