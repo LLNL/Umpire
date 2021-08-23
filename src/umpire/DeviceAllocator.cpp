@@ -6,7 +6,6 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
 #include "umpire/util/device_allocator_helper.hpp"
-#include "umpire/Umpire.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
