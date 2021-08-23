@@ -11,7 +11,7 @@ namespace umpire {
 
 namespace util {
 
-int UMPIRE_TOTAL_DEV_ALLOCS{10};
+int UMPIRE_TOTAL_DEV_ALLOCS_h{10};
 int UMPIRE_DEV_ALLOCS_COUNTER_h{0};
 DeviceAllocator* UMPIRE_DEV_ALLOCS_h{nullptr};
 __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
