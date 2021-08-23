@@ -180,7 +180,6 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name);
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 #endif
 
-
 } // end of namespace umpire
 
 #endif // UMPIRE_Umpire_HPP
