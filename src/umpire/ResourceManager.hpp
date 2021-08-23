@@ -135,7 +135,7 @@ class ResourceManager {
    * \param allocator Allocator to build the DeviceAllocator from.
    * \param size Total size of the DeviceAllocator.
    */
-  DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size);
+  DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char* name);
 #endif
 
   /*!

@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 ////////////////////////////////////////////////////////////////////////////
 #include "umpire/util/device_allocator_helper.hpp"
+#include <string.h>
 
 namespace umpire {
 
@@ -12,7 +13,17 @@ namespace util {
 
 DeviceAllocator* UMPIRE_DEV_ALLOCS_h{nullptr};
 __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
-__device__ const int DEFAULT_DEVICE_ALLOCATOR_ID{0};
+
+__device__ DeviceAllocator getDeviceAllocator(const char* name)
+{
+  for (int i = 0; i < 10; i++)
+  { 
+    if(umpire::util::UMPIRE_DEV_ALLOCS[i].getName() == name) {
+      return umpire::util::UMPIRE_DEV_ALLOCS[i];
+    }
+  }
+  return umpire::util::UMPIRE_DEV_ALLOCS[0];
+}
 
 } // end of namespace util
 

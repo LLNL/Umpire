@@ -8,6 +8,7 @@
 #define UMPIRE_device_allocator_helper_HPP
 
 #include "umpire/DeviceAllocator.hpp"
+#include <string.h>
 
 namespace umpire {
 
@@ -15,7 +16,8 @@ namespace util {
 
 extern DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
 __device__ extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
-__device__ extern const int DEFAULT_DEVICE_ALLOCATOR_ID;
+
+__device__ extern DeviceAllocator getDeviceAllocator(const char* name);
 
 __device__ inline DeviceAllocator getDeviceAllocator(int id)
 {
@@ -24,14 +26,14 @@ __device__ inline DeviceAllocator getDeviceAllocator(int id)
 
 inline bool existsDeviceAllocator()
 {
-  return (UMPIRE_DEV_ALLOCS_h != nullptr) ? true : false;
+  return (umpire::util::UMPIRE_DEV_ALLOCS_h != nullptr) ? true : false;
 }
 
-#define UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY()           \
-{                                                        \
-  cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS,    \
-                    &umpire::util::UMPIRE_DEV_ALLOCS_h,  \
-                    sizeof(umpire::DeviceAllocator*));   \
+#define UMPIRE_SYNC_DEVICE_ALLOCATORS()                       \
+{                                                             \
+  cudaMemcpyToSymbol(umpire::util::UMPIRE_DEV_ALLOCS,         \
+                    &umpire::util::UMPIRE_DEV_ALLOCS_h,       \
+                    sizeof(umpire::DeviceAllocator*));        \
 }
 
 } // end of namespace util

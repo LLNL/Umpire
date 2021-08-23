@@ -23,6 +23,16 @@ __global__ void my_kernel(double** data_ptr)
   }
 }
 
+__global__ void my_other_kernel(double** data_ptr)
+{
+  if (threadIdx.x == 0) {
+    umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator("my_device_alloc");
+    double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
+    *data_ptr = data;
+    data[0] = 42; 
+  }
+}
+
 int main(int argc, char const* argv[])
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -34,8 +44,7 @@ int main(int argc, char const* argv[])
 
   //Create all of my allocators
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = rm.makeDeviceAllocator(allocator, 1024);
-  auto device_allocator2 = rm.makeDeviceAllocator(allocator, 2048);
+  auto device_allocator = rm.makeDeviceAllocator(allocator, 1024, "my_device_alloc");
 
   //Checking that now a DeviceAllocator exists
   if(umpire::util::existsDeviceAllocator) {
@@ -46,16 +55,15 @@ int main(int argc, char const* argv[])
       static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   //Make sure that device and host side DeviceAllocator pointers are synched
-  UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY();
+  UMPIRE_SYNC_DEVICE_ALLOCATORS();
 
   my_kernel<<<1, 16>>>(ptr_to_data);
   cudaDeviceSynchronize();
+  std::cout << "After first kernel, found value: " << (*ptr_to_data)[7] << std::endl;
 
-  //Printing out the kernel result, plus the IDs for my DeviceAllocators
-  std::cout << "Bytes used: " << device_allocator.getBytesUsed() << std::endl;
-  std::cout << "Found value: " << (*ptr_to_data)[7] << std::endl;
-  std::cout << "DA1 with ID: " << device_allocator.getID() << std::endl;
-  std::cout << "DA2 with ID: " << device_allocator2.getID() << std::endl;
+  my_other_kernel<<<1, 16>>>(ptr_to_data);
+  cudaDeviceSynchronize();
+  std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
   return 0;
 }

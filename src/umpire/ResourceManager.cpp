@@ -331,14 +331,13 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
 }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
-DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size)
+DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size, const char* name)
 {
   static size_t i{0};
-  auto dev_alloc = DeviceAllocator(allocator, size, i);
+  auto dev_alloc = DeviceAllocator(allocator, size, name, i);
 
   if (i == 0) {
     cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
-    dev_alloc.m_initialized = true;
   }
 
   umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = dev_alloc;

@@ -69,7 +69,7 @@ void performTest(umpire::Allocator allocator)
   memset(results, 0, BLOCKS*THREADS_PER_BLOCK);
 
   //Sync up the device and host side global pointers that keep track of DeviceAllocator objects
-  UMPIRE_SET_UP_DEVICE_ALLOCATOR_ARRAY();
+  UMPIRE_SYNC_DEVICE_ALLOCATORS();
 
   //call kernel and sync
   my_kernel<<<BLOCKS, THREADS_PER_BLOCK>>>(results);
@@ -90,7 +90,7 @@ int main(int argc, char const* argv[])
 
   //create the allocators that will be used in this program
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = rm.makeDeviceAllocator(allocator, BLOCKS*sizeof(int));
+  auto device_allocator = rm.makeDeviceAllocator(allocator, BLOCKS*sizeof(int), "my_alloc");
 
   //call the function that performs the actual test
   performTest(allocator);
