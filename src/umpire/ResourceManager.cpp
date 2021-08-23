@@ -335,9 +335,11 @@ DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t
 {
   static size_t i{0};
   auto dev_alloc = DeviceAllocator(allocator, size, name, i);
+  umpire::util::UMPIRE_DEV_ALLOCS_COUNTER_h++;
 
   if (i == 0) {
-    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 10*sizeof(DeviceAllocator));
+    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 
+                                umpire::util::UMPIRE_TOTAL_DEV_ALLOCS_h*sizeof(DeviceAllocator));
   }
 
   umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = dev_alloc;

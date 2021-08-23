@@ -36,6 +36,13 @@ class DeviceAllocator {
    * \return Returns the id. 
    */
   __host__ __device__ size_t getID();
+
+  /*
+   * \brief Get the name associated with the
+   *  current DeviceAllocator object.
+   *
+   * \return Returns the name. 
+   */
   __device__ const char* getName();
 
   friend class ResourceManager;
@@ -48,12 +55,6 @@ class DeviceAllocator {
    * \param allocator Allocator to use for allocating memory.
    */
   __host__ DeviceAllocator(Allocator allocator, size_t size, const char* name, size_t id);
-
-  /* 
-   * \brief Destruct the existing DeviceAllocator. This function will only be
-   * called by the ResourceManager.
-   */
-  __host__ void DestroyDeviceAllocator();
 
   umpire::Allocator m_allocator;
 

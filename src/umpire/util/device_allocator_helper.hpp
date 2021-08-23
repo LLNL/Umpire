@@ -14,6 +14,8 @@ namespace umpire {
 
 namespace util {
 
+extern int UMPIRE_TOTAL_DEV_ALLOCS_h;
+extern int UMPIRE_DEV_ALLOCS_COUNTER_h;
 extern DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
 __device__ extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
 
