@@ -16,6 +16,14 @@ namespace umpire {
  */
 class DeviceAllocator {
  public:
+  /*!
+   * \brief Construct a new DeviceAllocator that will use allocator to allocate
+   * data. This constructor will only be called by the ResourceManager.
+   *
+   * \param allocator Allocator to use for allocating memory.
+   */
+  __host__ DeviceAllocator(Allocator allocator, size_t size, const char* name, size_t id);
+
   __host__ __device__ ~DeviceAllocator();
 
   __host__ __device__ DeviceAllocator(const DeviceAllocator& other);
@@ -45,17 +53,12 @@ class DeviceAllocator {
    */
   __device__ const char* getName();
 
-  friend class ResourceManager;
+  /*
+   * \brief Deallocate memory associated with Device Allocator object.
+   */
+  __host__ void destroy();
 
  private:
-  /*!
-   * \brief Construct a new DeviceAllocator that will use allocator to allocate
-   * data. This constructor will only be called by the ResourceManager.
-   *
-   * \param allocator Allocator to use for allocating memory.
-   */
-  __host__ DeviceAllocator(Allocator allocator, size_t size, const char* name, size_t id);
-
   umpire::Allocator m_allocator;
 
   char* m_ptr;

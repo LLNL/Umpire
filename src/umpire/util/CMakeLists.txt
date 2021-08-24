@@ -51,20 +51,6 @@ if (ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-if (ENABLE_CUDA)
-  set(umpire_util_headers
-    ${umpire_util_headers}
-    device_allocator_helper.hpp)
-
-  set (umpire_util_sources
-    ${umpire_util_sources}
-    device_allocator_helper.cu)
-
-  set (umpire_util_depends
-    ${umpire_util_depends}
-    cuda)
-endif()
-
 set (umpire_util_depends camp umpire_tpl_judy)
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")

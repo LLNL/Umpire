@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
-#include "umpire/util/device_allocator_helper.hpp"
+#include "umpire/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
@@ -40,19 +40,17 @@ __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& othe
 
 __host__ __device__ DeviceAllocator::~DeviceAllocator()
 {
-#if !defined(__CUDA_ARCH__)
-  umpire::util::UMPIRE_DEV_ALLOCS_COUNTER_h--;
-  if(umpire::util::UMPIRE_DEV_ALLOCS_COUNTER_h == 1)
-  {
-    if (!m_child) {
-      auto& rm = umpire::ResourceManager::getInstance();
-      auto device_alloc = rm.getAllocator(umpire::resource::Device);
+}
 
-      device_alloc.deallocate(m_counter);
-      m_allocator.deallocate(m_ptr);
-    }
-  }
-#endif
+__host__ void DeviceAllocator::destroy()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto device_alloc = rm.getAllocator(umpire::resource::Device);
+
+  if(m_counter != nullptr)
+    device_alloc.deallocate(m_counter);
+  if(m_counter != nullptr)
+    m_allocator.deallocate(m_ptr);
 }
 
 __device__ void* DeviceAllocator::allocate(size_t size)

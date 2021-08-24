@@ -86,15 +86,21 @@ endif ()
 if (ENABLE_CUDA)
   set(umpire_headers
     ${umpire_headers}
-    DeviceAllocator.hpp)
+    DeviceAllocator.hpp
+    device_allocator_helper.hpp)
 
   set(umpire_sources
     ${umpire_sources}
-    DeviceAllocator.cpp)
+    DeviceAllocator.cpp
+    device_allocator_helper.cpp)
 
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+  set_source_files_properties(device_allocator_helper.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
+
 endif()
 
 set (umpire_depends

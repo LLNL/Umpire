@@ -27,7 +27,6 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
-#include "umpire/util/device_allocator_helper.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -327,23 +326,6 @@ void ResourceManager::registerAllocation(void* ptr, util::AllocationRecord recor
 
   m_allocations.insert(ptr, record);
 }
-
-#if defined(UMPIRE_ENABLE_CUDA)
-DeviceAllocator ResourceManager::makeDeviceAllocator(Allocator allocator, size_t size, const char* name)
-{
-  static size_t i{0};
-  auto dev_alloc = DeviceAllocator(allocator, size, name, i);
-  umpire::util::UMPIRE_DEV_ALLOCS_COUNTER_h++;
-
-  if (i == 0) {
-    cudaMallocManaged((void**) &umpire::util::UMPIRE_DEV_ALLOCS_h, 
-                                umpire::util::UMPIRE_TOTAL_DEV_ALLOCS_h*sizeof(DeviceAllocator));
-  }
-
-  umpire::util::UMPIRE_DEV_ALLOCS_h[i++] = dev_alloc;
-  return dev_alloc; 
-}
-#endif
 
 util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
 {

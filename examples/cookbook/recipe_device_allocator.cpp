@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
-#include "umpire/util/device_allocator_helper.hpp"
+#include "umpire/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
 
 const int THREADS_PER_BLOCK = 128;
@@ -25,7 +25,7 @@ __global__ void my_kernel(int* result)
   unsigned int i{threadIdx.x+blockIdx.x*blockDim.x};
 
   if (i == 0) {
-    umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator(0);
+    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator(0);
     data = static_cast<int*>(alloc.allocate(BLOCKS * sizeof(int)));
   }
 
@@ -90,7 +90,7 @@ int main(int argc, char const* argv[])
 
   //create the allocators that will be used in this program
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = rm.makeDeviceAllocator(allocator, BLOCKS*sizeof(int), "my_alloc");
+  auto device_allocator = umpire::makeDeviceAllocator(allocator, BLOCKS*sizeof(int), "my_alloc");
 
   //call the function that performs the actual test
   performTest(allocator);

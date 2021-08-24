@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/util/device_allocator_helper.hpp"
+#include "umpire/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
 
 /*
@@ -16,7 +16,7 @@
 __global__ void my_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator(0);
+    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator(0);
     double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
     *data_ptr = data;
     data[7] = 1024;
@@ -26,7 +26,7 @@ __global__ void my_kernel(double** data_ptr)
 __global__ void my_other_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    umpire::DeviceAllocator alloc = umpire::util::getDeviceAllocator("my_device_alloc");
+    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator("my_device_alloc");
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = 42; 
@@ -38,16 +38,16 @@ int main(int argc, char const* argv[])
   auto& rm = umpire::ResourceManager::getInstance();
 
   //Checking to make sure a DeviceAllocator doesn't yet exist
-  if(!umpire::util::existsDeviceAllocator()) {
+  if(!umpire::existsDeviceAllocator()) {
     std::cout << "Before I create a DeviceAllocator, it doesn't exist!" << std::endl;
   }
 
   //Create all of my allocators
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = rm.makeDeviceAllocator(allocator, 1024, "my_device_alloc");
+  auto device_allocator = umpire::makeDeviceAllocator(allocator, 1024, "my_device_alloc");
 
   //Checking that now a DeviceAllocator exists
-  if(umpire::util::existsDeviceAllocator()) {
+  if(umpire::existsDeviceAllocator()) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
   }
 
@@ -64,6 +64,8 @@ int main(int argc, char const* argv[])
   my_other_kernel<<<1, 16>>>(ptr_to_data);
   cudaDeviceSynchronize();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
+
+  umpire::destroyDeviceAllocator();
 
   return 0;
 }
