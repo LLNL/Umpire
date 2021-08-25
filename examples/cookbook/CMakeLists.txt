@@ -56,12 +56,6 @@ if (ENABLE_CUDA)
   list(APPEND umpire_cookbooks recipe_advice_device_id)
 
   blt_add_executable(
-    NAME recipe_device_allocator
-    SOURCES recipe_device_allocator.cpp
-    DEPENDS_ON ${cookbook_depends})
-  list(APPEND umpire_cookbooks recipe_device_allocator)
-
-  blt_add_executable(
     NAME recipe_pool_advice
     SOURCES recipe_pool_advice.cpp
     DEPENDS_ON ${cookbook_depends})
