@@ -5,6 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 ////////////////////////////////////////////////////////////////////////////
 #include "umpire/device_allocator_helper.hpp"
+#include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include <string.h>
 
 namespace umpire {
@@ -39,8 +40,12 @@ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char
   auto dev_alloc = DeviceAllocator(allocator, size, name, allocator_id);
 
   if (allocator_id == 0) {
-    cudaMallocManaged((void**) &umpire::UMPIRE_DEV_ALLOCS_h, 
-                                umpire::UMPIRE_TOTAL_DEV_ALLOCS_h*sizeof(DeviceAllocator));
+#if defined (UMPIRE_ENABLE_CUDA)
+    auto um_alloc = umpire::alloc::CudaMallocManagedAllocator();
+#elif defined (UMPIRE_ENABLE_HIP)
+    auto um_alloc = umpire::alloc::HipMallocManagedAllocator();
+#endif
+    UMPIRE_DEV_ALLOCS_h = (umpire::DeviceAllocator*)um_alloc.allocate(UMPIRE_TOTAL_DEV_ALLOCS_h*sizeof(DeviceAllocator));
   }
 
   UMPIRE_DEV_ALLOCS_h[allocator_id++] = dev_alloc;
@@ -69,6 +74,15 @@ void destroyDeviceAllocator()
       UMPIRE_DEV_ALLOCS_h[i].destroy();
     }
   }
+}
+
+void synchronizeDeviceAllocator()
+{
+#if defined (UMPIRE_ENABLE_CUDA)
+  cudaDeviceSynchronize();
+#elif defined (UMPIRE_ENABLE_HIP)
+  hipDeviceSynchronize();
+#endif
 }
 
 } // end of namespace umpire

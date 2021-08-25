@@ -50,16 +50,17 @@ int main(int argc, char const* argv[])
       static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   //Make sure that device and host side DeviceAllocator pointers are synched
-  UMPIRE_SYNC_DEVICE_ALLOCATORS();
+  UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
   my_kernel<<<1, 16>>>(ptr_to_data);
-  cudaDeviceSynchronize();
+  umpire::synchronizeDeviceAllocator();
   std::cout << "After first kernel, found value: " << (*ptr_to_data)[7] << std::endl;
 
   my_other_kernel<<<1, 16>>>(ptr_to_data);
-  cudaDeviceSynchronize();
+  umpire::synchronizeDeviceAllocator();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
+  //Tear down and deallocate memory.
   umpire::destroyDeviceAllocator();
 
   return 0;
