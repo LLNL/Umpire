@@ -6,6 +6,13 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/ResourceManager.hpp"
 #include "umpire/device_allocator_helper.hpp"
+#include "camp/camp.hpp"
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  using resource_type = camp::resources::Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+  using resource_type = camp::resources::Hip;
+#endif
 
 /*
  * Very simple kernel that uses only the first thread to "get" the

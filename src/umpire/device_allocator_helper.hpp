@@ -38,8 +38,9 @@ __device__ extern DeviceAllocator getDeviceAllocator(int id);
  * Check if the DeviceAllocator object specified by either the
  * given name or id currently exists.
  */
-extern bool deviceAllocatorExists(int id);
-extern bool deviceAllocatorExists(const char* name);
+__host__ extern bool deviceAllocatorExists(int id);
+__device__ extern bool deviceAllocatorExistsOnDevice(int id);
+__host__ extern bool deviceAllocatorExists(const char* name);
 
 /*!
  * \brief Construct a new DeviceAllocator. Calls the private Device
@@ -48,19 +49,19 @@ extern bool deviceAllocatorExists(const char* name);
  * \param allocator Allocator to build the DeviceAllocator from.
  * \param size Total size of the DeviceAllocator.
  */
-extern DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char* name);
+__host__ extern DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char* name);
 
 /*
  * Destroy any DeviceAllocator objects currently in existence.
  * Deallocate any memory belonging to object about to be destroyed.
  */
-extern void destroyDeviceAllocator();
+__host__ extern void destroyDeviceAllocator();
 
 /*
  * Function that calls the appropriate device synchronization
  * method.
  */
-extern void synchronizeDeviceAllocator();
+__host__ extern void synchronizeDeviceAllocator();
 
 /*
  * This macro ensures that the host and device global arrays

@@ -64,7 +64,7 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   return static_cast<void*>(m_ptr + counter);
 }
 
-__host__ bool DeviceAllocator::isInitialized()
+__host__ __device__ bool DeviceAllocator::isInitialized()
 {
   if (m_size > 0) {
     return true;

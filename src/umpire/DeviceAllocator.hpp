@@ -58,7 +58,7 @@ class DeviceAllocator {
    */
   __host__ void destroy();
 
-  __host__ bool isInitialized();
+  __host__ __device__ bool isInitialized();
 
  private:
   umpire::Allocator m_allocator;
