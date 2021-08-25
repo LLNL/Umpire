@@ -10,10 +10,6 @@ if (ENABLE_HIP)
   set (cookbook_depends ${cookbook_depends} hip_runtime)
 endif()
 
-if (ENABLE_CUDA)
-  set (cookbook_depends ${cookbook_depends} cuda)
-endif()
-
 if (ENABLE_OPENMP_TARGET)
   set (cookbook_depends
     ${cookbook_depends}

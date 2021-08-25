@@ -77,7 +77,7 @@ __host__ __device__ size_t DeviceAllocator::getID()
   return m_id;
 }
 
-__device__ const char* DeviceAllocator::getName()
+__host__ __device__ const char* DeviceAllocator::getName()
 {
   return m_name;
 }
