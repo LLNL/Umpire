@@ -40,6 +40,21 @@ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char
   return dev_alloc; 
 }
 
+bool deviceAllocatorExists(const char* name)
+{
+  for(int i = 0; i < 10; i++)
+  {
+    if(umpire::UMPIRE_DEV_ALLOCS_h[i].getName() == name)
+      return deviceAllocatorExists(i);
+  }  
+  return false;
+}
+
+bool deviceAllocatorExists(int id)
+{
+  return (umpire::UMPIRE_DEV_ALLOCS_h[id].isInitialized()) ? true : false;
+}
+
 void destroyDeviceAllocator()
 {
   for(int i = 0; i < 10; i++) {

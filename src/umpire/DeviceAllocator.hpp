@@ -51,12 +51,14 @@ class DeviceAllocator {
    *
    * \return Returns the name. 
    */
-  __device__ const char* getName();
+  __host__ __device__ const char* getName();
 
   /*
    * \brief Deallocate memory associated with Device Allocator object.
    */
   __host__ void destroy();
+
+  __host__ bool isInitialized();
 
  private:
   umpire::Allocator m_allocator;

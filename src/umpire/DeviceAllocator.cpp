@@ -49,7 +49,7 @@ __host__ void DeviceAllocator::destroy()
 
   if(m_counter != nullptr)
     device_alloc.deallocate(m_counter);
-  if(m_counter != nullptr)
+  if(m_ptr != nullptr)
     m_allocator.deallocate(m_ptr);
 }
 
@@ -61,6 +61,14 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   }
 
   return static_cast<void*>(m_ptr + counter);
+}
+
+__host__ bool DeviceAllocator::isInitialized()
+{
+  if(m_size > 0) {
+    return true;
+  }
+  return false;
 }
 
 __host__ __device__ size_t DeviceAllocator::getID()

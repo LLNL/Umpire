@@ -24,10 +24,8 @@ __device__ inline DeviceAllocator getDeviceAllocator(int id)
   return umpire::UMPIRE_DEV_ALLOCS[id];
 }
 
-inline bool existsDeviceAllocator()
-{
-  return (umpire::UMPIRE_DEV_ALLOCS_h != nullptr) ? true : false;
-}
+extern bool deviceAllocatorExists(int id);
+extern bool deviceAllocatorExists(const char* name);
 
 /*!
  * \brief Construct a new DeviceAllocator. Calls the private Device

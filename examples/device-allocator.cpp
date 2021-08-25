@@ -37,17 +37,12 @@ int main(int argc, char const* argv[])
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  //Checking to make sure a DeviceAllocator doesn't yet exist
-  if(!umpire::existsDeviceAllocator()) {
-    std::cout << "Before I create a DeviceAllocator, it doesn't exist!" << std::endl;
-  }
-
   //Create all of my allocators
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = umpire::makeDeviceAllocator(allocator, 1024, "my_device_alloc");
 
   //Checking that now a DeviceAllocator exists
-  if(umpire::existsDeviceAllocator()) {
+  if(umpire::deviceAllocatorExists("my_device_alloc")) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
   }
 
