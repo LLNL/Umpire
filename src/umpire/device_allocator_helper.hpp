@@ -78,6 +78,8 @@ __host__ extern void synchronizeDeviceAllocator();
   {                                                                                                               \
     hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
   }
+#else
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()
 #endif
 
 } // end of namespace umpire
