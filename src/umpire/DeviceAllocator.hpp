@@ -41,7 +41,7 @@ class DeviceAllocator {
    * \brief Get the id associated with the
    *  current DeviceAllocator object.
    *
-   * \return Returns the id. 
+   * \return Returns the id.
    */
   __host__ __device__ size_t getID();
 
@@ -49,7 +49,7 @@ class DeviceAllocator {
    * \brief Get the name associated with the
    *  current DeviceAllocator object.
    *
-   * \return Returns the name. 
+   * \return Returns the name.
    */
   __host__ __device__ const char* getName();
 

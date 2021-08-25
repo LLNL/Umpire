@@ -7,8 +7,9 @@
 #ifndef UMPIRE_device_allocator_helper_HPP
 #define UMPIRE_device_allocator_helper_HPP
 
-#include "umpire/DeviceAllocator.hpp"
 #include <string.h>
+
+#include "umpire/DeviceAllocator.hpp"
 
 namespace umpire {
 
@@ -34,7 +35,7 @@ __device__ extern DeviceAllocator getDeviceAllocator(const char* name);
 __device__ extern DeviceAllocator getDeviceAllocator(int id);
 
 /*
- * Check if the DeviceAllocator object specified by either the 
+ * Check if the DeviceAllocator object specified by either the
  * given name or id currently exists.
  */
 extern bool deviceAllocatorExists(int id);
@@ -66,20 +67,16 @@ extern void synchronizeDeviceAllocator();
  * that keep track of the DeviceAllocator objects created are
  * synced up and pointing to each other.
  */
-#if defined (UMPIRE_ENABLE_CUDA)
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                     \
-{                                                             \
-      cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS,           \
-                        &umpire::UMPIRE_DEV_ALLOCS_h,         \
-                        sizeof(umpire::DeviceAllocator*));    \
-}
-#elif defined (UMPIRE_ENABLE_HIP)
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                     \
-{                                                             \
-      hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS,            \
-                        &umpire::UMPIRE_DEV_ALLOCS_h,         \
-                        sizeof(umpire::DeviceAllocator*));    \
-}
+#if defined(UMPIRE_ENABLE_CUDA)
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                          \
+  {                                                                                                                \
+    cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+  }
+#elif defined(UMPIRE_ENABLE_HIP)
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                         \
+  {                                                                                                               \
+    hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+  }
 #endif
 
 } // end of namespace umpire

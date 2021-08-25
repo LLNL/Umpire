@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/device_allocator_helper.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/device_allocator_helper.hpp"
 
 /*
  * Very simple kernel that uses only the first thread to "get" the
@@ -29,7 +29,7 @@ __global__ void my_other_kernel(double** data_ptr)
     umpire::DeviceAllocator alloc = umpire::getDeviceAllocator("my_device_alloc");
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
-    data[0] = 42; 
+    data[0] = 42;
   }
 }
 
@@ -37,19 +37,18 @@ int main(int argc, char const* argv[])
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  //Create all of my allocators
+  // Create all of my allocators
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = umpire::makeDeviceAllocator(allocator, 1024, "my_device_alloc");
 
-  //Checking that now a DeviceAllocator exists
-  if(umpire::deviceAllocatorExists("my_device_alloc")) {
+  // Checking that now a DeviceAllocator exists
+  if (umpire::deviceAllocatorExists("my_device_alloc")) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
   }
 
-  double** ptr_to_data =
-      static_cast<double**>(allocator.allocate(sizeof(double*)));
+  double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-  //Make sure that device and host side DeviceAllocator pointers are synched
+  // Make sure that device and host side DeviceAllocator pointers are synched
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
   my_kernel<<<1, 16>>>(ptr_to_data);
@@ -60,7 +59,7 @@ int main(int argc, char const* argv[])
   umpire::synchronizeDeviceAllocator();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
-  //Tear down and deallocate memory.
+  // Tear down and deallocate memory.
   umpire::destroyDeviceAllocator();
 
   return 0;

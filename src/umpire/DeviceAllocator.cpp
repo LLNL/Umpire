@@ -5,8 +5,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
-#include "umpire/device_allocator_helper.hpp"
+
 #include "umpire/ResourceManager.hpp"
+#include "umpire/device_allocator_helper.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
 
@@ -47,9 +48,9 @@ __host__ void DeviceAllocator::destroy()
   auto& rm = umpire::ResourceManager::getInstance();
   auto device_alloc = rm.getAllocator(umpire::resource::Device);
 
-  if(m_counter != nullptr)
+  if (m_counter != nullptr)
     device_alloc.deallocate(m_counter);
-  if(m_ptr != nullptr)
+  if (m_ptr != nullptr)
     m_allocator.deallocate(m_ptr);
 }
 
@@ -65,7 +66,7 @@ __device__ void* DeviceAllocator::allocate(size_t size)
 
 __host__ bool DeviceAllocator::isInitialized()
 {
-  if(m_size > 0) {
+  if (m_size > 0) {
     return true;
   }
   return false;
