@@ -12,18 +12,31 @@
 
 namespace umpire {
 
-extern int UMPIRE_TOTAL_DEV_ALLOCS_h;
-extern int UMPIRE_DEV_ALLOCS_COUNTER_h;
+/*
+ * Const variables for the limit of unique DeviceAllocator
+ * objects available at once.
+ */
+extern const int UMPIRE_TOTAL_DEV_ALLOCS_h;
+__device__ extern const int UMPIRE_TOTAL_DEV_ALLOCS;
+
+/*
+ * Global arrays for both host and device which hold the
+ * DeviceAllocator objects created.
+ */
 extern DeviceAllocator* UMPIRE_DEV_ALLOCS_h;
 __device__ extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
 
+/*
+ * Get the DeviceAllocator object specified by either the given
+ * name or id.
+ */
 __device__ extern DeviceAllocator getDeviceAllocator(const char* name);
+__device__ extern DeviceAllocator getDeviceAllocator(int id);
 
-__device__ inline DeviceAllocator getDeviceAllocator(int id)
-{
-  return umpire::UMPIRE_DEV_ALLOCS[id];
-}
-
+/*
+ * Check if the DeviceAllocator object specified by either the 
+ * given name or id currently exists.
+ */
 extern bool deviceAllocatorExists(int id);
 extern bool deviceAllocatorExists(const char* name);
 
@@ -36,8 +49,17 @@ extern bool deviceAllocatorExists(const char* name);
  */
 extern DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char* name);
 
+/*
+ * Destroy any DeviceAllocator objects currently in existence.
+ * Deallocate any memory belonging to object about to be destroyed.
+ */
 extern void destroyDeviceAllocator();
 
+/*
+ * This macro ensures that the host and device global arrays
+ * that keep track of the DeviceAllocator objects created are
+ * synced up and pointing to each other.
+ */
 #define UMPIRE_SYNC_DEVICE_ALLOCATORS()                       \
 {                                                             \
   cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS,         \
