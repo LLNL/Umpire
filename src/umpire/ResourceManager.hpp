@@ -21,10 +21,6 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
 
-#if defined(UMPIRE_ENABLE_DEVICE)
-#include "umpire/DeviceAllocator.hpp"
-#endif
-
 namespace umpire {
 
 namespace op {
@@ -352,6 +348,7 @@ class ResourceManager {
   strategy::AllocationStrategy* m_default_allocator;
 
   int m_id;
+
   std::mutex m_mutex;
 
   // Methods that need access to m_allocations to print/filter records
