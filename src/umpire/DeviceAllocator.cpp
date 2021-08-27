@@ -17,7 +17,6 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
     : m_allocator(allocator),
       m_id(id),
       m_ptr(static_cast<char*>(m_allocator.allocate(size))),
-      m_name(name),
       m_size(size),
       m_child(false)
 {
@@ -26,6 +25,8 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
 
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
+  m_name = static_cast<char*>(allocator.allocate(strlen(name) * sizeof(char)));
+  memcpy((char*)m_name, (char*)name, strlen(name)+1);
 }
 
 __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& other)
