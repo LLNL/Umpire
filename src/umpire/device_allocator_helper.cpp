@@ -58,7 +58,7 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
 __host__ bool deviceAllocatorExists(const char* name)
 {
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
-    if (*UMPIRE_DEV_ALLOCS_h[i].getName() == *name)
+    if (UMPIRE_DEV_ALLOCS_h[i].getName() == name)
       return deviceAllocatorExists(i);
   }
   return false;
