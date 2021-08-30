@@ -8,6 +8,7 @@
 #define UMPIRE_DeviceAllocator_HPP
 
 #include "umpire/Allocator.hpp"
+#include <string.h>
 
 namespace umpire {
 
@@ -64,7 +65,7 @@ class DeviceAllocator {
   umpire::Allocator m_allocator;
 
   char* m_ptr;
-  const char* m_name;
+  char m_name[128];
   unsigned int* m_counter;
 
   size_t m_id;

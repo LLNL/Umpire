@@ -11,6 +11,9 @@
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
 
+#include <string.h>
+#include <stdio.h>
+
 namespace umpire {
 
 __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, const char* name, size_t id)
@@ -25,19 +28,26 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
 
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
-  m_name = static_cast<char*>(allocator.allocate(strlen(name) * sizeof(char)));
-  memcpy((char*)m_name, (char*)name, strlen(name)+1);
+  memset(m_name, '\0', strlen(name)+1);
+
+  int i = 0;
+  do {
+    m_name[i] = name[i];
+  } while (name[i++] != 0);
 }
 
 __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& other)
     : m_allocator(other.m_allocator),
       m_id(other.m_id),
       m_ptr(other.m_ptr),
-      m_name(other.m_name),
       m_counter(other.m_counter),
       m_size(other.m_size),
       m_child(true)
 {
+  int i = 0;
+  do {
+    m_name[i] = other.m_name[i];}
+  while (other.m_name[i++] != 0);
 }
 
 __host__ __device__ DeviceAllocator::~DeviceAllocator()

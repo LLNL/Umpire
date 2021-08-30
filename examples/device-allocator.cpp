@@ -33,7 +33,7 @@ __global__ void my_kernel(double** data_ptr)
 __global__ void my_other_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator("my_device_alloc");
+    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator("my_other_device_alloc");
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = 42;
@@ -47,10 +47,17 @@ int main(int argc, char const* argv[])
   // Create all of my allocators
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = umpire::makeDeviceAllocator(allocator, 1024, "my_device_alloc");
+  auto device_allocator2 = umpire::makeDeviceAllocator(allocator, 512, "my_other_device_alloc");
 
   // Checking that now a DeviceAllocator exists
   if (umpire::deviceAllocatorExists("my_device_alloc")) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
+  }
+  if (umpire::deviceAllocatorExists("my_other_device_alloc")) {
+    std::cout << "I found another DeviceAllocator!" << std::endl;
+  }
+  if (!umpire::deviceAllocatorExists("my_nonexistent_device_alloc")) {
+    std::cout << "but I didn't find the nonexistent DeviceAllocator!" << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));

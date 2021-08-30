@@ -22,11 +22,25 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 __device__ DeviceAllocator getDeviceAllocator(const char* name)
 {
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
-    if (UMPIRE_DEV_ALLOCS[i].getName() == name) {
+    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
+    int index = 0;
+    int tally = 0;
+    do {
+      if (temp[index] != name[index])
+        tally++;
+    } while (name[index++] != 0); 
+    if (tally == 0)
       return UMPIRE_DEV_ALLOCS[i];
-    }
   }
   UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+  //
+  // The UMPIRE_ERROR macro above does not return.  It instead throws
+  // an exception.  However, for some reason, nvcc throws a warning
+  // "warning: missing return statement at end of non-void function"
+  // even though the following line cannot be reached.  Adding this
+  // fake return statement to work around the incorrect warning.
+  //
+  return UMPIRE_DEV_ALLOCS[0];
 }
 
 __device__ DeviceAllocator getDeviceAllocator(int id)
@@ -58,7 +72,7 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
 __host__ bool deviceAllocatorExists(const char* name)
 {
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
-    if (UMPIRE_DEV_ALLOCS_h[i].getName() == name)
+    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0)
       return deviceAllocatorExists(i);
   }
   return false;
@@ -68,6 +82,11 @@ __host__ bool deviceAllocatorExists(int id)
 {
   return (UMPIRE_DEV_ALLOCS_h[id].isInitialized()) ? true : false;
 }
+
+//__device__ bool deviceAllocatorExistsOnDevice(const char* name)
+//{
+//
+//}
 
 __device__ bool deviceAllocatorExistsOnDevice(int id)
 {
