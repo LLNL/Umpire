@@ -13,6 +13,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added a getDeviceAllocator function that allows users to get a DeviceAllocator object
   from the kernel without explicitly passing the allocator to the kernel first.
 
+### Changed
+
+### Removed
+
+### Fixed
+
 ## [v6.0.0 - 2021-08-18]
 
 ### Added
