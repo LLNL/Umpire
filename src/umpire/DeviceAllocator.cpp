@@ -75,14 +75,6 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   return static_cast<void*>(m_ptr + counter);
 }
 
-__host__ __device__ bool DeviceAllocator::isInitialized()
-{
-  if (m_size > 0) {
-    return true;
-  }
-  return false;
-}
-
 __host__ __device__ size_t DeviceAllocator::getID()
 {
   return m_id;
@@ -91,6 +83,14 @@ __host__ __device__ size_t DeviceAllocator::getID()
 __host__ __device__ const char* DeviceAllocator::getName()
 {
   return m_name;
+}
+
+__host__ __device__ bool DeviceAllocator::isInitialized()
+{
+  if (m_size > 0) {
+    return true;
+  }
+  return false;
 }
 
 } // end of namespace umpire

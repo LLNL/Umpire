@@ -43,6 +43,7 @@ __global__ void my_other_kernel(double** data_ptr)
 int main(int argc, char const* argv[])
 {
   auto& rm = umpire::ResourceManager::getInstance();
+  auto resource = camp::resources::Resource{resource_type{}};
 
   // Create all of my allocators
   auto allocator = rm.getAllocator("UM");
@@ -50,11 +51,9 @@ int main(int argc, char const* argv[])
   auto device_allocator2 = umpire::makeDeviceAllocator(allocator, 512, "my_other_device_alloc");
 
   // Checking that now a DeviceAllocator exists
-  if (umpire::deviceAllocatorExists("my_device_alloc")) {
-    std::cout << "I found a DeviceAllocator!" << std::endl;
-  }
-  if (umpire::deviceAllocatorExists("my_device_allocator")) {
-    std::cout << "This allocator name doesn't exist!" << std::endl;
+  int id_found = umpire::findDeviceAllocatorID("my_device_alloc");
+  if (umpire::deviceAllocatorExists(id_found)) {
+    std::cout << "I found a DeviceAllocator with ID: " << id_found << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
@@ -63,11 +62,11 @@ int main(int argc, char const* argv[])
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
   my_kernel<<<1, 16>>>(ptr_to_data);
-  umpire::synchronizeDeviceAllocator();
+  resource.get_event().wait();
   std::cout << "After first kernel, found value: " << (*ptr_to_data)[7] << std::endl;
 
   my_other_kernel<<<1, 16>>>(ptr_to_data);
-  umpire::synchronizeDeviceAllocator();
+  resource.get_event().wait();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
   // Tear down and deallocate memory.

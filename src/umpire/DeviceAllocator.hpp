@@ -59,6 +59,9 @@ class DeviceAllocator {
    */
   __host__ void destroy();
 
+  /*
+   * \brief Determine if this object has been initialized or not.
+   */
   __host__ __device__ bool isInitialized();
 
  private:

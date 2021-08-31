@@ -13,31 +13,92 @@
 
 namespace umpire {
 
+////////////////////////////////////////////////////////////////////////// 
+// Global variables for host and device
+////////////////////////////////////////////////////////////////////////// 
 const int UMPIRE_TOTAL_DEV_ALLOCS_h{10};
 __device__ const int UMPIRE_TOTAL_DEV_ALLOCS{10};
 
 DeviceAllocator* UMPIRE_DEV_ALLOCS_h{nullptr};
 __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 
-__device__ DeviceAllocator getDeviceAllocator(const char* name)
+////////////////////////////////////////////////////////////////////////// 
+// host/device functions
+////////////////////////////////////////////////////////////////////////// 
+__host__ __device__ DeviceAllocator getDeviceAllocator(const char* name)
 {
-  int index = deviceAllocatorExistsOnDevice(name);
+  int index = findDeviceAllocatorID(name);
   if (index == -1)
     UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
-
+#if !defined(__CUDA_ARCH__)
+  return UMPIRE_DEV_ALLOCS_h[index];
+#else
   return UMPIRE_DEV_ALLOCS[index];
+#endif
 }
 
-__device__ DeviceAllocator getDeviceAllocator(int id)
+__host__ __device__ DeviceAllocator getDeviceAllocator(int id)
 {
+#if !defined(__CUDA_ARCH__)
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS)
     UMPIRE_ERROR("Invalid ID given.");
-  if (!deviceAllocatorExistsOnDevice(id))
+#else
+  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS_h)
+    UMPIRE_ERROR("Invalid ID given.");
+#endif
+
+  if (!deviceAllocatorExists(id))
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
     
+#if !defined(__CUDA_ARCH__)
+  return UMPIRE_DEV_ALLOCS_h[id];
+#else
   return UMPIRE_DEV_ALLOCS[id];
+#endif
 }
 
+__host__ __device__ int findDeviceAllocatorID(const char* name)
+{
+#if !defined(__CUDA_ARCH__)
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
+    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0)
+      return i;
+  }
+  return -1;
+#else
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
+    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
+    int index = 0;
+    int tally = 0;
+    do {
+      if (temp[index] == 0)
+        break;
+      if (temp[index] != name[index])
+        tally++;
+    } while (name[index++] != 0);
+    if (tally == 0)
+      return i;
+  }
+  return -1;
+#endif
+}
+
+__host__ __device__ bool deviceAllocatorExists(int id)
+{
+#if !defined(__CUDA_ARCH__)
+  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS_h)
+    UMPIRE_ERROR("Invalid ID given.");
+  return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
+#else
+  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS)
+    UMPIRE_ERROR("Invalid ID given.");
+  return UMPIRE_DEV_ALLOCS[id].isInitialized();
+#endif
+}
+
+////////////////////////////////////////////////////////////////////////// 
+// host functions
+////////////////////////////////////////////////////////////////////////// 
 __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char* name)
 {
   static size_t allocator_id{0};
@@ -54,43 +115,6 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
   return dev_alloc;
 }
 
-__host__ bool deviceAllocatorExists(const char* name)
-{
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
-    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0)
-      return deviceAllocatorExists(i);
-  }
-  return false;
-}
-
-__host__ bool deviceAllocatorExists(int id)
-{
-  return (UMPIRE_DEV_ALLOCS_h[id].isInitialized()) ? true : false;
-}
-
-__device__ int deviceAllocatorExistsOnDevice(const char* name)
-{
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
-    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
-    int index = 0;
-    int tally = 0;
-    do {
-      if (temp[index] == 0)
-        break;
-      if (temp[index] != name[index])
-        tally++;
-    } while (name[index++] != 0);
-    if (tally == 0)
-      return i;
-  }
-  return -1;
-}
-
-__device__ bool deviceAllocatorExistsOnDevice(int id)
-{
-  return (UMPIRE_DEV_ALLOCS[id].isInitialized()) ? true : false;
-}
-
 __host__ void destroyDeviceAllocator()
 {
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
@@ -98,15 +122,6 @@ __host__ void destroyDeviceAllocator()
       UMPIRE_DEV_ALLOCS_h[i].destroy();
     }
   }
-}
-
-__host__ void synchronizeDeviceAllocator()
-{
-#if defined(UMPIRE_ENABLE_CUDA)
-  cudaDeviceSynchronize();
-#elif defined(UMPIRE_ENABLE_HIP)
-  hipDeviceSynchronize();
-#endif
 }
 
 } // end of namespace umpire

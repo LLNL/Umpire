@@ -31,17 +31,19 @@ __device__ extern DeviceAllocator* UMPIRE_DEV_ALLOCS;
  * Get the DeviceAllocator object specified by either the given
  * name or id.
  */
-__device__ DeviceAllocator getDeviceAllocator(const char* name);
-__device__ DeviceAllocator getDeviceAllocator(int id);
+__host__ __device__ DeviceAllocator getDeviceAllocator(const char* name);
+__host__ __device__ DeviceAllocator getDeviceAllocator(int id);
 
 /*
- * Check if the DeviceAllocator object specified by either the
- * given name or id currently exists.
+ * Check if the DeviceAllocator object specified by the
+ * given id currently exists.
  */
-__host__ bool deviceAllocatorExists(int id);
-__device__ bool deviceAllocatorExistsOnDevice(int id);
-__device__ int deviceAllocatorExistsOnDevice(const char* name);
-__host__ bool deviceAllocatorExists(const char* name);
+__host__ __device__ bool deviceAllocatorExists(int id);
+
+/*
+ * Given a name, find the corresponding ID, if it exists.
+ */
+__host__ __device__ int findDeviceAllocatorID(const char* name);
 
 /*!
  * \brief Construct a new DeviceAllocator. Calls the private Device
@@ -57,12 +59,6 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
  * Deallocate any memory belonging to object about to be destroyed.
  */
 __host__ void destroyDeviceAllocator();
-
-/*
- * Function that calls the appropriate device synchronization
- * method.
- */
-__host__ void synchronizeDeviceAllocator();
 
 /*
  * This macro ensures that the host and device global arrays
