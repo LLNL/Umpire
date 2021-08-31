@@ -28,8 +28,8 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
 
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
+  
   memset(m_name, '\0', strlen(name)+1);
-
   int i = 0;
   do {
     m_name[i] = name[i];

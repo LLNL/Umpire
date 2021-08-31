@@ -65,7 +65,7 @@ class DeviceAllocator {
   umpire::Allocator m_allocator;
 
   char* m_ptr;
-  char m_name[128];
+  char m_name[64];
   unsigned int* m_counter;
 
   size_t m_id;

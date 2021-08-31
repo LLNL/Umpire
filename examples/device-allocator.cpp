@@ -53,11 +53,8 @@ int main(int argc, char const* argv[])
   if (umpire::deviceAllocatorExists("my_device_alloc")) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
   }
-  if (umpire::deviceAllocatorExists("my_other_device_alloc")) {
-    std::cout << "I found another DeviceAllocator!" << std::endl;
-  }
-  if (!umpire::deviceAllocatorExists("my_nonexistent_device_alloc")) {
-    std::cout << "but I didn't find the nonexistent DeviceAllocator!" << std::endl;
+  if (umpire::deviceAllocatorExists("my_device_allocator")) {
+    std::cout << "This allocator name doesn't exist!" << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));

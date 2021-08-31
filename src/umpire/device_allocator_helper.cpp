@@ -21,26 +21,11 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 
 __device__ DeviceAllocator getDeviceAllocator(const char* name)
 {
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
-    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
-    int index = 0;
-    int tally = 0;
-    do {
-      if (temp[index] != name[index])
-        tally++;
-    } while (name[index++] != 0); 
-    if (tally == 0)
-      return UMPIRE_DEV_ALLOCS[i];
-  }
-  UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
-  //
-  // The UMPIRE_ERROR macro above does not return.  It instead throws
-  // an exception.  However, for some reason, nvcc throws a warning
-  // "warning: missing return statement at end of non-void function"
-  // even though the following line cannot be reached.  Adding this
-  // fake return statement to work around the incorrect warning.
-  //
-  return UMPIRE_DEV_ALLOCS[0];
+  int index = deviceAllocatorExistsOnDevice(name);
+  if (index == -1)
+    UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+
+  return UMPIRE_DEV_ALLOCS[index];
 }
 
 __device__ DeviceAllocator getDeviceAllocator(int id)
@@ -83,10 +68,23 @@ __host__ bool deviceAllocatorExists(int id)
   return (UMPIRE_DEV_ALLOCS_h[id].isInitialized()) ? true : false;
 }
 
-//__device__ bool deviceAllocatorExistsOnDevice(const char* name)
-//{
-//
-//}
+__device__ int deviceAllocatorExistsOnDevice(const char* name)
+{
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
+    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
+    int index = 0;
+    int tally = 0;
+    do {
+      if (temp[index] == 0)
+        break;
+      if (temp[index] != name[index])
+        tally++;
+    } while (name[index++] != 0);
+    if (tally == 0)
+      return i;
+  }
+  return -1;
+}
 
 __device__ bool deviceAllocatorExistsOnDevice(int id)
 {
@@ -95,7 +93,7 @@ __device__ bool deviceAllocatorExistsOnDevice(int id)
 
 __host__ void destroyDeviceAllocator()
 {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
     if (UMPIRE_DEV_ALLOCS_h[i].isInitialized()) {
       UMPIRE_DEV_ALLOCS_h[i].destroy();
     }
