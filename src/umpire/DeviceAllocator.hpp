@@ -7,8 +7,9 @@
 #ifndef UMPIRE_DeviceAllocator_HPP
 #define UMPIRE_DeviceAllocator_HPP
 
-#include "umpire/Allocator.hpp"
 #include <string.h>
+
+#include "umpire/Allocator.hpp"
 
 namespace umpire {
 

@@ -6,13 +6,13 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
 
+#include <stdio.h>
+#include <string.h>
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/device_allocator_helper.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
-
-#include <string.h>
-#include <stdio.h>
 
 namespace umpire {
 
@@ -28,8 +28,8 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
 
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
-  
-  memset(m_name, '\0', strlen(name)+1);
+
+  memset(m_name, '\0', strlen(name) + 1);
   int i = 0;
   do {
     m_name[i] = name[i];
@@ -46,8 +46,8 @@ __host__ __device__ DeviceAllocator::DeviceAllocator(const DeviceAllocator& othe
 {
   int i = 0;
   do {
-    m_name[i] = other.m_name[i];}
-  while (other.m_name[i++] != 0);
+    m_name[i] = other.m_name[i];
+  } while (other.m_name[i++] != 0);
 }
 
 __host__ __device__ DeviceAllocator::~DeviceAllocator()
