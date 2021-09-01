@@ -114,6 +114,9 @@ if (ENABLE_CUDA)
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
+
+set_target_properties(umpire_device PROPERTIES
+  CUDA_SEPARABLE_COMPILATION On)
 endif()
 
 set (umpire_depends
@@ -172,9 +175,6 @@ else()
 endif()
 
 set_target_properties(umpire PROPERTIES
-  CUDA_SEPARABLE_COMPILATION On)
-
-set_target_properties(umpire_device PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
 
 set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
