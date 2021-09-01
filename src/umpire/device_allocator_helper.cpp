@@ -16,8 +16,7 @@ namespace umpire {
 //////////////////////////////////////////////////////////////////////////
 // Global variables for host and device
 //////////////////////////////////////////////////////////////////////////
-const int UMPIRE_TOTAL_DEV_ALLOCS_h{10};
-__device__ const int UMPIRE_TOTAL_DEV_ALLOCS{10};
+__managed__ int UMPIRE_TOTAL_DEV_ALLOCS{10};
 
 DeviceAllocator* UMPIRE_DEV_ALLOCS_h{nullptr};
 __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
@@ -39,14 +38,8 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(const char* name)
 
 __host__ __device__ DeviceAllocator getDeviceAllocator(int id)
 {
-#if !defined(__CUDA_ARCH__)
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS)
     UMPIRE_ERROR("Invalid ID given.");
-#else
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS_h)
-    UMPIRE_ERROR("Invalid ID given.");
-#endif
-
   if (!deviceAllocatorExists(id))
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
 
@@ -60,7 +53,7 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(int id)
 __host__ __device__ int findDeviceAllocatorID(const char* name)
 {
 #if !defined(__CUDA_ARCH__)
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0)
       return i;
   }
@@ -85,13 +78,12 @@ __host__ __device__ int findDeviceAllocatorID(const char* name)
 
 __host__ __device__ bool deviceAllocatorExists(int id)
 {
-#if !defined(__CUDA_ARCH__)
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS_h)
-    UMPIRE_ERROR("Invalid ID given.");
-  return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
-#else
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS)
     UMPIRE_ERROR("Invalid ID given.");
+
+#if !defined(__CUDA_ARCH__)
+  return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
+#else
   return UMPIRE_DEV_ALLOCS[id].isInitialized();
 #endif
 }
@@ -108,7 +100,7 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
     auto& rm = umpire::ResourceManager::getInstance();
     auto um_alloc = rm.getAllocator("UM");
     UMPIRE_DEV_ALLOCS_h =
-        (umpire::DeviceAllocator*)um_alloc.allocate(UMPIRE_TOTAL_DEV_ALLOCS_h * sizeof(DeviceAllocator));
+        (umpire::DeviceAllocator*)um_alloc.allocate(UMPIRE_TOTAL_DEV_ALLOCS * sizeof(DeviceAllocator));
   }
 
   UMPIRE_DEV_ALLOCS_h[allocator_id++] = dev_alloc;
@@ -117,7 +109,7 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
 
 __host__ void destroyDeviceAllocator()
 {
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS_h; i++) {
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (UMPIRE_DEV_ALLOCS_h[i].isInitialized()) {
       UMPIRE_DEV_ALLOCS_h[i].destroy();
     }
