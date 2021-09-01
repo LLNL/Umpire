@@ -83,24 +83,48 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     $<INSTALL_INTERFACE:include>)
 endif ()
 
-if (ENABLE_CUDA)
-  set(umpire_headers
-    ${umpire_headers}
+if (ENABLE_CUDA OR ENABLE_HIP)
+  set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
 
-  set(umpire_sources
-    ${umpire_sources}
+  set(umpire_device_sources
     DeviceAllocator.cpp
     device_allocator_helper.cpp)
 
-  set_source_files_properties(DeviceAllocator.cpp
+  if (ENABLE_CUDA)
+    set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-  set_source_files_properties(device_allocator_helper.cpp
+    set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+  else()
+    set_source_files_properties(DeviceAllocator.cpp
+                              PROPERTIES
+                              LANGUAGE HIP)
+    set_source_files_properties(device_allocator_helper.cpp
+                              PROPERTIES
+                              LANGUAGE HIP)
+  endif()
 
+  set(umpire_device_depends camp)
+  blt_list_append( TO umpire_device_depends ELEMENTS cuda_runtime IF ENABLE_CUDA )
+  blt_list_append( TO umpire_device_depends ELEMENTS hip_runtime IF ENABLE_HIP )
+
+  blt_add_library(
+    NAME umpire_device
+    HEADERS ${umpire_device_headers}
+    SOURCES ${umpire_device_sources}
+    DEPENDS_ON ${umpire_device_depends}
+    OBJECT TRUE)
+
+  target_include_directories(
+    umpire_device
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 endif()
 
 set (umpire_depends
@@ -120,6 +144,7 @@ endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_C )
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
+blt_list_append( TO umpire_depends ELEMENTS umpire_device IF ENABLE_CUDA OR ENABLE_HIP)
 
 set (umpire_defines)
 
@@ -221,6 +246,10 @@ install(TARGETS
 
 install(FILES
   ${umpire_headers}
+  DESTINATION include/umpire)
+
+install(FILES
+  ${umpire_device_headers}
   DESTINATION include/umpire)
 
 install(FILES
