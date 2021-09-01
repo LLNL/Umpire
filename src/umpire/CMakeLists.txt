@@ -136,7 +136,7 @@ endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_C )
 blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
-blt_list_append( TO umpire_depends ELEMENTS umpire_device IF ENABLE_CUDA OR ENABLE_HIP)
+blt_list_append( TO umpire_depends ELEMENTS umpire_device IF ENABLE_CUDA)
 
 set (umpire_defines)
 

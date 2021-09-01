@@ -20,9 +20,13 @@ class DeviceAllocator {
  public:
   /*!
    * \brief Construct a new DeviceAllocator that will use allocator to allocate
-   * data. This constructor will only be called by the ResourceManager.
+   * data.
    *
    * \param allocator Allocator to use for allocating memory.
+   * \param size Total amount of memory that the DeviceAllocator will have.
+   * \param name Name of the DeviceAllocator object.
+   * \param id ID associated with this DeviceAllocator object. ID will be used
+   *   to reference UMPIRE_DEV_ALLOCS array if necessary.
    */
   __host__ DeviceAllocator(Allocator allocator, size_t size, const char* name, size_t id);
 
@@ -62,6 +66,8 @@ class DeviceAllocator {
 
   /*
    * \brief Determine if this object has been initialized or not.
+   *
+   * \return Returns true if object has been initialized, false otherwise.
    */
   __host__ __device__ bool isInitialized();
 
