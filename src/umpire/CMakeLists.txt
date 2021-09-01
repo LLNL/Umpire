@@ -83,7 +83,7 @@ if (ENABLE_FORTRAN OR ENABLE_C)
     $<INSTALL_INTERFACE:include>)
 endif ()
 
-if (ENABLE_CUDA OR ENABLE_HIP)
+if (ENABLE_CUDA)
   set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
@@ -92,25 +92,14 @@ if (ENABLE_CUDA OR ENABLE_HIP)
     DeviceAllocator.cpp
     device_allocator_helper.cpp)
 
-  if (ENABLE_CUDA)
-    set_source_files_properties(DeviceAllocator.cpp
+  set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-    set_source_files_properties(device_allocator_helper.cpp
+  set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-  else()
-    set_source_files_properties(DeviceAllocator.cpp
-                              PROPERTIES
-                              LANGUAGE HIP)
-    set_source_files_properties(device_allocator_helper.cpp
-                              PROPERTIES
-                              LANGUAGE HIP)
-  endif()
 
-  set(umpire_device_depends camp)
-  blt_list_append( TO umpire_device_depends ELEMENTS cuda_runtime IF ENABLE_CUDA )
-  blt_list_append( TO umpire_device_depends ELEMENTS hip_runtime IF ENABLE_HIP )
+  set(umpire_device_depends camp cuda)
 
   blt_add_library(
     NAME umpire_device
