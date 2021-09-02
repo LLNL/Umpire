@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Reorganized cmake object library for c/fortran interface.
+
 ### Removed
 
 ### Fixed

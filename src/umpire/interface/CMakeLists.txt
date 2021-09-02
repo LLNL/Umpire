@@ -4,9 +4,6 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-#if (ENABLE_FORTRAN OR ENABLE_C)
-#  add_subdirectory(c_fortran)
-#endif()
 
 add_shroud(
   YAML_INPUT_FILE umpire_shroud.yaml
