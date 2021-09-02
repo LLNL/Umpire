@@ -55,6 +55,7 @@ target_include_directories(
 install(TARGETS
   umpire_interface
   EXPORT umpire-targets
+  OBJECTS DESTINATION lib
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
