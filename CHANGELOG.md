@@ -10,6 +10,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+### Changed
+
+### Removed
+
+### Fixed
+
+## [v6.0.0 - 2021-08-18]
+
+### Added
+
 - Spack environment files for developer builds.
 
 - Created 'ENABLE_INACCESSIBILITY_TESTS' cmake flag for explicitly checking that if an allocator
@@ -69,6 +79,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Asynchronous memset and reallocate operations for CUDA and HIP.
 
+- Added support for named allocations.
+
 ### Changed
 
 - Organized configuration options in config.hpp.in in alphabetical order.
@@ -103,7 +115,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Formatting changed to 120 col, and added CI check to ensure style is applied.
 
-- Update camp to latest commit.
+- Update camp to v0.2.2.
 
 - Use CMakeCachedPackage in uberenv.
 
@@ -115,6 +127,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - All asynchronous operations now return a camp::resources::EventProxy to avoid
   the overhead of creating Events when they are unused.
+
+- CI builds against latest version of TPLs.
+
+- Removed CI jobs that were allowed to fail.
 
 ### Removed
 
@@ -181,7 +197,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fixed cmake warning for HIP+tools builds
 
 - Export external camp_DIR if one is provided when building Umpire, and check
-  both camp_DIR and camp_DIR/lib/cmake/camp when looking for package.
+  both camp_DIR and camp_DIR/lib/cmake/camp when looking for the package.
 
 ## [v5.0.1] - 2021-03-31
 
@@ -251,6 +267,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Have build_and_tesh.sh script re-run make with verbose output if
   compilation fails.
+
+- Updated copyright date to 2021
 
 ### Removed
 

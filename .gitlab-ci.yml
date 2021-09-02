@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -61,6 +61,8 @@ stages:
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 30 -N 1 scripts/gitlab/build_and_test.sh
+  variables:
+    SLURM_OVERLAP: 1
   artifacts:
     reports:
       junit: junit.xml
