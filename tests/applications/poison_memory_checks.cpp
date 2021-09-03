@@ -8,7 +8,6 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
 // NOTE:
@@ -17,19 +16,12 @@
 //
 int main(int, char**)
 {
-  const bool try_map{false};
   const bool try_list{false};
   const bool try_quick{true};
   double* data{nullptr};
   auto& rm = umpire::ResourceManager::getInstance();
 
-  if (try_map) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>("pool", rm.getAllocator("HOST"));
-    data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
-    data[1023] = 100;
-    data[1024] = 100;
-    pool.deallocate(data);
-  } else if (try_list) {
+if (try_list) {
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[1023] = 100;

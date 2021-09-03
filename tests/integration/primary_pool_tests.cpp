@@ -14,18 +14,12 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 template <>
 struct tag_to_string<umpire::strategy::DynamicPoolList> {
   static constexpr const char* value = "DynamicPoolList";
-};
-
-template <>
-struct tag_to_string<umpire::strategy::DynamicPoolMap> {
-  static constexpr const char* value = "DynamicPoolMap";
 };
 
 template <>
@@ -53,7 +47,7 @@ using ResourceTypes = camp::list<host_resource_tag
                                  >;
 
 using PoolTypes =
-    camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
+    camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;
@@ -174,14 +168,6 @@ TYPED_TEST(PrimaryPoolTest, BlocksStatistic)
     ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
   }
 
-  //
-  // The DynamicPoolMap does not recombine blocks dynamically, so we have
-  // to (carefully) coalesce them here to have our total block count match
-  // with the other pools.
-  //
-  if (std::is_same<Pool, umpire::strategy::DynamicPoolMap>::value) {
-    dynamic_pool->coalesce();
-  }
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3);
 
   // 1 BLocks (1 Free, 0 allocated) - Auto-collapsed

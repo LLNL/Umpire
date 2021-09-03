@@ -9,9 +9,7 @@ set (umpire_strategy_headers
   AllocationAdvisor.hpp
   AllocationPrefetcher.hpp
   AllocationStrategy.hpp
-  DynamicPool.hpp
   DynamicPoolList.hpp
-  DynamicPoolMap.hpp
   DynamicSizePool.hpp
   FixedPool.hpp
   FixedSizePool.hpp
@@ -43,7 +41,6 @@ set (umpire_strategy_sources
   AllocationPrefetcher.cpp
   AllocationStrategy.cpp
   DynamicPoolList.cpp
-  DynamicPoolMap.cpp
   FixedPool.cpp
   MixedPool.cpp
   mixins/AlignedAllocation.cpp
@@ -81,10 +78,6 @@ if (ENABLE_OPENMP_TARGET)
     ${umpire_strategy_depends}
     openmp)
 endif ()
-
-set_source_files_properties(DynamicPoolMap.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(DynamicPoolMap.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-set_source_files_properties(DynamicPool.hpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 blt_add_library(
   NAME umpire_strategy

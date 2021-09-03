@@ -19,17 +19,11 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
 template <>
 struct tag_to_string<umpire::strategy::DynamicPoolList> {
   static constexpr const char* value = "DynamicPoolList";
-};
-
-template <>
-struct tag_to_string<umpire::strategy::DynamicPoolMap> {
-  static constexpr const char* value = "DynamicPoolMap";
 };
 
 template <>
@@ -57,7 +51,7 @@ using ResourceTypes = camp::list<host_resource_tag
                                  >;
 
 using PoolTypes =
-    camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap, umpire::strategy::QuickPool>;
+    camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;

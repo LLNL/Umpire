@@ -13,7 +13,6 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
@@ -77,7 +76,7 @@ using Strategies =
 #if !(defined(UMPIRE_ENABLE_HIP) || defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_SYCL) || \
       defined(UMPIRE_ENABLE_OPENMP_TARGET) || defined(__PGI))
                ,
-               umpire::strategy::AlignedAllocator, umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap,
+               umpire::strategy::AlignedAllocator, umpire::strategy::DynamicPoolList,
                umpire::strategy::QuickPool, umpire::strategy::MixedPool, umpire::strategy::NamedAllocationStrategy,
                umpire::strategy::SizeLimiter, umpire::strategy::SlotPool, umpire::strategy::ThreadSafeAllocator
 #endif
