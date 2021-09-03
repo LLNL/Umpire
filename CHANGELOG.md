@@ -17,6 +17,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
+- Removed unneeded hip dependency in the tests/debug/ CMake file.
+
 ### Fixed
 
 ## [v6.0.0 - 2021-08-18]
