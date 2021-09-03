@@ -46,8 +46,7 @@ using ResourceTypes = camp::list<host_resource_tag
 #endif
                                  >;
 
-using PoolTypes =
-    camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::QuickPool>;
+using PoolTypes = camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::QuickPool>;
 using TestTypes = camp::cartesian_product<PoolTypes, ResourceTypes>;
 
 using PoolTestTypes = Test<TestTypes>::Types;

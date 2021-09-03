@@ -150,10 +150,10 @@ using Strategies =
 #if defined(UMPIRE_ENABLE_CUDA)
                      umpire::strategy::AllocationAdvisor,
 #endif
-                     umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool,
-                     umpire::strategy::MixedPool, umpire::strategy::MonotonicAllocationStrategy,
-                     umpire::strategy::NamedAllocationStrategy, umpire::strategy::QuickPool,
-                     umpire::strategy::SizeLimiter, umpire::strategy::SlotPool, umpire::strategy::ThreadSafeAllocator>;
+                     umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::MixedPool,
+                     umpire::strategy::MonotonicAllocationStrategy, umpire::strategy::NamedAllocationStrategy,
+                     umpire::strategy::QuickPool, umpire::strategy::SizeLimiter, umpire::strategy::SlotPool,
+                     umpire::strategy::ThreadSafeAllocator>;
 
 TYPED_TEST_SUITE(StrategyTest, Strategies, );
 
@@ -316,8 +316,8 @@ void ReleaseTest<umpire::strategy::FixedPool>::SetUp()
       rm.makeAllocator<umpire::strategy::FixedPool>(name, rm.getAllocator(limiter_name), max_alloc_size, 1));
 }
 
-using ReleaseStrategies = ::testing::Types<umpire::strategy::DynamicPoolList,
-                                           umpire::strategy::FixedPool, umpire::strategy::QuickPool>;
+using ReleaseStrategies =
+    ::testing::Types<umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::QuickPool>;
 
 TYPED_TEST_SUITE(ReleaseTest, ReleaseStrategies, );
 

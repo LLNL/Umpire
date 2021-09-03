@@ -21,7 +21,7 @@ int main(int, char**)
   double* data{nullptr};
   auto& rm = umpire::ResourceManager::getInstance();
 
-if (try_list) {
+  if (try_list) {
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[1023] = 100;
