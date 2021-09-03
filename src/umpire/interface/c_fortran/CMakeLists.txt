@@ -49,13 +49,11 @@ target_include_directories(
   umpire_interface
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
 
 install(TARGETS
   umpire_interface
   EXPORT umpire-targets
-  OBJECTS DESTINATION lib
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
