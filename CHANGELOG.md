@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Set property CUDA_RESOLVE_DEVICE_SYMBOLS on Umpire library.
+
 ### Removed
 
 - Removed unneeded hip dependency in the tests/debug/ CMake file.

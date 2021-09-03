@@ -97,13 +97,15 @@ if (ENABLE_CUDA)
                               LANGUAGE CUDA)
 endif()
 
-set (umpire_depends
-  camp
+set (umpire_components
   umpire_resource
   umpire_strategy
   umpire_alloc
   umpire_op
-  umpire_util
+  umpire_util)
+
+set (umpire_depends
+  camp
   umpire_tpl_judy)
 
 if (ENABLE_OPENMP_TARGET)
@@ -127,8 +129,12 @@ blt_add_library(
   NAME umpire
   HEADERS ${umpire_headers}
   SOURCES ${umpire_sources}
-  DEPENDS_ON ${umpire_depends}
+  DEPENDS_ON ${umpire_components} ${umpire_depends}
   DEFINES ${umpire_defines})
+
+if (ENABLE_CUDA)
+  set_target_properties(umpire ${umpire_components} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS On)
+endif ()
 
 if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   target_link_options(
