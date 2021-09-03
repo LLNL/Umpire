@@ -23,7 +23,9 @@ using resource_type = camp::resources::Hip;
 __global__ void my_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
+    // _sphinx_tag_get_dev_allocator_id_start
     umpire::DeviceAllocator alloc = umpire::getDeviceAllocator(0);
+    // _sphinx_tag_get_dev_allocator_id_end
     double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
     *data_ptr = data;
     data[7] = 1024;
@@ -33,7 +35,9 @@ __global__ void my_kernel(double** data_ptr)
 __global__ void my_other_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
+    // _sphinx_tag_get_dev_allocator_name_start
     umpire::DeviceAllocator alloc = umpire::getDeviceAllocator("my_other_device_alloc");
+    // _sphinx_tag_get_dev_allocator_name_end
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = 42;
@@ -47,8 +51,10 @@ int main(int argc, char const* argv[])
 
   // Create all of my allocators
   auto allocator = rm.getAllocator("UM");
+  // _sphinx_tag_make_dev_allocator_start
   auto device_allocator = umpire::makeDeviceAllocator(allocator, 1024, "my_device_alloc");
   auto device_allocator2 = umpire::makeDeviceAllocator(allocator, 512, "my_other_device_alloc");
+  // _sphinx_tag_make_dev_allocator_end
 
   // Checking that now a DeviceAllocator exists
   int id_found = umpire::findDeviceAllocatorID("my_device_alloc");
@@ -59,7 +65,9 @@ int main(int argc, char const* argv[])
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
   // Make sure that device and host side DeviceAllocator pointers are synched
+  // _sphinx_tag_macro_start
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
+  // _sphinx_tag_macro_end
 
   my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
