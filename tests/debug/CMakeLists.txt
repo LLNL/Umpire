@@ -8,18 +8,6 @@
 #Intend to add more debug helper tests like this, so setting a variable specifically
 set (test_debug_depends umpire)
 
-if (ENABLE_HIP)
-  set (test_debug_depends
-      ${test_debug_depends}
-      hip_runtime)
-endif()
-
-if (ENABLE_OPENMP_TARGET)
-  set (test_debug_depends
-      ${test_debug_depends}
-      openmp)
-endif()
-
 blt_add_executable(
   NAME allocate_deallocate
   SOURCES allocate_deallocate.cpp
