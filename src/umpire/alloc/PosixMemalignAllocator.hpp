@@ -30,7 +30,7 @@ struct PosixMemalignAllocator {
   void* allocate(std::size_t bytes)
   {
     void* ret = NULL;
-    int err = ::posix_memalign(&ret, get_page_size(), bytes);    
+    int err = ::posix_memalign(&ret, get_page_size(), bytes);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
