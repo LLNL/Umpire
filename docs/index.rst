@@ -16,8 +16,6 @@ memory hierarchies.
 
 Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
 
-* `Source Documentation <doxygen/html/index.html>`_
-
 .. toctree::
   :maxdepth: 2
   :caption: Basics
@@ -32,7 +30,7 @@ Any questions? File an issue on GitHub, or email umpire-dev@llnl.gov
   sphinx/advanced_configuration
   sphinx/cookbook
   sphinx/features
-  sphinx/code_documentation
+  Source Documentation <doxygen/html/index.html#http://>
 
 .. toctree::
   :maxdepth: 2
