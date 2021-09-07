@@ -134,6 +134,7 @@ blt_add_library(
 
 if (ENABLE_CUDA)
   set_target_properties(umpire ${umpire_components} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS On)
+  target_compile_options(umpire PRIVATE -rdc=true) # only for nvcc
 endif ()
 
 if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
