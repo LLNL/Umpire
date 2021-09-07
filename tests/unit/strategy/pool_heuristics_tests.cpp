@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -12,6 +12,7 @@
 #include "gtest/gtest.h"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
 namespace {
@@ -38,7 +39,7 @@ struct PoolHeuristicsTest : public ::testing::Test {
   const std::size_t alignment{16};
 
   using myPoolType = POOL;
-  using CoalesceHeuristic = std::function<bool(const POOL&)>;
+  using CoalesceHeuristic = umpire::strategy::PoolCoalesceHeuristic<POOL>;
   using TestAllocator = std::pair<umpire::Allocator, POOL*>;
 
   TestAllocator getAllocator(CoalesceHeuristic h)

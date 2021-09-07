@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -30,6 +30,14 @@
 
 #include "camp/camp.hpp"
 #include "gtest/gtest.h"
+
+#if defined(UMPIRE_ENABLE_CUDA)
+using resource_type = camp::resources::Cuda;
+#elif defined(UMPIRE_ENABLE_HIP)
+using resource_type = camp::resources::Hip;
+#else
+using resource_type = camp::resources::Host;
+#endif
 
 static int s_counter{0};
 
@@ -275,6 +283,23 @@ TYPED_TEST(CopyTest, InvalidSize)
   ASSERT_THROW(rm.copy(small_dest_array, this->source_array), umpire::util::Exception);
 
   this->dest_allocator->deallocate(small_dest_array);
+}
+
+TYPED_TEST(CopyTest, Async)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto resource = camp::resources::Resource{resource_type{}};
+
+  for (std::size_t i = 0; i < this->m_size; i++) {
+    this->source_array[i] = static_cast<float>(i);
+  }
+
+  camp::resources::Event event = rm.copy(this->dest_array, this->source_array, resource);
+  event = rm.copy(this->check_array, this->dest_array, resource);
+
+  for (std::size_t i = 0; i < this->m_size; i++) {
+    ASSERT_FLOAT_EQ(this->source_array[i], this->check_array[i]);
+  }
 }
 
 template <typename T>
@@ -704,9 +729,13 @@ TYPED_TEST(AdviceTest, AccessedBy)
   ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
 
+#endif
+
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
+
 TEST(AsyncTest, Copy)
 {
-  auto resource = camp::resources::Resource{camp::resources::Cuda{}};
+  auto resource = camp::resources::Resource{resource_type{}};
   auto& rm = umpire::ResourceManager::getInstance();
 
   constexpr std::size_t size = 1024;
@@ -723,7 +752,7 @@ TEST(AsyncTest, Copy)
     source_array[i] = static_cast<float>(i);
   }
 
-  auto event = rm.copy(dest_array, source_array, resource);
+  camp::resources::Event event = rm.copy(dest_array, source_array, resource);
   event = rm.copy(check_array, dest_array, resource);
 
   event.wait();
@@ -737,4 +766,45 @@ TEST(AsyncTest, Copy)
   device_alloc.deallocate(dest_array);
 }
 
+TEST(AsyncTest, Memset)
+{
+  auto resource = camp::resources::Resource{resource_type{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto host_alloc = rm.getAllocator("HOST");
+  auto device_alloc = rm.getAllocator("DEVICE");
+
+  float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+  float* check_array = static_cast<float*>(host_alloc.allocate(size * sizeof(float)));
+
+  auto event_proxy = rm.memset(source_array, 0, resource);
+  camp::resources::Event event = rm.copy(check_array, source_array, resource);
+
+  event.wait();
+
+  for (std::size_t i = 0; i < size; i++) {
+    ASSERT_FLOAT_EQ(0, check_array[i]);
+  }
+
+  device_alloc.deallocate(source_array);
+  host_alloc.deallocate(check_array);
+}
+
+TEST(AsyncTest, Reallocate)
+{
+  auto resource = camp::resources::Resource{resource_type{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto device_alloc = rm.getAllocator("DEVICE");
+  float* source_array = static_cast<float*>(device_alloc.allocate(size * sizeof(float)));
+  source_array = static_cast<float*>(rm.reallocate(source_array, 50, resource));
+
+  resource.get_event().wait();
+
+  device_alloc.deallocate(source_array);
+}
 #endif

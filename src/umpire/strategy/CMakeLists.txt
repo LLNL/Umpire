@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -18,6 +18,7 @@ set (umpire_strategy_headers
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
+  PoolCoalesceHeuristic.hpp
   QuickPool.hpp
   SizeLimiter.hpp
   SlotPool.hpp
@@ -67,6 +68,12 @@ if (ENABLE_CUDA)
   set(umpire_strategy_depends
     ${umpire_strategy_depends}
     cuda_runtime)
+endif ()
+
+if (ENABLE_HIP)
+  set(umpire_strategy_depends
+    ${umpire_strategy_depends}
+    hip_runtime)
 endif ()
 
 if (ENABLE_OPENMP_TARGET)

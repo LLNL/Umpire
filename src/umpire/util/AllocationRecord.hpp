@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <string>
 
 #include "umpire/util/backtrace.hpp"
 
@@ -21,17 +22,24 @@ class AllocationStrategy;
 namespace util {
 
 struct AllocationRecord {
-  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat) : ptr{p}, size{s}, strategy{strat}
+  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat)
+      : ptr{p}, size{s}, strategy{strat}, name{}
   {
   }
 
-  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}
+  AllocationRecord(void* p, std::size_t s, strategy::AllocationStrategy* strat, const std::string& _name)
+      : ptr{p}, size{s}, strategy{strat}, name{_name}
+  {
+  }
+
+  AllocationRecord() : ptr{nullptr}, size{0}, strategy{nullptr}, name{}
   {
   }
 
   void* ptr;
   std::size_t size;
   strategy::AllocationStrategy* strategy;
+  std::string name;
 #if defined(UMPIRE_ENABLE_BACKTRACE)
   util::backtrace allocation_backtrace;
 #endif // UMPIRE_ENABLE_BACKTRACE

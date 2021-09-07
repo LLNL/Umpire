@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <sstream>
+#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -31,6 +32,7 @@ AllocationMap::RecordList::~RecordList()
   RecordBlock* curr = m_tail;
   while (curr) {
     RecordBlock* prev = curr->prev;
+    curr->~RecordBlock();
     m_map.m_block_pool.deallocate(curr);
     curr = prev;
   }
@@ -38,7 +40,7 @@ AllocationMap::RecordList::~RecordList()
 
 void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 {
-  RecordBlock* curr = static_cast<RecordBlock*>(m_map.m_block_pool.allocate());
+  RecordBlock* curr = new (m_map.m_block_pool.allocate()) RecordBlock{};
   curr->prev = m_tail;
   curr->rec = rec;
   m_tail = curr;
@@ -55,6 +57,7 @@ AllocationRecord AllocationMap::RecordList::pop_back()
   RecordBlock* prev = m_tail->prev;
 
   // Deallocate and move tail pointer
+  m_tail->~RecordBlock();
   m_map.m_block_pool.deallocate(m_tail);
   m_tail = prev;
 
@@ -297,10 +300,11 @@ void AllocationMap::print(const std::function<bool(const AllocationRecord&)>&& p
       if (pred(*iter)) {
         any_match = true;
         auto end_ptr = static_cast<unsigned char*>(iter->ptr) + iter->size;
-        ss << iter->size << " [ " << reinterpret_cast<void*>(iter->ptr) << " -- " << reinterpret_cast<void*>(end_ptr)
-           << " ] " << std::endl
+        ss << "  size: " << iter->size << ", "
+           << "range: " << reinterpret_cast<void*>(iter->ptr) << " -- " << reinterpret_cast<void*>(end_ptr) << ", "
+           << "name: " << iter->name << ", "
 #if defined(UMPIRE_ENABLE_BACKTRACE)
-           << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
+           << "backtrace: " << umpire::util::backtracer<trace_optional>::print(iter->allocation_backtrace)
 #endif // UMPIRE_ENABLE_BACKTRACE
            << std::endl;
       }

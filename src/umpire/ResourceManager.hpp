@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -223,7 +223,8 @@ class ResourceManager {
    */
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
-  camp::resources::Event copy(void* dst_ptr, void* src_ptr, camp::resources::Resource& ctx, std::size_t size = 0);
+  camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
+                                                              camp::resources::Resource& ctx, std::size_t size = 0);
 
   /*!
    * \brief Set the first length bytes of ptr to the value val.
@@ -233,6 +234,9 @@ class ResourceManager {
    * \param length Number of bytes to set to val.
    */
   void memset(void* ptr, int val, std::size_t length = 0);
+
+  camp::resources::EventProxy<camp::resources::Resource> memset(void* ptr, int val, camp::resources::Resource& ctx,
+                                                                std::size_t length = 0);
 
   /*!
    * \brief Reallocate current_ptr to new_size.
@@ -258,6 +262,8 @@ class ResourceManager {
    */
   void* reallocate(void* current_ptr, std::size_t new_size);
 
+  void* reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx);
+
   /*!
    * \brief Reallocate current_ptr to new_size.
    *
@@ -275,6 +281,8 @@ class ResourceManager {
    *
    */
   void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
+
+  void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   /*!
    * \brief Move src_ptr to memory from allocator
@@ -325,6 +333,8 @@ class ResourceManager {
   strategy::AllocationStrategy* getZeroByteAllocator();
 
   void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator);
+
+  void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   util::AllocationMap m_allocations;
 

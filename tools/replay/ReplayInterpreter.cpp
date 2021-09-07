@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -101,24 +101,34 @@ void ReplayInterpreter::buildOperations()
     }
 
     try {
-      if ( m_json["event"] == "allocation_map_insert" ) {
-        m_allocation_map_insert_ops++;
+      if ( m_json["event"] == "allocate" ) {
+        m_allocate_ops++;
+        if ( ! m_options.info_only )
+          replay_compileAllocate();
+      }
+      else if ( m_json["event"] == "deallocate" ) {
+        m_deallocate_ops++;
+        if ( ! m_options.info_only ) {
+          if (!replay_compileDeallocate()) {
+            REPLAY_TRACE("Skipped " << m_ops->getLine(m_line_number));
+            continue;
+          }
+        }
+      }
+      else if ( m_json["event"] == "allocation_map_insert" ) {
         if ( ! m_options.info_only )
           replay_processMapInsert();
         continue;
       }
       else if ( m_json["event"] == "allocation_map_remove" ) {
-        m_allocation_map_remove_ops++;
         if ( ! m_options.info_only )
           replay_processMapRemove();
         continue;
       }
       else if ( m_json["event"] == "allocation_map_find" ) {
-        m_allocation_map_find_ops++;
         continue;
       }
       else if ( m_json["event"] == "allocation_map_clear" ) {
-        m_allocation_map_clear_ops++;
         continue;
       }
       else if ( m_json["event"] == "mpi" ) {
@@ -164,20 +174,6 @@ void ReplayInterpreter::buildOperations()
         m_set_default_allocator_ops++;
         if ( ! m_options.info_only )
           replay_compileSetDefaultAllocator();
-      }
-      else if ( m_json["event"] == "allocate" ) {
-        m_allocate_ops++;
-        if ( ! m_options.info_only )
-          replay_compileAllocate();
-      }
-      else if ( m_json["event"] == "deallocate" ) {
-        m_deallocate_ops++;
-        if ( ! m_options.info_only ) {
-          if (!replay_compileDeallocate()) {
-            REPLAY_TRACE("Skipped " << m_ops->getLine(m_line_number));
-            continue;
-          }
-        }
       }
       else if ( m_json["event"] == "coalesce" ) {
         m_coalesce_ops++;
@@ -275,16 +271,8 @@ void ReplayInterpreter::buildOperations()
       << "    " << std::setw(12) << m_deallocate_external_ignored << " skipped due to being external registration" << std::endl
       << "    " << std::setw(12) << m_deallocate_rogue_ignored << " skipped due to being rogue" << std::endl
       << std::endl
-      << std::setw(12) << m_allocation_map_insert_ops << " allocation_map_insert operations (not replayed)" << std::endl
-      << "    " << std::setw(12) << m_allocation_map_insert_due_to_make_allocator << " from makeAllocator" << std::endl
-      << "    " << std::setw(12) << m_allocation_map_insert_due_to_allocation << " from allocate" << std::endl
-      << "    " << std::setw(12) << m_allocation_map_insert_due_to_reallocate << " from reallocate" << std::endl
-      << "    " << std::setw(12) << m_allocation_map_insert_rogue_ignored << " from external registration" << std::endl
-      << std::setw(12) << m_allocation_map_remove_ops << " allocation_map_remove operations" << std::endl
-      << "    " << std::setw(12) << m_allocation_map_remove_ops - m_allocation_map_remove_rogue_ignored << " from deallocate" << std::endl
-      << "    " << std::setw(12) << m_allocation_map_remove_rogue_ignored << " from external registration" << std::endl
-      << std::setw(12) << m_allocation_map_find_ops << " allocation_map_find operations" << std::endl
-      << std::setw(12) << m_allocation_map_clear_ops << " allocation_map_clear operations" << std::endl
+      << std::setw(12) << m_register_external_pointer << " external registrations (not replayed)" << std::endl
+      << std::setw(12) << m_deregister_external_pointer << " external deregistrations (not replayed)" << std::endl
       << std::endl
       << std::setw(12) << m_copy_ops << " copy operations" << std::endl
       << std::setw(12) << m_memset_ops << " memset operations" << std::endl
@@ -819,22 +807,11 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
 void ReplayInterpreter::replay_processMapInsert()
 {
-  if ( m_make_allocator_in_progress ) {
-    m_allocation_map_insert_due_to_make_allocator++;
+  if ( m_make_allocation_in_progress || m_replaying_reallocate || m_make_allocator_in_progress ) {
     return;
   }
 
-  if ( m_replaying_reallocate ) {
-    m_allocation_map_insert_due_to_reallocate++;
-    return;
-  }
-
-  if ( m_make_allocation_in_progress ) {
-    m_allocation_map_insert_due_to_allocation++;
-    return;
-  }
-
-  m_allocation_map_insert_rogue_ignored++;
+  m_register_external_pointer++;
 
   REPLAY_TRACE("Skipping " << m_ops->getLine(m_line_number));
   uint64_t memory_ptr{ getPointer( std::string{m_json["payload"]["ptr"]} ) };
@@ -848,7 +825,7 @@ void ReplayInterpreter::replay_processMapRemove()
 
   if ( m_external_registrations.find(memory_ptr) != m_external_registrations.end() ) {
     REPLAY_TRACE("Erasing " << m_ops->getLine(m_line_number));
-    m_allocation_map_remove_rogue_ignored++;
+    m_deregister_external_pointer++;
     m_external_registrations.erase(memory_ptr);
   }
 }

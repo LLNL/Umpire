@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -13,6 +13,9 @@ add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
 endif ()
+if (ENABLE_C OR ENABLE_FORTRAN)
+  add_subdirectory(interface/c_fortran)
+endif()
 
 set (umpire_headers
   Allocator.hpp
@@ -31,57 +34,6 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (ENABLE_FORTRAN OR ENABLE_C)
-  set (umpire_interface_headers
-    interface/umpire.h)
-
-  set (umpire_interface_c_fortran_headers
-    interface/c_fortran/wrapAllocator.h
-    interface/c_fortran/wrapResourceManager.h
-    interface/c_fortran/wrapUmpire.h
-    interface/c_fortran/typesUmpire.h)
-
-  set (umpire_interface_sources
-    interface/c_fortran/utilUmpire.cpp
-    interface/c_fortran/wrapAllocator.cpp
-    interface/c_fortran/wrapResourceManager.cpp
-    interface/c_fortran/wrapUmpire.cpp)
-
-  if (ENABLE_FORTRAN)
-    set (umpire_interface_sources
-      ${umpire_interface_sources}
-      interface/c_fortran/wrapfumpire.f)
-
-    set_source_files_properties(
-      interface/c_fortran/wrapfumpire.f
-      PROPERTIES
-      Fortran_FORMAT FREE)
-    endif ()
-    
-  set_source_files_properties(
-    interface/c_fortran/wrapResourceManager.cpp 
-    PROPERTIES 
-    COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-
-  set(umpire_interface_depends camp)
-  blt_list_append( TO umpire_interface_depends ELEMENTS cuda_runtime IF ENABLE_CUDA )
-  blt_list_append( TO umpire_interface_depends ELEMENTS hip_runtime IF ENABLE_HIP )
-  blt_list_append( TO umpire_interface_depends ELEMENTS mpi IF ENABLE_MPI )
-
-  blt_add_library(
-    NAME umpire_interface
-    HEADERS ${umpire_interface_headers} ${umpire_interface_c_fortran_headers}
-    SOURCES ${umpire_interface_sources}
-    DEPENDS_ON ${umpire_interface_depends}
-    OBJECT TRUE)
-
-  target_include_directories(
-    umpire_interface
-    PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
-    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-    $<INSTALL_INTERFACE:include>)
-endif ()
 
 if (ENABLE_CUDA)
   set(umpire_headers
@@ -216,19 +168,6 @@ install(TARGETS
 install(FILES
   ${umpire_headers}
   DESTINATION include/umpire)
-
-install(FILES
-  ${umpire_interface_headers}
-  DESTINATION include/umpire/interface)
-
-install(FILES
-  ${umpire_interface_c_fortran_headers}
-  DESTINATION include/umpire/interface/c_fortran)
-
-install(DIRECTORY
-  ${CMAKE_Fortran_MODULE_DIRECTORY}/
-  DESTINATION include/umpire
-  FILES_MATCHING PATTERN "*.mod")
 
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
