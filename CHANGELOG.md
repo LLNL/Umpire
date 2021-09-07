@@ -12,6 +12,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking
+  change since the include paths are different.
+
 ### Removed
 
 - Remove deprecated registerAllocator and isAllocatorRegistered methods.
