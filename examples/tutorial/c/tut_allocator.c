@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 #define SIZE 1024
 
