@@ -100,7 +100,7 @@ if (ENABLE_CUDA)
     DEPENDS_ON umpire cuda
   )
 
-  set_source_files_properties(
+   set_source_files_properties(
     device-allocator.cpp
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 

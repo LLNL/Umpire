@@ -95,6 +95,10 @@ if (ENABLE_CUDA)
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+
+  set_source_files_properties(DeviceAllocator.cpp
+                              PROPERTIES
+                              CUDA_SEPARABLE_COMPILATION On)
 endif()
 
 set (umpire_components
@@ -133,7 +137,7 @@ blt_add_library(
   DEFINES ${umpire_defines})
 
 if (ENABLE_CUDA)
-  set_target_properties(umpire ${umpire_components} PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS On)
+  set_target_properties(umpire umpire_resource umpire_strategy umpire_op umpire_util PROPERTIES CUDA_RESOLVE_DEVICE_SYMBOLS On)
 endif ()
 
 if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)

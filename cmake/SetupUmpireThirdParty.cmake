@@ -55,6 +55,11 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     )
 endif ()
 
+if (ENABLE_CUDA)
+ set (CMAKE_CUDA_SEPARABLE_COMPILATION On CACHE Bool "")
+ set (CUDA_LINK_WITH_NVCC On CACHE Bool "")
+endif ()
+
 set(TPL_DEPS)
 blt_list_append(TO TPL_DEPS ELEMENTS cuda cuda_runtime IF ENABLE_CUDA)
 blt_list_append(TO TPL_DEPS ELEMENTS hip hip_runtime IF ENABLE_HIP)
