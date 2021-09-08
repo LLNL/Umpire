@@ -36,7 +36,7 @@ struct PosixMemalignAllocator {
 
     if (ret == nullptr) {
       UMPIRE_ERROR(
-          "posix_memalign( bytes = " << bytes << ", pagesize = " << get_page_size() << " ) failed with error = ", err);
+          "posix_memalign( bytes = " << bytes << ", pagesize = " << get_page_size() << " ) failed with error = " << err);
     }
 
     return ret;
