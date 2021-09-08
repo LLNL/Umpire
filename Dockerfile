@@ -73,7 +73,7 @@ FROM axom/compilers:oneapi-2021.2.0 AS sycl
 ENV GTEST_COLOR=1
 COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
-RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh && mkdir build && cd build && cmake -DCMAKE_CXX_COMPILER=dpcpp -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On .."
+RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh && mkdir build && cd build && cmake -DCMAKE_CXX_COMPILER=dpcpp -DENABLE_WARNINGS_AS_ERRORS=Off -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On .."
 RUN /bin/bash -c "source /opt/intel/oneapi/setvars.sh && cd build && make -j 16"
 
 FROM axom/compilers:clang-10 AS check
