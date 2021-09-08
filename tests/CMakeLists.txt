@@ -9,7 +9,7 @@ add_subdirectory(unit)
 add_subdirectory(integration)
 add_subdirectory(tools)
 add_subdirectory(debug)
-if (ENABLE_DEVELOPER_DEFAULTS)
+if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
     add_subdirectory(applications)
 endif()
 

@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME cuda_mem_advise_op_tests
     SOURCES cuda_mem_advise_op_tests.cpp

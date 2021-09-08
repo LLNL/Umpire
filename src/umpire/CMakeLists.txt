@@ -13,7 +13,7 @@ add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
 endif ()
-if (ENABLE_C OR ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_C OR UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(interface/c_fortran)
 endif()
 
@@ -34,8 +34,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set(umpire_headers
     ${umpire_headers}
     DeviceAllocator.hpp)
@@ -58,14 +57,14 @@ set (umpire_depends
   umpire_util
   umpire_tpl_judy)
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_depends
     ${umpire_depends}
     openmp)
 endif ()
 
-blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF ENABLE_C )
-blt_list_append( TO umpire_depends ELEMENTS cuda IF ENABLE_CUDA )
+blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
+blt_list_append( TO umpire_depends ELEMENTS cuda IF UMPIRE_ENABLE_CUDA )
 
 set (umpire_defines)
 
@@ -93,7 +92,7 @@ if (NOT WIN32 AND NOT ${CMAKE_VERSION} VERSION_LESS 3.18)
   )
 endif()
 
-if (ENABLE_IPC_SHARED_MEMORY)
+if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   message(STATUS "Host Shared Memory Enabled")
   target_link_libraries(
     umpire INTERFACE $<BUILD_INTERFACE:-lrt>
@@ -106,29 +105,14 @@ endif()
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
 
-set(UMPIRE_ENABLE_CUDA ${ENABLE_CUDA})
-set(UMPIRE_ENABLE_NUMA ${ENABLE_NUMA})
-set(UMPIRE_ENABLE_LOGGING ${ENABLE_LOGGING})
-set(UMPIRE_ENABLE_INACCESSIBILITY_TESTS ${ENABLE_INACCESSIBILITY_TESTS})
-set(UMPIRE_ENABLE_SLIC ${ENABLE_SLIC})
-set(UMPIRE_ENABLE_BACKTRACE ${ENABLE_BACKTRACE})
-set(UMPIRE_ENABLE_BACKTRACE_SYMBOLS ${ENABLE_BACKTRACE_SYMBOLS})
-set(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS ${ENABLE_DEVELOPER_BENCHMARKS})
-set(UMPIRE_ENABLE_MPI ${ENABLE_MPI})
-set(UMPIRE_ENABLE_HIP ${ENABLE_HIP})
-set(UMPIRE_ENABLE_SYCL ${ENABLE_SYCL})
-set(UMPIRE_ENABLE_OPENMP_TARGET ${ENABLE_OPENMP_TARGET})
-set(UMPIRE_ENABLE_IPC_SHARED_MEMORY ${ENABLE_IPC_SHARED_MEMORY})
-set(UMPIRE_ENABLE_FILE_RESOURCE ${ENABLE_FILE_RESOURCE})
-
-if (ENABLE_CUDA OR ENABLE_HIP)
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_PINNED On)
   set(UMPIRE_ENABLE_UM On)
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set(UMPIRE_ENABLE_CONST On)
   endif()
-elseif (ENABLE_SYCL)
+elseif (UMPIRE_ENABLE_SYCL)
   set(UMPIRE_ENABLE_DEVICE On)
   set(UMPIRE_ENABLE_UM On)
   set(UMPIRE_ENABLE_PINNED On)
@@ -139,11 +123,7 @@ else ()
   set(UMPIRE_ENABLE_UM Off)
 endif()
 
-if (ENABLE_ASAN)
-  set(UMPIRE_ENABLE_ASAN On)
-endif ()
-
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(UMPIRE_ENABLE_DEVICE On)
 endif ()
 

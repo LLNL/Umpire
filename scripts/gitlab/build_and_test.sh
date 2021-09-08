@@ -150,7 +150,7 @@ then
     date
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
-    if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
+    if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
     then
         date
         ctest --verbose -C Benchmark -R no-op_stress_test

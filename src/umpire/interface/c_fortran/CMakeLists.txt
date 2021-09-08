@@ -17,7 +17,7 @@ set (umpire_interface_c_fortran_sources
   wrapResourceManager.cpp
   wrapUmpire.cpp)
 
-if (ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_FORTRAN)
   set (umpire_interface_c_fortran_sources
     ${umpire_interface_c_fortran_sources}
     wrapfumpire.f)
@@ -34,9 +34,9 @@ set_source_files_properties(
   COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 set(umpire_interface_c_fortran_depends camp)
-blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS cuda_runtime IF ENABLE_CUDA )
-blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS hip_runtime IF ENABLE_HIP )
-blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS mpi IF ENABLE_MPI )
+blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS cuda_runtime IF UMPIRE_ENABLE_CUDA )
+blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS hip_runtime IF UMPIRE_ENABLE_HIP )
+blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS mpi IF UMPIRE_ENABLE_MPI )
 
 blt_add_library(
   NAME umpire_interface
