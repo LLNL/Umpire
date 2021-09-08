@@ -28,6 +28,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Fix warning caused by ignoring posix_memalign return value.
+
 ## [v6.0.0 - 2021-08-18]
 
 ### Added
