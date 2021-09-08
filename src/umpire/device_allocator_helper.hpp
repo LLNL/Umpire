@@ -37,7 +37,7 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(int id);
  * Check if the DeviceAllocator object specified by the
  * given id currently exists.
  */
-__host__ __device__ bool deviceAllocatorExists(int id);
+__host__ __device__ bool isDeviceAllocator(int id);
 
 /*
  * Given a name, find the corresponding ID, if it exists.

@@ -172,10 +172,6 @@ install(FILES
   ${umpire_headers}
   DESTINATION include/umpire)
 
-install(FILES
-  ${umpire_device_headers}
-  DESTINATION include/umpire)
-
 install(DIRECTORY
   ${CMAKE_BINARY_DIR}/include
   DESTINATION ".")

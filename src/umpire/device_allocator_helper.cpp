@@ -27,8 +27,9 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 __host__ __device__ DeviceAllocator getDeviceAllocator(const char* name)
 {
   int index = findDeviceAllocatorID(name);
-  if (index == -1)
+  if (index == -1) {
     UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+  }
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[index];
 #else
@@ -38,10 +39,12 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(const char* name)
 
 __host__ __device__ DeviceAllocator getDeviceAllocator(int id)
 {
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS)
+  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
     UMPIRE_ERROR("Invalid ID given.");
-  if (!deviceAllocatorExists(id))
+  }
+  if (!deviceAllocatorExists(id)) {
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
+  }
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id];
@@ -54,8 +57,9 @@ __host__ __device__ int findDeviceAllocatorID(const char* name)
 {
 #if !defined(__CUDA_ARCH__)
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
-    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0)
+    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
       return i;
+    }
   }
   return -1;
 #else
@@ -64,22 +68,26 @@ __host__ __device__ int findDeviceAllocatorID(const char* name)
     int index = 0;
     int tally = 0;
     do {
-      if (temp[index] == 0)
+      if (temp[index] == 0) {
         break;
-      if (temp[index] != name[index])
+      }
+      if (temp[index] != name[index]) {
         tally++;
+      }
     } while (name[index++] != 0);
-    if (tally == 0)
+    if (tally == 0) {
       return i;
+    }
   }
   return -1;
 #endif
 }
 
-__host__ __device__ bool deviceAllocatorExists(int id)
+__host__ __device__ bool isDeviceAllocator(int id)
 {
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS)
+  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
     UMPIRE_ERROR("Invalid ID given.");
+  }
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id].isInitialized();

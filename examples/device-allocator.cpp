@@ -58,7 +58,7 @@ int main(int argc, char const* argv[])
 
   // Checking that now a DeviceAllocator exists
   int id_found = umpire::findDeviceAllocatorID("my_device_alloc");
-  if (umpire::deviceAllocatorExists(id_found)) {
+  if (umpire::isDeviceAllocator(id_found)) {
     std::cout << "I found a DeviceAllocator with ID: " << id_found << std::endl;
   }
 
