@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -36,13 +36,10 @@ inline int find_first_set(int i)
 
 static constexpr std::size_t bits_per_int = sizeof(int) * 8;
 
-FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
-                      const std::size_t object_bytes,
-                      const std::size_t objects_per_pool,
-                      const std::size_t avail_bytes)
+FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy, const std::size_t object_bytes,
+                      const std::size_t objects_per_pool, const std::size_t avail_bytes)
     : strategy(allocation_strategy),
-      data(reinterpret_cast<char*>(
-          strategy->allocate(object_bytes * objects_per_pool))),
+      data(reinterpret_cast<char*>(strategy->allocate_internal(object_bytes * objects_per_pool))),
       avail(reinterpret_cast<int*>(std::malloc(avail_bytes))),
       num_avail(objects_per_pool)
 {
@@ -51,10 +48,9 @@ FixedPool::Pool::Pool(AllocationStrategy* allocation_strategy,
   std::memset(avail, not_zero, avail_bytes);
 }
 
-FixedPool::FixedPool(const std::string& name, int id, Allocator allocator,
-                     const std::size_t object_bytes,
+FixedPool::FixedPool(const std::string& name, int id, Allocator allocator, const std::size_t object_bytes,
                      const std::size_t objects_per_pool) noexcept
-    : AllocationStrategy{name, id, allocator.getAllocationStrategy()},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "FixedPool"},
       m_strategy{allocator.getAllocationStrategy()},
       m_obj_bytes{object_bytes},
       m_obj_per_pool{objects_per_pool},
@@ -75,12 +71,10 @@ FixedPool::~FixedPool()
   for (auto& p : m_pool) {
     if (m_obj_per_pool != p.num_avail) {
       for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index)
-        for (unsigned int bit_index = 0; bit_index < bits_per_int;
-             ++bit_index) {
+        for (unsigned int bit_index = 0; bit_index < bits_per_int; ++bit_index) {
           if (!(p.avail[int_index] & 1 << bit_index)) {
             const std::size_t index{int_index * bits_per_int + bit_index};
-            leaked_addrs.push_back(
-                static_cast<void*>(p.data + m_obj_bytes * index));
+            leaked_addrs.push_back(static_cast<void*>(p.data + m_obj_bytes * index));
           }
         }
     }
@@ -103,7 +97,7 @@ FixedPool::~FixedPool()
     UMPIRE_LOG(Warning, ss.str());
   } else {
     for (auto& p : m_pool) {
-      p.strategy->deallocate(p.data);
+      p.strategy->deallocate_internal(p.data, m_data_bytes);
       std::free(p.avail);
     }
   }
@@ -111,8 +105,7 @@ FixedPool::~FixedPool()
 
 void FixedPool::newPool()
 {
-  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool,
-                      m_avail_bytes * sizeof(int));
+  m_pool.emplace_back(m_strategy, m_obj_bytes, m_obj_per_pool, m_avail_bytes * sizeof(int));
   m_actual_bytes += m_avail_bytes + m_data_bytes;
 }
 
@@ -135,8 +128,7 @@ void* FixedPool::allocInPool(Pool& p)
     }
   }
 
-  UMPIRE_ASSERT(
-      "FixedPool::allocInPool(): num_avail > 0, but no available slots" && 0);
+  UMPIRE_ASSERT("FixedPool::allocInPool(): num_avail > 0, but no available slots" && 0);
   return nullptr;
 }
 
@@ -163,13 +155,12 @@ void* FixedPool::allocate(std::size_t bytes)
   }
 
   if (!ptr) {
-    UMPIRE_ERROR("FixedPool::allocate(size=" << m_obj_bytes
-                                             << "): Could not allocate");
+    UMPIRE_ERROR("FixedPool::allocate(size=" << m_obj_bytes << "): Could not allocate");
   }
   return ptr;
 }
 
-void FixedPool::deallocate(void* ptr)
+void FixedPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   for (auto& p : m_pool) {
     const char* t_ptr = reinterpret_cast<char*>(ptr);
@@ -194,16 +185,16 @@ void FixedPool::deallocate(void* ptr)
   UMPIRE_ERROR("Could not find the pointer to deallocate");
 }
 
-void FixedPool::release() 
-{ 
+void FixedPool::release()
+{
   for (auto& p : m_pool) {
     if (m_obj_per_pool == p.num_avail) {
-      p.strategy->deallocate(p.data);
+      p.strategy->deallocate_internal(p.data, m_data_bytes);
       std::free(p.avail);
-    } 
+    }
   }
-  m_pool.erase(std::remove_if(m_pool.begin(), m_pool.end(), 
-                          [&] (Pool& p) {return m_obj_per_pool == p.num_avail;}), m_pool.end()); 
+  m_pool.erase(std::remove_if(m_pool.begin(), m_pool.end(), [&](Pool& p) { return m_obj_per_pool == p.num_avail; }),
+               m_pool.end());
 }
 
 std::size_t FixedPool::getCurrentSize() const noexcept

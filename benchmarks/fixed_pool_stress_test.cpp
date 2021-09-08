@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,10 +8,12 @@
 #include <string>
 #include <random>
 #include <numeric>
+#include <map>
 
 #include "umpire/config.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/FixedPool.hpp"
 
 constexpr std::size_t OBJECTS_PER_BLOCK {1<<11}; //number of blocks of object_bytes size (2048)
 

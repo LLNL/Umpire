@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,9 +15,8 @@
 namespace umpire {
 namespace op {
 
-void OpenMPTargetMemsetOperation::apply(void* src_ptr,
-                                        util::AllocationRecord* src_allocation,
-                                        int val, std::size_t length)
+void OpenMPTargetMemsetOperation::apply(void* src_ptr, util::AllocationRecord* src_allocation, int val,
+                                        std::size_t length)
 {
   int device = src_allocation->strategy->getTraits().id;
   unsigned char* data_ptr{static_cast<unsigned char*>(src_ptr)};

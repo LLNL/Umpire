@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -17,11 +17,9 @@ void allocate_and_deallocate(const std::string& resource)
 
   constexpr std::size_t SIZE = 1024;
 
-  double* data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
-  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the "
-            << allocator.getName() << " allocator...";
+  std::cout << "Allocated " << (SIZE * sizeof(double)) << " bytes using the " << allocator.getName() << " allocator...";
 
   allocator.deallocate(data);
 

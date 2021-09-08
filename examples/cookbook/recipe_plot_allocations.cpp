@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -9,15 +9,14 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto allocator = rm.getAllocator("HOST");
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "HOST_POOL", allocator, 1024 * 16);
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>("HOST_POOL", allocator, 1024 * 16);
 
   void* a[4];
   for (int i = 0; i < 4; ++i)

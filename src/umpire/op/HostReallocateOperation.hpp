@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -24,8 +24,7 @@ class HostReallocateOperation : public MemoryOperation {
    *
    * \copydetails MemoryOperation::transform
    */
-  void transform(void* current_ptr, void** new_ptr,
-                 util::AllocationRecord* current_allocation,
+  void transform(void* current_ptr, void** new_ptr, util::AllocationRecord* current_allocation,
                  util::AllocationRecord* new_allocation, std::size_t new_size);
 };
 

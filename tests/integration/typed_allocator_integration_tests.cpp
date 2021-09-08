@@ -1,16 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-#include "umpire/TypedAllocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/TypedAllocator.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 
 class TypedAllocatorTest : public ::testing::TestWithParam<std::string> {
@@ -18,8 +17,7 @@ class TypedAllocatorTest : public ::testing::TestWithParam<std::string> {
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
-    m_allocator = new umpire::TypedAllocator<double>(
-        rm.getAllocator(GetParam()));
+    m_allocator = new umpire::TypedAllocator<double>(rm.getAllocator(GetParam()));
   }
 
   virtual void TearDown()
@@ -114,17 +112,15 @@ std::vector<std::string> allocator_strings()
   return allocators;
 }
 
-INSTANTIATE_TEST_SUITE_P(Allocators, TypedAllocatorTest,
-                         ::testing::ValuesIn(allocator_strings()));
-
+INSTANTIATE_TEST_SUITE_P(Allocators, TypedAllocatorTest, ::testing::ValuesIn(allocator_strings()));
 
 TEST(TypedAllocation, DeallocateDifferent)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
   umpire::TypedAllocator<double> alloc_one(rm.getAllocator("HOST"));
-  umpire::TypedAllocator<double> alloc_two(rm.makeAllocator<umpire::strategy::SizeLimiter>(
-      "DeallocateDifferentLimiter", rm.getAllocator("HOST"), 1024));
+  umpire::TypedAllocator<double> alloc_two(
+      rm.makeAllocator<umpire::strategy::SizeLimiter>("DeallocateDifferentLimiter", rm.getAllocator("HOST"), 1024));
 
   double* data = alloc_one.allocate(1024);
 
@@ -132,7 +128,6 @@ TEST(TypedAllocation, DeallocateDifferent)
 
   ASSERT_NO_THROW(alloc_one.deallocate(data, 1024));
 }
-
 
 TEST(TypedAllocation, DeallocateDifferentInstance)
 {
@@ -166,7 +161,7 @@ TEST(TypedAllocation, EqualityTypeDifferent)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  umpire::TypedAllocator<char>   alloc_one(rm.getAllocator("HOST"));
+  umpire::TypedAllocator<char> alloc_one(rm.getAllocator("HOST"));
   umpire::TypedAllocator<double> alloc_two(rm.getAllocator("HOST"));
 
   ASSERT_TRUE((alloc_one == alloc_two));
@@ -184,8 +179,7 @@ TEST(TypedAllocation, EqualityDifferent)
 
   umpire::TypedAllocator<double> alloc_one(rm.getAllocator("HOST"));
   umpire::TypedAllocator<double> alloc_two(
-      rm.makeAllocator<umpire::strategy::SizeLimiter>(
-        "EqualityDifferentLimiter", rm.getAllocator("HOST"), 1024));
+      rm.makeAllocator<umpire::strategy::SizeLimiter>("EqualityDifferentLimiter", rm.getAllocator("HOST"), 1024));
 
   ASSERT_FALSE((alloc_one == alloc_two));
 
@@ -200,10 +194,9 @@ TEST(TypedAllocation, EqualityDifferentTypeDifferent)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  umpire::TypedAllocator<char>   alloc_one(rm.getAllocator("HOST"));
-  umpire::TypedAllocator<double> alloc_two(
-      rm.makeAllocator<umpire::strategy::SizeLimiter>(
-        "EqualityDifferentTypeDifferentLimiter", rm.getAllocator("HOST"), 1024));
+  umpire::TypedAllocator<char> alloc_one(rm.getAllocator("HOST"));
+  umpire::TypedAllocator<double> alloc_two(rm.makeAllocator<umpire::strategy::SizeLimiter>(
+      "EqualityDifferentTypeDifferentLimiter", rm.getAllocator("HOST"), 1024));
 
   ASSERT_FALSE((alloc_one == alloc_two));
 

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -24,22 +24,19 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   if (try_map) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-        "pool", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>("pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[1023] = 100;
     data[1024] = 100;
     pool.deallocate(data);
   } else if (try_list) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-        "pool", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[1023] = 100;
     data[1024] = 100;
     pool.deallocate(data);
   } else if (try_quick) {
-    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
-        "pool", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("pool", rm.getAllocator("HOST"));
     data = static_cast<double*>(pool.allocate(1024 * sizeof(double)));
     data[1023] = 100;
     data[1024] = 100;

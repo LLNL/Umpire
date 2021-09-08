@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -30,14 +30,13 @@ struct PosixMemalignAllocator {
   void* allocate(std::size_t bytes)
   {
     void* ret = NULL;
-    ::posix_memalign(&ret, get_page_size(), bytes);
+    int err = ::posix_memalign(&ret, get_page_size(), bytes);
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = "
-                                              << get_page_size()
-                                              << " ) failed");
+      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << get_page_size()
+                                              << " ) failed with error = " << err);
     }
 
     return ret;
@@ -58,7 +57,7 @@ struct PosixMemalignAllocator {
 
   bool isAccessible(Platform p)
   {
-    if(p == Platform::host)
+    if (p == Platform::host)
       return true;
     else
       return false;

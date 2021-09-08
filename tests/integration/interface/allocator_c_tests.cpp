@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 #include "umpire/config.hpp"
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 static int unique_name = 0;
 
@@ -34,8 +34,7 @@ class AllocatorCTest : public ::testing::TestWithParam<const char*> {
 
 TEST_P(AllocatorCTest, AllocateDeallocateBig)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_allocator, data);
@@ -43,8 +42,7 @@ TEST_P(AllocatorCTest, AllocateDeallocateBig)
 
 TEST_P(AllocatorCTest, AllocateDeallocateSmall)
 {
-  double* data = (double*)umpire_allocator_allocate(&m_allocator,
-                                                    m_small * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_allocator, m_small * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_allocator, data);
@@ -52,8 +50,7 @@ TEST_P(AllocatorCTest, AllocateDeallocateSmall)
 
 TEST_P(AllocatorCTest, AllocateDeallocateNothing)
 {
-  double* data = (double*)umpire_allocator_allocate(&m_allocator,
-                                                    m_nothing * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_allocator, m_nothing * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_allocator, data);
@@ -63,8 +60,7 @@ TEST_P(AllocatorCTest, GetSize)
 {
   const std::size_t size = m_big * sizeof(double);
 
-  double* data =
-      (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
 
   ASSERT_EQ(size, umpire_allocator_get_size(&m_allocator, data));
 
@@ -86,16 +82,13 @@ TEST_P(AllocatorCTest, GetAllocatorById)
 
 TEST_P(AllocatorCTest, Introspection)
 {
-  double* data_one =
-      (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
+  double* data_one = (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
   ASSERT_NE(nullptr, data_one);
 
-  double* data_two =
-      (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
+  double* data_two = (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
   ASSERT_NE(nullptr, data_two);
 
-  double* data_three =
-      (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
+  double* data_three = (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
   ASSERT_NE(nullptr, data_three);
 
   std::size_t total_size = 3 * m_big * sizeof(double);
@@ -111,15 +104,13 @@ TEST_P(AllocatorCTest, Introspection)
 
   umpire_allocator_deallocate(&m_allocator, data_three);
   count -= 1;
-  ASSERT_EQ((2 * m_big * sizeof(double)),
-            umpire_allocator_get_current_size(&m_allocator));
+  ASSERT_EQ((2 * m_big * sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
   ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
   umpire_allocator_deallocate(&m_allocator, data_two);
   count -= 1;
-  ASSERT_EQ((m_big * sizeof(double)),
-            umpire_allocator_get_current_size(&m_allocator));
+  ASSERT_EQ((m_big * sizeof(double)), umpire_allocator_get_current_size(&m_allocator));
   ASSERT_EQ(total_size, umpire_allocator_get_high_watermark(&m_allocator));
   ASSERT_EQ(count, umpire_allocator_get_allocation_count(&m_allocator));
 
@@ -144,8 +135,7 @@ TEST_P(AllocatorCTest, HasAllocator)
   umpire_resourcemanager rm;
   umpire_resourcemanager_get_instance(&rm);
 
-  double* data =
-      (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_allocator, m_big * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   ASSERT_EQ(true, umpire_resourcemanager_has_allocator(&rm, (void*)data));
@@ -172,22 +162,19 @@ const char* allocator_names[] = {"HOST"
 #endif
 };
 
-INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorCTest,
-                         ::testing::ValuesIn(allocator_names));
+INSTANTIATE_TEST_SUITE_P(Allocators, AllocatorCTest, ::testing::ValuesIn(allocator_names));
 
 class PoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
  public:
   virtual void SetUp()
   {
-    std::string pool_name =
-        std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
+    std::string pool_name = std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
 
     umpire_resourcemanager rm;
     umpire_resourcemanager_get_instance(&rm);
     umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);
     ;
-    umpire_resourcemanager_make_allocator_pool(
-        &rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
+    umpire_resourcemanager_make_allocator_pool(&rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
   }
 
   virtual void TearDown()
@@ -211,8 +198,7 @@ class PoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
 
 TEST_P(PoolAllocatorCTest, AllocateDeallocateBig)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_big * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -220,8 +206,7 @@ TEST_P(PoolAllocatorCTest, AllocateDeallocateBig)
 
 TEST_P(PoolAllocatorCTest, AllocateDeallocateSmall)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_small * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_small * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -229,8 +214,7 @@ TEST_P(PoolAllocatorCTest, AllocateDeallocateSmall)
 
 TEST_P(PoolAllocatorCTest, AllocateDeallocateNothing)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -251,22 +235,19 @@ const char* pool_names[] = {"HOST"
 #endif
 };
 
-INSTANTIATE_TEST_SUITE_P(Pools, PoolAllocatorCTest,
-                         ::testing::ValuesIn(pool_names));
+INSTANTIATE_TEST_SUITE_P(Pools, PoolAllocatorCTest, ::testing::ValuesIn(pool_names));
 
 class ListPoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
  public:
   virtual void SetUp()
   {
-    std::string pool_name =
-        std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
+    std::string pool_name = std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
 
     umpire_resourcemanager rm;
     umpire_resourcemanager_get_instance(&rm);
     umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);
     ;
-    umpire_resourcemanager_make_allocator_list_pool(
-        &rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
+    umpire_resourcemanager_make_allocator_list_pool(&rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
   }
 
   virtual void TearDown()
@@ -290,8 +271,7 @@ class ListPoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
 
 TEST_P(ListPoolAllocatorCTest, AllocateDeallocateBig)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_big * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -299,8 +279,7 @@ TEST_P(ListPoolAllocatorCTest, AllocateDeallocateBig)
 
 TEST_P(ListPoolAllocatorCTest, AllocateDeallocateSmall)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_small * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_small * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -308,29 +287,25 @@ TEST_P(ListPoolAllocatorCTest, AllocateDeallocateSmall)
 
 TEST_P(ListPoolAllocatorCTest, AllocateDeallocateNothing)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_SUITE_P(ListPools, ListPoolAllocatorCTest,
-                         ::testing::ValuesIn(pool_names));
+INSTANTIATE_TEST_SUITE_P(ListPools, ListPoolAllocatorCTest, ::testing::ValuesIn(pool_names));
 
 class QuickPoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
  public:
   virtual void SetUp()
   {
-    std::string pool_name =
-        std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
+    std::string pool_name = std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
 
     umpire_resourcemanager rm;
     umpire_resourcemanager_get_instance(&rm);
     umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);
     ;
-    umpire_resourcemanager_make_allocator_quick_pool(
-        &rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
+    umpire_resourcemanager_make_allocator_quick_pool(&rm, pool_name.c_str(), m_allocator, m_big, m_small, &m_pool);
   }
 
   virtual void TearDown()
@@ -354,8 +329,7 @@ class QuickPoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
 
 TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateBig)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_big * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -363,8 +337,7 @@ TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateBig)
 
 TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateSmall)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_small * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_small * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
@@ -372,29 +345,25 @@ TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateSmall)
 
 TEST_P(QuickPoolAllocatorCTest, AllocateDeallocateNothing)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_SUITE_P(QuickPools, QuickPoolAllocatorCTest,
-                         ::testing::ValuesIn(pool_names));
+INSTANTIATE_TEST_SUITE_P(QuickPools, QuickPoolAllocatorCTest, ::testing::ValuesIn(pool_names));
 
 class FixedPoolAllocatorCTest : public ::testing::TestWithParam<const char*> {
  public:
   virtual void SetUp()
   {
-    std::string pool_name =
-        std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
+    std::string pool_name = std::string{GetParam()} + "_c_pool" + std::to_string(unique_name++);
 
     umpire_resourcemanager rm;
     umpire_resourcemanager_get_instance(&rm);
     umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);
     ;
-    umpire_resourcemanager_make_allocator_fixed_pool(
-        &rm, pool_name.c_str(), m_allocator, m_big, &m_pool);
+    umpire_resourcemanager_make_allocator_fixed_pool(&rm, pool_name.c_str(), m_allocator, m_big, &m_pool);
   }
 
   virtual void TearDown()
@@ -421,29 +390,25 @@ TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateBig)
 
 TEST_P(FixedPoolAllocatorCTest, AllocateDeallocateNothing)
 {
-  double* data =
-      (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_pool, m_nothing * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_pool, data);
 }
 
-INSTANTIATE_TEST_SUITE_P(FixedPools, FixedPoolAllocatorCTest,
-                         ::testing::ValuesIn(pool_names));
+INSTANTIATE_TEST_SUITE_P(FixedPools, FixedPoolAllocatorCTest, ::testing::ValuesIn(pool_names));
 
 class NamedAllocatorCTest : public ::testing::TestWithParam<const char*> {
  public:
   virtual void SetUp()
   {
-    std::string allocator_name =
-        std::string{GetParam()} + "_c_named" + std::to_string(unique_name++);
+    std::string allocator_name = std::string{GetParam()} + "_c_named" + std::to_string(unique_name++);
 
     umpire_resourcemanager rm;
     umpire_resourcemanager_get_instance(&rm);
     umpire_resourcemanager_get_allocator_by_name(&rm, GetParam(), &m_allocator);
     ;
-    umpire_resourcemanager_make_allocator_named(
-        &rm, allocator_name.c_str(), m_allocator, &m_named_allocator);
+    umpire_resourcemanager_make_allocator_named(&rm, allocator_name.c_str(), m_allocator, &m_named_allocator);
   }
 
   virtual void TearDown()
@@ -462,8 +427,7 @@ class NamedAllocatorCTest : public ::testing::TestWithParam<const char*> {
 
 TEST_P(NamedAllocatorCTest, AllocateDeallocateBig)
 {
-  double* data = (double*)umpire_allocator_allocate(&m_named_allocator,
-                                                    m_big * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_named_allocator, m_big * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_named_allocator, data);
@@ -471,8 +435,7 @@ TEST_P(NamedAllocatorCTest, AllocateDeallocateBig)
 
 TEST_P(NamedAllocatorCTest, AllocateDeallocateSmall)
 {
-  double* data = (double*)umpire_allocator_allocate(&m_named_allocator,
-                                                    m_small * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_named_allocator, m_small * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_named_allocator, data);
@@ -480,15 +443,13 @@ TEST_P(NamedAllocatorCTest, AllocateDeallocateSmall)
 
 TEST_P(NamedAllocatorCTest, AllocateDeallocateNothing)
 {
-  double* data = (double*)umpire_allocator_allocate(&m_named_allocator,
-                                                    m_nothing * sizeof(double));
+  double* data = (double*)umpire_allocator_allocate(&m_named_allocator, m_nothing * sizeof(double));
   ASSERT_NE(nullptr, data);
 
   umpire_allocator_deallocate(&m_named_allocator, data);
 }
 
-INSTANTIATE_TEST_SUITE_P(Nameds, NamedAllocatorCTest,
-                         ::testing::ValuesIn(pool_names));
+INSTANTIATE_TEST_SUITE_P(Nameds, NamedAllocatorCTest, ::testing::ValuesIn(pool_names));
 
 TEST(Allocators, GetInvalidId)
 {
@@ -497,4 +458,22 @@ TEST(Allocators, GetInvalidId)
 
   ASSERT_EQ(0xDEADBEE, id);
   ASSERT_EQ(id, cpp_id);
+}
+
+TEST(Allocators, RegisterAllocation)
+{
+  umpire_resourcemanager rm;
+  umpire_allocator allocator;
+  umpire_resourcemanager_get_instance(&rm);
+  umpire_resourcemanager_get_allocator_by_name(&rm, "HOST", &allocator);
+
+  double d = 1.0;
+
+  ASSERT_NO_THROW(umpire_resourcemanager_register_allocation(&rm, &d, sizeof(double), allocator));
+
+  ASSERT_TRUE(umpire_resourcemanager_has_allocator(&rm, &d));
+
+  ASSERT_NO_THROW(umpire_resourcemanager_deregister_allocation(&rm, &d));
+
+  umpire_allocator_delete(&allocator);
 }

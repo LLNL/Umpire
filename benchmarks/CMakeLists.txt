@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -46,6 +46,10 @@ blt_add_executable(
   NAME pool_stress_test
   SOURCES pool_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
+
+blt_add_target_compile_flags(
+  TO pool_stress_test
+  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 if (ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)

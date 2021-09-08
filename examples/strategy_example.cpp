@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -7,8 +7,8 @@
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/DynamicPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 
 int main(int, char**)
@@ -24,27 +24,19 @@ int main(int, char**)
   /*
    * Build some new Allocators from the named AllocationStrategies.
    *
-   * Allocator makeAllocator(
-   *     const std::string& name,  // Allocator name
-   *     const std::string& strategy,  // Strategy name
-   *     AllocatorTraits traits, // Traits object
-   *     std::vector<Allocator> providers); // Vector of providers (parent)
-   * Allocators
-   *
    *  Named Allocators are stored in a map, and can be later accessed using the
    *  getAllocator function.
    */
-  auto alloc = rm.makeAllocator<umpire::strategy::DynamicPool>(
-      "host_dynamic_pool", rm.getAllocator("HOST"));
+  umpire::Tracking tracking{umpire::Tracking::Untracked};
+  auto alloc = rm.makeAllocator<umpire::strategy::QuickPool>("host_dynamic_pool", tracking, rm.getAllocator("HOST"));
 
-  alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "MONOTONIC 1024", rm.getAllocator("HOST"), 1024);
+  alloc =
+      rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>("MONOTONIC 1024", rm.getAllocator("HOST"), 1024);
 
-  alloc = rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>(
-      "MONOTONIC 4096", rm.getAllocator("HOST"), 4096);
+  alloc =
+      rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy>("MONOTONIC 4096", rm.getAllocator("HOST"), 4096);
 
-  alloc = rm.makeAllocator<umpire::strategy::SlotPool>(
-      "host_slot_pool", rm.getAllocator("HOST"), 64);
+  alloc = rm.makeAllocator<umpire::strategy::SlotPool>("host_slot_pool", rm.getAllocator("HOST"), 64);
 
   /*
    * Get the previously created POOL allocator.

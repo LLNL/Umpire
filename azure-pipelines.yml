@@ -116,3 +116,17 @@ jobs:
     inputs:
       testResultsFormat: 'cTest'
       testResultsFiles: '**/Test.xml'
+- job: Style_Check
+  pool:
+    vmImage: 'ubuntu-latest'
+  variables:
+    DOCKER_BUILDKIT: '1'
+  steps:
+  - checkout: self
+    clean: boolean
+    submodules: recursive
+  - task: Docker@1
+    inputs:
+      command: build
+      dockerFile: Dockerfile
+      arguments: '--target check'

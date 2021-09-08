@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -17,8 +17,7 @@ int main(int, char**)
   //
   // Allocate host data
   //
-  double* host_data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* host_data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
   //
   // Move data to unified memory

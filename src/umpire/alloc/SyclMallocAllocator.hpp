@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -35,8 +35,7 @@ struct SyclMallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR("SYCL malloc_device( bytes = " << size
-                                                  << " ) failed with error!");
+      UMPIRE_ERROR("SYCL malloc_device( bytes = " << size << " ) failed with error!");
     } else {
       return ptr;
     }
@@ -59,7 +58,7 @@ struct SyclMallocAllocator {
 
   bool isAccessible(umpire::Platform p)
   {
-    if (p == umpire::Platform::sycl) 
+    if (p == umpire::Platform::sycl)
       return true;
     else
       return false;

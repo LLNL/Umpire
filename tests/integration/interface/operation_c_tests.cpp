@@ -1,42 +1,36 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
 #endif
 
-class OperationTest : public ::testing::TestWithParam<
-                          ::testing::tuple<const char*, const char*>> {
+class OperationTest : public ::testing::TestWithParam<::testing::tuple<const char*, const char*>> {
  public:
   virtual void SetUp()
   {
     umpire_resourcemanager rm;
     umpire_resourcemanager_get_instance(&rm);
 
-    umpire_resourcemanager_get_allocator_by_name(
-        &rm, ::testing::get<0>(GetParam()), &source_allocator);
+    umpire_resourcemanager_get_allocator_by_name(&rm, ::testing::get<0>(GetParam()), &source_allocator);
     ;
-    umpire_resourcemanager_get_allocator_by_name(
-        &rm, ::testing::get<1>(GetParam()), &dest_allocator);
+    umpire_resourcemanager_get_allocator_by_name(&rm, ::testing::get<1>(GetParam()), &dest_allocator);
     ;
 
-    source_array = (float*)umpire_allocator_allocate(&source_allocator,
-                                                     m_size * sizeof(float));
-    dest_array = (float*)umpire_allocator_allocate(&dest_allocator,
-                                                   m_size * sizeof(float));
+    source_array = (float*)umpire_allocator_allocate(&source_allocator, m_size * sizeof(float));
+    dest_array = (float*)umpire_allocator_allocate(&dest_allocator, m_size * sizeof(float));
 
     umpire_allocator host_allocator;
     umpire_resourcemanager_get_allocator_by_name(&rm, "HOST", &host_allocator);
     ;
 
-    check_array = (float*)umpire_allocator_allocate(&host_allocator,
-                                                    m_size * sizeof(float));
+    check_array = (float*)umpire_allocator_allocate(&host_allocator, m_size * sizeof(float));
 
     umpire_allocator_delete(&host_allocator);
   }
@@ -101,10 +95,8 @@ TEST_P(CopyTest, CopyOffset)
 
   check_array[10] = 3.14;
 
-  umpire_resourcemanager_copy_with_size(&rm, &dest_array[11], &check_array[10],
-                                        sizeof(float));
-  umpire_resourcemanager_copy_with_size(&rm, &check_array[0], &dest_array[11],
-                                        sizeof(float));
+  umpire_resourcemanager_copy_with_size(&rm, &dest_array[11], &check_array[10], sizeof(float));
+  umpire_resourcemanager_copy_with_size(&rm, &check_array[0], &dest_array[11], sizeof(float));
 
   ASSERT_EQ(check_array[0], check_array[10]);
 }
@@ -136,8 +128,7 @@ const char* copy_dests[] = {"HOST"
 };
 
 INSTANTIATE_TEST_SUITE_P(Copies, CopyTest,
-                         ::testing::Combine(::testing::ValuesIn(copy_sources),
-                                            ::testing::ValuesIn(copy_dests)));
+                         ::testing::Combine(::testing::ValuesIn(copy_sources), ::testing::ValuesIn(copy_dests)));
 
 class MemsetTest : public OperationTest {
 };
@@ -174,8 +165,7 @@ const char* memset_sources[] = {"HOST"
 const char* memset_dests[] = {"HOST"};
 
 INSTANTIATE_TEST_SUITE_P(Sets, MemsetTest,
-                         ::testing::Combine(::testing::ValuesIn(memset_sources),
-                                            ::testing::ValuesIn(memset_dests)));
+                         ::testing::Combine(::testing::ValuesIn(memset_sources), ::testing::ValuesIn(memset_dests)));
 
 class ReallocateTest : public OperationTest {
 };
@@ -189,14 +179,12 @@ TEST_P(ReallocateTest, Reallocate)
 
   umpire_resourcemanager_memset_all(&rm, source_array, 0);
 
-  float* reallocated_array = (float*)umpire_resourcemanager_reallocate_default(
-      &rm, source_array, reallocated_size * sizeof(float));
+  float* reallocated_array =
+      (float*)umpire_resourcemanager_reallocate_default(&rm, source_array, reallocated_size * sizeof(float));
 
-  ASSERT_EQ(umpire_allocator_get_size(&source_allocator, reallocated_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(umpire_allocator_get_size(&source_allocator, reallocated_array), reallocated_size * sizeof(float));
 
-  umpire_resourcemanager_copy_with_size(&rm, check_array, reallocated_array,
-                                        reallocated_size * sizeof(float));
+  umpire_resourcemanager_copy_with_size(&rm, check_array, reallocated_array, reallocated_size * sizeof(float));
 
   for (std::size_t i = 0; i < reallocated_size; i++) {
     ASSERT_FLOAT_EQ(check_array[i], 0);
@@ -217,18 +205,15 @@ TEST_P(ReallocateTest, ReallocateLarger)
 
   umpire_resourcemanager_memset_all(&rm, source_array, 0);
 
-  float* reallocated_array = (float*)umpire_resourcemanager_reallocate_default(
-      &rm, source_array, reallocated_size * sizeof(float));
+  float* reallocated_array =
+      (float*)umpire_resourcemanager_reallocate_default(&rm, source_array, reallocated_size * sizeof(float));
 
-  ASSERT_EQ(umpire_allocator_get_size(&source_allocator, reallocated_array),
-            reallocated_size * sizeof(float));
+  ASSERT_EQ(umpire_allocator_get_size(&source_allocator, reallocated_array), reallocated_size * sizeof(float));
 
   float* reallocated_check_array =
-      (float*)umpire_resourcemanager_reallocate_default(
-          &rm, check_array, reallocated_size * sizeof(float));
+      (float*)umpire_resourcemanager_reallocate_default(&rm, check_array, reallocated_size * sizeof(float));
 
-  umpire_resourcemanager_copy_with_size(&rm, reallocated_check_array,
-                                        reallocated_array,
+  umpire_resourcemanager_copy_with_size(&rm, reallocated_check_array, reallocated_array,
                                         reallocated_size * sizeof(float));
 
   for (std::size_t i = 0; i < m_size; i++) {
@@ -280,10 +265,9 @@ const char* reallocate_sources[] = {"HOST"
 
 const char* reallocate_dests[] = {"HOST"};
 
-INSTANTIATE_TEST_SUITE_P(
-    Reallocate, ReallocateTest,
-    ::testing::Combine(::testing::ValuesIn(reallocate_sources),
-                       ::testing::ValuesIn(reallocate_dests)));
+INSTANTIATE_TEST_SUITE_P(Reallocate, ReallocateTest,
+                         ::testing::Combine(::testing::ValuesIn(reallocate_sources),
+                                            ::testing::ValuesIn(reallocate_dests)));
 
 // class MoveTest :
 //   public OperationTest

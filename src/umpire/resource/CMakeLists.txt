@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -58,6 +58,21 @@ endif()
 
 set(umpire_resource_depends
   camp)
+
+if(ENABLE_IPC_SHARED_MEMORY)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    HostSharedMemoryResource.hpp
+    HostSharedMemoryResourceFactory.hpp
+    HostSharedMemoryResourceImpl.hpp
+  )
+
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    HostSharedMemoryResource.cpp
+    HostSharedMemoryResourceFactory.cpp
+  )
+endif()
 
 if (ENABLE_CUDA)
   set (umpire_resource_headers

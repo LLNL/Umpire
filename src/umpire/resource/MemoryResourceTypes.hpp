@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,16 +23,7 @@ struct MemoryResourceTypeHash {
   }
 };
 
-enum MemoryResourceType {
-  Host,
-  Device,
-  Unified,
-  Pinned,
-  Constant,
-  File,
-  NoOp,
-  Unknown
-};
+enum MemoryResourceType { Host, Device, Unified, Pinned, Constant, File, NoOp, Shared, Unknown };
 
 inline std::string resource_to_string(MemoryResourceType type)
 {
@@ -51,6 +42,8 @@ inline std::string resource_to_string(MemoryResourceType type)
       return "FILE";
     case NoOp:
       return "NO_OP";
+    case Shared:
+      return "SHARED";
     default:
       UMPIRE_ERROR("Unkown resource type: " << type);
       //
@@ -82,6 +75,8 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
     return MemoryResourceType::File;
   else if (resource == "NO_OP")
     return MemoryResourceType::NoOp;
+  else if (resource == "SHARED")
+    return MemoryResourceType::Shared;
   else {
     UMPIRE_ERROR("Unkown resource name: " << resource);
 

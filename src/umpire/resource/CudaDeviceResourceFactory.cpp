@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,28 +15,24 @@
 namespace umpire {
 namespace resource {
 
-bool CudaDeviceResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool CudaDeviceResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
-  if ((name.find("CONST") == std::string::npos) &&
-      (name.find("DEVICE") != std::string::npos)) {
+  if ((name.find("CONST") == std::string::npos) && (name.find("DEVICE") != std::string::npos)) {
     return true;
   } else {
     return false;
   }
 }
 
-std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> CudaDeviceResourceFactory::create(const std::string& name, int id,
+                                                                            MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::CudaDeviceMemoryResource>(
-      Platform::cuda, name, id, traits);
+  return util::make_unique<resource::CudaDeviceMemoryResource>(Platform::cuda, name, id, traits);
 }
 
 MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
@@ -47,8 +43,7 @@ MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
   auto error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: "
-                 << cudaGetErrorString(error));
+    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
   }
 
   traits.unified = false;

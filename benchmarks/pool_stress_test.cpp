@@ -1,11 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 #include <chrono>
+#include <map>
 #include <string>
 #include <random>
 #include <numeric>
@@ -14,6 +15,9 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
+#include "umpire/strategy/DynamicPoolMap.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 
 #if defined (UMPIRE_ENABLE_CUDA) || defined (UMPIRE_ENABLE_HIP)
   constexpr std::size_t ALLOC_SIZE {8589934592ULL}; //8GiB total size of all allocations together
@@ -72,7 +76,7 @@ template <class T>
 void do_test(std::string pool_name, std::map<const std::string, const std::vector<std::size_t>&> indexing_pairs)
 {
   auto& rm {umpire::ResourceManager::getInstance()};
-  umpire::Allocator alloc {rm.getAllocator("DEVICE")};
+  umpire::Allocator alloc {rm.getAllocator("HOST")};
   umpire::Allocator pool_alloc {rm.makeAllocator<T, false>(pool_name, alloc, ALLOC_SIZE)};
 
   for(auto i : indexing_pairs) {

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -16,6 +16,7 @@
 
 #include "camp/resource.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/Tracking.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/AllocationMap.hpp"
@@ -28,7 +29,11 @@ class MemoryOperation;
 
 namespace strategy {
 class ZeroByteHandler;
+
+namespace mixins {
+class AllocateNull;
 }
+} // namespace strategy
 
 /*!
  * \brief
@@ -90,10 +95,10 @@ class ResourceManager {
    * The Memory Resource Registry dynamically populates available memory resource
    * types based on what's available. This function returns those names so they
    * can be used to determine allocator accessibility.
-   * 
+   *
    * \return The available resource names.
    */
-   std::vector<std::string> getResourceNames();
+  std::vector<std::string> getResourceNames();
 
   /*!
    * \brief Set the default Allocator.
@@ -111,23 +116,12 @@ class ResourceManager {
   template <typename Strategy, bool introspection = true, typename... Args>
   Allocator makeAllocator(const std::string& name, Args&&... args);
 
+  template <typename Strategy, typename... Args>
+  Allocator makeAllocator(const std::string& name, Tracking tracked, Args&&... args);
+
   Allocator makeResource(const std::string& name);
 
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
-
-  /*!
-   * \brief Register an Allocator with the ResourceManager.
-   *
-   * After registration, the Allocator can be retrieved by calling
-   * getAllocator(name).
-   *
-   * The same Allocator can be registered under multiple names.
-   *
-   * \param name Name to register Allocator with.
-   * \param allocator Allocator to register.
-   */
-  UMPIRE_DEPRECATE("addAlias should be used instead")
-  void registerAllocator(const std::string& name, Allocator allocator);
 
   /*!
    * \brief Add an Allocator alias.
@@ -195,13 +189,6 @@ class ResourceManager {
   const util::AllocationRecord* findAllocationRecord(void* ptr) const;
 
   /*!
-   * \brief Check whether the named Allocator exists.
-   *
-   */
-  UMPIRE_DEPRECATE("Use isAllocator instead.")
-  bool isAllocatorRegistered(const std::string& name);
-
-  /*!
    * \brief Copy size bytes of data from src_ptr to dst_ptr.
    *
    * Both the src_ptr and dst_ptr addresses must be allocated by Umpire. They
@@ -215,9 +202,8 @@ class ResourceManager {
    */
   void copy(void* dst_ptr, void* src_ptr, std::size_t size = 0);
 
-  camp::resources::Event copy(void* dst_ptr, void* src_ptr,
-                              camp::resources::Resource& ctx,
-                              std::size_t size = 0);
+  camp::resources::EventProxy<camp::resources::Resource> copy(void* dst_ptr, void* src_ptr,
+                                                              camp::resources::Resource& ctx, std::size_t size = 0);
 
   /*!
    * \brief Set the first length bytes of ptr to the value val.
@@ -227,6 +213,9 @@ class ResourceManager {
    * \param length Number of bytes to set to val.
    */
   void memset(void* ptr, int val, std::size_t length = 0);
+
+  camp::resources::EventProxy<camp::resources::Resource> memset(void* ptr, int val, camp::resources::Resource& ctx,
+                                                                std::size_t length = 0);
 
   /*!
    * \brief Reallocate current_ptr to new_size.
@@ -252,6 +241,8 @@ class ResourceManager {
    */
   void* reallocate(void* current_ptr, std::size_t new_size);
 
+  void* reallocate(void* current_ptr, std::size_t new_size, camp::resources::Resource& ctx);
+
   /*!
    * \brief Reallocate current_ptr to new_size.
    *
@@ -268,8 +259,9 @@ class ResourceManager {
    * \return Reallocated pointer.
    *
    */
-  void* reallocate(void* current_ptr, std::size_t new_size,
-                   Allocator allocator);
+  void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator);
+
+  void* reallocate(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   /*!
    * \brief Move src_ptr to memory from allocator
@@ -297,9 +289,8 @@ class ResourceManager {
    */
   std::size_t getSize(void* ptr) const;
 
-  std::shared_ptr<op::MemoryOperation> getOperation(
-      const std::string& operation_name, Allocator src_allocator,
-      Allocator dst_allocator);
+  std::shared_ptr<op::MemoryOperation> getOperation(const std::string& operation_name, Allocator src_allocator,
+                                                    Allocator dst_allocator);
 
   int getNumDevices() const;
 
@@ -320,19 +311,17 @@ class ResourceManager {
 
   strategy::AllocationStrategy* getZeroByteAllocator();
 
-  void* reallocate_impl(void* current_ptr, std::size_t new_size,
-                        Allocator allocator);
+  void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator);
+
+  void* reallocate_impl(void* current_ptr, std::size_t new_size, Allocator allocator, camp::resources::Resource& ctx);
 
   util::AllocationMap m_allocations;
 
   std::list<std::unique_ptr<strategy::AllocationStrategy>> m_allocators;
 
   std::unordered_map<int, strategy::AllocationStrategy*> m_allocators_by_id;
-  std::unordered_map<std::string, strategy::AllocationStrategy*>
-      m_allocators_by_name;
-  std::unordered_map<resource::MemoryResourceType,
-                     strategy::AllocationStrategy*,
-                     resource::MemoryResourceTypeHash>
+  std::unordered_map<std::string, strategy::AllocationStrategy*> m_allocators_by_name;
+  std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash>
       m_memory_resources;
 
   strategy::AllocationStrategy* m_default_allocator;
@@ -345,6 +334,7 @@ class ResourceManager {
   friend void print_allocator_records(Allocator, std::ostream&);
   friend std::vector<util::AllocationRecord> get_allocator_records(Allocator);
   friend strategy::ZeroByteHandler;
+  friend strategy::mixins::AllocateNull;
 };
 
 } // end namespace umpire
