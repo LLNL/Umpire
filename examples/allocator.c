@@ -1,12 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 int main(int argc, char* argv[])
 {
@@ -26,10 +26,8 @@ int main(int argc, char* argv[])
   int i;
 
   printf("Allocating memory on HOST...");
-  alloc_one =
-      (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
-  alloc_two =
-      (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
+  alloc_one = (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
+  alloc_two = (double*)umpire_allocator_allocate(&allocator, sizeof(double) * ELEMS);
 
   for (i = 0; i < ELEMS; i++) {
     alloc_one[i] = 1.0 * i;

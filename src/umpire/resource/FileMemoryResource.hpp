@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -39,8 +39,7 @@ class FileMemoryResource : public MemoryResource {
    * \param id Id of this instance of the FileMemoryResource.
    * \param traits Traits of this instance of the FileMemoryResource.
    */
-  FileMemoryResource(Platform platform, const std::string& name, int id,
-                     MemoryResourceTraits traits);
+  FileMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 
   /*!
    * \brief Dallocates and removes all files created by the code meant for
@@ -85,7 +84,7 @@ class FileMemoryResource : public MemoryResource {
   std::size_t getHighWatermark() const noexcept;
 
   bool isAccessibleFrom(Platform p) noexcept;
-  
+
   Platform getPlatform() noexcept;
   static int s_file_counter;
 

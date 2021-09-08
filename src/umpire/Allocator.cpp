@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -22,8 +22,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
 
 void Allocator::release()
 {
-  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\" }");
+  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\" }");
 
   UMPIRE_LOG(Debug, "");
 
@@ -38,7 +37,7 @@ std::size_t Allocator::getSize(void* ptr) const
 
 std::size_t Allocator::getHighWatermark() const noexcept
 {
- return m_allocator->getHighWatermark();
+  return m_allocator->getHighWatermark();
 }
 
 std::size_t Allocator::getCurrentSize() const noexcept

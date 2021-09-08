@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -9,16 +9,15 @@
 
 #include <sstream>
 
+#include "camp/list.hpp"
 #include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
-#include "camp/list.hpp"
-
 namespace umpire {
 
-template<typename Strategy, typename... Args>
+template <typename Strategy, typename... Args>
 Allocator ResourceManager::makeAllocator(const std::string& name, Tracking tracked, Args&&... args)
 {
   std::lock_guard<std::mutex> lock(m_mutex);
@@ -31,14 +30,10 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   }
 
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
-  UMPIRE_REPLAY(
-      "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-      << typeid(Strategy).name()
-      << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
-      << ", \"allocator_name\":\"" << name << "\""
-      << ", \"args\": [ "
-      << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
-      << " ] }");
+  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+                << typeid(Strategy).name() << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
+                << ", \"allocator_name\":\"" << name << "\""
+                << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }");
   if (isAllocator(name)) {
     UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
   }
@@ -46,15 +41,11 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
   allocator->setTracking(is_tracked);
 
-  UMPIRE_REPLAY(
-      "\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-      << typeid(Strategy).name()
-      << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
-      << ", \"allocator_name\":\"" << name << "\""
-      << ", \"args\": [ "
-      << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...)
-      << " ] }"
-      << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }");
+  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
+                << typeid(Strategy).name() << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
+                << ", \"allocator_name\":\"" << name << "\""
+                << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }"
+                << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }");
 
   m_allocators_by_name[name] = allocator.get();
   m_allocators_by_id[allocator->getId()] = allocator.get();
@@ -64,8 +55,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
 }
 
 template <typename Strategy, bool introspection, typename... Args>
-Allocator ResourceManager::makeAllocator(const std::string& name,
-                                         Args&&... args)
+Allocator ResourceManager::makeAllocator(const std::string& name, Args&&... args)
 {
   Tracking tracked = introspection ? Tracking::Tracked : Tracking::Untracked;
   return makeAllocator<Strategy>(name, tracked, std::forward<Args>(args)...);

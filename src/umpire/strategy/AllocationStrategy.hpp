@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -26,10 +26,10 @@ namespace strategy {
  * \brief AllocationStrategy provides a unified interface to all classes that
  * can be used to allocate and free data.
  */
-class AllocationStrategy
-{
+class AllocationStrategy {
   friend class umpire::ResourceManager;
   friend class umpire::Allocator;
+
  public:
   /*!
    * \brief Construct a new AllocationStrategy object.
@@ -40,13 +40,14 @@ class AllocationStrategy
    * \param name The name of this AllocationStrategy object.
    * \param id The id of this AllocationStrategy object.
    */
-  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent, const std::string& strategy_name) noexcept;
+  AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent,
+                     const std::string& strategy_name) noexcept;
 
   virtual ~AllocationStrategy() = default;
 
   void* allocate_internal(std::size_t bytes);
 
-  void deallocate_internal(void* ptr, std::size_t size=0);
+  void deallocate_internal(void* ptr, std::size_t size = 0);
 
   /*!
    * \brief Release any and all unused memory held by this AllocationStrategy
@@ -114,8 +115,7 @@ class AllocationStrategy
    */
   int getId() noexcept;
 
-  friend std::ostream& operator<<(std::ostream& os,
-                                  const AllocationStrategy& strategy);
+  friend std::ostream& operator<<(std::ostream& os, const AllocationStrategy& strategy);
 
   /*!
    * \brief Traces where the allocator came from.
@@ -142,9 +142,9 @@ class AllocationStrategy
   int m_id;
   bool m_tracked{true};
 
-  AllocationStrategy* m_parent; 
-  private:
+  AllocationStrategy* m_parent;
 
+ private:
   /*!
    * \brief Allocate bytes of memory.
    *
@@ -160,8 +160,7 @@ class AllocationStrategy
    *
    * \param ptr Pointer to free.
    */
-  virtual void deallocate(void* ptr, std::size_t size=0) = 0;
-
+  virtual void deallocate(void* ptr, std::size_t size = 0) = 0;
 };
 
 } // end of namespace strategy

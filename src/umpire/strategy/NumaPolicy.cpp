@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -16,8 +16,7 @@ namespace umpire {
 
 namespace strategy {
 
-NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
-                       int numa_node)
+NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator, int numa_node)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "NumaPolicy"},
       m_allocator(allocator.getAllocationStrategy()),
       m_platform(Platform::host),
@@ -32,8 +31,7 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator,
 
 #if defined(UMPIRE_ENABLE_DEVICE)
   auto host_nodes = numa::get_host_nodes();
-  if (std::find(host_nodes.begin(), host_nodes.end(), m_node) ==
-      host_nodes.end()) {
+  if (std::find(host_nodes.begin(), host_nodes.end(), m_node) == host_nodes.end()) {
     // This is a device node
 #if defined(UMPIRE_ENABLE_CUDA)
     m_platform = Platform::cuda;

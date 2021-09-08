@@ -79,10 +79,16 @@ add_subdirectory(judy)
 
 if (NOT TARGET camp)
   if (DEFINED camp_DIR)
-    find_package(camp REQUIRED)
+    find_package(camp REQUIRED
+      NO_DEFAULT_PATH
+      PATHS ${camp_DIR}
+      ${camp_DIR}/lib/cmake/camp
+    )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
+    set(umpire_camp_DIR ${camp_DIR} CACHE PATH "")
   else ()
     add_subdirectory(camp)
+    set(umpire_camp_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/camp CACHE PATH "")
   endif()
 
   if(UMPIRE_ENABLE_CUDA)
@@ -90,6 +96,13 @@ if (NOT TARGET camp)
       TO camp
       SCOPE INTERFACE
       TARGET_DEFINITIONS CAMP_HAVE_CUDA)
+  endif()
+
+  if(ENABLE_HIP)
+    blt_add_target_definitions(
+      TO camp
+      SCOPE INTERFACE
+      TARGET_DEFINITIONS CAMP_HAVE_HIP)
   endif()
 
 endif ()

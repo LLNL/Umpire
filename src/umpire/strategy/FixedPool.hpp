@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -38,8 +38,7 @@ class FixedPool : public AllocationStrategy {
    * of sizeof(int)*8, but it will also likely improve performance
    * if so.
    */
-  FixedPool(const std::string& name, int id, Allocator allocator,
-            const std::size_t object_bytes,
+  FixedPool(const std::string& name, int id, Allocator allocator, const std::size_t object_bytes,
             const std::size_t objects_per_pool = 64 * sizeof(int) * 8) noexcept;
 
   ~FixedPool();
@@ -48,7 +47,7 @@ class FixedPool : public AllocationStrategy {
 
   void* allocate(std::size_t bytes = 0) override final;
   void deallocate(void* ptr, std::size_t size) override final;
-  
+
   void release() override final;
 
   std::size_t getCurrentSize() const noexcept override final;
@@ -68,8 +67,7 @@ class FixedPool : public AllocationStrategy {
     char* data;
     int* avail;
     std::size_t num_avail;
-    Pool(AllocationStrategy* allocation_strategy,
-         const std::size_t object_bytes, const std::size_t objects_per_pool,
+    Pool(AllocationStrategy* allocation_strategy, const std::size_t object_bytes, const std::size_t objects_per_pool,
          const std::size_t avail_bytes);
   };
 

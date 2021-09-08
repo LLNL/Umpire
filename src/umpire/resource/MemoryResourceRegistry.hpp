@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -22,11 +22,10 @@ class MemoryResourceRegistry {
 
   const std::vector<std::string>& getResourceNames() noexcept;
 
-  std::unique_ptr<resource::MemoryResource> makeMemoryResource(
-      const std::string& name, int id);
+  std::unique_ptr<resource::MemoryResource> makeMemoryResource(const std::string& name, int id);
 
-  std::unique_ptr<resource::MemoryResource> makeMemoryResource(
-      const std::string& name, int id, MemoryResourceTraits traits);
+  std::unique_ptr<resource::MemoryResource> makeMemoryResource(const std::string& name, int id,
+                                                               MemoryResourceTraits traits);
 
   void registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory);
 

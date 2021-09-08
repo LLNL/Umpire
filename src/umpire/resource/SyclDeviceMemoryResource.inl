@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,9 +18,8 @@ namespace umpire {
 namespace resource {
 
 template <typename _allocator>
-SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(
-    Platform platform, const std::string& name, int id,
-    MemoryResourceTraits traits)
+SyclDeviceMemoryResource<_allocator>::SyclDeviceMemoryResource(Platform platform, const std::string& name, int id,
+                                                               MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator(), m_platform(platform)
 {
 }
@@ -44,16 +43,14 @@ void SyclDeviceMemoryResource<_allocator>::deallocate(void* ptr, std::size_t UMP
 }
 
 template <typename _allocator>
-std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize()
-    const noexcept
+std::size_t SyclDeviceMemoryResource<_allocator>::getCurrentSize() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;
 }
 
 template <typename _allocator>
-std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark()
-    const noexcept
+std::size_t SyclDeviceMemoryResource<_allocator>::getHighWatermark() const noexcept
 {
   UMPIRE_LOG(Debug, "() returning " << 0);
   return 0;

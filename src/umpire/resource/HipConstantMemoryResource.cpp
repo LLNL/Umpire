@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,8 +18,7 @@ __constant__ static char s_umpire_internal_device_constant_memory[64 * 1024];
 namespace umpire {
 namespace resource {
 
-HipConstantMemoryResource::HipConstantMemoryResource(
-    const std::string& name, int id, MemoryResourceTraits traits)
+HipConstantMemoryResource::HipConstantMemoryResource(const std::string& name, int id, MemoryResourceTraits traits)
     : MemoryResource{name, id, traits},
       m_current_size{0},
       m_highwatermark{0},
@@ -39,9 +38,7 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
   void* ret{static_cast<void*>(ptr)};
 
   if (m_offset > 1024 * 64) {
-    UMPIRE_ERROR(
-        "Max total size of constant allocations is 64KB, current size is "
-        << m_offset - bytes << "bytes");
+    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
@@ -55,8 +52,7 @@ void HipConstantMemoryResource::deallocate(void* ptr, std::size_t size)
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
-  if ((static_cast<char*>(m_ptr) + (m_offset - size)) ==
-      static_cast<char*>(ptr)) {
+  if ((static_cast<char*>(m_ptr) + (m_offset - size)) == static_cast<char*>(ptr)) {
     m_offset -= size;
   } else {
     UMPIRE_ERROR("HipConstantMemory deallocations must be in reverse order");
@@ -77,7 +73,7 @@ std::size_t HipConstantMemoryResource::getHighWatermark() const noexcept
 
 bool HipConstantMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::hip)
+  if (p == Platform::hip)
     return true;
   else
     return false;

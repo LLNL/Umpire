@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -9,10 +9,7 @@
 
 namespace umpire {
 
-enum class Tracking {
-  Tracked,
-  Untracked
-};
+enum class Tracking { Tracked, Untracked };
 
 }
 

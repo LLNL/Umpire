@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -74,7 +74,7 @@ class MemoryResource : public strategy::AllocationStrategy {
   virtual bool isAccessibleFrom(Platform p) noexcept = 0;
 
   MemoryResourceTraits getTraits() const noexcept override;
- 
+
  protected:
   MemoryResourceTraits m_traits;
 };

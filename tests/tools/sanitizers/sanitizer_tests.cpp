@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -17,8 +17,7 @@ void test_read_after_free()
 
   const std::size_t SIZE = 1356;
   const std::size_t INDEX = SIZE / 2;
-  double* data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
   data[INDEX] = 100;
   std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
@@ -34,8 +33,7 @@ void test_write_after_free()
 
   const std::size_t SIZE = 1356;
   const std::size_t INDEX = SIZE / 2;
-  double* data =
-      static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
 
   data[INDEX] = 100;
   std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
@@ -48,9 +46,7 @@ void test_write_after_free()
 int main(int argc, char* argv[])
 {
   if (argc < 3) {
-    std::cout << argv[0]
-              << " requires 2 arguments, test type and allocation strategy"
-              << std::endl;
+    std::cout << argv[0] << " requires 2 arguments, test type and allocation strategy" << std::endl;
   }
 
   const std::string strategy{argv[1]};
@@ -59,12 +55,10 @@ int main(int argc, char* argv[])
   auto& rm = umpire::ResourceManager::getInstance();
 
   if (strategy.find("QuickPool") != std::string::npos) {
-    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>(
-        "test_allocator", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator("HOST"));
     UMPIRE_USE_VAR(pool);
   } else if (strategy.find("DynamicPoolList") != std::string::npos) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
-        "test_allocator", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("test_allocator", rm.getAllocator("HOST"));
     UMPIRE_USE_VAR(pool);
   }
 

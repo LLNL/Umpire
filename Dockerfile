@@ -75,3 +75,10 @@ COPY --chown=axom:axom . /home/axom/workspace
 WORKDIR /home/axom/workspace
 RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && mkdir build && cd build && cmake -DCMAKE_CXX_COMPILER=dpcpp -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_SYCL=On .."
 RUN /bin/bash -c "source /opt/intel/inteloneapi/setvars.sh && cd build && make -j 16"
+
+FROM axom/compilers:clang-10 AS check
+ENV GTEST_COLOR=1
+COPY --chown=axom:axom . /home/axom/workspace
+WORKDIR /home/axom/workspace
+RUN mkdir build && cd build && cmake -DENABLE_DEVELOPER_DEFAULTS=On -DENABLE_CLANGQUERY=Off -DENABLE_CLANGTIDY=Off -DENABLE_CPPCHECK=Off -DCMAKE_CXX_COMPILER=clang++ ..
+RUN cd build && make check

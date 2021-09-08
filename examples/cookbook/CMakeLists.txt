@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -184,6 +184,12 @@ blt_add_executable(
   SOURCES recipe_strategy_name.cpp
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_strategy_name)
+
+blt_add_executable(
+  NAME recipe_named_allocation
+  SOURCES recipe_named_allocation.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_named_allocation)
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
 

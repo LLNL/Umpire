@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,8 +13,7 @@
 namespace umpire {
 namespace resource {
 
-bool SyclPinnedMemoryResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool SyclPinnedMemoryResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("PINNED") != std::string::npos) {
     return true;
@@ -23,23 +22,21 @@ bool SyclPinnedMemoryResourceFactory::isValidMemoryResourceFor(
   }
 }
 
-std::unique_ptr<resource::MemoryResource>
-SyclPinnedMemoryResourceFactory::create(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> SyclPinnedMemoryResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource>
-SyclPinnedMemoryResourceFactory::create(const std::string& name, int id,
-                                        MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> SyclPinnedMemoryResourceFactory::create(const std::string& name, int id,
+                                                                                  MemoryResourceTraits traits)
 {
-  auto sycl_asynchandler = [] (sycl::exception_list exceptions) {
+  auto sycl_asynchandler = [](sycl::exception_list exceptions) {
     for (std::exception_ptr const& e : exceptions) {
       try {
-	std::rethrow_exception(e);
+        std::rethrow_exception(e);
       } catch (sycl::exception const& ex) {
-	std::cout << "Caught asynchronous SYCL exception:" << std::endl
-	<< ex.what() << ", OpenCL code: " << ex.get_cl_code() << std::endl;
+        std::cout << "Caught asynchronous SYCL exception:" << std::endl
+                  << ex.what() << ", OpenCL code: " << ex.get_cl_code() << std::endl;
       }
     }
   };
@@ -51,28 +48,28 @@ SyclPinnedMemoryResourceFactory::create(const std::string& name, int id,
   for (auto& device : devices) {
     if (device.is_gpu()) {
       if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
-	auto subDevicesDomainNuma = device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(sycl::info::partition_affinity_domain::numa);
-	for (auto& subDev : subDevicesDomainNuma) {
-	  device_count++;
-	  if ((device_count-1) == traits.id) {
-	    sycl::context syclctxt(subDev, sycl_asynchandler);
-	    traits.queue = new sycl::queue(syclctxt, subDev, sycl::property_list{sycl::property::queue::in_order{}});
-	  }
-	}
-      }
-      else {
-	device_count++;
-	if ((device_count-1) == traits.id) {
-	  sycl::context syclctxt(device, sycl_asynchandler);
-	  traits.queue = new sycl::queue(syclctxt, device, sycl::property_list{sycl::property::queue::in_order{}});
-	}
+        auto subDevicesDomainNuma =
+            device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
+                sycl::info::partition_affinity_domain::numa);
+        for (auto& subDev : subDevicesDomainNuma) {
+          device_count++;
+          if ((device_count - 1) == traits.id) {
+            sycl::context syclctxt(subDev, sycl_asynchandler);
+            traits.queue = new sycl::queue(syclctxt, subDev, sycl::property_list{sycl::property::queue::in_order{}});
+          }
+        }
+      } else {
+        device_count++;
+        if ((device_count - 1) == traits.id) {
+          sycl::context syclctxt(device, sycl_asynchandler);
+          traits.queue = new sycl::queue(syclctxt, device, sycl::property_list{sycl::property::queue::in_order{}});
+        }
       }
     }
   }
 
-  return util::make_unique<
-      resource::SyclDeviceMemoryResource<alloc::SyclPinnedAllocator>>(
-      Platform::sycl, name, id, traits);
+  return util::make_unique<resource::SyclDeviceMemoryResource<alloc::SyclPinnedAllocator>>(Platform::sycl, name, id,
+                                                                                           traits);
 }
 
 MemoryResourceTraits SyclPinnedMemoryResourceFactory::getDefaultTraits()

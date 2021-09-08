@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -66,18 +66,15 @@ class Replay {
 
 } /* namespace umpire */
 
-#define UMPIRE_REPLAY(msg)                                                     \
-  {                                                                            \
-    if (umpire::Replay::getReplayLogger()->replayLoggingEnabled()) {           \
-      std::ostringstream local_msg;                                            \
-      auto time = std::chrono::time_point_cast<std::chrono::nanoseconds>(      \
-                      std::chrono::system_clock::now())                        \
-                      .time_since_epoch();                                     \
-      local_msg << "{ \"kind\":\"replay\", \"uid\":"                           \
-                << umpire::Replay::getReplayLogger()->replayUid() << ", "      \
-                << "\"timestamp\":" << static_cast<long>(time.count()) << ", " \
-                << msg << " }" << std::endl;                                   \
-      umpire::Replay::getReplayLogger()->logMessage(local_msg.str());          \
-    }                                                                          \
+#define UMPIRE_REPLAY(msg)                                                                                             \
+  {                                                                                                                    \
+    if (umpire::Replay::getReplayLogger()->replayLoggingEnabled()) {                                                   \
+      std::ostringstream local_msg;                                                                                    \
+      auto time =                                                                                                      \
+          std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch(); \
+      local_msg << "{ \"kind\":\"replay\", \"uid\":" << umpire::Replay::getReplayLogger()->replayUid() << ", "         \
+                << "\"timestamp\":" << static_cast<long>(time.count()) << ", " << msg << " }" << std::endl;            \
+      umpire::Replay::getReplayLogger()->logMessage(local_msg.str());                                                  \
+    }                                                                                                                  \
   }
 #endif /* UMPIRE_Replay_HPP */

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,15 +13,12 @@
 namespace umpire {
 namespace util {
 
-bool operator==(const umpire::util::AllocationRecord& left,
-                const umpire::util::AllocationRecord& right)
+bool operator==(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
 {
-  return left.ptr == right.ptr && left.size == right.size &&
-         left.strategy == right.strategy;
+  return left.ptr == right.ptr && left.size == right.size && left.strategy == right.strategy;
 }
 
-bool operator!=(const umpire::util::AllocationRecord& left,
-                const umpire::util::AllocationRecord& right)
+bool operator!=(const umpire::util::AllocationRecord& left, const umpire::util::AllocationRecord& right)
 {
   return !(left == right);
 }
@@ -31,10 +28,7 @@ bool operator!=(const umpire::util::AllocationRecord& left,
 
 class AllocationMapTest : public ::testing::Test {
  protected:
-  AllocationMapTest()
-      : data(new double[15]),
-        size(15 * sizeof(double)),
-        record({data, size, nullptr})
+  AllocationMapTest() : data(new double[15]), size(15 * sizeof(double)), record({data, size, nullptr})
   {
   }
 
@@ -141,8 +135,7 @@ TEST_F(AllocationMapTest, RegisterMultipleIteratorSize)
   umpire::util::AllocationRecord next_record{data, 1, nullptr};
   umpire::util::AllocationRecord another_record{data + 10, 5, nullptr};
 
-  ASSERT_NO_THROW(map.insert(data, record); map.insert(data, next_record);
-                  map.insert(data, another_record););
+  ASSERT_NO_THROW(map.insert(data, record); map.insert(data, next_record); map.insert(data, another_record););
 
   std::size_t sz = 0;
   auto iter = map.begin(), end = map.end();
@@ -196,9 +189,7 @@ TEST_F(AllocationMapTest, Print)
 
   map.printAll();
 
-  map.print([this](const umpire::util::AllocationRecord& r) {
-    return r.ptr == data;
-  });
+  map.print([this](const umpire::util::AllocationRecord& r) { return r.ptr == data; });
 
   delete[] extra_data;
 }

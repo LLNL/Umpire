@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -23,17 +23,7 @@ struct MemoryResourceTypeHash {
   }
 };
 
-enum MemoryResourceType {
-  Host,
-  Device,
-  Unified,
-  Pinned,
-  Constant,
-  File,
-  NoOp,
-  Shared,
-  Unknown
-};
+enum MemoryResourceType { Host, Device, Unified, Pinned, Constant, File, NoOp, Shared, Unknown };
 
 inline std::string resource_to_string(MemoryResourceType type)
 {

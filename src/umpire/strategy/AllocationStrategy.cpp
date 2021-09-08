@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -11,7 +11,8 @@
 namespace umpire {
 namespace strategy {
 
-AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent, const std::string& strategy_name) noexcept
+AllocationStrategy::AllocationStrategy(const std::string& name, int id, AllocationStrategy* parent,
+                                       const std::string& strategy_name) noexcept
     : m_name{name}, m_strategy_name{strategy_name}, m_id{id}, m_parent{parent}
 {
 }
@@ -28,22 +29,10 @@ void* AllocationStrategy::allocate_internal(std::size_t bytes)
   return allocate(bytes);
 }
 
-void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t UMPIRE_UNUSED_ARG(bytes))
+void* AllocationStrategy::allocate_named(const std::string& UMPIRE_UNUSED_ARG(name), std::size_t bytes)
 {
-  UMPIRE_ERROR("This allocation strategy does not support named allocations");
-
-  //
-  // The UMPIRE_ERROR macro above does not return.  It instead throws
-  // an exception.  However, for some reason, nvcc throws a warning
-  // "warning: missing return statement at end of non-void function"
-  // even though the following line cannot be reached.  Adding this
-  // fake return statement to work around the incorrect warning.
-  //
-#if defined(__CUDACC__) && defined(__CUDA_ARCH__)
-  return nullptr;
-#endif
+  return allocate(bytes);
 }
-
 
 void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 {
@@ -52,7 +41,6 @@ void AllocationStrategy::deallocate_internal(void* ptr, std::size_t size)
 
   deallocate(ptr, size);
 }
-
 
 const std::string& AllocationStrategy::getName() noexcept
 {

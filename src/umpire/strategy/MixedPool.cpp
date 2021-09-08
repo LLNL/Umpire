@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,41 +10,38 @@
 #include <algorithm>
 #include <cstdint>
 
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace strategy {
 
-MixedPool::MixedPool(const std::string& name, int id, Allocator allocator,
-                     std::size_t smallest_fixed_obj_size,
-                     std::size_t largest_fixed_obj_size,
-                     std::size_t max_initial_fixed_pool_size,
-                     std::size_t fixed_size_multiplier,
-                     const std::size_t quick_pool_initial_alloc_size,
-                     const std::size_t quick_pool_min_alloc_size,
-                     const std::size_t quick_pool_align_bytes,
-                     QuickPool::CoalesceHeuristic should_coalesce) noexcept
+MixedPool::MixedPool(const std::string& name, int id, Allocator allocator, std::size_t smallest_fixed_obj_size,
+                     std::size_t largest_fixed_obj_size, std::size_t max_initial_fixed_pool_size,
+                     std::size_t fixed_size_multiplier, const std::size_t quick_pool_initial_alloc_size,
+                     const std::size_t quick_pool_min_alloc_size, const std::size_t quick_pool_align_bytes,
+                     PoolCoalesceHeuristic<QuickPool> should_coalesce) noexcept
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "MixedPool"},
       m_map{},
       m_fixed_pool_map{},
       m_fixed_pool{},
       m_quick_pool{"internal_quick_pool",
-                     -1,
-                     allocator,
-                     quick_pool_initial_alloc_size,
-                     quick_pool_min_alloc_size,
-                     quick_pool_align_bytes,
-                     should_coalesce},
+                   -1,
+                   allocator,
+                   quick_pool_initial_alloc_size,
+                   quick_pool_min_alloc_size,
+                   quick_pool_align_bytes,
+                   should_coalesce},
       m_allocator{allocator.getAllocationStrategy()}
 {
   std::size_t obj_size{smallest_fixed_obj_size};
   while (obj_size <= largest_fixed_obj_size) {
-    const std::size_t obj_per_pool{
-        std::min(64 * sizeof(int) * 8, max_initial_fixed_pool_size / obj_size)};
+    const std::size_t obj_per_pool{std::min(64 * sizeof(int) * 8, max_initial_fixed_pool_size / obj_size)};
     if (obj_per_pool > 1) {
-      m_fixed_pool.emplace_back(util::make_unique<FixedPool>(
-          "internal_fixed_pool", -1, allocator, obj_size, obj_per_pool));
+      m_fixed_pool.emplace_back(
+          util::make_unique<FixedPool>("internal_fixed_pool", -1, allocator, obj_size, obj_per_pool));
       m_fixed_pool_map.emplace_back(obj_size);
     } else {
       break;

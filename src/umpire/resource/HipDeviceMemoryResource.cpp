@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,10 +15,8 @@
 namespace umpire {
 namespace resource {
 
-HipDeviceMemoryResource::HipDeviceMemoryResource(Platform platform,
-                                                   const std::string& name,
-                                                   int id,
-                                                   MemoryResourceTraits traits)
+HipDeviceMemoryResource::HipDeviceMemoryResource(Platform platform, const std::string& name, int id,
+                                                 MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
 {
 }
@@ -55,7 +53,7 @@ void HipDeviceMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_AR
 
 bool HipDeviceMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
-  if(p == Platform::hip || p == Platform::host)
+  if (p == Platform::hip || p == Platform::host)
     return true;
   else
     return false;

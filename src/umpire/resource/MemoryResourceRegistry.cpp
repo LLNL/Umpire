@@ -1,17 +1,15 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/config.hpp"
-
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 
-#include "umpire/util/make_unique.hpp"
-
+#include "umpire/config.hpp"
 #include "umpire/resource/HostResourceFactory.hpp"
 #include "umpire/resource/NullMemoryResourceFactory.hpp"
+#include "umpire/util/make_unique.hpp"
 
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 #include "umpire/resource/HostSharedMemoryResourceFactory.hpp"
@@ -78,37 +76,30 @@ MemoryResourceRegistry& MemoryResourceRegistry::getInstance()
   return resource_registry;
 }
 
-const std::vector<std::string>&
-MemoryResourceRegistry::getResourceNames() noexcept
+const std::vector<std::string>& MemoryResourceRegistry::getResourceNames() noexcept
 {
   return m_resource_names;
 }
 
-MemoryResourceRegistry::MemoryResourceRegistry()
-    : m_allocator_factories()
+MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
 {
-  registerMemoryResource(
-      util::make_unique<resource::HostResourceFactory>());
+  registerMemoryResource(util::make_unique<resource::HostResourceFactory>());
   m_resource_names.push_back("HOST");
 
 #if defined(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
-  registerMemoryResource(
-      util::make_unique<resource::NoOpResourceFactory>());
+  registerMemoryResource(util::make_unique<resource::NoOpResourceFactory>());
   m_resource_names.push_back("NO_OP");
 #endif
 
-  registerMemoryResource(
-      util::make_unique<resource::NullMemoryResourceFactory>());
+  registerMemoryResource(util::make_unique<resource::NullMemoryResourceFactory>());
 
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
-  registerMemoryResource(
-      util::make_unique<resource::HostSharedMemoryResourceFactory>());
+  registerMemoryResource(util::make_unique<resource::HostSharedMemoryResourceFactory>());
   m_resource_names.push_back("SHARED");
 #endif
 
 #if defined(UMPIRE_ENABLE_FILE_RESOURCE)
-  registerMemoryResource(
-      util::make_unique<resource::FileMemoryResourceFactory>());
+  registerMemoryResource(util::make_unique<resource::FileMemoryResourceFactory>());
   m_resource_names.push_back("FILE");
 #endif
 
@@ -120,8 +111,7 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       UMPIRE_ERROR("Umpire compiled with CUDA support but no GPUs detected!");
     }
 
-    registerMemoryResource(
-        util::make_unique<resource::CudaDeviceResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::CudaDeviceResourceFactory>());
     m_resource_names.push_back("DEVICE");
 
     for (int device = 0; device < device_count; ++device) {
@@ -129,17 +119,14 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       m_resource_names.push_back(name);
     }
 
-    registerMemoryResource(
-        util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
     m_resource_names.push_back("UM");
 
-    registerMemoryResource(
-        util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
     m_resource_names.push_back("PINNED");
 
 #if defined(UMPIRE_ENABLE_CONST)
-    registerMemoryResource(
-        util::make_unique<resource::CudaConstantMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::CudaConstantMemoryResourceFactory>());
     m_resource_names.push_back("DEVICE_CONST");
 #endif
   }
@@ -153,8 +140,7 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       UMPIRE_ERROR("Umpire compiled with HIP support but no GPUs detected!");
     }
 
-    registerMemoryResource(
-        util::make_unique<resource::HipDeviceResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
     m_resource_names.push_back("DEVICE");
 
     for (int device = 0; device < device_count; ++device) {
@@ -162,17 +148,14 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       m_resource_names.push_back(name);
     }
 
-    registerMemoryResource(
-        util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
     m_resource_names.push_back("UM");
 
-    registerMemoryResource(
-        util::make_unique<resource::HipPinnedMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::HipPinnedMemoryResourceFactory>());
     m_resource_names.push_back("PINNED");
 
 #if defined(UMPIRE_ENABLE_CONST)
-    registerMemoryResource(
-        util::make_unique<resource::HipConstantMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::HipConstantMemoryResourceFactory>());
     m_resource_names.push_back("DEVICE_CONST");
 #endif
   }
@@ -185,15 +168,15 @@ MemoryResourceRegistry::MemoryResourceRegistry()
     for (auto& platform : platforms) {
       auto devices = platform.get_devices();
       for (auto& device : devices) {
-	if (device.is_gpu()) {
-	  if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
-	    auto subDevicesDomainNuma = device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
-	      sycl::info::partition_affinity_domain::numa);
-	    device_count += subDevicesDomainNuma.size();
-	  }
-	  else
-	    device_count++;
-	}
+        if (device.is_gpu()) {
+          if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
+            auto subDevicesDomainNuma =
+                device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
+                    sycl::info::partition_affinity_domain::numa);
+            device_count += subDevicesDomainNuma.size();
+          } else
+            device_count++;
+        }
       }
     }
 
@@ -201,8 +184,7 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       UMPIRE_ERROR("Umpire compiled with SYCL support but no GPUs detected!");
     }
 
-    registerMemoryResource(
-        util::make_unique<resource::SyclDeviceResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::SyclDeviceResourceFactory>());
     m_resource_names.push_back("DEVICE");
 
     for (int device = 0; device < device_count; ++device) {
@@ -210,12 +192,10 @@ MemoryResourceRegistry::MemoryResourceRegistry()
       m_resource_names.push_back(name);
     }
 
-    registerMemoryResource(
-        util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
     m_resource_names.push_back("UM");
 
-    registerMemoryResource(
-        util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
+    registerMemoryResource(util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
     m_resource_names.push_back("PINNED");
   }
 #endif
@@ -227,20 +207,17 @@ MemoryResourceRegistry::MemoryResourceRegistry()
     m_resource_names.push_back(name);
   }
 
-  registerMemoryResource(
-      util::make_unique<resource::OpenMPTargetResourceFactory>());
+  registerMemoryResource(util::make_unique<resource::OpenMPTargetResourceFactory>());
   m_resource_names.push_back("DEVICE");
 #endif
 }
 
-void MemoryResourceRegistry::registerMemoryResource(
-    std::unique_ptr<MemoryResourceFactory>&& factory)
+void MemoryResourceRegistry::registerMemoryResource(std::unique_ptr<MemoryResourceFactory>&& factory)
 {
   m_allocator_factories.push_back(std::move(factory));
 }
 
-std::unique_ptr<resource::MemoryResource>
-MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
 {
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
@@ -252,9 +229,8 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id)
   UMPIRE_ERROR("MemoryResource " << name << " not found");
 }
 
-std::unique_ptr<resource::MemoryResource>
-MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
-                                           MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
+                                                                                     MemoryResourceTraits traits)
 {
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {
@@ -266,8 +242,7 @@ MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
   UMPIRE_ERROR("MemoryResource " << name << " not found");
 }
 
-MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(
-    const std::string& name)
+MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
 {
   for (auto const& allocator_factory : m_allocator_factories) {
     if (allocator_factory->isValidMemoryResourceFor(name)) {

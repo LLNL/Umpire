@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -13,8 +13,8 @@
 #include <string>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
-#include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/strategy/mixins/AllocateNull.hpp"
+#include "umpire/strategy/mixins/Inspector.hpp"
 #include "umpire/util/Platform.hpp"
 
 class AllocatorTest;
@@ -28,7 +28,7 @@ namespace op {
 class HostReallocateOperation;
 class GenericReallocateOperation;
 
-}
+} // namespace op
 
 /*!
  * \brief Provides a unified interface to allocate and free data.
@@ -40,9 +40,7 @@ class GenericReallocateOperation;
  *
  * \see TypedAllocator
  */
-class Allocator : 
-  private strategy::mixins::Inspector, strategy::mixins::AllocateNull
-{
+class Allocator : private strategy::mixins::Inspector, strategy::mixins::AllocateNull {
   friend class ResourceManager;
   friend class ::AllocatorTest;
   friend class umpire::op::HostReallocateOperation;
@@ -71,9 +69,9 @@ class Allocator :
    * \brief Free the memory at ptr.
    *
    * This method will throw an umpire::Exception if ptr was not allocated
-   * using this Allocator. If the value of the pointer is set to nullptr, 
-   * this behavior is _allowed_, but it will be ignored. 
-   * If you need to deallocate memory allocated by an unknown object, 
+   * using this Allocator. If the value of the pointer is set to nullptr,
+   * this behavior is _allowed_, but it will be ignored.
+   * If you need to deallocate memory allocated by an unknown object,
    * use the ResourceManager::deallocate method.
    *
    * \param ptr Pointer to free (If nullptr, it will be ignored.)
@@ -177,7 +175,7 @@ class Allocator :
 
   bool isTracked() const noexcept;
 
-  const std::string& getStrategyName() const noexcept; 
+  const std::string& getStrategyName() const noexcept;
 
   Allocator() = default;
 

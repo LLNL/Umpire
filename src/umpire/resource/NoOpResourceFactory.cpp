@@ -1,40 +1,36 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/resource/NoOpResourceFactory.hpp"
-#include "umpire/resource/NoOpMemoryResource.hpp"
 
+#include "umpire/resource/NoOpMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/make_unique.hpp"
 #include "umpire/util/detect_vendor.hpp"
+#include "umpire/util/make_unique.hpp"
 
 namespace umpire {
 namespace resource {
 
-bool NoOpResourceFactory::isValidMemoryResourceFor(
-    const std::string& name) noexcept
+bool NoOpResourceFactory::isValidMemoryResourceFor(const std::string& name) noexcept
 {
   if (name.find("NO_OP") != std::string::npos)
     return true;
-  else 
+  else
     return false;
-  
 }
 
-std::unique_ptr<resource::MemoryResource> NoOpResourceFactory::create(
-    const std::string& name, int id)
+std::unique_ptr<resource::MemoryResource> NoOpResourceFactory::create(const std::string& name, int id)
 {
   return create(name, id, getDefaultTraits());
 }
 
-std::unique_ptr<resource::MemoryResource> NoOpResourceFactory::create(
-    const std::string& name, int id, MemoryResourceTraits traits)
+std::unique_ptr<resource::MemoryResource> NoOpResourceFactory::create(const std::string& name, int id,
+                                                                      MemoryResourceTraits traits)
 {
-  return util::make_unique<resource::NoOpMemoryResource>(
-      Platform::host, name, id, traits);
+  return util::make_unique<resource::NoOpMemoryResource>(Platform::host, name, id, traits);
 }
 
 MemoryResourceTraits NoOpResourceFactory::getDefaultTraits()
