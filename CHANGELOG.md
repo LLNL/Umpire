@@ -15,6 +15,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking
   change since the include paths are different. 
 
+- Build Doxygen documentation on ReadTheDocs.
+
 ### Removed
 
 - Removed unneeded hip dependency in the tests/debug/ CMake file.
