@@ -232,7 +232,7 @@ blt_add_target_compile_flags(
 blt_add_target_compile_flags(
   TO primary_pool_tests
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-if (ENABLE_PERFORMANCE_TESTS)
+if (UMPIRE_ENABLE_PERFORMANCE_TESTS)
   blt_add_target_compile_flags(
     TO primary_pool_performance_tests 
     FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})

@@ -42,7 +42,7 @@ if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
     NUM_MPI_TASKS 4)
 endif()
 
-if (ENABLE_GMOCK)
+if (UMPIRE_ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
     SOURCES resource_tests.cpp
