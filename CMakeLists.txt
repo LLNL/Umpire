@@ -18,42 +18,24 @@ project(Umpire
 
 set(UMPIRE_VERSION_RC "")
 
-option(ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
-option(ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
-mark_as_advanced(ENABLE_DEVELOPER_DEFAULTS ENABLE_DEVELOPER_BENCHMARKS)
+##This may change locations, but for now keeping it here
+option(UMPIRE_ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
+option(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
+mark_as_advanced(UMPIRE_ENABLE_DEVELOPER_DEFAULTS UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
 
-if (ENABLE_DEVELOPER_DEFAULTS)
+##This may change locations, but for now keeping it here
+if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
   set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
-  set(ENABLE_TOOLS On CACHE BOOL "")
+  set(UMPIRE_ENABLE_TOOLS On CACHE BOOL "")
 endif ()
 
 set(ENABLE_CUDA Off CACHE BOOL "")
-set(ENABLE_HIP Off CACHE BOOL "")
-set(ENABLE_SYCL Off CACHE BOOL "")
-set(ENABLE_NUMA Off CACHE BOOL "")
-set(ENABLE_OPENMP Off CACHE BOOL "")
-set(ENABLE_COPY_HEADERS Off CACHE BOOL "")
-set(ENABLE_GMOCK On CACHE BOOL "")
-set(ENABLE_CLANGQUERY Off CACHE BOOL "")
-set(ENABLE_DOCS Off CACHE BOOL "")
+option(UMPIRE_ENABLE_CUDA "Build Umpire with CUDA" Off)
 
-option(ENABLE_LOGGING "Build Umpire with Logging enabled" On)
-option(ENABLE_SLIC "Build Umpire with SLIC logging" Off)
-option(ENABLE_BACKTRACE "Build Umpire with allocation backtrace enabled" Off)
-option(ENABLE_BACKTRACE_SYMBOLS "Build Umpire with symbol support" Off)
-option(ENABLE_COVERAGE "Enable code coverage (with GCC)" Off)
-option(ENABLE_PEDANTIC_WARNINGS "Enable pedantic compiler warnings" On)
-option(ENABLE_INACCESSIBILITY_TESTS "Test allocator inaccessibility functionality" Off)
-option(ENABLE_TOOLS "Enable Umpire development tools" Off)
-option(ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
-option(ENABLE_OPENMP_TARGET "Enable OpenMP target support" Off)
-option(ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
-option(ENABLE_ASAN "Enable use with address sanitizer tools" Off)
-option(ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
-if(WIN32 OR APPLE)
-  set(ENABLE_FILE_RESOURCE Off CACHE BOOL "")
-endif()
-option(ENABLE_FILE_RESOURCE "Enable File Resource" On)
+set(ENABLE_GMOCK On CACHE BOOL "")
+option(UMPIRE_ENABLE_GMOCK "Build Umpire with GMOCK support" On)
+
+include(cmake/SetupUmpireOptions.cmake)
 
 set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
 set(CMAKE_CUDA_STANDARD 11)
@@ -63,11 +45,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   set( CMAKE_CXX_EXTENSIONS ON )
 endif()
 
-if (ENABLE_INACCESSIBILITY_TESTS)
+if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   cmake_minimum_required(VERSION 3.9)
 else ()
   cmake_minimum_required(VERSION 3.8.2)
@@ -75,23 +57,13 @@ endif ()
 
 message(STATUS "Using CMake version ${CMAKE_VERSION}")
 
-if (ENABLE_FORTRAN)
-  set(ENABLE_C On)
-endif()
-
-if (ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
-  message(FATAL_ERROR "\
-  Sphinx documentation requires Doxygen, \
-  please re-configure with ENABLE_DOXYGEN=ON")
-endif ()
-
-if (ENABLE_NUMA AND (NOT UNIX OR APPLE))
+if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   message(FATAL_ERROR "\
   NUMA support unavailable. \
-  Please re-configure with ENABLE_NUMA=Off (default value)")
+  Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   if ((CMAKE_CXX_COMPILER_ID MATCHES GNU) AND (CMAKE_SYSTEM_PROCESSOR MATCHES ppc64le))
     if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8.0)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
@@ -99,7 +71,7 @@ if (ENABLE_CUDA)
   endif ()
 endif()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
    if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
@@ -134,16 +106,45 @@ endif()
 #######################################
 # Options that depend on BLT Options
 #######################################
+cmake_dependent_option( UMPIRE_ENABLE_CUDA "Build Umpire with CUDA support" On
+                        "ENABLE_CUDA" Off )
+cmake_dependent_option( UMPIRE_ENABLE_HIP "Build Umpire with HIP" On
+                       "ENABLE_HIP" Off )
+cmake_dependent_option( UMPIRE_ENABLE_OPENMP "Build Umpire with OpenMP" On
+                       "ENABLE_OPENMP" Off )
+cmake_dependent_option( UMPIRE_ENABLE_MPI "Build Umpire with MPI" On
+                       "ENABLE_MPI" Off )
+cmake_dependent_option( ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
+                       "NOT WIN32;NOT APPLE" Off )
+
+
 cmake_dependent_option( UMPIRE_ENABLE_TESTS "Build Umpire tests" On
                        "ENABLE_TESTS" Off )
-cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
-                        "ENABLE_DOCS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
+                        "ENABLE_BENCHMARKS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 
-cmake_dependent_option(
-  ENABLE_IPC_SHARED_MEMORY "Enable Host Shared Memory Resource" ${ENABLE_MPI}
-  "NOT WIN32;NOT APPLE" Off )
+cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
+                        "ENABLE_DOCS" Off )
+cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang query" On
+                        "ENABLE_CLANGQUERY" Off )
+cmake_dependent_option( UMPIRE_ENABLE_COVERAGE "Build Umpire with Coverage support (with GCC)" On
+                        "ENABLE_COVERAGE" Off )
+cmake_dependent_option( UMPIRE_ENABLE_GMOCK "Build Umpire with gmock" On
+                        "ENABLE_GMOCK" Off )
+cmake_dependent_option( UMPIRE_ENABLE_FORTRAN "Build Umpire with FORTRAN" On
+                        "ENABLE_FORTRAN" Off )
+
+if (UMPIRE_ENABLE_FORTRAN)
+  set(UMPIRE_ENABLE_C On)
+endif()
+
+if (UMPIRE_ENABLE_DOCS AND NOT ENABLE_DOXYGEN)
+  message(FATAL_ERROR "\
+  Sphinx documentation requires Doxygen, \
+  please re-configure with ENABLE_DOXYGEN=ON")
+endif ()
 
 if (Git_FOUND)
   blt_git_hashcode (HASHCODE umpire_sha1
@@ -172,15 +173,15 @@ if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)
 endif ()
 
-if (ENABLE_DEVELOPER_BENCHMARKS)
+if (UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   add_subdirectory(benchmarks)
   if ((NOT CMAKE_BUILD_TYPE) OR (NOT ${CMAKE_BUILD_TYPE} STREQUAL "Release"))
     message("-- Warning: CMAKE_BUILD_TYPE not set to Release, benchmark information will not be reliable for this build!")
   endif()
 else()
-  if (ENABLE_BENCHMARKS)
+  if (UMPIRE_ENABLE_BENCHMARKS)
     message("-- Warning: Benchmarks will not be built. If you want to build with benchmarks,\n"
-          "     set ENABLE_DEVELOPER_BENCHMARKS to On.")
+          "     set UMPIRE_ENABLE_DEVELOPER_BENCHMARKS to On.")
   endif()
 endif ()
 
@@ -188,7 +189,7 @@ if (UMPIRE_ENABLE_EXAMPLES)
   add_subdirectory(examples)
 endif ()
 
-if (ENABLE_TOOLS)
+if (UMPIRE_ENABLE_TOOLS)
   add_subdirectory(tools)
 endif ()
 

@@ -136,7 +136,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         entries.append(cmake_cache_option("ENABLE_FORTRAN", 
             ('+fortran' in spec) and (self.compiler.fc is not None)))
-        entries.append(cmake_cache_option("ENABLE_C", '+c' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_C", '+c' in spec))
         
         fortran_compilers = ["gfortran", "xlf"]
         if any(compiler in self.compiler.fc for compiler in fortran_compilers) and ("clang" in self.compiler.cxx):
@@ -201,9 +201,9 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             else:
                 entries.append(cmake_cache_string("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
-        entries.append(cmake_cache_option("ENABLE_DEVICE_CONST", "+deviceconst" in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_DEVICE_CONST", "+deviceconst" in spec))
 
-        entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
             if ('%xl' in spec):
                 entries.append(cmake_cache_string("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
@@ -228,15 +228,15 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_path("camp_DIR" ,spec['camp'].prefix))
         entries.append(cmake_cache_string("CMAKE_BUILD_TYPE", spec.variants['build_type'].value))
         entries.append(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec or '+dev_benchmarks' in spec))
-        entries.append(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", '+dev_benchmarks' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_DEVELOPER_BENCHMARKS", '+dev_benchmarks' in spec))
         entries.append(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
-        entries.append(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", '+tools' in spec))
         entries.append(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
-        entries.append(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
-        entries.append(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_ASAN", '+asan' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
         entries.append(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         entries.append(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
-        entries.append(cmake_cache_option("ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
         
         return entries
 

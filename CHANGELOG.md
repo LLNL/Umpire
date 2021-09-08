@@ -17,6 +17,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Build Doxygen documentation on ReadTheDocs.
 
+- Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
+  on the corresponding BLT options. 
+
 ### Removed
 
 - Remove deprecated registerAllocator and isAllocatorRegistered methods.
