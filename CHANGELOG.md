@@ -13,12 +13,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
 - Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking
-  change since the include paths are different.
+  change since the include paths are different. 
+
+- Build Doxygen documentation on ReadTheDocs.
 
 - Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
   on the corresponding BLT options. 
 
 ### Removed
+
+- Remove deprecated registerAllocator and isAllocatorRegistered methods.
 
 - Removed unneeded hip dependency in the tests/debug/ CMake file.
 

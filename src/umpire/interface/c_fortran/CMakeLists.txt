@@ -52,14 +52,6 @@ target_include_directories(
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
-install(TARGETS
-  umpire_interface
-  EXPORT umpire-targets
-  OBJECTS DESTINATION lib
-  RUNTIME DESTINATION lib
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
 install(FILES
   ${umpire_interface_c_fortran_headers}
   DESTINATION include/umpire/interface/c_fortran)
