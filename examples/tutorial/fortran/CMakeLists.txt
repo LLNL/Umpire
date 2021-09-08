@@ -6,13 +6,13 @@
 ##############################################################################
 set (tutorial_fortran_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (tutorial_fortran_depends
       ${tutorial_fortran_depends}
       hip_runtime)
 endif()
 
-if(ENABLE_CUDA)
+if(UMPIRE_ENABLE_CUDA)
   set (tutorial_fortran_depends
       ${tutorial_fortran_depends}
       cuda_runtime)

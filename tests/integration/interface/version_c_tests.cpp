@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "gtest/gtest.h"
-#include "umpire/interface/umpire.h"
+#include "umpire/interface/c_fortran/umpire.h"
 
 TEST(Version, MajorVersion)
 {

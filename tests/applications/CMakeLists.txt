@@ -6,19 +6,19 @@
 ##############################################################################
 set (test_applications_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (test_applications_depends
       ${test_applications_depends}
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (test_applications_depends
       ${test_applications_depends}
       openmp)
 endif()
 
-if (ENABLE_BACKTRACE_SYMBOLS)
+if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set (test_applications_depends
       ${test_applications_depends}
       ${CMAKE_DL_LIBS})

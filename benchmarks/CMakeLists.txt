@@ -6,13 +6,13 @@
 ##############################################################################
 set (stress_test_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (stress_test_depends
       ${stress_test_depends}
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (stress_test_depends
       ${stress_test_depends}
       openmp)
@@ -51,16 +51,16 @@ blt_add_target_compile_flags(
   TO pool_stress_test
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-if (ENABLE_BENCHMARKS)
+if (UMPIRE_ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)
 
-  if (ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP)
     set (benchmark_depends
       ${benchmark_depends}
       hip_runtime)
   endif()
 
-  if (ENABLE_OPENMP_TARGET)
+  if (UMPIRE_ENABLE_OPENMP_TARGET)
     set (benchmark_depends
       ${benchmark_depends}
       openmp)
@@ -89,7 +89,7 @@ if (ENABLE_BENCHMARKS)
     SOURCES debuglog_benchmarks.cpp
     DEPENDS_ON ${benchmark_depends})
 
-  if (ENABLE_OPENMP)
+  if (UMPIRE_ENABLE_OPENMP)
     set (benchmark_depends
       ${benchmark_depends}
       openmp)
