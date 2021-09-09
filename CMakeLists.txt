@@ -22,7 +22,14 @@ set(UMPIRE_VERSION_RC "")
 
 include(cmake/SetupUmpireOptions.cmake)
 
-set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+if (UMPIRE_ENABLE_SYCL)
+  set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
+   endif()
+else()
+  set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+endif()
 set(CMAKE_CUDA_STANDARD 11)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
@@ -37,12 +44,6 @@ if (UMPIRE_ENABLE_NUMA AND (NOT UNIX OR APPLE))
   NUMA support unavailable. \
   Please re-configure with UMPIRE_ENABLE_NUMA=Off (default value)")
 endif ()
-
-if (UMPIRE_ENABLE_SYCL)
-   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
-   endif()
-endif()
 
 set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")
 
