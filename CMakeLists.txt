@@ -37,7 +37,14 @@ option(UMPIRE_ENABLE_GMOCK "Build Umpire with GMOCK support" On)
 
 include(cmake/SetupUmpireOptions.cmake)
 
-set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+if (UMPIRE_ENABLE_SYCL)
+  set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
+   endif()
+else()
+  set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+endif()
 set(CMAKE_CUDA_STANDARD 11)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
@@ -69,12 +76,6 @@ if (UMPIRE_ENABLE_CUDA)
       set (CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -mno-float128")
     endif ()
   endif ()
-endif()
-
-if (UMPIRE_ENABLE_SYCL)
-   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
-   endif()
 endif()
 
 set(BLT_EXPORT_THIRDPARTY ON CACHE BOOL "")

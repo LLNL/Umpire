@@ -30,6 +30,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Fix warning caused by ignoring posix_memalign return value.
 
+- Use C++17 for SYCL backend.
+
 ## [v6.0.0 - 2021-08-18]
 
 ### Added
