@@ -95,6 +95,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - `umpire::mark_event()` to mark an event during Umpire lifecycle
 
+- Benchmark for measuring performance of the Device Allocator.
+
 - Asynchronous memset and reallocate operations for CUDA and HIP.
 
 - Added support for named allocations.
