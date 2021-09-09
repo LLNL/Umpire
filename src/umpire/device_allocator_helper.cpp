@@ -26,10 +26,38 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 //////////////////////////////////////////////////////////////////////////
 __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
-  int index = find_device_allocator_ID(name);
+#if !defined(__CUDA_ARCH__)
+  int index{-1};
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
+    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
+      index = i;
+    }
+  }
+#else
+  int index{-1};
+  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
+    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
+    int curr = 0;
+    int tally = 0;
+    do {
+      if (temp[curr] == 0) {
+        break;
+      }
+      if (temp[curr] != name[curr]) {
+        tally++;
+      }
+    } while (name[curr++] != 0);
+    if (tally == 0) {
+      index = i;
+      break;
+    }
+  }
+#endif
+
   if (index == -1) {
     UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
   }
+
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[index];
 #else
@@ -50,36 +78,6 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
   return UMPIRE_DEV_ALLOCS_h[id];
 #else
   return UMPIRE_DEV_ALLOCS[id];
-#endif
-}
-
-__host__ __device__ int find_device_allocator_ID(const char* name)
-{
-#if !defined(__CUDA_ARCH__)
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
-    if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
-      return i;
-    }
-  }
-  return -1;
-#else
-  for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
-    const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
-    int index = 0;
-    int tally = 0;
-    do {
-      if (temp[index] == 0) {
-        break;
-      }
-      if (temp[index] != name[index]) {
-        tally++;
-      }
-    } while (name[index++] != 0);
-    if (tally == 0) {
-      return i;
-    }
-  }
-  return -1;
 #endif
 }
 

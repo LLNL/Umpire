@@ -39,11 +39,6 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id);
  */
 __host__ __device__ bool is_device_allocator(int id);
 
-/*
- * Given a name, find the corresponding ID, if it exists.
- */
-__host__ __device__ int find_device_allocator_ID(const char* name);
-
 /*!
  * \brief Construct a new DeviceAllocator. Calls the private Device
  * Allocator constructor that records the associated id.
