@@ -27,6 +27,7 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
+
 #include "umpire/device_allocator_helper.hpp"
 #endif
 
