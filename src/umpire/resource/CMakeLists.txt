@@ -16,7 +16,7 @@ set (umpire_resource_headers
   NullMemoryResourceFactory.hpp
 )
 
-if(ENABLE_DEVELOPER_BENCHMARKS)
+if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     NoOpMemoryResource.hpp
@@ -24,7 +24,7 @@ if(ENABLE_DEVELOPER_BENCHMARKS)
   )
 endif()
 
-if(ENABLE_FILE_RESOURCE)
+if(UMPIRE_ENABLE_FILE_RESOURCE)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     FileMemoryResource.hpp
@@ -40,7 +40,7 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
-if(ENABLE_DEVELOPER_BENCHMARKS)
+if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_sources
     ${umpire_resource_sources}
     NoOpMemoryResource.cpp
@@ -48,7 +48,7 @@ if(ENABLE_DEVELOPER_BENCHMARKS)
   )
 endif()
 
-if(ENABLE_FILE_RESOURCE)
+if(UMPIRE_ENABLE_FILE_RESOURCE)
   set (umpire_resource_sources
     ${umpire_resource_sources}
     FileMemoryResource.cpp
@@ -59,7 +59,7 @@ endif()
 set(umpire_resource_depends
   camp)
 
-if(ENABLE_IPC_SHARED_MEMORY)
+if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     HostSharedMemoryResource.hpp
@@ -74,7 +74,7 @@ if(ENABLE_IPC_SHARED_MEMORY)
   )
 endif()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     CudaDeviceMemoryResource.hpp
@@ -90,7 +90,7 @@ if (ENABLE_CUDA)
     CudaPinnedMemoryResourceFactory.cpp
     CudaUnifiedMemoryResourceFactory.cpp)
 
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers
       ${umpire_resource_headers}
       CudaConstantMemoryResource.hpp
@@ -107,7 +107,7 @@ if (ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     HipDeviceMemoryResource.hpp
@@ -126,7 +126,7 @@ if (ENABLE_HIP)
     ${umpire_resource_depends}
     hip_runtime)
 
-  if (ENABLE_DEVICE_CONST)
+  if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers
       ${umpire_resource_headers}
       HipConstantMemoryResourceFactory.hpp
@@ -139,7 +139,7 @@ if (ENABLE_HIP)
   endif ()
 endif ()
 
-if (ENABLE_SYCL)
+if (UMPIRE_ENABLE_SYCL)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     SyclDeviceMemoryResource.hpp
@@ -160,7 +160,7 @@ if (ENABLE_SYCL)
     ${umpire_resource_depends})
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_resource_headers
     ${umpire_resource_headers}
     OpenMPTargetMemoryResourceFactory.hpp)

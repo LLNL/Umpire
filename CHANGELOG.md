@@ -14,11 +14,27 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Set property CUDA_RESOLVE_DEVICE_SYMBOLS on Umpire library.
 
+- Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking
+  change since the include paths are different. 
+
+- Build Doxygen documentation on ReadTheDocs.
+
+- Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
+  on the corresponding BLT options. 
+
 ### Removed
+
+- Remove deprecated registerAllocator and isAllocatorRegistered methods.
 
 - Removed unneeded hip dependency in the tests/debug/ CMake file.
 
+- Removed hardcoded `-Xcompiler -mno-float128` for GCC 8+ with CUDA on PowerPC.
+
 ### Fixed
+
+- Fix warning caused by ignoring posix_memalign return value.
+
+- Use C++17 for SYCL backend.
 
 ## [v6.0.0 - 2021-08-18]
 

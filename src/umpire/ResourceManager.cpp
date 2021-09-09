@@ -257,11 +257,6 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
   m_default_allocator = allocator.getAllocationStrategy();
 }
 
-void ResourceManager::registerAllocator(const std::string& name, Allocator allocator)
-{
-  addAlias(name, allocator);
-}
-
 void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
@@ -344,11 +339,6 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
   UMPIRE_LOG(Debug, "(Returning allocation record for ptr = " << ptr << ")");
 
   return alloc_record;
-}
-
-bool ResourceManager::isAllocatorRegistered(const std::string& name)
-{
-  return isAllocator(name);
 }
 
 void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
