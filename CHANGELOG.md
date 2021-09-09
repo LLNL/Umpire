@@ -26,6 +26,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Removed unneeded hip dependency in the tests/debug/ CMake file.
 
+- Removed hardcoded `-Xcompiler -mno-float128` for GCC 8+ with CUDA on PowerPC.
+
 ### Fixed
 
 - Fix warning caused by ignoring posix_memalign return value.
