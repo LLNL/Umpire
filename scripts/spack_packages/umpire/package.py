@@ -178,6 +178,9 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             if self.spec_uses_toolchain(self.spec):
                 cuda_flags.append("-Xcompiler {}".format(self.spec_uses_toolchain(self.spec)[0]))
 
+            if (spec.satisfies('%gcc@8.1: target=ppc64le')):
+                cuda_flags.append('-Xcompiler -mno-float128')
+
             entries.append(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
         entries.append(cmake_cache_option("ENABLE_HIP", "+rocm" in spec))
