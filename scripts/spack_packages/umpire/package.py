@@ -15,7 +15,7 @@ from os.path import join as pjoin
 import re
 
 
-class Umpire(CachedCMakePackage, CudaPackage):
+class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     """An application-focused API for memory management on NUMA & GPU
     architectures"""
 
@@ -23,7 +23,7 @@ class Umpire(CachedCMakePackage, CudaPackage):
     git      = 'https://github.com/LLNL/Umpire.git'
 
     version('develop', branch='develop', submodules='True')
-    version('master', branch='main', submodules='True')
+    version('main', branch='main', submodules='True')
     version('3.0.0', tag='v3.0.0', submodules='True')
     version('2.1.0', tag='v2.1.0', submodules='True')
     version('2.0.0', tag='v2.0.0', submodules='True')
@@ -60,25 +60,39 @@ class Umpire(CachedCMakePackage, CudaPackage):
             multi=False, description='Tests to run')
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
-    variant('hip', default=False, description='Build with HIP support')
     variant('tools', default=True, description='Enable tools')
     variant('dev_benchmarks', default=False, description='Enable Developer Benchmarks')
     variant('werror', default=True, description='Enable warnings as errors')
     variant('asan', default=False, description='Enable ASAN')
     variant('sanitizer_tests', default=False, description='Enable address sanitizer tests')
 
-    depends_on('cmake@3.8:', type='build')
-    depends_on('cmake@3.9:', when='+cuda', type='build')
+    depends_on('cmake@3.14:', type='build')
     depends_on('mpi', when='+mpi')
-    depends_on('hip', when='+hip')
+
+    depends_on('blt@0.4.1', type='build', when='@main')
+    depends_on('blt@0.4.1:', type='build')
+
+    # variants +rocm and amdgpu_targets are not automatically passed to
+    # dependencies, so do it manually.
+    depends_on('camp+rocm', when='+rocm')
+    for val in ROCmPackage.amdgpu_targets:
+        depends_on('camp amdgpu_target=%s' % val, when='amdgpu_target=%s' % val)
+
+    depends_on('camp+cuda', when='+cuda')
+    for sm_ in CudaPackage.cuda_arch_values:
+        depends_on('camp cuda_arch={0}'.format(sm_),
+                   when='cuda_arch={0}'.format(sm_))
+
+    depends_on('camp@0.1.0', when='@main')
+    depends_on('camp@master')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
     conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
-    conflicts('+cuda', when='+hip')
-    conflicts('+openmp', when='+hip')
-    conflicts('+openmp_target', when='+hip')
-    conflicts('+deviceconst', when='~hip~cuda')
+    conflicts('+cuda', when='+rocm')
+    conflicts('+openmp', when='+rocm')
+    conflicts('+openmp_target', when='+rocm')
+    conflicts('+deviceconst', when='~rocm~cuda')
     conflicts('~mpi', when='+ipc_shmem', msg='Shared Memory Allocator requires MPI')
     conflicts('+ipc_shmem', when='@:5.0.1')
     conflicts('+sanitizer_tests', when='~asan')
@@ -122,7 +136,7 @@ class Umpire(CachedCMakePackage, CudaPackage):
 
         entries.append(cmake_cache_option("ENABLE_FORTRAN", 
             ('+fortran' in spec) and (self.compiler.fc is not None)))
-        entries.append(cmake_cache_option("ENABLE_C", '+c' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_C", '+c' in spec))
         
         fortran_compilers = ["gfortran", "xlf"]
         if any(compiler in self.compiler.fc for compiler in fortran_compilers) and ("clang" in self.compiler.cxx):
@@ -164,10 +178,13 @@ class Umpire(CachedCMakePackage, CudaPackage):
             if self.spec_uses_toolchain(self.spec):
                 cuda_flags.append("-Xcompiler {}".format(self.spec_uses_toolchain(self.spec)[0]))
 
+            if (spec.satisfies('%gcc@8.1: target=ppc64le')):
+                cuda_flags.append('-Xcompiler -mno-float128')
+
             entries.append(cmake_cache_string("CMAKE_CUDA_FLAGS",  ' '.join(cuda_flags)))
 
-        entries.append(cmake_cache_option("ENABLE_HIP", "+hip" in spec))
-        if "+hip" in spec:
+        entries.append(cmake_cache_option("ENABLE_HIP", "+rocm" in spec))
+        if "+rocm" in spec:
             hip_root = spec['hip'].prefix
             rocm_root = hip_root + "/.."
             entries.append(cmake_cache_path("HIP_ROOT_DIR",
@@ -187,9 +204,9 @@ class Umpire(CachedCMakePackage, CudaPackage):
             else:
                 entries.append(cmake_cache_string("CMAKE_EXE_LINKER_FLAGS", hip_link_flags))
 
-        entries.append(cmake_cache_option("ENABLE_DEVICE_CONST", "+deviceconst" in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_DEVICE_CONST", "+deviceconst" in spec))
 
-        entries.append(cmake_cache_option("ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_OPENMP_TARGET", "+openmp_target" in spec))
         if "+openmp_target" in spec:
             if ('%xl' in spec):
                 entries.append(cmake_cache_string("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
@@ -210,17 +227,19 @@ class Umpire(CachedCMakePackage, CudaPackage):
         spec = self.spec
         entries = []
 
+        entries.append(cmake_cache_path("BLT_SOURCE_DIR", spec['blt'].prefix))
+        entries.append(cmake_cache_path("camp_DIR" ,spec['camp'].prefix))
         entries.append(cmake_cache_string("CMAKE_BUILD_TYPE", spec.variants['build_type'].value))
         entries.append(cmake_cache_option("ENABLE_BENCHMARKS", 'tests=benchmarks' in spec or '+dev_benchmarks' in spec))
-        entries.append(cmake_cache_option("ENABLE_DEVELOPER_BENCHMARKS", '+dev_benchmarks' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_DEVELOPER_BENCHMARKS", '+dev_benchmarks' in spec))
         entries.append(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
-        entries.append(cmake_cache_option("ENABLE_TOOLS", '+tools' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", '+tools' in spec))
         entries.append(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
-        entries.append(cmake_cache_option("ENABLE_ASAN", '+asan' in spec))
-        entries.append(cmake_cache_option("ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_ASAN", '+asan' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_SANITIZER_TESTS", '+sanitizer_tests' in spec))
         entries.append(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         entries.append(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
-        entries.append(cmake_cache_option("ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
         
         return entries
 

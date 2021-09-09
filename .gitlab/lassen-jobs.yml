@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -68,6 +68,11 @@ ibm_clang_9_gcc_8_cuda:
     SPEC: "+fortran+cuda %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
+clang_10_0_1_cuda_mpi_shmem:
+  variables:
+    SPEC: "%clang@10.0.1ibm +cuda +ipc_shmem +mpi ^spectrum-mpi ^cuda@10.1.168"
+  extends: .build_and_test_on_lassen
+
 gcc_8_3_1_cuda:
   variables:
     SPEC: "+fortran+cuda %gcc@8.3.1 ^cuda@10.1.168"
@@ -78,17 +83,17 @@ pgi_19_10_cuda:
     SPEC: "+fortran+cuda %pgi@19.10 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
-pgi_19_10_gcc_8_3_1_cuda:
-  variables:
-    SPEC: "+fortran+cuda %pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
-  allow_failure: true
-  extends: .build_and_test_on_lassen
+# pgi_19_10_gcc_8_3_1_cuda:
+#   variables:
+#     SPEC: "+fortran+cuda %pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
+#   allow_failure: true
+#   extends: .build_and_test_on_lassen
 
-pgi_20_4_gcc_8_3_1_cuda_11:
-  variables:
-    SPEC: "+fortran+cuda %pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
-  allow_failure: true
-  extends: .build_and_test_on_lassen
+# pgi_20_4_gcc_8_3_1_cuda_11:
+#   variables:
+#     SPEC: "+fortran+cuda %pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
+#   allow_failure: true
+#   extends: .build_and_test_on_lassen
 
 xl_16_1_1_7_cuda:
   variables:
@@ -97,8 +102,7 @@ xl_16_1_1_7_cuda:
 
 xl_16_1_1_7_gcc_8_3_1_cuda_11:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.7 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
-  allow_failure: true
+    SPEC: "+fortran+cuda tests=none %xl@16.1.1.7 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
   extends: .build_and_test_on_lassen
 
 # EXTRAS
@@ -114,11 +118,11 @@ clang_9_0_0_memleak (build and test on lassen):
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 
-clang_9_0_0_datarace (build and test on lassen):
-  variables:
-    SPEC: "%clang@9.0.0 cxxflags=-fsanitize=thread"
-  allow_failure: true
-  extends: .build_and_test_on_lassen
+# clang_9_0_0_datarace (build and test on lassen):
+#   variables:
+#     SPEC: "%clang@9.0.0 cxxflags=-fsanitize=thread"
+#   allow_failure: true
+#   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_dev_benchmarks:
   variables:
@@ -133,4 +137,21 @@ xl_default_omp_target (build and test on lassen):
 gcc_8_3_1_numa:
   variables:
     SPEC: "+fortran+numa%gcc@8.3.1"
+  extends: .build_and_test_on_lassen
+
+# Develop/main builds against specific tpl versions
+
+gcc_8_3_1_tpls:
+  variables:
+    SPEC: "+fortran%gcc@8.3.1 ^blt@develop"
+  extends: .build_and_test_on_lassen
+
+ibm_clang_9_gcc_8_cuda_tpls:
+  variables:
+    SPEC: "+fortran+cuda %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
+  extends: .build_and_test_on_lassen
+
+xl_16_1_1_7_cuda_tpls:
+  variables:
+    SPEC: "+fortran+cuda %xl@16.1.1.7 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen

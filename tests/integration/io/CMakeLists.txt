@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -43,13 +43,13 @@ endif ()
 
 set (log_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (log_depends
     ${log_depends}
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (log_depends
     ${log_depends}
     openmp)

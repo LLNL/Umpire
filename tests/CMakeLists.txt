@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -9,7 +9,7 @@ add_subdirectory(unit)
 add_subdirectory(integration)
 add_subdirectory(tools)
 add_subdirectory(debug)
-if (ENABLE_DEVELOPER_DEFAULTS)
+if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
     add_subdirectory(applications)
 endif()
 

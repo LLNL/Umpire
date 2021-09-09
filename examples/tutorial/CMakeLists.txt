@@ -1,18 +1,18 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (tutorial_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (tutorial_depends
       ${tutorial_depends}
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (tutorial_depends
     ${tutorial_depends}
     openmp)
@@ -84,11 +84,11 @@ blt_add_executable(
   DEPENDS_ON ${tutorial_depends})
 list(APPEND umpire_tutorials tut_replay)
 
-if (ENABLE_C)
+if (UMPIRE_ENABLE_C)
   add_subdirectory(c)
 endif ()
 
-if (ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_FORTRAN)
   add_subdirectory(fortran)
 endif ()
 

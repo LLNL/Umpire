@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -124,20 +124,6 @@ class ResourceManager {
   Allocator makeResource(const std::string& name, MemoryResourceTraits traits);
 
   /*!
-   * \brief Register an Allocator with the ResourceManager.
-   *
-   * After registration, the Allocator can be retrieved by calling
-   * getAllocator(name).
-   *
-   * The same Allocator can be registered under multiple names.
-   *
-   * \param name Name to register Allocator with.
-   * \param allocator Allocator to register.
-   */
-  UMPIRE_DEPRECATE("addAlias should be used instead")
-  void registerAllocator(const std::string& name, Allocator allocator);
-
-  /*!
    * \brief Add an Allocator alias.
    *
    * After this call, allocator can be retrieved by calling getAllocator(name).
@@ -201,13 +187,6 @@ class ResourceManager {
    * \return the record if found, or throws an exception if not found.
    */
   const util::AllocationRecord* findAllocationRecord(void* ptr) const;
-
-  /*!
-   * \brief Check whether the named Allocator exists.
-   *
-   */
-  UMPIRE_DEPRECATE("Use isAllocator instead.")
-  bool isAllocatorRegistered(const std::string& name);
 
   /*!
    * \brief Copy size bytes of data from src_ptr to dst_ptr.
