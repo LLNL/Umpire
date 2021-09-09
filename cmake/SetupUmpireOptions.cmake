@@ -4,6 +4,16 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+
+option(UMPIRE_ENABLE_DEVELOPER_DEFAULTS "Enable default options for Umpire developers" Off)
+option(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS "Enable benchmarks for Umpire developers" Off)
+mark_as_advanced(UMPIRE_ENABLE_DEVELOPER_DEFAULTS UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
+
+if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
+  set(ENABLE_WARNINGS_AS_ERRORS On CACHE BOOL "")
+  set(UMPIRE_ENABLE_TOOLS On CACHE BOOL "")
+endif ()
+
 if(WIN32 OR APPLE)
   set(UMPIRE_ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
@@ -25,3 +35,10 @@ option(UMPIRE_ENABLE_DEVICE_CONST "Enable constant memory on GPUs" Off)
 option(UMPIRE_ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off)
 option(UMPIRE_ENABLE_ASAN "Enable use with address sanitizer tools" Off)
 option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
+
+if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
+  set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
+endif()
+
+set(ENABLE_CUDA Off CACHE BOOL "")
+set(ENABLE_GMOCK On CACHE BOOL "")
