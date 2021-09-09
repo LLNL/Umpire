@@ -77,8 +77,5 @@ int main(int argc, char const* argv[])
   resource.get_event().wait();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
-  // Tear down and deallocate memory.
-  umpire::destroyDeviceAllocator();
-
   return 0;
 }

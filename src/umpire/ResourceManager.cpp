@@ -27,6 +27,7 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
+#include "umpire/device_allocator_helper.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -77,6 +78,11 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
+#if defined(UMPIRE_ENABLE_CUDA)
+  // Tear down and deallocate memory.
+  umpire::destroyDeviceAllocator();
+#endif
+
   for (auto&& allocator : m_allocators) {
     if (allocator->getCurrentSize() != 0) {
       std::stringstream ss;

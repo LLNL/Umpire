@@ -42,7 +42,7 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(int id)
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
     UMPIRE_ERROR("Invalid ID given.");
   }
-  if (!deviceAllocatorExists(id)) {
+  if (!isDeviceAllocator(id)) {
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
   }
 
