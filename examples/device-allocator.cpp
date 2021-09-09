@@ -24,7 +24,7 @@ __global__ void my_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
     // _sphinx_tag_get_dev_allocator_id_start
-    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator(0);
+    umpire::DeviceAllocator alloc = umpire::get_device_allocator(0);
     // _sphinx_tag_get_dev_allocator_id_end
     double* data = static_cast<double*>(alloc.allocate(10 * sizeof(double)));
     *data_ptr = data;
@@ -36,7 +36,7 @@ __global__ void my_other_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
     // _sphinx_tag_get_dev_allocator_name_start
-    umpire::DeviceAllocator alloc = umpire::getDeviceAllocator("my_other_device_alloc");
+    umpire::DeviceAllocator alloc = umpire::get_device_allocator("my_other_device_alloc");
     // _sphinx_tag_get_dev_allocator_name_end
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
@@ -52,13 +52,13 @@ int main(int argc, char const* argv[])
   // Create all of my allocators
   auto allocator = rm.getAllocator("UM");
   // _sphinx_tag_make_dev_allocator_start
-  auto device_allocator = umpire::makeDeviceAllocator(allocator, 1024, "my_device_alloc");
-  auto device_allocator2 = umpire::makeDeviceAllocator(allocator, 512, "my_other_device_alloc");
+  auto device_allocator = umpire::make_device_allocator(allocator, 1024, "my_device_alloc");
+  auto device_allocator2 = umpire::make_device_allocator(allocator, 512, "my_other_device_alloc");
   // _sphinx_tag_make_dev_allocator_end
 
   // Checking that now a DeviceAllocator exists
-  int id_found = umpire::findDeviceAllocatorID("my_device_alloc");
-  if (umpire::isDeviceAllocator(id_found)) {
+  int id_found = umpire::find_device_allocator_ID("my_device_alloc");
+  if (umpire::is_device_allocator(id_found)) {
     std::cout << "I found a DeviceAllocator with ID: " << id_found << std::endl;
   }
 

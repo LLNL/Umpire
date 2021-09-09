@@ -80,7 +80,7 @@ ResourceManager::~ResourceManager()
 {
 #if defined(UMPIRE_ENABLE_CUDA)
   // Tear down and deallocate memory.
-  umpire::destroyDeviceAllocator();
+  umpire::destroy_device_allocator();
 #endif
 
   for (auto&& allocator : m_allocators) {

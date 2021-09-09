@@ -24,9 +24,9 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 //////////////////////////////////////////////////////////////////////////
 // host/device functions
 //////////////////////////////////////////////////////////////////////////
-__host__ __device__ DeviceAllocator getDeviceAllocator(const char* name)
+__host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
-  int index = findDeviceAllocatorID(name);
+  int index = find_device_allocator_ID(name);
   if (index == -1) {
     UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
   }
@@ -37,12 +37,12 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(const char* name)
 #endif
 }
 
-__host__ __device__ DeviceAllocator getDeviceAllocator(int id)
+__host__ __device__ DeviceAllocator get_device_allocator(int id)
 {
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
     UMPIRE_ERROR("Invalid ID given.");
   }
-  if (!isDeviceAllocator(id)) {
+  if (!is_device_allocator(id)) {
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
   }
 
@@ -53,7 +53,7 @@ __host__ __device__ DeviceAllocator getDeviceAllocator(int id)
 #endif
 }
 
-__host__ __device__ int findDeviceAllocatorID(const char* name)
+__host__ __device__ int find_device_allocator_ID(const char* name)
 {
 #if !defined(__CUDA_ARCH__)
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
@@ -83,7 +83,7 @@ __host__ __device__ int findDeviceAllocatorID(const char* name)
 #endif
 }
 
-__host__ __device__ bool isDeviceAllocator(int id)
+__host__ __device__ bool is_device_allocator(int id)
 {
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
     UMPIRE_ERROR("Invalid ID given.");
@@ -99,7 +99,7 @@ __host__ __device__ bool isDeviceAllocator(int id)
 //////////////////////////////////////////////////////////////////////////
 // host functions
 //////////////////////////////////////////////////////////////////////////
-__host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, const char* name)
+__host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const char* name)
 {
   static size_t allocator_id{0};
   auto dev_alloc = DeviceAllocator(allocator, size, name, allocator_id);
@@ -115,7 +115,7 @@ __host__ DeviceAllocator makeDeviceAllocator(Allocator allocator, size_t size, c
   return dev_alloc;
 }
 
-__host__ void destroyDeviceAllocator()
+__host__ void destroy_device_allocator()
 {
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (UMPIRE_DEV_ALLOCS_h[i].isInitialized()) {
