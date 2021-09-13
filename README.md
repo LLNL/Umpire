@@ -30,9 +30,9 @@ For more advanced configuration you can use standard CMake variables.
 
 Both user and code documentation is available [here](http://umpire.readthedocs.io/).
 
-The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/tutorial.html) provides a step by step introduction to Umpire features.
+The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/sphinx/tutorial.html) provides a step by step introduction to Umpire features.
 
-If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
+If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/sphinx/advanced_configuration.html) too!
 
 # Getting Involved
 
