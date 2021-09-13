@@ -26,15 +26,14 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 //////////////////////////////////////////////////////////////////////////
 __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
-#if !defined(__CUDA_ARCH__)
   int index{-1};
+#if !defined(__CUDA_ARCH__)
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
       index = i;
     }
   }
 #else
-  int index{-1};
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
     int curr = 0;
