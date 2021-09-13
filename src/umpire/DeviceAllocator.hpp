@@ -71,6 +71,13 @@ class DeviceAllocator {
    */
   __host__ __device__ bool isInitialized();
 
+ /*
+  * \brief Reset the DeviceAllocator counter pointer back to original
+  *  starting point. This will effectively allow the DeviceAllocator to
+  *  start overwritting old data.
+  */
+  __host__ __device__ void reset();
+
  private:
   umpire::Allocator m_allocator;
 
