@@ -16,7 +16,7 @@
 
 namespace umpire {
 
-__host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, const std::string old_name, size_t id)
+__host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, const std::string& old_name, size_t id)
     : m_allocator(allocator),
       m_id(id),
       m_ptr(static_cast<char*>(m_allocator.allocate(size))),

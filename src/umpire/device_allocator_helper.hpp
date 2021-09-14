@@ -17,7 +17,7 @@ namespace umpire {
  * Const variable for the limit of unique DeviceAllocator
  * objects available at once.
  */
-extern __managed__ int UMPIRE_TOTAL_DEV_ALLOCS;
+constexpr int UMPIRE_TOTAL_DEV_ALLOCS{64};
 
 /*
  * Global arrays for both host and device which hold the

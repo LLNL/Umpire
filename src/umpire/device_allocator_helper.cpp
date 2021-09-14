@@ -16,8 +16,6 @@ namespace umpire {
 //////////////////////////////////////////////////////////////////////////
 // Global variables for host and device
 //////////////////////////////////////////////////////////////////////////
-__managed__ int UMPIRE_TOTAL_DEV_ALLOCS{10};
-
 DeviceAllocator* UMPIRE_DEV_ALLOCS_h{nullptr};
 __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 
