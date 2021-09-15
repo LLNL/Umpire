@@ -94,7 +94,7 @@ __host__ __device__ bool is_device_allocator(int id)
 //////////////////////////////////////////////////////////////////////////
 // host functions
 //////////////////////////////////////////////////////////////////////////
-__host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string name)
+__host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
   static size_t allocator_id{0};
   auto dev_alloc = DeviceAllocator(allocator, size, name, allocator_id);
