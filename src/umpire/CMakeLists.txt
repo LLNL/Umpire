@@ -35,17 +35,40 @@ set (umpire_sources
   Umpire.cpp)
 
 if (UMPIRE_ENABLE_CUDA)
-  set(umpire_headers
-    ${umpire_headers}
-    DeviceAllocator.hpp)
+  set(umpire_device_headers
+    DeviceAllocator.hpp
+    device_allocator_helper.hpp)
 
-  set(umpire_sources
-    ${umpire_sources}
-    DeviceAllocator.cpp)
+  set(umpire_device_sources
+    DeviceAllocator.cpp
+    device_allocator_helper.cpp)
 
   set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+  set_source_files_properties(device_allocator_helper.cpp
+                              PROPERTIES
+                              LANGUAGE CUDA)
+
+  set(umpire_device_depends camp cuda)
+
+  blt_add_library(
+    NAME umpire_device
+    HEADERS ${umpire_device_headers}
+    SOURCES ${umpire_device_sources}
+    DEPENDS_ON ${umpire_device_depends}
+    OBJECT TRUE)
+
+  target_include_directories(
+    umpire_device
+    PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+  set_target_properties(umpire_device PROPERTIES
+    CUDA_SEPARABLE_COMPILATION On)
+
 endif()
 
 set (umpire_depends
@@ -64,7 +87,7 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
-blt_list_append( TO umpire_depends ELEMENTS cuda IF UMPIRE_ENABLE_CUDA )
+blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_CUDA)
 
 set (umpire_defines)
 
