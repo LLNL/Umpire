@@ -30,10 +30,8 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
   rm.memset(m_counter, 0);
 
   //convert the string name to a char name
-  char name[old_name.length()];
-  strcpy(name, old_name.c_str());
-
-  memset(m_name, '\0', strlen(name) + 1);
+  const char* name = old_name.c_str();
+  memset(m_name, '\0', old_name.length() + 1);
   int i = 0;
   do {
     m_name[i] = name[i];
