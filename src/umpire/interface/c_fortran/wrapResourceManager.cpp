@@ -372,34 +372,6 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_prefetcher(
     // splicer end class.ResourceManager.method.make_allocator_bufferify_prefetcher
 }
 
-void umpire_resourcemanager_register_allocator(
-    umpire_resourcemanager * self, const char * name,
-    umpire_allocator allocator)
-{
-    umpire::ResourceManager *SH_this =
-        static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.register_allocator
-    const std::string SHCXX_name(name);
-    umpire::Allocator * SHCXX_allocator =
-        static_cast<umpire::Allocator *>(allocator.addr);
-    SH_this->addAlias(SHCXX_name, *SHCXX_allocator);
-    // splicer end class.ResourceManager.method.register_allocator
-}
-
-void umpire_resourcemanager_register_allocator_bufferify(
-    umpire_resourcemanager * self, const char * name, int Lname,
-    umpire_allocator allocator)
-{
-    umpire::ResourceManager *SH_this =
-        static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.register_allocator_bufferify
-    const std::string SHCXX_name(name, Lname);
-    umpire::Allocator * SHCXX_allocator =
-        static_cast<umpire::Allocator *>(allocator.addr);
-    SH_this->addAlias(SHCXX_name, *SHCXX_allocator);
-    // splicer end class.ResourceManager.method.register_allocator_bufferify
-}
-
 void umpire_resourcemanager_add_alias(umpire_resourcemanager * self,
     const char * name, umpire_allocator allocator)
 {

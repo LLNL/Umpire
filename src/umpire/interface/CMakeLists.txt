@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+
 add_shroud(
   YAML_INPUT_FILE umpire_shroud.yaml
   YAML_OUTPUT_DIR yaml

@@ -112,14 +112,6 @@ umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_prefetcher(
     umpire_allocator allocator, int device_id,
     umpire_allocator * SHC_rv);
 
-void umpire_resourcemanager_register_allocator(
-    umpire_resourcemanager * self, const char * name,
-    umpire_allocator allocator);
-
-void umpire_resourcemanager_register_allocator_bufferify(
-    umpire_resourcemanager * self, const char * name, int Lname,
-    umpire_allocator allocator);
-
 void umpire_resourcemanager_add_alias(umpire_resourcemanager * self,
     const char * name, umpire_allocator allocator);
 

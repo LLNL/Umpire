@@ -10,13 +10,34 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Added a getDeviceAllocator function that allows users to get a DeviceAllocator object
+  from the kernel without explicitly passing the allocator to the kernel first.
+
 ### Changed
+
+- Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking
+  change since the include paths are different. 
+
+- Build Doxygen documentation on ReadTheDocs.
+
+- Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
+  on the corresponding BLT options. 
 
 ### Removed
 
 - Removed deprecated DynamicPoolMap and DynamicPool alias.
 
+- Remove deprecated registerAllocator and isAllocatorRegistered methods.
+
+- Removed unneeded hip dependency in the tests/debug/ CMake file.
+
+- Removed hardcoded `-Xcompiler -mno-float128` for GCC 8+ with CUDA on PowerPC.
+
 ### Fixed
+
+- Fix warning caused by ignoring posix_memalign return value.
+
+- Use C++17 for SYCL backend.
 
 ## [v6.0.0 - 2021-08-18]
 
@@ -78,6 +99,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   value of `getActualSize`.
 
 - `umpire::mark_event()` to mark an event during Umpire lifecycle
+
+- Benchmark for measuring performance of the Device Allocator.
 
 - Asynchronous memset and reallocate operations for CUDA and HIP.
 

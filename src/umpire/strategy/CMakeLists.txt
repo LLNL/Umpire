@@ -23,7 +23,7 @@ set (umpire_strategy_headers
   StdAllocator.hpp
   ThreadSafeAllocator.hpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_headers
     ${umpire_strategy_headers}
     NumaPolicy.hpp)
@@ -53,7 +53,7 @@ set (umpire_strategy_sources
   SlotPool.cpp
   ThreadSafeAllocator.cpp)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   set (umpire_strategy_sources
     ${umpire_strategy_sources}
     NumaPolicy.cpp)
@@ -61,19 +61,19 @@ endif ()
 
 set(umpire_strategy_depends camp)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set(umpire_strategy_depends
     ${umpire_strategy_depends}
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set(umpire_strategy_depends
     ${umpire_strategy_depends}
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set( umpire_strategy_depends
     ${umpire_strategy_depends}
     openmp)

@@ -159,7 +159,6 @@ module umpire_mod
         procedure :: make_allocator_thread_safe => resourcemanager_make_allocator_thread_safe
         procedure :: make_allocator_fixed_pool => resourcemanager_make_allocator_fixed_pool
         procedure :: make_allocator_prefetcher => resourcemanager_make_allocator_prefetcher
-        procedure :: register_allocator => resourcemanager_register_allocator
         procedure :: add_alias => resourcemanager_add_alias
         procedure :: remove_alias => resourcemanager_remove_alias
         procedure :: get_allocator_for_ptr => resourcemanager_get_allocator_for_ptr
@@ -589,29 +588,6 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_make_allocator_bufferify_prefetcher
-
-        subroutine c_resourcemanager_register_allocator(self, name, &
-                allocator) &
-                bind(C, name="umpire_resourcemanager_register_allocator")
-            use iso_c_binding, only : C_CHAR
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
-            implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
-            character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-        end subroutine c_resourcemanager_register_allocator
-
-        subroutine c_resourcemanager_register_allocator_bufferify(self, &
-                name, Lname, allocator) &
-                bind(C, name="umpire_resourcemanager_register_allocator_bufferify")
-            use iso_c_binding, only : C_CHAR, C_INT
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
-            implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
-            character(kind=C_CHAR), intent(IN) :: name(*)
-            integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-        end subroutine c_resourcemanager_register_allocator_bufferify
 
         subroutine c_resourcemanager_add_alias(self, name, allocator) &
                 bind(C, name="umpire_resourcemanager_add_alias")
@@ -1813,17 +1789,6 @@ contains
             device_id, SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.make_allocator_prefetcher
     end function resourcemanager_make_allocator_prefetcher
-
-    subroutine resourcemanager_register_allocator(obj, name, allocator)
-        use iso_c_binding, only : C_INT
-        class(UmpireResourceManager) :: obj
-        character(len=*), intent(IN) :: name
-        type(UmpireAllocator), value, intent(IN) :: allocator
-        ! splicer begin class.ResourceManager.method.register_allocator
-        call c_resourcemanager_register_allocator_bufferify(obj%cxxmem, &
-            name, len_trim(name, kind=C_INT), allocator%cxxmem)
-        ! splicer end class.ResourceManager.method.register_allocator
-    end subroutine resourcemanager_register_allocator
 
     subroutine resourcemanager_add_alias(obj, name, allocator)
         use iso_c_binding, only : C_INT
