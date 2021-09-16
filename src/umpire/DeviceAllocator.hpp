@@ -76,7 +76,7 @@ class DeviceAllocator {
   *  starting point. This will effectively allow the DeviceAllocator to
   *  start overwritting old data.
   */
-  __host__ __device__ void reset();
+  __host__ void reset();
 
  private:
   umpire::Allocator m_allocator;
