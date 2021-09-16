@@ -98,11 +98,11 @@ __host__ __device__ bool DeviceAllocator::isInitialized()
   return false;
 }
 
-__host__ void DeviceAllocator::reset()
+__device__ void DeviceAllocator::reset()
 {
   // Set m_counter back to zero
-  auto& rm = umpire::ResourceManager::getInstance();
-  rm.memset(m_counter, 0);
+  *m_counter = (unsigned int)m_size;
+  atomicCAS(m_counter, (unsigned int)m_size, 0);
 }
 
 } // end of namespace umpire
