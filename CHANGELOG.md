@@ -13,6 +13,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Added a getDeviceAllocator function that allows users to get a DeviceAllocator object
   from the kernel without explicitly passing the allocator to the kernel first.
 
+- Added a reset function to the DeviceAllocator so that old data can be rewritten.
+
 ### Changed
 
 - Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking
