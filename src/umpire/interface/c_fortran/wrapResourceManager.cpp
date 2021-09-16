@@ -12,7 +12,6 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationPrefetcher.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/QuickPool.hpp"
@@ -83,48 +82,6 @@ umpire_allocator * umpire_resourcemanager_get_allocator_by_id(
     SHC_rv->idtor = 1;
     return SHC_rv;
     // splicer end class.ResourceManager.method.get_allocator_by_id
-}
-
-umpire_allocator * umpire_resourcemanager_make_allocator_pool(
-    umpire_resourcemanager * self, const char * name,
-    umpire_allocator allocator, size_t initial_size, size_t block,
-    umpire_allocator * SHC_rv)
-{
-    umpire::ResourceManager *SH_this =
-        static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.make_allocator_pool
-    const std::string SHCXX_name(name);
-    umpire::Allocator * SHCXX_allocator =
-        static_cast<umpire::Allocator *>(allocator.addr);
-    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv =
-        SH_this->makeAllocator<umpire::strategy::DynamicPoolMap>(
-        SHCXX_name, *SHCXX_allocator, initial_size, block);
-    SHC_rv->addr = SHCXX_rv;
-    SHC_rv->idtor = 1;
-    return SHC_rv;
-    // splicer end class.ResourceManager.method.make_allocator_pool
-}
-
-umpire_allocator * umpire_resourcemanager_make_allocator_bufferify_pool(
-    umpire_resourcemanager * self, const char * name, int Lname,
-    umpire_allocator allocator, size_t initial_size, size_t block,
-    umpire_allocator * SHC_rv)
-{
-    umpire::ResourceManager *SH_this =
-        static_cast<umpire::ResourceManager *>(self->addr);
-    // splicer begin class.ResourceManager.method.make_allocator_bufferify_pool
-    const std::string SHCXX_name(name, Lname);
-    umpire::Allocator * SHCXX_allocator =
-        static_cast<umpire::Allocator *>(allocator.addr);
-    umpire::Allocator * SHCXX_rv = new umpire::Allocator;
-    *SHCXX_rv =
-        SH_this->makeAllocator<umpire::strategy::DynamicPoolMap>(
-        SHCXX_name, *SHCXX_allocator, initial_size, block);
-    SHC_rv->addr = SHCXX_rv;
-    SHC_rv->idtor = 1;
-    return SHC_rv;
-    // splicer end class.ResourceManager.method.make_allocator_bufferify_pool
 }
 
 umpire_allocator * umpire_resourcemanager_make_allocator_list_pool(

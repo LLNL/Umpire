@@ -152,7 +152,6 @@ module umpire_mod
         procedure, nopass :: get_instance => resourcemanager_get_instance
         procedure :: get_allocator_by_name => resourcemanager_get_allocator_by_name
         procedure :: get_allocator_by_id => resourcemanager_get_allocator_by_id
-        procedure :: make_allocator_pool => resourcemanager_make_allocator_pool
         procedure :: make_allocator_list_pool => resourcemanager_make_allocator_list_pool
         procedure :: make_allocator_quick_pool => resourcemanager_make_allocator_quick_pool
         procedure :: make_allocator_advisor => resourcemanager_make_allocator_advisor
@@ -366,39 +365,6 @@ module umpire_mod
             type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
             type(C_PTR) SHT_rv
         end function c_resourcemanager_get_allocator_by_id
-
-        function c_resourcemanager_make_allocator_pool(self, name, &
-                allocator, initial_size, block, SHT_crv) &
-                result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_pool")
-            use iso_c_binding, only : C_CHAR, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
-            implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
-            character(kind=C_CHAR), intent(IN) :: name(*)
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-            integer(C_SIZE_T), value, intent(IN) :: initial_size
-            integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
-            type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_pool
-
-        function c_resourcemanager_make_allocator_bufferify_pool(self, &
-                name, Lname, allocator, initial_size, block, SHT_crv) &
-                result(SHT_rv) &
-                bind(C, name="umpire_resourcemanager_make_allocator_bufferify_pool")
-            use iso_c_binding, only : C_CHAR, C_INT, C_PTR, C_SIZE_T
-            import :: umpire_SHROUD_allocator_capsule, umpire_SHROUD_resourcemanager_capsule
-            implicit none
-            type(umpire_SHROUD_resourcemanager_capsule), intent(IN) :: self
-            character(kind=C_CHAR), intent(IN) :: name(*)
-            integer(C_INT), value, intent(IN) :: Lname
-            type(umpire_SHROUD_allocator_capsule), intent(IN), value :: allocator
-            integer(C_SIZE_T), value, intent(IN) :: initial_size
-            integer(C_SIZE_T), value, intent(IN) :: block
-            type(umpire_SHROUD_allocator_capsule), intent(OUT) :: SHT_crv
-            type(C_PTR) SHT_rv
-        end function c_resourcemanager_make_allocator_bufferify_pool
 
         function c_resourcemanager_make_allocator_list_pool(self, name, &
                 allocator, initial_size, block, SHT_crv) &
@@ -1703,24 +1669,6 @@ contains
             SHT_rv%cxxmem)
         ! splicer end class.ResourceManager.method.get_allocator_by_id
     end function resourcemanager_get_allocator_by_id
-
-    function resourcemanager_make_allocator_pool(obj, name, allocator, &
-            initial_size, block) &
-            result(SHT_rv)
-        use iso_c_binding, only : C_INT, C_PTR, C_SIZE_T
-        class(UmpireResourceManager) :: obj
-        character(len=*), intent(IN) :: name
-        type(UmpireAllocator), value, intent(IN) :: allocator
-        integer(C_SIZE_T), value, intent(IN) :: initial_size
-        integer(C_SIZE_T), value, intent(IN) :: block
-        type(UmpireAllocator) :: SHT_rv
-        ! splicer begin class.ResourceManager.method.make_allocator_pool
-        type(C_PTR) :: SHT_prv
-        SHT_prv = c_resourcemanager_make_allocator_bufferify_pool(obj%cxxmem, &
-            name, len_trim(name, kind=C_INT), allocator%cxxmem, &
-            initial_size, block, SHT_rv%cxxmem)
-        ! splicer end class.ResourceManager.method.make_allocator_pool
-    end function resourcemanager_make_allocator_pool
 
     function resourcemanager_make_allocator_list_pool(obj, name, &
             allocator, initial_size, block) &

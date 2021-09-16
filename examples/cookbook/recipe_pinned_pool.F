@@ -19,7 +19,7 @@ program umpire_f_pinned_pool
       rm = rm%get_instance()
       base_allocator = rm%get_allocator_by_name("PINNED")
 
-      pinned_pool = rm%make_allocator_pool("PINNED_POOL", &
+      pinned_pool = rm%make_allocator_quick_pool("PINNED_POOL", &
                                            base_allocator, &
                                            512_8*1024_8, &
                                            1024_8)
