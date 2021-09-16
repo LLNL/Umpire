@@ -16,7 +16,7 @@
 
 namespace umpire {
 
-__host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, const std::string old_name, size_t id)
+__host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, const std::string& old_name, size_t id)
     : m_allocator(allocator),
       m_id(id),
       m_ptr(static_cast<char*>(m_allocator.allocate(size))),
@@ -29,10 +29,9 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
 
-  char name[old_name.length()];
-  strcpy(name, old_name.c_str());
-
-  memset(m_name, '\0', strlen(name) + 1);
+  // convert the string name to a char name
+  const char* name = old_name.c_str();
+  memset(m_name, '\0', old_name.length() + 1);
   int i = 0;
   do {
     m_name[i] = name[i];

@@ -14,7 +14,6 @@
 #include "umpire/strategy/AllocationAdvisor.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
@@ -151,10 +150,10 @@ using Strategies =
 #if defined(UMPIRE_ENABLE_CUDA)
                      umpire::strategy::AllocationAdvisor,
 #endif
-                     umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap, umpire::strategy::FixedPool,
-                     umpire::strategy::MixedPool, umpire::strategy::MonotonicAllocationStrategy,
-                     umpire::strategy::NamedAllocationStrategy, umpire::strategy::QuickPool,
-                     umpire::strategy::SizeLimiter, umpire::strategy::SlotPool, umpire::strategy::ThreadSafeAllocator>;
+                     umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::MixedPool,
+                     umpire::strategy::MonotonicAllocationStrategy, umpire::strategy::NamedAllocationStrategy,
+                     umpire::strategy::QuickPool, umpire::strategy::SizeLimiter, umpire::strategy::SlotPool,
+                     umpire::strategy::ThreadSafeAllocator>;
 
 TYPED_TEST_SUITE(StrategyTest, Strategies, );
 
@@ -317,8 +316,8 @@ void ReleaseTest<umpire::strategy::FixedPool>::SetUp()
       rm.makeAllocator<umpire::strategy::FixedPool>(name, rm.getAllocator(limiter_name), max_alloc_size, 1));
 }
 
-using ReleaseStrategies = ::testing::Types<umpire::strategy::DynamicPoolList, umpire::strategy::DynamicPoolMap,
-                                           umpire::strategy::FixedPool, umpire::strategy::QuickPool>;
+using ReleaseStrategies =
+    ::testing::Types<umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::QuickPool>;
 
 TYPED_TEST_SUITE(ReleaseTest, ReleaseStrategies, );
 
@@ -340,48 +339,6 @@ TYPED_TEST(ReleaseTest, ReleaseCheck)
 
   ASSERT_NO_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size));
   ASSERT_NO_THROW(this->m_limiter_allocator->deallocate(this->test[0]));
-}
-
-TEST(DynamicPoolMap, LimitedResource)
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-
-  const std::size_t max_mem{1024 * 1024 * 4};
-
-  auto limited_resource =
-      rm.makeAllocator<umpire::strategy::SizeLimiter>("limited_resource", rm.getAllocator("HOST"), max_mem);
-
-  auto allocator = rm.makeAllocator<umpire::strategy::DynamicPoolMap>("host_dyn_pool", limited_resource, 0, 1024);
-
-  ASSERT_EQ(allocator.getName(), "host_dyn_pool");
-
-  void* alloc{nullptr};
-
-  ASSERT_NO_THROW({ alloc = allocator.allocate(100); });
-  ASSERT_GE(allocator.getCurrentSize(), 100);
-  ASSERT_EQ(allocator.getSize(alloc), 100);
-  ASSERT_GE(allocator.getHighWatermark(), 100);
-  ASSERT_NO_THROW({ allocator.deallocate(alloc); });
-
-  std::size_t alloc_size = max_mem / 4;
-  void* alloc1 = nullptr;
-  void* alloc2 = nullptr;
-  void* alloc3 = nullptr;
-
-  // Hold a little of the first block we allocate
-  ASSERT_NO_THROW({ alloc1 = allocator.allocate(1024); });
-  ASSERT_NO_THROW({ alloc2 = allocator.allocate(1024); });
-  ASSERT_NO_THROW({ allocator.deallocate(alloc1); });
-  ASSERT_NO_THROW({ alloc3 = allocator.allocate(100); });
-  ASSERT_NO_THROW({ allocator.deallocate(alloc2); });
-
-  for (int i = 0; i < 16; ++i) {
-    ASSERT_NO_THROW({ alloc1 = allocator.allocate(alloc_size); });
-    ASSERT_NO_THROW({ allocator.deallocate(alloc1); });
-    alloc_size += 1024;
-  }
-
-  ASSERT_NO_THROW({ allocator.deallocate(alloc3); });
 }
 
 TEST(MonotonicStrategy, Host)

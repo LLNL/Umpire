@@ -15,7 +15,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AlignedAllocator.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/wrap_allocator.hpp"
@@ -58,7 +57,6 @@ void allocate_and_check(std::size_t nbytes, std::size_t alignment, std::vector<v
 int main()
 {
   const bool run_quick{true};
-  const bool run_map{true};
   const bool run_list{true};
   const std::size_t one_megabyte{1024 * 1024};
   const std::size_t one_gigabyte{one_megabyte * 1024};
@@ -86,13 +84,6 @@ int main()
   auto quick_alloc =
       rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>("HOST_quick_safe_pool", quick_aligned_allocator);
 
-  auto map_allocation_pool = rm.makeAllocator<umpire::strategy::DynamicPoolMap>(
-      "HOST_map_pool", rm.getAllocator("HOST"), initial_pool_size, subsequent_pool_increments);
-  auto map_dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(map_allocation_pool);
-  auto map_aligned_allocator = rm.makeAllocator<umpire::strategy::AlignedAllocator>(
-      "HOST_map_aligned", map_allocation_pool, allocation_alignment);
-  auto map_alloc = rm.makeAllocator<umpire::strategy::ThreadSafeAllocator>("HOST_map_safe_pool", map_aligned_allocator);
-
   auto list_allocation_pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>(
       "HOST_list_pool", rm.getAllocator("HOST"), initial_pool_size, subsequent_pool_increments);
   auto list_dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(list_allocation_pool);
@@ -103,7 +94,6 @@ int main()
 
   for (int j{0}; j < max_iterations; ++j) {
     std::vector<void*> quick_allocations;
-    std::vector<void*> map_allocations;
     std::vector<void*> list_allocations;
     std::size_t total_bytes{0};
 
@@ -113,10 +103,6 @@ int main()
 
         if (run_quick) {
           allocate_and_check(nbytes, allocation_alignment, quick_allocations, quick_alloc);
-        }
-
-        if (run_map) {
-          allocate_and_check(nbytes, allocation_alignment, map_allocations, map_alloc);
         }
 
         if (run_list) {
@@ -132,10 +118,6 @@ int main()
 
     if (run_quick) {
       report_and_deallocate(j, quick_allocations, quick_alloc, quick_dynamic_pool);
-    }
-
-    if (run_map) {
-      report_and_deallocate(j, map_allocations, map_alloc, map_dynamic_pool);
     }
 
     if (run_list) {

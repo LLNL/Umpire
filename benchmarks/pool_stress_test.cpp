@@ -15,7 +15,6 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/MixedPool.hpp"
-#include "umpire/strategy/DynamicPoolMap.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
@@ -109,7 +108,6 @@ int main(int, char**) {
   indexing_pairs.insert({"SHUFFLE_ORDER", shuffle_order});
 
   //Call template function to run tests for each pool
-  do_test<umpire::strategy::DynamicPoolMap> ("DynamicPoolMap", indexing_pairs);
   do_test<umpire::strategy::DynamicPoolList> ("DynamicPoolList", indexing_pairs);
   do_test<umpire::strategy::QuickPool> ("QuickPool", indexing_pairs);
   do_test<umpire::strategy::MixedPool> ("MixedPool", indexing_pairs);

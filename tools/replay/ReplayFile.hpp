@@ -19,7 +19,6 @@ public:
       MEMORY_RESOURCE = 1
     , ALLOCATION_ADVISOR
     , DYNAMIC_POOL_LIST
-    , DYNAMIC_POOL_MAP
     , MONOTONIC
     , SLOT_POOL
     , SIZE_LIMITER
@@ -114,7 +113,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 15;
+  const uint64_t REPLAY_VERSION = 16;
 
   struct Header {
     struct Magic {
