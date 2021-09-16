@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
@@ -49,24 +49,24 @@ int main(int argc, char const* argv[])
   auto allocator = rm.getAllocator("UM");
   auto device_allocator = umpire::make_device_allocator(allocator, 1024, "my_device_alloc");
   auto device_allocator2 = umpire::make_device_allocator(allocator, 512, "my_other_device_alloc");
-  
+
   // Checking that now a DeviceAllocator exists
   if (umpire::is_device_allocator(0)) {
     std::cout << "I found a DeviceAllocator! " << std::endl;
   }
-  
+
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
-  
+
   // Make sure that device and host side DeviceAllocator pointers are synched
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
-  
+
   my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
   std::cout << "After first kernel, found value: " << (*ptr_to_data)[7] << std::endl;
-  
+
   my_other_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
-  
+
   return 0;
 }
