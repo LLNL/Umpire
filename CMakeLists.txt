@@ -136,8 +136,12 @@ install(FILES
   DESTINATION share/umpire/cmake)
 
 write_basic_package_version_file(
-  umpire-config-version.cmake
+  ${PROJECT_BINARY_DIR}/umpire-config-version.cmake
   COMPATIBILITY SameMajorVersion)
+
+install(FILES 
+  "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
+  DESTINATION share/umpire/cmake)
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
