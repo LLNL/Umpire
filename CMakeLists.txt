@@ -135,6 +135,10 @@ install(FILES
   "${PROJECT_BINARY_DIR}/umpire-config.cmake"
   DESTINATION share/umpire/cmake)
 
+write_basic_package_version_file(
+  ${CMAKE_INSTALL_PREFIX}/umpire-config-version.cmake
+  COMPATIBILITY SameMajorVersion)
+
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
 
 if (UMPIRE_ENABLE_TESTS)
