@@ -11,6 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
 
 include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
