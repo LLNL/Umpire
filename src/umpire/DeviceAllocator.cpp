@@ -104,8 +104,11 @@ __host__ __device__ void DeviceAllocator::reset()
   auto& rm = umpire::ResourceManager::getInstance();
   rm.memset(m_counter, 0);
 #else
-  *m_counter = (unsigned int)m_size;
-  atomicCAS(m_counter, (unsigned int)m_size, 0);
+  unsigned int assumed, old;
+  do {
+    assumed = *m_counter;
+    old = atomicCAS(m_counter, assumed, 0);
+  } while (assumed != old);
 #endif
 }
 
