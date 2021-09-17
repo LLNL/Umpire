@@ -17,7 +17,7 @@ namespace umpire {
  * Const variable for the limit of unique DeviceAllocator
  * objects available at once.
  */
-extern __managed__ int UMPIRE_TOTAL_DEV_ALLOCS;
+constexpr int UMPIRE_TOTAL_DEV_ALLOCS{64};
 
 /*
  * Global arrays for both host and device which hold the
@@ -46,7 +46,7 @@ __host__ __device__ bool is_device_allocator(int id);
  * \param allocator Allocator to build the DeviceAllocator from.
  * \param size Total size of the DeviceAllocator.
  */
-__host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string name);
+__host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name);
 
 /*
  * Destroy any DeviceAllocator objects currently in existence.

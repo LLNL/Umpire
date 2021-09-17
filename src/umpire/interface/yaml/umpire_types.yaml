@@ -48,16 +48,6 @@ typemap:
         f_derived_type: dynamicpoollist
         f_capsule_data_type: umpire_SHROUD_strategy_dynamicpoollist_capsule
         f_to_c: "{f_var}%cxxmem"
-    - type: DynamicPoolMap
-      fields:
-        base: shadow
-        wrap_header:
-        - typesUmpire.h
-        c_type: umpire_strategy_dynamicpoolmap
-        f_module_name: umpire_strategy_mod
-        f_derived_type: dynamicpoolmap
-        f_capsule_data_type: umpire_SHROUD_strategy_dynamicpoolmap_capsule
-        f_to_c: "{f_var}%cxxmem"
     - type: FixedPool
       fields:
         base: shadow

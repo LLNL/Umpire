@@ -27,6 +27,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
+- Removed deprecated DynamicPoolMap and DynamicPool alias.
+
 - Remove deprecated registerAllocator and isAllocatorRegistered methods.
 
 - Removed unneeded hip dependency in the tests/debug/ CMake file.

@@ -322,13 +322,9 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
   //
   if ( !m_options.pool_to_use.empty() ) {
     if (   alloc->type == ReplayFile::rtype::DYNAMIC_POOL_LIST
-        || alloc->type == ReplayFile::rtype::DYNAMIC_POOL_MAP
         || alloc->type == ReplayFile::rtype::QUICKPOOL) {
       if (m_options.pool_to_use == "List") {
         alloc->type = ReplayFile::rtype::DYNAMIC_POOL_LIST;
-      }
-      else if (m_options.pool_to_use == "Map") {
-        alloc->type = ReplayFile::rtype::DYNAMIC_POOL_MAP;
       }
       else if (m_options.pool_to_use == "Quick") {
         alloc->type = ReplayFile::rtype::QUICKPOOL;
@@ -758,93 +754,6 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     }
     break;
 
-  case ReplayFile::rtype::DYNAMIC_POOL_MAP:
-    if (alloc->argc >= 4) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-              , alloc->argv.pool.alignment
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-              , alloc->argv.pool.alignment
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 3) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-            )
-        );
-      }
-    }
-    else if (alloc->argc == 2) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-            )
-        );
-      }
-    }
-    else {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolMap, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-    }
-    break;
-
   case ReplayFile::rtype::MONOTONIC:
     if (alloc->introspection) {
       alloc->allocator = new umpire::Allocator(
@@ -1246,16 +1155,9 @@ void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->op_allocator];
 
-  try {
-    auto dynamic_pool =
-      umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolMap>(*(alloc->allocator));
-    dynamic_pool->coalesce();
-  }
-  catch(...) {
-    auto dynamic_pool =
-      umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(*(alloc->allocator));
-    dynamic_pool->coalesce();
-  }
+  auto dynamic_pool =
+    umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(*(alloc->allocator));
+  dynamic_pool->coalesce();
 }
 
 void ReplayOperationManager::makeRelease(ReplayFile::Operation* op)

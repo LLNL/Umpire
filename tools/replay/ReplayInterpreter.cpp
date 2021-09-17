@@ -297,7 +297,6 @@ void ReplayInterpreter::printAllocators(ReplayFile* rf)
       case ReplayFile::MEMORY_RESOURCE: std::cerr << " MEMORY_RESOURCE "; break;
       case ReplayFile::ALLOCATION_ADVISOR: std::cerr << " ALLOCATION_ADVISOR "; break;
       case ReplayFile::DYNAMIC_POOL_LIST: std::cerr << " DYNAMIC_POOL_LIST "; break;
-      case ReplayFile::DYNAMIC_POOL_MAP: std::cerr << " DYNAMIC_POOL_MAP "; break;
       case ReplayFile::QUICKPOOL: std::cerr << " QUICKPOOL "; break;
       case ReplayFile::MONOTONIC: std::cerr << " MONOTONIC "; break;
       case ReplayFile::SLOT_POOL: std::cerr << " SLOT_POOL "; break;
@@ -635,31 +634,6 @@ void ReplayInterpreter::replay_compileAllocator( void )
       m_ops->copyString(base_allocator_name, alloc->base_name);
 
       // Now grab the optional fields
-      if (alloc->argc >= 4) {
-        alloc->argc = 4;    // strip heuristic parameter
-        get_from_string(m_json["payload"]["args"][1],
-                        alloc->argv.pool.initial_alloc_size);
-        get_from_string(m_json["payload"]["args"][2],
-                        alloc->argv.pool.min_alloc_size);
-        get_from_string(m_json["payload"]["args"][3],
-                        alloc->argv.pool.alignment);
-      }
-      else if (alloc->argc >= 3) {
-        alloc->argc = 3;    // strip heuristic parameter
-        get_from_string(m_json["payload"]["args"][1], alloc->argv.pool.initial_alloc_size);
-        get_from_string(m_json["payload"]["args"][2], alloc->argv.pool.min_alloc_size);
-      }
-      else if (alloc->argc == 2) {
-        get_from_string(m_json["payload"]["args"][1],
-            alloc->argv.pool.initial_alloc_size);
-      }
-    }
-    else if (type == "umpire::strategy::DynamicPoolMap" ) {
-      const std::string base_allocator_name{m_json["payload"]["args"][0]};
-
-      alloc->type = ReplayFile::rtype::DYNAMIC_POOL_MAP;
-      m_ops->copyString(base_allocator_name, alloc->base_name);
-
       if (alloc->argc >= 4) {
         alloc->argc = 4;    // strip heuristic parameter
         get_from_string(m_json["payload"]["args"][1],

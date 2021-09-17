@@ -28,7 +28,7 @@ class DeviceAllocator {
    * \param id ID associated with this DeviceAllocator object. ID will be used
    *   to reference UMPIRE_DEV_ALLOCS array if necessary.
    */
-  __host__ DeviceAllocator(Allocator allocator, size_t size, const std::string name, size_t id);
+  __host__ DeviceAllocator(Allocator allocator, size_t size, const std::string& name, size_t id);
 
   __host__ __device__ ~DeviceAllocator();
 

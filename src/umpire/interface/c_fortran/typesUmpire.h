@@ -114,13 +114,6 @@ struct s_umpire_strategy_dynamicpoollist {
 };
 typedef struct s_umpire_strategy_dynamicpoollist umpire_strategy_dynamicpoollist;
 
-// helper capsule_umpire_strategy_dynamicpoolmap
-struct s_umpire_strategy_dynamicpoolmap {
-    void *addr;     /* address of C++ memory */
-    int idtor;      /* index of destructor */
-};
-typedef struct s_umpire_strategy_dynamicpoolmap umpire_strategy_dynamicpoolmap;
-
 // helper capsule_umpire_strategy_fixedpool
 struct s_umpire_strategy_fixedpool {
     void *addr;     /* address of C++ memory */
