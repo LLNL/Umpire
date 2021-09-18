@@ -39,6 +39,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Use C++17 for SYCL backend.
 
+- Fixed a cmake install config issue so that now users can find a package of Umpire
+  with a version constraint.
+
 ## [v6.0.0 - 2021-08-18]
 
 ### Added
