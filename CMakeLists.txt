@@ -11,6 +11,7 @@ cmake_policy(SET CMP0057 NEW)
 cmake_policy(SET CMP0054 NEW)
 
 include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
@@ -133,6 +134,14 @@ configure_file(
 
 install(FILES
   "${PROJECT_BINARY_DIR}/umpire-config.cmake"
+  DESTINATION share/umpire/cmake)
+
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/umpire-config-version.cmake
+  COMPATIBILITY SameMajorVersion)
+
+install(FILES 
+  "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
   DESTINATION share/umpire/cmake)
 
 install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
