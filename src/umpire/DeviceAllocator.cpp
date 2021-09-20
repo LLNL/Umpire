@@ -61,10 +61,12 @@ __host__ void DeviceAllocator::destroy()
   auto& rm = umpire::ResourceManager::getInstance();
   auto device_alloc = rm.getAllocator(umpire::resource::Device);
 
-  if (m_counter != nullptr)
+  if (m_counter != nullptr) {
     device_alloc.deallocate(m_counter);
-  if (m_ptr != nullptr)
+  }
+  if (m_ptr != nullptr) {
     m_allocator.deallocate(m_ptr);
+  }
 }
 
 __device__ void* DeviceAllocator::allocate(size_t size)
@@ -93,6 +95,21 @@ __host__ __device__ bool DeviceAllocator::isInitialized()
     return true;
   }
   return false;
+}
+
+__host__ __device__ void DeviceAllocator::reset()
+{
+  // Set m_counter back to zero
+#if !defined(__CUDA_ARCH__)
+  auto& rm = umpire::ResourceManager::getInstance();
+  rm.memset(m_counter, 0);
+#else
+  unsigned int assumed, old;
+  do {
+    assumed = *m_counter;
+    old = atomicCAS(m_counter, assumed, 0);
+  } while (assumed != old);
+#endif
 }
 
 } // end of namespace umpire
