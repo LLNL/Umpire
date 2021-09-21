@@ -8,7 +8,7 @@ if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME cuda_mem_advise_op_tests
     SOURCES cuda_mem_advise_op_tests.cpp
-    DEPENDS_ON umpire cuda_runtime gtest gmock)
+    DEPENDS_ON umpire cuda_runtime gtest)
 
   blt_add_test(
     NAME cuda_mem_advise_op_tests

@@ -4,14 +4,79 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-clang_10:
+clang_9_0_0:
+  variables:
+    SPEC: "+fortran %clang@9.0.0"
+  extends: .build_and_test_on_ruby
+
+clang_10_0_1:
   variables:
     SPEC: "+fortran %clang@10.0.1"
   extends: .build_and_test_on_ruby
 
-clang_9:
+clang_11_0_1:
   variables:
-    SPEC: "+fortran %clang@9.0.0"
+    SPEC: "+fortran %clang@11.0.1"
+  extends: .build_and_test_on_ruby
+
+intel_17_0_2:
+  variables:
+    SPEC: "+fortran %intel@17.0.2"
+  extends: .build_and_test_on_ruby
+
+intel_18_0_2:
+  variables:
+    SPEC: "+fortran %intel@18.0.2"
+  extends: .build_and_test_on_ruby
+
+intel_19_0_4:
+  variables:
+    SPEC: "+fortran %intel@19.0.4"
+  extends: .build_and_test_on_ruby
+
+intel_19_1_0:
+  variables:
+    SPEC: "+fortran %intel@19.1.0"
+  extends: .build_and_test_on_ruby
+
+intel_19_1_2:
+  variables:
+    SPEC: "+fortran %intel@19.1.2"
+  extends: .build_and_test_on_ruby
+
+intel_2021_2:
+  variables:
+    SPEC: "+fortran %intel@2021.2"
+  extends: .build_and_test_on_ruby
+
+oneapi_ifort_2021_2:
+  variables:
+    SPEC: "+fortran %oneapi@2021.2-ifort"
+  extends: .build_and_test_on_ruby
+
+oneapi_ifx_2021_2:
+  variables:
+    SPEC: "+fortran %oneapi@2021.2-ifx"
+  extends: .build_and_test_on_ruby
+
+pgi_19_7:
+  variables:
+    SPEC: "+fortran %pgi@19.7"
+  extends: .build_and_test_on_ruby
+
+pgi_20_1:
+  variables:
+    SPEC: "+fortran %pgi@20.1"
+  extends: .build_and_test_on_ruby
+
+pgi_21_1:
+  variables:
+    SPEC: "+fortran %pgi@21.1"
+  extends: .build_and_test_on_ruby
+
+gcc_4_9_3:
+  variables:
+    SPEC: "%gcc@4.9.3"
   extends: .build_and_test_on_ruby
 
 gcc_8_1_0:
@@ -19,60 +84,37 @@ gcc_8_1_0:
     SPEC: "+fortran %gcc@8.1.0"
   extends: .build_and_test_on_ruby
 
-icpc_17_0_2:
+gcc_8_3_1:
   variables:
-    SPEC: "+fortran %intel@17.0.2"
+    SPEC: "+fortran %gcc@8.3.1"
   extends: .build_and_test_on_ruby
 
-icpc_18_0_2:
+gcc_10_2_1:
   variables:
-    SPEC: "+fortran tests=none %intel@18.0.2"
-  extends: .build_and_test_on_ruby
-
-icpc_19_1_0:
-  variables:
-    SPEC: "+fortran %intel@19.1.0"
-  extends: .build_and_test_on_ruby
-
-pgi_19_7:
-  variables:
-    SPEC: "+fortran %pgi@19.7 cxxflags=-I/usr/tce/packages/gcc/gcc-4.9.3/include/c++/4.9.3"
-    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
-  extends: .build_and_test_on_ruby
-
-pgi_20_1:
-  variables:
-    SPEC: "+fortran %pgi@20.1"
-    PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
+    SPEC: "+fortran %gcc@10.2.1"
   extends: .build_and_test_on_ruby
 
 # EXTRAS
 
-gcc_4_9_3:
-  variables:
-    SPEC: "%gcc@4.9.3"
-  extends: .build_and_test_on_ruby
-
-gcc_8_1_0_numa:
+ex_gcc_8_1_0_numa:
   variables:
     SPEC: "+fortran+numa %gcc@8.1.0"
   extends: .build_and_test_on_ruby
 
-
   # Develop builds against specific tpl version
 
-pgi_20_1_tpls:
+ex_pgi_20_1_tpls:
   variables:
     SPEC: "+fortran %pgi@20.1 ^blt@develop"
     PGI_LOCALRC: /collab/usr/global/tools/pgi/etc/localrc-gcc-4.9.3
   extends: .build_and_test_on_ruby
 
-clang_10_tpls:
+ex_clang_10_tpls:
   variables:
     SPEC: "+fortran %clang@10.0.1 ^blt@develop"
   extends: .build_and_test_on_ruby
 
-gcc_8_1_0_tpls:
+ex_gcc_8_1_0_tpls:
   variables:
     SPEC: "+fortran %gcc@8.1.0 ^blt@develop"
   extends: .build_and_test_on_ruby

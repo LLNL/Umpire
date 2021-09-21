@@ -39,6 +39,3 @@ option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")
 endif()
-
-set(ENABLE_CUDA Off CACHE BOOL "")
-set(ENABLE_GMOCK On CACHE BOOL "")

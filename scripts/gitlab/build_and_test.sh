@@ -138,6 +138,13 @@ then
     echo "~~~~~ Testing Umpire"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
+    if grep -q -i "CUDA_TOOLKIT_ROOT_DIR.*" ${hostconfig_path}
+    then
+        cuda=$(grep -oP '/usr/tce/packages/cuda/cuda-.*?"' ${hostconfig_path})
+        cuda_ver=$(echo ${cuda} | cut -d'-' -f2 | tr -d '"')
+        module load cuda/${cuda_ver}
+    fi
+
     if [[ ! -d ${build_dir} ]]
     then
         echo "ERROR: Build directory not found : ${build_dir}" && exit 1

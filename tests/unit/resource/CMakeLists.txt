@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (resource_depends umpire gtest gmock)
+set (resource_depends umpire gtest)
 
 if (UMPIRE_ENABLE_HIP)
   set (resource_depends ${resource_depends} hip_runtime)
@@ -46,7 +46,7 @@ if (UMPIRE_ENABLE_GMOCK)
   blt_add_executable(
     NAME resource_tests
     SOURCES resource_tests.cpp
-    DEPENDS_ON ${resource_depends})
+    DEPENDS_ON ${resource_depends} gmock)
 
   blt_add_test(
     NAME resource_tests
