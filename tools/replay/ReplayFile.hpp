@@ -16,7 +16,8 @@
 class ReplayFile {
 public:
   enum rtype {
-      MEMORY_RESOURCE = 1
+      UNKNOWN = 0
+    , MEMORY_RESOURCE = 1
     , ALLOCATION_ADVISOR
     , DYNAMIC_POOL_LIST
     , MONOTONIC
