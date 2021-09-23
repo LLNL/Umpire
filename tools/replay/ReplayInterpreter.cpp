@@ -63,7 +63,7 @@ void ReplayInterpreter::buildOperations()
 
     hdr = m_ops->getOperationsTable();
     hdr->num_allocators = 0;
-    memset(hdr->allocators, 0, sizeof(hdr->allocators));
+    memset(static_cast<void*>(hdr->allocators), 0, sizeof(hdr->allocators));
     op = &hdr->ops[0];
     memset(op, 0, sizeof(*op));
     op->op_type = ReplayFile::otype::ALLOCATE;
