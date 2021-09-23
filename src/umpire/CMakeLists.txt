@@ -34,7 +34,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (UMPIRE_ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
@@ -42,15 +42,32 @@ if (UMPIRE_ENABLE_CUDA)
   set(umpire_device_sources
     DeviceAllocator.cpp
     device_allocator_helper.cpp)
+    
+  set(umpire_device_depends camp)
 
-  set_source_files_properties(DeviceAllocator.cpp
-                              PROPERTIES
-                              LANGUAGE CUDA)
-  set_source_files_properties(device_allocator_helper.cpp
-                              PROPERTIES
-                              LANGUAGE CUDA)
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(DeviceAllocator.cpp
+                                PROPERTIES
+                                LANGUAGE CUDA)
+    set_source_files_properties(device_allocator_helper.cpp
+                                PROPERTIES
+                                LANGUAGE CUDA)
 
-  set(umpire_device_depends camp cuda)
+    set(umpire_device_depends
+       ${umpire_device_depends}
+       cuda)
+  else()
+    set_source_files_properties(DeviceAllocator.cpp
+                                PROPERTIES
+                                LANGUAGE HIP)
+    set_source_files_properties(device_allocator_helper.cpp
+                                PROPERTIES
+                                LANGUAGE HIP)
+    
+    set(umpire_device_depends
+       ${umpire_device_depends}
+       hip)
+  endif()
 
   blt_add_library(
     NAME umpire_device
@@ -66,9 +83,11 @@ if (UMPIRE_ENABLE_CUDA)
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
-  set_target_properties(umpire_device PROPERTIES
-    CUDA_SEPARABLE_COMPILATION On)
-
+  if (UMPIRE_ENABLE_CUDA)
+    set_target_properties(umpire_device
+                          PROPERTIES
+                          CUDA_SEPARABLE_COMPILATION On)
+  endif()
 endif()
 
 set (umpire_depends
@@ -87,7 +106,7 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
-blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_CUDA)
+blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
 
 set (umpire_defines)
 

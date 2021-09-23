@@ -60,14 +60,22 @@ int main(int argc, char const* argv[])
   // Make sure that device and host side DeviceAllocator pointers are synched.
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
+#if defined(UMPIRE_ENABLE_CUDA)
   my_kernel<<<1, 16>>>(ptr_to_data);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(my_kernel, 1, 16, 0, 0, ptr_to_data);
+#endif
   resource.get_event().wait();
   std::cout << "After first kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
   // DeviceAllocator only has enough memory for one double. We need to reset it!
   device_allocator.reset();
 
+#if defined(UMPIRE_ENABLE_CUDA)
   my_other_kernel<<<1, 16>>>(ptr_to_data);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(my_other_kernel, 1, 16, 0, 0, ptr_to_data);
+#endif
   resource.get_event().wait();
   std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 

@@ -4,12 +4,12 @@
 //
 // SPDX-License-Identifier: (MIT)
 ////////////////////////////////////////////////////////////////////////////
-#include "umpire/device_allocator_helper.hpp"
-
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#include "umpire/device_allocator_helper.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 
@@ -25,7 +25,7 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
   int index{-1};
-#if !defined(__CUDA_ARCH__)
+#if !defined(UMPIRE_DEVICE_COMPILE)
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
       index = i;
@@ -55,7 +55,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
     UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(UMPIRE_DEVICE_COMPILE)
   return UMPIRE_DEV_ALLOCS_h[index];
 #else
   return UMPIRE_DEV_ALLOCS[index];
@@ -71,7 +71,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(UMPIRE_DEVICE_COMPILE)
   return UMPIRE_DEV_ALLOCS_h[id];
 #else
   return UMPIRE_DEV_ALLOCS[id];
@@ -84,7 +84,7 @@ __host__ __device__ bool is_device_allocator(int id)
     UMPIRE_ERROR("Invalid ID given.");
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(UMPIRE_DEVICE_COMPILE)
   return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
 #else
   return UMPIRE_DEV_ALLOCS[id].isInitialized();

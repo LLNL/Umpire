@@ -140,4 +140,9 @@
 #define UMPIRE_INTERNAL_UNTRACK(p) umpire::util::AllocationRecord{};
 #endif
 
+// Device Macros
+#if defined(__CUDA_ARCH__) || defined(__HIP_DEVICE_COMPILE__)
+#define UMPIRE_DEVICE_COMPILE
+#endif
+
 #endif // UMPIRE_Macros_HPP

@@ -126,6 +126,16 @@ if (UMPIRE_ENABLE_CUDA)
   list(APPEND umpire_examples multi_device)
 endif()
 
+if (UMPIRE_ENABLE_HIP)
+  blt_add_executable(
+    NAME device_allocator_example
+    SOURCES device-allocator.cpp
+    DEPENDS_ON umpire hip
+  )
+  
+  list(APPEND umpire_examples device_allocator_example)
+endif()
+
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
 
 add_subdirectory(tutorial)
