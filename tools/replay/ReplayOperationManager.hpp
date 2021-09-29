@@ -8,34 +8,33 @@
 #define REPLAY_ReplayOperationManager_HPP
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include <iostream>
 #include <cstdint>
+#include <iostream>
 #include <vector>
 
 #include "ReplayFile.hpp"
 #include "ReplayOptions.hpp"
 #include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/strategy/SizeLimiter.hpp"
-#include "umpire/strategy/MixedPool.hpp"
-#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-#include "umpire/ResourceManager.hpp"
 
 class ReplayOperationManager {
-public:
-  ReplayOperationManager( const ReplayOptions& options, ReplayFile* rFile,
-      ReplayFile::Header* Operations );
+ public:
+  ReplayOperationManager(const ReplayOptions& options, ReplayFile* rFile, ReplayFile::Header* Operations);
   ~ReplayOperationManager();
 
   void runOperations();
 
-private:
-  std::map<std::string, std::vector< std::pair<size_t, std::size_t>>> m_stat_series;
+ private:
+  std::map<std::string, std::vector<std::pair<size_t, std::size_t>>> m_stat_series;
   ReplayOptions m_options;
   ReplayFile* m_replay_file;
   ReplayFile::Header* m_ops_table;

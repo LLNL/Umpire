@@ -10,25 +10,26 @@
 
 #include <string>
 #include <vector>
+
 #include "ReplayOptions.hpp"
 #include "umpire/Allocator.hpp"
 
 class ReplayFile {
-public:
+ public:
   enum rtype {
-      UNKNOWN = 0
-    , MEMORY_RESOURCE = 1
-    , ALLOCATION_ADVISOR
-    , DYNAMIC_POOL_LIST
-    , MONOTONIC
-    , SLOT_POOL
-    , SIZE_LIMITER
-    , THREADSAFE_ALLOCATOR
-    , FIXED_POOL
-    , MIXED_POOL
-    , ALLOCATION_PREFETCHER
-    , NUMA_POLICY
-    , QUICKPOOL
+    UNKNOWN = 0,
+    MEMORY_RESOURCE = 1,
+    ALLOCATION_ADVISOR,
+    DYNAMIC_POOL_LIST,
+    MONOTONIC,
+    SLOT_POOL,
+    SIZE_LIMITER,
+    THREADSAFE_ALLOCATOR,
+    FIXED_POOL,
+    MIXED_POOL,
+    ALLOCATION_PREFETCHER,
+    NUMA_POLICY,
+    QUICKPOOL
   };
 
   static const std::size_t max_allocators{256 * 1024};
@@ -36,7 +37,7 @@ public:
 
   struct AllocatorTableEntry {
     rtype type;
-    std::size_t line_number;    // Causal line number of input file
+    std::size_t line_number; // Causal line number of input file
     bool introspection;
     char name[max_name_length];
     char base_name[max_name_length];
@@ -82,37 +83,32 @@ public:
   };
 
   enum otype {
-      ALLOCATOR_CREATION = 1
-    , ALLOCATE
-    , COALESCE
-    , COPY
-    , MOVE
-    , DEALLOCATE
-    , REALLOCATE
-    , REALLOCATE_EX
-    , RELEASE
-    , SETDEFAULTALLOCATOR
+    ALLOCATOR_CREATION = 1,
+    ALLOCATE,
+    COALESCE,
+    COPY,
+    MOVE,
+    DEALLOCATE,
+    REALLOCATE,
+    REALLOCATE_EX,
+    RELEASE,
+    SETDEFAULTALLOCATOR
   };
 
   struct Operation {
-    otype       op_type;
-    std::size_t op_line_number;     // Causal line number of input file
-    int         op_allocator;
-    void*       op_allocated_ptr;
-    std::size_t op_size;            // Size of allocation/operation
-    std::size_t op_offsets[2];      // 0-src, 1-dst
-    std::size_t op_alloc_ops[2];    // 0-src, 1-dst/prev
+    otype op_type;
+    std::size_t op_line_number; // Causal line number of input file
+    int op_allocator;
+    void* op_allocated_ptr;
+    std::size_t op_size;         // Size of allocation/operation
+    std::size_t op_offsets[2];   // 0-src, 1-dst
+    std::size_t op_alloc_ops[2]; // 0-src, 1-dst/prev
   };
 
-  const uint64_t REPLAY_MAGIC =
-    static_cast<uint64_t>(
-            static_cast<uint64_t>(0x7f) << 48
-          | static_cast<uint64_t>('R') << 40
-          | static_cast<uint64_t>('E') << 32
-          | static_cast<uint64_t>('P') << 24
-          | static_cast<uint64_t>('L') << 16
-          | static_cast<uint64_t>('A') << 8
-          | static_cast<uint64_t>('Y'));
+  const uint64_t REPLAY_MAGIC = static_cast<uint64_t>(
+      static_cast<uint64_t>(0x7f) << 48 | static_cast<uint64_t>('R') << 40 | static_cast<uint64_t>('E') << 32 |
+      static_cast<uint64_t>('P') << 24 | static_cast<uint64_t>('L') << 16 | static_cast<uint64_t>('A') << 8 |
+      static_cast<uint64_t>('Y'));
 
   const uint64_t REPLAY_VERSION = 16;
 
@@ -127,16 +123,22 @@ public:
     Operation ops[1];
   };
 
-  ReplayFile( const ReplayOptions& options );
-  ~ReplayFile( );
+  ReplayFile(const ReplayOptions& options);
+  ~ReplayFile();
   ReplayFile::Header* getOperationsTable();
 
   void copyString(std::string source, char (&dest)[max_name_length]);
-  bool compileNeeded() { return m_compile_needed; }
+  bool compileNeeded()
+  {
+    return m_compile_needed;
+  }
   std::string getLine(std::size_t lineno);
-  std::string getInputFileName() { return m_options.input_file; }
+  std::string getInputFileName()
+  {
+    return m_options.input_file;
+  }
 
-private:
+ private:
   ReplayOptions m_options;
   Header* m_op_tables{nullptr};
   const std::string m_binary_filename;

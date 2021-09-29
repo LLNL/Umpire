@@ -8,27 +8,28 @@
 #define REPLAY_ReplayOptions_HPP
 
 #include <string>
+
 #include "umpire/tpl/CLI11/CLI11.hpp"
 
 struct ReplayUsePoolValidator : public CLI::Validator {
-  ReplayUsePoolValidator() {
+  ReplayUsePoolValidator()
+  {
     func_ = [](const std::string &str) {
       if (str != "Quick" && str != "List" && str != "Map") {
         return std::string("Invalid pool name, must be Quick, List, or Map");
-      }
-      else
+      } else
         return std::string();
     };
   }
 };
 
 struct ReplayUseHeuristicValidator : public CLI::Validator {
-  ReplayUseHeuristicValidator() {
+  ReplayUseHeuristicValidator()
+  {
     func_ = [](const std::string &str) {
       if (str != "Block" && str != "FreePercentage") {
         return std::string("Invalid heuristic name, must be Block or FreePercentage");
-      }
-      else
+      } else
         return std::string();
     };
   }
@@ -50,5 +51,4 @@ struct ReplayOptions {
   int heuristic_parm{2};          // --heuristic-parm
 };
 
-#endif  // REPLAY_ReplayOptions_HPP
-
+#endif // REPLAY_ReplayOptions_HPP

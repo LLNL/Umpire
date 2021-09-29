@@ -11,34 +11,32 @@
 #include <vector>
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include "umpire/Allocator.hpp"
-#include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/strategy/AllocationPrefetcher.hpp"
-#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
-#include "umpire/strategy/SizeLimiter.hpp"
-#include "umpire/strategy/QuickPool.hpp"
-#include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/wrap_allocator.hpp"
-#include "umpire/ResourceManager.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
 #include "ReplayOptions.hpp"
-
-#include "ReplayOptions.hpp"
+#include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/AllocationAdvisor.hpp"
+#include "umpire/strategy/AllocationPrefetcher.hpp"
+#include "umpire/strategy/PoolCoalesceHeuristic.hpp"
+#include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/util/AllocationRecord.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
 #include "umpire/strategy/NumaPolicy.hpp"
 #include "umpire/util/numa.hpp"
 #endif // defined(UMPIRE_ENABLE_NUMA)
 
 #if !defined(_MSC_VER)
-#include <unistd.h>   // getpid()
+#include <unistd.h> // getpid()
 #else
 #include <process.h>
 #define getpid _getpid
 #endif
 
-ReplayOperationManager::ReplayOperationManager( const ReplayOptions& options,
-  ReplayFile* rFile, ReplayFile::Header* Operations )
+ReplayOperationManager::ReplayOperationManager(const ReplayOptions& options, ReplayFile* rFile,
+                                               ReplayFile::Header* Operations)
     : m_options{options}, m_replay_file{rFile}, m_ops_table{Operations}
 {
 }
@@ -48,121 +46,113 @@ ReplayOperationManager::~ReplayOperationManager()
   for (std::size_t i = 0; i < m_ops_table->num_allocators; i++) {
     auto alloc = &m_ops_table->allocators[i];
     if (alloc->allocator != nullptr)
-      delete(alloc->allocator);
+      delete (alloc->allocator);
   }
 }
 
 namespace {
-  struct TrackedCounter {
-    void increment() {
-      current_count++;
-      if (current_count > high_watermark)
-        high_watermark = current_count;
-    };
-
-    void decrement() {
-      current_count--;
-    };
-
-    std::size_t current_count{0};
-    std::size_t high_watermark{0};
-  };
-
-  //
-  // https://stackoverflow.com/questions/11376288/fast-computing-of-log2-for-64-bit-integers
-  //
-  const int tab64[64] = {
-    63,  0, 58,  1, 59, 47, 53,  2,
-    60, 39, 48, 27, 54, 33, 42,  3,
-    61, 51, 37, 40, 49, 18, 28, 20,
-    55, 30, 34, 11, 43, 14, 22,  4,
-    62, 57, 46, 52, 38, 26, 32, 41,
-    50, 36, 17, 19, 29, 10, 13, 21,
-    56, 45, 25, 31, 35, 16,  9, 12,
-    44, 24, 15,  8, 23,  7,  6,  5};
-
-  int log2_64 (std::size_t size)
+struct TrackedCounter {
+  void increment()
   {
-    uint64_t value{static_cast<uint64_t>(size)};
-    value |= value >> 1;
-    value |= value >> 2;
-    value |= value >> 4;
-    value |= value >> 8;
-    value |= value >> 16;
-    value |= value >> 32;
-    uint64_t multiplier = UINT64_C(0x07EDD5E59A4E28C2);
-    uint64_t shifter = UINT64_C(58);
-    value = value - (value >> 1);
-    int index = (value * multiplier) >> shifter;
-    return tab64[index];
-  }
-
-  struct TrackedHistogram {
-    void increment(std::size_t size) {
-      int index{ log2_64(size) };
-
-      allocations++;
-      allocation_count++;
-      if ( size > largest_allocation )
-        largest_allocation = size;
-
-      log2_buckets[index].increment();
-    };
-
-    void decrement(std::size_t size) {
-      int index{ log2_64(size) };
-      deallocations++;
-      allocation_count--;
-      log2_buckets[index].decrement();
-    };
-
-    void print(std::string name) const {
-      if (largest_allocation > 0) {
-        std::cout << std::endl << name << ":" << std::endl;
-        std::cout << "    Total Deallocations:  " << deallocations << std::endl;
-        std::cout << "    Total Allocations:    " << allocations << std::endl;
-        std::cout << "    Largest Allocation:   " << largest_allocation << std::endl;
-        std::cout << "    Allocation Sizes Histogram (High watermark of allocations):" << std::endl;
-        for ( int i = 0; i < 64; i++ ) {
-          if (log2_buckets[i].high_watermark) {
-            std::cout << "    [2^" << i << " - 2^" << i+1 << ") = ";
-            std::cout << log2_buckets[i].high_watermark << std::endl;
-          }
-        }
-        std::cout << std::endl;
-      }
-    };
-
-    TrackedCounter log2_buckets[64]{};
-    std::size_t largest_allocation{0};
-    std::size_t allocations{0};
-    std::size_t deallocations{0};
-    std::size_t allocation_count{0};
+    current_count++;
+    if (current_count > high_watermark)
+      high_watermark = current_count;
   };
+
+  void decrement()
+  {
+    current_count--;
+  };
+
+  std::size_t current_count{0};
+  std::size_t high_watermark{0};
+};
+
+//
+// https://stackoverflow.com/questions/11376288/fast-computing-of-log2-for-64-bit-integers
+//
+const int tab64[64] = {63, 0,  58, 1,  59, 47, 53, 2,  60, 39, 48, 27, 54, 33, 42, 3,  61, 51, 37, 40, 49, 18,
+                       28, 20, 55, 30, 34, 11, 43, 14, 22, 4,  62, 57, 46, 52, 38, 26, 32, 41, 50, 36, 17, 19,
+                       29, 10, 13, 21, 56, 45, 25, 31, 35, 16, 9,  12, 44, 24, 15, 8,  23, 7,  6,  5};
+
+int log2_64(std::size_t size)
+{
+  uint64_t value{static_cast<uint64_t>(size)};
+  value |= value >> 1;
+  value |= value >> 2;
+  value |= value >> 4;
+  value |= value >> 8;
+  value |= value >> 16;
+  value |= value >> 32;
+  uint64_t multiplier = UINT64_C(0x07EDD5E59A4E28C2);
+  uint64_t shifter = UINT64_C(58);
+  value = value - (value >> 1);
+  int index = (value * multiplier) >> shifter;
+  return tab64[index];
 }
+
+struct TrackedHistogram {
+  void increment(std::size_t size)
+  {
+    int index{log2_64(size)};
+
+    allocations++;
+    allocation_count++;
+    if (size > largest_allocation)
+      largest_allocation = size;
+
+    log2_buckets[index].increment();
+  };
+
+  void decrement(std::size_t size)
+  {
+    int index{log2_64(size)};
+    deallocations++;
+    allocation_count--;
+    log2_buckets[index].decrement();
+  };
+
+  void print(std::string name) const
+  {
+    if (largest_allocation > 0) {
+      std::cout << std::endl << name << ":" << std::endl;
+      std::cout << "    Total Deallocations:  " << deallocations << std::endl;
+      std::cout << "    Total Allocations:    " << allocations << std::endl;
+      std::cout << "    Largest Allocation:   " << largest_allocation << std::endl;
+      std::cout << "    Allocation Sizes Histogram (High watermark of allocations):" << std::endl;
+      for (int i = 0; i < 64; i++) {
+        if (log2_buckets[i].high_watermark) {
+          std::cout << "    [2^" << i << " - 2^" << i + 1 << ") = ";
+          std::cout << log2_buckets[i].high_watermark << std::endl;
+        }
+      }
+      std::cout << std::endl;
+    }
+  };
+
+  TrackedCounter log2_buckets[64]{};
+  std::size_t largest_allocation{0};
+  std::size_t allocations{0};
+  std::size_t deallocations{0};
+  std::size_t allocation_count{0};
+};
+} // namespace
 
 void ReplayOperationManager::runOperations()
 {
-  std::map<int, TrackedHistogram > size_histogram;
+  std::map<int, TrackedHistogram> size_histogram;
   std::size_t op_counter{0};
   auto& rm = umpire::ResourceManager::getInstance();
 
   const int name_width{40};
   const int num_width{16};
   if (m_options.track_stats) {
-    std::cout
-      << std::setw(name_width) << std::left << "Filename"
-      << std::setw(name_width) << std::left << "Allocator"
-      << std::setw(num_width) << std::left << "Current Size"
-      << std::setw(num_width) << std::left << "Actual Size"
-      << std::setw(num_width) << std::left << "High Watermark"
-      << std::endl;
+    std::cout << std::setw(name_width) << std::left << "Filename" << std::setw(name_width) << std::left << "Allocator"
+              << std::setw(num_width) << std::left << "Current Size" << std::setw(num_width) << std::left
+              << "Actual Size" << std::setw(num_width) << std::left << "High Watermark" << std::endl;
   }
 
-  for ( auto op = &m_ops_table->ops[1];
-        op < &m_ops_table->ops[m_ops_table->num_operations];
-        ++op)
-  {
+  for (auto op = &m_ops_table->ops[1]; op < &m_ops_table->ops[m_ops_table->num_operations]; ++op) {
     try {
       switch (op->op_type) {
         case ReplayFile::otype::ALLOCATOR_CREATION:
@@ -212,12 +202,12 @@ void ReplayOperationManager::runOperations()
           REPLAY_ERROR("Unknown operation type: " << op->op_type);
           break;
       }
-    }
-    catch(...) {
-      std::cerr << std::endl << std::endl
-        << "Replay Failure Line Number: " << std::endl
-        << "  Line: " << op->op_line_number << m_replay_file->getLine(op->op_line_number)
-        << std::endl << std::endl;
+    } catch (...) {
+      std::cerr << std::endl
+                << std::endl
+                << "Replay Failure Line Number: " << std::endl
+                << "  Line: " << op->op_line_number << m_replay_file->getLine(op->op_line_number) << std::endl
+                << std::endl;
       throw;
     }
 
@@ -234,25 +224,13 @@ void ReplayOperationManager::runOperations()
         std::string hwm_stat_name{alloc_name + " hwm"};
         std::string allocs_stat_name{alloc_name + " allocation count"};
 
-        m_stat_series[cur_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              alloc->allocator->getCurrentSize()));
+        m_stat_series[cur_stat_name].push_back(std::make_pair(op_counter, alloc->allocator->getCurrentSize()));
 
-        m_stat_series[actual_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              alloc->allocator->getActualSize()));
+        m_stat_series[actual_stat_name].push_back(std::make_pair(op_counter, alloc->allocator->getActualSize()));
 
-        m_stat_series[hwm_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              alloc->allocator->getHighWatermark()));
+        m_stat_series[hwm_stat_name].push_back(std::make_pair(op_counter, alloc->allocator->getHighWatermark()));
 
-        m_stat_series[allocs_stat_name].push_back(
-            std::make_pair(
-              op_counter,
-              size_histogram[i].allocation_count));
+        m_stat_series[allocs_stat_name].push_back(std::make_pair(op_counter, size_histogram[i].allocation_count));
 
         auto strategy = alloc->allocator->getAllocationStrategy();
         umpire::strategy::QuickPool* qp_strat{dynamic_cast<umpire::strategy::QuickPool*>(strategy)};
@@ -261,13 +239,10 @@ void ReplayOperationManager::runOperations()
           std::string blocks_name{alloc_name + " total blocks"};
           std::string releasable_blocks_name{alloc_name + " releasable blocks"};
 
-          m_stat_series[releasable_blocks_name].push_back(
-              std::make_pair(op_counter, qp_strat->getReleasableBlocks()));
+          m_stat_series[releasable_blocks_name].push_back(std::make_pair(op_counter, qp_strat->getReleasableBlocks()));
 
-          m_stat_series[blocks_name].push_back(
-              std::make_pair(op_counter, qp_strat->getTotalBlocks()));
-        }
-        else {
+          m_stat_series[blocks_name].push_back(std::make_pair(op_counter, qp_strat->getTotalBlocks()));
+        } else {
           umpire::strategy::DynamicPoolList* dpl_strat{dynamic_cast<umpire::strategy::DynamicPoolList*>(strategy)};
 
           if (dpl_strat != nullptr) {
@@ -277,8 +252,7 @@ void ReplayOperationManager::runOperations()
             m_stat_series[releasable_blocks_name].push_back(
                 std::make_pair(op_counter, dpl_strat->getReleasableBlocks()));
 
-            m_stat_series[blocks_name].push_back(
-                std::make_pair(op_counter, dpl_strat->getTotalBlocks()));
+            m_stat_series[blocks_name].push_back(std::make_pair(op_counter, dpl_strat->getTotalBlocks()));
           }
         }
       }
@@ -294,18 +268,14 @@ void ReplayOperationManager::runOperations()
     for (const auto& alloc_name : rm.getAllocatorNames()) {
       auto alloc = rm.getAllocator(alloc_name);
       if (alloc.getHighWatermark()) {
-        std::cout
-          << std::setw(name_width) << std::left << m_replay_file->getInputFileName()
-          << std::setw(name_width) << std::left << alloc_name
-          << std::setw(num_width) << std::left << alloc.getCurrentSize()
-          << std::setw(num_width) << std::left << alloc.getActualSize()
-          << std::setw(num_width) << std::left << alloc.getHighWatermark()
-          << std::endl;
+        std::cout << std::setw(name_width) << std::left << m_replay_file->getInputFileName() << std::setw(name_width)
+                  << std::left << alloc_name << std::setw(num_width) << std::left << alloc.getCurrentSize()
+                  << std::setw(num_width) << std::left << alloc.getActualSize() << std::setw(num_width) << std::left
+                  << alloc.getHighWatermark() << std::endl;
       }
     }
 
-    for (auto const& x : size_histogram)
-    {
+    for (auto const& x : size_histogram) {
       auto alloc = &m_ops_table->allocators[x.first];
       x.second.print(alloc->allocator->getName());
     }
@@ -320,773 +290,403 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
   //
   // Check to see if user requested that we switch to a different pool
   //
-  if ( !m_options.pool_to_use.empty() ) {
-    if (   alloc->type == ReplayFile::rtype::DYNAMIC_POOL_LIST
-        || alloc->type == ReplayFile::rtype::QUICKPOOL) {
+  if (!m_options.pool_to_use.empty()) {
+    if (alloc->type == ReplayFile::rtype::DYNAMIC_POOL_LIST || alloc->type == ReplayFile::rtype::QUICKPOOL) {
       if (m_options.pool_to_use == "List") {
         alloc->type = ReplayFile::rtype::DYNAMIC_POOL_LIST;
-      }
-      else if (m_options.pool_to_use == "Quick") {
+      } else if (m_options.pool_to_use == "Quick") {
         alloc->type = ReplayFile::rtype::QUICKPOOL;
       }
     }
   }
 
   switch (alloc->type) {
-  case ReplayFile::rtype::MEMORY_RESOURCE:
-    alloc->allocator = new umpire::Allocator(rm.getAllocator(alloc->name));
-    break;
+    case ReplayFile::rtype::MEMORY_RESOURCE:
+      alloc->allocator = new umpire::Allocator(rm.getAllocator(alloc->name));
+      break;
 
-  case ReplayFile::rtype::ALLOCATION_ADVISOR:
-    if (alloc->argv.advisor.device_id >= 0) { // Optional device ID specified
-      switch ( alloc->argc ) {
-      default:
-        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
-      case 3:
-        if (alloc->introspection) {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-                , alloc->argv.advisor.device_id
-              )
-          );
+    case ReplayFile::rtype::ALLOCATION_ADVISOR:
+      if (alloc->argv.advisor.device_id >= 0) { // Optional device ID specified
+        switch (alloc->argc) {
+          default:
+            REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+          case 3:
+            if (alloc->introspection) {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice,
+                  alloc->argv.advisor.device_id));
+            } else {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice,
+                  alloc->argv.advisor.device_id));
+            }
+            break;
+          case 4:
+            if (alloc->introspection) {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice,
+                  rm.getAllocator(alloc->argv.advisor.accessing_allocator), alloc->argv.advisor.device_id));
+            } else {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice,
+                  rm.getAllocator(alloc->argv.advisor.accessing_allocator), alloc->argv.advisor.device_id));
+            }
+            break;
         }
-        else {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-                , alloc->argv.advisor.device_id
-              )
-          );
+      } else { // Use default device_id
+        switch (alloc->argc) {
+          default:
+            REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
+          case 2:
+            if (alloc->introspection) {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice));
+            } else {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice));
+            }
+            break;
+          case 3:
+            if (alloc->introspection) {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice,
+                  rm.getAllocator(alloc->argv.advisor.accessing_allocator)));
+            } else {
+              alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>(
+                  alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.advisor.advice,
+                  rm.getAllocator(alloc->argv.advisor.accessing_allocator)));
+            }
+            break;
         }
-        break;
-      case 4:
-        if (alloc->introspection) {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-                , rm.getAllocator(alloc->argv.advisor.accessing_allocator)
-                , alloc->argv.advisor.device_id
-              )
-          );
-        }
-        else {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-                , rm.getAllocator(alloc->argv.advisor.accessing_allocator)
-                , alloc->argv.advisor.device_id
-              )
-          );
-        }
-        break;
       }
-    }
-    else { // Use default device_id
-      switch ( alloc->argc ) {
-      default:
-        REPLAY_ERROR("Invalid number of arguments " << alloc->argc);
-      case 2:
-        if (alloc->introspection) {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-              )
-          );
-        }
-        else {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-              )
-          );
-        }
-        break;
-      case 3:
-        if (alloc->introspection) {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, true>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-                , rm.getAllocator(alloc->argv.advisor.accessing_allocator)
-              )
-          );
-        }
-        else {
-          alloc->allocator = new umpire::Allocator(
-            rm.makeAllocator<umpire::strategy::AllocationAdvisor, false>
-              (   alloc->name
-                , rm.getAllocator(alloc->base_name)
-                , alloc->argv.advisor.advice
-                , rm.getAllocator(alloc->argv.advisor.accessing_allocator)
-              )
-          );
-        }
-        break;
+      break;
+
+    case ReplayFile::rtype::ALLOCATION_PREFETCHER:
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationPrefetcher, true>(
+            alloc->name, rm.getAllocator(alloc->base_name)));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::AllocationPrefetcher, false>(
+            alloc->name, rm.getAllocator(alloc->base_name)));
       }
-    }
-    break;
+      break;
 
-  case ReplayFile::rtype::ALLOCATION_PREFETCHER:
-    if (alloc->introspection) {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::AllocationPrefetcher, true>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-          )
-      );
-    }
-    else {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::AllocationPrefetcher, false>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-          )
-      );
-    }
-    break;
-
-  case ReplayFile::rtype::NUMA_POLICY:
+    case ReplayFile::rtype::NUMA_POLICY:
 #if defined(UMPIRE_ENABLE_NUMA)
-    if (alloc->introspection) {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::NumaPolicy, true>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.numa.node
-          )
-      );
-    }
-    else {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::NumaPolicy, false>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.numa.node
-          )
-      );
-    }
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::NumaPolicy, true>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.numa.node));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::NumaPolicy, false>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.numa.node));
+      }
 #else
-    std::cerr
-      << "Warning, NUMA policy operation found and skipped, consider building"
-      << std::endl
-      << "version of replay with -DENABLE_NUMA=On."
-      << std::endl;
+      std::cerr << "Warning, NUMA policy operation found and skipped, consider building" << std::endl
+                << "version of replay with -DENABLE_NUMA=On." << std::endl;
 #endif // defined(UMPIRE_ENABLE_NUMA)
-    break;
+      break;
 
-  case ReplayFile::rtype::QUICKPOOL:
-    if (!m_options.heuristic_to_use.empty()) {
-      std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
-      std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
-      std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
-      umpire::strategy::PoolCoalesceHeuristic<umpire::strategy::QuickPool> heuristic{umpire::strategy::QuickPool::percent_releasable(100)};
+    case ReplayFile::rtype::QUICKPOOL:
+      if (!m_options.heuristic_to_use.empty()) {
+        std::size_t init_alloc_size{alloc->argv.pool.initial_alloc_size};
+        std::size_t min_alloc_size{alloc->argv.pool.min_alloc_size};
+        std::size_t alignment{static_cast<std::size_t>(alloc->argv.pool.alignment)};
+        umpire::strategy::PoolCoalesceHeuristic<umpire::strategy::QuickPool> heuristic{
+            umpire::strategy::QuickPool::percent_releasable(100)};
 
-      if (alloc->argc == 1) {
-        init_alloc_size = umpire::strategy::QuickPool::s_default_first_block_size;
-        min_alloc_size = umpire::strategy::QuickPool::s_default_next_block_size;
-        alignment = umpire::strategy::QuickPool::s_default_alignment;
-      }
-      else if (alloc->argc == 2) {
-        min_alloc_size = umpire::strategy::QuickPool::s_default_next_block_size;
-        alignment = umpire::strategy::QuickPool::s_default_alignment;
-      }
-      if (alloc->argc == 3) {
-        alignment = umpire::strategy::QuickPool::s_default_alignment;
-      }
+        if (alloc->argc == 1) {
+          init_alloc_size = umpire::strategy::QuickPool::s_default_first_block_size;
+          min_alloc_size = umpire::strategy::QuickPool::s_default_next_block_size;
+          alignment = umpire::strategy::QuickPool::s_default_alignment;
+        } else if (alloc->argc == 2) {
+          min_alloc_size = umpire::strategy::QuickPool::s_default_next_block_size;
+          alignment = umpire::strategy::QuickPool::s_default_alignment;
+        }
+        if (alloc->argc == 3) {
+          alignment = umpire::strategy::QuickPool::s_default_alignment;
+        }
 
-      if (m_options.heuristic_to_use == "Block") {
-        heuristic = umpire::strategy::QuickPool::blocks_releasable(m_options.heuristic_parm);
-      }
-      else if (m_options.heuristic_to_use == "FreePercentage") {
-        heuristic = umpire::strategy::QuickPool::percent_releasable(m_options.heuristic_parm);
-      }
+        if (m_options.heuristic_to_use == "Block") {
+          heuristic = umpire::strategy::QuickPool::blocks_releasable(m_options.heuristic_parm);
+        } else if (m_options.heuristic_to_use == "FreePercentage") {
+          heuristic = umpire::strategy::QuickPool::percent_releasable(m_options.heuristic_parm);
+        }
 
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , init_alloc_size
-              , min_alloc_size
-              , alignment
-              , heuristic));
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), init_alloc_size, min_alloc_size, alignment, heuristic));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), init_alloc_size, min_alloc_size, alignment));
+        }
+      } else if (alloc->argc >= 4) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size, alloc->argv.pool.alignment));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size, alloc->argv.pool.alignment));
+        }
+      } else if (alloc->argc == 3) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size));
+        }
+      } else if (alloc->argc == 2) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::QuickPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size));
+        }
+      } else {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(
+              rm.makeAllocator<umpire::strategy::QuickPool, true>(alloc->name, rm.getAllocator(alloc->base_name)));
+        } else {
+          alloc->allocator = new umpire::Allocator(
+              rm.makeAllocator<umpire::strategy::QuickPool, false>(alloc->name, rm.getAllocator(alloc->base_name)));
+        }
       }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , init_alloc_size
-              , min_alloc_size
-              , alignment));
-      }
-    }
-    else if (alloc->argc >= 4) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-              , alloc->argv.pool.alignment
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-              , alloc->argv.pool.alignment
-            )
-        );
-      }
-    }
-    else if (alloc->argc == 3) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-            )
-        );
-      }
-    }
-    else if (alloc->argc == 2) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-            )
-        );
-      }
-    }
-    else {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::QuickPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-    }
-    break;
+      break;
 
-  case ReplayFile::rtype::DYNAMIC_POOL_LIST:
-    if (!m_options.heuristic_to_use.empty()) {
-      std::size_t init_alloc_size{ alloc->argv.pool.initial_alloc_size };
-      std::size_t min_alloc_size{ alloc->argv.pool.min_alloc_size };
-      std::size_t alignment{ static_cast<std::size_t>(alloc->argv.pool.alignment) };
-      umpire::strategy::PoolCoalesceHeuristic<umpire::strategy::DynamicPoolList> heuristic{umpire::strategy::DynamicPoolList::percent_releasable(100)};
+    case ReplayFile::rtype::DYNAMIC_POOL_LIST:
+      if (!m_options.heuristic_to_use.empty()) {
+        std::size_t init_alloc_size{alloc->argv.pool.initial_alloc_size};
+        std::size_t min_alloc_size{alloc->argv.pool.min_alloc_size};
+        std::size_t alignment{static_cast<std::size_t>(alloc->argv.pool.alignment)};
+        umpire::strategy::PoolCoalesceHeuristic<umpire::strategy::DynamicPoolList> heuristic{
+            umpire::strategy::DynamicPoolList::percent_releasable(100)};
 
-      if (alloc->argc == 1) {
-        init_alloc_size = umpire::strategy::DynamicPoolList::s_default_first_block_size;
-        min_alloc_size = umpire::strategy::DynamicPoolList::s_default_next_block_size;
-        alignment = umpire::strategy::DynamicPoolList::s_default_alignment;
-      }
-      else if (alloc->argc == 2) {
-        min_alloc_size = umpire::strategy::DynamicPoolList::s_default_next_block_size;
-        alignment = umpire::strategy::DynamicPoolList::s_default_alignment;
-      }
-      if (alloc->argc == 3) {
-        alignment = umpire::strategy::DynamicPoolList::s_default_alignment;
-      }
+        if (alloc->argc == 1) {
+          init_alloc_size = umpire::strategy::DynamicPoolList::s_default_first_block_size;
+          min_alloc_size = umpire::strategy::DynamicPoolList::s_default_next_block_size;
+          alignment = umpire::strategy::DynamicPoolList::s_default_alignment;
+        } else if (alloc->argc == 2) {
+          min_alloc_size = umpire::strategy::DynamicPoolList::s_default_next_block_size;
+          alignment = umpire::strategy::DynamicPoolList::s_default_alignment;
+        }
+        if (alloc->argc == 3) {
+          alignment = umpire::strategy::DynamicPoolList::s_default_alignment;
+        }
 
-      if (m_options.heuristic_to_use == "Block") {
-        heuristic = umpire::strategy::DynamicPoolList::blocks_releasable(m_options.heuristic_parm);
-      }
-      else if (m_options.heuristic_to_use == "FreePercentage") {
-        heuristic = umpire::strategy::DynamicPoolList::percent_releasable(m_options.heuristic_parm);
-      }
+        if (m_options.heuristic_to_use == "Block") {
+          heuristic = umpire::strategy::DynamicPoolList::blocks_releasable(m_options.heuristic_parm);
+        } else if (m_options.heuristic_to_use == "FreePercentage") {
+          heuristic = umpire::strategy::DynamicPoolList::percent_releasable(m_options.heuristic_parm);
+        }
 
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , init_alloc_size
-              , min_alloc_size
-              , alignment
-              , heuristic));
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), init_alloc_size, min_alloc_size, alignment, heuristic));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), init_alloc_size, min_alloc_size, alignment));
+        }
+      } else if (alloc->argc >= 4) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size, alloc->argv.pool.alignment));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size, alloc->argv.pool.alignment));
+        }
+      } else if (alloc->argc == 3) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size,
+              alloc->argv.pool.min_alloc_size));
+        }
+      } else if (alloc->argc == 2) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.pool.initial_alloc_size));
+        }
+      } else {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, true>(
+              alloc->name, rm.getAllocator(alloc->base_name)));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::DynamicPoolList, false>(
+              alloc->name, rm.getAllocator(alloc->base_name)));
+        }
       }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , init_alloc_size
-              , min_alloc_size
-              , alignment));
-      }
-    }
-    else if (alloc->argc >= 4) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-              , alloc->argv.pool.alignment
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-              , alloc->argv.pool.alignment
-            )
-        );
-      }
-    }
-    else if (alloc->argc == 3) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-              , alloc->argv.pool.min_alloc_size
-            )
-        );
-      }
-    }
-    else if (alloc->argc == 2) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.pool.initial_alloc_size
-            )
-        );
-      }
-    }
-    else {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::DynamicPoolList, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-    }
-    break;
+      break;
 
-  case ReplayFile::rtype::MONOTONIC:
-    if (alloc->introspection) {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.monotonic_pool.capacity
-          )
-      );
-    }
-    else {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.monotonic_pool.capacity
-          )
-      );
-    }
-    break;
+    case ReplayFile::rtype::MONOTONIC:
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, true>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.monotonic_pool.capacity));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.monotonic_pool.capacity));
+      }
+      break;
 
-  case ReplayFile::rtype::SLOT_POOL:
-    if (alloc->introspection) {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::SlotPool, true>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.slot_pool.slots
-          )
-      );
-    }
-    else {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::SlotPool, false>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.slot_pool.slots
-          )
-      );
-    }
-    break;
+    case ReplayFile::rtype::SLOT_POOL:
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::SlotPool, true>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.slot_pool.slots));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::SlotPool, false>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.slot_pool.slots));
+      }
+      break;
 
-  case ReplayFile::rtype::SIZE_LIMITER:
-    if (alloc->introspection) {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::SizeLimiter, true>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.size_limiter.size_limit
-          )
-      );
-    }
-    else {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::SizeLimiter, false>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-            , alloc->argv.size_limiter.size_limit
-          )
-      );
-    }
-    break;
+    case ReplayFile::rtype::SIZE_LIMITER:
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter, true>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.size_limiter.size_limit));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::SizeLimiter, false>(
+            alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.size_limiter.size_limit));
+      }
+      break;
 
-  case ReplayFile::rtype::THREADSAFE_ALLOCATOR:
-    if (alloc->introspection) {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, true>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-          )
-      );
-    }
-    else {
-      alloc->allocator = new umpire::Allocator(
-        rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, false>
-          (   alloc->name
-            , rm.getAllocator(alloc->base_name)
-          )
-      );
-    }
-    break;
+    case ReplayFile::rtype::THREADSAFE_ALLOCATOR:
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, true>(
+            alloc->name, rm.getAllocator(alloc->base_name)));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::ThreadSafeAllocator, false>(
+            alloc->name, rm.getAllocator(alloc->base_name)));
+      }
+      break;
 
-  case ReplayFile::rtype::FIXED_POOL:
-    if (alloc->argc >= 3) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::FixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.fixed_pool.object_bytes
-              , alloc->argv.fixed_pool.objects_per_pool
-            )
-        );
+    case ReplayFile::rtype::FIXED_POOL:
+      if (alloc->argc >= 3) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::FixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.fixed_pool.object_bytes,
+              alloc->argv.fixed_pool.objects_per_pool));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::FixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.fixed_pool.object_bytes,
+              alloc->argv.fixed_pool.objects_per_pool));
+        }
+      } else {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::FixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.fixed_pool.object_bytes));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::FixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.fixed_pool.object_bytes));
+        }
       }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::FixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.fixed_pool.object_bytes
-              , alloc->argv.fixed_pool.objects_per_pool
-            )
-        );
-      }
-    }
-    else {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::FixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.fixed_pool.object_bytes
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::FixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.fixed_pool.object_bytes
-            )
-        );
-      }
-    }
-    break;
+      break;
 
-  case ReplayFile::rtype::MIXED_POOL:
-    if (alloc->argc >= 8) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-              , alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
-              , alloc->argv.mixed_pool.dynamic_min_alloc_bytes
-              , alloc->argv.mixed_pool.dynamic_align_bytes
-            )
-        );
+    case ReplayFile::rtype::MIXED_POOL:
+      if (alloc->argc >= 8) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier, alloc->argv.mixed_pool.dynamic_initial_alloc_bytes,
+              alloc->argv.mixed_pool.dynamic_min_alloc_bytes, alloc->argv.mixed_pool.dynamic_align_bytes));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier, alloc->argv.mixed_pool.dynamic_initial_alloc_bytes,
+              alloc->argv.mixed_pool.dynamic_min_alloc_bytes, alloc->argv.mixed_pool.dynamic_align_bytes));
+        }
+      } else if (alloc->argc >= 7) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier, alloc->argv.mixed_pool.dynamic_initial_alloc_bytes,
+              alloc->argv.mixed_pool.dynamic_min_alloc_bytes));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier, alloc->argv.mixed_pool.dynamic_initial_alloc_bytes,
+              alloc->argv.mixed_pool.dynamic_min_alloc_bytes));
+        }
+      } else if (alloc->argc >= 6) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier, alloc->argv.mixed_pool.dynamic_initial_alloc_bytes));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier, alloc->argv.mixed_pool.dynamic_initial_alloc_bytes));
+        }
+      } else if (alloc->argc >= 5) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize,
+              alloc->argv.mixed_pool.size_multiplier));
+        }
+      } else if (alloc->argc >= 4) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize, alloc->argv.mixed_pool.max_fixed_blocksize));
+        }
+      } else if (alloc->argc >= 3) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize,
+              alloc->argv.mixed_pool.largest_fixed_blocksize));
+        }
+      } else if (alloc->argc >= 2) {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, true>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize));
+        } else {
+          alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MixedPool, false>(
+              alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.mixed_pool.smallest_fixed_blocksize));
+        }
+      } else {
+        if (alloc->introspection) {
+          alloc->allocator = new umpire::Allocator(
+              rm.makeAllocator<umpire::strategy::MixedPool, true>(alloc->name, rm.getAllocator(alloc->base_name)));
+        } else {
+          alloc->allocator = new umpire::Allocator(
+              rm.makeAllocator<umpire::strategy::MixedPool, false>(alloc->name, rm.getAllocator(alloc->base_name)));
+        }
       }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-              , alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
-              , alloc->argv.mixed_pool.dynamic_min_alloc_bytes
-              , alloc->argv.mixed_pool.dynamic_align_bytes
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 7) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-              , alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
-              , alloc->argv.mixed_pool.dynamic_min_alloc_bytes
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-              , alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
-              , alloc->argv.mixed_pool.dynamic_min_alloc_bytes
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 6) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-              , alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-              , alloc->argv.mixed_pool.dynamic_initial_alloc_bytes
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 5) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-              , alloc->argv.mixed_pool.size_multiplier
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 4) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-              , alloc->argv.mixed_pool.max_fixed_blocksize
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 3) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-              , alloc->argv.mixed_pool.largest_fixed_blocksize
-            )
-        );
-      }
-    }
-    else if (alloc->argc >= 2) {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-              , alloc->argv.mixed_pool.smallest_fixed_blocksize
-            )
-        );
-      }
-    }
-    else {
-      if (alloc->introspection) {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, true>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-      else {
-        alloc->allocator = new umpire::Allocator(
-          rm.makeAllocator<umpire::strategy::MixedPool, false>
-            (   alloc->name
-              , rm.getAllocator(alloc->base_name)
-            )
-        );
-      }
-    }
-    break;
+      break;
 
-  default:
-    REPLAY_ERROR("Unknown operation type: " << op->op_type);
-    break;
+    default:
+      REPLAY_ERROR("Unknown operation type: " << op->op_type);
+      break;
   }
 }
 
@@ -1128,7 +728,7 @@ void ReplayOperationManager::makeCopy(ReplayFile::Operation* op)
   auto dst_off = op->op_offsets[1];
   auto size = op->op_size;
 
-  rm.copy(dst_ptr+dst_off, src_ptr+src_off, size);
+  rm.copy(dst_ptr + dst_off, src_ptr + src_off, size);
 }
 
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
@@ -1137,16 +737,14 @@ void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
     auto alloc = &m_ops_table->allocators[op->op_allocator];
     auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
     alloc->allocator->deallocate(ptr);
-  }
-  catch (...) {
+  } catch (...) {
     std::cerr << std::endl
-      << "Deallocation Failure Line Number: " << std::endl
-      << "  Line: " << op->op_line_number << m_replay_file->getLine(op->op_line_number) << std::endl
-      << "  for memory allocation at:" << std::endl
-      << "  Line: " << m_ops_table->ops[op->op_alloc_ops[0]].op_line_number
-      << m_replay_file->getLine(
-              m_ops_table->ops[op->op_alloc_ops[0]].op_line_number)
-      << std::endl << std::endl;
+              << "Deallocation Failure Line Number: " << std::endl
+              << "  Line: " << op->op_line_number << m_replay_file->getLine(op->op_line_number) << std::endl
+              << "  for memory allocation at:" << std::endl
+              << "  Line: " << m_ops_table->ops[op->op_alloc_ops[0]].op_line_number
+              << m_replay_file->getLine(m_ops_table->ops[op->op_alloc_ops[0]].op_line_number) << std::endl
+              << std::endl;
     throw;
   }
 }
@@ -1155,8 +753,7 @@ void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->op_allocator];
 
-  auto dynamic_pool =
-    umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(*(alloc->allocator));
+  auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(*(alloc->allocator));
   dynamic_pool->coalesce();
 }
 
@@ -1181,9 +778,7 @@ void ReplayOperationManager::dumpStats()
       std::size_t val;
       std::tie(t, val) = entry;
 
-      file
-        <<  t
-        << " " << val << std::endl;
+      file << t << " " << val << std::endl;
     }
   }
 }
