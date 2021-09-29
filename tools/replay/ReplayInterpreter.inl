@@ -10,11 +10,11 @@
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include <sstream>
 
-template <typename T> void
-ReplayInterpreter::get_from_string( const std::string& s, T& val )
+template <typename T>
+void ReplayInterpreter::get_from_string(const std::string& s, T& val)
 {
-    std::istringstream ss(s);
-    ss >> val;
+  std::istringstream ss(s);
+  ss >> val;
 }
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 

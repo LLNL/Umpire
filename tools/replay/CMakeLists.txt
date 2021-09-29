@@ -57,3 +57,5 @@ blt_add_target_compile_flags(
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)
+
+umpire_add_code_checks(PREFIX tools)
