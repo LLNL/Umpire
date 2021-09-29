@@ -57,13 +57,6 @@ if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
        ${umpire_device_depends}
        cuda)
   else()
-    set_source_files_properties(DeviceAllocator.cpp
-                                PROPERTIES
-                                LANGUAGE HIP)
-    set_source_files_properties(device_allocator_helper.cpp
-                                PROPERTIES
-                                LANGUAGE HIP)
-    
     set(umpire_device_depends
        ${umpire_device_depends}
        hip)
@@ -73,8 +66,7 @@ if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     NAME umpire_device
     HEADERS ${umpire_device_headers}
     SOURCES ${umpire_device_sources}
-    DEPENDS_ON ${umpire_device_depends}
-    OBJECT TRUE)
+    DEPENDS_ON ${umpire_device_depends})
 
   target_include_directories(
     umpire_device

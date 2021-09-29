@@ -79,7 +79,7 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_DEVICE_COMPILE)
   // Tear down and deallocate memory.
   if (umpire::UMPIRE_DEV_ALLOCS_h != nullptr) {
     umpire::destroy_device_allocator();

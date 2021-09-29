@@ -7,7 +7,11 @@
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#elif defined(UMPIRE_ENABLE_HIP)
+#include "umpire/alloc/HipMallocManagedAllocator.hpp"
+#endif
 #include "umpire/device_allocator_helper.hpp"
 #include "umpire/util/Macros.hpp"
 

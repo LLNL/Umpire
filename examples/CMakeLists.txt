@@ -132,7 +132,7 @@ if (UMPIRE_ENABLE_HIP)
     SOURCES device-allocator.cpp
     DEPENDS_ON umpire hip
   )
-  
+
   list(APPEND umpire_examples device_allocator_example)
 endif()
 

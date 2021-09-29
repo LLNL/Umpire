@@ -4,12 +4,11 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/DeviceAllocator.hpp"
-
 #include <stdio.h>
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/DeviceAllocator.hpp"
 #include "umpire/device_allocator_helper.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
@@ -100,7 +99,7 @@ __host__ __device__ bool DeviceAllocator::isInitialized()
 __host__ __device__ void DeviceAllocator::reset()
 {
   // Set m_counter back to zero
-#if !defined(__CUDA_ARCH__)
+#if !defined(UMPIRE_DEVICE_COMPILE)
   auto& rm = umpire::ResourceManager::getInstance();
   rm.memset(m_counter, 0);
 #else

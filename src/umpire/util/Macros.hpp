@@ -83,7 +83,7 @@
 
 #if defined(__CUDA_ARCH__)
 #define UMPIRE_ERROR(msg) asm("trap;");
-#elif defined(__HIPCC__) && defined(__HIP_DEVICE_COMPILE__)
+#elif defined(__HIPCC__) || defined(__HIP_DEVICE_COMPILE__)
 #define UMPIRE_ERROR(msg) abort();
 #else
 #define UMPIRE_ERROR(msg)                                                                             \
