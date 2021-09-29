@@ -599,7 +599,10 @@ void ReplayInterpreter::replay_compileAllocator( void )
 
       m_ops->copyString(base_allocator_name, alloc->base_name);
     }
-    else if ( type == "umpire::strategy::QuickPool" ) {
+    // DynamicPool and DynamicPoolMap were deprecated in v6.0.0 and subsequently removed.  Convert all replays of
+    // DynamicPoolMap to QuickPool so that old replays may still be run.
+    //
+    else if ( type == "umpire::strategy::QuickPool" || type == "umpire::strategy::DynamicPool" || type == "umpire::strategy::DynamicPoolMap" ) {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::QUICKPOOL;
