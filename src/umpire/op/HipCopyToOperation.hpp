@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -27,6 +27,12 @@ class HipCopyToOperation : public MemoryOperation {
    */
   void transform(void* src_ptr, void** dst_ptr, umpire::util::AllocationRecord* src_allocation,
                  umpire::util::AllocationRecord* dst_allocation, std::size_t length);
+
+  camp::resources::EventProxy<camp::resources::Resource> transform_async(void* src_ptr, void** dst_ptr,
+                                                                         umpire::util::AllocationRecord* src_allocation,
+                                                                         umpire::util::AllocationRecord* dst_allocation,
+                                                                         std::size_t length,
+                                                                         camp::resources::Resource& ctx);
 };
 
 } // end of namespace op

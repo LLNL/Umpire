@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -65,18 +65,18 @@ if [[ -z ${hostconfig} ]]
 then
     # If no host config file was provided, we assume it was generated.
     # This means we are looking of a unique one in project dir.
-    hostconfigs=( $( ls "${project_dir}/"hc-*.cmake ) )
+    hostconfigs=( $( ls "${project_dir}/"*.cmake ) )
     if [[ ${#hostconfigs[@]} == 1 ]]
     then
         hostconfig_path=${hostconfigs[0]}
         echo "Found host config file: ${hostconfig_path}"
     elif [[ ${#hostconfigs[@]} == 0 ]]
     then
-        echo "No result for: ${project_dir}/hc-*.cmake"
+        echo "No result for: ${project_dir}/*.cmake"
         echo "Spack generated host-config not found."
         exit 1
     else
-        echo "More than one result for: ${project_dir}/hc-*.cmake"
+        echo "More than one result for: ${project_dir}/*.cmake"
         echo "${hostconfigs[@]}"
         echo "Please specify one with HOST_CONFIG variable"
         exit 1
@@ -150,7 +150,7 @@ then
     date
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
-    if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
+    if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
     then
         date
         ctest --verbose -C Benchmark -R no-op_stress_test

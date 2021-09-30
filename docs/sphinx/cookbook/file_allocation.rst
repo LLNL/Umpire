@@ -4,7 +4,7 @@
 Using File System Allocator (FILE)
 ==================================
 
-Umpire supports the use of file based memory allocation. When ``ENABLE_FILE_RESOURCE`` 
+Umpire supports the use of file based memory allocation. When ``UMPIRE_ENABLE_FILE_RESOURCE`` 
 is enabled, the environment variables ``UMPIRE_MEMORY_FILE_DIR`` can be used to determine 
 where memory can be allocated from:
 
@@ -55,12 +55,12 @@ Note that ``-stage storage=64`` is needed in order to work with the Burst Buffer
 Running File Resource Benchmarks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Continue building Umpire on 1 node, and set the ``-DENABLE_FILE_RESOURCE=On`` :
+Continue building Umpire on 1 node, and set the ``-DUMPIRE_ENABLE_FILE_RESOURCE=On`` :
 
 .. code-block:: bash
 
   $ mkdir build && cd build
-  $ lrun -n 1 cmake -DENABLE_FILE_RESOURCE=On -DENABLE_OPENMP=On ../ && make
+  $ lrun -n 1 cmake -DUMPIRE_ENABLE_FILE_RESOURCE=On -DENABLE_OPENMP=On ../ && make
 
 To run the built-in benchmarks in Umpire from the build run:
 

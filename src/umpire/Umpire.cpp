@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -26,7 +26,7 @@
 #include <fstream>
 #include <sstream>
 
-UMPIRE_EXPORT volatile int umpire_ver_5_found = 0;
+UMPIRE_EXPORT int UMPIRE_VERSION_SYM{0};
 
 namespace umpire {
 
@@ -136,7 +136,12 @@ std::size_t get_process_memory_usage()
 
 void mark_event(const std::string& event)
 {
-  UMPIRE_REPLAY(R"( "event": "mark", "payload": { "event": ")" << event << R"(" })");
+  umpire::event::event::builder()
+      .name("event")
+      .category(event::category::metadata)
+      .arg("name", event)
+      .tag("replay", "true")
+      .record();
 }
 
 std::size_t get_device_memory_usage(int device_id)
@@ -222,5 +227,33 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   return c;
 }
 #endif
+
+void register_external_allocation(void* ptr, util::AllocationRecord record)
+{
+  umpire::event::event::builder()
+      .name("register_external_allocation")
+      .category(event::category::operation)
+      .arg("allocator_ref", (void*)record.strategy)
+      .arg("size", record.size)
+      .arg("pointer", record.ptr)
+      .tag("allocator_name", record.strategy->getName())
+      .tag("replay", "true")
+      .record();
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  rm.registerAllocation(ptr, record);
+}
+
+util::AllocationRecord deregister_external_allocation(void* ptr)
+{
+  umpire::event::event::builder()
+      .name("deregister_external_allocation")
+      .category(event::category::operation)
+      .tag("replay", "true")
+      .record();
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  return rm.deregisterAllocation(ptr);
+}
 
 } // end namespace umpire

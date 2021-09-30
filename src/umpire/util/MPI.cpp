@@ -1,13 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
+
 #include "umpire/util/MPI.hpp"
 
-#include "umpire/Replay.hpp"
 #include "umpire/config.hpp"
+#include "umpire/event/event.hpp"
 #include "umpire/util/Macros.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
@@ -101,7 +102,12 @@ void MPI::logMpiInfo()
     UMPIRE_LOG(Info, "MPI rank: " << s_rank);
     UMPIRE_LOG(Info, "MPI comm size: " << s_world_size);
 
-    UMPIRE_REPLAY("\"event\": \"mpi\", \"payload\": { \"rank\":" << s_rank << ", \"size\":" << s_world_size << "}");
+    umpire::event::event::builder()
+        .name("mpi")
+        .category(event::category::metadata)
+        .arg("world_size", s_world_size)
+        .arg("rank", s_rank)
+        .record();
 #endif
   }
 }

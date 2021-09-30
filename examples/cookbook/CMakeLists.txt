@@ -1,16 +1,16 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (cookbook_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (cookbook_depends ${cookbook_depends} hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (cookbook_depends
     ${cookbook_depends}
     openmp)
@@ -22,7 +22,7 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_no_introspection)
 
-if (ENABLE_NUMA)
+if (UMPIRE_ENABLE_NUMA)
   blt_add_executable(
     NAME recipe_move_between_numa
     SOURCES recipe_move_between_numa.cpp
@@ -30,7 +30,7 @@ if (ENABLE_NUMA)
   list(APPEND umpire_cookbooks recipe_move_between_numa)
 endif ()
 
-if (ENABLE_IPC_SHARED_MEMORY)
+if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   blt_add_executable(
     NAME recipe_shared_memory
     SOURCES recipe_shared_memory.cpp
@@ -38,7 +38,7 @@ if (ENABLE_IPC_SHARED_MEMORY)
   list(APPEND umpire_cookbooks recipe_shared_memory)
 endif()
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp
@@ -77,7 +77,7 @@ if (ENABLE_CUDA)
     OUTPUT_DIR ${cookbook_output_dir})
   list(APPEND umpire_cookbooks recipe_memprefetch_pool)
 
-  if (ENABLE_FORTRAN)
+  if (UMPIRE_ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
       SOURCES recipe_pinned_pool.F
@@ -103,7 +103,7 @@ if (ENABLE_CUDA)
   endif()
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp
@@ -116,7 +116,7 @@ if (ENABLE_HIP)
     DEPENDS_ON ${cookbook_depends})
   list(APPEND umpire_cookbooks recipe_move_to_managed)
 
-  if (ENABLE_FORTRAN)
+  if (UMPIRE_ENABLE_FORTRAN)
     blt_add_executable(
       NAME recipe_pinned_pool
       SOURCES recipe_pinned_pool.F
@@ -167,7 +167,7 @@ blt_add_executable(
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_mixed_pool)
 
-if (ENABLE_FORTRAN)
+if (UMPIRE_ENABLE_FORTRAN)
   blt_add_executable(
     NAME recipe_thread_safe_F
     SOURCES recipe_thread_safe.F
@@ -184,6 +184,12 @@ blt_add_executable(
   SOURCES recipe_strategy_name.cpp
   DEPENDS_ON ${cookbook_depends})
 list(APPEND umpire_cookbooks recipe_strategy_name)
+
+blt_add_executable(
+  NAME recipe_named_allocation
+  SOURCES recipe_named_allocation.cpp
+  DEPENDS_ON ${cookbook_depends})
+list(APPEND umpire_cookbooks recipe_named_allocation)
 
 install(TARGETS ${umpire_cookbooks} RUNTIME DESTINATION bin)
 

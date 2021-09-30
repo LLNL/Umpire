@@ -1,12 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 
-#include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
 
@@ -22,7 +21,13 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
 
 void Allocator::release()
 {
-  UMPIRE_REPLAY("\"event\": \"release\", \"payload\": { \"allocator_ref\": \"" << m_allocator << "\" }");
+  umpire::event::event::builder()
+      .name("release")
+      .category(event::category::operation)
+      .arg("allocator_ref", (void*)m_allocator)
+      .tag("allocator_name", m_allocator->getName())
+      .tag("replay", "true")
+      .record();
 
   UMPIRE_LOG(Debug, "");
 

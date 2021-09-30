@@ -1,17 +1,17 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set(tools_depends umpire umpire_tpl_json)
+set(tools_depends umpire umpire_tpl_CLI11)
 
-if (ENABLE_BACKTRACE_SYMBOLS)
+if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set(tools_depends ${tools_depends} ${CMAKE_DL_LIBS})
 endif()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set(tools_depends ${tools_depends} hip_runtime)
 endif()
 
@@ -40,7 +40,7 @@ blt_add_executable(
   DEPENDS_ON ${tools_depends})
 list(APPEND replay_tools replaydiff)
 
-if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND ENABLE_BACKTRACE_SYMBOLS)
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" AND UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   blt_add_target_link_flags(
     TO replay
     FLAGS "-rdynamic")

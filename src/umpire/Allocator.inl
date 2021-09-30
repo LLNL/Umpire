@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -8,8 +8,9 @@
 #define UMPIRE_Allocator_INL
 
 #include "umpire/Allocator.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/config.hpp"
+#include "umpire/event/event.hpp"
+#include "umpire/event/recorder_factory.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -18,12 +19,9 @@ inline void* Allocator::allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
-  umpire_ver_5_found = 0;
+  UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator
-                                                                                << "\", \"size\": " << bytes << " }");
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -35,8 +33,15 @@ inline void* Allocator::allocate(std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator);
   }
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  umpire::event::event::builder()
+      .name("allocate")
+      .category(event::category::operation)
+      .arg("allocator_ref", (void*)m_allocator)
+      .arg("size", bytes)
+      .arg("pointer", ret)
+      .tag("allocator_name", m_allocator->getName())
+      .tag("replay", "true")
+      .record();
 
   return ret;
 }
@@ -45,14 +50,9 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
 
+  UMPIRE_ASSERT(UMPIRE_VERSION_OK());
+
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  if (m_allocator->getTraits().resource != MemoryResourceTraits::resource_type::shared) {
-    UMPIRE_ERROR("This allocator does not support named allocations");
-  }
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -61,20 +61,35 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   }
 
   if (m_tracking) {
-    registerAllocation(ret, bytes, m_allocator);
+    registerAllocation(ret, bytes, m_allocator, name);
   }
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
-                << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  umpire::event::event::builder()
+      .name("allocate")
+      .category(event::category::operation)
+      .arg("allocator_ref", (void*)m_allocator)
+      .arg("size", bytes)
+      .arg("pointer", ret)
+      .arg("name", name)
+      .tag("allocator_name", m_allocator->getName())
+      .tag("replay", "true")
+      .record();
 
   return ret;
 }
 
 inline void Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
+  //#if defined(UMPIRE_ENABLE_EVENTS)
+  umpire::event::event::builder()
+      .name("deallocate")
+      .category(event::category::operation)
+      .arg("allocator_ref", (void*)m_allocator)
+      .arg("pointer", ptr)
+      .tag("allocator_name", m_allocator->getName())
+      .tag("replay", "true")
+      .record();
+  //#endif
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 

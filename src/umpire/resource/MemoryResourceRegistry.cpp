@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -63,7 +63,6 @@
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 #endif
 
-#include "umpire/Replay.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {

@@ -1,18 +1,18 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (stress_test_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (stress_test_depends
       ${stress_test_depends}
       hip_runtime)
 endif()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (stress_test_depends
       ${stress_test_depends}
       openmp)
@@ -22,6 +22,21 @@ blt_add_executable(
   NAME allocator_stress_test
   SOURCES allocator_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
+
+if (ENABLE_CUDA)
+  blt_add_executable(
+    NAME device_allocator_stress_test
+    SOURCES device_allocator_stress_test.cpp
+    DEPENDS_ON umpire cuda)
+
+  set_source_files_properties(
+    device_allocator_stress_test.cpp
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  set_target_properties(
+    device_allocator_stress_test
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+endif()
 
 blt_add_executable(
   NAME copy_stress_test
@@ -51,16 +66,16 @@ blt_add_target_compile_flags(
   TO pool_stress_test
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-if (ENABLE_BENCHMARKS)
+if (UMPIRE_ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)
 
-  if (ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP)
     set (benchmark_depends
       ${benchmark_depends}
       hip_runtime)
   endif()
 
-  if (ENABLE_OPENMP_TARGET)
+  if (UMPIRE_ENABLE_OPENMP_TARGET)
     set (benchmark_depends
       ${benchmark_depends}
       openmp)
@@ -89,7 +104,7 @@ if (ENABLE_BENCHMARKS)
     SOURCES debuglog_benchmarks.cpp
     DEPENDS_ON ${benchmark_depends})
 
-  if (ENABLE_OPENMP)
+  if (UMPIRE_ENABLE_OPENMP)
     set (benchmark_depends
       ${benchmark_depends}
       openmp)

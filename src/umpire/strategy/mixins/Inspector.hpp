@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,6 +10,7 @@
 #include "umpire/util/AllocationRecord.hpp"
 
 #include <memory>
+#include <string>
 
 namespace umpire {
 namespace strategy {
@@ -23,14 +24,12 @@ class Inspector
   public:
     Inspector() = default;
 
-    void registerAllocation(
-        void* ptr,
-        std::size_t size,
-        strategy::AllocationStrategy* strategy);
+    void registerAllocation(void* ptr, std::size_t size, strategy::AllocationStrategy* strategy);
+
+    void registerAllocation(void* ptr, std::size_t size, strategy::AllocationStrategy* strategy, const std::string& name);
 
     // Deregisters the allocation if the strategy matches, otherwise throws an error
-    util::AllocationRecord deregisterAllocation(
-      void* ptr, strategy::AllocationStrategy* strategy);
+    util::AllocationRecord deregisterAllocation(void* ptr, strategy::AllocationStrategy* strategy);
 };
 
 } // end of namespace mixins

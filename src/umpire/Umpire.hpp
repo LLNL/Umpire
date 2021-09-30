@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -179,6 +179,9 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name);
 #if defined(UMPIRE_ENABLE_MPI)
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 #endif
+
+void register_external_allocation(void* ptr, util::AllocationRecord record);
+util::AllocationRecord deregister_external_allocation(void* ptr);
 
 } // end of namespace umpire
 

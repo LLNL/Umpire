@@ -1,26 +1,26 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-if (ENABLE_C)
+if (UMPIRE_ENABLE_C)
   set (interface_tests_depends
     umpire gtest)
 
-  if (ENABLE_CUDA)
+  if (UMPIRE_ENABLE_CUDA)
     set (interface_tests_depends
       ${interface_tests_depends}
       cuda_runtime)
   endif ()
 
-  if (ENABLE_HIP)
+  if (UMPIRE_ENABLE_HIP)
     set (interface_tests_depends
       ${interface_tests_depends}
       hip_runtime)
   endif ()
 
-  if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+  if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
     set (interface_tests_depends
       ${interface_tests_depends}
       openmp)
@@ -68,7 +68,7 @@ if (ENABLE_C)
     NAME version_c_tests
     COMMAND version_c_tests)
 
-  if (ENABLE_FORTRAN)
+  if (UMPIRE_ENABLE_FORTRAN)
     add_subdirectory(fortran)
   endif()
 endif()

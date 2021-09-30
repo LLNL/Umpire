@@ -1,11 +1,11 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_IOManager_HPP
-#define UMPIRE_IOManager_HPP
+#ifndef UMPIRE_io_HPP
+#define UMPIRE_io_HPP
 
 #include <ostream>
 #include <string>
@@ -14,16 +14,25 @@ namespace umpire {
 
 // Output streams
 std::ostream& log();
-std::ostream& replay();
 std::ostream& error();
 
 namespace util {
+
+std::string make_unique_filename(const std::string& base_dir, const std::string& name, const int pid,
+                                 const std::string& extension);
+
+bool file_exists(const std::string& file);
+
+bool directory_exists(const std::string& file);
+
+const std::string& get_io_output_dir();
+const std::string& get_io_output_basename();
 
 /*!
  * \brief Initialize the streams. This method is called when ResourceManger is
  * initialized. Do not call this manually.
  */
-void initialize_io(const bool enable_log, const bool enable_replay);
+void initialize_io(const bool enable_log);
 
 /*!
  * \brief Synchronize all stream buffers to their respective output sequences.

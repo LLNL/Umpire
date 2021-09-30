@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -14,42 +14,31 @@ if (NOT C_COMPILER_FAMILY_IS_PGI)
 
   if (PYTHON_EXECUTABLE)
     umpire_add_test_with_mpi(
-      NAME io_tests_with_basename_logging_replay
+      NAME io_tests_with_basename_logging
       NUM_MPI_TASKS 1
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +logging +replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +logging" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     umpire_add_test_with_mpi(
       NAME io_tests_with_basename_directory
       NUM_MPI_TASKS 1
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory -logging -replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory -logging" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
     umpire_add_test_with_mpi(
       NAME io_tests_with_basename_directory_logging
       NUM_MPI_TASKS 1
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory +logging -replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-    umpire_add_test_with_mpi(
-      NAME io_tests_with_basename_directory_replay
-      NUM_MPI_TASKS 1
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory -logging +replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-    umpire_add_test_with_mpi(
-      NAME io_tests_with_basename_directory_logging_replay
-      NUM_MPI_TASKS 1
-      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory +logging +replay" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
+      COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/io_tests_runner.py "Basename +Directory +logging" WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   endif ()
 endif ()
 
 set (log_depends umpire)
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (log_depends
     ${log_depends}
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (log_depends
     ${log_depends}
     openmp)

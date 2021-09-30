@@ -1,0 +1,20 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Beckingsale 
+    given-names: David
+    orcid: https://orcid.org/0000-0003-2545-4837
+  - family-names: McFadden
+    given-names: Marty
+  - family-names: Dahm
+    given-names: Johann
+  - family-names: Pankajakshan
+    given-names: Ramesh 
+    orcid: https://orcid.org/0000-0002-4249-2555
+  - family-names: Hornung 
+    given-names: Rich
+    orcid: https://orcid.org/0000-0002-9495-6972
+title: "Umpire: Application-focused management and coordination of complex hierarchical memory"
+version: develop
+doi: 10.1147/JRD.2019.2954403
+date-released: 2020-05-01

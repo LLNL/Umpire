@@ -14,7 +14,7 @@
 ##############################################################################
 
 copyright:
-  - Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+  - Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
   - project contributors. See the COPYRIGHT file for details.
   -
   - "SPDX-License-Identifier: (MIT)"
@@ -189,8 +189,6 @@ declarations:
               template_suffix: _prefetcher
               function_suffix: ""
 
-
-      - decl: void registerAllocator(const std::string& name, Allocator allocator)
       - decl: void addAlias(const std::string& name, Allocator allocator)
       - decl: void removeAlias(const std::string& name, Allocator allocator)
 

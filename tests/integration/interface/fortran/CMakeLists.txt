@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-20, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -10,30 +10,30 @@ set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MAJOR=${Umpir
 set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_MINOR=${Umpire_VERSION_MINOR})
 set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_VERSION_PATCH=${Umpire_VERSION_PATCH})
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_CUDA)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (fortran_test_defines ${fortran_test_defines} -DUMPIRE_ENABLE_HIP)
 endif ()
 
 set (fortran_tests_depends
   umpire fruit)
 
-if (ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA)
   set (fortran_tests_depends
     ${fortran_tests_depends}
     cuda_runtime)
 endif ()
 
-if (ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP)
   set (fortran_tests_depends
     ${fortran_tests_depends}
     hip_runtime)
 endif ()
 
-if (ENABLE_OPENMP OR ENABLE_OPENMP_TARGET)
+if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (fortran_tests_depends
     ${fortran_tests_depends}
     openmp)

@@ -1,4 +1,4 @@
-# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v5.0.1
+# <img src="https://cdn.rawgit.com/LLNL/Umpire/develop/share/umpire/logo/umpire-logo.png" width="128" valign="middle" alt="Umpire"/>  Umpire v6.0.0
 
 [![Travis Build Status](https://travis-ci.com/LLNL/Umpire.svg?branch=develop)](https://travis-ci.com/LLNL/Umpire)
 [![Azure Pipelines Build Status](https://dev.azure.com/davidbeckingsale/Umpire/_apis/build/status/LLNL.Umpire?branchName=develop)](https://dev.azure.com/davidbeckingsale/Umpire/_build/latest?definitionId=1&branchName=develop)
@@ -30,9 +30,9 @@ For more advanced configuration you can use standard CMake variables.
 
 Both user and code documentation is available [here](http://umpire.readthedocs.io/).
 
-The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/tutorial.html) provides a step by step introduction to Umpire features.
+The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/sphinx/tutorial.html) provides a step by step introduction to Umpire features.
 
-If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
+If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/sphinx/advanced_configuration.html) too!
 
 # Getting Involved
 

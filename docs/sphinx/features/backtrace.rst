@@ -13,8 +13,8 @@ Build Configuration
 -------------------
 Backtrace is enabled in Umpire builds with the following:
 
-- **``cmake ... -DENABLE_BACKTRACE=On ...``** to backtrace capability in Umpire.
-- **``cmake -DENABLE_BACKTRACE=On -DENABLE_BACKTRACE_SYMBOLS=On ...``** to
+- **``cmake ... -DUMPIRE_ENABLE_BACKTRACE=On ...``** to backtrace capability in Umpire.
+- **``cmake -DUMPIRE_ENABLE_BACKTRACE=On -DUMPIRE_ENABLE_BACKTRACE_SYMBOLS=On ...``** to
   enable Umpire to display symbol information with backtrace.  **Note:**
   Using programs will need to add the ``-rdyanmic`` and ``-ldl`` linker flags
   in order to properly link with this configuration of the Umpire library.
