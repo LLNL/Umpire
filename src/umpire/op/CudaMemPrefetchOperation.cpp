@@ -42,5 +42,39 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
   }
 }
 
+camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation::apply_async(
+    void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value, std::size_t length,
+    camp::resources::Resource& ctx)
+{
+  int device{value};
+  cudaError_t error;
+
+  // Use current device for properties if device is CPU
+  int current_device;
+  cudaGetDevice(&current_device);
+  int gpu = (device != cudaCpuDeviceId) ? device : current_device;
+
+  cudaDeviceProp properties;
+  error = ::cudaGetDeviceProperties(&properties, gpu);
+
+  auto stream = ctx.get<camp::resources::Cuda>().get_stream();
+
+  if (error != cudaSuccess) {
+    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+                                                      << " failed with error: " << cudaGetErrorString(error));
+  }
+
+  if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
+    error = ::cudaMemPrefetchAsync(src_ptr, length, device, stream);
+
+    if (error != cudaSuccess) {
+      UMPIRE_ERROR("cudaMemPrefetchAsync( src_ptr = " << src_ptr << ", length = " << length << ", device = " << device
+                                                      << ") failed with error: " << cudaGetErrorString(error));
+    }
+  }
+
+  return camp::resources::EventProxy<camp::resources::Resource>{ctx};
+}
+
 } // end of namespace op
 } // end of namespace umpire

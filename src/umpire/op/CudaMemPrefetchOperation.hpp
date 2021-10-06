@@ -15,6 +15,10 @@ namespace op {
 class CudaMemPrefetchOperation : public MemoryOperation {
  public:
   void apply(void* src_ptr, umpire::util::AllocationRecord* src_allocation, int value, std::size_t length);
+
+  camp::resources::EventProxy<camp::resources::Resource> apply_async(void* src_ptr, util::AllocationRecord* ptr,
+                                                                     int value, std::size_t length,
+                                                                     camp::resources::Resource& ctx);
 };
 
 } // end of namespace op
