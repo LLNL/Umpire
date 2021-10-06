@@ -17,6 +17,7 @@ class AllocatorTest : public ::testing::TestWithParam<std::string> {
   virtual void SetUp()
   {
     auto& rm = umpire::ResourceManager::getInstance();
+    ASSERT_TRUE(rm.isAllocator(GetParam()));
     m_allocator = new umpire::Allocator(rm.getAllocator(GetParam()));
   }
 
