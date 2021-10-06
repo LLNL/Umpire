@@ -302,7 +302,11 @@ Allocator ResourceManager::getAllocator(void* ptr)
 
 bool ResourceManager::isAllocator(const std::string& name) noexcept
 {
-  return (m_allocators_by_name.find(name) != m_allocators_by_name.end());
+  resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
+  auto resource_names = registry.getResourceNames();
+
+  return (m_allocators_by_name.find(name) != m_allocators_by_name.end() ||
+          std::find(resource_names.begin(), resource_names.end(), name) != std::end(resource_names));
 }
 
 bool ResourceManager::isAllocator(int id) noexcept
