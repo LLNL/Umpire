@@ -702,6 +702,25 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
   return dst_ptr;
 }
 
+camp::resources::EventProxy<camp::resources::Resource> ResourceManager::prefetch(void* ptr, int device,
+                                                                                 camp::resources::Resource& ctx)
+{
+  UMPIRE_LOG(Debug, "(ptr=" << ptr << ", device=" << device << ")");
+
+  auto& op_registry = op::MemoryOperationRegistry::getInstance();
+  auto alloc_record = m_allocations.find(ptr);
+
+  if (alloc_record->strategy->getTraits().resource != umpire::MemoryResourceTraits::resource_type::um) {
+    UMPIRE_ERROR("ResourceManager::prefetch only works on allocations from a UM resource.");
+  }
+
+  std::ptrdiff_t offset = static_cast<char*>(ptr) - static_cast<char*>(alloc_record->ptr);
+  std::size_t size = alloc_record->size - offset;
+
+  auto op = op_registry.find("PREFETCH", alloc_record->strategy, alloc_record->strategy);
+  return op->apply_async(ptr, alloc_record, device, size, ctx);
+}
+
 void ResourceManager::deallocate(void* ptr)
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");

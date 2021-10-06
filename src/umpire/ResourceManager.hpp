@@ -281,6 +281,16 @@ class ResourceManager {
   void deallocate(void* ptr);
 
   /*!
+   * \brief Asynchronously prefetch memory ptr to device.
+   *
+   * \param ptr Pointer to prefech
+   * \param device Device to prefetch data to
+   * \param ctx Resource to use for asynchronous operation
+   */
+  camp::resources::EventProxy<camp::resources::Resource> prefetch(void* ptr, int device,
+                                                                  camp::resources::Resource& ctx);
+
+  /*!
    * \brief Get the size in bytes of the allocation for the given pointer.
    *
    * \param ptr Pointer to find size of.

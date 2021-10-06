@@ -807,3 +807,24 @@ TEST(AsyncTest, Reallocate)
   device_alloc.deallocate(source_array);
 }
 #endif
+
+#if defined(UMPIRE_ENABLE_CUDA)
+TEST(AsyncTest, Prefetch)
+{
+  auto resource = camp::resources::Resource{resource_type{}};
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  constexpr std::size_t size = 1024;
+
+  auto alloc = rm.getAllocator("UM");
+  float* array = static_cast<float*>(alloc.allocate(size * sizeof(float)));
+
+  ASSERT_NE(array, nullptr);
+
+  // Prefetch to device 0
+  camp::resources::Event event = rm.prefetch(array, 0, resource);
+  event.wait();
+
+  alloc.deallocate(array);
+}
+#endif
