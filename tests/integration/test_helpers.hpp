@@ -62,6 +62,16 @@ struct tag_to_string<file_resource_tag> {
 };
 #endif
 
+#if defined(UMPIRE_ENABLE_CONST)
+struct device_const_resource_tag {
+};
+
+template <>
+struct tag_to_string<device_const_resource_tag> {
+  static constexpr const char* value = "DEVICE_CONST";
+};
+#endif
+
 template <class T>
 struct Test;
 

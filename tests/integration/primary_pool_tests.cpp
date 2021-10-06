@@ -581,3 +581,51 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
   ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1); // Collapse happened
 }
+
+#if defined(UMPIRE_ENABLE_CONST)
+using ConstResourceTypes = camp::list<device_const_resource_tag>;
+using ConstPoolTypes = camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::QuickPool>;
+using ConstTestTypes = camp::cartesian_product<ConstPoolTypes, ConstResourceTypes>;
+
+using ConstPoolTestTypes = Test<ConstTestTypes>::Types;
+
+template <typename PoolTuple>
+class ConstResourcePoolTest : public ::testing::Test {
+ public:
+  using Pool = typename camp::at<PoolTuple, camp::num<0>>::type;
+  using ResourceType = typename camp::at<PoolTuple, camp::num<1>>::type;
+
+  void SetUp() override
+  {
+    static int unique_counter{0};
+    auto& rm = umpire::ResourceManager::getInstance();
+    m_resource_name = std::string(tag_to_string<ResourceType>::value);
+
+    m_pool_name = std::string{"constant_mem_pool_test"} + std::string{"_"} + std::string{tag_to_string<Pool>::value} +
+                  std::string{"_"} + std::string{m_resource_name} + std::string{"_"} + std::to_string(unique_counter++);
+
+    m_allocator = new umpire::Allocator(rm.makeAllocator<Pool>(m_pool_name, rm.getAllocator(m_resource_name),
+                                                               m_initial_pool_size, m_min_pool_growth_size));
+  }
+
+  void TearDown() override
+  {
+    m_allocator->release();
+    delete m_allocator;
+    m_allocator = nullptr;
+  }
+
+  umpire::Allocator* m_allocator;
+  const std::size_t m_initial_pool_size{32 * 1024};
+  const std::size_t m_min_pool_growth_size{1024};
+  std::string m_pool_name;
+  std::string m_resource_name;
+};
+
+TYPED_TEST_SUITE(ConstResourcePoolTest, ConstPoolTestTypes, );
+
+TYPED_TEST(ConstResourcePoolTest, Allocate)
+{
+  ASSERT_NO_THROW(this->m_allocator->deallocate(this->m_allocator->allocate(10)););
+}
+#endif // defined(UMPIRE_ENABLE_CONST)
