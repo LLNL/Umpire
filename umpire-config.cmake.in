@@ -4,23 +4,13 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-get_filename_component(UMPIRE_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
-set(UMPIRE_INCLUDE_DIRS "@CMAKE_INSTALL_PREFIX@/include")
+@PACKAGE_INIT@
 
 if (NOT TARGET camp)
-  if (NOT DEFINED camp_DIR)
-    set(camp_DIR @umpire_camp_DIR@)
-  endif ()
-  find_package(camp REQUIRED
-    NO_DEFAULT_PATH
-    PATHS ${camp_DIR}
-    ${camp_DIR}/lib/cmake/camp
-  )
+  include(CMakeFindDependencyMacro)
+  find_dependency(camp CONFIG PATHS @PACKAGE_CMAKE_INSTALL_PREFIX@)
 endif ()
 
-set(Umpire_VERSION_MAJOR  @Umpire_VERSION_MAJOR@)
-set(Umpire_VERSION_MINOR @Umpire_VERSION_MINOR@)
-set(Umpire_VERSION_PATCH @Umpire_VERSION_PATCH@)
-set(Umpire_VERSION_RC "@UMPIRE_VERSION_RC@")
+include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 
-include("${UMPIRE_CMAKE_DIR}/umpire-targets.cmake")
+check_required_components(@PROJECT_NAME@)
