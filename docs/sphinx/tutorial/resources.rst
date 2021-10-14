@@ -50,8 +50,8 @@ example of how to query this information.
 .. note::
    In order to test some memory resources, you may need to configure your Umpire
    build to use a particular platform (a member of the ``umpire::Allocator``, defined by
-   ``Platform.hpp``) that has access to that resource. See the `Developer's 
-   Guide <https://umpire.readthedocs.io/en/develop/developer_guide.html>`_ for more information. 
+   ``Platform.hpp``) that has access to that resource. See the :ref:`Developer's 
+   Guide <Developer Guide>` for more information. 
 
 Next, we will see an example of how to move data between resources using
 operations.

@@ -84,8 +84,8 @@ sizes. It's easy to construct multiple pools with different configurations:
    :language: C++
 
 There are lots of different strategies that you can use, we will look at some
-of them in this tutorial. A complete list of strategies can be found `here
-<../features/operations.html>`_.
+of them in this tutorial. A complete list of strategies can be found :ref:`here
+<Operations>`.
 
 .. literalinclude:: ../../../examples/tutorial/tut_dynamic_pool_1.cpp
 

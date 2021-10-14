@@ -37,7 +37,7 @@ compiler loaded and the configuration is as simple as:
 
 By default, Umpire will only support host memory. Additional backends for
 device support can be enabled using the options detailed in
-:doc:`advanced_configuration`. CMake will provide output about which compiler
+:ref:`Advanced Configuration`. CMake will provide output about which compiler
 is being used and the values of other options. Once CMake has completed, Umpire
 can be built with Make:
 
@@ -45,7 +45,7 @@ can be built with Make:
 
   $ make
 
-For more advanced configuration options, see :doc:`advanced_configuration`.
+For more advanced configuration options, see :ref:`Advanced Configuration`.
 
 ^^^^^^^^^^^^^^^^^
 Installing Umpire
