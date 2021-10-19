@@ -45,6 +45,7 @@ struct ReplayOptions {
   bool force_compile{false};      // -r,--recompile
   bool do_not_demangle{false};    // --no-demangle
   bool quiet{false};              // -q,--quiet
+  bool introspection_off{false};  // --introspection-off
   std::string input_file;         // -i,-infile input_file
   std::string pool_to_use;        // -p,--use-pool
   std::string heuristic_to_use{}; // --use-heuristic
