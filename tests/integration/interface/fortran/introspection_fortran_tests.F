@@ -21,7 +21,7 @@ module umpire_fortran_introspection_tests
           type(UmpireAllocator) allocator
 
           integer(C_INT), pointer, dimension(:) :: array
-          integer(C_SIZE_T) :: memory_usage, allocation_count
+          integer(C_SIZE_T) :: memory_usage, memory_hwm, allocation_count
           integer(C_SIZE_T) :: zero
 
           zero = 0
@@ -31,6 +31,9 @@ module umpire_fortran_introspection_tests
 
           memory_usage = get_process_memory_usage()
           call assert_true(memory_usage .ge. zero)
+
+          memory_hwm = get_process_memory_usage_hwm()
+          call assert_true(memory_hwm .ge. zero)
 
           call allocator%allocate(array, [10])
 

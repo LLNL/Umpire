@@ -151,6 +151,12 @@ std::string get_backtrace(void* ptr);
 std::size_t get_process_memory_usage();
 
 /*!
+ * \brief Get high watermark memory usage of the current process (uses underlying
+ * system-dependent calls)
+ */
+std::size_t get_process_memory_usage_hwm();
+
+/*!
  * \brief Mark an application-specific event string within Umpire life cycle.
  */
 void mark_event(const std::string& event);

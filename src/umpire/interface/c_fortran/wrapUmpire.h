@@ -40,6 +40,8 @@ void umpire_get_backtrace_bufferify(void * ptr,
 
 size_t umpire_get_process_memory_usage(void);
 
+size_t umpire_get_process_memory_usage_hwm(void);
+
 size_t umpire_get_device_memory_usage(int device_id);
 
 int umpire_get_major_version(void);
