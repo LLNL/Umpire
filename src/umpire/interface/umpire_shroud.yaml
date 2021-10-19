@@ -26,6 +26,7 @@ cxx_header: umpire/Umpire.hpp
 options:
   F_module_per_class: False
   C_API_case: lower
+  wrap_python: False
 
 format:
   C_prefix: umpire_
