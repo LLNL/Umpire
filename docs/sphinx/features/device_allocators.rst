@@ -5,14 +5,13 @@ Device Allocators
 =================
 
 The DeviceAllocator is designed for memory allocations on the GPU. 
-Currently there is only support for CUDA, although HIP support is coming soon.
 
 Creating a Device Allocator
 --------------------------
 
 To create a DeviceAllocator, users can call the :class:`umpire::make_device_allocator` host function.
 This function takes an allocator, the total amount of memory the DeviceAllocator will have, and a name
-for the new DeviceAllocator object, as shown below. Currently, a maximum of 64 unique DeviceAllocators can be
+for the new DeviceAllocator object, as shown below. A maximum of 64 unique DeviceAllocators can be
 created at a time.
 
 .. literalinclude:: ../../../examples/device-allocator.cpp
@@ -23,7 +22,8 @@ created at a time.
 When the DeviceAllocator is created, the ``size`` parameter that is passed to the :class:`umpire::make_device_allocator`
 function is the total memory, in bytes, available to that allocator. Whenever the ``allocate`` function is
 called on the GPU, it is simply atomically incrementing a counter which offsets a pointer to the start of that
-memory.
+memory. In other words, the total size from all of the allocates performed on the device with the DeviceAllocator may not 
+exceed the size that was used when making the device allocator.
 
 Retrieving a DeviceAllocator Object
 -----------------------------------

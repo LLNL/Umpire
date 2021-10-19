@@ -7,7 +7,7 @@ Move Allocations Between NUMA Nodes
 When using NUMA (cache coherent or non uniform memory access) systems, there
 are different latencies to parts of the memory. From an application
 perspective, the memory looks the same, yet especially for high-performance
-computing it is advantageous to have finer control. `malloc()` attempts to
+computing it is advantageous to have finer control. ``malloc()`` attempts to
 allocate memory close to your node, but it can make no guarantees. Therefore,
 Linux provides both a process-level interface for setting NUMA policies with
 the system utility `numactl`, and a fine-grained interface with `libnuma`.

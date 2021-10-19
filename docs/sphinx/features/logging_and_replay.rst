@@ -8,7 +8,7 @@ Logging
 -------
 When debugging memory operation problems, it is sometimes helpful to enable
 Umpire's logging facility.  The logging functionality is enabled for default
-builds unless -DUMPIRE_ENABLE_LOGGING='Off' has been specified in which case it is
+builds unless ``-DUMPIRE_ENABLE_LOGGING=Off`` has been specified in which case it is
 disabled.
 
 If Umpire logging is enabled, it may be controlled by setting the
@@ -99,7 +99,7 @@ to the object that was created within Umpire for that resource.
 makeAllocator Event
 -------------------
 The **makeAllocator** event occurs whenever a new allocator instance is being
-created.  Each call to *makeAllocator* will generate a pair of JSON lines.  The
+created.  Each call to **makeAllocator** will generate a pair of JSON lines.  The
 first line will show the intent of the call and the second line will show both
 the intent and the result.  This is because the makeAllocator call can fail
 and keeping both the intent and result allows us to reproduce this failure

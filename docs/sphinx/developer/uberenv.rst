@@ -10,7 +10,7 @@ therefore `shared <https://radiuss-ci.readthedocs.io/en/latest/uberenv.html#uber
 This page will provides some Umpire specific examples to illustrate the
 workflow described in the documentation.
 
-Before to start
+Before starting
 ---------------
 
 First of all, it is worth noting that Umpire does not have dependencies, except
@@ -24,9 +24,11 @@ pre-configured.
 Machine specific configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+To view the different configurations for Umpire, follow the steps below:
+
 .. code-block:: bash
 
-  $ ls -c1 scripts/uberenv/spack_configs
+  $ ls -c1 scripts/radiuss-spack-configs
   blueos_3_ppc64le_ib
   darwin
   toss_3_x86_64_ib
@@ -38,27 +40,24 @@ Umpire has been configured for ``toss_3_x86_64_ib`` and other systems.
 Vetted specs
 ^^^^^^^^^^^^
 
+To view the CI jobs for diffrent LC machines, follow the steps below:
+
 .. code-block:: bash
 
   $ ls -c1 .gitlab/*jobs.yml
+  .gitlab/corona-jobs.yml
   .gitlab/lassen-jobs.yml
   .gitlab/ruby-jobs.yml
 
-CI contains jobs for ruby.
+This shows that the CI contains jobs for corona, lassen, and ruby.
 
 .. code-block:: bash
 
   $ git grep -h "SPEC" .gitlab/ruby-jobs.yml | grep "gcc"
       SPEC: "%gcc@4.9.3"
-      SPEC: "%gcc@6.1.0"
-      SPEC: "%gcc@7.1.0"
-      SPEC: "%gcc@7.3.0"
       SPEC: "%gcc@8.1.0"
 
-We now have a list of the specs vetted on ``ruby``/``toss_3_x86_64_ib``.
-
-.. note::
-  In practice, one should check if the job is not *allowed to fail*, or even deactivated.
+In the example above, we see a list of the specs vetted on ``ruby``/``toss_3_x86_64_ib``.
 
 MacOS case
 ^^^^^^^^^^
@@ -69,7 +68,7 @@ In Umpire, the Spack configuration for MacOS contains the default compilers depe
 Using Uberenv to generate the host-config file
 ----------------------------------------------
 
-We have seen that we can safely use `gcc@8.1.0` on ruby. Let us ask for the default configuration first, and then produce static libs, have OpenMP support and run the benchmarks:
+We have seen that we can safely use `gcc@8.1.0` on ruby. Let us ask for the default configuration first, then produce static libs with OpenMP support and run the benchmarks:
 
 .. code-block:: bash
 
@@ -80,7 +79,7 @@ Each will generate a CMake cache file, e.g.:
 
 .. code-block:: bash
 
-  hc-ruby-toss_3_x86_64_ib-gcc@8.1.0-fjcjwd6ec3uen5rh6msdqujydsj74ubf.cmake
+  ruby-toss_3_x86_64_ib-gcc@8.1.0-<some_hash>.cmake
 
 Using host-config files to build Umpire
 ---------------------------------------
@@ -107,12 +106,12 @@ During development, it may be beneficial to regularly check for memory leaks. Th
 
   $ srun -ppdebug -N1 --exclusive python scripts/uberenv/uberenv.py --spec="%clang@9.0.0 cxxflags=-fsanitize=address"
   $ cd build
-  $ cmake -C <path_to>/hc-ruby-toss_3_x86_64_ib-clang@9.0.0.cmake ..
+  $ cmake -C <path_to>/<host-config>.cmake ..
   $ cmake --build -j
   $ ASAN_OPTIONS=detect_leaks=1 make test
 
 .. note::
-  The host config file (i.e., ``hc-ruby-...cmake``) can be reused in order to rebuild with the same configuration if needed.
+  The host config file can be reused in order to rebuild with the same configuration if needed.
 
 This will configure a build with Clang 9.0.0 and the Leak Sanitizer. If there is a leak in one of the tests, it can be useful to gather more information about what happened and more details about where it happened. One way to do this is to run:
 

@@ -33,9 +33,9 @@ The complete example is included below:
 
 .. literalinclude:: ../../../examples/cookbook/recipe_filesystem_memory_allocation.cpp
 
-=============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Using Burst Buffers On Lassen
-=============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 On Lassen, 1) Download the latest version of Umpire 2) request a private node to build:
 
@@ -68,8 +68,8 @@ To run the built-in benchmarks in Umpire from the build run:
 
   $ lrun -n 1 --threads=** ./bin/file_resource_benchmarks ##
 
-** is a placeholder for the amount of threads wanted to run the benchmark on. 
-## stands for the number of array elements wanted to be passed through the benchmark. 
+In the snippet above, "**" is a placeholder for the amount of threads wanted to run the benchmark on. 
+"##" stands for the number of array elements wanted to be passed through the benchmark. 
 This number can range from 1-100,000,000,000.
 
 Results should appear like:
