@@ -37,6 +37,8 @@ int main(int argc, char* argv[])
 
   app.add_flag("-q,--quiet", options.quiet, "Only errors will be displayed.");
 
+  app.add_flag("--introspection-off", options.introspection_off, "Turn off Umpire introspection");
+
   app.add_flag("-t,--time-run", options.time_replay_run, "Display time information for replay running operations");
 
   app.add_flag("-d,--dump", options.dump_statistics,

@@ -300,6 +300,10 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     }
   }
 
+  if (m_options.introspection_off) {
+    alloc->introspection = false;
+  }
+
   switch (alloc->type) {
     case ReplayFile::rtype::MEMORY_RESOURCE:
       alloc->allocator = new umpire::Allocator(rm.getAllocator(alloc->name));
