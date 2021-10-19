@@ -10,20 +10,4 @@ pooling methods to speed up allocations to applying different operations to
 every alloctaion.  Strategies can be composed to combine their functionality,
 allowing flexible and reusable implementations of different components.
 
-.. doxygenclass:: umpire::strategy::AllocationStrategy
-
--------------------
-Provided Strategies 
--------------------
-
-.. doxygenclass:: umpire::strategy::AllocationAdvisor
-
-.. doxygenclass:: umpire::strategy::DynamicPoolList
-
-.. doxygenclass:: umpire::strategy::FixedPool
-
-.. doxygenclass:: umpire::strategy::MonotonicAllocationStrategy
-
-.. doxygenclass:: umpire::strategy::SlotPool
-
-.. doxygenclass:: umpire::strategy::ThreadSafeAllocator
+A list of our provided strategies can be found in our source doxygen `here <../../doxygen/html/index.html>`_.

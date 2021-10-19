@@ -5,10 +5,6 @@ Operations
 ==========
 
 Operations provide an abstract interface to modifying and moving data between
-Umpire :class:`umpire::Allocator`s. 
+Umpire :class:`umpire::Allocator` s. 
 
--------------------
-Provided Operations 
--------------------
-
-.. doxygennamespace:: umpire::op
+A list of provided operations can be found in our source doxygen `here <../../doxygen/html/index.html>`_.
