@@ -74,6 +74,14 @@ size_t umpire_get_process_memory_usage(void)
     // splicer end function.get_process_memory_usage
 }
 
+size_t umpire_get_process_memory_usage_hwm(void)
+{
+    // splicer begin function.get_process_memory_usage_hwm
+    size_t SHC_rv = umpire::get_process_memory_usage_hwm();
+    return SHC_rv;
+    // splicer end function.get_process_memory_usage_hwm
+}
+
 size_t umpire_get_device_memory_usage(int device_id)
 {
     // splicer begin function.get_device_memory_usage

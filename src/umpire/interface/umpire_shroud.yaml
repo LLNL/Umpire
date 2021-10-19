@@ -35,6 +35,7 @@ declarations:
   - decl: bool pointer_contains(void* left, void* right)
   - decl: string get_backtrace(void* ptr)
   - decl: size_t get_process_memory_usage()
+  - decl: size_t get_process_memory_usage_hwm()
   - decl: size_t get_device_memory_usage(int device_id)
   - decl: int get_major_version()
   - decl: int get_minor_version()

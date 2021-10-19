@@ -856,6 +856,14 @@ module umpire_mod
             integer(C_SIZE_T) :: SHT_rv
         end function get_process_memory_usage
 
+        function get_process_memory_usage_hwm() &
+                result(SHT_rv) &
+                bind(C, name="umpire_get_process_memory_usage_hwm")
+            use iso_c_binding, only : C_SIZE_T
+            implicit none
+            integer(C_SIZE_T) :: SHT_rv
+        end function get_process_memory_usage_hwm
+
         function get_device_memory_usage(device_id) &
                 result(SHT_rv) &
                 bind(C, name="umpire_get_device_memory_usage")

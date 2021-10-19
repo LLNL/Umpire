@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <map>
 #include <sstream>
 #include <string>
@@ -116,6 +117,32 @@ std::string get_backtrace(void* ptr)
 #else
   UMPIRE_USE_VAR(ptr);
   return "[Umpire: UMPIRE_BACKTRACE=Off]";
+#endif
+}
+
+std::size_t get_process_memory_usage_hwm()
+{
+#if defined(_MSC_VER) || defined(__APPLE__)
+  return 0;
+#else
+  std::ifstream status{"/proc/self/status"};
+
+  std::size_t rval{0};
+  std::string line;
+  while (std::getline(status, line)) {
+    std::stringstream ss{line};
+    std::string key;
+    ss >> key;
+
+    if (key == "VmHWM:") {
+      std::size_t resident_hwm;
+      long page_size{::sysconf(_SC_PAGE_SIZE)};
+      ss >> resident_hwm;
+      rval = std::size_t{resident_hwm * page_size};
+      break;
+    }
+  }
+  return rval;
 #endif
 }
 
