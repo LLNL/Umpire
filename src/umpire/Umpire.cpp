@@ -136,9 +136,12 @@ std::size_t get_process_memory_usage_hwm()
 
     if (key == "VmHWM:") {
       std::size_t resident_hwm;
-      long page_size{::sysconf(_SC_PAGE_SIZE)};
       ss >> resident_hwm;
-      rval = std::size_t{resident_hwm * page_size};
+
+      //
+      // "VmHWM" returns the number of kB in use. Convert this to number of bytes
+      //
+      rval = std::size_t{resident_hwm * 1024};
       break;
     }
   }
