@@ -39,6 +39,11 @@ if (ENABLE_CUDA)
 endif()
 
 blt_add_executable(
+  NAME allocator_memory_cost_benchmark
+  SOURCES allocator_memory_cost_benchmark.cpp
+  DEPENDS_ON ${stress_test_depends})
+
+blt_add_executable(
   NAME copy_stress_test
   SOURCES copy_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
