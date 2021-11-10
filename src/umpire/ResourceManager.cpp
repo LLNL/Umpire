@@ -58,7 +58,6 @@ ResourceManager::ResourceManager()
       m_allocators_by_id(),
       m_allocators_by_name(),
       m_memory_resources(),
-      m_default_allocator(nullptr),
       m_id(0),
       m_mutex()
 {
@@ -119,19 +118,15 @@ void ResourceManager::initialize()
         // util::wrap_allocator<strategy::AllocationTracker>(
         registry.makeMemoryResource(s_null_resource_name, getNextId())};
 
-    int id{allocator->getId()};
-    m_allocators_by_name[s_null_resource_name] = allocator.get();
-    m_allocators_by_id[id] = allocator.get();
+    m_null_allocator = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
 
   {
-    std::unique_ptr<strategy::AllocationStrategy> allocator{new strategy::FixedPool{
-        s_zero_byte_pool_name, getNextId(), Allocator{m_allocators_by_name[s_null_resource_name]}, 1}};
+    std::unique_ptr<strategy::AllocationStrategy> allocator{
+        new strategy::FixedPool{s_zero_byte_pool_name, getNextId(), Allocator{m_null_allocator}, 1}};
 
-    int id{allocator->getId()};
-    m_allocators_by_name[s_zero_byte_pool_name] = allocator.get();
-    m_allocators_by_id[id] = allocator.get();
+    m_zero_byte_pool = allocator.get();
     m_allocators.emplace_front(std::move(allocator));
   }
 
@@ -799,7 +794,7 @@ std::string ResourceManager::getAllocatorInformation() const noexcept
 
 strategy::AllocationStrategy* ResourceManager::getZeroByteAllocator()
 {
-  return m_allocators_by_name[s_zero_byte_pool_name];
+  return m_zero_byte_pool;
 }
 
 std::shared_ptr<op::MemoryOperation> ResourceManager::getOperation(const std::string& operation_name,

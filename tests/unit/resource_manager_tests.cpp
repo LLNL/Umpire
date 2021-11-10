@@ -59,8 +59,11 @@ TEST(ResourceManager, getAllocatorById)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
+  auto alloc = rm.getAllocator("HOST");
+  int id = alloc.getId();
+
   EXPECT_NO_THROW({
-    auto alloc = rm.getAllocator(0);
+    alloc = rm.getAllocator(id);
     UMPIRE_USE_VAR(alloc);
   });
 
