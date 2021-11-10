@@ -101,11 +101,6 @@ TEST_P(AllocatorCTest, Introspection)
   ASSERT_FALSE(umpire_pointer_overlaps(data_one, data_two));
   ASSERT_GE(umpire_get_process_memory_usage(), 0);
 
-  //
-  // Be careful with the following test case.  The _hwm call must be called last when compared
-  // to the live amount of system memory in use
-  //
-  ASSERT_LE(umpire_get_process_memory_usage(), umpire_get_process_memory_usage_hwm());
   ASSERT_GE(umpire_get_device_memory_usage(0), 0);
 
   umpire_allocator_deallocate(&m_allocator, data_three);
