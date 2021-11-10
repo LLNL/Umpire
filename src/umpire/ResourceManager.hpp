@@ -334,7 +334,9 @@ class ResourceManager {
   std::unordered_map<resource::MemoryResourceType, strategy::AllocationStrategy*, resource::MemoryResourceTypeHash>
       m_memory_resources;
 
-  strategy::AllocationStrategy* m_default_allocator;
+  strategy::AllocationStrategy* m_default_allocator{nullptr};
+  strategy::AllocationStrategy* m_null_allocator{nullptr};
+  strategy::AllocationStrategy* m_zero_byte_pool{nullptr};
 
   int m_id;
 
