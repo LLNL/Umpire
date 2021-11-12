@@ -66,6 +66,10 @@ if (UMPIRE_ENABLE_CUDA)
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 
+  install(FILES
+    ${umpire_device_headers}
+    DESTINATION include/umpire)
+
   set_target_properties(umpire_device PROPERTIES
     CUDA_SEPARABLE_COMPILATION On)
 
