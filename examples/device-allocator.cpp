@@ -63,11 +63,6 @@ int main(int argc, char const* argv[])
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-  // Make sure that device and host side DeviceAllocator pointers are synched
-  // _sphinx_tag_macro_start
-  UMPIRE_SET_UP_DEVICE_ALLOCATORS();
-  // _sphinx_tag_macro_end
-
   my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
   std::cout << "After first kernel, found value: " << (*ptr_to_data)[0] << std::endl;

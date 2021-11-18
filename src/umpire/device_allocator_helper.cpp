@@ -6,6 +6,7 @@
 ////////////////////////////////////////////////////////////////////////////
 #include "umpire/device_allocator_helper.hpp"
 
+#include <limits.h>
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
@@ -97,9 +98,12 @@ __host__ __device__ bool is_device_allocator(int id)
 __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
   static size_t allocator_id{0};
-  auto dev_alloc = DeviceAllocator(allocator, size, name, allocator_id);
 
-  if (allocator_id == 0) {
+  // The DA ID should not conflict with other allocator IDs,
+  // so we use INT_MAX to get unique value.
+  auto dev_alloc = DeviceAllocator(allocator, size, name, INT_MAX + allocator_id);
+
+  if (UMPIRE_DEV_ALLOCS_h == nullptr) {
     auto& rm = umpire::ResourceManager::getInstance();
     auto um_alloc = rm.getAllocator("UM");
     UMPIRE_DEV_ALLOCS_h =
@@ -107,6 +111,10 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
   }
 
   UMPIRE_DEV_ALLOCS_h[allocator_id++] = dev_alloc;
+
+  // Call macro so that host and device pointers are set up correctly
+  UMPIRE_SET_UP_DEVICE_ALLOCATORS();
+
   return dev_alloc;
 }
 

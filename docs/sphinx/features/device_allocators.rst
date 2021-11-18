@@ -28,7 +28,8 @@ exceed the size that was used when making the device allocator.
 Retrieving a DeviceAllocator Object
 -----------------------------------
 
-The :class:`umpire::get_device_allocator` host/device function returns the DeviceAllocator object that corresponds 
+After creating a DeviceAllocator, we can immediately start using that allocator to allocate device memory. To do this, we
+have the :class:`umpire::get_device_allocator` host/device function which returns the DeviceAllocator object corresponding 
 to the ID or name given. The DeviceAllocator class also includes a helper function, :class:`umpire::is_device_allocator`,
 to query whether or not a given ID corresponds to an existing DeviceAllocator. Below is an example of using the **ID** to 
 obtain the DeviceAllocator object:
@@ -49,15 +50,11 @@ With the :class:`umpire::get_device_allocator` function, there is no need to kee
 call stacks can become quite complex. Users can instead use this function to obtain it inside whichever host or device
 function they need.
 
-Under the hood, the :class:`umpire::get_device_allocator` uses global arrays which can be accessed by both 
-the host and device. The global array is indexed by DeviceAllocator ID, which is returned by :class:`DeviceAllocator::getID()`. 
-Because we are using global arrays on host and device, the arrays need to be "set up" after at least one DeviceAllocator
-has been created, but before any kernels which use a DeviceAllocator are called. This process is done by calling 
-the ``UMPIRE_SET_UP_DEVICE_ALLOCS()`` macro. This just ensures that the host and device global arrays are updated and 
-pointing at the same memory.
-
 .. note::
-   In order to use the full capabilities of the DeviceAllocator, relocatable device code must be enabled.
+   In order to use the full capabilities of the DeviceAllocator, relocatable device code (RDC) must be enabled. If RDC is
+   not enabled, users must manually call the ``UMPIRE_SET_UP_DEVICE_ALLOCATORS()`` macro after at least one DeviceAllocator
+   is created. This macro ensures that the host and device memory are set up properly. If RDC is enabled, then the 
+   DeviceAllocator helper functions will take care of this automatically and no manual call is necessary. 
 
 Resetting Memory on the DeviceAllocator
 ---------------------------------------

@@ -6,6 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/DeviceAllocator.hpp"
 
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -79,9 +80,11 @@ __device__ void* DeviceAllocator::allocate(size_t size)
   return static_cast<void*>(m_ptr + counter);
 }
 
+// The DA ID should not conflict with other allocator IDs,
+// so we use INT_MAX to get unique value.
 __host__ __device__ size_t DeviceAllocator::getID()
 {
-  return m_id;
+  return m_id - INT_MAX;
 }
 
 __host__ __device__ const char* DeviceAllocator::getName()

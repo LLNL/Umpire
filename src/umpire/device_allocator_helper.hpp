@@ -13,6 +13,16 @@
 
 namespace umpire {
 
+// Namespace needed to make the macro_tracking var within the
+// translation unit scope
+namespace {
+static int macro_tracking{0};
+inline int eliminate_warning_for_macro_tracking()
+{
+  return macro_tracking;
+}
+} // namespace
+
 /*
  * Const variable for the limit of unique DeviceAllocator
  * objects available at once.
@@ -60,17 +70,28 @@ __host__ void destroy_device_allocator();
  * synced up and pointing to each other.
  */
 #if defined(UMPIRE_ENABLE_CUDA)
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                          \
-  {                                                                                                                \
-    cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                            \
+  {                                                                                                                  \
+    if (umpire::macro_tracking == 0) {                                                                               \
+      UMPIRE_LOG(Debug, "Calling cudaMemcpyToSymbol DeviceAllocator macro.");                                        \
+      cudaMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+    }                                                                                                                \
+    umpire::macro_tracking = 1;                                                                                      \
   }
 #elif defined(UMPIRE_ENABLE_HIP)
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                         \
-  {                                                                                                               \
-    hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                                                           \
+  {                                                                                                                 \
+    if (umpire::macro_tracking == 0) {                                                                              \
+      UMPIRE_LOG(Debug, "Calling hipMemcpyToSymbol DeviceAllocator macro.");                                        \
+      hipMemcpyToSymbol(umpire::UMPIRE_DEV_ALLOCS, &umpire::UMPIRE_DEV_ALLOCS_h, sizeof(umpire::DeviceAllocator*)); \
+    }                                                                                                               \
+    umpire::macro_tracking = 1;                                                                                     \
   }
 #else
-#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()
+#define UMPIRE_SET_UP_DEVICE_ALLOCATORS()                                              \
+  {                                                                                    \
+    UMPIRE_LOG(Warning, "Neither HIP nor CUDA enabled. Macro is not doing anything."); \
+  }
 #endif
 
 } // end of namespace umpire
