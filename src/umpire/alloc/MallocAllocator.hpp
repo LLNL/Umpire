@@ -32,7 +32,7 @@ struct MallocAllocator {
    * \param bytes Number of bytes to allocate.
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t bytes)
   {
@@ -40,7 +40,7 @@ struct MallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR("malloc( bytes = " << bytes << " ) failed");
+      UMPIRE_ERROR(runtime_error,"malloc( bytes = " << bytes << " ) failed");
     } else {
       return ret;
     }
@@ -51,7 +51,7 @@ struct MallocAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory cannot be free'd.
+   * \throws umpire::util::runtime_error if memory cannot be free'd.
    */
   void deallocate(void* ptr)
   {

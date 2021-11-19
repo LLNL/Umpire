@@ -18,11 +18,11 @@ AlignedAllocator::AlignedAllocator(const std::string& name, int id, Allocator al
       m_mask{static_cast<uintptr_t>(~(m_alignment - 1))}
 {
   if (m_allocator->getPlatform() != Platform::host) {
-    UMPIRE_ERROR("Cannot construct AlignedAllocator from non-host Allocator.");
+    UMPIRE_ERROR(runtime_error,"Cannot construct AlignedAllocator from non-host Allocator.");
   }
 
   if (!(m_alignment >= 16 && ((m_alignment & (m_alignment - 1)) == 0))) {
-    UMPIRE_ERROR(
+    UMPIRE_ERROR(runtime_error,
         "AlignedAllocator alignment must be a power of 2 greater than or equal "
         "to 16");
   }

@@ -111,22 +111,22 @@ void initialize_io(const bool enable_log, const bool enable_replay)
           if (enable_log || enable_replay) {
 #ifndef WIN32
             if (mkdir(root_io_dir.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH)) {
-              UMPIRE_ERROR("mkdir(" << root_io_dir << ") failed");
+              UMPIRE_ERROR(runtime_error,"mkdir(" << root_io_dir << ") failed");
             }
 #else
             if (_mkdir(root_io_dir.c_str())) {
-              UMPIRE_ERROR("mkdir(" << root_io_dir << ") failed");
+              UMPIRE_ERROR(runtime_error,"mkdir(" << root_io_dir << ") failed");
             }
 #endif
           }
         } else if (!(S_ISDIR(info.st_mode))) {
-          UMPIRE_ERROR(root_io_dir << "exists and is not a directory");
+          UMPIRE_ERROR(runtime_error,root_io_dir << "exists and is not a directory");
         }
 #endif
       }
       MPI::sync();
     } else {
-      UMPIRE_ERROR(
+      UMPIRE_ERROR(runtime_error,
           "Cannot create output directory before MPI has been initialized. "
           "Please unset UMPIRE_OUTPUT_DIR in your environment");
     }
@@ -138,7 +138,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
     if (s_log_ofstream) {
       s_log_buffer.setFileStream(&s_log_ofstream);
     } else {
-      UMPIRE_ERROR("Couldn't open log file:" << log_filename);
+      UMPIRE_ERROR(runtime_error,"Couldn't open log file:" << log_filename);
     }
   }
 
@@ -148,7 +148,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
     if (s_replay_ofstream) {
       s_replay_buffer.setFileStream(&s_replay_ofstream);
     } else {
-      UMPIRE_ERROR("Couldn't open replay file:" << replay_filename);
+      UMPIRE_ERROR(runtime_error,"Couldn't open replay file:" << replay_filename);
     }
   }
 

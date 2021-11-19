@@ -168,7 +168,7 @@ TEST_F(SharedMemoryTest, UnitTests)
   MPI_Barrier(MPI_COMM_WORLD);
   {
     std::size_t allocation_size{m_segment_size + 1};
-    ASSERT_THROW(allocator.allocate("AllocTooMuch", allocation_size), umpire::util::Exception);
+    ASSERT_THROW(allocator.allocate("AllocTooMuch", allocation_size), umpire::runtime_error);
   }
 
   MPI_Barrier(MPI_COMM_WORLD);

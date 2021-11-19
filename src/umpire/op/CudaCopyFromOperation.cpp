@@ -27,7 +27,7 @@ void CudaCopyFromOperation::transform(void* src_ptr, void** dst_ptr, util::Alloc
   cudaSetDevice(old_device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
+    UMPIRE_ERROR(runtime_error,"cudaMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
                                            << ", cudaMemcpyDeviceToHost ) failed with error: "
                                            << cudaGetErrorString(error));
   }
@@ -43,7 +43,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyFromOperation::tr
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
+    UMPIRE_ERROR(runtime_error,"cudaMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
                                            << ", cudaMemcpyDeviceToHost ) failed with error: "
                                            << cudaGetErrorString(error));
   }

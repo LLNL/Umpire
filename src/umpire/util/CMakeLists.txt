@@ -11,7 +11,7 @@ set (umpire_util_headers
   AllocationRecord.hpp
   backtrace.hpp
   backtrace.inl
-  Exception.hpp
+  runtime_error.hpp
   FixedMallocPool.hpp
   io.hpp
   Logger.hpp
@@ -36,7 +36,6 @@ endif ()
 
 set (umpire_util_sources
   AllocationMap.cpp
-  Exception.cpp
   FixedMallocPool.cpp
   io.cpp
   Logger.cpp

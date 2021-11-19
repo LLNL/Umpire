@@ -28,7 +28,7 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
   error = ::cudaGetDeviceProperties(&properties, gpu);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+    UMPIRE_ERROR(runtime_error,"cudaGetDeviceProperties( device = " << device << "),"
                                                       << " failed with error: " << cudaGetErrorString(error));
   }
 
@@ -36,7 +36,7 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
     error = ::cudaMemPrefetchAsync(src_ptr, length, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMemPrefetchAsync( src_ptr = " << src_ptr << ", length = " << length << ", device = " << device
+      UMPIRE_ERROR(runtime_error,"cudaMemPrefetchAsync( src_ptr = " << src_ptr << ", length = " << length << ", device = " << device
                                                       << ") failed with error: " << cudaGetErrorString(error));
     }
   }
@@ -60,7 +60,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
   auto stream = ctx.get<camp::resources::Cuda>().get_stream();
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << device << "),"
+    UMPIRE_ERROR(runtime_error,"cudaGetDeviceProperties( device = " << device << "),"
                                                       << " failed with error: " << cudaGetErrorString(error));
   }
 
@@ -68,7 +68,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
     error = ::cudaMemPrefetchAsync(src_ptr, length, device, stream);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMemPrefetchAsync( src_ptr = " << src_ptr << ", length = " << length << ", device = " << device
+      UMPIRE_ERROR(runtime_error,"cudaMemPrefetchAsync( src_ptr = " << src_ptr << ", length = " << length << ", device = " << device
                                                       << ") failed with error: " << cudaGetErrorString(error));
     }
   }

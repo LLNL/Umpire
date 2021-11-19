@@ -19,7 +19,7 @@ void HipMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNU
   hipError_t error = ::hipMemset(src_ptr, value, length);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
+    UMPIRE_ERROR(runtime_error,"hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
                                          << ") failed with error: " << hipGetErrorString(error));
   }
 }
@@ -34,7 +34,7 @@ camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply
   hipError_t error = ::hipMemsetAsync(src_ptr, value, length, stream);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
+    UMPIRE_ERROR(runtime_error,"hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
                                          << ") failed with error: " << hipGetErrorString(error));
   }
 

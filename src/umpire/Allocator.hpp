@@ -68,7 +68,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   /*!
    * \brief Free the memory at ptr.
    *
-   * This method will throw an umpire::Exception if ptr was not allocated
+   * This method will throw an umpire::runtime_error if ptr was not allocated
    * using this Allocator. If the value of the pointer is set to nullptr,
    * this behavior is _allowed_, but it will be ignored.
    * If you need to deallocate memory allocated by an unknown object,

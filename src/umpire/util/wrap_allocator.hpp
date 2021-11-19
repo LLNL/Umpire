@@ -38,7 +38,7 @@ Strategy* unwrap_allocation_strategy(strategy::AllocationStrategy* base_strategy
   Strategy* strategy{dynamic_cast<Strategy*>(base_strategy)};
 
   if (!strategy) {
-    UMPIRE_ERROR("Couldn't unwrap " << base_strategy->getName() << " to " << typeid(Strategy).name());
+    UMPIRE_ERROR(runtime_error,"Couldn't unwrap " << base_strategy->getName() << " to " << typeid(Strategy).name());
   }
 
   return strategy;

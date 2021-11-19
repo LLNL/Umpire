@@ -25,7 +25,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {
-    UMPIRE_ERROR("Maximum number of concurrent allocators exceeded! "
+    UMPIRE_ERROR(runtime_error,"Maximum number of concurrent allocators exceeded! "
                  << "Please email umpire-dev@llnl.gov");
   }
 
@@ -35,7 +35,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
                 << ", \"allocator_name\":\"" << name << "\""
                 << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }");
   if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+    UMPIRE_ERROR(runtime_error,"Allocator with name " << name << " is already registered.");
   }
 
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);

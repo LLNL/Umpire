@@ -34,7 +34,7 @@ void* MonotonicAllocationStrategy::allocate(std::size_t bytes)
   m_size += bytes;
 
   if (m_size > m_capacity) {
-    UMPIRE_ERROR("MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
+    UMPIRE_ERROR(runtime_error,"MonotonicAllocationStrategy capacity exceeded " << m_size << " > " << m_capacity);
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);

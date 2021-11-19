@@ -36,7 +36,7 @@ void HostReallocateOperation::transform(void* current_ptr, void** new_ptr, util:
     *new_ptr = ::realloc(current_ptr, new_size);
 
     if (!*new_ptr) {
-      UMPIRE_ERROR("::realloc(current_ptr=" << current_ptr << ", old_size=" << old_record.size
+      UMPIRE_ERROR(runtime_error,"::realloc(current_ptr=" << current_ptr << ", old_size=" << old_record.size
                                             << ", new_size=" << new_size << ") failed");
     }
 

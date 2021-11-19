@@ -13,7 +13,7 @@
 #include <sstream>
 
 #include "umpire/config.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/runtime_error.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/io.hpp"
 
@@ -86,7 +86,7 @@
 #elif defined(__HIPCC__) && defined(__HIP_DEVICE_COMPILE__)
 #define UMPIRE_ERROR(msg) abort();
 #else
-#define UMPIRE_ERROR(msg)                                                                             \
+#define UMPIRE_ERROR(type, msg)                                                                 \
   {                                                                                                   \
     umpire::util::backtrace bt;                                                                       \
     umpire::util::backtracer<umpire::util::trace_always>::get_backtrace(bt);                          \
@@ -95,7 +95,7 @@
     umpire_oss_error << umpire::util::backtracer<umpire::util::trace_always>::print(bt) << std::endl; \
     UMPIRE_LOG(Error, umpire_oss_error.str());                                                        \
     umpire::util::flush_files();                                                                      \
-    throw umpire::util::Exception(umpire_oss_error.str(), std::string(__FILE__), __LINE__);           \
+    throw umpire::type(umpire_oss_error.str(), std::string(__FILE__), __LINE__);           \
   }
 #endif
 

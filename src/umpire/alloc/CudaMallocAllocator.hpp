@@ -25,7 +25,7 @@ struct CudaMallocAllocator {
    * \param bytes Number of bytes to allocate.
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t size)
   {
@@ -33,7 +33,11 @@ struct CudaMallocAllocator {
     cudaError_t error = ::cudaMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
+      if (error == cudaErrorMemoryAllocation) {
+        UMPIRE_ERROR(out_of_memory_error, "cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
+      } else {
+        UMPIRE_ERROR(runtime_error"cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
+      }
     } else {
       return ptr;
     }
@@ -44,14 +48,14 @@ struct CudaMallocAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory cannot be free'd.
+   * \throws umpire::util::runtime_error if memory cannot be free'd.
    */
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
     }
   }
 };

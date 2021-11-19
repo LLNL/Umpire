@@ -25,7 +25,7 @@ struct HipMallocAllocator {
    * \param bytes Number of bytes to allocate.
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t size)
   {
@@ -33,7 +33,7 @@ struct HipMallocAllocator {
     hipError_t error = ::hipMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipMalloc( bytes = " << size << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,"hipMalloc( bytes = " << size << " ) failed with error: " << hipGetErrorString(error));
     } else {
       return ptr;
     }
@@ -44,14 +44,14 @@ struct HipMallocAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory cannot be free'd.
+   * \throws umpire::util::runtime_error if memory cannot be free'd.
    */
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,"hipFree( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
     }
   }
 };

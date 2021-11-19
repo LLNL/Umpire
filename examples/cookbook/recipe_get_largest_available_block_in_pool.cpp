@@ -9,7 +9,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/runtime_error.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 int main(int, char**)
@@ -23,7 +23,7 @@ int main(int, char**)
   // _sphinx_tag_tut_unwrap_end
 
   if (quick_pool == nullptr) {
-    UMPIRE_ERROR(pool.getName() << " is not a QuickPool");
+    UMPIRE_ERROR(runtime_error, pool.getName() << " is not a QuickPool");
   }
 
   auto ptr = pool.allocate(1024);

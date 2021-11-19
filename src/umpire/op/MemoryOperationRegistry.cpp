@@ -202,13 +202,13 @@ std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(const
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
-    UMPIRE_ERROR("Cannot find operator " << name);
+    UMPIRE_ERROR(runtime_error,"Cannot find operator " << name);
   }
 
   auto op = operations->second.find(platforms);
 
   if (op == operations->second.end()) {
-    UMPIRE_ERROR("Cannot find operator" << name << " for platforms " << static_cast<int>(platforms.first) << ", "
+    UMPIRE_ERROR(runtime_error,"Cannot find operator" << name << " for platforms " << static_cast<int>(platforms.first) << ", "
                                         << static_cast<int>(platforms.second));
   }
 

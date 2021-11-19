@@ -49,7 +49,7 @@ Inspector::deregisterAllocation(void* ptr, strategy::AllocationStrategy* s)
   } else {
     // Re-register the pointer and throw an error
     ResourceManager::getInstance().registerAllocation(ptr, {ptr, record.size, record.strategy, record.name});
-    UMPIRE_ERROR(ptr << " was not allocated by " << s->getName());
+    UMPIRE_ERROR(runtime_error,ptr << " was not allocated by " << s->getName());
   }
 
   return record;

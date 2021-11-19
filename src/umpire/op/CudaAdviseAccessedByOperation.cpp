@@ -23,7 +23,7 @@ void CudaAdviseAccessedByOperation::apply(void* src_ptr, util::AllocationRecord*
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties( device = " << 0 << "),"
+    UMPIRE_ERROR(runtime_error,"cudaGetDeviceProperties( device = " << 0 << "),"
                                                       << " failed with error: " << cudaGetErrorString(error));
   }
 
@@ -31,7 +31,7 @@ void CudaAdviseAccessedByOperation::apply(void* src_ptr, util::AllocationRecord*
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetAccessedBy, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length << ", cudaMemAdviseSetAccessedBy, "
+      UMPIRE_ERROR(runtime_error,"cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length << ", cudaMemAdviseSetAccessedBy, "
                                                << device << ") failed with error: " << cudaGetErrorString(error));
     }
   }

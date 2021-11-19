@@ -124,7 +124,7 @@ TEST(TypedAllocation, DeallocateDifferent)
 
   double* data = alloc_one.allocate(1024);
 
-  ASSERT_THROW(alloc_two.deallocate(data, 1024), umpire::util::Exception);
+  ASSERT_THROW(alloc_two.deallocate(data, 1024), umpire::runtime_error);
 
   ASSERT_NO_THROW(alloc_one.deallocate(data, 1024));
 }

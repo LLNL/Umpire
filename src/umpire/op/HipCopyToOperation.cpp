@@ -21,7 +21,7 @@ void HipCopyToOperation::transform(void* src_ptr, void** dst_ptr,
   hipError_t error = ::hipMemcpy(*dst_ptr, src_ptr, length, hipMemcpyHostToDevice);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
+    UMPIRE_ERROR(runtime_error,"hipMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
                                           << ", hipMemcpyHostToDevice ) failed with error: "
                                           << hipGetErrorString(error));
   }
@@ -38,7 +38,7 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyToOperation::trans
   hipError_t error = ::hipMemcpyAsync(*dst_ptr, src_ptr, length, hipMemcpyHostToDevice, stream);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemcpyAsync( dest_ptr = "
+    UMPIRE_ERROR(runtime_error,"hipMemcpyAsync( dest_ptr = "
                  << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length << ", hipMemcpyHostToDevice "
                  << ", stream = " << stream << ") failed with error: " << hipGetErrorString(error));
   }

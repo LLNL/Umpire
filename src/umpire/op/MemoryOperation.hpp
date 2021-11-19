@@ -35,7 +35,7 @@ class MemoryOperation {
    * \param dst_allocation AllocationRecord of destination.
    * \param length Number of bytes to transform.
    *
-   * \throws util::Exception
+   * \throws util::runtime_error
    */
   virtual void transform(void* src_ptr, void** dst_ptr, util::AllocationRecord* src_allocation,
                          util::AllocationRecord* dst_allocation, std::size_t length);
@@ -54,7 +54,7 @@ class MemoryOperation {
    * \param val Value to apply.
    * \param length Number of bytes to modify.
    *
-   * \throws util::Exception
+   * \throws util::runtime_error
    */
   virtual void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length);
 

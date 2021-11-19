@@ -70,7 +70,7 @@ bool pointer_overlaps(void* left_ptr, void* right_ptr)
 
     return ((right >= left) && ((left + left_record->size) > right) &&
             ((right + right_record->size) > (left + left_record->size)));
-  } catch (umpire::util::Exception&) {
+  } catch (umpire::runtime_error&) {
     UMPIRE_LOG(Error, "Unknown pointer in pointer_overlaps");
     throw;
   }
@@ -89,7 +89,7 @@ bool pointer_contains(void* left_ptr, void* right_ptr)
 
     return ((right >= left) && (left + left_record->size > right) &&
             (right + right_record->size <= left + left_record->size));
-  } catch (umpire::util::Exception&) {
+  } catch (umpire::runtime_error&) {
     UMPIRE_LOG(Error, "Unknown pointer in pointer_contains");
     throw;
   }
@@ -222,7 +222,7 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
 
   {
     if (ptr == nullptr) {
-      UMPIRE_ERROR(allocator.getName() << " Allocator is not a Shared Memory Allocator");
+      UMPIRE_ERROR(runtime_error,allocator.getName() << " Allocator is not a Shared Memory Allocator");
     }
   }
   return ptr;

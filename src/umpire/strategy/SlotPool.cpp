@@ -50,7 +50,7 @@ void* SlotPool::allocate(std::size_t bytes)
   int64_t int_bytes = static_cast<int64_t>(bytes);
 
   if (int_bytes < 0) {
-    UMPIRE_ERROR("allocation request of size: " << bytes << " bytes is too large for this pool");
+    UMPIRE_ERROR(runtime_error,"allocation request of size: " << bytes << " bytes is too large for this pool");
   }
 
   for (std::size_t i = 0; i < m_slots; ++i) {

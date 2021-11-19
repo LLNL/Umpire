@@ -45,7 +45,7 @@ inline std::string resource_to_string(MemoryResourceType type)
     case Shared:
       return "SHARED";
     default:
-      UMPIRE_ERROR("Unkown resource type: " << type);
+      UMPIRE_ERROR(runtime_error,"Unkown resource type: " << type);
       //
       // The UMPIRE_ERROR macro above does not return.  It instead throws
       // an exception.  However, for some reason, nvcc throws a warning
@@ -78,7 +78,7 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "SHARED")
     return MemoryResourceType::Shared;
   else {
-    UMPIRE_ERROR("Unkown resource name: " << resource);
+    UMPIRE_ERROR(runtime_error,"Unkown resource name: " << resource);
 
     //
     // The UMPIRE_ERROR macro above does not return.  It instead throws

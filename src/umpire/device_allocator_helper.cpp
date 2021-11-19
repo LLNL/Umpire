@@ -52,7 +52,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 #endif
 
   if (index == -1) {
-    UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+    UMPIRE_ERROR(runtime_error,"No DeviceAllocator by the name " << name << " was found.");
   }
 
 #if !defined(__CUDA_ARCH__)
@@ -65,10 +65,10 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 __host__ __device__ DeviceAllocator get_device_allocator(int id)
 {
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR("Invalid ID given.");
+    UMPIRE_ERROR(runtime_error,"Invalid ID given.");
   }
   if (!is_device_allocator(id)) {
-    UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
+    UMPIRE_ERROR(runtime_error,"No DeviceAllocator by with that ID was found.");
   }
 
 #if !defined(__CUDA_ARCH__)
@@ -81,7 +81,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
 __host__ __device__ bool is_device_allocator(int id)
 {
   if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR("Invalid ID given.");
+    UMPIRE_ERROR(runtime_error,"Invalid ID given.");
   }
 
 #if !defined(__CUDA_ARCH__)

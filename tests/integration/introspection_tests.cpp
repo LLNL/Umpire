@@ -96,5 +96,5 @@ TEST(IntrospectionTest, RegisterNull)
 
   auto record = umpire::util::AllocationRecord{nullptr, 0, strategy};
 
-  EXPECT_THROW(rm.registerAllocation(nullptr, record), umpire::util::Exception);
+  EXPECT_THROW(rm.registerAllocation(nullptr, record), umpire::runtime_error);
 }
