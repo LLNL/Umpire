@@ -149,8 +149,7 @@ class event::builder {
     if (event_enabled) {
       using std::to_string;
       return arg(k, to_string(v));
-    }
-    else {
+    } else {
       return *this;
     }
   }
