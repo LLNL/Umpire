@@ -109,6 +109,11 @@ class event::builder {
     return event_enabled ? arg(k, std::string{v}) : *this;
   }
 
+  builder& arg(const std::string& k, char* v)
+  {
+    return event_enabled ? arg(k, std::string{v}) : *this;
+  }
+
   builder& arg(const char* k, void* p)
   {
     return event_enabled ? arg(std::string{k}, p) : *this;
@@ -141,7 +146,13 @@ class event::builder {
   template <typename T>
   std::enable_if_t<!std::is_arithmetic<T>::value, builder&> arg(const std::string& k, T v)
   {
-    return event_enabled ? arg(k, v) : *this;
+    if (event_enabled) {
+      using std::to_string;
+      return arg(k, to_string(v));
+    }
+    else {
+      return *this;
+    }
   }
 
   template <typename... Ts, std::size_t... N>
