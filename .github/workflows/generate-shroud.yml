@@ -1,4 +1,4 @@
-on: 
+on:
   pull_request:
     paths:
       - '**umpire_shroud.yaml'
