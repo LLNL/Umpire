@@ -1,5 +1,7 @@
 on: 
-  pull_request: []
+  pull_request:
+    paths:
+      - '**umpire_shroud.yaml'
 
 name: Generate C/FORTRAN Interface
 jobs:
@@ -11,21 +13,9 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
-      - name: Get specific changed files
-        id: changed-shroud-yaml
-        run: |
-          git diff --compact-summary origin/develop | grep umpire_shroud.yaml
-          if [ $? -eq 0 ]; then
-              echo "::set-output name=changed::true"
-          else
-              echo "::set-output name=changed::false"
-          fi
-          
       - name: Run shroud on changed files
-        if: steps.changed-shroud-yaml.outputs.changed == 'true'
         uses: ./.github/actions/shroud
       - name: Push changed files
-        if: steps.changed-shroud-yaml.outputs.changed == 'true'
         run: |
           printf "GitHub Actor: ${GITHUB_ACTOR}\n"
           git config user.name "github-actions"
@@ -34,4 +24,4 @@ jobs:
             git add src/umpire/interface/.
             git commit -m 'Update C/FORTRAN interface'
             git push
-          fi 
+          fi
