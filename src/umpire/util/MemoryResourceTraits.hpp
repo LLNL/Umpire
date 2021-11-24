@@ -18,6 +18,7 @@
 namespace umpire {
 
 struct MemoryResourceTraits {
+  MemoryResourceTraits() {};
   enum class optimized_for { any, latency, bandwidth, access };
 
   enum class vendor_type { unknown, amd, ibm, intel, nvidia };
