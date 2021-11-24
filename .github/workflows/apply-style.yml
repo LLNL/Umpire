@@ -1,0 +1,24 @@
+on: 
+  pull_request: []
+
+name: Apply Style
+jobs:
+  apply-style:
+    name: Apply Style to Source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: Apply style updates
+        uses: ./.github/actions/apply-style
+      - name: Push changed files
+        run: |
+          printf "GitHub Actor: ${GITHUB_ACTOR}\n"
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -am 'Apply style updates'
+            git push
+          fi
