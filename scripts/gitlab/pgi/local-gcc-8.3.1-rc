@@ -1,0 +1,18 @@
+set LDSO=/lib64/ld-linux-x86-64.so.2;
+set GCCDIR=/usr/tce/packages/gcc/gcc-8.3.1/rh/usr/bin/../lib/gcc/x86_64-redhat-linux/8;
+set G77DIR=/usr/tce/packages/gcc/gcc-8.3.1/rh/usr/bin/../lib/gcc/x86_64-redhat-linux/8/;
+set OEM_INFO=64-bit target on x86-64 Linux $INFOTPVAL;
+set GNUATOMIC=-latomic;
+set GCCINC= /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/bin/../lib/gcc/x86_64-redhat-linux/8/include /usr/local/include /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/bin/../lib/gcc/../../include /usr/include;
+set GPPDIR= /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/include/c++/8 /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/include/c++/8/x86_64-redhat-linux /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/include/c++/8/backward /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/lib/gcc/x86_64-redhat-linux/8/include /usr/local/include /usr/tce/packages/gcc/gcc-8.3.1/rh/usr/include /usr/include;
+set NUMALIBNAME=-lnuma ;
+set LOCALRC=YES;
+set EXTENSION=__extension__=;
+set COMPGCCINCDIR=include-gcc70;
+set LC=$if(-Bstatic,-lgcc -lgcc_eh -lc -lgcc -lgcc_eh -lc, -lgcc -lc -lgcc -lgcc_s);
+# GLIBC version 2.17
+# GCC version 8.3.1
+set GCCVERSION=80301;
+set LIBNCURSES=YES;
+export PGI=$COMPBASE;
+# makelocalrc executed by martymcf Thu Dec 2 09:00:33
