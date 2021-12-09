@@ -36,7 +36,7 @@ icpc_19_1_0:
 
 pgi_19_7:
   variables:
-    SPEC: "+fortran %pgi@20.1 cxxflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc"
+    SPEC: "+fortran %pgi@19.7 cxxflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc"
   extends: .build_and_test_on_ruby
 
 pgi_20_1:
