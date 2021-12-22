@@ -16,15 +16,11 @@ namespace umpire {
 template <typename T>
 class TypedAllocator;
 
-}
+template <typename U, typename V>
+bool operator==(const TypedAllocator<U>&, const TypedAllocator<V>&);
 
 template <typename U, typename V>
-bool operator==(const umpire::TypedAllocator<U>&, const umpire::TypedAllocator<V>&);
-
-template <typename U, typename V>
-bool operator!=(const umpire::TypedAllocator<U>&, const umpire::TypedAllocator<V>&);
-
-namespace umpire {
+bool operator!=(const TypedAllocator<U>&, const TypedAllocator<V>&);
 
 /*!
  * \brief Allocator for objects of type T
@@ -71,10 +67,10 @@ class TypedAllocator {
   void deallocate(T* ptr, std::size_t size);
 
   template <typename U, typename V>
-  friend bool ::operator==(const TypedAllocator<U>&, const TypedAllocator<V>&);
+  friend bool operator==(const TypedAllocator<U>&, const TypedAllocator<V>&);
 
   template <typename U, typename V>
-  friend bool ::operator!=(const TypedAllocator<U>&, const TypedAllocator<V>&);
+  friend bool operator!=(const TypedAllocator<U>&, const TypedAllocator<V>&);
 
  private:
   umpire::Allocator m_allocator;
