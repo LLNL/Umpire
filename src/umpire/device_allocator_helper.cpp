@@ -5,8 +5,10 @@
 // SPDX-License-Identifier: (MIT)
 ////////////////////////////////////////////////////////////////////////////
 #include "umpire/device_allocator_helper.hpp"
+#include "umpire/util/Macros.hpp"
 
 #include <limits.h>
+#include <functional>
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
@@ -65,12 +67,14 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 
 __host__ __device__ DeviceAllocator get_device_allocator(int id)
 {
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR("Invalid ID given.");
+  if (id < 1 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
+    UMPIRE_ERROR("Invalid ID given. Valid range: [1-64]");
   }
   if (!is_device_allocator(id)) {
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
   }
+
+  id = id - 1; //adjust for indexing into array
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id];
@@ -81,9 +85,16 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
 
 __host__ __device__ bool is_device_allocator(int id)
 {
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR("Invalid ID given.");
+  if (id < 1 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
+#if !defined(__CUDA_ARCH__)
+    UMPIRE_LOG(Warning, "Invalid ID given. Valid range: [1-64]");
+    return false;
+#else
+    UMPIRE_ERROR("Invalid ID given. Valid range: [1-64]");
+#endif
   }
+
+  id = id - 1; //adjust for indexing into array
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
@@ -97,11 +108,12 @@ __host__ __device__ bool is_device_allocator(int id)
 //////////////////////////////////////////////////////////////////////////
 __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
-  static size_t allocator_id{0};
+  static int allocator_id{0};
+  int da_id = ((-1)*(allocator_id)) - 1;
 
   // The DA ID should not conflict with other allocator IDs,
-  // so we use INT_MAX to get unique value.
-  auto dev_alloc = DeviceAllocator(allocator, size, name, INT_MAX + allocator_id);
+  // so we use negative numbers to get unique value.
+  auto dev_alloc = DeviceAllocator(allocator, size, name, da_id);
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
     auto& rm = umpire::ResourceManager::getInstance();

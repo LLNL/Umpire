@@ -25,7 +25,7 @@ __global__ void my_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
     // _sphinx_tag_get_dev_allocator_id_start
-    umpire::DeviceAllocator alloc = umpire::get_device_allocator(0);
+    umpire::DeviceAllocator alloc = umpire::get_device_allocator(1);
     // _sphinx_tag_get_dev_allocator_id_end
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
@@ -56,12 +56,15 @@ int main(int argc, char const* argv[])
   auto device_allocator = umpire::make_device_allocator(allocator, sizeof(double), "my_device_alloc");
   // _sphinx_tag_make_dev_allocator_end
 
-  // Checking that a DeviceAllocator exists...
-  if (umpire::is_device_allocator(0)) {
+  // Checking that the DeviceAllocator just created can be found...
+  if (umpire::is_device_allocator(1)) {
     std::cout << "I found a DeviceAllocator! " << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
+
+  // See ReadTheDocs DeviceAllocator documentation for more info about macro usage!
+  UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
   my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();

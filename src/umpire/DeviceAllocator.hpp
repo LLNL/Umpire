@@ -28,7 +28,7 @@ class DeviceAllocator {
    * \param id ID associated with this DeviceAllocator object. ID will be used
    *   to reference UMPIRE_DEV_ALLOCS array if necessary.
    */
-  __host__ DeviceAllocator(Allocator allocator, size_t size, const std::string& name, size_t id);
+  __host__ DeviceAllocator(Allocator allocator, size_t size, const std::string& name, int id);
 
   __host__ __device__ ~DeviceAllocator();
 
@@ -49,7 +49,7 @@ class DeviceAllocator {
    *
    * \return Returns the id.
    */
-  __host__ __device__ size_t getID();
+  __host__ __device__ int getID();
 
   /*
    * \brief Get the name associated with the
@@ -88,7 +88,7 @@ class DeviceAllocator {
   char m_name[64];
   unsigned int* m_counter;
 
-  size_t m_id;
+  int m_id;
   size_t m_size;
   bool m_child;
 };
