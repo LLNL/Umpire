@@ -71,7 +71,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
   }
 
-  id = id - 1; //adjust for indexing into array
+  id = id - 1; // adjust for indexing into array
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id];
@@ -91,7 +91,7 @@ __host__ __device__ bool is_device_allocator(int id)
 #endif
   }
 
-  id = id - 1; //adjust for indexing into array
+  id = id - 1; // adjust for indexing into array
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
@@ -106,7 +106,7 @@ __host__ __device__ bool is_device_allocator(int id)
 __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
   static int allocator_id{0};
-  int da_id = ((-1)*(allocator_id)) - 1;
+  int da_id = ((-1) * (allocator_id)) - 1;
 
   // The DA ID should not conflict with other allocator IDs,
   // so we use negative numbers to get unique value.

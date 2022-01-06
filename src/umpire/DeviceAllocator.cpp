@@ -4,13 +4,11 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/DeviceAllocator.hpp"
-
-#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/DeviceAllocator.hpp"
 #include "umpire/device_allocator_helper.hpp"
 #include "umpire/resource/MemoryResourceTypes.hpp"
 #include "umpire/util/Macros.hpp"
