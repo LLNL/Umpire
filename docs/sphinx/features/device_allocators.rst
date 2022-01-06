@@ -39,7 +39,8 @@ obtain the DeviceAllocator object:
    :end-before: _sphinx_tag_get_dev_allocator_id_end
    :language: C++
 
-And next is an example of using the **name** instead:
+Note that the IDs start at one. The range of valid DeviceAllocator IDs is between 1 and 64, inclusively.
+Next is an example of using the **name** instead:
 
 .. literalinclude:: ../../../examples/device-allocator.cpp
    :start-after: _sphinx_tag_get_dev_allocator_name_start
