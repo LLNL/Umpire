@@ -32,7 +32,7 @@ After creating a DeviceAllocator, we can immediately start using that allocator 
 have the :class:`umpire::get_device_allocator` host/device function which returns the DeviceAllocator object corresponding 
 to the ID or name given. The DeviceAllocator class also includes a helper function, :class:`umpire::is_device_allocator`,
 to query whether or not a given ID corresponds to an existing DeviceAllocator. Below is an example of using the **ID** to 
-obtain the DeviceAllocator object:
+obtain the first DeviceAllocator object:
 
 .. literalinclude:: ../../../examples/device-allocator.cpp
    :start-after: _sphinx_tag_get_dev_allocator_id_start
