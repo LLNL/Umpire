@@ -10,7 +10,7 @@ Creating a Device Allocator
 --------------------------
 
 To create a DeviceAllocator, users can call the :class:`umpire::make_device_allocator` host function.
-This function takes an allocator, the total amount of memory the DeviceAllocator will have, and a name
+This function takes an allocator, the total amount of memory the DeviceAllocator will have, and a unique name
 for the new DeviceAllocator object, as shown below. A maximum of 64 unique DeviceAllocators can be
 created at a time.
 
@@ -39,7 +39,6 @@ obtain the first DeviceAllocator object:
    :end-before: _sphinx_tag_get_dev_allocator_id_end
    :language: C++
 
-Note that the IDs start at one. The range of valid DeviceAllocator IDs is between 1 and 64, inclusively.
 Next is an example of using the **name** instead:
 
 .. literalinclude:: ../../../examples/device-allocator.cpp

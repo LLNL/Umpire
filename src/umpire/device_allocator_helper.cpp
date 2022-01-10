@@ -66,7 +66,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 __host__ __device__ DeviceAllocator get_device_allocator(int id)
 {
   if (id < 1 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR("Invalid ID given. Valid range: [1-64]");
+    UMPIRE_ERROR("Invalid ID given.");
   }
   if (!is_device_allocator(id)) {
     UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
@@ -85,10 +85,10 @@ __host__ __device__ bool is_device_allocator(int id)
 {
   if (id < 1 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
 #if !defined(__CUDA_ARCH__)
-    UMPIRE_LOG(Warning, "Invalid ID given. Valid range: [1-64]");
+    UMPIRE_LOG(Warning, "Invalid ID given.");
     return false;
 #else
-    UMPIRE_ERROR("Invalid ID given. Valid range: [1-64]");
+    UMPIRE_ERROR("Invalid ID given.");
 #endif
   }
 
