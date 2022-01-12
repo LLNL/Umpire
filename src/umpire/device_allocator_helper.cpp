@@ -91,10 +91,10 @@ __host__ __device__ DeviceAllocator get_device_allocator(int da_id)
   int id = convert(da_id);
 
   if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
-    UMPIRE_ERROR("Invalid ID given.");
+    UMPIRE_ERROR("Invalid ID given: " << id);
   }
   if (!is_device_allocator(da_id)) {
-    UMPIRE_ERROR("No DeviceAllocator with that ID was found.");
+    UMPIRE_ERROR("No DeviceAllocator with ID, " << id << " was found.");
   }
 
 #if !defined(__CUDA_ARCH__)
@@ -109,10 +109,19 @@ __host__ __device__ bool is_device_allocator(const char* name)
   int index = get_index(name);
 
   if (index == -1) {
+#if !defined(__CUDA_ARCH__)
+    UMPIRE_LOG(Warning, "No DeviceAllocator by the name " << name << " was found.");
     return false;
+#else
+    UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+#endif
   }
 
-  return true;
+#if !defined(__CUDA_ARCH__)
+  return UMPIRE_DEV_ALLOCS_h[index].isInitialized();
+#else
+  return UMPIRE_DEV_ALLOCS[index].isInitialized();
+#endif
 }
 
 __host__ __device__ bool is_device_allocator(int da_id)
@@ -121,10 +130,10 @@ __host__ __device__ bool is_device_allocator(int da_id)
 
   if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
 #if !defined(__CUDA_ARCH__)
-    UMPIRE_LOG(Warning, "Invalid ID given.");
+    UMPIRE_LOG(Warning, "Invalid ID given: " << id);
     return false;
 #else
-    UMPIRE_ERROR("Invalid ID given.");
+    UMPIRE_ERROR("Invalid ID given: " << id);
 #endif
   }
 
