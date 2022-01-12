@@ -52,7 +52,7 @@ __host__ __device__ bool is_device_allocator(const char* name);
 
 /*
  * DeviceAllocator IDs are negative by design so they do not
- * conflict with other allocator IDs. This function converts that 
+ * conflict with other allocator IDs. This function converts that
  * negative value to a positive to be used as an array index.
  */
 
