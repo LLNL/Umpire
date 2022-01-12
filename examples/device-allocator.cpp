@@ -44,8 +44,8 @@ int main(int argc, char const* argv[])
   // _sphinx_tag_make_dev_allocator_end
 
   // Checking that the DeviceAllocator just created can be found...
-  if (umpire::is_device_allocator(device_allocator.getID())) {
-    std::cout << "I found a DeviceAllocator! " << std::endl;
+  if (umpire::is_device_allocator("my_device_alloc")) {
+    std::cout << "I found a DeviceAllocator!" << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));

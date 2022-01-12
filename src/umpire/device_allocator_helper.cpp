@@ -22,13 +22,23 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 //////////////////////////////////////////////////////////////////////////
 // host/device functions
 //////////////////////////////////////////////////////////////////////////
+
+/*
+ * DeviceAllocator IDs are negative by design so they do not
+ * conflict with other allocator IDs. This function converts that
+ * negative value to a positive to be used as an array index.
+ */
 __host__ __device__ inline int convert(int neg_id)
 {
   int pos_id = (neg_id * (-1)) - 1;
   return pos_id;
 }
 
-__host__ __device__ DeviceAllocator get_device_allocator(const char* name)
+/*
+ * Given a name, this function returns whether or not it
+ * corresponds to a DeviceAllocator.
+ */
+__host__ __device__ inline int get_index(const char* name)
 {
   int index{-1};
 #if !defined(__CUDA_ARCH__)
@@ -57,6 +67,13 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
   }
 #endif
 
+  return index;
+}
+
+__host__ __device__ DeviceAllocator get_device_allocator(const char* name)
+{
+  int index = get_index(name);
+
   if (index == -1) {
     UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
   }
@@ -84,6 +101,17 @@ __host__ __device__ DeviceAllocator get_device_allocator(int da_id)
 #else
   return UMPIRE_DEV_ALLOCS[id];
 #endif
+}
+
+__host__ __device__ bool is_device_allocator(const char* name)
+{
+  int index = get_index(name);
+
+  if (index == -1) {
+    return false;
+  }
+
+  return true;
 }
 
 __host__ __device__ bool is_device_allocator(int da_id)

@@ -45,16 +45,16 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id);
 
 /*
  * Check if the DeviceAllocator object specified by the
- * given id currently exists.
+ * given name or id currently exists.
  */
 __host__ __device__ bool is_device_allocator(int id);
+__host__ __device__ bool is_device_allocator(const char* name);
 
 /*
  * DeviceAllocator IDs are negative by design so they do not
  * conflict with other allocator IDs. This function converts that 
  * negative value to a positive to be used as an array index.
  */
-__host__ __device__ inline int conversion(int id);
 
 /*!
  * \brief Construct a new DeviceAllocator. Calls the private Device
