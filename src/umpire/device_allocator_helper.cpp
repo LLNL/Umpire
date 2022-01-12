@@ -5,11 +5,12 @@
 // SPDX-License-Identifier: (MIT)
 ////////////////////////////////////////////////////////////////////////////
 #include "umpire/device_allocator_helper.hpp"
+
+#include <string.h>
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include "umpire/util/Macros.hpp"
-
-#include <string.h>
 
 namespace umpire {
 
