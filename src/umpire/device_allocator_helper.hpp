@@ -50,12 +50,6 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id);
 __host__ __device__ bool is_device_allocator(int id);
 __host__ __device__ bool is_device_allocator(const char* name);
 
-/*
- * DeviceAllocator IDs are negative by design so they do not
- * conflict with other allocator IDs. This function converts that
- * negative value to a positive to be used as an array index.
- */
-
 /*!
  * \brief Construct a new DeviceAllocator. Calls the private Device
  * Allocator constructor that records the associated id.
