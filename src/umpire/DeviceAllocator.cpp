@@ -81,7 +81,7 @@ __device__ void* DeviceAllocator::allocate(size_t size)
 
 __host__ __device__ int DeviceAllocator::getID()
 {
-  return (m_id * (-1));
+  return m_id;
 }
 
 __host__ __device__ const char* DeviceAllocator::getName()

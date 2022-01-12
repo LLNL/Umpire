@@ -5,12 +5,11 @@
 // SPDX-License-Identifier: (MIT)
 ////////////////////////////////////////////////////////////////////////////
 #include "umpire/device_allocator_helper.hpp"
-
-#include <string.h>
-
 #include "umpire/ResourceManager.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
 #include "umpire/util/Macros.hpp"
+
+#include <string.h>
 
 namespace umpire {
 
@@ -23,6 +22,12 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 //////////////////////////////////////////////////////////////////////////
 // host/device functions
 //////////////////////////////////////////////////////////////////////////
+__host__ __device__ inline int convert(int neg_id)
+{
+  int pos_id = (neg_id * (-1)) - 1;
+  return pos_id;
+}
+
 __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 {
   int index{-1};
@@ -63,16 +68,16 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 #endif
 }
 
-__host__ __device__ DeviceAllocator get_device_allocator(int id)
+__host__ __device__ DeviceAllocator get_device_allocator(int da_id)
 {
-  if (id < 1 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
+  int id = convert(da_id);
+
+  if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
     UMPIRE_ERROR("Invalid ID given.");
   }
-  if (!is_device_allocator(id)) {
-    UMPIRE_ERROR("No DeviceAllocator by with that ID was found.");
+  if (!is_device_allocator(da_id)) {
+    UMPIRE_ERROR("No DeviceAllocator with that ID was found.");
   }
-
-  id = id - 1; // adjust for indexing into array
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id];
@@ -81,9 +86,11 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
 #endif
 }
 
-__host__ __device__ bool is_device_allocator(int id)
+__host__ __device__ bool is_device_allocator(int da_id)
 {
-  if (id < 1 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
+  int id = convert(da_id);
+
+  if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
 #if !defined(__CUDA_ARCH__)
     UMPIRE_LOG(Warning, "Invalid ID given.");
     return false;
@@ -91,8 +98,6 @@ __host__ __device__ bool is_device_allocator(int id)
     UMPIRE_ERROR("Invalid ID given.");
 #endif
   }
-
-  id = id - 1; // adjust for indexing into array
 
 #if !defined(__CUDA_ARCH__)
   return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
@@ -107,10 +112,11 @@ __host__ __device__ bool is_device_allocator(int id)
 __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
   static int allocator_id{0};
-  int da_id = ((-1) * (allocator_id)) - 1;
 
-  // The DA ID should not conflict with other allocator IDs,
+  // The DeviceAllocator ID should not conflict with other allocator IDs,
   // so we use negative numbers to get unique value.
+  int da_id = convert(allocator_id);
+
   auto dev_alloc = DeviceAllocator(allocator, size, name, da_id);
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {

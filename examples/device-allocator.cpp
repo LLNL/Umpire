@@ -15,25 +15,12 @@ using resource_type = camp::resources::Hip;
 #endif
 
 /*
- * Very simple kernels that use only the first thread to "get" the
- * existing DeviceAllocator and to allocate a double. (One kernel retrieves
- * the DeviceAllocator object by ID, the other by name.)
+ * Very simple kernel that uses only the first thread to "get" the
+ * existing DeviceAllocator and allocate a double.
  * Making sure that the data_ptr is pointing to the device allocated double,
  * it sets the value of that double which will be checked later.
  */
 __global__ void my_kernel(double** data_ptr)
-{
-  if (threadIdx.x == 0) {
-    // _sphinx_tag_get_dev_allocator_id_start
-    umpire::DeviceAllocator alloc = umpire::get_device_allocator(1);
-    // _sphinx_tag_get_dev_allocator_id_end
-    double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
-    *data_ptr = data;
-    data[0] = 1024;
-  }
-}
-
-__global__ void my_other_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
     // _sphinx_tag_get_dev_allocator_name_start
@@ -41,7 +28,7 @@ __global__ void my_other_kernel(double** data_ptr)
     // _sphinx_tag_get_dev_allocator_name_end
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
-    data[0] = 42;
+    data[0] = 1024;
   }
 }
 
@@ -57,7 +44,7 @@ int main(int argc, char const* argv[])
   // _sphinx_tag_make_dev_allocator_end
 
   // Checking that the DeviceAllocator just created can be found...
-  if (umpire::is_device_allocator(1)) {
+  if (umpire::is_device_allocator(device_allocator.getID())) {
     std::cout << "I found a DeviceAllocator! " << std::endl;
   }
 
@@ -68,14 +55,14 @@ int main(int argc, char const* argv[])
 
   my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
-  std::cout << "After first kernel, found value: " << (*ptr_to_data)[0] << std::endl;
+  std::cout << "After calling kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
   // DeviceAllocator only has enough memory for one double. We need to reset it!
   device_allocator.reset();
 
-  my_other_kernel<<<1, 16>>>(ptr_to_data);
+  my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
-  std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
+  std::cout << "After calling kernel again, found value: " << (*ptr_to_data)[0] << std::endl;
 
   return 0;
 }

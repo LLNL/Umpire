@@ -221,7 +221,7 @@ Allocator ResourceManager::getAllocator(int id)
   UMPIRE_LOG(Debug, "(\"" << id << "\")");
 
   if (id < 0) {
-    UMPIRE_ERROR("Passed an invalid ID - is this a DeviceAllocator instead?");
+    UMPIRE_ERROR("Passed an invalid ID: " << id << ". Is this a DeviceAllocator instead?");
   }
 
   if (id == umpire::invalid_allocator_id) {

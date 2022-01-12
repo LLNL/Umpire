@@ -23,23 +23,16 @@ When the DeviceAllocator is created, the ``size`` parameter that is passed to th
 function is the total memory, in bytes, available to that allocator. Whenever the ``allocate`` function is
 called on the GPU, it is simply atomically incrementing a counter which offsets a pointer to the start of that
 memory. In other words, the total size from all of the allocates performed on the device with the DeviceAllocator may not 
-exceed the size that was used when making the device allocator.
+exceed the size that was used when creating the device allocator.
 
 Retrieving a DeviceAllocator Object
 -----------------------------------
 
 After creating a DeviceAllocator, we can immediately start using that allocator to allocate device memory. To do this, we
 have the :class:`umpire::get_device_allocator` host/device function which returns the DeviceAllocator object corresponding 
-to the ID or name given. The DeviceAllocator class also includes a helper function, :class:`umpire::is_device_allocator`,
-to query whether or not a given ID corresponds to an existing DeviceAllocator. Below is an example of using the **ID** to 
-obtain the first DeviceAllocator object:
-
-.. literalinclude:: ../../../examples/device-allocator.cpp
-   :start-after: _sphinx_tag_get_dev_allocator_id_start
-   :end-before: _sphinx_tag_get_dev_allocator_id_end
-   :language: C++
-
-Next is an example of using the **name** instead:
+to the name (or ID) given. The DeviceAllocator class also includes a helper function, :class:`umpire::is_device_allocator`,
+to query whether or not a given ID corresponds to an existing DeviceAllocator. Below is an example of using the **name** to 
+obtain the DeviceAllocator object:
 
 .. literalinclude:: ../../../examples/device-allocator.cpp
    :start-after: _sphinx_tag_get_dev_allocator_name_start
@@ -51,10 +44,8 @@ call stacks can become quite complex. Users can instead use this function to obt
 function they need.
 
 .. note::
-   In order to use the full capabilities of the DeviceAllocator, relocatable device code (RDC) must be enabled. If RDC is
-   not enabled, users must manually call the ``UMPIRE_SET_UP_DEVICE_ALLOCATORS()`` macro after at least one DeviceAllocator
-   is created. This macro ensures that the host and device memory are set up properly. If RDC is enabled, then the 
-   DeviceAllocator helper functions will take care of this automatically and no manual call is necessary. 
+   When compiling without relocatable device code (RDC), the ``UMPIRE_SET_UP_DEVICE_ALLOCATORS()`` macro must be called 
+   in every translation unit that will use the :class:`umpire::get_device_allocator` function.
 
 Resetting Memory on the DeviceAllocator
 ---------------------------------------
