@@ -65,6 +65,11 @@ blt_add_executable(
   NAME backtrace_example
   SOURCES backtrace_example.cpp
   DEPENDS_ON ${example_depends})
+
+if (NOT WIN32 AND NOT APPLE)
+  blt_add_target_link_flags( TO backtrace_example FLAGS -rdynamic)
+endif()
+
 list(APPEND umpire_examples backtrace_example)
 
 if (UMPIRE_ENABLE_C)
