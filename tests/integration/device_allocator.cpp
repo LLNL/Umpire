@@ -67,9 +67,11 @@ TEST(DeviceAllocator, CreateAndAllocate)
   size_t size = 2048;
   //const char* name = "da";
 
+  ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
+
   umpire::DeviceAllocator dev_alloc = umpire::make_device_allocator(allocator, size, "da");
   
-  //ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[0], nullptr);
+  ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
 
   ASSERT_EQ(dev_alloc.getID(), -1);
   //ASSERT_EQ(dev_alloc.getName(), name);
