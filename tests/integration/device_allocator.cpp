@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-#include "umpire/ResourceManager.hpp"
 #include "umpire/DeviceAllocator.hpp"
+#include "umpire/ResourceManager.hpp"
 #include "umpire/device_allocator_helper.hpp"
 
 template <typename Platform>
@@ -65,15 +65,15 @@ TEST(DeviceAllocator, CreateAndAllocate)
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
   size_t size = 2048;
-  //const char* name = "da";
+  // const char* name = "da";
 
   umpire::DeviceAllocator dev_alloc = umpire::make_device_allocator(allocator, size, "da");
-  
-  //ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[0], nullptr);
+
+  // ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[0], nullptr);
 
   ASSERT_EQ(dev_alloc.getID(), -1);
-  //ASSERT_EQ(dev_alloc.getName(), name);
-  ASSERT_EQ(dev_alloc.isInitialized(), true); 
+  // ASSERT_EQ(dev_alloc.getName(), name);
+  ASSERT_EQ(dev_alloc.isInitialized(), true);
 
   ASSERT_EQ(umpire::is_device_allocator("da"), true);
   ASSERT_EQ(umpire::is_device_allocator(dev_alloc.getID()), true);
@@ -89,8 +89,8 @@ TEST(DeviceAllocator, CreateAndAllocate)
   allocate_and_use<hip_platform> hip;
   ASSERT_NO_THROW(hip.test(allocator, "da"));
 #else
-  FAIL(); // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
-#endif  
+  FAIL();   // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
+#endif
 
   ASSERT_NO_THROW(dev_alloc.reset());
   ASSERT_NO_THROW(umpire::destroy_device_allocator());
@@ -100,17 +100,17 @@ TEST(DeviceAllocator, MultipleDAs)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  size_t size = 42*sizeof(double);
+  size_t size = 42 * sizeof(double);
 
   umpire::DeviceAllocator da1 = umpire::make_device_allocator(allocator, size, "da1");
   umpire::DeviceAllocator da2 = umpire::make_device_allocator(allocator, size, "da2");
   umpire::DeviceAllocator da3 = umpire::make_device_allocator(allocator, size, "da3");
   umpire::DeviceAllocator da4 = umpire::make_device_allocator(allocator, size, "da4");
 
-  //ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[0], nullptr);
-  //ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[1], nullptr);
-  //ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[2], nullptr);
-  //ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[3], nullptr);
+  // ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[0], nullptr);
+  // ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[1], nullptr);
+  // ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[2], nullptr);
+  // ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h[3], nullptr);
 
   ASSERT_EQ(da1.getID(), -1);
   ASSERT_EQ(da2.getID(), -2);
@@ -131,14 +131,14 @@ TEST(DeviceAllocator, MultipleDAs)
 
   for (int i = 0; i < umpire::UMPIRE_TOTAL_DEV_ALLOCS; i++) {
 #if defined(UMPIRE_ENABLE_CUDA)
-  allocate_and_use<cuda_platform> cuda;
-  ASSERT_NO_THROW(cuda.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
+    allocate_and_use<cuda_platform> cuda;
+    ASSERT_NO_THROW(cuda.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
 #elif defined(UMPIRE_ENABLE_HIP)
-  allocate_and_use<hip_platform> hip;
-  ASSERT_NO_THROW(hip.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
+    allocate_and_use<hip_platform> hip;
+    ASSERT_NO_THROW(hip.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
 #else
-  FAIL(); // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
-#endif  
+    FAIL(); // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
+#endif
   }
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -158,7 +158,6 @@ TEST(DeviceAllocator, MultipleDAs)
 
 int main(int argc, char* argv[])
 {
-
   ::testing::InitGoogleTest(&argc, argv);
 
   int result = RUN_ALL_TESTS();
