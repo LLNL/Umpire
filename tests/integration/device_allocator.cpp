@@ -70,7 +70,7 @@ TEST(DeviceAllocator, CreateAndAllocate)
   ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
 
   umpire::DeviceAllocator dev_alloc = umpire::make_device_allocator(allocator, size, "da");
-  
+
   ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
 
   ASSERT_EQ(dev_alloc.getID(), -1);
