@@ -12,7 +12,7 @@ if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
 endif()
 
 if (UMPIRE_ENABLE_HIP)
-  set(tools_depends ${tools_depends} hip_runtime)
+  set(tools_depends ${tools_depends} blt::hip_runtime)
 endif()
 
 set(replay_headers

@@ -12,7 +12,7 @@ set (replay_integration_tests_depends
 if (UMPIRE_ENABLE_HIP)
   set (replay_integration_tests_depends
       ${replay_integration_tests_depends}
-      hip_runtime)
+      blt::hip_runtime)
 endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)

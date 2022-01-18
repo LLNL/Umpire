@@ -9,7 +9,7 @@ set (test_applications_depends umpire)
 if (UMPIRE_ENABLE_HIP)
   set (test_applications_depends
       ${test_applications_depends}
-      hip_runtime)
+      blt::hip_runtime)
 endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)

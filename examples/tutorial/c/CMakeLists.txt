@@ -9,7 +9,7 @@ set (tutorial_depends umpire)
 if (UMPIRE_ENABLE_HIP)
   set (tutorial_depends
       ${tutorial_depends}
-      hip_runtime)
+      blt::hip_runtime)
 endif()
 
 blt_add_executable(

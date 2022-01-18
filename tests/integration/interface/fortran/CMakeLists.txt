@@ -30,7 +30,7 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (fortran_tests_depends
     ${fortran_tests_depends}
-    hip_runtime)
+    blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)

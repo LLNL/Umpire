@@ -124,7 +124,7 @@ if (UMPIRE_ENABLE_HIP)
 
   set(umpire_resource_depends
     ${umpire_resource_depends}
-    hip_runtime)
+    blt::hip_runtime)
 
   if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers

@@ -9,7 +9,7 @@ set (stress_test_depends umpire)
 if (UMPIRE_ENABLE_HIP)
   set (stress_test_depends
       ${stress_test_depends}
-      hip_runtime)
+      blt::hip_runtime)
 endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
@@ -77,7 +77,7 @@ if (UMPIRE_ENABLE_BENCHMARKS)
   if (UMPIRE_ENABLE_HIP)
     set (benchmark_depends
       ${benchmark_depends}
-      hip_runtime)
+      blt::hip_runtime)
   endif()
 
   if (UMPIRE_ENABLE_OPENMP_TARGET)

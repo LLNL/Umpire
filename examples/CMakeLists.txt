@@ -9,7 +9,7 @@ set (example_depends umpire)
 if (UMPIRE_ENABLE_HIP)
   set (example_depends
       ${example_depends}
-      hip_runtime)
+      blt::hip_runtime)
 endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
@@ -39,7 +39,7 @@ if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
-    DEPENDS_ON umpire hip)
+    DEPENDS_ON umpire blt::hip)
   list(APPEND umpire_examples multi_device)
 endif()
 

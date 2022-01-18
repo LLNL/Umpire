@@ -7,7 +7,7 @@
 set (cookbook_depends umpire)
 
 if (UMPIRE_ENABLE_HIP)
-  set (cookbook_depends ${cookbook_depends} hip_runtime)
+  set (cookbook_depends ${cookbook_depends} blt::hip_runtime)
 endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)

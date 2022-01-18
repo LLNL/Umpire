@@ -7,7 +7,7 @@
 set (resource_depends umpire gtest gmock)
 
 if (UMPIRE_ENABLE_HIP)
-  set (resource_depends ${resource_depends} hip_runtime)
+  set (resource_depends ${resource_depends} blt::hip_runtime)
 endif()
 
 blt_add_executable(
