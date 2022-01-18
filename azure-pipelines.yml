@@ -40,10 +40,6 @@ jobs:
 - job: Docker
   strategy:
     matrix: 
-      gcc5: 
-        docker_target: gcc5
-      gcc6:
-        docker_target: gcc6
       gcc7:
         docker_target: gcc7
       gcc8:
