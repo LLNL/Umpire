@@ -29,6 +29,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Changed more CMakeList options to have 'UMPIRE' prefixes and made them dependent
   on the corresponding BLT options. 
 
+- Umpire now requires C++14.
+
 ### Removed
 
 - Removed deprecated DynamicPoolMap and DynamicPool alias.
