@@ -43,14 +43,18 @@ jobs:
       gcc7:
         docker_target: gcc7
       gcc8:
+        docker_target: gcc8
+      gcc9:
+        docker_target: gcc9
+      gcc13:
         docker_target: gcc
-      clang4:
-        docker_target: clang4
-      clang5:
-        docker_target: clang5
-      clang6:
+      clang11:
+        docker_target: clang11
+      clang13:
         docker_target: clang
-      nvcc:
+      nvcc10:
+        docker_target: nvcc10
+      nvcc11:
         docker_target: nvcc
       hip:
         docker_target: hip
