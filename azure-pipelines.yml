@@ -46,6 +46,8 @@ jobs:
         docker_target: gcc8
       gcc9:
         docker_target: gcc9
+      clang10:
+        docker_target: clang10
       clang11:
         docker_target: clang11
       nvcc10:

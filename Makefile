@@ -16,6 +16,9 @@ gcc9:
 gcc11:
 	DOCKER_BUILDKIT=1 docker build --target gcc11 --no-cache $(DebugArgs) .
 
+clang10:
+	DOCKER_BUILDKIT=1 docker build --target clang10 --no-cache $(DebugArgs) .
+
 clang11:
 	DOCKER_BUILDKIT=1 docker build --target clang11 --no-cache $(DebugArgs) .
 
