@@ -40,22 +40,22 @@ jobs:
 - job: Docker
   strategy:
     matrix: 
-      gcc5: 
-        docker_target: gcc5
-      gcc6:
-        docker_target: gcc6
       gcc7:
         docker_target: gcc7
       gcc8:
-        docker_target: gcc
-      clang4:
-        docker_target: clang4
-      clang5:
-        docker_target: clang5
-      clang6:
-        docker_target: clang
-      nvcc:
-        docker_target: nvcc
+        docker_target: gcc8
+      gcc9:
+        docker_target: gcc9
+      clang10:
+        docker_target: clang10
+      clang11:
+        docker_target: clang11
+      clang12:
+        docker_target: clang12
+      nvcc10:
+        docker_target: nvcc10
+      nvcc11:
+        docker_target: nvcc11
       hip:
         docker_target: hip
       sycl:
