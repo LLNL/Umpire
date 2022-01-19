@@ -45,7 +45,6 @@ class AllocationMap {
       ConstIterator();
       ConstIterator(const RecordList* list, iterator_begin);
       ConstIterator(const RecordList* list, iterator_end);
-      ConstIterator(const ConstIterator&) = default;
 
       const AllocationRecord& operator*();
       const AllocationRecord* operator->();
