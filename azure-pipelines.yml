@@ -46,16 +46,12 @@ jobs:
         docker_target: gcc8
       gcc9:
         docker_target: gcc9
-      gcc13:
-        docker_target: gcc
       clang11:
         docker_target: clang11
-      clang13:
-        docker_target: clang
       nvcc10:
         docker_target: nvcc10
       nvcc11:
-        docker_target: nvcc
+        docker_target: nvcc11
       hip:
         docker_target: hip
       sycl:
