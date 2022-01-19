@@ -1,6 +1,6 @@
 FROM axom/compilers:gcc-8
 
-RUN sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends abigail-tools perl-base binutils libtool pkg-config elfutils libelf-dev
+RUN sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends abigail-tools perl-base binutils libtool pkg-config elfutils libelf-dev cmake
 
 RUN git clone https://github.com/lvc/vtable-dumper && cd vtable-dumper \
     && sudo make install
