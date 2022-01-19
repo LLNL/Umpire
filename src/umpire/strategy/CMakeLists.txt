@@ -67,12 +67,6 @@ if (UMPIRE_ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (UMPIRE_ENABLE_HIP)
-  set(umpire_strategy_depends
-    ${umpire_strategy_depends}
-    blt::hip_runtime)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set( umpire_strategy_depends
     ${umpire_strategy_depends}

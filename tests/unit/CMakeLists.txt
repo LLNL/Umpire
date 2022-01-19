@@ -6,10 +6,6 @@
 ##############################################################################
 set (unit_depends umpire gtest)
 
-if (UMPIRE_ENABLE_HIP)
-  set (unit_depends ${unit_depends} blt::hip_runtime)
-endif()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (unit_depends ${unit_depends} openmp)
 endif ()

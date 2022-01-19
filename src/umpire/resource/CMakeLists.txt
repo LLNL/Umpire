@@ -122,10 +122,6 @@ if (UMPIRE_ENABLE_HIP)
     HipUnifiedMemoryResourceFactory.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
-  set(umpire_resource_depends
-    ${umpire_resource_depends}
-    blt::hip_runtime)
-
   if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers
       ${umpire_resource_headers}

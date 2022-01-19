@@ -84,10 +84,6 @@ if (UMPIRE_ENABLE_HIP)
     HipCopyFromOperation.cpp
     HipCopyToOperation.cpp
     HipMemsetOperation.cpp)
-
-  set (umpire_op_depends
-    ${umpire_op_depends}
-    blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_SYCL)
