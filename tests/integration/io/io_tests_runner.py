@@ -75,7 +75,8 @@ def run_io_test(test_env, file_uid, expect_logging, expect_replay):
             env=dict(os.environ, **test_env),
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            shell=False)
+            shell=False,
+            text=True)
     pid = test_program.pid
     ecode = test_program.wait()
 
