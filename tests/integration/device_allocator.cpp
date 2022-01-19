@@ -90,7 +90,7 @@ TEST(DeviceAllocator, CreateAndAllocate)
   allocate_and_use<hip_platform> hip;
   ASSERT_NO_THROW(hip.test(allocator, dev_alloc.getName()));
 #else
-  FAIL();   // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
+  FAIL(); // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
 #endif
 
   ASSERT_NO_THROW(dev_alloc.reset());
@@ -122,38 +122,38 @@ TEST(DeviceAllocator, MultipleDAs)
   ASSERT_EQ(umpire::is_device_allocator(-5), false);
 
   ASSERT_NO_THROW(UMPIRE_SET_UP_DEVICE_ALLOCATORS());
-/*
-  for (int i = 0; i < 4; i++) {
-#if defined(UMPIRE_ENABLE_CUDA)
+  /*
+    for (int i = 0; i < 4; i++) {
+  #if defined(UMPIRE_ENABLE_CUDA)
+      allocate_and_use<cuda_platform> cuda;
+      //ASSERT_NO_THROW(cuda.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
+      ASSERT_NO_THROW(cuda.test(allocator, "da1"));
+      std::cout << "ID is: " << i << std::endl;
+  #elif defined(UMPIRE_ENABLE_HIP)
+      allocate_and_use<hip_platform> hip;
+      ASSERT_NO_THROW(hip.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
+  #else
+      FAIL(); // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
+  #endif
+    }
+
+  #if defined(UMPIRE_ENABLE_CUDA)
     allocate_and_use<cuda_platform> cuda;
-    //ASSERT_NO_THROW(cuda.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
-    ASSERT_NO_THROW(cuda.test(allocator, "da1"));
-    std::cout << "ID is: " << i << std::endl;
-#elif defined(UMPIRE_ENABLE_HIP)
+    ASSERT_NO_THROW(cuda.test(allocator, da1.getName()));
+    //ASSERT_THROW(cuda.test(allocator, da1.getName()), umpire::util::Exception);
+    //ASSERT_NO_THROW(da1.reset());
+    //ASSERT_NO_THROW(cuda.test(allocator, da1.getName()));
+  #elif defined(UMPIRE_ENABLE_HIP)
     allocate_and_use<hip_platform> hip;
-    ASSERT_NO_THROW(hip.test(allocator, umpire::UMPIRE_DEV_ALLOCS_h[i].getName()));
-#else
-    FAIL(); // If neither CUDA nor HIP is enabled, yet we are testing the DeviceAllocator, something is wrong!
-#endif
-  }
+    ASSERT_NO_THROW(hip.test(allocator, da1.getName()));
+    ASSERT_THROW(hip.test(allocator, da1.getName()), umpire::util::Exception);
+    //ASSERT_NO_THROW(da1.reset());
+    ASSERT_NO_THROW(hip.test(allocator, da1.getName()));
+  #endif
 
-#if defined(UMPIRE_ENABLE_CUDA)
-  allocate_and_use<cuda_platform> cuda;
-  ASSERT_NO_THROW(cuda.test(allocator, da1.getName()));
-  //ASSERT_THROW(cuda.test(allocator, da1.getName()), umpire::util::Exception);
-  //ASSERT_NO_THROW(da1.reset());
-  //ASSERT_NO_THROW(cuda.test(allocator, da1.getName()));
-#elif defined(UMPIRE_ENABLE_HIP)
-  allocate_and_use<hip_platform> hip;
-  ASSERT_NO_THROW(hip.test(allocator, da1.getName()));
-  ASSERT_THROW(hip.test(allocator, da1.getName()), umpire::util::Exception);
-  //ASSERT_NO_THROW(da1.reset());
-  ASSERT_NO_THROW(hip.test(allocator, da1.getName()));
-#endif
-
-*/  
-  //ASSERT_NO_THROW(umpire::destroy_device_allocator());
-  //ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
+  */
+  // ASSERT_NO_THROW(umpire::destroy_device_allocator());
+  // ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
 }
 
 int main(int argc, char* argv[])
