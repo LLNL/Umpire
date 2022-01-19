@@ -6,12 +6,6 @@
 ##############################################################################
 set (stress_test_depends umpire)
 
-if (UMPIRE_ENABLE_HIP)
-  set (stress_test_depends
-      ${stress_test_depends}
-      blt::hip_runtime)
-endif()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (stress_test_depends
       ${stress_test_depends}
@@ -73,12 +67,6 @@ blt_add_target_compile_flags(
 
 if (UMPIRE_ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)
-
-  if (UMPIRE_ENABLE_HIP)
-    set (benchmark_depends
-      ${benchmark_depends}
-      blt::hip_runtime)
-  endif()
 
   if (UMPIRE_ENABLE_OPENMP_TARGET)
     set (benchmark_depends

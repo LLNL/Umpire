@@ -6,12 +6,6 @@
 ##############################################################################
 set (tutorial_fortran_depends umpire)
 
-if (UMPIRE_ENABLE_HIP)
-  set (tutorial_fortran_depends
-      ${tutorial_fortran_depends}
-      blt::hip_runtime)
-endif()
-
 if(UMPIRE_ENABLE_CUDA)
   set (tutorial_fortran_depends
       ${tutorial_fortran_depends}
