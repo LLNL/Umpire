@@ -35,7 +35,7 @@ set_source_files_properties(
 
 set(umpire_interface_c_fortran_depends camp)
 blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS cuda_runtime IF UMPIRE_ENABLE_CUDA )
-blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS blt_hip_runtime IF UMPIRE_ENABLE_HIP )
+blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS blt::hip_runtime IF UMPIRE_ENABLE_HIP )
 blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS mpi IF UMPIRE_ENABLE_MPI )
 
 blt_add_library(
