@@ -26,6 +26,10 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
   auto& rm = umpire::ResourceManager::getInstance();
   auto device_alloc = rm.getAllocator(umpire::resource::Device);
 
+  if (size <= 0) {
+    UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
+  }
+
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
 
