@@ -87,7 +87,7 @@ set (umpire_depends
 if (UMPIRE_ENABLE_HIP)
   set (umpire_depends
     ${umpire_depends}
-    blt::hip)
+    blt::hip_runtime)
 endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
