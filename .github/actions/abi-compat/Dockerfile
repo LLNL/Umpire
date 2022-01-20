@@ -1,4 +1,4 @@
-FROM axom/compilers:gcc-8
+FROM ghcr.io/rse-ops/gcc-ubuntu-20.04:gcc-8.1.0
 
 RUN sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends abigail-tools perl-base binutils libtool pkg-config elfutils libelf-dev
 
