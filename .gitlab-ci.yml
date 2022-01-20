@@ -27,11 +27,16 @@
 # the pipeline, preventing any form of concurrency with other pipelines. This
 # also means that the BUILD_ROOT directory will never be cleaned.
 # TODO: add a clean-up mechanism
+#
+# LLNL_SERVICE_USER:
+# Use the umdev LLNL service to run CI
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   BUILD_ROOT: ${CI_PROJECT_DIR}
+  LLNL_SERVICE_USER: umdev
+  CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 
 # Normally, stages are blocking in Gitlab. However, using the keyword "needs" we
 # can express dependencies between job that break the ordering of stages, in
