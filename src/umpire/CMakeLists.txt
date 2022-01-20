@@ -97,8 +97,6 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
-blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_CUDA)
-blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_HIP)
 
 if(UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   blt_list_append( TO umpire_depends ELEMENTS umpire_device)
