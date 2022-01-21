@@ -95,15 +95,16 @@ blt_add_test(
   NAME allocator_accessibility_tests
   COMMAND allocator_accessibility_tests)
 
-blt_add_executable(
-  NAME device_allocator_tests
-  SOURCES device_allocator.cpp
-  DEPENDS_ON ${device_allocator_test_depends})
+if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+  blt_add_executable(
+    NAME device_allocator_tests
+    SOURCES device_allocator.cpp
+    DEPENDS_ON ${device_allocator_test_depends})
 
-target_include_directories(
-  device_allocator_tests
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
+  target_include_directories(
+    device_allocator_tests
+    PRIVATE
+    ${PROJECT_BINARY_DIR}/include)
 
   set_source_files_properties(
     device-allocator.cpp
@@ -113,9 +114,10 @@ target_include_directories(
     device_allocator_tests
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-blt_add_test(
-  NAME device_allocator_tests
-  COMMAND device_allocator_tests)
+  blt_add_test(
+    NAME device_allocator_tests
+    COMMAND device_allocator_tests)
+endif()
 
 blt_add_executable(
   NAME memory_resource_traits_tests
