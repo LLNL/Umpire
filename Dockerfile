@@ -78,13 +78,19 @@ RUN . /opt/spack/share/spack/setup-env.sh && spack load cuda && \
     cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=g++ -DENABLE_CUDA=On .. && \
     make -j 16
 
-FROM axom/compilers:rocm AS hip
+FROM axom/compilers:rocm-4.3.1 AS hip
 ENV GTEST_COLOR=1
+ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
+RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-4.3.1/llvm/bin/amdclang++ -DHIP_PATH=/opt/rocm-4.3.1/hip -DROCM_PATH=/opt/rocm-4.3.1 -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
+    make VERBOSE=1
+
+FROM axom/compilers:rocm-4.3.1 AS hip.debug
+ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
-RUN cmake -DROCM_ROOT_DIR=/opt/rocm/include -DHIP_RUNTIME_INCLUDE_DIRS="/opt/rocm/include;/opt/rocm/hip/include" -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
-    make -j 16
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
 
 FROM ghcr.io/rse-ops/intel-ubuntu-20.04:intel-2021.2.0 AS sycl
 ENV GTEST_COLOR=1
