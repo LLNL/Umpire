@@ -157,7 +157,7 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
   }
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
-    allocator_id = 0;  // If destroy_device_allocator has been called, reset counter.
+    allocator_id = 0; // If destroy_device_allocator has been called, reset counter.
 
     auto& rm = umpire::ResourceManager::getInstance();
     auto um_alloc = rm.getAllocator("UM");
