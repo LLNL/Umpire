@@ -64,5 +64,7 @@ int main(int argc, char const* argv[])
   resource.get_event().wait();
   std::cout << "After calling kernel again, found value: " << (*ptr_to_data)[0] << std::endl;
 
+  allocator.deallocate(ptr_to_data);
+
   return 0;
 }

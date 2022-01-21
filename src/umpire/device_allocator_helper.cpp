@@ -152,9 +152,12 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
 {
   static int allocator_id{0};
 
+  if (size <= 0) {
+    UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
+  }
+
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
-    // If destroy_device_allocator has been called, reset counter.
-    allocator_id = 0;
+    allocator_id = 0;  // If destroy_device_allocator has been called, reset counter.
 
     auto& rm = umpire::ResourceManager::getInstance();
     auto um_alloc = rm.getAllocator("UM");
