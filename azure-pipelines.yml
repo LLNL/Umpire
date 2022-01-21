@@ -58,8 +58,8 @@ jobs:
         docker_target: nvcc11
       sycl:
         docker_target: sycl
-#     hip:
-#       docker_target: hip
+      hip:
+        docker_target: hip
   pool:
     vmImage: 'ubuntu-latest'
   variables:
