@@ -133,6 +133,10 @@ if (UMPIRE_ENABLE_HIP)
       HipConstantMemoryResourceFactory.cpp
       HipConstantMemoryResource.cpp)
   endif ()
+
+  set(umpire_resource_depends
+    ${umpire_resource_depends}
+    blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_SYCL)

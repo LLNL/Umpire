@@ -27,6 +27,12 @@ if (UMPIRE_ENABLE_CUDA)
     cuda)
 endif ()
 
+if (UMPIRE_ENABLE_HIP)
+  set (accessibility_test_depends
+    ${accessibility_test_depends}
+    blt::hip)
+endif ()
+
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (accessibility_test_depends
     ${accessibility_test_depends}

@@ -33,7 +33,7 @@ if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
-    DEPENDS_ON umpire)
+    DEPENDS_ON umpire blt::hip)
   list(APPEND umpire_examples multi_device)
 endif()
 
