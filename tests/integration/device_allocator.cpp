@@ -20,43 +20,63 @@ __global__ void tester(double** data_ptr, const char* name)
   }
 }
 
-TEST(DeviceAllocator, CreateAndAllocate)
+class DeviceAllocator : public ::testing::TestWithParam<const char*> {
+/*  void TearDown() override
+  {
+    ASSERT_NO_THROW(umpire::destroy_device_allocator());
+    ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
+  }*/
+};
+
+TEST_P(DeviceAllocator, CreateAndAllocate)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  size_t size = 3 * sizeof(double);
+  size_t size = 1 * sizeof(double);
 
-  ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
-
-  umpire::DeviceAllocator da1 = umpire::make_device_allocator(allocator, size, "da1");
-  umpire::DeviceAllocator da2 = umpire::make_device_allocator(allocator, size, "da2");
-  umpire::DeviceAllocator da3 = umpire::make_device_allocator(allocator, size, "da3");
+  umpire::DeviceAllocator da = umpire::make_device_allocator(allocator, size, GetParam());
   ASSERT_THROW((umpire::make_device_allocator(allocator, 0, "bad_da")), umpire::util::Exception);
 
-  ASSERT_NE(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
+  ASSERT_TRUE(da.isInitialized());
+  ASSERT_TRUE(umpire::is_device_allocator(da.getName()));
+  ASSERT_TRUE(umpire::is_device_allocator(da.getID()));
 
+  ASSERT_FALSE(umpire::is_device_allocator("not_da"));
+  ASSERT_FALSE(umpire::is_device_allocator(0));
+
+  ASSERT_NO_THROW(UMPIRE_SET_UP_DEVICE_ALLOCATORS());
+}
+
+TEST_P(DeviceAllocator, LaunchKernelTest)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto allocator = rm.getAllocator("UM");
+
+  double** data_ptr = static_cast<double**>(allocator.allocate(sizeof(double*)));
+  tester<<<1, 16>>>(data_ptr, GetParam());
+  cudaDeviceSynchronize();
+  ASSERT_EQ(*data_ptr[0], (double)(42 * 42));
+}
+
+const char* device_allocator_names [3] = {"da1", "da2", "da3"};
+
+INSTANTIATE_TEST_SUITE_P(DeviceAllocatorTests, DeviceAllocator, ::testing::ValuesIn(device_allocator_names));
+
+/*
+void launch_kernel(double** data_ptr, const char* name)
+{
+
+}
+*/
+/*
   ASSERT_EQ(da1.getID(), -1);
   ASSERT_EQ(da2.getID(), -2);
   ASSERT_EQ(da3.getID(), -3);
-  ASSERT_EQ(da2.isInitialized(), true);
-
-  ASSERT_EQ(umpire::is_device_allocator(da1.getName()), true);
-  ASSERT_EQ(umpire::is_device_allocator(da1.getID()), true);
-  ASSERT_EQ(umpire::is_device_allocator(da2.getID()), true);
-  ASSERT_EQ(umpire::is_device_allocator(da3.getID()), true);
-  ASSERT_EQ(umpire::is_device_allocator("not_da"), false);
-  ASSERT_EQ(umpire::is_device_allocator(1), false);
-  ASSERT_EQ(umpire::is_device_allocator(-5), false);
-
-  ASSERT_NO_THROW(UMPIRE_SET_UP_DEVICE_ALLOCATORS());
-
-  double** data_ptr = static_cast<double**>(allocator.allocate(sizeof(double*)));
+  //umpire::DeviceAllocator da2 = umpire::make_device_allocator(allocator, size, "da2");
+  //umpire::DeviceAllocator da3 = umpire::make_device_allocator(allocator, size, "da3");
 
   for (int i = 0; i < 3; i++) {
 #if defined(UMPIRE_ENABLE_CUDA)
-    tester<<<1, 16>>>(data_ptr, umpire::UMPIRE_DEV_ALLOCS_h[0].getName());
-    cudaDeviceSynchronize();
-    ASSERT_EQ(*data_ptr[0], (double)(42 * 42));
     ASSERT_NO_THROW(umpire::UMPIRE_DEV_ALLOCS_h[i].reset());
 #elif defined(UMPIRE_ENABLE_HIP)
     hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, name);
@@ -67,7 +87,5 @@ TEST(DeviceAllocator, CreateAndAllocate)
 #endif
   }
 
-  ASSERT_NO_THROW(umpire::destroy_device_allocator());
-  ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
-  allocator.deallocate(data_ptr);
 }
+*/
