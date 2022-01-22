@@ -21,11 +21,11 @@ __global__ void tester(double** data_ptr, const char* name)
 }
 
 class DeviceAllocator : public ::testing::TestWithParam<const char*> {
-/*  void TearDown() override
-  {
-    ASSERT_NO_THROW(umpire::destroy_device_allocator());
-    ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
-  }*/
+  /*  void TearDown() override
+    {
+      ASSERT_NO_THROW(umpire::destroy_device_allocator());
+      ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
+    }*/
 };
 
 TEST_P(DeviceAllocator, CreateAndAllocate)
@@ -58,7 +58,7 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
   ASSERT_EQ(*data_ptr[0], (double)(42 * 42));
 }
 
-const char* device_allocator_names [3] = {"da1", "da2", "da3"};
+const char* device_allocator_names[3] = {"da1", "da2", "da3"};
 
 INSTANTIATE_TEST_SUITE_P(DeviceAllocatorTests, DeviceAllocator, ::testing::ValuesIn(device_allocator_names));
 
