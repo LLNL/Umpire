@@ -106,5 +106,5 @@ include:
   - local: .gitlab/ruby-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-  - local: .gitlab/corona-templates.yml
-    # - local: .gitlab/corona-jobs.yml
+# - local: .gitlab/corona-templates.yml
+# - local: .gitlab/corona-jobs.yml
