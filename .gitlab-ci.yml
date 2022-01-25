@@ -49,7 +49,7 @@ stages:
   - r_release_resources
   - l_build_and_test
   - c_build_and_test
-  - multi_project
+#  - multi_project
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
 # jobs will share this through a template mechanism.
@@ -111,5 +111,5 @@ include:
   - local: .gitlab/ruby-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-# - local: .gitlab/corona-templates.yml
-# - local: .gitlab/corona-jobs.yml
+  - local: .gitlab/corona-templates.yml
+  - local: .gitlab/corona-jobs.yml
