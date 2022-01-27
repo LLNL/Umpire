@@ -33,7 +33,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (UMPIRE_ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
@@ -92,7 +92,9 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
-blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_CUDA)
+if(UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+  blt_list_append( TO umpire_depends ELEMENTS umpire_device)
+endif()
 
 set (umpire_defines)
 

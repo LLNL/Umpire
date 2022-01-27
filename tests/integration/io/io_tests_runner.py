@@ -83,7 +83,7 @@ def run_io_test(test_env, file_uid, expect_logging):
         print("{RED}[   ERROR]{END} Unexpected exit code {ecode} from io_test".format(ecode=ecode, **formatters))
         errors = 1
     else:
-        check_output('stderr', error, 'testing error stream')
+        check_output('stderr', error, b'testing error stream')
 
         output_filename = 'umpire_io_tests.{pid}.{uid}.log'.format(uid=file_uid, pid=pid)
 
@@ -92,11 +92,17 @@ def run_io_test(test_env, file_uid, expect_logging):
 
         if expect_logging:
             check_file_exists(output_filename)
-            with open(output_filename) as output_file:
-                check_output(output_filename, output_file, 'testing log stream')
+            with open(output_filename, 'rb') as output_file:
+                check_output(output_filename, output_file, b'testing log stream')
         else:
             check_file_not_exists(output_filename)
 
+        if expect_replay:
+            check_file_exists(replay_filename)
+            with open(replay_filename, 'rb') as replay_file:
+                check_output(replay_filename, replay_file, b'testing replay stream')
+        else:
+            check_file_not_exists(replay_filename)
 
 if __name__ == '__main__':
     import sys

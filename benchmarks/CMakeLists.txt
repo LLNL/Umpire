@@ -23,7 +23,7 @@ blt_add_executable(
   SOURCES allocator_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
 
-if (ENABLE_CUDA)
+if (ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   blt_add_executable(
     NAME device_allocator_stress_test
     SOURCES device_allocator_stress_test.cpp

@@ -27,8 +27,9 @@
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
-
+#if defined(UMPIRE_ENABLE_DEVICE_ALLOCATOR)
 #include "umpire/device_allocator_helper.hpp"
+#endif
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
@@ -75,7 +76,7 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) && defined(UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   // Tear down and deallocate memory.
   if (umpire::UMPIRE_DEV_ALLOCS_h != nullptr) {
     umpire::destroy_device_allocator();
