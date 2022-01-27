@@ -21,8 +21,9 @@ __global__ void tester(double** data_ptr, const char* name)
 }
 
 class DeviceAllocator : public ::testing::TestWithParam<const char*> {
-public:
-  static void TearDownTestSuite() {
+ public:
+  static void TearDownTestSuite()
+  {
     ASSERT_NO_THROW(umpire::destroy_device_allocator());
     ASSERT_EQ(umpire::UMPIRE_DEV_ALLOCS_h, nullptr);
   }
