@@ -7,10 +7,6 @@
 set (strategy_tests_depends
   umpire gtest)
 
-if (UMPIRE_ENABLE_HIP)
-  set (strategy_tests_depends ${strategy_tests_depends} hip_runtime)
-endif()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (strategy_tests_depends
     ${strategy_tests_depends}

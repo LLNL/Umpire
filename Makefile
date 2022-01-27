@@ -1,51 +1,13 @@
-gcc:
 ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target gcc --no-cache --progress plain .
+	DebugArgs=--progress plain
 else
-	DOCKER_BUILDKIT=1 docker build --target gcc --no-cache .
+	DebugArgs=
 endif
 
-clang:
-ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target clang --no-cache --progress plain .
-else
-	DOCKER_BUILDKIT=1 docker build --target clang --no-cache .
-endif
+targets = clang10 clang11 clang12 clang13 gcc11 gcc7 gcc8 gcc9 hip hip.debug nvcc10 nvcc11 sycl
 
-nvcc:
-ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target nvcc --no-cache --progress plain .
-else
-	DOCKER_BUILDKIT=1 docker build --target nvcc --no-cache .
-endif
-
-hcc:
-ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target hcc --no-cache --progress plain .
-else
-	DOCKER_BUILDKIT=1 docker build --target hcc --no-cache .
-endif
-
-hip:
-ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target hip --no-cache --progress plain .
-else
-	DOCKER_BUILDKIT=1 docker build --target hip --no-cache .
-endif
-
-sycl:
-ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target sycl --no-cache --progress plain .
-else
-	DOCKER_BUILDKIT=1 docker build --target sycl --no-cache .
-endif
-
-check:
-ifeq ($(DEBUG),1)
-	DOCKER_BUILDKIT=1 docker build --target check --no-cache --progress plain .
-else
-	DOCKER_BUILDKIT=1 docker build --target check --no-cache .
-endif
+$(targets):
+	DOCKER_BUILDKIT=1 docker build --target $@ --no-cache $(DebugArgs) .
 
 style:
 	scripts/docker/apply-style.sh
@@ -56,17 +18,17 @@ help:
 	@echo 'Build Umpire using Docker!'
 	@echo ''
 	@echo 'target:'
-	@echo '    gcc                            build with GCC 8'
-	@echo '    clang                          build with clang 6'
-	@echo '    nvcc                           build with CUDA 9'
-	@echo '    hcc                            build with hcc'
+	@echo '    gccN                           build with GCC N'
+	@echo '    clangN                         build with clang N'
+	@echo '    nvccN                          build with CUDA N'
 	@echo '    hip                            build with HIP'
+	@echo '    hip.debug                      build image for building HIP (attach with docker run -it <image> /bin/bash)'
 	@echo ''
 	@echo 'variable:'
 	@echo '    DEBUG                          display all output if set to 1'
 	@echo ''
 	@echo 'For example'
 	@echo ''
-	@echo '    make DEBUG=1 nvcc'
+	@echo '    make DEBUG=1 nvcc11'
 	@echo ''
-	@echo 'builds with the nvcc Docker image and displays all output.'
+	@echo 'builds with the nvcc Docker image for nvcc 11.1.1 and displays all output.'

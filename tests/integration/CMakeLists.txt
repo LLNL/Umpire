@@ -17,12 +17,6 @@ if (UMPIRE_ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (UMPIRE_ENABLE_HIP)
-  set (integration_tests_depends
-    ${integration_tests_depends}
-    hip_runtime)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
   set (integration_tests_depends
     ${integration_tests_depends}
@@ -41,10 +35,10 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (accessibility_test_depends
     ${accessibility_test_depends}
-    hip)
+    blt::hip)
   set (device_allocator_test_depends
     ${device_allocator_test_depends}
-    hip)
+    blt::hip)
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)

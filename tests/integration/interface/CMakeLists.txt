@@ -14,12 +14,6 @@ if (UMPIRE_ENABLE_C)
       cuda_runtime)
   endif ()
 
-  if (UMPIRE_ENABLE_HIP)
-    set (interface_tests_depends
-      ${interface_tests_depends}
-      hip_runtime)
-  endif ()
-
   if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
     set (interface_tests_depends
       ${interface_tests_depends}

@@ -87,7 +87,7 @@ if (UMPIRE_ENABLE_HIP)
 
   set (umpire_op_depends
     ${umpire_op_depends}
-    hip_runtime)
+    blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_SYCL)
@@ -106,10 +106,6 @@ if (UMPIRE_ENABLE_SYCL)
     SyclCopyToOperation.cpp
     SyclMemsetOperation.cpp
     SyclMemPrefetchOperation.cpp)
-
-  set (umpire_op_depends
-    ${umpire_op_depends})
-
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
