@@ -22,12 +22,6 @@ if (UMPIRE_ENABLE_CUDA)
     cuda_runtime)
 endif ()
 
-if (UMPIRE_ENABLE_HIP)
-  set (allocation_map_tests_depends
-    ${allocation_map_tests_depends}
-    hip_runtime)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (allocation_map_tests_depends
     ${allocation_map_tests_depends}

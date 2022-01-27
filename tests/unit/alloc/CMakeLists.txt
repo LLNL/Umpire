@@ -12,11 +12,6 @@ if (UMPIRE_ENABLE_CUDA)
     ${memory_allocator_tests_depends}
     cuda_runtime)
 endif ()
-if (UMPIRE_ENABLE_HIP)
-  set (memory_allocator_tests_depends
-    ${memory_allocator_tests_depends}
-    hip_runtime)
-endif ()
 
 blt_add_executable(
   NAME memory_allocator_tests

@@ -43,12 +43,6 @@ endif ()
 
 set (log_depends umpire)
 
-if (UMPIRE_ENABLE_HIP)
-  set (log_depends
-    ${log_depends}
-    hip_runtime)
-endif ()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (log_depends
     ${log_depends}

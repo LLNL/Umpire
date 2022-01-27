@@ -6,12 +6,6 @@
 ##############################################################################
 set (tutorial_depends umpire)
 
-if (UMPIRE_ENABLE_HIP)
-  set (tutorial_depends
-      ${tutorial_depends}
-      hip_runtime)
-endif()
-
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (tutorial_depends
     ${tutorial_depends}
