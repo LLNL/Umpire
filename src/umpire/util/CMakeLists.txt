@@ -86,7 +86,7 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (umpire_util_depends
     ${umpire_util_depends}
-    hip_runtime)
+    blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_CUDA)

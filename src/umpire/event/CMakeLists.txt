@@ -28,7 +28,7 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set(umpire_event_depends
     ${umpire_event_depends}
-    hip_runtime)
+    blt::hip_runtime)
 endif ()
 
 if (NOT WIN32)
