@@ -4,41 +4,10 @@ else
 	DebugArgs=
 endif
 
-gcc7:
-	DOCKER_BUILDKIT=1 docker build --target gcc7 --no-cache $(DebugArgs) .
+targets = clang10 clang11 clang12 clang13 gcc11 gcc7 gcc8 gcc9 hip hip.debug nvcc10 nvcc11 sycl
 
-gcc8:
-	DOCKER_BUILDKIT=1 docker build --target gcc8 --no-cache $(DebugArgs) .
-
-gcc9:
-	DOCKER_BUILDKIT=1 docker build --target gcc9 --no-cache $(DebugArgs) .
-
-gcc11:
-	DOCKER_BUILDKIT=1 docker build --target gcc11 --no-cache $(DebugArgs) .
-
-clang10:
-	DOCKER_BUILDKIT=1 docker build --target clang10 --no-cache $(DebugArgs) .
-
-clang11:
-	DOCKER_BUILDKIT=1 docker build --target clang11 --no-cache $(DebugArgs) .
-
-clang12:
-	DOCKER_BUILDKIT=1 docker build --target clang12 --no-cache $(DebugArgs) .
-
-clang13:
-	DOCKER_BUILDKIT=1 docker build --target clang13 --no-cache $(DebugArgs) .
-
-nvcc10:
-	DOCKER_BUILDKIT=1 docker build --target nvcc10 --no-cache $(DebugArgs) .
-
-nvcc11:
-	DOCKER_BUILDKIT=1 docker build --target nvcc11 --no-cache $(DebugArgs) .
-
-hip:
-	DOCKER_BUILDKIT=1 docker build --target hip --no-cache $(DebugArgs) .
-
-sycl:
-	DOCKER_BUILDKIT=1 docker build --target sycl --no-cache $(DebugArgs) .
+$(targets):
+	DOCKER_BUILDKIT=1 docker build --target $@ --no-cache $(DebugArgs) .
 
 style:
 	scripts/docker/apply-style.sh
@@ -53,6 +22,7 @@ help:
 	@echo '    clangN                         build with clang N'
 	@echo '    nvccN                          build with CUDA N'
 	@echo '    hip                            build with HIP'
+	@echo '    hip.debug                      build image for building HIP (attach with docker run -it <image> /bin/bash)'
 	@echo ''
 	@echo 'variable:'
 	@echo '    DEBUG                          display all output if set to 1'

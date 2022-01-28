@@ -11,10 +11,6 @@ if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set(tools_depends ${tools_depends} ${CMAKE_DL_LIBS})
 endif()
 
-if (UMPIRE_ENABLE_HIP)
-  set(tools_depends ${tools_depends} hip_runtime)
-endif()
-
 set(replay_headers
   ReplayInterpreter.hpp
   ReplayInterpreter.inl

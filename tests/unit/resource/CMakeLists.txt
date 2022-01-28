@@ -6,10 +6,6 @@
 ##############################################################################
 set (resource_depends umpire gtest gmock)
 
-if (UMPIRE_ENABLE_HIP)
-  set (resource_depends ${resource_depends} hip_runtime)
-endif()
-
 blt_add_executable(
   NAME null_resource_tests
   SOURCES null_resource_tests.cpp

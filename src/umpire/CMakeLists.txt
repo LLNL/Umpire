@@ -84,6 +84,12 @@ set (umpire_depends
   umpire_event
   umpire_tpl_judy)
 
+if (UMPIRE_ENABLE_HIP)
+  set (umpire_depends
+    ${umpire_depends}
+    blt::hip_runtime)
+endif()
+
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_depends
     ${umpire_depends}
@@ -92,6 +98,7 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
+
 if(UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   blt_list_append( TO umpire_depends ELEMENTS umpire_device)
 endif()
