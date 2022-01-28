@@ -97,13 +97,6 @@ def run_io_test(test_env, file_uid, expect_logging):
         else:
             check_file_not_exists(output_filename)
 
-        if expect_replay:
-            check_file_exists(replay_filename)
-            with open(replay_filename, 'rb') as replay_file:
-                check_output(replay_filename, replay_file, b'testing replay stream')
-        else:
-            check_file_not_exists(replay_filename)
-
 if __name__ == '__main__':
     import sys
 
