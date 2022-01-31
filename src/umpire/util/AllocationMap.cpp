@@ -15,8 +15,8 @@
 #include "umpire/Replay.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/error.hpp"
 #include "umpire/util/backtrace.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace util {
@@ -51,7 +51,7 @@ void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 AllocationRecord AllocationMap::RecordList::pop_back()
 {
   if (m_length == 0) {
-    UMPIRE_ERROR(runtime_error,"pop_back() called, but m_length == 0");
+    UMPIRE_ERROR(runtime_error, "pop_back() called, but m_length == 0");
   }
 
   const AllocationRecord ret = m_tail->rec;
@@ -120,14 +120,14 @@ const AllocationRecord& AllocationMap::RecordList::ConstIterator::operator*()
 const AllocationRecord* AllocationMap::RecordList::ConstIterator::operator->()
 {
   if (!m_curr)
-    UMPIRE_ERROR(runtime_error,"Cannot dereference nullptr");
+    UMPIRE_ERROR(runtime_error, "Cannot dereference nullptr");
   return &m_curr->rec;
 }
 
 AllocationMap::RecordList::ConstIterator& AllocationMap::RecordList::ConstIterator::operator++()
 {
   if (!m_curr)
-    UMPIRE_ERROR(runtime_error,"Cannot dereference nullptr");
+    UMPIRE_ERROR(runtime_error, "Cannot dereference nullptr");
   m_curr = m_curr->prev;
   return *this;
 }

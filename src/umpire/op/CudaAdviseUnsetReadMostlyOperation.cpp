@@ -23,7 +23,8 @@ void CudaAdviseUnsetReadMostlyOperation::apply(void* src_ptr, util::AllocationRe
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,"cudaGetDeviceProperties( device = " << 0 << "),"
+    UMPIRE_ERROR(runtime_error,
+                 "cudaGetDeviceProperties( device = " << 0 << "),"
                                                       << " failed with error: " << cudaGetErrorString(error));
   }
 
@@ -31,9 +32,9 @@ void CudaAdviseUnsetReadMostlyOperation::apply(void* src_ptr, util::AllocationRe
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseUnsetReadMostly, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,"cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
-                                               << ", cudaMemAdviseUnsetReadMostly, " << device
-                                               << ") failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
+                                                              << ", cudaMemAdviseUnsetReadMostly, " << device
+                                                              << ") failed with error: " << cudaGetErrorString(error));
     }
   }
 }

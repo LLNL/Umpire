@@ -182,7 +182,7 @@ void FixedPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     }
   }
 
-  UMPIRE_ERROR(runtime_error,"Could not find the pointer to deallocate");
+  UMPIRE_ERROR(runtime_error, "Could not find the pointer to deallocate");
 }
 
 void FixedPool::release()

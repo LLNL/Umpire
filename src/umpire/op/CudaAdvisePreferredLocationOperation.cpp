@@ -24,7 +24,8 @@ void CudaAdvisePreferredLocationOperation::apply(void* src_ptr,
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,"cudaGetDeviceProperties( device = " << 0 << "),"
+    UMPIRE_ERROR(runtime_error,
+                 "cudaGetDeviceProperties( device = " << 0 << "),"
                                                       << " failed with error: " << cudaGetErrorString(error));
   }
 
@@ -32,9 +33,10 @@ void CudaAdvisePreferredLocationOperation::apply(void* src_ptr,
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,"cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
-                                               << ", cudaMemAdviseSetPreferredLocation, " << device << ") "
-                                               << "failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
+                                                              << ", cudaMemAdviseSetPreferredLocation, " << device
+                                                              << ") "
+                                                              << "failed with error: " << cudaGetErrorString(error));
     }
   }
 }

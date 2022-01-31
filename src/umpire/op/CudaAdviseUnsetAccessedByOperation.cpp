@@ -23,7 +23,8 @@ void CudaAdviseUnsetAccessedByOperation::apply(void* src_ptr, util::AllocationRe
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,"cudaGetDeviceProperties( device = " << 0 << "),"
+    UMPIRE_ERROR(runtime_error,
+                 "cudaGetDeviceProperties( device = " << 0 << "),"
                                                       << " failed with error: " << cudaGetErrorString(error));
   }
 
@@ -31,9 +32,9 @@ void CudaAdviseUnsetAccessedByOperation::apply(void* src_ptr, util::AllocationRe
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseUnsetAccessedBy, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,"cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
-                                               << ", cudaMemAdviseSetUnsetAccessedBy, " << device
-                                               << ") failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
+                                                              << ", cudaMemAdviseSetUnsetAccessedBy, " << device
+                                                              << ") failed with error: " << cudaGetErrorString(error));
     }
   }
 }

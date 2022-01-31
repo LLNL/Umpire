@@ -35,7 +35,7 @@ struct OpenMPTargetAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR(runtime_error,"omp_target_alloc( bytes = " << bytes << ", device = " << device << " ) failed");
+      UMPIRE_ERROR(runtime_error, "omp_target_alloc( bytes = " << bytes << ", device = " << device << " ) failed");
     } else {
       return ret;
     }

@@ -35,7 +35,7 @@ struct SyclPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error,"SYCL malloc_host( bytes = " << size << " ) failed with error!");
+      UMPIRE_ERROR(runtime_error, "SYCL malloc_host( bytes = " << size << " ) failed with error!");
     } else {
       return ptr;
     }

@@ -34,7 +34,8 @@ struct CudaMallocManagedAllocator {
     cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,"cudaMallocManaged( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,
+                   "cudaMallocManaged( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
     }
     return ptr;
   }
@@ -52,7 +53,7 @@ struct CudaMallocManagedAllocator {
 
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,"cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
     }
   }
 

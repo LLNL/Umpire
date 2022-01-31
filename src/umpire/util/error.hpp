@@ -10,8 +10,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "umpire/util/Macros.hpp"
 #include "umpire/tpl/fmt/fmt.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 
@@ -27,7 +27,7 @@ class Allocator;
 class runtime_error : public std::runtime_error {
  public:
   runtime_error(const std::string& msg, const std::string& file, int line)
-    : std::runtime_error(msg),  m_message(msg), m_file(file), m_line(line)
+      : std::runtime_error(msg), m_message(msg), m_file(file), m_line(line)
   {
     m_what = this->message();
   }
@@ -55,25 +55,29 @@ class runtime_error : public std::runtime_error {
 };
 
 class out_of_memory_error : public umpire::runtime_error {
-  public:
-  out_of_memory_error(const std::string& msg, const std::string& file, int line) :
-    runtime_error(msg, file, line)
-    {}
-  
-  std::size_t requested_size() {
+ public:
+  out_of_memory_error(const std::string& msg, const std::string& file, int line) : runtime_error(msg, file, line)
+  {
+  }
+
+  std::size_t requested_size()
+  {
     return m_requested;
   }
 
-  int get_allocator_id() {
+  int get_allocator_id()
+  {
     return m_allocator;
   }
 
-  private:
-  void set_allocator_id(int id) {
+ private:
+  void set_allocator_id(int id)
+  {
     m_allocator = id;
   }
 
-  void set_requested_size(std::size_t s) {
+  void set_requested_size(std::size_t s)
+  {
     m_requested = s;
   }
 
@@ -84,23 +88,25 @@ class out_of_memory_error : public umpire::runtime_error {
 };
 
 class unknown_pointer_error : public umpire::runtime_error {
-  public:
-  unknown_pointer_error(const std::string& msg, const std::string& file, int line) :
-    runtime_error(msg, file, line)
-  {}
+ public:
+  unknown_pointer_error(const std::string& msg, const std::string& file, int line) : runtime_error(msg, file, line)
+  {
+  }
 
-  inline void* get_pointer() const {
+  inline void* get_pointer() const
+  {
     return m_pointer;
   }
 
-  private:
-    void set_pointer(void* p) {
-      m_pointer = p;
-    }
+ private:
+  void set_pointer(void* p)
+  {
+    m_pointer = p;
+  }
 
-    void* m_pointer;
+  void* m_pointer;
 
-    friend class Allocator;
+  friend class Allocator;
 };
 
 } // end of namespace umpire
@@ -110,16 +116,16 @@ class unknown_pointer_error : public umpire::runtime_error {
 #elif defined(__HIPCC__) && defined(__HIP_DEVICE_COMPILE__)
 #define UMPIRE_ERROR(type, msg, ...) abort();
 #else
-#define UMPIRE_ERROR(type, msg, ...)                                                                  \
-    {                                       \
-      type e{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__};  \
-      UMPIRE_LOG(Error, e.what());         \
-      umpire::util::flush_files();          \
-      throw e;                              \
-    }
-#endif 
+#define UMPIRE_ERROR(type, msg, ...)                             \
+  {                                                              \
+    type e{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__}; \
+    UMPIRE_LOG(Error, e.what());                                 \
+    umpire::util::flush_files();                                 \
+    throw e;                                                     \
+  }
+#endif
 
-  //umpire::throw_error(type{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__ });
+// umpire::throw_error(type{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__ });
 
 //   {                                                                                                   \
 //     umpire::util::backtrace bt;                                                                       \

@@ -26,9 +26,9 @@ void CudaCopyToOperation::transform(void* src_ptr, void** dst_ptr,
   cudaSetDevice(old_device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,"cudaMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
-                                           << ", cudaMemcpyHostToDevice ) failed with error: "
-                                           << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, "cudaMemcpy( dest_ptr = "
+                                    << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
+                                    << ", cudaMemcpyHostToDevice ) failed with error: " << cudaGetErrorString(error));
   }
 }
 
@@ -43,9 +43,10 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyToOperation::tran
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyHostToDevice, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,"cudaMemcpyAsync( dest_ptr = "
-                 << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length << ", cudaMemcpyHostToDevice "
-                 << ", stream = " << stream << ") failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, "cudaMemcpyAsync( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr
+                                                               << ", length = " << length << ", cudaMemcpyHostToDevice "
+                                                               << ", stream = " << stream
+                                                               << ") failed with error: " << cudaGetErrorString(error));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

@@ -26,7 +26,7 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {
-    UMPIRE_ERROR(runtime_error,"Maximum number of concurrent allocators exceeded! Please email umpire-dev@llnl.gov");
+    UMPIRE_ERROR(runtime_error, "Maximum number of concurrent allocators exceeded! Please email umpire-dev@llnl.gov");
   }
 
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");

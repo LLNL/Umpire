@@ -26,7 +26,7 @@ void* SizeLimiter::allocate(std::size_t bytes)
 
   if (m_total_size > m_size_limit) {
     m_total_size -= bytes;
-    UMPIRE_ERROR(runtime_error,"Size limit exceeded.");
+    UMPIRE_ERROR(runtime_error, "Size limit exceeded.");
   }
 
   return m_allocator->allocate_internal(bytes);

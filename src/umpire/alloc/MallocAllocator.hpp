@@ -9,8 +9,8 @@
 
 #include <cstdlib>
 
-#include "umpire/util/error.hpp"
 #include "umpire/util/Platform.hpp"
+#include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_HIP)
 #include <hip/hip_runtime_api.h>
@@ -40,12 +40,12 @@ struct MallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR( runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes) )
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
     } else {
       return ret;
     }
 
-    // 
+    //
     return nullptr;
   }
 

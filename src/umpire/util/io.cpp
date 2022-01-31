@@ -17,8 +17,8 @@
 #include "umpire/config.hpp"
 #include "umpire/util/MPI.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/error.hpp"
 #include "umpire/util/OutputBuffer.hpp"
+#include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_FILESYSTEM)
 #include <filesystem>
@@ -116,7 +116,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
             }
 #else
             if (_mkdir(root_io_dir.c_str())) {
-              UMPIRE_ERROR(runtime_error,"mkdir(" << root_io_dir << ") failed");
+              UMPIRE_ERROR(runtime_error, "mkdir(" << root_io_dir << ") failed");
             }
 #endif
           }
@@ -127,7 +127,9 @@ void initialize_io(const bool enable_log, const bool enable_replay)
       }
       MPI::sync();
     } else {
-      UMPIRE_ERROR(runtime_error, "Cannot create output directory before MPI has been initialized. Please unset UMPIRE_OUTPUT_DIR in your environment");
+      UMPIRE_ERROR(runtime_error,
+                   "Cannot create output directory before MPI has been initialized. Please unset UMPIRE_OUTPUT_DIR in "
+                   "your environment");
     }
   }
 

@@ -50,7 +50,7 @@ void MPI::initialize(
 
 #endif
   } else {
-    UMPIRE_ERROR(runtime_error,"umpire::MPI already initialized, cannot call initialize() again!");
+    UMPIRE_ERROR(runtime_error, "umpire::MPI already initialized, cannot call initialize() again!");
   }
 }
 
@@ -62,7 +62,7 @@ void MPI::finalize()
     s_world_size = -1;
 #endif
   } else {
-    UMPIRE_ERROR(runtime_error,"Cannot call MPI::finalize() when umpire::MPI not initialiazed");
+    UMPIRE_ERROR(runtime_error, "Cannot call MPI::finalize() when umpire::MPI not initialiazed");
   }
 }
 
@@ -91,7 +91,7 @@ void MPI::sync()
     MPI_Barrier(s_communicator);
 #endif
   } else {
-    UMPIRE_ERROR(runtime_error,"Cannot call MPI::sync() before umpire::MPI is initialized");
+    UMPIRE_ERROR(runtime_error, "Cannot call MPI::sync() before umpire::MPI is initialized");
   }
 }
 

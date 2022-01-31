@@ -109,7 +109,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     int device_count{0};
     auto error = ::cudaGetDeviceCount(&device_count);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,"Umpire compiled with CUDA support but no GPUs detected!");
+      UMPIRE_ERROR(runtime_error, "Umpire compiled with CUDA support but no GPUs detected!");
     }
 
     registerMemoryResource(util::make_unique<resource::CudaDeviceResourceFactory>());
@@ -138,7 +138,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     int device_count{0};
     auto error = ::hipGetDeviceCount(&device_count);
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error,"Umpire compiled with HIP support but no GPUs detected!");
+      UMPIRE_ERROR(runtime_error, "Umpire compiled with HIP support but no GPUs detected!");
     }
 
     registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
@@ -182,7 +182,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     }
 
     if (device_count == 0) {
-      UMPIRE_ERROR(runtime_error,"Umpire compiled with SYCL support but no GPUs detected!");
+      UMPIRE_ERROR(runtime_error, "Umpire compiled with SYCL support but no GPUs detected!");
     }
 
     registerMemoryResource(util::make_unique<resource::SyclDeviceResourceFactory>());
@@ -227,7 +227,7 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
     }
   }
 
-  UMPIRE_ERROR(runtime_error,umpire::fmt::format("MemoryResource \"{}\" not found", name));
+  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
@@ -240,7 +240,7 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
     }
   }
 
-  UMPIRE_ERROR(runtime_error,umpire::fmt::format("MemoryResource \"{}\" not found", name));
+  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
@@ -251,7 +251,7 @@ MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const s
     }
   }
 
-  UMPIRE_ERROR(runtime_error,umpire::fmt::format("MemoryResource \"{}\" not found", name));
+  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 } // end of namespace resource

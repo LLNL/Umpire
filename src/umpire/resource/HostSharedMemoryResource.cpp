@@ -30,7 +30,7 @@ HostSharedMemoryResource::~HostSharedMemoryResource()
 
 void* HostSharedMemoryResource::allocate(std::size_t UMPIRE_UNUSED_ARG(bytes))
 {
-  UMPIRE_ERROR(runtime_error,"Shared memory allocation without name is not supported");
+  UMPIRE_ERROR(runtime_error, "Shared memory allocation without name is not supported");
 }
 
 void* HostSharedMemoryResource::allocate_named(const std::string& name, std::size_t bytes)

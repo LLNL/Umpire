@@ -21,7 +21,8 @@ struct HipPinnedAllocator {
     hipError_t error = ::hipHostMalloc(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error,"hipMallocHost( bytes = " << bytes << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,
+                   "hipMallocHost( bytes = " << bytes << " ) failed with error: " << hipGetErrorString(error));
     } else {
       return ptr;
     }
@@ -32,7 +33,7 @@ struct HipPinnedAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipHostFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error,"hipFreeHost( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "hipFreeHost( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
     }
   }
 
