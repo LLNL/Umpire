@@ -1,16 +1,10 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (stress_test_depends umpire)
-
-if (UMPIRE_ENABLE_HIP)
-  set (stress_test_depends
-      ${stress_test_depends}
-      hip_runtime)
-endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (stress_test_depends
@@ -23,7 +17,7 @@ blt_add_executable(
   SOURCES allocator_stress_test.cpp
   DEPENDS_ON ${stress_test_depends})
 
-if (ENABLE_CUDA)
+if (ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   blt_add_executable(
     NAME device_allocator_stress_test
     SOURCES device_allocator_stress_test.cpp
@@ -73,12 +67,6 @@ blt_add_target_compile_flags(
 
 if (UMPIRE_ENABLE_BENCHMARKS)
   set (benchmark_depends gbenchmark umpire)
-
-  if (UMPIRE_ENABLE_HIP)
-    set (benchmark_depends
-      ${benchmark_depends}
-      hip_runtime)
-  endif()
 
   if (UMPIRE_ENABLE_OPENMP_TARGET)
     set (benchmark_depends

@@ -1,16 +1,10 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 set (example_depends umpire)
-
-if (UMPIRE_ENABLE_HIP)
-  set (example_depends
-      ${example_depends}
-      hip_runtime)
-endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (example_depends
@@ -39,7 +33,7 @@ if (UMPIRE_ENABLE_HIP)
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
-    DEPENDS_ON umpire hip)
+    DEPENDS_ON umpire blt::hip)
   list(APPEND umpire_examples multi_device)
 endif()
 
@@ -65,6 +59,11 @@ blt_add_executable(
   NAME backtrace_example
   SOURCES backtrace_example.cpp
   DEPENDS_ON ${example_depends})
+
+if (NOT WIN32 AND NOT APPLE)
+  blt_add_target_link_flags( TO backtrace_example FLAGS -rdynamic)
+endif()
+
 list(APPEND umpire_examples backtrace_example)
 
 if (UMPIRE_ENABLE_C)
@@ -94,21 +93,23 @@ blt_add_executable(
 list(APPEND umpire_examples use_after_free)
 
 if (UMPIRE_ENABLE_CUDA)
-  blt_add_executable(
-    NAME device_allocator_example
-    SOURCES device-allocator.cpp
-    DEPENDS_ON umpire cuda
-  )
+  if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+    blt_add_executable(
+      NAME device_allocator_example
+      SOURCES device-allocator.cpp
+      DEPENDS_ON umpire cuda
+    )
 
-  set_source_files_properties(
-    device-allocator.cpp
-    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+    set_source_files_properties(
+      device-allocator.cpp
+      PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  set_target_properties(
-    device_allocator_example
-    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+    set_target_properties(
+      device_allocator_example
+      PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples device_allocator_example)
+    list(APPEND umpire_examples device_allocator_example)
+  endif()
 
   blt_add_executable(
     NAME multi_device

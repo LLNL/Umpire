@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -8,12 +8,6 @@ find_program (BASH_PROGRAM bash)
 
 set (replay_integration_tests_depends
   umpire)
-
-if (UMPIRE_ENABLE_HIP)
-  set (replay_integration_tests_depends
-      ${replay_integration_tests_depends}
-      hip_runtime)
-endif()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (replay_integration_tests_depends

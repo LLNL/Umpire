@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -84,7 +84,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Umpire'
-copyright = u'2016-21, Lawrence Livermore National Security, LLC and Umpire project contributors'
+copyright = u'2016-22, Lawrence Livermore National Security, LLC and Umpire project contributors'
 author = u'David Beckingsale'
 
 # The version info for the project you're documenting, acts as replacement for

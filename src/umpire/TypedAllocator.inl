@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -34,18 +34,18 @@ void TypedAllocator<T>::deallocate(T* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   m_allocator.deallocate(ptr);
 }
 
-} // end of namespace umpire
-
 template <typename U, typename V>
-bool operator==(const umpire::TypedAllocator<U>& lhs, const umpire::TypedAllocator<V>& rhs)
+bool operator==(const TypedAllocator<U>& lhs, const TypedAllocator<V>& rhs)
 {
   return lhs.m_allocator.getId() == rhs.m_allocator.getId();
 }
 
 template <typename U, typename V>
-bool operator!=(const umpire::TypedAllocator<U>& lhs, const umpire::TypedAllocator<V>& rhs)
+bool operator!=(const TypedAllocator<U>& lhs, const TypedAllocator<V>& rhs)
 {
   return !(lhs == rhs);
 }
+
+} // end of namespace umpire
 
 #endif // UMPIRE_TypedAllocator_INL

@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -122,10 +122,6 @@ if (UMPIRE_ENABLE_HIP)
     HipUnifiedMemoryResourceFactory.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
-  set(umpire_resource_depends
-    ${umpire_resource_depends}
-    hip_runtime)
-
   if (UMPIRE_ENABLE_DEVICE_CONST)
     set (umpire_resource_headers
       ${umpire_resource_headers}
@@ -137,6 +133,10 @@ if (UMPIRE_ENABLE_HIP)
       HipConstantMemoryResourceFactory.cpp
       HipConstantMemoryResource.cpp)
   endif ()
+
+  set(umpire_resource_depends
+    ${umpire_resource_depends}
+    blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_SYCL)

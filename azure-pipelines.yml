@@ -40,26 +40,26 @@ jobs:
 - job: Docker
   strategy:
     matrix: 
-      gcc5: 
-        docker_target: gcc5
-      gcc6:
-        docker_target: gcc6
       gcc7:
         docker_target: gcc7
       gcc8:
-        docker_target: gcc
-      clang4:
-        docker_target: clang4
-      clang5:
-        docker_target: clang5
-      clang6:
-        docker_target: clang
-      nvcc:
-        docker_target: nvcc
-      hip:
-        docker_target: hip
+        docker_target: gcc8
+      gcc9:
+        docker_target: gcc9
+      clang10:
+        docker_target: clang10
+      clang11:
+        docker_target: clang11
+      clang12:
+        docker_target: clang12
+      nvcc10:
+        docker_target: nvcc10
+      nvcc11:
+        docker_target: nvcc11
       sycl:
         docker_target: sycl
+      hip:
+        docker_target: hip
   pool:
     vmImage: 'ubuntu-latest'
   variables:
@@ -116,17 +116,3 @@ jobs:
     inputs:
       testResultsFormat: 'cTest'
       testResultsFiles: '**/Test.xml'
-- job: Style_Check
-  pool:
-    vmImage: 'ubuntu-latest'
-  variables:
-    DOCKER_BUILDKIT: '1'
-  steps:
-  - checkout: self
-    clean: boolean
-    submodules: recursive
-  - task: Docker@1
-    inputs:
-      command: build
-      dockerFile: Dockerfile
-      arguments: '--target check'

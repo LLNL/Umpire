@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -9,10 +9,6 @@ set(tools_depends umpire umpire_tpl_json)
 
 if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set(tools_depends ${tools_depends} ${CMAKE_DL_LIBS})
-endif()
-
-if (UMPIRE_ENABLE_HIP)
-  set(tools_depends ${tools_depends} hip_runtime)
 endif()
 
 set(replay_headers

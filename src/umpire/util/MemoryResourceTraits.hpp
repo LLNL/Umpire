@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,6 +18,7 @@
 namespace umpire {
 
 struct MemoryResourceTraits {
+  MemoryResourceTraits(){};
   enum class optimized_for { any, latency, bandwidth, access };
 
   enum class vendor_type { unknown, amd, ibm, intel, nvidia };

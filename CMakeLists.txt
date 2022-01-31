@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -17,7 +17,7 @@ project(Umpire
   LANGUAGES CXX C
   VERSION 6.0.0)
 
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.14)
 
 set(UMPIRE_VERSION_RC "")
 
@@ -29,9 +29,13 @@ if (UMPIRE_ENABLE_SYCL)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
 else()
-  set(BLT_CXX_STD "c++11" CACHE STRING "Version of C++ standard")
+  set(BLT_CXX_STD "c++14" CACHE STRING "Version of C++ standard")
+  set(CMAKE_CUDA_STANDARD 14)
 endif()
-set(CMAKE_CUDA_STANDARD 11)
+
+if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" )
+    message(FATAL_ERROR "Umpire requires minimum C++ standard of c++14. Please set BLT_CXX_STD appropriately.")
+endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
@@ -69,6 +73,7 @@ if (NOT BLT_LOADED)
     endif ()
   endif ()
 
+  message(STATUS "BLT Source Directory: ${BLT_SOURCE_DIR}")
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
 
@@ -128,13 +133,15 @@ include(cmake/SetupUmpireThirdParty.cmake)
 
 add_subdirectory(src)
 
-configure_file(
-  umpire-config.cmake.in
-  "${PROJECT_BINARY_DIR}/umpire-config.cmake" @ONLY)
+configure_package_config_file(
+  "${PROJECT_SOURCE_DIR}/umpire-config.cmake.in"
+  "${PROJECT_BINARY_DIR}/umpire-config.cmake"
+  PATH_VARS CMAKE_INSTALL_PREFIX
+  INSTALL_DESTINATION lib/cmake/umpire)
 
 install(FILES
-  "${PROJECT_BINARY_DIR}/umpire-config.cmake"
-  DESTINATION share/umpire/cmake)
+  ${PROJECT_BINARY_DIR}/umpire-config.cmake
+  DESTINATION lib/cmake/umpire)
 
 write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/umpire-config-version.cmake
@@ -142,9 +149,9 @@ write_basic_package_version_file(
 
 install(FILES 
   "${PROJECT_BINARY_DIR}/umpire-config-version.cmake"
-  DESTINATION share/umpire/cmake)
+  DESTINATION lib/cmake/umpire)
 
-install(EXPORT umpire-targets DESTINATION share/umpire/cmake)
+install(EXPORT umpire-targets DESTINATION lib/cmake/umpire)
 
 if (UMPIRE_ENABLE_TESTS)
   add_subdirectory(tests)

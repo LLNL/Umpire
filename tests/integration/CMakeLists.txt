@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -13,12 +13,6 @@ if (UMPIRE_ENABLE_CUDA)
   set (integration_tests_depends
     ${integration_tests_depends}
     cuda_runtime)
-endif ()
-
-if (UMPIRE_ENABLE_HIP)
-  set (integration_tests_depends
-    ${integration_tests_depends}
-    hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)
@@ -36,7 +30,7 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (accessibility_test_depends
     ${accessibility_test_depends}
-    hip)
+    blt::hip)
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_OPENMP_TARGET)

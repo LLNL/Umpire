@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -45,7 +45,6 @@ class AllocationMap {
       ConstIterator();
       ConstIterator(const RecordList* list, iterator_begin);
       ConstIterator(const RecordList* list, iterator_end);
-      ConstIterator(const ConstIterator&) = default;
 
       const AllocationRecord& operator*();
       const AllocationRecord* operator->();

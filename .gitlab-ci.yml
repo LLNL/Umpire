@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -27,11 +27,16 @@
 # the pipeline, preventing any form of concurrency with other pipelines. This
 # also means that the BUILD_ROOT directory will never be cleaned.
 # TODO: add a clean-up mechanism
+#
+# LLNL_SERVICE_USER:
+# Use the umdev LLNL service to run CI
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
   BUILD_ROOT: ${CI_PROJECT_DIR}
+  LLNL_SERVICE_USER: umdev
+  CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 
 # Normally, stages are blocking in Gitlab. However, using the keyword "needs" we
 # can express dependencies between job that break the ordering of stages, in
@@ -43,7 +48,7 @@ stages:
   - r_build_and_test
   - r_release_resources
   - l_build_and_test
-  - c_build_and_test
+#  - c_build_and_test
 #  - multi_project
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
@@ -67,12 +72,12 @@ stages:
     reports:
       junit: junit.xml
 
-.build_toss_3_x86_64_ib_corona_script:
-  script:
-    - srun -p mi60 -t 30 -N 1 scripts/gitlab/build_and_test.sh
-  artifacts:
-    reports:
-      junit: junit.xml
+# .build_toss_3_x86_64_ib_corona_script:
+# script:
+# - srun -p mi60 -t 30 -N 1 scripts/gitlab/build_and_test.sh
+# artifacts:
+# reports:
+# junit: junit.xml
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
@@ -106,5 +111,5 @@ include:
   - local: .gitlab/ruby-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-  - local: .gitlab/corona-templates.yml
-  - local: .gitlab/corona-jobs.yml
+# - local: .gitlab/corona-templates.yml
+# - local: .gitlab/corona-jobs.yml

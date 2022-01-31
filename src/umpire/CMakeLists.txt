@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -34,7 +34,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (UMPIRE_ENABLE_CUDA)
+if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
@@ -84,6 +84,12 @@ set (umpire_depends
   umpire_util
   umpire_tpl_judy)
 
+if (UMPIRE_ENABLE_HIP)
+  set (umpire_depends
+    ${umpire_depends}
+    blt::hip_runtime)
+endif()
+
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_depends
     ${umpire_depends}
@@ -91,7 +97,10 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
 endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
-blt_list_append( TO umpire_depends ELEMENTS umpire_device IF UMPIRE_ENABLE_CUDA)
+
+if(UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+  blt_list_append( TO umpire_depends ELEMENTS umpire_device)
+endif()
 
 set (umpire_defines)
 
