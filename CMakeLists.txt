@@ -37,8 +37,6 @@ if("${BLT_CXX_STD}" STREQUAL "c++98" OR "${BLT_CXX_STD}" STREQUAL "c++11" )
     message(FATAL_ERROR "Umpire requires minimum C++ standard of c++14. Please set BLT_CXX_STD appropriately.")
 endif()
 
-set(CMAKE_CUDA_STANDARD 14)
-
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "PGI")
   message(STATUS "Setting CMAKE_CXX_EXTENSIONS to ON for PGI Compiler")
   set( CMAKE_CXX_EXTENSIONS ON )
