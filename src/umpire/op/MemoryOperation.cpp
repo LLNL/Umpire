@@ -7,6 +7,7 @@
 #include "umpire/op/MemoryOperation.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {

@@ -340,7 +340,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblock
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR(runtime_error,"Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
 
   if (percentage == 0) {

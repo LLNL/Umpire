@@ -142,7 +142,7 @@ Allocator ResourceManager::makeResource(const std::string& name)
 Allocator ResourceManager::makeResource(const std::string& name, MemoryResourceTraits traits)
 {
   if (m_allocators_by_name.find(name) != m_allocators_by_name.end()) {
-    UMPIRE_ERROR(runtime_error,"Allocator " << name << " already exists, and cannot be re-created.");
+    UMPIRE_ERROR(runtime_error,umpire::fmt::format("Allocator \"{}\" already exists, and cannot be re-created.", name));
   }
 
   resource::MemoryResourceRegistry& registry{resource::MemoryResourceRegistry::getInstance()};
@@ -186,7 +186,7 @@ strategy::AllocationStrategy* ResourceManager::getAllocationStrategy(const std::
     if (resource_name != std::end(resource_names)) {
       makeResource(name);
     } else {
-      UMPIRE_ERROR(runtime_error,"Allocator \"" << name << "\" not found. Available allocators: " << getAllocatorInformation());
+      UMPIRE_ERROR(runtime_error,umpire::fmt::format("Allocator \"{}\" not found. Available allocators: {}", name, getAllocatorInformation()));
     }
   }
 
@@ -226,7 +226,7 @@ Allocator ResourceManager::getAllocator(int id)
 
   auto allocator = m_allocators_by_id.find(id);
   if (allocator == m_allocators_by_id.end()) {
-    UMPIRE_ERROR(runtime_error,"Allocator \"" << id << "\" not found. Available allocators: " << getAllocatorInformation());
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator {} not found. Available allocators: {}", id, getAllocatorInformation()));
   }
 
   return Allocator(m_allocators_by_id[id]);
@@ -265,7 +265,7 @@ void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
     auto ra = getAllocator(name);
-    UMPIRE_ERROR(runtime_error,"Allocator " << name << " is already an alias for " << ra.getName());
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name, ra.getName()));
   }
 
   m_allocators_by_name[name] = allocator.getAllocationStrategy();
@@ -274,16 +274,16 @@ void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 void ResourceManager::removeAlias(const std::string& name, Allocator allocator)
 {
   if (!isAllocator(name)) {
-    UMPIRE_ERROR(runtime_error,"Allocator " << name << " is not registered.");
+    UMPIRE_ERROR(runtime_error,umpire::fmt::format("Allocator \"{}\" is not registered", name));
   }
 
   auto a = m_allocators_by_name.find(name);
   if (a->second->getName().compare(name) == 0) {
-    UMPIRE_ERROR(runtime_error,name << " is not an alias, so cannot be removed.")
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("\"{}\" is not an alias, so cannot be removed", name));
   }
 
   if (a->second->getId() != allocator.getId()) {
-    UMPIRE_ERROR(runtime_error,"Allocator " << name << " is not registered as an alias of " << allocator.getName());
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("\"{}\" is not is not registered as an alias of {}", name, allocator.getName()));
   }
 
   m_allocators_by_name.erase(a);
@@ -341,7 +341,7 @@ const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) c
   auto alloc_record = m_allocations.find(ptr);
 
   if (!alloc_record->strategy) {
-    UMPIRE_ERROR(runtime_error,"Cannot find allocator for " << ptr);
+    UMPIRE_ERROR(runtime_error,umpire::fmt::format("Cannot find allocator for {}", ptr));
   }
 
   UMPIRE_LOG(Debug, "(Returning allocation record for ptr = " << ptr << ")");
@@ -376,7 +376,7 @@ void ResourceManager::copy(void* dst_ptr, void* src_ptr, std::size_t size)
                 << R"( } )");
 
   if (size > dst_size) {
-    UMPIRE_ERROR(runtime_error,"Not enough resource in destination for copy: " << size << " -> " << dst_size);
+    UMPIRE_ERROR(runtime_error,umpire::fmt::format("Not enough space in destination to copy {} bytes into {} bytes", size, dst_size));
   }
 
   auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
@@ -405,7 +405,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::copy(voi
   }
 
   if (size > dst_size) {
-    UMPIRE_ERROR(runtime_error,"Not enough resource in destination for copy: " << size << " -> " << dst_size);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Not enough resource in destination for copy: {} -> {}", size, dst_size));
   }
 
   auto op = op_registry.find("COPY", src_alloc_record->strategy, dst_alloc_record->strategy);
@@ -435,7 +435,7 @@ void ResourceManager::memset(void* ptr, int value, std::size_t length)
                 << R"( })");
 
   if (length > size) {
-    UMPIRE_ERROR(runtime_error,"Cannot memset over the end of allocation: " << length << " -> " << size);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
   }
 
   auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
@@ -461,7 +461,7 @@ camp::resources::EventProxy<camp::resources::Resource> ResourceManager::memset(v
   }
 
   if (length > size) {
-    UMPIRE_ERROR(runtime_error,"Cannot memset over the end of allocation: " << length << " -> " << size);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot memset over the end of allocation: {} -> {}", length, size));
   }
 
   auto op = op_registry.find("MEMSET", alloc_record->strategy, alloc_record->strategy);
@@ -553,8 +553,7 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
     auto alloc = Allocator(alloc_record->strategy);
 
     if (alloc_record->strategy != allocator.getAllocationStrategy()) {
-      UMPIRE_ERROR(runtime_error,"Cannot reallocate " << current_ptr << " from: " << alloc.getName() << " with Allocator "
-                                        << allocator.getName());
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"", current_ptr, alloc.getName(), allocator.getName()));
     }
 
     //
@@ -567,7 +566,7 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
       if (current_ptr != alloc_record->ptr) {
-        UMPIRE_ERROR(runtime_error,"Cannot reallocate an offset ptr (ptr=" << current_ptr << ", base=" << alloc_record->ptr);
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
 
       std::shared_ptr<umpire::op::MemoryOperation> op;
@@ -603,8 +602,7 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
     auto alloc = Allocator(alloc_record->strategy);
 
     if (alloc_record->strategy != allocator.getAllocationStrategy()) {
-      UMPIRE_ERROR(runtime_error,"Cannot reallocate " << current_ptr << " from: " << alloc.getName() << " with Allocator "
-                                        << allocator.getName());
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot reallocate {} from allocator \"{}\" with allocator \"{}\"", current_ptr, alloc.getName(), allocator.getName()));
     }
 
     //
@@ -617,7 +615,7 @@ void* ResourceManager::reallocate_impl(void* current_ptr, std::size_t new_size, 
       auto& op_registry = op::MemoryOperationRegistry::getInstance();
 
       if (current_ptr != alloc_record->ptr) {
-        UMPIRE_ERROR(runtime_error,"Cannot reallocate an offset ptr (ptr=" << current_ptr << ", base=" << alloc_record->ptr);
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot reallocate an offset ptr (ptr={}, base={})", current_ptr, alloc_record->ptr));
       }
 
       std::shared_ptr<umpire::op::MemoryOperation> op;
@@ -681,7 +679,7 @@ void* ResourceManager::move(void* ptr, Allocator allocator)
 #endif
 
   if (ptr != alloc_record->ptr) {
-    UMPIRE_ERROR(runtime_error,"Cannot move an offset ptr (ptr=" << ptr << ", base=" << alloc_record->ptr);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot move an offset ptr (ptr={}, base={})", ptr, alloc_record->ptr));
   }
 
   void* dst_ptr{allocator.allocate(alloc_record->size)};
@@ -736,7 +734,7 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForId(int id)
   auto allocator_i = m_allocators_by_id.find(id);
 
   if (allocator_i == m_allocators_by_id.end()) {
-    UMPIRE_ERROR(runtime_error,"Cannot find allocator for ID " << id);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot find allocator with id: {}", id));
   }
 
   UMPIRE_LOG(Debug, "(id=" << id << ") returning " << allocator_i->second);
@@ -748,7 +746,7 @@ strategy::AllocationStrategy* ResourceManager::findAllocatorForPointer(void* ptr
   auto allocation_record = m_allocations.find(ptr);
 
   if (!allocation_record->strategy) {
-    UMPIRE_ERROR(runtime_error,"Cannot find allocator " << ptr);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot find allocator for pointer: {}", ptr));
   }
 
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ") returning " << allocation_record->strategy);

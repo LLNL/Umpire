@@ -11,7 +11,7 @@ set (umpire_util_headers
   AllocationRecord.hpp
   backtrace.hpp
   backtrace.inl
-  runtime_error.hpp
+  error.hpp
   FixedMallocPool.hpp
   io.hpp
   Logger.hpp

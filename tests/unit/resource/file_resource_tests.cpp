@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 #include "resource_tests.hpp"
 #include "umpire/resource/FileMemoryResource.hpp"
-#include "umpire/util/runtime_error.hpp"
+#include "umpire/util/error.hpp"
 
 TYPED_TEST_P(ResourceTest, AllocateDeallocate)
 {

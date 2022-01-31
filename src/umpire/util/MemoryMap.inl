@@ -8,6 +8,7 @@
 #define UMPIRE_MemoryMap_INL
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace util {
@@ -163,7 +164,7 @@ void MemoryMap<V>::erase(Key ptr)
   if (m_last) {
     removeLast();
   } else {
-    UMPIRE_ERROR(runtime_error,"Could not remove ptr = " << ptr);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Could not remove ptr: {}", ptr));
   }
 }
 

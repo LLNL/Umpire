@@ -15,6 +15,7 @@
 #include "umpire/Replay.hpp"
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/backtrace.hpp"
 
 namespace umpire {
@@ -193,7 +194,7 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
     // use this from a debugger to dump the contents of the AllocationMap
     printAll();
 #endif
-    UMPIRE_ERROR(runtime_error,"Allocation not mapped: " << ptr);
+    UMPIRE_ERROR(unknown_pointer_error, umpire::fmt::format("Allocation not mapped: {}", ptr));
   }
 }
 
@@ -258,7 +259,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
     if (iter->second->empty())
       m_map.removeLast();
   } else {
-    UMPIRE_ERROR(runtime_error,"Cannot remove " << ptr);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot remove {}", ptr));
   }
 
   --m_size;

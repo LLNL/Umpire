@@ -222,7 +222,7 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
 
   {
     if (ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error,allocator.getName() << " Allocator is not a Shared Memory Allocator");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator \"{}\" is not a Shared Memory Allocator", allocator.getName()));
     }
   }
   return ptr;

@@ -10,7 +10,7 @@
 #include <cstddef>
 #include <string>
 
-#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace resource {
@@ -45,18 +45,17 @@ inline std::string resource_to_string(MemoryResourceType type)
     case Shared:
       return "SHARED";
     default:
-      UMPIRE_ERROR(runtime_error,"Unkown resource type: " << type);
-      //
-      // The UMPIRE_ERROR macro above does not return.  It instead throws
-      // an exception.  However, for some reason, nvcc throws a warning
-      // "warning: missing return statement at end of non-void function"
-      // even though the following line cannot be reached.  Adding this
-      // fake return statement to work around the incorrect warning.
-      //
-#if defined(__CUDACC__) && defined(__CUDA_ARCH__)
-      return "Unknown";
-#endif
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Unkown resource type: {}",type));
   }
+
+  //
+  // The UMPIRE_ERROR macro above does not return.  It instead throws
+  // an exception.  However, for some reason, nvcc throws a warning
+  // "warning: missing return statement at end of non-void function"
+  // even though the following line cannot be reached.  Adding this
+  // fake return statement to work around the incorrect warning.
+  //
+  return "Unknown";
 }
 
 inline MemoryResourceType string_to_resource(const std::string& resource)
@@ -78,19 +77,17 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "SHARED")
     return MemoryResourceType::Shared;
   else {
-    UMPIRE_ERROR(runtime_error,"Unkown resource name: " << resource);
-
-    //
-    // The UMPIRE_ERROR macro above does not return.  It instead throws
-    // an exception.  However, for some reason, nvcc throws a warning
-    // "warning: missing return statement at end of non-void function"
-    // even though the following line cannot be reached.  Adding this
-    // fake return statement to work around the incorrect warning.
-    //
-#if defined(__CUDACC__) && defined(__CUDA_ARCH__)
-    return MemoryResourceType::Unknown;
-#endif
+    UMPIRE_ERROR(runtime_error,umpire::fmt::format("Unkown resource name \"{}\"", resource));
   }
+
+  //
+  // The UMPIRE_ERROR macro above does not return.  It instead throws
+  // an exception.  However, for some reason, nvcc throws a warning
+  // "warning: missing return statement at end of non-void function"
+  // even though the following line cannot be reached.  Adding this
+  // fake return statement to work around the incorrect warning.
+  //
+  return MemoryResourceType::Unknown;
 }
 
 inline int resource_to_device_id(const std::string& resource)

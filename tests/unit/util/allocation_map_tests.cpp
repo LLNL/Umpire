@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 #include "umpire/util/AllocationMap.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/runtime_error.hpp"
+#include "umpire/util/error.hpp"
 
 // Define equality operators for tests
 namespace umpire {

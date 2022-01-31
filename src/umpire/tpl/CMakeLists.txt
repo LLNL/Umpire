@@ -107,5 +107,39 @@ if (NOT TARGET camp)
 
 endif ()
 
+set(fmt_headers
+    fmt/fmt.hpp
+    fmt/args.h
+    fmt/chrono.h
+    fmt/color.h
+    fmt/compile.h
+    fmt/core.h
+    fmt/format-inl.h
+    fmt/format.h
+    fmt/locale.h
+    fmt/os.h
+    fmt/ostream.h
+    fmt/printf.h
+    fmt/ranges.h
+    )
+
+blt_add_library(NAME    umpire_tpl_fmt
+                HEADERS ${fmt_headers})
+
+
+target_include_directories(
+  umpire_tpl_fmt
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+install(TARGETS
+  umpire_tpl_fmt
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
 set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})

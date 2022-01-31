@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "umpire/util/error.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
