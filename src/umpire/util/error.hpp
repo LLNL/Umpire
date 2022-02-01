@@ -15,13 +15,6 @@
 
 namespace umpire {
 
-// template<typename Error>
-// inline constexpr void throw_error(Error e) {
-//     UMPIRE_LOG(Error, e.what());
-//     umpire::util::flush_files();
-//     throw e;
-// }
-
 class Allocator;
 
 class runtime_error : public std::runtime_error {
