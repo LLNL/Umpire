@@ -9,6 +9,8 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/device_allocator_helper.hpp"
 
+constexpr double NUM = 42.0 * 42.0;
+
 __global__ void tester(double** data_ptr, const char* name)
 {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
@@ -16,7 +18,7 @@ __global__ void tester(double** data_ptr, const char* name)
     umpire::DeviceAllocator da = umpire::get_device_allocator(name);
     double* data = static_cast<double*>(da.allocate(1 * sizeof(double)));
     *data_ptr = data;
-    data[0] = 42 * 42;
+    data[0] = NUM;
   }
 }
 
@@ -57,7 +59,7 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   ASSERT_NO_THROW((tester<<<1, 16>>>(data_ptr, GetParam())));
   cudaDeviceSynchronize();
-  ASSERT_EQ(*data_ptr[0], (double)(42 * 42));
+  ASSERT_EQ(*data_ptr[0], NUM);
 
   auto my_da = umpire::get_device_allocator(GetParam());
   ASSERT_NO_THROW(my_da.reset());
