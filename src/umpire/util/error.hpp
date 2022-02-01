@@ -29,9 +29,12 @@ class runtime_error : public std::runtime_error {
 
   std::string message() const
   {
+    umpire::util::backtrace bt;
+    umpire::util::backtracer<umpire::util::trace_always>::get_backtrace(bt);
     std::stringstream oss;
     oss << "! Umpire runtime_error [" << m_file << ":" << m_line << "]: ";
     oss << m_message;
+    oss << std::endl << umpire::util::backtracer<umpire::util::trace_always>::print(bt) << std::endl;
     return oss.str();
   }
 
