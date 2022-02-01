@@ -624,7 +624,7 @@ TEST(SizeLimiter, Host)
         void* tmp_data = alloc.allocate(1024);
         UMPIRE_USE_VAR(tmp_data);
       },
-      umpire::runtime_error);
+      umpire::out_of_memory_error);
 
   EXPECT_NO_THROW(alloc.deallocate(data));
 }

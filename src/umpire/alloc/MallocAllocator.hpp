@@ -40,13 +40,10 @@ struct MallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
-    } else {
-      return ret;
+      UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
     }
 
-    //
-    return nullptr;
+    return ret;
   }
 
   /*!
