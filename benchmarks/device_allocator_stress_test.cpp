@@ -52,7 +52,7 @@ __global__ void each_thread(double** data_ptr, unsigned int N)
 static void CudaTest(const char *msg)
 {
   cudaError_t e = cudaGetLastError();
-  cudaThreadSynchronize();
+  cudaDeviceSynchronize();
   if (cudaSuccess != e) {
     fprintf(stderr, "%s: %d\n", msg, e);
     fprintf(stderr, "%s\n", cudaGetErrorString(e));
@@ -95,9 +95,9 @@ int main(int, char**)
                  "Timing won't be as accurate. Continuing anyways... **" << std::endl;
   }
 
-  // Create device allocator and set up memory
+  // Create device allocator
   auto dev_alloc = umpire::make_device_allocator(allocator, N * sizeof(double), "dev_alloc");
-  UMPIRE_SET_UP_DEVICE_ALLOCATORS(); 
+  UMPIRE_SET_UP_DEVICE_ALLOCATORS(); // Still required in case this is called on different translation unit.
 
   // Create cuda streams and events
   cudaStream_t stream;
