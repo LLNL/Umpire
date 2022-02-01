@@ -31,7 +31,9 @@ if (C_COMPILER_FAMILY_IS_PGI)
   target_compile_options(
     umpire_tpl_json
     INTERFACE
-    --diag_suppress186)
+    $<$<COMPILE_LANGUAGE:CXX>:--diag_suppress 186>
+    $<$<COMPILE_LANGUAGE:C>:--diag_suppress 186>
+  )
 endif ()
 target_link_libraries(umpire_tpl_json INTERFACE)
 
