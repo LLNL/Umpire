@@ -27,6 +27,15 @@ blt_add_library(
   NAME umpire_tpl_json
   HEADERS ${json_headers})
 
+if (C_COMPILER_FAMILY_IS_INTEL)
+  target_compile_options(
+    umpire_tpl_json
+    INTERFACE
+    $<$<COMPILE_LANGUAGE:CXX>:-wd186>
+    $<$<COMPILE_LANGUAGE:C>:-wd186>
+  )
+endif ()
+
 if (C_COMPILER_FAMILY_IS_PGI)
   target_compile_options(
     umpire_tpl_json
