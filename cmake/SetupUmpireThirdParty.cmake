@@ -16,17 +16,23 @@ if (EXISTS ${SHROUD_EXECUTABLE})
 endif ()
 
 if (UMPIRE_ENABLE_UMAP)
-  if(NOT DEFINED ENV{UMAP_ROOT})
-    message(FATAL_ERROR "UMAP_ROOT undefined")
-  endif ()
-  find_path( UMAP_INCLUDE_DIR
-    NAMES "umap/umap.h"
-    PATHS ($ENV{UMAP_ROOT}/install/include)
-  )
   find_library( UMAP_LIBRARY
     libumap.a
     PATHS ($ENV{UMAP_ROOT}/install/lib)
   )
+  if (NOT UMAP_LIBRARY)
+    if(NOT DEFINED ENV{UMAP_ROOT})
+	    message(FATAL_ERROR "Could not find UMAP library, UMAP_ROOT undefined")
+    endif ()
+    message(FATAL_ERROR "Could not find UMAP library, check UMAP installation at UMAP_ROOT")
+  endif()
+  find_path( UMAP_INCLUDE_DIR
+    NAMES "umap/umap.h"
+    PATHS ($ENV{UMAP_ROOT}/install/include)
+  )
+  if (NOT UMAP_INCLUDE_DIR)
+    message(FATAL_ERROR "Headers missing, check UMAP installation at UMAP_ROOT")
+  endif ()
   blt_import_library(NAME umap
     INCLUDES ${UMAP_INCLUDE_DIR}
     LIBRARIES ${UMAP_LIBRARY}
