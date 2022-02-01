@@ -15,6 +15,24 @@ if (EXISTS ${SHROUD_EXECUTABLE})
   include(${CMAKE_CURRENT_BINARY_DIR}/SetupShroud.cmake)
 endif ()
 
+if (UMPIRE_ENABLE_UMAP)
+  if(NOT DEFINED ENV{UMAP_ROOT})
+    message(FATAL_ERROR "UMAP_ROOT undefined")
+  endif ()
+  find_path( UMAP_INCLUDE_DIR
+    NAMES "umap/umap.h"
+    PATHS ($ENV{UMAP_ROOT}/install/include)
+  )
+  find_library( UMAP_LIBRARY
+    libumap.a
+    PATHS ($ENV{UMAP_ROOT}/install/lib)
+  )
+  blt_import_library(NAME umap
+    INCLUDES ${UMAP_INCLUDE_DIR}
+    LIBRARIES ${UMAP_LIBRARY}
+    DEPENDS_ON -lpthread -lrt)
+endif ()
+
 if (ENABLE_SLIC AND ENABLE_LOGGING)
   find_library( SLIC_LIBRARY
     libslic.a
@@ -60,6 +78,7 @@ blt_list_append(TO TPL_DEPS ELEMENTS cuda cuda_runtime IF ENABLE_CUDA)
 blt_list_append(TO TPL_DEPS ELEMENTS blt_hip blt_hip_runtime IF ENABLE_HIP)
 blt_list_append(TO TPL_DEPS ELEMENTS openmp IF ENABLE_OPENMP)
 blt_list_append(TO TPL_DEPS ELEMENTS mpi IF ENABLE_MPI)
+blt_list_append(TO TPL_DEPS ELEMENTS umap IF ENABLE_UMAP)
 
 foreach(dep ${TPL_DEPS})
     # If the target is EXPORTABLE, add it to the export set

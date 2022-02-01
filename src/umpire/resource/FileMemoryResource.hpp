@@ -8,6 +8,7 @@
 #define UMPIRE_FileMemoryResource_HPP
 
 #include <utility>
+#include <map>
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/MemoryMap.hpp"
@@ -98,6 +99,9 @@ class FileMemoryResource : public MemoryResource {
    * \param std::pair Paring of the file name and the size of the file
    */
   util::MemoryMap<std::pair<const std::string, std::size_t>> m_size_map;
+#if defined(UMPIRE_ENABLE_UMAP)
+  std::map<std::string, int> m_filefd;
+#endif
 
   bool isPageable() noexcept;
 };

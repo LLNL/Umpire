@@ -24,14 +24,6 @@ if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   )
 endif()
 
-if(UMPIRE_ENABLE_FILE_RESOURCE)
-  set (umpire_resource_headers
-    ${umpire_resource_headers}
-    FileMemoryResource.hpp
-    FileMemoryResourceFactory.hpp
-  )
-endif()
-
 set (umpire_resource_sources
   HostResourceFactory.cpp
   MemoryResource.cpp
@@ -40,6 +32,27 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
+set(umpire_resource_depends
+  camp)
+
+if(UMPIRE_ENABLE_FILE_RESOURCE)
+  set (umpire_resource_headers
+    ${umpire_resource_headers}
+    FileMemoryResource.hpp
+    FileMemoryResourceFactory.hpp
+  )
+  set (umpire_resource_sources
+    ${umpire_resource_sources}
+    FileMemoryResource.cpp
+    FileMemoryResourceFactory.cpp
+  )
+  if(UMPIRE_ENABLE_UMAP)
+    set (umpire_resource_depends
+      ${umpire_resource_depends}
+      umap)
+  endif()
+endif()
+
 if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
   set (umpire_resource_sources
     ${umpire_resource_sources}
@@ -47,17 +60,6 @@ if(UMPIRE_ENABLE_DEVELOPER_BENCHMARKS)
     NoOpResourceFactory.cpp
   )
 endif()
-
-if(UMPIRE_ENABLE_FILE_RESOURCE)
-  set (umpire_resource_sources
-    ${umpire_resource_sources}
-    FileMemoryResource.cpp
-    FileMemoryResourceFactory.cpp
-  )
-endif()
-
-set(umpire_resource_depends
-  camp)
 
 if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   set (umpire_resource_headers

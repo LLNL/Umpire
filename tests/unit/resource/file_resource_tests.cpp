@@ -61,7 +61,6 @@ TYPED_TEST_P(ResourceTest, MmapFile)
     }
     start += sizeof(size_t);
   }
-
   this->memory_resource->deallocate(ptr, 1000000000ULL * sizeof(std::size_t));
 }
 
