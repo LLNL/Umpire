@@ -150,14 +150,14 @@ __host__ __device__ bool is_device_allocator(int da_id)
 //////////////////////////////////////////////////////////////////////////
 __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
-  static int allocator_id{0};
+  static int index{0};
 
   if (size <= 0) {
     UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
   }
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
-    allocator_id = 0; // If destroy_device_allocator has been called, reset counter.
+    index = 0; // If destroy_device_allocator has been called, reset counter.
 
     auto& rm = umpire::ResourceManager::getInstance();
     auto um_alloc = rm.getAllocator("UM");
@@ -167,11 +167,11 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
 
   // The DeviceAllocator ID should not conflict with other allocator IDs,
   // so we use negative numbers to get unique value.
-  int da_id = convert_to_array_index(allocator_id);
+  int da_id = convert_to_array_index(index);
 
   auto dev_alloc = DeviceAllocator(allocator, size, name, da_id);
 
-  UMPIRE_DEV_ALLOCS_h[allocator_id++] = dev_alloc;
+  UMPIRE_DEV_ALLOCS_h[index++] = dev_alloc;
 
   // Call macro so that host and device pointers are set up correctly
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();

@@ -18,17 +18,10 @@ namespace umpire {
  */
 class DeviceAllocator {
  public:
-  /*!
-   * \brief Construct a new DeviceAllocator that will use allocator to allocate
-   * data.
-   *
-   * \param allocator Allocator to use for allocating memory.
-   * \param size Total amount of memory that the DeviceAllocator will have.
-   * \param name Name of the DeviceAllocator object.
-   * \param id ID associated with this DeviceAllocator object. ID will be used
-   *   to reference UMPIRE_DEV_ALLOCS array if necessary.
+  /*
+   * Declare friend function that will call constructor.
    */
-  __host__ DeviceAllocator(Allocator allocator, size_t size, const std::string& name, int id);
+  friend __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name);
 
   __host__ __device__ ~DeviceAllocator();
 
@@ -82,6 +75,18 @@ class DeviceAllocator {
   __host__ __device__ void reset();
 
  private:
+  /*!
+   * \brief Construct a new DeviceAllocator that will use allocator to allocate
+   * data. Called by make_device_allocator helper function only.
+   *
+   * \param allocator Allocator to use for allocating memory.
+   * \param size Total amount of memory that the DeviceAllocator will have.
+   * \param name Name of the DeviceAllocator object.
+   * \param id ID associated with this DeviceAllocator object. ID will be used
+   *   to reference UMPIRE_DEV_ALLOCS array if necessary.
+   */
+  __host__ DeviceAllocator(Allocator allocator, size_t size, const std::string& name, int id);
+
   umpire::Allocator m_allocator;
 
   char* m_ptr;
