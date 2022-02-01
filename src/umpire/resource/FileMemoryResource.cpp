@@ -72,7 +72,8 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (trun == -1) {
     int errno_save = errno;
     remove(ss.str().c_str());
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("truncate64 of file {} failed: {}", ss.str(), strerror(errno_save)));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("truncate64 of file {} failed: {}", ss.str(), strerror(errno_save)));
   }
 
   // Using mmap
@@ -80,7 +81,8 @@ void* FileMemoryResource::allocate(std::size_t bytes)
   if (ptr == MAP_FAILED) {
     int errno_save = errno;
     remove(ss.str().c_str());
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("mmap of {} to file {} failed: {}", rounded_bytes, ss.str(), strerror(errno_save)));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("mmap of {} to file {} failed: {}", rounded_bytes, ss.str(),
+                                                    strerror(errno_save)));
   }
 
   // Storing Information On File
@@ -97,11 +99,13 @@ void FileMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(siz
   auto iter = m_size_map.find(ptr);
   // Unmap File
   if (munmap(iter->first, iter->second->second) < 0) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("munmap of file {} failed: {}", iter->second->first.c_str(), strerror(errno)));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("munmap of file {} failed: {}", iter->second->first.c_str(), strerror(errno)));
   }
   // Remove File
   if (remove(iter->second->first.c_str()) < 0) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("remove of file {} failed: {}", iter->second->first.c_str(), strerror(errno)));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("remove of file {} failed: {}", iter->second->first.c_str(), strerror(errno)));
   }
   // Remove Information about file in m_size_map
   m_size_map.erase(iter->first);
