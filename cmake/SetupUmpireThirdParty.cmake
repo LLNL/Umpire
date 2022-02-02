@@ -17,7 +17,7 @@ endif ()
 
 if (UMPIRE_ENABLE_UMAP)
   find_library( UMAP_LIBRARY
-    libumap.a
+    libumap.so
     PATHS ($ENV{UMAP_ROOT}/install/lib)
   )
   if (NOT UMAP_LIBRARY)
