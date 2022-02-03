@@ -8,22 +8,22 @@
 # CPU ONLY
 ibm_clang_9:
   variables:
-    SPEC: "+fortran %clang@9.0.0ibm"
+    SPEC: "+fortran %clang@ibm.9.0.0"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8:
   variables:
-    SPEC: "+fortran %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
+    SPEC: "+fortran %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_mpi (build and test on lassen):
   variables:
-    SPEC: "%clang@10.0.1ibm +mpi ^spectrum-mpi"
+    SPEC: "%clang@ibm.10.0.1 +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_mpi_shmem:
   variables:
-    SPEC: "%clang@10.0.1ibm +ipc_shmem +mpi ^spectrum-mpi"
+    SPEC: "%clang@ibm.10.0.1 +ipc_shmem +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1:
@@ -60,17 +60,17 @@ xl_16_1_1_10_gcc_8_3_1:
 
 ibm_clang_9_cuda:
   variables:
-    SPEC: "+fortran+cuda %clang@9.0.0ibm ^cuda@10.1.168"
+    SPEC: "+fortran+cuda %clang@ibm.9.0.0 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8_cuda:
   variables:
-    SPEC: "+fortran+cuda %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
+    SPEC: "+fortran+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_cuda_mpi_shmem:
   variables:
-    SPEC: "%clang@10.0.1ibm +cuda +ipc_shmem +mpi ^spectrum-mpi ^cuda@10.1.168"
+    SPEC: "%clang@ibm.10.0.1 +cuda +ipc_shmem +mpi ^spectrum-mpi ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda:
@@ -131,7 +131,7 @@ gcc_8_3_1_tpls:
 
 ibm_clang_9_gcc_8_cuda_tpls:
   variables:
-    SPEC: "+fortran+cuda %clang@9.0.0ibm cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
+    SPEC: "+fortran+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda_tpls:
