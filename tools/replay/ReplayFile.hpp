@@ -16,7 +16,8 @@
 class ReplayFile {
 public:
   enum rtype {
-      MEMORY_RESOURCE = 1
+      INIT = 0
+    , MEMORY_RESOURCE = 1
     , ALLOCATION_ADVISOR = 2
     , DYNAMIC_POOL_LIST = 3
     , MONOTONIC = 4
@@ -34,47 +35,47 @@ public:
   static const std::size_t max_name_length{512};
 
   struct AllocatorTableEntry {
-    rtype type;
-    std::size_t line_number;    // Causal line number of input file
-    bool introspection;
-    char name[max_name_length];
-    char base_name[max_name_length];
-    int argc;
+    rtype type{rtype::INIT};
+    std::size_t line_number{0};    // Causal line number of input file
+    bool introspection{0};
+    char name[max_name_length]{0};
+    char base_name[max_name_length]{0};
+    int argc{0};
     union {
       struct {
-        int device_id;
-        char advice[max_name_length];
-        char accessing_allocator[max_name_length];
+        int device_id{0};
+        char advice[max_name_length]{0};
+        char accessing_allocator[max_name_length]{0};
       } advisor;
       struct {
-        int node;
+        int node{0};
       } numa;
       struct {
-        std::size_t initial_alloc_size;
-        std::size_t min_alloc_size;
-        int alignment;
+        std::size_t initial_alloc_size{0};
+        std::size_t min_alloc_size{0};
+        int alignment{0};
       } pool;
       struct {
-        std::size_t capacity;
+        std::size_t capacity{0};
       } monotonic_pool;
       struct {
-        std::size_t slots;
+        std::size_t slots{0};
       } slot_pool;
       struct {
-        std::size_t size_limit;
+        std::size_t size_limit{0};
       } size_limiter;
       struct {
-        std::size_t object_bytes;
-        std::size_t objects_per_pool;
+        std::size_t object_bytes{0};
+        std::size_t objects_per_pool{0};
       } fixed_pool;
       struct {
-        std::size_t smallest_fixed_blocksize;
-        std::size_t largest_fixed_blocksize;
-        std::size_t max_fixed_blocksize;
-        std::size_t size_multiplier;
-        std::size_t dynamic_initial_alloc_bytes;
-        std::size_t dynamic_min_alloc_bytes;
-        std::size_t dynamic_align_bytes;
+        std::size_t smallest_fixed_blocksize{0};
+        std::size_t largest_fixed_blocksize{0};
+        std::size_t max_fixed_blocksize{0};
+        std::size_t size_multiplier{0};
+        std::size_t dynamic_initial_alloc_bytes{0};
+        std::size_t dynamic_min_alloc_bytes{0};
+        std::size_t dynamic_align_bytes{0};
       } mixed_pool;
     } argv;
     umpire::Allocator* allocator{nullptr};
