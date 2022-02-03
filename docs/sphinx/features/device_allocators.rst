@@ -10,7 +10,7 @@ Creating a Device Allocator
 --------------------------
 
 To create a DeviceAllocator, users can call the :class:`umpire::make_device_allocator` host function.
-This function takes an allocator, the total amount of memory the DeviceAllocator will have, and a name
+This function takes an allocator, the total amount of memory the DeviceAllocator will have, and a unique name
 for the new DeviceAllocator object, as shown below. A maximum of 64 unique DeviceAllocators can be
 created at a time.
 
@@ -23,22 +23,16 @@ When the DeviceAllocator is created, the ``size`` parameter that is passed to th
 function is the total memory, in bytes, available to that allocator. Whenever the ``allocate`` function is
 called on the GPU, it is simply atomically incrementing a counter which offsets a pointer to the start of that
 memory. In other words, the total size from all of the allocates performed on the device with the DeviceAllocator may not 
-exceed the size that was used when making the device allocator.
+exceed the size that was used when creating the device allocator.
 
 Retrieving a DeviceAllocator Object
 -----------------------------------
 
-The :class:`umpire::get_device_allocator` host/device function returns the DeviceAllocator object that corresponds 
-to the ID or name given. The DeviceAllocator class also includes a helper function, :class:`umpire::is_device_allocator`,
-to query whether or not a given ID corresponds to an existing DeviceAllocator. Below is an example of using the **ID** to 
-obtain the DeviceAllocator object:
-
-.. literalinclude:: ../../../examples/device-allocator.cpp
-   :start-after: _sphinx_tag_get_dev_allocator_id_start
-   :end-before: _sphinx_tag_get_dev_allocator_id_end
-   :language: C++
-
-And next is an example of using the **name** instead:
+After creating a DeviceAllocator, we can immediately start using that allocator to allocate device memory. To do this, we
+have the :class:`umpire::get_device_allocator` host/device function which returns the DeviceAllocator object corresponding 
+to the name (or ID) given. The DeviceAllocator class also includes a helper function, :class:`umpire::is_device_allocator`,
+to query whether or not a given name (or ID) corresponds to an existing DeviceAllocator. Below is an example of using 
+the **name** to obtain the DeviceAllocator object:
 
 .. literalinclude:: ../../../examples/device-allocator.cpp
    :start-after: _sphinx_tag_get_dev_allocator_name_start
@@ -49,15 +43,9 @@ With the :class:`umpire::get_device_allocator` function, there is no need to kee
 call stacks can become quite complex. Users can instead use this function to obtain it inside whichever host or device
 function they need.
 
-Under the hood, the :class:`umpire::get_device_allocator` uses global arrays which can be accessed by both 
-the host and device. The global array is indexed by DeviceAllocator ID, which is returned by :class:`DeviceAllocator::getID()`. 
-Because we are using global arrays on host and device, the arrays need to be "set up" after at least one DeviceAllocator
-has been created, but before any kernels which use a DeviceAllocator are called. This process is done by calling 
-the ``UMPIRE_SET_UP_DEVICE_ALLOCS()`` macro. This just ensures that the host and device global arrays are updated and 
-pointing at the same memory.
-
 .. note::
-   In order to use the full capabilities of the DeviceAllocator, relocatable device code must be enabled.
+   When compiling without relocatable device code (RDC), the ``UMPIRE_SET_UP_DEVICE_ALLOCATORS()`` macro must be called 
+   in every translation unit that will use the :class:`umpire::get_device_allocator` function.
 
 Resetting Memory on the DeviceAllocator
 ---------------------------------------
