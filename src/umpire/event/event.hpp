@@ -44,9 +44,9 @@ class event {
 
   event()
   {
-     if (event_build_enabled()) {
-        timestamp = std::chrono::system_clock::now();
-     }
+    if (event_build_enabled()) {
+      timestamp = std::chrono::system_clock::now();
+    }
   }
 
   std::string name;
