@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# This is intended to be run from within the scripts/benchmark directory of the umpire source.
+# It will take a profile of the develop branch and compare it to a problem of this branch (using hatchet and hpctoolkit)
+#
+
+#
+# Treat undefined variable usage as an error
+#
+set -u
+
+rootdir=`pwd`
+h=`hostname -s | sed -e 's/[0-9]*$//'`
+if [ "$LMOD_arch" = "ppc64le" ]
+then
+   prun="lalloc 1"
+else
+   prun="srun -N1-1 --exclusive"
+fi
+
+run_cmd()
+{
+  echo $1
+  if ! eval $1
+  then
+    echo "FAIL"
+    echo $1
+    echo "FAIL"
+    exit 1
+  fi
+}
+
+# module -q load cmake git gcc/10.2.1 hpctoolkit/2021.05
+# cxx="g++"
+# cc="gcc"
+# module -q load cmake git clang/11.0.1-gcc-8.3.1 hpctoolkit/2021.05
+# module -q load cmake git clang/13.0.0 hpctoolkit/2021.05
+module -q load cmake git clang/13.0.0 hpctoolkit/2022.01
+cxx="clang++"
+cc="clang"
+
+run_cmd "git rev-parse --show-toplevel"
+run_cmd "git rev-parse --abbrev-ref HEAD"
+
+rundir=$rootdir/run.$h
+lhs_branch=develop
+lhs_source=$rundir/umpire.develop
+
+rhs_branch=$(git rev-parse --abbrev-ref HEAD)
+rhs_source=$(git rev-parse --show-toplevel)
+
+cmake_args="-DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_DEVELOPER_BENCHMARKS=On -DUMPIRE_ENABLE_TOOLS=On -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS='-g' -DCMAKE_C_FLAGS='-g' -DCMAKE_CXX_COMPILER=$cxx -DCMAKE_C_COMPILER=$cc -Wno-dev .."
+
+if [ ! -d $lhs_source ] ; then run_cmd "git clone -q -b $lhs_branch git@github.com:LLNL/Umpire.git $lhs_source"; fi
+
+for src in $lhs_source $rhs_source
+do
+   echo "Configuring $src"
+   run_cmd "( cd $src && git pull --quiet && git submodule --quiet update --init --recursive )"
+
+   # run_cmd "rm -rf $src/build.$h"
+   if [ ! -d $src/build.$h ]
+   then
+      run_cmd "( mkdir -p $src/build.$h && cd $src/build.$h && $prun cmake ${cmake_args} )"
+   fi
+   echo "Building $src"
+   run_cmd "( cd $src/build.$h && $prun make -j allocator_memory_cost_benchmark )"
+done
+
+lhs_benchmark=$lhs_source/build.$h/bin/allocator_memory_cost_benchmark
+rhs_benchmark=$rhs_source/build.$h/bin/allocator_memory_cost_benchmark
+benchmark_args="--quiet --measure_time_overhead -a Host -n 10000000"
+
+run_cmd "rm -rf $rundir/hpc_prof.$LMOD_arch && mkdir -p $rundir/hpc_prof.$LMOD_arch"
+
+echo "Building HPC struct"
+run_cmd "$prun hpcstruct -j4 -o $rundir/hpc_prof.$LMOD_arch/lhs.struct $lhs_benchmark "
+run_cmd "$prun hpcstruct -j4 -o $rundir/hpc_prof.$LMOD_arch/rhs.struct $rhs_benchmark "
+
+echo "Profiling"
+run_cmd "$prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/lhs -e CPUTIME $lhs_benchmark $benchmark_args"
+run_cmd "$prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/rhs -e CPUTIME $rhs_benchmark $benchmark_args"
+
+echo "Building Profile Database"
+run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/lhs && $prun hpcprof-mpi --metric-db yes -S ../lhs.struct . )"
+run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/rhs && $prun hpcprof-mpi --metric-db yes -S ../rhs.struct . )"
+
+PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs $rundir/hpc_prof.$LMOD_arch/rhs
+
+# hpcviewer
