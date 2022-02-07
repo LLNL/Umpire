@@ -30,11 +30,6 @@ run_cmd()
   fi
 }
 
-# module -q load cmake git gcc/10.2.1 hpctoolkit/2021.05
-# cxx="g++"
-# cc="gcc"
-# module -q load cmake git clang/11.0.1-gcc-8.3.1 hpctoolkit/2021.05
-# module -q load cmake git clang/13.0.0 hpctoolkit/2021.05
 module -q load cmake git clang/13.0.0 hpctoolkit/2022.01
 cxx="clang++"
 cc="clang"
@@ -87,4 +82,6 @@ run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/rhs && $prun hpcprof-mpi --metric-db y
 
 PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs $rundir/hpc_prof.$LMOD_arch/rhs
 
-# hpcviewer
+#
+# To view this directly within the HPCToolkit viewer, run "hpcviewer" from an x-server session
+#

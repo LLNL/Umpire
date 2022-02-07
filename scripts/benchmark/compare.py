@@ -10,8 +10,7 @@ def print_graphs(name, d):
     gf_event.drop_index_levels()
 
     print("Graph: {}".format(name))
-    # for x in range(5, 11):
-    for x in range(5, 6):
+    for x in range(5, 11):
         print(gf_event.tree(metric_column="time (inc)", precision=3, depth=x, expand_name=True, context_column=None))
 
 if __name__ == "__main__":
