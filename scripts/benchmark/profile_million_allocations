@@ -64,7 +64,7 @@ done
 
 lhs_benchmark=$lhs_source/build.$h/bin/allocator_memory_cost_benchmark
 rhs_benchmark=$rhs_source/build.$h/bin/allocator_memory_cost_benchmark
-benchmark_args="--quiet --measure_time_overhead -a Host -n 10000000"
+benchmark_args="--measure_time_overhead -a Host -n 100000000 --no_introspection"
 
 run_cmd "rm -rf $rundir/hpc_prof.$LMOD_arch && mkdir -p $rundir/hpc_prof.$LMOD_arch"
 
@@ -80,7 +80,7 @@ echo "Building Profile Database"
 run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/lhs && $prun hpcprof-mpi --metric-db yes -S ../lhs.struct . )"
 run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/rhs && $prun hpcprof-mpi --metric-db yes -S ../rhs.struct . )"
 
-PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs $rundir/hpc_prof.$LMOD_arch/rhs
+run_cmd "PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs $rundir/hpc_prof.$LMOD_arch/rhs"
 
 #
 # To view this directly within the HPCToolkit viewer, run "hpcviewer" from an x-server session
