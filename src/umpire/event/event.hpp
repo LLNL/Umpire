@@ -42,19 +42,12 @@ class event {
  public:
   class builder;
 
-  event()
-  {
-    if (event_build_enabled()) {
-      timestamp = std::chrono::system_clock::now();
-    }
-  }
-
   std::string name;
   category cat{category::statistic};
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
   std::map<std::string, std::string> tags{};
-  std::chrono::time_point<std::chrono::system_clock> timestamp{};
+  std::chrono::time_point<std::chrono::system_clock> timestamp {std::chrono::system_clock::now()};
 };
 
 class event::builder {
@@ -62,7 +55,15 @@ class event::builder {
   builder() : event_enabled{event_build_enabled()}
   {
     if (event_enabled) {
-      e.name = "anon";
+      e = new event;
+      e->name = "anon";
+    }
+  }
+
+  ~builder()
+  {
+    if (event_enabled) {
+      delete e;
     }
   }
 
@@ -70,7 +71,7 @@ class event::builder {
   {
     if (event_enabled) {
       std::string nm{n};
-      e.name = nm;
+      e->name = nm;
     }
     return *this;
   }
@@ -78,14 +79,14 @@ class event::builder {
   builder& name(const std::string& n)
   {
     if (event_enabled)
-      e.name = n;
+      e->name = n;
     return *this;
   }
 
   builder& category(category c)
   {
     if (event_enabled)
-      e.cat = c;
+      e->cat = c;
     return *this;
   }
 
@@ -95,7 +96,7 @@ class event::builder {
       std::stringstream ss;
       ss << p;
       std::string pointer{ss.str()};
-      e.string_args[k] = pointer;
+      e->string_args[k] = pointer;
     }
     return *this;
   }
@@ -103,7 +104,7 @@ class event::builder {
   builder& arg(const std::string& k, const std::string& v)
   {
     if (event_enabled)
-      e.string_args[k] = v;
+      e->string_args[k] = v;
     return *this;
   }
 
@@ -136,7 +137,7 @@ class event::builder {
   std::enable_if_t<std::is_arithmetic<T>::value, builder&> arg(const std::string& k, T v)
   {
     if (event_enabled)
-      e.numeric_args[k] = static_cast<std::uintmax_t>(v);
+      e->numeric_args[k] = static_cast<std::uintmax_t>(v);
     return *this;
   }
 
@@ -181,7 +182,7 @@ class event::builder {
     if (event_enabled) {
       std::string tagstr{t};
       std::string value{v};
-      e.tags[tagstr] = value;
+      e->tags[tagstr] = value;
     }
     return *this;
   }
@@ -189,19 +190,21 @@ class event::builder {
   builder& tag(const std::string& t, const std::string& v)
   {
     if (event_enabled)
-      e.tags[t] = v;
+      e->tags[t] = v;
     return *this;
   }
 
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    if (event_enabled)
-      r.record(e);
+    if (event_enabled) {
+      e->timestamp = std::chrono::system_clock::now();
+      r.record(*e);
+    }
   }
 
  private:
-  event e;
+  event* e{nullptr};
   bool event_enabled;
 };
 
