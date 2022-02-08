@@ -47,7 +47,7 @@ class event {
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
   std::map<std::string, std::string> tags{};
-  std::chrono::time_point<std::chrono::system_clock> timestamp {std::chrono::system_clock::now()};
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
 class event::builder {
