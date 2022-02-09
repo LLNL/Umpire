@@ -102,15 +102,9 @@ void MPI::logMpiInfo()
     UMPIRE_LOG(Info, "MPI rank: " << s_rank);
     UMPIRE_LOG(Info, "MPI comm size: " << s_world_size);
 
-  umpire::event::record(
-      [&](auto& event) {
-        event
-        .name("mpi")
-        .category(event::category::metadata)
-        .arg("world_size", s_world_size)
-        .arg("rank", s_rank);
-        }
-    );
+    umpire::event::record([&](auto& event) {
+      event.name("mpi").category(event::category::metadata).arg("world_size", s_world_size).arg("rank", s_rank);
+    });
 #endif
   }
 }

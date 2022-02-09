@@ -36,19 +36,16 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
   allocator->setTracking(is_tracked);
 
-  umpire::event::record(
-      [&](auto& event) {
-        event
-      .name("make_allocator")
-      .category(event::category::operation)
-      .arg("allocator_ref", (void*)allocator.get())
-      .arg("type", typeid(Strategy).name())
-      .arg("introspection", is_tracked)
-      .args(args...)
-      .tag("allocator_name", allocator->getName())
-      .tag("replay", "true");
-      }
-  );
+  umpire::event::record([&](auto& event) {
+    event.name("make_allocator")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)allocator.get())
+        .arg("type", typeid(Strategy).name())
+        .arg("introspection", is_tracked)
+        .args(args...)
+        .tag("allocator_name", allocator->getName())
+        .tag("replay", "true");
+  });
 
   m_allocators_by_name[name] = allocator.get();
   m_allocators_by_id[allocator->getId()] = allocator.get();

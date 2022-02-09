@@ -27,7 +27,8 @@ class event {
  public:
   class builder;
 
-  std::string name{"anon"};;
+  std::string name{"anon"};
+  ;
   category cat{category::statistic};
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
@@ -153,7 +154,7 @@ class event::builder {
   event e;
 };
 
-template<typename Lambda>
+template <typename Lambda>
 void record(Lambda&& l)
 {
   static const char* replay_env{getenv("UMPIRE_REPLAY")};

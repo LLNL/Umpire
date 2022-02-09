@@ -167,14 +167,7 @@ std::size_t get_process_memory_usage()
 void mark_event(const std::string& event)
 {
   umpire::event::record(
-      [&](auto& e) {
-        e
-      .name("event")
-      .category(event::category::metadata)
-      .arg("name", event)
-      .tag("replay", "true");
-      }
-  );
+      [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
 }
 
 std::size_t get_device_memory_usage(int device_id)
@@ -263,18 +256,15 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
 
 void register_external_allocation(void* ptr, util::AllocationRecord record)
 {
-  umpire::event::record(
-      [&](auto& event) {
-        event
-      .name("register_external_allocation")
-      .category(event::category::operation)
-      .arg("allocator_ref", (void*)record.strategy)
-      .arg("size", record.size)
-      .arg("pointer", record.ptr)
-      .tag("allocator_name", record.strategy->getName())
-      .tag("replay", "true");
-      }
-  );
+  umpire::event::record([&](auto& event) {
+    event.name("register_external_allocation")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)record.strategy)
+        .arg("size", record.size)
+        .arg("pointer", record.ptr)
+        .tag("allocator_name", record.strategy->getName())
+        .tag("replay", "true");
+  });
 
   auto& rm = umpire::ResourceManager::getInstance();
   rm.registerAllocation(ptr, record);
@@ -282,14 +272,9 @@ void register_external_allocation(void* ptr, util::AllocationRecord record)
 
 util::AllocationRecord deregister_external_allocation(void* ptr)
 {
-  umpire::event::record(
-      [&](auto& event) {
-        event
-      .name("deregister_external_allocation")
-      .category(event::category::operation)
-      .tag("replay", "true");
-      }
-  );
+  umpire::event::record([&](auto& event) {
+    event.name("deregister_external_allocation").category(event::category::operation).tag("replay", "true");
+  });
 
   auto& rm = umpire::ResourceManager::getInstance();
   return rm.deregisterAllocation(ptr);

@@ -313,15 +313,9 @@ void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
 
-  umpire::event::record(
-      [&](auto& event) {
-        event
-      .name("coalesce")
-      .category(event::category::operation)
-      .tag("allocator_name", getName())
-      .tag("replay", "true");
-      }
-  );
+  umpire::event::record([&](auto& event) {
+    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
+  });
 
   do_coalesce(getActualSize());
 }
