@@ -83,7 +83,7 @@ ENV GTEST_COLOR=1
 ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=/opt/rocm-4.3.1/llvm/bin/amdclang++ -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
+RUN cmake -DENABLE_WARNINGS_AS_ERRORS=Off -DCMAKE_CXX_COMPILER=amdclang++ -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DENABLE_HIP=On .. && \
     make -j 16 VERBOSE=1
 
 FROM ghcr.io/rse-ops/hip-ubuntu-22.04:hip-4.3.1 AS hip.debug
