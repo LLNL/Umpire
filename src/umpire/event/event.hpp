@@ -21,189 +21,153 @@
 namespace umpire {
 namespace event {
 
-namespace {
-
-bool event_build_enabled()
-{
-  static char* replay_env = getenv("UMPIRE_REPLAY");
-  static bool enable_replay = (replay_env != NULL);
-
-  static char* event_env = getenv("UMPIRE_EVENTS");
-  static bool enable_event = (event_env != NULL);
-
-  return (enable_replay || enable_event);
-}
-
-} // namespace
-
 enum class category { operation, statistic, metadata };
 
 class event {
  public:
   class builder;
 
-  event()
-  {
-    if (event_build_enabled()) {
-      timestamp = std::chrono::system_clock::now();
-    }
-  }
-
-  std::string name;
+  std::string name{"anon"};;
   category cat{category::statistic};
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
   std::map<std::string, std::string> tags{};
-  std::chrono::time_point<std::chrono::system_clock> timestamp{};
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
 class event::builder {
  public:
-  builder() : event_enabled{event_build_enabled()}
-  {
-    if (event_enabled) {
-      e.name = "anon";
-    }
-  }
-
   builder& name(const char* n)
   {
-    if (event_enabled) {
-      std::string nm{n};
-      e.name = nm;
-    }
+    std::string nm{n};
+    e.name = nm;
     return *this;
   }
 
   builder& name(const std::string& n)
   {
-    if (event_enabled)
-      e.name = n;
+    e.name = n;
     return *this;
   }
 
   builder& category(category c)
   {
-    if (event_enabled)
-      e.cat = c;
+    e.cat = c;
     return *this;
   }
 
   builder& arg(const std::string& k, void* p)
   {
-    if (event_enabled) {
-      std::stringstream ss;
-      ss << p;
-      std::string pointer{ss.str()};
-      e.string_args[k] = pointer;
-    }
+    std::stringstream ss;
+    ss << p;
+    std::string pointer{ss.str()};
+    e.string_args[k] = pointer;
     return *this;
   }
 
   builder& arg(const std::string& k, const std::string& v)
   {
-    if (event_enabled)
-      e.string_args[k] = v;
+    e.string_args[k] = v;
     return *this;
   }
 
   builder& arg(const std::string& k, const char* v)
   {
-    return event_enabled ? arg(k, std::string{v}) : *this;
+    return arg(k, std::string{v});
   }
 
   builder& arg(const std::string& k, char* v)
   {
-    return event_enabled ? arg(k, std::string{v}) : *this;
+    return arg(k, std::string{v});
   }
 
   builder& arg(const char* k, void* p)
   {
-    return event_enabled ? arg(std::string{k}, p) : *this;
+    return arg(std::string{k}, p);
   }
 
   builder& arg(const char* k, const char* v)
   {
-    return event_enabled ? arg(std::string{k}, std::string{v}) : *this;
+    return arg(std::string{k}, std::string{v});
   }
 
   builder& arg(const char* k, const std::string& v)
   {
-    return event_enabled ? arg(std::string{k}, v) : *this;
+    return arg(std::string{k}, v);
   }
 
   template <typename T>
   std::enable_if_t<std::is_arithmetic<T>::value, builder&> arg(const std::string& k, T v)
   {
-    if (event_enabled)
-      e.numeric_args[k] = static_cast<std::uintmax_t>(v);
+    e.numeric_args[k] = static_cast<std::uintmax_t>(v);
     return *this;
   }
 
   template <typename T>
   std::enable_if_t<std::is_arithmetic<T>::value, builder&> arg(const char* k, T v)
   {
-    return event_enabled ? arg(std::string{k}, v) : *this;
+    return arg(std::string{k}, v);
   }
 
   template <typename T>
   std::enable_if_t<!std::is_arithmetic<T>::value, builder&> arg(const std::string& k, T v)
   {
-    if (event_enabled) {
-      using std::to_string;
-      return arg(k, to_string(v));
-    } else {
-      return *this;
-    }
+    using std::to_string;
+    return arg(k, to_string(v));
   }
 
   template <typename... Ts, std::size_t... N>
   builder& args_impl(std::index_sequence<N...>, Ts... as)
   {
-    if (event_enabled) {
-      UMPIRE_USE_VAR(CAMP_EXPAND(arg("arg" + std::to_string(N), as)));
-    }
+    UMPIRE_USE_VAR(CAMP_EXPAND(arg("arg" + std::to_string(N), as)));
     return *this;
   }
 
   template <typename... Ts>
   builder& args(Ts... as)
   {
-    if (event_enabled) {
-      return args_impl(std::make_index_sequence<sizeof...(Ts)>(), as...);
-    } else {
-      return *this;
-    }
+    return args_impl(std::make_index_sequence<sizeof...(Ts)>(), as...);
   }
 
   builder& tag(const char* t, const char* v)
   {
-    if (event_enabled) {
-      std::string tagstr{t};
-      std::string value{v};
-      e.tags[tagstr] = value;
-    }
+    std::string tagstr{t};
+    std::string value{v};
+    e.tags[tagstr] = value;
     return *this;
   }
 
   builder& tag(const std::string& t, const std::string& v)
   {
-    if (event_enabled)
-      e.tags[t] = v;
+    e.tags[t] = v;
     return *this;
   }
 
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    if (event_enabled)
-      r.record(e);
+    r.record(e);
   }
 
  private:
   event e;
-  bool event_enabled;
 };
+
+template<typename Lambda>
+void record(Lambda&& l)
+{
+  static const char* replay_env{getenv("UMPIRE_REPLAY")};
+  static const bool enable_replay{(replay_env != NULL)};
+  static const char* event_env{getenv("UMPIRE_EVENTS")};
+  static const bool enable_event{(event_env != NULL)};
+  static const bool event_build_enabled{enable_replay || enable_event};
+
+  if (event_build_enabled) {
+    umpire::event::event::builder e;
+    l(e);
+    e.record();
+  }
+}
 
 } // namespace event
 } // namespace umpire

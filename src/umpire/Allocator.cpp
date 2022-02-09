@@ -21,13 +21,16 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
 
 void Allocator::release()
 {
-  umpire::event::event::builder()
-      .name("release")
-      .category(event::category::operation)
-      .arg("allocator_ref", (void*)m_allocator)
-      .tag("allocator_name", m_allocator->getName())
-      .tag("replay", "true")
-      .record();
+  umpire::event::record(
+      [&](auto& event) {
+        event
+        .name("release")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)m_allocator)
+        .tag("allocator_name", m_allocator->getName())
+        .tag("replay", "true");
+      }
+  );
 
   UMPIRE_LOG(Debug, "");
 

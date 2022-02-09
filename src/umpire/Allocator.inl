@@ -33,15 +33,18 @@ inline void* Allocator::allocate(std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator);
   }
 
-  umpire::event::event::builder()
-      .name("allocate")
-      .category(event::category::operation)
-      .arg("allocator_ref", (void*)m_allocator)
-      .arg("size", bytes)
-      .arg("pointer", ret)
-      .tag("allocator_name", m_allocator->getName().c_str())
-      .tag("replay", "true")
-      .record();
+  umpire::event::record(
+      [&](auto& event) {
+        event
+        .name("allocate")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)m_allocator)
+        .arg("size", bytes)
+        .arg("pointer", ret)
+        .tag("allocator_name", m_allocator->getName().c_str())
+        .tag("replay", "true");
+      }
+  );
 
   return ret;
 }
@@ -64,32 +67,35 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator, name);
   }
 
-  umpire::event::event::builder()
-      .name("allocate")
-      .category(event::category::operation)
-      .arg("allocator_ref", (void*)m_allocator)
-      .arg("size", bytes)
-      .arg("pointer", ret)
-      .arg("name", name)
-      .tag("allocator_name", m_allocator->getName().c_str())
-      .tag("replay", "true")
-      .record();
-
+  umpire::event::record(
+      [&](auto& event) {
+        event
+          .name("allocate")
+          .category(event::category::operation)
+          .arg("allocator_ref", (void*)m_allocator)
+          .arg("size", bytes)
+          .arg("pointer", ret)
+          .arg("name", name)
+          .tag("allocator_name", m_allocator->getName().c_str())
+          .tag("replay", "true");
+      }
+  );
   return ret;
 }
 
 inline void Allocator::deallocate(void* ptr)
 {
-  //#if defined(UMPIRE_ENABLE_EVENTS)
-  umpire::event::event::builder()
-      .name("deallocate")
-      .category(event::category::operation)
-      .arg("allocator_ref", (void*)m_allocator)
-      .arg("pointer", ptr)
-      .tag("allocator_name", m_allocator->getName().c_str())
-      .tag("replay", "true")
-      .record();
-  //#endif
+  umpire::event::record(
+      [&](auto& event) {
+        event
+        .name("deallocate")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)m_allocator)
+        .arg("pointer", ptr)
+        .tag("allocator_name", m_allocator->getName().c_str())
+        .tag("replay", "true");
+      }
+  );
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
