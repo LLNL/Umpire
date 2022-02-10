@@ -155,14 +155,14 @@ class event::builder {
 };
 
 namespace {
-  static const char* replay_env{getenv("UMPIRE_REPLAY")};
-  static const bool enable_replay{(replay_env != NULL)};
-  static const char* event_env{getenv("UMPIRE_EVENTS")};
-  static const bool enable_event{(event_env != NULL)};
-  static const bool event_build_enabled{enable_replay || enable_event};
-}
+static const char* replay_env{getenv("UMPIRE_REPLAY")};
+static const bool enable_replay{(replay_env != NULL)};
+static const char* event_env{getenv("UMPIRE_EVENTS")};
+static const bool enable_event{(event_env != NULL)};
+static const bool event_build_enabled{enable_replay || enable_event};
+} // namespace
 
-template<typename Lambda>
+template <typename Lambda>
 void record(Lambda&& l)
 {
   if (event_build_enabled) {
