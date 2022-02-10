@@ -28,7 +28,6 @@ class event {
   class builder;
 
   std::string name{"anon"};
-  ;
   category cat{category::statistic};
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
