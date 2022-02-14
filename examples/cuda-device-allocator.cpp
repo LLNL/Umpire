@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-21, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -15,66 +15,69 @@ using resource_type = camp::resources::Hip;
 #endif
 
 /*
- * Very simple kernel that uses only the first thread to "get" the
- * existing DeviceAllocator and allocate a double.
+ * Very simple kernels that use only the first thread to "get" the
+ * existing DeviceAllocator and to allocate a double. (One kernel retrieves
+ * the DeviceAllocator object by ID, the other by name.)
  * Making sure that the data_ptr is pointing to the device allocated double,
  * it sets the value of that double which will be checked later.
  */
 __global__ void my_kernel(double** data_ptr)
 {
   if (threadIdx.x == 0) {
-    // _sphinx_tag_get_dev_allocator_name_start
-    umpire::DeviceAllocator alloc = umpire::get_device_allocator("my_device_alloc");
-    // _sphinx_tag_get_dev_allocator_name_end
+    umpire::DeviceAllocator alloc = umpire::get_device_allocator(0);
     double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = 1024;
   }
 }
 
+__global__ void my_other_kernel(double** data_ptr)
+{
+  if (threadIdx.x == 0) {
+    umpire::DeviceAllocator alloc = umpire::get_device_allocator("my_device_alloc");
+    double* data = static_cast<double*>(alloc.allocate(1 * sizeof(double)));
+    *data_ptr = data;
+    data[0] = 42;
+  }
+}
+
 int main(int argc, char const* argv[])
 {
+  auto& rm = umpire::ResourceManager::getInstance();
   auto resource = camp::resources::Resource{resource_type{}};
 
   // Create my allocators.
-  // _sphinx_tag_make_dev_allocator_start
-  auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  auto device_allocator = umpire::make_device_allocator(allocator, sizeof(double), "my_device_alloc");
-  // _sphinx_tag_make_dev_allocator_end
+  auto device_allocator = umpire::make_device_allocator(allocator, 8, "my_device_alloc");
 
-  // Checking that the DeviceAllocator just created can be found...
-  if (umpire::is_device_allocator("my_device_alloc")) {
-    std::cout << "I found a DeviceAllocator!" << std::endl;
+  // Checking that a DeviceAllocator exists...
+  if (umpire::is_device_allocator(0)) {
+    std::cout << "I found a DeviceAllocator! " << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-  // See ReadTheDocs DeviceAllocator documentation for more info about macro usage!
+  // Make sure that device and host side DeviceAllocator pointers are synched.
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
 #if defined(UMPIRE_ENABLE_CUDA)
   my_kernel<<<1, 16>>>(ptr_to_data);
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(my_kernel, dim3(1), dim3(16), 0, 0, ptr_to_data);
+  hipLaunchKernelGGL(my_kernel, 1, 16, 0, 0, ptr_to_data);
 #endif
-
   resource.get_event().wait();
-  std::cout << "After calling kernel, found value: " << (*ptr_to_data)[0] << std::endl;
+  std::cout << "After first kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
   // DeviceAllocator only has enough memory for one double. We need to reset it!
   device_allocator.reset();
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  my_kernel<<<1, 16>>>(ptr_to_data);
+  my_other_kernel<<<1, 16>>>(ptr_to_data);
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(my_kernel, dim3(1), dim3(16), 0, 0, ptr_to_data);
+  hipLaunchKernelGGL(my_other_kernel, 1, 16, 0, 0, ptr_to_data);
 #endif
-
   resource.get_event().wait();
-  std::cout << "After calling kernel again, found value: " << (*ptr_to_data)[0] << std::endl;
-
-  allocator.deallocate(ptr_to_data);
+  std::cout << "After second kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
   return 0;
 }

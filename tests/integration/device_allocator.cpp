@@ -57,13 +57,23 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   double** data_ptr = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-  ASSERT_NO_THROW((tester<<<1, 16>>>(data_ptr, GetParam())));
+#if defined(UMPIRE_ENABLE_CUDA)
+  tester<<<1, 16>>>(data_ptr, GetParam());
   cudaDeviceSynchronize();
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, GetParam());
+  hipDeviceSynchronize();
+#endif
+
   ASSERT_EQ(*data_ptr[0], NUM);
 
   auto my_da = umpire::get_device_allocator(GetParam());
   ASSERT_NO_THROW(my_da.reset());
-  ASSERT_NO_THROW((tester<<<1, 16>>>(data_ptr, GetParam())));
+#if defined(UMPIRE_ENABLE_CUDA)
+  tester<<<1, 16>>>(data_ptr, GetParam());
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, GetParam());
+#endif
 }
 
 const char* device_allocator_names[3] = {"da1", "da2", "da3"};

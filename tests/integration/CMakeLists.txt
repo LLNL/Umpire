@@ -100,13 +100,15 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     PRIVATE
     ${PROJECT_BINARY_DIR}/include)
 
-  set_source_files_properties(
-    device-allocator.cpp
-    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(
+      device-allocator.cpp
+      PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  set_target_properties(
-    device_allocator_tests
-    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+    set_target_properties(
+      device_allocator_tests
+      PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+  endif()
 
   blt_add_test(
     NAME device_allocator_tests

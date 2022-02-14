@@ -30,6 +30,13 @@ blt_add_executable(
 list(APPEND umpire_examples malloc)
 
 if (UMPIRE_ENABLE_HIP)
+  if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+    blt_add_executable(
+      NAME device_allocator_example
+      SOURCES device-allocator.cpp
+      DEPENDS_ON umpire blt::hip)
+    list(APPEND umpire_examples device_allocator_example)
+  endif()
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp
