@@ -5,9 +5,9 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include <string>
-
 #include "umpire/event/event_store_recorder.hpp"
+
+#include <string>
 
 #include "umpire/event/event.hpp"
 

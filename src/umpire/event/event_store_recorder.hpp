@@ -8,6 +8,7 @@
 #define UMPIRE_event_store_recorder_HPP
 
 #include <string>
+
 #include "umpire/event/event_store.hpp"
 
 namespace umpire {

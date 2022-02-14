@@ -49,11 +49,12 @@ class event::builder {
   {
     std::stringstream ss;
     ss << R"({"category":"operation","name":"allocate")"
-      << R"(,"numeric_args":{"size":)" << sz << "}"
-      << R"(,"string_args":{"allocator_ref":")" << ref << R"(")" << R"(,"pointer":")" << ptr << R"(")" << "}"
-      << R"(,"tags":{"replay":"true"},"timestamp":)"
-      << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()
-      << "}";
+       << R"(,"numeric_args":{"size":)" << sz << "}"
+       << R"(,"string_args":{"allocator_ref":")" << ref << R"(")"
+       << R"(,"pointer":")" << ptr << R"(")"
+       << "}"
+       << R"(,"tags":{"replay":"true"},"timestamp":)"
+       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
     e.raw_line = ss.str();
     return *this;
   }
@@ -62,11 +63,12 @@ class event::builder {
   {
     std::stringstream ss;
     ss << R"({"category":"operation","name":"allocate")"
-      << R"(,"numeric_args":{"size":)" << sz << "}"
-      << R"(,"string_args":{"allocator_ref":")" << ref << R"(")" << R"(,"pointer":")" << ptr << R"(")" << R"(,"allocation_name":")" << allocation_name << R"("})"
-      << R"(,"tags":{"replay":"true"},"timestamp":)"
-      << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()
-      << "}";
+       << R"(,"numeric_args":{"size":)" << sz << "}"
+       << R"(,"string_args":{"allocator_ref":")" << ref << R"(")"
+       << R"(,"pointer":")" << ptr << R"(")"
+       << R"(,"allocation_name":")" << allocation_name << R"("})"
+       << R"(,"tags":{"replay":"true"},"timestamp":)"
+       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
     e.raw_line = ss.str();
     return *this;
   }
@@ -75,10 +77,11 @@ class event::builder {
   {
     std::stringstream ss;
     ss << R"({"category":"operation","name":"deallocate")"
-      << R"(,"string_args":{"allocator_ref":")" << ref << R"(")" << R"(,"pointer":")" << ptr << R"(")" << "}"
-      << R"(,"tags":{"replay":"true"},"timestamp":)"
-      << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()
-      << "}";
+       << R"(,"string_args":{"allocator_ref":")" << ref << R"(")"
+       << R"(,"pointer":")" << ptr << R"(")"
+       << "}"
+       << R"(,"tags":{"replay":"true"},"timestamp":)"
+       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
     e.raw_line = ss.str();
     return *this;
   }

@@ -33,9 +33,7 @@ inline void* Allocator::allocate(std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator);
   }
 
-  umpire::event::record([&](auto& event) {
-    event.allocate_event(bytes, (void*)m_allocator, ret);
-  });
+  umpire::event::record([&](auto& event) { event.allocate_event(bytes, (void*)m_allocator, ret); });
 
   return ret;
 }
@@ -58,17 +56,13 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator, name);
   }
 
-  umpire::event::record([&](auto& event) {
-    event.allocate_event(name, bytes, (void*)m_allocator, ret);
-  });
+  umpire::event::record([&](auto& event) { event.allocate_event(name, bytes, (void*)m_allocator, ret); });
   return ret;
 }
 
 inline void Allocator::deallocate(void* ptr)
 {
-  umpire::event::record([&](auto& event) {
-    event.deallocate_event((void*)m_allocator, ptr);
-  });
+  umpire::event::record([&](auto& event) { event.deallocate_event((void*)m_allocator, ptr); });
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 
