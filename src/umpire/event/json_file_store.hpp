@@ -23,6 +23,7 @@ class json_file_store : public event_store {
   json_file_store(const std::string& filename, bool read_only = false);
 
   virtual void insert(event e);
+  virtual void insert_direct(const std::string& s);
 
   virtual std::vector<event> get_events();
 

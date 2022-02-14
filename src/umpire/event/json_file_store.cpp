@@ -8,6 +8,7 @@
 #include "umpire/event/json_file_store.hpp"
 
 #include <fstream>
+#include <string>
 #include <vector>
 
 #include "umpire/event/event_json.hpp"
@@ -27,6 +28,12 @@ void json_file_store::insert(event e)
   open_store();
   nlohmann::json json_event = e;
   m_fstream << json_event << std::endl;
+}
+
+void json_file_store::insert_direct(const std::string& s)
+{
+  open_store();
+  m_fstream << s << std::endl;
 }
 
 std::vector<event> json_file_store::get_events()

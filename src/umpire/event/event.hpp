@@ -28,6 +28,7 @@ class event {
   class builder;
 
   std::string name{"anon"};
+  std::string raw_line;
   category cat{category::statistic};
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
@@ -41,6 +42,44 @@ class event::builder {
   {
     std::string nm{n};
     e.name = nm;
+    return *this;
+  }
+
+  builder& allocate_event(std::size_t sz, void* ref, void* ptr)
+  {
+    std::stringstream ss;
+    ss << R"({"category":"operation","name":"allocate")"
+      << R"(,"numeric_args":{"size":)" << sz << "}"
+      << R"(,"string_args":{"allocator_ref":")" << ref << R"(")" << R"(,"pointer":")" << ptr << R"(")" << "}"
+      << R"(,"tags":{"replay":"true"},"timestamp":)"
+      << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()
+      << "}";
+    e.raw_line = ss.str();
+    return *this;
+  }
+
+  builder& allocate_event(const std::string& allocation_name, std::size_t sz, void* ref, void* ptr)
+  {
+    std::stringstream ss;
+    ss << R"({"category":"operation","name":"allocate")"
+      << R"(,"numeric_args":{"size":)" << sz << "}"
+      << R"(,"string_args":{"allocator_ref":")" << ref << R"(")" << R"(,"pointer":")" << ptr << R"(")" << R"(,"allocation_name":")" << allocation_name << R"("})"
+      << R"(,"tags":{"replay":"true"},"timestamp":)"
+      << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()
+      << "}";
+    e.raw_line = ss.str();
+    return *this;
+  }
+
+  builder& deallocate_event(void* ref, void* ptr)
+  {
+    std::stringstream ss;
+    ss << R"({"category":"operation","name":"deallocate")"
+      << R"(,"string_args":{"allocator_ref":")" << ref << R"(")" << R"(,"pointer":")" << ptr << R"(")" << "}"
+      << R"(,"tags":{"replay":"true"},"timestamp":)"
+      << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()
+      << "}";
+    e.raw_line = ss.str();
     return *this;
   }
 
@@ -146,7 +185,10 @@ class event::builder {
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    r.record(e);
+    if (e.raw_line.empty())
+      r.record(e);
+    else
+      r.record_direct(e.raw_line);
   }
 
  private:

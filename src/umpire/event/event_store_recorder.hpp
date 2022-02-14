@@ -7,6 +7,7 @@
 #ifndef UMPIRE_event_store_recorder_HPP
 #define UMPIRE_event_store_recorder_HPP
 
+#include <string>
 #include "umpire/event/event_store.hpp"
 
 namespace umpire {
@@ -19,6 +20,8 @@ class event_store_recorder {
   event_store_recorder(event_store* db);
 
   void record(event e);
+
+  void record_direct(const std::string& s);
 
  private:
   event_store* m_database;

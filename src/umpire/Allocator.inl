@@ -34,13 +34,7 @@ inline void* Allocator::allocate(std::size_t bytes)
   }
 
   umpire::event::record([&](auto& event) {
-    event.name("allocate")
-        .category(event::category::operation)
-        .arg("allocator_ref", (void*)m_allocator)
-        .arg("size", bytes)
-        .arg("pointer", ret)
-        .tag("allocator_name", m_allocator->getName().c_str())
-        .tag("replay", "true");
+    event.allocate_event(bytes, (void*)m_allocator, ret);
   });
 
   return ret;
@@ -65,14 +59,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   }
 
   umpire::event::record([&](auto& event) {
-    event.name("allocate")
-        .category(event::category::operation)
-        .arg("allocator_ref", (void*)m_allocator)
-        .arg("size", bytes)
-        .arg("pointer", ret)
-        .arg("name", name)
-        .tag("allocator_name", m_allocator->getName().c_str())
-        .tag("replay", "true");
+    event.allocate_event(name, bytes, (void*)m_allocator, ret);
   });
   return ret;
 }
@@ -80,12 +67,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 inline void Allocator::deallocate(void* ptr)
 {
   umpire::event::record([&](auto& event) {
-    event.name("deallocate")
-        .category(event::category::operation)
-        .arg("allocator_ref", (void*)m_allocator)
-        .arg("pointer", ptr)
-        .tag("allocator_name", m_allocator->getName().c_str())
-        .tag("replay", "true");
+    event.deallocate_event((void*)m_allocator, ptr);
   });
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");

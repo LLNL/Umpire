@@ -5,6 +5,8 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
+#include <string>
+
 #include "umpire/event/event_store_recorder.hpp"
 
 #include "umpire/event/event.hpp"
@@ -19,6 +21,11 @@ event_store_recorder::event_store_recorder(event_store* db) : m_database(db)
 void event_store_recorder::record(event e)
 {
   m_database->insert(e);
+}
+
+void event_store_recorder::record_direct(const std::string& s)
+{
+  m_database->insert_direct(s);
 }
 
 } // namespace event

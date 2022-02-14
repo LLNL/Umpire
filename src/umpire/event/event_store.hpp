@@ -7,6 +7,7 @@
 #ifndef UMPIRE_event_store_HPP
 #define UMPIRE_event_store_HPP
 
+#include <string>
 #include <vector>
 
 namespace umpire {
@@ -17,6 +18,7 @@ class event;
 class event_store {
  public:
   virtual void insert(event e) = 0;
+  virtual void insert_direct(const std::string& s) = 0;
 
   virtual std::vector<event> get_events() = 0;
 };
