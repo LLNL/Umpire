@@ -22,12 +22,12 @@ namespace umpire {
 namespace event {
 
 namespace {
-  static const char* replay_env{getenv("UMPIRE_REPLAY")};
-  static const bool enable_replay{(replay_env != NULL)};
-  static const char* event_env{getenv("UMPIRE_EVENTS")};
-  static const bool enable_event{(event_env != NULL)};
-  static const bool event_build_enabled{enable_replay || enable_event};
-}
+static const char* replay_env{getenv("UMPIRE_REPLAY")};
+static const bool enable_replay{(replay_env != NULL)};
+static const char* event_env{getenv("UMPIRE_EVENTS")};
+static const bool enable_event{(event_env != NULL)};
+static const bool event_build_enabled{enable_replay || enable_event};
+} // namespace
 
 enum class category { operation, statistic, metadata };
 
@@ -61,7 +61,7 @@ struct deallocate {
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
-template <typename E=event>
+template <typename E = event>
 class builder {
  public:
   builder& name(const char* n)
