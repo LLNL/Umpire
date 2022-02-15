@@ -36,7 +36,12 @@ if (UMPIRE_ENABLE_HIP)
       SOURCES device-allocator.cpp
       DEPENDS_ON umpire blt::hip)
     list(APPEND umpire_examples device_allocator_example)
+
+    set_target_properties(
+      device_allocator_example
+      PROPERTIES LINK_FLAGS "-fgpu-rdc")
   endif()
+
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp

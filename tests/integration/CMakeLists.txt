@@ -109,6 +109,11 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
       device_allocator_tests
       PROPERTIES CUDA_SEPARABLE_COMPILATION On)
   endif()
+  if (UMPIRE_ENABLE_HIP)
+    set_target_properties(
+      device_allocator_tests
+      PROPERTIES LINK_FLAGS "-fgpu-rdc")
+  endif()
 
   blt_add_test(
     NAME device_allocator_tests
