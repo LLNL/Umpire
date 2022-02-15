@@ -18,7 +18,7 @@
 namespace umpire {
 namespace event {
 
-class event;
+struct event;
 
 class quest_database : public event_store {
  public:

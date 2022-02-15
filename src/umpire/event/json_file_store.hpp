@@ -16,7 +16,7 @@
 namespace umpire {
 namespace event {
 
-class event;
+struct event;
 
 class json_file_store : public event_store {
  public:

@@ -14,7 +14,7 @@
 namespace umpire {
 namespace event {
 
-class event;
+struct event;
 
 class event_store_recorder {
  public:
