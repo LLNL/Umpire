@@ -21,14 +21,18 @@
 namespace umpire {
 namespace event {
 
+namespace {
+  static const char* replay_env{getenv("UMPIRE_REPLAY")};
+  static const bool enable_replay{(replay_env != NULL)};
+  static const char* event_env{getenv("UMPIRE_EVENTS")};
+  static const bool enable_event{(event_env != NULL)};
+  static const bool event_build_enabled{enable_replay || enable_event};
+}
+
 enum class category { operation, statistic, metadata };
 
-class event {
- public:
-  class builder;
-
+struct event {
   std::string name{"anon"};
-  std::string raw_line;
   category cat{category::statistic};
   std::map<std::string, std::string> string_args{};
   std::map<std::string, std::uintmax_t> numeric_args{};
@@ -36,53 +40,34 @@ class event {
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
-class event::builder {
+struct allocate {
+  std::size_t size;
+  void* ref;
+  void* ptr;
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
+};
+
+struct named_allocate {
+  std::size_t size;
+  void* ref;
+  void* ptr;
+  std::string name;
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
+};
+
+struct deallocate {
+  void* ref;
+  void* ptr;
+  std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
+};
+
+template <typename E=event>
+class builder {
  public:
   builder& name(const char* n)
   {
     std::string nm{n};
     e.name = nm;
-    return *this;
-  }
-
-  builder& allocate_event(std::size_t sz, void* ref, void* ptr)
-  {
-    std::stringstream ss;
-    ss << R"({"category":"operation","name":"allocate")"
-       << R"(,"numeric_args":{"size":)" << sz << "}"
-       << R"(,"string_args":{"allocator_ref":")" << ref << R"(")"
-       << R"(,"pointer":")" << ptr << R"(")"
-       << "}"
-       << R"(,"tags":{"replay":"true"},"timestamp":)"
-       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-    e.raw_line = ss.str();
-    return *this;
-  }
-
-  builder& allocate_event(const std::string& allocation_name, std::size_t sz, void* ref, void* ptr)
-  {
-    std::stringstream ss;
-    ss << R"({"category":"operation","name":"allocate")"
-       << R"(,"numeric_args":{"size":)" << sz << "}"
-       << R"(,"string_args":{"allocator_ref":")" << ref << R"(")"
-       << R"(,"pointer":")" << ptr << R"(")"
-       << R"(,"allocation_name":")" << allocation_name << R"("})"
-       << R"(,"tags":{"replay":"true"},"timestamp":)"
-       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-    e.raw_line = ss.str();
-    return *this;
-  }
-
-  builder& deallocate_event(void* ref, void* ptr)
-  {
-    std::stringstream ss;
-    ss << R"({"category":"operation","name":"deallocate")"
-       << R"(,"string_args":{"allocator_ref":")" << ref << R"(")"
-       << R"(,"pointer":")" << ptr << R"(")"
-       << "}"
-       << R"(,"tags":{"replay":"true"},"timestamp":)"
-       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-    e.raw_line = ss.str();
     return *this;
   }
 
@@ -188,29 +173,144 @@ class event::builder {
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    if (e.raw_line.empty())
-      r.record(e);
-    else
-      r.record_direct(e.raw_line);
+    r.record(e);
   }
 
  private:
-  event e;
+  E e;
 };
 
-namespace {
-static const char* replay_env{getenv("UMPIRE_REPLAY")};
-static const bool enable_replay{(replay_env != NULL)};
-static const char* event_env{getenv("UMPIRE_EVENTS")};
-static const bool enable_event{(event_env != NULL)};
-static const bool event_build_enabled{enable_replay || enable_event};
-} // namespace
+template <>
+class builder<allocate> {
+ public:
+  builder& size(std::size_t size)
+  {
+    e.size = size;
+    return *this;
+  }
+
+  builder& ref(void* ref)
+  {
+    e.ref = ref;
+    return *this;
+  }
+
+  builder& ptr(void* ptr)
+  {
+    e.ptr = ptr;
+    return *this;
+  }
+
+  template <typename Recorder = decltype(recorder_factory::get_recorder())>
+  void record(Recorder r = recorder_factory::get_recorder())
+  {
+    std::stringstream ss;
+    ss << R"({"category":"operation","name":"allocate")"
+       << R"(,"numeric_args":{"size":)" << e.size << "}"
+       << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
+       << R"(,"pointer":")" << e.ptr << R"(")"
+       << "}"
+       << R"(,"tags":{"replay":"true"},"timestamp":)"
+       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
+    r.record_direct(ss.str());
+  }
+
+ private:
+  allocate e;
+};
+
+template <>
+class builder<named_allocate> {
+ public:
+  builder& name(const std::string& name)
+  {
+    e.name = name;
+    return *this;
+  }
+
+  builder& size(std::size_t size)
+  {
+    e.size = size;
+    return *this;
+  }
+
+  builder& ref(void* ref)
+  {
+    e.ref = ref;
+    return *this;
+  }
+
+  builder& ptr(void* ptr)
+  {
+    e.ptr = ptr;
+    return *this;
+  }
+
+  template <typename Recorder = decltype(recorder_factory::get_recorder())>
+  void record(Recorder r = recorder_factory::get_recorder())
+  {
+    std::stringstream ss;
+    ss << R"({"category":"operation","name":"allocate")"
+       << R"(,"numeric_args":{"size":)" << e.size << "}"
+       << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
+       << R"(,"pointer":")" << e.ptr << R"(")"
+       << R"(,"allocation_name":")" << e.name << R"("})"
+       << R"(,"tags":{"replay":"true"},"timestamp":)"
+       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
+    r.record_direct(ss.str());
+  }
+
+ private:
+  named_allocate e;
+};
+
+template <>
+class builder<deallocate> {
+ public:
+  builder& ref(void* ref)
+  {
+    e.ref = ref;
+    return *this;
+  }
+
+  builder& ptr(void* ptr)
+  {
+    e.ptr = ptr;
+    return *this;
+  }
+
+  template <typename Recorder = decltype(recorder_factory::get_recorder())>
+  void record(Recorder r = recorder_factory::get_recorder())
+  {
+    std::stringstream ss;
+    ss << R"({"category":"operation","name":"deallocate")"
+       << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
+       << R"(,"pointer":")" << e.ptr << R"(")"
+       << "}"
+       << R"(,"tags":{"replay":"true"},"timestamp":)"
+       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
+    r.record_direct(ss.str());
+  }
+
+ private:
+  deallocate e;
+};
 
 template <typename Lambda>
 void record(Lambda&& l)
 {
   if (event_build_enabled) {
-    umpire::event::event::builder e;
+    umpire::event::builder<> e;
+    l(e);
+    e.record();
+  }
+}
+
+template <typename B, typename Lambda>
+void record(Lambda&& l)
+{
+  if (event_build_enabled) {
+    umpire::event::builder<B> e;
     l(e);
     e.record();
   }
