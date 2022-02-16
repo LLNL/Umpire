@@ -9,7 +9,11 @@
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#else
+#include "umpire/alloc/HipMallocManagedAllocator.hpp"
+#endif
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {

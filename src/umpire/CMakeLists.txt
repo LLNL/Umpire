@@ -34,7 +34,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
@@ -43,14 +43,19 @@ if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     DeviceAllocator.cpp
     device_allocator_helper.cpp)
 
-  set_source_files_properties(DeviceAllocator.cpp
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-  set_source_files_properties(device_allocator_helper.cpp
+    set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
 
-  set(umpire_device_depends camp cuda)
+    set(umpire_device_depends camp cuda)
+  elseif (UMPIRE_ENABLE_HIP)
+    set(umpire_device_depends camp blt::hip)
+  endif()
+
 
   blt_add_library(
     NAME umpire_device
@@ -70,8 +75,12 @@ if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     ${umpire_device_headers}
     DESTINATION include/umpire)
 
-  set_target_properties(umpire_device PROPERTIES
-    CUDA_SEPARABLE_COMPILATION On)
+  if (UMPIRE_ENABLE_CUDA)
+    set_target_properties(umpire_device PROPERTIES
+      CUDA_SEPARABLE_COMPILATION On)
+  else ()
+    target_link_options(umpire_device INTERFACE -fgpu-rdc)
+  endif ()
 
 endif()
 
@@ -98,7 +107,7 @@ endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
 
-if(UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+if(UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   blt_list_append( TO umpire_depends ELEMENTS umpire_device)
 endif()
 
@@ -140,6 +149,9 @@ endif()
 
 set_target_properties(umpire PROPERTIES
   CUDA_SEPARABLE_COMPILATION On)
+if (UMPIRE_ENABLE_HIP)
+  target_link_options(umpire PUBLIC -fgpu-rdc)
+endif()
 
 if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
