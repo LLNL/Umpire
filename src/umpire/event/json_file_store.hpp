@@ -8,6 +8,7 @@
 #define UMPIRE_json_file_store_HPP
 
 #include <stdio.h>
+
 #include <string>
 #include <vector>
 
