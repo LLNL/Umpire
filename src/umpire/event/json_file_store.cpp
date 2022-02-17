@@ -37,8 +37,12 @@ void json_file_store::insert(const event& e)
 void json_file_store::insert(const allocate& e)
 {
   fprintf(m_fstream,
-          "{\"category\":\"operation\",\"name\":\"allocate\",\"numeric_args\":{\"size\":%ld},\"string_args\":{"
-          "\"allocator_ref\":\"%p\",\"pointer\":\"%p\"},\"tags\":{\"replay\":\"true\"},\"timestamp\":%lld}\n",
+          R"({"category":"operation","name":"allocate")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
           e.size, e.ref, e.ptr,
           static_cast<long long>(std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
@@ -46,9 +50,12 @@ void json_file_store::insert(const allocate& e)
 void json_file_store::insert(const named_allocate& e)
 {
   fprintf(m_fstream,
-          "{\"category\":\"operation\",\"name\":\"named_allocate\",\"numeric_args\":{\"size\":%ld},\"string_args\":{"
-          "\"allocator_ref\":\"%p\",\"pointer\":\"%p\",\"allocation_name\":\"%s\"},\"tags\":{\"replay\":\"true\"},"
-          "\"timestamp\":%lld}\n",
+          R"({"category":"operation","name":"named_allocate")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","allocation_name":"%s"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
           e.size, e.ref, e.ptr, e.name.c_str(),
           static_cast<long long>(std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
@@ -56,8 +63,11 @@ void json_file_store::insert(const named_allocate& e)
 void json_file_store::insert(const deallocate& e)
 {
   fprintf(m_fstream,
-          "{\"category\":\"operation\",\"name\":\"deallocate\",\"string_args\":{\"allocator_ref\":\"%p\",\"pointer\":"
-          "\"%p\"},\"tags\":{\"replay\":\"true\"},\"timestamp\":%lld}\n",
+          R"({"category":"operation","name":"deallocate")"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
+          "\n",
           e.ref, e.ptr, static_cast<long long>(std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
 
