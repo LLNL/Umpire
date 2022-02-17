@@ -67,10 +67,9 @@ std::vector<event> json_file_store::get_events()
   size_t len{0};
   std::vector<event> events;
   std::size_t line_number{1};
-  int nread;
 
   open_store();
-  while ((nread = getline(&line, &len, m_fstream)) != -1) {
+  while (getline(&line, &len, m_fstream) != -1) {
     nlohmann::json json_event;
     event e;
 
