@@ -99,6 +99,7 @@ std::vector<event> json_file_store::get_events()
     line_number++;
   }
 
+  free(line);
   return events;
 }
 
