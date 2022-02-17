@@ -204,15 +204,7 @@ class builder<allocate> {
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    std::stringstream ss;
-    ss << R"({"category":"operation","name":"allocate")"
-       << R"(,"numeric_args":{"size":)" << e.size << "}"
-       << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
-       << R"(,"pointer":")" << e.ptr << R"(")"
-       << "}"
-       << R"(,"tags":{"replay":"true"},"timestamp":)"
-       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-    r.record_direct(ss.str());
+    r.record(e);
   }
 
  private:
@@ -249,15 +241,7 @@ class builder<named_allocate> {
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    std::stringstream ss;
-    ss << R"({"category":"operation","name":"allocate")"
-       << R"(,"numeric_args":{"size":)" << e.size << "}"
-       << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
-       << R"(,"pointer":")" << e.ptr << R"(")"
-       << R"(,"allocation_name":")" << e.name << R"("})"
-       << R"(,"tags":{"replay":"true"},"timestamp":)"
-       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-    r.record_direct(ss.str());
+    r.record(e);
   }
 
  private:
@@ -282,14 +266,7 @@ class builder<deallocate> {
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
-    std::stringstream ss;
-    ss << R"({"category":"operation","name":"deallocate")"
-       << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
-       << R"(,"pointer":")" << e.ptr << R"(")"
-       << "}"
-       << R"(,"tags":{"replay":"true"},"timestamp":)"
-       << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-    r.record_direct(ss.str());
+    r.record(e);
   }
 
  private:

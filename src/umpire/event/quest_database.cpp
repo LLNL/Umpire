@@ -28,7 +28,7 @@ quest_database::quest_database(const std::string& url, const std::string& port, 
   connect(m_socket_desc, m_db_server->ai_addr, m_db_server->ai_addrlen);
 }
 
-void quest_database::insert(event e)
+void quest_database::insert(const event& e)
 {
   std::stringstream data;
 
@@ -70,6 +70,18 @@ void quest_database::insert(event e)
   auto bytes_sent = send(m_socket_desc, packet, strlen(packet), 0);
 
   std::cout << "bytes sent: " << bytes_sent << std::endl;
+}
+
+void quest_database::insert(const allocate&)
+{
+}
+
+void quest_database::insert(const named_allocate&)
+{
+}
+
+void quest_database::insert(const deallocate&)
+{
 }
 
 std::vector<event> quest_database::get_events()

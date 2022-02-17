@@ -14,15 +14,19 @@
 namespace umpire {
 namespace event {
 
+struct allocate;
+struct named_allocate;
+struct deallocate;
 struct event;
 
 class event_store_recorder {
  public:
   event_store_recorder(event_store* db);
 
-  void record(event e);
-
-  void record_direct(const std::string& s);
+  void record(const event& e);
+  void record(const allocate& e);
+  void record(const named_allocate& e);
+  void record(const deallocate& e);
 
  private:
   event_store* m_database;

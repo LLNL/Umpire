@@ -14,11 +14,16 @@ namespace umpire {
 namespace event {
 
 struct event;
+struct allocate;
+struct named_allocate;
+struct deallocate;
 
 class event_store {
  public:
-  virtual void insert(event e) = 0;
-  virtual void insert_direct(const std::string& s) = 0;
+  virtual void insert(const event& e) = 0;
+  virtual void insert(const allocate& e) = 0;
+  virtual void insert(const named_allocate& e) = 0;
+  virtual void insert(const deallocate& e) = 0;
 
   virtual std::vector<event> get_events() = 0;
 };

@@ -17,13 +17,18 @@ namespace umpire {
 namespace event {
 
 struct event;
+struct allocate;
+struct named_allocate;
+struct deallocate;
 
 class json_file_store : public event_store {
  public:
   json_file_store(const std::string& filename, bool read_only = false);
 
-  virtual void insert(event e);
-  virtual void insert_direct(const std::string& s);
+  virtual void insert(const event& e);
+  virtual void insert(const allocate& e);
+  virtual void insert(const named_allocate& e);
+  virtual void insert(const deallocate& e);
 
   virtual std::vector<event> get_events();
 

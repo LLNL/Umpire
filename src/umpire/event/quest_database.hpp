@@ -19,12 +19,18 @@ namespace umpire {
 namespace event {
 
 struct event;
+struct allocate;
+struct named_allocate;
+struct deallocate;
 
 class quest_database : public event_store {
  public:
   quest_database(const std::string& url, const std::string& port, const std::string& name);
 
-  void insert(event e) override final;
+  void insert(const event& e) override final;
+  void insert(const allocate& e) override final;
+  void insert(const named_allocate& e) override final;
+  void insert(const deallocate& e) override final;
 
   std::vector<event> get_events() override final;
 

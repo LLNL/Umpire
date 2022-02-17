@@ -23,17 +23,49 @@ json_file_store::json_file_store(const std::string& filename, bool read_only)
 {
 }
 
-void json_file_store::insert(event e)
+void json_file_store::insert(const event& e)
 {
   open_store();
   nlohmann::json json_event = e;
   m_fstream << json_event << std::endl;
 }
 
-void json_file_store::insert_direct(const std::string& s)
+void json_file_store::insert(const allocate& e)
 {
-  open_store();
-  m_fstream << s << std::endl;
+  std::stringstream ss;
+  ss << R"({"category":"operation","name":"allocate")"
+     << R"(,"numeric_args":{"size":)" << e.size << "}"
+     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
+     << R"(,"pointer":")" << e.ptr << R"(")"
+     << "}"
+     << R"(,"tags":{"replay":"true"},"timestamp":)"
+     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
+  m_fstream << ss.str() << std::endl;
+}
+
+void json_file_store::insert(const named_allocate& e)
+{
+  std::stringstream ss;
+  ss << R"({"category":"operation","name":"allocate")"
+     << R"(,"numeric_args":{"size":)" << e.size << "}"
+     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
+     << R"(,"pointer":")" << e.ptr << R"(")"
+     << R"(,"allocation_name":")" << e.name << R"("})"
+     << R"(,"tags":{"replay":"true"},"timestamp":)"
+     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
+  m_fstream << ss.str() << std::endl;
+}
+
+void json_file_store::insert(const deallocate& e)
+{
+  std::stringstream ss;
+  ss << R"({"category":"operation","name":"deallocate")"
+     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
+     << R"(,"pointer":")" << e.ptr << R"(")"
+     << "}"
+     << R"(,"tags":{"replay":"true"},"timestamp":)"
+     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
+  m_fstream << ss.str() << std::endl;
 }
 
 std::vector<event> json_file_store::get_events()
