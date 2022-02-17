@@ -7,7 +7,7 @@
 #ifndef UMPIRE_json_file_store_HPP
 #define UMPIRE_json_file_store_HPP
 
-#include <fstream>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
@@ -34,7 +34,7 @@ class json_file_store : public event_store {
 
  private:
   void open_store();
-  std::fstream m_fstream;
+  FILE* m_fstream{nullptr};
   std::string m_filename;
   bool m_read_only;
 };

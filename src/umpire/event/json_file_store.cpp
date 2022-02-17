@@ -7,7 +7,8 @@
 
 #include "umpire/event/json_file_store.hpp"
 
-#include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 
@@ -27,55 +28,42 @@ void json_file_store::insert(const event& e)
 {
   open_store();
   nlohmann::json json_event = e;
-  m_fstream << json_event << std::endl;
+  std::stringstream ss;
+  ss << json_event;
+  fprintf(m_fstream, "%s\n", ss.str().c_str());
 }
 
 void json_file_store::insert(const allocate& e)
 {
-  std::stringstream ss;
-  ss << R"({"category":"operation","name":"allocate")"
-     << R"(,"numeric_args":{"size":)" << e.size << "}"
-     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
-     << R"(,"pointer":")" << e.ptr << R"(")"
-     << "}"
-     << R"(,"tags":{"replay":"true"},"timestamp":)"
-     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-  m_fstream << ss.str() << std::endl;
+  fprintf(m_fstream, 
+  "{\"category\":\"operation\",\"name\":\"allocate\",\"numeric_args\":{\"size\":%ld},\"string_args\":{\"allocator_ref\":\"%p\",\"pointer\":\"%p\"},\"tags\":{\"replay\":\"true\"},\"timestamp\":%ld}\n",
+      e.size, e.ref, e.ptr, std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count());
 }
 
 void json_file_store::insert(const named_allocate& e)
 {
-  std::stringstream ss;
-  ss << R"({"category":"operation","name":"allocate")"
-     << R"(,"numeric_args":{"size":)" << e.size << "}"
-     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
-     << R"(,"pointer":")" << e.ptr << R"(")"
-     << R"(,"allocation_name":")" << e.name << R"("})"
-     << R"(,"tags":{"replay":"true"},"timestamp":)"
-     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-  m_fstream << ss.str() << std::endl;
+  fprintf(m_fstream, 
+  "{\"category\":\"operation\",\"name\":\"named_allocate\",\"numeric_args\":{\"size\":%ld},\"string_args\":{\"allocator_ref\":\"%p\",\"pointer\":\"%p\",\"allocation_name\":\"%s\"},\"tags\":{\"replay\":\"true\"},\"timestamp\":%ld}\n",
+      e.size, e.ref, e.ptr, e.name.c_str(), std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count());
 }
 
 void json_file_store::insert(const deallocate& e)
 {
-  std::stringstream ss;
-  ss << R"({"category":"operation","name":"deallocate")"
-     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(")"
-     << R"(,"pointer":")" << e.ptr << R"(")"
-     << "}"
-     << R"(,"tags":{"replay":"true"},"timestamp":)"
-     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << "}";
-  m_fstream << ss.str() << std::endl;
+  fprintf(m_fstream, 
+  "{\"category\":\"operation\",\"name\":\"deallocate\",\"string_args\":{\"allocator_ref\":\"%p\",\"pointer\":\"%p\"},\"tags\":{\"replay\":\"true\"},\"timestamp\":%ld}\n",
+      e.ref, e.ptr, std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count());
 }
 
 std::vector<event> json_file_store::get_events()
 {
-  std::string line;
+  char* line{NULL};
+  size_t len{0};
   std::vector<event> events;
   std::size_t line_number{1};
+  int nread;
 
   open_store();
-  while (std::getline(m_fstream, line)) {
+  while ((nread = getline(&line, &len, m_fstream)) != -1) {
     nlohmann::json json_event;
     event e;
 
@@ -96,12 +84,10 @@ std::vector<event> json_file_store::get_events()
 
 void json_file_store::open_store()
 {
-  if (!m_fstream.is_open()) {
-    std::fstream::openmode mode{m_read_only ? std::fstream::in : std::fstream::out | std::fstream::trunc};
+  if (m_fstream == NULL) {
+    m_fstream = fopen(m_filename.c_str(), m_read_only ? "r" : "w");
 
-    m_fstream.open(m_filename, mode);
-
-    if (m_fstream.fail()) {
+    if (m_fstream == NULL) {
       UMPIRE_ERROR("Failed to open " << m_filename);
     }
   }
