@@ -30,6 +30,16 @@ RUN cmake -DUMPIRE_ENABLE_C=On -DENABLE_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DU
     make -j 16 && \
     ctest -T test --output-on-failure
 
+FROM ghcr.io/rse-ops/clang-ubuntu-20.04:llvm-10.0.0 AS asan
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang \
+          -DUMPIRE_ENABLE_C=On -DCMAKE_CXX_FLAGS="-fsanitize=address" -DENABLE_TESTS=On -DUMPIRE_ENABLE_TOOLS=On \
+          -DUMPIRE_ENABLE_ASAN=On -DUMPIRE_ENABLE_SANITIZER_TESTS=On .. && \
+    make -j && \
+    ctest -T test --output-on-failure
+
 FROM ghcr.io/rse-ops/clang-ubuntu-20.04:llvm-10.0.0 AS clang10
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
