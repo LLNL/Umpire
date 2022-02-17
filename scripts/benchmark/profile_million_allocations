@@ -65,7 +65,7 @@ done
 lhs_benchmark=$lhs_source/build.$h/bin/allocator_memory_cost_benchmark
 rhs_benchmark=$rhs_source/build.$h/bin/allocator_memory_cost_benchmark
 bm_dormant_args="--measure_time_overhead -a Host -n 100000000 --no_introspection"
-bm_active_args="--measure_time_overhead -a Host -n    1000000 --no_introspection"
+bm_active_args="--measure_time_overhead -a Host -n  100000000 --no_introspection"
 
 run_cmd "rm -rf $rundir/hpc_prof.$LMOD_arch && mkdir -p $rundir/hpc_prof.$LMOD_arch && cd $rundir/hpc_prof.$LMOD_arch"
 
