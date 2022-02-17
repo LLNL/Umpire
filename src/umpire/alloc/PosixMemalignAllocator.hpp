@@ -8,9 +8,11 @@
 #define UMPIRE_PosixMemalignAllocator_HPP
 
 #include <stdlib.h>
+#include <cerrno>
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/numa.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -35,8 +37,11 @@ struct PosixMemalignAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR(runtime_error, "posix_memalign( bytes = " << bytes << ", pagesize = " << get_page_size()
-                                                             << " ) failed with error = " << err);
+      if (err = ENOMEM) {
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes, get_page_size(), err));
+      } else {
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes, get_page_size(), err));
+      }
     }
 
     return ret;

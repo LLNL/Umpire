@@ -9,6 +9,7 @@
 #include <cuda_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -20,9 +21,7 @@ void CudaCopyOperation::transform(void* src_ptr, void** dst_ptr,
   cudaError_t error = ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToDevice);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, "cudaMemcpy( dest_ptr = "
-                                    << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
-                                    << ", cudaMemcpyDeviceToDevice ) failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("CudaMemmcpy( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToDevice) failed with error: {}", *dst_ptr, src_ptr, length, cudaGetErrorString(error)));
   }
 }
 
@@ -36,9 +35,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyOperation::transf
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToDevice, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, "cudaMemcpy( dest_ptr = "
-                                    << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
-                                    << ", cudaMemcpyDeviceToHost ) failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToDevice, stream = {}) failed with error: {}", *dst_ptr, src_ptr, length, cudaGetErrorString(error), (void*)stream));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

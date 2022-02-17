@@ -121,18 +121,4 @@ class unknown_pointer_error : public umpire::runtime_error {
   }
 #endif
 
-// umpire::throw_error(type{msg, std::string{__FILE__}, __LINE__, ##__VA_ARGS__ });
-
-//   {                                                                                                   \
-//     umpire::util::backtrace bt;                                                                       \
-//     umpire::util::backtracer<umpire::util::trace_always>::get_backtrace(bt);                          \
-//     std::ostringstream umpire_oss_error;                                                              \
-//     umpire_oss_error << " " << __func__ << " " << msg << std::endl;                                   \
-//     umpire_oss_error << umpire::util::backtracer<umpire::util::trace_always>::print(bt) << std::endl; \
-//     UMPIRE_LOG(Error, umpire_oss_error.str());                                                        \
-//     umpire::util::flush_files();                                                                      \
-//     throw umpire::type(umpire_oss_error.str(), std::string(__FILE__), __LINE__);           \
-//   }
-// #endif
-
 #endif // UMPIRE_runtime_error_HPP

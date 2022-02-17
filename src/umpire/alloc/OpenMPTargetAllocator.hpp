@@ -10,6 +10,7 @@
 #include "omp.h"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/Platform.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -35,7 +36,7 @@ struct OpenMPTargetAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR(runtime_error, "omp_target_alloc( bytes = " << bytes << ", device = " << device << " ) failed");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("omp_target_alloc( bytes = {}, device = {} ) failed. ", bytes, device));
     } else {
       return ret;
     }

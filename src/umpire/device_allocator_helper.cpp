@@ -52,7 +52,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 #endif
 
   if (index == -1) {
-    UMPIRE_ERROR(runtime_error, "No DeviceAllocator by the name " << name << " was found.");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator named \"{}\" was found", name));
   }
 
 #if !defined(__CUDA_ARCH__)

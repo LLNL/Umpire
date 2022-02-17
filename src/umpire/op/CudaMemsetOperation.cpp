@@ -9,6 +9,7 @@
 #include <cuda_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -19,8 +20,7 @@ void CudaMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
   cudaError_t error = ::cudaMemset(src_ptr, value, length);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, "cudaMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
-                                                         << ") failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemset( src_ptr = {}, val = {}, length = {}) failed with error: {}", src_ptr, value, length, cudaGetErrorString(error)));
   }
 }
 
@@ -34,8 +34,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::appl
   cudaError_t error = ::cudaMemsetAsync(src_ptr, value, length, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, "cudaMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
-                                                         << ") failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}", src_ptr, value, length, cudaGetErrorString(error), (void*)stream));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

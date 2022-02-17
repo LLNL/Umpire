@@ -10,6 +10,7 @@
 #include <hip/hip_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -29,15 +30,19 @@ struct HipMallocAllocator {
    */
   void* allocate(std::size_t size)
   {
-    void* ptr = nullptr;
+    void* ptr{nullptr};
+
     hipError_t error = ::hipMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   "hipMalloc( bytes = " << size << " ) failed with error: " << hipGetErrorString(error));
-    } else {
-      return ptr;
+      if (error == hipErrorMemoryAllocation) {
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size, hipGetErrorString(error)));
+      } else {
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size, hipGetErrorString(error)));
+      }
     }
+
+    return ptr;
   }
 
   /*!
@@ -52,7 +57,7 @@ struct HipMallocAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR(runtime_error, "hipFree( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
     }
   }
 };

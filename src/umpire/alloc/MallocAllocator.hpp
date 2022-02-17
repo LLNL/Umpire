@@ -8,6 +8,7 @@
 #define UMPIRE_MallocAllocator_HPP
 
 #include <cstdlib>
+#include <cerrno>
 
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
@@ -40,7 +41,11 @@ struct MallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
+      if (errno == ENOMEM) {
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
+      } else {
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
+      }
     }
 
     return ret;

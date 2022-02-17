@@ -8,7 +8,7 @@
 
 #include <cuda_runtime_api.h>
 
-#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -24,19 +24,14 @@ void CudaAdviseUnsetPreferredLocationOperation::apply(void* src_ptr,
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 "cudaGetDeviceProperties( device = " << 0 << "),"
-                                                      << " failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = 0), failed with error: {}", cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseUnsetPreferredLocation, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, "cudaMemAdvise( src_ptr = " << src_ptr << ", length = " << length
-                                                              << ", cudaMemAdviseUnsetPreferredLocation, " << device
-                                                              << ") "
-                                                              << "failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseUnsetPreferredLocation, device = {}) failed with error: ", src_ptr, length, device, cudaGetErrorString(error)));
     }
   }
 }

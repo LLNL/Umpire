@@ -116,7 +116,7 @@ void initialize_io(const bool enable_log, const bool enable_replay)
             }
 #else
             if (_mkdir(root_io_dir.c_str())) {
-              UMPIRE_ERROR(runtime_error, "mkdir(" << root_io_dir << ") failed");
+              UMPIRE_ERROR(runtime_error, umpire::fmt::format("mkdir( \"{}\" ) failed", root_io_dir));
             }
 #endif
           }

@@ -10,6 +10,7 @@
 #include <CL/sycl.hpp>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -35,7 +36,7 @@ struct SyclPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error, "SYCL malloc_host( bytes = " << size << " ) failed with error!");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_host( bytes = {} ) failed", size));
     } else {
       return ptr;
     }

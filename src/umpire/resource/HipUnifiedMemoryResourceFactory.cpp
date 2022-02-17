@@ -43,7 +43,7 @@ MemoryResourceTraits HipUnifiedMemoryResourceFactory::getDefaultTraits()
   auto error = ::hipGetDeviceProperties(&properties, 0);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, "hipGetDeviceProperties failed with error: " << hipGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipGetDeviceProperties failed with error: {}", hipGetErrorString(error)));
   }
 
   traits.unified = true;

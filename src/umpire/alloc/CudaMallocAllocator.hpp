@@ -10,6 +10,7 @@
 #include <cuda_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -29,20 +30,18 @@ struct CudaMallocAllocator {
    */
   void* allocate(std::size_t size)
   {
-    void* ptr = nullptr;
+    void* ptr{nullptr};
     cudaError_t error = ::cudaMalloc(&ptr, size);
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != cudaSuccess) {
       if (error == cudaErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error,
-                     "cudaMalloc( bytes = " << size << " ) failed with error: " << cudaGetErrorString(error));
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", size, cudaGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error "cudaMalloc( bytes = " << size
-                                                          << " ) failed with error: " << cudaGetErrorString(error));
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", size, cudaGetErrorString(error)));
       }
-    } else {
-      return ptr;
     }
+
+    return ptr;
   }
 
   /*!
@@ -57,7 +56,7 @@ struct CudaMallocAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, "cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaFree( ptr = {} ) failed with error: {}", ptr, cudaGetErrorString(error)));
     }
   }
 };

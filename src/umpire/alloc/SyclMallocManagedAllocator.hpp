@@ -10,6 +10,7 @@
 #include <CL/sycl.hpp>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -35,7 +36,7 @@ struct SyclMallocManagedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
 
     if (usm_ptr == nullptr) {
-      UMPIRE_ERROR(runtime_error, "sycl::malloc_shared( bytes = " << bytes << " ) failed with error!");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_shared( bytes = {} ) failed", bytes));
     } else {
       return usm_ptr;
     }
