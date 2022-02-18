@@ -7,9 +7,9 @@
 
 #include "umpire/event/json_file_store.hpp"
 
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string>
 #include <vector>
 
@@ -108,15 +108,15 @@ std::vector<event> json_file_store::get_events()
   std::string line;
   std::vector<event> events;
   std::size_t line_number{1};
-  std::fstream fstream;
+  std::fstream f;
 
-  fstream.open(m_filename, "r");
+  f.open(m_filename, std::fstream::in);
 
-  if (fstream.fail()) {
+  if (f.fail()) {
     UMPIRE_ERROR("Failed to open " << m_filename);
   }
 
-  while (std::getline(fstream, line)) {
+  while (std::getline(f, line)) {
     nlohmann::json json_event;
     event e;
 
