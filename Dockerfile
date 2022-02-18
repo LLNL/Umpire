@@ -62,6 +62,16 @@ RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. 
     make -j 16 && \
     ctest -T test --output-on-failure
 
+FROM ghcr.io/rse-ops/clang-ubuntu-20.04:llvm-12.0.0 AS asan
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang \
+          -DUMPIRE_ENABLE_C=On -DCMAKE_CXX_FLAGS="-fsanitize=address" -DENABLE_TESTS=On -DUMPIRE_ENABLE_TOOLS=On \
+          -DUMPIRE_ENABLE_ASAN=On -DUMPIRE_ENABLE_SANITIZER_TESTS=On .. && \
+    make -j && \
+    ctest -T test -E operation_tests --output-on-failure
+
 FROM ghcr.io/rse-ops/cuda:cuda-10.1.243-ubuntu-18.04 AS nvcc10
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
