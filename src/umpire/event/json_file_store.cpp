@@ -7,9 +7,10 @@
 
 #include "umpire/event/json_file_store.hpp"
 
-#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <fstream>
 #include <string>
 #include <vector>
 
