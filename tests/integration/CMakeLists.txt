@@ -141,21 +141,23 @@ blt_add_test(
   NAME strategy_tests
   COMMAND strategy_tests)
 
-blt_add_executable(
-  NAME operation_tests
-  SOURCES operation_tests.cpp
-  DEPENDS_ON ${integration_tests_depends})
+if (NOT UMPIRE_ENABLE_SANITIZER_TESTS)
+  blt_add_executable(
+    NAME operation_tests
+    SOURCES operation_tests.cpp
+    DEPENDS_ON ${integration_tests_depends})
 
-set_source_files_properties(operation_tests.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+  set_source_files_properties(operation_tests.cpp PROPERTIES COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-target_include_directories(
-  operation_tests
-  PRIVATE
-  ${PROJECT_BINARY_DIR}/include)
+  target_include_directories(
+    operation_tests
+    PRIVATE
+    ${PROJECT_BINARY_DIR}/include)
 
-blt_add_test(
-  NAME operation_tests
-  COMMAND operation_tests)
+  blt_add_test(
+    NAME operation_tests
+    COMMAND operation_tests)
+endif()
 
 blt_add_executable(
   NAME reallocate_tests
@@ -252,9 +254,13 @@ add_subdirectory(io)
 blt_add_target_compile_flags(
   TO strategy_tests
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
-blt_add_target_compile_flags(
-  TO operation_tests
-  FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+
+if (NOT UMPIRE_ENABLE_SANITIZER_TESTS)
+  blt_add_target_compile_flags(
+    TO operation_tests
+    FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
+endif()
+
 blt_add_target_compile_flags(
   TO primary_pool_tests
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
