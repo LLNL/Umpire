@@ -76,6 +76,7 @@ void json_file_store::insert(const deallocate& e)
 }
 
 std::vector<event> json_file_store::get_events()
+#if !defined(_MSC_VER)
 {
   char* line{NULL};
   size_t len{0};
@@ -102,6 +103,38 @@ std::vector<event> json_file_store::get_events()
   free(line);
   return events;
 }
+#else
+{
+  std::string line;
+  std::vector<event> events;
+  std::size_t line_number{1};
+  std::fstream fstream;
+
+  fstream.open(m_filename, "r");
+
+  if (fstream.fail()) {
+    UMPIRE_ERROR("Failed to open " << m_filename);
+  }
+
+  while (std::getline(fstream, line)) {
+    nlohmann::json json_event;
+    event e;
+
+    try {
+      json_event = nlohmann::json::parse(line);
+      e = json_event;
+    } catch (...) {
+      UMPIRE_ERROR("json_file_store::get_events: Error parsing Line #" << line_number);
+    }
+
+    events.push_back(e);
+
+    line_number++;
+  }
+
+  return events;
+}
+#endif
 
 void json_file_store::open_store()
 {
