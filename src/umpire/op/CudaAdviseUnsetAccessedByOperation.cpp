@@ -30,7 +30,7 @@ void CudaAdviseUnsetAccessedByOperation::apply(void* src_ptr, util::AllocationRe
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseUnsetAccessedBy, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseUnsetAccessedBy, device = {}) failed with error: ", src_ptr, length, device, cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseUnsetAccessedBy, device = {}) failed with error: {}", src_ptr, length, device, cudaGetErrorString(error)));
     }
   }
 }

@@ -133,7 +133,7 @@ class HostSharedMemoryResource::impl {
         if (fstat(m_segment_fd, &st) < 0) {
           err = errno;
           UMPIRE_ERROR(runtime_error,
-                       "Failed fstat for shared memory segment " << m_segment_name << ": " << strerror(err));
+                       umpire::fmt::format("Failed fstat for shared memory segment  {}: {}",  m_segment_name, strerror(err)));
         }
         filesize = st.st_size;
         std::this_thread::yield();
@@ -185,7 +185,7 @@ class HostSharedMemoryResource::impl {
 
     if ((err = pthread_mutex_lock(&m_segment->mutex)) != 0) {
       UMPIRE_ERROR(runtime_error,
-                   "Failed to lock mutex for shared memory segment " << m_segment_name << ": " << strerror(err));
+                   umpire::fmt::format("Failed to lock mutex for shared memory segment {}: {}",  m_segment_name, strerror(err)));
     }
 
     // First let's see if the allaction already exists
@@ -224,7 +224,7 @@ class HostSharedMemoryResource::impl {
     pthread_mutex_unlock(&m_segment->mutex);
 
     if (best == nullptr) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("shared memory allocation( bytes = {} ) failed", requested_size));
+      UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("shared memory allocation( bytes = {} ) failed", requested_size));
     } else {
       offset_to_pointer(best->memory_offset, ptr);
     }
@@ -247,7 +247,7 @@ class HostSharedMemoryResource::impl {
     int err{0};
     if ((err = pthread_mutex_lock(&m_segment->mutex)) != 0) {
       UMPIRE_ERROR(runtime_error,
-                   "Failed to lock mutex for shared memory segment " << m_segment_name << ": " << strerror(err));
+                   umpire::fmt::format("Failed to lock mutex for shared memory segment {}: {}", m_segment_name, strerror(err)));
     }
 
     block_ptr->reference_count--;
@@ -281,7 +281,7 @@ class HostSharedMemoryResource::impl {
 
     if ((err = pthread_mutex_lock(&m_segment->mutex)) != 0) {
       UMPIRE_ERROR(runtime_error,
-                   "Failed to lock mutex for shared memory segment " << m_segment_name << ": " << strerror(err));
+                   umpire::fmt::format("Failed to lock mutex for shared memory segment {}: {}", m_segment_name, strerror(err)));
     }
 
     // First let's see if the allaction already exists

@@ -34,7 +34,7 @@ camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply
   hipError_t error = ::hipMemsetAsync(src_ptr, value, length, stream);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}", src_ptr, value, length, hipGetErrorString(error), (void*)stream));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}", src_ptr, value, length, (void*)stream, hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

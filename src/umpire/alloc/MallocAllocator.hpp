@@ -44,7 +44,7 @@ struct MallocAllocator {
       if (errno == ENOMEM) {
         UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
       } else {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed {}", bytes, strerror(errno)))
       }
     }
 

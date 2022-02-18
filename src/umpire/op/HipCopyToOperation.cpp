@@ -37,7 +37,7 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyToOperation::trans
   hipError_t error = ::hipMemcpyAsync(*dst_ptr, src_ptr, length, hipMemcpyHostToDevice, stream);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, hipMemcpyHostToDevice, stream = {}) failed with error: {}", *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, hipMemcpyHostToDevice, stream = {}) failed with error: {}", *dst_ptr, src_ptr, length, (void*)stream, hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

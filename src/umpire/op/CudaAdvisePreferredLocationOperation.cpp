@@ -31,7 +31,7 @@ void CudaAdvisePreferredLocationOperation::apply(void* src_ptr,
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseSetPreferredLocation, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseSetPreferredLocation, device = {}) failed with error: ", src_ptr, length, device, cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseSetPreferredLocation, device = {}) failed with error: {}", src_ptr, length, device, cudaGetErrorString(error)));
     }
   }
 }
