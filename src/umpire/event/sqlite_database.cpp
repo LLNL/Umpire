@@ -8,6 +8,8 @@
 #include "umpire/event/sqlite_database.hpp"
 
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
@@ -27,10 +29,45 @@ sqlite_database::sqlite_database(const std::string& name)
   sqlite3_exec(m_database, sql.c_str(), NULL, 0, &messaggeError);
 }
 
-void sqlite_database::insert(event e)
+void sqlite_database::insert(const event& e)
 {
   nlohmann::json json_event = e;
   const std::string sql{"INSERT INTO EVENTS VALUES(json('" + json_event.dump() + "'));"};
+  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+}
+
+void sqlite_database::insert(const allocate& e)
+{
+  std::stringstream ss;
+  ss << R"({"category":"operation","name":"allocate")"
+     << R"(,"numeric_args":{"size":)" << e.size << "}"
+     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(","pointer":")" << e.ptr << R"(})"
+     << R"(,"tags":{"replay":"true"})"
+     << R"(,"timestamp":)" << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << std::endl;
+  const std::string sql{"INSERT INTO EVENTS VALUES(json('" + ss.str() + "'));"};
+  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+}
+
+void sqlite_database::insert(const named_allocate& e)
+{
+  std::stringstream ss;
+  ss << R"({"category":"operation","name":"named_allocate")"
+     << R"(,"numeric_args":{"size":)" << e.size << "}"
+     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(","pointer":")" << e.ptr << R"(","allocation_name":")" << e.name << R"(})"
+     << R"(,"tags":{"replay":"true"})"
+     << R"(,"timestamp":)" << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << std::endl;
+  const std::string sql{"INSERT INTO EVENTS VALUES(json('" + ss.str() + "'));"};
+  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+}
+
+void sqlite_database::insert(const deallocate& e)
+{
+  std::stringstream ss;
+  ss << R"({"category":"operation","name":"deallocate")"
+     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(","pointer":")" << e.ptr << R"(})"
+     << R"(,"tags":{"replay":"true"})"
+     << R"(,"timestamp":)" << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << std::endl;
+  const std::string sql{"INSERT INTO EVENTS VALUES(json('" + ss.str() + "'));"};
   sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
 }
 

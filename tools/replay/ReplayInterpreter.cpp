@@ -13,13 +13,20 @@
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include <cxxabi.h>   // for __cxa_demangle
 
+#include "umpire/config.hpp"
+
 #include "ReplayFile.hpp"
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
 #include "ReplayOptions.hpp"
 #include "umpire/event/event.hpp"
+
+#if defined(UMPIRE_ENABLE_SQLITE)
+#include "umpire/event/sqlite_database.hpp"
+#else
 #include "umpire/event/json_file_store.hpp"
+#endif
 
 ReplayInterpreter::ReplayInterpreter( const ReplayOptions& options ) : m_options(options)
 {
@@ -58,10 +65,13 @@ void ReplayInterpreter::buildOperations()
   op->op_line_number = m_line_number;
   hdr->num_operations = 1;
 
-  umpire::event::json_file_store jfile{m_options.input_file, true};
+#if defined(UMPIRE_ENABLE_SQLITE)
+umpire::event::sqlite_database store{m_options.input_file};
+#else
+umpire::event::json_file_store store{m_options.input_file, true};
+#endif
   std::vector<umpire::event::event> events;
-
-  events = jfile.get_events();
+  events = store.get_events();
 
   for (auto e : events) {
     m_line_number++;

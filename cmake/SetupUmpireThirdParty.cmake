@@ -72,3 +72,7 @@ foreach(dep ${TPL_DEPS})
         set_target_properties(${dep} PROPERTIES EXPORT_NAME umpire::${dep})
     endif()
 endforeach()
+
+if (UMPIRE_ENABLE_SQLITE)
+  find_package(SQLite3 REQUIRED)
+endif()

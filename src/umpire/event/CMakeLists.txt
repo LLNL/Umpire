@@ -39,7 +39,7 @@ endif()
 if (UMPIRE_ENABLE_SQLITE)
   set (umpire_event_headers ${umpire_event_headers} sqlite_database.hpp)
   set (umpire_event_sources ${umpire_event_sources} sqlite_database.cpp)
-  set (umpire_event_depends ${umpire_event_depends} sqlite3)
+  set (umpire_event_depends ${umpire_event_depends} SQLite::SQLite3)
 endif()
 
 blt_add_library(

@@ -8,13 +8,17 @@
 #include "umpire/event/recorder_factory.hpp"
 
 #include "umpire/config.hpp"
-#include "umpire/event/json_file_store.hpp"
+
 #ifndef WIN32
 #include "umpire/event/quest_database.hpp"
 #endif
+
 #ifdef UMPIRE_ENABLE_SQLITE
 #include "umpire/event/sqlite_database.hpp"
+#else
+#include "umpire/event/json_file_store.hpp"
 #endif // UMPIRE_ENABLE_SQLITE
+
 #include "umpire/util/io.hpp"
 
 #if !defined(_MSC_VER)
@@ -32,12 +36,13 @@ store_type& recorder_factory::get_recorder()
 {
   static const std::string filename{
       util::make_unique_filename(util::get_io_output_dir(), util::get_io_output_basename(), getpid(), "stats")};
-  static json_file_store db{filename};
 
   // static quest_database db{"localhost", "9009", "db"};
   // static binary_file_database db{"test.bin"};
 #ifdef UMPIRE_ENABLE_SQLITE
-  // static sqlite_database db{"test.db"};
+  static sqlite_database db{filename};
+#else
+  static json_file_store db{filename};
 #endif // UMPIRE_ENABLE_SQLITE
   static event_store_recorder recorder(&db);
 

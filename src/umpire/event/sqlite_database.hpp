@@ -8,7 +8,6 @@
 #define UMPIRE_sqlite_database_HPP
 
 #include "umpire/config.hpp"
-
 #ifdef UMPIRE_ENABLE_SQLITE
 #include <sqlite3.h>
 
@@ -19,12 +18,20 @@
 namespace umpire {
 namespace event {
 
-class event;
+struct event;
+struct allocate;
+struct named_allocate;
+struct deallocate;
 
 class sqlite_database : public event_store {
  public:
   sqlite_database(const std::string& name);
-  void insert(event e) override final;
+
+  virtual void insert(const event& e) override final;
+  virtual void insert(const allocate& e) override final;
+  virtual void insert(const named_allocate& e) override final;
+  virtual void insert(const deallocate& e) override final;
+
   std::vector<event> get_events() override final;
 
  private:
