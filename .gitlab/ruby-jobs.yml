@@ -41,6 +41,11 @@ pgi_20_1:
 
 # EXTRAS
 
+gcc_10_2_1_sqlite:
+  variables:
+    SPEC: "+fortran+sqlite %gcc@10.2.1"
+  extends: .build_and_test_on_ruby
+
 gcc_8_1_0_numa:
   variables:
     SPEC: "+fortran+numa %gcc@8.1.0"
