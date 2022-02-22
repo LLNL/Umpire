@@ -7,8 +7,8 @@
 #ifndef UMPIRE_MallocAllocator_HPP
 #define UMPIRE_MallocAllocator_HPP
 
-#include <cstdlib>
 #include <cerrno>
+#include <cstdlib>
 
 #include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"

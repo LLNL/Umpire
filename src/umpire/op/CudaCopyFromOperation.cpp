@@ -28,7 +28,11 @@ void CudaCopyFromOperation::transform(void* src_ptr, void** dst_ptr, util::Alloc
   cudaSetDevice(old_device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("CudaMemmcpy( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToHost) failed with error: {}", *dst_ptr, src_ptr, length, cudaGetErrorString(error)));
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format(
+            "CudaMemmcpy( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToHost) failed with error: {}",
+            *dst_ptr, src_ptr, length, cudaGetErrorString(error)));
   }
 }
 
@@ -42,7 +46,10 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyFromOperation::tr
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToHost, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, cudaMemcpyDeviceToHost, stream = {}) failed with error: {}", *dst_ptr, src_ptr, length, cudaGetErrorString(error), (void*)stream));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("cudaMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
+                                     "cudaMemcpyDeviceToHost, stream = {}) failed with error: {}",
+                                     *dst_ptr, src_ptr, length, cudaGetErrorString(error), (void*)stream));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

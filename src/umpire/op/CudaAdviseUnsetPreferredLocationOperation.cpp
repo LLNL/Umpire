@@ -24,14 +24,18 @@ void CudaAdviseUnsetPreferredLocationOperation::apply(void* src_ptr,
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = 0), failed with error: {}", cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = 0), failed with error: {}",
+                                                    cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
     error = ::cudaMemAdvise(src_ptr, length, cudaMemAdviseUnsetPreferredLocation, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseUnsetPreferredLocation, device = {}) failed with error: {}", src_ptr, length, device, cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error,
+                   umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, cudaMemAdviseUnsetPreferredLocation, "
+                                       "device = {}) failed with error: {}",
+                                       src_ptr, length, device, cudaGetErrorString(error)));
     }
   }
 }

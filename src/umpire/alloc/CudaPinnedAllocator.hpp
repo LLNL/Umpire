@@ -24,14 +24,15 @@ struct CudaPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
       if (error == cudaErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", bytes, cudaGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", bytes,
+                                                              cudaGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", bytes, cudaGetErrorString(error)));
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", bytes,
+                                                        cudaGetErrorString(error)));
       }
-    } 
+    }
 
     return ptr;
-
   }
 
   void deallocate(void* ptr)
@@ -39,7 +40,8 @@ struct CudaPinnedAllocator {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
     cudaError_t error = ::cudaFreeHost(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaFreeHost( ptr = {} ) failed with error: {}", ptr, cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaFreeHost( ptr = {} ) failed with error: {}", ptr,
+                                                      cudaGetErrorString(error)));
     }
   }
 
