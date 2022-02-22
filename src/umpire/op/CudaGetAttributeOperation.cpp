@@ -8,6 +8,7 @@
 #define UMPIRE_CudaGetAttributeOperation_INL
 
 #include "umpire/op/CudaGetAttributeOperation.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -21,9 +22,7 @@ bool CudaGetAttributeOperation<ATTRIBUTE>::check_apply(void* src_ptr, umpire::ut
   error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 "cudaGetDeviceProperties( device = " << 0 << "),"
-                                                      << " failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = 0 ) failed with error: {}", cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
@@ -32,9 +31,7 @@ bool CudaGetAttributeOperation<ATTRIBUTE>::check_apply(void* src_ptr, umpire::ut
     error = ::cudaMemRangeGetAttribute(&result, sizeof(result), ATTRIBUTE, src_ptr, length);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(runtime_error,
-                   "cudaMemRangeGetAtribute( src_ptr = " << src_ptr << ", length = " << length
-                                                         << ") failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, "cudaMemRangeGetAtribute( src_ptr = {}, length = {} ) failed with error: {}", src_ptr, length, cudaGetErrorString(error));
     }
   }
 }
