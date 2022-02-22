@@ -37,9 +37,8 @@ if (UMPIRE_ENABLE_HIP)
       DEPENDS_ON umpire blt::hip)
     list(APPEND umpire_examples device_allocator_example)
 
-    set_target_properties(
-      device_allocator_example
-      PROPERTIES LINK_FLAGS "-fgpu-rdc")
+    target_compile_options(device_allocator_example PUBLIC -fgpu-rdc)
+    blt_add_target_link_flags( TO device_allocator_example FLAGS -fgpu-rdc)
   endif()
 
   blt_add_executable(
