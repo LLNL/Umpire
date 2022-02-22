@@ -34,7 +34,7 @@ int main(int, char**)
     void* data = preferred_location_allocator.allocate(1024);
 
     preferred_location_allocator.deallocate(data);
-  } catch (umpire::util::runtime_error& e) {
+  } catch (umpire::runtime_error& e) {
     std::cout << "Couldn't create Allocator with device_id = " << device_id << std::endl;
     std::cout << e.message() << std::endl;
   }
