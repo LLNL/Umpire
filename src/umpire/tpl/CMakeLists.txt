@@ -132,6 +132,10 @@ target_include_directories(
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+# Avoid warnings from fmt (so we can still use -Werror)
+blt_patch_target(NAME umpire_tpl_fmt
+                 TREAT_INCLUDES_AS_SYSTEM ON)
+
 install(TARGETS
   umpire_tpl_fmt
   EXPORT umpire-targets
