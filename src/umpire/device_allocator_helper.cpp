@@ -10,6 +10,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#include "umpire/util/Macros.hpp"
 
 namespace umpire {
 
@@ -22,7 +23,23 @@ __device__ DeviceAllocator* UMPIRE_DEV_ALLOCS{nullptr};
 //////////////////////////////////////////////////////////////////////////
 // host/device functions
 //////////////////////////////////////////////////////////////////////////
-__host__ __device__ DeviceAllocator get_device_allocator(const char* name)
+namespace {
+/*
+ * DeviceAllocator IDs are negative by design so they do not
+ * conflict with other allocator IDs. This function converts that
+ * negative value to a positive to be used as an array index.
+ */
+__host__ __device__ inline int convert_to_array_index(int neg_id)
+{
+  int pos_id = (neg_id * (-1)) - 1;
+  return pos_id;
+}
+
+/*
+ * Given a name, this function returns whether or not it
+ * corresponds to a DeviceAllocator.
+ */
+__host__ __device__ inline int get_index(const char* name)
 {
   int index{-1};
 #if !defined(__CUDA_ARCH__)
@@ -51,6 +68,14 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
   }
 #endif
 
+  return index;
+}
+} // end of namespace
+
+__host__ __device__ DeviceAllocator get_device_allocator(const char* name)
+{
+  int index = get_index(name);
+
   if (index == -1) {
     UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator named \"{}\" was found", name));
   }
@@ -62,13 +87,15 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
 #endif
 }
 
-__host__ __device__ DeviceAllocator get_device_allocator(int id)
+__host__ __device__ DeviceAllocator get_device_allocator(int da_id)
 {
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR(runtime_error, "Invalid ID given.");
+  int id = convert_to_array_index(da_id);
+
+  if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid id given: {}", id));
   }
-  if (!is_device_allocator(id)) {
-    UMPIRE_ERROR(runtime_error, "No DeviceAllocator by with that ID was found.");
+  if (!is_device_allocator(da_id)) {
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator with id: {} was found", id));
   }
 
 #if !defined(__CUDA_ARCH__)
@@ -78,10 +105,37 @@ __host__ __device__ DeviceAllocator get_device_allocator(int id)
 #endif
 }
 
-__host__ __device__ bool is_device_allocator(int id)
+__host__ __device__ bool is_device_allocator(const char* name)
 {
-  if (id < 0 || id > UMPIRE_TOTAL_DEV_ALLOCS) {
-    UMPIRE_ERROR(runtime_error, "Invalid ID given.");
+  int index = get_index(name);
+
+  if (index == -1) {
+#if !defined(__CUDA_ARCH__)
+    UMPIRE_LOG(Warning, "No DeviceAllocator by the name " << name << " was found.");
+    return false;
+#else
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator by the name \"{}\" was found", name));
+#endif
+  }
+
+#if !defined(__CUDA_ARCH__)
+  return UMPIRE_DEV_ALLOCS_h[index].isInitialized();
+#else
+  return UMPIRE_DEV_ALLOCS[index].isInitialized();
+#endif
+}
+
+__host__ __device__ bool is_device_allocator(int da_id)
+{
+  int id = convert_to_array_index(da_id);
+
+  if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
+#if !defined(__CUDA_ARCH__)
+    UMPIRE_LOG(Warning, "Invalid ID given: " << id);
+    return false;
+#else
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid id given: {}", id));
+#endif
   }
 
 #if !defined(__CUDA_ARCH__)
@@ -96,17 +150,32 @@ __host__ __device__ bool is_device_allocator(int id)
 //////////////////////////////////////////////////////////////////////////
 __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size, const std::string& name)
 {
-  static size_t allocator_id{0};
-  auto dev_alloc = DeviceAllocator(allocator, size, name, allocator_id);
+  static int index{0};
 
-  if (allocator_id == 0) {
+  if (size <= 0) {
+    UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
+  }
+
+  if (UMPIRE_DEV_ALLOCS_h == nullptr) {
+    index = 0; // If destroy_device_allocator has been called, reset counter.
+
     auto& rm = umpire::ResourceManager::getInstance();
     auto um_alloc = rm.getAllocator("UM");
     UMPIRE_DEV_ALLOCS_h =
         (umpire::DeviceAllocator*)um_alloc.allocate(UMPIRE_TOTAL_DEV_ALLOCS * sizeof(DeviceAllocator));
   }
 
-  UMPIRE_DEV_ALLOCS_h[allocator_id++] = dev_alloc;
+  // The DeviceAllocator ID should not conflict with other allocator IDs,
+  // so we use negative numbers to get unique value.
+  int da_id = convert_to_array_index(index);
+
+  auto dev_alloc = DeviceAllocator(allocator, size, name, da_id);
+
+  UMPIRE_DEV_ALLOCS_h[index++] = dev_alloc;
+
+  // Call macro so that host and device pointers are set up correctly
+  UMPIRE_SET_UP_DEVICE_ALLOCATORS();
+
   return dev_alloc;
 }
 
@@ -117,6 +186,7 @@ __host__ void destroy_device_allocator()
       UMPIRE_DEV_ALLOCS_h[i].destroy();
     }
   }
+  UMPIRE_DEV_ALLOCS_h = nullptr;
 }
 
 } // end of namespace umpire
