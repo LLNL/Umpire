@@ -6,7 +6,7 @@
 #ifndef UMPIRE_fmt_HPP
 #define UMPIRE_fmt_HPP
 
-#define FMT_EXCEPTIONS 0
+#define FMT_EXCEPTIONS 1
 #define FMT_HEADER_ONLY 1
 
 #include "args.h"
