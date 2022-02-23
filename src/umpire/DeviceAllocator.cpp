@@ -97,6 +97,25 @@ __host__ __device__ bool DeviceAllocator::isInitialized()
   return false;
 }
 
+__host__ __device__ unsigned int DeviceAllocator::getCurrentSize()
+{
+#if !defined(__CUDA_ARCH__)
+  //auto& rm = umpire::ResourceManager::getInstance();
+  unsigned int* curr = (unsigned int*)malloc(1 * sizeof(unsigned int*));
+  
+  //rm.memset(curr, *m_counter);
+  cudaMemcpy(curr, m_counter, sizeof(unsigned int), cudaMemcpyDeviceToHost);
+  return *curr;
+#else
+  return *m_counter;
+#endif
+}
+
+__host__ __device__ size_t DeviceAllocator::getTotalSize()
+{
+  return m_size;
+}
+
 __host__ __device__ void DeviceAllocator::reset()
 {
   // Set m_counter back to zero

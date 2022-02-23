@@ -64,6 +64,9 @@ class DeviceAllocator {
    */
   __host__ __device__ bool isInitialized();
 
+  __host__ __device__ unsigned int getCurrentSize();
+  __host__ __device__ size_t getTotalSize();
+
   /*
    * \brief Reset the DeviceAllocator counter pointer back to original
    *  starting point. This will effectively allow the DeviceAllocator to
