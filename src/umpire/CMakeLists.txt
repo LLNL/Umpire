@@ -139,7 +139,7 @@ else()
 endif()
 
 set_target_properties(umpire PROPERTIES
-  CUDA_SEPARABLE_COMPILATION On)
+  CUDA_SEPARABLE_COMPILATION On CUDA_RESOLVE_DEVICE_SYMBOLS ON)
 
 if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
@@ -172,7 +172,8 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/umpire>)
 
 install(TARGETS
   umpire
