@@ -84,7 +84,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                    when='cuda_arch={0}'.format(sm_))
 
     depends_on('camp@0.1.0', when='@main')
-    depends_on('camp@0.2.2')
+    depends_on('camp@0.5.2')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
@@ -189,13 +189,18 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             rocm_root = hip_root + "/.."
             entries.append(cmake_cache_path("HIP_ROOT_DIR",
                                         hip_root))
-            entries.append(cmake_cache_path("HIP_CLANG_PATH",
+            entries.append(cmake_cache_path("ROCM_ROOT_DIR",
+                                        rocm_root))
+            entries.append(cmake_cache_path("HIP_PATH",
                                         rocm_root + '/llvm/bin'))
+            #entries.append(cmake_cache_path("HIP_CLANG_PATH",
+            #                            rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("HIP_HIPCC_FLAGS",
                                         '--amdgpu-target=gfx906'))
-            entries.append(cmake_cache_string("HIP_RUNTIME_INCLUDE_DIRS",
-                                        "{0}/include;{0}/../hsa/include".format(hip_root)))
-            hip_link_flags = "-Wl,--disable-new-dtags -L{0}/lib -L{0}/../lib64 -L{0}/../lib -Wl,-rpath,{0}/lib:{0}/../lib:{0}/../lib64 -lamdhip64 -lhsakmt -lhsa-runtime64".format(hip_root)
+            #entries.append(cmake_cache_string("HIP_RUNTIME_INCLUDE_DIRS",
+            #                            "{0}/include;{0}/../hsa/include".format(hip_root)))
+            #hip_link_flags = "-Wl,--disable-new-dtags -L{0}/lib -L{0}/../lib64 -L{0}/../lib -Wl,-rpath,{0}/lib:{0}/../lib:{0}/../lib64 -lamdhip64 -lhsakmt -lhsa-runtime64".format(hip_root)
+            hip_link_flags = ""
             if '%gcc' in spec:
                 gcc_bin = os.path.dirname(self.compiler.cxx)
                 gcc_prefix = join_path(gcc_bin, '..')

@@ -50,7 +50,7 @@ then
           done
         fi
 
-        prefix="${prefix}/${job_unique_id}"
+        prefix="${prefix}/${job_unique_id}/${hostname}"
         mkdir -p ${prefix}
         prefix_opt="--prefix=${prefix}"
     fi
@@ -119,6 +119,10 @@ then
     mkdir -p ${build_dir} && cd ${build_dir}
 
     date
+    if [[ "${truehostname}" == "corona" ]]
+    then
+        module unload rocm
+    fi
     $cmake_exe \
       -C ${hostconfig_path} \
       ${project_dir}
