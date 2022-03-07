@@ -7,8 +7,8 @@
 #ifndef UMPIRE_FileMemoryResource_HPP
 #define UMPIRE_FileMemoryResource_HPP
 
-#include <utility>
 #include <map>
+#include <utility>
 
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/MemoryMap.hpp"
