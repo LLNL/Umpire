@@ -122,8 +122,10 @@ public:
     }
   }
 
-  void run_benchmark()
+  void run_space_benchmark()
   {
+    std::vector<void*> slots;
+
     for (std::size_t i = 0; i < number_of_allocs; ++i)
       slots.push_back(nullptr);
 
@@ -142,6 +144,12 @@ public:
     for (std::size_t i = 0; i < number_of_allocs; ++i)
       deallocate(slots[i]);
 
+  }
+
+  void run_time_benchmark()
+  {
+    for (std::size_t i = 0; i < number_of_allocs; ++i)
+      deallocate(allocate(allocation_size));
   }
 
   struct AllocatorValidator : public CLI::Validator {
@@ -164,7 +172,6 @@ private:
 
   umpire::Allocator umpire_allocator;
   bool is_umpire_allocator;
-  std::vector<void*> slots;
 
   MemoryStatSnapshot mstat_baseline;
   MemoryStatSnapshot mstat;
@@ -257,18 +264,36 @@ int main(int argc, char* argv[])
     ->required()
     ->check(CLI::Range(0, 100000000));
 
+  bool quiet{false};
+  app.add_flag("--quiet", quiet, "No Output");
+
   bool no_introspection{false};
   app.add_flag("--no_introspection", no_introspection, "Disable introspection");
 
   bool show_process_mem_info{false};
   app.add_flag("--show_process_mem_info", show_process_mem_info, "Display process memory details");
 
+  bool measure_time_overhead{false};
+  app.add_flag("--measure_time_overhead", measure_time_overhead, "Measure time overhead");
+
+  bool measure_space_overhead{false};
+  app.add_flag("--measure_space_overhead", measure_space_overhead, "Measure space overhead");
+
   CLI11_PARSE(app, argc, argv);
 
   AllocatorCostBenchmark bm{allocator, allocations, no_introspection, show_process_mem_info};
 
-  bm.run_benchmark();
-  std::cout << bm;
+  if (measure_time_overhead) {
+     bm.run_time_benchmark();
+  }
+
+  if (measure_space_overhead) {
+     bm.run_space_benchmark();
+  }
+
+  if (quiet != false) {
+     std::cout << bm;
+  }
 
   return 0;
 }

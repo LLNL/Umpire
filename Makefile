@@ -4,7 +4,7 @@ else
 	DebugArgs=
 endif
 
-targets = clang10 clang11 clang12 clang13 gcc11 gcc7 gcc8 gcc9 hip hip.debug nvcc10 nvcc11 sycl
+targets = asan clang10 clang11 clang12 clang13 gcc11 gcc7 gcc8 gcc9 hip hip.debug nvcc10 nvcc11 sycl
 
 $(targets):
 	DOCKER_BUILDKIT=1 docker build --target $@ --no-cache $(DebugArgs) .
@@ -18,6 +18,7 @@ help:
 	@echo 'Build Umpire using Docker!'
 	@echo ''
 	@echo 'target:'
+	@echo '    asan                           build with clang sanitizer'
 	@echo '    gccN                           build with GCC N'
 	@echo '    clangN                         build with clang N'
 	@echo '    nvccN                          build with CUDA N'
