@@ -16,7 +16,7 @@ Make umpire-config.cmake package relocatable
 
 Add `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option to disable Device Allocator which defaults to "On", to control whether or not the DeviceAllocator class is included in the library.
 
-Use blt namespace for hip targets (#692)
+Use blt namespace for hip targets
 
 Removed deprecated DynamicPoolMap and DynamicPool alias.
 
