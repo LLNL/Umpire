@@ -1,3 +1,67 @@
+# [v2022.03.0 - 2022-03-14]
+
+Umpire now requires C++14
+
+Umpire now requires minimum cmake version to be 3.14
+
+Use C++17 for SYCL backend.
+
+Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking change since the include paths are different.
+
+Changed CMakeList options to have `UMPIRE` prefixes and made them dependent on the corresponding BLT options.
+
+C/FORTRAN API is now auto generated
+
+Make umpire-config.cmake package relocatable
+
+Add `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option to disable Device Allocator which defaults to "On", to control whether or not the DeviceAllocator class is included in the library.
+
+Use blt namespace for hip targets (#692)
+
+Removed deprecated DynamicPoolMap and DynamicPool alias.
+
+Remove deprecated registerAllocator and isAllocatorRegistered methods.
+
+Removed unneeded hip dependency in the tests/debug/ CMake file.
+
+Removed hardcoded `-Xcompiler -mno-float128` for GCC 8+ with CUDA on PowerPC.
+
+Added a getDeviceAllocator function that allows users to get a DeviceAllocator object from the kernel without explicitly passing the allocator to the kernel first.
+
+Added a reset function to the DeviceAllocator so that old data can be rewritten.
+
+Expose "PREFETCH" operations registered with the MemoryOperationRegistry with a new ResourceManager::prefetch method.
+
+Build Doxygen documentation on ReadTheDocs.
+
+Add `-rdynamic` to backtrace example
+
+Add CI job with interprocess shared memory and CUDA
+
+Add CI containers to allow for gcc{7,8,9}, clang{11,12}, and nvcc{10,11}
+
+Add CI to use C++14 version of XL Compiler
+
+Add CI to check pools work with DEVICE_CONST memory
+
+Add Umpire Allocator profile comparison benchmark
+
+Add replay `--introspection-off` option for strategies
+
+Fix warning caused by ignoring posix_memalign return value.
+
+Fixed a cmake install config issue so that now users can find a package of Umpire with a version constraint.
+
+Fix `ResourceManager::isAllocator` to work for resources
+
+Fix comparison operators for `TypedAllocators`. Move the operators into the same namespace as `TypedAllocator` for ADL instead of leaving in the global namespace.
+
+Fix host and device Allocator ID overlap
+
+Fix return value from get_process_highwater_mark by correctly treating VmHWM as kB
+
+Remove null and zero-byte pool from list of valid allocators
+
 # v6.0.0
 
 Added documentation on allocator (in)accessibility as well as getAllocator usage.

@@ -90,6 +90,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Fix return value from get_process_highwater_mark by correctly treating VmHWM as kB
 
 - Remove null and zero-byte pool from list of valid allocators
+
 ## [v6.0.0 - 2021-08-18]
 
 ### Added
