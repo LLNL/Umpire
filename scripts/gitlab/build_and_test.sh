@@ -50,7 +50,7 @@ then
           done
         fi
 
-        prefix="${prefix}/${job_unique_id}/${hostname}"
+        prefix="${prefix}/${job_unique_id}"
         mkdir -p ${prefix}
         prefix_opt="--prefix=${prefix}"
     fi
