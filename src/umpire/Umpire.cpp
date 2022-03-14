@@ -19,10 +19,9 @@
 #include "umpire/config.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
-#include "umpire/util/wrap_allocator.hpp"
-
-#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
 #include <unistd.h>
@@ -256,7 +255,8 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
 }
 #endif
 
-bool try_coalesce(Allocator a) {
+bool try_coalesce(Allocator a)
+{
   auto s = a.getAllocationStrategy();
   bool coalesced{false};
 
@@ -275,7 +275,8 @@ bool try_coalesce(Allocator a) {
   return coalesced;
 }
 
-void coalesce(Allocator a) {
+void coalesce(Allocator a)
+{
   bool coalesced{try_coalesce(a)};
 
   if (!coalesced)
