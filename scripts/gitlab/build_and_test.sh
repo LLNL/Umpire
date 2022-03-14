@@ -13,6 +13,7 @@ set -o nounset
 
 option=${1:-""}
 hostname="$(hostname)"
+truehostname=${hostname//[0-9]/}
 project_dir="$(pwd)"
 
 build_root=${BUILD_ROOT:-""}
