@@ -21,6 +21,9 @@
 #include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
+#include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
+
 #if !defined(_MSC_VER)
 #include <unistd.h>
 #endif
@@ -252,5 +255,31 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   return c;
 }
 #endif
+
+bool try_coalesce(Allocator a) {
+  auto s = a.getAllocationStrategy();
+  bool coalesced{false};
+
+  strategy::QuickPool* qp{dynamic_cast<strategy::QuickPool*>(s)};
+  if (qp) {
+    qp->coalesce();
+    coalesced = true;
+  }
+
+  strategy::DynamicPoolList* dpl{dynamic_cast<strategy::DynamicPoolList*>(s)};
+  if (dpl) {
+    dpl->coalesce();
+    coalesced = true;
+  }
+
+  return coalesced;
+}
+
+void coalesce(Allocator a) {
+  bool coalesced{try_coalesce(a)};
+
+  if (!coalesced)
+    UMPIRE_ERROR("Allocator \"" << a.getName() << "\" could not be coalesced.");
+}
 
 } // end namespace umpire

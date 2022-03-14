@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "umpire/Umpire.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AlignedAllocator.hpp"
@@ -30,6 +31,7 @@ void report_and_deallocate(int iteration, std::vector<void*>& ptrs, umpire::Allo
     allocator.deallocate(a);
   }
 
+  umpire::coalesce(allocator);
   strategy->coalesce();
   strategy->release();
 

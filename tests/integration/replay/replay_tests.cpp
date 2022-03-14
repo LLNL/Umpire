@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+#include "umpire/Umpire.hpp"
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/config.hpp"

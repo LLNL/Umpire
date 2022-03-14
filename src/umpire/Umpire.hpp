@@ -186,6 +186,20 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name);
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 #endif
 
+/*!
+ * \brief Attempt to coalesce Allocator a, return true if a coalesce was performed.
+ *
+ * \return True if the Allocator was coalesced.
+ */
+bool try_coalesce(Allocator a);
+
+/*!
+ * \brief Attempt to coalesce Allocator a, throw if a does not support coalescing.
+ *
+ * \throw umpire::util::Exception if the Allocator doesn't support coalescing.
+ */
+void coalesce(Allocator a);
+
 } // end of namespace umpire
 
 #endif // UMPIRE_Umpire_HPP
