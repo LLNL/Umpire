@@ -26,6 +26,11 @@ if (UMPIRE_ENABLE_FORTRAN)
     wrapfumpire.f
     PROPERTIES
     Fortran_FORMAT FREE)
+
+  set_source_files_properties(
+    wrapfumpire.f
+    PROPERTIES
+    COMPILE_FLAGS -Mfree)
 endif ()
     
 set_source_files_properties(
