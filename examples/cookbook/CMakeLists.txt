@@ -83,7 +83,7 @@ if (UMPIRE_ENABLE_CUDA)
     set_source_files_properties(
       recipe_pinned_pool.F
       PROPERTIES
-      Fortran_FORMAT FREE)
+      COMPILE_FLAGS -Mfree)
 
     blt_add_executable(
       NAME recipe_prefetch_pool
@@ -95,7 +95,7 @@ if (UMPIRE_ENABLE_CUDA)
     set_source_files_properties(
       recipe_prefetch_pool.F
       PROPERTIES
-      Fortran_FORMAT FREE)
+      COMPILE_FLAGS -Mfree)
   endif()
 endif ()
 
@@ -122,7 +122,7 @@ if (UMPIRE_ENABLE_HIP)
     set_source_files_properties(
       recipe_pinned_pool.F
       PROPERTIES
-      Fortran_FORMAT FREE)
+      COMPILE_FLAGS -Mfree)
   endif ()
 endif ()
 
@@ -172,7 +172,7 @@ if (UMPIRE_ENABLE_FORTRAN)
   set_source_files_properties(
     recipe_thread_safe.F
     PROPERTIES
-    Fortran_FORMAT FREE)
+    COMPILE_FLAGS -Mfree)
 endif ()
 
 blt_add_executable(

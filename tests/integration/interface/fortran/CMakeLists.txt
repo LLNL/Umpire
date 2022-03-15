@@ -42,7 +42,7 @@ blt_add_executable(
 set_source_files_properties(
   allocator_fortran_tests.F
   PROPERTIES
-  Fortran_FORMAT FREE)
+  COMPILE_FLAGS -Mfree)
 
 blt_add_test(
   NAME allocator_fortran_tests
@@ -57,7 +57,7 @@ blt_add_executable(
 set_source_files_properties(
   op_fortran_tests.F
   PROPERTIES
-  Fortran_FORMAT FREE)
+  COMPILE_FLAGS -Mfree)
 
 blt_add_test(
   NAME op_fortran_tests
@@ -72,7 +72,7 @@ blt_add_executable(
 set_source_files_properties(
   introspection_fortran_tests.F
   PROPERTIES
-  Fortran_FORMAT FREE)
+  COMPILE_FLAGS -Mfree)
 
 blt_add_test(
   NAME introspection_fortran_tests
@@ -87,7 +87,7 @@ blt_add_executable(
 set_source_files_properties(
   version_fortran_tests.F
   PROPERTIES
-  Fortran_FORMAT FREE)
+  COMPILE_FLAGS -Mfree)
 
 blt_add_test(
   NAME version_fortran_tests
