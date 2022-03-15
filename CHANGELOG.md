@@ -28,7 +28,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Make umpire-config.cmake package relocatable
 
 - Add `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option to disable Device Allocator which defaults
-  to "On", to control whether or not the DeviceAllocator class is included in the
+  to "Off", to control whether or not the DeviceAllocator class is included in the
   library.
 
 - Use blt namespace for hip targets (#692)
