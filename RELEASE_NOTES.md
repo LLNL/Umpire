@@ -1,66 +1,48 @@
 # v2022.03.0
 
-Umpire now requires C++14
+## Changes Impacting Builds
+This release of Umpire contains new build requirements including:
 
-Umpire now requires minimum cmake version to be 3.14
+- C++14 is now required to build Umpire
+- `cmake` version 3.14 or later is required
 
-Use C++17 for SYCL backend.
+## Changes Impacting C/Fortran
+- The `cmake` object library for `C/FORTRAN` interface has been reorganized.
+  (**NOTE**: *This is a breaking change since the include paths are now different.*)
 
-Reorganized cmake object library for c/fortran interface. NOTE: This is a breaking change since the include paths are different.
+## New Interfaces
+- Added a `getDeviceAllocator` function that allows users to get a `DeviceAllocator` object from the kernel without explicitly passing the allocator to the kernel first.
+- Added a `reset` function to the `DeviceAllocator` so that old data can be rewritten.
+- Expose `PREFETCH` operations registered with the `MemoryOperationRegistry` with a new `ResourceManager::prefetch` method.
 
-Changed CMakeList options to have `UMPIRE` prefixes and made them dependent on the corresponding BLT options.
+## Removed Interfaces
+The following functions previously marked as deprecated have now been removed:
 
-C/FORTRAN API is now auto generated
+- `DynamicPoolMap` and `DynamicPool` aliases removed
+- `registerAllocator` and `isAllocatorRegistered` removed
 
-Make umpire-config.cmake package relocatable
+## Fixes
+- Fixed a cmake install config issue so that now users can find a package of Umpire with a version constraint.
+- Fix `ResourceManager::isAllocator` to work for resources
+- Fix comparison operators for `TypedAllocators`
+- Fix host and device Allocator ID overlap
+- Remove null and zero-byte pool from list of valid allocators
 
-Add `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option to disable Device Allocator which defaults to "On", to control whether or not the DeviceAllocator class is included in the library.
+## New Configuration Options
+- The `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option was added to control whether or not the DeviceAllocator class is included in the library.  The default is "On".
 
-Use blt namespace for hip targets
+## Build/Deployment Improvements
+- `C/FORTRAN` API is now auto generated
+- The `umpire-config.cmake` package is now relocatable
+- Use `blt` namespace for hip targets
+- Umpire `CMakeList` options now have `UMPIRE_` prefixes and are now dependent upon corresponding `BLT` options.
+- Removed hardcoded `-Xcompiler -mno-float128` for GCC 8+ with CUDA on PowerPC.
+- Build Doxygen documentation on ReadTheDocs.
 
-Removed deprecated DynamicPoolMap and DynamicPool alias.
-
-Remove deprecated registerAllocator and isAllocatorRegistered methods.
-
-Removed unneeded hip dependency in the tests/debug/ CMake file.
-
-Removed hardcoded `-Xcompiler -mno-float128` for GCC 8+ with CUDA on PowerPC.
-
-Added a getDeviceAllocator function that allows users to get a DeviceAllocator object from the kernel without explicitly passing the allocator to the kernel first.
-
-Added a reset function to the DeviceAllocator so that old data can be rewritten.
-
-Expose "PREFETCH" operations registered with the MemoryOperationRegistry with a new ResourceManager::prefetch method.
-
-Build Doxygen documentation on ReadTheDocs.
-
-Add `-rdynamic` to backtrace example
-
-Add CI job with interprocess shared memory and CUDA
-
-Add CI containers to allow for gcc{7,8,9}, clang{11,12}, and nvcc{10,11}
-
-Add CI to use C++14 version of XL Compiler
-
-Add CI to check pools work with DEVICE_CONST memory
-
-Add Umpire Allocator profile comparison benchmark
-
-Add replay `--introspection-off` option for strategies
-
-Fix warning caused by ignoring posix_memalign return value.
-
-Fixed a cmake install config issue so that now users can find a package of Umpire with a version constraint.
-
-Fix `ResourceManager::isAllocator` to work for resources
-
-Fix comparison operators for `TypedAllocators`. Move the operators into the same namespace as `TypedAllocator` for ADL instead of leaving in the global namespace.
-
-Fix host and device Allocator ID overlap
-
-Fix return value from get_process_highwater_mark by correctly treating VmHWM as kB
-
-Remove null and zero-byte pool from list of valid allocators
+## Continuous Integration Updates
+- Add CI job with interprocess shared memory and CUDA
+- Add CI containers to allow for gcc{7,8,9}, clang{11,12}, and nvcc{10,11}
+- Add CI to check pools work with `DEVICE_CONST` memory
 
 # v6.0.0
 
@@ -117,7 +99,7 @@ Removed all internal tracking, allocations are only tracked at the Allocator lev
 - Moved backend-specific resource code out of ResourceManager and into resource::MemoryResourceRegistry.
 
 - Fixed accounting for number of releasable bytes in Quickpool that was causing
-  coalesce operations to not work properly. 
+  coalesce operations to not work properly.
 
 # v4.1.2
 
