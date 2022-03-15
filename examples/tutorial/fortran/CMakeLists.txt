@@ -21,8 +21,7 @@ list(APPEND umpire_tutorials tut_allocator_fortran)
 set_source_files_properties(
   tut_allocator.F
   PROPERTIES
-  Fortran_FORMAT FREE)
-
+  COMPILE_FLAGS -Mfree)
 
 # blt_add_executable(
 #   NAME tut_resources_f
