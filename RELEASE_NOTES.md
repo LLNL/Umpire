@@ -29,7 +29,7 @@ The following functions previously marked as deprecated have now been removed:
 - Remove null and zero-byte pool from list of valid allocators
 
 ## New Configuration Options
-- The `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option was added to control whether or not the DeviceAllocator class is included in the library.  The default is "On".
+- The `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option was added to control whether or not the DeviceAllocator class is included in the library.  The default is "Off".
 
 ## Build/Deployment Improvements
 - `C/FORTRAN` API is now auto generated
