@@ -80,10 +80,17 @@ if (UMPIRE_ENABLE_CUDA)
       DEPENDS_ON ${cookbook_depends})
     list(APPEND umpire_cookbooks recipe_pinned_pool)
 
-    set_source_files_properties(
-      recipe_pinned_pool.F
-      PROPERTIES
-      COMPILE_FLAGS -Mfree)
+    if (UMPIRE_ENABLE_HIP)
+      set_source_files_properties(
+        wrapfumpire.f
+        PROPERTIES
+        COMPILE_FLAGS -Mfree)
+    else()
+      set_source_files_properties(
+        wrapfumpire.f
+        PROPERTIES
+        Fortran_FORMAT FREE)
+    endif()
 
     blt_add_executable(
       NAME recipe_prefetch_pool
@@ -92,10 +99,17 @@ if (UMPIRE_ENABLE_CUDA)
       OUTPUT_DIR ${cookbook_output_dir})
     list(APPEND umpire_cookbooks recipe_prefetch_pool)
 
-    set_source_files_properties(
-      recipe_prefetch_pool.F
-      PROPERTIES
-      COMPILE_FLAGS -Mfree)
+    if (UMPIRE_ENABLE_HIP)
+      set_source_files_properties(
+        wrapfumpire.f
+        PROPERTIES
+        COMPILE_FLAGS -Mfree)
+    else()
+      set_source_files_properties(
+        wrapfumpire.f
+        PROPERTIES
+        Fortran_FORMAT FREE)
+    endif()
   endif()
 endif ()
 
@@ -119,10 +133,17 @@ if (UMPIRE_ENABLE_HIP)
       DEPENDS_ON ${cookbook_depends})
     list(APPEND umpire_cookbooks recipe_pinned_pool)
 
-    set_source_files_properties(
-      recipe_pinned_pool.F
-      PROPERTIES
-      COMPILE_FLAGS -Mfree)
+    if (UMPIRE_ENABLE_HIP)
+      set_source_files_properties(
+        wrapfumpire.f
+        PROPERTIES
+        COMPILE_FLAGS -Mfree)
+    else()
+      set_source_files_properties(
+        wrapfumpire.f
+        PROPERTIES
+        Fortran_FORMAT FREE)
+    endif()
   endif ()
 endif ()
 
@@ -169,10 +190,17 @@ if (UMPIRE_ENABLE_FORTRAN)
     SOURCES recipe_thread_safe.F
     DEPENDS_ON ${cookbook_depends})
 
-  set_source_files_properties(
-    recipe_thread_safe.F
-    PROPERTIES
-    COMPILE_FLAGS -Mfree)
+  if (UMPIRE_ENABLE_HIP)
+    set_source_files_properties(
+      wrapfumpire.f
+      PROPERTIES
+      COMPILE_FLAGS -Mfree)
+  else()
+    set_source_files_properties(
+      wrapfumpire.f
+      PROPERTIES
+      Fortran_FORMAT FREE)
+  endif()
 endif ()
 
 blt_add_executable(
