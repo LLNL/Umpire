@@ -20,12 +20,12 @@ list(APPEND umpire_tutorials tut_allocator_fortran)
 
 if (UMPIRE_ENABLE_HIP)
   set_source_files_properties(
-    wrapfumpire.f
+    tut_allocator.F
     PROPERTIES
     COMPILE_FLAGS -Mfree)
 else()
   set_source_files_properties(
-    wrapfumpire.f
+    tut_allocator.F
     PROPERTIES
     Fortran_FORMAT FREE)
 endif()

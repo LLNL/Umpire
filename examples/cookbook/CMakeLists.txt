@@ -82,12 +82,12 @@ if (UMPIRE_ENABLE_CUDA)
 
     if (UMPIRE_ENABLE_HIP)
       set_source_files_properties(
-        wrapfumpire.f
+        recipe_pinned_pool.F
         PROPERTIES
         COMPILE_FLAGS -Mfree)
     else()
       set_source_files_properties(
-        wrapfumpire.f
+        recipe_pinned_pool.F
         PROPERTIES
         Fortran_FORMAT FREE)
     endif()
@@ -101,12 +101,12 @@ if (UMPIRE_ENABLE_CUDA)
 
     if (UMPIRE_ENABLE_HIP)
       set_source_files_properties(
-        wrapfumpire.f
+        recipe_prefetch_pool.F
         PROPERTIES
         COMPILE_FLAGS -Mfree)
     else()
       set_source_files_properties(
-        wrapfumpire.f
+        recipe_prefetch_pool.F
         PROPERTIES
         Fortran_FORMAT FREE)
     endif()
@@ -135,12 +135,12 @@ if (UMPIRE_ENABLE_HIP)
 
     if (UMPIRE_ENABLE_HIP)
       set_source_files_properties(
-        wrapfumpire.f
+        recipe_pinned_pool.F
         PROPERTIES
         COMPILE_FLAGS -Mfree)
     else()
       set_source_files_properties(
-        wrapfumpire.f
+        recipe_pinned_pool.F
         PROPERTIES
         Fortran_FORMAT FREE)
     endif()
@@ -192,12 +192,12 @@ if (UMPIRE_ENABLE_FORTRAN)
 
   if (UMPIRE_ENABLE_HIP)
     set_source_files_properties(
-      wrapfumpire.f
+      recipe_thread_safe.F
       PROPERTIES
       COMPILE_FLAGS -Mfree)
   else()
     set_source_files_properties(
-      wrapfumpire.f
+      recipe_thread_safe.F
       PROPERTIES
       Fortran_FORMAT FREE)
   endif()

@@ -41,12 +41,12 @@ blt_add_executable(
 
 if (UMPIRE_ENABLE_HIP)
   set_source_files_properties(
-    wrapfumpire.f
+    allocator_fortran_tests.F
     PROPERTIES
     COMPILE_FLAGS -Mfree)
 else()
   set_source_files_properties(
-    wrapfumpire.f
+    allocator_fortran_tests.F
     PROPERTIES
     Fortran_FORMAT FREE)
 endif()
@@ -63,12 +63,12 @@ blt_add_executable(
 
 if (UMPIRE_ENABLE_HIP)
   set_source_files_properties(
-    wrapfumpire.f
+    op_fortran_tests.F 
     PROPERTIES
     COMPILE_FLAGS -Mfree)
 else()
   set_source_files_properties(
-    wrapfumpire.f
+    op_fortran_tests.F
     PROPERTIES
     Fortran_FORMAT FREE)
 endif()
@@ -85,12 +85,12 @@ blt_add_executable(
 
 if (UMPIRE_ENABLE_HIP)
   set_source_files_properties(
-    wrapfumpire.f
+    introspection_fortran_tests.F
     PROPERTIES
     COMPILE_FLAGS -Mfree)
 else()
   set_source_files_properties(
-    wrapfumpire.f
+    introspection_fortran_tests.F
     PROPERTIES
     Fortran_FORMAT FREE)
 endif()
@@ -107,12 +107,12 @@ blt_add_executable(
 
 if (UMPIRE_ENABLE_HIP)
   set_source_files_properties(
-    wrapfumpire.f
+    version_fortran_tests.F
     PROPERTIES
     COMPILE_FLAGS -Mfree)
 else()
   set_source_files_properties(
-    wrapfumpire.f
+    version_fortran_tests.F
     PROPERTIES
     Fortran_FORMAT FREE)
 endif()
