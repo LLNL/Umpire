@@ -10,7 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Build Changes and Updates
 
-- Umpire now requires minimum cmake version to be 3.14
+- Umpire now requires minimum CMake version to be 3.14
 
 - Umpire now requires C++14.
 
