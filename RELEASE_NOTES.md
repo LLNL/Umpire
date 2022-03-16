@@ -1,27 +1,32 @@
 # v2022.03.0
 
 ## Changes Impacting Builds
+
 This release of Umpire contains new build requirements including:
 
 - C++14 is now required to build Umpire
 - CMake version 3.14 or later is required
 
 ## Changes Impacting C/Fortran
+
 - The CMake object library for `C/FORTRAN` interface has been reorganized.
   (**NOTE**: *This is a breaking change since the include paths are now different.*)
 
 ## New Interfaces
+
 - Added a `getDeviceAllocator` function that allows users to get a `DeviceAllocator` object from the kernel without explicitly passing the allocator to the kernel first.
 - Added a `reset` function to the `DeviceAllocator` so that old data can be rewritten.
 - Expose `PREFETCH` operations registered with the `MemoryOperationRegistry` with a new `ResourceManager::prefetch` method.
 
 ## Removed Interfaces
+
 The following functions previously marked as deprecated have now been removed:
 
 - `DynamicPoolMap` and `DynamicPool` aliases removed
 - `registerAllocator` and `isAllocatorRegistered` removed
 
 ## Fixes
+
 - Fixed a cmake install config issue so that now users can find a package of Umpire with a version constraint.
 - Fix `ResourceManager::isAllocator` to work for resources
 - Fix comparison operators for `TypedAllocators`
@@ -29,9 +34,11 @@ The following functions previously marked as deprecated have now been removed:
 - Remove null and zero-byte pool from list of valid allocators
 
 ## New Configuration Options
+
 - The `UMPIRE_ENABLE_DEVICE_ALLOCATOR` option was added to control whether or not the DeviceAllocator class is included in the library.  The default is "Off".
 
 ## Build/Deployment Improvements
+
 - `C/FORTRAN` API is now auto generated
 - The `umpire-config.cmake` package is now relocatable
 - Use `blt` namespace for hip targets
@@ -40,6 +47,7 @@ The following functions previously marked as deprecated have now been removed:
 - Build Doxygen documentation on ReadTheDocs.
 
 ## Continuous Integration Updates
+
 - Add CI job with interprocess shared memory and CUDA
 - Add CI containers to allow for gcc{7,8,9}, clang{11,12}, and nvcc{10,11}
 - Add CI to check pools work with `DEVICE_CONST` memory
