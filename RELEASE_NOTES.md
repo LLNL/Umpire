@@ -4,7 +4,7 @@
 This release of Umpire contains new build requirements including:
 
 - C++14 is now required to build Umpire
-- `cmake` version 3.14 or later is required
+- CMake version 3.14 or later is required
 
 ## Changes Impacting C/Fortran
 - The `cmake` object library for `C/FORTRAN` interface has been reorganized.
