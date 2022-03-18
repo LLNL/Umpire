@@ -18,7 +18,7 @@ blt_add_executable(
   DEPENDS_ON ${tutorial_fortran_depends})
 list(APPEND umpire_tutorials tut_allocator_fortran)
 
-if (UMPIRE_ENABLE_HIP)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
   set_source_files_properties(
     tut_allocator.F
     PROPERTIES

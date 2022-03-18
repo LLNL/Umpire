@@ -193,13 +193,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                                         rocm_root))
             entries.append(cmake_cache_path("HIP_PATH",
                                         rocm_root + '/llvm/bin'))
-            #entries.append(cmake_cache_path("HIP_CLANG_PATH",
-            #                            rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("HIP_HIPCC_FLAGS",
                                         '--amdgpu-target=gfx906'))
-            #entries.append(cmake_cache_string("HIP_RUNTIME_INCLUDE_DIRS",
-            #                            "{0}/include;{0}/../hsa/include".format(hip_root)))
-            #hip_link_flags = "-Wl,--disable-new-dtags -L{0}/lib -L{0}/../lib64 -L{0}/../lib -Wl,-rpath,{0}/lib:{0}/../lib:{0}/../lib64 -lamdhip64 -lhsakmt -lhsa-runtime64".format(hip_root)
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
             hip_link_flags = ""
             if '%gcc' in spec:

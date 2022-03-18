@@ -80,7 +80,7 @@ if (UMPIRE_ENABLE_CUDA)
       DEPENDS_ON ${cookbook_depends})
     list(APPEND umpire_cookbooks recipe_pinned_pool)
 
-    if (UMPIRE_ENABLE_HIP)
+    if (Fortran_COMPILER_FAMILY_IS_CLANG)
       set_source_files_properties(
         recipe_pinned_pool.F
         PROPERTIES
@@ -99,7 +99,7 @@ if (UMPIRE_ENABLE_CUDA)
       OUTPUT_DIR ${cookbook_output_dir})
     list(APPEND umpire_cookbooks recipe_prefetch_pool)
 
-    if (UMPIRE_ENABLE_HIP)
+    if (Fortran_COMPILER_FAMILY_IS_CLANG)
       set_source_files_properties(
         recipe_prefetch_pool.F
         PROPERTIES
@@ -133,7 +133,7 @@ if (UMPIRE_ENABLE_HIP)
       DEPENDS_ON ${cookbook_depends})
     list(APPEND umpire_cookbooks recipe_pinned_pool)
 
-    if (UMPIRE_ENABLE_HIP)
+    if (Fortran_COMPILER_FAMILY_IS_CLANG)
       set_source_files_properties(
         recipe_pinned_pool.F
         PROPERTIES
@@ -190,7 +190,7 @@ if (UMPIRE_ENABLE_FORTRAN)
     SOURCES recipe_thread_safe.F
     DEPENDS_ON ${cookbook_depends})
 
-  if (UMPIRE_ENABLE_HIP)
+  if (Fortran_COMPILER_FAMILY_IS_CLANG)
     set_source_files_properties(
       recipe_thread_safe.F
       PROPERTIES

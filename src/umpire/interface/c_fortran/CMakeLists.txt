@@ -22,7 +22,7 @@ if (UMPIRE_ENABLE_FORTRAN)
     ${umpire_interface_c_fortran_sources}
     wrapfumpire.f)
 
-  if (UMPIRE_ENABLE_HIP)
+  if (Fortran_COMPILER_FAMILY_IS_CLANG)
     set_source_files_properties(
       wrapfumpire.f
       PROPERTIES

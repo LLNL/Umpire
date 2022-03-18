@@ -39,7 +39,7 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-if (UMPIRE_ENABLE_HIP)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
   set_source_files_properties(
     allocator_fortran_tests.F
     PROPERTIES
@@ -61,7 +61,7 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-if (UMPIRE_ENABLE_HIP)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
   set_source_files_properties(
     op_fortran_tests.F 
     PROPERTIES
@@ -83,7 +83,7 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-if (UMPIRE_ENABLE_HIP)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
   set_source_files_properties(
     introspection_fortran_tests.F
     PROPERTIES
@@ -105,7 +105,7 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-if (UMPIRE_ENABLE_HIP)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
   set_source_files_properties(
     version_fortran_tests.F
     PROPERTIES
