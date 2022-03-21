@@ -46,7 +46,7 @@ int main(int argc, char const* argv[])
   // Checking that the DeviceAllocator just created can be found...
   if (umpire::is_device_allocator("my_device_alloc")) {
     std::cout << "I found a DeviceAllocator!" << std::endl;
-    std::cout << "The total size is:" << device_allocator.getTotalSize() << std::endl;
+    std::cout << "The total size is: " << device_allocator.getTotalSize() << std::endl;
   }
 
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
@@ -60,7 +60,7 @@ int main(int argc, char const* argv[])
 
   // DeviceAllocator only has enough memory for one double. We need to reset it!
   device_allocator.reset();
-  std::cout << "After calling reset, the current size is:" << device_allocator.getCurrentSize() << std::endl;
+  std::cout << "After calling reset, the current size is: " << device_allocator.getCurrentSize() << std::endl;
 
   my_kernel<<<1, 16>>>(ptr_to_data);
   resource.get_event().wait();
