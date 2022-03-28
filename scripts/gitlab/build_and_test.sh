@@ -13,6 +13,7 @@ set -o nounset
 
 option=${1:-""}
 hostname="$(hostname)"
+truehostname=${hostname//[0-9]/}
 project_dir="$(pwd)"
 
 build_root=${BUILD_ROOT:-""}
@@ -119,6 +120,10 @@ then
     mkdir -p ${build_dir} && cd ${build_dir}
 
     date
+    if [[ "${truehostname}" == "corona" ]]
+    then
+        module unload rocm
+    fi
     $cmake_exe \
       -C ${hostconfig_path} \
       ${project_dir}

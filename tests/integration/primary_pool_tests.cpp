@@ -12,6 +12,7 @@
 #include "gtest/gtest.h"
 #include "test_helpers.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
@@ -345,13 +346,13 @@ TYPED_TEST(PrimaryPoolTest, coalesce)
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3); // 1 Free, 2 Allocated
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr_two););
 
-  dynamic_pool->coalesce();
+  umpire::coalesce(*this->m_allocator);
 
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 3); // 2 Free, 1 Allocated
 
   ASSERT_NO_THROW(this->m_allocator->deallocate(ptr_one););
 
-  dynamic_pool->coalesce();
+  umpire::coalesce(*this->m_allocator);
 
   ASSERT_EQ(dynamic_pool->getBlocksInPool(), 1);
 
