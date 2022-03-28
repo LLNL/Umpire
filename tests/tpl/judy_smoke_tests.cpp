@@ -6,8 +6,8 @@
 //////////////////////////////////////////////////////////////////////////////
 
 #include "gtest/gtest.h"
-#include "judy/judyL2Array.h"
-#include "judy/judyLArray.h"
+#include "umpire/judy/judyL2Array.h"
+#include "umpire/judy/judyLArray.h"
 
 TEST(Judy, LArray)
 {
