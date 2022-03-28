@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <string>
 
-#include "umpire/tpl/fmt/fmt.hpp"
+#include "umpire/fmt/fmt.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {

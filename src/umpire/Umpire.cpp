@@ -281,7 +281,7 @@ void coalesce(Allocator a)
   bool coalesced{try_coalesce(a)};
 
   if (!coalesced)
-    UMPIRE_ERROR("Allocator \"" << a.getName() << "\" could not be coalesced.");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator \"{}\" could not be coalesced", a.getName()));
 }
 
 } // end namespace umpire

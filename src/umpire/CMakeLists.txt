@@ -4,7 +4,6 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-add_subdirectory(tpl)
 add_subdirectory(resource)
 add_subdirectory(alloc)
 add_subdirectory(op)

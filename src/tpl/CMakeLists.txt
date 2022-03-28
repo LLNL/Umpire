@@ -21,7 +21,7 @@ set(UMPIRE_ENABLE_FORTRAN Off)
 #
 # Json
 set (json_headers
-  ./json/json.hpp )
+  umpire/json/json.hpp )
 
 blt_add_library(
   NAME umpire_tpl_json
@@ -37,7 +37,7 @@ target_link_libraries(umpire_tpl_json INTERFACE)
 
 install(FILES
   ${json_headers}
-  DESTINATION include/umpire/tpl/json)
+  DESTINATION include/umpire/json)
 
 install(TARGETS
   umpire_tpl_json
@@ -49,7 +49,7 @@ install(TARGETS
 #
 # CLI11 Option Parsing Headers
 set (CLI11_headers
-  ./CLI11/CLI11.hpp )
+  umpire/CLI11/CLI11.hpp )
 
 blt_add_library(
   NAME umpire_tpl_CLI11
@@ -60,13 +60,13 @@ target_link_libraries(umpire_tpl_CLI11 INTERFACE)
 target_include_directories(
   umpire_tpl_CLI11
   INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(FILES
   ${CLI11_headers}
-  DESTINATION include/umpire/tpl/CLI11)
+  DESTINATION include/umpire/CLI11)
 
 install(TARGETS
   umpire_tpl_CLI11
@@ -75,7 +75,7 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-add_subdirectory(judy)
+add_subdirectory(umpire/judy)
 
 if (NOT TARGET camp)
   if (DEFINED camp_DIR)
@@ -86,7 +86,7 @@ if (NOT TARGET camp)
     )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
-    add_subdirectory(camp)
+    add_subdirectory(umpire/camp)
   endif()
 
   if(UMPIRE_ENABLE_CUDA)
@@ -106,19 +106,19 @@ if (NOT TARGET camp)
 endif ()
 
 set(fmt_headers
-    fmt/fmt.hpp
-    fmt/args.h
-    fmt/chrono.h
-    fmt/color.h
-    fmt/compile.h
-    fmt/core.h
-    fmt/format-inl.h
-    fmt/format.h
-    fmt/locale.h
-    fmt/os.h
-    fmt/ostream.h
-    fmt/printf.h
-    fmt/ranges.h
+    umpire/fmt/fmt.hpp
+    umpire/fmt/args.h
+    umpire/fmt/chrono.h
+    umpire/fmt/color.h
+    umpire/fmt/compile.h
+    umpire/fmt/core.h
+    umpire/fmt/format-inl.h
+    umpire/fmt/format.h
+    umpire/fmt/locale.h
+    umpire/fmt/os.h
+    umpire/fmt/ostream.h
+    umpire/fmt/printf.h
+    umpire/fmt/ranges.h
     )
 
 blt_add_library(NAME    umpire_tpl_fmt
@@ -128,7 +128,7 @@ blt_add_library(NAME    umpire_tpl_fmt
 target_include_directories(
   umpire_tpl_fmt
   INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
@@ -142,6 +142,10 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+install(FILES
+  ${fmt_headers}
+  DESTINATION include/umpire/fmt)
 
 set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})

@@ -10,7 +10,7 @@
 #include <string>
 
 #include "gtest/gtest.h"
-#include "umpire/tpl/CLI11/CLI11.hpp"
+#include "CLI11/CLI11.hpp"
 
 static std::string getVersion()
 {

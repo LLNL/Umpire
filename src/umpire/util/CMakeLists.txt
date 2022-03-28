@@ -50,7 +50,7 @@ if (UMPIRE_ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends camp umpire_tpl_judy)
+set (umpire_util_depends camp umpire_tpl_judy umpire_tpl_fmt)
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (umpire_util_depends
