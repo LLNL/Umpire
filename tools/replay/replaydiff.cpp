@@ -16,7 +16,7 @@
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 #include "ReplayInterpreter.hpp"
 #include "ReplayOptions.hpp"
-#include "CLI11/CLI11.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])

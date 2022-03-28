@@ -18,7 +18,7 @@
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOptions.hpp"
-#include "CLI11/CLI11.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 
 const static ReplayUsePoolValidator ReplayValidPool;
 const static ReplayUseHeuristicValidator ReplayValidHeuristic;

@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "CLI11/CLI11.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 
 struct ReplayUsePoolValidator : public CLI::Validator {
   ReplayUsePoolValidator()
