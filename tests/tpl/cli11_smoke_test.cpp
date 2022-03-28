@@ -9,8 +9,8 @@
 #include <sstream>
 #include <string>
 
-#include "umpire/CLI11/CLI11.hpp"
 #include "gtest/gtest.h"
+#include "umpire/CLI11/CLI11.hpp"
 
 static std::string getVersion()
 {
