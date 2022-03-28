@@ -21,10 +21,13 @@ namespace util {
 inline int find_first_set(int i)
 {
 #if defined(_MSC_VER)
-  unsigned long bit;
+  unsigned long index;
   unsigned long i_l = static_cast<unsigned long>(i);
-  _BitScanForward(&bit, i_l);
-  return static_cast<int>(bit);
+  int bit = 0;
+  if (_BitScanForward(&index, i_l)) {
+    bit = static_cast<int>(index) + 1;
+  }
+  return bit;
 #else
   return ffs(i);
 #endif
