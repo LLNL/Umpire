@@ -20,7 +20,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "CLI11/CLI11.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 
 namespace {
 const std::string hwm_name{"Memory Usage HSM"};
