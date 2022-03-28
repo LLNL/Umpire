@@ -74,8 +74,8 @@ class HostSharedMemoryResource::impl {
         created = true;
         completed = true;
       } else if (err != EEXIST) {
-        UMPIRE_ERROR(runtime_error,
-                     "Failed to create shared memory segment " << m_segment_name << ": " << strerror(err));
+          UMPIRE_ERROR(runtime_error, umpire::fmt::format("Failed to create shared memory segment \"{}\": {}",
+                                                          m_segment_name, strerror(err)));
       } else {
         if (open_shared_memory_segment(err, O_RDWR)) {
           created = false;

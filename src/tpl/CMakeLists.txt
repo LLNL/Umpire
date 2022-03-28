@@ -33,7 +33,11 @@ if (C_COMPILER_FAMILY_IS_PGI)
     INTERFACE
     --diag_suppress186)
 endif ()
+
 target_link_libraries(umpire_tpl_json INTERFACE)
+
+blt_patch_target(NAME umpire_tpl_json
+                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 install(FILES
   ${json_headers}
@@ -74,6 +78,9 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+blt_patch_target(NAME umpire_tpl_CLI11
+                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 add_subdirectory(umpire/judy)
 
