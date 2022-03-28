@@ -12,6 +12,7 @@
 #include <cstring>
 #include <sstream>
 
+#include "umpire/util/find_first_set.hpp"
 #include "umpire/util/Macros.hpp"
 
 #if !defined(_MSC_VER)
@@ -21,18 +22,6 @@
 
 namespace umpire {
 namespace strategy {
-
-inline int find_first_set(int i)
-{
-#if defined(_MSC_VER)
-  unsigned long bit;
-  unsigned long i_l = static_cast<unsigned long>(i);
-  _BitScanForward(&bit, i_l);
-  return static_cast<int>(bit);
-#else
-  return ffs(i);
-#endif
-}
 
 static constexpr std::size_t bits_per_int = sizeof(int) * 8;
 
@@ -116,7 +105,7 @@ void* FixedPool::allocInPool(Pool& p)
 
   for (unsigned int int_index = 0; int_index < m_avail_bytes; ++int_index) {
     // Return the index of the first 1 bit
-    const int bit_index = find_first_set(p.avail[int_index]) - 1;
+    const int bit_index = util::find_first_set(p.avail[int_index]) - 1;
     if (bit_index >= 0) {
       const std::size_t index = int_index * bits_per_int + bit_index;
       if (index < m_obj_per_pool) {
