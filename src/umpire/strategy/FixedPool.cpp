@@ -12,8 +12,8 @@
 #include <cstring>
 #include <sstream>
 
-#include "umpire/util/find_first_set.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/find_first_set.hpp"
 
 #if !defined(_MSC_VER)
 #define _XOPEN_SOURCE_EXTENDED 1
