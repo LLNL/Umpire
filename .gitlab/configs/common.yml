@@ -1,0 +1,29 @@
+###############################################################################
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+###############################################################################
+
+# We define the following GitLab pipeline variables:
+variables:
+
+# Use the umdev LLNL service user to run CI. This prevent running pipelines as
+# an actual user.
+  LLNL_SERVICE_USER: umdev
+
+# Use the service user workspace. Solves permission issues, stores everything
+# at the same place whoever triggers a pipeline.
+  CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
+
+# Tells Gitlab to recursively update the submodules when cloning umpire
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# We build the projects in the CI clone directory.
+# TODO: add a clean-up mechanism
+  BUILD_ROOT: ${CI_PROJECT_DIR}
+
+# On LLNL's ruby, this pipeline creates only one allocation shared among jobs
+# in order to save time and resources. This allocation has to be uniquely named
+# so that we are sure to retrieve it.
+  ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
