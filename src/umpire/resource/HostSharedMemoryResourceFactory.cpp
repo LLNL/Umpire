@@ -8,6 +8,7 @@
 
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
