@@ -151,7 +151,7 @@ blt_append_custom_compiler_flag(
 
 target_compile_options(
   umpire_tpl_fmt
-  PUBLIC
+  INTERFACE
   ${_fmt_warning_disable_flags})
 
 install(TARGETS
