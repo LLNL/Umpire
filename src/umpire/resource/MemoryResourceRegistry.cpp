@@ -211,7 +211,7 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     registerMemoryResource(util::make_unique<resource::OpenMPTargetResourceFactory>());
     m_resource_names.push_back("DEVICE");
   } else {
-      UMPIRE_LOG(Warning, "Umpire compiled with OpenMP Target support but no GPUs detected!");
+    UMPIRE_LOG(Warning, "Umpire compiled with OpenMP Target support but no GPUs detected!");
   }
 
 #endif
