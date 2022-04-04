@@ -143,6 +143,17 @@ target_include_directories(
 blt_patch_target(NAME umpire_tpl_fmt
                  TREAT_INCLUDES_AS_SYSTEM ON)
 
+set (_fmt_warning_disable_flags)
+blt_append_custom_compiler_flag(
+  FLAGS_VAR _fmt_warning_disable_flags
+  XL -Wno-unknown-attributes
+)
+
+target_compile_options(
+  umpire_tpl_fmt
+  PUBLIC
+  ${_fmt_warning_disable_flags})
+
 install(TARGETS
   umpire_tpl_fmt
   EXPORT umpire-targets
