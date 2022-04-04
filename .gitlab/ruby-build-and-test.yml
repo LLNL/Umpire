@@ -6,9 +6,9 @@
 ##############################################################################
 
 stages:
-  - allocate_resource
+  - allocate_resources
   - build_and_test
-  - release_resource
+  - release_resources
 
 ####
 # In pre-build phase, allocate a node for builds
