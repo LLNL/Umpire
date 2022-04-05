@@ -71,7 +71,7 @@ stages:
   artifacts:
     reports:
       junit: junit.xml
- 
+
 #.build_toss_4_x86_64_ib_corona_script:
 #  script:
 #    - srun -p pbatch -t 30 -N 1 scripts/gitlab/build_and_test.sh
