@@ -139,20 +139,19 @@ target_include_directories(
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
+if (C_COMPILER_FAMILY_IS_XL)
+  set(_fmt_warning_disable_flag
+    $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-Wno-unknown-attributes> 
+    $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wno-unknown-attributes>)
+
+    target_compile_options(umpire_tpl_fmt INTERFACE ${_fmt_warning_disable_flag})
+endif ()
+
 # Avoid warnings from fmt (so we can still use -Werror)
 blt_patch_target(NAME umpire_tpl_fmt
-                 TREAT_INCLUDES_AS_SYSTEM ON)
+  TREAT_INCLUDES_AS_SYSTEM ON)
 
-set (_fmt_warning_disable_flags)
-blt_append_custom_compiler_flag(
-  FLAGS_VAR _fmt_warning_disable_flags
-  XL -Wno-unknown-attributes
-)
-
-target_compile_options(
-  umpire_tpl_fmt
-  INTERFACE
-  ${_fmt_warning_disable_flags})
+blt_print_target_properties(TARGET umpire_tpl_fmt)
 
 install(TARGETS
   umpire_tpl_fmt
