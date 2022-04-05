@@ -7,8 +7,8 @@
 
 # Shared configuration of jobs for corona.
 
-# These are templates (.name) that can be included in another jobs to share
-# part of the job definition.
+# These are templates (.name) that can be included in other jobs to share part
+# of the job definition.
 .on_corona:
   tags:
     - shell
@@ -21,7 +21,7 @@
     # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
     - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
       when: never
-    # We should always release resource allocated before.
+    # We should always release resources allocated before.
     - if: '$CI_JOB_NAME =~ /release_resources/'
       when: always
     # A true statement is expected to allow jobs to run. Here is the default.

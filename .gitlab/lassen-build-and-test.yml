@@ -8,7 +8,8 @@
 stages:
   - build_and_test
 
-# CPU ONLY
+# CPU only.
+
 ibm_clang_9:
   variables:
     SPEC: "+fortran %clang@ibm.9.0.0"
@@ -59,7 +60,7 @@ xl_16_1_1_10_gcc_8_3_1:
     SPEC: "+fortran%xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
-# CUDA
+# CUDA.
 
 ibm_clang_9_cuda:
   variables:
@@ -91,7 +92,7 @@ xl_16_1_1_10_gcc_8_3_1_cuda_11:
     SPEC: "+fortran+cuda tests=none %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
   extends: .build_and_test_on_lassen
 
-# EXTRAS
+# Extras.
 
 clang_9_0_0_libcpp (build and test on lassen):
   variables:
@@ -125,7 +126,7 @@ gcc_8_3_1_numa:
     SPEC: "+fortran+numa%gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-# Develop/main builds against specific tpl versions
+# Develop/main builds against specific tpl versions.
 
 gcc_8_3_1_tpls:
   variables:

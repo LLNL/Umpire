@@ -16,28 +16,28 @@
 # to a test phase on a given machine. This design is simpler and more scalable
 # than doing the same with stages.
 
+# The stages in the top-level pipeline described here correspond to high level
+# steps in the testing workflow.
+# TODO: rehabilitate multi-project and branch radiuss-spack-testing.
 stages:
-  - sub-pipelines
-
-# LLNL_SERVICE_USER:
-# Use the umdev LLNL service to run CI
+  - build-and-test
+  - multi-project # unused so far
+  - radiuss-spack-testing # unused so far
 
 variables:
-
-# Use the umdev LLNL service user to run CI. This prevent running pipelines as
-# an actual user.
+# Use the umdev LLNL service user to run CI. This prevents from running
+# pipelines as an actual user.
   LLNL_SERVICE_USER: umdev
-
 # Use the service user workspace. Solves permission issues, stores everything
-# at the same place whoever triggers a pipeline.
+# at the same location whoever triggers a pipeline.
   CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 
 # Trigger sub-pipelines:
 ruby-build-and-test:
-  stage: sub-pipelines
+  stage: build-and-test
   variables:
-    # Explicitly pass down values that we want to be able to set when triggering
-    # pipelines manually or using scheduling
+    # Explicitly pass down variables that we want to be able to set when
+    # triggering pipelines manually or using scheduling.
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_RUBY: "${ON_RUBY}"
   trigger:
@@ -45,10 +45,8 @@ ruby-build-and-test:
     strategy: depend
 
 corona-build-and-test:
-  stage: sub-pipelines
+  stage: build-and-test
   variables:
-    # Explicitly pass down values that we want to be able to set when triggering
-    # pipelines manually or using scheduling
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_CORONA: "${ON_CORONA}"
   trigger:
@@ -56,10 +54,8 @@ corona-build-and-test:
     strategy: depend
 
 lassen-build-and-test:
-  stage: sub-pipelines
+  stage: build-and-test
   variables:
-    # Explicitly pass down values that we want to be able to set when triggering
-    # pipelines manually or using scheduling
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_LASSEN: "${ON_LASSEN}"
   trigger:
@@ -67,10 +63,10 @@ lassen-build-and-test:
     strategy: depend
 
 # If testing develop branch, trigger CHAI pipeline with this version of Umpire.
-# TODO: Once spack allows to clone a specific commit on demand, then point to the exact commit.
+# TODO: Once Spack allows to clone a specific commit on demand, then point to the exact commit.
 #       This will prevent from sticking to a branch (here develop).
 # trigger-chai:
-#  stage: multi_project
+#  stage: multi-project
 #  rules:
 #    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
 #  variables:
