@@ -48,7 +48,7 @@ stages:
   - r_build_and_test
   - r_release_resources
   - l_build_and_test
-  - c_build_and_test
+# - c_build_and_test
 #  - multi_project
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
@@ -60,24 +60,24 @@ stages:
 # These are also templates (.name) that define project specific build commands.
 # If an allocation exist with the name defined in this pipeline, the job will
 # use it (slurm specific).
-.build_toss_3_x86_64_ib_script:
-  script:
-    - echo ${ALLOC_NAME}
-    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-    - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 30 -N 1 scripts/gitlab/build_and_test.sh
-  variables:
-    SLURM_OVERLAP: 1
-  artifacts:
-    reports:
-      junit: junit.xml
-
-.build_toss_4_x86_64_ib_corona_script:
-  script:
-    - srun -p pbatch -t 30 -N 1 scripts/gitlab/build_and_test.sh
-  artifacts:
-    reports:
-      junit: junit.xml
+#.build_toss_3_x86_64_ib_script:
+#   script:
+#     - echo ${ALLOC_NAME}
+#     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+#     - echo ${JOBID}
+#     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 30 -N 1 scripts/gitlab/build_and_test.sh
+#   variables:
+#     SLURM_OVERLAP: 1
+#   artifacts:
+#     reports:
+#       junit: junit.xml
+#
+#.build_toss_4_x86_64_ib_corona_script:
+#  script:
+#    - srun -p pbatch -t 30 -N 1 scripts/gitlab/build_and_test.sh
+#  artifacts:
+#    reports:
+#      junit: junit.xml
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
@@ -111,5 +111,5 @@ include:
   - local: .gitlab/ruby-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-  - local: .gitlab/corona-templates.yml
-  - local: .gitlab/corona-jobs.yml
+# - local: .gitlab/corona-templates.yml
+# - local: .gitlab/corona-jobs.yml
