@@ -55,7 +55,9 @@ inline std::string resource_to_string(MemoryResourceType type)
   // even though the following line cannot be reached.  Adding this
   // fake return statement to work around the incorrect warning.
   //
+#if defined(__CUDACC__) && defined(__CUDA_ARCH__)
   return "Unknown";
+#endif
 }
 
 inline MemoryResourceType string_to_resource(const std::string& resource)
@@ -87,7 +89,9 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   // even though the following line cannot be reached.  Adding this
   // fake return statement to work around the incorrect warning.
   //
+#if defined(__CUDACC__) && defined(__CUDA_ARCH__)
   return MemoryResourceType::Unknown;
+#endif
 }
 
 inline int resource_to_device_id(const std::string& resource)
