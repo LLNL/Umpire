@@ -61,16 +61,16 @@ stages:
 # If an allocation exist with the name defined in this pipeline, the job will
 # use it (slurm specific).
 .build_toss_3_x86_64_ib_script:
-    script:
-      - echo ${ALLOC_NAME}
-      - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
-      - echo ${JOBID}
-      - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 30 -N 1 scripts/gitlab/build_and_test.sh
-    variables:
-      SLURM_OVERLAP: 1
-    artifacts:
-      reports:
-        junit: junit.xml
+   script:
+     - echo ${ALLOC_NAME}
+     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+     - echo ${JOBID}
+     - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 30 -N 1 scripts/gitlab/build_and_test.sh
+   variables:
+     SLURM_OVERLAP: 1
+   artifacts:
+     reports:
+       junit: junit.xml
  
 #.build_toss_4_x86_64_ib_corona_script:
 #  script:
