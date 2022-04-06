@@ -48,13 +48,13 @@ inline std::string resource_to_string(MemoryResourceType type)
       UMPIRE_ERROR(runtime_error, umpire::fmt::format("Unkown resource type: {}", type));
   }
 
-  //
-  // The UMPIRE_ERROR macro above does not return.  It instead throws
-  // an exception.  However, for some reason, nvcc throws a warning
-  // "warning: missing return statement at end of non-void function"
-  // even though the following line cannot be reached.  Adding this
-  // fake return statement to work around the incorrect warning.
-  //
+    //
+    // The UMPIRE_ERROR macro above does not return.  It instead throws
+    // an exception.  However, for some reason, nvcc throws a warning
+    // "warning: missing return statement at end of non-void function"
+    // even though the following line cannot be reached.  Adding this
+    // fake return statement to work around the incorrect warning.
+    //
 #if defined(__CUDACC__) && defined(__CUDA_ARCH__)
   return "Unknown";
 #endif
