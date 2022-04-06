@@ -151,9 +151,15 @@ if (C_COMPILER_FAMILY_IS_PGI)
   set(_fmt_warning_disable_flag
    "--diag_suppress 1625;--diag_suppress 185;--diag_suppress 811;--diag_suppress 186")
    
+   if (ENABLE_FORTRAN)
     target_compile_options(umpire_tpl_fmt
       INTERFACE 
       $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${_fmt_warning_disable_flag}>)
+    else ()
+      target_compile_options(umpire_tpl_fmt
+        INTERFACE 
+        ${_fmt_warning_disable_flag})
+    endif ()
 endif ()
 
 # Avoid warnings from fmt (so we can still use -Werror)
