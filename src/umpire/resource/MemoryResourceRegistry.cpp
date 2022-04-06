@@ -119,25 +119,25 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         m_resource_names.push_back(name);
       }
 
-    registerMemoryResource(util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
-    m_resource_names.push_back("UM");
+      registerMemoryResource(util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
+      m_resource_names.push_back("UM");
 
-    registerMemoryResource(util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
-    m_resource_names.push_back("PINNED");
+      registerMemoryResource(util::make_unique<resource::CudaPinnedMemoryResourceFactory>());
+      m_resource_names.push_back("PINNED");
 
 #if defined(UMPIRE_ENABLE_CONST)
-    registerMemoryResource(util::make_unique<resource::CudaConstantMemoryResourceFactory>());
-    m_resource_names.push_back("DEVICE_CONST");
+      registerMemoryResource(util::make_unique<resource::CudaConstantMemoryResourceFactory>());
+      m_resource_names.push_back("DEVICE_CONST");
 #endif
+    }
   }
-}
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-{
-  int device_count{0};
-  auto error = ::hipGetDeviceCount(&device_count);
-  if (error != hipSuccess) {
+  {
+    int device_count{0};
+    auto error = ::hipGetDeviceCount(&device_count);
+    if (error != hipSuccess) {
       UMPIRE_LOG(Warning, "Umpire compiled with HIP support but no GPUs detected!");
     } else {
       registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
@@ -148,40 +148,40 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         m_resource_names.push_back(name);
       }
 
-  registerMemoryResource(util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
-  m_resource_names.push_back("UM");
+      registerMemoryResource(util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
+      m_resource_names.push_back("UM");
 
-  registerMemoryResource(util::make_unique<resource::HipPinnedMemoryResourceFactory>());
-  m_resource_names.push_back("PINNED");
+      registerMemoryResource(util::make_unique<resource::HipPinnedMemoryResourceFactory>());
+      m_resource_names.push_back("PINNED");
 
 #if defined(UMPIRE_ENABLE_CONST)
-  registerMemoryResource(util::make_unique<resource::HipConstantMemoryResourceFactory>());
-  m_resource_names.push_back("DEVICE_CONST");
+      registerMemoryResource(util::make_unique<resource::HipConstantMemoryResourceFactory>());
+      m_resource_names.push_back("DEVICE_CONST");
 #endif
-}
-}
+    }
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-{
-  int device_count{0};
-  auto platforms = sycl::platform::get_platforms();
-  for (auto& platform : platforms) {
-    auto devices = platform.get_devices();
-    for (auto& device : devices) {
-      if (device.is_gpu()) {
-        if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
-          auto subDevicesDomainNuma =
-              device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
-                  sycl::info::partition_affinity_domain::numa);
-          device_count += subDevicesDomainNuma.size();
-        } else
-          device_count++;
+  {
+    int device_count{0};
+    auto platforms = sycl::platform::get_platforms();
+    for (auto& platform : platforms) {
+      auto devices = platform.get_devices();
+      for (auto& device : devices) {
+        if (device.is_gpu()) {
+          if (device.get_info<sycl::info::device::partition_max_sub_devices>() > 0) {
+            auto subDevicesDomainNuma =
+                device.create_sub_devices<sycl::info::partition_property::partition_by_affinity_domain>(
+                    sycl::info::partition_affinity_domain::numa);
+            device_count += subDevicesDomainNuma.size();
+          } else
+            device_count++;
+        }
       }
     }
-  }
 
-  if (device_count == 0) {
+    if (device_count == 0) {
       UMPIRE_LOG(Warning, "Umpire compiled with SYCL support but no GPUs detected!");
     } else {
       registerMemoryResource(util::make_unique<resource::SyclDeviceResourceFactory>());
@@ -192,28 +192,28 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         m_resource_names.push_back(name);
       }
 
-  registerMemoryResource(util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
-  m_resource_names.push_back("UM");
+      registerMemoryResource(util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
+      m_resource_names.push_back("UM");
 
-  registerMemoryResource(util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
-  m_resource_names.push_back("PINNED");
-}
-}
+      registerMemoryResource(util::make_unique<resource::SyclPinnedMemoryResourceFactory>());
+      m_resource_names.push_back("PINNED");
+    }
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
-int device_count{device_count = omp_get_num_devices()};
-if (device_count >= 0) {
-  for (int device = 0; device < device_count; ++device) {
-    std::string name{"DEVICE::" + std::to_string(device)};
-    m_resource_names.push_back(name);
-  }
+  int device_count{device_count = omp_get_num_devices()};
+  if (device_count >= 0) {
+    for (int device = 0; device < device_count; ++device) {
+      std::string name{"DEVICE::" + std::to_string(device)};
+      m_resource_names.push_back(name);
+    }
 
-  registerMemoryResource(util::make_unique<resource::OpenMPTargetResourceFactory>());
-  m_resource_names.push_back("DEVICE");
-} else {
-  UMPIRE_LOG(Warning, "Umpire compiled with OpenMP Target support but no GPUs detected!");
-}
+    registerMemoryResource(util::make_unique<resource::OpenMPTargetResourceFactory>());
+    m_resource_names.push_back("DEVICE");
+  } else {
+    UMPIRE_LOG(Warning, "Umpire compiled with OpenMP Target support but no GPUs detected!");
+  }
 
 #endif
 }
