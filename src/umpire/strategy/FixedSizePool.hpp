@@ -13,6 +13,7 @@
 #include <iostream>
 
 #include "StdAllocator.hpp"
+#include "umpire/util/find_first_set.hpp"
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -20,18 +21,6 @@
 #pragma warning(disable : 4245)
 #pragma warning(disable : 4267)
 #endif
-
-inline int find_first_set(int i)
-{
-#if defined(_MSC_VER)
-  unsigned long bit;
-  unsigned long i_l = static_cast<unsigned long>(i);
-  _BitScanForward(&bit, i_l);
-  return static_cast<int>(bit);
-#else
-  return ffs(i);
-#endif
-}
 
 template <class T, class MA, class IA = StdAllocator, int NP = (1 << 6)>
 class FixedSizePool {
@@ -69,7 +58,7 @@ class FixedSizePool {
       return NULL;
 
     for (int i = 0; i < NP; i++) {
-      const int bit = find_first_set(p->avail[i]) - 1;
+      const int bit = umpire::util::find_first_set(p->avail[i]) - 1;
       if (bit >= 0) {
         p->avail[i] ^= 1 << bit;
         p->numAvail--;
