@@ -109,18 +109,6 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
     int device_count{0};
     auto error = ::cudaGetDeviceCount(&device_count);
     if (error != cudaSuccess) {
-<<<<<<< HEAD
-      UMPIRE_ERROR(runtime_error, "Umpire compiled with CUDA support but no GPUs detected!");
-    }
-
-    registerMemoryResource(util::make_unique<resource::CudaDeviceResourceFactory>());
-    m_resource_names.push_back("DEVICE");
-
-    for (int device = 0; device < device_count; ++device) {
-      std::string name{"DEVICE::" + std::to_string(device)};
-      m_resource_names.push_back(name);
-    }
-=======
       UMPIRE_LOG(Warning, "Umpire compiled with CUDA support but no GPUs detected!");
     } else {
       registerMemoryResource(util::make_unique<resource::CudaDeviceResourceFactory>());
@@ -130,7 +118,6 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         std::string name{"DEVICE::" + std::to_string(device)};
         m_resource_names.push_back(name);
       }
->>>>>>> develop
 
     registerMemoryResource(util::make_unique<resource::CudaUnifiedMemoryResourceFactory>());
     m_resource_names.push_back("UM");
@@ -151,18 +138,6 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
   int device_count{0};
   auto error = ::hipGetDeviceCount(&device_count);
   if (error != hipSuccess) {
-<<<<<<< HEAD
-    UMPIRE_ERROR(runtime_error, "Umpire compiled with HIP support but no GPUs detected!");
-  }
-
-  registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
-  m_resource_names.push_back("DEVICE");
-
-  for (int device = 0; device < device_count; ++device) {
-    std::string name{"DEVICE::" + std::to_string(device)};
-    m_resource_names.push_back(name);
-  }
-=======
       UMPIRE_LOG(Warning, "Umpire compiled with HIP support but no GPUs detected!");
     } else {
       registerMemoryResource(util::make_unique<resource::HipDeviceResourceFactory>());
@@ -172,7 +147,6 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         std::string name{"DEVICE::" + std::to_string(device)};
         m_resource_names.push_back(name);
       }
->>>>>>> develop
 
   registerMemoryResource(util::make_unique<resource::HipUnifiedMemoryResourceFactory>());
   m_resource_names.push_back("UM");
@@ -208,10 +182,6 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
   }
 
   if (device_count == 0) {
-<<<<<<< HEAD
-    UMPIRE_ERROR(runtime_error, "Umpire compiled with SYCL support but no GPUs detected!");
-  }
-=======
       UMPIRE_LOG(Warning, "Umpire compiled with SYCL support but no GPUs detected!");
     } else {
       registerMemoryResource(util::make_unique<resource::SyclDeviceResourceFactory>());
@@ -221,7 +191,6 @@ MemoryResourceRegistry::MemoryResourceRegistry() : m_allocator_factories()
         std::string name{"DEVICE::" + std::to_string(device)};
         m_resource_names.push_back(name);
       }
->>>>>>> develop
 
   registerMemoryResource(util::make_unique<resource::SyclUnifiedMemoryResourceFactory>());
   m_resource_names.push_back("UM");
