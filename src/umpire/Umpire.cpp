@@ -19,6 +19,8 @@
 #include "umpire/config.hpp"
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
+#include "umpire/strategy/QuickPool.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 #if !defined(_MSC_VER)
@@ -278,6 +280,34 @@ util::AllocationRecord deregister_external_allocation(void* ptr)
 
   auto& rm = umpire::ResourceManager::getInstance();
   return rm.deregisterAllocation(ptr);
+}
+
+bool try_coalesce(Allocator a)
+{
+  auto s = a.getAllocationStrategy();
+  bool coalesced{false};
+
+  strategy::QuickPool* qp{dynamic_cast<strategy::QuickPool*>(s)};
+  if (qp) {
+    qp->coalesce();
+    coalesced = true;
+  }
+
+  strategy::DynamicPoolList* dpl{dynamic_cast<strategy::DynamicPoolList*>(s)};
+  if (dpl) {
+    dpl->coalesce();
+    coalesced = true;
+  }
+
+  return coalesced;
+}
+
+void coalesce(Allocator a)
+{
+  bool coalesced{try_coalesce(a)};
+
+  if (!coalesced)
+    UMPIRE_ERROR("Allocator \"" << a.getName() << "\" could not be coalesced.");
 }
 
 } // end namespace umpire

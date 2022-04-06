@@ -12,6 +12,7 @@ set (umpire_util_headers
   backtrace.hpp
   backtrace.inl
   Exception.hpp
+  find_first_set.hpp
   FixedMallocPool.hpp
   io.hpp
   Logger.hpp

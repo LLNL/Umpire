@@ -39,10 +39,17 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-set_source_files_properties(
-  allocator_fortran_tests.F
-  PROPERTIES
-  Fortran_FORMAT FREE)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
+  set_source_files_properties(
+    allocator_fortran_tests.F
+    PROPERTIES
+    COMPILE_FLAGS -Mfree)
+else()
+  set_source_files_properties(
+    allocator_fortran_tests.F
+    PROPERTIES
+    Fortran_FORMAT FREE)
+endif()
 
 blt_add_test(
   NAME allocator_fortran_tests
@@ -54,10 +61,17 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-set_source_files_properties(
-  op_fortran_tests.F
-  PROPERTIES
-  Fortran_FORMAT FREE)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
+  set_source_files_properties(
+    op_fortran_tests.F 
+    PROPERTIES
+    COMPILE_FLAGS -Mfree)
+else()
+  set_source_files_properties(
+    op_fortran_tests.F
+    PROPERTIES
+    Fortran_FORMAT FREE)
+endif()
 
 blt_add_test(
   NAME op_fortran_tests
@@ -69,10 +83,17 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-set_source_files_properties(
-  introspection_fortran_tests.F
-  PROPERTIES
-  Fortran_FORMAT FREE)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
+  set_source_files_properties(
+    introspection_fortran_tests.F
+    PROPERTIES
+    COMPILE_FLAGS -Mfree)
+else()
+  set_source_files_properties(
+    introspection_fortran_tests.F
+    PROPERTIES
+    Fortran_FORMAT FREE)
+endif()
 
 blt_add_test(
   NAME introspection_fortran_tests
@@ -84,10 +105,17 @@ blt_add_executable(
   DEFINES ${fortran_test_defines}
   DEPENDS_ON ${fortran_tests_depends})
 
-set_source_files_properties(
-  version_fortran_tests.F
-  PROPERTIES
-  Fortran_FORMAT FREE)
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
+  set_source_files_properties(
+    version_fortran_tests.F
+    PROPERTIES
+    COMPILE_FLAGS -Mfree)
+else()
+  set_source_files_properties(
+    version_fortran_tests.F
+    PROPERTIES
+    Fortran_FORMAT FREE)
+endif()
 
 blt_add_test(
   NAME version_fortran_tests
