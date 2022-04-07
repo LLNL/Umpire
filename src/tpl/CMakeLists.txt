@@ -46,8 +46,12 @@ endif ()
 
 target_link_libraries(umpire_tpl_json INTERFACE)
 
-blt_patch_target(NAME umpire_tpl_json
-                 TREAT_INCLUDES_AS_SYSTEM ON)
+target_include_directories(
+  umpire_tpl_json
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 install(FILES
   ${json_headers}
@@ -59,6 +63,9 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+blt_patch_target(NAME umpire_tpl_json
+                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 #
 # CLI11 Option Parsing Headers

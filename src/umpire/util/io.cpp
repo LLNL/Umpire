@@ -118,16 +118,6 @@ void initialize_io(const bool enable_log)
     }
   }
 
-  if (enable_replay) {
-    static std::ofstream s_replay_ofstream{replay_filename};
-
-    if (s_replay_ofstream) {
-      s_replay_buffer.setFileStream(&s_replay_ofstream);
-    } else {
-      UMPIRE_ERROR(runtime_error, umpire::fmt::format("Couldn't open replay file: {}", replay_filename));
-    }
-  }
-
   MPI::logMpiInfo();
 }
 
