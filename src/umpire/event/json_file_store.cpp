@@ -95,7 +95,7 @@ std::vector<event> json_file_store::get_events()
       e = json_event;
     } catch (...) {
       UMPIRE_ERROR(umpire::runtime_error,
-              umpire::fmt::format("json_file_store::get_events: Error parsing Line #{}", line_number));
+                   umpire::fmt::format("json_file_store::get_events: Error parsing Line #{}", line_number));
     }
 
     events.push_back(e);
@@ -127,7 +127,8 @@ std::vector<event> json_file_store::get_events()
       json_event = nlohmann::json::parse(line);
       e = json_event;
     } catch (...) {
-      UMPIRE_ERROR(umpire::runtime_error,umpire::fmt::format("json_file_store::get_events: Error parsing Line #{}", line_number));
+      UMPIRE_ERROR(umpire::runtime_error,
+                   umpire::fmt::format("json_file_store::get_events: Error parsing Line #{}", line_number));
     }
 
     events.push_back(e);
