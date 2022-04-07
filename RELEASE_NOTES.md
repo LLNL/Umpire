@@ -1,3 +1,8 @@
+# v2022.03.1
+
+This is a patch release of v2022.03 that fixes reported build errors by setting `UMPIRE_ENABLE_DOCS` back to OFF
+by default since building documentation sets requires additional tools to build properly.
+
 # v2022.03.0
 
 ## Changes Impacting Builds
