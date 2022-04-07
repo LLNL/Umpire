@@ -17,6 +17,7 @@
 #include "ReplayOptions.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/event/json_file_store.hpp"
+#include "umpire/json/json.hpp"
 
 class ReplayInterpreter {
   public:

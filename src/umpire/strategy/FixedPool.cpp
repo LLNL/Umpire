@@ -144,7 +144,7 @@ void* FixedPool::allocate(std::size_t bytes)
   }
 
   if (!ptr) {
-    UMPIRE_ERROR("FixedPool::allocate(size=" << m_obj_bytes << "): Could not allocate");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("FixedPool::allocate(size={}): Could not allocate.", m_obj_bytes));
   }
   return ptr;
 }
@@ -171,7 +171,7 @@ void FixedPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
     }
   }
 
-  UMPIRE_ERROR("Could not find the pointer to deallocate");
+  UMPIRE_ERROR(runtime_error, "Could not find the pointer to deallocate");
 }
 
 void FixedPool::release()

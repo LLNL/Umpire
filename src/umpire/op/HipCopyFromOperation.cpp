@@ -9,6 +9,7 @@
 #include <hip/hip_runtime.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -20,9 +21,11 @@ void HipCopyFromOperation::transform(void* src_ptr, void** dst_ptr,
   hipError_t error = ::hipMemcpy(*dst_ptr, src_ptr, length, hipMemcpyDeviceToHost);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemcpy( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
-                                          << ", hipMemcpyDeviceToHost ) failed with error: "
-                                          << hipGetErrorString(error));
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format(
+            "hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}, hipMemcpyDeviceToHost) failed with error: {}",
+            *dst_ptr, src_ptr, length, hipGetErrorString(error)));
   }
 }
 
@@ -36,9 +39,10 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyFromOperation::tra
   hipError_t error = ::hipMemcpyAsync(*dst_ptr, src_ptr, length, hipMemcpyDeviceToHost, stream);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemcpyAsync( dest_ptr = " << *dst_ptr << ", src_ptr = " << src_ptr << ", length = " << length
-                                               << ", hipMemcpyDeviceToHost ) failed with error: "
-                                               << hipGetErrorString(error));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, hipMemcpyDeviceToHost, "
+                                     "stream = {}) failed with error: {}",
+                                     *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

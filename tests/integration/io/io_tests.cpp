@@ -13,7 +13,7 @@
 #include "mpi.h"
 #endif
 
-#include "umpire/tpl/CLI11/CLI11.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 
 int main(int argc, char** argv)
 {

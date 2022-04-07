@@ -21,6 +21,7 @@
 #include "ReplayOperationManager.hpp"
 #include "ReplayOptions.hpp"
 #include "umpire/event/event.hpp"
+#include "umpire/json/json.hpp"
 
 #if defined(UMPIRE_ENABLE_SQLITE)
 #include "umpire/event/sqlite_database.hpp"

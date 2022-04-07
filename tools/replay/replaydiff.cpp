@@ -14,9 +14,9 @@
 #include "umpire/util/Macros.hpp"
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include "umpire/tpl/CLI11/CLI11.hpp"
 #include "ReplayInterpreter.hpp"
 #include "ReplayOptions.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 int main(int argc, char* argv[])

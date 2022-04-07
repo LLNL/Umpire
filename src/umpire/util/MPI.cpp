@@ -10,6 +10,7 @@
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_MPI)
 #include "mpi.h"
@@ -50,7 +51,7 @@ void MPI::initialize(
 
 #endif
   } else {
-    UMPIRE_ERROR("umpire::MPI already initialized, cannot call initialize() again!");
+    UMPIRE_ERROR(runtime_error, "umpire::MPI already initialized, cannot call initialize() again!");
   }
 }
 
@@ -62,14 +63,14 @@ void MPI::finalize()
     s_world_size = -1;
 #endif
   } else {
-    UMPIRE_ERROR("Cannot call MPI::finalize() when umpire::MPI not initialiazed");
+    UMPIRE_ERROR(runtime_error, "Cannot call MPI::finalize() when umpire::MPI not initialiazed");
   }
 }
 
 int MPI::getRank()
 {
   if (!s_initialized) {
-    UMPIRE_LOG(Warning, "umpire::MPI not initialized, returning rank=" << s_rank);
+    UMPIRE_LOG(Warning, umpire::fmt::format("umpire::MPI not initialized, returning rank={}", s_rank));
   }
 
   return s_rank;
@@ -78,7 +79,7 @@ int MPI::getRank()
 int MPI::getSize()
 {
   if (!s_initialized) {
-    UMPIRE_LOG(Warning, "umpire::MPI not initialized, returning size=" << s_world_size);
+    UMPIRE_LOG(Warning, umpire::fmt::format("umpire::MPI not initialized, returning size={}", s_world_size));
   }
 
   return s_world_size;
@@ -91,7 +92,7 @@ void MPI::sync()
     MPI_Barrier(s_communicator);
 #endif
   } else {
-    UMPIRE_ERROR("Cannot call MPI::sync() before umpire::MPI is initialized");
+    UMPIRE_ERROR(runtime_error, "Cannot call MPI::sync() before umpire::MPI is initialized");
   }
 }
 

@@ -16,10 +16,10 @@
 #include "umpire/util/Macros.hpp"
 
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-#include "umpire/tpl/CLI11/CLI11.hpp"
 #include "ReplayInterpreter.hpp"
 #include "ReplayMacros.hpp"
 #include "ReplayOptions.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 
 const static ReplayUsePoolValidator ReplayValidPool;
 const static ReplayUseHeuristicValidator ReplayValidHeuristic;

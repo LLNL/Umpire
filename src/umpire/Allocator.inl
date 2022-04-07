@@ -12,6 +12,7 @@
 #include "umpire/event/event.hpp"
 #include "umpire/event/recorder_factory.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 
@@ -26,7 +27,13 @@ inline void* Allocator::allocate(std::size_t bytes)
   if (0 == bytes) {
     ret = allocateNull();
   } else {
-    ret = m_allocator->allocate(bytes);
+    try {
+      ret = m_allocator->allocate(bytes);
+    } catch (umpire::out_of_memory_error& e) {
+      e.set_allocator_id(this->getId());
+      e.set_requested_size(bytes);
+      throw;
+    }
   }
 
   if (m_tracking) {
