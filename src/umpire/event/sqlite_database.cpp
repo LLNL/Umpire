@@ -14,7 +14,7 @@
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/event/event_json.hpp"
-#include "umpire/tpl/json/json.hpp"
+#include "umpire/json/json.hpp"
 
 namespace umpire {
 namespace event {

@@ -8,7 +8,7 @@
 #define UMPIRE_event_json_HPP
 
 #include "umpire/event/event.hpp"
-#include "umpire/tpl/json/json.hpp"
+#include "umpire/json/json.hpp"
 
 namespace umpire {
 namespace event {
