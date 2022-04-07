@@ -10,6 +10,7 @@
 #include <CL/sycl.hpp>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -26,7 +27,7 @@ struct SyclMallocManagedAllocator {
    *
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t bytes, const sycl::queue& queue_t)
   {
@@ -35,7 +36,7 @@ struct SyclMallocManagedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << usm_ptr);
 
     if (usm_ptr == nullptr) {
-      UMPIRE_ERROR("sycl::malloc_shared( bytes = " << bytes << " ) failed with error!");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_shared( bytes = {} ) failed", bytes));
     } else {
       return usm_ptr;
     }
@@ -46,7 +47,7 @@ struct SyclMallocManagedAllocator {
    *
    * \param usm_ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory be free'd.
+   * \throws umpire::util::runtime_error if memory be free'd.
    */
   void deallocate(void* usm_ptr, const sycl::queue& queue_t)
   {

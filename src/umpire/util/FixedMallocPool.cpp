@@ -16,6 +16,7 @@
 #include <cstring>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace util {
@@ -113,7 +114,7 @@ void FixedMallocPool::deallocate(void* ptr)
     }
   }
 
-  UMPIRE_ERROR("Could not find the pointer to deallocate");
+  UMPIRE_ERROR(runtime_error, "Could not find the pointer to deallocate");
 }
 
 std::size_t FixedMallocPool::numPools() const noexcept

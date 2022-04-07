@@ -4,11 +4,10 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-add_subdirectory(tpl)
+add_subdirectory(util)
 add_subdirectory(resource)
 add_subdirectory(alloc)
 add_subdirectory(op)
-add_subdirectory(util)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)

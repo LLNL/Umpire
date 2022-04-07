@@ -369,14 +369,14 @@ TYPED_TEST(PrimaryPoolTest, heuristic_bounds)
         auto h = Pool::percent_releasable(-1);
         UMPIRE_USE_VAR(h);
       },
-      umpire::util::Exception);
+      umpire::runtime_error);
 
   EXPECT_THROW(
       {
         auto h = Pool::percent_releasable(101);
         UMPIRE_USE_VAR(h);
       },
-      umpire::util::Exception);
+      umpire::runtime_error);
 }
 
 TYPED_TEST(PrimaryPoolTest, heuristic_0_percent)

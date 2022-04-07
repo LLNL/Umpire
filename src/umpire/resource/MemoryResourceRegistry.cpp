@@ -65,6 +65,7 @@
 
 #include "umpire/Replay.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace resource {
@@ -231,7 +232,7 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
     }
   }
 
-  UMPIRE_ERROR("MemoryResource " << name << " not found");
+  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryResource(const std::string& name, int id,
@@ -244,7 +245,7 @@ std::unique_ptr<resource::MemoryResource> MemoryResourceRegistry::makeMemoryReso
     }
   }
 
-  UMPIRE_ERROR("MemoryResource " << name << " not found");
+  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const std::string& name)
@@ -255,7 +256,7 @@ MemoryResourceTraits MemoryResourceRegistry::getDefaultTraitsForResource(const s
     }
   }
 
-  UMPIRE_ERROR("MemoryResource " << name << " not found");
+  UMPIRE_ERROR(runtime_error, umpire::fmt::format("MemoryResource \"{}\" not found", name));
 }
 
 } // end of namespace resource

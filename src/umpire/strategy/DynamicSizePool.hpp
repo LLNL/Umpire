@@ -237,7 +237,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
             // Ignore error in case the underlying vendor API has already
             // shutdown
             //
-            UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+            UMPIRE_LOG(Error, "Pool is destructing, runtime_error Ignored");
           } else {
             throw;
           }
