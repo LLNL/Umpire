@@ -8,8 +8,8 @@
 stages:
   - build_and_test
 
+# Gitlab jobs for the lassen machine at LLNL.
 # CPU only.
-
 ibm_clang_9:
   variables:
     SPEC: "+fortran %clang@ibm.9.0.0"
@@ -61,7 +61,6 @@ xl_16_1_1_10_gcc_8_3_1:
   extends: .build_and_test_on_lassen
 
 # CUDA.
-
 ibm_clang_9_cuda:
   variables:
     SPEC: "+fortran+cuda %clang@ibm.9.0.0 ^cuda@10.1.168"
@@ -93,7 +92,6 @@ xl_16_1_1_10_gcc_8_3_1_cuda_11:
   extends: .build_and_test_on_lassen
 
 # Extras.
-
 clang_9_0_0_libcpp (build and test on lassen):
   variables:
     SPEC: "%clang@9.0.0+libcpp cxxflags='-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0' cflags='-DGTEST_HAS_CXXABI_H_=0'"

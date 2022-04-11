@@ -16,7 +16,7 @@ variables:
 # at the same location whoever triggers a pipeline.
   CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 
-# Tells Gitlab to recursively update the submodules when cloning umpire
+# Tells Gitlab to recursively update the submodules when cloning the project.
   GIT_SUBMODULE_STRATEGY: recursive
 
 # We build the projects in the CI clone directory.
