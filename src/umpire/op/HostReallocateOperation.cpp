@@ -10,7 +10,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/mixins/Inspector.hpp"
-#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -36,8 +36,8 @@ void HostReallocateOperation::transform(void* current_ptr, void** new_ptr, util:
     *new_ptr = ::realloc(current_ptr, new_size);
 
     if (!*new_ptr) {
-      UMPIRE_ERROR("::realloc(current_ptr=" << current_ptr << ", old_size=" << old_record.size
-                                            << ", new_size=" << new_size << ") failed");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("::realloc(current_ptr={}, old_size={}, new_size={}) failed.",
+                                                      current_ptr, old_record.size, new_size));
     }
 
     ResourceManager::getInstance().registerAllocation(*new_ptr, {*new_ptr, new_size, new_allocation->strategy});

@@ -225,7 +225,7 @@ void QuickPool::release()
           //
           // Ignore error in case the underlying vendor API has already shutdown
           //
-          UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+          UMPIRE_LOG(Error, "Pool is destructing, runtime_error Ignored");
         } else {
           throw;
         }
@@ -340,7 +340,9 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblock
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
 
   if (percentage == 0) {

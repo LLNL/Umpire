@@ -21,7 +21,7 @@
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
 #include <cuda_runtime_api.h>
@@ -275,11 +275,11 @@ TYPED_TEST(CopyTest, InvalidSize)
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_THROW(rm.copy(this->dest_array, this->source_array, (this->m_size + 100) * sizeof(float)),
-               umpire::util::Exception);
+               umpire::runtime_error);
 
   float* small_dest_array = static_cast<float*>(this->dest_allocator->allocate(10 * sizeof(float)));
 
-  ASSERT_THROW(rm.copy(small_dest_array, this->source_array), umpire::util::Exception);
+  ASSERT_THROW(rm.copy(small_dest_array, this->source_array), umpire::runtime_error);
 
   this->dest_allocator->deallocate(small_dest_array);
 }
@@ -344,14 +344,14 @@ TYPED_TEST(MemsetTest, InvalidSize)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(rm.memset(this->source_array, 0, (this->m_size + 100) * sizeof(float)), umpire::util::Exception);
+  ASSERT_THROW(rm.memset(this->source_array, 0, (this->m_size + 100) * sizeof(float)), umpire::runtime_error);
 }
 
 TYPED_TEST(MemsetTest, InvalidPointer)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(rm.memset((void*)0x1, 0), umpire::util::Exception);
+  ASSERT_THROW(rm.memset((void*)0x1, 0), umpire::runtime_error);
 }
 
 template <typename T>
@@ -632,7 +632,7 @@ TYPED_TEST(ReallocateTest, ReallocateWithAllocatorFail)
     SUCCEED();
   } else {
     umpire::ResourceManager& rm = umpire::ResourceManager::getInstance();
-    ASSERT_THROW(rm.reallocate(this->source_array, this->m_size, *this->dest_allocator), umpire::util::Exception);
+    ASSERT_THROW(rm.reallocate(this->source_array, this->m_size, *this->dest_allocator), umpire::runtime_error);
   }
 }
 

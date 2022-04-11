@@ -44,14 +44,15 @@ ruby-build-and-test:
     include: .gitlab/ruby-build-and-test.yml
     strategy: depend
 
-corona-build-and-test:
-  stage: build-and-test
-  variables:
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_CORONA: "${ON_CORONA}"
-  trigger:
-    include: .gitlab/corona-build-and-test.yml
-    strategy: depend
+# Turning off corona temporarily
+#corona-build-and-test:
+#  stage: build-and-test
+#  variables:
+#    ALL_TARGETS: "${ALL_TARGETS}"
+#    ON_CORONA: "${ON_CORONA}"
+#  trigger:
+#    include: .gitlab/corona-build-and-test.yml
+#    strategy: depend
 
 lassen-build-and-test:
   stage: build-and-test
@@ -75,4 +76,3 @@ lassen-build-and-test:
 #    project: radiuss/chai
 #    branch: develop
 #    strategy: depend
-

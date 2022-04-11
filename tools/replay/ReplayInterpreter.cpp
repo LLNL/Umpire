@@ -19,7 +19,7 @@
 #include "ReplayMacros.hpp"
 #include "ReplayOperationManager.hpp"
 #include "ReplayOptions.hpp"
-#include "umpire/tpl/json/json.hpp"
+#include "umpire/json/json.hpp"
 
 ReplayInterpreter::ReplayInterpreter(const ReplayOptions& options)
     : m_options{options}, m_input_file{m_options.input_file}

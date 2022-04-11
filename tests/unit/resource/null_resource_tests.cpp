@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 #include "resource_tests.hpp"
 #include "umpire/resource/NullMemoryResource.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/error.hpp"
 
 TYPED_TEST_P(ResourceTest, AccessNullResource)
 {

@@ -21,7 +21,7 @@ set(UMPIRE_ENABLE_FORTRAN Off)
 #
 # Json
 set (json_headers
-  ./json/json.hpp )
+  umpire/json/json.hpp )
 
 blt_add_library(
   NAME umpire_tpl_json
@@ -33,11 +33,15 @@ if (C_COMPILER_FAMILY_IS_PGI)
     INTERFACE
     --diag_suppress186)
 endif ()
+
 target_link_libraries(umpire_tpl_json INTERFACE)
+
+blt_patch_target(NAME umpire_tpl_json
+                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 install(FILES
   ${json_headers}
-  DESTINATION include/umpire/tpl/json)
+  DESTINATION include/umpire/json)
 
 install(TARGETS
   umpire_tpl_json
@@ -49,7 +53,7 @@ install(TARGETS
 #
 # CLI11 Option Parsing Headers
 set (CLI11_headers
-  ./CLI11/CLI11.hpp )
+  umpire/CLI11/CLI11.hpp )
 
 blt_add_library(
   NAME umpire_tpl_CLI11
@@ -60,13 +64,13 @@ target_link_libraries(umpire_tpl_CLI11 INTERFACE)
 target_include_directories(
   umpire_tpl_CLI11
   INTERFACE
-  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 
 install(FILES
   ${CLI11_headers}
-  DESTINATION include/umpire/tpl/CLI11)
+  DESTINATION include/umpire/CLI11)
 
 install(TARGETS
   umpire_tpl_CLI11
@@ -75,7 +79,10 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-add_subdirectory(judy)
+blt_patch_target(NAME umpire_tpl_CLI11
+                 TREAT_INCLUDES_AS_SYSTEM ON)
+
+add_subdirectory(umpire/judy)
 
 if (NOT TARGET camp)
   if (DEFINED camp_DIR)
@@ -86,7 +93,7 @@ if (NOT TARGET camp)
     )
     set_target_properties(camp PROPERTIES IMPORTED_GLOBAL TRUE)
   else ()
-    add_subdirectory(camp)
+    add_subdirectory(umpire/camp)
   endif()
 
   if(UMPIRE_ENABLE_CUDA)
@@ -104,6 +111,73 @@ if (NOT TARGET camp)
   endif()
 
 endif ()
+
+set(fmt_headers
+    umpire/fmt/fmt.hpp
+    umpire/fmt/args.h
+    umpire/fmt/chrono.h
+    umpire/fmt/color.h
+    umpire/fmt/compile.h
+    umpire/fmt/core.h
+    umpire/fmt/format-inl.h
+    umpire/fmt/format.h
+    umpire/fmt/locale.h
+    umpire/fmt/os.h
+    umpire/fmt/ostream.h
+    umpire/fmt/printf.h
+    umpire/fmt/ranges.h
+    )
+
+blt_add_library(NAME    umpire_tpl_fmt
+                HEADERS ${fmt_headers})
+
+
+target_include_directories(
+  umpire_tpl_fmt
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+if (C_COMPILER_FAMILY_IS_XL)
+  set(_fmt_warning_disable_flag
+    $<$<NOT:$<COMPILE_LANGUAGE:CUDA>>:-Wno-unknown-attributes> 
+    $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wno-unknown-attributes>)
+
+    target_compile_options(umpire_tpl_fmt INTERFACE ${_fmt_warning_disable_flag})
+endif ()
+
+if (C_COMPILER_FAMILY_IS_PGI)
+  set(_fmt_warning_disable_flag
+   "--diag_suppress 1625;--diag_suppress 185;--diag_suppress 811;--diag_suppress 186")
+   
+   if (ENABLE_FORTRAN)
+    target_compile_options(umpire_tpl_fmt
+      INTERFACE 
+      $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${_fmt_warning_disable_flag}>)
+    else ()
+      target_compile_options(umpire_tpl_fmt
+        INTERFACE 
+        ${_fmt_warning_disable_flag})
+    endif ()
+endif ()
+
+# Avoid warnings from fmt (so we can still use -Werror)
+blt_patch_target(NAME umpire_tpl_fmt
+  TREAT_INCLUDES_AS_SYSTEM ON)
+
+blt_print_target_properties(TARGET umpire_tpl_fmt)
+
+install(TARGETS
+  umpire_tpl_fmt
+  EXPORT umpire-targets
+  RUNTIME DESTINATION lib
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
+
+install(FILES
+  ${fmt_headers}
+  DESTINATION include/umpire/fmt)
 
 set(UMPIRE_ENABLE_TESTS ${OLD_ENABLE_TESTS})
 set(UMPIRE_ENABLE_FORTRAN ${OLD_ENABLE_FORTRAN})

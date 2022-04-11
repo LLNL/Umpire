@@ -12,6 +12,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 __constant__ static char s_umpire_internal_device_constant_memory[64 * 1024];
 
@@ -38,7 +39,9 @@ void* HipConstantMemoryResource::allocate(std::size_t bytes)
   void* ret{static_cast<void*>(ptr)};
 
   if (m_offset > 1024 * 64) {
-    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("Max total size of constant allocations is 64KB, current size is {} bytes",
+                                     (m_offset - bytes)));
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
@@ -55,7 +58,7 @@ void HipConstantMemoryResource::deallocate(void* ptr, std::size_t size)
   if ((static_cast<char*>(m_ptr) + (m_offset - size)) == static_cast<char*>(ptr)) {
     m_offset -= size;
   } else {
-    UMPIRE_ERROR("HipConstantMemory deallocations must be in reverse order");
+    UMPIRE_ERROR(runtime_error, "HipConstantMemory deallocations must be in reverse order");
   }
 }
 

@@ -13,9 +13,13 @@ rocm_4_5_2_fortran_clang_13_0_0 (build and test on corona):
     SPEC: "+fortran+rocm~tools amdgpu_target=gfx906 %clang@13.0.0 ^blt@develop ^hip@4.5.2"
   extends: .build_and_test_on_corona
 
-rocm_4_5_2_fortran_clang_13_0_0(build and test on corona):
+###
+# This job intentionally tests our umpire package.py because although this job does not
+# explicitly have the ~tools, the package.py should still disable tools from being built.
+###
+rocm_4_5_2_openmp_fortran_clang_13_0_0(build and test on corona):
   variables:
-    SPEC: "+fortran+rocm amdgpu_target=gfx906 %clang@13.0.0 ^blt@develop ^hip@4.5.2"
+    SPEC: "+fortran+rocm+openmp amdgpu_target=gfx906 %clang@13.0.0 ^blt@develop ^hip@4.5.2"
   extends: .build_and_test_on_corona
 
 include:

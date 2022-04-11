@@ -23,10 +23,10 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator, int
       m_node(numa_node)
 {
   if (numa_node < 0) {
-    UMPIRE_ERROR("NumaPolicy error: NUMA nodes are always non-negative ints");
+    UMPIRE_ERROR(runtime_error, "NumaPolicy error: NUMA nodes are always non-negative ints");
   }
   if (allocator.getPlatform() != Platform::host) {
-    UMPIRE_ERROR("NumaPolicy error: allocator is not of cpu type");
+    UMPIRE_ERROR(runtime_error, "NumaPolicy error: allocator is not of cpu type");
   }
 
 #if defined(UMPIRE_ENABLE_DEVICE)
@@ -38,7 +38,7 @@ NumaPolicy::NumaPolicy(const std::string& name, int id, Allocator allocator, int
 #elif defined(UMPIRE_ENABLE_HIP)
     m_platform = Platform::hip;
 #else
-    UMPIRE_ERROR("Could not determine device platform.");
+    UMPIRE_ERROR(runtime_error, "Could not determine device platform.");
 #endif
   }
 #endif

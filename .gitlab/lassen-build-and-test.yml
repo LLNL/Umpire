@@ -35,16 +35,6 @@ gcc_8_3_1:
     SPEC: "+fortran%gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-pgi_19_10:
-  variables:
-    SPEC: "+fortran%pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
-  extends: .build_and_test_on_lassen
-
-pgi_19_10_gcc_8_3_1:
-  variables:
-    SPEC: "+fortran%pgi@19.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
-  extends: .build_and_test_on_lassen
-
 pgi_20_4_gcc_8_3_1:
   variables:
     SPEC: "+fortran%pgi@20.4 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
@@ -78,7 +68,7 @@ clang_10_0_1_cuda_mpi_shmem:
 
 gcc_8_3_1_cuda:
   variables:
-    SPEC: "+fortran+cuda %gcc@8.3.1 ^cuda@10.1.168"
+    SPEC: "+fortran+cuda+shared %gcc@8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda:

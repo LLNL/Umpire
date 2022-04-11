@@ -7,10 +7,11 @@
 #ifndef UMPIRE_MallocAllocator_HPP
 #define UMPIRE_MallocAllocator_HPP
 
+#include <cerrno>
 #include <cstdlib>
 
-#include "umpire/util/Macros.hpp"
 #include "umpire/util/Platform.hpp"
+#include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_HIP)
 #include <hip/hip_runtime_api.h>
@@ -32,7 +33,7 @@ struct MallocAllocator {
    * \param bytes Number of bytes to allocate.
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t bytes)
   {
@@ -40,10 +41,14 @@ struct MallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR("malloc( bytes = " << bytes << " ) failed");
-    } else {
-      return ret;
+      if (errno == ENOMEM) {
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("malloc( bytes = {} ) failed.", bytes))
+      } else {
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("malloc( bytes = {} ) failed {}", bytes, strerror(errno)))
+      }
     }
+
+    return ret;
   }
 
   /*!
@@ -51,7 +56,7 @@ struct MallocAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory cannot be free'd.
+   * \throws umpire::util::runtime_error if memory cannot be free'd.
    */
   void deallocate(void* ptr)
   {
