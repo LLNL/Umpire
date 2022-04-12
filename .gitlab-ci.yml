@@ -41,7 +41,10 @@ ruby-build-and-test:
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_RUBY: "${ON_RUBY}"
   trigger:
-    include: .gitlab/ruby-build-and-test.yml
+    include:
+    - local: .gitlab/configs/custom.yml
+    - local: .gitlab/configs/machines.yml
+    - local: .gitlab/ruby-build-and-test.yml
     strategy: depend
 
 corona-build-and-test:
@@ -49,8 +52,10 @@ corona-build-and-test:
   variables:
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_CORONA: "${ON_CORONA}"
-  trigger:
-    include: .gitlab/corona-build-and-test.yml
+   include:
+   - local: .gitlab/configs/custom.yml
+   - local: .gitlab/configs/machines.yml
+   - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
 
 lassen-build-and-test:
@@ -59,7 +64,10 @@ lassen-build-and-test:
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_LASSEN: "${ON_LASSEN}"
   trigger:
-    include: .gitlab/lassen-build-and-test.yml
+    include:
+    - local: .gitlab/configs/custom.yml
+    - local: .gitlab/configs/machines.yml
+    - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
 
 # If testing develop branch, trigger CHAI pipeline with this version of Umpire.

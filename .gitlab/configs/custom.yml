@@ -27,3 +27,28 @@ variables:
 # in order to save time and resources. This allocation has to be uniquely named
 # so that we are sure to retrieve it and avoid collisions.
   ALLOC_NAME: ${CI_PROJECT_NAME}_ci_${CI_PIPELINE_ID}
+
+# Ruby
+# Arguments for top level allocation
+  RUBY_BUILD_AND_TEST_SHARED_ALLOC: "-N 1 -c 36 -p pdebug -t 10"
+# Arguments for job level allocation
+  RUBY_BUILD_AND_TEST_JOB_ALLOC: "-t 10 -N 1"
+
+# Corona
+# Arguments for top level allocation
+  CORONA_BUILD_AND_TEST_SHARED_ALLOC: "-N 1 -c 36 -p pdebug -t 10"
+# Arguments for job level allocation
+  CORONA_BUILD_AND_TEST_JOB_ALLOC: "-p pdebug -t 10 -N 1"
+
+# Lassen and Butte use a different job scheduler (spectrum lsf) that does not
+# allow pre-allocation the same way slurm does.
+# Arguments for job level allocation
+  LASSEN_BUILD_AND_TEST_JOB_ALLOC: "1 -W 12"
+
+# Configuration shared by build and test jobs specific to this project.
+# Not all configuration can be shared, here is here projects can fine tune the
+# CI behavior.
+.custom_build_and_test:
+  artifacts:
+    reports:
+      junit: junit.xml
