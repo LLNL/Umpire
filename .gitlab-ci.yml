@@ -48,7 +48,7 @@ stages:
   - r_build_and_test
   - r_release_resources
   - l_build_and_test
-# - c_build_and_test
+  - c_build_and_test
 #  - multi_project
 
 # This is the rules that drives the activation of "advanced" jobs. All advanced
@@ -72,12 +72,12 @@ stages:
     reports:
       junit: junit.xml
 
-#.build_toss_4_x86_64_ib_corona_script:
-#  script:
-#    - srun -p pbatch -t 30 -N 1 scripts/gitlab/build_and_test.sh
-#  artifacts:
-#    reports:
-#      junit: junit.xml
+.build_toss_4_x86_64_ib_corona_script:
+  script:
+    - srun -p pdebug -t 30 -N 1 scripts/gitlab/build_and_test.sh
+  artifacts:
+    reports:
+      junit: junit.xml
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
@@ -111,5 +111,5 @@ include:
   - local: .gitlab/ruby-jobs.yml
   - local: .gitlab/lassen-templates.yml
   - local: .gitlab/lassen-jobs.yml
-# - local: .gitlab/corona-templates.yml
-# - local: .gitlab/corona-jobs.yml
+  - local: .gitlab/corona-templates.yml
+  - local: .gitlab/corona-jobs.yml
