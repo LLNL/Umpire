@@ -194,6 +194,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                                         rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("HIP_HIPCC_FLAGS",
                                         '--amdgpu-target=gfx906'))
+            entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES",
+                                        'fx906'))
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
             hip_link_flags = ""
             if '%gcc' in spec:
