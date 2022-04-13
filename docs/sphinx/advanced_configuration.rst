@@ -14,27 +14,28 @@ argument is a boolean option, and  can be turned on or off:
 
 Here is a summary of the configuration options, their default value, and meaning:
 
-    ================================    ========    ===========================================================================
-    Variable                            Default     Meaning
-    ================================    ========    ===========================================================================
-    ``ENABLE_BENCHMARKS``               On          Build benchmark programs
-    ``ENABLE_CUDA``                     Off         Enable CUDA support
-    ``ENABLE_DOCS``                     Off         Build documentation (requires Sphinx and/or Doxygen)
-    ``ENABLE_FORTRAN``                  Off         Build the Fortran API
-    ``ENABLE_HIP``                      Off         Enable HIP support
-    ``ENABLE_TESTS``                    On          Build test executables
-    ``UMPIRE_ENABLE_ASAN``              Off         Enable ASAN support
-    ``UMPIRE_ENABLE_BACKTRACE_SYMBOLS`` Off         Enable symbol lookup for backtraces
-    ``UMPIRE_ENABLE_BACKTRACE``         Off         Enable backtraces for allocations
-    ``UMPIRE_ENABLE_C``                 Off         Build the C API
-    ``UMPIRE_ENABLE_FILE_RESOURCE``     Off         Enable FILE support      
-    ``UMPIRE_ENABLE_IPC_SHARED_MEMORY`` ENABLE_MPI  Enable Shared Memory support
-    ``UMPIRE_ENABLE_LOGGING``           On          Enable Logging within Umpire
-    ``UMPIRE_ENABLE_NUMA``              Off         Enable NUMA support
-    ``UMPIRE_ENABLE_PERFORMANCE_TESTS`` Off         Build and run performance tests
-    ``UMPIRE_ENABLE_SLIC``              Off         Enable SLIC logging
-    ``UMPIRE_ENABLE_TOOLS``             Off         Enable tools like replay
-    ==================================  ==========  ===========================================================================
+    ====================================== ==========  ===========================================================================
+    Variable                               Default     Meaning
+    ====================================== ==========  ===========================================================================
+    ``ENABLE_BENCHMARKS``                  On          Build benchmark programs
+    ``ENABLE_CUDA``                        Off         Enable CUDA support
+    ``ENABLE_DOCS``                        Off         Build documentation (requires Sphinx and/or Doxygen)
+    ``ENABLE_FORTRAN``                     Off         Build the Fortran API
+    ``ENABLE_HIP``                         Off         Enable HIP support
+    ``ENABLE_TESTS``                       On          Build test executables
+    ``UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG`` Off         Disable verbose output from AllocationMap when a pointer cannot be found
+    ``UMPIRE_ENABLE_ASAN``                 Off         Enable ASAN support
+    ``UMPIRE_ENABLE_BACKTRACE_SYMBOLS``    Off         Enable symbol lookup for backtraces
+    ``UMPIRE_ENABLE_BACKTRACE``            Off         Enable backtraces for allocations
+    ``UMPIRE_ENABLE_C``                    Off         Build the C API
+    ``UMPIRE_ENABLE_FILE_RESOURCE``        Off         Enable FILE support      
+    ``UMPIRE_ENABLE_IPC_SHARED_MEMORY``    ENABLE_MPI  Enable Shared Memory support
+    ``UMPIRE_ENABLE_LOGGING``              On          Enable Logging within Umpire
+    ``UMPIRE_ENABLE_NUMA``                 Off         Enable NUMA support
+    ``UMPIRE_ENABLE_PERFORMANCE_TESTS``    Off         Build and run performance tests
+    ``UMPIRE_ENABLE_SLIC``                 Off         Enable SLIC logging
+    ``UMPIRE_ENABLE_TOOLS``                Off         Enable tools like replay
+    ====================================== ==========  ===========================================================================
 
 These arguments are explained in more detail below:
 
@@ -59,6 +60,11 @@ These arguments are explained in more detail below:
 
 * ``ENABLE_TESTS``
   This option controls whether or not test executables will be built.
+
+* ``UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG``
+  This option disables verbose output from the AllocationMap during debug
+  builds. By default, when an allocation cannot be found, the contents of the
+  AllocationMap are printed.
 
 * ``UMPIRE_ENABLE_ASAN``
   This option enables address sanitization checks within Umpire by compilers
