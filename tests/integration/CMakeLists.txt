@@ -80,6 +80,9 @@ blt_add_executable(
   SOURCES allocator_accessibility.cpp
   DEPENDS_ON ${accessibility_test_depends})
 
+set_source_files_properties(allocator_accessibility.cpp 
+PROPERTIES COMPILE_FLAGS --offload-arch=gfx906)
+
 target_include_directories(
   allocator_accessibility_tests
   PRIVATE
