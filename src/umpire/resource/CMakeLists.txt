@@ -33,6 +33,7 @@ set (umpire_resource_sources
 )
 
 set(umpire_resource_depends
+  umpire_util
   camp)
 
 if(UMPIRE_ENABLE_FILE_RESOURCE)
