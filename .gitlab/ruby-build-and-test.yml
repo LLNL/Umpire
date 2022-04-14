@@ -5,6 +5,21 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
+stages:
+  - allocate_resources
+  - build_and_test
+  - release_resources
+
+# In pre-build phase, allocate a node for builds.
+# TODO: make the resource configurable, not all projects will want the same.
+allocate_resources (on ruby):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_ruby
+  stage: allocate_resources
+  script:
+    - salloc ${RUBY_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
+
 # Gitlab jobs for the Ruby machine at LLNL.
 clang_10:
   variables:
@@ -57,3 +72,16 @@ gcc_8_1_0_tpls:
   variables:
     SPEC: "+fortran %gcc@8.1.0 ^blt@develop"
   extends: .build_and_test_on_ruby
+
+# In post-build phase, deallocate resources.
+# Note : we make sure this is run even on build phase failure using a specific
+# rule in the template ".on_ruby".
+release_resources (on ruby):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_ruby
+  stage: release_resources
+  script:
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
+
