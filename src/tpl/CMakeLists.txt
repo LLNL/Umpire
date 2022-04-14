@@ -166,8 +166,6 @@ endif ()
 blt_patch_target(NAME umpire_tpl_fmt
   TREAT_INCLUDES_AS_SYSTEM ON)
 
-blt_print_target_properties(TARGET umpire_tpl_fmt)
-
 install(TARGETS
   umpire_tpl_fmt
   EXPORT umpire-targets
