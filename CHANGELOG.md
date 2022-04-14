@@ -6,6 +6,11 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v2022.03.1 - 2022-04-12]
+
+- Fix reported build errors by setting UMPIRE_ENABLE_DOCS back to OFF by default
+  since building documentation sets requires additional tools to build properly.
+
 ## [v2022.03.0 - 2022-03-14]
 
 ### Build Changes and Updates

@@ -9,7 +9,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/util/Exception.hpp"
 
 int main(int, char**)
 {

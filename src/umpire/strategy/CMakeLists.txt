@@ -59,7 +59,7 @@ if (UMPIRE_ENABLE_NUMA)
     NumaPolicy.cpp)
 endif ()
 
-set(umpire_strategy_depends camp)
+set(umpire_strategy_depends camp umpire_util)
 
 if (UMPIRE_ENABLE_CUDA)
   set(umpire_strategy_depends

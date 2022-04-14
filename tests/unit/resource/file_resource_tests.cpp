@@ -12,7 +12,7 @@
 #include "gtest/gtest.h"
 #include "resource_tests.hpp"
 #include "umpire/resource/FileMemoryResource.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/error.hpp"
 
 TYPED_TEST_P(ResourceTest, AllocateDeallocate)
 {
@@ -34,7 +34,7 @@ TYPED_TEST_P(ResourceTest, AllocateDeallocate)
 
 TYPED_TEST_P(ResourceTest, ZeroFile)
 {
-  ASSERT_THROW(this->memory_resource->allocate(0), umpire::util::Exception);
+  ASSERT_THROW(this->memory_resource->allocate(0), umpire::runtime_error);
 }
 
 TYPED_TEST_P(ResourceTest, LargeFile)

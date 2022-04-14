@@ -54,3 +54,12 @@ blt_add_executable(
 blt_add_test(
   NAME memory_map_tests
   COMMAND memory_map_tests)
+
+blt_add_executable(
+  NAME find_first_set_tests
+  SOURCES find_first_set_tests.cpp
+  DEPENDS_ON umpire gtest)
+
+blt_add_test(
+  NAME find_first_set_tests
+  COMMAND find_first_set_tests)
