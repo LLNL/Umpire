@@ -42,6 +42,9 @@ then
 
     if [[ -d /dev/shm ]]
     then
+        echo "ls -alR /dev/shm"
+        ls -alR /dev/shm
+        echo ""
         prefix="/dev/shm/${hostname}"
         if [[ -z ${job_unique_id} ]]; then
           job_unique_id=manual_job_$(date +%s)
@@ -56,6 +59,7 @@ then
         prefix_opt="--prefix=${prefix}"
     fi
 
+    echo 'python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}'
     python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
