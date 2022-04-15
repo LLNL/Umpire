@@ -31,7 +31,12 @@
   extends: [.custom_build_and_test, .on_corona]
   stage: build_and_test
   script:
-    - srun ${CORONA_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+    - echo ${ALLOC_NAME}
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - echo ${JOBID}
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) ${RUBY_BUILD_AND_TEST_JOB_ALLOC} scripts/gitlab/build_and_test.sh
+  variables:
+    SLURM_OVERLAP: 1
 
 ##############################################################################
 # LASSEN

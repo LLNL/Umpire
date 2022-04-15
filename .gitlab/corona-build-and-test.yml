@@ -6,7 +6,18 @@
 ##############################################################################
 
 stages:
+  - allocate_resources
   - build_and_test
+  - release_resources
+
+# In pre-build phase, allocate a node for builds.
+allocate_resources (on corona):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_corona
+  stage: allocate_resources
+  script:
+    - salloc ${RUBY_BUILD_AND_TEST_SHARED_ALLOC} --no-shell --job-name=${ALLOC_NAME}
 
 rocm_4_5_2_fortran_clang_13_0_0 (build and test on corona):
   variables:
@@ -21,3 +32,15 @@ rocm_4_5_2_openmp_fortran_clang_13_0_0(build and test on corona):
   variables:
     SPEC: "+fortran+rocm+openmp amdgpu_target=gfx906 %clang@13.0.0 ^blt@develop ^hip@4.5.2"
   extends: .build_and_test_on_corona
+
+# In post-build phase, deallocate resources.
+# Note : we make sure this is run even on build phase failure using a specific
+# rule in the template ".on_corona".
+release_resources (on corona):
+  variables:
+    GIT_STRATEGY: none
+  extends: .on_corona
+  stage: release_resources
+  script:
+    - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
+    - ([[ -n "${JOBID}" ]] && scancel ${JOBID})
