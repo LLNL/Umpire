@@ -91,7 +91,9 @@ fi
 # Build Directory
 if [[ -z ${build_root} ]]
 then
-    build_root="/tmp$(pwd)"
+    build_root="/dev/shm$(pwd)"
+else
+    build_root="/dev/shm${build_root}"
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
