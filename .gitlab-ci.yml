@@ -65,7 +65,7 @@ stages:
     - echo ${ALLOC_NAME}
     - export JOBID=$(squeue -h --name=${ALLOC_NAME} --format=%A)
     - echo ${JOBID}
-    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 30 -N 1 scripts/gitlab/build_and_test.sh
+    - srun $( [[ -n "${JOBID}" ]] && echo "--jobid=${JOBID}" ) -t 10 -N 1 scripts/gitlab/build_and_test.sh
   variables:
     SLURM_OVERLAP: 1
   artifacts:
@@ -74,7 +74,7 @@ stages:
 
 .build_toss_4_x86_64_ib_corona_script:
   script:
-    - srun -p pdebug -t 30 -N 1 scripts/gitlab/build_and_test.sh
+    - srun -p pdebug -t 10 -N 1 scripts/gitlab/build_and_test.sh
   artifacts:
     reports:
       junit: junit.xml
@@ -83,7 +83,7 @@ stages:
 # allow pre-allocation the same way slurm does.
 .build_blueos_3_ppc64le_ib_script:
   script:
-    - lalloc 1 -W 30 scripts/gitlab/build_and_test.sh
+    - lalloc 1 -W 10 scripts/gitlab/build_and_test.sh
   artifacts:
     reports:
       junit: junit.xml
