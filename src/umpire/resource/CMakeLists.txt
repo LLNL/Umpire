@@ -4,6 +4,9 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
+
+set(umpire_resource_depends umpire_util camp umpire_tpl_fmt)
+
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
@@ -32,10 +35,6 @@ set (umpire_resource_sources
   NullMemoryResourceFactory.cpp
 )
 
-set(umpire_resource_depends
-  umpire_util
-  camp)
-
 if(UMPIRE_ENABLE_FILE_RESOURCE)
   set (umpire_resource_headers
     ${umpire_resource_headers}
@@ -48,9 +47,7 @@ if(UMPIRE_ENABLE_FILE_RESOURCE)
     FileMemoryResourceFactory.cpp
   )
   if(UMPIRE_ENABLE_UMAP)
-    set (umpire_resource_depends
-      ${umpire_resource_depends}
-      umap)
+    set (umpire_resource_depends ${umpire_resource_depends} umap)
   endif()
 endif()
 
@@ -105,9 +102,7 @@ if (UMPIRE_ENABLE_CUDA)
       CudaConstantMemoryResourceFactory.cpp)
   endif ()
 
-  set(umpire_resource_depends
-    ${umpire_resource_depends}
-    cuda_runtime)
+  set(umpire_resource_depends ${umpire_resource_depends} cuda_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_HIP)
@@ -137,9 +132,7 @@ if (UMPIRE_ENABLE_HIP)
       HipConstantMemoryResource.cpp)
   endif ()
 
-  set(umpire_resource_depends
-    ${umpire_resource_depends}
-    blt::hip_runtime)
+  set(umpire_resource_depends ${umpire_resource_depends} blt::hip_runtime)
 endif ()
 
 if (UMPIRE_ENABLE_SYCL)
@@ -158,9 +151,6 @@ if (UMPIRE_ENABLE_SYCL)
     SyclPinnedMemoryResourceFactory.cpp
     SyclUnifiedMemoryResourceFactory.cpp
     )
-
-  set(umpire_resource_depends
-    ${umpire_resource_depends})
 endif ()
 
 if (UMPIRE_ENABLE_OPENMP_TARGET)
@@ -172,9 +162,7 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
     ${umpire_resource_sources}
     OpenMPTargetMemoryResourceFactory.cpp)
 
-  set (umpire_resource_depends
-    ${umpire_resource_depends}
-    openmp)
+  set (umpire_resource_depends ${umpire_resource_depends} openmp)
 endif ()
 
 blt_add_library(
