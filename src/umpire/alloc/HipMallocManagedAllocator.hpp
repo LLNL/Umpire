@@ -9,6 +9,7 @@
 
 #include "hip/hip_runtime_api.h"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -25,18 +26,25 @@ struct HipMallocManagedAllocator {
    *
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t bytes)
   {
-    void* ptr = nullptr;
+    void* ptr{nullptr};
+
     hipError_t error = ::hipMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipMallocManaged( bytes = " << bytes << " ) failed with error: " << hipGetErrorString(error));
-    } else {
-      return ptr;
+      if (error == hipErrorMemoryAllocation) {
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("hipMallocManaged( bytes = {} ) failed with error: {}",
+                                                              bytes, hipGetErrorString(error)));
+      } else {
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMallocManaged( bytes = {} ) failed with error: {}", bytes,
+                                                        hipGetErrorString(error)));
+      }
     }
+
+    return ptr;
   }
 
   /*!
@@ -44,7 +52,7 @@ struct HipMallocManagedAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory be free'd.
+   * \throws umpire::util::runtime_error if memory be free'd.
    */
   void deallocate(void* ptr)
   {
@@ -52,7 +60,8 @@ struct HipMallocManagedAllocator {
 
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
-      UMPIRE_ERROR("hipFree( ptr = " << ptr << " ) failed with error: " << hipGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,
+                   umpire::fmt::format("hipFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
     }
   }
 

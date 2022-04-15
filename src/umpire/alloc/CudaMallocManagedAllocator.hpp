@@ -10,6 +10,7 @@
 #include <cuda_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -26,7 +27,7 @@ struct CudaMallocManagedAllocator {
    *
    * \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t bytes)
   {
@@ -34,7 +35,13 @@ struct CudaMallocManagedAllocator {
     cudaError_t error = ::cudaMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaMallocManaged( bytes = " << bytes << " ) failed with error: " << cudaGetErrorString(error));
+      if (error == cudaErrorMemoryAllocation) {
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("cudaMallocManaged( bytes = {} ) failed with error: {}",
+                                                              bytes, cudaGetErrorString(error)));
+      } else {
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMallocManaged( bytes = {} ) failed with error: {}", bytes,
+                                                        cudaGetErrorString(error)));
+      }
     }
     return ptr;
   }
@@ -44,7 +51,7 @@ struct CudaMallocManagedAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory be free'd.
+   * \throws umpire::util::runtime_error if memory be free'd.
    */
   void deallocate(void* ptr)
   {
@@ -52,7 +59,8 @@ struct CudaMallocManagedAllocator {
 
     cudaError_t error = ::cudaFree(ptr);
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaFree( ptr = " << ptr << " ) failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error,
+                   umpire::fmt::format("cudaFree( ptr = {} ) failed with error: {}", ptr, cudaGetErrorString(error)));
     }
   }
 

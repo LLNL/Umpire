@@ -34,13 +34,13 @@ TEST(ResourceManager, findAllocationRecord)
   ASSERT_EQ(ptr, rec_middle->ptr);
   ASSERT_EQ(ptr, rec_end->ptr);
 
-  ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::util::Exception);
+  ASSERT_THROW(rm.findAllocationRecord(ptr + size), umpire::runtime_error);
 
-  ASSERT_THROW(rm.findAllocationRecord(ptr + size + 1), umpire::util::Exception);
+  ASSERT_THROW(rm.findAllocationRecord(ptr + size + 1), umpire::runtime_error);
 
   alloc.deallocate(ptr);
 
-  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::util::Exception);
+  ASSERT_THROW(rm.findAllocationRecord(nullptr), umpire::runtime_error);
 }
 
 TEST(ResourceManager, getAllocatorByName)
@@ -52,7 +52,7 @@ TEST(ResourceManager, getAllocatorByName)
     UMPIRE_USE_VAR(alloc);
   });
 
-  ASSERT_THROW(rm.getAllocator("BANANA"), umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator("BANANA"), umpire::runtime_error);
 }
 
 TEST(ResourceManager, getAllocatorById)
@@ -67,14 +67,14 @@ TEST(ResourceManager, getAllocatorById)
     UMPIRE_USE_VAR(alloc);
   });
 
-  ASSERT_THROW(rm.getAllocator(-4), umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator(-4), umpire::runtime_error);
 }
 
 TEST(ResourceManager, getAllocatorInvalidId)
 {
   auto& rm = umpire::ResourceManager::getInstance();
 
-  ASSERT_THROW(rm.getAllocator(umpire::invalid_allocator_id), umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator(umpire::invalid_allocator_id), umpire::runtime_error);
 }
 
 TEST(ResourceManager, aliases)
@@ -83,20 +83,20 @@ TEST(ResourceManager, aliases)
 
   auto alloc = rm.getAllocator("HOST");
   rm.addAlias("HOST_ALIAS", alloc);
-  EXPECT_THROW({ rm.addAlias("HOST_ALIAS", alloc); }, umpire::util::Exception);
+  EXPECT_THROW({ rm.addAlias("HOST_ALIAS", alloc); }, umpire::runtime_error);
 
   auto alloc_alias = rm.getAllocator("HOST_ALIAS");
   EXPECT_EQ(alloc_alias.getId(), alloc.getId());
   EXPECT_EQ(alloc_alias.getName(), alloc.getName());
   EXPECT_NE(alloc_alias.getName(), "HOST_ALIAS");
 
-  EXPECT_THROW({ rm.removeAlias("BLAH", alloc); }, umpire::util::Exception);
+  EXPECT_THROW({ rm.removeAlias("BLAH", alloc); }, umpire::runtime_error);
   EXPECT_NO_THROW({ rm.removeAlias("HOST_ALIAS", alloc); });
 
   alloc = rm.getAllocator("HOST");
-  EXPECT_THROW({ rm.removeAlias("HOST", alloc); }, umpire::util::Exception);
+  EXPECT_THROW({ rm.removeAlias("HOST", alloc); }, umpire::runtime_error);
 
   auto named_alloc = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("NAMED_ALLOCATOR", alloc);
 
-  EXPECT_THROW({ rm.removeAlias("NAMED_ALLOCATOR", named_alloc); }, umpire::util::Exception);
+  EXPECT_THROW({ rm.removeAlias("NAMED_ALLOCATOR", named_alloc); }, umpire::runtime_error);
 }

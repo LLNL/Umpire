@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "umpire/tpl/judy/judy.h"
+#include "umpire/judy/judy.h"
 #include "umpire/util/FixedMallocPool.hpp"
 
 namespace umpire {

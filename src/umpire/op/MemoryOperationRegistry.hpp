@@ -63,13 +63,13 @@ class MemoryOperationRegistry {
    *
    * Finds the MemoryOperation object that matches the given name and
    * AllocationStrategy objects. If the requested MemoryOperation is not
-   * found, this method will throw an Exception.
+   * found, this method will throw an runtime_error.
    *
    * \param name Name of operation.
    * \param src_allocator AllocationStrategy of the source allocation.
    * \param dst_allocator AllocationStrategy of the destination allocation.
    *
-   * \throws umpire::util::Exception if the requested MemoryOperation is not
+   * \throws umpire::util::runtime_error if the requested MemoryOperation is not
    *         found.
    */
   std::shared_ptr<umpire::op::MemoryOperation> find(const std::string& name,

@@ -10,6 +10,7 @@
 
 #include "umpire/resource/CudaDeviceMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
@@ -43,7 +44,8 @@ MemoryResourceTraits CudaDeviceResourceFactory::getDefaultTraits()
   auto error = ::cudaGetDeviceProperties(&properties, 0);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR("cudaGetDeviceProperties failed with error: " << cudaGetErrorString(error));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("cudaGetDeviceProperties failed with error: {}", cudaGetErrorString(error)));
   }
 
   traits.unified = false;

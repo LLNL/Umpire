@@ -108,7 +108,7 @@ ENV HCC_AMDGPU_TARGET=gfx900
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
 
-FROM ghcr.io/rse-ops/intel-ubuntu-20.04:intel-2021.2.0 AS sycl
+FROM ghcr.io/rse-ops/intel-ubuntu-20.04:intel-2022.0.2 AS sycl
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
