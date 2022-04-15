@@ -95,9 +95,15 @@ fi
 if [[ -z ${build_root} ]]
 then
     build_root=$(pwd)
+
+    if [[ -d /dev/shm ]]
+    then
+        build_root="/dev/shm/${hostname}/${build_root}"
+    fi
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
+echo "Build Directory: ${build_dir}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
