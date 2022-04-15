@@ -8,6 +8,7 @@
 ##############################################################################
 
 
+set -x
 set -o errexit
 set -o nounset
 
@@ -42,9 +43,6 @@ then
 
     if [[ -d /dev/shm ]]
     then
-        echo "ls -alR /dev/shm"
-        ls -alR /dev/shm
-        echo ""
         prefix="/dev/shm/${hostname}"
         if [[ -z ${job_unique_id} ]]; then
           job_unique_id=manual_job_$(date +%s)
@@ -59,7 +57,6 @@ then
         prefix_opt="--prefix=${prefix}"
     fi
 
-    echo 'python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}'
     python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
@@ -94,16 +91,10 @@ fi
 # Build Directory
 if [[ -z ${build_root} ]]
 then
-    build_root=$(pwd)
-
-    if [[ -d /dev/shm ]]
-    then
-        build_root="/dev/shm/${hostname}/${build_root}"
-    fi
+    build_root="/tmp$(pwd)"
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
-echo "Build Directory: ${build_dir}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
