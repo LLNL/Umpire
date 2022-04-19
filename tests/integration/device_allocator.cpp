@@ -38,7 +38,7 @@ TEST_P(DeviceAllocator, CreateAndAllocate)
   size_t size = 1 * sizeof(double);
 
   umpire::DeviceAllocator da = umpire::make_device_allocator(allocator, size, GetParam());
-  ASSERT_THROW((umpire::make_device_allocator(allocator, 0, "bad_da")), umpire::util::Exception);
+  ASSERT_THROW((umpire::make_device_allocator(allocator, 0, "bad_da")), umpire::runtime_error);
 
   ASSERT_TRUE(da.isInitialized());
   ASSERT_TRUE(umpire::is_device_allocator(da.getName()));
