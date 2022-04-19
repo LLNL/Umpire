@@ -63,7 +63,11 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   auto my_da = umpire::get_device_allocator(GetParam());
   ASSERT_NO_THROW(my_da.reset());
+
+  ASSERT_EQ(my_da.getCurrentSize(), 0);
   ASSERT_NO_THROW((tester<<<1, 16>>>(data_ptr, GetParam())));
+  cudaDeviceSynchronize();
+  ASSERT_EQ(my_da.getCurrentSize(), sizeof(double));
 }
 
 const char* device_allocator_names[3] = {"da1", "da2", "da3"};
