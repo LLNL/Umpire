@@ -7,7 +7,7 @@
 #include "gtest/gtest.h"
 #include "umpire/util/AllocationMap.hpp"
 #include "umpire/util/AllocationRecord.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/error.hpp"
 
 // Define equality operators for tests
 namespace umpire {
@@ -56,7 +56,7 @@ TEST_F(AllocationMapTest, Add)
 
 TEST_F(AllocationMapTest, FindNotFound)
 {
-  ASSERT_THROW(map.find(data), umpire::util::Exception);
+  ASSERT_THROW(map.find(data), umpire::runtime_error);
 }
 
 TEST_F(AllocationMapTest, Find)
@@ -96,14 +96,14 @@ TEST_F(AllocationMapTest, Remove)
     map.remove(data);
   });
 
-  ASSERT_THROW(map.find(data), umpire::util::Exception);
+  ASSERT_THROW(map.find(data), umpire::runtime_error);
 
   ASSERT_FALSE(map.contains(data));
 }
 
 TEST_F(AllocationMapTest, RemoveNotFound)
 {
-  ASSERT_THROW(map.remove(data), umpire::util::Exception);
+  ASSERT_THROW(map.remove(data), umpire::runtime_error);
 }
 
 TEST_F(AllocationMapTest, RemoveAndUse)

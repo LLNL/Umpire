@@ -22,10 +22,17 @@ if (UMPIRE_ENABLE_FORTRAN)
     ${umpire_interface_c_fortran_sources}
     wrapfumpire.f)
 
-  set_source_files_properties(
-    wrapfumpire.f
-    PROPERTIES
-    Fortran_FORMAT FREE)
+  if (Fortran_COMPILER_FAMILY_IS_CLANG)
+    set_source_files_properties(
+      wrapfumpire.f
+      PROPERTIES
+      COMPILE_FLAGS -Mfree)
+  else()
+    set_source_files_properties(
+      wrapfumpire.f
+      PROPERTIES
+      Fortran_FORMAT FREE)
+  endif()
 endif ()
     
 set_source_files_properties(
@@ -33,7 +40,7 @@ set_source_files_properties(
   PROPERTIES 
   COMPILE_FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
-set(umpire_interface_c_fortran_depends camp)
+set(umpire_interface_c_fortran_depends camp umpire_util)
 blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS cuda_runtime IF UMPIRE_ENABLE_CUDA )
 blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS blt::hip_runtime IF UMPIRE_ENABLE_HIP )
 blt_list_append( TO umpire_interface_c_fortran_depends ELEMENTS mpi IF UMPIRE_ENABLE_MPI )

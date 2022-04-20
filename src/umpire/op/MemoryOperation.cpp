@@ -7,6 +7,7 @@
 #include "umpire/op/MemoryOperation.hpp"
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -16,7 +17,7 @@ void MemoryOperation::transform(void* UMPIRE_UNUSED_ARG(src_ptr), void** UMPIRE_
                                 util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation),
                                 std::size_t UMPIRE_UNUSED_ARG(length))
 {
-  UMPIRE_ERROR("MemoryOperation::transform() is not implemented");
+  UMPIRE_ERROR(runtime_error, "MemoryOperation::transform() is not implemented");
 }
 
 camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::transform_async(
@@ -32,7 +33,7 @@ camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::transfor
 void MemoryOperation::apply(void* UMPIRE_UNUSED_ARG(src_ptr), util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
                             int UMPIRE_UNUSED_ARG(val), std::size_t UMPIRE_UNUSED_ARG(length))
 {
-  UMPIRE_ERROR("MemoryOperation::apply() is not implemented");
+  UMPIRE_ERROR(runtime_error, "MemoryOperation::apply() is not implemented");
 }
 
 camp::resources::EventProxy<camp::resources::Resource> MemoryOperation::apply_async(

@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 
@@ -25,22 +26,23 @@ namespace numa {
 int preferred_node()
 {
   if (numa_available() < 0)
-    UMPIRE_ERROR("libnuma is unusable.");
+    UMPIRE_ERROR(runtime_error, "libnuma is unusable.");
   return numa_preferred();
 }
 
 void move_to_node(void* ptr, std::size_t bytes, int node)
 {
   if (numa_available() < 0)
-    UMPIRE_ERROR("libnuma is unusable.");
+    UMPIRE_ERROR(runtime_error, "libnuma is unusable.");
 
   struct bitmask* mask = numa_bitmask_alloc(numa_max_node() + 1);
   numa_bitmask_clearall(mask);
   numa_bitmask_setbit(mask, node);
 
   if (mbind(ptr, bytes, MPOL_BIND, mask->maskp, mask->size + 1, MPOL_MF_MOVE | MPOL_MF_STRICT) != 0) {
-    UMPIRE_ERROR("numa::move_to_node error: mbind( ptr = " << ptr << ", bytes = " << bytes << ", node = " << node
-                                                           << " ) failed");
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("numa::move_to_node error: mbind( ptr = {}, bytes = {}, node = {} ) failed: {}",
+                                     ptr, bytes, node, strerror(errno)));
   }
 
   numa_bitmask_free(mask);
@@ -50,7 +52,8 @@ int get_location(void* ptr)
 {
   int numa_node = -1;
   if (get_mempolicy(&numa_node, NULL, 0, ptr, MPOL_F_NODE | MPOL_F_ADDR) != 0) {
-    UMPIRE_ERROR("numa::get_location error: get_mempolicy( ptr = " << ptr << ") failed");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("numa::get_location error: get_mempolicy( ptr = {} ) failed: {}",
+                                                    ptr, strerror(errno)));
   }
   return numa_node;
 }
@@ -58,7 +61,7 @@ int get_location(void* ptr)
 std::vector<int> get_host_nodes()
 {
   if (numa_available() < 0)
-    UMPIRE_ERROR("libnuma is unusable.");
+    UMPIRE_ERROR(runtime_error, "libnuma is unusable.");
 
   std::vector<int> host_nodes;
   struct bitmask* cpus = numa_allocate_cpumask();
@@ -68,7 +71,7 @@ std::vector<int> get_host_nodes()
     if (numa_bitmask_isbitset(numa_all_nodes_ptr, i)) {
       // Check if this has CPUs
       if (numa_node_to_cpus(i, cpus) != 0) {
-        UMPIRE_ERROR("Error getting CPU list for NUMA node.");
+        UMPIRE_ERROR(runtime_error, "Error getting CPU list for NUMA node.");
       }
 
       const std::size_t ncpus = numa_bitmask_weight(cpus);
@@ -86,7 +89,7 @@ std::vector<int> get_host_nodes()
 std::vector<int> get_device_nodes()
 {
   if (numa_available() < 0)
-    UMPIRE_ERROR("libnuma is unusable.");
+    UMPIRE_ERROR(runtime_error, "libnuma is unusable.");
 
   std::vector<int> device_nodes;
   struct bitmask* cpus = numa_allocate_cpumask();
@@ -96,7 +99,7 @@ std::vector<int> get_device_nodes()
     if (numa_bitmask_isbitset(numa_all_nodes_ptr, i)) {
       // Check if this has CPUs
       if (numa_node_to_cpus(i, cpus) != 0) {
-        UMPIRE_ERROR("Error getting CPU list for NUMA node.");
+        UMPIRE_ERROR(runtime_error, "Error getting CPU list for NUMA node.");
       }
 
       const std::size_t ncpus = numa_bitmask_weight(cpus);
@@ -114,7 +117,7 @@ std::vector<int> get_device_nodes()
 std::vector<int> get_allocatable_nodes()
 {
   if (numa_available() < 0)
-    UMPIRE_ERROR("libnuma is unusable.");
+    UMPIRE_ERROR(runtime_error, "libnuma is unusable.");
 
   struct bitmask* mask = numa_get_mems_allowed();
   std::vector<int> nodes;

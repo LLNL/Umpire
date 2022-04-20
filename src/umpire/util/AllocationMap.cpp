@@ -16,6 +16,7 @@
 #include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace util {
@@ -50,7 +51,7 @@ void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 AllocationRecord AllocationMap::RecordList::pop_back()
 {
   if (m_length == 0) {
-    UMPIRE_ERROR("pop_back() called, but m_length == 0");
+    UMPIRE_ERROR(runtime_error, "pop_back() called, but m_length == 0");
   }
 
   const AllocationRecord ret = m_tail->rec;
@@ -119,14 +120,14 @@ const AllocationRecord& AllocationMap::RecordList::ConstIterator::operator*()
 const AllocationRecord* AllocationMap::RecordList::ConstIterator::operator->()
 {
   if (!m_curr)
-    UMPIRE_ERROR("Cannot dereference nullptr");
+    UMPIRE_ERROR(runtime_error, "Cannot dereference nullptr");
   return &m_curr->rec;
 }
 
 AllocationMap::RecordList::ConstIterator& AllocationMap::RecordList::ConstIterator::operator++()
 {
   if (!m_curr)
-    UMPIRE_ERROR("Cannot dereference nullptr");
+    UMPIRE_ERROR(runtime_error, "Cannot dereference nullptr");
   m_curr = m_curr->prev;
   return *this;
 }
@@ -189,11 +190,11 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
   if (alloc_record) {
     return alloc_record;
   } else {
-#if !defined(NDEBUG)
+#if !(defined(NDEBUG) || defined(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG))
     // use this from a debugger to dump the contents of the AllocationMap
     printAll();
 #endif
-    UMPIRE_ERROR("Allocation not mapped: " << ptr);
+    UMPIRE_ERROR(unknown_pointer_error, umpire::fmt::format("Allocation not mapped: {}", ptr));
   }
 }
 
@@ -258,7 +259,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
     if (iter->second->empty())
       m_map.removeLast();
   } else {
-    UMPIRE_ERROR("Cannot remove " << ptr);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot remove {}", ptr));
   }
 
   --m_size;

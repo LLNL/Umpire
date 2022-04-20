@@ -4,11 +4,10 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-add_subdirectory(tpl)
+add_subdirectory(util)
 add_subdirectory(resource)
 add_subdirectory(alloc)
 add_subdirectory(op)
-add_subdirectory(util)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
@@ -51,9 +50,9 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
                               PROPERTIES
                               LANGUAGE CUDA)
 
-    set(umpire_device_depends camp cuda)
+    set(umpire_device_depends camp cuda umpire_util)
   elseif (UMPIRE_ENABLE_HIP)
-    set(umpire_device_depends camp blt::hip)
+    set(umpire_device_depends camp blt::hip umpire_util)
   endif()
 
 

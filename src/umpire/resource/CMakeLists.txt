@@ -57,6 +57,7 @@ if(UMPIRE_ENABLE_FILE_RESOURCE)
 endif()
 
 set(umpire_resource_depends
+  umpire_util
   camp)
 
 if(UMPIRE_ENABLE_IPC_SHARED_MEMORY)

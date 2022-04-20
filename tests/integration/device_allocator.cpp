@@ -38,7 +38,7 @@ TEST_P(DeviceAllocator, CreateAndAllocate)
   size_t size = 1 * sizeof(double);
 
   umpire::DeviceAllocator da = umpire::make_device_allocator(allocator, size, GetParam());
-  ASSERT_THROW((umpire::make_device_allocator(allocator, 0, "bad_da")), umpire::util::Exception);
+  ASSERT_THROW((umpire::make_device_allocator(allocator, 0, "bad_da")), umpire::runtime_error);
 
   ASSERT_TRUE(da.isInitialized());
   ASSERT_TRUE(umpire::is_device_allocator(da.getName()));
@@ -69,11 +69,17 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   auto my_da = umpire::get_device_allocator(GetParam());
   ASSERT_NO_THROW(my_da.reset());
+  ASSERT_EQ(my_da.getCurrentSize(), 0);
+
 #if defined(UMPIRE_ENABLE_CUDA)
   tester<<<1, 16>>>(data_ptr, GetParam());
+  cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
   hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, GetParam());
+  hipDeviceSynchronize();
 #endif
+
+  ASSERT_EQ(my_da.getCurrentSize(), sizeof(double));
 }
 
 const char* device_allocator_names[3] = {"da1", "da2", "da3"};

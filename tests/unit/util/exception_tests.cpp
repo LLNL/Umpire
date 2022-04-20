@@ -5,15 +5,12 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
-#include "umpire/util/Exception.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 TEST(Exception, ThrowException)
 {
-  ASSERT_THROW(throw umpire::util::Exception("Test Exception", __FILE__, __LINE__), umpire::util::Exception);
-}
-
-TEST(Exception, ThrowFromErrorMacro)
-{
-  ASSERT_THROW(UMPIRE_ERROR("Test Exception"), umpire::util::Exception);
+  ASSERT_THROW(throw umpire::runtime_error("Test Exception", __FILE__, __LINE__), umpire::runtime_error);
+  ASSERT_THROW(throw umpire::out_of_memory_error("Test OOM Exception", __FILE__, __LINE__),
+               umpire::out_of_memory_error);
 }

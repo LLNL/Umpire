@@ -25,6 +25,9 @@ called on the GPU, it is simply atomically incrementing a counter which offsets 
 memory. In other words, the total size from all of the allocates performed on the device with the DeviceAllocator may not 
 exceed the size that was used when creating the device allocator.
 
+To see what the total memory, in bytes, available to the allocator is, simply call the :class:`DeviceAllocator::getTotalSize()`
+function.
+
 Retrieving a DeviceAllocator Object
 -----------------------------------
 
@@ -63,5 +66,8 @@ The above code snippet shows the ``reset()`` function being called from the host
 utilizes the ResourceManager and Umpire's ``memset`` operation under the hood. Therefore, there is some kind of 
 synchronization guaranteed. However, if the ``reset()`` function is called on the device, there is no synchronization
 guaranteed, so the user must be very careful not to reset memory that other GPU threads still need.
+
+To see the current size of the DeviceAllocator (aka, the current amount of memory, in bytes, being used), call the
+:class:`DeviceAllocator::getCurrentSize()` function.
 
 .. literalinclude:: ../../../examples/device-allocator.cpp
