@@ -14,8 +14,7 @@
 namespace umpire {
 namespace op {
 
-CudaCopyOperation::CudaCopyOperation(cudaMemcpyKind kind) :
-  m_kind{kind}
+CudaCopyOperation::CudaCopyOperation(cudaMemcpyKind kind) : m_kind{kind}
 {
 }
 

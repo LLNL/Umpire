@@ -13,20 +13,20 @@
 namespace umpire {
 namespace op {
 
-CudaAdviseOperation::CudaAdviseOperation(cudaMemoryAdvise a) :
-  m_advice{a}
+CudaAdviseOperation::CudaAdviseOperation(cudaMemoryAdvise a) : m_advice{a}
 {
 }
 
-void CudaAdviseOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
-                                          int val, std::size_t length)
+void CudaAdviseOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation), int val,
+                                std::size_t length)
 {
   int device = val;
   cudaError_t error = ::cudaMemAdvise(src_ptr, length, m_advice, device);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
-                                                    src_ptr, length, device, cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
+                                     src_ptr, length, device, cudaGetErrorString(error)));
   }
 }
 

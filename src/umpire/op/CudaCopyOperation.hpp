@@ -7,9 +7,9 @@
 #ifndef UMPIRE_CudaCopyOperation_HPP
 #define UMPIRE_CudaCopyOperation_HPP
 
-#include "umpire/op/MemoryOperation.hpp"
-
 #include <cuda_runtime.h>
+
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
@@ -19,7 +19,6 @@ namespace op {
  */
 class CudaCopyOperation : public MemoryOperation {
  public:
-
   CudaCopyOperation(cudaMemcpyKind kind);
 
   /*!
@@ -39,8 +38,7 @@ class CudaCopyOperation : public MemoryOperation {
                                                                          std::size_t length,
                                                                          camp::resources::Resource& ctx);
 
-
-  private:
+ private:
   cudaMemcpyKind m_kind;
 };
 

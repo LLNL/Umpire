@@ -7,9 +7,9 @@
 #ifndef UMPIRE_CudaAdviseAccessedByOperation_HPP
 #define UMPIRE_CudaAdviseAccessedByOperation_HPP
 
-#include "umpire/op/MemoryOperation.hpp"
-
 #include <cuda_runtime.h>
+
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
@@ -27,7 +27,7 @@ class CudaAdviseOperation : public MemoryOperation {
    */
   void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length);
 
-  private:
+ private:
   cudaMemoryAdvise m_advice;
 };
 
