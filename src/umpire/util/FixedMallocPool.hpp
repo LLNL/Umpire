@@ -22,7 +22,18 @@ namespace util {
  */
 class FixedMallocPool {
  public:
+  FixedMallocPool() = delete;
+
   FixedMallocPool(const std::size_t object_bytes, const std::size_t objects_per_pool = 1024 * 1024);
+
+  // Copy construction is not allowed. Doing so would create two
+  // FixedMallocPool objects with m_pool that point to the same allocated
+  // data; this data would be freed when one FixedMallocPool object is
+  // destroyed, leaving the other with a dangling pointer.
+  FixedMallocPool(const FixedMallocPool& other) = delete;
+
+  // Copy assignment is not allowed (same reasoning as copy construction).
+  FixedMallocPool& operator=(const FixedMallocPool& other) = delete;
 
   ~FixedMallocPool();
 
@@ -42,6 +53,7 @@ class FixedMallocPool {
 
   void newPool();
   void* allocInPool(Pool& p) noexcept;
+  void* allocate_impl(std::size_t bytes);
 
   unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
   unsigned int index_from_addr(const Pool& p, const unsigned char* ptr) const;
