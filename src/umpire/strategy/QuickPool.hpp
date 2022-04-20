@@ -15,18 +15,12 @@
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
-#include "umpire/util/MemoryMap.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
 class Allocator;
-
-namespace util {
-
-class FixedMallocPool;
-
-}
 
 namespace strategy {
 
