@@ -31,6 +31,8 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+#include "umpire/op/HipAdviseOperation.hpp"
 #include "umpire/op/HipCopyFromOperation.hpp"
 #include "umpire/op/HipCopyOperation.hpp"
 #include "umpire/op/HipCopyToOperation.hpp"
@@ -125,6 +127,27 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
+  constexpr std::size_t HIP_NUM_ADVICE_OPS{
+#if HIP_VERSION_MAJOR >= 5
+    8
+#else
+    6
+#endif
+  };
+
+  const std::array< const std::tuple< std::string, hipMemoryAdvise>, HIP_NUM_ADVICE_OPS> hip_advice_operations{{
+    {"SET_READ_MOSTLY", hipMemAdviseSetReadMostly}
+    , {"UNSET_READ_MOSTLY", hipMemAdviseUnsetReadMostly}
+    , {"SET_PREFERRED_LOCATION", hipMemAdviseSetPreferredLocation}
+    , {"UNSET_PREFERRED_LOCATION", hipMemAdviseUnsetPreferredLocation}
+    , {"SET_ACCESSED_BY", hipMemAdviseSetAccessedBy}
+    , {"UNSET_ACCESSED_BY", hipMemAdviseUnsetAccessedBy}
+#if HIP_VERSION_MAJOR >= 5
+    , {"SET_COARSE_GRAIN", hipMemAdviseSetCoarseGrain}
+    , {"UNSET_COARSE_GRAIN", hipMemAdviseUnsetCoarseGrain}
+#endif
+  }};
+
   registerOperation("COPY", std::make_pair(Platform::host, Platform::hip), std::make_shared<HipCopyToOperation>());
 
   registerOperation("COPY", std::make_pair(Platform::hip, Platform::host), std::make_shared<HipCopyFromOperation>());
@@ -135,6 +158,13 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
   registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
                     std::make_shared<GenericReallocateOperation>());
+
+  for (auto advice : hip_advice_operations) {
+    auto name = std::get<0>(advice);
+    auto advice_enum = std::get<1>(advice);
+    registerOperation(name, std::make_pair(Platform::hip, Platform::hip),
+                      std::make_shared<HipAdviseOperation>(advice_enum));
+  }
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
