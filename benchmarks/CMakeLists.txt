@@ -31,15 +31,15 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
   set_target_properties(
     device_allocator_stress_test
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
-  elseif (UMPIRE_ENABLE_HIP)
-    blt_add_executable(
-      NAME device_allocator_stress_test
-      SOURCES device_allocator_stress_test.cpp
-      DEPENDS_ON umpire blt::hip)
-
-    set_target_properties(
-      device_allocator_stress_test
-      PROPERTIES LINK_FLAGS "-fgpu-rdc")
+#  elseif (UMPIRE_ENABLE_HIP)
+#    blt_add_executable(
+#      NAME device_allocator_stress_test
+#      SOURCES device_allocator_stress_test.cpp
+#      DEPENDS_ON umpire blt::hip)
+#
+#    set_target_properties(
+#      device_allocator_stress_test
+#      PROPERTIES LINK_FLAGS "-fgpu-rdc")
   endif()
 endif()
 

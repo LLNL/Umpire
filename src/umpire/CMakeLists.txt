@@ -78,7 +78,7 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     set_target_properties(umpire_device PROPERTIES
       CUDA_SEPARABLE_COMPILATION On)
   else ()
-    target_link_options(umpire_device PUBLIC -fgpu-rdc --hip-link)
+    target_link_options(umpire_device PUBLIC -fgpu-rdc)
     target_compile_options(umpire_device PUBLIC -fgpu-rdc)
   endif ()
 
