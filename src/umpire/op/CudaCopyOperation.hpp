@@ -9,6 +9,8 @@
 
 #include "umpire/op/MemoryOperation.hpp"
 
+#include <cuda_runtime.h>
+
 namespace umpire {
 namespace op {
 
@@ -17,6 +19,9 @@ namespace op {
  */
 class CudaCopyOperation : public MemoryOperation {
  public:
+
+  CudaCopyOperation(cudaMemcpyKind kind);
+
   /*!
    * @copybrief MemoryOperation::transform
    *
@@ -33,6 +38,10 @@ class CudaCopyOperation : public MemoryOperation {
                                                                          util::AllocationRecord* dst_allocation,
                                                                          std::size_t length,
                                                                          camp::resources::Resource& ctx);
+
+
+  private:
+  cudaMemcpyKind m_kind;
 };
 
 } // end of namespace op
