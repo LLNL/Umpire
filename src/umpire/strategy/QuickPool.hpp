@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <tuple>
 #include <unordered_map>
 
@@ -103,11 +104,10 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    pool_allocator() : pool{sizeof(Value)}
+    pool_allocator() : pool{std::make_shared<util::FixedMallocPool>(sizeof(Value))}
     {
     }
 
-    /// BUG: Only required for MSVC
     template <typename U>
     pool_allocator(const pool_allocator<U>& other) : pool{other.pool}
     {
@@ -115,15 +115,15 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
     Value* allocate(std::size_t n)
     {
-      return static_cast<Value*>(pool.allocate(n));
+      return static_cast<Value*>(pool->allocate(n));
     }
 
     void deallocate(Value* data, std::size_t)
     {
-      pool.deallocate(data);
+      pool->deallocate(data);
     }
 
-    util::FixedMallocPool pool;
+    std::shared_ptr<util::FixedMallocPool> pool;
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
