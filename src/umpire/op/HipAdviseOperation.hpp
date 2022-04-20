@@ -7,16 +7,16 @@
 #ifndef UMPIRE_HipAdviseOperation_HPP
 #define UMPIRE_HipAdviseOperation_HPP
 
-#include "umpire/op/MemoryOperation.hpp"
-
 #include <hip/hip_runtime.h>
+
+#include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
 class HipAdviseOperation : public MemoryOperation {
  public:
- HipAdviseOperation(hipMemoryAdvise a);
+  HipAdviseOperation(hipMemoryAdvise a);
   /*!
    * @copybrief MemoryOperation::apply
    *
@@ -25,8 +25,8 @@ class HipAdviseOperation : public MemoryOperation {
    * @copydetails MemoryOperation::apply
    */
   void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length);
-  
-  private:
+
+ private:
   hipMemoryAdvise m_advise;
 };
 
