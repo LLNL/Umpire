@@ -49,7 +49,7 @@ if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
                               PROPERTIES
                               LANGUAGE CUDA)
 
-  set(umpire_device_depends camp cuda)
+  set(umpire_device_depends camp cuda umpire_util)
 
   blt_add_library(
     NAME umpire_device

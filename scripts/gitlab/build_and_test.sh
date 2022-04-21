@@ -8,6 +8,7 @@
 ##############################################################################
 
 
+# set -x
 set -o errexit
 set -o nounset
 
@@ -26,6 +27,9 @@ py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
 
 # Dependencies
 date
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~~ Build and test started"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -59,6 +63,9 @@ then
     python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
+  echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  echo "~~~~~ Dependencies Built"
+  echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 date
 
 # Host config file
@@ -90,7 +97,9 @@ fi
 # Build Directory
 if [[ -z ${build_root} ]]
 then
-    build_root=$(pwd)
+    build_root="/dev/shm$(pwd)"
+else
+    build_root="/dev/shm${build_root}"
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
@@ -119,7 +128,6 @@ then
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
 
-    date
     if [[ "${truehostname}" == "corona" ]]
     then
         module unload rocm
@@ -133,12 +141,17 @@ then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       $cmake_exe --build . --verbose -j 1
     fi
+
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~~~~~ Umpire Built"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     date
 fi
 
 # Test
 if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_TESTS.*ON" ${hostconfig_path}
 then
+    date
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Testing Umpire"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -150,9 +163,7 @@ then
 
     cd ${build_dir}
 
-    date
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
-    date
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
     if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
@@ -179,7 +190,17 @@ then
     fi
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~ CLEAN UP"
+    echo "~~~~~ Umpire Tests Complete"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    make clean
+    date
+
+    # echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    # echo "~~~~~ CLEAN UP"
+    # echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    # make clean
 fi
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~~ Build and test completed"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+date

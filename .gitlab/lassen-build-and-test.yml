@@ -53,7 +53,7 @@ xl_16_1_1_10_gcc_8_3_1:
 # CUDA.
 ibm_clang_9_cuda:
   variables:
-    SPEC: "+fortran+cuda %clang@ibm.9.0.0 ^cuda@10.1.168"
+    SPEC: "+fortran+cuda+device_alloc %clang@ibm.9.0.0 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8_cuda:

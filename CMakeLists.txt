@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2022.03.0)
+  VERSION 2022.03.1)
 
 cmake_minimum_required(VERSION 3.14)
 
@@ -99,7 +99,7 @@ cmake_dependent_option( UMPIRE_ENABLE_BENCHMARKS "Build Umpire benchmarks" On
 cmake_dependent_option( UMPIRE_ENABLE_EXAMPLES "Build Umpire examples" On
                         "ENABLE_EXAMPLES" Off )
 
-cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" On
+cmake_dependent_option( UMPIRE_ENABLE_DOCS "Build Umpire docs" Off
                         "ENABLE_DOCS" Off )
 cmake_dependent_option( UMPIRE_ENABLE_CLANGQUERY "Build Umpire with Clang query" On
                         "ENABLE_CLANGQUERY" Off )

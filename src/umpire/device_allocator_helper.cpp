@@ -153,7 +153,7 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
   static int index{0};
 
   if (size <= 0) {
-    UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid size passed to DeviceAllocator: ", size));
   }
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
