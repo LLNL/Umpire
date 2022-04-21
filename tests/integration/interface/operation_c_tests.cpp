@@ -346,7 +346,7 @@ INSTANTIATE_TEST_SUITE_P(Reallocate, ReallocateTest,
 //   int device = 0;
 //
 //   auto m_advice_operation = op_registry.find(
-//       "READ_MOSTLY",
+//       "SET_READ_MOSTLY",
 //       strategy,
 //       strategy);
 //
@@ -371,7 +371,7 @@ INSTANTIATE_TEST_SUITE_P(Reallocate, ReallocateTest,
 //   int device = 0;
 //
 //   auto m_advice_operation = op_registry.find(
-//       "PREFERRED_LOCATION",
+//       "SET_PREFERRED_LOCATION",
 //       strategy,
 //       strategy);
 //
@@ -396,7 +396,7 @@ INSTANTIATE_TEST_SUITE_P(Reallocate, ReallocateTest,
 //   int device = 0;
 //
 //   auto m_advice_operation = op_registry.find(
-//       "ACCESSED_BY",
+//       "SET_ACCESSED_BY",
 //       strategy,
 //       strategy);
 //

@@ -103,7 +103,7 @@ void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
   std::string name{"strategy_test_" + std::to_string(unique_strategy_id++)};
 
   m_allocator = new umpire::Allocator(
-      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator("UM"), "READ_MOSTLY"));
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator("UM"), "SET_READ_MOSTLY"));
 
   m_parent_name = "UM";
 }
@@ -405,7 +405,7 @@ TEST(AllocationAdvisor, Create)
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_NO_THROW(auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-                      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
+                      "read_only_um", rm.getAllocator("UM"), "SET_READ_MOSTLY");
                   UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(auto failed_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
@@ -420,7 +420,7 @@ TEST(AllocationAdvisor, CreateWithId)
   const int device_id = 2;
 
   ASSERT_NO_THROW(auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-                      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id);
+                      "read_only_um_device_id", rm.getAllocator("UM"), "SET_READ_MOSTLY", device_id);
                   UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(auto failed_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
@@ -435,7 +435,7 @@ TEST(AllocationAdvisor, Host)
   auto host_allocator = rm.getAllocator("HOST");
 
   auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>("preferred_location_host", um_allocator,
-                                                                               "PREFERRED_LOCATION", host_allocator);
+                                                                               "SET_PREFERRED_LOCATION", host_allocator);
 
   ASSERT_NO_THROW({
     double* data = static_cast<double*>(read_only_alloc.allocate(1024 * sizeof(double)));
