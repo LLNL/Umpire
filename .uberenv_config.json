@@ -8,5 +8,5 @@
 "spack_activate" : {},
 "spack_configs_path": "scripts/radiuss-spack-configs",
 "spack_packages_path": "scripts/spack_packages",
-"spack_concretizer": "clingo"
+"spack_concretizer": "original"
 }
