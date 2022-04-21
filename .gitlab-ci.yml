@@ -52,11 +52,12 @@ corona-build-and-test:
   variables:
     ALL_TARGETS: "${ALL_TARGETS}"
     ON_CORONA: "${ON_CORONA}"
-   include:
-   - local: .gitlab/configs/custom.yml
-   - local: .gitlab/configs/machines.yml
-   - local: .gitlab/lassen-build-and-test.yml
-    strategy: depend
+  trigger:
+    include:
+    - local: .gitlab/configs/custom.yml
+    - local: .gitlab/configs/machines.yml
+    - local: .gitlab/lassen-build-and-test.yml
+   strategy: depend
 
 lassen-build-and-test:
   stage: build-and-test
