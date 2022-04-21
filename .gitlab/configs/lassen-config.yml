@@ -29,7 +29,7 @@
 # allow pre-allocation the same way slurm does.
 .build_blueos_3_ppc64le_ib_p9_script:
   script:
-    - lalloc 1 -W 30 scripts/gitlab/build_and_test.sh
+    - lalloc 1 -W 12 scripts/gitlab/build_and_test.sh
   artifacts:
     reports:
       junit: junit.xml
