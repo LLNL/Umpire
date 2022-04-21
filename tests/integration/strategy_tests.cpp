@@ -434,8 +434,8 @@ TEST(AllocationAdvisor, Host)
   auto um_allocator = rm.getAllocator("UM");
   auto host_allocator = rm.getAllocator("HOST");
 
-  auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>("preferred_location_host", um_allocator,
-                                                                               "SET_PREFERRED_LOCATION", host_allocator);
+  auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "preferred_location_host", um_allocator, "SET_PREFERRED_LOCATION", host_allocator);
 
   ASSERT_NO_THROW({
     double* data = static_cast<double*>(read_only_alloc.allocate(1024 * sizeof(double)));
