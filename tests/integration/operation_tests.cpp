@@ -667,7 +667,7 @@ TYPED_TEST(MoveTest, Move)
   this->source_array = nullptr;
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 template <typename T>
 class AdviceTest : public OperationTest<T> {
 };
@@ -727,10 +727,6 @@ TYPED_TEST(AdviceTest, AccessedBy)
 
   ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
-
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
 TEST(AsyncTest, Copy)
 {
