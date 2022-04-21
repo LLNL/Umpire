@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaAdviseAccessedByOperation_HPP
-#define UMPIRE_CudaAdviseAccessedByOperation_HPP
+#ifndef UMPIRE_CudaAdviseOperation_HPP
+#define UMPIRE_CudaAdviseOperation_HPP
 
 #include <cuda_runtime.h>
 
