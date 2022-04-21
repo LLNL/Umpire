@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC, and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -63,6 +63,22 @@ class DeviceAllocator {
    * \return Returns true if object has been initialized, false otherwise.
    */
   __host__ __device__ bool isInitialized();
+
+  /*
+   * \brief Get the current size of the DeviceAllocator so users know how
+   * much more space there is remaining before a reset is required.
+   *
+   * \return Returns the current size.
+   */
+  __host__ __device__ unsigned int getCurrentSize();
+
+  /*
+   * \brief Get the total size of the DeviceAllocator which was used when
+   * constructed.
+   *
+   * \return Returns the total size.
+   */
+  __host__ __device__ size_t getTotalSize();
 
   /*
    * \brief Reset the DeviceAllocator counter pointer back to original

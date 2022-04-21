@@ -37,6 +37,7 @@ option(UMPIRE_ENABLE_ASAN "Enable use with address sanitizer tools" Off)
 option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 option(UMPIRE_ENABLE_DEVICE_ALLOCATOR "Enable Device Allocator" Off)
 option(UMPIRE_ENABLE_SQLITE "Build with sqlite event integration" Off)
+option(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG "Disable verbose output from AllocationMap during debug builds" Off)
 
 if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")

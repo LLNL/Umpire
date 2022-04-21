@@ -24,7 +24,7 @@ __host__ DeviceAllocator::DeviceAllocator(Allocator allocator, size_t size, cons
       m_child(false)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto device_alloc = rm.getAllocator(umpire::resource::Device);
+  auto device_alloc = rm.getAllocator("UM");
 
   m_counter = static_cast<unsigned int*>(device_alloc.allocate(sizeof(unsigned int)));
   rm.memset(m_counter, 0);
@@ -59,7 +59,7 @@ __host__ __device__ DeviceAllocator::~DeviceAllocator()
 __host__ void DeviceAllocator::destroy()
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto device_alloc = rm.getAllocator(umpire::resource::Device);
+  auto device_alloc = rm.getAllocator("UM");
 
   if (m_counter != nullptr) {
     device_alloc.deallocate(m_counter);
@@ -95,6 +95,16 @@ __host__ __device__ bool DeviceAllocator::isInitialized()
     return true;
   }
   return false;
+}
+
+__host__ __device__ unsigned int DeviceAllocator::getCurrentSize()
+{
+  return *m_counter;
+}
+
+__host__ __device__ size_t DeviceAllocator::getTotalSize()
+{
+  return m_size;
 }
 
 __host__ __device__ void DeviceAllocator::reset()
