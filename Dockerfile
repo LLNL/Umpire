@@ -50,11 +50,12 @@ FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-12.0.0 AS clang12
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN ls -la /proc/sys/vm && \
-    echo "Updating /proc/sys/vm/unprivileged_userfaultfd" && \
-    echo 1 > /proc/sys/vm/unprivileged_userfaultfd && \
-    echo "cat /proc/sys/vm/unprivileged_userfaultfd" && \
+RUN echo "cat /proc/sys/vm/unprivileged_userfaultfd" && \
     cat /proc/sys/vm/unprivileged_userfaultfd && \
+    echo ". /opt/spack/share/spack/setup-env.sh && spack install umap +tests" && \
+    . /opt/spack/share/spack/setup-env.sh && spack install umap +tests && \
+    echo "/opt/view/bin/psort umap_testfile" && \
+    /opt/view/bin/psort umap_testfile && \
     cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. && \
     make -j 16 && \
     ctest -T test --output-on-failure

@@ -66,6 +66,8 @@ jobs:
     DOCKER_BUILDKIT: '1'
     CMAKE_EXTRA_FLAGS: '-DUMPIRE_ENABLE_DEVELOPER_BENCHMARKS=On -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_BUILD_TYPE=Release'
   steps:
+  - script: |
+      sysctl vm.unprivileged_userfaultfd=1
   - checkout: self
     clean: boolean
     submodules: recursive
