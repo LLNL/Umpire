@@ -51,6 +51,8 @@ ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
 RUN ls -la /proc/sys/vm && \
+    echo "cat /proc/sys/vm/unprivileged_userfaultfd" && \
+    cat /proc/sys/vm/unprivileged_userfaultfd && \
     cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. && \
     make -j 16 && \
     ctest -T test --output-on-failure
