@@ -24,7 +24,7 @@ int main(int, char**)
   // GPU as the preferred location.
   //
   auto preferred_location_allocator = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-      "preferred_location_device", allocator, "PREFERRED_LOCATION");
+      "preferred_location_device", allocator, "SET_PREFERRED_LOCATION");
 
   //
   // Create a pool using the preferred_location_allocator. This makes all

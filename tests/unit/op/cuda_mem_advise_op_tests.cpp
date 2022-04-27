@@ -18,7 +18,7 @@ TEST(CudaAdviseAccessedBy, Find)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  ASSERT_NO_THROW(op_registry.find("ACCESSED_BY", strategy, strategy));
+  ASSERT_NO_THROW(op_registry.find("SET_ACCESSED_BY", strategy, strategy));
 }
 
 TEST(CudaAdviseAccessedBy, Apply)
@@ -29,7 +29,7 @@ TEST(CudaAdviseAccessedBy, Apply)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation = op_registry.find("ACCESSED_BY", strategy, strategy);
+  auto advice_operation = op_registry.find("SET_ACCESSED_BY", strategy, strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
 
@@ -47,7 +47,7 @@ TEST(CudaAdvisePreferredLocation, Find)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  ASSERT_NO_THROW(op_registry.find("PREFERRED_LOCATION", strategy, strategy));
+  ASSERT_NO_THROW(op_registry.find("SET_PREFERRED_LOCATION", strategy, strategy));
 }
 
 TEST(CudaAdvisePreferredLocation, Apply)
@@ -58,7 +58,7 @@ TEST(CudaAdvisePreferredLocation, Apply)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto advice_operation = op_registry.find("SET_PREFERRED_LOCATION", strategy, strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
   auto record = new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
@@ -79,7 +79,7 @@ TEST(CudaAdvisePreferredLocation, ApplyHost)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  auto advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto advice_operation = op_registry.find("SET_PREFERRED_LOCATION", strategy, strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
   auto record = new umpire::util::AllocationRecord{data, 1024 * sizeof(float), strategy};
@@ -100,7 +100,7 @@ TEST(CudaAdviseReadMostly, Find)
 
   auto& op_registry = umpire::op::MemoryOperationRegistry::getInstance();
 
-  ASSERT_NO_THROW(op_registry.find("READ_MOSTLY", strategy, strategy));
+  ASSERT_NO_THROW(op_registry.find("SET_READ_MOSTLY", strategy, strategy));
 }
 
 TEST(CudaAdviseReadMostly, Apply)
@@ -111,7 +111,7 @@ TEST(CudaAdviseReadMostly, Apply)
   auto allocator = rm.getAllocator("UM");
   auto strategy = allocator.getAllocationStrategy();
 
-  auto advice_operation = op_registry.find("READ_MOSTLY", strategy, strategy);
+  auto advice_operation = op_registry.find("SET_READ_MOSTLY", strategy, strategy);
 
   float* data = static_cast<float*>(allocator.allocate(1024 * sizeof(float)));
 

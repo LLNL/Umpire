@@ -131,7 +131,7 @@ struct make_allocator_helper<umpire::strategy::AllocationAdvisor> {
   {
     auto& rm = umpire::ResourceManager::getInstance();
     return rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator(resource_name),
-                                                                 "PREFERRED_LOCATION");
+                                                                 "SET_PREFERRED_LOCATION");
   }
 };
 
@@ -687,7 +687,7 @@ TYPED_TEST(AdviceTest, ReadMostly)
 
   int device = 0;
 
-  auto m_advice_operation = op_registry.find("READ_MOSTLY", strategy, strategy);
+  auto m_advice_operation = op_registry.find("SET_READ_MOSTLY", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
@@ -703,7 +703,7 @@ TYPED_TEST(AdviceTest, PreferredLocation)
 
   int device = 0;
 
-  auto m_advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto m_advice_operation = op_registry.find("SET_PREFERRED_LOCATION", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;
@@ -719,7 +719,7 @@ TYPED_TEST(AdviceTest, AccessedBy)
 
   int device = 0;
 
-  auto m_advice_operation = op_registry.find("ACCESSED_BY", strategy, strategy);
+  auto m_advice_operation = op_registry.find("SET_ACCESSED_BY", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
     device = cudaCpuDeviceId;

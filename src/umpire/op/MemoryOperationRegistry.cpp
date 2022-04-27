@@ -17,15 +17,8 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-#include "umpire/op/CudaAdviseAccessedByOperation.hpp"
-#include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
-#include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
-#include "umpire/op/CudaAdviseUnsetAccessedByOperation.hpp"
-#include "umpire/op/CudaAdviseUnsetPreferredLocationOperation.hpp"
-#include "umpire/op/CudaAdviseUnsetReadMostlyOperation.hpp"
-#include "umpire/op/CudaCopyFromOperation.hpp"
+#include "umpire/op/CudaAdviseOperation.hpp"
 #include "umpire/op/CudaCopyOperation.hpp"
-#include "umpire/op/CudaCopyToOperation.hpp"
 #include "umpire/op/CudaMemPrefetchOperation.hpp"
 #include "umpire/op/CudaMemsetOperation.hpp"
 #endif
@@ -85,40 +78,41 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::cuda), std::make_shared<CudaCopyToOperation>());
+  const std::array<const std::tuple<std::string, cudaMemoryAdvise, umpire::Platform>, 10> cuda_advice_operations{
+      {{"SET_READ_MOSTLY", cudaMemAdviseSetReadMostly, Platform::cuda},
+       {"UNSET_READ_MOSTLY", cudaMemAdviseUnsetReadMostly, Platform::cuda},
+       {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::cuda},
+       {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::cuda},
+       {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::cuda},
+       {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::cuda},
+       {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::host},
+       {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::host},
+       {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::host},
+       {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::host}}};
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::host), std::make_shared<CudaCopyFromOperation>());
+  const std::array<const std::tuple<umpire::Platform, umpire::Platform, cudaMemcpyKind>, 3> cuda_copy_operations{
+      {{Platform::host, Platform::cuda, cudaMemcpyHostToDevice},
+       {Platform::cuda, Platform::host, cudaMemcpyDeviceToHost},
+       {Platform::cuda, Platform::cuda, cudaMemcpyDeviceToDevice}}};
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::cuda), std::make_shared<CudaCopyOperation>());
+  for (auto copy : cuda_copy_operations) {
+    auto src_plat = std::get<0>(copy);
+    auto dst_plat = std::get<1>(copy);
+    auto kind = std::get<2>(copy);
+    registerOperation("COPY", std::make_pair(src_plat, dst_plat), std::make_shared<CudaCopyOperation>(kind));
+  }
+
+  for (auto advice : cuda_advice_operations) {
+    auto name = std::get<0>(advice);
+    auto advice_enum = std::get<1>(advice);
+    auto platform = std::get<2>(advice);
+    registerOperation(name, std::make_pair(platform, platform), std::make_shared<CudaAdviseOperation>(advice_enum));
+  }
 
   registerOperation("MEMSET", std::make_pair(Platform::cuda, Platform::cuda), std::make_shared<CudaMemsetOperation>());
 
   registerOperation("REALLOCATE", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<GenericReallocateOperation>());
-
-  registerOperation("ACCESSED_BY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseAccessedByOperation>());
-
-  registerOperation("PREFERRED_LOCATION", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdvisePreferredLocationOperation>());
-
-  registerOperation("PREFERRED_LOCATION", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<CudaAdvisePreferredLocationOperation>());
-
-  registerOperation("READ_MOSTLY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseReadMostlyOperation>());
-
-  registerOperation("UNSET_ACCESSED_BY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseUnsetAccessedByOperation>());
-
-  registerOperation("UNSET_PREFERRED_LOCATION", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
-
-  registerOperation("UNSET_PREFERRED_LOCATION", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
-
-  registerOperation("UNSET_READ_MOSTLY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
 
   registerOperation("PREFETCH", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaMemPrefetchOperation>());

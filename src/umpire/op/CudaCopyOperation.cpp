@@ -14,11 +14,15 @@
 namespace umpire {
 namespace op {
 
+CudaCopyOperation::CudaCopyOperation(cudaMemcpyKind kind) : m_kind{kind}
+{
+}
+
 void CudaCopyOperation::transform(void* src_ptr, void** dst_ptr,
                                   umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
                                   umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation), std::size_t length)
 {
-  cudaError_t error = ::cudaMemcpy(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToDevice);
+  cudaError_t error = ::cudaMemcpy(*dst_ptr, src_ptr, length, m_kind);
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(
@@ -36,7 +40,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyOperation::transf
   auto device = ctx.get<camp::resources::Cuda>();
   auto stream = device.get_stream();
 
-  cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, cudaMemcpyDeviceToDevice, stream);
+  cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, m_kind, stream);
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
