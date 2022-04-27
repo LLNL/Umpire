@@ -75,7 +75,7 @@ jobs:
     inputs:
       command: build
       dockerFile: Dockerfile
-      arguments: '--target $(docker_target)'
+      arguments: '--security-opt seccomp=unconfined --target $(docker_target)'
   - script: |
       CID=$(docker create llnl/umpire:$(Build.BuildId))
       echo ${CID}
