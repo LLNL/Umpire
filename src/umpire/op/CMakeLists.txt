@@ -59,6 +59,7 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (umpire_op_headers
     ${umpire_op_headers}
+    HipAdviseOperation.hpp
     HipCopyOperation.hpp
     HipCopyFromOperation.hpp
     HipCopyToOperation.hpp
@@ -66,6 +67,7 @@ if (UMPIRE_ENABLE_HIP)
 
   set (umpire_op_sources
     ${umpire_op_sources}
+    HipAdviseOperation.cpp
     HipCopyOperation.cpp
     HipCopyFromOperation.cpp
     HipCopyToOperation.cpp
