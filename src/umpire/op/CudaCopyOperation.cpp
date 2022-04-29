@@ -10,6 +10,7 @@
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
+#include "umpire/util/Platform.hpp"
 
 namespace umpire {
 namespace op {
@@ -37,8 +38,12 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyOperation::transf
     void* src_ptr, void** dst_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
     util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation), std::size_t length, camp::resources::Resource& ctx)
 {
-  auto device = ctx.get<camp::resources::Cuda>();
-  auto stream = device.get_stream();
+  auto device = ctx.try_get<camp::resources::Cuda>();
+  if (!device) {
+    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}", platform_to_string(ctx.get_platform())));
+
+  }
+  auto stream = device->get_stream();
 
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, m_kind, stream);
 

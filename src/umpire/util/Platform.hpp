@@ -9,9 +9,31 @@
 
 #include "camp/resource/platform.hpp"
 
+#include <string>
+
 namespace umpire {
 
 using Platform = camp::resources::Platform;
+
+inline std::string platform_to_string(Platform type)
+{
+  switch (type) {
+    case Platform::undefined:
+      return "Undefined";
+    case Platform::host:
+      return "Host";
+    case Platform::cuda:
+      return "Cuda";
+    case Platform::omp_target:
+      return "OmpTarget";
+    case Platform::hip:
+      return "Hip";
+    case Platform::sycl:
+      return "Sycl";
+    default:
+      return "Unknown";
+  }
+}
 
 } // end of namespace umpire
 
