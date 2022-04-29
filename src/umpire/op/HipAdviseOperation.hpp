@@ -17,10 +17,11 @@ namespace op {
 class HipAdviseOperation : public MemoryOperation {
  public:
   HipAdviseOperation(hipMemoryAdvise a);
+  
   /*!
    * @copybrief MemoryOperation::apply
    *
-   * Uses cudaMemAdvise to set data as accessed by the appropriate device.
+   * Uses hipMemAdvise to apply memory advice to the given allocation.
    *
    * @copydetails MemoryOperation::apply
    */
