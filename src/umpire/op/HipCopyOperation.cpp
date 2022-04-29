@@ -25,11 +25,9 @@ void HipCopyOperation::transform(void* src_ptr, void** dst_ptr,
   hipError_t error = ::hipMemcpy(*dst_ptr, src_ptr, length, m_kind);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(
-        runtime_error,
-        umpire::fmt::format(
-            "hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}) failed with error: {}",
-            *dst_ptr, src_ptr, length, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}) failed with error: {}",
+                                     *dst_ptr, src_ptr, length, hipGetErrorString(error)));
   }
 }
 

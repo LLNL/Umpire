@@ -19,7 +19,7 @@ namespace op {
  */
 class HipCopyOperation : public MemoryOperation {
  public:
-   HipCopyOperation(hipMemcpyKind kind);
+  HipCopyOperation(hipMemcpyKind kind);
 
   /*!
    * @copybrief MemoryOperation::transform
@@ -37,8 +37,9 @@ class HipCopyOperation : public MemoryOperation {
                                                                          util::AllocationRecord* dst_allocation,
                                                                          std::size_t length,
                                                                          camp::resources::Resource& ctx);
-  private:
-    hipMemcpyKind m_kind;
+
+ private:
+  hipMemcpyKind m_kind;
 };
 
 } // end of namespace op
