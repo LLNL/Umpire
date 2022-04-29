@@ -17,7 +17,7 @@ namespace op {
 class HipAdviseOperation : public MemoryOperation {
  public:
   HipAdviseOperation(hipMemoryAdvise a);
-  
+
   /*!
    * @copybrief MemoryOperation::apply
    *
