@@ -9,8 +9,8 @@
 #include <cuda_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/error.hpp"
 #include "umpire/util/Platform.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -33,8 +33,8 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::appl
 {
   auto device = ctx.try_get<camp::resources::Cuda>();
   if (!device) {
-    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}", platform_to_string(ctx.get_platform())));
-
+    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
+                                                     platform_to_string(ctx.get_platform())));
   }
   auto stream = device->get_stream();
 

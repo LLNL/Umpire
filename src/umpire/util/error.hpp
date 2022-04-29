@@ -106,7 +106,7 @@ class unknown_pointer_error : public umpire::runtime_error {
 };
 
 class resource_error : public umpire::runtime_error {
-  public:
+ public:
   resource_error(const std::string& msg, const std::string& file, int line) : runtime_error(msg, file, line)
   {
   }

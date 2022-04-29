@@ -7,9 +7,9 @@
 #ifndef UMPIRE_Platform_HPP
 #define UMPIRE_Platform_HPP
 
-#include "camp/resource/platform.hpp"
-
 #include <string>
+
+#include "camp/resource/platform.hpp"
 
 namespace umpire {
 
