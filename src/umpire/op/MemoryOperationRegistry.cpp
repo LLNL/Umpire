@@ -27,9 +27,7 @@
 #include <hip/hip_runtime.h>
 
 #include "umpire/op/HipAdviseOperation.hpp"
-#include "umpire/op/HipCopyFromOperation.hpp"
 #include "umpire/op/HipCopyOperation.hpp"
-#include "umpire/op/HipCopyToOperation.hpp"
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
@@ -81,22 +79,22 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  const std::array<const std::tuple<std::string, cudaMemoryAdvise, umpire::Platform>, 10> cuda_advice_operations{
-      {{"SET_READ_MOSTLY", cudaMemAdviseSetReadMostly, Platform::cuda},
-       {"UNSET_READ_MOSTLY", cudaMemAdviseUnsetReadMostly, Platform::cuda},
-       {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::cuda},
-       {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::cuda},
-       {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::cuda},
-       {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::cuda},
-       {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::host},
-       {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::host},
-       {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::host},
-       {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::host}}};
+  const std::tuple<std::string, cudaMemoryAdvise, umpire::Platform> cuda_advice_operations[] = {
+      {"SET_READ_MOSTLY", cudaMemAdviseSetReadMostly, Platform::cuda},
+      {"UNSET_READ_MOSTLY", cudaMemAdviseUnsetReadMostly, Platform::cuda},
+      {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::cuda},
+      {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::cuda},
+      {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::cuda},
+      {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::cuda},
+      {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::host},
+      {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::host},
+      {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::host},
+      {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::host}};
 
-  const std::array<const std::tuple<umpire::Platform, umpire::Platform, cudaMemcpyKind>, 3> cuda_copy_operations{
-      {{Platform::host, Platform::cuda, cudaMemcpyHostToDevice},
-       {Platform::cuda, Platform::host, cudaMemcpyDeviceToHost},
-       {Platform::cuda, Platform::cuda, cudaMemcpyDeviceToDevice}}};
+  const std::tuple<umpire::Platform, umpire::Platform, cudaMemcpyKind> cuda_copy_operations[] = {
+      {Platform::host, Platform::cuda, cudaMemcpyHostToDevice},
+      {Platform::cuda, Platform::host, cudaMemcpyDeviceToHost},
+      {Platform::cuda, Platform::cuda, cudaMemcpyDeviceToDevice}};
 
   for (auto copy : cuda_copy_operations) {
     auto src_plat = std::get<0>(copy);
@@ -122,39 +120,31 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-  constexpr std::size_t HIP_NUM_ADVICE_OPS
-  {
+  const std::tuple<std::string, hipMemoryAdvise> hip_advice_operations[] = {
+    {"SET_READ_MOSTLY", hipMemAdviseSetReadMostly},
+    {"UNSET_READ_MOSTLY", hipMemAdviseUnsetReadMostly},
+    {"SET_PREFERRED_LOCATION", hipMemAdviseSetPreferredLocation},
+    {"UNSET_PREFERRED_LOCATION", hipMemAdviseUnsetPreferredLocation},
+    {"SET_ACCESSED_BY", hipMemAdviseSetAccessedBy},
+    {"UNSET_ACCESSED_BY", hipMemAdviseUnsetAccessedBy}
 #if HIP_VERSION_MAJOR >= 5
-    8
-#else
-    6
+    ,
+    {"SET_COARSE_GRAIN", hipMemAdviseSetCoarseGrain},
+    {"UNSET_COARSE_GRAIN", hipMemAdviseUnsetCoarseGrain}
 #endif
   };
 
-  const std::array<const std::tuple<std::string, hipMemoryAdvise>, HIP_NUM_ADVICE_OPS> hip_advice_operations{
-      {{"SET_READ_MOSTLY", hipMemAdviseSetReadMostly},
-       {"UNSET_READ_MOSTLY", hipMemAdviseUnsetReadMostly},
-       {"SET_PREFERRED_LOCATION", hipMemAdviseSetPreferredLocation},
-       {"UNSET_PREFERRED_LOCATION", hipMemAdviseUnsetPreferredLocation},
-       {"SET_ACCESSED_BY", hipMemAdviseSetAccessedBy},
-       {"UNSET_ACCESSED_BY", hipMemAdviseUnsetAccessedBy}
-#if HIP_VERSION_MAJOR >= 5
-       ,
-       {"SET_COARSE_GRAIN", hipMemAdviseSetCoarseGrain},
-       {"UNSET_COARSE_GRAIN", hipMemAdviseUnsetCoarseGrain}
-#endif
-      }};
+  const std::tuple<umpire::Platform, umpire::Platform, hipMemcpyKind> hip_copy_operations[] = {
+      {Platform::host, Platform::hip, hipMemcpyHostToDevice},
+      {Platform::hip, Platform::host, hipMemcpyDeviceToHost},
+      {Platform::hip, Platform::hip, hipMemcpyDeviceToDevice}};
 
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::hip), std::make_shared<HipCopyToOperation>());
-
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::host), std::make_shared<HipCopyFromOperation>());
-
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipCopyOperation>());
-
-  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipMemsetOperation>());
-
-  registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
-                    std::make_shared<GenericReallocateOperation>());
+  for (auto copy : hip_copy_operations) {
+    auto src_plat = std::get<0>(copy);
+    auto dst_plat = std::get<1>(copy);
+    auto kind = std::get<2>(copy);
+    registerOperation("COPY", std::make_pair(src_plat, dst_plat), std::make_shared<HipCopyOperation>(kind));
+  }
 
   for (auto advice : hip_advice_operations) {
     auto name = std::get<0>(advice);
@@ -162,6 +152,11 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
     registerOperation(name, std::make_pair(Platform::hip, Platform::hip),
                       std::make_shared<HipAdviseOperation>(advice_enum));
   }
+
+  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipMemsetOperation>());
+
+  registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
+                    std::make_shared<GenericReallocateOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)

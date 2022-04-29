@@ -14,18 +14,20 @@
 namespace umpire {
 namespace op {
 
+HipCopyOperation::HipCopyOperation(hipMemcpyKind kind) : m_kind{kind}
+{
+}
+
 void HipCopyOperation::transform(void* src_ptr, void** dst_ptr,
                                  umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(src_allocation),
                                  umpire::util::AllocationRecord* UMPIRE_UNUSED_ARG(dst_allocation), std::size_t length)
 {
-  hipError_t error = ::hipMemcpy(*dst_ptr, src_ptr, length, hipMemcpyDeviceToDevice);
+  hipError_t error = ::hipMemcpy(*dst_ptr, src_ptr, length, m_kind);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR(
-        runtime_error,
-        umpire::fmt::format(
-            "hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}, hipMemcpyDeviceToDevice) failed with error: {}",
-            *dst_ptr, src_ptr, length, hipGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}) failed with error: {}",
+                                     *dst_ptr, src_ptr, length, hipGetErrorString(error)));
   }
 }
 
@@ -36,12 +38,12 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyOperation::transfo
   auto device = ctx.get<camp::resources::Hip>();
   auto stream = device.get_stream();
 
-  hipError_t error = ::hipMemcpyAsync(*dst_ptr, src_ptr, length, hipMemcpyDeviceToDevice, stream);
+  hipError_t error = ::hipMemcpyAsync(*dst_ptr, src_ptr, length, m_kind, stream);
 
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
                  umpire::fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
-                                     "hipMemcpyDeviceToDevice, stream = {}) failed with error: {}",
+                                     "stream = {}) failed with error: {}",
                                      *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
   }
 
