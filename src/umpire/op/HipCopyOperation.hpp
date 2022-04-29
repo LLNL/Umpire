@@ -7,6 +7,8 @@
 #ifndef UMPIRE_HipCopyOperation_HPP
 #define UMPIRE_HipCopyOperation_HPP
 
+#include <hip/hip_runtime.h>
+
 #include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
@@ -17,6 +19,8 @@ namespace op {
  */
 class HipCopyOperation : public MemoryOperation {
  public:
+   HipCopyOperation(hipMemcpyKind kind);
+
   /*!
    * @copybrief MemoryOperation::transform
    *
@@ -33,6 +37,8 @@ class HipCopyOperation : public MemoryOperation {
                                                                          util::AllocationRecord* dst_allocation,
                                                                          std::size_t length,
                                                                          camp::resources::Resource& ctx);
+  private:
+    hipMemcpyKind m_kind;
 };
 
 } // end of namespace op

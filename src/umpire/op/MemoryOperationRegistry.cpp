@@ -27,9 +27,7 @@
 #include <hip/hip_runtime.h>
 
 #include "umpire/op/HipAdviseOperation.hpp"
-#include "umpire/op/HipCopyFromOperation.hpp"
 #include "umpire/op/HipCopyOperation.hpp"
-#include "umpire/op/HipCopyToOperation.hpp"
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
@@ -145,16 +143,17 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
       }};
 
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::hip), std::make_shared<HipCopyToOperation>());
+  const std::array<const std::tuple<umpire::Platform, umpire::Platform, hipMemcpyKind>, 3> hip_copy_operations{
+      {{Platform::host, Platform::hip, hipMemcpyHostToDevice},
+       {Platform::hip, Platform::host, hipMemcpyDeviceToHost},
+       {Platform::hip, Platform::hip, hipMemcpyDeviceToDevice}}};
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::host), std::make_shared<HipCopyFromOperation>());
-
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipCopyOperation>());
-
-  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipMemsetOperation>());
-
-  registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
-                    std::make_shared<GenericReallocateOperation>());
+  for (auto copy : hip_copy_operations) {
+    auto src_plat = std::get<0>(copy);
+    auto dst_plat = std::get<1>(copy);
+    auto kind = std::get<2>(copy);
+    registerOperation("COPY", std::make_pair(src_plat, dst_plat), std::make_shared<HipCopyOperation>(kind));
+  }
 
   for (auto advice : hip_advice_operations) {
     auto name = std::get<0>(advice);
@@ -162,6 +161,11 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
     registerOperation(name, std::make_pair(Platform::hip, Platform::hip),
                       std::make_shared<HipAdviseOperation>(advice_enum));
   }
+
+  registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipMemsetOperation>());
+
+  registerOperation("REALLOCATE", std::make_pair(Platform::hip, Platform::hip),
+                    std::make_shared<GenericReallocateOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)

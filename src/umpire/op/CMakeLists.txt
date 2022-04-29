@@ -61,16 +61,12 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_op_headers}
     HipAdviseOperation.hpp
     HipCopyOperation.hpp
-    HipCopyFromOperation.hpp
-    HipCopyToOperation.hpp
     HipMemsetOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
     HipAdviseOperation.cpp
     HipCopyOperation.cpp
-    HipCopyFromOperation.cpp
-    HipCopyToOperation.cpp
     HipMemsetOperation.cpp)
 
   set (umpire_op_depends
