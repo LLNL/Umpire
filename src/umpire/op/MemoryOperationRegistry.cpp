@@ -80,21 +80,21 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
 #if defined(UMPIRE_ENABLE_CUDA)
   const std::tuple<std::string, cudaMemoryAdvise, umpire::Platform> cuda_advice_operations[] = {
-       {"SET_READ_MOSTLY", cudaMemAdviseSetReadMostly, Platform::cuda},
-       {"UNSET_READ_MOSTLY", cudaMemAdviseUnsetReadMostly, Platform::cuda},
-       {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::cuda},
-       {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::cuda},
-       {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::cuda},
-       {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::cuda},
-       {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::host},
-       {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::host},
-       {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::host},
-       {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::host}};
+      {"SET_READ_MOSTLY", cudaMemAdviseSetReadMostly, Platform::cuda},
+      {"UNSET_READ_MOSTLY", cudaMemAdviseUnsetReadMostly, Platform::cuda},
+      {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::cuda},
+      {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::cuda},
+      {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::cuda},
+      {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::cuda},
+      {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::host},
+      {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::host},
+      {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::host},
+      {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::host}};
 
   const std::tuple<umpire::Platform, umpire::Platform, cudaMemcpyKind> cuda_copy_operations[] = {
-       {Platform::host, Platform::cuda, cudaMemcpyHostToDevice},
-       {Platform::cuda, Platform::host, cudaMemcpyDeviceToHost},
-       {Platform::cuda, Platform::cuda, cudaMemcpyDeviceToDevice}};
+      {Platform::host, Platform::cuda, cudaMemcpyHostToDevice},
+      {Platform::cuda, Platform::host, cudaMemcpyDeviceToHost},
+      {Platform::cuda, Platform::cuda, cudaMemcpyDeviceToDevice}};
 
   for (auto copy : cuda_copy_operations) {
     auto src_plat = std::get<0>(copy);
@@ -121,23 +121,23 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 
 #if defined(UMPIRE_ENABLE_HIP)
   const std::tuple<std::string, hipMemoryAdvise> hip_advice_operations[] = {
-       {"SET_READ_MOSTLY", hipMemAdviseSetReadMostly},
-       {"UNSET_READ_MOSTLY", hipMemAdviseUnsetReadMostly},
-       {"SET_PREFERRED_LOCATION", hipMemAdviseSetPreferredLocation},
-       {"UNSET_PREFERRED_LOCATION", hipMemAdviseUnsetPreferredLocation},
-       {"SET_ACCESSED_BY", hipMemAdviseSetAccessedBy},
-       {"UNSET_ACCESSED_BY", hipMemAdviseUnsetAccessedBy}
+    {"SET_READ_MOSTLY", hipMemAdviseSetReadMostly},
+    {"UNSET_READ_MOSTLY", hipMemAdviseUnsetReadMostly},
+    {"SET_PREFERRED_LOCATION", hipMemAdviseSetPreferredLocation},
+    {"UNSET_PREFERRED_LOCATION", hipMemAdviseUnsetPreferredLocation},
+    {"SET_ACCESSED_BY", hipMemAdviseSetAccessedBy},
+    {"UNSET_ACCESSED_BY", hipMemAdviseUnsetAccessedBy}
 #if HIP_VERSION_MAJOR >= 5
-       ,
-       {"SET_COARSE_GRAIN", hipMemAdviseSetCoarseGrain},
-       {"UNSET_COARSE_GRAIN", hipMemAdviseUnsetCoarseGrain}
+    ,
+    {"SET_COARSE_GRAIN", hipMemAdviseSetCoarseGrain},
+    {"UNSET_COARSE_GRAIN", hipMemAdviseUnsetCoarseGrain}
 #endif
-      };
+  };
 
   const std::tuple<umpire::Platform, umpire::Platform, hipMemcpyKind> hip_copy_operations[] = {
-       {Platform::host, Platform::hip, hipMemcpyHostToDevice},
-       {Platform::hip, Platform::host, hipMemcpyDeviceToHost},
-       {Platform::hip, Platform::hip, hipMemcpyDeviceToDevice}};
+      {Platform::host, Platform::hip, hipMemcpyHostToDevice},
+      {Platform::hip, Platform::host, hipMemcpyDeviceToHost},
+      {Platform::hip, Platform::hip, hipMemcpyDeviceToDevice}};
 
   for (auto copy : hip_copy_operations) {
     auto src_plat = std::get<0>(copy);
