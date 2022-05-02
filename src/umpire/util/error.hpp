@@ -105,6 +105,13 @@ class unknown_pointer_error : public umpire::runtime_error {
   friend class Allocator;
 };
 
+class resource_error : public umpire::runtime_error {
+ public:
+  resource_error(const std::string& msg, const std::string& file, int line) : runtime_error(msg, file, line)
+  {
+  }
+};
+
 } // end of namespace umpire
 
 #if defined(__CUDA_ARCH__)
