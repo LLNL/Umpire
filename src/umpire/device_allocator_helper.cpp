@@ -46,7 +46,7 @@ __host__ __device__ inline int get_index(const char* name)
 #if !defined(__CUDA_ARCH__)
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
     UMPIRE_LOG(Warning, "No DeviceAllocators have been created yet.");
-    return index;   
+    return index;
   }
 
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
@@ -56,7 +56,7 @@ __host__ __device__ inline int get_index(const char* name)
   }
 #else
   if (UMPIRE_DEV_ALLOCS == nullptr) {
-    return index;   
+    return index;
   }
 
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
