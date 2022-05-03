@@ -53,7 +53,6 @@ class FixedMallocPool {
 
   void newPool();
   void* allocInPool(Pool& p) noexcept;
-  void* allocate_impl(std::size_t bytes);
 
   unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
   unsigned int index_from_addr(const Pool& p, const unsigned char* ptr) const;

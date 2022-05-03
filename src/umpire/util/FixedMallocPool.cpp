@@ -74,19 +74,23 @@ void* FixedMallocPool::allocInPool(Pool& p) noexcept
   return ret;
 }
 
-void* FixedMallocPool::allocate_impl(std::size_t bytes)
+void* FixedMallocPool::allocate(std::size_t bytes)
 {
+  UMPIRE_ASSERT(bytes <= m_obj_bytes);
+
   void* ptr = nullptr;
 
-  for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
-    ptr = allocInPool(*it);
-    if (ptr)
-      return ptr;
-  }
+  while (!ptr) {
+    for (auto it = m_pool.rbegin(); it != m_pool.rend(); ++it) {
+      ptr = allocInPool(*it);
+      if (ptr) {
+        break;
+      }
+    }
 
-  if (!ptr) {
-    newPool();
-    ptr = allocate_impl(bytes);
+    if (!ptr) {
+      newPool();
+    }
   }
 
   // Could be an error, but FixedMallocPool is used internally and an
@@ -94,12 +98,6 @@ void* FixedMallocPool::allocate_impl(std::size_t bytes)
   UMPIRE_ASSERT(ptr);
 
   return ptr;
-}
-
-void* FixedMallocPool::allocate(std::size_t bytes)
-{
-  UMPIRE_ASSERT(bytes <= m_obj_bytes);
-  return allocate_impl(bytes);
 }
 
 void FixedMallocPool::deallocate(void* ptr)
