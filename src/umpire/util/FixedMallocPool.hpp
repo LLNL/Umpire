@@ -53,6 +53,8 @@ class FixedMallocPool {
 
   void newPool();
   void* allocInPool(Pool& p) noexcept;
+
+  // allocate_impl used to avoid repeated ASSERT in allocate
   void* allocate_impl(std::size_t bytes);
 
   unsigned char* addr_from_index(const Pool& p, unsigned int i) const;
