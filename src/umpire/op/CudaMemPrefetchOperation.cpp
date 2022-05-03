@@ -9,6 +9,7 @@
 #include <cuda_runtime_api.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
@@ -60,7 +61,12 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
   cudaDeviceProp properties;
   error = ::cudaGetDeviceProperties(&properties, gpu);
 
-  auto stream = ctx.get<camp::resources::Cuda>().get_stream();
+  auto resource = ctx.try_get<camp::resources::Cuda>();
+  if (!resource) {
+    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
+                                                     platform_to_string(ctx.get_platform())));
+  }
+  auto stream = resource->get_stream();
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}",

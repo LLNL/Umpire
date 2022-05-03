@@ -48,11 +48,6 @@ xl_16_1_1_10_gcc_8_3_1:
 
 # CUDA
 
-ibm_clang_9_cuda:
-  variables:
-    SPEC: "+fortran+cuda+device_alloc %clang@ibm.9.0.0 ^cuda@10.1.168"
-  extends: .build_and_test_on_lassen
-
 ibm_clang_9_gcc_8_cuda:
   variables:
     SPEC: "+fortran+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
@@ -60,7 +55,7 @@ ibm_clang_9_gcc_8_cuda:
 
 clang_10_0_1_cuda_mpi_shmem:
   variables:
-    SPEC: "%clang@ibm.10.0.1 +cuda +ipc_shmem +mpi ^spectrum-mpi ^cuda@10.1.168"
+    SPEC: "%clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^spectrum-mpi ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda:
@@ -70,7 +65,7 @@ gcc_8_3_1_cuda:
 
 xl_16_1_1_10_cuda:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.10 ^cuda@10.1.168 ^cmake@3.14.5"
+    SPEC: "+fortran+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_gcc_8_3_1_cuda_11:
@@ -126,5 +121,5 @@ ibm_clang_9_gcc_8_cuda_tpls:
 
 xl_16_1_1_10_cuda_tpls:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.10 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
+    SPEC: "+fortran+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
