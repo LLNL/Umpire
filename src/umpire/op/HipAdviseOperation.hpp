@@ -4,27 +4,34 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_CudaAdviseReadMostlyOperation_HPP
-#define UMPIRE_CudaAdviseReadMostlyOperation_HPP
+#ifndef UMPIRE_HipAdviseOperation_HPP
+#define UMPIRE_HipAdviseOperation_HPP
+
+#include <hip/hip_runtime.h>
 
 #include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
 namespace op {
 
-class CudaAdviseReadMostlyOperation : public MemoryOperation {
+class HipAdviseOperation : public MemoryOperation {
  public:
+  HipAdviseOperation(hipMemoryAdvise a);
+
   /*!
    * @copybrief MemoryOperation::apply
    *
-   * Uses cudaMemAdvise to set data as "read mostly" on the appropriate device.
+   * Uses hipMemAdvise to apply memory advice to the given allocation.
    *
    * @copydetails MemoryOperation::apply
    */
   void apply(void* src_ptr, util::AllocationRecord* src_allocation, int val, std::size_t length);
+
+ private:
+  hipMemoryAdvise m_advise;
 };
 
 } // end of namespace op
 } // end of namespace umpire
 
-#endif // UMPIRE_CudaAdviseReadMostlyOperation_HPP
+#endif // UMPIRE_HipAdviseOperation_HPP

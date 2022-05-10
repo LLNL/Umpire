@@ -131,7 +131,7 @@ struct make_allocator_helper<umpire::strategy::AllocationAdvisor> {
   {
     auto& rm = umpire::ResourceManager::getInstance();
     return rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator(resource_name),
-                                                                 "PREFERRED_LOCATION");
+                                                                 "SET_PREFERRED_LOCATION");
   }
 };
 
@@ -667,7 +667,7 @@ TYPED_TEST(MoveTest, Move)
   this->source_array = nullptr;
 }
 
-#if defined(UMPIRE_ENABLE_CUDA)
+#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 template <typename T>
 class AdviceTest : public OperationTest<T> {
 };
@@ -687,10 +687,14 @@ TYPED_TEST(AdviceTest, ReadMostly)
 
   int device = 0;
 
-  auto m_advice_operation = op_registry.find("READ_MOSTLY", strategy, strategy);
+  auto m_advice_operation = op_registry.find("SET_READ_MOSTLY", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
+#if defined(UMPIRE_ENABLE_CUDA)
     device = cudaCpuDeviceId;
+#elif defined(UMPIRE_ENABLE_HIP)
+    device = hipCpuDeviceId;
+#endif
   }
 
   ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
@@ -703,10 +707,14 @@ TYPED_TEST(AdviceTest, PreferredLocation)
 
   int device = 0;
 
-  auto m_advice_operation = op_registry.find("PREFERRED_LOCATION", strategy, strategy);
+  auto m_advice_operation = op_registry.find("SET_PREFERRED_LOCATION", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
+#if defined(UMPIRE_ENABLE_CUDA)
     device = cudaCpuDeviceId;
+#elif defined(UMPIRE_ENABLE_HIP)
+    device = hipCpuDeviceId;
+#endif
   }
 
   ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
@@ -719,18 +727,18 @@ TYPED_TEST(AdviceTest, AccessedBy)
 
   int device = 0;
 
-  auto m_advice_operation = op_registry.find("ACCESSED_BY", strategy, strategy);
+  auto m_advice_operation = op_registry.find("SET_ACCESSED_BY", strategy, strategy);
 
   if (this->dest_allocator->getPlatform() == umpire::Platform::host) {
+#if defined(UMPIRE_ENABLE_CUDA)
     device = cudaCpuDeviceId;
+#elif defined(UMPIRE_ENABLE_HIP)
+    device = hipCpuDeviceId;
+#endif
   }
 
   ASSERT_NO_THROW({ m_advice_operation->apply(this->source_array, nullptr, device, this->m_size); });
 }
-
-#endif
-
-#if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
 
 TEST(AsyncTest, Copy)
 {
