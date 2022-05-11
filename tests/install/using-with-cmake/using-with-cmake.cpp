@@ -4,16 +4,17 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/ResourceManager.hpp"
-#include "umpire/Allocator.hpp"
-
 #include <iostream>
 
-int main() {
+#include "umpire/Allocator.hpp"
+#include "umpire/ResourceManager.hpp"
+
+int main()
+{
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
   std::cout << "Available allocators: ";
-  for (auto s : rm.getAllocatorNames()){
+  for (auto s : rm.getAllocatorNames()) {
     std::cout << s << "  ";
   }
   std::cout << std::endl;
