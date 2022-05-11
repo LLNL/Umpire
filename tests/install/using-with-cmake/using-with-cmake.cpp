@@ -13,6 +13,8 @@ int main()
 {
   auto& rm = umpire::ResourceManager::getInstance();
   umpire::Allocator alloc = rm.getAllocator("HOST");
+  std::cout << "Got allocator: " << alloc.getName() << std::endl;
+
   std::cout << "Available allocators: ";
   for (auto s : rm.getAllocatorNames()) {
     std::cout << s << "  ";
