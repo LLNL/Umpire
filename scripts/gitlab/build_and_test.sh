@@ -200,7 +200,7 @@ then
 
     cd ${install_dir}/examples/umpire/using-with-cmake
     mkdir build && cd build
-    if ! $cmake_exe -C ../host-config.cmake; then
+    if ! $cmake_exe -C ../host-config.cmake ..; then
       echo "ERROR: running cmake for using-with-cmake test" && exit 1
     fi
 
