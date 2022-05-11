@@ -6,9 +6,22 @@
 ##############################################################################
 @PACKAGE_INIT@
 
+if (@UMPIRE_NEEDS_BLT_TPLS@)
+  include("${CMAKE_CURRENT_LIST_DIR}/umpire-blt-targets.cmake")
+endif()
+
 if (NOT TARGET camp)
+  set(UMPIRE_CAMP_DIR "@camp_DIR@")
+  if(NOT camp_DIR) 
+    set(camp_DIR ${UMPIRE_CAMP_DIR}) 
+  endif()
+
   include(CMakeFindDependencyMacro)
-  find_dependency(camp CONFIG PATHS @PACKAGE_CMAKE_INSTALL_PREFIX@)
+  find_dependency(camp CONFIG NO_DEFAULT_PATH PATHS 
+    ${camp_DIR}
+    ${camp_DIR}/lib/cmake/camp
+    @PACKAGE_CMAKE_INSTALL_PREFIX@
+    @PACKAGE_CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
 endif ()
 
 include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
