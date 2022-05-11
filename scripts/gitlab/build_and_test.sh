@@ -143,7 +143,8 @@ then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       $cmake_exe --build . --verbose -j 1
     else
-      $cmake_exe --install .
+      # todo this should use cmake --install once we use CMake 3.15+ everywhere
+      make install
     fi
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
