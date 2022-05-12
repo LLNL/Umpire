@@ -1,0 +1,39 @@
+##############################################################################
+# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+##############################################################################
+
+# Shared configuration of jobs for lassen
+
+# These are templates (.name) that can be included in other jobs to share part
+# of the job definition.
+.on_lassen:
+  variables:
+  tags:
+    - shell
+    - lassen
+  rules:
+    # Runs except if we explicitly deactivate lassen by variable.
+    - if: '$ON_LASSEN == "OFF"'
+      when: never
+    # Advanced jobs can only run on master, develop or if ALL_TARGETS is ON.
+    # Set ADVANCED_JOB to ON in the job definition to make it an advanced job.
+    - if: '$ADVANCED_JOB == "ON" && $CI_COMMIT_BRANCH != "main" && $CI_COMMIT_BRANCH != "develop" && $ALL_TARGETS != "ON"'
+      when: never
+    # A true statement is expected to allow jobs to run. Here is the default.
+    - when: on_success
+
+# Lassen and Butte use a different job scheduler (spectrum lsf) that does not
+# allow pre-allocation the same way slurm does.
+.build_blueos_3_ppc64le_ib_p9_script:
+  script:
+    - lalloc 1 -W 12 scripts/gitlab/build_and_test.sh
+  artifacts:
+    reports:
+      junit: junit.xml
+
+.build_and_test_on_lassen:
+  extends: [.build_blueos_3_ppc64le_ib_p9_script, .on_lassen]
+  stage: build_and_test
