@@ -13,7 +13,6 @@
 #include <utility>
 
 #include "umpire/Replay.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/error.hpp"
@@ -190,7 +189,7 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
   if (alloc_record) {
     return alloc_record;
   } else {
-#if !defined(NDEBUG)
+#if !(defined(NDEBUG) || defined(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG))
     // use this from a debugger to dump the contents of the AllocationMap
     printAll();
 #endif

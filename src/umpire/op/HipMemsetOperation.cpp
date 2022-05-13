@@ -9,6 +9,7 @@
 #include <hip/hip_runtime.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
@@ -30,8 +31,12 @@ camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply
     void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value, std::size_t length,
     camp::resources::Resource& ctx)
 {
-  auto device = ctx.get<camp::resources::Hip>();
-  auto stream = device.get_stream();
+  auto device = ctx.try_get<camp::resources::Hip>();
+  if (!device) {
+    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
+                                                     platform_to_string(ctx.get_platform())));
+  }
+  auto stream = device->get_stream();
 
   hipError_t error = ::hipMemsetAsync(src_ptr, value, length, stream);
 
