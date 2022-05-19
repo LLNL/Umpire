@@ -57,7 +57,7 @@ corona-build-and-test:
     - local: .gitlab/configs/custom.yml
     - local: .gitlab/configs/machines.yml
     - local: .gitlab/lassen-build-and-test.yml
-   strategy: depend
+    strategy: depend
 
 lassen-build-and-test:
   stage: build-and-test
