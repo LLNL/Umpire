@@ -42,8 +42,8 @@ ruby-build-and-test:
     ON_RUBY: "${ON_RUBY}"
   trigger:
     include:
-    - local: .gitlab/configs/custom.yml
-    - local: .gitlab/configs/machines.yml
+    - local: .gitlab/custom.yml
+    - local: .gitlab/machines.yml
     - local: .gitlab/ruby-build-and-test.yml
     strategy: depend
 
@@ -54,8 +54,8 @@ corona-build-and-test:
     ON_CORONA: "${ON_CORONA}"
   trigger:
     include:
-    - local: .gitlab/configs/custom.yml
-    - local: .gitlab/configs/machines.yml
+    - local: .gitlab/custom.yml
+    - local: .gitlab/machines.yml
     - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
 
@@ -66,8 +66,8 @@ lassen-build-and-test:
     ON_LASSEN: "${ON_LASSEN}"
   trigger:
     include:
-    - local: .gitlab/configs/custom.yml
-    - local: .gitlab/configs/machines.yml
+    - local: .gitlab/custom.yml
+    - local: .gitlab/machines.yml
     - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
 
