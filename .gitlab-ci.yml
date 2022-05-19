@@ -35,41 +35,36 @@ variables:
 # Trigger sub-pipelines:
 ruby-build-and-test:
   stage: build-and-test
-  variables:
-    # Explicitly pass down variables that we want to be able to set when
-    # triggering pipelines manually or using scheduling.
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_RUBY: "${ON_RUBY}"
   trigger:
     include:
     - local: .gitlab/custom.yml
     - local: .gitlab/machines.yml
     - local: .gitlab/ruby-build-and-test.yml
     strategy: depend
+    forward:
+      pipeline_variables: true
 
 corona-build-and-test:
   stage: build-and-test
-  variables:
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_CORONA: "${ON_CORONA}"
   trigger:
     include:
     - local: .gitlab/custom.yml
     - local: .gitlab/machines.yml
     - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
+    forward:
+      pipeline_variables: true
 
 lassen-build-and-test:
   stage: build-and-test
-  variables:
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_LASSEN: "${ON_LASSEN}"
   trigger:
     include:
     - local: .gitlab/custom.yml
     - local: .gitlab/machines.yml
     - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
+    forward:
+      pipeline_variables: true
 
 # If testing develop branch, trigger CHAI pipeline with this version of Umpire.
 # TODO: Once Spack allows to clone a specific commit on demand, then point to the exact commit.
