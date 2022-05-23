@@ -18,17 +18,14 @@ endif ()
 if (UMPIRE_ENABLE_UMAP)
   find_library( UMAP_LIBRARY
     libumap.so
-    PATHS ($ENV{UMAP_ROOT}/install/lib)
+    PATHS ${UMAP_ROOT}/lib
   )
   if (NOT UMAP_LIBRARY)
-    if(NOT DEFINED ENV{UMAP_ROOT})
-	    message(FATAL_ERROR "Could not find UMAP library, UMAP_ROOT undefined")
-    endif ()
     message(FATAL_ERROR "Could not find UMAP library, check UMAP installation at UMAP_ROOT")
   endif()
   find_path( UMAP_INCLUDE_DIR
     NAMES "umap/umap.h"
-    PATHS ($ENV{UMAP_ROOT}/install/include)
+    PATHS ${UMAP_ROOT}/include
   )
   if (NOT UMAP_INCLUDE_DIR)
     message(FATAL_ERROR "Headers missing, check UMAP installation at UMAP_ROOT")

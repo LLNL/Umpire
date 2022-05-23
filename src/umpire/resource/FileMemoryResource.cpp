@@ -18,7 +18,6 @@
 #include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_UMAP)
-#warning Buiding with UMAP
 #include "umap/umap.h"
 #endif
 

@@ -46,19 +46,17 @@ RUN cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. 
     make -j 16 && \
     ctest -T test --output-on-failure
 
-FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-12.0.0 AS clang12
+FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-11.0.0 AS umap_build
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
 WORKDIR /home/umpire/workspace/build
-RUN echo "cat /proc/sys/vm/unprivileged_userfaultfd" && \
-    cat /proc/sys/vm/unprivileged_userfaultfd && \
-    echo ". /opt/spack/share/spack/setup-env.sh && spack install umap +tests" && \
-    . /opt/spack/share/spack/setup-env.sh && spack install umap +tests && \
-    echo "/opt/view/bin/psort umap_testfile" && \
-    /opt/view/bin/psort umap_testfile && \
-    cmake -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. && \
-    make -j 16 && \
-    ctest -T test --output-on-failure
+RUN \
+    git clone -q https://github.com/LLNL/umap.git umap && \
+    cd umap && mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/home/umpire/install.umap .. && \
+    make -j 16 install && cd ../.. && \
+    cmake -DUMAP_ROOT=/home/umpire/install.umap -DCMAKE_INSTALL_PREFIX=/home/umpire/install.umpire -DUMPIRE_ENABLE_UMAP=On -DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DCMAKE_CXX_COMPILER=clang++ .. && \
+    make -j 16
 
 FROM ghcr.io/rse-ops/clang-ubuntu-22.04:llvm-13.0.0 AS clang13
 ENV GTEST_COLOR=1
