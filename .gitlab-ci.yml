@@ -35,7 +35,7 @@ ruby-build-and-test:
     include:
       - local: .gitlab/custom-jobs.yml
       - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-      - local: .gitlab/ruby-build-and-test.yml
+      - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/ruby-build-and-test.yml'
     strategy: depend
     forward:
       pipeline_variables: true
@@ -46,7 +46,7 @@ corona-build-and-test:
     include:
       - local: .gitlab/custom-jobs.yml
       - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-      - local: .gitlab/corona-build-and-test.yml
+      - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/corona-build-and-test.yml'
     strategy: depend
     forward:
       pipeline_variables: true
@@ -57,7 +57,7 @@ lassen-build-and-test:
     include:
       - local: .gitlab/custom-jobs.yml
       - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-      - local: .gitlab/lassen-build-and-test.yml
+      - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/lassen-build-and-test.yml'
     strategy: depend
     forward:
       pipeline_variables: true
