@@ -165,9 +165,12 @@ endif ()
 # Avoid warnings from fmt (so we can still use -Werror)
 blt_patch_target(NAME umpire_tpl_fmt
   TREAT_INCLUDES_AS_SYSTEM ON)
-target_compile_options(umpire_tpl_fmt
-  INTERFACE $<$<COMPILE_LANGUAGE:CXX>:-fcompare-debug-second>
-)
+
+if (C_COMPILER_FAMILY_IS_GNU)
+  target_compile_options(umpire_tpl_fmt
+    INTERFACE 
+    $<$<COMPILE_LANGUAGE:CXX>:-fcompare-debug-second>)
+endif ()
 
 install(TARGETS
   umpire_tpl_fmt
