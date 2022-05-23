@@ -42,13 +42,23 @@ __host__ __device__ inline int convert_to_array_index(int neg_id)
 __host__ __device__ inline int get_index(const char* name)
 {
   int index{-1};
+
 #if !defined(__CUDA_ARCH__)
+  if (UMPIRE_DEV_ALLOCS_h == nullptr) {
+    UMPIRE_LOG(Warning, "No DeviceAllocators have been created yet.");
+    return index;
+  }
+
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
       index = i;
     }
   }
 #else
+  if (UMPIRE_DEV_ALLOCS == nullptr) {
+    return index;
+  }
+
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
     int curr = 0;
@@ -153,7 +163,7 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
   static int index{0};
 
   if (size <= 0) {
-    UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid size passed to DeviceAllocator: ", size));
   }
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {

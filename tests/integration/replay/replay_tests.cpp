@@ -185,19 +185,21 @@ static void runTest()
       auto accessing_alloc = rm.getAllocator("HOST");
 
       name = basename + "_AllocationAdvisor_spec_";
-      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "default_id", base_alloc, "READ_MOSTLY");
-      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_id", base_alloc, "READ_MOSTLY", device_id);
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "default_id", base_alloc, "SET_READ_MOSTLY");
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_id", base_alloc, "SET_READ_MOSTLY",
+                                                               device_id);
       testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_accessing_and_default_id", base_alloc,
-                                                               "READ_MOSTLY", accessing_alloc);
+                                                               "SET_READ_MOSTLY", accessing_alloc);
       testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_accessing_and_id", base_alloc,
-                                                               "PREFERRED_LOCATION", accessing_alloc, device_id);
+                                                               "SET_PREFERRED_LOCATION", accessing_alloc, device_id);
       name = basename + "_AllocationAdvisor_no_introspection_spec_";
-      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "default_id", base_alloc, "READ_MOSTLY");
-      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_id", base_alloc, "READ_MOSTLY", device_id);
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "default_id", base_alloc, "SET_READ_MOSTLY");
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_id", base_alloc, "SET_READ_MOSTLY",
+                                                                device_id);
       testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_accessing_and_default_id", base_alloc,
-                                                                "READ_MOSTLY", accessing_alloc);
+                                                                "SET_READ_MOSTLY", accessing_alloc);
       testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_accessing_and_id", base_alloc,
-                                                                "PREFERRED_LOCATION", accessing_alloc, device_id);
+                                                                "SET_PREFERRED_LOCATION", accessing_alloc, device_id);
 
       name = basename + "_AllocationPrefetcher";
       testAllocator<umpire::strategy::AllocationPrefetcher, true>(name, base_alloc);

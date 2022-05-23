@@ -9,7 +9,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
