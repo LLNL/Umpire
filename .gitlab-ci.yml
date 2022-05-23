@@ -16,6 +16,10 @@
 # to a test phase on a given machine. This design is simpler and more scalable
 # than doing the same with stages.
 
+# We start with custom configuration, local to the project.
+include:
+  - local: .gitlab/custom-variables.yml
+
 # The stages in the top-level pipeline described here correspond to high level
 # steps in the testing workflow.
 # TODO: rehabilitate multi-project and branch radiuss-spack-testing.
@@ -24,22 +28,14 @@ stages:
   - multi-project # unused so far
   - radiuss-spack-testing # unused so far
 
-variables:
-# Use the umdev LLNL service user to run CI. This prevents from running
-# pipelines as an actual user.
-  LLNL_SERVICE_USER: umdev
-# Use the service user workspace. Solves permission issues, stores everything
-# at the same location whoever triggers a pipeline.
-  CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
-
 # Trigger sub-pipelines:
 ruby-build-and-test:
   stage: build-and-test
   trigger:
     include:
-    - local: .gitlab/custom.yml
-    - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-    - local: .gitlab/ruby-build-and-test.yml
+      - local: .gitlab/custom-jobs.yml
+      - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
+      - local: .gitlab/ruby-build-and-test.yml
     strategy: depend
     forward:
       pipeline_variables: true
@@ -48,9 +44,9 @@ corona-build-and-test:
   stage: build-and-test
   trigger:
     include:
-    - local: .gitlab/custom.yml
-    - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-    - local: .gitlab/lassen-build-and-test.yml
+      - local: .gitlab/custom-jobs.yml
+      - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
+      - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
     forward:
       pipeline_variables: true
@@ -59,9 +55,9 @@ lassen-build-and-test:
   stage: build-and-test
   trigger:
     include:
-    - local: .gitlab/custom.yml
-    - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-    - local: .gitlab/lassen-build-and-test.yml
+      - local: .gitlab/custom-jobs.yml
+      - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
+      - local: .gitlab/lassen-build-and-test.yml
     strategy: depend
     forward:
       pipeline_variables: true
