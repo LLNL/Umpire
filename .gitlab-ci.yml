@@ -46,7 +46,7 @@ corona-build-and-test:
     include:
       - local: .gitlab/custom-jobs.yml
       - remote: 'https://raw.githubusercontent.com/LLNL/radiuss-shared-ci/main/machines.yml'
-      - local: .gitlab/lassen-build-and-test.yml
+      - local: .gitlab/corona-build-and-test.yml
     strategy: depend
     forward:
       pipeline_variables: true
