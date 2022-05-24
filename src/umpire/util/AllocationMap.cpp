@@ -12,7 +12,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/error.hpp"

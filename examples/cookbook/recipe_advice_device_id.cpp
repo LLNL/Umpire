@@ -28,7 +28,7 @@ int main(int, char**)
 
   try {
     auto preferred_location_allocator = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-        "preferred_location_device_2", allocator, "PREFERRED_LOCATION", device_id);
+        "preferred_location_device_2", allocator, "SET_PREFERRED_LOCATION", device_id);
 
     // _sphinx_tag_tut_device_advice_end
     void* data = preferred_location_allocator.allocate(1024);
