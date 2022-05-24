@@ -7,6 +7,9 @@
 
 #include "umpire/event/sqlite_database.hpp"
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -19,60 +22,102 @@
 namespace umpire {
 namespace event {
 
+#undef UMPIRE_TRACE_SQEXEC
+#if defined(UMPIRE_TRACE_SQEXEC)
+#define UMPIRE_PRINT_SQEXE(sql) std::cout << "sqlite3_exec(\"" << sql << "\")" << std::endl
+#else
+#define UMPIRE_PRINT_SQEXE(sql)
+#endif
+
+#define UMP_SQ3_EXE(db, sql, proc, cb) \
+{\
+    UMPIRE_PRINT_SQEXE(sql);\
+    char* messageError;\
+    int error = sqlite3_exec(db, sql, proc, cb, &messageError);\
+    if (error) {\
+      std::cout << __PRETTY_FUNCTION__ << ":" << __LINE__ << " (" << error << ") " << messageError << std::endl;\
+      exit(1); \
+    }\
+}
+
 sqlite_database::sqlite_database(const std::string& name)
 {
-  sqlite3_open(name.c_str(), &m_database);
+  {
+    int error = sqlite3_open(name.c_str(), &m_database);
+    if (error) {
+      std::cout
+          << __PRETTY_FUNCTION__ << " " << __LINE__
+          << ": sqlite3_open(" << name << ") failed with "
+          << error << ": " << sqlite3_errstr(error)
+          << std::endl;
+    }
+  }
   const std::string sql =
       "CREATE TABLE IF NOT EXISTS EVENTS ("
       "EVENT           JSON    );";
-  char* messaggeError;
-  sqlite3_exec(m_database, sql.c_str(), NULL, 0, &messaggeError);
+  UMP_SQ3_EXE(m_database, sql.c_str(), NULL, 0);
 }
 
 void sqlite_database::insert(const event& e)
 {
   nlohmann::json json_event = e;
   const std::string sql{"INSERT INTO EVENTS VALUES(json('" + json_event.dump() + "'));"};
-  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+  UMP_SQ3_EXE(m_database, sql.c_str(), NULL, 0);
 }
 
 void sqlite_database::insert(const allocate& e)
 {
-  std::stringstream ss;
-  ss << R"({"category":"operation","name":"allocate")"
-     << R"(,"numeric_args":{"size":)" << e.size << "}"
-     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(","pointer":")" << e.ptr << R"(})"
-     << R"(,"tags":{"replay":"true"})"
-     << R"(,"timestamp":)"
-     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << std::endl;
-  const std::string sql{"INSERT INTO EVENTS VALUES(json('" + ss.str() + "'));"};
-  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+  char buffer[512];
+  sprintf(buffer,
+          "INSERT INTO EVENTS VALUES(json('"
+              R"({"category":"operation","name":"allocate")"
+              R"(,"numeric_args":{"size":%ld})"
+              R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+              R"(,"tags":{"replay":"true"})"
+              R"(,"timestamp":%lld})"
+          "'));",
+          e.size, e.ref, e.ptr,
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+
+  UMP_SQ3_EXE(m_database, buffer, NULL, 0);
 }
 
 void sqlite_database::insert(const named_allocate& e)
 {
-  std::stringstream ss;
-  ss << R"({"category":"operation","name":"named_allocate")"
-     << R"(,"numeric_args":{"size":)" << e.size << "}"
-     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(","pointer":")" << e.ptr << R"(","allocation_name":")"
-     << e.name << R"(})"
-     << R"(,"tags":{"replay":"true"})"
-     << R"(,"timestamp":)"
-     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << std::endl;
-  const std::string sql{"INSERT INTO EVENTS VALUES(json('" + ss.str() + "'));"};
-  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+  char buffer[512];
+
+  sprintf(buffer,
+          "INSERT INTO EVENTS VALUES(json('"
+              R"({"category":"operation","name":"named_allocate")"
+              R"(,"numeric_args":{"size":%ld})"
+              R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","allocation_name":"%s"})"
+              R"(,"tags":{"replay":"true"})"
+              R"(,"timestamp":%lld})"
+          "'));",
+          e.size, e.ref, e.ptr, e.name.c_str(),
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+
+  UMP_SQ3_EXE(m_database, buffer, NULL, 0);
 }
 
 void sqlite_database::insert(const deallocate& e)
 {
-  std::stringstream ss;
-  ss << R"({"category":"operation","name":"deallocate")"
-     << R"(,"string_args":{"allocator_ref":")" << e.ref << R"(","pointer":")" << e.ptr << R"(})"
-     << R"(,"tags":{"replay":"true"})"
-     << R"(,"timestamp":)"
-     << std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count() << std::endl;
-  const std::string sql{"INSERT INTO EVENTS VALUES(json('" + ss.str() + "'));"};
-  sqlite3_exec(m_database, sql.c_str(), NULL, 0, NULL);
+  char buffer[512];
+
+  sprintf(buffer,
+          "INSERT INTO EVENTS VALUES(json('"
+              R"({"category":"operation","name":"deallocate")"
+              R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+              R"(,"tags":{"replay":"true"})"
+              R"(,"timestamp":%lld})"
+          "'));",
+          e.ref, e.ptr,
+          static_cast<long long>(
+              std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
+
+  UMP_SQ3_EXE(m_database, buffer, NULL, 0);
 }
 
 std::vector<event> sqlite_database::get_events()
@@ -90,7 +135,7 @@ std::vector<event> sqlite_database::get_events()
   };
 
   const std::string sql{"SELECT * FROM EVENTS;"};
-  sqlite3_exec(m_database, sql.c_str(), event_processor, (void*)&events, NULL);
+  UMP_SQ3_EXE(m_database, sql.c_str(), event_processor, (void*)&events);
 
   return events;
 }

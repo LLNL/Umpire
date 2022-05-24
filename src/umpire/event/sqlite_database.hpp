@@ -9,7 +9,7 @@
 
 #include "umpire/config.hpp"
 #ifdef UMPIRE_ENABLE_SQLITE
-#include <sqlite3.h>
+#include "sqlite3.h"
 
 #include <string>
 
