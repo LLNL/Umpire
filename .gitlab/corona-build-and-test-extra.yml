@@ -1,9 +1,9 @@
-##############################################################################
-# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+###############################################################################
+# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
-##############################################################################
+###############################################################################
 
 rocm_5.1.0_fortran_clang_13_0_0 (build and test on corona):
   variables:
