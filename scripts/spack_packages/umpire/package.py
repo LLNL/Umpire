@@ -251,6 +251,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         entries.append(cmake_cache_option("UMPIRE_ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
         entries.append(cmake_cache_option("UMPIRE_ENABLE_SQLITE", '+sqlite' in spec))
+        if "+sqlite" in spec:
+            entries.append(cmake_cache_path("SQLite3_ROOT" ,spec['sqlite'].prefix))
         
         return entries
 
