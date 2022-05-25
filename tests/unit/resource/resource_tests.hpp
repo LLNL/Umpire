@@ -42,7 +42,6 @@ TYPED_TEST_P(ResourceTest, Constructor)
 {
   SUCCEED();
 }
-
 TYPED_TEST_P(ResourceTest, Allocate)
 {
   void* data = this->memory_resource->allocate(64);
