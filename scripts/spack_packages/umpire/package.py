@@ -86,7 +86,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                    when='cuda_arch={0}'.format(sm_))
 
     depends_on('camp@0.1.0', when='@main')
-    depends_on('camp@2022.03.0')
+    depends_on('camp@main')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
