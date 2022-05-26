@@ -5,7 +5,12 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-# CPU ONLY
+stages:
+  - build_and_test
+
+# Gitlab jobs for the lassen machine at LLNL.
+
+# CPU only.
 ibm_clang_9:
   variables:
     SPEC: "+fortran %clang@ibm.9.0.0"
@@ -46,8 +51,7 @@ xl_16_1_1_10_gcc_8_3_1:
     SPEC: "+fortran%xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1"
   extends: .build_and_test_on_lassen
 
-# CUDA
-
+# CUDA.
 ibm_clang_9_gcc_8_cuda:
   variables:
     SPEC: "+fortran+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@10.1.168"
@@ -60,7 +64,7 @@ clang_10_0_1_cuda_mpi_shmem:
 
 gcc_8_3_1_cuda:
   variables:
-    SPEC: "+fortran+cuda+shared %gcc@8.3.1 ^cuda@10.1.168"
+    SPEC: "+fortran+cuda+shared+tools+backtrace %gcc@8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda:
@@ -73,8 +77,7 @@ xl_16_1_1_10_gcc_8_3_1_cuda_11:
     SPEC: "+fortran+cuda tests=none %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^cuda@11.0.2"
   extends: .build_and_test_on_lassen
 
-# EXTRAS
-
+# Extras.
 clang_9_0_0_libcpp (build and test on lassen):
   variables:
     SPEC: "%clang@9.0.0+libcpp cxxflags='-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0' cflags='-DGTEST_HAS_CXXABI_H_=0'"
@@ -107,7 +110,7 @@ gcc_8_3_1_numa:
     SPEC: "+fortran+numa%gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-# Develop/main builds against specific tpl versions
+# Develop/main builds against specific tpl versions.
 
 gcc_8_3_1_tpls:
   variables:
@@ -123,3 +126,7 @@ xl_16_1_1_10_cuda_tpls:
   variables:
     SPEC: "+fortran+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
+
+include:
+  - local: .gitlab/configs/common.yml
+  - local: .gitlab/configs/lassen-config.yml
