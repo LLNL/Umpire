@@ -193,8 +193,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                                         hip_root))
             entries.append(cmake_cache_path("ROCM_ROOT_DIR",
                                         rocm_root))
-            entries.append(cmake_cache_path("HIP_PATH",
-                                        rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES",
                                         hip_arch[0]))
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
