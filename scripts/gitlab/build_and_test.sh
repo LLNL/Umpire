@@ -199,14 +199,16 @@ then
         echo "ERROR: install directory not found : ${install_dir}" && exit 1
     fi
 
-    cd ${install_dir}/examples/umpire/using-with-cmake
-    mkdir build && cd build
-    if ! $cmake_exe -C ../host-config.cmake ..; then
-      echo "ERROR: running cmake for using-with-cmake test" && exit 1
-    fi
+    if [[ ! ( grep -q -i "UMPIRE_ENABLE_HIP.*ON" ${hostconfig_path} || grep -q -i "UMPIRE_ENABLE_MPI.*ON" ${hostconfig_path} ) ]]
+        cd ${install_dir}/examples/umpire/using-with-cmake
+        mkdir build && cd build
+        if ! $cmake_exe -C ../host-config.cmake ..; then
+        echo "ERROR: running cmake for using-with-cmake test" && exit 1
+        fi
 
-    if ! make; then
-      echo "ERROR: running make for using-with-cmake test" && exit 1
+        if ! make; then
+        echo "ERROR: running make for using-with-cmake test" && exit 1
+        fi
     fi
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
