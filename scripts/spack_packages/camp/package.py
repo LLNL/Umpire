@@ -56,6 +56,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
             options.extend([
                 '-DENABLE_HIP=ON',
                 '-DROCM_ROOT_DIR={0}/../'.format(spec['hip'].prefix),
+                '-DHIP_CXX_COMPILER={0}'.format(self.compiler.cxx), # required when using Spack amdclang++ wrapper
                 '-DHIP_ROOT_DIR={0}'.format(spec['hip'].prefix)
             ])
             archs = self.spec.variants['amdgpu_target'].value
