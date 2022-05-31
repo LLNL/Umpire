@@ -199,9 +199,9 @@ then
         echo "ERROR: install directory not found : ${install_dir}" && exit 1
     fi
 
-    if grep -q -i "UMPIRE_ENABLE_HIP.*ON" ${hostconfig_path} || grep -q -i "UMPIRE_ENABLE_MPI.*ON" ${hostconfig_path} 
+    if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
     then
-        echo "WARNING: No install test with HIP or MPI"
+        echo "WARNING: No install test with HIP"
     else
         cd ${install_dir}/examples/umpire/using-with-cmake
         mkdir build && cd build
