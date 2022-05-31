@@ -129,6 +129,7 @@ endif()
 
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   message(STATUS "Host Shared Memory Enabled")
+  find_package(Threads)
   target_link_libraries(
     umpire INTERFACE Threads::Threads -lrt 
   )
