@@ -61,6 +61,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     variant('libcpp', default=False, description='Uses libc++ instead of libstdc++')
     variant('tools', default=True, description='Enable tools')
+    variant('backtrace', default=False, description='Enable backtrace tools')
     variant('dev_benchmarks', default=False, description='Enable Developer Benchmarks')
     variant('device_alloc', default=False, description='Enable the DeviceAllocator')
     variant('werror', default=True, description='Enable warnings as errors')
@@ -70,8 +71,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('cmake@3.14:', type='build')
     depends_on('mpi', when='+mpi')
 
-    depends_on('blt@0.4.1', type='build', when='@main')
-    depends_on('blt@0.4.1:', type='build')
+    depends_on('blt@0.5.0', type='build', when='@main')
+    depends_on('blt@0.5.0:', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.
@@ -85,7 +86,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                    when='cuda_arch={0}'.format(sm_))
 
     depends_on('camp@0.1.0', when='@main')
-    depends_on('camp@2022.03.0')
+    depends_on('camp@main')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
@@ -193,8 +194,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                                         hip_root))
             entries.append(cmake_cache_path("ROCM_ROOT_DIR",
                                         rocm_root))
-            entries.append(cmake_cache_path("HIP_PATH",
-                                        rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES",
                                         hip_arch[0]))
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
@@ -238,6 +237,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_option("UMPIRE_ENABLE_DEVICE_ALLOCATOR", '+device_alloc' in spec))
         entries.append(cmake_cache_option("ENABLE_TESTS", not 'tests=none' in spec))
         entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", '+tools' in spec))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_BACKTRACE", '+backtrace' in spec))
         entries.append(cmake_cache_option("ENABLE_WARNINGS_AS_ERRORS", '+werror' in spec))
         entries.append(cmake_cache_option("UMPIRE_ENABLE_ASAN", '+asan' in spec))
         entries.append(cmake_cache_option("BUILD_SHARED_LIBS", '+shared' in spec))

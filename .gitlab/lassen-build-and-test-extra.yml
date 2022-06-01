@@ -50,22 +50,27 @@ xl_default_omp_target:
 
 gcc_8_3_1_numa:
   variables:
-    SPEC: "+fortran+numa%gcc@8.3.1"
+    SPEC: "+numa%gcc@8.3.1"
+  extends: .build_and_test_on_lassen
+
+gcc_8_3_1_cuda:
+  variables:
+    SPEC: "+cuda+shared+tools+backtrace %gcc@8.3.1 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 # Develop/main builds against specific tpl versions.
 
 gcc_8_3_1_tpls:
   variables:
-    SPEC: "+fortran%gcc@8.3.1 ^blt@develop"
+    SPEC: " %gcc@8.3.1 ^blt@develop"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8_cuda_tpls:
   variables:
-    SPEC: "+fortran+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
+    SPEC: "+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda_tpls:
   variables:
-    SPEC: "+fortran+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
+    SPEC: "+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen

@@ -103,6 +103,7 @@ else
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
+install_dir="${build_root}/install_${hostconfig//.cmake/}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
@@ -134,12 +135,16 @@ then
     fi
     $cmake_exe \
       -C ${hostconfig_path} \
+      -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
     if ! $cmake_exe --build . -j; then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       echo "Compilation failed, running make VERBOSE=1"
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       $cmake_exe --build . --verbose -j 1
+    else
+      # todo this should use cmake --install once we use CMake 3.15+ everywhere
+      make install
     fi
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -187,6 +192,26 @@ then
     if grep -q "Errors while running CTest" ./tests_output.txt
     then
         echo "ERROR: failure(s) while running CTest" && exit 1
+    fi
+
+    if [[ ! -d ${install_dir} ]]
+    then
+        echo "ERROR: install directory not found : ${install_dir}" && exit 1
+    fi
+
+    if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
+    then
+        echo "WARNING: No install test with HIP"
+    else
+        cd ${install_dir}/examples/umpire/using-with-cmake
+        mkdir build && cd build
+        if ! $cmake_exe -C ../host-config.cmake ..; then
+        echo "ERROR: running cmake for using-with-cmake test" && exit 1
+        fi
+
+        if ! make; then
+        echo "ERROR: running make for using-with-cmake test" && exit 1
+        fi
     fi
 
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
