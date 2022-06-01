@@ -1,0 +1,36 @@
+###############################################################################
+# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# project contributors. See the COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: (MIT)
+###############################################################################
+
+# Trigger a build-and-test pipeline for ruby, corona and lassen
+ruby-build-and-test:
+  variables:
+    CI_MACHINE: "ruby"
+  extends: [.build-and-test]
+
+corona-build-and-test:
+  variables:
+    CI_MACHINE: "corona"
+  extends: [.build-and-test]
+
+lassen-build-and-test:
+  variables:
+    CI_MACHINE: "lassen"
+  extends: [.build-and-test]
+
+## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
+## TODO: Once Spack allows to clone a specific commit on demand, then point to
+## the exact commit. This will prevent from sticking to a branch (here develop).
+# trigger-chai:
+#  stage: multi-project
+#  rules:
+#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
+#  variables:
+#    UPDATE_UMPIRE: develop
+#  trigger:
+#    project: radiuss/chai
+#    branch: develop
+#    strategy: depend

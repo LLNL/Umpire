@@ -1,77 +1,50 @@
 ###############################################################################
-# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
+# DESCRIPTION:
 ###############################################################################
 # General GitLab pipelines configurations for supercomputers and Linux clusters
 # at Lawrence Livermore National Laboratory (LLNL).
-#
 # This entire pipeline is LLNL-specific
-# #############################################################################
+#
+# Important note: This file is a copy of the template provided by
+# llnl/radiuss-shared-ci. It should not require any change from the project.
+#
+# Instead, each project should provide:
+# - .gitlab/custom-variables.yml
+# - .gitlab/custom-pipelines.yml
+# - .gitlab/custom-jobs.yml
+# - .gitlab/${MACHINE}-build-and-test-extra.yml
+###############################################################################
 
-# We organize the CI on Gitlab in sub-pipelines. Each sub-pipeline correspond
-# to a test phase on a given machine. This design is simpler and more scalable
-# than doing the same with stages.
+# We organize the CI on Gitlab in sub-pipelines. Each sub-pipeline corresponds
+# to a test phase on a given machine.
 
-# The stages in the top-level pipeline described here correspond to high level
-# steps in the testing workflow.
-# TODO: rehabilitate multi-project and branch radiuss-spack-testing.
+# High level stages
 stages:
   - build-and-test
-  - multi-project # unused so far
-  - radiuss-spack-testing # unused so far
+  - multi-project #TODO unused so far
+  - radiuss-spack-testing #TODO unused so far
 
-variables:
-# Use the umdev LLNL service user to run CI. This prevents from running
-# pipelines as an actual user.
-  LLNL_SERVICE_USER: umdev
-# Use the service user workspace. Solves permission issues, stores everything
-# at the same location whoever triggers a pipeline.
-  CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
-
-# Trigger sub-pipelines:
-ruby-build-and-test:
+# Template for jobs triggering a build-and-test sub-pipelines:
+.build-and-test:
   stage: build-and-test
-  variables:
-    # Explicitly pass down variables that we want to be able to set when
-    # triggering pipelines manually or using scheduling.
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_RUBY: "${ON_RUBY}"
   trigger:
-    include: .gitlab/ruby-build-and-test.yml
+    include:
+      - local: '.gitlab/custom-jobs.yml'
+      - project: 'radiuss/radiuss-shared-ci'
+        ref: main
+        file: '${CI_MACHINE}-build-and-test.yml'
+      - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
     strategy: depend
+    forward:
+      pipeline_variables: true
 
-corona-build-and-test:
-  stage: build-and-test
-  variables:
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_CORONA: "${ON_CORONA}"
-  trigger:
-    include: .gitlab/corona-build-and-test.yml
-    strategy: depend
-
-lassen-build-and-test:
-  stage: build-and-test
-  variables:
-    ALL_TARGETS: "${ALL_TARGETS}"
-    ON_LASSEN: "${ON_LASSEN}"
-  trigger:
-    include: .gitlab/lassen-build-and-test.yml
-    strategy: depend
-
-# If testing develop branch, trigger CHAI pipeline with this version of Umpire.
-# TODO: Once Spack allows to clone a specific commit on demand, then point to the exact commit.
-#       This will prevent from sticking to a branch (here develop).
-# trigger-chai:
-#  stage: multi-project
-#  rules:
-#    - if: '$CI_COMMIT_BRANCH == "develop" || $MULTI_PROJECT == "ON"' #run only if ...
-#  variables:
-#    UPDATE_UMPIRE: develop
-#  trigger:
-#    project: radiuss/chai
-#    branch: develop
-#    strategy: depend
+# Import parameters and pipelines defined by the project
+include:
+  - local: .gitlab/custom-variables.yml
+  - local: .gitlab/custom-pipelines.yml
