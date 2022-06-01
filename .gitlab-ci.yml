@@ -36,20 +36,26 @@ stages:
       - local: '.gitlab/custom-jobs.yml'
       - project: 'radiuss/radiuss-shared-ci'
         ref: main
-        file: '${CI_JOB_NAME}.yml'
-      - local: '.gitlab/${CI_JOB_NAME}-extra.yml'
+        file: '${CI_MACHINE}-build-and-test.yml'
+      - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
     strategy: depend
     forward:
       pipeline_variables: true
 
 # Trigger a pipeline for ruby, corona and lassen
 ruby-build-and-test:
+  variables:
+    CI_MACHINE: "ruby"
   extends: [.build-and-test]
 
 corona-build-and-test:
+  variables:
+    CI_MACHINE: "corona"
   extends: [.build-and-test]
 
 lassen-build-and-test:
+  variables:
+    CI_MACHINE: "lassen"
   extends: [.build-and-test]
 
 # If testing develop branch, trigger CHAI pipeline with this version of Umpire.
