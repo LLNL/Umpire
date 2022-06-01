@@ -28,45 +28,29 @@ stages:
   - multi-project # unused so far
   - radiuss-spack-testing # unused so far
 
-# Trigger sub-pipelines:
-ruby-build-and-test:
+# Template for jobs triggering a build-and-test  sub-pipelines:
+.build-and-test:
   stage: build-and-test
   trigger:
     include:
       - local: '.gitlab/custom-jobs.yml'
       - project: 'radiuss/radiuss-shared-ci'
         ref: main
-        file: 'ruby-build-and-test.yml'
-      - local: '.gitlab/ruby-build-and-test-extra.yml'
+        file: '${CI_JOB_NAME}.yml'
+      - local: '.gitlab/${CI_JOB_NAME}-extra.yml'
     strategy: depend
     forward:
       pipeline_variables: true
+
+# Trigger a pipeline for ruby, corona and lassen
+ruby-build-and-test:
+  extends: [.build-and-test]
 
 corona-build-and-test:
-  stage: build-and-test
-  trigger:
-    include:
-      - local: '.gitlab/custom-jobs.yml'
-      - project: 'radiuss/radiuss-shared-ci'
-        ref: main
-        file: 'corona-build-and-test.yml'
-      - local: '.gitlab/corona-build-and-test-extra.yml'
-    strategy: depend
-    forward:
-      pipeline_variables: true
+  extends: [.build-and-test]
 
 lassen-build-and-test:
-  stage: build-and-test
-  trigger:
-    include:
-      - local: '.gitlab/custom-jobs.yml'
-      - project: 'radiuss/radiuss-shared-ci'
-        ref: main
-        file: 'lassen-build-and-test.yml'
-      - local: '.gitlab/lassen-build-and-test-extra.yml'
-    strategy: depend
-    forward:
-      pipeline_variables: true
+  extends: [.build-and-test]
 
 # If testing develop branch, trigger CHAI pipeline with this version of Umpire.
 # TODO: Once Spack allows to clone a specific commit on demand, then point to the exact commit.
