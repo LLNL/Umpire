@@ -28,11 +28,10 @@ jobs:
     inputs:
       workingDir: 'build'
       cmakeArgs: '--build . --config Release --verbose'
-  - task: CMake@1
+  - task: CmdLine@2
     inputs:
-      workingDir: 'build'
-      cmakeArgs: '--build . --config Release --target test'
-    condition: eq( variables['Agent.OS'], 'Windows_NT')
+      script: 'ctest.exe -T test -C Release'
+      workingDirectory: 'build'
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'cTest'
