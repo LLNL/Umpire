@@ -34,6 +34,10 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(replay_config "${replay_config}omp_")
 endif ()
 
+if (UMPIRE_ENABLE_SQLITE)
+  set(replay_config "${replay_config}sqlite_")
+endif ()
+
 set(replay_config_stripped "")
 string(REGEX REPLACE "_$" "" replay_config_stripped "${replay_config}")
 set(raw_replay_file "${raw_replay_file}.${replay_config_stripped}.replay")

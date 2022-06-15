@@ -12,6 +12,11 @@ gcc_8_1_0_numa:
     SPEC: "+fortran+numa %gcc@8.1.0"
   extends: .build_and_test_on_ruby
 
+clang_10_sqlite:
+  variables:
+    SPEC: "+sqlite %clang@10.0.1"
+  extends: .build_and_test_on_ruby
+
 # Develop builds against specific tpl version.
 pgi_20_1_tpls:
   variables:
