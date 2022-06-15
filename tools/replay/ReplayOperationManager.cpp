@@ -760,8 +760,8 @@ void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
   switch (alloc->type) {
       case ReplayFile::rtype::QUICKPOOL:
           {
-              auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(*(alloc->allocator));
-              dynamic_pool->coalesce();
+              auto quick_pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(*(alloc->allocator));
+              quick_pool->coalesce();
           }
           break;
       case ReplayFile::rtype::DYNAMIC_POOL_LIST:
