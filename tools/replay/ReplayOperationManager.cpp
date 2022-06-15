@@ -1093,15 +1093,23 @@ void ReplayOperationManager::makeCoalesce(ReplayFile::Operation* op)
 {
   auto alloc = &m_ops_table->allocators[op->op_allocator];
 
-  try {
-    auto dynamic_pool =
-      umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(*(alloc->allocator));
-    dynamic_pool->coalesce();
-  }
-  catch(...) {
-    auto dynamic_pool =
-      umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(*(alloc->allocator));
-    dynamic_pool->coalesce();
+  switch (alloc->type) {
+      case ReplayFile::rtype::QUICKPOOL:
+          {
+              auto quick_pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(*(alloc->allocator));
+              quick_pool->coalesce();
+          }
+          break;
+      case ReplayFile::rtype::DYNAMIC_POOL_LIST:
+          {
+              auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(*(alloc->allocator));
+              dynamic_pool->coalesce();
+          }
+          break;
+      default:
+        std::cerr << std::endl
+              << "Unknown pool type for coalesce: %d Skipped" << alloc->type << std::endl;
+        break;
   }
 }
 
