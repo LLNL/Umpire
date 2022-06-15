@@ -22,6 +22,7 @@ class ReplayFile {
     ALLOCATION_ADVISOR,
     DYNAMIC_POOL_LIST,
     MONOTONIC,
+    NAMED,
     SLOT_POOL,
     SIZE_LIMITER,
     THREADSAFE_ALLOCATOR,
@@ -48,6 +49,10 @@ class ReplayFile {
         char advice[max_name_length];
         char accessing_allocator[max_name_length];
       } advisor;
+      struct {
+        int alloc_id;
+        char named_alloc[max_name_length];
+      } named;
       struct {
         int node;
       } numa;
@@ -110,7 +115,7 @@ class ReplayFile {
       static_cast<uint64_t>('P') << 24 | static_cast<uint64_t>('L') << 16 | static_cast<uint64_t>('A') << 8 |
       static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 16;
+  const uint64_t REPLAY_VERSION = 17;
 
   struct Header {
     struct Magic {
