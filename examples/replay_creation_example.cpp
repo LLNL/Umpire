@@ -10,47 +10,31 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Umpire.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/wrap_allocator.hpp"
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("HOST");
-  auto pool_allocator = rm.makeAllocator<umpire::strategy::QuickPool>("host_quick_pool", allocator);
 
-  allocator.allocate(16);
-  allocator.allocate(32);
-  allocator.allocate(64);
+  auto heuristic = umpire::strategy::QuickPool::percent_releasable(75);
+  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("host_quick_pool", allocator, 1024ul, 1024ul, 16, heuristic);
 
-  pool_allocator.allocate(128);
-  pool_allocator.allocate(256);
-  pool_allocator.allocate(512);
+  auto unwrap_quick_pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(pool);
 
-  pool_allocator.allocate(128 + 64);
-  pool_allocator.allocate(256 + 32);
-  pool_allocator.allocate(512 + 16);
+  // Allocate memory in pool
+  void* a[4];
+  for (int i = 0; i < 4; ++i)
+    a[i] = pool.allocate(1024);
 
-  allocator.deallocate((void*)32);
-  allocator.allocate(128);
+  // Create Fragmentation by deallocating a few allocations and reallocating to different values
+  pool.deallocate(a[1]);
+  pool.deallocate(a[2]);
+  a[1] = (void*)pool.allocate(128 + (128*1));
+  a[2] = (void*)pool.allocate(256 + (128*2));
 
-  pool_allocator.deallocate((void*)512);
-  pool_allocator.allocate(256);
-
-  std::stringstream ss;
-  umpire::print_allocator_records(allocator, ss);
-  umpire::print_allocator_records(pool_allocator, ss);
-
-  if (!ss.str().empty())
-    std::cout << ss.str();
-
-  // When umpire throws an exception, a backtrace to the offending call will
-  // be provided in the exception string.
-  void* bad_ptr = (void*)0xBADBADBAD;
-
-  try {
-    allocator.deallocate(bad_ptr); // Will cause a throw from umpire
-  } catch (const std::exception& exc) {
-    std::cout << "Exception thrown from Umpire:" << std::endl << exc.what();
-  }
+  // Coalesce the pool
+  unwrap_quick_pool->coalesce();
 
   return 0;
 }
