@@ -15,10 +15,10 @@ int main(int, char**)
   auto allocator = rm.getAllocator("HOST");
 
   auto heuristic = umpire::strategy::QuickPool::percent_releasable(75);
-  auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("host_quick_pool", allocator, 1024ul, 1024ul, 16, heuristic);
+  auto pool =
+      rm.makeAllocator<umpire::strategy::QuickPool>("host_quick_pool", allocator, 1024ul, 1024ul, 16, heuristic);
 
   auto unwrap_quick_pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(pool);
-
 
   // Allocate memory in pool
   void* a[4];
