@@ -46,7 +46,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     patch('camp_target_umpire_3.0.0.patch', when='@3.0.0')
 
-    variant('fortran', default=False, description='Build C/Fortran API')
+    variant('fortran', default=True, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
     variant('ipc_shmem', default=False, description='Enable POSIX shared memory')
@@ -73,8 +73,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('sqlite', when='+sqlite')
     depends_on('mpi', when='+mpi')
 
-    depends_on('blt@0.4.1', type='build', when='@main')
-    depends_on('blt@develop', type='build')
+    depends_on('blt@0.5.0', type='build', when='@main')
+    depends_on('blt@0.5.0:', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.
@@ -88,7 +88,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                    when='cuda_arch={0}'.format(sm_))
 
     depends_on('camp@0.1.0', when='@main')
-    depends_on('camp@2022.03.0')
+    depends_on('camp@main')
 
     conflicts('+numa', when='@:0.3.2')
     conflicts('~c', when='+fortran', msg='Fortran API requires C API')
@@ -197,8 +197,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                                         hip_root))
             entries.append(cmake_cache_path("ROCM_ROOT_DIR",
                                         rocm_root))
-            entries.append(cmake_cache_path("HIP_PATH",
-                                        rocm_root + '/llvm/bin'))
             entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES",
                                         hip_arch[0]))
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
