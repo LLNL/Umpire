@@ -29,27 +29,24 @@ namespace event {
 #define UMPIRE_PRINT_SQEXE(sql)
 #endif
 
-#define UMP_SQ3_EXE(db, sql, proc, cb) \
-{\
-    UMPIRE_PRINT_SQEXE(sql);\
-    char* messageError;\
-    int error = sqlite3_exec(db, sql, proc, cb, &messageError);\
-    if (error) {\
-      std::cout << __PRETTY_FUNCTION__ << ":" << __LINE__ << " (" << error << ") " << messageError << std::endl;\
-      exit(1); \
-    }\
-}
+#define UMP_SQ3_EXE(db, sql, proc, cb)                                                                           \
+  {                                                                                                              \
+    UMPIRE_PRINT_SQEXE(sql);                                                                                     \
+    char* messageError;                                                                                          \
+    int error = sqlite3_exec(db, sql, proc, cb, &messageError);                                                  \
+    if (error) {                                                                                                 \
+      std::cout << __PRETTY_FUNCTION__ << ":" << __LINE__ << " (" << error << ") " << messageError << std::endl; \
+      exit(1);                                                                                                   \
+    }                                                                                                            \
+  }
 
 sqlite_database::sqlite_database(const std::string& name)
 {
   {
     int error = sqlite3_open(name.c_str(), &m_database);
     if (error) {
-      std::cout
-          << __PRETTY_FUNCTION__ << " " << __LINE__
-          << ": sqlite3_open(" << name << ") failed with "
-          << error << ": " << sqlite3_errstr(error)
-          << std::endl;
+      std::cout << __PRETTY_FUNCTION__ << " " << __LINE__ << ": sqlite3_open(" << name << ") failed with " << error
+                << ": " << sqlite3_errstr(error) << std::endl;
     }
   }
   const std::string sql =
@@ -70,11 +67,11 @@ void sqlite_database::insert(const allocate& e)
   char buffer[512];
   sprintf(buffer,
           "INSERT INTO EVENTS VALUES(json('"
-              R"({"category":"operation","name":"allocate")"
-              R"(,"numeric_args":{"size":%ld})"
-              R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
-              R"(,"tags":{"replay":"true"})"
-              R"(,"timestamp":%lld})"
+          R"({"category":"operation","name":"allocate")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
           "'));",
           e.size, e.ref, e.ptr,
           static_cast<long long>(
@@ -89,11 +86,11 @@ void sqlite_database::insert(const named_allocate& e)
 
   sprintf(buffer,
           "INSERT INTO EVENTS VALUES(json('"
-              R"({"category":"operation","name":"named_allocate")"
-              R"(,"numeric_args":{"size":%ld})"
-              R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","allocation_name":"%s"})"
-              R"(,"tags":{"replay":"true"})"
-              R"(,"timestamp":%lld})"
+          R"({"category":"operation","name":"named_allocate")"
+          R"(,"numeric_args":{"size":%ld})"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","allocation_name":"%s"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
           "'));",
           e.size, e.ref, e.ptr, e.name.c_str(),
           static_cast<long long>(
@@ -108,10 +105,10 @@ void sqlite_database::insert(const deallocate& e)
 
   sprintf(buffer,
           "INSERT INTO EVENTS VALUES(json('"
-              R"({"category":"operation","name":"deallocate")"
-              R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
-              R"(,"tags":{"replay":"true"})"
-              R"(,"timestamp":%lld})"
+          R"({"category":"operation","name":"deallocate")"
+          R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+          R"(,"tags":{"replay":"true"})"
+          R"(,"timestamp":%lld})"
           "'));",
           e.ref, e.ptr,
           static_cast<long long>(

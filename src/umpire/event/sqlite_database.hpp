@@ -9,10 +9,9 @@
 
 #include "umpire/config.hpp"
 #ifdef UMPIRE_ENABLE_SQLITE
-#include "sqlite3.h"
-
 #include <string>
 
+#include "sqlite3.h"
 #include "umpire/event/event_store.hpp"
 
 namespace umpire {
