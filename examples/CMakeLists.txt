@@ -60,11 +60,18 @@ blt_add_executable(
   SOURCES backtrace_example.cpp
   DEPENDS_ON ${example_depends})
 
+blt_add_executable(
+  NAME replay_creation_example
+  SOURCES replay_creation_example.cpp
+  DEPENDS_ON ${example_depends})
+
 if (NOT WIN32 AND NOT APPLE)
   blt_add_target_link_flags( TO backtrace_example FLAGS -rdynamic)
+  blt_add_target_link_flags( TO replay_creation_example FLAGS -rdynamic)
 endif()
 
 list(APPEND umpire_examples backtrace_example)
+list(APPEND umpire_examples replay_creation_example)
 
 if (UMPIRE_ENABLE_C)
   blt_add_executable(
