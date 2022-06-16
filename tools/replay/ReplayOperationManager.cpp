@@ -548,10 +548,10 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
     case ReplayFile::rtype::NAMED:
       if (alloc->introspection) {
         alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::NamedAllocationStrategy, true>(
-            alloc->name, rm.getAllocator(alloc->base_name));
+            alloc->name, rm.getAllocator(alloc->base_name)));
       } else {
         alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::NamedAllocationStrategy, false>(
-            alloc->name, rm.getAllocator(alloc->base_name));
+            alloc->name, rm.getAllocator(alloc->base_name)));
       }
       break;
 
