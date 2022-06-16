@@ -50,7 +50,6 @@ class ReplayFile {
         char accessing_allocator[max_name_length];
       } advisor;
       struct {
-        int alloc_id;
         char named_alloc[max_name_length];
       } named;
       struct {

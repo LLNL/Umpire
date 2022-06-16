@@ -21,6 +21,7 @@
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -541,6 +542,16 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       } else {
         alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(
             alloc->name, rm.getAllocator(alloc->base_name), alloc->argv.monotonic_pool.capacity));
+      }
+      break;
+
+    case ReplayFile::rtype::NAMED:
+      if (alloc->introspection) {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::NamedAllocationStrategy, true>(
+            alloc->name, rm.getAllocator(alloc->base_name));
+      } else {
+        alloc->allocator = new umpire::Allocator(rm.makeAllocator<umpire::strategy::NamedAllocationStrategy, false>(
+            alloc->name, rm.getAllocator(alloc->base_name));
       }
       break;
 

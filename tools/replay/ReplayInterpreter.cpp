@@ -576,6 +576,8 @@ void ReplayInterpreter::replay_compileAllocator(void)
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
 
       alloc->type = ReplayFile::rtype::NAMED;
+      get_from_string(m_json["payload"]["args"][1], alloc->argv.named.named_alloc);
+
       m_ops->copyString(base_allocator_name, alloc->base_name);
     } else if (type == "umpire::strategy::NumaPolicy") {
       const std::string base_allocator_name{m_json["payload"]["args"][0]};
