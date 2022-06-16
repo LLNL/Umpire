@@ -102,6 +102,8 @@ else
     hostconfig_path="${project_dir}/host-configs/${hostconfig}"
 fi
 
+hostconfig=$(basename ${hostconfig_path})
+
 # Build Directory
 if [[ -z ${build_root} ]]
 then
@@ -110,8 +112,8 @@ else
     build_root="/dev/shm${build_root}"
 fi
 
-build_dir="${build_root}/build_${hostconfig//.cmake/}"
-install_dir="${build_root}/install_${hostconfig//.cmake/}"
+build_dir="${build_root}/build_${job_unique_id}_${hostconfig//.cmake/}"
+install_dir="${build_root}/install_${job_unique_id}_${hostconfig//.cmake/}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
