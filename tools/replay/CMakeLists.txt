@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set(tools_depends umpire umpire_tpl_CLI11)
+set(tools_depends umpire umpire_tpl_CLI11 umpire_tpl_json)
 
 if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set(tools_depends ${tools_depends} ${CMAKE_DL_LIBS})
@@ -53,3 +53,5 @@ blt_add_target_compile_flags(
   FLAGS ${UMPIRE_DISABLE_DEPRECATED_WARNINGS_FLAG})
 
 install(TARGETS ${replay_tools} RUNTIME DESTINATION bin)
+
+umpire_add_code_checks(PREFIX tools)
