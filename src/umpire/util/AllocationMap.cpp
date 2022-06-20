@@ -13,7 +13,6 @@
 #include <utility>
 
 #include "umpire/Replay.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/error.hpp"

@@ -47,12 +47,21 @@ __host__ __device__ inline int get_index(const char* name)
 {
   int index{-1};
 #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
+  if (UMPIRE_DEV_ALLOCS_h == nullptr) {
+    UMPIRE_LOG(Warning, "No DeviceAllocators have been created yet.");
+    return index;
+  }
+
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
       index = i;
     }
   }
 #else
+  if (UMPIRE_DEV_ALLOCS == nullptr) {
+    return index;
+  }
+
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
     int curr = 0;

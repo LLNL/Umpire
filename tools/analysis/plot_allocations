@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import matplotlib.pyplot as plt
 
 from re import compile
-a_pat = compile(r'\s*(?P<bytes>\d+)\s+\[\s+(?P<start>\w+)\s+--\s+(?P<end>\w+)\s*\]')
+a_pat = compile(r'\s*size:\s(?P<bytes>\d+),\s+range:\s+(?P<start>\w+)\s+--\s+(?P<end>\w+),.+')
 
 def import_from_file(fname):
     with open(fname, mode='r') as f:
@@ -50,7 +50,7 @@ def plot_ranges(*args):
     # Add the rectangles from each record set in args
     for record_set in args:
         verts = [ ((a[0] / denom, 0), (a[1] / denom, 0), (a[1] / denom, 1), (a[0] / denom, 1)) for a in record_set['ranges'] ]
-        rects = PolyCollection(verts, closed=True, color=record_set['color'], alpha=record_set['alpha'])
+        rects = PolyCollection(verts, closed=True, color=record_set['color'], alpha=float(record_set['alpha']))
         axes.add_collection(rects)
     axes.autoscale_view()
     axes.set_yticks(ticks=())

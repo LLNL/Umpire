@@ -37,6 +37,8 @@ TEST_P(DeviceAllocator, CreateAndAllocate)
   auto allocator = rm.getAllocator("UM");
   size_t size = 1 * sizeof(double);
 
+  ASSERT_FALSE(umpire::is_device_allocator("No_DeviceAllocator_created_yet"));
+
   umpire::DeviceAllocator da = umpire::make_device_allocator(allocator, size, GetParam());
   ASSERT_THROW((umpire::make_device_allocator(allocator, 0, "bad_da")), umpire::runtime_error);
 

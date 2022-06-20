@@ -15,6 +15,27 @@ if (EXISTS ${SHROUD_EXECUTABLE})
   include(${CMAKE_CURRENT_BINARY_DIR}/SetupShroud.cmake)
 endif ()
 
+if (UMPIRE_ENABLE_UMAP)
+  find_library( UMAP_LIBRARY
+    libumap.so
+    PATHS ${UMAP_ROOT}/lib
+  )
+  if (NOT UMAP_LIBRARY)
+    message(FATAL_ERROR "Could not find UMAP library, check UMAP installation at UMAP_ROOT")
+  endif()
+  find_path( UMAP_INCLUDE_DIR
+    NAMES "umap/umap.h"
+    PATHS ${UMAP_ROOT}/include
+  )
+  if (NOT UMAP_INCLUDE_DIR)
+    message(FATAL_ERROR "Headers missing, check UMAP installation at UMAP_ROOT")
+  endif ()
+  blt_import_library(NAME umap
+    INCLUDES ${UMAP_INCLUDE_DIR}
+    LIBRARIES ${UMAP_LIBRARY}
+    DEPENDS_ON -lpthread -lrt)
+endif ()
+
 if (ENABLE_SLIC AND ENABLE_LOGGING)
   find_library( SLIC_LIBRARY
     libslic.a
@@ -55,20 +76,12 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     )
 endif ()
 
-set(TPL_DEPS)
-blt_list_append(TO TPL_DEPS ELEMENTS cuda cuda_runtime IF ENABLE_CUDA)
-blt_list_append(TO TPL_DEPS ELEMENTS blt_hip blt_hip_runtime IF ENABLE_HIP)
-blt_list_append(TO TPL_DEPS ELEMENTS openmp IF ENABLE_OPENMP)
-blt_list_append(TO TPL_DEPS ELEMENTS mpi IF ENABLE_MPI)
+set(UMPIRE_NEEDS_BLT_TPLS False) 
+if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_CUDA)
+  set(UMPIRE_NEEDS_BLT_TPLS True)
+endif ()
 
-foreach(dep ${TPL_DEPS})
-    # If the target is EXPORTABLE, add it to the export set
-    get_target_property(_is_imported ${dep} IMPORTED)
-    if(NOT ${_is_imported})
-        install(TARGETS              ${dep}
-                EXPORT               umpire-targets
-                DESTINATION          lib)
-        # Namespace target to avoid conflicts
-        set_target_properties(${dep} PROPERTIES EXPORT_NAME umpire::${dep})
-    endif()
-endforeach()
+if (UMPIRE_NEEDS_BLT_TPLS)
+  blt_export_tpl_targets(EXPORT umpire-blt-targets NAMESPACE umpire)
+  install(EXPORT umpire-blt-targets DESTINATION lib/cmake/umpire)
+endif()
