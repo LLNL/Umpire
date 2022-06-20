@@ -10,6 +10,7 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/NumaPolicy.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/numa.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -26,7 +27,8 @@ int main(int, char**)
   auto host_nodes = umpire::numa::get_host_nodes();
 
   if (host_nodes.size() < 1) {
-    UMPIRE_ERROR("No NUMA nodes detected");
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("No NUMA nodes detected: {}", host_nodes.size()));
   }
 
   // Create an allocator on the first NUMA node
@@ -46,7 +48,8 @@ int main(int, char**)
 
     // The pointer shouldn't change even though the memory location changes
     if (dst_ptr != src_ptr) {
-      UMPIRE_ERROR("Pointers should match");
+      UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("Pointers should match: {}, {}", dst_ptr, src_ptr));
     }
 
     // Touch it
@@ -54,7 +57,8 @@ int main(int, char**)
 
     // Verify NUMA node
     if (umpire::numa::get_location(dst_ptr) != host_nodes[1]) {
-      UMPIRE_ERROR("Move was unsuccessful");
+      UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("Move was unsuccessful: {}", dst_ptr));
     }
   }
 
@@ -74,7 +78,8 @@ int main(int, char**)
 
     // The pointer shouldn't change even though the memory location changes
     if (dst_ptr != src_ptr) {
-      UMPIRE_ERROR("Pointers should match");
+      UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("Pointers should match: {}, {}", dst_ptr, src_ptr));
     }
 
     // Touch it -- this currently uses the host memset operation (thus, copying
@@ -83,7 +88,8 @@ int main(int, char**)
 
     // Verify NUMA node
     if (umpire::numa::get_location(dst_ptr) != device_nodes[0]) {
-      UMPIRE_ERROR("Move was unsuccessful");
+      UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("Move was unsuccessful: {}", dst_ptr));
     }
   }
 #endif
