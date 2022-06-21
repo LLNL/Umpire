@@ -27,7 +27,7 @@ int main(int, char**)
   auto host_nodes = umpire::numa::get_host_nodes();
 
   if (host_nodes.size() < 1) {
-    UMPIRE_ERROR(runtime_error,
+    UMPIRE_ERROR(umpire::runtime_error,
                  umpire::fmt::format("No NUMA nodes detected: {}", host_nodes.size()));
   }
 
@@ -48,7 +48,7 @@ int main(int, char**)
 
     // The pointer shouldn't change even though the memory location changes
     if (dst_ptr != src_ptr) {
-      UMPIRE_ERROR(runtime_error,
+      UMPIRE_ERROR(umpire::runtime_error,
                  umpire::fmt::format("Pointers should match: {}, {}", dst_ptr, src_ptr));
     }
 
@@ -57,7 +57,7 @@ int main(int, char**)
 
     // Verify NUMA node
     if (umpire::numa::get_location(dst_ptr) != host_nodes[1]) {
-      UMPIRE_ERROR(runtime_error,
+      UMPIRE_ERROR(umpire::runtime_error,
                  umpire::fmt::format("Move was unsuccessful: {}", dst_ptr));
     }
   }
@@ -78,7 +78,7 @@ int main(int, char**)
 
     // The pointer shouldn't change even though the memory location changes
     if (dst_ptr != src_ptr) {
-      UMPIRE_ERROR(runtime_error,
+      UMPIRE_ERROR(umpire::runtime_error,
                  umpire::fmt::format("Pointers should match: {}, {}", dst_ptr, src_ptr));
     }
 
@@ -88,7 +88,7 @@ int main(int, char**)
 
     // Verify NUMA node
     if (umpire::numa::get_location(dst_ptr) != device_nodes[0]) {
-      UMPIRE_ERROR(runtime_error,
+      UMPIRE_ERROR(umpire::runtime_error,
                  umpire::fmt::format("Move was unsuccessful: {}", dst_ptr));
     }
   }
