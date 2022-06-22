@@ -27,7 +27,7 @@ int main(int, char**)
   auto host_nodes = umpire::numa::get_host_nodes();
 
   if (host_nodes.size() < 1) {
-    UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("No NUMA nodes detected: {}", host_nodes.size()));
+    UMPIRE_ERROR(umpire::runtime_error, "No NUMA nodes detected");
   }
 
   // Create an allocator on the first NUMA node
