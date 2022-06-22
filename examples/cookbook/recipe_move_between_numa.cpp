@@ -47,7 +47,8 @@ int main(int, char**)
 
     // The pointer shouldn't change even though the memory location changes
     if (dst_ptr != src_ptr) {
-      UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("Pointers should match: dst_ptr: {} != src_ptr: {}", dst_ptr, src_ptr));
+      UMPIRE_ERROR(umpire::runtime_error,
+                   umpire::fmt::format("Pointers should match: dst_ptr: {} != src_ptr: {}", dst_ptr, src_ptr));
     }
 
     // Touch it
@@ -75,7 +76,8 @@ int main(int, char**)
 
     // The pointer shouldn't change even though the memory location changes
     if (dst_ptr != src_ptr) {
-      UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("Pointers should match: dst_ptr: {} != src_ptr: {}", dst_ptr, src_ptr));
+      UMPIRE_ERROR(umpire::runtime_error,
+                   umpire::fmt::format("Pointers should match: dst_ptr: {} != src_ptr: {}", dst_ptr, src_ptr));
     }
 
     // Touch it -- this currently uses the host memset operation (thus, copying
