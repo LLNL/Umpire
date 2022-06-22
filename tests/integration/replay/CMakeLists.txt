@@ -34,7 +34,7 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(replay_config "${replay_config}omp_")
 endif ()
 
-if (UMPIRE_ENABLE_SQLITE)
+if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   set(replay_config "${replay_config}sqlite_")
 endif ()
 

@@ -36,7 +36,7 @@ set (umpire_event_headers ${umpire_event_headers} quest_database.hpp)
 set (umpire_event_sources ${umpire_event_sources} quest_database.cpp)
 endif()
 
-if (UMPIRE_ENABLE_SQLITE)
+if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   set (umpire_event_headers ${umpire_event_headers} sqlite_database.hpp)
   set (umpire_event_sources ${umpire_event_sources} sqlite_database.cpp)
   set (umpire_event_depends ${umpire_event_depends} SQLite::SQLite3)

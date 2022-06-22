@@ -76,7 +76,7 @@ if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     )
 endif ()
 
-if (UMPIRE_ENABLE_SQLITE)
+if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   find_package(SQLite3 REQUIRED)
 endif()
 

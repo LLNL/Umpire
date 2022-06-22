@@ -50,7 +50,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
     variant('ipc_shmem', default=False, description='Enable POSIX shared memory')
-    variant('sqlite', default=False, description='Enable sqlite integration with umpire events')
+    variant('sqlite_experimental', default=False, description='Enable sqlite integration with umpire events (Experimental)')
     variant('numa', default=False, description='Enable NUMA support')
     variant('shared', default=False, description='Enable Shared libs')
     variant('openmp', default=False, description='Build with OpenMP support')
@@ -70,7 +70,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant('sanitizer_tests', default=False, description='Enable address sanitizer tests')
 
     depends_on('cmake@3.14:', type='build')
-    depends_on('sqlite', when='+sqlite')
+    depends_on('sqlite', when='+sqlite_experimental')
     depends_on('mpi', when='+mpi')
 
     depends_on('blt@0.5.0', type='build', when='@main')
@@ -99,7 +99,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     conflicts('+device_alloc', when='~rocm~cuda')
     conflicts('~mpi', when='+ipc_shmem', msg='Shared Memory Allocator requires MPI')
     conflicts('+ipc_shmem', when='@:5.0.1')
-    conflicts('+sqlite', when='@:6.0.0')
+    conflicts('+sqlite_experimental', when='@:6.0.0')
     conflicts('+sanitizer_tests', when='~asan')
 
     def _get_sys_type(self, spec):
@@ -248,9 +248,9 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_option("ENABLE_NUMA", '+numa' in spec))
         entries.append(cmake_cache_option("ENABLE_OPENMP", '+openmp' in spec))
         entries.append(cmake_cache_option("UMPIRE_ENABLE_IPC_SHARED_MEMORY", '+ipc_shmem' in spec))
-        entries.append(cmake_cache_option("UMPIRE_ENABLE_SQLITE", '+sqlite' in spec))
-        if "+sqlite" in spec:
-            entries.append(cmake_cache_path("SQLite3_ROOT" ,spec['sqlite'].prefix))
+        entries.append(cmake_cache_option("UMPIRE_ENABLE_SQLITE_EXPERIMENTAL", '+sqlite_experimental' in spec))
+        if "+sqlite_experimental" in spec:
+            entries.append(cmake_cache_path("SQLite3_ROOT" ,spec['sqlite_experimental'].prefix))
         
         return entries
 

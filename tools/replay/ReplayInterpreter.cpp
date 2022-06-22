@@ -23,7 +23,7 @@
 #include "umpire/event/event.hpp"
 #include "umpire/json/json.hpp"
 
-#if defined(UMPIRE_ENABLE_SQLITE)
+#if defined(UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
 #include "umpire/event/sqlite_database.hpp"
 #else
 #include "umpire/event/json_file_store.hpp"
@@ -66,7 +66,7 @@ void ReplayInterpreter::buildOperations()
   op->op_line_number = m_line_number;
   hdr->num_operations = 1;
 
-#if defined(UMPIRE_ENABLE_SQLITE)
+#if defined(UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
 umpire::event::sqlite_database store{m_options.input_file};
 #else
 umpire::event::json_file_store store{m_options.input_file, true};

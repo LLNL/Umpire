@@ -44,7 +44,7 @@ lhs_source=$rundir/umpire.develop
 rhs_branch=$(git rev-parse --abbrev-ref HEAD)
 rhs_source=$(git rev-parse --show-toplevel)
 
-cmake_args="-DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_DEVELOPER_BENCHMARKS=On -DUMPIRE_ENABLE_TOOLS=On -DCMAKE_BUILD_TYPE=Release -DUMPIRE_ENABLE_SQLITE=On -DCMAKE_CXX_FLAGS='-g' -DCMAKE_C_FLAGS='-g' -DCMAKE_CXX_COMPILER=$cxx -DCMAKE_C_COMPILER=$cc -Wno-dev .."
+cmake_args="-DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_DEVELOPER_BENCHMARKS=On -DUMPIRE_ENABLE_TOOLS=On -DCMAKE_BUILD_TYPE=Release -DUMPIRE_ENABLE_SQLITE_EXPERIMENTAL=On -DCMAKE_CXX_FLAGS='-g' -DCMAKE_C_FLAGS='-g' -DCMAKE_CXX_COMPILER=$cxx -DCMAKE_C_COMPILER=$cc -Wno-dev .."
 
 if [ ! -d $lhs_source ] ; then run_cmd "git clone -q -b $lhs_branch git@github.com:LLNL/Umpire.git $lhs_source"; fi
 
