@@ -168,8 +168,12 @@ std::size_t get_process_memory_usage()
 
 void mark_event(const std::string& event)
 {
-  umpire::event::record(
-      [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
+  umpire::event::record( [&](auto& e) {
+    e.name("event")
+      .category(event::category::metadata)
+      .arg("name", event)
+      .tag("replay", "true");
+  });
 }
 
 std::size_t get_device_memory_usage(int device_id)
