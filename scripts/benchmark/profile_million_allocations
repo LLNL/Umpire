@@ -44,7 +44,7 @@ lhs_source=$rundir/umpire.develop
 rhs_branch=$(git rev-parse --abbrev-ref HEAD)
 rhs_source=$(git rev-parse --show-toplevel)
 
-cmake_args="-DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_DEVELOPER_BENCHMARKS=On -DUMPIRE_ENABLE_TOOLS=On -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS='-g' -DCMAKE_C_FLAGS='-g' -DCMAKE_CXX_COMPILER=$cxx -DCMAKE_C_COMPILER=$cc -Wno-dev .."
+cmake_args="-DUMPIRE_ENABLE_DEVELOPER_DEFAULTS=On -DUMPIRE_ENABLE_DEVELOPER_BENCHMARKS=On -DUMPIRE_ENABLE_TOOLS=On -DCMAKE_BUILD_TYPE=Release -DUMPIRE_ENABLE_SQLITE_EXPERIMENTAL=On -DCMAKE_CXX_FLAGS='-g' -DCMAKE_C_FLAGS='-g' -DCMAKE_CXX_COMPILER=$cxx -DCMAKE_C_COMPILER=$cc -Wno-dev .."
 
 if [ ! -d $lhs_source ] ; then run_cmd "git clone -q -b $lhs_branch git@github.com:LLNL/Umpire.git $lhs_source"; fi
 
@@ -64,23 +64,37 @@ done
 
 lhs_benchmark=$lhs_source/build.$h/bin/allocator_memory_cost_benchmark
 rhs_benchmark=$rhs_source/build.$h/bin/allocator_memory_cost_benchmark
-benchmark_args="--quiet --measure_time_overhead -a Host -n 10000000"
+bm_dormant_args="--measure_time_overhead -a Host -n 100000000 --no_introspection"
+bm_active_args="--measure_time_overhead -a Host -n  100000000 --no_introspection"
 
-run_cmd "rm -rf $rundir/hpc_prof.$LMOD_arch && mkdir -p $rundir/hpc_prof.$LMOD_arch"
+run_cmd "rm -rf $rundir/hpc_prof.$LMOD_arch && mkdir -p $rundir/hpc_prof.$LMOD_arch && cd $rundir/hpc_prof.$LMOD_arch"
 
 echo "Building HPC struct"
 run_cmd "$prun hpcstruct -j4 -o $rundir/hpc_prof.$LMOD_arch/lhs.struct $lhs_benchmark "
 run_cmd "$prun hpcstruct -j4 -o $rundir/hpc_prof.$LMOD_arch/rhs.struct $rhs_benchmark "
 
-echo "Profiling"
-run_cmd "$prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/lhs -e CPUTIME $lhs_benchmark $benchmark_args"
-run_cmd "$prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/rhs -e CPUTIME $rhs_benchmark $benchmark_args"
+echo "Profiling Dormant Case"
+run_cmd "$prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/lhs.dormant -e CPUTIME $lhs_benchmark $bm_dormant_args"
+run_cmd "$prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/rhs.dormant -e CPUTIME $rhs_benchmark $bm_dormant_args"
 
-echo "Building Profile Database"
-run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/lhs && $prun hpcprof-mpi --metric-db yes -S ../lhs.struct . )"
-run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/rhs && $prun hpcprof-mpi --metric-db yes -S ../rhs.struct . )"
+echo "Building Profile Database of Dormant Case"
+run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/lhs.dormant && $prun hpcprof-mpi --metric-db yes -S ../lhs.struct . )"
+run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/rhs.dormant && $prun hpcprof-mpi --metric-db yes -S ../rhs.struct . )"
 
-PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs $rundir/hpc_prof.$LMOD_arch/rhs
+echo "Profiling Active Case"
+run_cmd "UMPIRE_REPLAY=On $prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/lhs.active -e CPUTIME $lhs_benchmark $bm_active_args"
+run_cmd "UMPIRE_REPLAY=On $prun hpcrun -o $rundir/hpc_prof.$LMOD_arch/rhs.active -e CPUTIME $rhs_benchmark $bm_active_args"
+
+echo "Building Profile Database of Active Case"
+run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/lhs.active && $prun hpcprof-mpi --metric-db yes -S ../lhs.struct . )"
+run_cmd "( cd $rundir/hpc_prof.$LMOD_arch/rhs.active && $prun hpcprof-mpi --metric-db yes -S ../rhs.struct . )"
+
+run_cmd "cd $rootdir"
+echo "Dormant Case Times"
+run_cmd "PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs.dormant $rundir/hpc_prof.$LMOD_arch/rhs.dormant"
+
+echo "Active Case Times"
+run_cmd "PYTHONPATH=/usr/gapps/spot/live/hatchet/$LMOD_arch/ ./compare.py $rundir/hpc_prof.$LMOD_arch/lhs.active $rundir/hpc_prof.$LMOD_arch/rhs.active"
 
 #
 # To view this directly within the HPCToolkit viewer, run "hpcviewer" from an x-server session

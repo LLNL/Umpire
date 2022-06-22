@@ -186,6 +186,9 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name);
 MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm);
 #endif
 
+void register_external_allocation(void* ptr, util::AllocationRecord record);
+util::AllocationRecord deregister_external_allocation(void* ptr);
+
 /*!
  * \brief Attempt to coalesce Allocator a, return true if a coalesce was performed.
  *

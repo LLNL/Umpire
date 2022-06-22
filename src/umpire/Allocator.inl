@@ -8,8 +8,9 @@
 #define UMPIRE_Allocator_INL
 
 #include "umpire/Allocator.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/config.hpp"
+#include "umpire/event/event.hpp"
+#include "umpire/event/recorder_factory.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -22,9 +23,6 @@ inline void* Allocator::allocate(std::size_t bytes)
   UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \"" << m_allocator
-                                                                                << "\", \"size\": " << bytes << " }");
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -42,8 +40,9 @@ inline void* Allocator::allocate(std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator);
   }
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  umpire::event::record<umpire::event::allocate>(
+      [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret); });
+
   return ret;
 }
 
@@ -55,9 +54,6 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\" }");
-
   if (0 == bytes) {
     ret = allocateNull();
   } else {
@@ -68,16 +64,14 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator, name);
   }
 
-  UMPIRE_REPLAY("\"event\": \"allocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"size\": " << bytes << ", \"name\": \"" << name << "\""
-                << " }, \"result\": { \"memory_ptr\": \"" << ret << "\" }");
+  umpire::event::record<umpire::event::named_allocate>(
+      [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
   return ret;
 }
 
 inline void Allocator::deallocate(void* ptr)
 {
-  UMPIRE_REPLAY("\"event\": \"deallocate\", \"payload\": { \"allocator_ref\": \""
-                << m_allocator << "\", \"memory_ptr\": \"" << ptr << "\" }");
+  umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
 
   UMPIRE_LOG(Debug, "(" << ptr << ")");
 

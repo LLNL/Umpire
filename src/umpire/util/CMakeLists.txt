@@ -51,7 +51,7 @@ if (UMPIRE_ENABLE_NUMA)
     numa.cpp)
 endif ()
 
-set (umpire_util_depends camp umpire_tpl_judy umpire_tpl_fmt)
+set (umpire_util_depends camp umpire_event umpire_tpl_judy umpire_tpl_fmt)
 
 if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   set (umpire_util_depends
@@ -81,6 +81,18 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_util_depends
     ${umpire_util_depends}
     openmp)
+endif ()
+
+if (UMPIRE_ENABLE_HIP)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    blt::hip_runtime)
+endif ()
+
+if (UMPIRE_ENABLE_CUDA)
+  set (umpire_util_depends
+    ${umpire_util_depends}
+    cuda_runtime)
 endif ()
 
 

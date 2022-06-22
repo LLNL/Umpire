@@ -27,17 +27,31 @@ blt_add_library(
   NAME umpire_tpl_json
   HEADERS ${json_headers})
 
+if (C_COMPILER_FAMILY_IS_INTEL)
+  target_compile_options(
+    umpire_tpl_json
+    INTERFACE
+    $<$<COMPILE_LANGUAGE:CXX>:-wd186>
+    $<$<COMPILE_LANGUAGE:C>:-wd186>
+  )
+endif ()
+
 if (C_COMPILER_FAMILY_IS_PGI)
   target_compile_options(
     umpire_tpl_json
     INTERFACE
-    --diag_suppress186)
+    $<$<COMPILE_LANGUAGE:CXX>:--diag_suppress 186>
+  )
 endif ()
 
 target_link_libraries(umpire_tpl_json INTERFACE)
 
-blt_patch_target(NAME umpire_tpl_json
-                 TREAT_INCLUDES_AS_SYSTEM ON)
+target_include_directories(
+  umpire_tpl_json
+  INTERFACE
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
 
 install(FILES
   ${json_headers}
@@ -49,6 +63,9 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
+
+blt_patch_target(NAME umpire_tpl_json
+                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 #
 # CLI11 Option Parsing Headers
