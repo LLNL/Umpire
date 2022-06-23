@@ -38,7 +38,7 @@ struct PosixMemalignAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      if (err = ENOMEM) {
+      if (err == ENOMEM) {
         UMPIRE_ERROR(out_of_memory_error,
                      umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
                                          get_page_size(), strerror(err)));
