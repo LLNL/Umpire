@@ -29,6 +29,10 @@ if (NOT TARGET camp)
     @PACKAGE_CMAKE_INSTALL_PREFIX@/lib/cmake/camp)
 endif ()
 
+if (@UMPIRE_ENABLE_SQLITE_EXPERIMENTAL@)
+  find_package(SQLite3 REQUIRED)
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/umpire-targets.cmake")
 
 check_required_components(@PROJECT_NAME@)

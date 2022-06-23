@@ -55,6 +55,20 @@ void testCopy(std::string name)
   dst_allocator.deallocate(dst_buffer);
 }
 
+void testMove(std::string name)
+{
+  constexpr std::size_t MAX_ALLOCATION_SIZE = 128;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto dst_allocator = rm.getAllocator(name);
+  auto src_allocator = rm.getAllocator("HOST");
+
+  char* src_buffer = static_cast<char*>(src_allocator.allocate(MAX_ALLOCATION_SIZE));
+  void* dst_buffer = rm.move(src_buffer, dst_allocator);
+
+  dst_allocator.deallocate(dst_buffer);
+}
+
 void testReallocation(std::string name)
 {
   constexpr std::size_t MAX_ALLOCATION_SIZE = 32;
@@ -163,6 +177,7 @@ static void runTest()
 
   for (auto basename : allocators) {
     testCopy(basename);
+    testMove(basename);
     testAllocation(basename);
     testReallocation(basename);
 
@@ -299,6 +314,15 @@ static void runTest()
     name = basename + "_FixedPool_no_instrospection_spec_";
     testAllocator<umpire::strategy::FixedPool, false>(name + "1", base_alloc, fpa1);
     testAllocator<umpire::strategy::FixedPool, false>(name + "2", base_alloc, fpa1, fpa2);
+  }
+
+  // test registering external pointers
+  {
+    int* data[10];
+    umpire::register_external_allocation(
+        data, umpire::util::AllocationRecord(data, 10 * sizeof(int), rm.getAllocator("HOST").getAllocationStrategy(),
+                                             "external array"));
+    umpire::deregister_external_allocation(data);
   }
 }
 

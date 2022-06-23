@@ -7,7 +7,6 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 
 #include "umpire/Allocator.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/util/Macros.hpp"
@@ -123,7 +122,9 @@ bool DynamicPoolList::tracksMemoryUse() const noexcept
 void DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
+  umpire::event::record([&](auto& event) {
+    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
+  });
   dpa.coalesce(dpa.getActualSize());
 }
 

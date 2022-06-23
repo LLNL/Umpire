@@ -5,11 +5,18 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-
+####################
 # Extra jobs.
+####################
+
 gcc_8_1_0_numa:
   variables:
     SPEC: "+fortran+numa %gcc@8.1.0"
+  extends: .build_and_test_on_ruby
+
+clang_10_sqlite_experimental:
+  variables:
+    SPEC: "+sqlite_experimental %clang@10.0.1"
   extends: .build_and_test_on_ruby
 
 # Develop builds against specific tpl version.

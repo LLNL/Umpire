@@ -34,6 +34,10 @@ if (UMPIRE_ENABLE_OPENMP_TARGET)
   set(replay_config "${replay_config}omp_")
 endif ()
 
+if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
+  set(replay_config "${replay_config}sqlite_")
+endif ()
+
 set(replay_config_stripped "")
 string(REGEX REPLACE "_$" "" replay_config_stripped "${replay_config}")
 set(raw_replay_file "${raw_replay_file}.${replay_config_stripped}.replay")
@@ -46,7 +50,7 @@ blt_add_executable(
 
 add_custom_target(
   regen_replay_output
-  COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.replay ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file} && rm -f *.replay)
+  COMMAND  ${CMAKE_COMMAND} -E env UMPIRE_REPLAY=On $<TARGET_FILE:replay_tests> && mv *.stats ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file} && rm -f *.stats)
 
 message(STATUS "Looking for ${replay_file} reference output...")
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${replay_file})

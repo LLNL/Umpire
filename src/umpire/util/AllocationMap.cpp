@@ -12,7 +12,6 @@
 #include <type_traits>
 #include <utility>
 
-#include "umpire/Replay.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
 #include "umpire/util/error.hpp"
@@ -158,9 +157,6 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_insert\", \"payload\": { \"ptr\": \""
-                << ptr << "\", \"record_ptr\": \"" << record.ptr << "\", \"record_size\": \"" << record.size
-                << "\", \"record_strategy\": \"" << record.strategy << "\" }");
 
   auto pair = m_map.insert(ptr, *this, record);
 
@@ -182,7 +178,6 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Searching for " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_find\", \"payload\": { \"ptr\": \"" << ptr << "\" }");
 
   const AllocationRecord* alloc_record = doFindRecord(ptr);
 
@@ -248,7 +243,6 @@ AllocationRecord AllocationMap::remove(void* ptr)
   AllocationRecord ret;
 
   UMPIRE_LOG(Debug, "Removing " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_remove\", \"payload\": { \"ptr\": \"" << ptr << "\" }");
 
   auto iter = m_map.find(ptr);
 
@@ -277,7 +271,6 @@ void AllocationMap::clear()
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Clearing");
-  UMPIRE_REPLAY("\"event\": \"allocation_map_clear\"");
 
   m_map.clear();
   m_size = 0;
