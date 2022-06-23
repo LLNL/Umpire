@@ -63,7 +63,6 @@
 #include "umpire/resource/OpenMPTargetMemoryResourceFactory.hpp"
 #endif
 
-#include "umpire/Replay.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 

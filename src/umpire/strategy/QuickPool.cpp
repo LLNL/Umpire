@@ -311,7 +311,11 @@ std::size_t QuickPool::getLargestAvailableBlock() noexcept
 void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
+
+  umpire::event::record([&](auto& event) {
+    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
+  });
+
   do_coalesce(getActualSize());
 }
 
