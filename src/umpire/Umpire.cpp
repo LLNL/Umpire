@@ -168,7 +168,8 @@ std::size_t get_process_memory_usage()
 
 void mark_event(const std::string& event)
 {
-  UMPIRE_REPLAY(R"( "event": "mark", "payload": { "event": ")" << event << R"(" })");
+  umpire::event::record(
+      [&](auto& e) { e.name("event").category(event::category::metadata).arg("name", event).tag("replay", "true"); });
 }
 
 std::size_t get_device_memory_usage(int device_id)
@@ -201,7 +202,7 @@ std::vector<util::AllocationRecord> get_leaked_allocations(Allocator allocator)
 umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name)
 {
   umpire::resource::MemoryResourceRegistry& registry{umpire::resource::MemoryResourceRegistry::getInstance()};
-  umpire::MemoryResourceTraits traits{registry.getDefaultTraitsForResource(name)};
+  umpire::MemoryResourceTraits traits(registry.getDefaultTraitsForResource(name));
   return traits;
 }
 
@@ -255,6 +256,32 @@ MPI_Comm get_communicator_for_allocator(Allocator a, MPI_Comm comm)
   return c;
 }
 #endif
+
+void register_external_allocation(void* ptr, util::AllocationRecord record)
+{
+  umpire::event::record([&](auto& event) {
+    event.name("register_external_allocation")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)record.strategy)
+        .arg("size", record.size)
+        .arg("pointer", record.ptr)
+        .tag("allocator_name", record.strategy->getName())
+        .tag("replay", "true");
+  });
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  rm.registerAllocation(ptr, record);
+}
+
+util::AllocationRecord deregister_external_allocation(void* ptr)
+{
+  umpire::event::record([&](auto& event) {
+    event.name("deregister_external_allocation").category(event::category::operation).tag("replay", "true");
+  });
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  return rm.deregisterAllocation(ptr);
+}
 
 bool try_coalesce(Allocator a)
 {

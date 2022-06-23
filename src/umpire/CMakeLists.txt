@@ -7,6 +7,7 @@
 add_subdirectory(util)
 add_subdirectory(resource)
 add_subdirectory(alloc)
+add_subdirectory(event)
 add_subdirectory(op)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
@@ -19,7 +20,6 @@ endif()
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
-  Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
   Tracking.hpp
@@ -29,7 +29,6 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
-  Replay.cpp
   ResourceManager.cpp
   Umpire.cpp)
 
@@ -91,6 +90,7 @@ set (umpire_depends
   umpire_alloc
   umpire_op
   umpire_util
+  umpire_event
   umpire_tpl_judy)
 
 if (UMPIRE_ENABLE_HIP)
@@ -102,6 +102,7 @@ endif()
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_depends
     ${umpire_depends}
+    umpire_event
     openmp)
 endif ()
 

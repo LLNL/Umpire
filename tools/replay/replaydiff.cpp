@@ -5,8 +5,8 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include <fstream>
 #include <iostream>
+#include <fstream>
 #include <ratio>
 #include <string>
 #include <vector>
@@ -24,20 +24,21 @@ int main(int argc, char* argv[])
 #if !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
   ReplayOptions lhs_options;
   ReplayOptions rhs_options;
-  CLI::App app{
-      "Compare two replay result files created"
-      " by Umpire library with UMPIRE_REPLAY=On"};
+  CLI::App app{"Compare two replay result files created"
+                " by Umpire library with UMPIRE_REPLAY=On"};
 
   std::vector<std::string> positional_args;
 
-  app.add_flag("-r,--recompile", lhs_options.force_compile, "Force recompile replay binary");
+  app.add_flag("-r,--recompile" , lhs_options.force_compile,
+      "Force recompile replay binary");
 
-  app.add_flag("-q,--quiet", lhs_options.quiet, "Only errors will be displayed.");
+  app.add_flag("-q,--quiet", lhs_options.quiet,
+        "Only errors will be displayed.");
 
   app.add_option("files", positional_args, "replay_file_1 replay_file_2")
-      ->required()
-      ->expected(2)
-      ->check(CLI::ExistingFile);
+    ->required()
+    ->expected(2)
+    ->check(CLI::ExistingFile);
 
   CLI11_PARSE(app, argc, argv);
 
@@ -60,8 +61,8 @@ int main(int argc, char* argv[])
   UMPIRE_USE_VAR(argc);
   UMPIRE_USE_VAR(argv);
   std::cerr << "This program requires the ability to demangle C++" << std::endl
-            << "However, this program was compiled with -stdlib=libc++ which does " << std::endl
-            << "not have this feature." << std::endl;
+    << "However, this program was compiled with -stdlib=libc++ which does " << std::endl
+    << "not have this feature." << std::endl;
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
   return 0;
