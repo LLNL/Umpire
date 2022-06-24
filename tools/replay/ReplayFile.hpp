@@ -21,14 +21,15 @@ public:
     , ALLOCATION_ADVISOR = 2
     , DYNAMIC_POOL_LIST = 3
     , MONOTONIC = 4
-    , SLOT_POOL = 5
-    , SIZE_LIMITER = 6
-    , THREADSAFE_ALLOCATOR = 7
-    , FIXED_POOL = 8
-    , MIXED_POOL = 9
-    , ALLOCATION_PREFETCHER = 10
-    , NUMA_POLICY = 11
-    , QUICKPOOL = 12
+    , NAMED = 5
+    , SLOT_POOL = 6
+    , SIZE_LIMITER = 7
+    , THREADSAFE_ALLOCATOR = 8
+    , FIXED_POOL = 9
+    , MIXED_POOL = 10
+    , ALLOCATION_PREFETCHER = 11
+    , NUMA_POLICY = 12
+    , QUICKPOOL = 13
   };
 
   static const std::size_t max_allocators{256 * 1024};
@@ -114,7 +115,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 16;
+  const uint64_t REPLAY_VERSION = 17;
 
   struct Header {
     struct Magic {
