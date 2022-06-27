@@ -21,6 +21,7 @@ public:
     , DYNAMIC_POOL_LIST
     , DYNAMIC_POOL_MAP
     , MONOTONIC
+    , NAMED
     , SLOT_POOL
     , SIZE_LIMITER
     , THREADSAFE_ALLOCATOR
@@ -114,7 +115,7 @@ public:
           | static_cast<uint64_t>('A') << 8
           | static_cast<uint64_t>('Y'));
 
-  const uint64_t REPLAY_VERSION = 15;
+  const uint64_t REPLAY_VERSION = 17;
 
   struct Header {
     struct Magic {
