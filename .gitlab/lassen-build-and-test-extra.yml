@@ -23,7 +23,7 @@ clang_10_0_1_cuda_mpi_shmem:
 # Extras.
 clang_9_0_0_libcpp:
   variables:
-    SPEC: "~fortran %clang@9.0.0+libcpp cxxflags='-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0' cflags='-DGTEST_HAS_CXXABI_H_=0'"
+    SPEC: "~fortran %clang@9.0.0+libcpp cxxflags=\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags=\"-DGTEST_HAS_CXXABI_H_=0\""
   extends: .build_and_test_on_lassen
 
 clang_9_0_0_memleak:
