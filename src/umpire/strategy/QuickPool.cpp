@@ -45,7 +45,27 @@ void* QuickPool::allocate(std::size_t bytes)
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ")");
   const std::size_t rounded_bytes{aligned_round_up(bytes)};
   const auto& best = m_size_map.lower_bound(rounded_bytes);
-
+/*
+  static bool first = true;
+  if (!first) {
+  
+    std::size_t suggested_size{m_should_coalesce(*this)};
+    std::cout << "suggested size: " << suggested_size << std::endl;
+    if (0 != suggested_size) {
+      UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
+      do_coalesce(suggested_size);
+    }
+    
+   
+    //if (this->getReleasableBlocks() > 0) {
+    //  do_coalesce((getActualHighwaterMark() - getCurrentSize()));
+    //  std::cout << "Doing coalesce with size: " << getActualHighwaterMark() - getCurrentSize() << std::endl;
+    //}
+    this->coalesce();
+  
+  }
+  first = false;
+*/
   Chunk* chunk{nullptr};
 
   if (best == m_size_map.end()) {
@@ -192,10 +212,12 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   m_pointer_map.erase(ptr);
 
   std::size_t suggested_size{m_should_coalesce(*this)};
+  std::cout << "suggested size: " << suggested_size << std::endl;
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
   }
+
 }
 
 void QuickPool::release()

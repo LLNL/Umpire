@@ -24,6 +24,12 @@ blt_add_executable(
 list(APPEND umpire_examples alloc_access)
 
 blt_add_executable(
+  NAME heuristic_test
+  SOURCES heuristic_test.cpp 
+  DEPENDS_ON ${example_depends})
+list(APPEND umpire_examples heuristic_test)
+
+blt_add_executable(
   NAME malloc
   SOURCES malloc.cxx
   DEPENDS_ON ${example_depends})
