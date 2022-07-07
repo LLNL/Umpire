@@ -7,7 +7,6 @@
 #include "umpire/strategy/DynamicPoolList.hpp"
 
 #include "umpire/Allocator.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/util/Macros.hpp"
@@ -123,7 +122,9 @@ bool DynamicPoolList::tracksMemoryUse() const noexcept
 void DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
+  umpire::event::record([&](auto& event) {
+    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
+  });
   dpa.coalesce(dpa.getActualSize());
 }
 
@@ -137,7 +138,9 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable(std::s
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format("Invalid percentage {}, percentage must be an integer between 0 and 100", percentage));
   }
 
   if (percentage == 0) {

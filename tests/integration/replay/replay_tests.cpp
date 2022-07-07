@@ -10,6 +10,7 @@
 
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
+#include "umpire/Umpire.hpp"
 #include "umpire/config.hpp"
 #include "umpire/op/MemoryOperation.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
@@ -19,6 +20,7 @@
 #include "umpire/strategy/FixedPool.hpp"
 #include "umpire/strategy/MixedPool.hpp"
 #include "umpire/strategy/MonotonicAllocationStrategy.hpp"
+#include "umpire/strategy/NamedAllocationStrategy.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SlotPool.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
@@ -50,6 +52,20 @@ void testCopy(std::string name)
   rm.copy(dst_buffer, src_buffer + OFFSET, COPYAMOUNT);
 
   src_allocator.deallocate(src_buffer);
+  dst_allocator.deallocate(dst_buffer);
+}
+
+void testMove(std::string name)
+{
+  constexpr std::size_t MAX_ALLOCATION_SIZE = 128;
+
+  auto& rm = umpire::ResourceManager::getInstance();
+  auto dst_allocator = rm.getAllocator(name);
+  auto src_allocator = rm.getAllocator("HOST");
+
+  char* src_buffer = static_cast<char*>(src_allocator.allocate(MAX_ALLOCATION_SIZE));
+  void* dst_buffer = rm.move(src_buffer, dst_allocator);
+
   dst_allocator.deallocate(dst_buffer);
 }
 
@@ -161,6 +177,7 @@ static void runTest()
 
   for (auto basename : allocators) {
     testCopy(basename);
+    testMove(basename);
     testAllocation(basename);
     testReallocation(basename);
 
@@ -184,19 +201,21 @@ static void runTest()
       auto accessing_alloc = rm.getAllocator("HOST");
 
       name = basename + "_AllocationAdvisor_spec_";
-      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "default_id", base_alloc, "READ_MOSTLY");
-      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_id", base_alloc, "READ_MOSTLY", device_id);
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "default_id", base_alloc, "SET_READ_MOSTLY");
+      testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_id", base_alloc, "SET_READ_MOSTLY",
+                                                               device_id);
       testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_accessing_and_default_id", base_alloc,
-                                                               "READ_MOSTLY", accessing_alloc);
+                                                               "SET_READ_MOSTLY", accessing_alloc);
       testAllocator<umpire::strategy::AllocationAdvisor, true>(name + "with_accessing_and_id", base_alloc,
-                                                               "PREFERRED_LOCATION", accessing_alloc, device_id);
+                                                               "SET_PREFERRED_LOCATION", accessing_alloc, device_id);
       name = basename + "_AllocationAdvisor_no_introspection_spec_";
-      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "default_id", base_alloc, "READ_MOSTLY");
-      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_id", base_alloc, "READ_MOSTLY", device_id);
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "default_id", base_alloc, "SET_READ_MOSTLY");
+      testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_id", base_alloc, "SET_READ_MOSTLY",
+                                                                device_id);
       testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_accessing_and_default_id", base_alloc,
-                                                                "READ_MOSTLY", accessing_alloc);
+                                                                "SET_READ_MOSTLY", accessing_alloc);
       testAllocator<umpire::strategy::AllocationAdvisor, false>(name + "with_accessing_and_id", base_alloc,
-                                                                "PREFERRED_LOCATION", accessing_alloc, device_id);
+                                                                "SET_PREFERRED_LOCATION", accessing_alloc, device_id);
 
       name = basename + "_AllocationPrefetcher";
       testAllocator<umpire::strategy::AllocationPrefetcher, true>(name, base_alloc);
@@ -271,6 +290,11 @@ static void runTest()
     name = basename + "_MonotonicAllocationStrategy_no_instrospection_spec_";
     testAllocator<umpire::strategy::MonotonicAllocationStrategy, false>(name, base_alloc, ma1);
 
+    name = basename + "_NamedAllocationStrategy_spec_";
+    testAllocator<umpire::strategy::NamedAllocationStrategy, true>(name, base_alloc);
+    name = basename + "_NamedAllocationStrategy_no_instrospection_spec_";
+    testAllocator<umpire::strategy::NamedAllocationStrategy, false>(name, base_alloc);
+
     auto sa1 = 64; // Slots
     name = basename + "_SlotPool_spec_";
     testAllocator<umpire::strategy::SlotPool, true>(name, base_alloc, sa1);
@@ -290,6 +314,15 @@ static void runTest()
     name = basename + "_FixedPool_no_instrospection_spec_";
     testAllocator<umpire::strategy::FixedPool, false>(name + "1", base_alloc, fpa1);
     testAllocator<umpire::strategy::FixedPool, false>(name + "2", base_alloc, fpa1, fpa2);
+  }
+
+  // test registering external pointers
+  {
+    int* data[10];
+    umpire::register_external_allocation(
+        data, umpire::util::AllocationRecord(data, 10 * sizeof(int), rm.getAllocator("HOST").getAllocationStrategy(),
+                                             "external array"));
+    umpire::deregister_external_allocation(data);
   }
 }
 

@@ -9,7 +9,7 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "umpire/util/Exception.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
 int main(int, char**)
@@ -27,7 +27,7 @@ int main(int, char**)
     quick_pool->coalesce();
     // _sphinx_tag_tut_call_coalesce_end
   } else {
-    UMPIRE_ERROR(pool.getName() << " is not a QuickPool, cannot coalesce!");
+    UMPIRE_ERROR(umpire::runtime_error, umpire::fmt::format("{} is not a QuickPool, cannot coalesce!", pool.getName()));
   }
 
   return 0;

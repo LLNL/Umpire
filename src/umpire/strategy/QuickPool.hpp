@@ -9,24 +9,19 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <tuple>
 #include <unordered_map>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
-#include "umpire/util/MemoryMap.hpp"
+#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/MemoryResourceTraits.hpp"
 
 namespace umpire {
 
 class Allocator;
-
-namespace util {
-
-class FixedMallocPool;
-
-}
 
 namespace strategy {
 
@@ -109,11 +104,10 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    pool_allocator() : pool{sizeof(Value)}
+    pool_allocator() : pool{std::make_shared<util::FixedMallocPool>(sizeof(Value))}
     {
     }
 
-    /// BUG: Only required for MSVC
     template <typename U>
     pool_allocator(const pool_allocator<U>& other) : pool{other.pool}
     {
@@ -121,15 +115,15 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 
     Value* allocate(std::size_t n)
     {
-      return static_cast<Value*>(pool.allocate(n));
+      return static_cast<Value*>(pool->allocate(n));
     }
 
     void deallocate(Value* data, std::size_t)
     {
-      pool.deallocate(data);
+      pool->deallocate(data);
     }
 
-    util::FixedMallocPool pool;
+    std::shared_ptr<util::FixedMallocPool> pool;
   };
 
   using PointerMap = std::unordered_map<void*, Chunk*>;
@@ -170,6 +164,11 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
 };
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&);
+
+inline std::string to_string(PoolCoalesceHeuristic<QuickPool>&)
+{
+  return "PoolCoalesceHeuristic<QuickPool>";
+}
 
 } // end of namespace strategy
 } // end namespace umpire

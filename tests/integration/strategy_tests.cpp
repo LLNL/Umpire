@@ -103,7 +103,7 @@ void StrategyTest<umpire::strategy::AllocationAdvisor>::SetUp()
   std::string name{"strategy_test_" + std::to_string(unique_strategy_id++)};
 
   m_allocator = new umpire::Allocator(
-      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator("UM"), "READ_MOSTLY"));
+      rm.makeAllocator<umpire::strategy::AllocationAdvisor>(name, rm.getAllocator("UM"), "SET_READ_MOSTLY"));
 
   m_parent_name = "UM";
 }
@@ -228,7 +228,7 @@ TYPED_TEST(StrategyTest, GetById)
 
   ASSERT_EQ(this->m_allocator->getAllocationStrategy(), allocator_by_id.getAllocationStrategy());
 
-  ASSERT_THROW(rm.getAllocator(-25), umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator(-25), umpire::runtime_error);
 }
 
 TYPED_TEST(StrategyTest, get_allocator_records)
@@ -328,13 +328,13 @@ TYPED_TEST(ReleaseTest, ReleaseCheck)
   }
 
   this->m_allocator->release(); // this should have no effect
-  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::util::Exception);
+  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::runtime_error);
 
   for (int i = 0; i < this->num_allocs; i++) {
     this->m_allocator->deallocate(this->test[i]);
   }
 
-  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::util::Exception);
+  ASSERT_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size), umpire::runtime_error);
   this->m_allocator->release();
 
   ASSERT_NO_THROW(this->test[0] = this->m_limiter_allocator->allocate(this->max_alloc_size));
@@ -405,7 +405,7 @@ TEST(AllocationAdvisor, Create)
   auto& rm = umpire::ResourceManager::getInstance();
 
   ASSERT_NO_THROW(auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-                      "read_only_um", rm.getAllocator("UM"), "READ_MOSTLY");
+                      "read_only_um", rm.getAllocator("UM"), "SET_READ_MOSTLY");
                   UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(auto failed_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
@@ -420,7 +420,7 @@ TEST(AllocationAdvisor, CreateWithId)
   const int device_id = 2;
 
   ASSERT_NO_THROW(auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
-                      "read_only_um_device_id", rm.getAllocator("UM"), "READ_MOSTLY", device_id);
+                      "read_only_um_device_id", rm.getAllocator("UM"), "SET_READ_MOSTLY", device_id);
                   UMPIRE_USE_VAR(read_only_alloc));
 
   ASSERT_ANY_THROW(auto failed_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
@@ -434,8 +434,8 @@ TEST(AllocationAdvisor, Host)
   auto um_allocator = rm.getAllocator("UM");
   auto host_allocator = rm.getAllocator("HOST");
 
-  auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>("preferred_location_host", um_allocator,
-                                                                               "PREFERRED_LOCATION", host_allocator);
+  auto read_only_alloc = rm.makeAllocator<umpire::strategy::AllocationAdvisor>(
+      "preferred_location_host", um_allocator, "SET_PREFERRED_LOCATION", host_allocator);
 
   ASSERT_NO_THROW({
     double* data = static_cast<double*>(read_only_alloc.allocate(1024 * sizeof(double)));
@@ -624,7 +624,7 @@ TEST(SizeLimiter, Host)
         void* tmp_data = alloc.allocate(1024);
         UMPIRE_USE_VAR(tmp_data);
       },
-      umpire::util::Exception);
+      umpire::out_of_memory_error);
 
   EXPECT_NO_THROW(alloc.deallocate(data));
 }
@@ -635,14 +635,14 @@ TEST(NumaPolicyTest, EdgeCases)
   auto& rm = umpire::ResourceManager::getInstance();
 
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>("numa_alloc", rm.getAllocator("HOST"), -1),
-               umpire::util::Exception);
+               umpire::runtime_error);
 
 #if defined(UMPIRE_ENABLE_CUDA) || defined(UMPIRE_ENABLE_HIP)
   const int numa_node = umpire::numa::preferred_node();
 
   // Only works with HOST allocators
   EXPECT_THROW(rm.makeAllocator<umpire::strategy::NumaPolicy>("numa_alloc", rm.getAllocator("DEVICE"), numa_node),
-               umpire::util::Exception);
+               umpire::runtime_error);
 #endif
 }
 
@@ -725,7 +725,7 @@ TEST(AlignedAllocator, BadAlignment)
             rm.makeAllocator<umpire::strategy::AlignedAllocator>("aligned_allocator_6", rm.getAllocator("HOST"), 6);
         UMPIRE_USE_VAR(alloc);
       },
-      umpire::util::Exception);
+      umpire::runtime_error);
 
   EXPECT_THROW(
       {
@@ -733,7 +733,7 @@ TEST(AlignedAllocator, BadAlignment)
             rm.makeAllocator<umpire::strategy::AlignedAllocator>("aligned_allocator_11", rm.getAllocator("HOST"), 11);
         UMPIRE_USE_VAR(alloc);
       },
-      umpire::util::Exception);
+      umpire::runtime_error);
 
   EXPECT_THROW(
       {
@@ -741,5 +741,5 @@ TEST(AlignedAllocator, BadAlignment)
             rm.makeAllocator<umpire::strategy::AlignedAllocator>("aligned_allocator_0", rm.getAllocator("HOST"), 0);
         UMPIRE_USE_VAR(alloc);
       },
-      umpire::util::Exception);
+      umpire::runtime_error);
 }

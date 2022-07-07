@@ -20,7 +20,7 @@ set (umpire_op_sources
   MemoryOperation.cpp
   MemoryOperationRegistry.cpp)
 
-set (umpire_op_depends camp)
+set (umpire_op_depends camp umpire_util)
 
 if (UMPIRE_ENABLE_NUMA)
   set (umpire_op_headers
@@ -39,29 +39,15 @@ endif ()
 if (UMPIRE_ENABLE_CUDA)
   set (umpire_op_headers
     ${umpire_op_headers}
-    CudaAdviseAccessedByOperation.hpp
-    CudaAdviseUnsetAccessedByOperation.hpp
-    CudaAdvisePreferredLocationOperation.hpp
-    CudaAdviseUnsetPreferredLocationOperation.hpp
-    CudaAdviseReadMostlyOperation.hpp
-    CudaAdviseUnsetReadMostlyOperation.hpp
+    CudaAdviseOperation.hpp
     CudaCopyOperation.hpp
-    CudaCopyFromOperation.hpp
-    CudaCopyToOperation.hpp
     CudaMemsetOperation.hpp
     CudaMemPrefetchOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
-    CudaAdviseAccessedByOperation.cpp
-    CudaAdviseUnsetAccessedByOperation.cpp
-    CudaAdvisePreferredLocationOperation.cpp
-    CudaAdviseUnsetPreferredLocationOperation.cpp
-    CudaAdviseReadMostlyOperation.cpp
-    CudaAdviseUnsetReadMostlyOperation.cpp
+    CudaAdviseOperation.cpp
     CudaCopyOperation.cpp
-    CudaCopyFromOperation.cpp
-    CudaCopyToOperation.cpp
     CudaMemsetOperation.cpp
     CudaMemPrefetchOperation.cpp)
 
@@ -73,16 +59,14 @@ endif ()
 if (UMPIRE_ENABLE_HIP)
   set (umpire_op_headers
     ${umpire_op_headers}
+    HipAdviseOperation.hpp
     HipCopyOperation.hpp
-    HipCopyFromOperation.hpp
-    HipCopyToOperation.hpp
     HipMemsetOperation.hpp)
 
   set (umpire_op_sources
     ${umpire_op_sources}
+    HipAdviseOperation.cpp
     HipCopyOperation.cpp
-    HipCopyFromOperation.cpp
-    HipCopyToOperation.cpp
     HipMemsetOperation.cpp)
 
   set (umpire_op_depends

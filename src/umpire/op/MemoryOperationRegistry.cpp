@@ -17,23 +17,17 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-#include "umpire/op/CudaAdviseAccessedByOperation.hpp"
-#include "umpire/op/CudaAdvisePreferredLocationOperation.hpp"
-#include "umpire/op/CudaAdviseReadMostlyOperation.hpp"
-#include "umpire/op/CudaAdviseUnsetAccessedByOperation.hpp"
-#include "umpire/op/CudaAdviseUnsetPreferredLocationOperation.hpp"
-#include "umpire/op/CudaAdviseUnsetReadMostlyOperation.hpp"
-#include "umpire/op/CudaCopyFromOperation.hpp"
+#include "umpire/op/CudaAdviseOperation.hpp"
 #include "umpire/op/CudaCopyOperation.hpp"
-#include "umpire/op/CudaCopyToOperation.hpp"
 #include "umpire/op/CudaMemPrefetchOperation.hpp"
 #include "umpire/op/CudaMemsetOperation.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-#include "umpire/op/HipCopyFromOperation.hpp"
+#include <hip/hip_runtime.h>
+
+#include "umpire/op/HipAdviseOperation.hpp"
 #include "umpire/op/HipCopyOperation.hpp"
-#include "umpire/op/HipCopyToOperation.hpp"
 #include "umpire/op/HipMemsetOperation.hpp"
 #endif
 
@@ -52,7 +46,7 @@
 #include "umpire/op/OpenMPTargetMemsetOperation.hpp"
 #endif
 
-#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -85,51 +79,79 @@ MemoryOperationRegistry::MemoryOperationRegistry() noexcept
 #endif
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::cuda), std::make_shared<CudaCopyToOperation>());
+  const std::tuple<std::string, cudaMemoryAdvise, umpire::Platform> cuda_advice_operations[] = {
+      {"SET_READ_MOSTLY", cudaMemAdviseSetReadMostly, Platform::cuda},
+      {"UNSET_READ_MOSTLY", cudaMemAdviseUnsetReadMostly, Platform::cuda},
+      {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::cuda},
+      {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::cuda},
+      {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::cuda},
+      {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::cuda},
+      {"SET_PREFERRED_LOCATION", cudaMemAdviseSetPreferredLocation, Platform::host},
+      {"UNSET_PREFERRED_LOCATION", cudaMemAdviseUnsetPreferredLocation, Platform::host},
+      {"SET_ACCESSED_BY", cudaMemAdviseSetAccessedBy, Platform::host},
+      {"UNSET_ACCESSED_BY", cudaMemAdviseUnsetAccessedBy, Platform::host}};
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::host), std::make_shared<CudaCopyFromOperation>());
+  const std::tuple<umpire::Platform, umpire::Platform, cudaMemcpyKind> cuda_copy_operations[] = {
+      {Platform::host, Platform::cuda, cudaMemcpyHostToDevice},
+      {Platform::cuda, Platform::host, cudaMemcpyDeviceToHost},
+      {Platform::cuda, Platform::cuda, cudaMemcpyDeviceToDevice}};
 
-  registerOperation("COPY", std::make_pair(Platform::cuda, Platform::cuda), std::make_shared<CudaCopyOperation>());
+  for (auto copy : cuda_copy_operations) {
+    auto src_plat = std::get<0>(copy);
+    auto dst_plat = std::get<1>(copy);
+    auto kind = std::get<2>(copy);
+    registerOperation("COPY", std::make_pair(src_plat, dst_plat), std::make_shared<CudaCopyOperation>(kind));
+  }
+
+  for (auto advice : cuda_advice_operations) {
+    auto name = std::get<0>(advice);
+    auto advice_enum = std::get<1>(advice);
+    auto platform = std::get<2>(advice);
+    registerOperation(name, std::make_pair(platform, platform), std::make_shared<CudaAdviseOperation>(advice_enum));
+  }
 
   registerOperation("MEMSET", std::make_pair(Platform::cuda, Platform::cuda), std::make_shared<CudaMemsetOperation>());
 
   registerOperation("REALLOCATE", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<GenericReallocateOperation>());
 
-  registerOperation("ACCESSED_BY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseAccessedByOperation>());
-
-  registerOperation("PREFERRED_LOCATION", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdvisePreferredLocationOperation>());
-
-  registerOperation("PREFERRED_LOCATION", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<CudaAdvisePreferredLocationOperation>());
-
-  registerOperation("READ_MOSTLY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseReadMostlyOperation>());
-
-  registerOperation("UNSET_ACCESSED_BY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseUnsetAccessedByOperation>());
-
-  registerOperation("UNSET_PREFERRED_LOCATION", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
-
-  registerOperation("UNSET_PREFERRED_LOCATION", std::make_pair(Platform::host, Platform::host),
-                    std::make_shared<CudaAdviseUnsetPreferredLocationOperation>());
-
-  registerOperation("UNSET_READ_MOSTLY", std::make_pair(Platform::cuda, Platform::cuda),
-                    std::make_shared<CudaAdviseUnsetReadMostlyOperation>());
-
   registerOperation("PREFETCH", std::make_pair(Platform::cuda, Platform::cuda),
                     std::make_shared<CudaMemPrefetchOperation>());
 #endif
 
 #if defined(UMPIRE_ENABLE_HIP)
-  registerOperation("COPY", std::make_pair(Platform::host, Platform::hip), std::make_shared<HipCopyToOperation>());
+  const std::tuple<std::string, hipMemoryAdvise> hip_advice_operations[] = {
+    {"SET_READ_MOSTLY", hipMemAdviseSetReadMostly},
+    {"UNSET_READ_MOSTLY", hipMemAdviseUnsetReadMostly},
+    {"SET_PREFERRED_LOCATION", hipMemAdviseSetPreferredLocation},
+    {"UNSET_PREFERRED_LOCATION", hipMemAdviseUnsetPreferredLocation},
+    {"SET_ACCESSED_BY", hipMemAdviseSetAccessedBy},
+    {"UNSET_ACCESSED_BY", hipMemAdviseUnsetAccessedBy}
+#if HIP_VERSION_MAJOR >= 5
+    ,
+    {"SET_COARSE_GRAIN", hipMemAdviseSetCoarseGrain},
+    {"UNSET_COARSE_GRAIN", hipMemAdviseUnsetCoarseGrain}
+#endif
+  };
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::host), std::make_shared<HipCopyFromOperation>());
+  const std::tuple<umpire::Platform, umpire::Platform, hipMemcpyKind> hip_copy_operations[] = {
+      {Platform::host, Platform::hip, hipMemcpyHostToDevice},
+      {Platform::hip, Platform::host, hipMemcpyDeviceToHost},
+      {Platform::hip, Platform::hip, hipMemcpyDeviceToDevice}};
 
-  registerOperation("COPY", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipCopyOperation>());
+  for (auto copy : hip_copy_operations) {
+    auto src_plat = std::get<0>(copy);
+    auto dst_plat = std::get<1>(copy);
+    auto kind = std::get<2>(copy);
+    registerOperation("COPY", std::make_pair(src_plat, dst_plat), std::make_shared<HipCopyOperation>(kind));
+  }
+
+  for (auto advice : hip_advice_operations) {
+    auto name = std::get<0>(advice);
+    auto advice_enum = std::get<1>(advice);
+    registerOperation(name, std::make_pair(Platform::hip, Platform::hip),
+                      std::make_shared<HipAdviseOperation>(advice_enum));
+  }
 
   registerOperation("MEMSET", std::make_pair(Platform::hip, Platform::hip), std::make_shared<HipMemsetOperation>());
 
@@ -202,14 +224,15 @@ std::shared_ptr<umpire::op::MemoryOperation> MemoryOperationRegistry::find(const
   auto operations = m_operators.find(name);
 
   if (operations == m_operators.end()) {
-    UMPIRE_ERROR("Cannot find operator " << name);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot find operator \"{}\"", name));
   }
 
   auto op = operations->second.find(platforms);
 
   if (op == operations->second.end()) {
-    UMPIRE_ERROR("Cannot find operator" << name << " for platforms " << static_cast<int>(platforms.first) << ", "
-                                        << static_cast<int>(platforms.second));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("Cannot find operator \"{}\" for platforms {}, {}", name,
+                                     static_cast<int>(platforms.first), static_cast<int>(platforms.second)));
   }
 
   return op->second;

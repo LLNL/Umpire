@@ -8,6 +8,7 @@
 
 #include "umpire/resource/HostSharedMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
@@ -31,7 +32,7 @@ std::unique_ptr<resource::MemoryResource> HostSharedMemoryResourceFactory::creat
                                                                                   MemoryResourceTraits traits)
 {
   if (traits.scope != MemoryResourceTraits::shared_scope::node) {
-    UMPIRE_ERROR("HostSharedMemoryResource only supports shared_scope::node");
+    UMPIRE_ERROR(runtime_error, "HostSharedMemoryResource only supports shared_scope::node");
   }
   return util::make_unique<HostSharedMemoryResource>(Platform::host, name, id, traits);
 }

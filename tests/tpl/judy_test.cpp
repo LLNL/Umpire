@@ -5,7 +5,7 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
-#include "umpire/tpl/judy/judy.h"
+#include "umpire/judy/judy.h"
 
 #include <cstdint>
 #include <sstream>

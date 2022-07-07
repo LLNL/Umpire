@@ -20,7 +20,7 @@
 #include "umpire/Umpire.hpp"
 #include "umpire/resource/MemoryResourceRegistry.hpp"
 #include "umpire/strategy/QuickPool.hpp"
-#include "umpire/tpl/CLI11/CLI11.hpp"
+#include "umpire/CLI11/CLI11.hpp"
 
 namespace {
 const std::string hwm_name{"Memory Usage HSM"};
@@ -264,9 +264,6 @@ int main(int argc, char* argv[])
     ->required()
     ->check(CLI::Range(0, 100000000));
 
-  bool quiet{false};
-  app.add_flag("--quiet", quiet, "No Output");
-
   bool no_introspection{false};
   app.add_flag("--no_introspection", no_introspection, "Disable introspection");
 
@@ -286,12 +283,8 @@ int main(int argc, char* argv[])
   if (measure_time_overhead) {
      bm.run_time_benchmark();
   }
-
-  if (measure_space_overhead) {
+  else if (measure_space_overhead) {
      bm.run_space_benchmark();
-  }
-
-  if (quiet != false) {
      std::cout << bm;
   }
 

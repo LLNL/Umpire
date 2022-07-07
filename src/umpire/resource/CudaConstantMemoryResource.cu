@@ -8,6 +8,7 @@
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 #include <memory>
 #include <sstream>
@@ -36,7 +37,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
     cudaError_t error = ::cudaGetSymbolAddress((void**)&m_ptr, s_umpire_internal_device_constant_memory);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR("cudaGetSymbolAddress failed with error: " << cudaGetErrorString(error));
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("cudaGetSymbolAddress failed with error: {}", cudaGetErrorString(error)));
     }
 
     m_initialized = true;
@@ -49,7 +50,7 @@ void* CudaConstantMemoryResource::allocate(std::size_t bytes)
 
   if (m_offset > (1024 * 64))
   {
-    UMPIRE_ERROR("Max total size of constant allocations is 64KB, current size is " << m_offset - bytes << "bytes");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Max total size of constant allocations is 64KB, current size is {} bytes", (m_offset - bytes)));
   }
 
   UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
@@ -67,7 +68,7 @@ void CudaConstantMemoryResource::deallocate(void* ptr, std::size_t size)
       == static_cast<char*>(ptr)) {
     m_offset -= size;
   } else {
-    UMPIRE_ERROR("CudaConstantMemory deallocations must be in reverse order");
+    UMPIRE_ERROR(runtime_error,"CudaConstantMemory deallocations must be in reverse order");
   }
 }
 

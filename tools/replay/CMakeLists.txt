@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
 
-set(tools_depends umpire umpire_tpl_json)
+set(tools_depends umpire umpire_tpl_CLI11 umpire_tpl_json)
 
 if (UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   set(tools_depends ${tools_depends} ${CMAKE_DL_LIBS})

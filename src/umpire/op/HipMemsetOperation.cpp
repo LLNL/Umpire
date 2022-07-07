@@ -9,6 +9,8 @@
 #include <hip/hip_runtime.h>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/Platform.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace op {
@@ -19,8 +21,9 @@ void HipMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UNU
   hipError_t error = ::hipMemset(src_ptr, value, length);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
-                                         << ") failed with error: " << hipGetErrorString(error));
+    UMPIRE_ERROR(runtime_error,
+                 umpire::fmt::format("hipMemset( src_ptr = {}, value = {}, length = {}) failed with error: {}", src_ptr,
+                                     value, length, hipGetErrorString(error)));
   }
 }
 
@@ -28,14 +31,20 @@ camp::resources::EventProxy<camp::resources::Resource> HipMemsetOperation::apply
     void* src_ptr, util::AllocationRecord* UMPIRE_UNUSED_ARG(allocation), int value, std::size_t length,
     camp::resources::Resource& ctx)
 {
-  auto device = ctx.get<camp::resources::Hip>();
-  auto stream = device.get_stream();
+  auto device = ctx.try_get<camp::resources::Hip>();
+  if (!device) {
+    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
+                                                     platform_to_string(ctx.get_platform())));
+  }
+  auto stream = device->get_stream();
 
   hipError_t error = ::hipMemsetAsync(src_ptr, value, length, stream);
 
   if (error != hipSuccess) {
-    UMPIRE_ERROR("hipMemset( src_ptr = " << src_ptr << ", value = " << value << ", length = " << length
-                                         << ") failed with error: " << hipGetErrorString(error));
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format("hipMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}",
+                            src_ptr, value, length, (void*)stream, hipGetErrorString(error)));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

@@ -18,6 +18,7 @@ if(WIN32 OR APPLE)
   set(UMPIRE_ENABLE_FILE_RESOURCE Off CACHE BOOL "")
 endif()
 option(UMPIRE_ENABLE_FILE_RESOURCE "Enable File Resource" On)
+option(UMPIRE_ENABLE_UMAP "Enable UMAP allocator" Off)
 
 option(UMPIRE_ENABLE_SYCL "Build Umpire with SYCL" Off)
 option(UMPIRE_ENABLE_NUMA "Build Umpire with NUMA support" Off)
@@ -36,6 +37,8 @@ option(UMPIRE_ENABLE_PERFORMANCE_TESTS "Enable additional performance tests" Off
 option(UMPIRE_ENABLE_ASAN "Enable use with address sanitizer tools" Off)
 option(UMPIRE_ENABLE_SANITIZER_TESTS "Enable address sanitizer tests" Off)
 option(UMPIRE_ENABLE_DEVICE_ALLOCATOR "Enable Device Allocator" Off)
+option(UMPIRE_ENABLE_SQLITE_EXPERIMENTAL "Build with sqlite event integration (experimental)" Off)
+option(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG "Disable verbose output from AllocationMap during debug builds" Off)
 
 if (UMPIRE_ENABLE_INACCESSIBILITY_TESTS)
   set(ENABLE_GTEST_DEATH_TESTS On CACHE BOOL "Enable tests asserting failure.")

@@ -12,10 +12,9 @@
 #include <type_traits>
 #include <utility>
 
-#include "umpire/Replay.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/backtrace.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace util {
@@ -50,7 +49,7 @@ void AllocationMap::RecordList::push_back(const AllocationRecord& rec)
 AllocationRecord AllocationMap::RecordList::pop_back()
 {
   if (m_length == 0) {
-    UMPIRE_ERROR("pop_back() called, but m_length == 0");
+    UMPIRE_ERROR(runtime_error, "pop_back() called, but m_length == 0");
   }
 
   const AllocationRecord ret = m_tail->rec;
@@ -119,14 +118,14 @@ const AllocationRecord& AllocationMap::RecordList::ConstIterator::operator*()
 const AllocationRecord* AllocationMap::RecordList::ConstIterator::operator->()
 {
   if (!m_curr)
-    UMPIRE_ERROR("Cannot dereference nullptr");
+    UMPIRE_ERROR(runtime_error, "Cannot dereference nullptr");
   return &m_curr->rec;
 }
 
 AllocationMap::RecordList::ConstIterator& AllocationMap::RecordList::ConstIterator::operator++()
 {
   if (!m_curr)
-    UMPIRE_ERROR("Cannot dereference nullptr");
+    UMPIRE_ERROR(runtime_error, "Cannot dereference nullptr");
   m_curr = m_curr->prev;
   return *this;
 }
@@ -158,9 +157,6 @@ void AllocationMap::insert(void* ptr, AllocationRecord record)
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Inserting " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_insert\", \"payload\": { \"ptr\": \""
-                << ptr << "\", \"record_ptr\": \"" << record.ptr << "\", \"record_size\": \"" << record.size
-                << "\", \"record_strategy\": \"" << record.strategy << "\" }");
 
   auto pair = m_map.insert(ptr, *this, record);
 
@@ -182,18 +178,17 @@ const AllocationRecord* AllocationMap::find(void* ptr) const
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Searching for " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_find\", \"payload\": { \"ptr\": \"" << ptr << "\" }");
 
   const AllocationRecord* alloc_record = doFindRecord(ptr);
 
   if (alloc_record) {
     return alloc_record;
   } else {
-#if !defined(NDEBUG)
+#if !(defined(NDEBUG) || defined(UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG))
     // use this from a debugger to dump the contents of the AllocationMap
     printAll();
 #endif
-    UMPIRE_ERROR("Allocation not mapped: " << ptr);
+    UMPIRE_ERROR(unknown_pointer_error, umpire::fmt::format("Allocation not mapped: {}", ptr));
   }
 }
 
@@ -248,7 +243,6 @@ AllocationRecord AllocationMap::remove(void* ptr)
   AllocationRecord ret;
 
   UMPIRE_LOG(Debug, "Removing " << ptr);
-  UMPIRE_REPLAY("\"event\": \"allocation_map_remove\", \"payload\": { \"ptr\": \"" << ptr << "\" }");
 
   auto iter = m_map.find(ptr);
 
@@ -258,7 +252,7 @@ AllocationRecord AllocationMap::remove(void* ptr)
     if (iter->second->empty())
       m_map.removeLast();
   } else {
-    UMPIRE_ERROR("Cannot remove " << ptr);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot remove {}", ptr));
   }
 
   --m_size;
@@ -277,7 +271,6 @@ void AllocationMap::clear()
   std::lock_guard<std::mutex> lock(m_mutex);
 
   UMPIRE_LOG(Debug, "Clearing");
-  UMPIRE_REPLAY("\"event\": \"allocation_map_clear\"");
 
   m_map.clear();
   m_size = 0;

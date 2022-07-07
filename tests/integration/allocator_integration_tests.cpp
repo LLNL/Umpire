@@ -109,7 +109,7 @@ TEST_P(AllocatorTest, GetById)
 
   ASSERT_EQ(m_allocator->getAllocationStrategy(), allocator_by_id.getAllocationStrategy());
 
-  ASSERT_THROW(rm.getAllocator(-25), umpire::util::Exception);
+  ASSERT_THROW(rm.getAllocator(-25), umpire::runtime_error);
 }
 
 TEST_P(AllocatorTest, get_allocator_records)
@@ -249,7 +249,7 @@ TEST_P(AllocatorByResourceTest, AllocateDuplicateDeallocate)
 
   ASSERT_NO_THROW(m_allocator->deallocate(data));
 
-  ASSERT_THROW(m_allocator->deallocate(data), umpire::util::Exception);
+  ASSERT_THROW(m_allocator->deallocate(data), umpire::runtime_error);
 }
 
 const umpire::resource::MemoryResourceType resource_types[] = {umpire::resource::Host
@@ -282,7 +282,7 @@ TEST(Allocation, DeallocateDifferent)
 
   double* data = static_cast<double*>(alloc_one.allocate(1024 * sizeof(double)));
 
-  ASSERT_THROW(alloc_two.deallocate(data), umpire::util::Exception);
+  ASSERT_THROW(alloc_two.deallocate(data), umpire::runtime_error);
 
   ASSERT_NO_THROW(alloc_one.deallocate(data));
 }
@@ -296,7 +296,7 @@ TEST(Allocator, DeallocateDifferentUMDevice)
 
   double* data = static_cast<double*>(alloc_um.allocate(1024 * sizeof(double)));
 
-  ASSERT_THROW(alloc_dev.deallocate(data), umpire::util::Exception);
+  ASSERT_THROW(alloc_dev.deallocate(data), umpire::runtime_error);
 
   ASSERT_NO_THROW(alloc_um.deallocate(data));
 }

@@ -8,11 +8,13 @@
 ##############################################################################
 
 
+# set -x
 set -o errexit
 set -o nounset
 
 option=${1:-""}
 hostname="$(hostname)"
+truehostname=${hostname//[0-9]/}
 project_dir="$(pwd)"
 
 build_root=${BUILD_ROOT:-""}
@@ -25,6 +27,9 @@ py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
 
 # Dependencies
 date
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~~ Build and test started"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 if [[ "${option}" != "--build-only" && "${option}" != "--test-only" ]]
 then
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -58,6 +63,9 @@ then
     python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
+  echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+  echo "~~~~~ Dependencies Built"
+  echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 date
 
 # Host config file
@@ -89,10 +97,13 @@ fi
 # Build Directory
 if [[ -z ${build_root} ]]
 then
-    build_root=$(pwd)
+    build_root="/dev/shm$(pwd)"
+else
+    build_root="/dev/shm${build_root}"
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
+install_dir="${build_root}/install_${hostconfig//.cmake/}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
@@ -118,22 +129,34 @@ then
     rm -rf ${build_dir} 2>/dev/null
     mkdir -p ${build_dir} && cd ${build_dir}
 
-    date
+    if [[ "${truehostname}" == "corona" ]]
+    then
+        module unload rocm
+    fi
     $cmake_exe \
       -C ${hostconfig_path} \
+      -DCMAKE_INSTALL_PREFIX=${install_dir} \
       ${project_dir}
     if ! $cmake_exe --build . -j; then
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       echo "Compilation failed, running make VERBOSE=1"
       echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
       $cmake_exe --build . --verbose -j 1
+    else
+      # todo this should use cmake --install once we use CMake 3.15+ everywhere
+      make install
     fi
+
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    echo "~~~~~ Umpire Built"
+    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     date
 fi
 
 # Test
 if [[ "${option}" != "--build-only" ]] && grep -q -i "ENABLE_TESTS.*ON" ${hostconfig_path}
 then
+    date
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Testing Umpire"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -145,9 +168,7 @@ then
 
     cd ${build_dir}
 
-    date
     ctest --output-on-failure --no-compress-output -T test -VV 2>&1 | tee tests_output.txt
-    date
 
     # If Developer benchmarks enabled, run the no-op benchmark and show output
     if [[ "${option}" != "--build-only" ]] && grep -q -i "UMPIRE_ENABLE_DEVELOPER_BENCHMARKS.*ON" ${hostconfig_path}
@@ -173,8 +194,38 @@ then
         echo "ERROR: failure(s) while running CTest" && exit 1
     fi
 
+    if [[ ! -d ${install_dir} ]]
+    then
+        echo "ERROR: install directory not found : ${install_dir}" && exit 1
+    fi
+
+    if grep -q -i "ENABLE_HIP.*ON" ${hostconfig_path}
+    then
+        echo "WARNING: No install test with HIP"
+    else
+        cd ${install_dir}/examples/umpire/using-with-cmake
+        mkdir build && cd build
+        if ! $cmake_exe -C ../host-config.cmake ..; then
+        echo "ERROR: running cmake for using-with-cmake test" && exit 1
+        fi
+
+        if ! make; then
+        echo "ERROR: running make for using-with-cmake test" && exit 1
+        fi
+    fi
+
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~ CLEAN UP"
+    echo "~~~~~ Umpire Tests Complete"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    make clean
+    date
+
+    # echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    # echo "~~~~~ CLEAN UP"
+    # echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    # make clean
 fi
+
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+echo "~~~~~ Build and test completed"
+echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+date

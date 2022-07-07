@@ -16,6 +16,7 @@
 #include <cstring>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace util {
@@ -73,7 +74,7 @@ void* FixedMallocPool::allocInPool(Pool& p) noexcept
   return ret;
 }
 
-void* FixedMallocPool::allocate(std::size_t bytes)
+void* FixedMallocPool::allocate_impl(std::size_t bytes)
 {
   void* ptr = nullptr;
 
@@ -85,7 +86,7 @@ void* FixedMallocPool::allocate(std::size_t bytes)
 
   if (!ptr) {
     newPool();
-    ptr = allocate(bytes);
+    ptr = allocate_impl(bytes);
   }
 
   // Could be an error, but FixedMallocPool is used internally and an
@@ -93,6 +94,12 @@ void* FixedMallocPool::allocate(std::size_t bytes)
   UMPIRE_ASSERT(ptr);
 
   return ptr;
+}
+
+void* FixedMallocPool::allocate(std::size_t bytes)
+{
+  UMPIRE_ASSERT(bytes <= m_obj_bytes);
+  return allocate_impl(bytes);
 }
 
 void FixedMallocPool::deallocate(void* ptr)
@@ -113,7 +120,7 @@ void FixedMallocPool::deallocate(void* ptr)
     }
   }
 
-  UMPIRE_ERROR("Could not find the pointer to deallocate");
+  UMPIRE_ERROR(runtime_error, "Could not find the pointer to deallocate");
 }
 
 std::size_t FixedMallocPool::numPools() const noexcept

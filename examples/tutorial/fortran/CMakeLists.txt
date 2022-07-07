@@ -18,11 +18,17 @@ blt_add_executable(
   DEPENDS_ON ${tutorial_fortran_depends})
 list(APPEND umpire_tutorials tut_allocator_fortran)
 
-set_source_files_properties(
-  tut_allocator.F
-  PROPERTIES
-  Fortran_FORMAT FREE)
-
+if (Fortran_COMPILER_FAMILY_IS_CLANG)
+  set_source_files_properties(
+    tut_allocator.F
+    PROPERTIES
+    COMPILE_FLAGS -Mfree)
+else()
+  set_source_files_properties(
+    tut_allocator.F
+    PROPERTIES
+    Fortran_FORMAT FREE)
+endif()
 
 # blt_add_executable(
 #   NAME tut_resources_f

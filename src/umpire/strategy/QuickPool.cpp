@@ -9,7 +9,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/strategy/PoolCoalesceHeuristic.hpp"
 #include "umpire/strategy/mixins/AlignedAllocation.hpp"
-#include "umpire/util/FixedMallocPool.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
@@ -225,7 +224,7 @@ void QuickPool::release()
           //
           // Ignore error in case the underlying vendor API has already shutdown
           //
-          UMPIRE_LOG(Error, "Pool is destructing, Exception Ignored");
+          UMPIRE_LOG(Error, "Pool is destructing, runtime_error Ignored");
         } else {
           throw;
         }
@@ -312,7 +311,11 @@ std::size_t QuickPool::getLargestAvailableBlock() noexcept
 void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  UMPIRE_REPLAY("\"event\": \"coalesce\", \"payload\": { \"allocator_name\": \"" << getName() << "\" }");
+
+  umpire::event::record([&](auto& event) {
+    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
+  });
+
   do_coalesce(getActualSize());
 }
 
@@ -340,7 +343,9 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblock
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
 {
   if (percentage < 0 || percentage > 100) {
-    UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
+    UMPIRE_ERROR(
+        runtime_error,
+        umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
 
   if (percentage == 0) {

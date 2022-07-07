@@ -10,6 +10,7 @@
 #include <CL/sycl.hpp>
 
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
@@ -26,7 +27,7 @@ struct SyclPinnedAllocator {
    * \param queue_t SYCL queue for providing information on device and context
    * \return Pointer to start of the allocation on host.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t size, const sycl::queue& queue_t)
   {
@@ -35,7 +36,7 @@ struct SyclPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     if (ptr == nullptr) {
-      UMPIRE_ERROR("SYCL malloc_host( bytes = " << size << " ) failed with error!");
+      UMPIRE_ERROR(runtime_error, umpire::fmt::format("sycl::malloc_host( bytes = {} ) failed", size));
     } else {
       return ptr;
     }
@@ -47,7 +48,7 @@ struct SyclPinnedAllocator {
    * \param ptr Address to deallocate.
    * \param queue_t SYCL queue this pointer was asociated with
    *
-   * \throws umpire::util::Exception if memory cannot be free'd.
+   * \throws umpire::util::runtime_error if memory cannot be free'd.
    */
   void deallocate(void* ptr, const sycl::queue& queue_t)
   {

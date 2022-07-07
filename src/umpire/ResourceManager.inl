@@ -10,9 +10,9 @@
 #include <sstream>
 
 #include "camp/list.hpp"
-#include "umpire/Replay.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/make_unique.hpp"
 
 namespace umpire {
@@ -25,27 +25,27 @@ Allocator ResourceManager::makeAllocator(const std::string& name, Tracking track
   bool is_tracked = (tracked == Tracking::Tracked) ? true : false;
 
   if (m_id + 1 == umpire::invalid_allocator_id) {
-    UMPIRE_ERROR("Maximum number of concurrent allocators exceeded! "
-                 << "Please email umpire-dev@llnl.gov");
+    UMPIRE_ERROR(runtime_error, "Maximum number of concurrent allocators exceeded! Please email umpire-dev@llnl.gov");
   }
 
   UMPIRE_LOG(Debug, "(name=\"" << name << "\")");
-  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-                << typeid(Strategy).name() << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
-                << ", \"allocator_name\":\"" << name << "\""
-                << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }");
   if (isAllocator(name)) {
-    UMPIRE_ERROR("Allocator with name " << name << " is already registered.");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator with name \"{}\" is already registered", name));
   }
 
   allocator = util::make_unique<Strategy>(name, getNextId(), std::forward<Args>(args)...);
   allocator->setTracking(is_tracked);
 
-  UMPIRE_REPLAY("\"event\": \"makeAllocator\", \"payload\": { \"type\":\""
-                << typeid(Strategy).name() << "\", \"with_introspection\":" << (is_tracked ? "true" : "false")
-                << ", \"allocator_name\":\"" << name << "\""
-                << ", \"args\": [ " << umpire::Replay::printReplayAllocator(std::forward<Args>(args)...) << " ] }"
-                << ", \"result\": { \"allocator_ref\":\"" << allocator.get() << "\" }");
+  umpire::event::record([&](auto& event) {
+    event.name("make_allocator")
+        .category(event::category::operation)
+        .arg("allocator_ref", (void*)allocator.get())
+        .arg("type", typeid(Strategy).name())
+        .arg("introspection", is_tracked)
+        .args(args...)
+        .tag("allocator_name", allocator->getName())
+        .tag("replay", "true");
+  });
 
   m_allocators_by_name[name] = allocator.get();
   m_allocators_by_id[allocator->getId()] = allocator.get();

@@ -47,12 +47,21 @@ __host__ __device__ inline int get_index(const char* name)
 {
   int index{-1};
 #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
+  if (UMPIRE_DEV_ALLOCS_h == nullptr) {
+    UMPIRE_LOG(Warning, "No DeviceAllocators have been created yet.");
+    return index;
+  }
+
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     if (strcmp(UMPIRE_DEV_ALLOCS_h[i].getName(), name) == 0) {
       index = i;
     }
   }
 #else
+  if (UMPIRE_DEV_ALLOCS == nullptr) {
+    return index;
+  }
+
   for (int i = 0; i < UMPIRE_TOTAL_DEV_ALLOCS; i++) {
     const char* temp = UMPIRE_DEV_ALLOCS[i].getName();
     int curr = 0;
@@ -81,7 +90,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
   int index = get_index(name);
 
   if (index == -1) {
-    UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator named \"{}\" was found", name));
   }
 
 #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
@@ -96,10 +105,10 @@ __host__ __device__ DeviceAllocator get_device_allocator(int da_id)
   int id = convert_to_array_index(da_id);
 
   if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
-    UMPIRE_ERROR("Invalid ID given: " << id);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid id given: {}", id));
   }
   if (!is_device_allocator(da_id)) {
-    UMPIRE_ERROR("No DeviceAllocator with ID, " << id << " was found.");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator with id: {} was found", id));
   }
 
 #if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
@@ -118,7 +127,7 @@ __host__ __device__ bool is_device_allocator(const char* name)
     UMPIRE_LOG(Warning, "No DeviceAllocator by the name " << name << " was found.");
     return false;
 #else
-    UMPIRE_ERROR("No DeviceAllocator by the name " << name << " was found.");
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator by the name \"{}\" was found", name));
 #endif
   }
 
@@ -138,7 +147,7 @@ __host__ __device__ bool is_device_allocator(int da_id)
     UMPIRE_LOG(Warning, "Invalid ID given: " << id);
     return false;
 #else
-    UMPIRE_ERROR("Invalid ID given: " << id);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid id given: {}", id));
 #endif
   }
 
@@ -157,7 +166,7 @@ __host__ DeviceAllocator make_device_allocator(Allocator allocator, size_t size,
   static int index{0};
 
   if (size <= 0) {
-    UMPIRE_ERROR("Invalid size passed to DeviceAllocator: " << size);
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Invalid size passed to DeviceAllocator: ", size));
   }
 
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {

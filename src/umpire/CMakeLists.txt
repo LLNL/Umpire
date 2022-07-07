@@ -4,11 +4,11 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-add_subdirectory(tpl)
+add_subdirectory(util)
 add_subdirectory(resource)
 add_subdirectory(alloc)
+add_subdirectory(event)
 add_subdirectory(op)
-add_subdirectory(util)
 add_subdirectory(strategy)
 if (SHROUD_FOUND)
   add_subdirectory(interface)
@@ -20,7 +20,6 @@ endif()
 set (umpire_headers
   Allocator.hpp
   Allocator.inl
-  Replay.hpp
   ResourceManager.hpp
   ResourceManager.inl
   Tracking.hpp
@@ -30,7 +29,6 @@ set (umpire_headers
 
 set (umpire_sources
   Allocator.cpp
-  Replay.cpp
   ResourceManager.cpp
   Umpire.cpp)
 
@@ -50,12 +48,10 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-
-    set(umpire_device_depends camp cuda)
+    set(umpire_device_depends camp cuda umpire_util)
   elseif (UMPIRE_ENABLE_HIP)
-    set(umpire_device_depends camp blt::hip)
+    set(umpire_device_depends camp blt::hip umpire_util)
   endif()
-
 
   blt_add_library(
     NAME umpire_device
@@ -92,6 +88,7 @@ set (umpire_depends
   umpire_alloc
   umpire_op
   umpire_util
+  umpire_event
   umpire_tpl_judy)
 
 if (UMPIRE_ENABLE_HIP)
@@ -103,6 +100,7 @@ endif()
 if (UMPIRE_ENABLE_OPENMP_TARGET)
   set (umpire_depends
     ${umpire_depends}
+    umpire_event
     openmp)
 endif ()
 
@@ -140,9 +138,9 @@ endif()
 
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   message(STATUS "Host Shared Memory Enabled")
+  find_package(Threads)
   target_link_libraries(
-    umpire INTERFACE $<BUILD_INTERFACE:-lrt>
-                     $<BUILD_INTERFACE:-pthread>
+    umpire INTERFACE Threads::Threads -lrt 
   )
 else()
   message(STATUS "Host Shared Memory Disabled")

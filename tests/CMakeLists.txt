@@ -12,5 +12,6 @@ add_subdirectory(debug)
 if (UMPIRE_ENABLE_DEVELOPER_DEFAULTS)
     add_subdirectory(applications)
 endif()
+add_subdirectory(install)
 
 umpire_add_code_checks(PREFIX tests RECURSIVE TRUE)

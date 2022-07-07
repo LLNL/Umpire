@@ -9,13 +9,12 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/AllocationAdvisor.hpp"
-#include "umpire/util/Exception.hpp"
 
 int main(int, char**)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("UM");
-  auto set_advice_op = rm.getOperation("READ_MOSTLY", allocator, allocator);
+  auto set_advice_op = rm.getOperation("SET_READ_MOSTLY", allocator, allocator);
 
   auto unset_advice_op = rm.getOperation("UNSET_READ_MOSTLY", allocator, allocator);
 

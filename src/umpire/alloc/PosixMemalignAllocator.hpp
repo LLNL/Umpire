@@ -9,7 +9,10 @@
 
 #include <stdlib.h>
 
+#include <cerrno>
+
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/util/numa.hpp"
 
 namespace umpire {
@@ -25,7 +28,7 @@ struct PosixMemalignAllocator {
    * \param bytes Number of bytes to allocate. Does not have to be a multiple of
    * the system page size. \return Pointer to start of the allocation.
    *
-   * \throws umpire::util::Exception if memory cannot be allocated.
+   * \throws umpire::util::runtime_error if memory cannot be allocated.
    */
   void* allocate(std::size_t bytes)
   {
@@ -35,8 +38,15 @@ struct PosixMemalignAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ret);
 
     if (ret == nullptr) {
-      UMPIRE_ERROR("posix_memalign( bytes = " << bytes << ", pagesize = " << get_page_size()
-                                              << " ) failed with error = " << err);
+      if (err == ENOMEM) {
+        UMPIRE_ERROR(out_of_memory_error,
+                     umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
+                                         get_page_size(), strerror(err)));
+      } else {
+        UMPIRE_ERROR(runtime_error,
+                     umpire::fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
+                                         get_page_size(), strerror(err)));
+      }
     }
 
     return ret;
@@ -47,7 +57,7 @@ struct PosixMemalignAllocator {
    *
    * \param ptr Address to deallocate.
    *
-   * \throws umpire::util::Exception if memory cannot be free'd.
+   * \throws umpire::util::runtime_error if memory cannot be free'd.
    */
   void deallocate(void* ptr)
   {
