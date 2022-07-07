@@ -48,12 +48,10 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-
     set(umpire_device_depends camp cuda umpire_util)
   elseif (UMPIRE_ENABLE_HIP)
     set(umpire_device_depends camp blt::hip umpire_util)
   endif()
-
 
   blt_add_library(
     NAME umpire_device

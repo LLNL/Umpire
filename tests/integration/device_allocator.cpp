@@ -71,6 +71,7 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   auto my_da = umpire::get_device_allocator(GetParam());
   ASSERT_NO_THROW(my_da.reset());
+
   ASSERT_EQ(my_da.getCurrentSize(), 0);
 
 #if defined(UMPIRE_ENABLE_CUDA)
