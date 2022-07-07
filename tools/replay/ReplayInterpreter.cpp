@@ -499,6 +499,10 @@ void ReplayInterpreter::compile_make_allocator()
 
     m_ops->copyString(base_allocator_name, alloc->base_name);
   }
+  else if (type == "umpire::strategy::NamedAllocationStrategy") {
+    alloc->type = ReplayFile::rtype::NAMED;
+    m_ops->copyString(base_allocator_name, alloc->base_name);
+  }
   else if ( type == "umpire::strategy::QuickPool" ) {
     alloc->type = ReplayFile::rtype::QUICKPOOL;
     m_ops->copyString(base_allocator_name, alloc->base_name);
