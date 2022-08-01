@@ -352,12 +352,12 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
   release();
   std::size_t size_post{getActualSize()};
 
-#if defined(COUNT_COALESCE)
-  num_coalesce++;
-#endif
-
   if (size_post < suggested_size) {
     std::size_t alloc_size{suggested_size - size_post};
+
+    #if defined(COUNT_COALESCE)
+      num_coalesce++;
+    #endif
 
     UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
     auto ptr = allocate(alloc_size);
@@ -391,7 +391,6 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
-
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
@@ -407,7 +406,6 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
-
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
