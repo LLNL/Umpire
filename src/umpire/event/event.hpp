@@ -44,6 +44,7 @@ struct allocate {
   std::size_t size;
   void* ref;
   void* ptr;
+  std::string backtrace;
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
@@ -52,6 +53,7 @@ struct named_allocate {
   void* ref;
   void* ptr;
   std::string name;
+  std::string backtrace;
   std::chrono::time_point<std::chrono::system_clock> timestamp{std::chrono::system_clock::now()};
 };
 
@@ -201,6 +203,11 @@ class builder<allocate> {
     return *this;
   }
 
+  builder& backtrace(std::string& bt) {
+    e.backtrace = bt;
+    return *this;
+  }
+
   template <typename Recorder = decltype(recorder_factory::get_recorder())>
   void record(Recorder r = recorder_factory::get_recorder())
   {
@@ -235,6 +242,11 @@ class builder<named_allocate> {
   builder& ptr(void* ptr)
   {
     e.ptr = ptr;
+    return *this;
+  }
+
+  builder& backtrace(std::string& bt) {
+    e.backtrace = bt;
     return *this;
   }
 

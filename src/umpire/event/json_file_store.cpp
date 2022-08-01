@@ -42,10 +42,11 @@ void json_file_store::insert(const allocate& e)
           R"({"category":"operation","name":"allocate")"
           R"(,"numeric_args":{"size":%ld})"
           R"(,"string_args":{"allocator_ref":"%p","pointer":"%p"})"
+          R"(,"backtrace_data":"%s")"
           R"(,"tags":{"replay":"true"})"
           R"(,"timestamp":%lld})"
           "\n",
-          e.size, e.ref, e.ptr,
+          e.size, e.ref, e.ptr, e.backtrace.c_str(),
           static_cast<long long>(
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
@@ -56,10 +57,11 @@ void json_file_store::insert(const named_allocate& e)
           R"({"category":"operation","name":"named_allocate")"
           R"(,"numeric_args":{"size":%ld})"
           R"(,"string_args":{"allocator_ref":"%p","pointer":"%p","allocation_name":"%s"})"
+          R"(,"backtrace_data":"%s")"
           R"(,"tags":{"replay":"true"})"
           R"(,"timestamp":%lld})"
           "\n",
-          e.size, e.ref, e.ptr, e.name.c_str(),
+          e.size, e.ref, e.ptr, e.name.c_str(), e.backtrace.c_str(),
           static_cast<long long>(
               std::chrono::time_point_cast<std::chrono::nanoseconds>(e.timestamp).time_since_epoch().count()));
 }
