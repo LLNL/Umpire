@@ -204,7 +204,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(
                 cmake_cache_path("HIP_CLANG_INCLUDE_PATH", + glob.glob(
                     "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
-                )[0]
+                )[0])
             )
             hip_link_flags = ""
             if '%gcc' in spec:
