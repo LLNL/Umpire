@@ -9,7 +9,7 @@
 include(CMakeFindDependencyMacro)
 
 if (@UMPIRE_NEEDS_BLT_TPLS@)
-  include("${CMAKE_CURRENT_LIST_DIR}/umpire-blt-targets.cmake")
+  include("${CMAKE_CURRENT_LIST_DIR}/bltTargets.cmake")
 
   if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@)
     find_dependency(Threads)
