@@ -13,6 +13,23 @@
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/memory_sanitizers.hpp"
 
+// Experiment 1: Call coalesce before growing pool
+// #define COALESCE_BEFORE_GROW
+//
+// Experiment 2: Use actualHighWatermark instead of ActualSize for coalesce
+// #define USE_HIGHWATERMARK
+//
+// Experiment 3: Use Block Heuristic - Set this option when rerunning the replay 
+// file with option "--use-heuristic Block"
+//
+// Experiment 4: Test gradual effect of heuristics - Set this option when rerunning 
+// the replay file with option "--heuristic-parm X", where X is some integer value.
+
+#if defined(COALESCE_BEFORE_GROW) || defined(USE_HIGHWATERMARK)
+#define COUNT_COALESCE
+static int num_coalesce{0};
+#endif
+
 namespace umpire {
 namespace strategy {
 
@@ -37,6 +54,9 @@ QuickPool::QuickPool(const std::string& name, int id, Allocator allocator,
 QuickPool::~QuickPool()
 {
   UMPIRE_LOG(Debug, "Releasing free blocks to device");
+#if defined(COUNT_COALESCE)
+  std::cout << "coalesce function was called " << num_coalesce << " times." << std::endl;
+#endif
   m_is_destructing = true;
   release();
 }
@@ -56,6 +76,14 @@ void* QuickPool::allocate(std::size_t bytes)
     std::size_t size{(rounded_bytes > bytes_to_use) ? rounded_bytes : bytes_to_use};
 
     UMPIRE_LOG(Debug, "Allocating new chunk of size " << size);
+
+#if defined(COALESCE_BEFORE_GROW)
+    std::size_t suggested_size{m_should_coalesce(*this)};
+    if (0 != suggested_size) {
+      UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
+      do_coalesce(suggested_size);
+    } 
+#endif
 
     void* ret{nullptr};
     try {
@@ -192,11 +220,13 @@ void QuickPool::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
   // can do this with iterator?
   m_pointer_map.erase(ptr);
 
+#ifndef COALESCE_BEFORE_GROW
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
     do_coalesce(suggested_size);
   }
+#endif
 }
 
 void QuickPool::release()
@@ -322,6 +352,10 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
   release();
   std::size_t size_post{getActualSize()};
 
+#if defined(COUNT_COALESCE)
+  num_coalesce++;
+#endif
+
   if (size_post < suggested_size) {
     std::size_t alloc_size{suggested_size - size_post};
 
@@ -333,8 +367,13 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
+#if defined(USE_HIGHWATERMARK)
+  return
+      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0; };
+#else
   return
       [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
+#endif
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
@@ -343,6 +382,23 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
     UMPIRE_ERROR("Invalid percentage of " << percentage << ", percentage must be an integer between 0 and 100");
   }
 
+#if defined(USE_HIGHWATERMARK)
+  if (percentage == 0) {
+    return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
+  } else if (percentage == 100) {
+    return [=](const strategy::QuickPool& pool) {
+      return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0;
+    };
+  } else {
+    float f = (float)((float)percentage / (float)100.0);
+
+    return [=](const strategy::QuickPool& pool) {
+      // Calculate threshold in bytes from the percentage
+      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+      return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0;
+    };
+  }
+#else
   if (percentage == 0) {
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
@@ -358,6 +414,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
       return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
     };
   }
+#endif
 }
 
 std::ostream& operator<<(std::ostream& out, umpire::strategy::PoolCoalesceHeuristic<QuickPool>&)
