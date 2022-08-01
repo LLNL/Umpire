@@ -202,7 +202,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             # there is only one dir like this, but the version component is unknown
 
             entries.append(
-                cmake_cache_path("HIP_CLANG_INCLUDE_PATH", + glob.glob(
+                cmake_cache_path("HIP_CLANG_INCLUDE_PATH", glob.glob(
                     "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
                 )[0])
             )
