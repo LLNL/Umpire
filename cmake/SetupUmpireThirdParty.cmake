@@ -90,8 +90,19 @@ if (NOT BLT_EXPORTED)
   blt_import_library(NAME          blt_stub EXPORTABLE On)
   set_target_properties(blt_stub PROPERTIES EXPORT_NAME blt::blt_stub)
   install(TARGETS blt_stub
-          EXPORT               bltTargets)
+    EXPORT               bltTargets)
   blt_export_tpl_targets(EXPORT bltTargets NAMESPACE blt)
   install(EXPORT bltTargets
-    DESTINATION  lib/cmake/camp)
+    DESTINATION  lib/cmake/umpire)
+elseif (UMPIRE_ENABLE_MPI)
+  # If the target is EXPORTABLE, add it to the export set
+  get_target_property(_is_imported mpi IMPORTED)
+  if(NOT ${_is_imported})
+    install(TARGETS              mpi
+      EXPORT               ${arg_EXPORT})
+    # Namespace target to avoid conflicts
+    set_target_properties(mpi PROPERTIES EXPORT_NAME blt::mpi)
+    install(EXPORT bltTargets
+      DESTINATION  lib/cmake/umpire)
+  endif()
 endif()
