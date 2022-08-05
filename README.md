@@ -38,9 +38,9 @@ If you have build problems, we have comprehensive [build system documentation](h
 
 We ran our experiments on LLNL's LC systems (more info can be found [here](https://hpc.llnl.gov/)).
 
-A sequence of steps to replicate our results can be found [here]. This page includes how we built Umpire in order to turn on the Replay tool.
+A sequence of steps to replicate our results can be found [here](https://github.com/LLNL/Umpire/blob/poster_experimental_2022/REPRODUCIBILITY_APPENDIX.md). This page includes how we built Umpire in order to turn on the Replay tool.
 
-More documentation on the Replay tool itself can be found [here](https://umpire.readthedocs.io/en/develop/sphinx/features/logging and replay.html).
+More documentation on the Replay tool itself can be found [here](https://umpire.readthedocs.io/en/develop/sphinx/features/logging_and_replay.html).
 
 The application we used in our poster experiments can not be shared publicly. However, it was built with NVIDIA GPUs enabled. Thus, the version of Umpire that we built had CUDA enabled. This is documented on our reproducibility appendix page linked above. We also built Umpire with gcc v8.3.1. Otherwise, following the general build steps above will work well. The appendix also gives a brief explanation of how to edit the cmake to include other build commands.
 
