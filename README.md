@@ -34,6 +34,18 @@ The Umpire [tutorial](https://umpire.readthedocs.io/en/develop/tutorial.html) pr
 
 If you have build problems, we have comprehensive [build system documentation](https://umpire.readthedocs.io/en/develop/advanced_configuration.html) too!
 
+# Poster Reproducibility Information (SC22)
+
+We ran our experiments on LLNL's LC systems (more info can be found [here](https://hpc.llnl.gov/)).
+
+A sequence of steps to replicate our results can be found [here]. This page includes how we built Umpire in order to turn on the Replay tool.
+
+More documentation on the Replay tool itself can be found [here](https://umpire.readthedocs.io/en/develop/sphinx/features/logging and replay.html).
+
+The application we used in our poster experiments can not be shared publicly. However, it was built with NVIDIA GPUs enabled. Thus, the version of Umpire that we built had CUDA enabled. This is documented on our reproducibility appendix page linked above. We also built Umpire with gcc v8.3.1. Otherwise, following the general build steps above will work well. The appendix also gives a brief explanation of how to edit the cmake to include other build commands.
+
+We modified our QuickPool implementation for the experiments we did in the poster. The code modifications are documented in the reproducibility appendix file linked above as well as in the QuickPool source code. QuickPool was modified since that is what our application from the study used. However, similar edits could be made to any of the other pools that Umpire provides. Once you have an application that uses Umpire for memory management, just use this version of Umpire (built with Replay tool enabled), collect a replay file, run that file with the Replay tool, and look at resulting .ult files which can be viewed in pydv - or even Matplotlib. (The reproducibility appendix goes over that process step-by-step!)
+
 # Getting Involved
 
 Umpire is an open-source project, and we welcome contributions from the community.
