@@ -75,7 +75,7 @@ std::string stringify(const std::vector<void*>& frames)
   int num_frames = frames.size();
   char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
-  backtrace_stream << "    Backtrace: " << num_frames << " frames" << std::endl;
+  backtrace_stream << "    Backtrace: " << num_frames << " frames"; // << std::endl; // Uncomment to enable newlines.
 
   int index{0};
   for (const auto& it : frames) {
@@ -101,13 +101,13 @@ std::string stringify(const std::vector<void*>& frames)
     {
       backtrace_stream << "No dladdr: " << symbols[index];
     }
-    backtrace_stream << std::endl;
+    // backtrace_stream;  // << std::endl; // Uncomment to enable newlines.
     ++index;
   }
   free(symbols);
 #else
   static_cast<void>(frames);
-  backtrace_stream << " Backtrace not supported on Windows" << std::endl;
+  backtrace_stream << " Backtrace not supported on Windows"; // << std::endl; // Uncomment to enable newlines.
 #endif
   return backtrace_stream.str();
 }
