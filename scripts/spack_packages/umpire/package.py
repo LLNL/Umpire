@@ -2,7 +2,7 @@
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
-
+import glob
 
 from spack import *
 
@@ -87,7 +87,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         depends_on('camp cuda_arch={0}'.format(sm_),
                    when='cuda_arch={0}'.format(sm_))
 
-    depends_on('camp@0.1.0', when='@main')
     depends_on('camp@main')
 
     conflicts('+numa', when='@:0.3.2')
@@ -200,6 +199,13 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES",
                                         hip_arch[0]))
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
+            # there is only one dir like this, but the version component is unknown
+
+            entries.append(
+                cmake_cache_path("HIP_CLANG_INCLUDE_PATH", glob.glob(
+                    "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
+                )[0])
+            )
             hip_link_flags = ""
             if '%gcc' in spec:
                 gcc_bin = os.path.dirname(self.compiler.cxx)

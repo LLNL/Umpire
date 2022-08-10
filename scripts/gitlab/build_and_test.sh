@@ -58,6 +58,14 @@ then
         prefix="${prefix}/${job_unique_id}"
         mkdir -p ${prefix}
         prefix_opt="--prefix=${prefix}"
+
+        # We force Spack to put all generated files (cache and configuration of
+        # all sorts) in a unique location so that there can be no collision
+        # with existing or concurrent Spack.
+        spack_user_cache="${prefix}/spack-user-cache"
+        export SPACK_DISABLE_LOCAL_CONFIG=""
+        export SPACK_USER_CACHE_PATH="${spack_user_cache}"
+        mkdir -p ${spack_user_cache}
     fi
 
     python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
@@ -94,6 +102,8 @@ else
     hostconfig_path="${project_dir}/host-configs/${hostconfig}"
 fi
 
+hostconfig=$(basename ${hostconfig_path})
+
 # Build Directory
 if [[ -z ${build_root} ]]
 then
@@ -102,8 +112,8 @@ else
     build_root="/dev/shm${build_root}"
 fi
 
-build_dir="${build_root}/build_${hostconfig//.cmake/}"
-install_dir="${build_root}/install_${hostconfig//.cmake/}"
+build_dir="${build_root}/build_${job_unique_id}_${hostconfig//.cmake/}"
+install_dir="${build_root}/install_${job_unique_id}_${hostconfig//.cmake/}"
 
 cmake_exe=`grep 'CMake executable' ${hostconfig_path} | cut -d ':' -f 2 | xargs`
 
