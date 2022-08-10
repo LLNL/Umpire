@@ -30,15 +30,15 @@ variables:
 
 # Ruby
 # Arguments for top level allocation
-  RUBY_BUILD_AND_TEST_SHARED_ALLOC: "--partition=pdebug --time=10 --nodes=1 --cpus-per-task=36"
+  RUBY_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --partition=pdebug --time=10 --nodes=1"
 # Arguments for job level allocation
   RUBY_BUILD_AND_TEST_JOB_ALLOC: "--time=10 --nodes=1"
 
 # Corona
 # Arguments for top level allocation
-  CORONA_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --partition=pdebug --time=10 --nodes=1 --cpus-per-task=36"
+  CORONA_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --partition=pdebug --time=10 --nodes=1"
 # Arguments for job level allocation
-  CORONA_BUILD_AND_TEST_JOB_ALLOC: "--partition=pdebug --time=10 --nodes=1"
+  CORONA_BUILD_AND_TEST_JOB_ALLOC: "--time=10 --nodes=1"
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
