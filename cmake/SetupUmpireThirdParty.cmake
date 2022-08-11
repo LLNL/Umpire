@@ -80,12 +80,29 @@ if (UMPIRE_ENABLE_SQLITE_EXPERIMENTAL)
   find_package(SQLite3 REQUIRED)
 endif()
 
-set(UMPIRE_NEEDS_BLT_TPLS False) 
+set(UMPIRE_NEEDS_BLT_TPLS False)
 if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENABLE_CUDA)
   set(UMPIRE_NEEDS_BLT_TPLS True)
-endif ()
 
-if (UMPIRE_NEEDS_BLT_TPLS)
-  blt_export_tpl_targets(EXPORT umpire-blt-targets NAMESPACE umpire)
-  install(EXPORT umpire-blt-targets DESTINATION lib/cmake/umpire)
+  if (NOT BLT_EXPORTED)
+    set(BLT_EXPORTED On)
+    blt_import_library(NAME          blt_stub EXPORTABLE On)
+    set_target_properties(blt_stub PROPERTIES EXPORT_NAME blt::blt_stub)
+    install(TARGETS blt_stub
+      EXPORT               bltTargets)
+    blt_export_tpl_targets(EXPORT bltTargets NAMESPACE blt)
+    install(EXPORT bltTargets
+      DESTINATION  lib/cmake/umpire)
+  elseif (UMPIRE_ENABLE_MPI)
+    # If the target is EXPORTABLE, add it to the export set
+    get_target_property(_is_imported mpi IMPORTED)
+    if(NOT ${_is_imported})
+      install(TARGETS              mpi
+        EXPORT               ${arg_EXPORT})
+      # Namespace target to avoid conflicts
+      set_target_properties(mpi PROPERTIES EXPORT_NAME blt::mpi)
+      install(EXPORT bltTargets
+        DESTINATION  lib/cmake/umpire)
+    endif()
+  endif()
 endif()
