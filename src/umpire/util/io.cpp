@@ -134,9 +134,7 @@ std::string make_unique_filename(const std::string& base_dir, const std::string&
   std::string filename;
 
   do {
-    // filename = base_dir + "/" + name + "." + std::to_string(pid) + "." + std::to_string(unique_id++) + "." + extension;
-    // Remove pid from name so that replay files are named in creation order in the typical case.
-    filename = base_dir + "/" + name + "." + std::to_string(unique_id++) + "." + extension; 
+    filename = base_dir + "/" + name + "." + std::to_string(pid) + "." + std::to_string(unique_id++) + "." + extension;
   } while (file_exists(filename));
 
   return filename;
