@@ -43,7 +43,7 @@ macro(umpire_add_test_with_mpi)
     cmake_parse_arguments(arg
      "${options}" "${singleValueArgs}" "${multiValueArgs}" ${ARGN} )
 
-   if (ENABLE_MPI)
+    if (UMPIRE_ENABLE_MPI)
       blt_add_test( NAME           ${arg_NAME}
                     COMMAND        ${arg_COMMAND}
                     NUM_MPI_TASKS  ${arg_NUM_MPI_TASKS})
