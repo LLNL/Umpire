@@ -36,7 +36,7 @@ variables:
 
 # Corona
 # Arguments for job level allocation
-  CORONA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10 --nodes=1"
+  CORONA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
