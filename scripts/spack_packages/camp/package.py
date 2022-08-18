@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack import *
+import glob
+
+from spack.package import *
 
 
 class Camp(CMakePackage, CudaPackage, ROCmPackage):
@@ -27,6 +29,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
     # TODO: figure out gtest dependency and then set this default True.
     variant('tests', default=False, description='Build tests')
+    variant('openmp', default=False, description='Build OpenMP support')
 
     depends_on('cub', when='+cuda')
 
@@ -39,6 +42,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
         options.append("-DBLT_SOURCE_DIR={0}".format(spec['blt'].prefix))
 
+        options.append('-DENABLE_OPENMP=' + ("On" if '+openmp' in spec else "Off"))
         if '+cuda' in spec:
             options.extend([
                 '-DENABLE_CUDA=ON',
@@ -46,6 +50,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
             if not spec.satisfies('cuda_arch=none'):
                 cuda_arch = spec.variants['cuda_arch'].value
+                options.append('-DCMAKE_CUDA_ARCHITECTURES={0}'.format(cuda_arch[0]))
                 options.append('-DCUDA_ARCH=sm_{0}'.format(cuda_arch[0]))
                 flag = '-arch sm_{0}'.format(cuda_arch[0])
                 options.append('-DCMAKE_CUDA_FLAGS:STRING={0}'.format(flag))
@@ -55,10 +60,15 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
         if '+rocm' in spec:
             options.extend([
                 '-DENABLE_HIP=ON',
-                '-DROCM_ROOT_DIR={0}/../'.format(spec['hip'].prefix),
-                '-DHIP_CXX_COMPILER={0}'.format(self.compiler.cxx), # required when using Spack amdclang++ wrapper
                 '-DHIP_ROOT_DIR={0}'.format(spec['hip'].prefix)
             ])
+            # there is only one dir like this, but the version component is unknown
+
+            options.append(
+                "-DHIP_CLANG_INCLUDE_PATH=" + glob.glob(
+                    "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
+                )[0]
+            )
             archs = self.spec.variants['amdgpu_target'].value
             if archs != 'none':
                 arch_str = ",".join(archs)
