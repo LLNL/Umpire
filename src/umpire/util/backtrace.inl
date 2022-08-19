@@ -62,7 +62,8 @@ std::vector<void*> build_backtrace()
 #if !defined(_MSC_VER)
   void* callstack[128];
   const int nMaxFrames = sizeof(callstack) / sizeof(callstack[0]);
-  for (int i = 0; i < ::backtrace(callstack, nMaxFrames); ++i)
+  const int nFrames = ::backtrace(callstack, nMaxFrames);
+  for (int i = 0; i < nFrames; ++i)
     frames.push_back(callstack[i]);
 #endif // !defined(_MSC_VER)
   return frames;
