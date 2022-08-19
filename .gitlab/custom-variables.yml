@@ -35,6 +35,8 @@ variables:
   RUBY_BUILD_AND_TEST_JOB_ALLOC: "--time=10 --nodes=1"
 
 # Corona
+# Arguments for top level allocation
+  CORONA_BUILD_AND_TEST_SHARED_ALLOC: "--time-limit=15m --nodes=1"
 # Arguments for job level allocation
   CORONA_BUILD_AND_TEST_JOB_ALLOC: "--nodes=1"
 
