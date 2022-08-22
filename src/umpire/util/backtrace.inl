@@ -62,7 +62,8 @@ std::vector<void*> build_backtrace()
 #if !defined(_MSC_VER)
   void* callstack[128];
   const int nMaxFrames = sizeof(callstack) / sizeof(callstack[0]);
-  for (int i = 0; i < ::backtrace(callstack, nMaxFrames); ++i)
+  const int nFrames = ::backtrace(callstack, nMaxFrames);
+  for (int i = 0; i < nFrames; ++i)
     frames.push_back(callstack[i]);
 #endif // !defined(_MSC_VER)
   return frames;
@@ -75,7 +76,7 @@ std::string stringify(const std::vector<void*>& frames)
   int num_frames = frames.size();
   char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
-  backtrace_stream << "    Backtrace: " << num_frames << " frames"; // << std::endl; // Uncomment to enable newlines.
+  backtrace_stream << "    Backtrace: " << num_frames << " frames" << std::endl;
 
   int index{0};
   for (const auto& it : frames) {
@@ -101,13 +102,13 @@ std::string stringify(const std::vector<void*>& frames)
     {
       backtrace_stream << "No dladdr: " << symbols[index];
     }
-    // backtrace_stream;  // << std::endl; // Uncomment to enable newlines.
+    backtrace_stream << std::endl;
     ++index;
   }
   free(symbols);
 #else
   static_cast<void>(frames);
-  backtrace_stream << " Backtrace not supported on Windows"; // << std::endl; // Uncomment to enable newlines.
+  backtrace_stream << " Backtrace not supported on Windows" << std::endl;
 #endif
   return backtrace_stream.str();
 }
