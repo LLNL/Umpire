@@ -6,6 +6,15 @@ The format is based on [Keep a
 Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Changed
+
+- unifies the naming of Corona jobs with other projects.
+- uses options instead of variables to create overlapping allocations with Slurm.
+- use Flux scheduler on Corona.
+- updates radiuss-shared-ci to benefit from latest improvements, including sub-pipeline reporting.
+
 ## [v2022.03.1 - 2022-04-12]
 
 - Fix reported build errors by setting UMPIRE_ENABLE_DOCS back to OFF by default
