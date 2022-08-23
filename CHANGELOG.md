@@ -10,10 +10,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
-- unifies the naming of Corona jobs with other projects.
-- uses options instead of variables to create overlapping allocations with Slurm.
-- use Flux scheduler on Corona.
-- updates radiuss-shared-ci to benefit from latest improvements, including sub-pipeline reporting.
+- Unify the naming of Corona jobs with other projects.
+- Use options instead of variables to create overlapping allocations with Slurm.
+- Use Flux scheduler on Corona.
+- Update radiuss-shared-ci to benefit from latest improvements, including sub-pipeline reporting.
+
+### Fixed
+
+- Reference Radiuss-Shared-CI instead of Radiuss-CI in the documentation.
 
 ## [v2022.03.1 - 2022-04-12]
 
