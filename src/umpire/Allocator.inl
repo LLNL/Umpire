@@ -12,8 +12,8 @@
 #include "umpire/event/event.hpp"
 #include "umpire/event/recorder_factory.hpp"
 #include "umpire/util/Macros.hpp"
-#include "umpire/util/error.hpp"
 #include "umpire/util/backtrace.hpp"
+#include "umpire/util/error.hpp"
 
 namespace umpire {
 
@@ -50,7 +50,6 @@ inline void* Allocator::allocate(std::size_t bytes)
         event.size(bytes).ref((void*)m_allocator).ptr(ret).backtrace(s);
       });
 
-
   return ret;
 }
 
@@ -72,13 +71,12 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator, name);
   }
 
-  umpire::event::record<umpire::event::named_allocate>(
-      [&](auto& event) {
-        umpire::util::backtrace bt;
-        umpire::util::backtracer<umpire::util::trace_always>::get_backtrace(bt);
-        auto s = umpire::util::backtracer<umpire::util::trace_always>::print(bt);
-        event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret).backtrace(s); 
-        });
+  umpire::event::record<umpire::event::named_allocate>([&](auto& event) {
+    umpire::util::backtrace bt;
+    umpire::util::backtracer<umpire::util::trace_always>::get_backtrace(bt);
+    auto s = umpire::util::backtracer<umpire::util::trace_always>::print(bt);
+    event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret).backtrace(s);
+  });
   return ret;
 }
 
