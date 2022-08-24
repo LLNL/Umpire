@@ -30,7 +30,7 @@
 
 #if !defined(_MSC_VER)
 #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS) || defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
-#include <dlfcn.h>    // for dladdr
+#include <dlfcn.h> // for dladdr
 #include <gnu/lib-names.h>
 #endif                // defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
 #include <execinfo.h> // for backtrace
@@ -42,7 +42,7 @@ namespace util {
 namespace {
 
 #if defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
-using backtrace_signature = int(*)(void**, int);
+using backtrace_signature = int (*)(void**, int);
 
 inline backtrace_signature backtrace_make_func()
 {
@@ -87,7 +87,7 @@ inline backtrace_signature backtrace_get_func()
   static backtrace_signature s_backtrace = backtrace_make_func();
   return s_backtrace;
 }
-#endif  // defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
+#endif // defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
 
 bool backtrace_enabled()
 {
@@ -121,7 +121,7 @@ std::vector<void*> build_backtrace()
   const int nFrames = backtrace_get_func()(callstack, nMaxFrames);
 #else
   const int nFrames = ::backtrace(callstack, nMaxFrames);
-#endif  // defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
+#endif // defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
 
   for (int i = 0; i < nFrames; ++i)
     frames.push_back(callstack[i]);
@@ -165,7 +165,7 @@ std::string stringify(const std::vector<void*>& frames)
     ++index;
   }
   free(symbols);
-#else // #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
+#else  // #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
   int index{0};
   for (const auto& it : frames) {
     backtrace_stream << "    " << it << std::endl;
@@ -173,7 +173,7 @@ std::string stringify(const std::vector<void*>& frames)
   }
 #endif // #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
 
-#else   // #if !defined(_MSC_VER)
+#else // #if !defined(_MSC_VER)
   static_cast<void>(frames);
   backtrace_stream << " Backtrace not supported on Windows" << std::endl;
 

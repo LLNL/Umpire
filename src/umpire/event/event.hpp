@@ -203,7 +203,8 @@ class builder<allocate> {
     return *this;
   }
 
-  builder& backtrace(std::string& bt) {
+  builder& backtrace(std::string& bt)
+  {
     e.backtrace = bt;
     return *this;
   }
@@ -245,7 +246,8 @@ class builder<named_allocate> {
     return *this;
   }
 
-  builder& backtrace(std::string& bt) {
+  builder& backtrace(std::string& bt)
+  {
     e.backtrace = bt;
     return *this;
   }
