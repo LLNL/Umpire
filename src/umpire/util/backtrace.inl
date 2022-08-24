@@ -24,7 +24,7 @@
 
 #if !defined(_MSC_VER)
 #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
-#include <dlfcn.h> // for dladdr
+#include <dlfcn.h>    // for dladdr
 #endif                // defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
 #include <execinfo.h> // for backtrace
 #endif                // !defined(_MSC_VER)
