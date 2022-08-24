@@ -7,6 +7,12 @@
 #ifndef UMPIRE_Backtrace_INL
 #define UMPIRE_Backtrace_INL
 
+//
+// Only uncomment the following line if you want to attempt to use dlopen to directly
+// use the glibc version of ::backtrace instead of the overriden function (more expensive)
+// that libunwind uses
+// #define UMPIRE_RUN_WITH_LIBC_BACKTRACE 1
+
 #include <algorithm>
 #include <cstdio>
 #include <cstdlib>
@@ -23,8 +29,9 @@
 #endif              // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
 
 #if !defined(_MSC_VER)
-#if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
+#if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS) || defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
 #include <dlfcn.h>    // for dladdr
+#include <gnu/lib-names.h>
 #endif                // defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
 #include <execinfo.h> // for backtrace
 #endif                // !defined(_MSC_VER)
@@ -33,6 +40,54 @@ namespace umpire {
 namespace util {
 
 namespace {
+
+#if defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
+using backtrace_signature = int(*)(void**, int);
+
+inline backtrace_signature backtrace_make_func()
+{
+  backtrace_signature func_backtrace = nullptr;
+
+  if (func_backtrace == nullptr) {
+    // explicitly get glibc backtrace if compiled with unwind
+    void* libc_handle = dlopen(LIBC_SO, RTLD_LAZY);
+    if (libc_handle != nullptr) {
+      dlerror(); // clear any existing errors
+      // get backtrace symbol from libc library
+      func_backtrace = (backtrace_signature)dlsym(libc_handle, "backtrace");
+    }
+    if (func_backtrace == nullptr) {
+      // consume error silently
+      dlerror();
+      if (libc_handle != nullptr) {
+        // close handle to libc
+        dlclose(libc_handle);
+      }
+    }
+    // note libc_handle is not closed if we got backtrace
+  }
+
+  if (func_backtrace == nullptr) {
+    std::cout << "backtrace_make_func(): Using Global backtrace" << std::endl;
+    // global backtrace
+    func_backtrace = &::backtrace;
+  }
+
+  if (func_backtrace == nullptr) {
+    std::cout << "backtrace_make_func(): Using Dummy backtrace" << std::endl;
+    // dummy backtrace that does nothing
+    func_backtrace = [](void**, int) { return 0; };
+  }
+
+  return func_backtrace;
+}
+
+inline backtrace_signature backtrace_get_func()
+{
+  static backtrace_signature s_backtrace = backtrace_make_func();
+  return s_backtrace;
+}
+#endif  // defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
 
 bool backtrace_enabled()
 {
@@ -62,7 +117,12 @@ std::vector<void*> build_backtrace()
 #if !defined(_MSC_VER)
   void* callstack[128];
   const int nMaxFrames = sizeof(callstack) / sizeof(callstack[0]);
+#if defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
+  const int nFrames = backtrace_get_func()(callstack, nMaxFrames);
+#else
   const int nFrames = ::backtrace(callstack, nMaxFrames);
+#endif  // defined(UMPIRE_RUN_WITH_LIBC_BACKTRACE)
+
   for (int i = 0; i < nFrames; ++i)
     frames.push_back(callstack[i]);
 #endif // !defined(_MSC_VER)
@@ -74,18 +134,19 @@ std::string stringify(const std::vector<void*>& frames)
   std::ostringstream backtrace_stream;
 #if !defined(_MSC_VER)
   int num_frames = frames.size();
-  char** symbols = ::backtrace_symbols(&frames[0], num_frames);
 
   backtrace_stream << "    Backtrace: " << num_frames << " frames" << std::endl;
 
+#if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
+  char** symbols = ::backtrace_symbols(&frames[0], num_frames);
   int index{0};
   for (const auto& it : frames) {
     backtrace_stream << "    " << index << " " << it << " ";
-#if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
     Dl_info info;
     if (dladdr(it, &info) && info.dli_sname) {
       char* demangled = NULL;
       int status = -1;
+
 #if !defined(_LIBCPP_VERSION)
       if (info.dli_sname[0] == '_')
         demangled = abi::__cxa_demangle(info.dli_sname, NULL, 0, &status);
@@ -97,21 +158,30 @@ std::string stringify(const std::vector<void*>& frames)
 #if !defined(_LIBCPP_VERSION)
       free(demangled);
 #endif // !defined(_MSC_VER) && !defined(_LIBCPP_VERSION)
-    } else
-#endif // defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
-    {
+    } else {
       backtrace_stream << "No dladdr: " << symbols[index];
     }
     backtrace_stream << std::endl;
     ++index;
   }
   free(symbols);
-#else
+#else // #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
+  int index{0};
+  for (const auto& it : frames) {
+    backtrace_stream << "    " << it << std::endl;
+    index++;
+  }
+#endif // #if defined(UMPIRE_ENABLE_BACKTRACE_SYMBOLS)
+
+#else   // #if !defined(_MSC_VER)
   static_cast<void>(frames);
   backtrace_stream << " Backtrace not supported on Windows" << std::endl;
-#endif
+
+#endif // #if !defined(_MSC_VER)
+
   return backtrace_stream.str();
 }
+
 } // namespace
 
 template <>
