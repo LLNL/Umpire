@@ -14,18 +14,18 @@ gcc_8_1_0_numa:
     SPEC: "+fortran+numa %gcc@8.1.0"
   extends: .build_and_test_on_ruby
 
-clang_10_sqlite_experimental:
+clang_10_0_1_sqlite_experimental:
   variables:
     SPEC: "+sqlite_experimental %clang@10.0.1"
   extends: .build_and_test_on_ruby
 
 # Develop builds against specific tpl version.
-pgi_20_1_tpls:
+pgi_20_1_gcc_local_8_3_1_tpls:
   variables:
     SPEC: "+fortran %pgi@20.1 cxxflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc cflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc fflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc ^blt@develop"
   extends: .build_and_test_on_ruby
 
-clang_10_tpls:
+clang_10_0_1_tpls:
   variables:
     SPEC: "+fortran %clang@10.0.1 ^blt@develop"
   extends: .build_and_test_on_ruby

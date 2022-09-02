@@ -46,7 +46,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     patch('camp_target_umpire_3.0.0.patch', when='@3.0.0')
 
-    variant('fortran', default=True, description='Build C/Fortran API')
+    variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
     variant('ipc_shmem', default=False, description='Enable POSIX shared memory')
