@@ -73,6 +73,7 @@ class ReplayInterpreter {
     void compile_make_memory_resource();
     void compile_set_default_allocator();
     void compile_make_allocator();
+    void compile_fake_make_allocator();
     void compile_reallocate();
     void compile_allocate();
     bool compile_deallocate();

@@ -403,8 +403,55 @@ void ReplayInterpreter::compile_make_memory_resource()
   hdr->num_operations++;
 }
 
+void ReplayInterpreter::compile_fake_make_allocator()
+{
+  static bool initialized{false};
+
+  if (!initialized) {
+    initialized = true;
+    const std::string allocator_name{"FAKE_PERM_ALLOCATOR"};
+    const bool introspection{true};
+
+    ReplayFile::Header* hdr{m_ops->getOperationsTable()};
+    ReplayFile::AllocatorTableEntry* alloc{ &(m_ops->getOperationsTable()->allocators[hdr->num_allocators]) };
+
+    alloc->line_number = m_line_number;
+
+    m_ops->copyString(allocator_name, alloc->name);
+    alloc->introspection = introspection;
+
+    alloc->type = ReplayFile::rtype::QUICKPOOL;
+    const std::string base_allocator_name{"HOST"};
+    m_ops->copyString(base_allocator_name, alloc->base_name);
+
+    alloc->argc = 2;
+    alloc->argv.pool.initial_alloc_size = 1024;
+
+    const std::string allocator_ref_string{"0x1234560"};
+    const uint64_t obj_p{ getPointer(allocator_ref_string) };
+
+    m_allocator_indices[obj_p] = hdr->num_allocators;
+
+    ReplayFile::Operation* op = &hdr->ops[hdr->num_operations];
+    memset(op, 0, sizeof(*op));
+
+    op->op_type = ReplayFile::otype::ALLOCATOR_CREATION;
+    op->op_line_number = m_line_number;
+    op->op_allocator = hdr->num_allocators;
+
+    m_allocator_index[allocator_name] = hdr->num_allocators;
+
+    hdr->num_allocators++;
+    if (hdr->num_allocators >= ReplayFile::max_allocators) {
+      REPLAY_ERROR("Too many allocators for replay: " << hdr->num_allocators);
+    }
+    hdr->num_operations++;
+  }
+}
+
 void ReplayInterpreter::compile_make_allocator()
 {
+  compile_fake_make_allocator();
   const std::string allocator_name{m_event.tags["allocator_name"]};
   const bool introspection{m_event.numeric_args["introspection"] == 1};
   const std::string raw_mangled_type{m_event.string_args["type"]};
@@ -694,15 +741,31 @@ void ReplayInterpreter::compile_allocate()
   ReplayFile::Header* hdr{m_ops->getOperationsTable()};
   ReplayFile::Operation* op{&hdr->ops[hdr->num_operations]};
   const std::string allocator_ref{m_event.string_args["allocator_ref"]};
+  const std::string allocation_prediction{m_event.string_args["ml_prediction"]};
   const std::size_t allocation_size{m_event.numeric_args["size"]};
   std::string pointer_string{m_event.string_args["pointer"]};
   const std::string pointer_key{allocator_ref + pointer_string};
 
+#if 0
+  for (auto& kv : m_event.string_args ) {
+      std::cout << kv.first << " " << kv.second << std::endl;
+  }
+#endif
+
+  std::cout << "Allocation kind predicted to be " << allocation_prediction << std::endl;
   memset(op, 0, sizeof(*op));
 
   op->op_type = ReplayFile::otype::ALLOCATE;
   op->op_line_number = m_line_number;
-  op->op_allocator = getAllocatorIndex(allocator_ref);
+  //
+  // Use different allocator for "perm" predictions
+  //
+  if ( allocation_prediction == "perm" ) {
+      op->op_allocator = getAllocatorIndex("0x1234560");
+  }
+  else {
+      op->op_allocator = getAllocatorIndex(allocator_ref);
+  }
   op->op_size = allocation_size;
 
   if ( m_allocation_id.find(pointer_key) != m_allocation_id.end() ) {

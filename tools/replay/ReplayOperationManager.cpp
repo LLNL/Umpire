@@ -1072,9 +1072,9 @@ void ReplayOperationManager::makeCopy(ReplayFile::Operation* op)
 void ReplayOperationManager::makeDeallocate(ReplayFile::Operation* op)
 {
   try {
-    auto alloc = &m_ops_table->allocators[op->op_allocator];
+    auto& rm = umpire::ResourceManager::getInstance();
     auto ptr = m_ops_table->ops[op->op_alloc_ops[0]].op_allocated_ptr;
-    alloc->allocator->deallocate(ptr);
+    rm.deallocate(ptr);
   }
   catch (...) {
     std::cerr << std::endl
