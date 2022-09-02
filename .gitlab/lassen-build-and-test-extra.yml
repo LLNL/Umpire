@@ -12,7 +12,7 @@ clang_10_0_1_mpi_shmem:
 
 clang_10_0_1_mpi:
   variables:
-    SPEC: "%+fortran clang@ibm.10.0.1 +mpi ^spectrum-mpi"
+    SPEC: "+fortran %clang@ibm.10.0.1 +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_cuda_10_1_168_mpi_shmem:
