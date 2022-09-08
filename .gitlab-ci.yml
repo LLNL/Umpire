@@ -57,6 +57,6 @@ stages:
     forward:
       pipeline_variables: true
 
-# Import parameters and pipelines defined by the project
+# pipelines subscribed by the project
 include:
   - local: .gitlab/subscribed-pipelines.yml
