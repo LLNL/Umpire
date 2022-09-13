@@ -22,8 +22,6 @@ hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
 job_unique_id=${CI_JOB_ID:-""}
 
-sys_type=${SYS_TYPE:-""}
-py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
 
 # Dependencies
 date
@@ -68,7 +66,7 @@ then
         mkdir -p ${spack_user_cache}
     fi
 
-    python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
+    ./scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -122,15 +120,11 @@ if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
     date
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~ Host-config: ${hostconfig_path}"
-    echo "~ Build Dir:   ${build_dir}"
-    echo "~ Project Dir: ${project_dir}"
+    echo "~~~~~ Host-config: ${hostconfig_path}"
+    echo "~~~~~ Build Dir:   ${build_dir}"
+    echo "~~~~~ Project Dir: ${project_dir}"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo ""
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~ ENV ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Building Umpire"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
