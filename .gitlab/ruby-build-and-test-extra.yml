@@ -5,9 +5,21 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-####################
-# Extra jobs.
-####################
+########################
+# Overridden shared jobs
+########################
+# We duplicate the shared jobs description and add necessary changes for RAJA.
+# We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
+# the comparison with the original job is easier.
+
+# No overridden jobs so far.
+
+############
+# Extra jobs
+############
+# We do not recommend using ${PROJECT_<MACHINE>_VARIANTS} and
+# ${PROJECT_<MACHINE>_DEPS} in the extra jobs. There is not reason not to fully
+# describe the spec here.
 
 gcc_8_1_0_numa:
   variables:
