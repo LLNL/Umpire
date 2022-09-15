@@ -28,10 +28,10 @@ variables:
   CORONA_BUILD_AND_TEST_SHARED_ALLOC: "--time-limit=15m --nodes=1"
 # Arguments for job level allocation
   CORONA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
-# Project specific variants for ruby
-  PROJECT_RUBY_VARIANTS: "+fortran "
-# Project specific deps for ruby
-  PROJECT_RUBY_DEPS: "^blt@develop"
+# Project specific variants for corona
+  PROJECT_CORONA_VARIANTS: "+fortran "
+# Project specific deps for corona
+  PROJECT_CORONA_DEPS: "^blt@develop"
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
