@@ -30,6 +30,11 @@ RUN cmake -DUMPIRE_ENABLE_C=On -DENABLE_COVERAGE=On -DCMAKE_BUILD_TYPE=Debug -DU
     make -j 16 && \
     ctest -T test --output-on-failure
 
+FROM ghcr.io/rse-ops/gcc-ubuntu-18.04:gcc-11.2.0 AS gcc11.debug
+ENV GTEST_COLOR=1
+COPY . /home/umpire/workspace
+WORKDIR /home/umpire/workspace/build
+
 FROM ghcr.io/rse-ops/clang-ubuntu-20.04:llvm-10.0.0 AS clang10
 ENV GTEST_COLOR=1
 COPY . /home/umpire/workspace
