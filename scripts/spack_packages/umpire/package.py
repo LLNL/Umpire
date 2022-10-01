@@ -22,6 +22,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     homepage = 'https://github.com/LLNL/Umpire'
     git      = 'https://github.com/LLNL/Umpire.git'
 
+    version('add_try_compile', branch='feature/white238/add_try_compile', submodules='True')
     version('develop', branch='develop', submodules='True')
     version('main', branch='main', submodules='True')
     version('3.0.0', tag='v3.0.0', submodules='True')
@@ -74,7 +75,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('mpi', when='+mpi')
 
     depends_on('blt@0.5.0', type='build', when='@main')
-    depends_on('blt@0.5.0:', type='build')
+    depends_on('add_try_compile', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.
