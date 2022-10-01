@@ -11,9 +11,10 @@ endif()
 
 message(STATUS "Checking for std::filesystem")
 
-include(CheckCXXSourceCompiles)
-check_cxx_source_compiles(
-  "#include <iostream>
+blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_FILESYSTEM
+                        VERBOSE_OUTPUT ON
+                        SOURCE_STRING
+ "#include <iostream>
   #include <filesystem>
 
   int main(int, char**)
@@ -23,8 +24,7 @@ check_cxx_source_compiles(
     (void)(path);
 
     return 0;
-  }"
-  UMPIRE_ENABLE_FILESYSTEM)
+  }")
 
 if (UMPIRE_ENABLE_FILESYSTEM)
   message(STATUS "std::filesystem found")
