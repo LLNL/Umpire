@@ -12,7 +12,6 @@ endif()
 message(STATUS "Checking for std::filesystem")
 
 blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_FILESYSTEM
-                        VERBOSE_OUTPUT ON
                         SOURCE_STRING
  "#include <iostream>
   #include <filesystem>
