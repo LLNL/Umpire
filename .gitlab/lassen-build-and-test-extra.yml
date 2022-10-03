@@ -7,28 +7,28 @@
 
 clang_10_0_1_mpi_shmem:
   variables:
-    SPEC: "~fortran %clang@ibm.10.0.1 +ipc_shmem +mpi ^spectrum-mpi"
+    SPEC: "~fortran %clang@ibm.10.0.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 +ipc_shmem +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_mpi:
   variables:
-    SPEC: "%clang@ibm.10.0.1 +mpi ^spectrum-mpi"
+    SPEC: "%clang@ibm.10.0.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 clang_10_0_1_cuda_mpi_shmem:
   variables:
-    SPEC: "~fortran %clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^spectrum-mpi ^cuda@10.1.168"
+    SPEC: "~fortran %clang@ibm.10.0.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 +cuda +ipc_shmem +mpi cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^spectrum-mpi ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 # Extras.
 clang_9_0_0_libcpp:
   variables:
-    SPEC: "~fortran %clang@9.0.0+libcpp cxxflags=\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags=\"-DGTEST_HAS_CXXABI_H_=0\""
+    SPEC: "~fortran %clang@9.0.0+libcpp ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 cxxflags=\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags=\"-DGTEST_HAS_CXXABI_H_=0\""
   extends: .build_and_test_on_lassen
 
 clang_9_0_0_memleak:
   variables:
-    SPEC: "~fortran +asan +sanitizer_tests %clang@9.0.0 cxxflags=-fsanitize=address"
+    SPEC: "~fortran +asan +sanitizer_tests %clang@9.0.0 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 cxxflags=-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 
@@ -40,37 +40,37 @@ clang_9_0_0_memleak:
 
 gcc_8_3_1_dev_benchmarks:
   variables:
-    SPEC: "~fortran +dev_benchmarks %gcc@8.3.1 build_type=Release"
+    SPEC: "~fortran +dev_benchmarks %gcc@8.3.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 build_type=Release"
   extends: .build_and_test_on_lassen
 
 xl_default_omp_target:
   variables:
-    SPEC: "~fortran %xl@default+openmp+openmp_target ^cmake@3.14.5"
+    SPEC: "~fortran %xl@default+openmp+openmp_target ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_numa:
   variables:
-    SPEC: "+numa%gcc@8.3.1"
+    SPEC: "+numa%gcc@8.3.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda:
   variables:
-    SPEC: "+cuda+shared+tools+backtrace %gcc@8.3.1 ^cuda@10.1.168"
+    SPEC: "+cuda+shared+tools+backtrace %gcc@8.3.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 # Develop/main builds against specific tpl versions.
 
 gcc_8_3_1_tpls:
   variables:
-    SPEC: " %gcc@8.3.1 ^blt@develop"
+    SPEC: " %gcc@8.3.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_gcc_8_cuda_tpls:
   variables:
-    SPEC: "+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@develop ^cuda@10.1.168"
+    SPEC: "+cuda %clang@ibm.9.0.0 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_10_cuda_tpls:
   variables:
-    SPEC: "+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^blt@develop ^cuda@10.1.168 ^cmake@3.14.5"
+    SPEC: "+cuda %xl@16.1.1.10 cxxflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 cflags=--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1 ^blt@4a3703059df39d3c8307a481d04e82fa9f51a527 ^cuda@10.1.168 ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
