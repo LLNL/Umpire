@@ -17,7 +17,6 @@ class Blt(Package):
 
     maintainers = ['white238', 'davidbeckingsale']
 
-    version('add_try_compile', branch='feature/white238/add_try_compile')
     version('develop', branch='develop')
     version('main', branch='main')
     # Note: 0.4.0+ contains a breaking change to BLT created targets
