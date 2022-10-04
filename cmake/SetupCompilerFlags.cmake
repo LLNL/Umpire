@@ -13,17 +13,18 @@ message(STATUS "Checking for std::filesystem")
 
 blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_FILESYSTEM
                         SOURCE_STRING
- "#include <iostream>
-  #include <filesystem>
+[=[
+#include <iostream>
+#include <filesystem>
 
-  int main(int, char**)
-  {
-
+int main(int, char**)
+{
     auto path = std::filesystem::path(\".\");
     (void)(path);
 
     return 0;
-  }")
+}
+]=])
 
 if (UMPIRE_ENABLE_FILESYSTEM)
   message(STATUS "std::filesystem found")
