@@ -73,9 +73,12 @@ if (NOT BLT_LOADED)
     endif ()
   endif ()
 
-  message(STATUS "BLT Source Directory: ${BLT_SOURCE_DIR}")
   include(${BLT_SOURCE_DIR}/SetupBLT.cmake)
 endif()
+
+message(STATUS "BLT Source Directory: ${BLT_SOURCE_DIR}")
+
+hello_world()
 
 #######################################
 # Options that depend on BLT Options

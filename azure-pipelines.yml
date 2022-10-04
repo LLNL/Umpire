@@ -40,28 +40,8 @@ jobs:
 - job: Docker
   strategy:
     matrix: 
-      gcc7:
-        docker_target: gcc7
-      gcc8:
-        docker_target: gcc8
       gcc9:
         docker_target: gcc9
-      clang10:
-        docker_target: clang10
-      clang11:
-        docker_target: clang11
-      clang12:
-        docker_target: clang12
-      nvcc10:
-        docker_target: nvcc10
-      nvcc11:
-        docker_target: nvcc11
-      sycl:
-        docker_target: sycl
-      hip:
-        docker_target: hip
-      umap_build:
-        docker_target: umap_build
   pool:
     vmImage: 'ubuntu-latest'
   variables:

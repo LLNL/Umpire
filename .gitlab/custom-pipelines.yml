@@ -6,19 +6,9 @@
 ###############################################################################
 
 # Trigger a build-and-test pipeline for ruby, corona and lassen
-ruby-build-and-test:
-  variables:
-    CI_MACHINE: "ruby"
-  extends: [.build-and-test]
-
 corona-build-and-test:
   variables:
     CI_MACHINE: "corona"
-  extends: [.build-and-test]
-
-lassen-build-and-test:
-  variables:
-    CI_MACHINE: "lassen"
   extends: [.build-and-test]
 
 ## If testing develop branch, trigger CHAI pipeline with this version of Umpire.

@@ -11,6 +11,6 @@
 ###
 rocm_5_1_1_openmp_fortran_clang_13_0_0:
   variables:
-    SPEC: "+rocm +openmp amdgpu_target=gfx906 %clang@13.0.0 ^blt@develop ^hip@5.1.1"
+    SPEC: "+rocm +openmp amdgpu_target=gfx906 %clang@13.0.0 ^blt@f812878b5916ac019451e0217519adf85739b856 ^hip@5.1.1"
   extends: .build_and_test_on_corona
 
