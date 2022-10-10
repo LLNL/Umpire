@@ -74,7 +74,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('mpi', when='+mpi')
 
     depends_on('blt@0.5.0', type='build', when='@main')
-    depends_on('blt@0.5.0:', type='build')
+    depends_on('blt@0.5.2:', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.
