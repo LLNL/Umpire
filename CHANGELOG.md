@@ -14,6 +14,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Use options instead of variables to create overlapping allocations with Slurm.
 - Use Flux scheduler on Corona.
 - Update radiuss-shared-ci to benefit from latest improvements, including sub-pipeline reporting.
+- Update spack to latest release (0.18.1)
+- Update CI config to match RAJA one.
 
 ### Fixed
 
