@@ -30,8 +30,8 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
   using Pointer = void*;
 
   /*!
-   * \brief Coalescing Heuristic functions for Percent-Releasable and Blocks-Releasable. Both have 
-   * the option to reallocate to High Watermark instead of actual size of the pool (actual size is 
+   * \brief Coalescing Heuristic functions for Percent-Releasable and Blocks-Releasable. Both have
+   * the option to reallocate to High Watermark instead of actual size of the pool (actual size is
    * currently the default).
    */
   static PoolCoalesceHeuristic<QuickPool> percent_releasable(int percentage);

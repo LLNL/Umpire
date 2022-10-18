@@ -341,17 +341,19 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblock
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
-  return blocks_releasable(nblocks, true);  
+  return blocks_releasable(nblocks, true);
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks, bool hwm_switch)
 {
   if (hwm_switch)
-    return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0; };
+    return [=](const strategy::QuickPool& pool) {
+      return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
+    };
   else
-    return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
+    return [=](const strategy::QuickPool& pool) {
+      return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0;
+    };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
@@ -377,10 +379,12 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage, b
   } else if (percentage == 100) {
     if (hwm_switch)
       return [=](const strategy::QuickPool& pool) {
-        return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0; };
+        return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0;
+      };
     else
       return [=](const strategy::QuickPool& pool) {
-        return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualSize() : 0; };
+        return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualSize() : 0;
+      };
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
@@ -388,12 +392,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage, b
       return [=](const strategy::QuickPool& pool) {
         // Calculate threshold in bytes from the percentage
         const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-        return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0; };
+        return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0;
+      };
     else
       return [=](const strategy::QuickPool& pool) {
         // Calculate threshold in bytes from the percentage
         const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-        return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0; };
+        return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
+      };
   }
 }
 
