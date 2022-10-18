@@ -130,12 +130,35 @@ void DynamicPoolList::coalesce() noexcept
 
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::DynamicPoolList& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0;
-  };
+  return blocks_releasable(nblocks, false);
+}
+
+PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable_hwm(std::size_t nblocks)
+{
+  return blocks_releasable(nblocks, true);  
+}
+
+PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable(std::size_t nblocks, bool hwm_switch)
+{
+  if(hwm_switch)
+    return [=](const strategy::DynamicPoolList& pool) {
+      return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0; };
+  else
+    return [=](const strategy::DynamicPoolList& pool) {
+      return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
 }
 
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int percentage)
+{
+  return percent_releasable(percentage, false);
+}
+
+PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable_hwm(int percentage)
+{
+  return percent_releasable(percentage, true);
+}
+
+PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int percentage, bool hwm_switch)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR(
@@ -146,15 +169,22 @@ PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::percent_releasable(int p
   if (percentage == 0) {
     return [=](const DynamicPoolList& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    return [=](const strategy::DynamicPoolList& pool) { return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0; };
+    if (hwm_switch)
+      return [=](const strategy::DynamicPoolList& pool) { return pool.getCurrentSize() == 0 ? pool.getHighWatermark() : 0; };
+    else
+      return [=](const strategy::DynamicPoolList& pool) { return pool.getCurrentSize() == 0 ? pool.getActualSize() : 0; };
   } else {
     float f = (float)((float)percentage / (float)100.0);
-
-    return [=](const strategy::DynamicPoolList& pool) {
-      // Calculate threshold in bytes from the percentage
-      const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
-    };
+    if (hwm_switch)
+      return [=](const strategy::DynamicPoolList& pool) {
+        // Calculate threshold in bytes from the percentage
+        const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+        return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0; };
+    else
+      return [=](const strategy::DynamicPoolList& pool) {
+        // Calculate threshold in bytes from the percentage
+        const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
+        return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0; };
   }
 }
 

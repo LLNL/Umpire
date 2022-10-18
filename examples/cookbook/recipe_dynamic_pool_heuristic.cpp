@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
-#include "umpire/strategy/QuickPool.hpp"
+#include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/wrap_allocator.hpp"
 
@@ -21,10 +21,7 @@ int main(int, char**)
   // Create a heuristic function that will return true to the DynamicPoolList
   // object when the threshold of releasable size to total size is 75%.
   //
-  auto heuristic_function = umpire::strategy::QuickPool::percent_releasable(75);
-  //auto heuristic_function = umpire::strategy::QuickPool::percent_releasable_hwm(75);
-  //auto heuristic_function = umpire::strategy::QuickPool::blocks_releasable(2);
-  //auto heuristic_function = umpire::strategy::QuickPool::blocks_releasable_hwm(2);
+  auto heuristic_function = umpire::strategy::DynamicPoolList::percent_releasable(75);
   // _sphinx_tag_tut_creat_heuristic_fun_end
 
   // _sphinx_tag_tut_use_heuristic_fun_start
@@ -33,7 +30,7 @@ int main(int, char**)
   // all subsequent allocations and with our previously created heuristic
   // function.
   //
-  auto pooled_allocator = rm.makeAllocator<umpire::strategy::QuickPool>("HOST_POOL", allocator, 1024ul, 1024ul,
+  auto pooled_allocator = rm.makeAllocator<umpire::strategy::DynamicPoolList>("HOST_POOL", allocator, 1024ul, 1024ul,
                                                                               16, heuristic_function);
   // _sphinx_tag_tut_use_heuristic_fun_end
 
@@ -41,7 +38,7 @@ int main(int, char**)
   // Obtain a pointer to our specific DynamicPoolList instance in order to see the
   // DynamicPoolList-specific statistics
   //
-  auto pool = umpire::util::unwrap_allocator<umpire::strategy::QuickPool>(pooled_allocator);
+  auto pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(pooled_allocator);
 
   void* a[4];
   for (int i = 0; i < 4; ++i)
