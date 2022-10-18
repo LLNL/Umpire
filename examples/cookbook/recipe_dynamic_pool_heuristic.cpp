@@ -38,7 +38,7 @@ int main(int, char**)
   // Obtain a pointer to our specific DynamicPoolList instance in order to see the
   // DynamicPoolList-specific statistics
   //
-  auto pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(pooled_allocator);
+  auto dynamic_pool = umpire::util::unwrap_allocator<umpire::strategy::DynamicPoolList>(pooled_allocator);
 
   void* a[4];
   for (int i = 0; i < 4; ++i)
@@ -47,8 +47,8 @@ int main(int, char**)
   for (int i = 0; i < 4; ++i) {
     pooled_allocator.deallocate(a[i]);
     std::cout << "Pool has " << pooled_allocator.getActualSize() << " bytes of memory. "
-              << pooled_allocator.getCurrentSize() << " bytes are used. " << pool->getBlocksInPool()
-              << " blocks are in the pool. " << pool->getReleasableSize() << " bytes are releaseable. "
+              << pooled_allocator.getCurrentSize() << " bytes are used. " << dynamic_pool->getBlocksInPool()
+              << " blocks are in the pool. " << dynamic_pool->getReleasableSize() << " bytes are releaseable. "
               << std::endl;
   }
 
