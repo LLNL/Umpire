@@ -344,9 +344,9 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nb
   return blocks_releasable(nblocks, true);
 }
 
-PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks, bool hwm_switch)
+PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks, bool resize_to_hwm)
 {
-  if (hwm_switch)
+  if (resize_to_hwm)
     return [=](const strategy::QuickPool& pool) {
       return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
     };
@@ -366,7 +366,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
   return percent_releasable(percentage, true);
 }
 
-PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage, bool hwm_switch)
+PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage, bool resize_to_hwm)
 {
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR(
@@ -377,7 +377,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage, b
   if (percentage == 0) {
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
-    if (hwm_switch)
+    if (resize_to_hwm)
       return [=](const strategy::QuickPool& pool) {
         return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0;
       };
@@ -388,7 +388,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage, b
   } else {
     float f = (float)((float)percentage / (float)100.0);
 
-    if (hwm_switch)
+    if (resize_to_hwm)
       return [=](const strategy::QuickPool& pool) {
         // Calculate threshold in bytes from the percentage
         const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());

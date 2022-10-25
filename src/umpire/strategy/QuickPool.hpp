@@ -36,10 +36,10 @@ class QuickPool : public AllocationStrategy, private mixins::AlignedAllocation {
    */
   static PoolCoalesceHeuristic<QuickPool> percent_releasable(int percentage);
   static PoolCoalesceHeuristic<QuickPool> percent_releasable_hwm(int percentage);
-  static PoolCoalesceHeuristic<QuickPool> percent_releasable(int percentage, bool hwm_switch);
+  static PoolCoalesceHeuristic<QuickPool> percent_releasable(int percentage, bool resize_to_hwm);
   static PoolCoalesceHeuristic<QuickPool> blocks_releasable(std::size_t nblocks);
   static PoolCoalesceHeuristic<QuickPool> blocks_releasable_hwm(std::size_t nblocks);
-  static PoolCoalesceHeuristic<QuickPool> blocks_releasable(std::size_t nblocks, bool hwm_switch);
+  static PoolCoalesceHeuristic<QuickPool> blocks_releasable(std::size_t nblocks, bool resize_to_hwm);
 
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};
