@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - Update radiuss-shared-ci to benefit from latest improvements, including sub-pipeline reporting.
 - Update spack to latest release (0.18.1)
 - Update CI config to match RAJA one.
+- Use dedicated CI reservation in GitLab CI on ruby.
 
 ### Fixed
 
