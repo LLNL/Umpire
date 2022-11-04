@@ -57,6 +57,8 @@ target_include_directories(
   PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:$<$<COMPILE_LANGUAGE:Fortran>:${CMAKE_Fortran_MODULE_DIRECTORY}>>
+  $<INSTALL_INTERFACE:$<$<COMPILE_LANGUAGE:Fortran>:include/umpire>> # for Fortran module files
   $<INSTALL_INTERFACE:include>)
 
 install(FILES

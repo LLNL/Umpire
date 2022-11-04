@@ -146,7 +146,7 @@ class builder {
   template <typename... Ts, std::size_t... N>
   builder& args_impl(std::index_sequence<N...>, Ts... as)
   {
-    UMPIRE_USE_VAR(CAMP_EXPAND(arg("arg" + std::to_string(N), as)));
+    CAMP_EXPAND(arg("arg" + std::to_string(N), as));
     return *this;
   }
 
