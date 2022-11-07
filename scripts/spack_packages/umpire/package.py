@@ -13,6 +13,7 @@ from spack.pkg.builtin.camp import hip_repair_cache
 
 import re
 
+
 class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     """An application-focused API for memory management on NUMA & GPU
     architectures"""
@@ -208,7 +209,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_string("BLT_CMAKE_IMPLICIT_LINK_DIRECTORIES_EXCLUDE",
             "/usr/tce/packages/gcc/gcc-4.9.3/lib64;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64/gcc/powerpc64le-unknown-linux-gnu/4.9.3;/usr/tce/packages/gcc/gcc-4.9.3/gnu/lib64;/usr/tce/packages/gcc/gcc-4.9.3/lib64/gcc/x86_64-unknown-linux-gnu/4.9.3"))
 
-            libdir = pjoin(os.path.dirname(
+            libdir = os.path.join(os.path.dirname(
                            os.path.dirname(self.compiler.fc)), "lib")
             flags = ""
             for _libpath in [libdir, libdir + "64"]:
