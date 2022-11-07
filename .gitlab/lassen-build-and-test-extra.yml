@@ -12,7 +12,13 @@
 # We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
 # the comparison with the original job is easier.
 
-# No overridden jobs so far.
+# Spec has test disabled in shared CI, conflicting with default test setting in Umpire
+# TODO: This is likely an issue in RADIUSS Shared CI: why disable tests ?.
+xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
+  variables:
+    SPEC: "~shared +fortran ~device_alloc +cuda tests=none %xl@16.1.1.12 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2"
+  extends: .build_and_test_on_lassen
+
 
 ############
 # Extra jobs
