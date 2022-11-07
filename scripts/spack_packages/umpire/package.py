@@ -11,6 +11,7 @@ import llnl.util.tty as tty
 from spack.package import *
 from spack.pkg.builtin.camp import hip_repair_cache
 
+import re
 
 class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     """An application-focused API for memory management on NUMA & GPU
