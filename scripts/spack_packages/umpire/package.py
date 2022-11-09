@@ -385,7 +385,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
                 "SQLite3_ROOT" ,spec['sqlite'].prefix))
 
         # This option was renamed later than the others
-        if spec.satisfies("@2022.10.0:")
+        if spec.satisfies("@2022.10.0:"):
             entries.append(cmake_cache_option(
                 "UMPIRE_ENABLE_IPC_SHARED_MEMORY", "+ipc_shmem" in spec))
         else
