@@ -353,13 +353,18 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         entries.append(cmake_cache_option(
             "ENABLE_OPENMP", "+openmp" in spec))
         entries.append(cmake_cache_option(
-            "ENABLE_BENCHMARKS", "tests=benchmarks" in spec or "+dev_benchmarks" in spec))
-        entries.append(cmake_cache_option(
             "ENABLE_EXAMPLES", "+examples" in spec))
         entries.append(cmake_cache_option(
-            "ENABLE_TESTS", "tests=none" not in spec))
-        entries.append(cmake_cache_option(
             "ENABLE_DOCS", False))
+        if "tests=benchmarks" in spec or "+dev_benchmarks" in spec:
+            # BLT requires ENABLE_TESTS=True to enable benchmarks
+            entries.append(cmake_cache_option(
+                "ENABLE_BENCHMARKS", True))
+            entries.append(cmake_cache_option(
+                "ENABLE_TESTS", True))
+        else:
+            entries.append(cmake_cache_option(
+                "ENABLE_TESTS", "tests=none" not in spec))
 
         # Prefixed options that used to be name without one
         entries.append(cmake_cache_option(
