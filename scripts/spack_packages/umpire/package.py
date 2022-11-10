@@ -277,12 +277,10 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
             hip_root = spec["hip"].prefix
             rocm_root = hip_root + "/.."
-            hip_arch = spec.variants["amdgpu_target"].value
             entries.append(cmake_cache_path("HIP_ROOT_DIR", hip_root))
             entries.append(cmake_cache_path("ROCM_ROOT_DIR", rocm_root))
             # adrienbernede-22-11:
             #   Specific to Umpire, others or using the comma separted list of archs
-            entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES", hip_arch[0]))
             entries.append(cmake_cache_option("{}ENABLE_TOOLS".format(option_prefix), False))
 
             hip_repair_cache(entries, spec)
