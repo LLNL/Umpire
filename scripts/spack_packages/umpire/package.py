@@ -191,12 +191,13 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         # Default entries are already defined in CachedCMakePackage, inherit them:
         entries = super(Umpire, self).initconfig_compiler_entries()
 
-        # Switch to hip as a CPP compiler.
         # adrienbernede-22-11:
-        #   This was only done in upstream Spack raja package.
-        #   I could not find the equivalent logic in Spack source, so sharing it.
-        if "+rocm" in spec:
-            entries.insert(0, cmake_cache_path("CMAKE_CXX_COMPILER", spec["hip"].hipcc))
+        #   This was in upstream Spack raja package, but it’s causing the follwing failure:
+        #     CMake Error in src/umpire/CMakeLists.txt:
+        #     No known features for CXX compiler
+        #
+        #if "+rocm" in spec:
+        #    entries.insert(0, cmake_cache_path("CMAKE_CXX_COMPILER", spec["hip"].hipcc))
 
         option_prefix = "UMPIRE_" if spec.satisfies("@2022.03.0:") else ""
 
