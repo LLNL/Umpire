@@ -88,7 +88,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         description="Tests to run",
     )
     variant("libcpp", default=False, description="Uses libc++ instead of libstdc++")
-    variant("tools", default=True, description="Enable tools")
+    variant("tools", default=False, description="Enable tools")
     variant("backtrace", default=False, description="Enable backtrace tools")
     variant("dev_benchmarks", default=False, description="Enable Developer Benchmarks")
     variant("device_alloc", default=True, description="Enable DeviceAllocator")
@@ -142,6 +142,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
     conflicts('+cuda', when='+rocm')
+    conflicts('+tools', when='+rocm')
     conflicts('+rocm', when='+openmp_target', msg='Cant support both rocm and openmp device backends at once')
     conflicts('~mpi', when='+ipc_shmem', msg='Shared Memory Allocator requires MPI')
     conflicts('+ipc_shmem', when='@:5.0.1')
@@ -279,9 +280,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             rocm_root = hip_root + "/.."
             entries.append(cmake_cache_path("HIP_ROOT_DIR", hip_root))
             entries.append(cmake_cache_path("ROCM_ROOT_DIR", rocm_root))
-            # adrienbernede-22-11:
-            #   Specific to Umpire, others or using the comma separted list of archs
-            entries.append(cmake_cache_option("{}ENABLE_TOOLS".format(option_prefix), False))
 
             hip_repair_cache(entries, spec)
             archs = self.spec.variants["amdgpu_target"].value
