@@ -340,6 +340,11 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         if spec.satisfies("@5.0.0:"):
             entries.append(cmake_cache_path("camp_DIR", spec["camp"].prefix))
 
+        # Build options
+        entries.append("#------------------{0}".format("-" * 60))
+        entries.append("# Build Options")
+        entries.append("#------------------{0}\n".format("-" * 60))
+
         entries.append(cmake_cache_string(
             "CMAKE_BUILD_TYPE", spec.variants["build_type"].value))
         entries.append(cmake_cache_option(
