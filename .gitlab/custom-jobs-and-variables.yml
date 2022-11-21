@@ -49,3 +49,5 @@ variables:
   artifacts:
     reports:
       junit: junit.xml
+    paths:
+      - *.cmake
