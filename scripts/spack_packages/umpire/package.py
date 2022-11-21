@@ -116,8 +116,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on("camp@main", when="@develop")
     depends_on("camp+openmp", when="+openmp")
 
-    depends_on('sqlite', when='+sqlite_experimental')
-    depends_on('mpi', when='+mpi')
+    depends_on("sqlite", when="+sqlite_experimental")
+    depends_on("mpi", when="+mpi")
 
     with when("@5.0.0:"):
         with when("+cuda"):
@@ -137,18 +137,18 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     conflicts("~c", when="+fortran", msg="Fortran API requires C API")
 
     conflicts("+device_alloc", when="@:2022.03.0")
-    conflicts('+deviceconst', when='~rocm~cuda')
-    conflicts('+device_alloc', when='~rocm~cuda')
+    conflicts("+deviceconst", when="~rocm~cuda")
+    conflicts("+device_alloc", when="~rocm~cuda")
 
-    conflicts('~openmp', when='+openmp_target', msg='OpenMP target requires OpenMP')
-    conflicts('+cuda', when='+rocm')
-    conflicts('+tools', when='+rocm')
-    conflicts('+rocm', when='+openmp_target', msg='Cant support both rocm and openmp device backends at once')
-    conflicts('~mpi', when='+ipc_shmem', msg='Shared Memory Allocator requires MPI')
-    conflicts('+ipc_shmem', when='@:5.0.1')
+    conflicts("~openmp", when="+openmp_target", msg="OpenMP target requires OpenMP")
+    conflicts("+cuda", when="+rocm")
+    conflicts("+tools", when="+rocm")
+    conflicts("+rocm", when="+openmp_target", msg="Cant support both rocm and openmp device backends at once")
+    conflicts("~mpi", when="+ipc_shmem", msg="Shared Memory Allocator requires MPI")
+    conflicts("+ipc_shmem", when="@:5.0.1")
 
-    conflicts('+sqlite_experimental', when='@:6.0.0')
-    conflicts('+sanitizer_tests', when='~asan')
+    conflicts("+sqlite_experimental", when="@:6.0.0")
+    conflicts("+sanitizer_tests", when="~asan")
 
     # device allocator exports device code, which requires static libs
     # currently only available for cuda.
@@ -180,12 +180,12 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     def spec_uses_toolchain(self, spec):
         gcc_toolchain_regex = re.compile(".*gcc-toolchain.*")
-        using_toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags['cxxflags']))
+        using_toolchain = list(filter(gcc_toolchain_regex.match, spec.compiler_flags["cxxflags"]))
         return using_toolchain
 
     def spec_uses_gccname(self, spec):
         gcc_name_regex = re.compile(".*gcc-name.*")
-        using_gcc_name = list(filter(gcc_name_regex.match, spec.compiler_flags['cxxflags']))
+        using_gcc_name = list(filter(gcc_name_regex.match, spec.compiler_flags["cxxflags"]))
         return using_gcc_name
 
     def initconfig_compiler_entries(self):
@@ -238,7 +238,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         #adrienbernede-22-11:
         #  Specific to Umpire local package, worth sharing?
-        entries = [x for x in entries if not 'COMPILER_ID' in x]
+        entries = [x for x in entries if not "COMPILER_ID" in x]
 
         return entries
 
@@ -311,8 +311,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
         entries.append(cmake_cache_option(
             "{}ENABLE_OPENMP_TARGET".format(option_prefix), "+openmp_target" in spec))
-        if "+openmp_target" in spec:
-            if ('%xl' in spec):
+        if "+openmp_target" in spec and "%xl" in spec:
                 entries.append(cmake_cache_string("OpenMP_CXX_FLAGS", "-qsmp;-qoffload"))
 
         return entries
@@ -321,7 +320,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         spec = self.spec
 
         entries = super(Umpire, self).initconfig_mpi_entries()
-        entries.append(cmake_cache_option("ENABLE_MPI", '+mpi' in spec))
+        entries.append(cmake_cache_option("ENABLE_MPI", "+mpi" in spec))
 
         return entries
 
@@ -390,7 +389,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             "UMPIRE_ENABLE_SQLITE_EXPERIMENTAL", "+sqlite_experimental" in spec))
         if "+sqlite_experimental" in spec:
             entries.append(cmake_cache_path(
-                "SQLite3_ROOT" ,spec['sqlite'].prefix))
+                "SQLite3_ROOT" ,spec["sqlite"].prefix))
 
         # This option was renamed later than the others
         if spec.satisfies("@2022.10.0:"):
