@@ -556,8 +556,9 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_hwm)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto h_fun = Pool::percent_releasable_hwm(75);
-  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_75_hwm"}, rm.getAllocator(this->m_resource_name),
-                                      initial_size, subsequent_min_size, this->m_alignment, h_fun);
+  auto alloc =
+      rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_75_hwm"}, rm.getAllocator(this->m_resource_name),
+                             initial_size, subsequent_min_size, this->m_alignment, h_fun);
 
   auto dynamic_pool = umpire::util::unwrap_allocator<Pool>(alloc);
 
