@@ -34,16 +34,14 @@
 
 #if defined(__UMPIRE_USE_MEMORY_SANITIZER__)
 
-#define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)   \
-  if (allocator->getPlatform() == umpire::Platform::host || \
-      allocator->getPlatform() == umpire::Platform::hip) {  \
-    ASAN_POISON_MEMORY_REGION((ptr), (size));               \
+#define UMPIRE_POISON_MEMORY_REGION(allocator, ptr, size)                                                        \
+  if (allocator->getPlatform() == umpire::Platform::host || allocator->getPlatform() == umpire::Platform::hip) { \
+    ASAN_POISON_MEMORY_REGION((ptr), (size));                                                                    \
   }
 
-#define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size) \
-  if (allocator->getPlatform() == umpire::Platform::host || \
-      allocator->getPlatform() == umpire::Platform::hip) {  \
-    ASAN_UNPOISON_MEMORY_REGION((ptr), (size));             \
+#define UMPIRE_UNPOISON_MEMORY_REGION(allocator, ptr, size)                                                      \
+  if (allocator->getPlatform() == umpire::Platform::host || allocator->getPlatform() == umpire::Platform::hip) { \
+    ASAN_UNPOISON_MEMORY_REGION((ptr), (size));                                                                  \
   }
 
 #else // !defined(__UMPIRE_USE_MEMORY_SANITIZER__)
