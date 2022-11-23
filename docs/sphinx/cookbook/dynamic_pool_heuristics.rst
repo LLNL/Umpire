@@ -4,8 +4,7 @@
 Improving DynamicPoolList Performance with a Coalesce Heuristic
 ===========================================================
 
-As needed, the
-:class:`umpire::strategy::DynamicPoolList`
+As needed, the DynamicPoolList memory pool (:class:`umpire::strategy::DynamicPoolList`)
 will continue to allocate
 blocks to satisfy allocation requests that cannot be satisfied by blocks
 currently in the pool it is managing.  Under certain application-specific
@@ -15,17 +14,19 @@ the pool to grow too large.  For example, a problematic allocation pattern is
 when an application makes several allocations of incrementing size where each
 allocation is larger than the previous block size allocated.
 
-The Umpire library provides `Coalescing Heuristics` to help manage the blocks
+The Umpire library provides **Coalescing Heuristics** to help manage the blocks
 of memory within a memory pool. The purpose of a coalescing heuristic is to
 ensure that the memory pool is properly maintained through the duration of
 an application so that it does not grow too large and prematurely run out
-of memory. There are two coalescing heuristics: `Percent Releasable` and 
-`Blocks Releasable`. By default, a memory pool will use the `Percent Releasable` 
+of memory. There are two coalescing heuristics: **Percent Releasable** and 
+**Blocks Releasable**. By default, a memory pool will use the Percent Releasable 
 heuristic. Additionally, Umpire
-provides an optional tuning parameter. This tuning is called `HighWatermark` and
+provides an optional tuning parameter. This tuning is called the `HighWatermark` tuning and
 it uses the pool's HighWatermark value when coalescing the
-pool. By default, coalescing heuristics *DO NOT* use the `HighWatermark` tuning.
-Instead, they use the pool's Actual Size value.
+pool. By default, coalescing heuristics **DO NOT** use the `HighWatermark` tuning.
+Instead, they use the pool's Actual Size value. Go to Umpire's RZ Confluence page under
+"Design Documents" and refer to the "Umpire Pool Usage and Control" documentation for
+more information.
 
 .. note::
       To turn on the HighWatermark heuristic tuning, use the coalescing
