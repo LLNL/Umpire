@@ -52,13 +52,19 @@ int main(int argc, char* argv[])
   const std::string strategy{argv[1]};
   const std::string test_type{argv[2]};
 
+#if defined(UMPIRE_ENABLE_HIP)
+  const std::string resource_type{"DEVICE"};
+#else
+  const std::string resource_type{"HOST"};
+#endif
+
   auto& rm = umpire::ResourceManager::getInstance();
 
   if (strategy.find("QuickPool") != std::string::npos) {
-    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
   } else if (strategy.find("DynamicPoolList") != std::string::npos) {
-    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("test_allocator", rm.getAllocator("HOST"));
+    auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
   }
 
