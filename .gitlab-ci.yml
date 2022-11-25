@@ -22,6 +22,9 @@
 
 # We define the following GitLab pipeline variables:
 variables:
+# Required information about GitHub repository
+  GITHUB_PROJECT_NAME: "Umpire"
+  GITHUB_PROJECT_ORG: "LLNL"
 # Use the umdev LLNL service user to run CI. This prevents from running
 # pipelines as an actual user.
   LLNL_SERVICE_USER: umdev
@@ -34,8 +37,8 @@ variables:
 # TODO: add a clean-up mechanism
   BUILD_ROOT: ${CI_PROJECT_DIR}
 
-# We organize the CI on Gitlab in sub-pipelines. Each sub-pipeline corresponds
-# to a test phase on a given machine.
+# We organize the build-and-test stage in sub-pipelines. Each sub-pipeline
+# corresponds to a test batch on a given machine.
 
 # High level stages
 stages:
@@ -57,6 +60,10 @@ stages:
     forward:
       pipeline_variables: true
 
-# pipelines subscribed by the project
 include:
+  # [Optional] checks preliminary to running the actual CI test
+  #- project: 'radiuss/radiuss-shared-ci'
+  #  ref: main
+  #  file: 'preliminary-ignore-draft-pr.yml'
+  # pipelines subscribed by the project
   - local: .gitlab/subscribed-pipelines.yml
