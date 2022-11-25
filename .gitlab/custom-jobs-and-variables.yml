@@ -7,7 +7,6 @@
 
 # We define the following GitLab pipeline variables:
 variables:
-
 # On LLNL's ruby, this pipeline creates only one allocation shared among jobs
 # in order to save time and resources. This allocation has to be uniquely named
 # so that we are sure to retrieve it and avoid collisions.
