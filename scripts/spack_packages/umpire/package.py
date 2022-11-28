@@ -79,7 +79,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     variant("openmp", default=False, description="Build with OpenMP support")
     variant("openmp_target", default=False, description="Build with OpenMP 4.5 support")
     variant("deviceconst", default=False, description="Enables support for constant device memory")
-    variant("examples", default=True, description="Build Umpire Examples")
+    variant("examples", default=False, description="Build Umpire Examples")
     variant(
         "tests",
         default="none",
@@ -365,6 +365,8 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_option(
                 "ENABLE_TESTS", True))
         else:
+            entries.append(cmake_cache_option(
+                "ENABLE_BENCHMARKS", False))
             entries.append(cmake_cache_option(
                 "ENABLE_TESTS", "tests=none" not in spec))
 

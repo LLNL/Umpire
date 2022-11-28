@@ -29,28 +29,28 @@ xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
 
 ibm_clang_10_0_1_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc tests=basic %clang@ibm.10.0.1 +ipc_shmem +mpi ^spectrum-mpi"
+    SPEC: "~shared ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +ipc_shmem +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 ibm_clang_10_0_1_mpi:
   variables:
-    SPEC: "~shared +fortran ~device_alloc tests=basic %clang@ibm.10.0.1 +mpi ^spectrum-mpi"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +mpi ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
 ibm_clang_10_0_1_cuda_10_1_168_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc tests=basic %clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^spectrum-mpi ^cuda@10.1.168"
+    SPEC: "~shared ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^spectrum-mpi ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 # Extras.
 clang_9_0_0_libcpp:
   variables:
-    SPEC: "~shared ~device_alloc tests=basic %clang@9.0.0+libcpp cxxflags=\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags=\"-DGTEST_HAS_CXXABI_H_=0\""
+    SPEC: "~shared ~device_alloc +tools tests=basic %clang@9.0.0+libcpp cxxflags=\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags=\"-DGTEST_HAS_CXXABI_H_=0\""
   extends: .build_and_test_on_lassen
 
 clang_9_0_0_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests ~device_alloc tests=basic %clang@9.0.0 cxxflags=-fsanitize=address"
+    SPEC: "~shared +asan +sanitizer_tests +tools ~device_alloc tests=basic %clang@9.0.0 cxxflags=-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 
@@ -62,17 +62,17 @@ clang_9_0_0_memleak:
 
 gcc_8_3_1_dev_benchmarks:
   variables:
-    SPEC: "~shared +dev_benchmarks ~device_alloc %gcc@8.3.1 build_type=Release"
+    SPEC: "~shared +dev_benchmarks +tools ~device_alloc %gcc@8.3.1 build_type=Release"
   extends: .build_and_test_on_lassen
 
 xl_default_omp_target:
   variables:
-    SPEC: "~shared ~device_alloc tests=basic %xl@default+openmp+openmp_target ^cmake@3.14.5"
+    SPEC: "~shared ~device_alloc +tools tests=basic %xl@default+openmp+openmp_target ^cmake@3.14.5"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_numa:
   variables:
-    SPEC: "~shared +fortran +numa ~device_alloc tests=basic %gcc@8.3.1"
+    SPEC: "~shared +fortran +numa +tools ~device_alloc tests=basic %gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_cuda_10_1_168:
@@ -84,15 +84,15 @@ gcc_8_3_1_cuda_10_1_168:
 
 gcc_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc tests=basic %gcc@8.3.1 ^blt@develop"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %gcc@8.3.1 ^blt@develop"
   extends: .build_and_test_on_lassen
 
 ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc tests=basic %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ^blt@develop"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_12_gcc_8_3_1_cuda_10_1_168_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc tests=basic %xl@16.1.1.12 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5 ^blt@develop"
   extends: .build_and_test_on_lassen
