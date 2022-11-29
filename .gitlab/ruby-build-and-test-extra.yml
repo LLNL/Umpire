@@ -34,7 +34,7 @@ clang_10_0_1_sqlite_experimental:
 # Develop builds against specific tpl version.
 pgi_20_1_gcc_local_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@20.1 cxxflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc cflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc fflags=-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc ^blt@develop"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@20.1 cxxflags==\"-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc\" cflags==\"-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc\" fflags==\"-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc\" ^blt@develop"
   extends: .build_and_test_on_ruby
 
 clang_10_0_1_tpls:

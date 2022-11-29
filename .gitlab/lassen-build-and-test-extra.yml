@@ -16,7 +16,7 @@
 # TODO: This is likely an issue in RADIUSS Shared CI: why disable tests ?.
 xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools +cuda tests=none %xl@16.1.1.12 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2 ${PROJECT_LASSEN_DEPS}"
+    SPEC: "~shared +fortran ~device_alloc +tools +cuda tests=none %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2 ${PROJECT_LASSEN_DEPS}"
   extends: .build_and_test_on_lassen
 
 
@@ -39,24 +39,24 @@ ibm_clang_10_0_1_mpi:
 
 ibm_clang_10_0_1_cuda_10_1_168_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^spectrum-mpi ^cuda@10.1.168"
+    SPEC: "~shared ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^spectrum-mpi ^cuda@10.1.168"
   extends: .build_and_test_on_lassen
 
 # Extras.
 clang_9_0_0_libcpp:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %clang@9.0.0+libcpp cxxflags=\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags=\"-DGTEST_HAS_CXXABI_H_=0\""
+    SPEC: "~shared ~device_alloc +tools tests=basic %clang@9.0.0+libcpp cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags==\"-DGTEST_HAS_CXXABI_H_=0\""
   extends: .build_and_test_on_lassen
 
 clang_9_0_0_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools ~device_alloc tests=basic %clang@9.0.0 cxxflags=-fsanitize=address"
+    SPEC: "~shared +asan +sanitizer_tests +tools ~device_alloc tests=basic %clang@9.0.0 cxxflags==-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 
 # clang_9_0_0_datarace (build and test on lassen):
 #   variables:
-#     SPEC: "%clang@9.0.0 cxxflags=-fsanitize=thread"
+#     SPEC: "%clang@9.0.0 cxxflags==\"-fsanitize=thread\""
 #   allow_failure: true
 #   extends: .build_and_test_on_lassen
 
@@ -89,10 +89,10 @@ gcc_8_3_1_tpls:
 
 ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %clang@ibm.9.0.0 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %clang@ibm.9.0.0 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ^blt@develop"
   extends: .build_and_test_on_lassen
 
 xl_16_1_1_12_gcc_8_3_1_cuda_10_1_168_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12 cxxflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags=\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5 ^blt@develop"
   extends: .build_and_test_on_lassen
