@@ -46,7 +46,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     patch('camp_target_umpire_3.0.0.patch', when='@3.0.0')
 
-    variant('fortran', default=True, description='Build C/Fortran API')
+    variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
     variant('ipc_shmem', default=False, description='Enable POSIX shared memory')
@@ -74,7 +74,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('mpi', when='+mpi')
 
     depends_on('blt@0.5.0', type='build', when='@main')
-    depends_on('blt@0.5.0:', type='build')
+    depends_on('blt@0.5.2:', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.

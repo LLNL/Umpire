@@ -29,7 +29,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
     # TODO: figure out gtest dependency and then set this default True.
     variant('tests', default=False, description='Build tests')
-    variant('openmp', default=False, description='Build OpenMP support')
+    variant('openmp', default=False, description='Build with OpenMP support')
 
     depends_on('cub', when='+cuda')
 
@@ -42,7 +42,6 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
         options.append("-DBLT_SOURCE_DIR={0}".format(spec['blt'].prefix))
 
-        options.append('-DENABLE_OPENMP=' + ("On" if '+openmp' in spec else "Off"))
         if '+cuda' in spec:
             options.extend([
                 '-DENABLE_CUDA=ON',
@@ -62,22 +61,23 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
                 '-DENABLE_HIP=ON',
                 '-DHIP_ROOT_DIR={0}'.format(spec['hip'].prefix)
             ])
-            # there is only one dir like this, but the version component is unknown
-
-            options.append(
-                "-DHIP_CLANG_INCLUDE_PATH=" + glob.glob(
-                    "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
-                )[0]
-            )
             archs = self.spec.variants['amdgpu_target'].value
             if archs != 'none':
                 arch_str = ",".join(archs)
                 options.append(
                     '-DHIP_HIPCC_FLAGS=--amdgpu-target={0}'.format(arch_str)
                 )
+            # there is only one dir like this, but the version component is unknown
+            options.append(
+                "-DHIP_CLANG_INCLUDE_PATH=" + glob.glob(
+                    "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
+                )[0]
+            )
         else:
             options.append('-DENABLE_HIP=OFF')
 
         options.append(self.define_from_variant('ENABLE_TESTS', 'tests'))
+        options.append(self.define_from_variant('ENABLE_OPENMP', 'openmp'))
+
 
         return options
