@@ -4,8 +4,9 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include <iostream>
 #include <stdio.h>
+
+#include <iostream>
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
@@ -79,18 +80,18 @@ int main(int argc, char* argv[])
   }
 
   if (test_type.find("read") != std::string::npos) {
-    //test_read_after_free();
-    #if defined(UMPIRE_ENABLE_HIP)
-      auto allocator = rm.getAllocator("test_allocator");
-      const std::size_t SIZE = 1356;
-      const std::size_t INDEX = SIZE / 2;
-      double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
-      hipLaunchKernelGGL(test_read_after_free, dim3(1), dim3(16), 0, 0, ptr_to_data, INDEX);
+// test_read_after_free();
+#if defined(UMPIRE_ENABLE_HIP)
+    auto allocator = rm.getAllocator("test_allocator");
+    const std::size_t SIZE = 1356;
+    const std::size_t INDEX = SIZE / 2;
+    double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
+    hipLaunchKernelGGL(test_read_after_free, dim3(1), dim3(16), 0, 0, ptr_to_data, INDEX);
 
-      // Test read after free from host
-      allocator.deallocate(ptr_to_data);
-      std::cout << "data[256] = " << *ptr_to_data[256] << std::endl;
-    #endif
+    // Test read after free from host
+    allocator.deallocate(ptr_to_data);
+    std::cout << "data[256] = " << *ptr_to_data[256] << std::endl;
+#endif
   } else if (test_type.find("write") != std::string::npos) {
     test_write_after_free();
     //#if defined(UMPIRE_ENABLE_HIP)
