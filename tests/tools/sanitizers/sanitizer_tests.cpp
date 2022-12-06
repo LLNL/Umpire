@@ -5,10 +5,20 @@
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
+#include <stdio.h>
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+
+__global__ void test_read_after_free(double** data_ptr, std::size_t INDEX)
+{
+  if (threadIdx.x == 0) {
+    *data_ptr[INDEX] = 100;
+    printf("data_ptr[INDEX] = %f", *data_ptr[INDEX]);
+    printf("data_ptr[256] = %f", *data_ptr[256]);
+  }
+}
 
 void test_read_after_free()
 {
@@ -53,7 +63,7 @@ int main(int argc, char* argv[])
   const std::string test_type{argv[2]};
 
 #if defined(UMPIRE_ENABLE_HIP)
-  const std::string resource_type{"DEVICE"};
+  const std::string resource_type{"UM"};
 #else
   const std::string resource_type{"HOST"};
 #endif
@@ -69,9 +79,26 @@ int main(int argc, char* argv[])
   }
 
   if (test_type.find("read") != std::string::npos) {
-    test_read_after_free();
+    //test_read_after_free();
+    #if defined(UMPIRE_ENABLE_HIP)
+      auto allocator = rm.getAllocator("test_allocator");
+      const std::size_t SIZE = 1356;
+      const std::size_t INDEX = SIZE / 2;
+      double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
+      hipLaunchKernelGGL(test_read_after_free, dim3(1), dim3(16), 0, 0, ptr_to_data, INDEX);
+
+      // Test read after free from host
+      allocator.deallocate(ptr_to_data);
+      std::cout << "data[256] = " << *ptr_to_data[256] << std::endl;
+    #endif
   } else if (test_type.find("write") != std::string::npos) {
     test_write_after_free();
+    //#if defined(UMPIRE_ENABLE_HIP)
+    //  const std::size_t SIZE = 1356;
+    //  const std::size_t INDEX = SIZE / 2;
+    //  double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
+    //  hipLaunchKernelGGL(test_write_after_free, dim3(1), dim3(16), 0, 0, ptr_to_data, INDEX);
+    //#endif
   }
 
   return 0;
