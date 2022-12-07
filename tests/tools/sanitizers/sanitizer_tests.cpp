@@ -6,11 +6,11 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
-#include "umpire/util/Macros.hpp"
-#include "umpire/util/error.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
+#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 
 #if defined(UMPIRE_ENABLE_HIP)
 __global__ void test_for_hip(double** data_ptr, std::size_t INDEX)
