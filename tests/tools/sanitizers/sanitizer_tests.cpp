@@ -38,7 +38,7 @@ void sanitizer_test(const std::string test_type)
     // Test read after free from host
     allocator.deallocate(data);
     std::cout << "data[256] = " << *data[256] << std::endl;
-    //test_read_after_free(allocator, ptr_to_data, INDEX);
+    // test_read_after_free(allocator, ptr_to_data, INDEX);
   } else {
     if (test_type.find("write") == std::string::npos) {
       std::cout << "Test type did not match either option - using write" << std::endl;
@@ -55,7 +55,7 @@ void sanitizer_test(const std::string test_type)
     allocator.deallocate(data);
     *data[INDEX] = -1;
     std::cout << "data[INDEX] = " << *data[INDEX] << std::endl;
-    //test_write_after_free(allocator, ptr_to_data, INDEX);
+    // test_write_after_free(allocator, ptr_to_data, INDEX);
   }
 }
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   if (argc < 3) {
     std::cout << "Usage: requires 2 arguments." << std::endl;
     std::cout << "First, an allocation strategy (QuickPool or DynamicPoolList)." << std::endl;
-    std::cout << "Second, a test type (read or write). Try again." << std::endl;                 
+    std::cout << "Second, a test type (read or write). Try again." << std::endl;
     return 0;
   }
 
@@ -83,9 +83,9 @@ int main(int argc, char* argv[])
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
   } else {
-      if (strategy.find("QuickPool") == std::string::npos) {
-        std::cout << "Allocation strategy did not match either option - using QuickPool." << std::endl;
-      }
+    if (strategy.find("QuickPool") == std::string::npos) {
+      std::cout << "Allocation strategy did not match either option - using QuickPool." << std::endl;
+    }
     auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
   }
