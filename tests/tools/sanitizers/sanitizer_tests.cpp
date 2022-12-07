@@ -4,60 +4,68 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include <stdio.h>
-
 #include <iostream>
 
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
-__global__ void test_read_after_free(double** data_ptr, std::size_t INDEX)
+__global__ void test_for_hip(double** data_ptr, std::size_t INDEX)
 {
   if (threadIdx.x == 0) {
     *data_ptr[INDEX] = 100;
-    printf("data_ptr[INDEX] = %f", *data_ptr[INDEX]);
-    printf("data_ptr[256] = %f", *data_ptr[256]);
   }
 }
 
-void test_read_after_free()
+void sanitizer_test(const std::string test_type)
 {
   auto& rm = umpire::ResourceManager::getInstance();
   auto allocator = rm.getAllocator("test_allocator");
 
   const std::size_t SIZE = 1356;
   const std::size_t INDEX = SIZE / 2;
-  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
+  double** data = static_cast<double**>(allocator.allocate(SIZE * sizeof(double*)));
 
-  data[INDEX] = 100;
-  std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
+  if (test_type.find("read") != std::string::npos) {
+#if defined(UMPIRE_ENABLE_HIP)
+    hipLaunchKernelGGL(test_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
+    hipDeviceSynchronize();
+#else
+    *data[INDEX] = 100;
+    std::cout << "data[INDEX] = " << *data[INDEX] << std::endl;
+#endif
 
-  allocator.deallocate(data);
-  std::cout << "data[256] = " << data[256] << std::endl;
-}
+    // Test read after free from host
+    allocator.deallocate(data);
+    std::cout << "data[256] = " << *data[256] << std::endl;
+    //test_read_after_free(allocator, ptr_to_data, INDEX);
+  } else {
+    if (test_type.find("write") == std::string::npos) {
+      std::cout << "Test type did not match either option - using write" << std::endl;
+    }
+#if defined(UMPIRE_ENABLE_HIP)
+    hipLaunchKernelGGL(test_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
+    hipDeviceSynchronize();
+#else
+    *data[INDEX] = 100;
+    std::cout << "data[INDEX] = " << *data[INDEX] << std::endl;
+#endif
 
-void test_write_after_free()
-{
-  auto& rm = umpire::ResourceManager::getInstance();
-  auto allocator = rm.getAllocator("test_allocator");
-
-  const std::size_t SIZE = 1356;
-  const std::size_t INDEX = SIZE / 2;
-  double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
-
-  data[INDEX] = 100;
-  std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
-
-  allocator.deallocate(data);
-  data[INDEX] = -1;
-  std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
+    // Test write after free from host
+    allocator.deallocate(data);
+    *data[INDEX] = -1;
+    std::cout << "data[INDEX] = " << *data[INDEX] << std::endl;
+    //test_write_after_free(allocator, ptr_to_data, INDEX);
+  }
 }
 
 int main(int argc, char* argv[])
 {
   if (argc < 3) {
-    std::cout << argv[0] << " requires 2 arguments, test type and allocation strategy" << std::endl;
+    std::cout << "Usage: requires 2 arguments." << std::endl;
+    std::cout << "First, an allocation strategy (QuickPool or DynamicPoolList)." << std::endl;
+    std::cout << "Second, a test type (read or write). Try again." << std::endl;                 
+    return 0;
   }
 
   const std::string strategy{argv[1]};
@@ -71,36 +79,19 @@ int main(int argc, char* argv[])
 
   auto& rm = umpire::ResourceManager::getInstance();
 
-  if (strategy.find("QuickPool") != std::string::npos) {
-    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator(resource_type));
-    UMPIRE_USE_VAR(pool);
-  } else if (strategy.find("DynamicPoolList") != std::string::npos) {
+  if (strategy.find("DynamicPoolList") != std::string::npos) {
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
+  } else {
+      if (strategy.find("QuickPool") == std::string::npos) {
+        std::cout << "Allocation strategy did not match either option - using QuickPool." << std::endl;
+      }
+    auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator(resource_type));
+    UMPIRE_USE_VAR(pool);
   }
 
-  if (test_type.find("read") != std::string::npos) {
-// test_read_after_free();
-#if defined(UMPIRE_ENABLE_HIP)
-    auto allocator = rm.getAllocator("test_allocator");
-    const std::size_t SIZE = 1356;
-    const std::size_t INDEX = SIZE / 2;
-    double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
-    hipLaunchKernelGGL(test_read_after_free, dim3(1), dim3(16), 0, 0, ptr_to_data, INDEX);
-
-    // Test read after free from host
-    allocator.deallocate(ptr_to_data);
-    std::cout << "data[256] = " << *ptr_to_data[256] << std::endl;
-#endif
-  } else if (test_type.find("write") != std::string::npos) {
-    test_write_after_free();
-    //#if defined(UMPIRE_ENABLE_HIP)
-    //  const std::size_t SIZE = 1356;
-    //  const std::size_t INDEX = SIZE / 2;
-    //  double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
-    //  hipLaunchKernelGGL(test_write_after_free, dim3(1), dim3(16), 0, 0, ptr_to_data, INDEX);
-    //#endif
-  }
+  // Conduct the test
+  sanitizer_test(test_type);
 
   return 0;
 }
