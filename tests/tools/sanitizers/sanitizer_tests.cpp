@@ -90,10 +90,10 @@ int main(int argc, char* argv[])
     auto pool = rm.makeAllocator<umpire::strategy::DynamicPoolList>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
   } else {
-      if (strategy.find("QuickPool") == std::string::npos) {
-        std::cout << "Allocation strategy did not match either option - using QuickPool." << std::endl;
-	strategy = "QuickPool";
-      }
+    if (strategy.find("QuickPool") == std::string::npos) {
+      std::cout << "Allocation strategy did not match either option - using QuickPool." << std::endl;
+      strategy = "QuickPool";
+    }
     auto pool = rm.makeAllocator<umpire::strategy::QuickPool>("test_allocator", rm.getAllocator(resource_type));
     UMPIRE_USE_VAR(pool);
   }
