@@ -4,7 +4,7 @@
 #
 # SPDX-License-Identifier: (MIT)
 ##############################################################################
-set (sanitizer_depends umpire)
+set (sanitizer_depends umpire umpire_util)
 
 if (UMPIRE_ENABLE_HIP)
   set (sanitizer_depends

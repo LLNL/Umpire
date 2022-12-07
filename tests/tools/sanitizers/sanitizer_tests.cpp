@@ -6,16 +6,20 @@
 //////////////////////////////////////////////////////////////////////////////
 #include <iostream>
 
+#include "umpire/util/Macros.hpp"
+#include "umpire/util/error.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/DynamicPoolList.hpp"
 #include "umpire/strategy/QuickPool.hpp"
 
+#if defined(UMPIRE_ENABLE_HIP)
 __global__ void test_for_hip(double** data_ptr, std::size_t INDEX)
 {
   if (threadIdx.x == 0) {
     *data_ptr[INDEX] = 100;
   }
 }
+#endif
 
 void sanitizer_test(const std::string test_type, const std::string resource_type)
 {
@@ -28,8 +32,10 @@ void sanitizer_test(const std::string test_type, const std::string resource_type
 
   if (test_type.find("read") != std::string::npos) {
     if (resource_type != "HOST") {
+#if defined(UMPIRE_ENABLE_HIP)
       hipLaunchKernelGGL(test_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
       hipDeviceSynchronize();
+#endif
     } else {
       *data[INDEX] = 100;
       std::cout << "data[INDEX] = " << *data[INDEX] << std::endl;
@@ -43,8 +49,10 @@ void sanitizer_test(const std::string test_type, const std::string resource_type
       std::cout << "Test type did not match either option - using write" << std::endl;
     }
     if (resource_type != "HOST") {
+#if defined(UMPIRE_ENABLE_HIP)
       hipLaunchKernelGGL(test_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
       hipDeviceSynchronize();
+#endif
     } else {
       *data[INDEX] = 100;
       std::cout << "data[INDEX] = " << *data[INDEX] << std::endl;
@@ -75,7 +83,7 @@ int main(int argc, char* argv[])
 
   if ((resource_type.find("DEVICE") != std::string::npos) || (resource_type.find("UM") != std::string::npos)) {
 #if !defined(UMPIRE_ENABLE_HIP)
-    UMPIRE_ERROR(runtime_error,
+    UMPIRE_ERROR(umpire::runtime_error,
                  umpire::fmt::format("The resource, \"{}\", can't be used if HIP is not enabled.", resource_type));
 #endif
   } else {
