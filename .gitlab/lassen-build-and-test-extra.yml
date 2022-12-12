@@ -68,6 +68,7 @@ gcc_8_3_1_dev_benchmarks:
 xl_default_omp_target:
   variables:
     SPEC: "~shared ~device_alloc +tools tests=basic %xl@default+openmp+openmp_target ^cmake@3.14.5"
+  allow_failure: true
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_numa:
