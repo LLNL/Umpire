@@ -7,7 +7,6 @@
 
 # We define the following GitLab pipeline variables:
 variables:
-
 # On LLNL's ruby, this pipeline creates only one allocation shared among jobs
 # in order to save time and resources. This allocation has to be uniquely named
 # so that we are sure to retrieve it and avoid collisions.
@@ -33,6 +32,16 @@ variables:
 # Project specific deps for corona
   PROJECT_CORONA_DEPS: "^blt@develop"
 
+# Tioga
+# Arguments for top level allocation
+  TIOGA_BUILD_AND_TEST_SHARED_ALLOC: "--time-limit=15m --nodes=1"
+# Arguments for job level allocation
+  TIOGA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
+# Project specific variants for corona
+  PROJECT_TIOGA_VARIANTS: "~shared +fortran ~device_alloc tests=basic "
+# Project specific deps for corona
+  PROJECT_TIOGA_DEPS: "^blt@develop"
+
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
 # Arguments for job level allocation
@@ -42,8 +51,9 @@ variables:
 # Project specific deps for lassen
   PROJECT_LASSEN_DEPS: ""
 
+
 # Configuration shared by build and test jobs specific to this project.
-# Not all configuration can be shared, here is here projects can fine tune the
+# Not all configuration can be shared. Here projects can fine tune the
 # CI behavior.
 .custom_build_and_test:
   artifacts:
