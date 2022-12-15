@@ -37,9 +37,9 @@ variables:
   TIOGA_BUILD_AND_TEST_SHARED_ALLOC: "--time-limit=15m --nodes=1"
 # Arguments for job level allocation
   TIOGA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
-# Project specific variants for corona
+# Project specific variants for tioga
   PROJECT_TIOGA_VARIANTS: "~shared +fortran ~device_alloc tests=basic "
-# Project specific deps for corona
+# Project specific deps for tioga
   PROJECT_TIOGA_DEPS: "^blt@develop"
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
