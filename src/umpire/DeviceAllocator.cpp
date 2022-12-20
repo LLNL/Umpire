@@ -73,8 +73,8 @@ __device__ void* DeviceAllocator::allocate(size_t size)
 {
   std::size_t counter = atomicAdd(m_counter, size);
   if (*m_counter > m_size) {
-    //TODO
-    //UMPIRE_ERROR(out_of_memory_error, "DeviceAllocator out of space");
+    // TODO
+    // UMPIRE_ERROR(out_of_memory_error, "DeviceAllocator out of space");
   }
 
   return static_cast<void*>(m_ptr + counter);
