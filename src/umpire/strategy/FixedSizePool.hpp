@@ -119,7 +119,6 @@ class FixedSizePool {
 
   void deallocate(T *ptr)
   {
-    int i = 0;
     for (struct Pool *curr = pool; curr; curr = curr->next) {
       const T *start = reinterpret_cast<T *>(curr->data);
       const T *end = reinterpret_cast<T *>(curr->data) + numPerPool;
@@ -140,7 +139,6 @@ class FixedSizePool {
         numBlocks--;
         return;
       }
-      i++;
     }
     std::cerr << "Could not find pointer to deallocate" << std::endl;
     throw(std::bad_alloc());

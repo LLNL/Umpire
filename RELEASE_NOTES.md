@@ -1,3 +1,43 @@
+# v2022.10.0
+
+## New Features
+
+- New HIP Advise operations have been added for setting and unsetting of the
+  `READ_MOSTLY`, `PREFERRED_LOCATION`, and `ACCESSED_BY` advice.
+
+  For HIP versions >= 5, operations to set and unset `COARSE_GRAIN` has also been added.
+
+- `getCurrentSize` and `getTotalSize` methods were added to the `DeviceAllocator` API.
+
+- New event tracking has been added that can stream events to JSON (for replays)
+  and SQLITE.
+
+- `UMAP` allocation resource has been added.
+
+## Improvements
+
+- Using `try_get` for async device operations.
+
+## Bug Fixes
+
+- Fixed build problem for Fortan builds by properly installing the Umpire module files.
+
+- Fixed build problem on certain configurations where the `std::filesystem` check was returning incorrect results.
+
+- Instead of throwing an exception, the `is_device_allocator` helper function
+  now returns `false` if the `DeviceAllocator` object has not yet been instantiated.
+
+- Fixed `FixedMallocPool` on Windows, allowing the `QuickPool` allocator to be safely copied.
+
+## Build Configuration Updates
+
+- Add `UMPIRE_DISABLE_ALLOCATIONMAP_DEBUG` (default is `OFF`) option that allows users to disable
+  the AllocationMap from dumping all records when an allocation is not found in a debug build.
+
+- Using `UMPIRE_ENABLE_MPI` instead of `ENABLE_MPI` for Umpire-specific MPI capabilities
+
+- Using `UMPIRE_ENABLE_IPC_SHARED_MEMORY` instead of `ENABLE_IPC_SHARED_MEMORY` to indicate this is an Umpire-specific implementation feature.
+
 # v2022.03.1
 
 This is a patch release of v2022.03 that fixes reported build errors by setting `UMPIRE_ENABLE_DOCS` back to OFF

@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 
-##############################################################################
+# Initialize modules for users not using bash as a default shell
+if test -e /usr/share/lmod/lmod/init/bash
+then
+  . /usr/share/lmod/lmod/init/bash
+fi
+
+###############################################################################
 # Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
-##############################################################################
+###############################################################################
 
-
-# set -x
 set -o errexit
 set -o nounset
 
@@ -22,8 +26,22 @@ hostconfig=${HOST_CONFIG:-""}
 spec=${SPEC:-""}
 job_unique_id=${CI_JOB_ID:-""}
 
-sys_type=${SYS_TYPE:-""}
-py_env_path=${PYTHON_ENVIRONMENT_PATH:-""}
+prefix=""
+
+if [[ -d /dev/shm ]]
+then
+    prefix="/dev/shm/${hostname}"
+    if [[ -z ${job_unique_id} ]]; then
+      job_unique_id=manual_job_$(date +%s)
+      while [[ -d ${prefix}-${job_unique_id} ]] ; do
+          sleep 1
+          job_unique_id=manual_job_$(date +%s)
+      done
+    fi
+
+    prefix="${prefix}-${job_unique_id}"
+    mkdir -p ${prefix}
+fi
 
 # Dependencies
 date
@@ -46,21 +64,18 @@ then
 
     if [[ -d /dev/shm ]]
     then
-        prefix="/dev/shm/${hostname}"
-        if [[ -z ${job_unique_id} ]]; then
-          job_unique_id=manual_job_$(date +%s)
-          while [[ -d ${prefix}/${job_unique_id} ]] ; do
-              sleep 1
-              job_unique_id=manual_job_$(date +%s)
-          done
-        fi
-
-        prefix="${prefix}/${job_unique_id}"
-        mkdir -p ${prefix}
         prefix_opt="--prefix=${prefix}"
+
+        # We force Spack to put all generated files (cache and configuration of
+        # all sorts) in a unique location so that there can be no collision
+        # with existing or concurrent Spack.
+        spack_user_cache="${prefix}/spack-user-cache"
+        export SPACK_DISABLE_LOCAL_CONFIG=""
+        export SPACK_USER_CACHE_PATH="${spack_user_cache}"
+        mkdir -p ${spack_user_cache}
     fi
 
-    python3 scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
+    ./scripts/uberenv/uberenv.py --spec="${spec}" ${prefix_opt}
 
 fi
   echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -94,12 +109,19 @@ else
     hostconfig_path="${project_dir}/host-configs/${hostconfig}"
 fi
 
+hostconfig=$(basename ${hostconfig_path})
+
 # Build Directory
 if [[ -z ${build_root} ]]
 then
-    build_root="/dev/shm$(pwd)"
+    if [[ -d /dev/shm ]]
+    then
+        build_root="${prefix}"
+    else
+        build_root="$(pwd)"
+    fi
 else
-    build_root="/dev/shm${build_root}"
+    build_root="${build_root}"
 fi
 
 build_dir="${build_root}/build_${hostconfig//.cmake/}"
@@ -112,15 +134,12 @@ if [[ "${option}" != "--deps-only" && "${option}" != "--test-only" ]]
 then
     date
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~ Host-config: ${hostconfig_path}"
-    echo "~ Build Dir:   ${build_dir}"
-    echo "~ Project Dir: ${project_dir}"
+    echo "~~~~~ Host-config: ${hostconfig_path}"
+    echo "~~~~~ Build Dir:   ${build_dir}"
+    echo "~~~~~ Project Dir: ${project_dir}"
+    echo "~~~~~ Install Dir: ${install_dir}"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo ""
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~ ENV ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
     echo "~~~~~ Building Umpire"
     echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"

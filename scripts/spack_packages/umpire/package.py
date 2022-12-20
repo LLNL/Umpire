@@ -2,7 +2,7 @@
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
-
+import glob
 
 from spack import *
 
@@ -46,7 +46,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
 
     patch('camp_target_umpire_3.0.0.patch', when='@3.0.0')
 
-    variant('fortran', default=True, description='Build C/Fortran API')
+    variant('fortran', default=False, description='Build C/Fortran API')
     variant('c', default=True, description='Build C API')
     variant('mpi', default=False, description='Enable MPI support')
     variant('ipc_shmem', default=False, description='Enable POSIX shared memory')
@@ -74,7 +74,7 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
     depends_on('mpi', when='+mpi')
 
     depends_on('blt@0.5.0', type='build', when='@main')
-    depends_on('blt@0.5.0:', type='build')
+    depends_on('blt@0.5.2:', type='build')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
     # dependencies, so do it manually.
@@ -87,7 +87,6 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
         depends_on('camp cuda_arch={0}'.format(sm_),
                    when='cuda_arch={0}'.format(sm_))
 
-    depends_on('camp@0.1.0', when='@main')
     depends_on('camp@main')
 
     conflicts('+numa', when='@:0.3.2')
@@ -200,6 +199,13 @@ class Umpire(CachedCMakePackage, CudaPackage, ROCmPackage):
             entries.append(cmake_cache_string("CMAKE_HIP_ARCHITECTURES",
                                         hip_arch[0]))
             entries.append(cmake_cache_option("UMPIRE_ENABLE_TOOLS", False))
+            # there is only one dir like this, but the version component is unknown
+
+            entries.append(
+                cmake_cache_path("HIP_CLANG_INCLUDE_PATH", glob.glob(
+                    "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
+                )[0])
+            )
             hip_link_flags = ""
             if '%gcc' in spec:
                 gcc_bin = os.path.dirname(self.compiler.cxx)

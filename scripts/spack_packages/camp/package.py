@@ -3,7 +3,9 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
-from spack import *
+import glob
+
+from spack.package import *
 
 
 class Camp(CMakePackage, CudaPackage, ROCmPackage):
@@ -27,6 +29,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
     # TODO: figure out gtest dependency and then set this default True.
     variant('tests', default=False, description='Build tests')
+    variant('openmp', default=False, description='Build with OpenMP support')
 
     depends_on('cub', when='+cuda')
 
@@ -46,6 +49,7 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
 
             if not spec.satisfies('cuda_arch=none'):
                 cuda_arch = spec.variants['cuda_arch'].value
+                options.append('-DCMAKE_CUDA_ARCHITECTURES={0}'.format(cuda_arch[0]))
                 options.append('-DCUDA_ARCH=sm_{0}'.format(cuda_arch[0]))
                 flag = '-arch sm_{0}'.format(cuda_arch[0])
                 options.append('-DCMAKE_CUDA_FLAGS:STRING={0}'.format(flag))
@@ -55,8 +59,6 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
         if '+rocm' in spec:
             options.extend([
                 '-DENABLE_HIP=ON',
-                '-DROCM_ROOT_DIR={0}/../'.format(spec['hip'].prefix),
-                '-DHIP_CXX_COMPILER={0}'.format(self.compiler.cxx), # required when using Spack amdclang++ wrapper
                 '-DHIP_ROOT_DIR={0}'.format(spec['hip'].prefix)
             ])
             archs = self.spec.variants['amdgpu_target'].value
@@ -65,9 +67,17 @@ class Camp(CMakePackage, CudaPackage, ROCmPackage):
                 options.append(
                     '-DHIP_HIPCC_FLAGS=--amdgpu-target={0}'.format(arch_str)
                 )
+            # there is only one dir like this, but the version component is unknown
+            options.append(
+                "-DHIP_CLANG_INCLUDE_PATH=" + glob.glob(
+                    "{}/lib/clang/*/include".format(spec['llvm-amdgpu'].prefix)
+                )[0]
+            )
         else:
             options.append('-DENABLE_HIP=OFF')
 
         options.append(self.define_from_variant('ENABLE_TESTS', 'tests'))
+        options.append(self.define_from_variant('ENABLE_OPENMP', 'openmp'))
+
 
         return options
