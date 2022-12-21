@@ -16,7 +16,7 @@
 __global__ void test_read_for_hip(double* data_ptr, std::size_t INDEX)
 {
   if (threadIdx.x == 0) {
-    double dummy = data_ptr[INDEX];	
+    double dummy = data_ptr[INDEX];
     dummy = dummy + 42;
   }
 }
@@ -37,15 +37,15 @@ void sanitizer_test(const std::string test_type)
   const std::size_t SIZE = 1356;
   const std::size_t INDEX = SIZE / 2;
   double* data = static_cast<double*>(allocator.allocate(SIZE * sizeof(double)));
-  
+
   data[INDEX] = 100;
   std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
   allocator.deallocate(data);
 
   if (test_type.find("read") != std::string::npos) {
 #if defined(UMPIRE_ENABLE_HIP)
-      hipLaunchKernelGGL(test_read_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
-      hipDeviceSynchronize();
+    hipLaunchKernelGGL(test_read_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
+    hipDeviceSynchronize();
 #endif
     std::cout << "data[256] = " << data[256] << std::endl;
   } else {
@@ -53,8 +53,8 @@ void sanitizer_test(const std::string test_type)
       std::cout << "Test type did not match either option - using write" << std::endl;
     }
 #if defined(UMPIRE_ENABLE_HIP)
-      hipLaunchKernelGGL(test_write_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
-      hipDeviceSynchronize();
+    hipLaunchKernelGGL(test_write_for_hip, dim3(1), dim3(16), 0, 0, data, INDEX);
+    hipDeviceSynchronize();
 #endif
     data[INDEX] = -1;
     std::cout << "data[INDEX] = " << data[INDEX] << std::endl;
