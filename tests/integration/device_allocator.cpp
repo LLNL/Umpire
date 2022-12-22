@@ -68,7 +68,7 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
     }
   }
 
-#if defined(UMPIRE_ENABLE_CUDA) 
+#if defined(UMPIRE_ENABLE_CUDA)
   tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
