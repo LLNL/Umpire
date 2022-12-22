@@ -10,19 +10,21 @@
 #include "umpire/device_allocator_helper.hpp"
 
 constexpr double NUM = 42.0 * 42.0;
+static char* device_allocator_names_h[3] = {"da1", "da2", "da3"};
+__device__ static char* device_allocator_names[3] = {"da1", "da2", "da3"};
 
-__global__ void tester(double** data_ptr, const char* name)
+__global__ void tester(double** data_ptr, int index)
 {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
   if (idx == 0) {
-    umpire::DeviceAllocator da = umpire::get_device_allocator(name);
+    umpire::DeviceAllocator da = umpire::get_device_allocator(device_allocator_names[index]);
     double* data = static_cast<double*>(da.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = NUM;
   }
 }
 
-class DeviceAllocator : public ::testing::TestWithParam<const char*> {
+class DeviceAllocator : public ::testing::TestWithParam<char*> {
  public:
   static void TearDownTestSuite()
   {
@@ -59,11 +61,18 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   double** data_ptr = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-#if defined(UMPIRE_ENABLE_CUDA)
-  tester<<<1, 16>>>(data_ptr, GetParam());
+  int str_index{0};
+  for (int i = 0; i < 3; i++) {
+    if (strcmp(device_allocator_names_h[i], GetParam()) == 0) {
+      str_index = i;
+    }
+  }
+
+#if defined(UMPIRE_ENABLE_CUDA) 
+  tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, GetParam());
+  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
   hipDeviceSynchronize();
 #endif
 
@@ -75,16 +84,14 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
   ASSERT_EQ(my_da.getCurrentSize(), 0);
 
 #if defined(UMPIRE_ENABLE_CUDA)
-  tester<<<1, 16>>>(data_ptr, GetParam());
+  tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, GetParam());
+  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
   hipDeviceSynchronize();
 #endif
 
   ASSERT_EQ(my_da.getCurrentSize(), sizeof(double));
 }
 
-const char* device_allocator_names[3] = {"da1", "da2", "da3"};
-
-INSTANTIATE_TEST_SUITE_P(DeviceAllocatorTests, DeviceAllocator, ::testing::ValuesIn(device_allocator_names));
+INSTANTIATE_TEST_SUITE_P(DeviceAllocatorTests, DeviceAllocator, ::testing::ValuesIn(device_allocator_names_h));
