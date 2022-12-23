@@ -542,10 +542,10 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent)
   ASSERT_EQ(pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[2]); }); // 50% releasable
   ASSERT_EQ(pool->getBlocksInPool(), 4);
-  ASSERT_NO_THROW({ alloc.deallocate(a[1]); });  // 75% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 2); // Collapse happened
-  ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 1); // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[1]); }); // 75% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 2);        // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[0]); }); // 100% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 1);        // Collapse happened
 }
 
 TYPED_TEST(PrimaryPoolTest, heuristic_75_percent_hwm)
@@ -577,10 +577,10 @@ TYPED_TEST(PrimaryPoolTest, heuristic_75_percent_hwm)
   ASSERT_EQ(pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[2]); }); // 50% releasable
   ASSERT_EQ(pool->getBlocksInPool(), 4);
-  ASSERT_NO_THROW({ alloc.deallocate(a[1]); });  // 75% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 2); // Collapse happened
-  ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 1); // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[1]); }); // 75% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 2);        // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[0]); }); // 100% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 1);        // Collapse happened
 }
 
 TYPED_TEST(PrimaryPoolTest, heuristic_100_percent_hwm)
@@ -592,8 +592,9 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent_hwm)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto h_fun = Pool::percent_releasable_hwm(100);
-  auto alloc = rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_100_hwm"}, rm.getAllocator(this->m_resource_name),
-                                      initial_size, subsequent_min_size, alignment, h_fun);
+  auto alloc =
+      rm.makeAllocator<Pool>(this->m_pool_name + std::string{"_100_hwm"}, rm.getAllocator(this->m_resource_name),
+                             initial_size, subsequent_min_size, alignment, h_fun);
 
   auto pool = umpire::util::unwrap_allocator<Pool>(alloc);
 
@@ -612,10 +613,10 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent_hwm)
   ASSERT_EQ(pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[2]); }); // 50% releasable
   ASSERT_EQ(pool->getBlocksInPool(), 4);
-  ASSERT_NO_THROW({ alloc.deallocate(a[1]); });  // 75% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 4); // Collapse happened
-  ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 1); // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[1]); }); // 75% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 4);        // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[0]); }); // 100% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 1);        // Collapse happened
 }
 
 TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
@@ -647,10 +648,10 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
   ASSERT_EQ(pool->getBlocksInPool(), 4);
   ASSERT_NO_THROW({ alloc.deallocate(a[2]); }); // 50% releasable
   ASSERT_EQ(pool->getBlocksInPool(), 4);
-  ASSERT_NO_THROW({ alloc.deallocate(a[1]); });  // 75% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 4); // Collapse happened
-  ASSERT_NO_THROW({ alloc.deallocate(a[0]); });  // 100% releasable
-  ASSERT_EQ(pool->getBlocksInPool(), 1); // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[1]); }); // 75% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 4);        // Collapse happened
+  ASSERT_NO_THROW({ alloc.deallocate(a[0]); }); // 100% releasable
+  ASSERT_EQ(pool->getBlocksInPool(), 1);        // Collapse happened
 }
 
 #if defined(UMPIRE_ENABLE_CONST)
