@@ -67,7 +67,7 @@ gcc_8_3_1_dev_benchmarks:
 
 xl_default_omp_target:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %xl@default+openmp+openmp_target ^cmake@3.14.5"
+    SPEC: "~shared ~device_alloc +tools tests=basic %xl@default+openmp+openmp_target"
   allow_failure: true
   extends: .build_and_test_on_lassen
 
@@ -95,5 +95,5 @@ ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168_tpls:
 
 xl_16_1_1_12_gcc_8_3_1_cuda_10_1_168_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^cmake@3.14.5 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^blt@develop"
   extends: .build_and_test_on_lassen
