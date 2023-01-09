@@ -13,6 +13,7 @@ set (umpire_strategy_headers
   DynamicSizePool.hpp
   FixedPool.hpp
   FixedSizePool.hpp
+  GranularityController.hpp
   MixedPool.hpp
   MonotonicAllocationStrategy.hpp
   NamedAllocationStrategy.hpp
@@ -42,6 +43,7 @@ set (umpire_strategy_sources
   AllocationStrategy.cpp
   DynamicPoolList.cpp
   FixedPool.cpp
+  GranularityController.cpp
   MixedPool.cpp
   mixins/AlignedAllocation.cpp
   mixins/AllocateNull.cpp
