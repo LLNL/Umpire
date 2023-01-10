@@ -9,6 +9,7 @@
 
 #include <hip/hip_runtime_api.h>
 
+#include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -19,7 +20,7 @@ namespace alloc {
  * \brief Uses hipMalloc and hipFree to allocate and deallocate memory on
  *        AMD GPUs.
  */
-struct HipMallocAllocator {
+struct HipMallocAllocator : HipAllocator {
   /*!
    * \brief Allocate bytes of memory using hipMalloc
    *
@@ -31,18 +32,20 @@ struct HipMallocAllocator {
   void* allocate(std::size_t size)
   {
     void* ptr{nullptr};
+    int flags{ (m_granularity == course_grain_coherence) ? hipDeviceMallocDefault : hipDeviceMallocFinegrained };
+    hipError_t error{ ::hipExtMallocWithFlags(&ptr, size, flags) };
 
-    hipError_t error = ::hipMalloc(&ptr, size);
-    UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size,
+        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
                                                               hipGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size,
+        UMPIRE_ERROR(runtime_error, umpire::fmt::format("ExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
                                                         hipGetErrorString(error)));
       }
     }
+
+    UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
 
     return ptr;
   }

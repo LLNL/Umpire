@@ -8,6 +8,7 @@
 #define UMPIRE_HipMallocManagedAllocator_HPP
 
 #include "hip/hip_runtime_api.h"
+#include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
@@ -18,7 +19,7 @@ namespace alloc {
  * \brief Uses hipMallocManaged and hipFree to allocate and deallocate
  *        unified memory on AMD GPUs.
  */
-struct HipMallocManagedAllocator {
+struct HipMallocManagedAllocator : HipAllocator {
   /*!
    * \brief Allocate bytes of memory using hipMallocManaged.
    *
@@ -32,6 +33,7 @@ struct HipMallocManagedAllocator {
   {
     void* ptr{nullptr};
 
+
     hipError_t error = ::hipMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
@@ -44,6 +46,19 @@ struct HipMallocManagedAllocator {
       }
     }
 
+    if ( m_granularity == course_grain_coherence ) {
+      int device;
+
+      ::hipGetDevice(&device);
+
+      auto error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
+
+      if (error != hipSuccess) {
+        UMPIRE_ERROR(runtime_error,
+                     umpire::fmt::format("hipMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
+                                         ptr, bytes, device, hipGetErrorString(error)));
+      }
+    }
     return ptr;
   }
 
@@ -57,6 +72,11 @@ struct HipMallocManagedAllocator {
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
+
+    if ( m_granularity == course_grain_coherence ) {
+        ;
+        // hipMemAdviseSetCoarseGrain
+    }
 
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {

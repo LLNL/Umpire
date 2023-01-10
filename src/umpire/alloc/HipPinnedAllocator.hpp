@@ -9,18 +9,20 @@
 
 #include <hip/hip_runtime.h>
 
+#include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
 namespace alloc {
 
-struct HipPinnedAllocator {
+struct HipPinnedAllocator : HipAllocator {
   void* allocate(std::size_t bytes)
   {
     void* ptr{nullptr};
+    int flags{ (m_granularity == course_grain_coherence) ? hipDeviceMallocDefault : hipDeviceMallocFinegrained };
+    hipError_t error{ ::hipHostMalloc(&ptr, bytes, flags) };
 
-    hipError_t error = ::hipHostMalloc(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
