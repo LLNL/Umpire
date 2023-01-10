@@ -64,8 +64,7 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-blt_patch_target(NAME umpire_tpl_json
-                 TREAT_INCLUDES_AS_SYSTEM ON)
+blt_convert_to_system_includes(TARGET umpire_tpl_json)
 
 #
 # CLI11 Option Parsing Headers
@@ -96,8 +95,7 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-blt_patch_target(NAME umpire_tpl_CLI11
-                 TREAT_INCLUDES_AS_SYSTEM ON)
+blt_convert_to_system_includes(TARGET umpire_tpl_CLI11)
 
 add_subdirectory(umpire/judy)
 
@@ -180,8 +178,7 @@ if (C_COMPILER_FAMILY_IS_PGI)
 endif ()
 
 # Avoid warnings from fmt (so we can still use -Werror)
-blt_patch_target(NAME umpire_tpl_fmt
-  TREAT_INCLUDES_AS_SYSTEM ON)
+blt_convert_to_system_includes(TARGET umpire_tpl_fmt)
 
 if (C_COMPILER_FAMILY_IS_GNU)
   target_compile_options(umpire_tpl_fmt
