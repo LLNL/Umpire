@@ -33,7 +33,6 @@ struct HipMallocManagedAllocator : HipAllocator {
   {
     void* ptr{nullptr};
 
-
     hipError_t error = ::hipMallocManaged(&ptr, bytes);
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
@@ -46,7 +45,7 @@ struct HipMallocManagedAllocator : HipAllocator {
       }
     }
 
-    if ( m_granularity == umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence) {
+    if (m_granularity == umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence) {
       int device;
 
       ::hipGetDevice(&device);

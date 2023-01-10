@@ -51,8 +51,9 @@ struct HipMallocAllocator : HipAllocator {
 
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
-                                                              hipGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error,
+                     umpire::fmt::format("hipExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
+                                         hipGetErrorString(error)));
       } else {
         UMPIRE_ERROR(runtime_error, umpire::fmt::format("ExtMallocWithFlags( bytes = {} ) failed with error: {}", size,
                                                         hipGetErrorString(error)));

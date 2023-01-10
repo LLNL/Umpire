@@ -19,7 +19,7 @@ namespace umpire {
 namespace strategy {
 
 GranularityController::GranularityController(const std::string& name, int id, Allocator allocator,
-                                     Granularity granularity)
+                                             Granularity granularity)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "GranularityController"},
       m_allocator{allocator.getAllocationStrategy()},
       m_granularity{granularity}
@@ -27,8 +27,7 @@ GranularityController::GranularityController(const std::string& name, int id, Al
   umpire::alloc::HipAllocator* strat{dynamic_cast<umpire::alloc::HipAllocator*>(m_allocator)};
 
   if (strat == nullptr) {
-    UMPIRE_ERROR(runtime_error,
-        umpire::fmt::format("Cannot place Granularity Controller atop non-HIP device"));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Cannot place Granularity Controller atop non-HIP device"));
   }
 }
 
@@ -38,7 +37,7 @@ void* GranularityController::allocate(std::size_t bytes)
 
   Granularity old_granularity{strat->set_granularity(m_granularity)};
 
-  void* ptr{ m_allocator->allocate_internal(bytes) };
+  void* ptr{m_allocator->allocate_internal(bytes)};
 
   strat->set_granularity(old_granularity);
 

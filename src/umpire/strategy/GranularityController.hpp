@@ -20,7 +20,7 @@ namespace strategy {
  *
  * \brief Control granularity of memory coherence for allocaotr
  *
- * For supported memory resources, the GranularityController will cause the 
+ * For supported memory resources, the GranularityController will cause the
  * coherency of the memory allocations to be either fine or course grained.
  *
  * Using this AllocationStrategy when combined with a pool like QuickPool is
@@ -29,9 +29,10 @@ namespace strategy {
 class GranularityController : public AllocationStrategy {
  public:
   enum Granularity {
-      Default = 0                    // Effectively not set
-    , FineGrainedCoherence = 1
-    , CourseGrainedCoherence = 2
+    Default = 0 // Effectively not set
+    ,
+    FineGrainedCoherence = 1,
+    CourseGrainedCoherence = 2
   };
 
   GranularityController(const std::string& name, int id, Allocator allocator, Granularity granularity);
