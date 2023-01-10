@@ -29,12 +29,12 @@ namespace strategy {
 class GranularityController : public AllocationStrategy {
  public:
   enum Granularity {
-      FineGrainedCoherence = 1
-    , CourseGrainedCohorence = 2
+      Default = 0                    // Effectively not set
+    , FineGrainedCoherence = 1
+    , CourseGrainedCoherence = 2
   };
 
-  GranularityController(const std::string& name, int id, Allocator allocator, Granularity granularity,
-                    int device_id = 0);
+  GranularityController(const std::string& name, int id, Allocator allocator, Granularity granularity);
 
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;
@@ -44,11 +44,8 @@ class GranularityController : public AllocationStrategy {
   MemoryResourceTraits getTraits() const noexcept override;
 
  private:
-  std::shared_ptr<op::MemoryOperation> m_advice_operation;
-
   strategy::AllocationStrategy* m_allocator;
 
-  int m_device;
   Granularity m_granularity;
 };
 

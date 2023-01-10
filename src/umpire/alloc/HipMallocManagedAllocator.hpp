@@ -46,7 +46,7 @@ struct HipMallocManagedAllocator : HipAllocator {
       }
     }
 
-    if ( m_granularity == course_grain_coherence ) {
+    if ( m_granularity == umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence) {
       int device;
 
       ::hipGetDevice(&device);
@@ -72,11 +72,6 @@ struct HipMallocManagedAllocator : HipAllocator {
   void deallocate(void* ptr)
   {
     UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
-
-    if ( m_granularity == course_grain_coherence ) {
-        ;
-        // hipMemAdviseSetCoarseGrain
-    }
 
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {

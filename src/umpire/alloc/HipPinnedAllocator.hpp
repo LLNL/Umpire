@@ -19,9 +19,23 @@ namespace alloc {
 struct HipPinnedAllocator : HipAllocator {
   void* allocate(std::size_t bytes)
   {
+    hipError_t error;
     void* ptr{nullptr};
-    int flags{ (m_granularity == course_grain_coherence) ? hipDeviceMallocDefault : hipDeviceMallocFinegrained };
-    hipError_t error{ ::hipHostMalloc(&ptr, bytes, flags) };
+
+    switch (m_granularity) {
+      default:
+      case umpire::strategy::GranularityController::Granularity::Default:
+        error = ::hipHostMalloc(&ptr, bytes);
+        break;
+
+      case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
+        error = ::hipHostMalloc(&ptr, bytes, hipDeviceMallocFinegrained);
+        break;
+
+      case umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence:
+        error = ::hipHostMalloc(&ptr, bytes, hipDeviceMallocDefault);
+        break;
+    }
 
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {

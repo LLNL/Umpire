@@ -15,26 +15,15 @@ namespace umpire {
 namespace alloc {
 
 struct HipAllocator {
-  enum Granularity {
-    fine_grain_coherence = 1,
-    course_grain_coherence = 2
+  umpire::strategy::GranularityController::Granularity
+  set_granularity(umpire::strategy::GranularityController::Granularity gran) {
+      umpire::strategy::GranularityController::Granularity old_granularity{ m_granularity };
+      m_granularity = gran;
+      return old_granularity;
   };
 
-  void set_granularity(umpire::strategy::GranularityController::Granularity g) {
-    switch(g) {
-        case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
-        m_granularity = fine_grain_coherence;
-        break;
-        case umpire::strategy::GranularityController::Granularity::CourseGrainedCohorence:
-        m_granularity = course_grain_coherence;
-        break;
-      default:
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("Unknown coherence granularity: {}", g));
-        break;
-    }
-  }
-
-  Granularity m_granularity{fine_grain_coherence};
+  umpire::strategy::GranularityController::Granularity
+  m_granularity{umpire::strategy::GranularityController::Granularity::Default};
 };
 
 } // end of namespace alloc

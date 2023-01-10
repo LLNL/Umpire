@@ -8,6 +8,7 @@
 #include "umpire/strategy/GranularityController.hpp"
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/op/MemoryOperationRegistry.hpp"
 
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -18,17 +19,28 @@ namespace umpire {
 namespace strategy {
 
 GranularityController::GranularityController(const std::string& name, int id, Allocator allocator,
-                                     Granularity granularity, int device_id)
+                                     Granularity granularity)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "GranularityController"},
       m_allocator{allocator.getAllocationStrategy()},
-      m_device{device_id},
       m_granularity{granularity}
 {
+  umpire::alloc::HipAllocator* strat{dynamic_cast<umpire::alloc::HipAllocator*>(m_allocator)};
+
+  if (strat == nullptr) {
+    UMPIRE_ERROR(runtime_error,
+        umpire::fmt::format("Cannot place Granularity Controller atop non-HIP device"));
+  }
 }
 
 void* GranularityController::allocate(std::size_t bytes)
 {
-  void* ptr = m_allocator->allocate_internal(bytes);
+  umpire::alloc::HipAllocator* strat{dynamic_cast<umpire::alloc::HipAllocator*>(m_allocator)};
+
+  Granularity old_granularity{strat->set_granularity(m_granularity)};
+
+  void* ptr{ m_allocator->allocate_internal(bytes) };
+
+  strat->set_granularity(old_granularity);
 
   return ptr;
 }

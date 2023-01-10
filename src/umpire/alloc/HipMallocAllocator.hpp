@@ -31,9 +31,23 @@ struct HipMallocAllocator : HipAllocator {
    */
   void* allocate(std::size_t size)
   {
+    hipError_t error;
     void* ptr{nullptr};
-    int flags{ (m_granularity == course_grain_coherence) ? hipDeviceMallocDefault : hipDeviceMallocFinegrained };
-    hipError_t error{ ::hipExtMallocWithFlags(&ptr, size, flags) };
+
+    switch (m_granularity) {
+      default:
+      case umpire::strategy::GranularityController::Granularity::Default:
+        error = ::hipMalloc(&ptr, size);
+        break;
+
+      case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
+        error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocFinegrained);
+        break;
+
+      case umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence:
+        error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocDefault);
+        break;
+    }
 
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
