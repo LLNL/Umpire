@@ -32,7 +32,7 @@ struct HipPinnedAllocator : HipAllocator {
         error = ::hipHostMalloc(&ptr, bytes, hipDeviceMallocFinegrained);
         break;
 
-      case umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence:
+      case umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence:
         error = ::hipHostMalloc(&ptr, bytes, hipDeviceMallocDefault);
         break;
     }

@@ -44,7 +44,7 @@ struct HipMallocAllocator : HipAllocator {
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocFinegrained);
         break;
 
-      case umpire::strategy::GranularityController::Granularity::CourseGrainedCoherence:
+      case umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence:
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocDefault);
         break;
     }
