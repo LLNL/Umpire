@@ -8,8 +8,8 @@
 #define UMPIRE_HipDeviceMemoryResource_HPP
 
 #include "umpire/alloc/HipMallocAllocator.hpp"
-#include "umpire/resource/MemoryResource.hpp"
 #include "umpire/resource/HipMemoryResource.hpp"
+#include "umpire/resource/MemoryResource.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -22,6 +22,7 @@ namespace resource {
  */
 class HipDeviceMemoryResource : public HipMemoryResourceProxy<HipDeviceMemoryResource>, public MemoryResource {
   friend struct HipMemoryResourceProxy<HipDeviceMemoryResource>;
+
  public:
   HipDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 

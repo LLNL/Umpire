@@ -19,7 +19,7 @@ struct HipMemoryResource {
       umpire::strategy::GranularityController::Granularity gran) = 0;
 };
 
-template<typename Derived>
+template <typename Derived>
 struct HipMemoryResourceProxy : HipMemoryResource {
   virtual umpire::strategy::GranularityController::Granularity set_granularity(
       umpire::strategy::GranularityController::Granularity gran)
@@ -27,11 +27,9 @@ struct HipMemoryResourceProxy : HipMemoryResource {
     Derived* p = dynamic_cast<Derived*>(this);
     return p->m_allocator.set_granularity(gran);
   };
-
 };
 
-
-} // end of namespace alloc
+} // namespace resource
 } // end of namespace umpire
 
 #endif // UMPIRE_HipMemoryResource_HPP
