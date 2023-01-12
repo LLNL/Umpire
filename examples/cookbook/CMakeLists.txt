@@ -114,7 +114,13 @@ if (UMPIRE_ENABLE_CUDA)
 endif ()
 
 if (UMPIRE_ENABLE_HIP)
-  blt_add_executable(
+blt_add_executable(
+    NAME recipe_control_granularity
+    SOURCES recipe_control_granularity.cpp
+    DEPENDS_ON ${cookbook_depends})
+  list(APPEND umpire_cookbooks recipe_control_granularity)
+
+blt_add_executable(
     NAME recipe_shrink
     SOURCES recipe_shrink.cpp
     DEPENDS_ON ${cookbook_depends})

@@ -9,6 +9,7 @@
 
 #include "umpire/alloc/HipMallocAllocator.hpp"
 #include "umpire/resource/MemoryResource.hpp"
+#include "umpire/resource/HipMemoryResource.hpp"
 #include "umpire/util/AllocationRecord.hpp"
 #include "umpire/util/Platform.hpp"
 
@@ -19,7 +20,8 @@ namespace resource {
  * \brief Concrete MemoryResource object that uses the template _allocator to
  * allocate and deallocate memory.
  */
-class HipDeviceMemoryResource : public MemoryResource {
+class HipDeviceMemoryResource : public HipMemoryResourceProxy<HipDeviceMemoryResource>, public MemoryResource {
+  friend struct HipMemoryResourceProxy<HipDeviceMemoryResource>;
  public:
   HipDeviceMemoryResource(Platform platform, const std::string& name, int id, MemoryResourceTraits traits);
 

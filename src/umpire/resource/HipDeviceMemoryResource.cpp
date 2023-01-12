@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/resource/HipMemoryResource.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
