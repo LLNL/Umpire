@@ -37,14 +37,17 @@ struct HipMallocAllocator : HipAllocator {
     switch (m_granularity) {
       default:
       case umpire::strategy::GranularityController::Granularity::Default:
+        UMPIRE_LOG(Debug, "::hipMalloc(" << size << ")");
         error = ::hipMalloc(&ptr, size);
         break;
 
       case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
+        UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocFinegrained)");
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocFinegrained);
         break;
 
       case umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence:
+        UMPIRE_LOG(Debug, "::hipMallocWithFlags(" << size << ", hipDeviceMallocDefault)");
         error = ::hipExtMallocWithFlags(&ptr, size, hipDeviceMallocDefault);
         break;
     }

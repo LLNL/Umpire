@@ -25,15 +25,18 @@ struct HipPinnedAllocator : HipAllocator {
     switch (m_granularity) {
       default:
       case umpire::strategy::GranularityController::Granularity::Default:
+        UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ")");
         error = ::hipHostMalloc(&ptr, bytes);
         break;
 
       case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
-        error = ::hipHostMalloc(&ptr, bytes, hipDeviceMallocFinegrained);
+        UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocDefault)");
+        error = ::hipHostMalloc(&ptr, bytes, hipHostMallocDefault);
         break;
 
       case umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence:
-        error = ::hipHostMalloc(&ptr, bytes, hipDeviceMallocDefault);
+        UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocNonCoherent)");
+        error = ::hipHostMalloc(&ptr, bytes, hipHostMallocNonCoherent);
         break;
     }
 
