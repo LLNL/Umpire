@@ -13,7 +13,6 @@
 #include "umpire/Allocator.hpp"
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/GranularityController.hpp"
-// #include "umpire/strategy/QuickPool.hpp"
 
 // Statistics information for allocated memory
 struct myMemStats {
@@ -49,7 +48,8 @@ std::ostream& operator<<(std::ostream& stream, const myMemStats& mstats)
 
 int main(int, char**)
 {
-  const std::vector<std::string> resources{"DEVICE", "UM", "PINNED"};
+  // const std::vector<std::string> resources{"DEVICE", "UM", "PINNED"};
+  const std::vector<std::string> resources{"DEVICE", "UM"};
 
   for (auto&& resource : resources) {
     const std::vector<std::pair<umpire::strategy::GranularityController::Granularity, std::string>> mtypes{

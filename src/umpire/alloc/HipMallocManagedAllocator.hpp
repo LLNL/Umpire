@@ -50,6 +50,7 @@ struct HipMallocManagedAllocator : HipAllocator {
 
       ::hipGetDevice(&device);
 
+      std::cout << "::hipMemAdvise(hipMemAdviseSetCoarseGrain)" << std::endl;
       auto error = ::hipMemAdvise(ptr, bytes, hipMemAdviseSetCoarseGrain, device);
 
       if (error != hipSuccess) {

@@ -10,7 +10,6 @@ set(umpire_resource_depends umpire_util camp umpire_tpl_fmt)
 set (umpire_resource_headers
   DefaultMemoryResource.hpp
   DefaultMemoryResource.inl
-  HipMemoryResource.hpp
   HostResourceFactory.hpp
   MemoryResource.hpp
   MemoryResourceFactory.hpp
@@ -111,6 +110,8 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_resource_headers}
     HipDeviceMemoryResource.hpp
     HipDeviceResourceFactory.hpp
+    HipMemoryResource.hpp
+    HipUnifiedMemoryResource.hpp
     HipUnifiedMemoryResourceFactory.hpp
     HipPinnedMemoryResourceFactory.hpp)
 
@@ -118,6 +119,7 @@ if (UMPIRE_ENABLE_HIP)
     ${umpire_resource_sources}
     HipDeviceMemoryResource.cpp
     HipDeviceResourceFactory.cpp
+    HipUnifiedMemoryResource.cpp
     HipUnifiedMemoryResourceFactory.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
