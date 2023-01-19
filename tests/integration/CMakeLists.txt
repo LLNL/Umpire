@@ -223,6 +223,13 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
+if (UMPIRE_ENABLE_HIP)
+  blt_add_executable(
+    NAME granularity_control_allocator
+    SOURCES granularity_control_allocator.cpp
+    DEPENDS_ON ${integration_tests_depends})
+endif ()
+
 if (UMPIRE_ENABLE_IPC_SHARED_MEMORY AND UMPIRE_ENABLE_MPI)
   blt_add_executable(
     NAME get_communicator_tests
