@@ -48,8 +48,7 @@ std::ostream& operator<<(std::ostream& stream, const myMemStats& mstats)
 
 int main(int, char**)
 {
-  // const std::vector<std::string> resources{"DEVICE", "UM", "PINNED"};
-  const std::vector<std::string> resources{"DEVICE", "UM"};
+  const std::vector<std::string> resources{"DEVICE", "UM", "PINNED"};
 
   for (auto&& resource : resources) {
     const std::vector<std::pair<umpire::strategy::GranularityController::Granularity, std::string>> mtypes{

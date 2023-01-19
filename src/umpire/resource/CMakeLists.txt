@@ -113,6 +113,7 @@ if (UMPIRE_ENABLE_HIP)
     HipMemoryResource.hpp
     HipUnifiedMemoryResource.hpp
     HipUnifiedMemoryResourceFactory.hpp
+    HipPinnedMemoryResource.hpp
     HipPinnedMemoryResourceFactory.hpp)
 
   set (umpire_resource_sources
@@ -121,6 +122,7 @@ if (UMPIRE_ENABLE_HIP)
     HipDeviceResourceFactory.cpp
     HipUnifiedMemoryResource.cpp
     HipUnifiedMemoryResourceFactory.cpp
+    HipPinnedMemoryResource.cpp
     HipPinnedMemoryResourceFactory.cpp)
 
   if (UMPIRE_ENABLE_DEVICE_CONST)

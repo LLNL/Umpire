@@ -4,7 +4,7 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#include "umpire/resource/HipUnifiedMemoryResource.hpp"
+#include "umpire/resource/HipPinnedMemoryResource.hpp"
 
 #include <memory>
 #include <sstream>
@@ -16,13 +16,13 @@
 namespace umpire {
 namespace resource {
 
-HipUnifiedMemoryResource::HipUnifiedMemoryResource(Platform platform, const std::string& name, int id,
+HipPinnedMemoryResource::HipPinnedMemoryResource(Platform platform, const std::string& name, int id,
                                                    MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
 {
 }
 
-void* HipUnifiedMemoryResource::allocate(std::size_t bytes)
+void* HipPinnedMemoryResource::allocate(std::size_t bytes)
 {
   void* ptr = m_allocator.allocate(bytes);
 
@@ -31,14 +31,14 @@ void* HipUnifiedMemoryResource::allocate(std::size_t bytes)
   return ptr;
 }
 
-void HipUnifiedMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
+void HipPinnedMemoryResource::deallocate(void* ptr, std::size_t UMPIRE_UNUSED_ARG(size))
 {
   UMPIRE_LOG(Debug, "(ptr=" << ptr << ")");
 
   m_allocator.deallocate(ptr);
 }
 
-bool HipUnifiedMemoryResource::isAccessibleFrom(Platform p) noexcept
+bool HipPinnedMemoryResource::isAccessibleFrom(Platform p) noexcept
 {
   if (p == Platform::hip || p == Platform::host)
     return true;
@@ -46,7 +46,7 @@ bool HipUnifiedMemoryResource::isAccessibleFrom(Platform p) noexcept
     return false;
 }
 
-Platform HipUnifiedMemoryResource::getPlatform() noexcept
+Platform HipPinnedMemoryResource::getPlatform() noexcept
 {
   return m_platform;
 }

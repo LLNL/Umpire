@@ -8,6 +8,7 @@
 #define UMPIRE_HipPinnedMemoryResourceFactory_HPP
 
 #include "umpire/resource/MemoryResourceFactory.hpp"
+#include "umpire/resource/HipPinnedMemoryResource.hpp"
 
 namespace umpire {
 namespace resource {
