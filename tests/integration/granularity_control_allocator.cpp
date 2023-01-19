@@ -15,11 +15,13 @@ namespace {
 void run_test(const std::string& resource_name, const std::string& alloc_name, const umpire::strategy::GranularityController::Granularity gran)
 {
   auto& rm = umpire::ResourceManager::getInstance();
-  auto resource = rm.getAllocator(resource_name);
-  auto allocator = rm.makeAllocator<umpire::strategy::GranularityController>(alloc_name, resource, gran);
+  umpire::Allocator resource;
+  umpire::Allocator allocator;
   const size_t size{53};
 
-  allocator.deallocate(allocator.allocate(size));
+  ASSERT_NO_THROW(resource = rm.getAllocator(resource_name));
+  ASSERT_NO_THROW(allocator = rm.makeAllocator<umpire::strategy::GranularityController>(alloc_name, resource, gran));
+  ASSERT_NO_THROW(allocator.deallocate(allocator.allocate(size)));
 }
 
 }
