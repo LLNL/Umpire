@@ -17,7 +17,7 @@ namespace umpire {
 namespace resource {
 
 HipPinnedMemoryResource::HipPinnedMemoryResource(Platform platform, const std::string& name, int id,
-                                                   MemoryResourceTraits traits)
+                                                 MemoryResourceTraits traits)
     : MemoryResource(name, id, traits), m_allocator{}, m_platform(platform)
 {
 }
