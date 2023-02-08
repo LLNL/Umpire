@@ -1,11 +1,12 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
+#include <chrono>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -211,7 +212,9 @@ TEST_F(SharedMemoryTest, UnitTests)
     }
     MPI_Barrier(MPI_COMM_WORLD);
 
-    std::random_shuffle(allocs.begin(), allocs.end());
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+    std::shuffle(allocs.begin(), allocs.end(), std::default_random_engine(seed));
     do_deallocations(allocs);
 
     MPI_Barrier(MPI_COMM_WORLD);
