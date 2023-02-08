@@ -108,16 +108,15 @@ inline int resource_to_device_id(const std::string& resource)
   int device_id{0};
   if (resource.find("::") != std::string::npos) {
     device_id = std::stoi(resource.substr(resource.find("::") + 2));
-  }
-  else {
-    // get the device bound to the current process
-    #if defined(UMPIRE_ENABLE_CUDA)
-      cudaGetDevice(&device_id);
-    #endif /* UMPIRE_ENABLE_CUDA */
+  } else {
+// get the device bound to the current process
+#if defined(UMPIRE_ENABLE_CUDA)
+    cudaGetDevice(&device_id);
+#endif /* UMPIRE_ENABLE_CUDA */
 
-    #if defined(UMPIRE_ENABLE_HIP)
-      hipGetDevice(&device_id);
-    #endif /* UMPIRE_ENABLE_HIP */
+#if defined(UMPIRE_ENABLE_HIP)
+    hipGetDevice(&device_id);
+#endif /* UMPIRE_ENABLE_HIP */
   }
   return device_id;
 }
