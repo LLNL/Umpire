@@ -38,7 +38,7 @@ __global__ void only_first(double** data_ptr)
   }
 }
 
-__global__ void each_thread(double** data_ptr, unsigned int N)
+__global__ void each_thread(double** data_ptr, int N)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx < N) {
@@ -49,6 +49,7 @@ __global__ void each_thread(double** data_ptr, unsigned int N)
   }
 }
 
+#if defined(UMPIRE_ENABLE_CUDA)
 static void CudaTest(const char *msg)
 {
   cudaError_t e = cudaGetLastError();
@@ -59,7 +60,20 @@ static void CudaTest(const char *msg)
     exit(-1);
   }
 }
+#elif defined(UMPIRE_ENABLE_HIP)
+static void HipTest(const char *msg)
+{
+  hipError_t e = hipGetLastError();
+  hipDeviceSynchronize();
+  if (hipSuccess != e) {
+    fprintf(stderr, "%s: %d\n", msg, e);
+    fprintf(stderr, "%s\n", hipGetErrorString(e));
+    exit(-1);
+  }
+}
+#endif
 
+#if defined(UMPIRE_ENABLE_CUDA)
 void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, unsigned int total, std::string name)
 {
   float milliseconds {0};
@@ -72,6 +86,20 @@ void event_timing_reporting(cudaEvent_t start, cudaEvent_t stop, double** ptr, u
   std::cout << "Time per allocation: " << (milliseconds/total*1000.0) << "us" << std::endl;
   std::cout << "Retrieved value: " << *ptr[0] << std::endl << std::endl;
 }
+#elif defined(UMPIRE_ENABLE_HIP)
+void event_timing_reporting(hipEvent_t start, hipEvent_t stop, double** ptr, unsigned int total, std::string name)
+{
+  float milliseconds {0};
+  hipEventSynchronize(stop);
+  hipEventElapsedTime(&milliseconds, start, stop);
+  HipTest("Checking for error just after kernel...\n");
+
+  std::cout << name << std::endl;
+  std::cout << "Total time: " << (milliseconds*1000.0) << "us" << std::endl;
+  std::cout << "Time per allocation: " << (milliseconds/total*1000.0) << "us" << std::endl;
+  std::cout << "Retrieved value: " << *ptr[0] << std::endl << std::endl;
+}
+#endif
 
 int main(int, char**)
 {
@@ -79,13 +107,19 @@ int main(int, char**)
   auto allocator = rm.getAllocator("UM");
   double** ptr_to_data = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-  unsigned int N {0};
+  int N {0};
   N = NUM_SM * BLOCKS_PER_SM * THREADS_PER_BLOCK; 
 
   // Set up the device and get properties
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaDeviceProp devProp;
   cudaSetDevice(0);
   cudaGetDeviceProperties(&devProp, 0);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipDeviceProp_t devProp;
+  hipSetDevice(0);
+  hipGetDeviceProperties(&devProp, 0);
+#endif
   std::cout << "Running on device: " << devProp.name << std::endl;
   std::cout << "Number of threads: " << N << std::endl << std::endl;
 
@@ -99,52 +133,93 @@ int main(int, char**)
   auto dev_alloc = umpire::make_device_allocator(allocator, N * sizeof(double), "dev_alloc");
   UMPIRE_SET_UP_DEVICE_ALLOCATORS(); // Still required in case this is called on different translation unit.
 
-  // Create cuda streams and events
+  // Create streams and events
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaStream_t stream;
   cudaStreamCreate(&stream);
   cudaEvent_t start, stop;
   cudaEventCreate(&start);
   cudaEventCreate(&stop);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipStream_t stream;
+  hipStreamCreate(&stream);
+  hipEvent_t start, stop;
+  hipEventCreate(&start);
+  hipEventCreate(&stop);
+#endif
 
   // Run warm-up kernel
   //////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaEventRecord(start);
   only_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, 1, "Kernel: Warm-up"); 
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipEventRecord(start);
+  hipLaunchKernelGGL(only_first, dim3(N/THREADS_PER_BLOCK), dim3(THREADS_PER_BLOCK), 0, stream, ptr_to_data);
+  hipEventRecord(stop);
+  event_timing_reporting(start, stop, ptr_to_data, 1, "Kernel: Warm-up"); 
+#endif
   //////////////////////////////////////////////////
 
   dev_alloc.reset();
 
   // Run kernel to allocate per first thread per block
   //////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaEventRecord(start);
   first_in_block<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, (N/THREADS_PER_BLOCK), "Kernel: First thread per block");
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipEventRecord(start);
+  hipLaunchKernelGGL(first_in_block, dim3(N/THREADS_PER_BLOCK), dim3(THREADS_PER_BLOCK), 0, stream, ptr_to_data);
+  hipEventRecord(stop);
+  event_timing_reporting(start, stop, ptr_to_data, (N/THREADS_PER_BLOCK), "Kernel: First thread per block");
+#endif
   //////////////////////////////////////////////////
 
   dev_alloc.reset();
 
   // Run kernel to allocate with only thread 0
   //////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaEventRecord(start);
   only_first<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(ptr_to_data);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, 1, "Kernel: Only thread idx 0");
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipEventRecord(start);
+  hipLaunchKernelGGL(only_first, dim3(N/THREADS_PER_BLOCK), dim3(THREADS_PER_BLOCK), 0, stream, ptr_to_data);
+  hipEventRecord(stop);
+  event_timing_reporting(start, stop, ptr_to_data, 1, "Kernel: Only thread idx 0");
+#endif
   //////////////////////////////////////////////////
 
   dev_alloc.reset();
 
   // Run kernel to allocate per each thread
   //////////////////////////////////////////////////
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaEventRecord(start);
   each_thread<<<N/THREADS_PER_BLOCK, THREADS_PER_BLOCK, 0, stream>>>(ptr_to_data, N);
   cudaEventRecord(stop);
   event_timing_reporting(start, stop, ptr_to_data, N, "Kernel: Each thread"); 
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipEventRecord(start);
+  hipLaunchKernelGGL(each_thread, dim3(N/THREADS_PER_BLOCK), dim3(THREADS_PER_BLOCK), 0, stream, ptr_to_data, N);
+  hipEventRecord(stop);
+  event_timing_reporting(start, stop, ptr_to_data, N, "Kernel: Each thread"); 
+#endif
   //////////////////////////////////////////////////
 
+#if defined(UMPIRE_ENABLE_CUDA)
   cudaFree(ptr_to_data);
   cudaStreamDestroy(stream);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipFree(ptr_to_data);
+  hipStreamDestroy(stream);
+#endif
   return 0;
 }
