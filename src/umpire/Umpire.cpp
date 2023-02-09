@@ -206,7 +206,7 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name
   return traits;
 }
 
-// Using unused attribute to silence warning from rocm compiler 
+// Using unused attribute to silence warning from rocm compiler
 void* find_pointer_from_name(__attribute__((unused)) Allocator allocator, const std::string& name)
 {
   void* ptr{nullptr};
