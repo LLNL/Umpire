@@ -10,8 +10,8 @@
 #include "umpire/device_allocator_helper.hpp"
 
 constexpr double NUM = 42.0 * 42.0;
-static char* device_allocator_names_h[3] = {"da1", "da2", "da3"};
-__device__ static char* device_allocator_names[3] = {"da1", "da2", "da3"};
+static char* device_allocator_names_h[3] = {(char*)"da1", (char*)"da2", (char*)"da3"};
+__device__ static char* device_allocator_names[3] = {(char*)"da1", (char*)"da2", (char*)"da3"};
 
 __global__ void tester(double** data_ptr, int index)
 {

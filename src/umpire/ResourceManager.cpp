@@ -283,10 +283,11 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
   m_default_allocator = allocator.getAllocationStrategy();
 }
 
+// Using unused attribute to silence warning from rocm compiler 
 void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
-    auto ra = getAllocator(name);
+    __attribute__((unused)) auto ra = getAllocator(name);
     UMPIRE_ERROR(runtime_error,
                  umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name, ra.getName()));
   }
