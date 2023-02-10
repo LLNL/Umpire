@@ -32,7 +32,7 @@ ibm_clang_14_0_5_mpi:
 
 ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc +tools +cuda +ipc_shmem +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0"
+    SPEC: "~shared ~device_alloc +tools +cuda +ipc_shmem +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0+allow-unsupported-compilers"
   extends: .build_and_test_on_lassen
 
 clang_12_0_1_libcpp:
@@ -70,7 +70,7 @@ gcc_8_3_1_numa:
 
 gcc_8_3_1_cuda_11_7_0:
   variables:
-    SPEC: "+fortran +cuda +tools +backtrace ~device_alloc tests=basic %gcc@8.3.1 ^cuda@11.7.0"
+    SPEC: "+fortran +cuda +tools +backtrace ~device_alloc tests=basic %gcc@8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
   extends: .build_and_test_on_lassen
 
 # Develop/main builds against specific tpl versions.
@@ -82,10 +82,10 @@ gcc_8_3_1_tpls:
 
 ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers ^blt@develop"
   extends: .build_and_test_on_lassen
 
 xl_2022_08_19_gcc_8_3_1_cuda_11_7_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0 ^blt@develop"
+    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers ^blt@develop"
   extends: .build_and_test_on_lassen
