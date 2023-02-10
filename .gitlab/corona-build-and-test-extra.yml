@@ -27,6 +27,6 @@
 ###
 rocm_5_1_1_openmp_clang_13_0_0:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm ~device_alloc tests=basic amdgpu_target=gfx906 %clang@13.0.0 ^hip@5.1.1 ^blt@develop"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx906 %clang@13.0.0 ^hip@5.1.1 ^blt@develop"
   extends: .build_and_test_on_corona
 

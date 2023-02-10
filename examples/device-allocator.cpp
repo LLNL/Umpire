@@ -32,7 +32,7 @@ __global__ void my_kernel(double** data_ptr)
   }
 }
 
-int main(int argc, char const* argv[])
+int main()
 {
   auto resource = camp::resources::Resource{resource_type{}};
 
