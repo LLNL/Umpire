@@ -21,29 +21,29 @@
 # ${PROJECT_<MACHINE>_DEPS} in the extra jobs. There is not reason not to fully
 # describe the spec here.
 
-gcc_8_1_0_numa:
+gcc_10_2_1_numa:
   variables:
-    SPEC: "~shared +fortran +numa ~device_alloc +tools tests=basic %gcc@8.1.0"
+    SPEC: "~shared +fortran +numa ~device_alloc +tools tests=basic %gcc@10.2.1"
   extends: .build_and_test_on_ruby
 
-clang_10_0_1_sqlite_experimental:
+clang_14_0_4_sqlite_experimental:
   variables:
-    SPEC: "~shared +sqlite_experimental ~device_alloc +tools tests=basic %clang@10.0.1"
+    SPEC: "~shared +sqlite_experimental ~device_alloc +tools tests=basic %clang@14.0.4"
   extends: .build_and_test_on_ruby
 
 # Develop builds against specific tpl version.
-pgi_20_1_gcc_local_8_3_1_tpls:
+pgi_22_1_gcc_local_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@20.1 cxxflags==\"-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc\" cflags==\"-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc\" fflags==\"-rc=/usr/workspace/umpire/pgi/x86_64/local-gcc-8.3.1-rc\" ^blt@develop"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@22.1.gcc.local.8.3.1 ^blt@develop"
   extends: .build_and_test_on_ruby
 
-clang_10_0_1_tpls:
+clang_14_0_4_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@10.0.1 ^blt@develop"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@14.0.4 ^blt@develop"
   extends: .build_and_test_on_ruby
 
-gcc_8_1_0_tpls:
+gcc_10_2_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %gcc@8.1.0 ^blt@develop"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %gcc@10.2.1 ^blt@develop"
   extends: .build_and_test_on_ruby
 
