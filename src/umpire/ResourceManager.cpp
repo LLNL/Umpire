@@ -283,7 +283,7 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
   m_default_allocator = allocator.getAllocationStrategy();
 }
 
-// Using unused attribute to silence warning from rocm compiler 
+// Using unused attribute to silence warning from rocm compiler
 void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
