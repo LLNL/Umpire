@@ -287,7 +287,8 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
-    __attribute__((unused)) auto ra = getAllocator(name);
+    auto ra = getAllocator(name);
+    UMPIRE_USE_VAR(ra);
     UMPIRE_ERROR(runtime_error,
                  umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name, ra.getName()));
   }
