@@ -5,14 +5,14 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_LOCALE_H_
-#define FMT_LOCALE_H_
+#ifndef UMPIRE_FMT_LOCALE_H_
+#define UMPIRE_FMT_LOCALE_H_
 
 #include <locale>
 
 #include "format.h"
 
-FMT_BEGIN_NAMESPACE
+UMPIRE_FMT_BEGIN_NAMESPACE
 
 namespace detail {
 template <typename Char>
@@ -41,7 +41,7 @@ inline std::basic_string<Char> format(const std::locale& loc,
 
 template <typename S, typename OutputIt, typename... Args,
           typename Char = char_t<S>,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value)>
 inline OutputIt vformat_to(
     OutputIt out, const std::locale& loc, const S& format_str,
     basic_format_args<buffer_context<type_identity_t<Char>>> args) {
@@ -59,6 +59,6 @@ inline auto format_to(OutputIt out, const std::locale& loc, const S& format_str,
   return vformat_to(out, loc, to_string_view(format_str), vargs);
 }
 
-FMT_END_NAMESPACE
+UMPIRE_FMT_END_NAMESPACE
 
-#endif  // FMT_LOCALE_H_
+#endif  // UMPIRE_FMT_LOCALE_H_
