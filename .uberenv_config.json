@@ -3,6 +3,7 @@
 "package_version" : "develop",
 "package_final_phase" : "initconfig",
 "package_source_dir" : "../..",
+"force_commandline_prefix" : false,
 "spack_url": "https://github.com/spack/spack.git",
 "spack_branch": "v0.19.0",
 "spack_activate" : {},
