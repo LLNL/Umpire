@@ -49,7 +49,7 @@ variables:
 # Project specific variants for lassen
   PROJECT_LASSEN_VARIANTS: "~shared +fortran ~device_alloc +tools tests=basic "
 # Project specific deps for lassen
-  PROJECT_LASSEN_DEPS: "^blt@"cab32b28a254b0f0851adb3faea38b6cf9aea1ad
+  PROJECT_LASSEN_DEPS: "^blt@cab32b28a254b0f0851adb3faea38b6cf9aea1ad"
 
 
 # Configuration shared by build and test jobs specific to this project.
