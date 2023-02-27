@@ -37,7 +37,7 @@ variables:
 # TODO: add a clean-up mechanism
   BUILD_ROOT: ${CI_PROJECT_DIR}
 # Set the build-and-test command.
-  BUILD_AND_TEST_CMD: "./scripts/gitlab/build-and-test.sh"
+  BUILD_AND_TEST_CMD: "./scripts/gitlab/build_and_test.sh"
 # Override the list of branch that will skip the "draft PR test".
 # Add protected branches here. Defaults to "develop main master".
 #  ALWAYS_RUN_LIST: ""
