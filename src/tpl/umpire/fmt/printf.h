@@ -5,15 +5,15 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_PRINTF_H_
-#define FMT_PRINTF_H_
+#ifndef UMPIRE_FMT_PRINTF_H_
+#define UMPIRE_FMT_PRINTF_H_
 
 #include <algorithm>  // std::max
 #include <limits>     // std::numeric_limits
 
 #include "ostream.h"
 
-FMT_BEGIN_NAMESPACE
+UMPIRE_FMT_BEGIN_NAMESPACE
 namespace detail {
 
 // Checks if a value fits in int - used to avoid warnings about comparing
@@ -36,16 +36,16 @@ template <> struct int_checker<true> {
 
 class printf_precision_handler {
  public:
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(std::is_integral<T>::value)>
   int operator()(T value) {
     if (!int_checker<std::numeric_limits<T>::is_signed>::fits_in_int(value))
-      FMT_THROW(format_error("number is too big"));
+      UMPIRE_FMT_THROW(format_error("number is too big"));
     return (std::max)(static_cast<int>(value), 0);
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(!std::is_integral<T>::value)>
   int operator()(T) {
-    FMT_THROW(format_error("precision is not integer"));
+    UMPIRE_FMT_THROW(format_error("precision is not integer"));
     return 0;
   }
 };
@@ -53,12 +53,12 @@ class printf_precision_handler {
 // An argument visitor that returns true iff arg is a zero integer.
 class is_zero_int {
  public:
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(std::is_integral<T>::value)>
   bool operator()(T value) {
     return value == 0;
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(!std::is_integral<T>::value)>
   bool operator()(T) {
     return false;
   }
@@ -83,7 +83,7 @@ template <typename T, typename Context> class arg_converter {
     if (type_ != 's') operator()<bool>(value);
   }
 
-  template <typename U, FMT_ENABLE_IF(std::is_integral<U>::value)>
+  template <typename U, UMPIRE_FMT_ENABLE_IF(std::is_integral<U>::value)>
   void operator()(U value) {
     bool is_signed = type_ == 'd' || type_ == 'i';
     using target_type = conditional_t<std::is_same<T, void>::value, U, T>;
@@ -110,7 +110,7 @@ template <typename T, typename Context> class arg_converter {
     }
   }
 
-  template <typename U, FMT_ENABLE_IF(!std::is_integral<U>::value)>
+  template <typename U, UMPIRE_FMT_ENABLE_IF(!std::is_integral<U>::value)>
   void operator()(U) {}  // No conversion needed for non-integral types.
 };
 
@@ -131,13 +131,13 @@ template <typename Context> class char_converter {
  public:
   explicit char_converter(basic_format_arg<Context>& arg) : arg_(arg) {}
 
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(std::is_integral<T>::value)>
   void operator()(T value) {
     arg_ = detail::make_arg<Context>(
         static_cast<typename Context::char_type>(value));
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(!std::is_integral<T>::value)>
   void operator()(T) {}  // No conversion needed for non-integral types.
 };
 
@@ -159,7 +159,7 @@ template <typename Char> class printf_width_handler {
  public:
   explicit printf_width_handler(format_specs& specs) : specs_(specs) {}
 
-  template <typename T, FMT_ENABLE_IF(std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(std::is_integral<T>::value)>
   unsigned operator()(T value) {
     auto width = static_cast<uint32_or_64_or_128_t<T>>(value);
     if (detail::is_negative(value)) {
@@ -167,13 +167,13 @@ template <typename Char> class printf_width_handler {
       width = 0 - width;
     }
     unsigned int_max = max_value<int>();
-    if (width > int_max) FMT_THROW(format_error("number is too big"));
+    if (width > int_max) UMPIRE_FMT_THROW(format_error("number is too big"));
     return static_cast<unsigned>(width);
   }
 
-  template <typename T, FMT_ENABLE_IF(!std::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(!std::is_integral<T>::value)>
   unsigned operator()(T) {
-    FMT_THROW(format_error("width is not integer"));
+    UMPIRE_FMT_THROW(format_error("width is not integer"));
     return 0;
   }
 };
@@ -187,7 +187,7 @@ void vprintf(buffer<Char>& buf, basic_string_view<Char> format,
 
 // For printing into memory_buffer.
 template <typename Char, typename Context>
-FMT_DEPRECATED void printf(detail::buffer<Char>& buf,
+UMPIRE_FMT_DEPRECATED void printf(detail::buffer<Char>& buf,
                            basic_string_view<Char> format,
                            basic_format_args<Context> args) {
   return detail::vprintf(buf, format, args);
@@ -227,7 +227,7 @@ class printf_arg_formatter : public detail::arg_formatter_base<OutputIt, Char> {
 
   OutputIt operator()(monostate value) { return base::operator()(value); }
 
-  template <typename T, FMT_ENABLE_IF(umpire::fmt::detail::is_integral<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(umpire::fmt::detail::is_integral<T>::value)>
   OutputIt operator()(T value) {
     // MSVC2013 fails to compile separate overloads for bool and Char so use
     // std::is_same instead.
@@ -247,7 +247,7 @@ class printf_arg_formatter : public detail::arg_formatter_base<OutputIt, Char> {
     return base::operator()(value);
   }
 
-  template <typename T, FMT_ENABLE_IF(std::is_floating_point<T>::value)>
+  template <typename T, UMPIRE_FMT_ENABLE_IF(std::is_floating_point<T>::value)>
   OutputIt operator()(T value) {
     return base::operator()(value);
   }
@@ -344,7 +344,7 @@ template <typename OutputIt, typename Char> class basic_printf_context {
 
   parse_context_type& parse_context() { return parse_ctx_; }
 
-  FMT_CONSTEXPR void on_error(const char* message) {
+  UMPIRE_FMT_CONSTEXPR void on_error(const char* message) {
     parse_ctx_.on_error(message);
   }
 
@@ -542,7 +542,7 @@ OutputIt basic_printf_context<OutputIt, Char>::format() {
     }
 
     // Parse type.
-    if (it == end) FMT_THROW(format_error("invalid format string"));
+    if (it == end) UMPIRE_FMT_THROW(format_error("invalid format string"));
     specs.type = static_cast<char>(*it++);
     if (arg.is_integral()) {
       // Normalize type.
@@ -672,7 +672,7 @@ inline int vprintf(
   \endrst
  */
 template <typename S, typename... Args,
-          FMT_ENABLE_IF(detail::is_string<S>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_string<S>::value)>
 inline int printf(const S& format_str, const Args&... args) {
   using context = basic_printf_context_t<char_t<S>>;
   return vprintf(to_string_view(format_str),
@@ -717,6 +717,6 @@ inline int fprintf(std::basic_ostream<Char>& os, const S& format_str,
   return vfprintf(os, to_string_view(format_str),
                   make_format_args<context>(args...));
 }
-FMT_END_NAMESPACE
+UMPIRE_FMT_END_NAMESPACE
 
-#endif  // FMT_PRINTF_H_
+#endif  // UMPIRE_FMT_PRINTF_H_
