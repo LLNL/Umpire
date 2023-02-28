@@ -25,8 +25,8 @@
 # This job intentionally tests our umpire package.py because although this job does not
 # explicitly have the ~tools, the package.py should still disable tools from being built.
 ###
-rocm_5_4_2_openmp_clang_15_0_0:
+rocmcc_5_4_2_hip_openmp:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm ~device_alloc tests=basic amdgpu_target=gfx90a %clang@15.0.0 ^hip@5.4.2 ^blt@develop"
+    SPEC: "~shared +fortran +openmp +rocm ~device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.4.2 ^hip@5.4.2 ^blt@develop"
   extends: .build_and_test_on_tioga
 
