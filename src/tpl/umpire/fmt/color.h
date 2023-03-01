@@ -5,19 +5,19 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_COLOR_H_
-#define FMT_COLOR_H_
+#ifndef UMPIRE_FMT_COLOR_H_
+#define UMPIRE_FMT_COLOR_H_
 
 #include "format.h"
 
 // __declspec(deprecated) is broken in some MSVC versions.
-#if FMT_MSC_VER
-#  define FMT_DEPRECATED_NONMSVC
+#if UMPIRE_FMT_MSC_VER
+#  define UMPIRE_FMT_DEPRECATED_NONMSVC
 #else
-#  define FMT_DEPRECATED_NONMSVC FMT_DEPRECATED
+#  define UMPIRE_FMT_DEPRECATED_NONMSVC UMPIRE_FMT_DEPRECATED
 #endif
 
-FMT_BEGIN_NAMESPACE
+UMPIRE_FMT_BEGIN_NAMESPACE
 
 enum class color : uint32_t {
   alice_blue = 0xF0F8FF,               // rgb(240,248,255)
@@ -192,11 +192,11 @@ enum class emphasis : uint8_t {
 // rgb is a struct for red, green and blue colors.
 // Using the name "rgb" makes some editors show the color in a tooltip.
 struct rgb {
-  FMT_CONSTEXPR rgb() : r(0), g(0), b(0) {}
-  FMT_CONSTEXPR rgb(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
-  FMT_CONSTEXPR rgb(uint32_t hex)
+  UMPIRE_FMT_CONSTEXPR rgb() : r(0), g(0), b(0) {}
+  UMPIRE_FMT_CONSTEXPR rgb(uint8_t r_, uint8_t g_, uint8_t b_) : r(r_), g(g_), b(b_) {}
+  UMPIRE_FMT_CONSTEXPR rgb(uint32_t hex)
       : r((hex >> 16) & 0xFF), g((hex >> 8) & 0xFF), b(hex & 0xFF) {}
-  FMT_CONSTEXPR rgb(color hex)
+  UMPIRE_FMT_CONSTEXPR rgb(color hex)
       : r((uint32_t(hex) >> 16) & 0xFF),
         g((uint32_t(hex) >> 8) & 0xFF),
         b(uint32_t(hex) & 0xFF) {}
@@ -209,16 +209,16 @@ namespace detail {
 
 // color is a struct of either a rgb color or a terminal color.
 struct color_type {
-  FMT_CONSTEXPR color_type() FMT_NOEXCEPT : is_rgb(), value{} {}
-  FMT_CONSTEXPR color_type(color rgb_color) FMT_NOEXCEPT : is_rgb(true),
+  UMPIRE_FMT_CONSTEXPR color_type() UMPIRE_FMT_NOEXCEPT : is_rgb(), value{} {}
+  UMPIRE_FMT_CONSTEXPR color_type(color rgb_color) UMPIRE_FMT_NOEXCEPT : is_rgb(true),
                                                            value{} {
     value.rgb_color = static_cast<uint32_t>(rgb_color);
   }
-  FMT_CONSTEXPR color_type(rgb rgb_color) FMT_NOEXCEPT : is_rgb(true), value{} {
+  UMPIRE_FMT_CONSTEXPR color_type(rgb rgb_color) UMPIRE_FMT_NOEXCEPT : is_rgb(true), value{} {
     value.rgb_color = (static_cast<uint32_t>(rgb_color.r) << 16) |
                       (static_cast<uint32_t>(rgb_color.g) << 8) | rgb_color.b;
   }
-  FMT_CONSTEXPR color_type(terminal_color term_color) FMT_NOEXCEPT : is_rgb(),
+  UMPIRE_FMT_CONSTEXPR color_type(terminal_color term_color) UMPIRE_FMT_NOEXCEPT : is_rgb(),
                                                                      value{} {
     value.term_color = static_cast<uint8_t>(term_color);
   }
@@ -233,18 +233,18 @@ struct color_type {
 /** A text style consisting of foreground and background colors and emphasis. */
 class text_style {
  public:
-  FMT_CONSTEXPR text_style(emphasis em = emphasis()) FMT_NOEXCEPT
+  UMPIRE_FMT_CONSTEXPR text_style(emphasis em = emphasis()) UMPIRE_FMT_NOEXCEPT
       : set_foreground_color(),
         set_background_color(),
         ems(em) {}
 
-  FMT_CONSTEXPR text_style& operator|=(const text_style& rhs) {
+  UMPIRE_FMT_CONSTEXPR text_style& operator|=(const text_style& rhs) {
     if (!set_foreground_color) {
       set_foreground_color = rhs.set_foreground_color;
       foreground_color = rhs.foreground_color;
     } else if (rhs.set_foreground_color) {
       if (!foreground_color.is_rgb || !rhs.foreground_color.is_rgb)
-        FMT_THROW(format_error("can't OR a terminal color"));
+        UMPIRE_FMT_THROW(format_error("can't OR a terminal color"));
       foreground_color.value.rgb_color |= rhs.foreground_color.value.rgb_color;
     }
 
@@ -253,7 +253,7 @@ class text_style {
       background_color = rhs.background_color;
     } else if (rhs.set_background_color) {
       if (!background_color.is_rgb || !rhs.background_color.is_rgb)
-        FMT_THROW(format_error("can't OR a terminal color"));
+        UMPIRE_FMT_THROW(format_error("can't OR a terminal color"));
       background_color.value.rgb_color |= rhs.background_color.value.rgb_color;
     }
 
@@ -262,46 +262,46 @@ class text_style {
     return *this;
   }
 
-  friend FMT_CONSTEXPR text_style operator|(text_style lhs,
+  friend UMPIRE_FMT_CONSTEXPR text_style operator|(text_style lhs,
                                             const text_style& rhs) {
     return lhs |= rhs;
   }
 
-  FMT_DEPRECATED_NONMSVC FMT_CONSTEXPR text_style& operator&=(
+  UMPIRE_FMT_DEPRECATED_NONMSVC UMPIRE_FMT_CONSTEXPR text_style& operator&=(
       const text_style& rhs) {
     return and_assign(rhs);
   }
 
-  FMT_DEPRECATED_NONMSVC friend FMT_CONSTEXPR text_style
+  UMPIRE_FMT_DEPRECATED_NONMSVC friend UMPIRE_FMT_CONSTEXPR text_style
   operator&(text_style lhs, const text_style& rhs) {
     return lhs.and_assign(rhs);
   }
 
-  FMT_CONSTEXPR bool has_foreground() const FMT_NOEXCEPT {
+  UMPIRE_FMT_CONSTEXPR bool has_foreground() const UMPIRE_FMT_NOEXCEPT {
     return set_foreground_color;
   }
-  FMT_CONSTEXPR bool has_background() const FMT_NOEXCEPT {
+  UMPIRE_FMT_CONSTEXPR bool has_background() const UMPIRE_FMT_NOEXCEPT {
     return set_background_color;
   }
-  FMT_CONSTEXPR bool has_emphasis() const FMT_NOEXCEPT {
+  UMPIRE_FMT_CONSTEXPR bool has_emphasis() const UMPIRE_FMT_NOEXCEPT {
     return static_cast<uint8_t>(ems) != 0;
   }
-  FMT_CONSTEXPR detail::color_type get_foreground() const FMT_NOEXCEPT {
-    FMT_ASSERT(has_foreground(), "no foreground specified for this style");
+  UMPIRE_FMT_CONSTEXPR detail::color_type get_foreground() const UMPIRE_FMT_NOEXCEPT {
+    UMPIRE_FMT_ASSERT(has_foreground(), "no foreground specified for this style");
     return foreground_color;
   }
-  FMT_CONSTEXPR detail::color_type get_background() const FMT_NOEXCEPT {
-    FMT_ASSERT(has_background(), "no background specified for this style");
+  UMPIRE_FMT_CONSTEXPR detail::color_type get_background() const UMPIRE_FMT_NOEXCEPT {
+    UMPIRE_FMT_ASSERT(has_background(), "no background specified for this style");
     return background_color;
   }
-  FMT_CONSTEXPR emphasis get_emphasis() const FMT_NOEXCEPT {
-    FMT_ASSERT(has_emphasis(), "no emphasis specified for this style");
+  UMPIRE_FMT_CONSTEXPR emphasis get_emphasis() const UMPIRE_FMT_NOEXCEPT {
+    UMPIRE_FMT_ASSERT(has_emphasis(), "no emphasis specified for this style");
     return ems;
   }
 
  private:
-  FMT_CONSTEXPR text_style(bool is_foreground,
-                           detail::color_type text_color) FMT_NOEXCEPT
+  UMPIRE_FMT_CONSTEXPR text_style(bool is_foreground,
+                           detail::color_type text_color) UMPIRE_FMT_NOEXCEPT
       : set_foreground_color(),
         set_background_color(),
         ems() {
@@ -315,13 +315,13 @@ class text_style {
   }
 
   // DEPRECATED!
-  FMT_CONSTEXPR text_style& and_assign(const text_style& rhs) {
+  UMPIRE_FMT_CONSTEXPR text_style& and_assign(const text_style& rhs) {
     if (!set_foreground_color) {
       set_foreground_color = rhs.set_foreground_color;
       foreground_color = rhs.foreground_color;
     } else if (rhs.set_foreground_color) {
       if (!foreground_color.is_rgb || !rhs.foreground_color.is_rgb)
-        FMT_THROW(format_error("can't AND a terminal color"));
+        UMPIRE_FMT_THROW(format_error("can't AND a terminal color"));
       foreground_color.value.rgb_color &= rhs.foreground_color.value.rgb_color;
     }
 
@@ -330,7 +330,7 @@ class text_style {
       background_color = rhs.background_color;
     } else if (rhs.set_background_color) {
       if (!background_color.is_rgb || !rhs.background_color.is_rgb)
-        FMT_THROW(format_error("can't AND a terminal color"));
+        UMPIRE_FMT_THROW(format_error("can't AND a terminal color"));
       background_color.value.rgb_color &= rhs.background_color.value.rgb_color;
     }
 
@@ -339,11 +339,11 @@ class text_style {
     return *this;
   }
 
-  friend FMT_CONSTEXPR_DECL text_style fg(detail::color_type foreground)
-      FMT_NOEXCEPT;
+  friend UMPIRE_FMT_CONSTEXPR_DECL text_style fg(detail::color_type foreground)
+      UMPIRE_FMT_NOEXCEPT;
 
-  friend FMT_CONSTEXPR_DECL text_style bg(detail::color_type background)
-      FMT_NOEXCEPT;
+  friend UMPIRE_FMT_CONSTEXPR_DECL text_style bg(detail::color_type background)
+      UMPIRE_FMT_NOEXCEPT;
 
   detail::color_type foreground_color;
   detail::color_type background_color;
@@ -353,25 +353,25 @@ class text_style {
 };
 
 /** Creates a text style from the foreground (text) color. */
-FMT_CONSTEXPR inline text_style fg(detail::color_type foreground) FMT_NOEXCEPT {
+UMPIRE_FMT_CONSTEXPR inline text_style fg(detail::color_type foreground) UMPIRE_FMT_NOEXCEPT {
   return text_style(true, foreground);
 }
 
 /** Creates a text style from the background color. */
-FMT_CONSTEXPR inline text_style bg(detail::color_type background) FMT_NOEXCEPT {
+UMPIRE_FMT_CONSTEXPR inline text_style bg(detail::color_type background) UMPIRE_FMT_NOEXCEPT {
   return text_style(false, background);
 }
 
-FMT_CONSTEXPR inline text_style operator|(emphasis lhs,
-                                          emphasis rhs) FMT_NOEXCEPT {
+UMPIRE_FMT_CONSTEXPR inline text_style operator|(emphasis lhs,
+                                          emphasis rhs) UMPIRE_FMT_NOEXCEPT {
   return text_style(lhs) | rhs;
 }
 
 namespace detail {
 
 template <typename Char> struct ansi_color_escape {
-  FMT_CONSTEXPR ansi_color_escape(detail::color_type text_color,
-                                  const char* esc) FMT_NOEXCEPT {
+  UMPIRE_FMT_CONSTEXPR ansi_color_escape(detail::color_type text_color,
+                                  const char* esc) UMPIRE_FMT_NOEXCEPT {
     // If we have a terminal color, we need to output another escape code
     // sequence.
     if (!text_color.is_rgb) {
@@ -406,7 +406,7 @@ template <typename Char> struct ansi_color_escape {
     to_esc(color.b, buffer + 15, 'm');
     buffer[19] = static_cast<Char>(0);
   }
-  FMT_CONSTEXPR ansi_color_escape(emphasis em) FMT_NOEXCEPT {
+  UMPIRE_FMT_CONSTEXPR ansi_color_escape(emphasis em) UMPIRE_FMT_NOEXCEPT {
     uint8_t em_codes[4] = {};
     uint8_t em_bits = static_cast<uint8_t>(em);
     if (em_bits & static_cast<uint8_t>(emphasis::bold)) em_codes[0] = 1;
@@ -425,18 +425,18 @@ template <typename Char> struct ansi_color_escape {
     }
     buffer[index++] = static_cast<Char>(0);
   }
-  FMT_CONSTEXPR operator const Char*() const FMT_NOEXCEPT { return buffer; }
+  UMPIRE_FMT_CONSTEXPR operator const Char*() const UMPIRE_FMT_NOEXCEPT { return buffer; }
 
-  FMT_CONSTEXPR const Char* begin() const FMT_NOEXCEPT { return buffer; }
-  FMT_CONSTEXPR const Char* end() const FMT_NOEXCEPT {
+  UMPIRE_FMT_CONSTEXPR const Char* begin() const UMPIRE_FMT_NOEXCEPT { return buffer; }
+  UMPIRE_FMT_CONSTEXPR const Char* end() const UMPIRE_FMT_NOEXCEPT {
     return buffer + std::char_traits<Char>::length(buffer);
   }
 
  private:
   Char buffer[7u + 3u * 4u + 1u];
 
-  static FMT_CONSTEXPR void to_esc(uint8_t c, Char* out,
-                                   char delimiter) FMT_NOEXCEPT {
+  static UMPIRE_FMT_CONSTEXPR void to_esc(uint8_t c, Char* out,
+                                   char delimiter) UMPIRE_FMT_NOEXCEPT {
     out[0] = static_cast<Char>('0' + c / 100);
     out[1] = static_cast<Char>('0' + c / 10 % 10);
     out[2] = static_cast<Char>('0' + c % 10);
@@ -445,42 +445,42 @@ template <typename Char> struct ansi_color_escape {
 };
 
 template <typename Char>
-FMT_CONSTEXPR ansi_color_escape<Char> make_foreground_color(
-    detail::color_type foreground) FMT_NOEXCEPT {
+UMPIRE_FMT_CONSTEXPR ansi_color_escape<Char> make_foreground_color(
+    detail::color_type foreground) UMPIRE_FMT_NOEXCEPT {
   return ansi_color_escape<Char>(foreground, detail::data::foreground_color);
 }
 
 template <typename Char>
-FMT_CONSTEXPR ansi_color_escape<Char> make_background_color(
-    detail::color_type background) FMT_NOEXCEPT {
+UMPIRE_FMT_CONSTEXPR ansi_color_escape<Char> make_background_color(
+    detail::color_type background) UMPIRE_FMT_NOEXCEPT {
   return ansi_color_escape<Char>(background, detail::data::background_color);
 }
 
 template <typename Char>
-FMT_CONSTEXPR ansi_color_escape<Char> make_emphasis(emphasis em) FMT_NOEXCEPT {
+UMPIRE_FMT_CONSTEXPR ansi_color_escape<Char> make_emphasis(emphasis em) UMPIRE_FMT_NOEXCEPT {
   return ansi_color_escape<Char>(em);
 }
 
 template <typename Char>
-inline void fputs(const Char* chars, FILE* stream) FMT_NOEXCEPT {
+inline void fputs(const Char* chars, FILE* stream) UMPIRE_FMT_NOEXCEPT {
   std::fputs(chars, stream);
 }
 
 template <>
-inline void fputs<wchar_t>(const wchar_t* chars, FILE* stream) FMT_NOEXCEPT {
+inline void fputs<wchar_t>(const wchar_t* chars, FILE* stream) UMPIRE_FMT_NOEXCEPT {
   std::fputws(chars, stream);
 }
 
-template <typename Char> inline void reset_color(FILE* stream) FMT_NOEXCEPT {
+template <typename Char> inline void reset_color(FILE* stream) UMPIRE_FMT_NOEXCEPT {
   fputs(detail::data::reset_color, stream);
 }
 
-template <> inline void reset_color<wchar_t>(FILE* stream) FMT_NOEXCEPT {
+template <> inline void reset_color<wchar_t>(FILE* stream) UMPIRE_FMT_NOEXCEPT {
   fputs(detail::data::wreset_color, stream);
 }
 
 template <typename Char>
-inline void reset_color(buffer<Char>& buffer) FMT_NOEXCEPT {
+inline void reset_color(buffer<Char>& buffer) UMPIRE_FMT_NOEXCEPT {
   const char* begin = data::reset_color;
   const char* end = begin + sizeof(data::reset_color) - 1;
   buffer.append(begin, end);
@@ -532,7 +532,7 @@ void vprint(std::FILE* f, const text_style& ts, const S& format,
   \endrst
  */
 template <typename S, typename... Args,
-          FMT_ENABLE_IF(detail::is_string<S>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_string<S>::value)>
 void print(std::FILE* f, const text_style& ts, const S& format_str,
            const Args&... args) {
   vprint(f, ts, format_str,
@@ -551,7 +551,7 @@ void print(std::FILE* f, const text_style& ts, const S& format_str,
   \endrst
  */
 template <typename S, typename... Args,
-          FMT_ENABLE_IF(detail::is_string<S>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_string<S>::value)>
 void print(const text_style& ts, const S& format_str, const Args&... args) {
   return print(stdout, ts, format_str, args...);
 }
@@ -588,7 +588,7 @@ inline std::basic_string<Char> format(const text_style& ts, const S& format_str,
   Formats a string with the given text_style and writes the output to ``out``.
  */
 template <typename OutputIt, typename Char,
-          FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_output_iterator<OutputIt, Char>::value)>
 OutputIt vformat_to(
     OutputIt out, const text_style& ts, basic_string_view<Char> format_str,
     basic_format_args<buffer_context<type_identity_t<Char>>> args) {
@@ -619,6 +619,6 @@ inline auto format_to(OutputIt out, const text_style& ts, const S& format_str,
                     umpire::fmt::make_args_checked<Args...>(format_str, args...));
 }
 
-FMT_END_NAMESPACE
+UMPIRE_FMT_END_NAMESPACE
 
-#endif  // FMT_COLOR_H_
+#endif  // UMPIRE_FMT_COLOR_H_

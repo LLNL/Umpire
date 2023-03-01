@@ -6,9 +6,9 @@
 #ifndef UMPIRE_fmt_HPP
 #define UMPIRE_fmt_HPP
 
-#define FMT_EXCEPTIONS 0
-#define FMT_HEADER_ONLY 1
-#define FMT_DEPRECATED
+#define UMPIRE_FMT_EXCEPTIONS 0
+#define UMPIRE_FMT_HEADER_ONLY 1
+#define UMPIRE_FMT_DEPRECATED
 
 #include "args.h"
 #include "chrono.h"

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -221,6 +221,9 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
   } else
 #else
   UMPIRE_USE_VAR(name);
+
+  // Using unused attribute to silence warning from rocm compiler
+  UMPIRE_USE_VAR(allocator);
 #endif // defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 
   {

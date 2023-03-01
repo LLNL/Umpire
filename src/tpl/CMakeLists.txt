@@ -50,7 +50,13 @@ target_include_directories(
   umpire_tpl_json
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+
+blt_convert_to_system_includes(TARGET umpire_tpl_json)
+
+target_include_directories(
+  umpire_tpl_json
+  INTERFACE
   $<INSTALL_INTERFACE:include>)
 
 install(FILES
@@ -64,8 +70,6 @@ install(TARGETS
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-blt_patch_target(NAME umpire_tpl_json
-                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 #
 # CLI11 Option Parsing Headers
@@ -82,7 +86,13 @@ target_include_directories(
   umpire_tpl_CLI11
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+
+blt_convert_to_system_includes(TARGET umpire_tpl_CLI11)
+
+target_include_directories(
+  umpire_tpl_CLI11
+  INTERFACE
   $<INSTALL_INTERFACE:include>)
 
 install(FILES
@@ -95,9 +105,6 @@ install(TARGETS
   RUNTIME DESTINATION lib
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
-
-blt_patch_target(NAME umpire_tpl_CLI11
-                 TREAT_INCLUDES_AS_SYSTEM ON)
 
 add_subdirectory(umpire/judy)
 
@@ -153,7 +160,14 @@ target_include_directories(
   umpire_tpl_fmt
   INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src/tpl>
-  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)
+
+# Avoid warnings from fmt (so we can still use -Werror)
+blt_convert_to_system_includes(TARGET umpire_tpl_fmt)
+
+target_include_directories(
+  umpire_tpl_fmt
+  INTERFACE
   $<INSTALL_INTERFACE:include>)
 
 if (C_COMPILER_FAMILY_IS_XL)
@@ -168,20 +182,16 @@ if (C_COMPILER_FAMILY_IS_PGI)
   set(_fmt_warning_disable_flag
    "--diag_suppress 1625;--diag_suppress 185;--diag_suppress 811;--diag_suppress 186")
    
-   if (ENABLE_FORTRAN)
+  if (ENABLE_FORTRAN)
     target_compile_options(umpire_tpl_fmt
       INTERFACE 
       $<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${_fmt_warning_disable_flag}>)
-    else ()
-      target_compile_options(umpire_tpl_fmt
-        INTERFACE 
-        ${_fmt_warning_disable_flag})
-    endif ()
+  else ()
+    target_compile_options(umpire_tpl_fmt
+      INTERFACE 
+      ${_fmt_warning_disable_flag})
+  endif ()
 endif ()
-
-# Avoid warnings from fmt (so we can still use -Werror)
-blt_patch_target(NAME umpire_tpl_fmt
-  TREAT_INCLUDES_AS_SYSTEM ON)
 
 if (C_COMPILER_FAMILY_IS_GNU)
   target_compile_options(umpire_tpl_fmt

@@ -5,8 +5,8 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_OS_H_
-#define FMT_OS_H_
+#ifndef UMPIRE_FMT_OS_H_
+#define UMPIRE_FMT_OS_H_
 
 #include <cerrno>
 #include <clocale>  // for locale_t
@@ -21,54 +21,54 @@
 #include "format.h"
 
 // UWP doesn't provide _pipe.
-#if FMT_HAS_INCLUDE("winapifamily.h")
+#if UMPIRE_FMT_HAS_INCLUDE("winapifamily.h")
 #  include <winapifamily.h>
 #endif
-#if (FMT_HAS_INCLUDE(<fcntl.h>) || defined(__APPLE__) || \
+#if (UMPIRE_FMT_HAS_INCLUDE(<fcntl.h>) || defined(__APPLE__) || \
      defined(__linux__)) &&                              \
     (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
 #  include <fcntl.h>  // for O_RDONLY
-#  define FMT_USE_FCNTL 1
+#  define UMPIRE_FMT_USE_FCNTL 1
 #else
-#  define FMT_USE_FCNTL 0
+#  define UMPIRE_FMT_USE_FCNTL 0
 #endif
 
-#ifndef FMT_POSIX
+#ifndef UMPIRE_FMT_POSIX
 #  if defined(_WIN32) && !defined(__MINGW32__)
 // Fix warnings about deprecated symbols.
-#    define FMT_POSIX(call) _##call
+#    define UMPIRE_FMT_POSIX(call) _##call
 #  else
-#    define FMT_POSIX(call) call
+#    define UMPIRE_FMT_POSIX(call) call
 #  endif
 #endif
 
-// Calls to system functions are wrapped in FMT_SYSTEM for testability.
-#ifdef FMT_SYSTEM
-#  define FMT_POSIX_CALL(call) FMT_SYSTEM(call)
+// Calls to system functions are wrapped in UMPIRE_FMT_SYSTEM for testability.
+#ifdef UMPIRE_FMT_SYSTEM
+#  define UMPIRE_FMT_POSIX_CALL(call) UMPIRE_FMT_SYSTEM(call)
 #else
-#  define FMT_SYSTEM(call) ::call
+#  define UMPIRE_FMT_SYSTEM(call) ::call
 #  ifdef _WIN32
 // Fix warnings about deprecated symbols.
-#    define FMT_POSIX_CALL(call) ::_##call
+#    define UMPIRE_FMT_POSIX_CALL(call) ::_##call
 #  else
-#    define FMT_POSIX_CALL(call) ::call
+#    define UMPIRE_FMT_POSIX_CALL(call) ::call
 #  endif
 #endif
 
 // Retries the expression while it evaluates to error_result and errno
 // equals to EINTR.
 #ifndef _WIN32
-#  define FMT_RETRY_VAL(result, expression, error_result) \
+#  define UMPIRE_FMT_RETRY_VAL(result, expression, error_result) \
     do {                                                  \
       (result) = (expression);                            \
     } while ((result) == (error_result) && errno == EINTR)
 #else
-#  define FMT_RETRY_VAL(result, expression, error_result) result = (expression)
+#  define UMPIRE_FMT_RETRY_VAL(result, expression, error_result) result = (expression)
 #endif
 
-#define FMT_RETRY(result, expression) FMT_RETRY_VAL(result, expression, -1)
+#define UMPIRE_FMT_RETRY(result, expression) UMPIRE_FMT_RETRY_VAL(result, expression, -1)
 
-FMT_BEGIN_NAMESPACE
+UMPIRE_FMT_BEGIN_NAMESPACE
 
 /**
   \rst
@@ -123,9 +123,9 @@ class error_code {
   int value_;
 
  public:
-  explicit error_code(int value = 0) FMT_NOEXCEPT : value_(value) {}
+  explicit error_code(int value = 0) UMPIRE_FMT_NOEXCEPT : value_(value) {}
 
-  int get() const FMT_NOEXCEPT { return value_; }
+  int get() const UMPIRE_FMT_NOEXCEPT { return value_; }
 };
 
 #ifdef _WIN32
@@ -138,7 +138,7 @@ class utf16_to_utf8 {
 
  public:
   utf16_to_utf8() {}
-  FMT_API explicit utf16_to_utf8(wstring_view s);
+  UMPIRE_FMT_API explicit utf16_to_utf8(wstring_view s);
   operator string_view() const { return string_view(&buffer_[0], size()); }
   size_t size() const { return buffer_.size() - 1; }
   const char* c_str() const { return &buffer_[0]; }
@@ -147,17 +147,17 @@ class utf16_to_utf8 {
   // Performs conversion returning a system error code instead of
   // throwing exception on conversion error. This method may still throw
   // in case of memory allocation error.
-  FMT_API int convert(wstring_view s);
+  UMPIRE_FMT_API int convert(wstring_view s);
 };
 
-FMT_API void format_windows_error(buffer<char>& out, int error_code,
-                                  string_view message) FMT_NOEXCEPT;
+UMPIRE_FMT_API void format_windows_error(buffer<char>& out, int error_code,
+                                  string_view message) UMPIRE_FMT_NOEXCEPT;
 }  // namespace detail
 
 /** A Windows error. */
 class windows_error : public system_error {
  private:
-  FMT_API void init(int error_code, string_view format_str, format_args args);
+  UMPIRE_FMT_API void init(int error_code, string_view format_str, format_args args);
 
  public:
   /**
@@ -196,8 +196,8 @@ class windows_error : public system_error {
 
 // Reports a Windows error without throwing an exception.
 // Can be used to report errors from destructors.
-FMT_API void report_windows_error(int error_code,
-                                  string_view message) FMT_NOEXCEPT;
+UMPIRE_FMT_API void report_windows_error(int error_code,
+                                  string_view message) UMPIRE_FMT_NOEXCEPT;
 #endif  // _WIN32
 
 // A buffered file.
@@ -214,13 +214,13 @@ class buffered_file {
   void operator=(const buffered_file&) = delete;
 
   // Constructs a buffered_file object which doesn't represent any file.
-  buffered_file() FMT_NOEXCEPT : file_(nullptr) {}
+  buffered_file() UMPIRE_FMT_NOEXCEPT : file_(nullptr) {}
 
   // Destroys the object closing the file it represents if any.
-  FMT_API ~buffered_file() FMT_NOEXCEPT;
+  UMPIRE_FMT_API ~buffered_file() UMPIRE_FMT_NOEXCEPT;
 
  public:
-  buffered_file(buffered_file&& other) FMT_NOEXCEPT : file_(other.file_) {
+  buffered_file(buffered_file&& other) UMPIRE_FMT_NOEXCEPT : file_(other.file_) {
     other.file_ = nullptr;
   }
 
@@ -232,17 +232,17 @@ class buffered_file {
   }
 
   // Opens a file.
-  FMT_API buffered_file(cstring_view filename, cstring_view mode);
+  UMPIRE_FMT_API buffered_file(cstring_view filename, cstring_view mode);
 
   // Closes the file.
-  FMT_API void close();
+  UMPIRE_FMT_API void close();
 
   // Returns the pointer to a FILE object representing this file.
-  FILE* get() const FMT_NOEXCEPT { return file_; }
+  FILE* get() const UMPIRE_FMT_NOEXCEPT { return file_; }
 
   // We place parentheses around fileno to workaround a bug in some versions
   // of MinGW that define fileno as a macro.
-  FMT_API int(fileno)() const;
+  UMPIRE_FMT_API int(fileno)() const;
 
   void vprint(string_view format_str, format_args args) {
     umpire::fmt::vprint(file_, format_str, args);
@@ -254,9 +254,9 @@ class buffered_file {
   }
 };
 
-#if FMT_USE_FCNTL
+#if UMPIRE_FMT_USE_FCNTL
 // A file. Closed file is represented by a file object with descriptor -1.
-// Methods that are not declared with FMT_NOEXCEPT may throw
+// Methods that are not declared with UMPIRE_FMT_NOEXCEPT may throw
 // umpire::fmt::system_error in case of failure. Note that some errors such as
 // closing the file multiple times will cause a crash on Windows rather
 // than an exception. You can get standard behavior by overriding the
@@ -271,27 +271,27 @@ class file {
  public:
   // Possible values for the oflag argument to the constructor.
   enum {
-    RDONLY = FMT_POSIX(O_RDONLY),  // Open for reading only.
-    WRONLY = FMT_POSIX(O_WRONLY),  // Open for writing only.
-    RDWR = FMT_POSIX(O_RDWR),      // Open for reading and writing.
-    CREATE = FMT_POSIX(O_CREAT),   // Create if the file doesn't exist.
-    APPEND = FMT_POSIX(O_APPEND),  // Open in append mode.
-    TRUNC = FMT_POSIX(O_TRUNC)     // Truncate the content of the file.
+    RDONLY = UMPIRE_FMT_POSIX(O_RDONLY),  // Open for reading only.
+    WRONLY = UMPIRE_FMT_POSIX(O_WRONLY),  // Open for writing only.
+    RDWR = UMPIRE_FMT_POSIX(O_RDWR),      // Open for reading and writing.
+    CREATE = UMPIRE_FMT_POSIX(O_CREAT),   // Create if the file doesn't exist.
+    APPEND = UMPIRE_FMT_POSIX(O_APPEND),  // Open in append mode.
+    TRUNC = UMPIRE_FMT_POSIX(O_TRUNC)     // Truncate the content of the file.
   };
 
   // Constructs a file object which doesn't represent any file.
-  file() FMT_NOEXCEPT : fd_(-1) {}
+  file() UMPIRE_FMT_NOEXCEPT : fd_(-1) {}
 
   // Opens a file and constructs a file object representing this file.
-  FMT_API file(cstring_view path, int oflag);
+  UMPIRE_FMT_API file(cstring_view path, int oflag);
 
  public:
   file(const file&) = delete;
   void operator=(const file&) = delete;
 
-  file(file&& other) FMT_NOEXCEPT : fd_(other.fd_) { other.fd_ = -1; }
+  file(file&& other) UMPIRE_FMT_NOEXCEPT : fd_(other.fd_) { other.fd_ = -1; }
 
-  file& operator=(file&& other) FMT_NOEXCEPT {
+  file& operator=(file&& other) UMPIRE_FMT_NOEXCEPT {
     close();
     fd_ = other.fd_;
     other.fd_ = -1;
@@ -299,43 +299,43 @@ class file {
   }
 
   // Destroys the object closing the file it represents if any.
-  FMT_API ~file() FMT_NOEXCEPT;
+  UMPIRE_FMT_API ~file() UMPIRE_FMT_NOEXCEPT;
 
   // Returns the file descriptor.
-  int descriptor() const FMT_NOEXCEPT { return fd_; }
+  int descriptor() const UMPIRE_FMT_NOEXCEPT { return fd_; }
 
   // Closes the file.
-  FMT_API void close();
+  UMPIRE_FMT_API void close();
 
   // Returns the file size. The size has signed type for consistency with
   // stat::st_size.
-  FMT_API long long size() const;
+  UMPIRE_FMT_API long long size() const;
 
   // Attempts to read count bytes from the file into the specified buffer.
-  FMT_API size_t read(void* buffer, size_t count);
+  UMPIRE_FMT_API size_t read(void* buffer, size_t count);
 
   // Attempts to write count bytes from the specified buffer to the file.
-  FMT_API size_t write(const void* buffer, size_t count);
+  UMPIRE_FMT_API size_t write(const void* buffer, size_t count);
 
   // Duplicates a file descriptor with the dup function and returns
   // the duplicate as a file object.
-  FMT_API static file dup(int fd);
+  UMPIRE_FMT_API static file dup(int fd);
 
   // Makes fd be the copy of this file descriptor, closing fd first if
   // necessary.
-  FMT_API void dup2(int fd);
+  UMPIRE_FMT_API void dup2(int fd);
 
   // Makes fd be the copy of this file descriptor, closing fd first if
   // necessary.
-  FMT_API void dup2(int fd, error_code& ec) FMT_NOEXCEPT;
+  UMPIRE_FMT_API void dup2(int fd, error_code& ec) UMPIRE_FMT_NOEXCEPT;
 
   // Creates a pipe setting up read_end and write_end file objects for reading
   // and writing respectively.
-  FMT_API static void pipe(file& read_end, file& write_end);
+  UMPIRE_FMT_API static void pipe(file& read_end, file& write_end);
 
   // Creates a buffered_file object associated with this file and detaches
   // this file object from the file.
-  FMT_API buffered_file fdopen(const char* mode);
+  UMPIRE_FMT_API buffered_file fdopen(const char* mode);
 };
 
 // Returns the memory page size.
@@ -384,7 +384,7 @@ class ostream final : private detail::buffer<char> {
     clear();
   }
 
-  FMT_API void grow(size_t) override final;
+  UMPIRE_FMT_API void grow(size_t) override final;
 
   ostream(cstring_view path, const detail::ostream_params& params)
       : file_(path, params.oflag) {
@@ -440,9 +440,9 @@ template <typename... T>
 inline ostream output_file(cstring_view path, T... params) {
   return {path, detail::ostream_params(params...)};
 }
-#endif  // FMT_USE_FCNTL
+#endif  // UMPIRE_FMT_USE_FCNTL
 
-#ifdef FMT_LOCALE
+#ifdef UMPIRE_FMT_LOCALE
 // A "C" numeric locale.
 class locale {
  private:
@@ -465,11 +465,11 @@ class locale {
 
   locale() {
 #  ifndef _WIN32
-    locale_ = FMT_SYSTEM(newlocale(LC_NUMERIC_MASK, "C", nullptr));
+    locale_ = UMPIRE_FMT_SYSTEM(newlocale(LC_NUMERIC_MASK, "C", nullptr));
 #  else
     locale_ = _create_locale(LC_NUMERIC, "C");
 #  endif
-    if (!locale_) FMT_THROW(system_error(errno, "cannot create locale"));
+    if (!locale_) UMPIRE_FMT_THROW(system_error(errno, "cannot create locale"));
   }
   ~locale() { freelocale(locale_); }
 
@@ -484,8 +484,8 @@ class locale {
     return result;
   }
 };
-using Locale FMT_DEPRECATED_ALIAS = locale;
-#endif  // FMT_LOCALE
-FMT_END_NAMESPACE
+using Locale UMPIRE_FMT_DEPRECATED_ALIAS = locale;
+#endif  // UMPIRE_FMT_LOCALE
+UMPIRE_FMT_END_NAMESPACE
 
-#endif  // FMT_OS_H_
+#endif  // UMPIRE_FMT_OS_H_

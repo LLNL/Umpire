@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,7 +10,16 @@
 #include <cstddef>
 #include <string>
 
+#include "umpire/config.hpp"
 #include "umpire/util/error.hpp"
+
+#if defined(UMPIRE_ENABLE_CUDA)
+#include <cuda_runtime_api.h>
+#endif /* UMPIRE_ENABLE_CUDA */
+
+#if defined(UMPIRE_ENABLE_HIP)
+#include <hip/hip_runtime.h>
+#endif /* UMPIRE_ENABLE_HIP */
 
 namespace umpire {
 namespace resource {
@@ -99,6 +108,15 @@ inline int resource_to_device_id(const std::string& resource)
   int device_id{0};
   if (resource.find("::") != std::string::npos) {
     device_id = std::stoi(resource.substr(resource.find("::") + 2));
+  } else {
+// get the device bound to the current process
+#if defined(UMPIRE_ENABLE_CUDA)
+    cudaGetDevice(&device_id);
+#endif /* UMPIRE_ENABLE_CUDA */
+
+#if defined(UMPIRE_ENABLE_HIP)
+    hipGetDevice(&device_id);
+#endif /* UMPIRE_ENABLE_HIP */
   }
   return device_id;
 }
