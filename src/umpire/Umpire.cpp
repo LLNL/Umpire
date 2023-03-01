@@ -209,8 +209,6 @@ umpire::MemoryResourceTraits get_default_resource_traits(const std::string& name
 void* find_pointer_from_name(Allocator allocator, const std::string& name)
 {
   void* ptr{nullptr};
-  // Using unused attribute to silence warning from rocm compiler
-  UMPIRE_USE_VAR(allocator);
 
 #if defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
   auto base_strategy = util::unwrap_allocator<strategy::AllocationStrategy>(allocator);
@@ -223,6 +221,9 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
   } else
 #else
   UMPIRE_USE_VAR(name);
+
+  // Using unused attribute to silence warning from rocm compiler
+  UMPIRE_USE_VAR(allocator);
 #endif // defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 
   {
