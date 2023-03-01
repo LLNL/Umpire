@@ -13,7 +13,7 @@ which can ...
 at once instead of making multiple, smaller memory allocations which can 
 become quite expensive. However, the performance of memory pools 
 varies widely depending upon how the memory blocks within the pool are managed.
-Each allocation within a memory pool must fit within a `memory block`.
+Each application allocation within a memory pool must fit within a `memory block`.
 As memory is allocated and deallocated, those blocks must be properly 
 adjusted in order to handle new, incoming memory allocations.
 
