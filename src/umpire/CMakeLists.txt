@@ -41,8 +41,6 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     DeviceAllocator.cpp
     device_allocator_helper.cpp)
 
-  set(hip_version_min "5.4.0")
-
   if (UMPIRE_ENABLE_CUDA)
     set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
@@ -53,6 +51,8 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     set(umpire_device_depends camp cuda umpire_util)
   elseif (UMPIRE_ENABLE_HIP)
     set(umpire_device_depends camp blt::hip umpire_util)
+    set(hip_version_min "5.4.0")
+
     if (${hip_VERSION} VERSION_LESS ${hip_version_min})
       message(FATAL_ERROR "ROCM version must be 5.4.0 or higher for HIP DeviceAllocator functionality!")
     endif ()
