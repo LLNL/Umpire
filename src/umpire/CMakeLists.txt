@@ -54,7 +54,7 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     set(hip_version_min "5.4.0")
 
     if (${hip_VERSION} VERSION_LESS ${hip_version_min})
-      message(FATAL_ERROR "ROCM version must be 5.4.0 or higher for HIP DeviceAllocator functionality!")
+      message(FATAL_ERROR "ROCM version must be ${hip_version_min} or higher for HIP DeviceAllocator functionality!")
     endif ()
   endif()
 
