@@ -13,7 +13,7 @@ constexpr double NUM = 42.0 * 42.0;
 static char* device_allocator_names_h[3] = {(char*)"da1", (char*)"da2", (char*)"da3"};
 __device__ static char* device_allocator_names[3] = {(char*)"da1", (char*)"da2", (char*)"da3"};
 
-__global__ void tester(double** data_ptr, int index)
+__global__ void tester_by_name(double** data_ptr, int index)
 {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
   if (idx == 0) {
@@ -21,6 +21,17 @@ __global__ void tester(double** data_ptr, int index)
     double* data = static_cast<double*>(da.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = NUM;
+  }
+}
+
+__global__ void tester_by_ID(double** data_ptr, int index)
+{
+  int idx = blockDim.x * blockIdx.x + threadIdx.x;
+  if (idx == 10) {
+    umpire::DeviceAllocator da = umpire::get_device_allocator(index);
+    double* data = static_cast<double*>(da.allocate(1 * sizeof(double)));
+    *data_ptr = data;
+    data[0] = NUM * 42.0;
   }
 }
 
@@ -72,7 +83,7 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
   tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
+  hipLaunchKernelGGL(tester_by_name, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
   hipDeviceSynchronize();
 #endif
 
@@ -87,7 +98,7 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
   tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
 #elif defined(UMPIRE_ENABLE_HIP)
-  hipLaunchKernelGGL(tester, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
+  hipLaunchKernelGGL(tester_by_ID, dim3(1), dim3(16), 0, 0, data_ptr, my_da.getID());
   hipDeviceSynchronize();
 #endif
 
