@@ -20,7 +20,9 @@ adjusted in order to handle new, incoming memory allocations.
 Umpire's solution for managing blocks of memory within a pool is to use a
 `coalescing function`. The coalescing function will deallocate a certain amount
 of unused memory and reallocate it, creating a new memory block which can handle new allocations.
-
+When Umpire is unable to find a block with sufficient memory for the applications' allocation
+request, it will allocate a new block from the allocation resource and add that block to the pool.
+As application memory use grows, the pool will fill up with many blocks.  Umpire has a `coalescing function` that will deallocate all of the unused (free) blocks in its pool and then reallocate a single block of memory that is large enough to contain all of the freed blocks.
 The figure below attempts to describe how a particular pool ("Current Pool") 
 will handle a new incoming allocation into the pool with and without coalescing.
 
