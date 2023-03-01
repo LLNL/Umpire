@@ -23,6 +23,16 @@ will handle a new incoming allocation into the pool with and without coalescing.
 
 .. image:: ./memory-pool-with-without-coalesce.png
 
+.. note::
+   Some helpful hints: The entire size of the "Current Pool" depicted above
+   is also known as the "actual_size". Note how the actual size grows or does
+   not grow when there is or is not a coalesce. The "Used" portion depicted
+   within the "Current Pool" is also referred to as the "current_size". The
+   "actual_size" and the "current_size" may differ a lot in practice. Lastly,
+   the first depiction of the "Current Pool" has a "high_watermark" size
+   which is equal to the "current_size". However, the "high_watermark" size
+   will grow more or less according to the new value of "current_size".
+
 As depicted, if the memory pool can coalesce, it will deallocate those "free" (i.e. unused) blocks
 of memory and reallocate one, larger memory block that can handle the new allocation.
 Otherwise, if the pool can't coalesce, it will need to grow to accomodate the new allocation.
@@ -54,6 +64,23 @@ function:
    :end-before: _sphinx_tag_tut_call_coalesce_end
    :language: C++
 
-The complete example is included below:
+The complete example is included at the bottom of this page.
+
+Coalescing a Pool Automatically
+===============================
+
+Wouldn't it be great if we didn't have to make sure we called the coalescing function 
+manually every time? Well, we don't! Umpire provides coalescing heuristics which are supposed 
+to determine when to coalesce and with how many bytes.
+
+Users can create their own coalescing heuristic function or they can rely on the heuristics
+that Umpire provides. Umpire provides two heuristic functions: Blocks-Releasable and 
+Percent-Releasable. The Blocks-Releasable heuristic is passed an integer value for the 
+number of blocks that should be deemed "releasable" before coalescing. Similarly, the
+Percent-Releasable heuristic is passed an integer value for the percent of bytes that
+should be "releasable" before coalescing.
+
+More information about how to use these functions can be found in the Doxygen references. 
+There is also an example of using the coalescing heuristic to improve DynamicPool performance `here <https://umpire.readthedocs.io/en/task-um-1018-add-hwm-coalesce-funcs/sphinx/cookbook/dynamic_pool_heuristics.html>`_.
 
 .. literalinclude:: ../../../examples/cookbook/recipe_coalesce_pool.cpp

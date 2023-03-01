@@ -26,7 +26,7 @@ it uses the pool's HighWatermark value when coalescing the
 pool. By default, coalescing heuristics **DO NOT** use the `HighWatermark` tuning.
 Instead, they use the pool's Actual Size value. Go to Umpire's RZ Confluence page under
 "Design Documents" and refer to the "Umpire Pool Usage and Control" documentation for
-more information.
+more information. You can also refer to `Coalescing Pool Memory <https://umpire.readthedocs.io/en/task-um-1018-add-hwm-coalesce-funcs/sphinx/cookbook/coalesce_pool.html>`_.
 
 .. note::
       To turn on the HighWatermark heuristic tuning, use the coalescing
