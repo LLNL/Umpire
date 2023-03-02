@@ -26,7 +26,7 @@ gcc_10_2_1_numa:
     SPEC: "~shared +fortran +numa ~device_alloc +tools tests=basic %gcc@10.2.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_ruby
 
-clang_14_0_4_sqlite_experimental:
+clang_14_0_4_gcc_8_3_1_sqlite_experimental:
   variables:
     SPEC: "~shared +sqlite_experimental ~device_alloc +tools tests=basic %clang@14.0.4.gcc.8.3.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_ruby
@@ -37,7 +37,7 @@ pgi_22_1_gcc_local_8_3_1_tpls:
     SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@22.1.gcc.local.8.3.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_ruby
 
-clang_14_0_4_tpls:
+clang_14_0_4_gcc_8_3_1_tpls:
   variables:
     SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@14.0.4.gcc.8.3.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_ruby
