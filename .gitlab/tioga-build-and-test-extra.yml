@@ -27,6 +27,6 @@
 ###
 rocmcc_5_4_3_hip_openmp:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm ~device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.4.3 ^hip@5.4.3 ^blt@develop"
+    SPEC: "~shared +fortran +openmp +rocm ~device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.4.3 ^hip@5.4.3 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_tioga
 
