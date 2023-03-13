@@ -40,9 +40,9 @@ clang_12_0_1_libcpp:
     SPEC: "~shared ~device_alloc +tools tests=basic +libcpp %clang@12.0.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_lassen
 
-clang_12_0_1_memleak:
+clang_12_0_1_gcc_8_3_1_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools ~device_alloc tests=basic %clang@12.0.1 cxxflags==-fsanitize=address ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +asan +sanitizer_tests +tools ~device_alloc tests=basic %clang@12.0.1.gcc.8.3.1 cxxflags==-fsanitize=address ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 
