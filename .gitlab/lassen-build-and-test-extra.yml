@@ -22,12 +22,12 @@
 
 ibm_clang_14_0_5_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic +ipc_shmem +mpi %clang@14.0.5.ibm ^spectrum-mpi ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared ~device_alloc +tools tests=basic +ipc_shmem +mpi %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_lassen
 
 ibm_clang_14_0_5_mpi:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools +mpi tests=basic %clang@14.0.5.ibm ^spectrum-mpi ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +fortran ~device_alloc +tools +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
   extends: .build_and_test_on_lassen
 
 ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
