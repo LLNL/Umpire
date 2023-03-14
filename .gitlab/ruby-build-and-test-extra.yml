@@ -23,27 +23,27 @@
 
 gcc_10_2_1_numa:
   variables:
-    SPEC: "~shared +fortran +numa ~device_alloc +tools tests=basic %gcc@10.2.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +fortran +numa ~device_alloc +tools tests=basic %gcc@10.2.1 ^blt@ecd72751933bb7df1cffa417ecade4d00515883a"
   extends: .build_and_test_on_ruby
 
 clang_14_0_4_gcc_8_3_1_sqlite_experimental:
   variables:
-    SPEC: "~shared +sqlite_experimental ~device_alloc +tools tests=basic %clang@14.0.4.gcc.8.3.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +sqlite_experimental ~device_alloc +tools tests=basic %clang@14.0.4.gcc.8.3.1 ^blt@ecd72751933bb7df1cffa417ecade4d00515883a"
   extends: .build_and_test_on_ruby
 
 # Develop builds against specific tpl version.
 pgi_22_1_gcc_local_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@22.1.gcc.local.8.3.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %pgi@22.1.gcc.local.8.3.1 ^blt@ecd72751933bb7df1cffa417ecade4d00515883a"
   extends: .build_and_test_on_ruby
 
 clang_14_0_4_gcc_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@14.0.4.gcc.8.3.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@14.0.4.gcc.8.3.1 ^blt@ecd72751933bb7df1cffa417ecade4d00515883a"
   extends: .build_and_test_on_ruby
 
 gcc_10_2_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %gcc@10.2.1 ^blt@91799350f002307c22a3d079abdf8ed37a6cbb2f"
+    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %gcc@10.2.1 ^blt@ecd72751933bb7df1cffa417ecade4d00515883a"
   extends: .build_and_test_on_ruby
 
