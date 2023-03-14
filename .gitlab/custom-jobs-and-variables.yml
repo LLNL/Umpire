@@ -20,7 +20,7 @@ variables:
 # Project specific variants for ruby
   PROJECT_RUBY_VARIANTS: "~shared +fortran ~device_alloc +tools tests=basic "
 # Project specific deps for ruby
-  PROJECT_RUBY_DEPS: "^blt@a7dda59a1c5df136f13284e31cac3b31f228d0f3"
+  PROJECT_RUBY_DEPS: "^blt@03f5f207f5957273e05581619e3a4d9d7dbb5263"
 
 # Corona
 # Arguments for top level allocation
@@ -30,7 +30,7 @@ variables:
 # Project specific variants for corona
   PROJECT_CORONA_VARIANTS: "~shared +fortran ~device_alloc tests=basic "
 # Project specific deps for corona
-  PROJECT_CORONA_DEPS: "^blt@a7dda59a1c5df136f13284e31cac3b31f228d0f3"
+  PROJECT_CORONA_DEPS: "^blt@03f5f207f5957273e05581619e3a4d9d7dbb5263"
 
 # Tioga
 # Arguments for top level allocation
@@ -40,7 +40,7 @@ variables:
 # Project specific variants for tioga
   PROJECT_TIOGA_VARIANTS: "~shared +fortran ~device_alloc tests=basic "
 # Project specific deps for tioga
-  PROJECT_TIOGA_DEPS: "^blt@a7dda59a1c5df136f13284e31cac3b31f228d0f3"
+  PROJECT_TIOGA_DEPS: "^blt@03f5f207f5957273e05581619e3a4d9d7dbb5263"
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
@@ -49,7 +49,7 @@ variables:
 # Project specific variants for lassen
   PROJECT_LASSEN_VARIANTS: "~shared +fortran ~device_alloc +tools tests=basic "
 # Project specific deps for lassen
-  PROJECT_LASSEN_DEPS: "^blt@a7dda59a1c5df136f13284e31cac3b31f228d0f3"
+  PROJECT_LASSEN_DEPS: "^blt@03f5f207f5957273e05581619e3a4d9d7dbb5263"
 
 
 # Configuration shared by build and test jobs specific to this project.
