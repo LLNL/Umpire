@@ -50,7 +50,7 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
+#include "umpire/sycl_compat.hpp"
 
 #include "umpire/resource/SyclDeviceResourceFactory.hpp"
 #include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"

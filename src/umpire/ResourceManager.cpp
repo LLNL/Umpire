@@ -37,7 +37,7 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
+#include "umpire/sycl_compat.hpp"
 #endif
 
 static const char* s_null_resource_name{"__umpire_internal_null"};
