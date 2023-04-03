@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -34,8 +34,15 @@ namespace strategy {
  */
 class DynamicPoolList : public AllocationStrategy {
  public:
+  /*!
+   * \brief Coalescing Heuristic functions for Percent-Releasable and Blocks-Releasable. Both have
+   * the option to reallocate to High Watermark instead of actual size of the pool (actual size is
+   * currently the default).
+   */
   static PoolCoalesceHeuristic<DynamicPoolList> percent_releasable(int percentage);
+  static PoolCoalesceHeuristic<DynamicPoolList> percent_releasable_hwm(int percentage);
   static PoolCoalesceHeuristic<DynamicPoolList> blocks_releasable(std::size_t nblocks);
+  static PoolCoalesceHeuristic<DynamicPoolList> blocks_releasable_hwm(std::size_t nblocks);
 
   static constexpr std::size_t s_default_first_block_size{512 * 1024 * 1024};
   static constexpr std::size_t s_default_next_block_size{1 * 1024 * 1024};

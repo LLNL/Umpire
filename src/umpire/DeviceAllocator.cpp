@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -72,9 +72,11 @@ __host__ void DeviceAllocator::destroy()
 __device__ void* DeviceAllocator::allocate(size_t size)
 {
   std::size_t counter = atomicAdd(m_counter, size);
+#if defined(__HIP_DEVICE_COMPILE__)
   if (*m_counter > m_size) {
     UMPIRE_ERROR(out_of_memory_error, "DeviceAllocator out of space");
   }
+#endif
 
   return static_cast<void*>(m_ptr + counter);
 }
@@ -110,7 +112,7 @@ __host__ __device__ size_t DeviceAllocator::getTotalSize()
 __host__ __device__ void DeviceAllocator::reset()
 {
   // Set m_counter back to zero
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   auto& rm = umpire::ResourceManager::getInstance();
   rm.memset(m_counter, 0);
 #else

@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC, and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC, and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -105,11 +105,12 @@ class DeviceAllocator {
 
   umpire::Allocator m_allocator;
 
+  int m_id;
   char* m_ptr;
+
   char m_name[64];
   unsigned int* m_counter;
 
-  int m_id;
   size_t m_size;
   bool m_child;
 };

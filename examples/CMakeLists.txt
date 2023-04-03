@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -30,6 +30,17 @@ blt_add_executable(
 list(APPEND umpire_examples malloc)
 
 if (UMPIRE_ENABLE_HIP)
+  if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+    blt_add_executable(
+      NAME device_allocator_example
+      SOURCES device-allocator.cpp
+      DEPENDS_ON umpire blt::hip)
+    list(APPEND umpire_examples device_allocator_example)
+
+    target_compile_options(device_allocator_example PUBLIC -fgpu-rdc)
+    blt_add_target_link_flags( TO device_allocator_example FLAGS -fgpu-rdc)
+  endif()
+
   blt_add_executable(
     NAME multi_device
     SOURCES multi_device.cpp

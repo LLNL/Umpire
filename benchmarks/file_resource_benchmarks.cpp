@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,11 +10,12 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/Allocator.hpp"
 
-#include <omp.h>
-#include <vector>
-#include <unistd.h>
-#include <time.h>
 #include <algorithm>
+#include <chrono>
+#include <omp.h>
+#include <time.h>
+#include <unistd.h>
+#include <vector>
 
 int iterations;
 size_t Scalar = 5;
@@ -63,7 +64,9 @@ void Initialized(std::size_t* A, std::size_t* B, std::size_t* C){
             index[i] = i; 
     } 
 
-    std::random_shuffle(index.begin(), index.end());
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+    std::shuffle(index.begin(), index.end(), std::default_random_engine(seed));
 
     #pragma omp parallel for
     for (int i = 0; i < index.size(); i++) {

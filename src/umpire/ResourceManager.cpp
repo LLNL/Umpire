@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -286,9 +286,8 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
-    auto ra = getAllocator(name);
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name, ra.getName()));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name,
+                                                    getAllocator(name).getName()));
   }
 
   m_allocators_by_name[name] = allocator.getAllocationStrategy();
