@@ -40,7 +40,7 @@ variables:
   BUILD_AND_TEST_CMD: "./scripts/gitlab/build_and_test.sh"
 # Override the list of branch that will skip the "draft PR test".
 # Add protected branches here. Defaults to "develop main master".
-  ALWAYS_RUN_LIST: "develop main"
+#  ALWAYS_RUN_LIST: ""
 
 # We organize the build-and-test stage in sub-pipelines. Each sub-pipeline
 # corresponds to a test batch on a given machine.

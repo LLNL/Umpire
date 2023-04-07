@@ -9,7 +9,11 @@
 #include <string.h>
 
 #include "umpire/ResourceManager.hpp"
+#if defined(UMPIRE_ENABLE_CUDA)
 #include "umpire/alloc/CudaMallocManagedAllocator.hpp"
+#else
+#include "umpire/alloc/HipMallocManagedAllocator.hpp"
+#endif
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -42,8 +46,7 @@ __host__ __device__ inline int convert_to_array_index(int neg_id)
 __host__ __device__ inline int get_index(const char* name)
 {
   int index{-1};
-
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   if (UMPIRE_DEV_ALLOCS_h == nullptr) {
     UMPIRE_LOG(Warning, "No DeviceAllocators have been created yet.");
     return index;
@@ -90,7 +93,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(const char* name)
     UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator named \"{}\" was found", name));
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   return UMPIRE_DEV_ALLOCS_h[index];
 #else
   return UMPIRE_DEV_ALLOCS[index];
@@ -108,7 +111,7 @@ __host__ __device__ DeviceAllocator get_device_allocator(int da_id)
     UMPIRE_ERROR(runtime_error, umpire::fmt::format("No DeviceAllocator with id: {} was found", id));
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   return UMPIRE_DEV_ALLOCS_h[id];
 #else
   return UMPIRE_DEV_ALLOCS[id];
@@ -120,7 +123,7 @@ __host__ __device__ bool is_device_allocator(const char* name)
   int index = get_index(name);
 
   if (index == -1) {
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
     UMPIRE_LOG(Warning, "No DeviceAllocator by the name " << name << " was found.");
     return false;
 #else
@@ -128,7 +131,7 @@ __host__ __device__ bool is_device_allocator(const char* name)
 #endif
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   return UMPIRE_DEV_ALLOCS_h[index].isInitialized();
 #else
   return UMPIRE_DEV_ALLOCS[index].isInitialized();
@@ -140,7 +143,7 @@ __host__ __device__ bool is_device_allocator(int da_id)
   int id = convert_to_array_index(da_id);
 
   if (id < 0 || id > (UMPIRE_TOTAL_DEV_ALLOCS - 1)) {
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
     UMPIRE_LOG(Warning, "Invalid ID given: " << id);
     return false;
 #else
@@ -148,7 +151,7 @@ __host__ __device__ bool is_device_allocator(int da_id)
 #endif
   }
 
-#if !defined(__CUDA_ARCH__)
+#if !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   return UMPIRE_DEV_ALLOCS_h[id].isInitialized();
 #else
   return UMPIRE_DEV_ALLOCS[id].isInitialized();

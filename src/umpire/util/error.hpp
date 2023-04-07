@@ -116,8 +116,8 @@ class resource_error : public umpire::runtime_error {
 
 #if defined(__CUDA_ARCH__)
 #define UMPIRE_ERROR(type, msg, ...) asm("trap;");
-#elif defined(__HIPCC__) && defined(__HIP_DEVICE_COMPILE__)
-#define UMPIRE_ERROR(type, msg, ...) abort();
+#elif defined(__HIP_DEVICE_COMPILE__)
+#define UMPIRE_ERROR(type, msg) abort();
 #else
 #define UMPIRE_ERROR(type, msg, ...)                             \
   {                                                              \
