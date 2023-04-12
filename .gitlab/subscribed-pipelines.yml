@@ -5,26 +5,92 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-# Trigger a build-and-test pipeline for ruby, corona and lassen
+.machine-check: &machine_check
+    - |
+      if [[ $(jq '.${machine}.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      then
+        echo -e "\e[31mNo node available on ${machine}\e[0m"
+        curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
+             --header 'Content-Type: application/json' \
+             --header "authorization: Bearer ${GITHUB_TOKEN}" \
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab {machine} down\", \"context\": \"ci/gitlab/${machine}\" }"
+        exit 1
+      fi
+
+# Trigger a build-and-test pipeline for a machine
+
+###
+# RUBY
+###
+ruby-up-check:
+  stage: machines-check
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - machine="ruby"
+    - *machine_check
+
 ruby-build-and-test:
   variables:
     CI_MACHINE: "ruby"
+  needs: [ruby-up-check]
   extends: [.build-and-test]
+
+###
+# CORONA
+###
+corona-up-check:
+  stage: machines-check
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - machine="corona"
+    - *machine_check
 
 corona-build-and-test:
   variables:
     CI_MACHINE: "corona"
+  needs: [corona-up-check]
   extends: [.build-and-test]
+
+###
+# TIOGA
+###
+tioga-up-check:
+  stage: machines-check
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - machine="tioga"
+    - *machine_check
 
 tioga-build-and-test:
   variables:
     CI_MACHINE: "tioga"
+  needs: [tioga-up-check]
   extends: [.build-and-test]
+
+###
+# LASSEN
+###
+lassen-up-check:
+  stage: machines-check
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
+    - machine="lassen"
+    - *machine_check
 
 lassen-build-and-test:
   variables:
     CI_MACHINE: "lassen"
+  needs: [lassen-up-check]
   extends: [.build-and-test]
+
 
 ## If testing develop branch, trigger CHAI pipeline with this version of Umpire.
 ## TODO: Once Spack allows to clone a specific commit on demand, then point to
