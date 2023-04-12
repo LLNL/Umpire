@@ -5,7 +5,14 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
-.machine-check: &machine_check
+# The template job to test whether a machine is up.
+# Expects CI_MACHINE defined to machine name.
+.machine-check:
+  stage: machines-check
+  tags: [shell, oslic]
+  variables:
+    GIT_STRATEGY: none
+  script:
     - |
       if [[ $(jq '.[env.CI_MACHINE].total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
       then
@@ -17,19 +24,16 @@
         exit 1
       fi
 
-# Trigger a build-and-test pipeline for a machine
+###
+# Trigger a build-and-test pipeline for a machine.
+# Comment the jobs for machines you don’t need.
+###
 
-###
 # RUBY
-###
 ruby-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
-    GIT_STRATEGY: none
     CI_MACHINE: "ruby"
-  script:
-    - *machine_check
+  extends: [.machine-check]
 
 ruby-build-and-test:
   variables:
@@ -37,17 +41,11 @@ ruby-build-and-test:
   needs: [ruby-up-check]
   extends: [.build-and-test]
 
-###
 # CORONA
-###
 corona-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
-    GIT_STRATEGY: none
     CI_MACHINE: "corona"
-  script:
-    - *machine_check
+  extends: [.machine-check]
 
 corona-build-and-test:
   variables:
@@ -55,17 +53,11 @@ corona-build-and-test:
   needs: [corona-up-check]
   extends: [.build-and-test]
 
-###
 # TIOGA
-###
 tioga-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
     CI_MACHINE: "tioga"
-    GIT_STRATEGY: none
-  script:
-    - *machine_check
+  extends: [.machine-check]
 
 tioga-build-and-test:
   variables:
@@ -73,17 +65,11 @@ tioga-build-and-test:
   needs: [tioga-up-check]
   extends: [.build-and-test]
 
-###
 # LASSEN
-###
 lassen-up-check:
-  stage: machines-check
-  tags: [shell, oslic]
   variables:
     CI_MACHINE: "lassen"
-    GIT_STRATEGY: none
-  script:
-    - *machine_check
+  extends: [.machine-check]
 
 lassen-build-and-test:
   variables:
