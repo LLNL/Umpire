@@ -7,13 +7,13 @@
 
 .machine-check: &machine_check
     - |
-      if [[ $(jq '.${machine}.total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
+      if [[ $(jq '.[env.CI_MACHINE].total_nodes_up' /usr/global/tools/lorenz/data/loginnodeStatus) == 0 ]]
       then
-        echo -e "\e[31mNo node available on ${machine}\e[0m"
+        echo -e "\e[31mNo node available on ${CI_MACHINE}\e[0m"
         curl --url "https://api.github.com/repos/${GITHUB_PROJECT_ORG}/${GITHUB_PROJECT_NAME}/statuses/${CI_COMMIT_SHA}" \
              --header 'Content-Type: application/json' \
              --header "authorization: Bearer ${GITHUB_TOKEN}" \
-             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab {machine} down\", \"context\": \"ci/gitlab/${machine}\" }"
+             --data "{ \"state\": \"failure\", \"target_url\": \"${CI_PIPELINE_URL}\", \"description\": \"GitLab ${CI_MACHINE} down\", \"context\": \"ci/gitlab/${CI_MACHINE}\" }"
         exit 1
       fi
 
@@ -27,8 +27,8 @@ ruby-up-check:
   tags: [shell, oslic]
   variables:
     GIT_STRATEGY: none
+    CI_MACHINE: "ruby"
   script:
-    - machine="ruby"
     - *machine_check
 
 ruby-build-and-test:
@@ -45,8 +45,8 @@ corona-up-check:
   tags: [shell, oslic]
   variables:
     GIT_STRATEGY: none
+    CI_MACHINE: "corona"
   script:
-    - machine="corona"
     - *machine_check
 
 corona-build-and-test:
@@ -62,9 +62,9 @@ tioga-up-check:
   stage: machines-check
   tags: [shell, oslic]
   variables:
+    CI_MACHINE: "tioga"
     GIT_STRATEGY: none
   script:
-    - machine="tioga"
     - *machine_check
 
 tioga-build-and-test:
@@ -80,9 +80,9 @@ lassen-up-check:
   stage: machines-check
   tags: [shell, oslic]
   variables:
+    CI_MACHINE: "lassen"
     GIT_STRATEGY: none
   script:
-    - machine="lassen"
     - *machine_check
 
 lassen-build-and-test:
