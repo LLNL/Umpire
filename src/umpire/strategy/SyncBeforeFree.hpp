@@ -7,15 +7,14 @@
 #ifndef UMPIRE_SyncBeforeFree_HPP
 #define UMPIRE_SyncBeforeFree_HPP
 
-#include "umpire/strategy/AllocationStrategy.hpp"
-
 #include "camp/resource.hpp"
+#include "umpire/strategy/AllocationStrategy.hpp"
 
 namespace umpire {
 namespace strategy {
 
 class SyncBeforeFree : public AllocationStrategy {
-  public:
+ public:
   SyncBeforeFree(const std::string& name, int id, Allocator allocator, camp::resources::Resource r);
 
   void* allocate(std::size_t bytes) override;
@@ -25,7 +24,7 @@ class SyncBeforeFree : public AllocationStrategy {
 
   MemoryResourceTraits getTraits() const noexcept override;
 
-  private:
+ private:
   strategy::AllocationStrategy* m_allocator;
   camp::resources::Resource m_resource;
 };

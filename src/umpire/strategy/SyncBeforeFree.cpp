@@ -11,10 +11,11 @@ namespace umpire {
 namespace strategy {
 
 SyncBeforeFree::SyncBeforeFree(const std::string& name, int id, Allocator allocator, camp::resources::Resource r)
-      : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "SyncBeforeFree"},
+    : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "SyncBeforeFree"},
       m_allocator{allocator.getAllocationStrategy()},
       m_resource{r}
-      {}
+{
+}
 
 void* SyncBeforeFree::allocate(std::size_t bytes)
 {
@@ -37,6 +38,5 @@ MemoryResourceTraits SyncBeforeFree::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
-
-}
-}
+} // namespace strategy
+} // namespace umpire
