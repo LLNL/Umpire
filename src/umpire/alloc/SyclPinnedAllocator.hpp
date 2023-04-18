@@ -7,7 +7,7 @@
 #ifndef UMPIRE_SyclPinnedAllocator_HPP
 #define UMPIRE_SyclPinnedAllocator_HPP
 
-#include "umpire/sycl_compat.hpp"
+#include "umpire/util/sycl_compat.hpp"
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"

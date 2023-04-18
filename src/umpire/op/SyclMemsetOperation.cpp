@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/SyclMemsetOperation.hpp"
 
-#include "umpire/sycl_compat.hpp"
+#include "umpire/util/sycl_compat.hpp"
 #include <iostream>
 
 #include "umpire/strategy/AllocationStrategy.hpp"

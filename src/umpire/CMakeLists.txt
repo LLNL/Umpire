@@ -89,7 +89,7 @@ endif()
 if (UMPIRE_ENABLE_SYCL)
   set(umpire_headers
       ${umpire_headers}
-      sycl_compat.hpp)
+      util/sycl_compat.hpp)
 endif()
 
 set (umpire_depends

@@ -7,7 +7,7 @@
 #ifndef UMPIRE_SyclMallocAllocator_HPP
 #define UMPIRE_SyclMallocAllocator_HPP
 
-#include "umpire/sycl_compat.hpp"
+#include "umpire/util/sycl_compat.hpp"
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"

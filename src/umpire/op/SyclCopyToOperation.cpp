@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/SyclCopyToOperation.hpp"
 
-#include "umpire/sycl_compat.hpp"
+#include "umpire/util/sycl_compat.hpp"
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
