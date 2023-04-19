@@ -136,6 +136,21 @@ if (UMPIRE_ENABLE_CUDA)
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
   list(APPEND umpire_examples multi_device)
+
+  blt_add_executable(
+    NAME moving_avg 
+    SOURCES moving_avg.cpp
+    DEPENDS_ON umpire cuda)
+
+  set_source_files_properties(
+    moving_avg.cpp
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  set_target_properties(
+    moving_avg
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  list(APPEND umpire_examples moving_avg)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
