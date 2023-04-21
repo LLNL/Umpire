@@ -1,7 +1,7 @@
 [submodule "blt"]
 	path = blt
 	url = https://github.com/LLNL/blt.git
-[submodule "src/umpire/tpl/camp"]
+[submodule "src/tpl/umpire/camp"]
 	path = src/tpl/umpire/camp
 	url = https://github.com/LLNL/camp.git
 [submodule ".radiuss-ci"]
