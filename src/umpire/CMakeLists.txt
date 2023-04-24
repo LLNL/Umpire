@@ -86,6 +86,12 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
 
 endif()
 
+if (UMPIRE_ENABLE_SYCL)
+  set(umpire_headers
+      ${umpire_headers}
+      util/sycl_compat.hpp)
+endif()
+
 set (umpire_depends
   camp
   umpire_resource
