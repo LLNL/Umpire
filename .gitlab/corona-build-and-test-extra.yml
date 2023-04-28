@@ -27,6 +27,6 @@
 ###
 rocmcc_5_4_1_hip_openmp_device_alloc:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx906 %rocmcc@5.4.1 ^hip@5.4.1 ^blt@6279a3f5b663362885458110350a27cffe43a789"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx906 %rocmcc@5.4.1 ^hip@5.4.1 ^blt@develop"
   extends: .build_and_test_on_corona
 
