@@ -657,7 +657,7 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
           heuristic = umpire::strategy::DynamicPoolList::percent_releasable(m_options.heuristic_parm);
         }
         else if (m_options.heuristic_to_use == "FreePercentage_hwm") { 
-          heuristic = umpire::strategy::DynamicPoolList::percent_releasable(m_options.heuristic_parm);
+          heuristic = umpire::strategy::DynamicPoolList::percent_releasable_hwm(m_options.heuristic_parm);
         }
 
         if (alloc->introspection) {
