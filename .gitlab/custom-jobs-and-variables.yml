@@ -36,7 +36,7 @@ variables:
 # Arguments for top level allocation
   TIOGA_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
 # Arguments for job level allocation
-  TIOGA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
+  TIOGA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1 --begin-time=+5s"
 # Project specific variants for tioga
   PROJECT_TIOGA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
 # Project specific deps for tioga
