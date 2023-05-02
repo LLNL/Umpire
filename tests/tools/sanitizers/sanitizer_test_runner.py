@@ -49,7 +49,7 @@ def run_sanitizer_test(strategy, kind):
     output = test_program.stdout
     error = test_program.stderr
 
-    expected_string = b'{} of size 8'.format(kind.upper())
+    expected_string = '{} of size 8'.format(kind.upper()).encode()
     check_output(error, expected_string)
 
 
