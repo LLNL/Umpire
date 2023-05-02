@@ -12,7 +12,11 @@
 # We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
 # the comparison with the original job is easier.
 
-# No overridden jobs so far.
+# We override the cce job because we can’t use +device-alloc with it
+cce_15_0_1:
+  variables:
+    SPEC: "~shared +fortran tests=basic %cce@15.0.1"
+  extends: .build_and_test_on_tioga
 
 ############
 # Extra jobs
