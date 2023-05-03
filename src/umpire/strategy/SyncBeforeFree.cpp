@@ -7,6 +7,8 @@
 
 #include "umpire/strategy/SyncBeforeFree.hpp"
 
+#include "umpire/Allocator.hpp"
+
 namespace umpire {
 namespace strategy {
 

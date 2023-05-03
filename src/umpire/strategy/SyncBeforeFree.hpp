@@ -7,10 +7,15 @@
 #ifndef UMPIRE_SyncBeforeFree_HPP
 #define UMPIRE_SyncBeforeFree_HPP
 
-#include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
+#include "umpire/util/MemoryResourceTraits.hpp"
+
+#include "camp/resource.hpp"
 
 namespace umpire {
+
+class Allocator; 
+
 namespace strategy {
 
 class SyncBeforeFree : public AllocationStrategy {
