@@ -38,7 +38,7 @@ ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
 
 clang_12_0_1_libcpp:
   variables:
-    SPEC: "~shared +tools tests=basic +libcpp %clang@12.0.1"
+    SPEC: "~shared +tools tests=basic %clang@12.0.1 cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\""
   extends: .build_and_test_on_lassen
 
 clang_12_0_1_gcc_8_3_1_memleak:
