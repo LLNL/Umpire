@@ -19,7 +19,8 @@ namespace strategy {
 
 class Synchronizer : public AllocationStrategy {
  public:
-  Synchronizer(const std::string& name, int id, Allocator allocator, camp::resources::Resource r, bool sync_before_alloc=true, bool sync_before_dealloc=true);
+  Synchronizer(const std::string& name, int id, Allocator allocator, camp::resources::Resource r,
+               bool sync_before_alloc = true, bool sync_before_dealloc = true);
 
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;

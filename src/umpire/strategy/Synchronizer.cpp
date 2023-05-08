@@ -12,7 +12,8 @@
 namespace umpire {
 namespace strategy {
 
-Synchronizer::Synchronizer(const std::string& name, int id, Allocator allocator, camp::resources::Resource r, bool sync_before_alloc, bool sync_before_dealloc)
+Synchronizer::Synchronizer(const std::string& name, int id, Allocator allocator, camp::resources::Resource r,
+                           bool sync_before_alloc, bool sync_before_dealloc)
     : AllocationStrategy{name, id, allocator.getAllocationStrategy(), "Synchronizer"},
       m_allocator{allocator.getAllocationStrategy()},
       m_resource{r},

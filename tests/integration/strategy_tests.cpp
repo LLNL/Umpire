@@ -154,8 +154,8 @@ void StrategyTest<umpire::strategy::Synchronizer>::SetUp()
 
   camp::resources::Resource r{camp::resources::Host::get_default()};
 
-  m_allocator = new umpire::Allocator(
-      rm.makeAllocator<umpire::strategy::Synchronizer>(name, rm.getAllocator("HOST"), r));
+  m_allocator =
+      new umpire::Allocator(rm.makeAllocator<umpire::strategy::Synchronizer>(name, rm.getAllocator("HOST"), r));
 
   m_parent_name = "HOST";
 }
