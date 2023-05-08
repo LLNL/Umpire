@@ -4,8 +4,8 @@
 //
 // SPDX-License-Identifier: (MIT)
 //////////////////////////////////////////////////////////////////////////////
-#ifndef UMPIRE_SyncBeforeFree_HPP
-#define UMPIRE_SyncBeforeFree_HPP
+#ifndef UMPIRE_Synchronizer_HPP
+#define UMPIRE_Synchronizer_HPP
 
 #include "camp/resource.hpp"
 #include "umpire/strategy/AllocationStrategy.hpp"
@@ -17,9 +17,9 @@ class Allocator;
 
 namespace strategy {
 
-class SyncBeforeFree : public AllocationStrategy {
+class Synchronizer : public AllocationStrategy {
  public:
-  SyncBeforeFree(const std::string& name, int id, Allocator allocator, camp::resources::Resource r);
+  Synchronizer(const std::string& name, int id, Allocator allocator, camp::resources::Resource r, bool sync_before_alloc=true, bool sync_before_dealloc=true);
 
   void* allocate(std::size_t bytes) override;
   void deallocate(void* ptr, std::size_t size) override;
@@ -31,6 +31,8 @@ class SyncBeforeFree : public AllocationStrategy {
  private:
   strategy::AllocationStrategy* m_allocator;
   camp::resources::Resource m_resource;
+  bool m_sync_before_alloc;
+  bool m_sync_before_dealloc;
 };
 
 } // end of namespace strategy

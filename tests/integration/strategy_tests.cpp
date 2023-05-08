@@ -21,6 +21,7 @@
 #include "umpire/strategy/QuickPool.hpp"
 #include "umpire/strategy/SizeLimiter.hpp"
 #include "umpire/strategy/SlotPool.hpp"
+#include "umpire/strategy/Synchronizer.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 
 #if defined(UMPIRE_ENABLE_NUMA)
@@ -145,6 +146,20 @@ void StrategyTest<umpire::strategy::MonotonicAllocationStrategy>::SetUp()
   m_parent_name = "HOST";
 }
 
+template <>
+void StrategyTest<umpire::strategy::Synchronizer>::SetUp()
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+  std::string name{"strategy_test_" + std::to_string(unique_strategy_id++)};
+
+  camp::resources::Resource r{camp::resources::Host::get_default()};
+
+  m_allocator = new umpire::Allocator(
+      rm.makeAllocator<umpire::strategy::Synchronizer>(name, rm.getAllocator("HOST"), r));
+
+  m_parent_name = "HOST";
+}
+
 using Strategies =
     ::testing::Types<umpire::strategy::AlignedAllocator,
 #if defined(UMPIRE_ENABLE_CUDA)
@@ -153,7 +168,7 @@ using Strategies =
                      umpire::strategy::DynamicPoolList, umpire::strategy::FixedPool, umpire::strategy::MixedPool,
                      umpire::strategy::MonotonicAllocationStrategy, umpire::strategy::NamedAllocationStrategy,
                      umpire::strategy::QuickPool, umpire::strategy::SizeLimiter, umpire::strategy::SlotPool,
-                     umpire::strategy::ThreadSafeAllocator>;
+                     umpire::strategy::ThreadSafeAllocator, umpire::strategy::Synchronizer>;
 
 TYPED_TEST_SUITE(StrategyTest, Strategies, );
 
@@ -743,3 +758,30 @@ TEST(AlignedAllocator, BadAlignment)
       },
       umpire::runtime_error);
 }
+
+#if defined(UMPIRE_ENABLE_DEVICE)
+TEST(Synchronizer, SyncOnAlloc)
+{
+#if defined(UMPIRE_ENABLE_CUDA)
+  camp::resources::Resource r{camp::resources::Cuda::get_default()};
+#else if defined(UMPIRE_ENABLE_HIP)
+  camp::resources::Resource r{camp::resources::Hip::get_default()};
+#endif
+
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc = rm.makeAllocator<umpire::strategy::Synchronizer>("synchronizer", rm.getAllocator("DEVICE"), true, true);
+
+  auto e = r.get_event();
+
+  void* data = alloc.allocate(1024);
+
+  ASSERT_TRUE(e.check());
+
+  e = r.get_event();
+
+  alloc.deallocate(data);
+
+  ASSERT_TRUE(e.check());
+}
+#endif

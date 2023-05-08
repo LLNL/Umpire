@@ -21,7 +21,7 @@ set (umpire_strategy_headers
   SizeLimiter.hpp
   SlotPool.hpp
   StdAllocator.hpp
-  SyncBeforeFree.hpp
+  Synchronizer.hpp
   ThreadSafeAllocator.hpp)
 
 if (UMPIRE_ENABLE_NUMA)
@@ -52,7 +52,7 @@ set (umpire_strategy_sources
   QuickPool.cpp
   SizeLimiter.cpp
   SlotPool.cpp
-  SyncBeforeFree.cpp
+  Synchronizer.cpp
   ThreadSafeAllocator.cpp)
 
 if (UMPIRE_ENABLE_NUMA)
