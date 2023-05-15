@@ -26,18 +26,29 @@ inline namespace v1 {
 inline std::string to_string(camp::resources::Resource& r)
 {
   switch (r.get_platform()) {
-    case camp::resources::Platform::cuda: return "camp::resource::Cuda"; break;
-    case camp::resources::Platform::hip: return "camp::resource::Hip"; break;
-    case camp::resources::Platform::host: return "camp::resource::Host"; break;
-    case camp::resources::Platform::omp_target: return "camp::resource::OmpTarget"; break;
-    case camp::resources::Platform::sycl: return "camp::resource::Sycl"; break;
-    case camp::resources::Platform::undefined: return  "camp::resource::Undefined";
+    case camp::resources::Platform::cuda:
+      return "camp::resource::Cuda";
+      break;
+    case camp::resources::Platform::hip:
+      return "camp::resource::Hip";
+      break;
+    case camp::resources::Platform::host:
+      return "camp::resource::Host";
+      break;
+    case camp::resources::Platform::omp_target:
+      return "camp::resource::OmpTarget";
+      break;
+    case camp::resources::Platform::sycl:
+      return "camp::resource::Sycl";
+      break;
+    case camp::resources::Platform::undefined:
+      return "camp::resource::Undefined";
   }
 }
 
-}
-}
-}
+} // namespace v1
+} // namespace resources
+} // namespace camp
 
 namespace umpire {
 
