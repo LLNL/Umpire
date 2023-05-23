@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -37,7 +37,7 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
+#include "umpire/util/sycl_compat.hpp"
 #endif
 
 static const char* s_null_resource_name{"__umpire_internal_null"};
@@ -286,9 +286,8 @@ void ResourceManager::setDefaultAllocator(Allocator allocator) noexcept
 void ResourceManager::addAlias(const std::string& name, Allocator allocator)
 {
   if (isAllocator(name)) {
-    auto ra = getAllocator(name);
-    UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name, ra.getName()));
+    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Allocator \"{}\" is already an alias for \"{}\"", name,
+                                                    getAllocator(name).getName()));
   }
 
   m_allocators_by_name[name] = allocator.getAllocationStrategy();

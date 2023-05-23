@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -10,19 +10,32 @@
 #include "umpire/device_allocator_helper.hpp"
 
 constexpr double NUM = 42.0 * 42.0;
+static char* device_allocator_names_h[3] = {(char*)"da1", (char*)"da2", (char*)"da3"};
+__device__ static char* device_allocator_names[3] = {(char*)"da1", (char*)"da2", (char*)"da3"};
 
-__global__ void tester(double** data_ptr, const char* name)
+__global__ void tester_by_name(double** data_ptr, int index)
 {
   int idx = blockDim.x * blockIdx.x + threadIdx.x;
   if (idx == 0) {
-    umpire::DeviceAllocator da = umpire::get_device_allocator(name);
+    umpire::DeviceAllocator da = umpire::get_device_allocator(device_allocator_names[index]);
     double* data = static_cast<double*>(da.allocate(1 * sizeof(double)));
     *data_ptr = data;
     data[0] = NUM;
   }
 }
 
-class DeviceAllocator : public ::testing::TestWithParam<const char*> {
+__global__ void tester_by_ID(double** data_ptr, int index)
+{
+  int idx = blockDim.x * blockIdx.x + threadIdx.x;
+  if (idx == 10) {
+    umpire::DeviceAllocator da = umpire::get_device_allocator(index);
+    double* data = static_cast<double*>(da.allocate(1 * sizeof(double)));
+    *data_ptr = data;
+    data[0] = NUM * 42.0;
+  }
+}
+
+class DeviceAllocator : public ::testing::TestWithParam<char*> {
  public:
   static void TearDownTestSuite()
   {
@@ -59,19 +72,37 @@ TEST_P(DeviceAllocator, LaunchKernelTest)
 
   double** data_ptr = static_cast<double**>(allocator.allocate(sizeof(double*)));
 
-  ASSERT_NO_THROW((tester<<<1, 16>>>(data_ptr, GetParam())));
+  int str_index{0};
+  for (int i = 0; i < 3; i++) {
+    if (strcmp(device_allocator_names_h[i], GetParam()) == 0) {
+      str_index = i;
+    }
+  }
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(tester_by_name, dim3(1), dim3(16), 0, 0, data_ptr, str_index);
+  hipDeviceSynchronize();
+#endif
+
   ASSERT_EQ(*data_ptr[0], NUM);
 
   auto my_da = umpire::get_device_allocator(GetParam());
   ASSERT_NO_THROW(my_da.reset());
 
   ASSERT_EQ(my_da.getCurrentSize(), 0);
-  ASSERT_NO_THROW((tester<<<1, 16>>>(data_ptr, GetParam())));
+
+#if defined(UMPIRE_ENABLE_CUDA)
+  tester<<<1, 16>>>(data_ptr, str_index);
   cudaDeviceSynchronize();
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(tester_by_ID, dim3(1), dim3(16), 0, 0, data_ptr, my_da.getID());
+  hipDeviceSynchronize();
+#endif
+
   ASSERT_EQ(my_da.getCurrentSize(), sizeof(double));
 }
 
-const char* device_allocator_names[3] = {"da1", "da2", "da3"};
-
-INSTANTIATE_TEST_SUITE_P(DeviceAllocatorTests, DeviceAllocator, ::testing::ValuesIn(device_allocator_names));
+INSTANTIATE_TEST_SUITE_P(DeviceAllocatorTests, DeviceAllocator, ::testing::ValuesIn(device_allocator_names_h));

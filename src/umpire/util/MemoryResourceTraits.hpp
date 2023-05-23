@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -12,7 +12,7 @@
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
+#include "umpire/util/sycl_compat.hpp"
 #endif
 
 namespace umpire {

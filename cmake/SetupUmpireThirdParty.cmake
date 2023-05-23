@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -85,7 +85,7 @@ if (UMPIRE_ENABLE_MPI OR UMPIRE_ENABLE_HIP OR UMPIRE_ENABLE_OPENMP OR UMPIRE_ENA
   set(UMPIRE_NEEDS_BLT_TPLS True)
 
   if (NOT BLT_EXPORTED)
-    set(BLT_EXPORTED On)
+    set(BLT_EXPORTED On CACHE BOOL "" FORCE)
     blt_import_library(NAME          blt_stub EXPORTABLE On)
     set_target_properties(blt_stub PROPERTIES EXPORT_NAME blt::blt_stub)
     install(TARGETS blt_stub

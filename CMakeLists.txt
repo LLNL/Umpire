@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -25,7 +25,7 @@ include(cmake/SetupUmpireOptions.cmake)
 
 if (UMPIRE_ENABLE_SYCL)
   set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
-   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
 else()

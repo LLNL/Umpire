@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+# Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -100,13 +100,19 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     PRIVATE
     ${PROJECT_BINARY_DIR}/include)
 
-  set_source_files_properties(
-    device-allocator.cpp
-    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(
+      device-allocator.cpp
+      PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  set_target_properties(
-    device_allocator_tests
-    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+    set_target_properties(
+      device_allocator_tests
+      PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+  endif()
+  if (UMPIRE_ENABLE_HIP)
+    target_compile_options(device_allocator_tests PUBLIC -fgpu-rdc)
+    blt_add_target_link_flags( TO device_allocator_tests FLAGS -fgpu-rdc)
+  endif()
 
   blt_add_test(
     NAME device_allocator_tests

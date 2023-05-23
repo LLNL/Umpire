@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -18,7 +18,7 @@ namespace op {
 /*!
  * \brief Base class of an operation on memory.
  *
- * Neither the transfrom or apply methods are pure virtual, so inheriting
+ * Neither the transform or apply methods are pure virtual, so inheriting
  * classes only need overload the appropriate method. However, both methods
  * will throw an error if called.
  */
@@ -27,7 +27,7 @@ class MemoryOperation {
   virtual ~MemoryOperation() = default;
 
   /*!
-   * \brief Transfrom length bytes of memory from src_ptr to dst_ptr.
+   * \brief Transform length bytes of memory from src_ptr to dst_ptr.
    *
    * \param src_ptr Pointer to source memory location.
    * \param dst_ptr Pointer to destinatino memory location.

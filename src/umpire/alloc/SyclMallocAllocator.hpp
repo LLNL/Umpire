@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2016-22, Lawrence Livermore National Security, LLC and Umpire
+// Copyright (c) 2016-23, Lawrence Livermore National Security, LLC and Umpire
 // project contributors. See the COPYRIGHT file for details.
 //
 // SPDX-License-Identifier: (MIT)
@@ -7,7 +7,7 @@
 #ifndef UMPIRE_SyclMallocAllocator_HPP
 #define UMPIRE_SyclMallocAllocator_HPP
 
-#include <CL/sycl.hpp>
+#include "umpire/util/sycl_compat.hpp"
 
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
