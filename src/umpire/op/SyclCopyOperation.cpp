@@ -6,10 +6,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/SyclCopyOperation.hpp"
 
-#include "umpire/util/sycl_compat.hpp"
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/sycl_compat.hpp"
 
 namespace umpire {
 namespace op {
