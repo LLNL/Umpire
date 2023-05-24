@@ -7,8 +7,6 @@
 #ifndef UMPIRE_HipAdviseOperation_HPP
 #define UMPIRE_HipAdviseOperation_HPP
 
-#include <hip/hip_runtime.h>
-
 #include "umpire/op/MemoryOperation.hpp"
 
 namespace umpire {
