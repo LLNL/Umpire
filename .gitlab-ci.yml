@@ -47,6 +47,7 @@ variables:
 
 # High level stages
 stages:
+  - machine-checks
   - build-and-test
   - multi-project #TODO unused so far
   - radiuss-spack-testing #TODO unused so far
@@ -58,7 +59,7 @@ stages:
     include:
       - local: '.gitlab/custom-jobs-and-variables.yml'
       - project: 'radiuss/radiuss-shared-ci'
-        ref: v2023.03.0rc
+        ref: v2023.03.1
         file: '${CI_MACHINE}-build-and-test.yml'
       - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
     strategy: depend
@@ -68,7 +69,7 @@ stages:
 include:
   # [Optional] checks preliminary to running the actual CI test
   #- project: 'radiuss/radiuss-shared-ci'
-  #  ref: v2023.03.0rc
+  #  ref: v2023.03.1
   #  file: 'preliminary-ignore-draft-pr.yml'
   # pipelines subscribed by the project
   - local: .gitlab/subscribed-pipelines.yml
