@@ -229,7 +229,7 @@ blt_add_test(
   NAME introspection_tests
   COMMAND introspection_tests)
 
-if (UMPIRE_ENABLE_HIP)
+if (UMPIRE_ENABLE_HIP AND UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
   blt_add_executable(
     NAME granularity_control_allocator
     SOURCES granularity_control_allocator.cpp

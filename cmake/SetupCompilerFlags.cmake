@@ -35,41 +35,40 @@ endif ()
 if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 
-    if (ENABLE_HIP)
-        blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
-                                VERBOSE_OUTPUT ON
-                                SOURCE_STRING
-            [=[
-            #include <hip/hip_runtime.h>
-            #include <hip/hip_runtime_api.h>
+  blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+                          VERBOSE_OUTPUT ON
+                          SOURCE_STRING
+    [=[
+    #include <hip/hip_runtime.h>
+    #include <hip/hip_runtime_api.h>
 
-            int main(int, char**)
-            {
-              const std::size_t bytes{1024};
-              void* ptr1{nullptr};
+    int main(int, char**)
+    {
+      const std::size_t bytes{1024};
+      void* ptr1{nullptr};
 
-              ::hipHostMalloc(&ptr1, bytes, hipHostMallocDefault);
+      ::hipHostMalloc(&ptr1, bytes, hipHostMallocDefault);
 
-              if (ptr1 != nullptr) {
-                void* ptr2{nullptr};
-                ::hipHostMalloc(&ptr2, bytes, hipHostMallocNonCoherent);
+      if (ptr1 != nullptr) {
+        void* ptr2{nullptr};
+        ::hipHostMalloc(&ptr2, bytes, hipHostMallocNonCoherent);
 
-                if (ptr2 != nullptr) {
-                  int device;
-                  ::hipGetDevice(&device);
-                  ::hipMemAdvise(ptr1, bytes, hipMemAdviseSetCoarseGrain, device);
-                }
-              }
+        if (ptr2 != nullptr) {
+          int device;
+          ::hipGetDevice(&device);
+          ::hipMemAdvise(ptr1, bytes, hipMemAdviseSetCoarseGrain, device);
+        }
+      }
 
-              return 0;
-            }
-            ]=])
+      return 0;
+    }
+    ]=])
 
-      if (UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
-        message(STATUS "HIP memory coherence granularity: Enabled")
-      else ()
-        message(STATUS "HIP memory coherence granularity: Disabled, not supported")
-      endif ()
+  if (UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY)
+    message(STATUS "HIP memory coherence granularity: Enabled")
+  else ()
+    message(STATUS "HIP memory coherence granularity: Disabled, not supported")
+  endif ()
 endif()
 
 if (ENABLE_PEDANTIC_WARNINGS)

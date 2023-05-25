@@ -7,6 +7,8 @@
 #ifndef UMPIRE_HipPinnedAllocator_HPP
 #define UMPIRE_HipPinnedAllocator_HPP
 
+#include "umpire/config.hpp"
+
 #include <hip/hip_runtime.h>
 
 #include "umpire/alloc/HipAllocator.hpp"
@@ -30,13 +32,23 @@ struct HipPinnedAllocator : HipAllocator {
         break;
 
       case umpire::strategy::GranularityController::Granularity::FineGrainedCoherence:
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocDefault)");
         error = ::hipHostMalloc(&ptr, bytes, hipHostMallocDefault);
+#else
+        UMPIRE_ERROR(runtime_error,
+                     umpire::fmt::format("Fine grained memory coherence not supported for allocation" ));
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
 
       case umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence:
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         UMPIRE_LOG(Debug, "::hipHostMalloc(" << bytes << ", hipHostMallocNonCoherent)");
         error = ::hipHostMalloc(&ptr, bytes, hipHostMallocNonCoherent);
+#else
+        UMPIRE_ERROR(runtime_error,
+                     umpire::fmt::format("Course grained memory coherence not supported for allocation" ));
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
         break;
     }
 

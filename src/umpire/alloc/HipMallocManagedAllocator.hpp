@@ -7,6 +7,8 @@
 #ifndef UMPIRE_HipMallocManagedAllocator_HPP
 #define UMPIRE_HipMallocManagedAllocator_HPP
 
+#include "umpire/config.hpp"
+
 #include "hip/hip_runtime_api.h"
 #include "umpire/alloc/HipAllocator.hpp"
 #include "umpire/util/Macros.hpp"
@@ -45,6 +47,7 @@ struct HipMallocManagedAllocator : HipAllocator {
       }
     }
 
+#ifdef UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
     if (m_granularity == umpire::strategy::GranularityController::Granularity::CoarseGrainedCoherence) {
       int device;
 
@@ -59,6 +62,8 @@ struct HipMallocManagedAllocator : HipAllocator {
                                          ptr, bytes, device, hipGetErrorString(error)));
       }
     }
+#endif // UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
+
     return ptr;
   }
 
