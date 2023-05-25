@@ -12,7 +12,11 @@
 # We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
 # the comparison with the original job is easier.
 
-# No overridden jobs so far.
+# We override the cce job because we can’t use +device-alloc with it
+cce_15_0_1:
+  variables:
+    SPEC: "~shared +fortran tests=basic %cce@15.0.1"
+  extends: .build_and_test_on_tioga
 
 ############
 # Extra jobs
@@ -25,8 +29,8 @@
 # This job intentionally tests our umpire package.py because although this job does not
 # explicitly have the ~tools, the package.py should still disable tools from being built.
 ###
-rocmcc_5_4_1_hip_openmp:
+rocmcc_5_4_3_hip_openmp_device_alloc:
   variables:
-    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.4.1 ^hip@5.4.1 ^blt@develop"
+    SPEC: "~shared +fortran +openmp +rocm +device_alloc tests=basic amdgpu_target=gfx90a %rocmcc@5.4.3 ^hip@5.4.3"
   extends: .build_and_test_on_tioga
 
