@@ -7,10 +7,9 @@
 #ifndef UMPIRE_HipMallocManagedAllocator_HPP
 #define UMPIRE_HipMallocManagedAllocator_HPP
 
-#include "umpire/config.hpp"
-
 #include "hip/hip_runtime_api.h"
 #include "umpire/alloc/HipAllocator.hpp"
+#include "umpire/config.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
