@@ -36,7 +36,8 @@ if (ENABLE_HIP)
   set(HIP_HIPCC_FLAGS "${HIP_HIPCC_FLAGS} -Wno-inconsistent-missing-override")
 
   blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
-                          VERBOSE_OUTPUT ON
+                          VERBOSE_OUTPUT OFF
+                          LINK_LIBRARIES hip::host
                           SOURCE_STRING
     [=[
     #include <hip/hip_runtime.h>
