@@ -37,7 +37,7 @@ if (ENABLE_HIP)
 
   blt_check_code_compiles(CODE_COMPILES UMPIRE_ENABLE_HIP_COHERENCE_GRANULARITY
                           VERBOSE_OUTPUT OFF
-                          LINK_LIBRARIES hip::host
+                          DEPENDS_ON hip::host
                           SOURCE_STRING
     [=[
     #include <hip/hip_runtime.h>
