@@ -48,9 +48,9 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-    set(umpire_device_depends camp cuda umpire_util)
+    set(umpire_device_depends camp cuda umpire)
   elseif (UMPIRE_ENABLE_HIP)
-    set(umpire_device_depends camp blt::hip umpire_util)
+    set(umpire_device_depends camp blt::hip umpire)
     set(hip_version_min "5.4.0")
 
     if (${hip_VERSION} VERSION_LESS ${hip_version_min})
@@ -62,8 +62,7 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     NAME umpire_device
     HEADERS ${umpire_device_headers}
     SOURCES ${umpire_device_sources}
-    DEPENDS_ON ${umpire_device_depends}
-    OBJECT TRUE)
+    DEPENDS_ON ${umpire_device_depends})
 
   target_include_directories(
     umpire_device
@@ -71,6 +70,13 @@ if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
     $<INSTALL_INTERFACE:include>)
+
+  install(TARGETS
+    umpire_device
+    EXPORT umpire-targets
+    RUNTIME DESTINATION lib
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
 
   install(FILES
     ${umpire_device_headers}
@@ -117,10 +123,6 @@ endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
 
-if(UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
-  blt_list_append( TO umpire_depends ELEMENTS umpire_device)
-endif()
-
 set (umpire_defines)
 
 if (COMPILER_FAMILY_IS_MSVC AND NOT BUILD_SHARED_LIBS)
@@ -156,9 +158,6 @@ if (UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 else()
   message(STATUS "Host Shared Memory Disabled")
 endif()
-
-set_target_properties(umpire PROPERTIES
-  CUDA_SEPARABLE_COMPILATION On)
 
 if (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP)
   set(UMPIRE_ENABLE_DEVICE On)
