@@ -837,7 +837,6 @@ TEST(AsyncTest, Prefetch)
 }
 #endif
 
-
 TEST(Transfer, Transfer)
 {
   auto& rm = umpire::ResourceManager::getInstance();
@@ -860,7 +859,8 @@ TEST(Transfer, Move)
   auto& rm = umpire::ResourceManager::getInstance();
 
   auto alloc_one = rm.makeAllocator<umpire::strategy::QuickPool>("transfer_three", rm.getAllocator("HOST"));
-  auto alloc_two = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("transfer_four", rm.getAllocator("HOST"));
+  auto alloc_two =
+      rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("transfer_four", rm.getAllocator("HOST"));
 
   void* xfer_data{nullptr};
 

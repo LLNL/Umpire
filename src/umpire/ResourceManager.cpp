@@ -363,7 +363,7 @@ void* ResourceManager::transfer(void* ptr, Allocator to)
 {
   auto alloc_record = findAllocationRecord(ptr);
 
-  if (! (alloc_record->strategy->treatAsPassthrough() && to.getAllocationStrategy()->treatAsPassthrough()) ) {
+  if (!(alloc_record->strategy->treatAsPassthrough() && to.getAllocationStrategy()->treatAsPassthrough())) {
     return move(ptr, to);
   } else {
     Allocator from{alloc_record->strategy};
