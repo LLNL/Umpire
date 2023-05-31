@@ -185,6 +185,7 @@ class ResourceManager {
    *
    *
    *
+   *
    */
   void* transfer(void* ptr, Allocator to);
 
