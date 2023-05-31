@@ -359,6 +359,17 @@ util::AllocationRecord ResourceManager::deregisterAllocation(void* ptr)
   return m_allocations.remove(ptr);
 }
 
+void ResourceManager::transfer(void* ptr, Allocator to)
+{
+  auto alloc_record = findAllocationRecord(ptr);
+  Allocator from{alloc_record->strategy};
+
+  auto record = from.deregisterAllocation(ptr, alloc_record->strategy);
+
+  record.strategy = to.getAllocationStrategy();
+  to.registerAllocation(ptr, record.size, record.strategy);
+}
+
 const util::AllocationRecord* ResourceManager::findAllocationRecord(void* ptr) const
 {
   auto alloc_record = m_allocations.find(ptr);

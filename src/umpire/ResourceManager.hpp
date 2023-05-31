@@ -182,6 +182,14 @@ class ResourceManager {
   util::AllocationRecord deregisterAllocation(void* ptr);
 
   /*!
+   *
+   *
+   *
+   * 
+   */
+  void transfer(void* ptr, Allocator to);
+
+  /*!
    * \brief Find the allocation record associated with an address ptr.
    *
    * \return the record if found, or throws an exception if not found.
