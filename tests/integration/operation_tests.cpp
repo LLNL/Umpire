@@ -836,3 +836,42 @@ TEST(AsyncTest, Prefetch)
   alloc.deallocate(array);
 }
 #endif
+
+
+TEST(Transfer, Transfer)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc_one = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("transfer_one", rm.getAllocator("HOST"));
+  auto alloc_two = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("transfer_two", rm.getAllocator("HOST"));
+
+  void* data = alloc_one.allocate(100);
+  void* xfer_data{nullptr};
+
+  ASSERT_NO_THROW(xfer_data = rm.transfer(data, alloc_two));
+
+  ASSERT_EQ(data, xfer_data);
+
+  ASSERT_NO_THROW(alloc_two.deallocate(xfer_data));
+}
+
+TEST(Transfer, Move)
+{
+  auto& rm = umpire::ResourceManager::getInstance();
+
+  auto alloc_one = rm.makeAllocator<umpire::strategy::QuickPool>("transfer_three", rm.getAllocator("HOST"));
+  auto alloc_two = rm.makeAllocator<umpire::strategy::NamedAllocationStrategy>("transfer_four", rm.getAllocator("HOST"));
+
+  void* xfer_data{nullptr};
+
+  void* data = alloc_one.allocate(100);
+  ASSERT_NO_THROW(xfer_data = rm.transfer(data, alloc_two));
+  ASSERT_NE(xfer_data, data);
+  ASSERT_NO_THROW(alloc_two.deallocate(xfer_data));
+
+  xfer_data = nullptr;
+  data = alloc_two.allocate(100);
+  ASSERT_NO_THROW(xfer_data = rm.transfer(data, alloc_one));
+  ASSERT_NE(xfer_data, data);
+  ASSERT_NO_THROW(alloc_one.deallocate(xfer_data));
+}

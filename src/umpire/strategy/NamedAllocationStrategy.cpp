@@ -37,5 +37,10 @@ MemoryResourceTraits NamedAllocationStrategy::getTraits() const noexcept
   return m_allocator->getTraits();
 }
 
+bool NamedAllocationStrategy::treatAsPassthrough() const noexcept
+{
+  return true;
+}
+
 } // end of namespace strategy
 } // end of namespace umpire

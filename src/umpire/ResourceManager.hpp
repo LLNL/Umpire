@@ -185,9 +185,8 @@ class ResourceManager {
    *
    *
    *
-   * 
    */
-  void transfer(void* ptr, Allocator to);
+  void* transfer(void* ptr, Allocator to);
 
   /*!
    * \brief Find the allocation record associated with an address ptr.
