@@ -763,14 +763,14 @@ TEST(AlignedAllocator, BadAlignment)
 TEST(Synchronizer, SyncOnAlloc)
 {
 #if defined(UMPIRE_ENABLE_CUDA)
-  camp::resources::Resource r{camp::resources::Cuda::get_default()};
-#else if defined(UMPIRE_ENABLE_HIP)
-  camp::resources::Resource r{camp::resources::Hip::get_default()};
+  camp::resources::Resource r{camp::resources::Cuda()};
+#elif defined(UMPIRE_ENABLE_HIP)
+  camp::resources::Resource r{camp::resources::Hip()};
 #endif
 
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto alloc = rm.makeAllocator<umpire::strategy::Synchronizer>("synchronizer", rm.getAllocator("DEVICE"), true, true);
+  auto alloc = rm.makeAllocator<umpire::strategy::Synchronizer>("synchronizer", rm.getAllocator("DEVICE"), r, true, true);
 
   auto e = r.get_event();
 
