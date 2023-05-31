@@ -172,7 +172,7 @@ class builder {
   }
 
   template <typename T>
-  std::enable_if_t<!std::is_arithmetic<T>::value, builder&> arg(const std::string& k, T& v)
+  std::enable_if_t<!std::is_arithmetic<T>::value, builder&> arg(const std::string& k, T v)
   {
     using std::to_string;
     return arg(k, to_string(v));
