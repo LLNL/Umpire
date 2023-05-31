@@ -770,7 +770,8 @@ TEST(Synchronizer, SyncOnAlloc)
 
   auto& rm = umpire::ResourceManager::getInstance();
 
-  auto alloc = rm.makeAllocator<umpire::strategy::Synchronizer>("synchronizer", rm.getAllocator("DEVICE"), r, true, true);
+  auto alloc =
+      rm.makeAllocator<umpire::strategy::Synchronizer>("synchronizer", rm.getAllocator("DEVICE"), r, true, true);
 
   auto e = r.get_event();
 
