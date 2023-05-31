@@ -44,6 +44,8 @@ inline std::string to_string(camp::resources::Resource& r)
     case camp::resources::Platform::undefined:
       return "camp::resource::Undefined";
   }
+
+  return "unkown resource";
 }
 
 } // namespace v1
