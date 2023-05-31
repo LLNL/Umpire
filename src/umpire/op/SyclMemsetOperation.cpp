@@ -6,11 +6,11 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/SyclMemsetOperation.hpp"
 
-#include <CL/sycl.hpp>
 #include <iostream>
 
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/Macros.hpp"
+#include "umpire/util/sycl_compat.hpp"
 
 namespace umpire {
 namespace op {
