@@ -766,6 +766,10 @@ TEST(Synchronizer, SyncOnAlloc)
   camp::resources::Resource r{camp::resources::Cuda()};
 #elif defined(UMPIRE_ENABLE_HIP)
   camp::resources::Resource r{camp::resources::Hip()};
+#elif defined(UMPIRE_ENABLE_SYCL)
+  camp::resources::Resource r{camp::resources::Sycl()};
+#else
+  camp::resources::Resource r{camp::resources::Host()};
 #endif
 
   auto& rm = umpire::ResourceManager::getInstance();
