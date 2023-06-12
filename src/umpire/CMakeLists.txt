@@ -32,7 +32,7 @@ set (umpire_sources
   ResourceManager.cpp
   Umpire.cpp)
 
-if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+if (UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   set(umpire_device_headers
     DeviceAllocator.hpp
     device_allocator_helper.hpp)
@@ -41,14 +41,22 @@ if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     DeviceAllocator.cpp
     device_allocator_helper.cpp)
 
-  set_source_files_properties(DeviceAllocator.cpp
+  if (UMPIRE_ENABLE_CUDA)
+    set_source_files_properties(DeviceAllocator.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
-  set_source_files_properties(device_allocator_helper.cpp
+    set_source_files_properties(device_allocator_helper.cpp
                               PROPERTIES
                               LANGUAGE CUDA)
+    set(umpire_device_depends camp cuda umpire_util)
+  elseif (UMPIRE_ENABLE_HIP)
+    set(umpire_device_depends camp blt::hip umpire_util)
+    set(hip_version_min "5.4.0")
 
-  set(umpire_device_depends camp cuda umpire_util)
+    if (${hip_VERSION} VERSION_LESS ${hip_version_min})
+      message(FATAL_ERROR "ROCM version must be ${hip_version_min} or higher for HIP DeviceAllocator functionality!")
+    endif ()
+  endif()
 
   blt_add_library(
     NAME umpire_device
@@ -68,9 +76,20 @@ if (UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
     ${umpire_device_headers}
     DESTINATION include/umpire)
 
-  set_target_properties(umpire_device PROPERTIES
-    CUDA_SEPARABLE_COMPILATION On)
+  if (UMPIRE_ENABLE_CUDA)
+    set_target_properties(umpire_device PROPERTIES
+      CUDA_SEPARABLE_COMPILATION On)
+  else ()
+    target_link_options(umpire_device PUBLIC -fgpu-rdc)
+    target_compile_options(umpire_device PUBLIC -fgpu-rdc)
+  endif ()
 
+endif()
+
+if (UMPIRE_ENABLE_SYCL)
+  set(umpire_headers
+      ${umpire_headers}
+      util/sycl_compat.hpp)
 endif()
 
 set (umpire_depends
@@ -98,7 +117,7 @@ endif ()
 
 blt_list_append( TO umpire_depends ELEMENTS umpire_interface IF UMPIRE_ENABLE_C )
 
-if(UMPIRE_ENABLE_CUDA AND UMPIRE_ENABLE_DEVICE_ALLOCATOR)
+if(UMPIRE_ENABLE_DEVICE_ALLOCATOR AND (UMPIRE_ENABLE_CUDA OR UMPIRE_ENABLE_HIP))
   blt_list_append( TO umpire_depends ELEMENTS umpire_device)
 endif()
 

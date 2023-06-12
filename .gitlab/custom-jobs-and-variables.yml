@@ -18,36 +18,36 @@ variables:
 # Arguments for job level allocation
   RUBY_BUILD_AND_TEST_JOB_ALLOC: "--overlap --reservation=ci --qos=ci_ruby --time=10 --nodes=1"
 # Project specific variants for ruby
-  PROJECT_RUBY_VARIANTS: "~shared +fortran ~device_alloc +tools tests=basic "
+  PROJECT_RUBY_VARIANTS: "~shared +fortran +tools tests=basic "
 # Project specific deps for ruby
   PROJECT_RUBY_DEPS: ""
 
 # Corona
 # Arguments for top level allocation
-  CORONA_BUILD_AND_TEST_SHARED_ALLOC: "--time-limit=15m --nodes=1"
+  CORONA_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
 # Arguments for job level allocation
-  CORONA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
+  CORONA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1 --begin-time=+5s"
 # Project specific variants for corona
-  PROJECT_CORONA_VARIANTS: "~shared +fortran ~device_alloc tests=basic "
+  PROJECT_CORONA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
 # Project specific deps for corona
-  PROJECT_CORONA_DEPS: "^blt@develop"
+  PROJECT_CORONA_DEPS: ""
 
 # Tioga
 # Arguments for top level allocation
-  TIOGA_BUILD_AND_TEST_SHARED_ALLOC: "--time-limit=15m --nodes=1"
+  TIOGA_BUILD_AND_TEST_SHARED_ALLOC: "--exclusive --time-limit=15m --nodes=1"
 # Arguments for job level allocation
-  TIOGA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1"
+  TIOGA_BUILD_AND_TEST_JOB_ALLOC: "--time-limit=10m --nodes=1 --begin-time=+5s"
 # Project specific variants for tioga
-  PROJECT_TIOGA_VARIANTS: "~shared +fortran ~device_alloc tests=basic "
+  PROJECT_TIOGA_VARIANTS: "~shared +fortran +device_alloc tests=basic "
 # Project specific deps for tioga
-  PROJECT_TIOGA_DEPS: "^blt@develop"
+  PROJECT_TIOGA_DEPS: ""
 
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
 # Arguments for job level allocation
   LASSEN_BUILD_AND_TEST_JOB_ALLOC: "1 -W 18"
 # Project specific variants for lassen
-  PROJECT_LASSEN_VARIANTS: "~shared +fortran ~device_alloc +tools tests=basic "
+  PROJECT_LASSEN_VARIANTS: "~shared +fortran +tools tests=basic "
 # Project specific deps for lassen
   PROJECT_LASSEN_DEPS: ""
 

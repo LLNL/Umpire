@@ -5,24 +5,24 @@
 //
 // For the license information refer to format.h.
 
-#ifndef FMT_COMPILE_H_
-#define FMT_COMPILE_H_
+#ifndef UMPIRE_FMT_COMPILE_H_
+#define UMPIRE_FMT_COMPILE_H_
 
 #include <algorithm>
 #include <vector>
 
 #include "format.h"
 
-#ifndef FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
+#ifndef UMPIRE_FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
 #  if defined(__cpp_nontype_template_parameter_class) && \
-      (!FMT_GCC_VERSION || FMT_GCC_VERSION >= 903)
-#    define FMT_USE_NONTYPE_TEMPLATE_PARAMETERS 1
+      (!UMPIRE_FMT_GCC_VERSION || UMPIRE_FMT_GCC_VERSION >= 903)
+#    define UMPIRE_FMT_USE_NONTYPE_TEMPLATE_PARAMETERS 1
 #  else
-#    define FMT_USE_NONTYPE_TEMPLATE_PARAMETERS 0
+#    define UMPIRE_FMT_USE_NONTYPE_TEMPLATE_PARAMETERS 0
 #  endif
 #endif
 
-FMT_BEGIN_NAMESPACE
+UMPIRE_FMT_BEGIN_NAMESPACE
 namespace detail {
 
 template <typename OutputIt> class truncating_iterator_base {
@@ -120,12 +120,12 @@ struct is_compiled_string : std::is_base_of<compiled_string, S> {};
 
     // Converts 42 into std::string using the most efficient method and no
     // runtime format string processing.
-    std::string s = umpire::fmt::format(FMT_COMPILE("{}"), 42);
+    std::string s = umpire::fmt::format(UMPIRE_FMT_COMPILE("{}"), 42);
   \endrst
  */
-#define FMT_COMPILE(s) FMT_STRING_IMPL(s, umpire::fmt::detail::compiled_string)
+#define UMPIRE_FMT_COMPILE(s) UMPIRE_FMT_STRING_IMPL(s, umpire::fmt::detail::compiled_string)
 
-#if FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
+#if UMPIRE_FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
 template <typename Char, size_t N> struct fixed_string {
   constexpr fixed_string(const Char (&str)[N]) {
     copy_str<Char, const Char*, Char*>(static_cast<const Char*>(str), str + N,
@@ -164,26 +164,26 @@ template <typename Char> struct format_part {
     basic_string_view<Char> str;
     replacement repl;
 
-    FMT_CONSTEXPR value(int index = 0) : arg_index(index) {}
-    FMT_CONSTEXPR value(basic_string_view<Char> s) : str(s) {}
-    FMT_CONSTEXPR value(replacement r) : repl(r) {}
+    UMPIRE_FMT_CONSTEXPR value(int index = 0) : arg_index(index) {}
+    UMPIRE_FMT_CONSTEXPR value(basic_string_view<Char> s) : str(s) {}
+    UMPIRE_FMT_CONSTEXPR value(replacement r) : repl(r) {}
   } val;
   // Position past the end of the argument id.
   const Char* arg_id_end = nullptr;
 
-  FMT_CONSTEXPR format_part(kind k = kind::arg_index, value v = {})
+  UMPIRE_FMT_CONSTEXPR format_part(kind k = kind::arg_index, value v = {})
       : part_kind(k), val(v) {}
 
-  static FMT_CONSTEXPR format_part make_arg_index(int index) {
+  static UMPIRE_FMT_CONSTEXPR format_part make_arg_index(int index) {
     return format_part(kind::arg_index, index);
   }
-  static FMT_CONSTEXPR format_part make_arg_name(basic_string_view<Char> name) {
+  static UMPIRE_FMT_CONSTEXPR format_part make_arg_name(basic_string_view<Char> name) {
     return format_part(kind::arg_name, name);
   }
-  static FMT_CONSTEXPR format_part make_text(basic_string_view<Char> text) {
+  static UMPIRE_FMT_CONSTEXPR format_part make_text(basic_string_view<Char> text) {
     return format_part(kind::text, text);
   }
-  static FMT_CONSTEXPR format_part make_replacement(replacement repl) {
+  static UMPIRE_FMT_CONSTEXPR format_part make_replacement(replacement repl) {
     return format_part(kind::replacement, repl);
   }
 };
@@ -191,19 +191,19 @@ template <typename Char> struct format_part {
 template <typename Char> struct part_counter {
   unsigned num_parts = 0;
 
-  FMT_CONSTEXPR void on_text(const Char* begin, const Char* end) {
+  UMPIRE_FMT_CONSTEXPR void on_text(const Char* begin, const Char* end) {
     if (begin != end) ++num_parts;
   }
 
-  FMT_CONSTEXPR int on_arg_id() { return ++num_parts, 0; }
-  FMT_CONSTEXPR int on_arg_id(int) { return ++num_parts, 0; }
-  FMT_CONSTEXPR int on_arg_id(basic_string_view<Char>) {
+  UMPIRE_FMT_CONSTEXPR int on_arg_id() { return ++num_parts, 0; }
+  UMPIRE_FMT_CONSTEXPR int on_arg_id(int) { return ++num_parts, 0; }
+  UMPIRE_FMT_CONSTEXPR int on_arg_id(basic_string_view<Char>) {
     return ++num_parts, 0;
   }
 
-  FMT_CONSTEXPR void on_replacement_field(int, const Char*) {}
+  UMPIRE_FMT_CONSTEXPR void on_replacement_field(int, const Char*) {}
 
-  FMT_CONSTEXPR const Char* on_format_specs(int, const Char* begin,
+  UMPIRE_FMT_CONSTEXPR const Char* on_format_specs(int, const Char* begin,
                                             const Char* end) {
     // Find the matching brace.
     unsigned brace_counter = 0;
@@ -218,12 +218,12 @@ template <typename Char> struct part_counter {
     return begin;
   }
 
-  FMT_CONSTEXPR void on_error(const char*) {}
+  UMPIRE_FMT_CONSTEXPR void on_error(const char*) {}
 };
 
 // Counts the number of parts in a format string.
 template <typename Char>
-FMT_CONSTEXPR unsigned count_parts(basic_string_view<Char> format_str) {
+UMPIRE_FMT_CONSTEXPR unsigned count_parts(basic_string_view<Char> format_str) {
   part_counter<Char> counter;
   parse_format_string<true>(format_str, counter);
   return counter.num_parts;
@@ -240,39 +240,39 @@ class format_string_compiler : public error_handler {
   basic_format_parse_context<Char> parse_context_;
 
  public:
-  FMT_CONSTEXPR format_string_compiler(basic_string_view<Char> format_str,
+  UMPIRE_FMT_CONSTEXPR format_string_compiler(basic_string_view<Char> format_str,
                                        PartHandler handler)
       : handler_(handler),
         format_str_(format_str),
         parse_context_(format_str) {}
 
-  FMT_CONSTEXPR void on_text(const Char* begin, const Char* end) {
+  UMPIRE_FMT_CONSTEXPR void on_text(const Char* begin, const Char* end) {
     if (begin != end)
       handler_(part::make_text({begin, to_unsigned(end - begin)}));
   }
 
-  FMT_CONSTEXPR int on_arg_id() {
+  UMPIRE_FMT_CONSTEXPR int on_arg_id() {
     part_ = part::make_arg_index(parse_context_.next_arg_id());
     return 0;
   }
 
-  FMT_CONSTEXPR int on_arg_id(int id) {
+  UMPIRE_FMT_CONSTEXPR int on_arg_id(int id) {
     parse_context_.check_arg_id(id);
     part_ = part::make_arg_index(id);
     return 0;
   }
 
-  FMT_CONSTEXPR int on_arg_id(basic_string_view<Char> id) {
+  UMPIRE_FMT_CONSTEXPR int on_arg_id(basic_string_view<Char> id) {
     part_ = part::make_arg_name(id);
     return 0;
   }
 
-  FMT_CONSTEXPR void on_replacement_field(int, const Char* ptr) {
+  UMPIRE_FMT_CONSTEXPR void on_replacement_field(int, const Char* ptr) {
     part_.arg_id_end = ptr;
     handler_(part_);
   }
 
-  FMT_CONSTEXPR const Char* on_format_specs(int, const Char* begin,
+  UMPIRE_FMT_CONSTEXPR const Char* on_format_specs(int, const Char* begin,
                                             const Char* end) {
     auto repl = typename part::replacement();
     dynamic_specs_handler<basic_format_parse_context<Char>> handler(
@@ -291,7 +291,7 @@ class format_string_compiler : public error_handler {
 
 // Compiles a format string and invokes handler(part) for each parsed part.
 template <bool IS_CONSTEXPR, typename Char, typename PartHandler>
-FMT_CONSTEXPR void compile_format_string(basic_string_view<Char> format_str,
+UMPIRE_FMT_CONSTEXPR void compile_format_string(basic_string_view<Char> format_str,
                                          PartHandler handler) {
   parse_format_string<IS_CONSTEXPR>(
       format_str,
@@ -402,11 +402,11 @@ struct compiled_format_base : basic_compiled_format {
 
 template <typename Char, unsigned N> struct format_part_array {
   format_part<Char> data[N] = {};
-  FMT_CONSTEXPR format_part_array() = default;
+  UMPIRE_FMT_CONSTEXPR format_part_array() = default;
 };
 
 template <typename Char, unsigned N>
-FMT_CONSTEXPR format_part_array<Char, N> compile_to_parts(
+UMPIRE_FMT_CONSTEXPR format_part_array<Char, N> compile_to_parts(
     basic_string_view<Char> format_str) {
   format_part_array<Char, N> parts;
   unsigned counter = 0;
@@ -414,7 +414,7 @@ FMT_CONSTEXPR format_part_array<Char, N> compile_to_parts(
   struct {
     format_part<Char>* parts;
     unsigned* counter;
-    FMT_CONSTEXPR void operator()(const format_part<Char>& part) {
+    UMPIRE_FMT_CONSTEXPR void operator()(const format_part<Char>& part) {
       parts[(*counter)++] = part;
     }
   } collector{parts.data, &counter};
@@ -435,12 +435,12 @@ struct compiled_format_base<S, enable_if_t<is_compile_string<S>::value>>
     : basic_compiled_format {
   using char_type = char_t<S>;
 
-  FMT_CONSTEXPR explicit compiled_format_base(basic_string_view<char_type>) {}
+  UMPIRE_FMT_CONSTEXPR explicit compiled_format_base(basic_string_view<char_type>) {}
 
 // Workaround for old compilers. Format string compilation will not be
 // performed there anyway.
-#if FMT_USE_CONSTEXPR
-  static FMT_CONSTEXPR_DECL const unsigned num_format_parts =
+#if UMPIRE_FMT_USE_CONSTEXPR
+  static UMPIRE_FMT_CONSTEXPR_DECL const unsigned num_format_parts =
       constexpr_max(count_parts(to_string_view(S())), 1u);
 #else
   static const unsigned num_format_parts = 1;
@@ -449,7 +449,7 @@ struct compiled_format_base<S, enable_if_t<is_compile_string<S>::value>>
   using parts_container = format_part<char_type>[num_format_parts];
 
   const parts_container& parts() const {
-    static FMT_CONSTEXPR_DECL const auto compiled_parts =
+    static UMPIRE_FMT_CONSTEXPR_DECL const auto compiled_parts =
         compile_to_parts<char_type, num_format_parts>(
             detail::to_string_view(S()));
     return compiled_parts.data;
@@ -676,7 +676,7 @@ template <typename Char> struct arg_id_handler {
   constexpr void on_error(const char* message) { throw format_error(message); }
 
   constexpr int on_arg_id() {
-    FMT_ASSERT(false, "handler cannot be used with automatic indexing");
+    UMPIRE_FMT_ASSERT(false, "handler cannot be used with automatic indexing");
     return 0;
   }
 
@@ -781,7 +781,7 @@ constexpr auto compile_format_string(S format_str) {
 }
 
 template <typename... Args, typename S,
-          FMT_ENABLE_IF(is_compile_string<S>::value ||
+          UMPIRE_FMT_ENABLE_IF(is_compile_string<S>::value ||
                         detail::is_compiled_string<S>::value)>
 constexpr auto compile(S format_str) {
   constexpr basic_string_view<typename S::char_type> str = format_str;
@@ -796,7 +796,7 @@ constexpr auto compile(S format_str) {
 }
 #else
 template <typename... Args, typename S,
-          FMT_ENABLE_IF(is_compile_string<S>::value)>
+          UMPIRE_FMT_ENABLE_IF(is_compile_string<S>::value)>
 constexpr auto compile(S format_str) -> detail::compiled_format<S, Args...> {
   return detail::compiled_format<S, Args...>(to_string_view(format_str));
 }
@@ -813,20 +813,20 @@ auto compile(const Char (&format_str)[N])
 }
 }  // namespace detail
 
-// DEPRECATED! use FMT_COMPILE instead.
+// DEPRECATED! use UMPIRE_FMT_COMPILE instead.
 template <typename... Args>
-FMT_DEPRECATED auto compile(const Args&... args)
+UMPIRE_FMT_DEPRECATED auto compile(const Args&... args)
     -> decltype(detail::compile(args...)) {
   return detail::compile(args...);
 }
 
-#if FMT_USE_CONSTEXPR
+#if UMPIRE_FMT_USE_CONSTEXPR
 #  ifdef __cpp_if_constexpr
 
 template <typename CompiledFormat, typename... Args,
           typename Char = typename CompiledFormat::char_type,
-          FMT_ENABLE_IF(detail::is_compiled_format<CompiledFormat>::value)>
-FMT_INLINE std::basic_string<Char> format(const CompiledFormat& cf,
+          UMPIRE_FMT_ENABLE_IF(detail::is_compiled_format<CompiledFormat>::value)>
+UMPIRE_FMT_INLINE std::basic_string<Char> format(const CompiledFormat& cf,
                                           const Args&... args) {
   basic_memory_buffer<Char> buffer;
   cf.format(detail::buffer_appender<Char>(buffer), args...);
@@ -834,17 +834,17 @@ FMT_INLINE std::basic_string<Char> format(const CompiledFormat& cf,
 }
 
 template <typename OutputIt, typename CompiledFormat, typename... Args,
-          FMT_ENABLE_IF(detail::is_compiled_format<CompiledFormat>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_compiled_format<CompiledFormat>::value)>
 constexpr OutputIt format_to(OutputIt out, const CompiledFormat& cf,
                              const Args&... args) {
   return cf.format(out, args...);
 }
 #  endif  // __cpp_if_constexpr
-#endif    // FMT_USE_CONSTEXPR
+#endif    // UMPIRE_FMT_USE_CONSTEXPR
 
 template <typename CompiledFormat, typename... Args,
           typename Char = typename CompiledFormat::char_type,
-          FMT_ENABLE_IF(std::is_base_of<detail::basic_compiled_format,
+          UMPIRE_FMT_ENABLE_IF(std::is_base_of<detail::basic_compiled_format,
                                         CompiledFormat>::value)>
 std::basic_string<Char> format(const CompiledFormat& cf, const Args&... args) {
   basic_memory_buffer<Char> buffer;
@@ -855,8 +855,8 @@ std::basic_string<Char> format(const CompiledFormat& cf, const Args&... args) {
 }
 
 template <typename S, typename... Args,
-          FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
-FMT_INLINE std::basic_string<typename S::char_type> format(const S&,
+          UMPIRE_FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
+UMPIRE_FMT_INLINE std::basic_string<typename S::char_type> format(const S&,
                                                            Args&&... args) {
 #ifdef __cpp_if_constexpr
   if constexpr (std::is_same<typename S::char_type, char>::value) {
@@ -887,7 +887,7 @@ FMT_INLINE std::basic_string<typename S::char_type> format(const S&,
 }
 
 template <typename OutputIt, typename CompiledFormat, typename... Args,
-          FMT_ENABLE_IF(std::is_base_of<detail::basic_compiled_format,
+          UMPIRE_FMT_ENABLE_IF(std::is_base_of<detail::basic_compiled_format,
                                         CompiledFormat>::value)>
 constexpr OutputIt format_to(OutputIt out, const CompiledFormat& cf,
                              const Args&... args) {
@@ -898,8 +898,8 @@ constexpr OutputIt format_to(OutputIt out, const CompiledFormat& cf,
 }
 
 template <typename OutputIt, typename S, typename... Args,
-          FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
-FMT_CONSTEXPR OutputIt format_to(OutputIt out, const S&, Args&&... args) {
+          UMPIRE_FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
+UMPIRE_FMT_CONSTEXPR OutputIt format_to(OutputIt out, const S&, Args&&... args) {
   constexpr auto compiled = detail::compile<Args...>(S());
 #ifdef __cpp_if_constexpr
   if constexpr (std::is_same<remove_cvref_t<decltype(compiled)>,
@@ -930,7 +930,7 @@ auto format_to_n(OutputIt out, size_t n, const CompiledFormat& cf,
 }
 
 template <typename OutputIt, typename S, typename... Args,
-          FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
+          UMPIRE_FMT_ENABLE_IF(detail::is_compiled_string<S>::value)>
 format_to_n_result<OutputIt> format_to_n(OutputIt out, size_t n, const S&,
                                          Args&&... args) {
   auto it = format_to(detail::truncating_iterator<OutputIt>(out, n), S(),
@@ -939,14 +939,14 @@ format_to_n_result<OutputIt> format_to_n(OutputIt out, size_t n, const S&,
 }
 
 template <typename CompiledFormat, typename... Args,
-          FMT_ENABLE_IF(std::is_base_of<detail::basic_compiled_format,
+          UMPIRE_FMT_ENABLE_IF(std::is_base_of<detail::basic_compiled_format,
                                         CompiledFormat>::value ||
                         detail::is_compiled_string<CompiledFormat>::value)>
 size_t formatted_size(const CompiledFormat& cf, const Args&... args) {
   return format_to(detail::counting_iterator(), cf, args...).count();
 }
 
-#if FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
+#if UMPIRE_FMT_USE_NONTYPE_TEMPLATE_PARAMETERS
 inline namespace literals {
 template <detail::fixed_string Str>
 constexpr detail::udl_compiled_string<remove_cvref_t<decltype(Str.data[0])>,
@@ -957,6 +957,6 @@ operator""_cf() {
 }  // namespace literals
 #endif
 
-FMT_END_NAMESPACE
+UMPIRE_FMT_END_NAMESPACE
 
-#endif  // FMT_COMPILE_H_
+#endif  // UMPIRE_FMT_COMPILE_H_

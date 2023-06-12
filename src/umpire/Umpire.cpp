@@ -221,6 +221,9 @@ void* find_pointer_from_name(Allocator allocator, const std::string& name)
   } else
 #else
   UMPIRE_USE_VAR(name);
+
+  // Using unused attribute to silence warning from rocm compiler
+  UMPIRE_USE_VAR(allocator);
 #endif // defined(UMPIRE_ENABLE_IPC_SHARED_MEMORY)
 
   {

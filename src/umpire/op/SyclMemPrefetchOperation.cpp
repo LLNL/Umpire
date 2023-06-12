@@ -6,10 +6,9 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/op/SyclMemPrefetchOperation.hpp"
 
-#include <CL/sycl.hpp>
-
 #include "umpire/strategy/AllocationStrategy.hpp"
 #include "umpire/util/error.hpp"
+#include "umpire/util/sycl_compat.hpp"
 
 namespace umpire {
 namespace op {

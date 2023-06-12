@@ -32,7 +32,7 @@ __global__ void my_kernel(double** data_ptr)
   }
 }
 
-int main(int argc, char const* argv[])
+int main()
 {
   auto resource = camp::resources::Resource{resource_type{}};
 
@@ -54,7 +54,12 @@ int main(int argc, char const* argv[])
   // See ReadTheDocs DeviceAllocator documentation for more info about macro usage!
   UMPIRE_SET_UP_DEVICE_ALLOCATORS();
 
+#if defined(UMPIRE_ENABLE_CUDA)
   my_kernel<<<1, 16>>>(ptr_to_data);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(my_kernel, dim3(1), dim3(16), 0, 0, ptr_to_data);
+#endif
+
   resource.get_event().wait();
   std::cout << "After calling kernel, found value: " << (*ptr_to_data)[0] << std::endl;
 
@@ -62,7 +67,12 @@ int main(int argc, char const* argv[])
   device_allocator.reset();
   std::cout << "After calling reset, the current size is: " << device_allocator.getCurrentSize() << std::endl;
 
+#if defined(UMPIRE_ENABLE_CUDA)
   my_kernel<<<1, 16>>>(ptr_to_data);
+#elif defined(UMPIRE_ENABLE_HIP)
+  hipLaunchKernelGGL(my_kernel, dim3(1), dim3(16), 0, 0, ptr_to_data);
+#endif
+
   resource.get_event().wait();
   std::cout << "After calling kernel again, found value: " << (*ptr_to_data)[0] << std::endl;
 

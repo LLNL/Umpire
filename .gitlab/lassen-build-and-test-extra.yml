@@ -12,13 +12,6 @@
 # We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
 # the comparison with the original job is easier.
 
-# Spec has test disabled in shared CI, conflicting with default test setting in Umpire
-# TODO: This is likely an issue in RADIUSS Shared CI: why disable tests ?.
-xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
-  variables:
-    SPEC: "~shared +fortran ~device_alloc +tools +cuda tests=none %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@11.0.2 ${PROJECT_LASSEN_DEPS}"
-  extends: .build_and_test_on_lassen
-
 
 ############
 # Extra jobs
@@ -27,30 +20,30 @@ xl_16_1_1_12_gcc_8_3_1_cuda_11_0_2:
 # ${PROJECT_<MACHINE>_DEPS} in the extra jobs. There is no reason not to fully
 # describe the spec here.
 
-ibm_clang_10_0_1_mpi_shmem:
+ibm_clang_14_0_5_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +ipc_shmem +mpi ^spectrum-mpi"
+    SPEC: "~shared +tools tests=basic +ipc_shmem +mpi %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
-ibm_clang_10_0_1_mpi:
+ibm_clang_14_0_5_mpi:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +mpi ^spectrum-mpi"
+    SPEC: "~shared +fortran +tools +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi"
   extends: .build_and_test_on_lassen
 
-ibm_clang_10_0_1_cuda_10_1_168_mpi_shmem:
+ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_mpi_shmem:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %clang@ibm.10.0.1 +cuda +ipc_shmem +mpi cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^spectrum-mpi ^cuda@10.1.168"
+    SPEC: "~shared +tools +cuda +ipc_shmem +mpi tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^spectrum-mpi ^cuda@11.7.0+allow-unsupported-compilers"
+    MODULE_LIST: "cuda/11.7.0"
   extends: .build_and_test_on_lassen
 
-# Extras.
-clang_9_0_0_libcpp:
+clang_12_0_1_libcpp:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %clang@9.0.0+libcpp cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\" cflags==\"-DGTEST_HAS_CXXABI_H_=0\""
+    SPEC: "~shared +tools tests=basic %clang@12.0.1 cflags==\"-DGTEST_HAS_CXXABI_H_=0\" cxxflags==\"-stdlib=libc++ -DGTEST_HAS_CXXABI_H_=0\""
   extends: .build_and_test_on_lassen
 
-clang_9_0_0_memleak:
+clang_12_0_1_gcc_8_3_1_memleak:
   variables:
-    SPEC: "~shared +asan +sanitizer_tests +tools ~device_alloc tests=basic %clang@9.0.0 cxxflags==-fsanitize=address"
+    SPEC: "~shared +asan +sanitizer_tests +tools tests=basic %clang@12.0.1.gcc.8.3.1 cxxflags==-fsanitize=address"
     ASAN_OPTIONS: "detect_leaks=1"
   extends: .build_and_test_on_lassen
 
@@ -62,38 +55,41 @@ clang_9_0_0_memleak:
 
 gcc_8_3_1_dev_benchmarks:
   variables:
-    SPEC: "~shared +dev_benchmarks +tools ~device_alloc %gcc@8.3.1 build_type=Release"
+    SPEC: "~shared +dev_benchmarks +tools build_type=Release %gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-xl_default_omp_target:
+xl_2022_08_19_default_omp_target:
   variables:
-    SPEC: "~shared ~device_alloc +tools tests=basic %xl@default+openmp+openmp_target"
+    SPEC: "~shared +tools +openmp +openmp_target tests=basic %xl@16.1.1.12"
   allow_failure: true
   extends: .build_and_test_on_lassen
 
 gcc_8_3_1_numa:
   variables:
-    SPEC: "~shared +fortran +numa +tools ~device_alloc tests=basic %gcc@8.3.1"
+    SPEC: "~shared +fortran +numa +tools tests=basic %gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-gcc_8_3_1_cuda_10_1_168:
+gcc_8_3_1_cuda_11_7_0:
   variables:
-    SPEC: "+fortran +cuda +tools +backtrace ~device_alloc tests=basic %gcc@8.3.1 ^cuda@10.1.168"
+    SPEC: "+fortran +cuda +tools +backtrace tests=basic %gcc@8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+    MODULE_LIST: "cuda/11.7.0"
   extends: .build_and_test_on_lassen
 
 # Develop/main builds against specific tpl versions.
 
 gcc_8_3_1_tpls:
   variables:
-    SPEC: "~shared +fortran ~device_alloc +tools tests=basic %gcc@8.3.1 ^blt@develop"
+    SPEC: "~shared +fortran +tools tests=basic %gcc@8.3.1"
   extends: .build_and_test_on_lassen
 
-ibm_clang_9_0_0_gcc_8_3_1_cuda_10_1_168_tpls:
+ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %clang@ibm.9.0.0 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-8.3.1\" ^cuda@10.1.168 ^blt@develop"
+    SPEC: "~shared +fortran +cuda +tools tests=basic %clang@14.0.5.ibm.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+    MODULE_LIST: "cuda/11.7.0"
   extends: .build_and_test_on_lassen
 
-xl_16_1_1_12_gcc_8_3_1_cuda_10_1_168_tpls:
+xl_2022_08_19_gcc_8_3_1_cuda_11_7_tpls:
   variables:
-    SPEC: "~shared +fortran +cuda ~device_alloc +tools tests=basic %xl@16.1.1.12 cxxflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" cflags==\"--gcc-toolchain=/usr/tce/packages/gcc/gcc-7.3.1\" ^cuda@10.1.168 ^blt@develop"
+    SPEC: "~shared +fortran +cuda +tools tests=basic %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
+    MODULE_LIST: "cuda/11.7.0"
   extends: .build_and_test_on_lassen

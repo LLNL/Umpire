@@ -12,7 +12,7 @@
 #include "umpire/config.hpp"
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
+#include "umpire/util/sycl_compat.hpp"
 #endif
 
 namespace umpire {
