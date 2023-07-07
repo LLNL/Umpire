@@ -336,15 +336,15 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
-  return [=](const strategy::QuickPool& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
-  };
+  return
+      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
-  return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
+  return [=](const strategy::QuickPool& pool) {
+    return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
+  };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
