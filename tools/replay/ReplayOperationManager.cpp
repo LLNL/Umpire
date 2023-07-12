@@ -511,8 +511,14 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
       if (m_options.heuristic_to_use == "Block") {
         heuristic = umpire::strategy::QuickPool::blocks_releasable(m_options.heuristic_parm);
       }
+      else if (m_options.heuristic_to_use == "Block_hwm") {
+        heuristic = umpire::strategy::QuickPool::blocks_releasable_hwm(m_options.heuristic_parm);
+      }
       else if (m_options.heuristic_to_use == "FreePercentage") {
         heuristic = umpire::strategy::QuickPool::percent_releasable(m_options.heuristic_parm);
+      }
+      else if (m_options.heuristic_to_use == "FreePercentage_hwm") {
+        heuristic = umpire::strategy::QuickPool::percent_releasable_hwm(m_options.heuristic_parm);
       }
 
       if (alloc->introspection) {
@@ -643,8 +649,15 @@ void ReplayOperationManager::makeAllocator(ReplayFile::Operation* op)
 
         if (m_options.heuristic_to_use == "Block") {
           heuristic = umpire::strategy::DynamicPoolList::blocks_releasable(m_options.heuristic_parm);
-        } else if (m_options.heuristic_to_use == "FreePercentage") {
+        }
+        else if (m_options.heuristic_to_use == "Block_hwm") {
+          heuristic = umpire::strategy::DynamicPoolList::blocks_releasable_hwm(m_options.heuristic_parm);
+        }
+        else if (m_options.heuristic_to_use == "FreePercentage") {
           heuristic = umpire::strategy::DynamicPoolList::percent_releasable(m_options.heuristic_parm);
+        }
+        else if (m_options.heuristic_to_use == "FreePercentage_hwm") { 
+          heuristic = umpire::strategy::DynamicPoolList::percent_releasable_hwm(m_options.heuristic_parm);
         }
 
         if (alloc->introspection) {

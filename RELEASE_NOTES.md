@@ -1,3 +1,23 @@
+# v2023.06.0
+
+## New Features
+
+- Add `_hwm` variant of pool heuristic functions. These reallocate to the high watermark value after a coalescing, and can reduce memory overhead.
+
+## Improvements
+
+- Support 2023 OneAPI release.
+
+- Add HIP support to the DeviceAllocator.
+
+## Bug Fixes
+
+- Prefix fmt macros to avoid conflicts with other libraries including fmt.
+
+- Replace deprecated random_shuffle usage with shuffle for c++17.
+
+- Make exported include directories relative to install prefix.
+
 # v2022.10.0
 
 ## New Features

@@ -13,8 +13,8 @@
 struct ReplayUsePoolValidator : public CLI::Validator {
   ReplayUsePoolValidator() {
     func_ = [](const std::string &str) {
-      if (str != "Quick" && str != "List" && str != "Map") {
-        return std::string("Invalid pool name, must be Quick, List, or Map");
+      if (str != "Quick" && str != "List") {
+        return std::string("Invalid pool name, must be Quick or  List");
       }
       else
         return std::string();
@@ -25,8 +25,8 @@ struct ReplayUsePoolValidator : public CLI::Validator {
 struct ReplayUseHeuristicValidator : public CLI::Validator {
   ReplayUseHeuristicValidator() {
     func_ = [](const std::string &str) {
-      if (str != "Block" && str != "FreePercentage") {
-        return std::string("Invalid heuristic name, must be Block or FreePercentage");
+      if (str != "Block" && str != "FreePercentage" && str != "Block_hwm" && str != "FreePercentage_hwm") {
+        return std::string("Invalid heuristic name, must be Block, Block_hwm, FreePercentage, or FreePercentage_hwm");
       }
       else
         return std::string();
