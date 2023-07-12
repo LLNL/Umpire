@@ -40,7 +40,8 @@ int main(int argc, char* argv[])
   app.add_flag("--skip-operations" , options.skip_operations, "Skip Umpire Operations during replays");
   app.add_flag("-r,--recompile" , options.force_compile, "Force recompile replay binary");
   app.add_option("-p,--use-pool", options.pool_to_use, "Specify pool to use: List or Quick")->check(ReplayValidPool);
-  app.add_option("--use-heuristic", options.heuristic_to_use, "Heuristic: Default, Block, or FreePercentage")->check(ReplayValidHeuristic);
+  app.add_option("--use-heuristic", options.heuristic_to_use, 
+                 "Heuristic: Block, Block_hwm, FreePercentage, or FreePercentage_hwm")->check(ReplayValidHeuristic);
   app.add_option("--heuristic-parm", options.heuristic_parm, "Heuristic parameter to use")->check(CLI::Range(0,100));
   CLI11_PARSE(app, argc, argv);
 
