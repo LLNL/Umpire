@@ -352,7 +352,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR(
         runtime_error,
-        umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
+        fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
   if (percentage == 0) {
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
@@ -375,7 +375,7 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
   if (percentage < 0 || percentage > 100) {
     UMPIRE_ERROR(
         runtime_error,
-        umpire::fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
+        fmt::format("Invalid percentage: {}, percentage must be an integer between 0 and 100", percentage));
   }
   if (percentage == 0) {
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };

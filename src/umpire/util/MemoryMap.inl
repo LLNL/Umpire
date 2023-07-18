@@ -164,7 +164,7 @@ void MemoryMap<V>::erase(Key ptr)
   if (m_last) {
     removeLast();
   } else {
-    UMPIRE_ERROR(runtime_error, umpire::fmt::format("Could not remove ptr: {}", ptr));
+    UMPIRE_ERROR(runtime_error, fmt::format("Could not remove ptr: {}", ptr));
   }
 }
 

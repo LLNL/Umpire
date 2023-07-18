@@ -25,8 +25,8 @@ void CudaAdviseOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
-                                     src_ptr, length, device, cudaGetErrorString(error)));
+                 fmt::format("cudaMemAdvise( src_ptr = {}, length = {}, device = {}) failed with error: {}",
+                             src_ptr, length, device, cudaGetErrorString(error)));
   }
 }
 

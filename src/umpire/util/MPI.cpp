@@ -70,7 +70,7 @@ void MPI::finalize()
 int MPI::getRank()
 {
   if (!s_initialized) {
-    UMPIRE_LOG(Warning, umpire::fmt::format("umpire::MPI not initialized, returning rank={}", s_rank));
+    UMPIRE_LOG(Warning, fmt::format("umpire::MPI not initialized, returning rank={}", s_rank));
   }
 
   return s_rank;
@@ -79,7 +79,7 @@ int MPI::getRank()
 int MPI::getSize()
 {
   if (!s_initialized) {
-    UMPIRE_LOG(Warning, umpire::fmt::format("umpire::MPI not initialized, returning size={}", s_world_size));
+    UMPIRE_LOG(Warning, fmt::format("umpire::MPI not initialized, returning size={}", s_world_size));
   }
 
   return s_world_size;

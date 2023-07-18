@@ -36,11 +36,11 @@ struct HipMallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, umpire::fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size,
-                                                              hipGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error, fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size,
+                                                      hipGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, umpire::fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size,
-                                                        hipGetErrorString(error)));
+        UMPIRE_ERROR(runtime_error, fmt::format("hipMalloc( bytes = {} ) failed with error: {}", size,
+                                                hipGetErrorString(error)));
       }
     }
 
@@ -60,7 +60,7 @@ struct HipMallocAllocator {
     hipError_t error = ::hipFree(ptr);
     if (error != hipSuccess) {
       UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("hipFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
+                   fmt::format("hipFree( ptr = {} ) failed with error: {}", ptr, hipGetErrorString(error)));
     }
   }
 };

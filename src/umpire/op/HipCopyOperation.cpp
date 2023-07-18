@@ -27,8 +27,8 @@ void HipCopyOperation::transform(void* src_ptr, void** dst_ptr,
 
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}) failed with error: {}",
-                                     *dst_ptr, src_ptr, length, hipGetErrorString(error)));
+                 fmt::format("hipMemcpy( dest_ptr = {}, src_ptr = {}, length = {}) failed with error: {}",
+                             *dst_ptr, src_ptr, length, hipGetErrorString(error)));
   }
 }
 
@@ -38,8 +38,8 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyOperation::transfo
 {
   auto device = ctx.try_get<camp::resources::Hip>();
   if (!device) {
-    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Hip, got resources::{}",
-                                                     platform_to_string(ctx.get_platform())));
+    UMPIRE_ERROR(resource_error, fmt::format("Expected resources::Hip, got resources::{}",
+                                             platform_to_string(ctx.get_platform())));
   }
   auto stream = device->get_stream();
 
@@ -47,9 +47,9 @@ camp::resources::EventProxy<camp::resources::Resource> HipCopyOperation::transfo
 
   if (error != hipSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
-                                     "stream = {}) failed with error: {}",
-                                     *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
+                 fmt::format("hipMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
+                             "stream = {}) failed with error: {}",
+                             *dst_ptr, src_ptr, length, hipGetErrorString(error), (void*)stream));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

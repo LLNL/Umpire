@@ -37,7 +37,7 @@ struct OpenMPTargetAllocator {
 
     if (ret == nullptr) {
       UMPIRE_ERROR(runtime_error,
-                   umpire::fmt::format("omp_target_alloc( bytes = {}, device = {} ) failed. ", bytes, device));
+                   fmt::format("omp_target_alloc( bytes = {}, device = {} ) failed. ", bytes, device));
     } else {
       return ret;
     }

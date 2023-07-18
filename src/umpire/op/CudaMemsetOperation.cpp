@@ -22,8 +22,8 @@ void CudaMemsetOperation::apply(void* src_ptr, util::AllocationRecord* UMPIRE_UN
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format("cudaMemset( src_ptr = {}, val = {}, length = {}) failed with error: {}", src_ptr,
-                                     value, length, cudaGetErrorString(error)));
+                 fmt::format("cudaMemset( src_ptr = {}, val = {}, length = {}) failed with error: {}", src_ptr,
+                             value, length, cudaGetErrorString(error)));
   }
 }
 
@@ -33,8 +33,8 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::appl
 {
   auto device = ctx.try_get<camp::resources::Cuda>();
   if (!device) {
-    UMPIRE_ERROR(resource_error, umpire::fmt::format("Expected resources::Cuda, got resources::{}",
-                                                     platform_to_string(ctx.get_platform())));
+    UMPIRE_ERROR(resource_error, fmt::format("Expected resources::Cuda, got resources::{}",
+                                             platform_to_string(ctx.get_platform())));
   }
   auto stream = device->get_stream();
 
@@ -42,7 +42,7 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemsetOperation::appl
 
   if (error != cudaSuccess) {
     UMPIRE_ERROR(runtime_error,
-                 umpire::fmt::format(
+                 fmt::format(
                      "cudaMemsetAsync( src_ptr = {}, value = {}, length = {}, stream = {}) failed with error: {}",
                      src_ptr, value, length, cudaGetErrorString(error), (void*)stream));
   }
