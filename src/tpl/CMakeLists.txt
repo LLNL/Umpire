@@ -136,9 +136,9 @@ if (NOT TARGET camp)
 endif ()
 
 if (NOT TARGET fmt::fmt)
-  find_package(fmt 9.1...10 QUIET)
-
-  if (NOT fmt_FOUND)
+  if (DEFINED fmt_DIR)
+    find_package(fmt 9.1...10 REQUIRED NO_DEFAULT_PATH PATHS ${fmt_DIR})
+  else ()
     set(FMT_INSTALL ON)
     set(FMT_SYSTEM_HEADERS ON)
     add_subdirectory(umpire/fmt)
