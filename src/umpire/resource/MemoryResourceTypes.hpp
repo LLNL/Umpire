@@ -88,7 +88,7 @@ inline MemoryResourceType string_to_resource(const std::string& resource)
   else if (resource == "SHARED")
     return MemoryResourceType::Shared;
   else {
-    UMPIRE_ERROR(runtime_error, fmt::format("Unkown resource name \"{}\"", resource));
+    UMPIRE_ERROR(runtime_error, fmt::format("Unknown resource name \"{}\"", resource));
   }
 
   //
