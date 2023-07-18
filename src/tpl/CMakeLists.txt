@@ -136,7 +136,7 @@ if (NOT TARGET camp)
 endif ()
 
 if (NOT TARGET fmt::fmt-header-only)
-  find_package(fmt)
+  find_package(fmt QUIET)
 
   if (NOT fmt_FOUND)
     add_subdirectory(umpire/fmt)
