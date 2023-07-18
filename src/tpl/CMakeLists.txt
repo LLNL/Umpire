@@ -139,6 +139,8 @@ if (NOT TARGET fmt::fmt)
   find_package(fmt QUIET)
 
   if (NOT fmt_FOUND)
+    set(FMT_INSTALL ON)
+    set(FMT_SYSTEM_HEADERS ON)
     add_subdirectory(umpire/fmt)
   endif ()
 endif ()
