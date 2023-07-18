@@ -54,7 +54,7 @@ inline std::string resource_to_string(MemoryResourceType type)
     case Shared:
       return "SHARED";
     default:
-      UMPIRE_ERROR(runtime_error, fmt::format("Unkown resource type: {}", type));
+      UMPIRE_ERROR(runtime_error, fmt::format("Unknown resource type: {}", static_cast<int>(type)));
   }
 
     //
