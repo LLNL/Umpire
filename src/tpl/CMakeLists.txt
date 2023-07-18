@@ -135,7 +135,7 @@ if (NOT TARGET camp)
   endif()
 endif ()
 
-if (NOT TARGET fmt::fmt-header-only)
+if (NOT TARGET fmt::fmt)
   find_package(fmt QUIET)
 
   if (NOT fmt_FOUND)
