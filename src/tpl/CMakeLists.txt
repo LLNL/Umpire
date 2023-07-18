@@ -136,7 +136,7 @@ if (NOT TARGET camp)
 endif ()
 
 if (NOT TARGET fmt::fmt)
-  find_package(fmt QUIET)
+  find_package(fmt 9.1...10 QUIET)
 
   if (NOT fmt_FOUND)
     set(FMT_INSTALL ON)
