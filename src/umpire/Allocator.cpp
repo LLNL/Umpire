@@ -22,7 +22,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
   // we create a mutex to be used during allocation operations
   //
   if (dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr) {
-    m_mutex = new std::mutex; // Management of pointer TBD
+    m_mutex = std::shared_ptr<std::mutex>(new std::mutex);
   } else {
     m_mutex = nullptr;
   }

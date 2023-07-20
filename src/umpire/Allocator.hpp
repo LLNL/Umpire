@@ -205,7 +205,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    * \brief Mutex to be used for AllocationStrategys that
    * require thread safety
    */
-  std::mutex* m_mutex;
+  std::shared_ptr<std::mutex> m_mutex;
 };
 
 inline std::string to_string(const Allocator& a)
