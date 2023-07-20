@@ -64,7 +64,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
   if (m_mutex != nullptr)
     m_mutex->lock();
-  
+
   if (0 == bytes) {
     ret = allocateNull();
   } else {

@@ -23,8 +23,7 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
   //
   if (dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr) {
     m_mutex = new std::mutex; // Management of pointer TBD
-  }
-  else {
+  } else {
     m_mutex = nullptr;
   }
 }
