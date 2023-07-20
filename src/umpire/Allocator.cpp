@@ -7,6 +7,7 @@
 #include "umpire/Allocator.hpp"
 
 #include "umpire/ResourceManager.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 
 namespace umpire {
@@ -17,6 +18,15 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
       m_allocator{allocator},
       m_tracking{allocator->isTracked()}
 {
+  // Hack: If the strategy for this allocator requires thread safety,
+  // we create a mutex to be used during allocation operations
+  //
+  if (dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr) {
+    m_mutex = new std::mutex; // Management of pointer TBD
+  }
+  else {
+    m_mutex = nullptr;
+  }
 }
 
 void Allocator::release()

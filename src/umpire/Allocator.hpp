@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <ostream>
 #include <string>
 
@@ -199,6 +200,12 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   umpire::strategy::AllocationStrategy* m_allocator;
 
   bool m_tracking{true};
+
+  /*!
+   * \brief Mutex to be used for AllocationStrategys that
+   * require thread safety
+   */
+  std::mutex* m_mutex;
 };
 
 inline std::string to_string(const Allocator& a)
