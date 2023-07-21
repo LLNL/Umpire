@@ -24,25 +24,29 @@ inline void* Allocator::allocate(std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  {
-    const std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_mutex != nullptr)
+    m_mutex->lock();
 
-    if (0 == bytes) {
-      ret = allocateNull();
-    } else {
-      try {
-        ret = m_allocator->allocate(bytes);
-      } catch (umpire::out_of_memory_error& e) {
-        e.set_allocator_id(this->getId());
-        e.set_requested_size(bytes);
-        throw;
-      }
-    }
-
-    if (m_tracking) {
-      registerAllocation(ret, bytes, m_allocator);
+  if (0 == bytes) {
+    ret = allocateNull();
+  } else {
+    try {
+      ret = m_allocator->allocate(bytes);
+    } catch (umpire::out_of_memory_error& e) {
+      e.set_allocator_id(this->getId());
+      e.set_requested_size(bytes);
+      if (m_mutex != nullptr)
+        m_mutex->unlock();
+      throw;
     }
   }
+
+  if (m_tracking) {
+    registerAllocation(ret, bytes, m_allocator);
+  }
+
+  if (m_mutex != nullptr)
+    m_mutex->unlock();
 
   umpire::event::record<umpire::event::allocate>(
       [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret); });
@@ -58,19 +62,21 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
 
-  {
-    const std::lock_guard<std::mutex> lock(m_mutex);
+  if (m_mutex != nullptr)
+    m_mutex->lock();
 
-    if (0 == bytes) {
-      ret = allocateNull();
-    } else {
-      ret = m_allocator->allocate_named(name, bytes);
-    }
-
-    if (m_tracking) {
-      registerAllocation(ret, bytes, m_allocator, name);
-    }
+  if (0 == bytes) {
+    ret = allocateNull();
+  } else {
+    ret = m_allocator->allocate_named(name, bytes);
   }
+
+  if (m_tracking) {
+    registerAllocation(ret, bytes, m_allocator, name);
+  }
+
+  if (m_mutex != nullptr)
+    m_mutex->unlock();
 
   umpire::event::record<umpire::event::named_allocate>(
       [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
@@ -87,8 +93,8 @@ inline void Allocator::deallocate(void* ptr)
     UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is intentionally allowed and ignored)");
     return;
   } else {
-    const std::lock_guard<std::mutex> lock(m_mutex);
-
+    if (m_mutex != nullptr)
+      m_mutex->lock();
     if (m_tracking) {
       auto record = deregisterAllocation(ptr, m_allocator);
       if (!deallocateNull(ptr)) {
@@ -99,6 +105,8 @@ inline void Allocator::deallocate(void* ptr)
         m_allocator->deallocate(ptr);
       }
     }
+    if (m_mutex != nullptr)
+      m_mutex->unlock();
   }
 }
 
