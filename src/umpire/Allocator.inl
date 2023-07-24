@@ -8,6 +8,7 @@
 #define UMPIRE_Allocator_INL
 
 #include "umpire/Allocator.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/event/recorder_factory.hpp"
@@ -16,16 +17,13 @@
 
 namespace umpire {
 
-inline void* Allocator::allocate(std::size_t bytes)
+inline void* Allocator::do_allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
   UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  if (m_mutex != nullptr)
-    m_mutex->lock();
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -35,8 +33,6 @@ inline void* Allocator::allocate(std::size_t bytes)
     } catch (umpire::out_of_memory_error& e) {
       e.set_allocator_id(this->getId());
       e.set_requested_size(bytes);
-      if (m_mutex != nullptr)
-        m_mutex->unlock();
       throw;
     }
   }
@@ -45,25 +41,19 @@ inline void* Allocator::allocate(std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator);
   }
 
-  if (m_mutex != nullptr)
-    m_mutex->unlock();
-
   umpire::event::record<umpire::event::allocate>(
       [&](auto& event) { event.size(bytes).ref((void*)m_allocator).ptr(ret); });
 
   return ret;
 }
 
-inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
+inline void* Allocator::do_named_allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
 
   UMPIRE_ASSERT(UMPIRE_VERSION_OK());
 
   UMPIRE_LOG(Debug, "(" << bytes << ")");
-
-  if (m_mutex != nullptr)
-    m_mutex->lock();
 
   if (0 == bytes) {
     ret = allocateNull();
@@ -75,15 +65,12 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
     registerAllocation(ret, bytes, m_allocator, name);
   }
 
-  if (m_mutex != nullptr)
-    m_mutex->unlock();
-
   umpire::event::record<umpire::event::named_allocate>(
       [&](auto& event) { event.name(name).size(bytes).ref((void*)m_allocator).ptr(ret); });
   return ret;
 }
 
-inline void Allocator::deallocate(void* ptr)
+inline void Allocator::do_deallocate(void* ptr)
 {
   umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
 
@@ -93,8 +80,6 @@ inline void Allocator::deallocate(void* ptr)
     UMPIRE_LOG(Info, "Deallocating a null pointer (This behavior is intentionally allowed and ignored)");
     return;
   } else {
-    if (m_mutex != nullptr)
-      m_mutex->lock();
     if (m_tracking) {
       auto record = deregisterAllocation(ptr, m_allocator);
       if (!deallocateNull(ptr)) {
@@ -105,8 +90,33 @@ inline void Allocator::deallocate(void* ptr)
         m_allocator->deallocate(ptr);
       }
     }
-    if (m_mutex != nullptr)
-      m_mutex->unlock();
+  }
+}
+
+inline void* Allocator::allocate(std::size_t bytes)
+{
+  if (m_threadsafe) {
+    return thread_safe_allocate(bytes);
+  } else {
+    return do_allocate(bytes);
+  }
+}
+
+inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
+{
+  if (m_threadsafe) {
+    return thread_safe_named_allocate(name, bytes);
+  } else {
+    return do_named_allocate(name, bytes);
+  }
+}
+
+inline void Allocator::deallocate(void* ptr)
+{
+  if (m_threadsafe) {
+    thread_safe_deallocate(ptr);
+  } else {
+    do_deallocate(ptr);
   }
 }
 

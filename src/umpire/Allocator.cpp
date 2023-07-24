@@ -9,23 +9,37 @@
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
+#include <mutex>
 
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
     : strategy::mixins::Inspector{},
       strategy::mixins::AllocateNull{},
-      m_allocator{allocator},
       m_tracking{allocator->isTracked()}
 {
-  // Hack: If the strategy for this allocator requires thread safety,
-  // we create a mutex to be used during allocation operations
-  //
-  if (dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr) {
-    m_mutex = std::shared_ptr<std::mutex>(new std::mutex);
-  } else {
-    m_mutex = nullptr;
-  }
+  m_threadsafe = ( dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr );
+}
+
+void* Allocator::thread_safe_allocate(std::size_t bytes)
+{
+  umpire::strategy::ThreadSafeAllocator* alloc{dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)};
+  std::lock_guard<std::mutex> lock(alloc->get_mutex());
+  return do_allocate(bytes);
+}
+
+void* Allocator::thread_safe_named_allocate(const std::string& name, std::size_t bytes)
+{
+  umpire::strategy::ThreadSafeAllocator* alloc{dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)};
+  std::lock_guard<std::mutex> lock(alloc->get_mutex());
+  return do_named_allocate(name, bytes);
+}
+
+void Allocator::thread_safe_deallocate(void* ptr)
+{
+  umpire::strategy::ThreadSafeAllocator* alloc{dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)};
+  std::lock_guard<std::mutex> lock(alloc->get_mutex());
+  return do_deallocate(ptr);
 }
 
 void Allocator::release()

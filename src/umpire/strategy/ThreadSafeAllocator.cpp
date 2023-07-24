@@ -22,14 +22,12 @@ ThreadSafeAllocator::ThreadSafeAllocator(const std::string& name, int id, Alloca
 
 void* ThreadSafeAllocator::allocate(std::size_t bytes)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
   void* ret = m_allocator->allocate_internal(bytes);
   return ret;
 }
 
 void ThreadSafeAllocator::deallocate(void* ptr, std::size_t size)
 {
-  std::lock_guard<std::mutex> lock(m_mutex);
   m_allocator->deallocate_internal(ptr, size);
 }
 
@@ -41,6 +39,11 @@ Platform ThreadSafeAllocator::getPlatform() noexcept
 MemoryResourceTraits ThreadSafeAllocator::getTraits() const noexcept
 {
   return m_allocator->getTraits();
+}
+
+std::mutex& ThreadSafeAllocator::get_mutex()
+{
+  return m_mutex;
 }
 
 } // end of namespace strategy

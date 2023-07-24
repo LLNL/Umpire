@@ -9,7 +9,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <mutex>
 #include <ostream>
 #include <string>
 
@@ -194,18 +193,21 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
+  void* thread_safe_allocate(std::size_t bytes);
+  void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
+  void thread_safe_deallocate(void* ptr);
+
+  inline void* do_allocate(std::size_t bytes);
+  inline void* do_named_allocate(const std::string& name, std::size_t bytes);
+  inline void do_deallocate(void* ptr);
+
   /*!
    * \brief Pointer to the AllocationStrategy used by this Allocator.
    */
   umpire::strategy::AllocationStrategy* m_allocator;
 
   bool m_tracking{true};
-
-  /*!
-   * \brief Mutex to be used for AllocationStrategys that
-   * require thread safety
-   */
-  std::shared_ptr<std::mutex> m_mutex;
+  bool m_threadsafe{false};
 };
 
 inline std::string to_string(const Allocator& a)
