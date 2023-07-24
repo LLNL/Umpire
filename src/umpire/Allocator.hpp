@@ -194,9 +194,9 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
-  void* thread_safe_allocate(std::size_t bytes);
-  void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
-  void thread_safe_deallocate(void* ptr);
+  inline void* thread_safe_allocate(std::size_t bytes);
+  inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
+  inline void thread_safe_deallocate(void* ptr);
 
   inline void* do_allocate(std::size_t bytes);
   inline void* do_named_allocate(const std::string& name, std::size_t bytes);

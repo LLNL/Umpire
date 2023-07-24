@@ -47,6 +47,24 @@ inline void* Allocator::do_allocate(std::size_t bytes)
   return ret;
 }
 
+inline void* Allocator::thread_safe_allocate(std::size_t bytes)
+{
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_allocate(bytes);
+}
+
+inline void* Allocator::thread_safe_named_allocate(const std::string& name, std::size_t bytes)
+{
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_named_allocate(name, bytes);
+}
+
+inline void Allocator::thread_safe_deallocate(void* ptr)
+{
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_deallocate(ptr);
+}
+
 inline void* Allocator::do_named_allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
