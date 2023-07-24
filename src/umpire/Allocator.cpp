@@ -6,19 +6,18 @@
 //////////////////////////////////////////////////////////////////////////////
 #include "umpire/Allocator.hpp"
 
+#include <mutex>
+
 #include "umpire/ResourceManager.hpp"
 #include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
-#include <mutex>
 
 namespace umpire {
 
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
-    : strategy::mixins::Inspector{},
-      strategy::mixins::AllocateNull{},
-      m_tracking{allocator->isTracked()}
+    : strategy::mixins::Inspector{}, strategy::mixins::AllocateNull{}, m_tracking{allocator->isTracked()}
 {
-  m_threadsafe = ( dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr );
+  m_threadsafe = (dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr);
 }
 
 void* Allocator::thread_safe_allocate(std::size_t bytes)

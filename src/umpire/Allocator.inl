@@ -8,10 +8,10 @@
 #define UMPIRE_Allocator_INL
 
 #include "umpire/Allocator.hpp"
-#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/event/recorder_factory.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
