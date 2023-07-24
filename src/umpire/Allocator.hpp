@@ -207,7 +207,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   umpire::strategy::AllocationStrategy* m_allocator;
 
   bool m_tracking{true};
-  bool m_threadsafe{false};
+  bool m_threadsafe;
 };
 
 inline std::string to_string(const Allocator& a)
