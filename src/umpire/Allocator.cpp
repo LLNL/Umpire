@@ -17,29 +17,34 @@ namespace umpire {
 Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
     : strategy::mixins::Inspector{},
       strategy::mixins::AllocateNull{},
-      m_tracking{allocator->isTracked()},
-      m_threadsafe{(dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr)}
+      m_allocator{allocator},
+      m_tracking{allocator->isTracked()}
 {
+  umpire::strategy::ThreadSafeAllocator* thread_safe_allocator = dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator);
+
+  if (thread_safe_allocator != nullptr) {
+    m_thread_safe_mutex = thread_safe_allocator->get_mutex();
+  }
+  else {
+    m_thread_safe_mutex = nullptr;
+  }
 }
 
 void* Allocator::thread_safe_allocate(std::size_t bytes)
 {
-  umpire::strategy::ThreadSafeAllocator* alloc{dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)};
-  std::lock_guard<std::mutex> lock(alloc->get_mutex());
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_allocate(bytes);
 }
 
 void* Allocator::thread_safe_named_allocate(const std::string& name, std::size_t bytes)
 {
-  umpire::strategy::ThreadSafeAllocator* alloc{dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)};
-  std::lock_guard<std::mutex> lock(alloc->get_mutex());
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_named_allocate(name, bytes);
 }
 
 void Allocator::thread_safe_deallocate(void* ptr)
 {
-  umpire::strategy::ThreadSafeAllocator* alloc{dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)};
-  std::lock_guard<std::mutex> lock(alloc->get_mutex());
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
   return do_deallocate(ptr);
 }
 

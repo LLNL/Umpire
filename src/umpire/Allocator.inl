@@ -95,7 +95,7 @@ inline void Allocator::do_deallocate(void* ptr)
 
 inline void* Allocator::allocate(std::size_t bytes)
 {
-  if (m_threadsafe) {
+  if (m_thread_safe_mutex != nullptr) {
     return thread_safe_allocate(bytes);
   } else {
     return do_allocate(bytes);
@@ -104,7 +104,7 @@ inline void* Allocator::allocate(std::size_t bytes)
 
 inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 {
-  if (m_threadsafe) {
+  if (m_thread_safe_mutex != nullptr) {
     return thread_safe_named_allocate(name, bytes);
   } else {
     return do_named_allocate(name, bytes);
@@ -113,7 +113,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
 
 inline void Allocator::deallocate(void* ptr)
 {
-  if (m_threadsafe) {
+  if (m_thread_safe_mutex != nullptr) {
     thread_safe_deallocate(ptr);
   } else {
     do_deallocate(ptr);
