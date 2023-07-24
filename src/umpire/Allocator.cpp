@@ -20,12 +20,12 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
       m_allocator{allocator},
       m_tracking{allocator->isTracked()}
 {
-  umpire::strategy::ThreadSafeAllocator* thread_safe_allocator = dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator);
+  umpire::strategy::ThreadSafeAllocator* thread_safe_allocator =
+      dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator);
 
   if (thread_safe_allocator != nullptr) {
     m_thread_safe_mutex = thread_safe_allocator->get_mutex();
-  }
-  else {
+  } else {
     m_thread_safe_mutex = nullptr;
   }
 }
