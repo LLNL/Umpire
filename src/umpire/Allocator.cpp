@@ -21,7 +21,8 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
       m_tracking{allocator->isTracked()},
       m_thread_safe{(dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr)}
 {
-  m_thread_safe_mutex = m_thread_safe ? dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)->get_mutex() : nullptr;
+  m_thread_safe_mutex =
+      m_thread_safe ? dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)->get_mutex() : nullptr;
 }
 
 void Allocator::release()
