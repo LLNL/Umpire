@@ -18,16 +18,10 @@ Allocator::Allocator(strategy::AllocationStrategy* allocator) noexcept
     : strategy::mixins::Inspector{},
       strategy::mixins::AllocateNull{},
       m_allocator{allocator},
-      m_tracking{allocator->isTracked()}
+      m_tracking{allocator->isTracked()},
+      m_thread_safe{(dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator) != nullptr)}
 {
-  umpire::strategy::ThreadSafeAllocator* thread_safe_allocator =
-      dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(allocator);
-
-  if (thread_safe_allocator != nullptr) {
-    m_thread_safe_mutex = thread_safe_allocator->get_mutex();
-  } else {
-    m_thread_safe_mutex = nullptr;
-  }
+  m_thread_safe_mutex = m_thread_safe ? dynamic_cast<umpire::strategy::ThreadSafeAllocator*>(m_allocator)->get_mutex() : nullptr;
 }
 
 void Allocator::release()

@@ -208,6 +208,7 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   umpire::strategy::AllocationStrategy* m_allocator;
 
   bool m_tracking{true};
+  bool m_thread_safe{false};
   std::mutex* m_thread_safe_mutex{nullptr};
 };
 
