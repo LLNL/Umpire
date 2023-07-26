@@ -260,7 +260,7 @@ echo "~~~~~ To reproduce this build:"
 echo ""
 echo " #`git rev-parse HEAD` on host ${truehostname}"
 echo ""
-echo "SPACK_DISABLE_LOCAL_CONFIG=\"\" SPACK_USER_CACHE_PATH=\"ci_spack_cache\" python3 scripts/uberenv/uberenv.py ${SPEC}"
+echo "SPACK_DISABLE_LOCAL_CONFIG=\"\" SPACK_USER_CACHE_PATH=\"ci_spack_cache\" python3 scripts/uberenv/uberenv.py ${spec}"
 echo ""
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 date
