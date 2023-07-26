@@ -194,6 +194,23 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
    */
   Allocator(strategy::AllocationStrategy* allocator) noexcept;
 
+  /*!
+   * \brief Pointer to the AllocationStrategy used by this Allocator.
+   */
+  umpire::strategy::AllocationStrategy* m_allocator;
+
+  bool m_tracking{true};
+
+  /*!
+   * \brief Implementation to conditionally make Allocator thread-safe
+   *
+   * Make allocations thread-safe by syncronizing access to the entire
+   * allocation sequence including zero-byte-allocation check, allocation,
+   * and tracking bookkeeping.
+   *
+   * TODO: This is a temporary workaround until we update the Allocator API to
+   * automatically do this based upon type and/or policy information.
+   */
   inline void* thread_safe_allocate(std::size_t bytes);
   inline void* thread_safe_named_allocate(const std::string& name, std::size_t bytes);
   inline void thread_safe_deallocate(void* ptr);
@@ -202,12 +219,6 @@ class Allocator : private strategy::mixins::Inspector, strategy::mixins::Allocat
   inline void* do_named_allocate(const std::string& name, std::size_t bytes);
   inline void do_deallocate(void* ptr);
 
-  /*!
-   * \brief Pointer to the AllocationStrategy used by this Allocator.
-   */
-  umpire::strategy::AllocationStrategy* m_allocator;
-
-  bool m_tracking{true};
   bool m_thread_safe{false};
   std::mutex* m_thread_safe_mutex{nullptr};
 };
