@@ -33,6 +33,8 @@ class ThreadSafeAllocator : public AllocationStrategy {
 
   MemoryResourceTraits getTraits() const noexcept override;
 
+  std::mutex* get_mutex();
+
  protected:
   strategy::AllocationStrategy* m_allocator;
 

@@ -11,12 +11,13 @@
 #include "umpire/config.hpp"
 #include "umpire/event/event.hpp"
 #include "umpire/event/recorder_factory.hpp"
+#include "umpire/strategy/ThreadSafeAllocator.hpp"
 #include "umpire/util/Macros.hpp"
 #include "umpire/util/error.hpp"
 
 namespace umpire {
 
-inline void* Allocator::allocate(std::size_t bytes)
+inline void* Allocator::do_allocate(std::size_t bytes)
 {
   void* ret = nullptr;
 
@@ -46,7 +47,25 @@ inline void* Allocator::allocate(std::size_t bytes)
   return ret;
 }
 
-inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
+inline void* Allocator::thread_safe_allocate(std::size_t bytes)
+{
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_allocate(bytes);
+}
+
+inline void* Allocator::thread_safe_named_allocate(const std::string& name, std::size_t bytes)
+{
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_named_allocate(name, bytes);
+}
+
+inline void Allocator::thread_safe_deallocate(void* ptr)
+{
+  std::lock_guard<std::mutex> lock(*m_thread_safe_mutex);
+  return do_deallocate(ptr);
+}
+
+inline void* Allocator::do_named_allocate(const std::string& name, std::size_t bytes)
 {
   void* ret = nullptr;
 
@@ -69,7 +88,7 @@ inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
   return ret;
 }
 
-inline void Allocator::deallocate(void* ptr)
+inline void Allocator::do_deallocate(void* ptr)
 {
   umpire::event::record<umpire::event::deallocate>([&](auto& event) { event.ref((void*)m_allocator).ptr(ptr); });
 
@@ -90,6 +109,21 @@ inline void Allocator::deallocate(void* ptr)
       }
     }
   }
+}
+
+inline void* Allocator::allocate(std::size_t bytes)
+{
+  return m_thread_safe ? thread_safe_allocate(bytes) : do_allocate(bytes);
+}
+
+inline void* Allocator::allocate(const std::string& name, std::size_t bytes)
+{
+  return m_thread_safe ? thread_safe_named_allocate(name, bytes) : do_named_allocate(name, bytes);
+}
+
+inline void Allocator::deallocate(void* ptr)
+{
+  m_thread_safe ? thread_safe_deallocate(ptr) : do_deallocate(ptr);
 }
 
 } // end of namespace umpire
