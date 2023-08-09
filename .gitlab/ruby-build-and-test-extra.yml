@@ -12,7 +12,12 @@
 # We keep ${PROJECT_<MACHINE>_VARIANTS} and ${PROJECT_<MACHINE>_DEPS} So that
 # the comparison with the original job is easier.
 
-# No overridden jobs so far.
+# Allow failure due to compiler internal error building wrapfumpire.f
+intel_2022_1_0:
+  variables:
+    SPEC: "~shared +fortran +tools tests=basic %intel@2022.1.0"
+  extends: .build_and_test_on_ruby
+  allow_failure: true
 
 ############
 # Extra jobs
@@ -55,5 +60,3 @@ intel_2022_1_0_gcc_10_3_1:
     SPEC: "~shared +fortran +tools tests=basic %intel@2022.1.0.gcc.10.3.1"
   extends: .build_and_test_on_ruby
   allow_failure: true
-
-
