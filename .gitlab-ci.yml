@@ -11,8 +11,10 @@
 # at Lawrence Livermore National Laboratory (LLNL).
 # This entire pipeline is LLNL-specific
 #
-# Important note: This file is a copy of the template provided by
-# llnl/radiuss-shared-ci. It should not require any change from the project.
+# Important note: This file is a template provided by llnl/radiuss-shared-ci.
+# Remains to set variable values, change the reference to the radiuss-shared-ci
+# repo, opt-in and out optional features. The project can then extend it with
+# additional stages.
 #
 # Instead, each project should provide:
 # - .gitlab/custom-jobs-and-variables.yml
