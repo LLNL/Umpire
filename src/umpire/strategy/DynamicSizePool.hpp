@@ -412,7 +412,7 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
         nblocks++;
       }
     }
-    return nblocks > 1 ? nbytes : 0;
+    return nbytes;
   }
 
   std::size_t getFreeBlocks() const

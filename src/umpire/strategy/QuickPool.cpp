@@ -267,12 +267,17 @@ std::size_t QuickPool::getCurrentSize() const noexcept
   return m_current_bytes;
 }
 
-std::size_t QuickPool::getReleasableSize() const noexcept
+std::size_t QuickPool::getReleasableSizeCoalescing() const noexcept
 {
   if (m_size_map.size() > 1)
     return m_releasable_bytes;
   else
     return 0;
+}
+
+std::size_t QuickPool::getReleasableSize() const noexcept
+{
+  return m_releasable_bytes;
 }
 
 std::size_t QuickPool::getActualHighwaterMark() const noexcept
@@ -358,14 +363,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable(int percentage)
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
     return [=](const strategy::QuickPool& pool) {
-      return pool.getActualSize() == pool.getReleasableSize() ? pool.getActualSize() : 0;
+      return pool.getActualSize() == pool.getReleasableSizeCoalescing() ? pool.getActualSize() : 0;
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() >= threshold ? pool.getActualSize() : 0;
+      return pool.getReleasableSizeCoalescing() >= threshold ? pool.getActualSize() : 0;
     };
   }
 }
@@ -381,14 +386,14 @@ PoolCoalesceHeuristic<QuickPool> QuickPool::percent_releasable_hwm(int percentag
     return [=](const QuickPool& UMPIRE_UNUSED_ARG(pool)) { return 0; };
   } else if (percentage == 100) {
     return [=](const strategy::QuickPool& pool) {
-      return pool.getActualSize() == pool.getReleasableSize() ? pool.getHighWatermark() : 0;
+      return pool.getActualSize() == pool.getReleasableSizeCoalescing() ? pool.getHighWatermark() : 0;
     };
   } else {
     float f = (float)((float)percentage / (float)100.0);
     return [=](const strategy::QuickPool& pool) {
       // Calculate threshold in bytes from the percentage
       const std::size_t threshold = static_cast<std::size_t>(f * pool.getActualSize());
-      return pool.getReleasableSize() >= threshold ? pool.getHighWatermark() : 0;
+      return pool.getReleasableSizeCoalescing() >= threshold ? pool.getHighWatermark() : 0;
     };
   }
 }
