@@ -4,7 +4,7 @@ else
 	DebugArgs=
 endif
 
-targets = asan clang10 clang11 clang12 clang13 gcc11 gcc7 gcc8 gcc9 hip hip.debug nvcc10 nvcc11 sycl umap_build
+targets = asan clang10 clang11 clang12 clang13 gcc11 gcc7 gcc8 gcc9 hip hip.debug nvcc10 sycl umap_build
 
 $(targets):
 	DOCKER_BUILDKIT=1 docker build --target $@ --no-cache $(DebugArgs) .

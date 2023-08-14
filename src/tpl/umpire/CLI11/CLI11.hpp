@@ -3764,7 +3764,7 @@ class App {
     Option *help_all_ptr_{nullptr};
 
     /// This is the formatter for help printing. Default provided. INHERITABLE (same pointer)
-    std::shared_ptr<FormatterBase> formatter_{new Formatter()};
+    std::shared_ptr<FormatterBase> formatter_{std::make_shared<Formatter>()};
 
     /// The error message printing function INHERITABLE
     std::function<std::string(const App *, const Error &e)> failure_message_ = FailureMessage::simple;
@@ -3861,7 +3861,7 @@ class App {
     Option *config_ptr_{nullptr};
 
     /// This is the formatter for help printing. Default provided. INHERITABLE (same pointer)
-    std::shared_ptr<Config> config_formatter_{new ConfigINI()};
+    std::shared_ptr<Config> config_formatter_{std::make_shared<ConfigINI>()};
 
     ///@}
 
