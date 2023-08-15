@@ -27,6 +27,8 @@ variables:
 # Required information about GitHub repository
   GITHUB_PROJECT_NAME: "Umpire"
   GITHUB_PROJECT_ORG: "LLNL"
+# The Shared CI reference to use
+  SHARED_CI_REF: "woptim/isolate-jobs"
 # Use the umdev LLNL service user to run CI. This prevents from running
 # pipelines as an actual user.
   LLNL_SERVICE_USER: umdev
@@ -39,7 +41,7 @@ variables:
 # TODO: add a clean-up mechanism
   BUILD_ROOT: ${CI_PROJECT_DIR}
 # Set the build-and-test command.
-  BUILD_AND_TEST_CMD: "./scripts/gitlab/build_and_test.sh"
+  JOB_CMD: "./scripts/gitlab/build_and_test.sh"
 # Override the list of branch that will skip the "draft PR test".
 # Add protected branches here. Defaults to "develop main master".
 #  ALWAYS_RUN_LIST: ""
@@ -61,9 +63,9 @@ stages:
     include:
       - local: '.gitlab/custom-jobs-and-variables.yml'
       - project: 'radiuss/radiuss-shared-ci'
-        ref: v2023.08.0
+        ref: '${SHARED_CI_REF}'
         file: '${CI_MACHINE}-build-and-test.yml'
-      - local: '.gitlab/${CI_MACHINE}-build-and-test-extra.yml'
+      - local: '.gitlab/jobs/${CI_MACHINE}.yml'
     strategy: depend
     forward:
       pipeline_variables: true
@@ -71,7 +73,7 @@ stages:
 include:
   # [Optional] checks preliminary to running the actual CI test
   #- project: 'radiuss/radiuss-shared-ci'
-  #  ref: v2023.08.0
+  #  ref: '${SHARED_CI_REF}'
   #  file: 'preliminary-ignore-draft-pr.yml'
   # pipelines subscribed by the project
   - local: .gitlab/subscribed-pipelines.yml

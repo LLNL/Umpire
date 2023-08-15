@@ -5,6 +5,11 @@
 # SPDX-License-Identifier: (MIT)
 ###############################################################################
 
+include:
+  - project: 'radiuss/radiuss-shared-ci'
+    ref: '${SHARED_CI_REF}'
+    file: 'radiuss-jobs/lassen.yml'
+
 ########################
 # Overridden shared jobs
 ########################
