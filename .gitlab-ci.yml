@@ -64,7 +64,7 @@ stages:
       - local: '.gitlab/custom-jobs-and-variables.yml'
       - project: 'radiuss/radiuss-shared-ci'
         ref: '${SHARED_CI_REF}'
-        file: '${CI_MACHINE}-build-and-test.yml'
+        file: 'radiuss-jobs/${CI_MACHINE}.yml'
       - local: '.gitlab/jobs/${CI_MACHINE}.yml'
     strategy: depend
     forward:
