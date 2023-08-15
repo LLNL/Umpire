@@ -45,7 +45,7 @@ variables:
 # Lassen and Butte use a different job scheduler (spectrum lsf) that does not
 # allow pre-allocation the same way slurm does.
 # Arguments for job level allocation
- LASSEN_JOB_ALLOC: "1 -W 18"
+  LASSEN_JOB_ALLOC: "1 -W 18"
 # Project specific variants for lassen
   PROJECT_LASSEN_VARIANTS: "~shared +fortran +tools tests=basic "
 # Project specific deps for lassen
