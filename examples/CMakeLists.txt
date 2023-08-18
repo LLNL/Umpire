@@ -46,6 +46,11 @@ if (UMPIRE_ENABLE_HIP)
     SOURCES multi_device.cpp
     DEPENDS_ON umpire blt::hip)
   list(APPEND umpire_examples multi_device)
+
+  blt_add_executable(
+    NAME reproducer
+    SOURCES reproducer.cpp
+    DEPENDS_ON umpire blt::hip_runtime)
 endif()
 
 blt_add_executable(
