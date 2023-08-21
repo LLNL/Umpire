@@ -54,7 +54,7 @@
 #define UMPIRE_EXPORT
 #endif
 
-#define UMPIRE_VERSION_SYM  umpire_ver_@Umpire_VERSION_MAJOR@_found
+#define UMPIRE_VERSION_SYM  umpire_ver_@Umpire_VERSION_MAJOR@_@Umpire_VERSION_MINOR@_found
 UMPIRE_EXPORT extern int    UMPIRE_VERSION_SYM;
 #define UMPIRE_VERSION_OK() UMPIRE_VERSION_SYM == 0
 
