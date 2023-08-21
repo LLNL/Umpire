@@ -30,18 +30,17 @@ void CudaMemPrefetchOperation::apply(void* src_ptr, util::AllocationRecord* UMPI
   error = ::cudaGetDeviceProperties(&properties, gpu);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}",
-                                            device, cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
+                                            cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {
     error = ::cudaMemPrefetchAsync(src_ptr, length, device);
 
     if (error != cudaSuccess) {
-      UMPIRE_ERROR(
-          runtime_error,
-          fmt::format("cudaMemPrefetchAsync( src_ptr = {}, length = {}, device = {}) failed with error: {}",
-                      src_ptr, length, device, cudaGetErrorString(error)));
+      UMPIRE_ERROR(runtime_error,
+                   fmt::format("cudaMemPrefetchAsync( src_ptr = {}, length = {}, device = {}) failed with error: {}",
+                               src_ptr, length, device, cudaGetErrorString(error)));
     }
   }
 }
@@ -63,14 +62,14 @@ camp::resources::EventProxy<camp::resources::Resource> CudaMemPrefetchOperation:
 
   auto resource = ctx.try_get<camp::resources::Cuda>();
   if (!resource) {
-    UMPIRE_ERROR(resource_error, fmt::format("Expected resources::Cuda, got resources::{}",
-                                             platform_to_string(ctx.get_platform())));
+    UMPIRE_ERROR(resource_error,
+                 fmt::format("Expected resources::Cuda, got resources::{}", platform_to_string(ctx.get_platform())));
   }
   auto stream = resource->get_stream();
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}",
-                                            device, cudaGetErrorString(error)));
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaGetDeviceProperties( device = {} ) failed with error: {}", device,
+                                            cudaGetErrorString(error)));
   }
 
   if (properties.managedMemory == 1 && properties.concurrentManagedAccess == 1) {

@@ -14,8 +14,8 @@
 #include <string>
 #include <vector>
 
-#include "umpire/event/event_json.hpp"
 #include "fmt/format.h"
+#include "umpire/event/event_json.hpp"
 #include "umpire/json/json.hpp"
 #include "umpire/util/error.hpp"
 

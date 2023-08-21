@@ -35,11 +35,11 @@ struct CudaMallocAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << size << ") returning " << ptr);
     if (error != cudaSuccess) {
       if (error == cudaErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", size,
-                                                      cudaGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error,
+                     fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", size, cudaGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", size,
-                                                cudaGetErrorString(error)));
+        UMPIRE_ERROR(runtime_error,
+                     fmt::format("cudaMalloc( bytes = {} ) failed with error: {}", size, cudaGetErrorString(error)));
       }
     }
 

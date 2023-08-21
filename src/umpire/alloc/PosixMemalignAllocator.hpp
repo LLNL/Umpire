@@ -43,9 +43,8 @@ struct PosixMemalignAllocator {
                      fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
                                  get_page_size(), strerror(err)));
       } else {
-        UMPIRE_ERROR(runtime_error,
-                     fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}", bytes,
-                                 get_page_size(), strerror(err)));
+        UMPIRE_ERROR(runtime_error, fmt::format("posix_memalign( bytes = {}, pagesize = {} ) failed with error = {}",
+                                                bytes, get_page_size(), strerror(err)));
       }
     }
 

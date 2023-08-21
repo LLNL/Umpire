@@ -40,18 +40,17 @@ camp::resources::EventProxy<camp::resources::Resource> CudaCopyOperation::transf
 {
   auto device = ctx.try_get<camp::resources::Cuda>();
   if (!device) {
-    UMPIRE_ERROR(resource_error, fmt::format("Expected resources::Cuda, got resources::{}",
-                                             platform_to_string(ctx.get_platform())));
+    UMPIRE_ERROR(resource_error,
+                 fmt::format("Expected resources::Cuda, got resources::{}", platform_to_string(ctx.get_platform())));
   }
   auto stream = device->get_stream();
 
   cudaError_t error = ::cudaMemcpyAsync(*dst_ptr, src_ptr, length, m_kind, stream);
 
   if (error != cudaSuccess) {
-    UMPIRE_ERROR(runtime_error,
-                 fmt::format("cudaMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
-                             "cudaMemcpyDeviceToDevice, stream = {}) failed with error: {}",
-                             *dst_ptr, src_ptr, length, cudaGetErrorString(error), (void*)stream));
+    UMPIRE_ERROR(runtime_error, fmt::format("cudaMemcpyAsync( dest_ptr = {}, src_ptr = {}, length = {}, "
+                                            "cudaMemcpyDeviceToDevice, stream = {}) failed with error: {}",
+                                            *dst_ptr, src_ptr, length, cudaGetErrorString(error), (void*)stream));
   }
 
   return camp::resources::EventProxy<camp::resources::Resource>{ctx};

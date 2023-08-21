@@ -24,11 +24,11 @@ struct HipPinnedAllocator {
     UMPIRE_LOG(Debug, "(bytes=" << bytes << ") returning " << ptr);
     if (error != hipSuccess) {
       if (error == hipErrorMemoryAllocation) {
-        UMPIRE_ERROR(out_of_memory_error, fmt::format("hipMallocHost( bytes = {} ) failed with error: {}",
-                                                      bytes, hipGetErrorString(error)));
+        UMPIRE_ERROR(out_of_memory_error,
+                     fmt::format("hipMallocHost( bytes = {} ) failed with error: {}", bytes, hipGetErrorString(error)));
       } else {
-        UMPIRE_ERROR(runtime_error, fmt::format("hipMallocHost( bytes = {} ) failed with error: {}", bytes,
-                                                hipGetErrorString(error)));
+        UMPIRE_ERROR(runtime_error,
+                     fmt::format("hipMallocHost( bytes = {} ) failed with error: {}", bytes, hipGetErrorString(error)));
       }
     }
 
