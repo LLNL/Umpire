@@ -318,7 +318,7 @@ void QuickPool::coalesce() noexcept
 
 void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
-  if (m_size_map.size() > 1)  {
+  if (m_size_map.size() > 1) {
     UMPIRE_LOG(Debug, "()");
     release();
     std::size_t size_post{getActualSize()};
