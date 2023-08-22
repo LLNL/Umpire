@@ -122,7 +122,7 @@ bool DynamicPoolList::tracksMemoryUse() const noexcept
 void DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  
+
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug,

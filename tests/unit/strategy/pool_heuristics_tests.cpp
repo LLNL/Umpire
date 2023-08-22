@@ -147,4 +147,4 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasableHWM)
   ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
   ASSERT_EQ(a.second->getTotalBlocks(), 3);
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
-  }
+}
