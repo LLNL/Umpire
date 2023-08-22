@@ -122,10 +122,15 @@ bool DynamicPoolList::tracksMemoryUse() const noexcept
 void DynamicPoolList::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
-  umpire::event::record([&](auto& event) {
-    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
-  });
-  dpa.coalesce(dpa.getActualSize());
+  
+  std::size_t suggested_size{m_should_coalesce(*this)};
+  if (0 != suggested_size) {
+    UMPIRE_LOG(Debug,
+               "Heuristic returned true, "
+               "performing coalesce operation for "
+                   << this << "\n");
+    dpa.coalesce(suggested_size);
+  }
 }
 
 PoolCoalesceHeuristic<DynamicPoolList> DynamicPoolList::blocks_releasable(std::size_t nblocks)

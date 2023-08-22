@@ -312,11 +312,11 @@ void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
 
-  umpire::event::record([&](auto& event) {
-    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
-  });
-
-  do_coalesce(getActualSize());
+  std::size_t suggested_size{m_should_coalesce(*this)};
+  if (0 != suggested_size) {
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
+    do_coalesce(suggested_size);
+  }
 }
 
 void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
