@@ -269,10 +269,7 @@ std::size_t QuickPool::getCurrentSize() const noexcept
 
 std::size_t QuickPool::getReleasableSize() const noexcept
 {
-  if (m_size_map.size() > 1)
-    return m_releasable_bytes;
-  else
-    return 0;
+  return m_releasable_bytes;
 }
 
 std::size_t QuickPool::getActualHighwaterMark() const noexcept
@@ -321,16 +318,18 @@ void QuickPool::coalesce() noexcept
 
 void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 {
-  UMPIRE_LOG(Debug, "()");
-  release();
-  std::size_t size_post{getActualSize()};
+  if (m_size_map.size() > 1) {
+    UMPIRE_LOG(Debug, "()");
+    release();
+    std::size_t size_post{getActualSize()};
 
-  if (size_post < suggested_size) {
-    std::size_t alloc_size{suggested_size - size_post};
+    if (size_post < suggested_size) {
+      std::size_t alloc_size{suggested_size - size_post};
 
-    UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
-    auto ptr = allocate(alloc_size);
-    deallocate(ptr, alloc_size);
+      UMPIRE_LOG(Debug, "coalescing " << alloc_size << " bytes.");
+      auto ptr = allocate(alloc_size);
+      deallocate(ptr, alloc_size);
+    }
   }
 }
 
