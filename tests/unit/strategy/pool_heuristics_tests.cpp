@@ -110,12 +110,9 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasable)
 
   for (int i{max_blocks}; i > 0; i--) {
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i - 1]););
-
-    if (i % 2)
-      ASSERT_EQ(a.second->getReleasableBlocks(), 1);
-    else
-      ASSERT_EQ(a.second->getReleasableBlocks(), 2);
+    ASSERT_EQ(a.second->getReleasableBlocks(), 1);
   }
+
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
   ASSERT_EQ(a.second->getTotalBlocks(), 1);
 }
@@ -131,6 +128,7 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasableHWM)
 
   std::vector<void*> ptrs;
 
+  // allocate 64 bytes 23 times with first block being 1024 bytes and next_block 128 bytes
   for (int i{0}; i < 23; ++i) {
     ASSERT_NO_THROW(ptrs.push_back(a.first.allocate(64)));
     ASSERT_EQ(a.second->getReleasableBlocks(), 0);
@@ -140,11 +138,12 @@ TYPED_TEST(PoolHeuristicsTest, BlocksReleasableHWM)
   ASSERT_EQ(a.second->getHighWatermark(), 1472);
   ASSERT_EQ(a.second->getTotalBlocks(), 5);
 
-  for (int i{22}; i > 16; --i) {
+  // deallocate 4 times so that two blocks are relesable and they will coalesce automatically
+  for (int i{22}; i > 18; --i) {
     ASSERT_NO_THROW(a.first.deallocate(ptrs[i]););
   }
 
   ASSERT_EQ(a.second->getActualSize(), a.second->getHighWatermark());
-  ASSERT_EQ(a.second->getTotalBlocks(), 3);
+  ASSERT_EQ(a.second->getTotalBlocks(), 4);
   ASSERT_EQ(a.second->getReleasableBlocks(), 1);
-  }
+}

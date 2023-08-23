@@ -312,6 +312,10 @@ void QuickPool::coalesce() noexcept
 {
   UMPIRE_LOG(Debug, "()");
 
+  umpire::event::record([&](auto& event) {
+    event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
+  });
+
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
     UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
@@ -337,13 +341,13 @@ void QuickPool::do_coalesce(std::size_t suggested_size) noexcept
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable(std::size_t nblocks)
 {
   return
-      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() > nblocks ? pool.getActualSize() : 0; };
+      [=](const strategy::QuickPool& pool) { return pool.getReleasableBlocks() >= nblocks ? pool.getActualSize() : 0; };
 }
 
 PoolCoalesceHeuristic<QuickPool> QuickPool::blocks_releasable_hwm(std::size_t nblocks)
 {
   return [=](const strategy::QuickPool& pool) {
-    return pool.getReleasableBlocks() > nblocks ? pool.getHighWatermark() : 0;
+    return pool.getReleasableBlocks() >= nblocks ? pool.getHighWatermark() : 0;
   };
 }
 
