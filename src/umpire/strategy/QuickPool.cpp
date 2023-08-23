@@ -315,7 +315,7 @@ void QuickPool::coalesce() noexcept
 
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
-    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce.");
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce, suggested size is " << suggested_size);
     do_coalesce(suggested_size);
   }
 }

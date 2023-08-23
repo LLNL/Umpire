@@ -125,13 +125,10 @@ void DynamicPoolList::coalesce() noexcept
   umpire::event::record([&](auto& event) {
     event.name("coalesce").category(event::category::operation).tag("allocator_name", getName()).tag("replay", "true");
   });
-    
+
   std::size_t suggested_size{m_should_coalesce(*this)};
   if (0 != suggested_size) {
-    UMPIRE_LOG(Debug,
-               "Heuristic returned true, "
-               "performing coalesce operation for "
-                   << this << "\n");
+    UMPIRE_LOG(Debug, "coalesce heuristic true, performing coalesce, suggested size is " << suggested_size);
     dpa.coalesce(suggested_size);
   }
 }
