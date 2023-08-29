@@ -88,7 +88,7 @@ ibm_clang_14_0_5_gcc_8_3_1_cuda_11_7_0_tpls:
     MODULE_LIST: "cuda/11.7.0"
   extends: .build_and_test_on_lassen
 
-xl_2022_08_19_gcc_8_3_1_cuda_11_7_tpls:
+xl_2022_08_19_gcc_8_3_1_cuda_11_2_tpls:
   variables:
     SPEC: "~shared +fortran +cuda +tools tests=basic %xl@16.1.1.12.gcc.8.3.1 ^cuda@11.7.0+allow-unsupported-compilers"
     MODULE_LIST: "cuda/11.7.0"
