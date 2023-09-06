@@ -10,7 +10,7 @@ void* test_realloc(void* ptr, size_t size, size_t old_size, umpire::Allocator al
 
   //Must sync or else fails
   //To break reproducer, comment out this sync call
-  cudaDeviceSynchronize();
+  //cudaDeviceSynchronize();
 
   alloc.deallocate(ptr);
   return ret;
@@ -21,6 +21,8 @@ int main(int, char**)
   auto& rm = umpire::ResourceManager::getInstance();
 
   // Using a quickpool constructed from Unified Memory works.
+  // umpire::Allocator aloc = rm.getAllocator("UM");
+  // But using a quickpool with DEVICE does not.
   umpire::Allocator aloc = rm.getAllocator("DEVICE");
   umpire::Allocator *allocator = new umpire::Allocator(
                     rm.makeAllocator<umpire::strategy::QuickPool>(
