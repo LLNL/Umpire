@@ -140,7 +140,20 @@ if (UMPIRE_ENABLE_CUDA)
     multi_device
     PROPERTIES CUDA_SEPARABLE_COMPILATION On)
 
-  list(APPEND umpire_examples multi_device)
+  blt_add_executable(
+    NAME reproducer-cuda
+    SOURCES reproducer-cuda.cpp
+    DEPENDS_ON umpire cuda)
+
+  set_source_files_properties(
+    reproducer-cuda.cpp
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  set_target_properties(
+    reproducer-cuda
+    PROPERTIES CUDA_SEPARABLE_COMPILATION On)
+
+  list(APPEND umpire_examples multi_device reproducer-cuda)
 endif()
 
 install(TARGETS ${umpire_examples} RUNTIME DESTINATION bin)
