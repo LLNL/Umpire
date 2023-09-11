@@ -8,7 +8,7 @@
 include:
   - project: 'radiuss/radiuss-spack-configs'
     ref: '${SPACK_CONFIGS_REF}'
-    file: 'radiuss-jobs/corona.yml'
+    file: 'gitlab/radiuss-jobs/corona.yml'
 
 ########################
 # Overridden shared jobs

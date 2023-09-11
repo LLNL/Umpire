@@ -8,7 +8,7 @@
 include:
   - project: 'radiuss/radiuss-spack-configs'
     ref: '${SPACK_CONFIGS_REF}'
-    file: 'radiuss-jobs/ruby.yml'
+    file: 'gitlab/radiuss-jobs/ruby.yml'
 
 ########################
 # Overridden shared jobs

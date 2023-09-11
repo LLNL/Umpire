@@ -8,7 +8,7 @@
 include:
   - project: 'radiuss/radiuss-spack-configs'
     ref: '${SPACK_CONFIGS_REF}'
-    file: 'radiuss-jobs/tioga.yml'
+    file: 'gitlab/radiuss-jobs/tioga.yml'
 
 ########################
 # Overridden shared jobs
