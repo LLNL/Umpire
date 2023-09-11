@@ -24,11 +24,7 @@
 
 # We define the following GitLab pipeline variables:
 variables:
-# Required information about GitHub repository
-  GITHUB_PROJECT_NAME: "Umpire"
-  GITHUB_PROJECT_ORG: "LLNL"
-# The Shared CI reference to use
-  SHARED_CI_REF: "woptim/isolate-jobs"
+##### LG GITLAB CONFIGURATION
 # Use the umdev LLNL service user to run CI. This prevents from running
 # pipelines as an actual user.
   LLNL_SERVICE_USER: umdev
@@ -37,9 +33,22 @@ variables:
   CUSTOM_CI_BUILDS_DIR: /usr/workspace/umdev/gitlab-runner
 # Tells Gitlab to recursively update the submodules when cloning the project.
   GIT_SUBMODULE_STRATEGY: recursive
+
+##### PROJECT VARIABLES
 # We build the projects in the CI clone directory.
-# TODO: add a clean-up mechanism
+# Used in script/gitlab/build_and_test.sh script.
+# TODO: add a clean-up mechanism.
   BUILD_ROOT: ${CI_PROJECT_DIR}
+# The Spack Configs reference to use to import RADIUSS shared jobs.
+# WARNING: keep in sync with submodule "scripts/radiuss-spack-configs".
+  SPACK_CONFIGS_REF: "woptim/isolate-jobs"
+
+##### SHARED_CI CONFIGURATION
+# Shared CI reference to use
+  SHARED_CI_REF: "woptim/isolate-jobs"
+# Required information about GitHub repository
+  GITHUB_PROJECT_NAME: "Umpire"
+  GITHUB_PROJECT_ORG: "LLNL"
 # Set the build-and-test command.
   JOB_CMD: "./scripts/gitlab/build_and_test.sh"
 # Override the list of branch that will skip the "draft PR test".

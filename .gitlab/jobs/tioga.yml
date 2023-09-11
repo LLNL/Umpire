@@ -6,8 +6,8 @@
 ###############################################################################
 
 include:
-  - project: 'radiuss/radiuss-shared-ci'
-    ref: '${SHARED_CI_REF}'
+  - project: 'radiuss/radiuss-spack-configs'
+    ref: '${SPACK_CONFIGS_REF}'
     file: 'radiuss-jobs/tioga.yml'
 
 ########################
