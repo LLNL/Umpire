@@ -21,7 +21,7 @@ include:
 intel_2022_1_0:
   variables:
     SPEC: "~shared +fortran +tools tests=basic %intel@2022.1.0"
-  extends: .build_and_test_on_ruby
+  extends: .job_on_ruby
   allow_failure: true
 
 ############
