@@ -50,7 +50,7 @@ variables:
   GITHUB_PROJECT_NAME: "Umpire"
   GITHUB_PROJECT_ORG: "LLNL"
 # Set the build-and-test command.
-  JOB_CMD: "./scripts/radiuss-spack-configs/gitlab/build_and_test.sh"
+  JOB_CMD: "./scripts/gitlab/build_and_test.sh"
 # Override the list of branch that will skip the "draft PR test".
 # Add protected branches here. Defaults to "develop main master".
 #  ALWAYS_RUN_LIST: ""
