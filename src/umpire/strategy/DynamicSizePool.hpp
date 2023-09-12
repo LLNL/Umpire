@@ -404,15 +404,13 @@ class DynamicSizePool : private umpire::strategy::mixins::AlignedAllocation {
 
   std::size_t getReleasableSize() const
   {
-    std::size_t nblocks = 0;
     std::size_t nbytes = 0;
     for (struct Block *temp = freeBlocks; temp; temp = temp->next) {
       if (temp->size == temp->blockSize) {
         nbytes += temp->blockSize;
-        nblocks++;
       }
     }
-    return nblocks > 1 ? nbytes : 0;
+    return nbytes;
   }
 
   std::size_t getFreeBlocks() const

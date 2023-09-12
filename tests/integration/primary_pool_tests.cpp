@@ -655,6 +655,35 @@ TYPED_TEST(PrimaryPoolTest, heuristic_100_percent)
   ASSERT_EQ(pool->getBlocksInPool(), 1);        // Collapse happened
 }
 
+TYPED_TEST(PrimaryPoolTest, ReleasableSizeCheck)
+{
+  using Pool = typename TestFixture::Pool;
+  auto pool = umpire::util::unwrap_allocator<Pool>(*this->m_allocator);
+
+  ASSERT_NE(pool, nullptr);
+
+  const std::size_t iterations{8};
+  void* allocs[iterations];
+
+  ASSERT_EQ(pool->getReleasableSize(), 0);
+
+  // 8 Blocks (0 free, 8 allocated)
+  for (int i{0}; i < 8; ++i) {
+    ASSERT_NO_THROW(allocs[i] = this->m_allocator->allocate(this->m_initial_pool_size););
+    ASSERT_EQ(pool->getReleasableSize(), 0);
+  }
+
+  // 8 blocks (8 free, 0 allocated)
+  for (int i{0}; i < 8; ++i) {
+    ASSERT_NO_THROW(this->m_allocator->deallocate(allocs[i]););
+    ASSERT_EQ(pool->getReleasableSize(), this->m_initial_pool_size * (i + 1));
+  }
+
+  pool->release();
+
+  ASSERT_EQ(pool->getReleasableSize(), 0);
+}
+
 #if defined(UMPIRE_ENABLE_CONST)
 using ConstResourceTypes = camp::list<device_const_resource_tag>;
 using ConstPoolTypes = camp::list<umpire::strategy::DynamicPoolList, umpire::strategy::QuickPool>;
