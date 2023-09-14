@@ -29,6 +29,25 @@
 # Comment the jobs for machines you don’t need.
 ###
 
+# One job to generate the job list for all the subpipelines
+generate-job-lists:
+  stage: generate-job-lists
+  tags: [shell, oslic]
+  variables:
+    RADIUSS_JOBS_PATH: "scripts/radiuss-spack-configs/gitlab/radiuss-jobs"
+    LOCAL_JOBS_PATH: ".gitlab/jobs"
+  scripts:
+    - cat ${RADIUSS_JOBS_PATH}/ruby.yml ${LOCAL_JOBS_PATH}/ruby.yml > ruby-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/lassen.yml ${LOCAL_JOBS_PATH}/lassen.yml > lassen-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/corona.yml ${LOCAL_JOBS_PATH}/corona.yml > corona-jobs.yml
+    - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioag-jobs.yml
+  artifacts:
+    paths:
+      - ruby_jobs.yml
+      - lassen_jobs.yml
+      - corona_jobs.yml
+      - tioga_jobs.yml
+
 # RUBY
 ruby-up-check:
   variables:
