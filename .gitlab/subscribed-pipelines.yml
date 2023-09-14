@@ -43,10 +43,10 @@ generate-job-lists:
     - cat ${RADIUSS_JOBS_PATH}/tioga.yml ${LOCAL_JOBS_PATH}/tioga.yml > tioag-jobs.yml
   artifacts:
     paths:
-      - ruby_jobs.yml
-      - lassen_jobs.yml
-      - corona_jobs.yml
-      - tioga_jobs.yml
+      - ruby-jobs.yml
+      - lassen-jobs.yml
+      - corona-jobs.yml
+      - tioga-jobs.yml
 
 # RUBY
 ruby-up-check:
