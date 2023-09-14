@@ -6,7 +6,7 @@
 ###############################################################################
 
 include:
-  - project: 'radiuss/radiuss-spack-configs'
+  - project: '${SPACK_CONFIGS_GITLAB_PROJECT}'
     ref: '${SPACK_CONFIGS_REF}'
     file: 'gitlab/radiuss-jobs/ruby.yml'
 

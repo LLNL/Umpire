@@ -41,6 +41,7 @@ variables:
   BUILD_ROOT: ${CI_PROJECT_DIR}
 # The Spack Configs reference to use to import RADIUSS shared jobs.
 # WARNING: keep in sync with submodule "scripts/radiuss-spack-configs".
+  SPACK_CONFIGS_GITLAB_PROJECT: "radiuss/radiuss-spack-configs"
   SPACK_CONFIGS_REF: "woptim/isolate-jobs"
 
 ##### SHARED_CI CONFIGURATION
@@ -76,14 +77,18 @@ radiuss-spack-configs-version:
       submod_ref=$(git log -1 --pretty=format:%H)
       echo -e "Submodule ref = ${submod_ref}"
       echo -e "# Get reference set for CI"
-      git fetch origin
-      ci_ref=$(git rev-parse origin/${SPACK_CONFIGS_REF})
+      git fetch origin ${SPACK_CONFIGS_REF}:${SPACK_CONFIGS_REF}
+      ci_ref=$(git rev-parse ${SPACK_CONFIGS_REF})
       echo -e "CI ref = ${ci_ref}"
-      if [[ ${submod_ref} != ${ci_ref} ]];
+      if [[ ${submod_ref} != ${ci_ref} ]]
       then
         echo -e "# ERROR ! CI and Submodule references have diverged !"
         echo -e "# -> Check the value of ${SPACK_CONFIGS_REF} in your CI"
         echo -e "#    and the reference used if scripts/radiuss-spack-configs."
+      else
+        echo -e "# Warning: CI and Submodule may still point at diverged"
+        echo -e "#   references if GitLab is not in sync with GitHub yet."
+      fi
 
 # Template for jobs triggering a build-and-test sub-pipelines:
 .build-and-test:
