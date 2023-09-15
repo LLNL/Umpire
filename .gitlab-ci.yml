@@ -72,7 +72,7 @@ stages:
       - project: 'radiuss/radiuss-shared-ci'
         ref: '${SHARED_CI_REF}'
         file: 'pipelines/${CI_MACHINE}.yml'
-      - artifact: 'ruby-jobs.yml'
+      - artifact: '${CI_MACHINE}-jobs.yml'
         job: 'generate-job-lists'
     strategy: depend
     forward:
