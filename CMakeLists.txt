@@ -15,7 +15,7 @@ include(CMakePackageConfigHelpers)
 
 project(Umpire
   LANGUAGES CXX C
-  VERSION 2022.10.0)
+  VERSION 2023.06.0)
 
 cmake_minimum_required(VERSION 3.14)
 
@@ -25,7 +25,7 @@ include(cmake/SetupUmpireOptions.cmake)
 
 if (UMPIRE_ENABLE_SYCL)
   set(BLT_CXX_STD "c++17" CACHE STRING "Version of C++ standard")
-   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+   if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl")
    endif()
 else()

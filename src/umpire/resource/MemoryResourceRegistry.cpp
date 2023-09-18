@@ -50,11 +50,10 @@
 #endif
 
 #if defined(UMPIRE_ENABLE_SYCL)
-#include <CL/sycl.hpp>
-
 #include "umpire/resource/SyclDeviceResourceFactory.hpp"
 #include "umpire/resource/SyclPinnedMemoryResourceFactory.hpp"
 #include "umpire/resource/SyclUnifiedMemoryResourceFactory.hpp"
+#include "umpire/util/sycl_compat.hpp"
 #endif
 
 #if defined(UMPIRE_ENABLE_OPENMP_TARGET)
