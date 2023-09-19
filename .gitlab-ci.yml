@@ -24,7 +24,7 @@
 
 # We define the following GitLab pipeline variables:
 variables:
-##### LG GITLAB CONFIGURATION
+##### LC GITLAB CONFIGURATION
 # Use the umdev LLNL service user to run CI. This prevents from running
 # pipelines as an actual user.
   LLNL_SERVICE_USER: umdev
@@ -48,9 +48,10 @@ variables:
   GITHUB_PROJECT_ORG: "LLNL"
 # Set the build-and-test command.
   JOB_CMD: "./scripts/gitlab/build_and_test.sh"
-# Override the list of branch that will skip the "draft PR test".
-# Add protected branches here. Defaults to "develop main master".
-#  ALWAYS_RUN_LIST: ""
+# Override the pattern describing branches that will skip the "draft PR test".
+# Add protected branches here. See default value in
+# preliminary-ignore-draft-pr.yml.
+#  ALWAYS_RUN_PATTERN: ""
 
 # We organize the build-and-test stage in sub-pipelines. Each sub-pipeline
 # corresponds to a test batch on a given machine.
