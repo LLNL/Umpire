@@ -15,7 +15,7 @@ if (@UMPIRE_NEEDS_BLT_TPLS@)
   endif()
   unset(BLT_TGTS)
 
-  if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@)
+  if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@ OR @UMPIRE_ENABLE_IPC_SHARED_MEMORY)
     find_dependency(Threads)
   endif ()
 endif()
