@@ -14,11 +14,11 @@ if (@UMPIRE_NEEDS_BLT_TPLS@)
   include("${BLT_TGTS}")
   endif()
   unset(BLT_TGTS)
-
-  if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@)
-    find_dependency(Threads)
-  endif ()
 endif()
+
+if (@UMPIRE_ENABLE_CUDA@ OR @UMPIRE_ENABLE_MPI@ OR @UMPIRE_ENABLE_IPC_SHARED_MEMORY@)
+  find_dependency(Threads)
+endif ()
 
 if (NOT TARGET camp)
   set(UMPIRE_CAMP_DIR "@camp_DIR@")
