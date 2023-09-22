@@ -58,8 +58,7 @@ variables:
 
 # High level stages
 stages:
-  - generate-job-lists
-  - machine-checks
+  - prerequisites
   - build-and-test
   - multi-project #TODO unused so far
   - radiuss-spack-testing #TODO unused so far
