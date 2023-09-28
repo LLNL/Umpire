@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2022, Lawrence Livermore National Security, LLC and RADIUSS
+# Copyright (c) 2022-23, Lawrence Livermore National Security, LLC and RADIUSS
 # project contributors. See the COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (MIT)
@@ -48,8 +48,8 @@ variables:
   GITHUB_PROJECT_ORG: "LLNL"
 # Set the build-and-test command.
   JOB_CMD: "./scripts/gitlab/build_and_test.sh"
-# Override the pattern describing branches that will skip the "draft PR test".
-# Add protected branches here. See default value in
+# Override the pattern describing branches that will skip the "draft PR filter
+# test".  Add protected branches here. See default value in
 # preliminary-ignore-draft-pr.yml.
 #  ALWAYS_RUN_PATTERN: ""
 
@@ -84,4 +84,4 @@ include:
   #  ref: '${SHARED_CI_REF}'
   #  file: 'preliminary-ignore-draft-pr.yml'
   # pipelines subscribed by the project
-  - local: .gitlab/subscribed-pipelines.yml
+  - local: '.gitlab/subscribed-pipelines.yml'
